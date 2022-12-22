@@ -1,0 +1,182 @@
+/*
+ * Copyright 2021 Google LLC.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto2";
+
+package temporal_feature_processor.proto;
+
+// A processor defines a set of processing operations.
+message Processor {
+  repeated OperatorInstance operators = 1;
+
+  repeated EventSequence event_sequences = 2;
+
+  repeated Timestamps timestamps = 3;
+}
+
+// Instantiation of an operator in a processor.
+message OperatorInstance {
+  // Unique identifier of the operator instance.
+  optional string id = 1;
+
+  // Key of the operator.
+  optional string operator_def_key = 2;
+
+  // Input temporal data for the operator instance.
+  repeated Input inputs = 3;
+
+  // Output temporal data for the operator instance.
+  repeated Output outputs = 4;
+
+  // Input attributes.
+  repeated Attribute attributes = 5;
+
+  message Input {
+    optional string key = 1;
+
+    oneof type {
+      string event_sequence_id = 2;
+      FeatureSequence feature_sequence = 3;
+      string timestamp_id = 4;
+    }
+
+    message FeatureSequence {
+      optional string event_sequence_id = 1;
+      optional string feature_key = 2;
+    }
+  }
+
+  message Output {
+    optional string key = 1;
+
+    oneof type {
+      string event_sequence_id = 2;
+      FeatureSequence feature_sequence = 3;
+      string timestamp_id = 4;
+    }
+
+    message FeatureSequence {
+      optional string event_sequence_id = 1;
+      optional string feature_key = 2;
+    }
+  }
+
+  message Attribute {
+    optional string key = 1;
+
+    oneof type {
+      int64 integer_64 = 2;
+      string str = 3;
+    }
+  }
+}
+
+// Schema of an event sequence
+message EventSequence {
+  // Identifier of the event sequence. Should be unique across all the event
+  // sequences of the processor.
+  optional string id = 1;
+
+  // Identifier of the timestamp of the event sequence.
+  optional string timestamp_id = 2;
+
+  // Features in the event sequence.
+  repeated Feature features = 3;
+
+  // Index of the event sequence. Empty for global events.
+  repeated string index = 4;
+
+  message Feature {
+    // Identifier of the feature. Should be unique in the event sequence.
+    optional string key = 1;
+
+    optional Type type = 2;
+
+    enum Type {
+      UNDEFINED = 0;
+      FLOAT = 1;
+      INT64 = 2;
+    }
+  }
+}
+
+// Schema of a timestamp.
+message Timestamps {
+  // Identifier of the timestamps. Should be unique across all the timestamps
+  // of the processor.
+  optional string id = 1;
+}
+
+// Definition of an operator. No two operators definition can have the same key.
+message OperatorDef {
+  // Unique identifier of the operator.
+  optional string key = 1;
+
+  // Inputs of the operator.
+  repeated Input inputs = 2;
+
+  // Outputs of the operator.
+  repeated Output outputs = 3;
+
+  // Arguments of the operator.
+  repeated Attribute attributes = 4;
+
+  message Input {
+    // String identifier of the input. Should be unique.
+    optional string key = 1;
+
+    // What type of data is expected.
+    optional ArgumentType type = 2;
+
+    // If true, the input is optional.
+    optional bool is_optional = 3;
+  }
+
+  message Output {
+    // String identifier of the output. Should be unique.
+    optional string key = 1;
+
+    // What type of data is expected.
+    optional ArgumentType type = 2;
+
+    // If true, the input is optional.
+    optional bool is_optional = 3;
+  }
+
+  // Types of the operators input and output arguments.
+  enum ArgumentType {
+    UNDEFINED = 0;
+    EVENT_SEQUENCE = 1;
+    FEATURE_SEQUENCE = 2;
+    TIMESTAMP = 3;
+  }
+
+  message Attribute {
+    // String identifier of the atrribute. Should be unique.
+    optional string key = 1;
+
+    // What type of data is expected.
+    optional Type type = 2;
+
+    // If true, the attribute is optional.
+    optional bool is_optional = 3;
+
+    enum Type {
+      UNDEFINED = 0;
+      INTEGER_64 = 1;
+      STRING = 2;
+    }
+  }
+}

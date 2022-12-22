@@ -25,6 +25,10 @@ class TFPTest(absltest.TestCase):
     t.does_nothing()
     self.assertEqual(1, 1)
 
+  def test_create_toy_processor(self):
+    p = t.core.create_toy_processor()
+    logging.info("Processor:\n%s", p)
+
 
 if __name__ == "__main__":
   absltest.main()

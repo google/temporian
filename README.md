@@ -13,10 +13,11 @@ Note: This repository is the temporary location of this library.
 Python dependencies:
 
 -   Absl Python
+-   Protobuf
 
 ```shell
 # Install dependencies
-pip install absl-py
+pip install absl-py protobuf
 ```
 
 ## Run all tests
