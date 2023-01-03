@@ -59,6 +59,7 @@ message Operator {
     oneof type {
       int64 integer_64 = 2;
       string str = 3;
+      string sampling_id = 4;
     }
   }
 }
