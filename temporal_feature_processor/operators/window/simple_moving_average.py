@@ -1,9 +1,7 @@
-from typing import Union
-
 from pandas import Timedelta
 
 from temporal_feature_processor.sampling import Sampling
-from temporal_feature_processor.sequences import EventSequence, FeatureSequence
+from temporal_feature_processor.sequences import EventSequence
 
 from .base import WindowOperator
 
@@ -16,17 +14,16 @@ class SimpleMovingAverageOperator(WindowOperator):
 
     def __call__(
         self,
-        input: Union[EventSequence, FeatureSequence],
-    ) -> Union[EventSequence, FeatureSequence]:
-        """Apply a simple moving average to an event or feature.
-        If input is an event, the moving average will be computed for each of its features independently.
+        input: EventSequence,
+    ) -> EventSequence:
+        """Apply a simple moving average to an event.
+        If input has more than one feature, the moving average will be computed for each of its features independently.
 
         Args:
-            input (Union[EventSequence, FeatureSequence]): the input sequence to apply a simple moving average to.
+            input (EventSequence): the input event to apply a simple moving average to.
 
         Returns:
-            Union[EventSequence, FeatureSequence]: the output of the operator.
-                The output sequence will have the same type as the input sequence.
+            EventSequence: the output of the operator.
         """
         # TODO: implement logic
         pass
