@@ -17,63 +17,43 @@ syntax = "proto2";
 
 package temporal_feature_processor.proto;
 
-// A processor defines a set of processing operations.
+// A processor defines a set of processing operations and holds all Event, Feature and Sampling instances.
 message Processor {
-  repeated OperatorInstance operators = 1;
+  repeated Operator operators = 1;
 
-  repeated EventSequence event_sequences = 2;
+  repeated Event events = 2;
 
-  repeated Timestamps timestamps = 3;
+  repeated Feature features = 3;
+
+  repeated Sampling samplings = 4;
 }
 
 // Instantiation of an operator in a processor.
-message OperatorInstance {
+message Operator {
   // Unique identifier of the operator instance.
   optional string id = 1;
 
-  // Key of the operator.
+  // Key of the operator definition.
   optional string operator_def_key = 2;
 
-  // Input temporal data for the operator instance.
-  repeated Input inputs = 3;
+  // Input event ids by key.
+  repeated EventArgument inputs = 3;
 
-  // Output temporal data for the operator instance.
-  repeated Output outputs = 4;
+  // Output event ids by key.
+  repeated EventArgument outputs = 4;
 
-  // Input attributes.
+  // Constructor attributes.
   repeated Attribute attributes = 5;
 
-  message Input {
+  message EventArgument {
+    // Name of the argument.
     optional string key = 1;
-
-    oneof type {
-      string event_sequence_id = 2;
-      FeatureSequence feature_sequence = 3;
-      string timestamp_id = 4;
-    }
-
-    message FeatureSequence {
-      optional string event_sequence_id = 1;
-      optional string feature_key = 2;
-    }
-  }
-
-  message Output {
-    optional string key = 1;
-
-    oneof type {
-      string event_sequence_id = 2;
-      FeatureSequence feature_sequence = 3;
-      string timestamp_id = 4;
-    }
-
-    message FeatureSequence {
-      optional string event_sequence_id = 1;
-      optional string feature_key = 2;
-    }
+    
+    optional string event_id = 2;
   }
 
   message Attribute {
+    // Name of the attribute.
     optional string key = 1;
 
     oneof type {
@@ -83,39 +63,45 @@ message OperatorInstance {
   }
 }
 
-// Schema of an event sequence
-message EventSequence {
-  // Identifier of the event sequence. Should be unique across all the event
-  // sequences of the processor.
+// Schema of an event
+message Event {
+  // Identifier of the event. Should be unique across all the events of the processor.
   optional string id = 1;
 
-  // Identifier of the timestamp of the event sequence.
-  optional string timestamp_id = 2;
+  // Identifier of the sampling of the event.
+  optional string sampling_id = 2;
 
-  // Features in the event sequence.
-  repeated Feature features = 3;
+  // Features in the event.
+  repeated string feature_ids = 3;
 
-  // Index of the event sequence. Empty for global events.
+  // Index of the event. Empty for global events.
+  repeated string index = 4;
+}
+
+// Schema of a feature
+message Feature {
+  // Identifier of the feature. Should be unique in all the features in the processor.
+  optional string id = 1;
+
+  optional Type type = 2;
+
+  // Identifier of the sampling of the feature.
+  optional string sampling_id = 3;
+
+  // Index of the feature.
   repeated string index = 4;
 
-  message Feature {
-    // Identifier of the feature. Should be unique in the event sequence.
-    optional string key = 1;
-
-    optional Type type = 2;
-
-    enum Type {
-      UNDEFINED = 0;
-      FLOAT = 1;
-      INT64 = 2;
-    }
+  enum Type {
+    UNDEFINED = 0;
+    FLOAT = 1;
+    INT64 = 2;
   }
 }
 
-// Schema of a timestamp.
-message Timestamps {
-  // Identifier of the timestamps. Should be unique across all the timestamps
-  // of the processor.
+
+// Schema of a sampling.
+message Sampling {
+  // Identifier of the sampling. Should be unique across all the samplings of the processor.
   optional string id = 1;
 }
 
