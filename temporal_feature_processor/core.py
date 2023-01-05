@@ -24,78 +24,74 @@ def does_nothing() -> None:
 
 
 def create_toy_processor() -> pb.Processor:
+  """Create a toy processor.
 
-  # Create the following processor:
-  # x = t.read_event(table="sales_records")
-  # y = t.sma(x["sales"], windows=5)
+  Theoretical result of:
+    x = t.read_event(table="sales_records")
+    y = t.sma(x["sales"], windows=5)
+
+  Returns:
+    Toy processor.
+  """
 
   p = pb.Processor()
 
-  feed_op_id = "op_1"
-  feed_output_event_sequence_id = "event_sequence_1"
-  feed_output_timestamps_id = "timestamps_1"
-
   # The INPUT_PLACEHOLDER op injects data in the processor based on some input
   # data provided by the user.
-  feed_op = pb.OperatorInstance(
-      id=feed_op_id,
+  feed_op = pb.Operator(
+      id="op_1",
       operator_def_key="INPUT_PLACEHOLDER",
-      attributes=[
-          pb.OperatorInstance.Attribute(key="table", str="sales_records")
-      ],
-      outputs=[
-          pb.OperatorInstance.Output(
-              key="data", event_sequence_id=feed_output_event_sequence_id)
-      ])
+      attributes=[pb.Operator.Attribute(key="table", str="sales_records")],
+      outputs=[pb.Operator.EventArgument(key="data", event_id="event_1")],
+  )
   p.operators.append(feed_op)
 
   # Definition of the feed op results.
-  p.timestamps.append(pb.Timestamps(id=feed_output_timestamps_id))
-  p.event_sequences.append(
-      pb.EventSequence(
-          id=feed_output_event_sequence_id,
-          timestamp_id=feed_output_timestamps_id,
-          features=[
-              pb.EventSequence.Feature(
-                  key="price", type=pb.EventSequence.Feature.FLOAT)
-          ]))
+  p.samplings.append(pb.Sampling(id="sampling_1"))
+
+  p.events.append(
+      pb.Event(
+          id="event_1",
+          sampling_id="sampling_1",
+          feature_ids=["sales"],
+      )
+  )
+
+  p.features.append(
+      pb.Feature(
+          id="sales",
+          type=pb.Feature.FLOAT,
+          sampling_id="sampling_1",
+      )
+  )
 
   # We apply a SMA on the "price" feature using the same sampling rate as the
   # sales.
-  sma_op_id = "op_2"
-  sma_output_event_sequence_id = "event_sequence_2"
-
-  sma = pb.OperatorInstance(
-      id=sma_op_id,
+  sma = pb.Operator(
+      id="op_2",
       operator_def_key="SMA",
-      inputs=[
-          pb.OperatorInstance.Input(
-              key="input",
-              feature_sequence=pb.OperatorInstance.Input.FeatureSequence(
-                  event_sequence_id=feed_output_event_sequence_id,
-                  feature_key="price")),
-          pb.OperatorInstance.Input(
-              key="sampling", timestamp_id=feed_output_timestamps_id)
-      ],
       attributes=[],
-      outputs=[
-          pb.OperatorInstance.Output(
-              key="result",
-              feature_sequence=pb.OperatorInstance.Output.FeatureSequence(
-                  event_sequence_id=sma_output_event_sequence_id,
-                  feature_key="sma_price"))
-      ])
+      inputs=[pb.Operator.EventArgument(key="data", event_id="event_1")],
+      outputs=[pb.Operator.EventArgument(key="result", event_id="event_2")],
+  )
   p.operators.append(sma)
 
   # Definition of the SMA op results.
-  p.event_sequences.append(
-      pb.EventSequence(
-          id=sma_output_event_sequence_id,
-          # The same timestamps as the SMA input
-          timestamp_id=feed_output_timestamps_id,
-          features=[
-              pb.EventSequence.Feature(
-                  key="sma_price", type=pb.EventSequence.Feature.FLOAT)
-          ]))
+
+  p.events.append(
+      pb.Event(
+          id="event_2",
+          sampling_id="sampling_1",
+          feature_ids=["sma_sales"],
+      )
+  )
+
+  p.features.append(
+      pb.Feature(
+          id="sma_sales",
+          type=pb.Feature.FLOAT,
+          sampling_id="sampling_1",
+      )
+  )
 
   return p
