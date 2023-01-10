@@ -14,8 +14,22 @@
 
 """Temporal Feature Processor."""
 
+from temporal_feature_processor import core
+from temporal_feature_processor import dtype
+from temporal_feature_processor import evaluator
+from temporal_feature_processor import event
+from temporal_feature_processor import feature
+from temporal_feature_processor import operator
+from temporal_feature_processor import operator_lib
+from temporal_feature_processor import operators
+from temporal_feature_processor import processor
+
+
 __version__ = "0.0.1"
 
-from temporal_feature_processor import core
-
 does_nothing = core.does_nothing
+
+sma = operators.simple_moving_average.sma
+place_holder = operators.place_holder.place_holder
+Eval = evaluator.Eval
+Feature = feature.Feature

@@ -95,6 +95,9 @@ message Feature {
   // Index of the feature.
   repeated string index = 4;
 
+  // Index of the event id who's operator creator also created this feature.
+  optional string creator_event_id = 5;
+
   enum Type {
     UNDEFINED = 0;
     FLOAT = 1;
@@ -107,6 +110,12 @@ message Sampling {
   // Identifier of the sampling. Should be unique across all the samplings of
   // the processor.
   optional string id = 1;
+
+  // Index of the sampling.
+  repeated string index = 2;
+
+  // Index of the event id who's operator creator also created this feature.
+  optional string creator_event_id = 3;
 }
 
 // Definition of an operator. No two operators definition can have the same key.
@@ -127,9 +136,6 @@ message OperatorDef {
     // String identifier of the input. Should be unique.
     optional string key = 1;
 
-    // What type of data is expected.
-    optional ArgumentType type = 2;
-
     // If true, the input is optional.
     optional bool is_optional = 3;
   }
@@ -137,20 +143,6 @@ message OperatorDef {
   message Output {
     // String identifier of the output. Should be unique.
     optional string key = 1;
-
-    // What type of data is expected.
-    optional ArgumentType type = 2;
-
-    // If true, the input is optional.
-    optional bool is_optional = 3;
-  }
-
-  // Types of the operators input and output arguments.
-  enum ArgumentType {
-    UNDEFINED = 0;
-    EVENT_SEQUENCE = 1;
-    FEATURE_SEQUENCE = 2;
-    TIMESTAMP = 3;
   }
 
   message Attribute {
