@@ -1,4 +1,3 @@
-
 load("//temporal_feature_processor/utils:compile.bzl", "all_proto_library")
 
 package(
@@ -15,13 +14,12 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":core",
-        ":dtype",
         ":evaluator",
-        ":event",
-        ":feature",
-        ":operator",
         ":operator_lib",
         ":processor",
+        ":sampling",
+        "//temporal_feature_processor/data",
+        "//temporal_feature_processor/implementation",
         "//temporal_feature_processor/operators",
     ],
 )
@@ -41,7 +39,7 @@ py_library(
     srcs = ["evaluator.py"],
     srcs_version = "PY3",
     deps = [
-        ":event",
+        "//temporal_feature_processor/data:event",
         # pandas dep,
     ],
 )
@@ -55,36 +53,6 @@ py_library(
 py_library(
     name = "processor",
     srcs = ["processor.py"],
-    srcs_version = "PY3",
-)
-
-py_library(
-    name = "operator",
-    srcs = ["operator.py"],
-    srcs_version = "PY3",
-    deps = [":event"],
-)
-
-py_library(
-    name = "feature",
-    srcs = ["feature.py"],
-    srcs_version = "PY3",
-    deps = [":sampling"],
-)
-
-py_library(
-    name = "event",
-    srcs = ["event.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":feature",
-        ":sampling",
-    ],
-)
-
-py_library(
-    name = "dtype",
-    srcs = ["dtype.py"],
     srcs_version = "PY3",
 )
 

@@ -16,13 +16,13 @@
 
 from temporal_feature_processor import (
     core,
-    dtype,
     evaluator,
     operator_lib,
     operators,
     processor,
+    sampling,
 )
-from temporal_feature_processor.data import event, feature
+from temporal_feature_processor.data import dtype, event, feature
 from temporal_feature_processor.operators import base
 
 __version__ = "0.0.1"

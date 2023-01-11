@@ -1,4 +1,6 @@
-from ..base import PandasOperator
+from temporal_feature_processor.implementation.pandas.operators.base import (
+    PandasOperator,
+)
 
 
 class PandasWindowOperator(PandasOperator):

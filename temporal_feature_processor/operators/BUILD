@@ -1,4 +1,3 @@
-
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],
@@ -12,8 +11,19 @@ py_library(
     srcs = ["__init__.py"],
     srcs_version = "PY3",
     deps = [
+        ":base",
         ":place_holder",
         ":simple_moving_average",
+    ],
+)
+
+py_library(
+    name = "base",
+    srcs = ["base.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporal_feature_processor/data:event",
+        "//temporal_feature_processor/implementation/pandas/operators:base",
     ],
 )
 
@@ -22,12 +32,13 @@ py_library(
     srcs = ["place_holder.py"],
     srcs_version = "PY3",
     deps = [
+        ":base",
         "//temporal_feature_processor:core_py_proto",
-        "//temporal_feature_processor:event",
-        "//temporal_feature_processor:feature",
-        "//temporal_feature_processor:operator",
         "//temporal_feature_processor:operator_lib",
         "//temporal_feature_processor:sampling",
+        "//temporal_feature_processor/data:event",
+        "//temporal_feature_processor/data:feature",
+        "//temporal_feature_processor/implementation/pandas/operators:base",
     ],
 )
 
@@ -36,10 +47,11 @@ py_library(
     srcs = ["simple_moving_average.py"],
     srcs_version = "PY3",
     deps = [
+        ":base",
         "//temporal_feature_processor:core_py_proto",
-        "//temporal_feature_processor:event",
-        "//temporal_feature_processor:feature",
-        "//temporal_feature_processor:operator",
         "//temporal_feature_processor:operator_lib",
+        "//temporal_feature_processor/data:event",
+        "//temporal_feature_processor/data:feature",
+        "//temporal_feature_processor/implementation/pandas/operators:base",
     ],
 )

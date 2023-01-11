@@ -12,51 +12,51 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pandas as pd
 from absl import logging
 from absl.testing import absltest
-
-import pandas as pd
 
 import temporal_feature_processor as t
 
 
 class TFPTest(absltest.TestCase):
+    def test_does_nothing(self):
+        logging.info("Running a test")
+        t.does_nothing()
+        self.assertEqual(1, 1)
 
-  def test_does_nothing(self):
-    logging.info("Running a test")
-    t.does_nothing()
-    self.assertEqual(1, 1)
+    def test_create_toy_processor(self):
+        p = t.core.create_toy_processor()
+        logging.info("Processor:\n%s", p)
 
-  def test_create_toy_processor(self):
-    p = t.core.create_toy_processor()
-    logging.info("Processor:\n%s", p)
+    def test_create_processor(self):
+        a = t.place_holder(
+            features=[
+                t.Feature(name="f1", dtype=t.dtype.FLOAT),
+                t.Feature(name="f2", dtype=t.dtype.FLOAT),
+            ],
+            index=[],
+        )
 
-  def test_create_processor(self):
-    a = t.place_holder(
-        features=[
-            t.Feature(name="f1", dtype=t.dtype.FLOAT),
-            t.Feature(name="f2", dtype=t.dtype.FLOAT),
-        ],
-        index=[],
-    )
+        b = t.sma(data=a, window_length=7)
 
-    b = t.sma(data=a, window_length=7)
+        input_signal_data = pd.DataFrame(
+            {
+                "time": [0, 2, 4, 6],
+                "f1": [1, 2, 3, 4],
+                "f2": [5, 6, 7, 8],
+            }
+        )
 
-    input_signal_data = pd.DataFrame({
-        "time": [0, 2, 4, 6],
-        "f1": [1, 2, 3, 4],
-        "f2": [5, 6, 7, 8],
-    })
+        results = t.Eval(
+            query={"b": b},
+            data={
+                a: input_signal_data,
+            },
+        )
 
-    results = t.Eval(
-        query={"b": b},
-        data={
-            a: input_signal_data,
-        },
-    )
-
-    logging.info("results: %s", results)
+        logging.info("results: %s", results)
 
 
 if __name__ == "__main__":
-  absltest.main()
+    absltest.main()
