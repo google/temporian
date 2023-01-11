@@ -15,15 +15,13 @@
 """Evaluator module."""
 
 
-from typing import List, Union, Dict
+from typing import Dict, List, Union
+
 import pandas as pd
 
+from temporal_feature_processor.data.event import Event
 
-from temporal_feature_processor import event as event_lib
-
-Query = Union[
-    event_lib.Event, Dict[str, event_lib.Event], List[event_lib.Event]
-]
+Query = Union[Event, Dict[str, Event], List[Event]]
 
 Data = Union[pd.DataFrame, Dict[str, pd.DataFrame], List[pd.DataFrame]]
 
@@ -34,7 +32,7 @@ def Eval(
     query: Query,
     data: Data,
 ) -> Result:
-  """Evaluates a query on data."""
+    """Evaluates a query on data."""
 
-  del query
-  del data
+    del query
+    del data

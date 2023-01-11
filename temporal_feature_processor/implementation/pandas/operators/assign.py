@@ -1,10 +1,10 @@
-from temporal_feature_processor.sequences import EventSequence
+from temporal_feature_processor.implementation.pandas.data.event import PandasEvent
 
-from .base import Operator
+from .base import PandasOperator
 
 
-class AssignOperator(Operator):
-    def __call__(self, event: EventSequence, features: EventSequence) -> EventSequence:
+class PandasAssignOperator(PandasOperator):
+    def __call__(self, event: PandasEvent, features: PandasEvent) -> PandasEvent:
         """Assign features to an event.
         Input event and features must have same index.
         Features cannot have more than one row for a single index + timestamp occurence.
@@ -12,11 +12,11 @@ class AssignOperator(Operator):
         Assignment can be understood as a left join on the index and timestamp columns.
 
         Args:
-            event (EventSequence): event to assign the feature to.
-            feature (EventSequence): features to assign to the event.
+            event (PandasEvent): event to assign the feature to.
+            feature (PandasEvent): features to assign to the event.
 
         Returns:
-            EventSequence: a new event with the features assigned.
+            PandasEvent: a new event with the features assigned.
         """
         # TODO: implement logic.
         pass

@@ -14,16 +14,16 @@
 
 """Temporal Feature Processor."""
 
-from temporal_feature_processor import core
-from temporal_feature_processor import dtype
-from temporal_feature_processor import evaluator
-from temporal_feature_processor import event
-from temporal_feature_processor import feature
-from temporal_feature_processor import operator
-from temporal_feature_processor import operator_lib
-from temporal_feature_processor import operators
-from temporal_feature_processor import processor
-
+from temporal_feature_processor import (
+    core,
+    dtype,
+    evaluator,
+    operator_lib,
+    operators,
+    processor,
+)
+from temporal_feature_processor.data import event, feature
+from temporal_feature_processor.operators import base
 
 __version__ = "0.0.1"
 

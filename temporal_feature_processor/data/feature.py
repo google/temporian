@@ -12,26 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Event module."""
+"""Feature module."""
 
-from typing import List
+from typing import Optional
 
-from temporal_feature_processor import feature as feature_lib
 from temporal_feature_processor import sampling as sampling_lib
 
 
-class Event(object):
+class Feature(object):
+    def __init__(self, name: str, dtype, sampling=None):
+        self._name = name
+        self._sampling = None
+        self._dtype = dtype
 
-  def __init__(
-      self,
-      features: List[feature_lib.Feature],
-      sampling: sampling_lib.Sampling,
-  ):
-    self._features = features
-    self._sampling = sampling
+    def name(self):
+        return self._name
 
-  def sampling(self):
-    return self._sampling
+    def dtype(self):
+        return self._dtype
 
-  def features(self):
-    return self._features
+    def sampling(self) -> Optional[sampling_lib.Sampling]:
+        return self._sampling
+
+    def set_sampling(self, sampling: sampling_lib.Sampling):
+        self._sampling = sampling
