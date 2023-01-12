@@ -20,6 +20,20 @@ pycodestyle = ">=2.10.0,<2.11.0"
 pyflakes = ">=3.0.0,<3.1.0"
 
 [[package]]
+name = "isort"
+version = "5.11.4"
+description = "A Python utility / library to sort Python imports."
+category = "dev"
+optional = false
+python-versions = ">=3.7.0"
+
+[package.extras]
+colors = ["colorama (>=0.4.3,<0.5.0)"]
+requirements-deprecated-finder = ["pip-api", "pipreqs"]
+pipfile-deprecated-finder = ["pipreqs", "requirementslib"]
+plugins = ["setuptools"]
+
+[[package]]
 name = "mccabe"
 version = "0.7.0"
 description = "McCabe checker, plugin for flake8"
@@ -117,11 +131,12 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "0b84b366a7552b3b6780a2fa579026dd0a576683d1dcf7c34ca2e8ce8ff3fb45"
+content-hash = "e25ffc4ac75e1f990415f4401eae42ac83ab16044a4ce109f392685cb222d057"
 
 [metadata.files]
 absl-py = []
 flake8 = []
+isort = []
 mccabe = []
 numpy = []
 pandas = []

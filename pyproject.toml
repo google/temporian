@@ -18,6 +18,7 @@ pandas = "^1.5.2"
 [tool.poetry.dev-dependencies]
 flake8 = "^6.0.0"
 yapf = "^0.32.0"
+isort = "^5.11.4"
 
 [tool.yapf]
 based_on_style = "google"
