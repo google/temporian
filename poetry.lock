@@ -7,23 +7,45 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
-name = "flake8"
-version = "6.0.0"
-description = "the modular source code checker: pep8 pyflakes and co"
-category = "dev"
+name = "astroid"
+version = "2.13.2"
+description = "An abstract syntax tree for Python with inference support."
+category = "main"
 optional = false
-python-versions = ">=3.8.1"
+python-versions = ">=3.7.2"
 
 [package.dependencies]
-mccabe = ">=0.7.0,<0.8.0"
-pycodestyle = ">=2.10.0,<2.11.0"
-pyflakes = ">=3.0.0,<3.1.0"
+lazy-object-proxy = ">=1.4.0"
+typing-extensions = ">=4.0.0"
+wrapt = [
+    {version = ">=1.11,<2", markers = "python_version < \"3.11\""},
+    {version = ">=1.14,<2", markers = "python_version >= \"3.11\""},
+]
+
+[[package]]
+name = "colorama"
+version = "0.4.6"
+description = "Cross-platform colored terminal text."
+category = "main"
+optional = false
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
+
+[[package]]
+name = "dill"
+version = "0.3.6"
+description = "serialize all of python"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.extras]
+graph = ["objgraph (>=1.7.2)"]
 
 [[package]]
 name = "isort"
 version = "5.11.4"
 description = "A Python utility / library to sort Python imports."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7.0"
 
@@ -34,10 +56,18 @@ pipfile-deprecated-finder = ["pipreqs", "requirementslib"]
 plugins = ["setuptools"]
 
 [[package]]
+name = "lazy-object-proxy"
+version = "1.9.0"
+description = "A fast and thorough lazy object proxy."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[[package]]
 name = "mccabe"
 version = "0.7.0"
 description = "McCabe checker, plugin for flake8"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -70,6 +100,18 @@ pytz = ">=2020.1"
 test = ["hypothesis (>=5.5.3)", "pytest (>=6.0)", "pytest-xdist (>=1.31)"]
 
 [[package]]
+name = "platformdirs"
+version = "2.6.2"
+description = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.extras]
+docs = ["furo (>=2022.12.7)", "proselint (>=0.13)", "sphinx-autodoc-typehints (>=1.19.5)", "sphinx (>=5.3)"]
+test = ["appdirs (==1.4.4)", "covdefaults (>=2.2.2)", "pytest-cov (>=4)", "pytest-mock (>=3.10)", "pytest (>=7.2)"]
+
+[[package]]
 name = "protobuf"
 version = "4.21.12"
 description = ""
@@ -78,20 +120,30 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
-name = "pycodestyle"
-version = "2.10.0"
-description = "Python style guide checker"
-category = "dev"
+name = "pylint"
+version = "2.15.10"
+description = "python code static checker"
+category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7.2"
 
-[[package]]
-name = "pyflakes"
-version = "3.0.1"
-description = "passive checker of Python programs"
-category = "dev"
-optional = false
-python-versions = ">=3.6"
+[package.dependencies]
+astroid = ">=2.12.13,<=2.14.0-dev0"
+colorama = {version = ">=0.4.5", markers = "sys_platform == \"win32\""}
+dill = [
+    {version = ">=0.2", markers = "python_version < \"3.11\""},
+    {version = ">=0.3.6", markers = "python_version >= \"3.11\""},
+]
+isort = ">=4.2.5,<6"
+mccabe = ">=0.6,<0.8"
+platformdirs = ">=2.2.0"
+tomli = {version = ">=1.1.0", markers = "python_version < \"3.11\""}
+tomlkit = ">=0.10.1"
+typing-extensions = {version = ">=3.10.0", markers = "python_version < \"3.10\""}
+
+[package.extras]
+spelling = ["pyenchant (>=3.2,<4.0)"]
+testutils = ["gitpython (>3)"]
 
 [[package]]
 name = "python-dateutil"
@@ -121,6 +173,46 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
+name = "toml"
+version = "0.10.2"
+description = "Python Library for Tom's Obvious, Minimal Language"
+category = "dev"
+optional = false
+python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
+
+[[package]]
+name = "tomli"
+version = "2.0.1"
+description = "A lil' TOML parser"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[[package]]
+name = "tomlkit"
+version = "0.11.6"
+description = "Style preserving TOML library"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[[package]]
+name = "typing-extensions"
+version = "4.4.0"
+description = "Backported and Experimental Type Hints for Python 3.7+"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[[package]]
+name = "wrapt"
+version = "1.14.1"
+description = "Module for decorators, wrappers and monkey patching."
+category = "main"
+optional = false
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
+
+[[package]]
 name = "yapf"
 version = "0.32.0"
 description = "A formatter for Python code."
@@ -131,18 +223,21 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "e25ffc4ac75e1f990415f4401eae42ac83ab16044a4ce109f392685cb222d057"
+content-hash = "cc04406fa6bc2b410b202d79b2816106dc27112e0ea196b1a541c53037297d09"
 
 [metadata.files]
 absl-py = []
-flake8 = []
+astroid = []
+colorama = []
+dill = []
 isort = []
+lazy-object-proxy = []
 mccabe = []
 numpy = []
 pandas = []
+platformdirs = []
 protobuf = []
-pycodestyle = []
-pyflakes = []
+pylint = []
 python-dateutil = [
     {file = "python-dateutil-2.8.2.tar.gz", hash = "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"},
     {file = "python_dateutil-2.8.2-py2.py3-none-any.whl", hash = "sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9"},
@@ -152,4 +247,9 @@ six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
     {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
 ]
+toml = []
+tomli = []
+tomlkit = []
+typing-extensions = []
+wrapt = []
 yapf = []
