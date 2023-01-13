@@ -22,49 +22,47 @@ from temporal_feature_processor import sampling as sampling_lib
 from temporal_feature_processor.data import event as event_lib
 from temporal_feature_processor.data import feature as feature_lib
 from temporal_feature_processor.implementation.pandas.operators.base import (
-    PandasOperator,
-)
+    PandasOperator,)
 from temporal_feature_processor.operators import base
 
 
 class PlaceHolder(base.Operator):
-    """Place holder operator."""
+  """Place holder operator."""
 
-    def __init__(self, features: List[feature_lib.Feature], index: List[str]):
-        super().__init__()
+  def __init__(self, features: List[feature_lib.Feature], index: List[str]):
+    super().__init__()
 
-        sampling = sampling_lib.Sampling(index=index)
+    sampling = sampling_lib.Sampling(index=index)
 
-        for feature in features:
-            if feature.sampling() is not None:
-                raise ValueError("Cannot create a placeholder on existing features.")
-            feature.set_sampling(sampling)
+    for feature in features:
+      if feature.sampling() is not None:
+        raise ValueError("Cannot create a placeholder on existing features.")
+      feature.set_sampling(sampling)
 
-        self.add_output(
-            "output",
-            event_lib.Event(
-                features=features,
-                sampling=sampling,
-            ),
-        )
+    self.add_output(
+        "output",
+        event_lib.Event(
+            features=features,
+            sampling=sampling,
+        ),
+    )
 
-        self.check()
+    self.check()
 
-    @classmethod
-    def build_op_definition(cls) -> pb.OperatorDef:
-        return pb.OperatorDef(
-            key="PLACE_HOLDER",
-            outputs=[pb.OperatorDef.Output(key="output")],
-        )
+  @classmethod
+  def build_op_definition(cls) -> pb.OperatorDef:
+    return pb.OperatorDef(
+        key="PLACE_HOLDER",
+        outputs=[pb.OperatorDef.Output(key="output")],
+    )
 
-    def _get_pandas_implementation(self) -> PandasOperator:
-        return super()._get_pandas_implementation()
+  def _get_pandas_implementation(self) -> PandasOperator:
+    return super()._get_pandas_implementation()
 
 
 operator_lib.register_operator(PlaceHolder)
 
 
-def place_holder(
-    features: List[feature_lib.Feature], index: List[str]
-) -> event_lib.Event:
-    return PlaceHolder(features=features, index=index).outputs()["output"]
+def place_holder(features: List[feature_lib.Feature],
+                 index: List[str]) -> event_lib.Event:
+  return PlaceHolder(features=features, index=index).outputs()["output"]

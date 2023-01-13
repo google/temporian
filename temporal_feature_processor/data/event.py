@@ -21,16 +21,17 @@ from temporal_feature_processor.sampling import Sampling
 
 
 class Event(object):
-    def __init__(
-        self,
-        features: List[Feature],
-        sampling: Sampling,
-    ):
-        self._features = features
-        self._sampling = sampling
 
-    def sampling(self):
-        return self._sampling
+  def __init__(
+      self,
+      features: List[Feature],
+      sampling: Sampling,
+  ):
+    self._features = features
+    self._sampling = sampling
 
-    def features(self):
-        return self._features
+  def sampling(self):
+    return self._sampling
+
+  def features(self):
+    return self._features

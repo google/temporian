@@ -14,7 +14,6 @@
 
 """Evaluator module."""
 
-
 from typing import Dict, List, Union
 
 import pandas as pd
@@ -32,7 +31,7 @@ def Eval(
     query: Query,
     data: Data,
 ) -> Result:
-    """Evaluates a query on data."""
+  """Evaluates a query on data."""
 
-    del query
-    del data
+  del query
+  del data

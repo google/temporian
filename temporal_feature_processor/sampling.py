@@ -18,5 +18,6 @@ from typing import List
 
 
 class Sampling(object):
-    def __init__(self, index: List[str]):
-        self._index = index
+
+  def __init__(self, index: List[str]):
+    self._index = index

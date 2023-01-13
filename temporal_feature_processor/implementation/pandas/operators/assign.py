@@ -4,8 +4,9 @@ from .base import PandasOperator
 
 
 class PandasAssignOperator(PandasOperator):
-    def __call__(self, event: PandasEvent, features: PandasEvent) -> PandasEvent:
-        """Assign features to an event.
+
+  def __call__(self, event: PandasEvent, features: PandasEvent) -> PandasEvent:
+    """Assign features to an event.
         Input event and features must have same index.
         Features cannot have more than one row for a single index + timestamp occurence.
         Output event will have same exact index and timestamps as input one.
@@ -18,5 +19,5 @@ class PandasAssignOperator(PandasOperator):
         Returns:
             PandasEvent: a new event with the features assigned.
         """
-        # TODO: implement logic.
-        pass
+    # TODO: implement logic.
+    pass
