@@ -37,4 +37,10 @@ py_library(
     name = "processor",
     srcs = ["processor.py"],
     srcs_version = "PY3",
+    deps = [
+        "//temporal_feature_processor/core/data:event",
+        "//temporal_feature_processor/core/data:feature",
+        "//temporal_feature_processor/core/data:sampling",
+        "//temporal_feature_processor/core/operators:base",
+    ],
 )

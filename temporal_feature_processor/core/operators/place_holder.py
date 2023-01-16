@@ -52,6 +52,7 @@ class PlaceHolder(base.Operator):
   def build_op_definition(cls) -> pb.OperatorDef:
     return pb.OperatorDef(
         key="PLACE_HOLDER",
+        place_holder=True,
         outputs=[pb.OperatorDef.Output(key="output")],
     )
 

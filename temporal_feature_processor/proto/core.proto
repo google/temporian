@@ -132,6 +132,10 @@ message OperatorDef {
   // Arguments of the operator.
   repeated Attribute attributes = 4;
 
+  // If true, the operator is a placeholder. That is, the user has to provide
+  // the features of this operator output.
+  optional bool place_holder = 5 [default = false];
+
   message Input {
     // String identifier of the input. Should be unique.
     optional string key = 1;

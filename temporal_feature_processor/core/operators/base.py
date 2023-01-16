@@ -16,7 +16,6 @@
 
 from abc import ABC, abstractmethod
 from typing import Dict
-import contextlib
 
 from temporal_feature_processor.core.data.event import Event
 from temporal_feature_processor.implementation.pandas.operators.base import PandasOperator
@@ -64,6 +63,12 @@ class Operator(ABC):
     self._inputs = {}
     self._outputs = {}
 
+  def __str__(self):
+    return f'Operator<key:{self.definition().key},id:{id(self)}>'
+
+  def is_placeholder(self) -> bool:
+    return self.definition().place_holder
+
   def outputs(self) -> Dict[str, Event]:
     return self._outputs
 
@@ -73,7 +78,7 @@ class Operator(ABC):
   def check(self) -> None:
     """Ensures that the operator is valid."""
 
-    definition = self.__class__.build_op_definition()
+    definition = self.definition()
 
     with OperatorExceptionDecorator(self):
       # Check that expected inputs are present
@@ -114,6 +119,9 @@ class Operator(ABC):
   @classmethod
   def build_op_definition(cls) -> pb.OperatorDef:
     raise NotImplementedError()
+
+  def definition(self):
+    return self.__class__.build_op_definition()
 
   @abstractmethod
   def _get_pandas_implementation(self) -> PandasOperator:
