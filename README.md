@@ -45,7 +45,7 @@ located) and execute:
 poetry install
 ```
 
-The virtual environment's installation directory will depend on your operating
+The virtual environment installation directory will depend on your operating
 system as follows:
 
 -   Linux: `$XDG_CACHE_HOME/pypoetry/virtualenvs or

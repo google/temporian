@@ -17,9 +17,8 @@
 from abc import ABC, abstractmethod
 from typing import Dict
 
-from temporal_feature_processor.data.event import Event
-from temporal_feature_processor.implementation.pandas.operators.base import (
-    PandasOperator,)
+from temporal_feature_processor.core.data.event import Event
+from temporal_feature_processor.implementation.pandas.operators.base import PandasOperator
 
 
 class Operator(ABC):

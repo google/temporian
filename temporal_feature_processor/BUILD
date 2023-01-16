@@ -1,4 +1,3 @@
-load("//temporal_feature_processor/utils:compile.bzl", "all_proto_library")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -13,75 +12,15 @@ py_library(
     srcs = ["__init__.py"],
     srcs_version = "PY3",
     deps = [
-        ":core",
-        ":evaluator",
-        ":operator_lib",
-        ":processor",
-        ":sampling",
-        "//temporal_feature_processor/data",
-        "//temporal_feature_processor/implementation",
-        "//temporal_feature_processor/operators",
-    ],
-)
-
-py_library(
-    name = "core",
-    srcs = ["core.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":core_py_proto",
-        # absl/logging dep,
-    ],
-)
-
-py_library(
-    name = "evaluator",
-    srcs = ["evaluator.py"],
-    srcs_version = "PY3",
-    deps = [
-        "//temporal_feature_processor/data:event",
-        # pandas dep,
-    ],
-)
-
-py_library(
-    name = "operator_lib",
-    srcs = ["operator_lib.py"],
-    srcs_version = "PY3",
-)
-
-py_library(
-    name = "processor",
-    srcs = ["processor.py"],
-    srcs_version = "PY3",
-)
-
-py_library(
-    name = "sampling",
-    srcs = ["sampling.py"],
-    srcs_version = "PY3",
-)
-
-# Proto
-# ========
-
-all_proto_library(
-    name = "core_proto",
-    srcs = ["core.proto"],
-    deps = [],
-)
-
-# Tests
-# =====
-
-py_test(
-    name = "temporal_feature_processor_test",
-    srcs = ["temporal_feature_processor_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":temporal_feature_processor",
-        # absl/logging dep,
-        # absl/testing:absltest dep,
-        # pandas dep,
+        "//temporal_feature_processor/core",
+        "//temporal_feature_processor/core:evaluator",
+        "//temporal_feature_processor/core:operator_lib",
+        "//temporal_feature_processor/core:processor",
+        "//temporal_feature_processor/core/data:dtype",
+        "//temporal_feature_processor/core/data:event",
+        "//temporal_feature_processor/core/data:feature",
+        "//temporal_feature_processor/core/data:sampling",
+        "//temporal_feature_processor/core/operators",
+        "//temporal_feature_processor/core/operators:base",
     ],
 )

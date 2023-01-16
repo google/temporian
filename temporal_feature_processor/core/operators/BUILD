@@ -1,3 +1,4 @@
+
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],
@@ -11,7 +12,6 @@ py_library(
     srcs = ["__init__.py"],
     srcs_version = "PY3",
     deps = [
-        ":base",
         ":place_holder",
         ":simple_moving_average",
     ],
@@ -22,7 +22,7 @@ py_library(
     srcs = ["base.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporal_feature_processor/data:event",
+        "//temporal_feature_processor/core/data:event",
         "//temporal_feature_processor/implementation/pandas/operators:base",
     ],
 )
@@ -33,12 +33,12 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
-        "//temporal_feature_processor:core_py_proto",
-        "//temporal_feature_processor:operator_lib",
-        "//temporal_feature_processor:sampling",
-        "//temporal_feature_processor/data:event",
-        "//temporal_feature_processor/data:feature",
+        "//temporal_feature_processor/core:operator_lib",
+        "//temporal_feature_processor/core/data:event",
+        "//temporal_feature_processor/core/data:feature",
+        "//temporal_feature_processor/core/data:sampling",
         "//temporal_feature_processor/implementation/pandas/operators:base",
+        "//temporal_feature_processor/proto:core_py_proto",
     ],
 )
 
@@ -48,10 +48,11 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
-        "//temporal_feature_processor:core_py_proto",
-        "//temporal_feature_processor:operator_lib",
-        "//temporal_feature_processor/data:event",
-        "//temporal_feature_processor/data:feature",
+        "//temporal_feature_processor/core:operator_lib",
+        "//temporal_feature_processor/core/data:event",
+        "//temporal_feature_processor/core/data:feature",
         "//temporal_feature_processor/implementation/pandas/operators:base",
+        "//temporal_feature_processor/implementation/pandas/operators/window:simple_moving_average",
+        "//temporal_feature_processor/proto:core_py_proto",
     ],
 )

@@ -16,7 +16,7 @@
 
 from absl import logging
 
-from temporal_feature_processor import core_pb2 as pb
+from temporal_feature_processor.proto import core_pb2 as pb
 
 
 def does_nothing() -> None:
@@ -54,14 +54,16 @@ def create_toy_processor() -> pb.Processor:
           id="event_1",
           sampling_id="sampling_1",
           feature_ids=["sales"],
-      ))
+      )
+  )
 
   p.features.append(
       pb.Feature(
           id="sales",
           type=pb.Feature.FLOAT,
           sampling_id="sampling_1",
-      ))
+      )
+  )
 
   # We apply a SMA on the "price" feature using the same sampling rate as the
   # sales.
@@ -81,13 +83,15 @@ def create_toy_processor() -> pb.Processor:
           id="event_2",
           sampling_id="sampling_1",
           feature_ids=["sma_sales"],
-      ))
+      )
+  )
 
   p.features.append(
       pb.Feature(
           id="sma_sales",
           type=pb.Feature.FLOAT,
           sampling_id="sampling_1",
-      ))
+      )
+  )
 
   return p

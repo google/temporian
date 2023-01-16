@@ -14,5 +14,5 @@
 
 """Operators."""
 
-from temporal_feature_processor.operators import place_holder
-from temporal_feature_processor.operators import simple_moving_average
+from temporal_feature_processor.core.operators import place_holder
+from temporal_feature_processor.core.operators import simple_moving_average

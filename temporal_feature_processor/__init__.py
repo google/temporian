@@ -14,20 +14,22 @@
 
 """Temporal Feature Processor."""
 
-from temporal_feature_processor import (
-    core,
-    evaluator,
-    operator_lib,
-    operators,
-    processor,
-    sampling,
-)
-from temporal_feature_processor.data import dtype, event, feature
-from temporal_feature_processor.operators import base
+from temporal_feature_processor.core import core
+from temporal_feature_processor.core import evaluator
+from temporal_feature_processor.core import operator_lib
+from temporal_feature_processor.core import operators
+from temporal_feature_processor.core import processor
+from temporal_feature_processor.core.data import dtype
+from temporal_feature_processor.core.data import event
+from temporal_feature_processor.core.data import feature
+from temporal_feature_processor.core.data import sampling
+from temporal_feature_processor.core.operators import base
+
 
 __version__ = "0.0.1"
 
 does_nothing = core.does_nothing
+create_toy_processor = core.create_toy_processor
 
 sma = operators.simple_moving_average.sma
 place_holder = operators.place_holder.place_holder

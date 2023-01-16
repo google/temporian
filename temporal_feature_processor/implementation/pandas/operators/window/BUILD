@@ -1,3 +1,4 @@
+
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],
@@ -10,10 +11,6 @@ py_library(
     name = "window",
     srcs = ["__init__.py"],
     srcs_version = "PY3",
-    deps = [
-        ":base",
-        ":simple_moving_average",
-    ],
 )
 
 py_library(
@@ -30,7 +27,8 @@ py_library(
     srcs = ["simple_moving_average.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporal_feature_processor/implementation/pandas:sampling",
+        ":base",
         "//temporal_feature_processor/implementation/pandas/data:event",
+        "//temporal_feature_processor/implementation/pandas/data:sampling",
     ],
 )

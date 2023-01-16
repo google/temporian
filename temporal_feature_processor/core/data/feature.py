@@ -12,6 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Dtype module."""
+"""A feature."""
 
-FLOAT = "FLOAT"
+from typing import Optional
+
+from temporal_feature_processor.core.data import sampling as sampling_lib
+
+
+class Feature(object):
+
+  def __init__(self, name: str, dtype, sampling=None):
+    self._name = name
+    self._sampling = sampling
+    self._dtype = dtype
+
+  def name(self):
+    return self._name
+
+  def dtype(self):
+    return self._dtype
+
+  def sampling(self) -> Optional[sampling_lib.Sampling]:
+    return self._sampling
+
+  def set_sampling(self, sampling: sampling_lib.Sampling):
+    self._sampling = sampling

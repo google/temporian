@@ -1,3 +1,4 @@
+
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],
@@ -10,11 +11,6 @@ py_library(
     name = "data",
     srcs = ["__init__.py"],
     srcs_version = "PY3",
-    deps = [
-        ":dtype",
-        ":event",
-        ":feature",
-    ],
 )
 
 py_library(
@@ -29,8 +25,14 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":feature",
-        "//temporal_feature_processor:sampling",
+        ":sampling",
     ],
+)
+
+py_library(
+    name = "sampling",
+    srcs = ["sampling.py"],
+    srcs_version = "PY3",
 )
 
 py_library(
@@ -38,6 +40,6 @@ py_library(
     srcs = ["feature.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporal_feature_processor:sampling",
+        ":sampling",
     ],
 )

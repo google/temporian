@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# TODO: implement EventSequence class
+"""Type of features."""
 
-import pandas as pd
-
-
-PandasEvent = pd.DataFrame
+FLOAT = "FLOAT"

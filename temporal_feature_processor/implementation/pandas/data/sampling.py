@@ -12,26 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Event module."""
+"""We define a Sampling as a list of timestamps for each of the values of a given index.
+For the time being, we can represent this as a pandas Index whose last level must be a DatetimeIndex.
+"""
 
-from typing import List
-
-from temporal_feature_processor.data.feature import Feature
-from temporal_feature_processor.sampling import Sampling
+import pandas as pd
 
 
-class Event(object):
-
-  def __init__(
-      self,
-      features: List[Feature],
-      sampling: Sampling,
-  ):
-    self._features = features
-    self._sampling = sampling
-
-  def sampling(self):
-    return self._sampling
-
-  def features(self):
-    return self._features
+PandasSampling = pd.MultiIndex

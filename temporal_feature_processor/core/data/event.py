@@ -12,9 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# TODO: implement EventSequence class
+"""An event is a collection (possibly empty) of timesampled feature values."""
 
-import pandas as pd
+from typing import List
+
+from temporal_feature_processor.core.data.feature import Feature
+from temporal_feature_processor.core.data.sampling import Sampling
 
 
-PandasEvent = pd.DataFrame
+class Event(object):
+
+  def __init__(
+      self,
+      features: List[Feature],
+      sampling: Sampling,
+  ):
+    self._features = features
+    self._sampling = sampling
+
+  def sampling(self):
+    return self._sampling
+
+  def features(self):
+    return self._features
