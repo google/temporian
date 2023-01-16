@@ -22,8 +22,10 @@ py_library(
     srcs = ["base.py"],
     srcs_version = "PY3",
     deps = [
+        # absl/logging dep,
         "//temporal_feature_processor/core/data:event",
         "//temporal_feature_processor/implementation/pandas/operators:base",
+        "//temporal_feature_processor/proto:core_py_proto",
     ],
 )
 

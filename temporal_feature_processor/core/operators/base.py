@@ -16,9 +16,45 @@
 
 from abc import ABC, abstractmethod
 from typing import Dict
+import contextlib
 
 from temporal_feature_processor.core.data.event import Event
 from temporal_feature_processor.implementation.pandas.operators.base import PandasOperator
+from temporal_feature_processor.proto import core_pb2 as pb
+
+
+class OperatorExceptionDecorator(object):
+  """Adds details about an operator to exceptions raised in a block.
+
+  Usage example:
+    with OperatorExceptionDecorator(operator):
+      raise ValueError("Something is wrong")
+
+    Will print
+      Something is wrong
+      In operator NAME_OF_THE_OPERATOR
+  """
+
+  def __init__(self, operator):
+    self._operator = operator
+
+  def __enter__(self):
+    pass
+
+  def __exit__(self, exc_type, exc_val, traceback):
+    if not exc_type:
+      # No exceptions
+      return True
+
+    if exc_val:
+      # Add operator details in the exception.
+      exc_val.args += (
+          (
+              'In operator'
+              f' "{self._operator.__class__.build_op_definition().key}".'
+          ),
+      )
+    return False
 
 
 class Operator(ABC):
@@ -36,17 +72,48 @@ class Operator(ABC):
 
   def check(self) -> None:
     """Ensures that the operator is valid."""
-    pass
+
+    definition = self.__class__.build_op_definition()
+
+    with OperatorExceptionDecorator(self):
+      # Check that expected inputs are present
+      for expected_input in definition.inputs:
+        if (
+            not expected_input.is_optional
+            and expected_input.key not in self._inputs
+        ):
+          raise ValueError(f'Missing input "{expected_input.key}".')
+
+      # Check that no unexpected inputs are present
+      for available_input in self._inputs:
+        if available_input not in [v.key for v in definition.inputs]:
+          raise ValueError(f'Unexpected input "{available_input}".')
+
+      # Check that expected outputs are present
+      for expected_output in definition.outputs:
+        if expected_output.key not in self._outputs:
+          raise ValueError(f'Missing output "{expected_output.key}".')
+
+      # Check that no unexpected outputs are present
+      for available_output in self._outputs:
+        if available_output not in [v.key for v in definition.outputs]:
+          raise ValueError(f'Unexpected output "{available_output}".')
 
   def add_input(self, key: str, event: Event) -> None:
-    if key in self._inputs:
-      raise ValueError(f"Input {key} already existing")
-    self._inputs[key] = event
+    with OperatorExceptionDecorator(self):
+      if key in self._inputs:
+        raise ValueError(f'Already existing input "{key}".')
+      self._inputs[key] = event
 
   def add_output(self, key: str, event: Event) -> None:
-    if key in self._outputs:
-      raise ValueError(f"Output {key} already existing")
-    self._outputs[key] = event
+    with OperatorExceptionDecorator(self):
+      if key in self._outputs:
+        raise ValueError(f'Already existing output "{key}".')
+      self._outputs[key] = event
+
+  @classmethod
+  def build_op_definition(cls) -> pb.OperatorDef:
+    raise NotImplementedError()
 
   @abstractmethod
   def _get_pandas_implementation(self) -> PandasOperator:
