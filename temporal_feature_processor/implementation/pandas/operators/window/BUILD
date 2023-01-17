@@ -1,4 +1,3 @@
-
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],
@@ -11,6 +10,10 @@ py_library(
     name = "window",
     srcs = ["__init__.py"],
     srcs_version = "PY3",
+    deps = [
+        ":base",
+        ":simple_moving_average",
+    ],
 )
 
 py_library(
