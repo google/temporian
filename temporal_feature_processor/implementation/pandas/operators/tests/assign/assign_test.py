@@ -11,14 +11,17 @@ class AssignOperatorTest(absltest.TestCase):
     self.operator = PandasAssignOperator()
 
   def test_different_index(self) -> None:
-    self.assertRaises(IndexError, self.operator,
-                      test_data.different_index.INPUT_1,
-                      test_data.different_index.INPUT_2)
+    self.assertRaisesRegex(IndexError,
+                           "Assign sequences must have the same index names.",
+                           self.operator, test_data.different_index.INPUT_1,
+                           test_data.different_index.INPUT_2)
 
   def test_repeated_timestamps(self) -> None:
-    self.assertRaises(ValueError, self.operator,
-                      test_data.repeated_timestamps.INPUT_1,
-                      test_data.repeated_timestamps.INPUT_1)
+    self.assertRaisesRegex(
+        ValueError,
+        "Cannot have repeated timestamps in assigned EventSequence.",
+        self.operator, test_data.repeated_timestamps.INPUT_1,
+        test_data.repeated_timestamps.INPUT_1)
 
   def test_with_idx_same_timestamps(self) -> None:
     operator_output = self.operator(test_data.with_idx_same_timestamps.INPUT_1,
