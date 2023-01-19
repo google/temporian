@@ -1,4 +1,0 @@
-from temporal_feature_processor.implementation.pandas.operators.tests.assign.test_data import different_index
-from temporal_feature_processor.implementation.pandas.operators.tests.assign.test_data import repeated_timestamps
-from temporal_feature_processor.implementation.pandas.operators.tests.assign.test_data import with_idx_more_timestamps
-from temporal_feature_processor.implementation.pandas.operators.tests.assign.test_data import with_idx_same_timestamps
