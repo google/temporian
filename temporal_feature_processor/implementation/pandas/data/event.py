@@ -12,9 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# TODO: implement EventSequence class
-
 import pandas as pd
 
+from temporal_feature_processor.core.data.event import Event
+from temporal_feature_processor.core.data.feature import Feature
 
-PandasEvent = pd.DataFrame
+
+class PandasEvent(pd.DataFrame):
+
+  @property
+  def _constructor(self):
+    return PandasEvent
+
+  def schema(self) -> Event:
+    features = [
+        Feature(column_name, dtype=column_dtype)
+        for column_name, column_dtype in self.dtypes.items()
+    ]
+    sampling = self.index.names
+    return Event(features=features, sampling=sampling)

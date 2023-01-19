@@ -1,4 +1,3 @@
-
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],
@@ -15,7 +14,11 @@ py_library(
 
 py_library(
     name = "event",
-    srcs = ["event.py"],
+    srcs = [
+        "event.py",
+        "//temporal_feature_processor/core/data:event",
+        "//temporal_feature_processor/core/data:feature",
+    ],
     srcs_version = "PY3",
     deps = [
         # pandas dep,
