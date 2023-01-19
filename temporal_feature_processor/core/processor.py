@@ -131,7 +131,7 @@ def infer_processor(inputs: List[Event], outputs: List[Event]) -> Preprocessor:
       # The feature is missing.
       missing_features.add(repr(feature))
 
-    if feature.creator().is_placeholder():
+    elif feature.creator().is_placeholder():
       # The user is expected to see the input of placeholders.
       missing_features.add(
           f"{repr(feature)} from placeholder {feature.creator()}"
