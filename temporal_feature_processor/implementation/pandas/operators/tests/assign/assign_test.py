@@ -1,6 +1,6 @@
 from absl.testing import absltest
 
-from temporal_feature_processor.implementation.pandas.operators.assign import PandasAssignOperator
+from temporal_feature_processor.implementation.pandas.operators import assign
 from temporal_feature_processor.implementation.pandas.operators.tests.assign.test_data import different_index
 from temporal_feature_processor.implementation.pandas.operators.tests.assign.test_data import repeated_timestamps
 from temporal_feature_processor.implementation.pandas.operators.tests.assign.test_data import with_idx_more_timestamps
@@ -11,7 +11,7 @@ class AssignOperatorTest(absltest.TestCase):
   base_data_dir = "temporal_feature_processor/tests/operators/assign/data"
 
   def setUp(self) -> None:
-    self.operator = PandasAssignOperator()
+    self.operator = assign.PandasAssignOperator()
 
   def test_different_index(self) -> None:
     self.assertRaisesRegex(IndexError,
