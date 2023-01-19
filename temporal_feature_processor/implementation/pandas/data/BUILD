@@ -14,14 +14,12 @@ py_library(
 
 py_library(
     name = "event",
-    srcs = [
-        "event.py",
-        "//temporal_feature_processor/core/data:event",
-        "//temporal_feature_processor/core/data:feature",
-    ],
+    srcs = ["event.py"],
     srcs_version = "PY3",
     deps = [
         # pandas dep,
+        "//temporal_feature_processor/core/data:event",
+        "//temporal_feature_processor/core/data:feature",
     ],
 )
 
