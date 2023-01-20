@@ -28,14 +28,14 @@ class AssignOperatorTest(absltest.TestCase):
   def test_with_idx_same_timestamps(self) -> None:
     operator_output = self.operator(with_idx_same_timestamps.INPUT_1,
                                     with_idx_same_timestamps.INPUT_2)
-    self.assertEqual(True,
-                     with_idx_same_timestamps.OUTPUT.equals(operator_output))
+    self.assertEqual(
+        True, with_idx_same_timestamps.OUTPUT.equals(operator_output["output"]))
 
   def test_with_idx_more_timestamps(self) -> None:
     operator_output = self.operator(with_idx_more_timestamps.INPUT_1,
                                     with_idx_more_timestamps.INPUT_2)
-    self.assertEqual(True,
-                     with_idx_more_timestamps.OUTPUT.equals(operator_output))
+    self.assertEqual(
+        True, with_idx_more_timestamps.OUTPUT.equals(operator_output["output"]))
 
 
 if __name__ == "__main__":

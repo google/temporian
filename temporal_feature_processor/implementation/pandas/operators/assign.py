@@ -20,7 +20,8 @@ from temporal_feature_processor.implementation.pandas.operators.base import Pand
 
 class PandasAssignOperator(PandasOperator):
 
-  def __call__(self, event_1: PandasEvent, event_2: PandasEvent) -> PandasEvent:
+  def __call__(self, assignee_event: PandasEvent,
+               assigned_event: PandasEvent) -> PandasEvent:
     """Assign features to an event.
     Input event and features must have same index. Features cannot have more
     than one row for a single index + timestamp occurence. Output event will
@@ -35,23 +36,24 @@ class PandasAssignOperator(PandasOperator):
         PandasEvent: a new event with the features assigned.
     """
     # assert indexes are the same
-    if event_1.index.names != event_2.index.names:
+    if assignee_event.index.names != assigned_event.index.names:
       raise IndexError("Assign sequences must have the same index names.")
 
     # get index column names
-    index, timestamp = self.split_index(event_1)
+    index, timestamp = self.split_index(assignee_event)
 
     # check there's no repeated timestamps index-wise in the assigned sequence
     if index:
-      max_timestamps = (
-          event_2.reset_index().groupby(index)[timestamp].value_counts().max())
+      max_timestamps = (assigned_event.reset_index().groupby(index)
+                        [timestamp].value_counts().max())
     else:
-      max_timestamps = event_2.reset_index()[timestamp].value_counts().max()
+      max_timestamps = assigned_event.reset_index()[timestamp].value_counts(
+      ).max()
 
     if max_timestamps > 1:
       raise ValueError(
           "Cannot have repeated timestamps in assigned EventSequence.")
 
     # make assignment
-    output = event_1.join(event_2, how="left", rsuffix="y")
-    return output
+    output = assignee_event.join(assigned_event, how="left", rsuffix="y")
+    return {"output": output}
