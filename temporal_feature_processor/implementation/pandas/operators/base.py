@@ -15,7 +15,7 @@
 """Interface for the Pandas implementations of the operators."""
 
 from abc import ABC, abstractmethod
-from typing import Any, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 from temporal_feature_processor.implementation.pandas.data.event import PandasEvent
 
@@ -24,7 +24,7 @@ class PandasOperator(ABC):
   """Base class to define an operator's interface."""
 
   @abstractmethod
-  def __call__(self, *args: Any, **kwargs: Any) -> PandasEvent:
+  def __call__(self, *args: Any, **kwargs: Any) -> Dict[str, PandasEvent]:
     """Apply the operator to its inputs.
 
     Returns:
