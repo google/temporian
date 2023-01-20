@@ -126,3 +126,19 @@ class Operator(ABC):
   @abstractmethod
   def _get_pandas_implementation(self) -> PandasOperator:
     """Get pandas implementation for this operator."""
+
+  def evaluate(self) -> None:
+    # get implementation. Will support other backends in the future
+    operator_implmenetation = self._get_pandas_implementation()
+
+    # construct operator inputs
+    operator_inputs = {key: self.inputs()[key].data() for key in self.inputs()}
+
+    # evaluate
+    outputs = operator_implmenetation(**operator_inputs)
+
+    # materialize data in output events
+    for output_name, output_event in self.outputs().items():
+      output_event.set_data(outputs[output_name])
+      for i, col in enumerate(outputs[output_name].columns):
+        output_event.features()[i].set_data(outputs[output_name][col])
