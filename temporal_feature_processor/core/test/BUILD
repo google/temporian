@@ -1,4 +1,3 @@
-
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],
@@ -35,5 +34,19 @@ py_test(
         "//temporal_feature_processor/core/data:sampling",
         "//temporal_feature_processor/core/operators:base",
         "//temporal_feature_processor/proto:core_py_proto",
+    ],
+)
+
+py_test(
+    name = "prototype_test",
+    srcs = ["prototype_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporal_feature_processor/core:processor",
+        "//temporal_feature_processor/core/data:event",
+        "//temporal_feature_processor/core/operators:assign",
+        "//temporal_feature_processor/implementation/pandas/data:event",
+        # absl/logging dep,
+        # absl/testing:absltest dep,
     ],
 )
