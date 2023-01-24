@@ -1,3 +1,4 @@
+
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],
@@ -22,14 +23,13 @@ py_library(
     srcs = ["assign.py"],
     srcs_version = "PY3",
     deps = [
-        # absl/logging dep,
         ":base",
+        "//temporal_feature_processor/core:operator_lib",
         "//temporal_feature_processor/core/data:event",
         "//temporal_feature_processor/core/data:feature",
-        "//temporal_feature_processor/implementation/pandas/operators:base",
         "//temporal_feature_processor/implementation/pandas/operators:assign",
+        "//temporal_feature_processor/implementation/pandas/operators:base",
         "//temporal_feature_processor/proto:core_py_proto",
-        "//temporal_feature_processor/core:operator_lib",
     ],
 )
 
@@ -38,7 +38,6 @@ py_library(
     srcs = ["base.py"],
     srcs_version = "PY3",
     deps = [
-        # absl/logging dep,
         "//temporal_feature_processor/core/data:event",
         "//temporal_feature_processor/implementation/pandas/operators:base",
         "//temporal_feature_processor/proto:core_py_proto",

@@ -32,8 +32,7 @@ class PandasOperator(ABC):
     """
 
   def split_index(self, event: PandasEvent) -> Tuple[List[str], str]:
-    """Split pandas' DataFrame index into (potentially) index columns and
-    a timestamp column.
+    """Split pandas' DataFrame index into  index columns and a timestamp column.
 
     Args:
         event (PandasEvent): input PandasEvent (pandas DataFrame).

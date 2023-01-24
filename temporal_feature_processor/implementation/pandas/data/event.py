@@ -43,5 +43,7 @@ class PandasEvent(pd.DataFrame):
     return PandasFeature
 
   def schema(self) -> Event:
-    return Event(features=[self[col].schema() for col in self.columns],
-                 sampling=self.index.names)
+    return Event(
+        features=[self[col].schema() for col in self.columns],
+        sampling=self.index.names,
+    )

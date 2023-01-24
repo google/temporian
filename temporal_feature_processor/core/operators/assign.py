@@ -14,14 +14,12 @@
 
 """Simple moving average operator."""
 
-from typing import Optional
-
 from temporal_feature_processor.core import operator_lib
 from temporal_feature_processor.core.data.event import Event
 from temporal_feature_processor.core.data.feature import Feature
 from temporal_feature_processor.core.operators.base import Operator
-from temporal_feature_processor.implementation.pandas.operators.base import PandasOperator
 from temporal_feature_processor.implementation.pandas.operators.assign import PandasAssignOperator
+from temporal_feature_processor.implementation.pandas.operators.base import PandasOperator
 from temporal_feature_processor.proto import core_pb2 as pb
 
 

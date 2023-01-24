@@ -20,18 +20,20 @@ from temporal_feature_processor.implementation.pandas.operators.base import Pand
 
 class PandasAssignOperator(PandasOperator):
 
-  def __call__(self, assignee_event: PandasEvent,
-               assigned_event: PandasEvent) -> PandasEvent:
+  def __call__(
+      self, assignee_event: PandasEvent, assigned_event: PandasEvent
+  ) -> PandasEvent:
     """Assign features to an event.
+
     Input event and features must have same index. Features cannot have more
     than one row for a single index + timestamp occurence. Output event will
     have same exact index and timestamps as input one. Assignment can be
     understood as a left join on the index and timestamp columns.
 
     Args:
-        event (PandasEvent): event to assign the feature to.
-        feature (PandasEvent): features to assign to the event.
-        
+        assignee_event (PandasEvent): event to assign the feature to.
+        assigned_event (PandasEvent): features to assign to the event.
+
     Returns:
         PandasEvent: a new event with the features assigned.
     """
@@ -44,15 +46,21 @@ class PandasAssignOperator(PandasOperator):
 
     # check there's no repeated timestamps index-wise in the assigned sequence
     if index:
-      max_timestamps = (assigned_event.reset_index().groupby(index)
-                        [timestamp].value_counts().max())
+      max_timestamps = (
+          assigned_event.reset_index()
+          .groupby(index)[timestamp]
+          .value_counts()
+          .max()
+      )
     else:
-      max_timestamps = assigned_event.reset_index()[timestamp].value_counts(
-      ).max()
+      max_timestamps = (
+          assigned_event.reset_index()[timestamp].value_counts().max()
+      )
 
     if max_timestamps > 1:
       raise ValueError(
-          "Cannot have repeated timestamps in assigned EventSequence.")
+          "Cannot have repeated timestamps in assigned EventSequence."
+      )
 
     # make assignment
     output = assignee_event.join(assigned_event, how="left", rsuffix="y")
