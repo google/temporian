@@ -27,7 +27,7 @@ Data = Union[pd.DataFrame, Dict[str, pd.DataFrame], List[pd.DataFrame]]
 Result = Data
 
 
-def Eval(
+def evaluate(
     query: Query,
     data: Data,
 ) -> Result:

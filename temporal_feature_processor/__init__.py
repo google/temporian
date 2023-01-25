@@ -25,7 +25,6 @@ from temporal_feature_processor.core.data import feature
 from temporal_feature_processor.core.data import sampling
 from temporal_feature_processor.core.operators import base
 
-
 __version__ = "0.0.1"
 
 does_nothing = core.does_nothing
@@ -33,5 +32,5 @@ create_toy_processor = core.create_toy_processor
 
 sma = operators.simple_moving_average.sma
 place_holder = operators.place_holder.place_holder
-Eval = evaluator.Eval
+evaluate = evaluator.evaluate
 Feature = feature.Feature

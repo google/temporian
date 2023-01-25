@@ -47,7 +47,7 @@ class TFPTest(absltest.TestCase):
         "f2": [5, 6, 7, 8],
     })
 
-    results = t.Eval(
+    results = t.evaluate(
         query={"b": b},
         data={
             a: input_signal_data,
