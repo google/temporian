@@ -1,4 +1,3 @@
-
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],
@@ -29,5 +28,14 @@ py_library(
     srcs_version = "PY3",
     deps = [
         "//temporal_feature_processor/implementation/pandas/data:event",
+    ],
+)
+
+py_library(
+    name = "core_mapping",
+    srcs = ["core_mapping.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":assign",
     ],
 )
