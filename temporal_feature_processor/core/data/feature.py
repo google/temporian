@@ -37,7 +37,7 @@ class Feature(object):
     self._data: Optional[Any] = None
 
   def __repr__(self):
-    return f'Feature<name:{self._name},dtype:{self._dtype},sampling:{self._sampling},id:{id(self)}>'
+    return f'Feature<name:{self._name},dtype:{self._dtype},sampling:{self._sampling},creator:{self.creator()},id:{id(self)}>'
 
   def name(self):
     return self._name
