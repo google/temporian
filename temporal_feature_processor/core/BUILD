@@ -1,4 +1,3 @@
-
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],
@@ -24,6 +23,15 @@ py_library(
     deps = [
         # pandas dep,
         "//temporal_feature_processor/core/data:event",
+    ],
+)
+
+py_library(
+    name = "backends",
+    srcs = ["backends.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporal_feature_processor/implementation/pandas:evaluator",
     ],
 )
 
