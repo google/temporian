@@ -34,3 +34,23 @@ py_library(
         "//temporal_feature_processor/implementation/pandas/data:event",
     ],
 )
+
+py_library(
+    name = "diff_sampling",
+    srcs = ["diff_sampling.py"],
+    srcs_version = "PY3",
+    deps = [
+        # pandas dep,
+        "//temporal_feature_processor/implementation/pandas/data:event",
+    ],
+)
+
+py_library(
+    name = "many_events_per_day",
+    srcs = ["many_events_per_day.py"],
+    srcs_version = "PY3",
+    deps = [
+        # pandas dep,
+        "//temporal_feature_processor/implementation/pandas/data:event",
+    ],
+)
