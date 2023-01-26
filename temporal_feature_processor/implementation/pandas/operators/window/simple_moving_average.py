@@ -14,32 +14,75 @@
 
 """Implementation for the SimpleMovingAverage operator."""
 
-from temporal_feature_processor.implementation.pandas.data.event import PandasEvent
-from temporal_feature_processor.implementation.pandas.data.sampling import PandasSampling
-from temporal_feature_processor.implementation.pandas.operators.window.base import PandasWindowOperator
+from typing import Dict
+
+import pandas as pd
+
+from temporal_feature_processor.implementation.pandas.data.event import \
+    PandasEvent
+from temporal_feature_processor.implementation.pandas.data.sampling import \
+    PandasSampling
+from temporal_feature_processor.implementation.pandas.operators.window.base import \
+    PandasWindowOperator
 
 
 class PandasSimpleMovingAverageOperator(PandasWindowOperator):
   """Base class for window operators."""
 
-  def __init__(self, window_length: int) -> None:
+  def __init__(self, window_length: str) -> None:
     super().__init__(window_length=window_length)
 
   def __call__(
       self,
       data: PandasEvent,
       sampling: PandasSampling,
-  ) -> PandasEvent:
+  ) -> Dict[str, PandasEvent]:
     """Apply a simple moving average to an event.
 
     If input has more than one feature, the moving average will be computed for
     each of its features independently.
 
     Args:
-        data (PandasEvent): the input event to apply a simple moving average to.
+      data: the input event to apply a simple moving average to.
+      sampling: the desired sampling for the output event.
 
     Returns:
-        PandasEvent: the output of the operator.
+      Dict[str, PandasEvent]: the output event of the operator.
     """
+    # remove index to be able to filter using index values
+    data_no_index = data.reset_index()
 
-    raise NotImplementedError()
+    # get index columns and name of timestamp column
+    index_columns = sampling.names[:-1]
+    timestamp_column = sampling.names[-1]
+
+    # create output event with desired sampling
+    output = PandasEvent({
+        "simple_moving_average": [None] * len(sampling)
+    },
+                         dtype=float).set_index(sampling)
+
+    # manual rolling window since pandas doesn't support custom sampling in .rolling()
+    # TODO: optimize window calculation
+    for values in sampling:
+      index = values[:-1]
+      timestamp = values[-1]
+
+      # filter by index
+      data_filtered = data_no_index[(data_no_index[index_columns] == index
+                                    )] if index_columns else data_no_index
+
+      # filter by window start/end dates
+      data_filtered = data_filtered[
+          (data_filtered[timestamp_column] <= timestamp) &
+          (data_filtered[timestamp_column] >= timestamp -
+           pd.Timedelta(self.window_length))]
+
+      # calculate average of window
+      mean = data_filtered.set_index(sampling.names).mean().item()
+
+      # set result in output event
+      loc = index + (timestamp,)
+      output.loc[loc] = mean
+
+    return {"output": output}

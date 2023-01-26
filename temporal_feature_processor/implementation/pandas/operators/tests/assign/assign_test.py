@@ -15,14 +15,12 @@
 from absl.testing import absltest
 
 from temporal_feature_processor.implementation.pandas.operators import assign
-from temporal_feature_processor.implementation.pandas.operators.tests.assign.test_data import different_index
-from temporal_feature_processor.implementation.pandas.operators.tests.assign.test_data import repeated_timestamps
-from temporal_feature_processor.implementation.pandas.operators.tests.assign.test_data import with_idx_more_timestamps
-from temporal_feature_processor.implementation.pandas.operators.tests.assign.test_data import with_idx_same_timestamps
+from temporal_feature_processor.implementation.pandas.operators.tests.assign.test_data import (
+    different_index, repeated_timestamps, with_idx_more_timestamps,
+    with_idx_same_timestamps)
 
 
 class AssignOperatorTest(absltest.TestCase):
-  base_data_dir = "temporal_feature_processor/tests/operators/assign/data"
 
   def setUp(self) -> None:
     self.operator = assign.PandasAssignOperator()
@@ -46,20 +44,16 @@ class AssignOperatorTest(absltest.TestCase):
     )
 
   def test_with_idx_same_timestamps(self) -> None:
-    operator_output = self.operator(
-        with_idx_same_timestamps.INPUT_1, with_idx_same_timestamps.INPUT_2
-    )
+    operator_output = self.operator(with_idx_same_timestamps.INPUT_1,
+                                    with_idx_same_timestamps.INPUT_2)
     self.assertEqual(
-        True, with_idx_same_timestamps.OUTPUT.equals(operator_output["output"])
-    )
+        True, with_idx_same_timestamps.OUTPUT.equals(operator_output["output"]))
 
   def test_with_idx_more_timestamps(self) -> None:
-    operator_output = self.operator(
-        with_idx_more_timestamps.INPUT_1, with_idx_more_timestamps.INPUT_2
-    )
+    operator_output = self.operator(with_idx_more_timestamps.INPUT_1,
+                                    with_idx_more_timestamps.INPUT_2)
     self.assertEqual(
-        True, with_idx_more_timestamps.OUTPUT.equals(operator_output["output"])
-    )
+        True, with_idx_more_timestamps.OUTPUT.equals(operator_output["output"]))
 
 
 if __name__ == "__main__":

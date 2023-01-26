@@ -19,4 +19,5 @@ For the time being, we can represent this as a pandas Index whose last level mus
 import pandas as pd
 
 
-PandasSampling = pd.MultiIndex
+class PandasSampling(pd.MultiIndex):
+  pass

@@ -1,0 +1,17 @@
+package(
+    default_visibility = ["//visibility:public"],
+    licenses = ["notice"],
+)
+
+# Tests
+# =====
+py_test(
+    name = "test",
+    srcs = ["test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/testing:absltest dep,
+        "//temporal_feature_processor/implementation/pandas/operators/window:simple_moving_average",
+        "//temporal_feature_processor/implementation/pandas/operators/window/tests/simple_moving_average/data:no_index",
+    ],
+)
