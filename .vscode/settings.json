@@ -1,0 +1,13 @@
+{
+  "python.envFile": "${workspaceFolder}/.venv",
+  "python.formatting.provider": "yapf",
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true,
+  "isort.check": true,
+  "python.linting.flake8Enabled": false,
+  "python.linting.pylintEnabled": true,
+  "python.linting.enabled": true,
+  "editor.rulers": [
+    80
+  ]
+}
