@@ -8,13 +8,16 @@ def raise_(exception: Exception):
 
 BACKENDS = {
     "cpp": {
-        "read_csv_fn":
-            lambda path: raise_(NotImplementedError),
+        "event":
+            lambda: raise_(NotImplementedError),
         "evaluate_schedule_fn":
             lambda data, schedule: raise_(NotImplementedError),
+        "read_csv_fn":
+            lambda path: raise_(NotImplementedError)
     },
     "pandas": {
-        "read_csv_fn": pandas_event.pandas_event_from_csv,
-        "evaluate_schedule_fn": pandas_evaluator.evaluate_schedule
+        "event": pandas_event.PandasEvent,
+        "evaluate_schedule_fn": pandas_evaluator.evaluate_schedule,
+        "read_csv_fn": pandas_event.pandas_event_from_csv
     }
 }

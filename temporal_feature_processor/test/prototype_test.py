@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from absl import logging
 from absl.testing import absltest
-import pandas as pd
 
 from temporal_feature_processor.core.data.event import Event
 from temporal_feature_processor.core.data.event import Feature
@@ -46,11 +44,15 @@ class PrototypeTest(absltest.TestCase):
     # evaluate output
     output_event_pandas = evaluator.evaluate(
         output_event,
-        data={
+        input_data={
+            # assignee event specified from disk
             assignee_event:
                 "temporal_feature_processor/test/test_data/prototype/assignee_event.csv",
+            # assigned event loaded in ram
             assigned_event:
-                "temporal_feature_processor/test/test_data/prototype/assigned_event.csv",
+                pandas_event.pandas_event_from_csv(
+                    "temporal_feature_processor/test/test_data/prototype/assigned_event.csv",
+                    Sampling(["product_id", "timestamp"]))
         },
         backend="pandas")
 

@@ -17,20 +17,20 @@
 import pathlib
 from typing import Any, Dict, List, Literal, Set, Union
 
-import pandas as pd
-
 from temporal_feature_processor.core import backends
 from temporal_feature_processor.core.data.event import Event
 from temporal_feature_processor.core.data.feature import Feature
 from temporal_feature_processor.core.operators import base
+from temporal_feature_processor.implementation.pandas.data import event as pandas_event
 
 AvailableBackends = Literal[tuple(backends.BACKENDS.keys())]
+Data = Dict[Event, Union[str, pathlib.Path, pandas_event.PandasEvent]]
 Query = Union[Event, List[Event]]
 
 
 def evaluate(
     query: Query,
-    data: Dict[Event, Union[str, pathlib.Path]],
+    input_data: Data,
     backend: AvailableBackends = "pandas",
 ) -> Dict[Event, Any]:
   """Evaluates a query on data."""
@@ -53,19 +53,23 @@ def evaluate(
   ]
 
   # get backend
-  evaluate_schedule_fn = backends.BACKENDS[backend]["evaluate_schedule_fn"]
-  read_csv_fn = backends.BACKENDS[backend]["read_csv_fn"]
+  selected_backend = backends.BACKENDS[backend]
+  event = selected_backend["event"]
+  evaluate_schedule_fn = selected_backend["evaluate_schedule_fn"]
+  read_csv_fn = selected_backend["read_csv_fn"]
 
   # calculate opeartor schedule
   schedule = get_operator_schedule(features_to_compute)
 
-  # parse input .csvs
-  input_data = {
-      input_event: read_csv_fn(input_event_path, input_event.sampling())
-      for input_event, input_event_path in data.items()
+  # materialize input data. TODO: separate this logic
+  materialized_input_data = {
+      input_event:
+      input_event_spec if isinstance(input_event_spec, event) else read_csv_fn(
+          input_event_spec, input_event.sampling())
+      for input_event, input_event_spec in input_data.items()
   }
   # evaluate schedule
-  outputs = evaluate_schedule_fn(input_data, schedule)
+  outputs = evaluate_schedule_fn(materialized_input_data, schedule)
 
   return {event: outputs[event] for event in events_to_compute}
 
