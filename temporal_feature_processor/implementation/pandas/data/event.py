@@ -16,6 +16,7 @@ import pandas as pd
 
 from temporal_feature_processor.core.data.event import Event
 from temporal_feature_processor.core.data.feature import Feature
+from temporal_feature_processor.core.data.sampling import Sampling
 
 
 class PandasFeature(pd.Series):
@@ -47,3 +48,8 @@ class PandasEvent(pd.DataFrame):
         features=[self[col].schema() for col in self.columns],
         sampling=self.index.names,
     )
+
+
+def pandas_event_from_csv(path: str, sampling: Sampling) -> PandasEvent:
+  return PandasEvent(pd.read_csv(path)).set_index(
+      sampling._index)  # TODO: improve index setting

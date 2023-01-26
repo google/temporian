@@ -14,7 +14,8 @@
 
 """Evaluator module."""
 
-from typing import Dict, List, Literal, Set, Union
+import pathlib
+from typing import Any, Dict, List, Literal, Set, Union
 
 import pandas as pd
 
@@ -23,20 +24,15 @@ from temporal_feature_processor.core.data.event import Event
 from temporal_feature_processor.core.data.feature import Feature
 from temporal_feature_processor.core.operators import base
 
-Query = Union[Event, Dict[str, Event], List[Event]]
-
-Data = Union[pd.DataFrame, Dict[str, pd.DataFrame], List[pd.DataFrame]]
-
-Result = Data
-
 AvailableBackends = Literal[tuple(backends.BACKENDS.keys())]
+Query = Union[Event, List[Event]]
 
 
 def evaluate(
     query: Query,
-    data: Data,
+    data: Dict[Event, Union[str, pathlib.Path]],
     backend: AvailableBackends = "pandas",
-) -> Result:
+) -> Dict[Event, Any]:
   """Evaluates a query on data."""
 
   if isinstance(query, Event):
@@ -44,9 +40,6 @@ def evaluate(
 
   elif isinstance(query, list):
     events_to_compute = query
-
-  elif isinstance(query, dict):
-    events_to_compute = list(query.values())
 
   else:
     # TODO: improve error message
@@ -60,13 +53,19 @@ def evaluate(
   ]
 
   # get backend
-  evaluate_schedule_fun = backends.BACKENDS[backend]
+  evaluate_schedule_fn = backends.BACKENDS[backend]["evaluate_schedule_fn"]
+  read_csv_fn = backends.BACKENDS[backend]["read_csv_fn"]
 
   # calculate opeartor schedule
   schedule = get_operator_schedule(features_to_compute)
 
+  # parse input .csvs
+  input_data = {
+      input_event: read_csv_fn(input_event_path, input_event.sampling())
+      for input_event, input_event_path in data.items()
+  }
   # evaluate schedule
-  outputs = evaluate_schedule_fun(data, schedule)
+  outputs = evaluate_schedule_fn(input_data, schedule)
 
   return {event: outputs[event] for event in events_to_compute}
 
