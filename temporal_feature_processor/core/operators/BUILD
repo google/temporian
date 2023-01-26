@@ -1,4 +1,3 @@
-
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],
@@ -27,8 +26,6 @@ py_library(
         "//temporal_feature_processor/core:operator_lib",
         "//temporal_feature_processor/core/data:event",
         "//temporal_feature_processor/core/data:feature",
-        "//temporal_feature_processor/implementation/pandas/operators:assign",
-        "//temporal_feature_processor/implementation/pandas/operators:base",
         "//temporal_feature_processor/proto:core_py_proto",
     ],
 )
@@ -39,7 +36,6 @@ py_library(
     srcs_version = "PY3",
     deps = [
         "//temporal_feature_processor/core/data:event",
-        "//temporal_feature_processor/implementation/pandas/operators:base",
         "//temporal_feature_processor/proto:core_py_proto",
     ],
 )
@@ -54,7 +50,6 @@ py_library(
         "//temporal_feature_processor/core/data:event",
         "//temporal_feature_processor/core/data:feature",
         "//temporal_feature_processor/core/data:sampling",
-        "//temporal_feature_processor/implementation/pandas/operators:base",
         "//temporal_feature_processor/proto:core_py_proto",
     ],
 )
@@ -68,8 +63,6 @@ py_library(
         "//temporal_feature_processor/core:operator_lib",
         "//temporal_feature_processor/core/data:event",
         "//temporal_feature_processor/core/data:feature",
-        "//temporal_feature_processor/implementation/pandas/operators:base",
-        "//temporal_feature_processor/implementation/pandas/operators/window:simple_moving_average",
         "//temporal_feature_processor/proto:core_py_proto",
     ],
 )
