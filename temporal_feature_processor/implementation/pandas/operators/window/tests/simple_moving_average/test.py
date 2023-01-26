@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pandas as pd
 from absl.testing import absltest
 
 from temporal_feature_processor.implementation.pandas.operators.window import \
     simple_moving_average
-from temporal_feature_processor.implementation.pandas.operators.window.tests.simple_moving_average.data import \
-    no_index
+from temporal_feature_processor.implementation.pandas.operators.window.tests.simple_moving_average.data import (
+    no_index, same_sampling)
 
 
 class SimpleMovingAverageOperatorTest(absltest.TestCase):
@@ -28,7 +29,17 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
     operator = simple_moving_average.PandasSimpleMovingAverageOperator(
         window_length="7d")
     output = operator(no_index.INPUT, no_index.SAMPLING)
+    pd.testing.assert_frame_equal(no_index.OUTPUT, output["output"])
     self.assertTrue(no_index.OUTPUT.equals(output["output"]))
+
+  def test_same_sampling(self) -> None:
+    """Test simple moving average operator with same sampling for all index
+    values."""
+    operator = simple_moving_average.PandasSimpleMovingAverageOperator(
+        window_length="7d")
+    output = operator(same_sampling.INPUT, same_sampling.SAMPLING)
+    pd.testing.assert_frame_equal(same_sampling.OUTPUT, output["output"])
+    self.assertTrue(same_sampling.OUTPUT.equals(output["output"]))
 
 
 if __name__ == "__main__":

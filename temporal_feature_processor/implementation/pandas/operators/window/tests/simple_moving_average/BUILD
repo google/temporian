@@ -13,5 +13,6 @@ py_test(
         # absl/testing:absltest dep,
         "//temporal_feature_processor/implementation/pandas/operators/window:simple_moving_average",
         "//temporal_feature_processor/implementation/pandas/operators/window/tests/simple_moving_average/data:no_index",
+        "//temporal_feature_processor/implementation/pandas/operators/window/tests/simple_moving_average/data:same_sampling",
     ],
 )

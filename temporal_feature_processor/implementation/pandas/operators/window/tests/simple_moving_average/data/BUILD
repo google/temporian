@@ -24,3 +24,13 @@ py_library(
         "//temporal_feature_processor/implementation/pandas/data:event",
     ],
 )
+
+py_library(
+    name = "same_sampling",
+    srcs = ["same_sampling.py"],
+    srcs_version = "PY3",
+    deps = [
+        # pandas dep,
+        "//temporal_feature_processor/implementation/pandas/data:event",
+    ],
+)
