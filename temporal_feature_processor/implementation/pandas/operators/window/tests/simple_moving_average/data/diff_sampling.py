@@ -19,6 +19,7 @@ import pandas as pd
 from temporal_feature_processor.implementation.pandas.data.event import PandasEvent
 from temporal_feature_processor.implementation.pandas.data.sampling import PandasSampling
 
+# set of 4 events with different timestamps for each id
 INPUT = PandasEvent(
     [
         [1, pd.Timestamp("2013-01-01"), 10.0],
@@ -33,6 +34,7 @@ INPUT = PandasEvent(
     columns=["id", "timestamp", "value"],
 ).set_index(["id", "timestamp"])
 
+# sampling covering daily range of dates for each id independently
 SAMPLING = PandasSampling.from_tuples([
     (1, pd.Timestamp("2013-01-01")),
     (1, pd.Timestamp("2013-01-02")),

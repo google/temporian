@@ -19,6 +19,7 @@ import pandas as pd
 from temporal_feature_processor.implementation.pandas.data.event import PandasEvent
 from temporal_feature_processor.implementation.pandas.data.sampling import PandasSampling
 
+# two features with different magnitudes
 INPUT = PandasEvent(
     [
         [pd.Timestamp("2013-01-01"), 10.0, 100.0],
@@ -29,6 +30,7 @@ INPUT = PandasEvent(
     columns=["timestamp", "f1", "f2"],
 ).set_index(["timestamp"])
 
+# sampling covering daily range of dates
 SAMPLING = PandasSampling.from_arrays([[
     pd.Timestamp("2013-01-01"),
     pd.Timestamp("2013-01-02"),

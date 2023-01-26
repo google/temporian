@@ -19,6 +19,7 @@ import pandas as pd
 from temporal_feature_processor.implementation.pandas.data.event import PandasEvent
 from temporal_feature_processor.implementation.pandas.data.sampling import PandasSampling
 
+# several events for days 01 and 02
 INPUT = PandasEvent(
     [
         [pd.Timestamp("2013-01-01 16:03:14"), 10.0],
@@ -31,18 +32,21 @@ INPUT = PandasEvent(
     columns=["timestamp", "value"],
 ).set_index(["timestamp"])
 
-SAMPLING = PandasSampling.from_arrays([[
-    pd.Timestamp("2013-01-01"),
-    pd.Timestamp("2013-01-02"),
-    pd.Timestamp("2013-01-03"),
-    pd.Timestamp("2013-01-04"),
-]],
-                                      names=["timestamp"])
+SAMPLING = PandasSampling.from_arrays(
+    [[
+        pd.Timestamp("2013-01-01"),
+        pd.Timestamp("2013-01-02"),
+        pd.Timestamp("2013-01-03"),
+        # range goes up until day 04 since we have events during day 03
+        # that wouldn't get processed otherwise
+        pd.Timestamp("2013-01-04"),
+    ]],
+    names=["timestamp"])
 
 OUTPUT = PandasEvent(
     [
-        [pd.Timestamp("2013-01-01"), None
-        ],  # first is empty since the output sampling's timestamps are in each day's start
+        # first is empty since the output sampling's timestamps are in each day's start
+        [pd.Timestamp("2013-01-01"), None],
         [pd.Timestamp("2013-01-02"), 20.0],
         [pd.Timestamp("2013-01-03"), 30.0],
         [pd.Timestamp("2013-01-04"), 35.0],
