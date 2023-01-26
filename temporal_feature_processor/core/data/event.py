@@ -14,7 +14,7 @@
 
 """An event is a collection (possibly empty) of timesampled feature values."""
 
-from typing import Any, List, Optional
+from typing import List
 
 from temporal_feature_processor.core.data.feature import Feature
 from temporal_feature_processor.core.data.sampling import Sampling
@@ -30,9 +30,6 @@ class Event(object):
     self._features = features
     self._sampling = sampling
 
-    # materialized data
-    self._data: Optional[Any] = None
-
   def __repr__(self):
     return f'Event<features:{self._features},sampling:{self._sampling},id:{id(self)}>'
 
@@ -41,12 +38,3 @@ class Event(object):
 
   def features(self):
     return self._features
-
-  def data(self) -> Optional[Any]:
-    return self._data
-
-  def set_data(self, data: Any) -> None:
-    self._data = data
-
-  def is_computed(self) -> bool:
-    return self._data is not None

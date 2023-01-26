@@ -33,9 +33,6 @@ class Feature(object):
     self._dtype = dtype
     self._creator = creator
 
-    # materialized data
-    self._data: Optional[Any] = None
-
   def __repr__(self):
     return f'Feature<name:{self._name},dtype:{self._dtype},sampling:{self._sampling},creator:{self.creator()},id:{id(self)}>'
 
@@ -51,14 +48,5 @@ class Feature(object):
   def creator(self):
     return self._creator
 
-  def data(self) -> Optional[Any]:
-    return self._data
-
   def set_sampling(self, sampling: sampling_lib.Sampling):
     self._sampling = sampling
-
-  def set_data(self, data: Any) -> None:
-    self._data = data
-
-  def is_computed(self) -> bool:
-    return self._data is not None
