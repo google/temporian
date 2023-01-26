@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from absl.testing import absltest
+import pandas as pd
 
 from temporal_feature_processor.core.data.event import Event
 from temporal_feature_processor.core.data.event import Feature
@@ -26,9 +27,28 @@ class PrototypeTest(absltest.TestCase):
 
   def setUp(self) -> None:
 
-    self.expected_output_event = pandas_event.pandas_event_from_csv(
-        "temporal_feature_processor/test/test_data/prototype/output_event.csv",
-        Sampling(["product_id", "timestamp"]))
+    self.assignee_event = "temporal_feature_processor/test/test_data/prototype/assignee_event.csv"
+
+    self.assigned_event = pandas_event.PandasEvent({
+        "product_id": [666964, 666964, 574016],
+        "timestamp": [
+            pd.Timestamp("2013-01-02", tz="UTC"),
+            pd.Timestamp("2013-01-03", tz="UTC"),
+            pd.Timestamp("2013-01-04", tz="UTC")
+        ],
+        "costs": [740.0, 508.0, 573.0]
+    }).set_index(["product_id", "timestamp"])
+
+    self.expected_output_event = pandas_event.PandasEvent({
+        "product_id": [666964, 666964, 574016],
+        "timestamp": [
+            pd.Timestamp("2013-01-02", tz="UTC"),
+            pd.Timestamp("2013-01-03", tz="UTC"),
+            pd.Timestamp("2013-01-04", tz="UTC")
+        ],
+        "sales": [1091.0, 919.0, 953.0],
+        "costs": [740.0, 508.0, 573.0]
+    }).set_index(["product_id", "timestamp"])
 
   def test_prototoype(self) -> None:
 
@@ -46,15 +66,16 @@ class PrototypeTest(absltest.TestCase):
         output_event,
         input_data={
             # assignee event specified from disk
-            assignee_event:
-                "temporal_feature_processor/test/test_data/prototype/assignee_event.csv",
+            assignee_event: self.assignee_event,
             # assigned event loaded in ram
-            assigned_event:
-                pandas_event.pandas_event_from_csv(
-                    "temporal_feature_processor/test/test_data/prototype/assigned_event.csv",
-                    Sampling(["product_id", "timestamp"]))
+            assigned_event: self.assigned_event
         },
         backend="pandas")
+
+    print(self.assignee_event)
+    print(self.assigned_event)
+    print(self.expected_output_event)
+    print(output_event_pandas)
 
     # validate
     self.assertEqual(
