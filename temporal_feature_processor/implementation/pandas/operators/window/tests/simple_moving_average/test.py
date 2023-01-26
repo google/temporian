@@ -18,7 +18,7 @@ from absl.testing import absltest
 from temporal_feature_processor.implementation.pandas.operators.window import \
     simple_moving_average
 from temporal_feature_processor.implementation.pandas.operators.window.tests.simple_moving_average.data import (
-    diff_sampling, many_events_per_day, no_index, same_sampling)
+    diff_sampling, many_events_per_day, many_features, no_index, same_sampling)
 
 
 class SimpleMovingAverageOperatorTest(absltest.TestCase):
@@ -47,13 +47,21 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
     pd.testing.assert_frame_equal(diff_sampling.OUTPUT, output["output"])
     self.assertTrue(diff_sampling.OUTPUT.equals(output["output"]))
 
-  def many_events_per_day(self) -> None:
+  def test_many_events_per_day(self) -> None:
     """Test several events occuring per day."""
     operator = simple_moving_average.PandasSimpleMovingAverageOperator(
         window_length="7d")
     output = operator(many_events_per_day.INPUT, many_events_per_day.SAMPLING)
     pd.testing.assert_frame_equal(many_events_per_day.OUTPUT, output["output"])
     self.assertTrue(many_events_per_day.OUTPUT.equals(output["output"]))
+
+  def test_many_features(self) -> None:
+    """Test several events occuring per day."""
+    operator = simple_moving_average.PandasSimpleMovingAverageOperator(
+        window_length="7d")
+    output = operator(many_features.INPUT, many_features.SAMPLING)
+    pd.testing.assert_frame_equal(many_features.OUTPUT, output["output"])
+    self.assertTrue(many_features.OUTPUT.equals(output["output"]))
 
 
 if __name__ == "__main__":

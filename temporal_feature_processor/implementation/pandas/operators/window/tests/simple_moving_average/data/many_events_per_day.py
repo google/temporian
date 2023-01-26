@@ -36,14 +36,18 @@ INPUT = PandasEvent(
 SAMPLING = PandasSampling.from_arrays([[
     pd.Timestamp("2013-01-01"),
     pd.Timestamp("2013-01-02"),
+    pd.Timestamp("2013-01-03"),
+    pd.Timestamp("2013-01-04"),
 ]],
                                       names=["timestamp"])
 
 OUTPUT = PandasEvent(
     [
-        [pd.Timestamp("2013-01-01"), 20.0],
-        [pd.Timestamp("2013-01-02"), 30.0],
-        [pd.Timestamp("2013-01-03"), 35.0],
+        [pd.Timestamp("2013-01-01"), None
+        ],  # first is empty since the output sampling's timestamps are in each day's start
+        [pd.Timestamp("2013-01-02"), 20.0],
+        [pd.Timestamp("2013-01-03"), 30.0],
+        [pd.Timestamp("2013-01-04"), 35.0],
     ],
-    columns=["timestamp", "simple_moving_average"],
+    columns=["timestamp", "sma_value"],
 ).set_index(["timestamp"])

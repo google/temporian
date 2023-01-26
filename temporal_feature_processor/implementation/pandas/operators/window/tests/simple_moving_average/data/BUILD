@@ -54,3 +54,13 @@ py_library(
         "//temporal_feature_processor/implementation/pandas/data:event",
     ],
 )
+
+py_library(
+    name = "many_features",
+    srcs = ["many_features.py"],
+    srcs_version = "PY3",
+    deps = [
+        # pandas dep,
+        "//temporal_feature_processor/implementation/pandas/data:event",
+    ],
+)

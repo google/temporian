@@ -90,5 +90,5 @@ OUTPUT = PandasEvent(
         [2, pd.Timestamp("2013-01-11"), None],
         [2, pd.Timestamp("2013-01-12"), 400.0],
     ],
-    columns=["id", "timestamp", "simple_moving_average"],
+    columns=["id", "timestamp", "sma_value"],
 ).set_index(["id", "timestamp"])
