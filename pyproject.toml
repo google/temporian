@@ -29,6 +29,7 @@ column_limit = 80
 
 [tool.pylint]
 indent-string = '  '
+max-line-length = 80
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -18,12 +18,9 @@ from typing import Dict
 
 import pandas as pd
 
-from temporal_feature_processor.implementation.pandas.data.event import \
-    PandasEvent
-from temporal_feature_processor.implementation.pandas.data.sampling import \
-    PandasSampling
-from temporal_feature_processor.implementation.pandas.operators.window.base import \
-    PandasWindowOperator
+from temporal_feature_processor.implementation.pandas.data.event import PandasEvent
+from temporal_feature_processor.implementation.pandas.data.sampling import PandasSampling
+from temporal_feature_processor.implementation.pandas.operators.window.base import PandasWindowOperator
 
 
 class PandasSimpleMovingAverageOperator(PandasWindowOperator):

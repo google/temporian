@@ -17,8 +17,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Tuple
 
-from temporal_feature_processor.implementation.pandas.data.event import \
-    PandasEvent
+from temporal_feature_processor.implementation.pandas.data.event import PandasEvent
 
 
 class PandasOperator(ABC):

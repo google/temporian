@@ -15,10 +15,12 @@
 import pandas as pd
 from absl.testing import absltest
 
-from temporal_feature_processor.implementation.pandas.operators.window import \
-    simple_moving_average
-from temporal_feature_processor.implementation.pandas.operators.window.tests.simple_moving_average.data import (
-    diff_sampling, many_events_per_day, many_features, no_index, same_sampling)
+from temporal_feature_processor.implementation.pandas.operators.window import simple_moving_average
+from temporal_feature_processor.implementation.pandas.operators.window.tests.simple_moving_average.data import diff_sampling
+from temporal_feature_processor.implementation.pandas.operators.window.tests.simple_moving_average.data import many_events_per_day
+from temporal_feature_processor.implementation.pandas.operators.window.tests.simple_moving_average.data import many_features
+from temporal_feature_processor.implementation.pandas.operators.window.tests.simple_moving_average.data import no_index
+from temporal_feature_processor.implementation.pandas.operators.window.tests.simple_moving_average.data import same_sampling
 
 
 class SimpleMovingAverageOperatorTest(absltest.TestCase):

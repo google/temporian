@@ -16,10 +16,8 @@
 
 import pandas as pd
 
-from temporal_feature_processor.implementation.pandas.data.event import \
-    PandasEvent
-from temporal_feature_processor.implementation.pandas.data.sampling import \
-    PandasSampling
+from temporal_feature_processor.implementation.pandas.data.event import PandasEvent
+from temporal_feature_processor.implementation.pandas.data.sampling import PandasSampling
 
 INPUT = PandasEvent(
     [

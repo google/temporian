@@ -14,8 +14,7 @@
 
 """Base class for the implementation of window operators."""
 
-from temporal_feature_processor.implementation.pandas.operators.base import \
-    PandasOperator
+from temporal_feature_processor.implementation.pandas.operators.base import PandasOperator
 
 
 class PandasWindowOperator(PandasOperator):

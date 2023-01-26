@@ -15,9 +15,10 @@
 from absl.testing import absltest
 
 from temporal_feature_processor.implementation.pandas.operators import assign
-from temporal_feature_processor.implementation.pandas.operators.tests.assign.test_data import (
-    different_index, repeated_timestamps, with_idx_more_timestamps,
-    with_idx_same_timestamps)
+from temporal_feature_processor.implementation.pandas.operators.tests.assign.test_data import different_index
+from temporal_feature_processor.implementation.pandas.operators.tests.assign.test_data import repeated_timestamps
+from temporal_feature_processor.implementation.pandas.operators.tests.assign.test_data import with_idx_more_timestamps
+from temporal_feature_processor.implementation.pandas.operators.tests.assign.test_data import with_idx_same_timestamps
 
 
 class AssignOperatorTest(absltest.TestCase):
