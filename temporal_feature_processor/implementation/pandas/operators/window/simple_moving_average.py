@@ -27,7 +27,7 @@ from temporal_feature_processor.implementation.pandas.operators.window.base impo
 
 
 class PandasSimpleMovingAverageOperator(PandasWindowOperator):
-  """Base class for window operators."""
+  """Pandas implementation for the simple moving average operator."""
 
   def __init__(self, window_length: str) -> None:
     super().__init__(window_length=window_length)
