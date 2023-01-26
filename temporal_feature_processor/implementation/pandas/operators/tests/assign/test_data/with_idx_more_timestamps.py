@@ -26,8 +26,8 @@ INPUT_1 = pd.DataFrame({
         372306,
     ],
     "timestamp": [
-        pd.Timestamp("2013-01-01", tz="UTC"),
-        pd.Timestamp("2013-01-05", tz="UTC"),
+        pd.Timestamp("2013-01-01"),
+        pd.Timestamp("2013-01-05"),
     ],
     "sales": [
         0.0,
@@ -42,10 +42,10 @@ INPUT_2 = pd.DataFrame({
         372306,
     ],
     "timestamp": [
-        pd.Timestamp("2013-01-01", tz="UTC"),
-        pd.Timestamp("2013-01-05", tz="UTC"),
+        pd.Timestamp("2013-01-01"),
+        pd.Timestamp("2013-01-05"),
         pd.Timestamp(
-            "2013-01-07", tz="UTC"
+            "2013-01-07"
         ),  # more timestamps than assignee event for porudct_id = 372306
     ],
     "costs": [
@@ -61,10 +61,8 @@ OUTPUT = pd.DataFrame({
         372306,
     ],
     "timestamp": [
-        pd.Timestamp("2013-01-01", tz="UTC"),
-        pd.Timestamp(
-            "2013-01-05", tz="UTC"
-        ),  # assignee event's timestamps are preserved
+        pd.Timestamp("2013-01-01"),
+        pd.Timestamp("2013-01-05"),  # assignee event's timestamps are preserved
     ],
     "sales": [
         0.0,

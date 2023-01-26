@@ -30,11 +30,10 @@ class PrototypeTest(absltest.TestCase):
           574016,
       ],
       "timestamp": [
-          pd.Timestamp("2013-01-02", tz="UTC"),
-          pd.Timestamp("2013-01-03", tz="UTC"),
+          pd.Timestamp("2013-01-02"),
+          pd.Timestamp("2013-01-03"),
           pd.Timestamp(
-              "2013-01-04", tz="UTC"
-          ),  # identical timestamps for each index value
+              "2013-01-04"),  # identical timestamps for each index value
       ],
       "sales": [
           1091.0,
@@ -50,11 +49,10 @@ class PrototypeTest(absltest.TestCase):
           574016,
       ],
       "timestamp": [
-          pd.Timestamp("2013-01-02", tz="UTC"),
-          pd.Timestamp("2013-01-03", tz="UTC"),
+          pd.Timestamp("2013-01-02",),
+          pd.Timestamp("2013-01-03",),
           pd.Timestamp(
-              "2013-01-04", tz="UTC"
-          ),  # identical timestamps for each index value
+              "2013-01-04"),  # identical timestamps for each index value
       ],
       "costs": [
           740.0,
@@ -70,9 +68,9 @@ class PrototypeTest(absltest.TestCase):
           574016,
       ],
       "timestamp": [
-          pd.Timestamp("2013-01-02", tz="UTC"),
-          pd.Timestamp("2013-01-03", tz="UTC"),
-          pd.Timestamp("2013-01-04", tz="UTC"),
+          pd.Timestamp("2013-01-02"),
+          pd.Timestamp("2013-01-03"),
+          pd.Timestamp("2013-01-04"),
       ],
       "sales": [
           1091.0,
@@ -116,12 +114,10 @@ class PrototypeTest(absltest.TestCase):
         pending_features.remove(feature)
         continue
 
-      if all(
-          [
-              creator_input_feature.is_computed()
-              for creator_input_feature in feature.creator().inputs().values()
-          ]
-      ):
+      if all([
+          creator_input_feature.is_computed()
+          for creator_input_feature in feature.creator().inputs().values()
+      ]):
         # evaluate operator
         feature.creator().evaluate()
 

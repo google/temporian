@@ -21,44 +21,44 @@ from temporal_feature_processor.implementation.pandas.data.sampling import Panda
 
 INPUT = PandasEvent(
     [
-        [pd.Timestamp("2013-01-01", tz="UTC"), 10.0, 100.0],
-        [pd.Timestamp("2013-01-02", tz="UTC"), 20.0, 200.0],
-        [pd.Timestamp("2013-01-03", tz="UTC"), 30.0, 300.0],
-        [pd.Timestamp("2013-01-12", tz="UTC"), 40.0, 400.0],
+        [pd.Timestamp("2013-01-01"), 10.0, 100.0],
+        [pd.Timestamp("2013-01-02"), 20.0, 200.0],
+        [pd.Timestamp("2013-01-03"), 30.0, 300.0],
+        [pd.Timestamp("2013-01-12"), 40.0, 400.0],
     ],
     columns=["timestamp", "f1", "f2"],
 ).set_index(["timestamp"])
 
 SAMPLING = PandasSampling.from_arrays([[
-    pd.Timestamp("2013-01-01", tz="UTC"),
-    pd.Timestamp("2013-01-02", tz="UTC"),
-    pd.Timestamp("2013-01-03", tz="UTC"),
-    pd.Timestamp("2013-01-04", tz="UTC"),
-    pd.Timestamp("2013-01-05", tz="UTC"),
-    pd.Timestamp("2013-01-06", tz="UTC"),
-    pd.Timestamp("2013-01-07", tz="UTC"),
-    pd.Timestamp("2013-01-08", tz="UTC"),
-    pd.Timestamp("2013-01-09", tz="UTC"),
-    pd.Timestamp("2013-01-10", tz="UTC"),
-    pd.Timestamp("2013-01-11", tz="UTC"),
-    pd.Timestamp("2013-01-12", tz="UTC")
+    pd.Timestamp("2013-01-01"),
+    pd.Timestamp("2013-01-02"),
+    pd.Timestamp("2013-01-03"),
+    pd.Timestamp("2013-01-04"),
+    pd.Timestamp("2013-01-05"),
+    pd.Timestamp("2013-01-06"),
+    pd.Timestamp("2013-01-07"),
+    pd.Timestamp("2013-01-08"),
+    pd.Timestamp("2013-01-09"),
+    pd.Timestamp("2013-01-10"),
+    pd.Timestamp("2013-01-11"),
+    pd.Timestamp("2013-01-12")
 ]],
                                       names=["timestamp"])
 
 OUTPUT = PandasEvent(
     [
-        [pd.Timestamp("2013-01-01", tz="UTC"), 10.0, 100.0],
-        [pd.Timestamp("2013-01-02", tz="UTC"), 15.0, 150.0],
-        [pd.Timestamp("2013-01-03", tz="UTC"), 20.0, 200.0],
-        [pd.Timestamp("2013-01-04", tz="UTC"), 20.0, 200.0],
-        [pd.Timestamp("2013-01-05", tz="UTC"), 20.0, 200.0],
-        [pd.Timestamp("2013-01-06", tz="UTC"), 20.0, 200.0],
-        [pd.Timestamp("2013-01-07", tz="UTC"), 20.0, 200.0],
-        [pd.Timestamp("2013-01-08", tz="UTC"), 20.0, 200.0],
-        [pd.Timestamp("2013-01-09", tz="UTC"), 25.0, 250.0],
-        [pd.Timestamp("2013-01-10", tz="UTC"), 30.0, 300.0],
-        [pd.Timestamp("2013-01-11", tz="UTC"), None, None],
-        [pd.Timestamp("2013-01-12", tz="UTC"), 40.0, 400.0],
+        [pd.Timestamp("2013-01-01"), 10.0, 100.0],
+        [pd.Timestamp("2013-01-02"), 15.0, 150.0],
+        [pd.Timestamp("2013-01-03"), 20.0, 200.0],
+        [pd.Timestamp("2013-01-04"), 20.0, 200.0],
+        [pd.Timestamp("2013-01-05"), 20.0, 200.0],
+        [pd.Timestamp("2013-01-06"), 20.0, 200.0],
+        [pd.Timestamp("2013-01-07"), 20.0, 200.0],
+        [pd.Timestamp("2013-01-08"), 20.0, 200.0],
+        [pd.Timestamp("2013-01-09"), 25.0, 250.0],
+        [pd.Timestamp("2013-01-10"), 30.0, 300.0],
+        [pd.Timestamp("2013-01-11"), None, None],
+        [pd.Timestamp("2013-01-12"), 40.0, 400.0],
     ],
     columns=["timestamp", "sma_f1", "sma_f2"],
 ).set_index(["timestamp"])

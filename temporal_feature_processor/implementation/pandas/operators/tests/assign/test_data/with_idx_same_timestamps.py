@@ -27,11 +27,9 @@ INPUT_1 = pd.DataFrame({
         574016,
     ],
     "timestamp": [
-        pd.Timestamp("2013-01-02", tz="UTC"),
-        pd.Timestamp("2013-01-03", tz="UTC"),
-        pd.Timestamp(
-            "2013-01-04", tz="UTC"
-        ),  # identical timestamps for each index value
+        pd.Timestamp("2013-01-02"),
+        pd.Timestamp("2013-01-03"),
+        pd.Timestamp("2013-01-04"),  # identical timestamps for each index value
     ],
     "sales": [
         1091.0,
@@ -47,11 +45,9 @@ INPUT_2 = pd.DataFrame({
         574016,
     ],
     "timestamp": [
-        pd.Timestamp("2013-01-02", tz="UTC"),
-        pd.Timestamp("2013-01-03", tz="UTC"),
-        pd.Timestamp(
-            "2013-01-04", tz="UTC"
-        ),  # identical timestamps for each index value
+        pd.Timestamp("2013-01-02"),
+        pd.Timestamp("2013-01-03"),
+        pd.Timestamp("2013-01-04"),  # identical timestamps for each index value
     ],
     "costs": [
         740.0,
@@ -67,9 +63,9 @@ OUTPUT = pd.DataFrame({
         574016,
     ],
     "timestamp": [
-        pd.Timestamp("2013-01-02", tz="UTC"),
-        pd.Timestamp("2013-01-03", tz="UTC"),
-        pd.Timestamp("2013-01-04", tz="UTC"),
+        pd.Timestamp("2013-01-02"),
+        pd.Timestamp("2013-01-03"),
+        pd.Timestamp("2013-01-04"),
     ],
     "sales": [
         1091.0,

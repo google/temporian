@@ -27,11 +27,11 @@ INPUT_1 = pd.DataFrame({
         191562515,
     ],
     "timestamp": [
-        pd.Timestamp("2020-12-20", tz="UTC"),
+        pd.Timestamp("2020-12-20"),
         pd.Timestamp(
-            "2020-12-20", tz="UTC"
+            "2020-12-20"
         ),  # repeated timestamp on assingee event for user_id = 151591562
-        pd.Timestamp("2020-12-22", tz="UTC"),
+        pd.Timestamp("2020-12-22"),
     ],
     "price": [
         63.49,
@@ -47,10 +47,10 @@ INPUT_2 = pd.DataFrame({
         191562515,
     ],
     "timestamp": [
-        pd.Timestamp("2020-11-15", tz="UTC"),
-        pd.Timestamp("2020-11-18", tz="UTC"),
+        pd.Timestamp("2020-11-15"),
+        pd.Timestamp("2020-11-18"),
         pd.Timestamp(
-            "2020-11-18", tz="UTC"
+            "2020-11-18"
         ),  # repeated timestamp on assinged event for user_id = 191562515
     ],
     "price": [

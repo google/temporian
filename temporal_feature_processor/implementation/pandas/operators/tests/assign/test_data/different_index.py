@@ -25,16 +25,14 @@ INPUT_1 = pd.DataFrame({
         193285921,
     ],
     "timestamp": [
-        pd.Timestamp("2020-11-09", tz="UTC"),
-        pd.Timestamp("2020-11-10", tz="UTC"),
+        pd.Timestamp("2020-11-09"),
+        pd.Timestamp("2020-11-10"),
     ],
     "price": [
         63.49,
         55.12,
     ],
-}).set_index(
-    ["user_id", "timestamp"]
-)  # index is user_id
+}).set_index(["user_id", "timestamp"])  # index is user_id
 
 INPUT_2 = pd.DataFrame({
     "product_id": [
@@ -42,13 +40,11 @@ INPUT_2 = pd.DataFrame({
         574016,
     ],
     "timestamp": [
-        pd.Timestamp("2020-11-09", tz="UTC"),
-        pd.Timestamp("2020-11-10", tz="UTC"),
+        pd.Timestamp("2020-11-09"),
+        pd.Timestamp("2020-11-10"),
     ],
     "price": [
         126.98,
         266.42,
     ],
-}).set_index(
-    ["product_id", "timestamp"]
-)  # index is product_id
+}).set_index(["product_id", "timestamp"])  # index is product_id
