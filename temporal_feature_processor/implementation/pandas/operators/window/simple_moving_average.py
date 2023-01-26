@@ -53,7 +53,6 @@ class PandasSimpleMovingAverageOperator(PandasWindowOperator):
     data_no_index = data.reset_index()
 
     # get index columns and name of timestamp column
-    print(sampling.names)
     index_columns = sampling.names[:-1]
     timestamp_column = sampling.names[-1]
 
@@ -70,14 +69,9 @@ class PandasSimpleMovingAverageOperator(PandasWindowOperator):
       timestamp = values[-1]
 
       # filter by index_value
-      print(index_value)
-      print(index_columns)
-      print(data_no_index[index_columns])
-      print(type(data_no_index[index_columns]))
       data_filtered = data_no_index[(
           data_no_index[index_columns]
           == index_value).squeeze()] if index_columns else data_no_index
-      print(data_filtered)
 
       # filter by window start/end dates
       data_filtered = data_filtered[
@@ -86,10 +80,7 @@ class PandasSimpleMovingAverageOperator(PandasWindowOperator):
            pd.Timedelta(self.window_length))]
 
       # calculate average of window
-      print(sampling.names)
-      print(data_filtered)
       mean = data_filtered.set_index(sampling.names).mean().item()
-      print(mean)
 
       # set result in output event
       loc = index_value + (timestamp,)
