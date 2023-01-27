@@ -28,6 +28,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        # pandas dep,
         "//temporal_feature_processor/implementation/pandas/data:event",
         "//temporal_feature_processor/implementation/pandas/data:sampling",
     ],

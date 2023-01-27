@@ -35,33 +35,35 @@ INPUT = PandasEvent(
 ).set_index(["id", "timestamp"])
 
 # sampling covering daily range of dates
-SAMPLING = PandasSampling.from_tuples([
-    (1, pd.Timestamp("2013-01-01")),
-    (1, pd.Timestamp("2013-01-02")),
-    (1, pd.Timestamp("2013-01-03")),
-    (1, pd.Timestamp("2013-01-04")),
-    (1, pd.Timestamp("2013-01-05")),
-    (1, pd.Timestamp("2013-01-06")),
-    (1, pd.Timestamp("2013-01-07")),
-    (1, pd.Timestamp("2013-01-08")),
-    (1, pd.Timestamp("2013-01-09")),
-    (1, pd.Timestamp("2013-01-10")),
-    (1, pd.Timestamp("2013-01-11")),
-    (1, pd.Timestamp("2013-01-12")),
-    (2, pd.Timestamp("2013-01-01")),
-    (2, pd.Timestamp("2013-01-02")),
-    (2, pd.Timestamp("2013-01-03")),
-    (2, pd.Timestamp("2013-01-04")),
-    (2, pd.Timestamp("2013-01-05")),
-    (2, pd.Timestamp("2013-01-06")),
-    (2, pd.Timestamp("2013-01-07")),
-    (2, pd.Timestamp("2013-01-08")),
-    (2, pd.Timestamp("2013-01-09")),
-    (2, pd.Timestamp("2013-01-10")),
-    (2, pd.Timestamp("2013-01-11")),
-    (2, pd.Timestamp("2013-01-12")),
-],
-                                      names=["id", "timestamp"])
+SAMPLING = PandasSampling.from_tuples(
+    [
+        (1, pd.Timestamp("2013-01-01")),
+        (1, pd.Timestamp("2013-01-02")),
+        (1, pd.Timestamp("2013-01-03")),
+        (1, pd.Timestamp("2013-01-04")),
+        (1, pd.Timestamp("2013-01-05")),
+        (1, pd.Timestamp("2013-01-06")),
+        (1, pd.Timestamp("2013-01-07")),
+        (1, pd.Timestamp("2013-01-08")),
+        (1, pd.Timestamp("2013-01-09")),
+        (1, pd.Timestamp("2013-01-10")),
+        (1, pd.Timestamp("2013-01-11")),
+        (1, pd.Timestamp("2013-01-12")),
+        (2, pd.Timestamp("2013-01-01")),
+        (2, pd.Timestamp("2013-01-02")),
+        (2, pd.Timestamp("2013-01-03")),
+        (2, pd.Timestamp("2013-01-04")),
+        (2, pd.Timestamp("2013-01-05")),
+        (2, pd.Timestamp("2013-01-06")),
+        (2, pd.Timestamp("2013-01-07")),
+        (2, pd.Timestamp("2013-01-08")),
+        (2, pd.Timestamp("2013-01-09")),
+        (2, pd.Timestamp("2013-01-10")),
+        (2, pd.Timestamp("2013-01-11")),
+        (2, pd.Timestamp("2013-01-12")),
+    ],
+    names=["id", "timestamp"],
+)
 
 OUTPUT = PandasEvent(
     [

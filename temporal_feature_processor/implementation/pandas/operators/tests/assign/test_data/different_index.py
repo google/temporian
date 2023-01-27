@@ -32,7 +32,9 @@ INPUT_1 = pd.DataFrame({
         63.49,
         55.12,
     ],
-}).set_index(["user_id", "timestamp"])  # index is user_id
+}).set_index(
+    ["user_id", "timestamp"]
+)  # index is user_id
 
 INPUT_2 = pd.DataFrame({
     "product_id": [
@@ -47,4 +49,6 @@ INPUT_2 = pd.DataFrame({
         126.98,
         266.42,
     ],
-}).set_index(["product_id", "timestamp"])  # index is product_id
+}).set_index(
+    ["product_id", "timestamp"]
+)  # index is product_id

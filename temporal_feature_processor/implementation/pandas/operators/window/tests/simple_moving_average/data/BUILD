@@ -1,3 +1,4 @@
+
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],
@@ -22,6 +23,7 @@ py_library(
     deps = [
         # pandas dep,
         "//temporal_feature_processor/implementation/pandas/data:event",
+        "//temporal_feature_processor/implementation/pandas/data:sampling",
     ],
 )
 
@@ -32,6 +34,7 @@ py_library(
     deps = [
         # pandas dep,
         "//temporal_feature_processor/implementation/pandas/data:event",
+        "//temporal_feature_processor/implementation/pandas/data:sampling",
     ],
 )
 
@@ -42,6 +45,7 @@ py_library(
     deps = [
         # pandas dep,
         "//temporal_feature_processor/implementation/pandas/data:event",
+        "//temporal_feature_processor/implementation/pandas/data:sampling",
     ],
 )
 
@@ -52,6 +56,7 @@ py_library(
     deps = [
         # pandas dep,
         "//temporal_feature_processor/implementation/pandas/data:event",
+        "//temporal_feature_processor/implementation/pandas/data:sampling",
     ],
 )
 
@@ -62,5 +67,6 @@ py_library(
     deps = [
         # pandas dep,
         "//temporal_feature_processor/implementation/pandas/data:event",
+        "//temporal_feature_processor/implementation/pandas/data:sampling",
     ],
 )

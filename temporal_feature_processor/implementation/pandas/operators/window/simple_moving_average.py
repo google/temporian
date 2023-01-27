@@ -56,7 +56,8 @@ class PandasSimpleMovingAverageOperator(PandasWindowOperator):
     # create output event with desired sampling
     output = PandasEvent(
         {f"sma_{col}": [None] * len(sampling) for col in data.columns},
-        dtype=float).set_index(sampling)
+        dtype=float,
+    ).set_index(sampling)
 
     # manual rolling window since pandas doesn't support custom sampling in .rolling()
     # TODO: optimize window calculation
@@ -65,15 +66,20 @@ class PandasSimpleMovingAverageOperator(PandasWindowOperator):
       timestamp = values[-1]
 
       # filter by index_value
-      data_filtered = data_no_index[(
-          data_no_index[index_columns]
-          == index_value).squeeze()] if index_columns else data_no_index
+      data_filtered = (
+          data_no_index[(data_no_index[index_columns] == index_value).squeeze()]
+          if index_columns
+          else data_no_index
+      )
 
       # filter by window start/end dates
       data_filtered = data_filtered[
-          (data_filtered[timestamp_column] <= timestamp) &
-          (data_filtered[timestamp_column] >= timestamp -
-           pd.Timedelta(self.window_length))]
+          (data_filtered[timestamp_column] <= timestamp)
+          & (
+              data_filtered[timestamp_column]
+              >= timestamp - pd.Timedelta(self.window_length)
+          )
+      ]
 
       # calculate average of window
       mean = data_filtered.set_index(sampling.names).mean(axis=0).values

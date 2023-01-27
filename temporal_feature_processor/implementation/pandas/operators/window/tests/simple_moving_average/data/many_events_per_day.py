@@ -41,7 +41,8 @@ SAMPLING = PandasSampling.from_arrays(
         # that wouldn't get processed otherwise
         pd.Timestamp("2013-01-04"),
     ]],
-    names=["timestamp"])
+    names=["timestamp"],
+)
 
 OUTPUT = PandasEvent(
     [
