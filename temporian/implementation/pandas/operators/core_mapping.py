@@ -12,6 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from temporian.implementation.pandas.operators import assign
+from temporal_feature_processor.implementation.pandas.operators import assign
+from temporal_feature_processor.implementation.pandas.operators.window import simple_moving_average
 
-OPERATOR_IMPLEMENTATIONS = {"ASSIGN": assign.PandasAssignOperator}
+OPERATOR_IMPLEMENTATIONS = {
+    "ASSIGN":
+        assign.PandasAssignOperator,
+    "SIMPLE_MOVING_AVERAGE":
+        simple_moving_average.PandasSimpleMovingAverageOperator
+}

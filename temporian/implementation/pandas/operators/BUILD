@@ -37,5 +37,6 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":assign",
+        "//temporal_feature_processor/implementation/pandas/operators/window:simple_moving_average",
     ],
 )
