@@ -1,0 +1,6 @@
+build -c opt
+build --spawn_strategy=standalone
+build --announce_rc
+build --noincompatible_strict_action_env
+build:linux --copt=-fdiagnostics-color=always
+build --color=yes
