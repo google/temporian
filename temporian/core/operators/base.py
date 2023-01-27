@@ -15,7 +15,7 @@
 """Operator module."""
 
 from abc import ABC
-from typing import Dict
+from typing import Dict, Any
 
 from temporian.core.data.event import Event
 from temporian.proto import core_pb2 as pb
@@ -61,6 +61,7 @@ class Operator(ABC):
   def __init__(self):
     self._inputs = {}
     self._outputs = {}
+    self._attributes = {}
 
   def __str__(self):
     return f'Operator<key:{self.definition().key},id:{id(self)}>'
@@ -73,6 +74,9 @@ class Operator(ABC):
 
   def inputs(self) -> Dict[str, Event]:
     return self._inputs
+
+  def attributes(self) -> Dict[str, Any]:
+    return self._attributes
 
   def check(self) -> None:
     """Ensures that the operator is valid."""
@@ -114,6 +118,12 @@ class Operator(ABC):
       if key in self._outputs:
         raise ValueError(f'Already existing output "{key}".')
       self._outputs[key] = event
+
+  def add_attribute(self, key: str, value: Any) -> None:
+    with OperatorExceptionDecorator(self):
+      if key in self._attributes:
+        raise ValueError(f'Already existing attribute "{key}".')
+      self._attributes[key] = value
 
   @classmethod
   def build_op_definition(cls) -> pb.OperatorDef:
