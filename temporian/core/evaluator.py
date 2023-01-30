@@ -97,7 +97,7 @@ def get_operator_schedule(query: List[Feature]) -> List[base.Operator]:
       continue
 
     # required input features to compute this feature
-    # TODO: handle samplings as different type of nodes instead of checking for Event type in inputs
+  # TODO: handle samplings as different type of nodes instead of checking for Event type in inputs
     creator_input_features = {
         input_feature for input_event in feature.creator().inputs().values()
         if isinstance(input_event, Event)
