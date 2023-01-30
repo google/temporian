@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "temporal_feature_processor"
+name = "temporian"
 version = "0.1.0"
 description = ""
 authors = [
