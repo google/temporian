@@ -21,6 +21,7 @@ py_library(
         # pandas dep,
         "//temporal_feature_processor/core/data:event",
         "//temporal_feature_processor/core/data:feature",
+        "//temporal_feature_processor/core/data:sampling",
     ],
 )
 

@@ -1,3 +1,4 @@
+
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],
@@ -11,7 +12,6 @@ py_test(
     srcs = ["operator_test.py"],
     srcs_version = "PY3",
     deps = [
-        # absl/logging dep,
         # absl/testing:absltest dep,
         "//temporal_feature_processor/core/data:event",
         "//temporal_feature_processor/core/data:sampling",

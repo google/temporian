@@ -15,28 +15,29 @@
 from absl.testing import absltest
 import pandas as pd
 
+from temporal_feature_processor.core import evaluator
 from temporal_feature_processor.core.data.event import Event
 from temporal_feature_processor.core.data.event import Feature
 from temporal_feature_processor.core.data.sampling import Sampling
 from temporal_feature_processor.core.operators.assign import assign
-from temporal_feature_processor.core import evaluator
 from temporal_feature_processor.implementation.pandas.data import event as pandas_event
 
 
 class PrototypeTest(absltest.TestCase):
 
   def setUp(self) -> None:
+    super().setUp()
 
-    self.assignee_event = "temporal_feature_processor/test/test_data/prototype/assignee_event.csv"
+    self.assignee_event = "tensorflow_decision_forests/contrib/temporal_feature_processor/temporal_feature_processor/test/test_data/prototype/assignee_event.csv"
 
     self.assigned_event = pandas_event.PandasEvent({
         "product_id": [666964, 666964, 574016],
         "timestamp": [
             pd.Timestamp("2013-01-02", tz="UTC"),
             pd.Timestamp("2013-01-03", tz="UTC"),
-            pd.Timestamp("2013-01-04", tz="UTC")
+            pd.Timestamp("2013-01-04", tz="UTC"),
         ],
-        "costs": [740.0, 508.0, 573.0]
+        "costs": [740.0, 508.0, 573.0],
     }).set_index(["product_id", "timestamp"])
 
     self.expected_output_event = pandas_event.PandasEvent({
@@ -44,19 +45,22 @@ class PrototypeTest(absltest.TestCase):
         "timestamp": [
             pd.Timestamp("2013-01-02", tz="UTC"),
             pd.Timestamp("2013-01-03", tz="UTC"),
-            pd.Timestamp("2013-01-04", tz="UTC")
+            pd.Timestamp("2013-01-04", tz="UTC"),
         ],
         "sales": [1091.0, 919.0, 953.0],
-        "costs": [740.0, 508.0, 573.0]
+        "costs": [740.0, 508.0, 573.0],
     }).set_index(["product_id", "timestamp"])
 
   def test_prototoype(self) -> None:
-
     # instance input events
-    assignee_event = Event(features=[Feature(name="sales", dtype=float)],
-                           sampling=Sampling(["product_id", "timestamp"]))
-    assigned_event = Event(features=[Feature(name="costs", dtype=float)],
-                           sampling=Sampling(["product_id", "timestamp"]))
+    assignee_event = Event(
+        features=[Feature(name="sales", dtype=float)],
+        sampling=Sampling(["product_id", "timestamp"]),
+    )
+    assigned_event = Event(
+        features=[Feature(name="costs", dtype=float)],
+        sampling=Sampling(["product_id", "timestamp"]),
+    )
 
     # call assign operator
     output_event = assign(assignee_event, assigned_event)
@@ -68,9 +72,10 @@ class PrototypeTest(absltest.TestCase):
             # assignee event specified from disk
             assignee_event: self.assignee_event,
             # assigned event loaded in ram
-            assigned_event: self.assigned_event
+            assigned_event: self.assigned_event,
         },
-        backend="pandas")
+        backend="pandas",
+    )
 
     print(self.assignee_event)
     print(self.assigned_event)
@@ -80,7 +85,8 @@ class PrototypeTest(absltest.TestCase):
     # validate
     self.assertEqual(
         True,
-        self.expected_output_event.equals(output_event_pandas[output_event]))
+        self.expected_output_event.equals(output_event_pandas[output_event]),
+    )
 
 
 if __name__ == "__main__":

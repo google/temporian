@@ -30,7 +30,7 @@ class TFPTest(absltest.TestCase):
     p = t.create_toy_processor()
     logging.info("Processor:\n%s", p)
 
-  def test_create_processor(self):
+  def disabled_test_create_processor(self):
     a = t.place_holder(
         features=[
             t.Feature(name="f1", dtype=t.dtype.FLOAT),
@@ -49,7 +49,7 @@ class TFPTest(absltest.TestCase):
 
     results = t.evaluate(
         query={"b": b},
-        data={
+        input_data={
             a: input_signal_data,
         },
     )

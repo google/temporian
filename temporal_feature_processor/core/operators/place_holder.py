@@ -59,6 +59,7 @@ class PlaceHolder(base.Operator):
 operator_lib.register_operator(PlaceHolder)
 
 
-def place_holder(features: List[feature_lib.Feature],
-                 index: List[str]) -> event_lib.Event:
+def place_holder(
+    features: List[feature_lib.Feature], index: List[str]
+) -> event_lib.Event:
   return PlaceHolder(features=features, index=index).outputs()["output"]

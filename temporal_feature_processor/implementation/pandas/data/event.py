@@ -51,6 +51,8 @@ class PandasEvent(pd.DataFrame):
 
 
 def pandas_event_from_csv(path: str, sampling: Sampling) -> PandasEvent:
-  return PandasEvent(pd.read_csv(path, parse_dates=[
-      sampling._index[-1]
-  ])).set_index(sampling._index)  # TODO: improve index setting and parse_dates
+  return PandasEvent(
+      pd.read_csv(path, parse_dates=[sampling._index[-1]])
+  ).set_index(
+      sampling._index
+  )  # TODO: improve index setting and parse_dates

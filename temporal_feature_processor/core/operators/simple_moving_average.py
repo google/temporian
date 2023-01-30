@@ -48,7 +48,8 @@ class SimpleMovingAverage(Operator):
             name=f.name(),
             dtype=f.dtype(),
             sampling=sampling,
-        ) for f in data.features()
+        )
+        for f in data.features()
     ]
 
     self.add_output(
