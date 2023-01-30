@@ -14,20 +14,20 @@
 
 import pandas as pd
 from absl.testing import absltest
-from temporal_feature_processor.core import evaluator
-from temporal_feature_processor.core.data.event import Event
-from temporal_feature_processor.core.data.event import Feature
-from temporal_feature_processor.core.data.sampling import Sampling
-from temporal_feature_processor.core.operators.assign import assign
-from temporal_feature_processor.core.operators.simple_moving_average import sma
-from temporal_feature_processor.implementation.pandas.data import event as pandas_event
+from temporian.core import evaluator
+from temporian.core.data.event import Event
+from temporian.core.data.event import Feature
+from temporian.core.data.sampling import Sampling
+from temporian.core.operators.assign import assign
+from temporian.core.operators.simple_moving_average import sma
+from temporian.implementation.pandas.data import event as pandas_event
 
 
 class PrototypeTest(absltest.TestCase):
 
   def setUp(self) -> None:
     self.assignee_event = (
-        "temporal_feature_processor/test/test_data/prototype/assignee_event.csv"
+        "temporian/test/test_data/prototype/assignee_event.csv"
     )
 
     self.assigned_event = pandas_event.PandasEvent(

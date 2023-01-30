@@ -26,11 +26,11 @@ py_test(
     deps = [
         # absl/testing:absltest dep,
         # pandas dep,
-        "//temporal_feature_processor/core:evaluator",
-        "//temporal_feature_processor/core/data:event",
-        "//temporal_feature_processor/core/data:sampling",
-        "//temporal_feature_processor/core/operators:assign",
-        "//temporal_feature_processor/core/operators:simple_moving_average",
-        "//temporal_feature_processor/implementation/pandas/data:event",
+        "//temporian/core:evaluator",
+        "//temporian/core/data:event",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators:assign",
+        "//temporian/core/operators:simple_moving_average",
+        "//temporian/implementation/pandas/data:event",
     ],
 )
