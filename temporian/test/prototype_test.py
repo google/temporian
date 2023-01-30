@@ -27,8 +27,7 @@ class PrototypeTest(absltest.TestCase):
 
   def setUp(self) -> None:
     self.assignee_event = (
-        "temporian/test/test_data/prototype/assignee_event.csv"
-    )
+        "temporian/test/test_data/prototype/assignee_event.csv")
 
     self.assigned_event = pandas_event.PandasEvent(
         [
