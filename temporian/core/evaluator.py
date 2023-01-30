@@ -70,7 +70,8 @@ def evaluate(
     if not isinstance(input_event_spec, event):
       input_event_spec = read_csv_fn(input_event_spec, input_event.sampling())
 
-    materialized_input_data[input_event.sampling()] = input_event_spec.index
+    materialized_input_data[input_event.sampling(
+    )] = input_event_spec.index  # TODO: handle samplings as different type of nodes instead of doing this
     materialized_input_data[input_event] = input_event_spec
 
   # evaluate schedule
@@ -96,6 +97,7 @@ def get_operator_schedule(query: List[Feature]) -> List[base.Operator]:
       continue
 
     # required input features to compute this feature
+    # TODO: handle samplings as different type of nodes instead of checking for Event type in inputs
     creator_input_features = {
         input_feature for input_event in feature.creator().inputs().values()
         if isinstance(input_event, Event)
