@@ -24,57 +24,57 @@ from temporian.proto import core_pb2 as pb
 
 
 class SimpleMovingAverage(Operator):
-    """Simple moving average operator."""
+  """Simple moving average operator."""
 
-    def __init__(
-        self,
-        data: Event,
-        window_length: str,
-        sampling: Optional[Event] = None,
-    ):
-        super().__init__()
+  def __init__(
+      self,
+      data: Event,
+      window_length: str,
+      sampling: Optional[Event] = None,
+  ):
+    super().__init__()
 
-        self.add_attribute("window_length", window_length)
+    self.add_attribute("window_length", window_length)
 
-        if sampling is not None:
-            self.add_input("sampling", sampling)
-        else:
-            sampling = data.sampling()
+    if sampling is not None:
+      self.add_input("sampling", sampling)
+    else:
+      sampling = data.sampling()
 
-        self.add_input("data", data)
+    self.add_input("data", data)
 
-        output_features = [  # pylint: disable=g-complex-comprehension
-            Feature(name=f.name(), dtype=f.dtype(), sampling=sampling, creator=self)
-            for f in data.features()
-        ]
+    output_features = [  # pylint: disable=g-complex-comprehension
+        Feature(name=f.name(), dtype=f.dtype(), sampling=sampling, creator=self)
+        for f in data.features()
+    ]
 
-        self.add_output(
-            "output",
-            Event(
-                features=output_features,
-                sampling=sampling,
+    self.add_output(
+        "output",
+        Event(
+            features=output_features,
+            sampling=sampling,
+        ),
+    )
+
+    self.check()
+
+  @classmethod
+  def build_op_definition(cls) -> pb.OperatorDef:
+    return pb.OperatorDef(
+        key="SIMPLE_MOVING_AVERAGE",
+        attributes=[
+            pb.OperatorDef.Attribute(
+                key="window_length",
+                type=pb.OperatorDef.Attribute.Type.STRING,
+                is_optional=False,
             ),
-        )
-
-        self.check()
-
-    @classmethod
-    def build_op_definition(cls) -> pb.OperatorDef:
-        return pb.OperatorDef(
-            key="SIMPLE_MOVING_AVERAGE",
-            attributes=[
-                pb.OperatorDef.Attribute(
-                    key="window_length",
-                    type=pb.OperatorDef.Attribute.Type.STRING,
-                    is_optional=False,
-                ),
-            ],
-            inputs=[
-                pb.OperatorDef.Input(key="data"),
-                pb.OperatorDef.Input(key="sampling", is_optional=True),
-            ],
-            outputs=[pb.OperatorDef.Output(key="output")],
-        )
+        ],
+        inputs=[
+            pb.OperatorDef.Input(key="data"),
+            pb.OperatorDef.Input(key="sampling", is_optional=True),
+        ],
+        outputs=[pb.OperatorDef.Output(key="output")],
+    )
 
 
 operator_lib.register_operator(SimpleMovingAverage)
@@ -85,8 +85,8 @@ def sma(
     window_length: str,
     sampling: Optional[Event] = None,
 ) -> Event:
-    return SimpleMovingAverage(
-        data=data,
-        window_length=window_length,
-        sampling=sampling,
-    ).outputs()["output"]
+  return SimpleMovingAverage(
+      data=data,
+      window_length=window_length,
+      sampling=sampling,
+  ).outputs()["output"]
