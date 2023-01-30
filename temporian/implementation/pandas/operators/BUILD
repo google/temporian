@@ -18,6 +18,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/implementation/pandas:utils",
         "//temporian/implementation/pandas/data:event",
     ],
 )

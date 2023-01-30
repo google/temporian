@@ -20,7 +20,9 @@ index value. Repeated timestamps are allowed on the assignee event.
 
 import pandas as pd
 
-INPUT_1 = pd.DataFrame({
+from temporian.implementation.pandas.data.event import PandasEvent
+
+INPUT_1 = PandasEvent({
     "user_id": [
         151591562,
         151591562,
@@ -40,7 +42,7 @@ INPUT_1 = pd.DataFrame({
     ],
 }).set_index(["user_id", "timestamp"])
 
-INPUT_2 = pd.DataFrame({
+INPUT_2 = PandasEvent({
     "user_id": [
         151591562,
         191562515,

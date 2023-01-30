@@ -21,6 +21,7 @@ import pandas as pd
 from temporian.implementation.pandas.data.event import PandasEvent
 from temporian.implementation.pandas.data.sampling import PandasSampling
 from temporian.implementation.pandas.operators.window.base import PandasWindowOperator
+from temporian.implementation.pandas import utils
 
 
 class PandasSimpleMovingAverageOperator(PandasWindowOperator):
@@ -50,8 +51,8 @@ class PandasSimpleMovingAverageOperator(PandasWindowOperator):
     data_no_index = data.reset_index()
 
     # get index columns and name of timestamp column
-    index_columns = sampling.names[:-1]
-    timestamp_column = sampling.names[-1]
+    index_columns, timestamp_column = utils.get_index_and_timestamp_column_names(
+        sampling)
 
     # create output event with desired sampling
     output = PandasEvent(
