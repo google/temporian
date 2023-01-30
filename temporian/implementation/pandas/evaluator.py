@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pprint import pprint
 from typing import Dict, List
 
 from temporian.core.data import event
@@ -25,8 +24,6 @@ def evaluate_schedule(
     data: Dict[event.Event, pandas_event.PandasEvent],
     schedule: List[base.Operator],
 ) -> Dict[event.Event, pandas_event.PandasEvent]:
-  print(f"{schedule=}")
-
   for operator in schedule:
     operator_def = operator.definition()
     # get implementation
@@ -34,7 +31,6 @@ def evaluate_schedule(
         **operator.attributes(
         ))  # TODO: add operator attributes when instancing implementation
 
-    print(f"{operator.inputs().items()=}")
     # construct operator inputs
     operator_inputs = {
         input_key: data[input_event]
@@ -48,7 +44,5 @@ def evaluate_schedule(
     for output_key, output_event in operator.outputs().items():
       data[output_event] = operator_outputs[output_key]
       data[output_event.sampling()] = operator_outputs[output_key].index
-
-    pprint(data)
 
   return data
