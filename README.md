@@ -1,12 +1,8 @@
-# Temporal Feature Processor
+# Temporian
 
-**Temporal Feature Processor** (TFP) is a library to pre-process temporal
+**Temporian** is a library to pre-process temporal
 signals before their use as input features with of-the-shelf tabular machine
 learning libraries (e.g., TensorFlow Decision Forests).
-
-Note: Temporal Feature Processor is the placeholder name of this library.
-
-Note: This repository is the temporary location of this library.
 
 ## Requirements
 
@@ -49,7 +45,7 @@ The virtual environment installation directory will depend on your operating
 system as follows:
 
 -   Linux: `$XDG_CACHE_HOME/pypoetry/virtualenvs or
-    ~/.cache/pypoetry/virtualenvs`
+~/.cache/pypoetry/virtualenvs`
 -   Windows: `%LOCALAPPDATA%\pypoetry/virtualenvs`
 -   MacOS: `~/Library/Caches/pypoetry/virtualenvs`
 
@@ -65,7 +61,7 @@ poetry shell
 
 ## Run all tests
 
-Go to the root `temporal_feature_processor` directory, activate the virtual
+Go to the root `temporian` directory, activate the virtual
 environment and execute:
 
 ```shell
