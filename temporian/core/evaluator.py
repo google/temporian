@@ -84,8 +84,19 @@ def evaluate(
 
 
 def get_operator_schedule(query: Set[Feature]) -> Dict[base.Operator, int]:
-    # start features. Depth initialized as 0. Depth is measured from bottom to
-    # top, i.e. 0 depth corresponds to the output features
+    """Calculates which operators need to be executed in which order to
+    compute a set of query features.
+
+    Args:
+        query: set of query features to be computed.
+
+    Returns:
+        Dict[base.Operator, int]: dictionary mapping operators to their respective
+        depths in the compute graph. Depth is measured from bottom to top, i.e.
+        0 depth corresponds to the output features (query). Operators with the
+        same depth can be computed in parallel.
+    """
+    # start features. Depth initialized as 0
     feature_depth = [(feature, 0) for feature in query]
 
     # get all features and depths required to compute the query. One feature can
