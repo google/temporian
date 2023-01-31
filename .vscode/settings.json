@@ -1,7 +1,7 @@
 {
   "python.envFile": "${workspaceFolder}/.venv",
-  "python.formatting.provider": "yapf",
-  "editor.tabSize": 2,
+  "python.formatting.provider": "black",
+  "editor.tabSize": 4,
   "editor.formatOnSave": true,
   "python.linting.flake8Enabled": false,
   "python.linting.pylintEnabled": true,
@@ -9,4 +9,9 @@
   "editor.rulers": [
     80
   ],
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": false
+  },
+  "files.trimFinalNewlines": true,
+  "files.trimTrailingWhitespace": true,
 }
