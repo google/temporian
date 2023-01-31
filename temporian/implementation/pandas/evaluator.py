@@ -28,8 +28,7 @@ def evaluate_schedule(
     operator_def = operator.definition()
     # get implementation
     implementation = core_mapping.OPERATOR_IMPLEMENTATIONS[operator_def.key](
-        **operator.attributes(
-        ))  # TODO: add operator attributes when instancing implementation
+        **operator.attributes())
 
     # construct operator inputs
     operator_inputs = {
