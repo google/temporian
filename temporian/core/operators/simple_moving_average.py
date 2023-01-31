@@ -44,8 +44,10 @@ class SimpleMovingAverage(Operator):
     self.add_input("data", data)
 
     output_features = [  # pylint: disable=g-complex-comprehension
-        Feature(name=f.name(), dtype=f.dtype(), sampling=sampling, creator=self)
-        for f in data.features()
+        Feature(name=f"sma_{f.name()}",
+                dtype=f.dtype(),
+                sampling=sampling,
+                creator=self) for f in data.features()
     ]
 
     self.add_output(
