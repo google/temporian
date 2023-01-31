@@ -14,7 +14,7 @@
 
 """A feature."""
 
-from typing import Any, Optional
+from typing import Any, Optional, Set
 
 from temporian.core.data import sampling as sampling_lib
 
@@ -50,3 +50,12 @@ class Feature(object):
 
   def set_sampling(self, sampling: sampling_lib.Sampling):
     self._sampling = sampling
+
+  def parent_features(self) -> Set["Feature"]:
+    if self.creator() is None:
+      return {}
+
+    return {
+        input_feature for input_event in self.creator().inputs().values()
+        for input_feature in input_event.features()
+    }
