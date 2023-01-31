@@ -42,7 +42,7 @@ def evaluate_schedule(
     # materialize data in output events
     for output_key, output_event in operator.outputs().items():
       data[output_event] = operator_outputs[output_key]
-      data[output_event.sampling()] = operator_outputs[
-          output_key].index  # TODO: handle samplings as different type of nodes instead of doing this
+      # TODO: handle samplings as different type of nodes instead of doing this
+      data[output_event.sampling()] = operator_outputs[output_key].index
 
   return data

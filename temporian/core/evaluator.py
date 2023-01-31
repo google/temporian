@@ -23,7 +23,8 @@ from temporian.core.data.feature import Feature
 from temporian.core.operators import base
 from temporian.implementation.pandas.data import event as pandas_event
 
-AvailableBackends = Any  # TODO: Use typing.Literal[tuple(backends.BACKENDS.keys())]
+# TODO: Use typing.Literal[tuple(backends.BACKENDS.keys())]
+AvailableBackends = Any
 Data = Dict[Event, Union[str, pathlib.Path, pandas_event.PandasEvent]]
 Query = Union[Event, List[Event]]
 
@@ -70,8 +71,8 @@ def evaluate(
     if not isinstance(input_event_spec, event):
       input_event_spec = read_csv_fn(input_event_spec, input_event.sampling())
 
-    materialized_input_data[input_event.sampling(
-    )] = input_event_spec.index  # TODO: handle samplings as different type of nodes instead of doing this
+    # TODO: handle samplings as different type of nodes instead of doing this
+    materialized_input_data[input_event.sampling()] = input_event_spec.index
     materialized_input_data[input_event] = input_event_spec
 
   # evaluate schedule
