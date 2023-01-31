@@ -21,19 +21,17 @@ from temporian.proto import core_pb2 as pb
 
 
 class OperatorTest(absltest.TestCase):
-
     def test_check_operator(self):
-
         class ToyOperator(base.Operator):
-
             @classmethod
             def build_op_definition(cls) -> pb.OperatorDef:
                 return pb.OperatorDef(
                     key="TOY",
                     inputs=[
                         pb.OperatorDef.Input(key="input"),
-                        pb.OperatorDef.Input(key="optional_input",
-                                             is_optional=True),
+                        pb.OperatorDef.Input(
+                            key="optional_input", is_optional=True
+                        ),
                     ],
                     outputs=[pb.OperatorDef.Output(key="output")],
                 )
@@ -52,20 +50,23 @@ class OperatorTest(absltest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Missing output "output"'):
             t.check()
 
-        with self.assertRaisesRegex(ValueError,
-                                    'Already existing input "input"'):
+        with self.assertRaisesRegex(
+            ValueError, 'Already existing input "input"'
+        ):
             t.add_input("input", build_fake_event())
 
         t.add_output("output", build_fake_event())
         t.check()
 
-        with self.assertRaisesRegex(ValueError,
-                                    'Already existing output "output"'):
+        with self.assertRaisesRegex(
+            ValueError, 'Already existing output "output"'
+        ):
             t.add_output("output", build_fake_event())
 
         t.add_output("unexpected_output", build_fake_event())
-        with self.assertRaisesRegex(ValueError,
-                                    'Unexpected output "unexpected_output"'):
+        with self.assertRaisesRegex(
+            ValueError, 'Unexpected output "unexpected_output"'
+        ):
             t.check()
 
 

@@ -49,11 +49,14 @@ def evaluate(
         # TODO: improve error message
         raise TypeError(
             f"schedule_graph query argument must be one of {Query}. Received"
-            f" {type(query)}.")
+            f" {type(query)}."
+        )
 
     # get features from events
     features_to_compute = [
-        feature for event in events_to_compute for feature in event.features()  # pytype: disable=attribute-error
+        feature
+        for event in events_to_compute
+        for feature in event.features()  # pytype: disable=attribute-error
     ]
 
     # get backend
@@ -69,8 +72,9 @@ def evaluate(
     materialized_input_data = {}
     for input_event, input_event_spec in input_data.items():
         if not isinstance(input_event_spec, event):
-            input_event_spec = read_csv_fn(input_event_spec,
-                                           input_event.sampling())
+            input_event_spec = read_csv_fn(
+                input_event_spec, input_event.sampling()
+            )
         materialized_input_data[input_event] = input_event_spec
 
     # evaluate schedule

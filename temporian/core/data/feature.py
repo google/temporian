@@ -20,7 +20,6 @@ from temporian.core.data import sampling as sampling_lib
 
 
 class Feature(object):
-
     def __init__(
         self,
         name: str,
@@ -34,7 +33,7 @@ class Feature(object):
         self._creator = creator
 
     def __repr__(self):
-        return f'Feature<name:{self._name},dtype:{self._dtype},sampling:{self._sampling},creator:{self.creator()},id:{id(self)}>'
+        return f"Feature<name:{self._name},dtype:{self._dtype},sampling:{self._sampling},creator:{self.creator()},id:{id(self)}>"
 
     def name(self):
         return self._name

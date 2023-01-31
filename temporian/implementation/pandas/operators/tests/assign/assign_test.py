@@ -15,14 +15,21 @@
 from absl.testing import absltest
 
 from temporian.implementation.pandas.operators import assign
-from temporian.implementation.pandas.operators.tests.assign.test_data import different_index
-from temporian.implementation.pandas.operators.tests.assign.test_data import repeated_timestamps
-from temporian.implementation.pandas.operators.tests.assign.test_data import with_idx_more_timestamps
-from temporian.implementation.pandas.operators.tests.assign.test_data import with_idx_same_timestamps
+from temporian.implementation.pandas.operators.tests.assign.test_data import (
+    different_index,
+)
+from temporian.implementation.pandas.operators.tests.assign.test_data import (
+    repeated_timestamps,
+)
+from temporian.implementation.pandas.operators.tests.assign.test_data import (
+    with_idx_more_timestamps,
+)
+from temporian.implementation.pandas.operators.tests.assign.test_data import (
+    with_idx_same_timestamps,
+)
 
 
 class AssignOperatorTest(absltest.TestCase):
-
     def setUp(self) -> None:
         self.operator = assign.PandasAssignOperator()
 
@@ -45,18 +52,22 @@ class AssignOperatorTest(absltest.TestCase):
         )
 
     def test_with_idx_same_timestamps(self) -> None:
-        operator_output = self.operator(with_idx_same_timestamps.INPUT_1,
-                                        with_idx_same_timestamps.INPUT_2)
+        operator_output = self.operator(
+            with_idx_same_timestamps.INPUT_1, with_idx_same_timestamps.INPUT_2
+        )
         self.assertEqual(
             True,
-            with_idx_same_timestamps.OUTPUT.equals(operator_output["output"]))
+            with_idx_same_timestamps.OUTPUT.equals(operator_output["output"]),
+        )
 
     def test_with_idx_more_timestamps(self) -> None:
-        operator_output = self.operator(with_idx_more_timestamps.INPUT_1,
-                                        with_idx_more_timestamps.INPUT_2)
+        operator_output = self.operator(
+            with_idx_more_timestamps.INPUT_1, with_idx_more_timestamps.INPUT_2
+        )
         self.assertEqual(
             True,
-            with_idx_more_timestamps.OUTPUT.equals(operator_output["output"]))
+            with_idx_more_timestamps.OUTPUT.equals(operator_output["output"]),
+        )
 
 
 if __name__ == "__main__":

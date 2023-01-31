@@ -20,7 +20,9 @@ import pandas as pd
 
 from temporian.implementation.pandas.data.event import PandasEvent
 from temporian.implementation.pandas.data.sampling import PandasSampling
-from temporian.implementation.pandas.operators.window.base import PandasWindowOperator
+from temporian.implementation.pandas.operators.window.base import (
+    PandasWindowOperator,
+)
 from temporian.implementation.pandas import utils
 
 
@@ -37,17 +39,17 @@ class PandasSimpleMovingAverageOperator(PandasWindowOperator):
     ) -> Dict[str, PandasEvent]:
         """Apply a simple moving average to an event.
 
-    If input has more than one feature, the moving average will be computed for
-    each of its features independently.
+        If input has more than one feature, the moving average will be computed for
+        each of its features independently.
 
-    Args:
-      data: the input event to apply a simple moving average to.
-      sampling: an event with the desired sampling for the output event.
-          If None, the original sampling of `data` will be used.
+        Args:
+          data: the input event to apply a simple moving average to.
+          sampling: an event with the desired sampling for the output event.
+              If None, the original sampling of `data` will be used.
 
-    Returns:
-      Dict[str, PandasEvent]: the output event of the operator.
-    """
+        Returns:
+          Dict[str, PandasEvent]: the output event of the operator.
+        """
         # remove index to be able to filter using index values
         data_no_index = data.reset_index()
 
@@ -55,8 +57,10 @@ class PandasSimpleMovingAverageOperator(PandasWindowOperator):
             sampling = data
 
         # get index columns and name of timestamp column
-        index_columns, timestamp_column = utils.get_index_and_timestamp_column_names(
-            sampling)
+        (
+            index_columns,
+            timestamp_column,
+        ) = utils.get_index_and_timestamp_column_names(sampling)
 
         # create output event with desired sampling
         output = PandasEvent(
@@ -71,19 +75,29 @@ class PandasSimpleMovingAverageOperator(PandasWindowOperator):
             timestamp = values[-1]
 
             # filter by index_value
-            data_filtered = (data_no_index[(data_no_index[index_columns]
-                                            == index_value).squeeze()]
-                             if index_columns else data_no_index)
+            data_filtered = (
+                data_no_index[
+                    (data_no_index[index_columns] == index_value).squeeze()
+                ]
+                if index_columns
+                else data_no_index
+            )
 
             # filter by window start/end dates
             data_filtered = data_filtered[
-                (data_filtered[timestamp_column] <= timestamp) &
-                (data_filtered[timestamp_column] >= timestamp -
-                 pd.Timedelta(self.window_length))]
+                (data_filtered[timestamp_column] <= timestamp)
+                & (
+                    data_filtered[timestamp_column]
+                    >= timestamp - pd.Timedelta(self.window_length)
+                )
+            ]
 
             # calculate average of window
-            mean = data_filtered.set_index(
-                sampling.index.names).mean(axis=0).values
+            mean = (
+                data_filtered.set_index(sampling.index.names)
+                .mean(axis=0)
+                .values
+            )
 
             # set result in output event
             loc = index_value + (timestamp,)

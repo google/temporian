@@ -21,7 +21,6 @@ from temporian.implementation.pandas.data.event import PandasEvent
 
 
 class TFPTest(absltest.TestCase):
-
     def test_does_nothing(self):
         logging.info("Running a test")
         t.does_nothing()
@@ -42,11 +41,13 @@ class TFPTest(absltest.TestCase):
 
         b = t.sma(data=a, window_length=7)
 
-        input_signal_data = PandasEvent({
-            "time": [0, 2, 4, 6],
-            "f1": [1, 2, 3, 4],
-            "f2": [5, 6, 7, 8],
-        })
+        input_signal_data = PandasEvent(
+            {
+                "time": [0, 2, 4, 6],
+                "f1": [1, 2, 3, 4],
+                "f2": [5, 6, 7, 8],
+            }
+        )
 
         results = t.evaluate(
             query={"b": b},

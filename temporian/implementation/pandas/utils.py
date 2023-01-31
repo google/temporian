@@ -22,15 +22,15 @@ def get_index_and_timestamp_column_names(
     obj: Union[event.PandasEvent, sampling.PandasSampling]
 ) -> tuple[list[str], str]:
     """Get the names of the index columns and the timestamp column from a
-  PandasEvent or PandasSampling.
+    PandasEvent or PandasSampling.
 
-  Args:
-      obj (Union[event.PandasEvent, sampling.PandasSampling]): the event or
-      sampling to get the index names of.
+    Args:
+        obj (Union[event.PandasEvent, sampling.PandasSampling]): the event or
+        sampling to get the index names of.
 
-  Returns:
-      Tuple[List[str], str]: output index and timestamp column names.
-  """
+    Returns:
+        Tuple[List[str], str]: output index and timestamp column names.
+    """
     if isinstance(obj, event.PandasEvent):
         obj = obj.index
 

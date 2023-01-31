@@ -21,7 +21,6 @@ from temporian.core.data.sampling import Sampling
 
 
 class Event(object):
-
     def __init__(
         self,
         features: List[Feature],
@@ -31,7 +30,7 @@ class Event(object):
         self._sampling = sampling
 
     def __repr__(self):
-        return f'Event<features:{self._features},sampling:{self._sampling},id:{id(self)}>'
+        return f"Event<features:{self._features},sampling:{self._sampling},id:{id(self)}>"
 
     def sampling(self):
         return self._sampling

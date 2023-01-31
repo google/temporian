@@ -27,6 +27,6 @@ class PandasOperator(ABC):
     def __call__(self, *args: Any, **kwargs: Any) -> Dict[str, PandasEvent]:
         """Apply the operator to its inputs.
 
-    Returns:
-        Dict[str, PandasEvent]: the output event of the operator.
-    """
+        Returns:
+            Dict[str, PandasEvent]: the output event of the operator.
+        """

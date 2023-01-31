@@ -22,61 +22,71 @@ import pandas as pd
 
 from temporian.implementation.pandas.data.event import PandasEvent
 
-INPUT_1 = PandasEvent({
-    "product_id": [
-        666964,
-        666964,
-        574016,
-    ],
-    "timestamp": [
-        pd.Timestamp("2013-01-02"),
-        pd.Timestamp("2013-01-03"),
-        pd.Timestamp("2013-01-04"),  # identical timestamps for each index value
-    ],
-    "sales": [
-        1091.0,
-        919.0,
-        953.0,
-    ],
-}).set_index(["product_id", "timestamp"])
+INPUT_1 = PandasEvent(
+    {
+        "product_id": [
+            666964,
+            666964,
+            574016,
+        ],
+        "timestamp": [
+            pd.Timestamp("2013-01-02"),
+            pd.Timestamp("2013-01-03"),
+            pd.Timestamp(
+                "2013-01-04"
+            ),  # identical timestamps for each index value
+        ],
+        "sales": [
+            1091.0,
+            919.0,
+            953.0,
+        ],
+    }
+).set_index(["product_id", "timestamp"])
 
-INPUT_2 = PandasEvent({
-    "product_id": [
-        666964,
-        666964,
-        574016,
-    ],
-    "timestamp": [
-        pd.Timestamp("2013-01-02"),
-        pd.Timestamp("2013-01-03"),
-        pd.Timestamp("2013-01-04"),  # identical timestamps for each index value
-    ],
-    "costs": [
-        740.0,
-        508.0,
-        573.0,
-    ],
-}).set_index(["product_id", "timestamp"])
+INPUT_2 = PandasEvent(
+    {
+        "product_id": [
+            666964,
+            666964,
+            574016,
+        ],
+        "timestamp": [
+            pd.Timestamp("2013-01-02"),
+            pd.Timestamp("2013-01-03"),
+            pd.Timestamp(
+                "2013-01-04"
+            ),  # identical timestamps for each index value
+        ],
+        "costs": [
+            740.0,
+            508.0,
+            573.0,
+        ],
+    }
+).set_index(["product_id", "timestamp"])
 
-OUTPUT = PandasEvent({
-    "product_id": [
-        666964,
-        666964,
-        574016,
-    ],
-    "timestamp": [
-        pd.Timestamp("2013-01-02"),
-        pd.Timestamp("2013-01-03"),
-        pd.Timestamp("2013-01-04"),
-    ],
-    "sales": [
-        1091.0,
-        919.0,
-        953.0,
-    ],
-    "costs": [
-        740.0,
-        508.0,
-        573.0,
-    ],
-}).set_index(["product_id", "timestamp"])
+OUTPUT = PandasEvent(
+    {
+        "product_id": [
+            666964,
+            666964,
+            574016,
+        ],
+        "timestamp": [
+            pd.Timestamp("2013-01-02"),
+            pd.Timestamp("2013-01-03"),
+            pd.Timestamp("2013-01-04"),
+        ],
+        "sales": [
+            1091.0,
+            919.0,
+            953.0,
+        ],
+        "costs": [
+            740.0,
+            508.0,
+            573.0,
+        ],
+    }
+).set_index(["product_id", "timestamp"])

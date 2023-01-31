@@ -71,15 +71,15 @@ class Preprocessor(object):
 def infer_processor(inputs: List[Event], outputs: List[Event]) -> Preprocessor:
     """Create a self contained processor.
 
-  Fails if some inputs are missing.
+    Fails if some inputs are missing.
 
-  Args:
-    inputs: List of available inputs.
-    outputs: List of requested outputs.
+    Args:
+      inputs: List of available inputs.
+      outputs: List of requested outputs.
 
-  Returns:
-    A preprocessor.
-  """
+    Returns:
+      A preprocessor.
+    """
 
     p = Preprocessor()
 
@@ -134,7 +134,8 @@ def infer_processor(inputs: List[Event], outputs: List[Event]) -> Preprocessor:
         elif feature.creator().is_placeholder():
             # The user is expected to see the input of placeholders.
             missing_features.add(
-                f"{repr(feature)} from placeholder {feature.creator()}")
+                f"{repr(feature)} from placeholder {feature.creator()}"
+            )
 
         else:
             p.operators().add(feature.creator())

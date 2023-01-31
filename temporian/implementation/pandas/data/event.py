@@ -20,7 +20,6 @@ from temporian.core.data.sampling import Sampling
 
 
 class PandasFeature(pd.Series):
-
     @property
     def _constructor(self):
         return PandasFeature
@@ -30,13 +29,12 @@ class PandasFeature(pd.Series):
         return PandasEvent
 
     def schema(self) -> Feature:
-        return Feature(name=self.name,
-                       dtype=self.dtype,
-                       sampling=self.index.names)
+        return Feature(
+            name=self.name, dtype=self.dtype, sampling=self.index.names
+        )
 
 
 class PandasEvent(pd.DataFrame):
-
     @property
     def _constructor(self):
         return PandasEvent
@@ -54,5 +52,7 @@ class PandasEvent(pd.DataFrame):
 
 def pandas_event_from_csv(path: str, sampling: Sampling) -> PandasEvent:
     return PandasEvent(
-        pd.read_csv(path, parse_dates=[sampling._index[-1]])).set_index(
-            sampling._index)  # TODO: improve index setting and parse_dates
+        pd.read_csv(path, parse_dates=[sampling._index[-1]])
+    ).set_index(
+        sampling._index
+    )  # TODO: improve index setting and parse_dates

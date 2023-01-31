@@ -32,17 +32,21 @@ INPUT = PandasEvent(
     columns=["timestamp", "value"],
 ).set_index(["timestamp"])
 
-SAMPLING = PandasEvent(index=PandasSampling.from_arrays(
-    [[
-        pd.Timestamp("2013-01-01"),
-        pd.Timestamp("2013-01-02"),
-        pd.Timestamp("2013-01-03"),
-        # range goes up until day 04 since we have events during day 03
-        # that wouldn't get processed otherwise
-        pd.Timestamp("2013-01-04"),
-    ]],
-    names=["timestamp"],
-))
+SAMPLING = PandasEvent(
+    index=PandasSampling.from_arrays(
+        [
+            [
+                pd.Timestamp("2013-01-01"),
+                pd.Timestamp("2013-01-02"),
+                pd.Timestamp("2013-01-03"),
+                # range goes up until day 04 since we have events during day 03
+                # that wouldn't get processed otherwise
+                pd.Timestamp("2013-01-04"),
+            ]
+        ],
+        names=["timestamp"],
+    )
+)
 
 OUTPUT = PandasEvent(
     [

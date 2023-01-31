@@ -28,7 +28,6 @@ from temporian.proto import core_pb2 as pb
 
 
 class OpO1(base.Operator):
-
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
@@ -57,7 +56,6 @@ class OpO1(base.Operator):
 
 
 class OpI1O1(base.Operator):
-
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
@@ -73,10 +71,12 @@ class OpI1O1(base.Operator):
             "output",
             Event(
                 features=[
-                    Feature("f1",
-                            dtype.FLOAT,
-                            sampling=data.sampling(),
-                            creator=self)
+                    Feature(
+                        "f1",
+                        dtype.FLOAT,
+                        sampling=data.sampling(),
+                        creator=self,
+                    )
                 ],
                 sampling=data.sampling(),
             ),
@@ -88,7 +88,6 @@ class OpI1O1(base.Operator):
 
 
 class OpI2O1(base.Operator):
-
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
@@ -108,10 +107,12 @@ class OpI2O1(base.Operator):
             "output",
             Event(
                 features=[
-                    Feature("f1",
-                            dtype.FLOAT,
-                            sampling=input_1.sampling(),
-                            creator=self)
+                    Feature(
+                        "f1",
+                        dtype.FLOAT,
+                        sampling=input_1.sampling(),
+                        creator=self,
+                    )
                 ],
                 sampling=input_1.sampling(),
             ),
@@ -123,7 +124,6 @@ class OpI2O1(base.Operator):
 
 
 class OpI1O2(base.Operator):
-
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
@@ -144,10 +144,12 @@ class OpI1O2(base.Operator):
             "output_1",
             Event(
                 features=[
-                    Feature("f1",
-                            dtype.FLOAT,
-                            sampling=data.sampling(),
-                            creator=self)
+                    Feature(
+                        "f1",
+                        dtype.FLOAT,
+                        sampling=data.sampling(),
+                        creator=self,
+                    )
                 ],
                 sampling=data.sampling(),
             ),
@@ -156,10 +158,12 @@ class OpI1O2(base.Operator):
             "output_2",
             Event(
                 features=[
-                    Feature("f1",
-                            dtype.FLOAT,
-                            sampling=data.sampling(),
-                            creator=self)
+                    Feature(
+                        "f1",
+                        dtype.FLOAT,
+                        sampling=data.sampling(),
+                        creator=self,
+                    )
                 ],
                 sampling=data.sampling(),
             ),
@@ -171,7 +175,6 @@ class OpI1O2(base.Operator):
 
 
 class ProcessorTest(absltest.TestCase):
-
     def test_dependency_basic(self):
         o1 = OpO1()
         o2 = OpI1O1(o1.outputs()["output"])
@@ -180,10 +183,8 @@ class ProcessorTest(absltest.TestCase):
         o5 = OpI1O2(o4.outputs()["output"])
 
         p = processor.infer_processor(
-            [o1.outputs()["output"],
-             o3.outputs()["output"]],
-            [o5.outputs()["output_1"],
-             o4.outputs()["output"]],
+            [o1.outputs()["output"], o3.outputs()["output"]],
+            [o5.outputs()["output_1"], o4.outputs()["output"]],
         )
         logging.info("Processor:\n%s", p)
 
@@ -200,8 +201,8 @@ class ProcessorTest(absltest.TestCase):
         o2 = OpI1O1(o1.outputs()["output"])
 
         with self.assertRaisesRegex(
-                ValueError,
-                "Missing input features.*from placeholder Operator<key: OpO1,",
+            ValueError,
+            "Missing input features.*from placeholder Operator<key: OpO1,",
         ):
             processor.infer_processor([], [o2.outputs()["output"]])
 

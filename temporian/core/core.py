@@ -26,13 +26,13 @@ def does_nothing() -> None:
 def create_toy_processor() -> pb.Processor:
     """Create a toy processor.
 
-  Theoretical result of:
-    x = t.read_event(table="sales_records")
-    y = t.sma(x["sales"], windows=5)
+    Theoretical result of:
+      x = t.read_event(table="sales_records")
+      y = t.sma(x["sales"], windows=5)
 
-  Returns:
-    Toy processor.
-  """
+    Returns:
+      Toy processor.
+    """
 
     p = pb.Processor()
 
@@ -54,14 +54,16 @@ def create_toy_processor() -> pb.Processor:
             id="event_1",
             sampling_id="sampling_1",
             feature_ids=["sales"],
-        ))
+        )
+    )
 
     p.features.append(
         pb.Feature(
             id="sales",
             type=pb.Feature.FLOAT,
             sampling_id="sampling_1",
-        ))
+        )
+    )
 
     # We apply a SMA on the "price" feature using the same sampling rate as the
     # sales.
@@ -81,13 +83,15 @@ def create_toy_processor() -> pb.Processor:
             id="event_2",
             sampling_id="sampling_1",
             feature_ids=["sma_sales"],
-        ))
+        )
+    )
 
     p.features.append(
         pb.Feature(
             id="sma_sales",
             type=pb.Feature.FLOAT,
             sampling_id="sampling_1",
-        ))
+        )
+    )
 
     return p

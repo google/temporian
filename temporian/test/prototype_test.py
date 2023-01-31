@@ -24,10 +24,10 @@ from temporian.implementation.pandas.data import event as pandas_event
 
 
 class PrototypeTest(absltest.TestCase):
-
     def setUp(self) -> None:
         self.assignee_event = (
-            "temporian/test/test_data/prototype/assignee_event.csv")
+            "temporian/test/test_data/prototype/assignee_event.csv"
+        )
 
         self.assigned_event = pandas_event.PandasEvent(
             [
@@ -40,12 +40,9 @@ class PrototypeTest(absltest.TestCase):
 
         self.expected_output_event = pandas_event.PandasEvent(
             [
-                [666964,
-                 pd.Timestamp("2013-01-02"), 1091.0, 740.0, 740.0],
-                [666964,
-                 pd.Timestamp("2013-01-03"), 919.0, 508.0, 624.0],
-                [574016,
-                 pd.Timestamp("2013-01-04"), 953.0, 573.0, 573.0],
+                [666964, pd.Timestamp("2013-01-02"), 1091.0, 740.0, 740.0],
+                [666964, pd.Timestamp("2013-01-03"), 919.0, 508.0, 624.0],
+                [574016, pd.Timestamp("2013-01-04"), 953.0, 573.0, 573.0],
             ],
             columns=["product_id", "timestamp", "sales", "costs", "sma_costs"],
         ).set_index(["product_id", "timestamp"])
@@ -65,9 +62,9 @@ class PrototypeTest(absltest.TestCase):
         output_event = assign(assignee_event, assigned_event)
 
         # call sma operator
-        sma_assigned_event = sma(assigned_event,
-                                 window_length="7d",
-                                 sampling=assigned_event)
+        sma_assigned_event = sma(
+            assigned_event, window_length="7d", sampling=assigned_event
+        )
 
         # call assign operator with result of sma
         output_event = assign(output_event, sma_assigned_event)
@@ -88,7 +85,8 @@ class PrototypeTest(absltest.TestCase):
         self.assertEqual(
             True,
             self.expected_output_event.equals(
-                output_event_pandas[output_event]),
+                output_event_pandas[output_event]
+            ),
         )
 
 

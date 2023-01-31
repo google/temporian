@@ -35,7 +35,8 @@ class PlaceHolder(base.Operator):
         for feature in features:
             if feature.sampling() is not None:
                 raise ValueError(
-                    "Cannot create a placeholder on existing features.")
+                    "Cannot create a placeholder on existing features."
+                )
             feature.set_sampling(sampling)
 
         self.add_output(
@@ -60,6 +61,7 @@ class PlaceHolder(base.Operator):
 operator_lib.register_operator(PlaceHolder)
 
 
-def place_holder(features: List[feature_lib.Feature],
-                 index: List[str]) -> event_lib.Event:
+def place_holder(
+    features: List[feature_lib.Feature], index: List[str]
+) -> event_lib.Event:
     return PlaceHolder(features=features, index=index).outputs()["output"]
