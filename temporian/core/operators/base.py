@@ -46,12 +46,9 @@ class OperatorExceptionDecorator(object):
 
     if exc_val:
       # Add operator details in the exception.
-      exc_val.args += (
-          (
-              'In operator'
-              f' "{self._operator.__class__.build_op_definition().key}".'
-          ),
-      )
+      exc_val.args += ((
+          'In operator'
+          f' "{self._operator.__class__.build_op_definition().key}".'),)
     return False
 
 
@@ -64,7 +61,7 @@ class Operator(ABC):
     self._attributes = {}
 
   def __str__(self):
-    return f'Operator<key:{self.definition().key},id:{id(self)}>'
+    return f'Operator<key: {self.definition().key}, id: {id(self)}, attributes: {self.attributes()}>'
 
   def is_placeholder(self) -> bool:
     return self.definition().place_holder
@@ -86,10 +83,8 @@ class Operator(ABC):
     with OperatorExceptionDecorator(self):
       # Check that expected inputs are present
       for expected_input in definition.inputs:
-        if (
-            not expected_input.is_optional
-            and expected_input.key not in self._inputs
-        ):
+        if (not expected_input.is_optional and
+            expected_input.key not in self._inputs):
           raise ValueError(f'Missing input "{expected_input.key}".')
 
       # Check that no unexpected inputs are present
@@ -124,6 +119,7 @@ class Operator(ABC):
       if key in self._attributes:
         raise ValueError(f'Already existing attribute "{key}".')
       self._attributes[key] = value
+    print(str(self))
 
   @classmethod
   def build_op_definition(cls) -> pb.OperatorDef:
