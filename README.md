@@ -52,6 +52,14 @@ poetry shell
 
 ## Run all tests
 
+Install bazel and buildifier (in Mac we recommend installing bazelisk with brew)
+
+```shell
+brew install bazelisk buildifier
+```
+
+Run all tests with bazel:
+
 ```shell
 bazel test //...:all
 ```
