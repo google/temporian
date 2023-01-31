@@ -22,41 +22,41 @@ from temporian.proto import core_pb2 as pb
 
 
 class AssignOperator(Operator):
-  """Simple moving average operator."""
+    """Simple moving average operator."""
 
-  def __init__(
-      self,
-      assignee_event: Event,
-      assigned_event: Event,
-  ):
-    super().__init__()
+    def __init__(
+        self,
+        assignee_event: Event,
+        assigned_event: Event,
+    ):
+        super().__init__()
 
-    # inputs
-    self.add_input("assignee_event", assignee_event)
-    self.add_input("assigned_event", assigned_event)
+        # inputs
+        self.add_input("assignee_event", assignee_event)
+        self.add_input("assigned_event", assigned_event)
 
-    # outputs
-    output_features = assignee_event.features() + [
-        Feature(name=feature.name(), dtype=feature.dtype(), creator=self)
-        for feature in assigned_event.features()
-    ]
-    output_sampling = assignee_event.sampling()
-    self.add_output(
-        "output",
-        Event(features=output_features, sampling=output_sampling),
-    )
-    self.check()
+        # outputs
+        output_features = assignee_event.features() + [
+            Feature(name=feature.name(), dtype=feature.dtype(), creator=self)
+            for feature in assigned_event.features()
+        ]
+        output_sampling = assignee_event.sampling()
+        self.add_output(
+            "output",
+            Event(features=output_features, sampling=output_sampling),
+        )
+        self.check()
 
-  @classmethod
-  def build_op_definition(cls) -> pb.OperatorDef:
-    return pb.OperatorDef(
-        key="ASSIGN",
-        inputs=[
-            pb.OperatorDef.Input(key="assignee_event"),
-            pb.OperatorDef.Input(key="assigned_event"),
-        ],
-        outputs=[pb.OperatorDef.Output(key="output")],
-    )
+    @classmethod
+    def build_op_definition(cls) -> pb.OperatorDef:
+        return pb.OperatorDef(
+            key="ASSIGN",
+            inputs=[
+                pb.OperatorDef.Input(key="assignee_event"),
+                pb.OperatorDef.Input(key="assigned_event"),
+            ],
+            outputs=[pb.OperatorDef.Output(key="output")],
+        )
 
 
 operator_lib.register_operator(AssignOperator)
@@ -66,4 +66,4 @@ def assign(
     assignee_event: Event,
     assigned_event: Event,
 ) -> Event:
-  return AssignOperator(assignee_event, assigned_event).outputs()["output"]
+    return AssignOperator(assignee_event, assigned_event).outputs()["output"]

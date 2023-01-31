@@ -17,16 +17,17 @@ from temporian.implementation.pandas.data import event as pandas_event
 
 
 def raise_(exception: Exception):
-  raise exception
+    raise exception
 
 
 BACKENDS = {
     "cpp": {
-        "event": lambda: raise_(NotImplementedError()),
-        "evaluate_schedule_fn": lambda data, schedule: raise_(
-            NotImplementedError()
-        ),
-        "read_csv_fn": lambda path: raise_(NotImplementedError()),
+        "event":
+            lambda: raise_(NotImplementedError()),
+        "evaluate_schedule_fn":
+            lambda data, schedule: raise_(NotImplementedError()),
+        "read_csv_fn":
+            lambda path: raise_(NotImplementedError()),
     },
     "pandas": {
         "event": pandas_event.PandasEvent,

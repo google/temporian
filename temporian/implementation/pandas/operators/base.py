@@ -21,11 +21,11 @@ from temporian.implementation.pandas.data.event import PandasEvent
 
 
 class PandasOperator(ABC):
-  """Base class to define an operator's interface."""
+    """Base class to define an operator's interface."""
 
-  @abstractmethod
-  def __call__(self, *args: Any, **kwargs: Any) -> Dict[str, PandasEvent]:
-    """Apply the operator to its inputs.
+    @abstractmethod
+    def __call__(self, *args: Any, **kwargs: Any) -> Dict[str, PandasEvent]:
+        """Apply the operator to its inputs.
 
     Returns:
         Dict[str, PandasEvent]: the output event of the operator.

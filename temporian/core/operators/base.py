@@ -22,7 +22,7 @@ from temporian.proto import core_pb2 as pb
 
 
 class OperatorExceptionDecorator(object):
-  """Adds details about an operator to exceptions raised in a block.
+    """Adds details about an operator to exceptions raised in a block.
 
   Usage example:
     with OperatorExceptionDecorator(operator):
@@ -33,97 +33,97 @@ class OperatorExceptionDecorator(object):
       In operator NAME_OF_THE_OPERATOR
   """
 
-  def __init__(self, operator):
-    self._operator = operator
+    def __init__(self, operator):
+        self._operator = operator
 
-  def __enter__(self):
-    pass
+    def __enter__(self):
+        pass
 
-  def __exit__(self, exc_type, exc_val, traceback):
-    if not exc_type:
-      # No exceptions
-      return True
+    def __exit__(self, exc_type, exc_val, traceback):
+        if not exc_type:
+            # No exceptions
+            return True
 
-    if exc_val:
-      # Add operator details in the exception.
-      exc_val.args += ((
-          'In operator'
-          f' "{self._operator.__class__.build_op_definition().key}".'),)
-    return False
+        if exc_val:
+            # Add operator details in the exception.
+            exc_val.args += ((
+                'In operator'
+                f' "{self._operator.__class__.build_op_definition().key}".'),)
+        return False
 
 
 class Operator(ABC):
-  """Operator interface."""
+    """Operator interface."""
 
-  def __init__(self):
-    self._inputs = {}
-    self._outputs = {}
-    self._attributes: dict[str, Union[str, int]] = {}
+    def __init__(self):
+        self._inputs = {}
+        self._outputs = {}
+        self._attributes: dict[str, Union[str, int]] = {}
 
-  def __str__(self):
-    return f'Operator<key: {self.definition().key}, id: {id(self)}, attributes: {self.attributes()}>'
+    def __str__(self):
+        return f'Operator<key: {self.definition().key}, id: {id(self)}, attributes: {self.attributes()}>'
 
-  def is_placeholder(self) -> bool:
-    return self.definition().place_holder
+    def is_placeholder(self) -> bool:
+        return self.definition().place_holder
 
-  def outputs(self) -> dict[str, Event]:
-    return self._outputs
+    def outputs(self) -> dict[str, Event]:
+        return self._outputs
 
-  def inputs(self) -> dict[str, Event]:
-    return self._inputs
+    def inputs(self) -> dict[str, Event]:
+        return self._inputs
 
-  def attributes(self) -> dict[str, Any]:
-    return self._attributes
+    def attributes(self) -> dict[str, Any]:
+        return self._attributes
 
-  def check(self) -> None:
-    """Ensures that the operator is valid."""
+    def check(self) -> None:
+        """Ensures that the operator is valid."""
 
-    definition = self.definition()
+        definition = self.definition()
 
-    with OperatorExceptionDecorator(self):
-      # Check that expected inputs are present
-      for expected_input in definition.inputs:
-        if (not expected_input.is_optional and
-            expected_input.key not in self._inputs):
-          raise ValueError(f'Missing input "{expected_input.key}".')
+        with OperatorExceptionDecorator(self):
+            # Check that expected inputs are present
+            for expected_input in definition.inputs:
+                if (not expected_input.is_optional and
+                        expected_input.key not in self._inputs):
+                    raise ValueError(f'Missing input "{expected_input.key}".')
 
-      # Check that no unexpected inputs are present
-      for available_input in self._inputs:
-        if available_input not in [v.key for v in definition.inputs]:
-          raise ValueError(f'Unexpected input "{available_input}".')
+            # Check that no unexpected inputs are present
+            for available_input in self._inputs:
+                if available_input not in [v.key for v in definition.inputs]:
+                    raise ValueError(f'Unexpected input "{available_input}".')
 
-      # Check that expected outputs are present
-      for expected_output in definition.outputs:
-        if expected_output.key not in self._outputs:
-          raise ValueError(f'Missing output "{expected_output.key}".')
+            # Check that expected outputs are present
+            for expected_output in definition.outputs:
+                if expected_output.key not in self._outputs:
+                    raise ValueError(f'Missing output "{expected_output.key}".')
 
-      # Check that no unexpected outputs are present
-      for available_output in self._outputs:
-        if available_output not in [v.key for v in definition.outputs]:
-          raise ValueError(f'Unexpected output "{available_output}".')
+            # Check that no unexpected outputs are present
+            for available_output in self._outputs:
+                if available_output not in [v.key for v in definition.outputs]:
+                    raise ValueError(f'Unexpected output "{available_output}".')
 
-  def add_input(self, key: str, event: Event) -> None:
-    with OperatorExceptionDecorator(self):
-      if key in self._inputs:
-        raise ValueError(f'Already existing input "{key}".')
-      self._inputs[key] = event
+    def add_input(self, key: str, event: Event) -> None:
+        with OperatorExceptionDecorator(self):
+            if key in self._inputs:
+                raise ValueError(f'Already existing input "{key}".')
+            self._inputs[key] = event
 
-  def add_output(self, key: str, event: Event) -> None:
-    with OperatorExceptionDecorator(self):
-      if key in self._outputs:
-        raise ValueError(f'Already existing output "{key}".')
-      self._outputs[key] = event
+    def add_output(self, key: str, event: Event) -> None:
+        with OperatorExceptionDecorator(self):
+            if key in self._outputs:
+                raise ValueError(f'Already existing output "{key}".')
+            self._outputs[key] = event
 
-  def add_attribute(self, key: str, value: Any) -> None:
-    with OperatorExceptionDecorator(self):
-      if key in self._attributes:
-        raise ValueError(f'Already existing attribute "{key}".')
-      self._attributes[key] = value
-    print(str(self))
+    def add_attribute(self, key: str, value: Any) -> None:
+        with OperatorExceptionDecorator(self):
+            if key in self._attributes:
+                raise ValueError(f'Already existing attribute "{key}".')
+            self._attributes[key] = value
+        print(str(self))
 
-  @classmethod
-  def build_op_definition(cls) -> pb.OperatorDef:
-    raise NotImplementedError()
+    @classmethod
+    def build_op_definition(cls) -> pb.OperatorDef:
+        raise NotImplementedError()
 
-  def definition(self):
-    return self.__class__.build_op_definition()
+    def definition(self):
+        return self.__class__.build_op_definition()

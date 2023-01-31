@@ -24,23 +24,23 @@ def evaluate_schedule(
     data: Dict[event.Event, pandas_event.PandasEvent],
     schedule: List[base.Operator],
 ) -> Dict[event.Event, pandas_event.PandasEvent]:
-  for operator in schedule:
-    operator_def = operator.definition()
-    # get implementation
-    implementation = core_mapping.OPERATOR_IMPLEMENTATIONS[operator_def.key](
-        **operator.attributes())
+    for operator in schedule:
+        operator_def = operator.definition()
+        # get implementation
+        implementation = core_mapping.OPERATOR_IMPLEMENTATIONS[
+            operator_def.key](**operator.attributes())
 
-    # construct operator inputs
-    operator_inputs = {
-        input_key: data[input_event]
-        for input_key, input_event in operator.inputs().items()
-    }
+        # construct operator inputs
+        operator_inputs = {
+            input_key: data[input_event]
+            for input_key, input_event in operator.inputs().items()
+        }
 
-    # compute output
-    operator_outputs = implementation(**operator_inputs)
+        # compute output
+        operator_outputs = implementation(**operator_inputs)
 
-    # materialize data in output events
-    for output_key, output_event in operator.outputs().items():
-      data[output_event] = operator_outputs[output_key]
+        # materialize data in output events
+        for output_key, output_event in operator.outputs().items():
+            data[output_event] = operator_outputs[output_key]
 
-  return data
+    return data

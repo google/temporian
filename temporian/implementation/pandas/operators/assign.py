@@ -21,9 +21,9 @@ from temporian.implementation.pandas import utils
 
 class PandasAssignOperator(PandasOperator):
 
-  def __call__(self, assignee_event: PandasEvent,
-               assigned_event: PandasEvent) -> PandasEvent:
-    """Assign features to an event.
+    def __call__(self, assignee_event: PandasEvent,
+                 assigned_event: PandasEvent) -> PandasEvent:
+        """Assign features to an event.
 
     Input event and features must have same index. Features cannot have more
     than one row for a single index + timestamp occurence. Output event will
@@ -37,26 +37,26 @@ class PandasAssignOperator(PandasOperator):
     Returns:
         PandasEvent: a new event with the features assigned.
     """
-    # assert indexes are the same
-    if assignee_event.index.names != assigned_event.index.names:
-      raise IndexError("Assign sequences must have the same index names.")
+        # assert indexes are the same
+        if assignee_event.index.names != assigned_event.index.names:
+            raise IndexError("Assign sequences must have the same index names.")
 
-    # get index column names
-    index, timestamp = utils.get_index_and_timestamp_column_names(
-        assignee_event)
+        # get index column names
+        index, timestamp = utils.get_index_and_timestamp_column_names(
+            assignee_event)
 
-    # check there's no repeated timestamps index-wise in the assigned sequence
-    if index:
-      max_timestamps = (assigned_event.reset_index().groupby(index)
-                        [timestamp].value_counts().max())
-    else:
-      max_timestamps = (
-          assigned_event.reset_index()[timestamp].value_counts().max())
+        # check there's no repeated timestamps index-wise in the assigned sequence
+        if index:
+            max_timestamps = (assigned_event.reset_index().groupby(index)
+                              [timestamp].value_counts().max())
+        else:
+            max_timestamps = (
+                assigned_event.reset_index()[timestamp].value_counts().max())
 
-    if max_timestamps > 1:
-      raise ValueError(
-          "Cannot have repeated timestamps in assigned EventSequence.")
+        if max_timestamps > 1:
+            raise ValueError(
+                "Cannot have repeated timestamps in assigned EventSequence.")
 
-    # make assignment
-    output = assignee_event.join(assigned_event, how="left", rsuffix="y")
-    return {"output": output}
+        # make assignment
+        output = assignee_event.join(assigned_event, how="left", rsuffix="y")
+        return {"output": output}

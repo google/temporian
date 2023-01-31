@@ -18,9 +18,9 @@ _OPERATORS = {}
 
 
 def register_operator(operator_class):
-  """Registers an operator."""
+    """Registers an operator."""
 
-  definition = operator_class.build_op_definition()
-  if definition.key in _OPERATORS:
-    raise ValueError("Operator already registered")
-  _OPERATORS[definition.key] = operator_class
+    definition = operator_class.build_op_definition()
+    if definition.key in _OPERATORS:
+        raise ValueError("Operator already registered")
+    _OPERATORS[definition.key] = operator_class
