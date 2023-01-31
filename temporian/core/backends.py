@@ -17,7 +17,7 @@ from temporian.implementation.pandas.data import event as pandas_event
 
 
 def raise_(exception: Exception):
-  raise exception
+    raise exception
 
 
 BACKENDS = {

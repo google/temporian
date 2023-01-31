@@ -34,84 +34,90 @@ def evaluate(
     input_data: Data,
     backend: AvailableBackends = "pandas",
 ) -> Dict[Event, Any]:
-  """Evaluates a query on data."""
+    """Evaluates a query on data."""
 
-  if isinstance(query, Event):
-    events_to_compute = [query]
+    if isinstance(query, Event):
+        events_to_compute = [query]
 
-  elif isinstance(query, list):
-    events_to_compute = query
+    elif isinstance(query, list):
+        events_to_compute = query
 
-  elif isinstance(query, dict):
-    raise NotImplementedError()
+    elif isinstance(query, dict):
+        raise NotImplementedError()
 
-  else:
-    # TODO: improve error message
-    raise TypeError(
-        f"schedule_graph query argument must be one of {Query}. Received"
-        f" {type(query)}.")
+    else:
+        # TODO: improve error message
+        raise TypeError(
+            f"schedule_graph query argument must be one of {Query}. Received"
+            f" {type(query)}."
+        )
 
-  # get features from events
-  features_to_compute = [
-      feature for event in events_to_compute for feature in event.features()  # pytype: disable=attribute-error
-  ]
+    # get features from events
+    features_to_compute = [
+        feature
+        for event in events_to_compute
+        for feature in event.features()  # pytype: disable=attribute-error
+    ]
 
-  # get backend
-  selected_backend = backends.BACKENDS[backend]
-  event = selected_backend["event"]
-  evaluate_schedule_fn = selected_backend["evaluate_schedule_fn"]
-  read_csv_fn = selected_backend["read_csv_fn"]
+    # get backend
+    selected_backend = backends.BACKENDS[backend]
+    event = selected_backend["event"]
+    evaluate_schedule_fn = selected_backend["evaluate_schedule_fn"]
+    read_csv_fn = selected_backend["read_csv_fn"]
 
-  # calculate opeartor schedule
-  schedule = get_operator_schedule(features_to_compute)
+    # calculate opeartor schedule
+    schedule = get_operator_schedule(features_to_compute)
 
-  # materialize input data. TODO: separate this logic
-  materialized_input_data = {}
-  for input_event, input_event_spec in input_data.items():
-    if not isinstance(input_event_spec, event):
-      input_event_spec = read_csv_fn(input_event_spec, input_event.sampling())
-    materialized_input_data[input_event] = input_event_spec
+    # materialize input data. TODO: separate this logic
+    materialized_input_data = {}
+    for input_event, input_event_spec in input_data.items():
+        if not isinstance(input_event_spec, event):
+            input_event_spec = read_csv_fn(
+                input_event_spec, input_event.sampling()
+            )
+        materialized_input_data[input_event] = input_event_spec
 
-  # evaluate schedule
-  outputs = evaluate_schedule_fn(materialized_input_data, schedule)
+    # evaluate schedule
+    outputs = evaluate_schedule_fn(materialized_input_data, schedule)
 
-  return {event: outputs[event] for event in events_to_compute}
+    return {event: outputs[event] for event in events_to_compute}
 
 
 def get_operator_schedule(query: List[Feature]) -> List[base.Operator]:
-  # TODO: add depth calculation for parallelization
-  # TODO: Make "query" a Set
+    # TODO: add depth calculation for parallelization
+    # TODO: Make "query" a Set
 
-  operators_to_compute = []  # TODO: implement as ordered set
-  visited_features = set()
-  pending_features = list(query.copy())  # TODO: implement as ordered set
-  while pending_features:
-    feature = next(iter(pending_features))
-    visited_features.add(feature)
+    operators_to_compute = []  # TODO: implement as ordered set
+    visited_features = set()
+    pending_features = list(query.copy())  # TODO: implement as ordered set
+    while pending_features:
+        feature = next(iter(pending_features))
+        visited_features.add(feature)
 
-    if feature.creator() is None:
-      # is input feature
-      pending_features.remove(feature)
-      continue
+        if feature.creator() is None:
+            # is input feature
+            pending_features.remove(feature)
+            continue
 
-    # required input features to compute this feature
-    creator_input_features = {
-        input_feature for input_event in feature.creator().inputs().values()
-        for input_feature in input_event.features()
-    }
+        # required input features to compute this feature
+        creator_input_features = {
+            input_feature
+            for input_event in feature.creator().inputs().values()
+            for input_feature in input_event.features()
+        }
 
-    # check if all required input features have already been visited
-    if creator_input_features.issubset(visited_features):
-      # feature can be computed - remove it from pending_features
-      pending_features.remove(feature)
+        # check if all required input features have already been visited
+        if creator_input_features.issubset(visited_features):
+            # feature can be computed - remove it from pending_features
+            pending_features.remove(feature)
 
-      # add operator at the end of operators_to_compute
-      if feature.creator() not in operators_to_compute:
-        operators_to_compute.append(feature.creator())
+            # add operator at the end of operators_to_compute
+            if feature.creator() not in operators_to_compute:
+                operators_to_compute.append(feature.creator())
 
-      continue
+            continue
 
-    # add required input features at the beginning of pending_features
-    pending_features = list(creator_input_features) + pending_features
+        # add required input features at the beginning of pending_features
+        pending_features = list(creator_input_features) + pending_features
 
-  return operators_to_compute
+    return operators_to_compute

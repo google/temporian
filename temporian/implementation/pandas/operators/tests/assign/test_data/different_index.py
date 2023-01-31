@@ -20,32 +20,40 @@ import pandas as pd
 
 from temporian.implementation.pandas.data.event import PandasEvent
 
-INPUT_1 = PandasEvent({
-    "user_id": [
-        151591562,
-        193285921,
-    ],
-    "timestamp": [
-        pd.Timestamp("2020-11-09"),
-        pd.Timestamp("2020-11-10"),
-    ],
-    "price": [
-        63.49,
-        55.12,
-    ],
-}).set_index(["user_id", "timestamp"])  # index is user_id
+INPUT_1 = PandasEvent(
+    {
+        "user_id": [
+            151591562,
+            193285921,
+        ],
+        "timestamp": [
+            pd.Timestamp("2020-11-09"),
+            pd.Timestamp("2020-11-10"),
+        ],
+        "price": [
+            63.49,
+            55.12,
+        ],
+    }
+).set_index(
+    ["user_id", "timestamp"]
+)  # index is user_id
 
-INPUT_2 = PandasEvent({
-    "product_id": [
-        666964,
-        574016,
-    ],
-    "timestamp": [
-        pd.Timestamp("2020-11-09"),
-        pd.Timestamp("2020-11-10"),
-    ],
-    "price": [
-        126.98,
-        266.42,
-    ],
-}).set_index(["product_id", "timestamp"])  # index is product_id
+INPUT_2 = PandasEvent(
+    {
+        "product_id": [
+            666964,
+            574016,
+        ],
+        "timestamp": [
+            pd.Timestamp("2020-11-09"),
+            pd.Timestamp("2020-11-10"),
+        ],
+        "price": [
+            126.98,
+            266.42,
+        ],
+    }
+).set_index(
+    ["product_id", "timestamp"]
+)  # index is product_id

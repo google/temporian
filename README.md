@@ -41,17 +41,8 @@ located) and execute:
 poetry install
 ```
 
-The virtual environment installation directory will depend on your operating
-system as follows:
-
--   Linux: `$XDG_CACHE_HOME/pypoetry/virtualenvs or
-~/.cache/pypoetry/virtualenvs`
--   Windows: `%LOCALAPPDATA%\pypoetry/virtualenvs`
--   MacOS: `~/Library/Caches/pypoetry/virtualenvs`
-
 You can also install the environment in the project's root directory by
-executing `shell poetry config virtualenvs.in-project true` before running
-`poetry install`.
+executing `poetry config virtualenvs.in-project true` before it.
 
 Finally, activate the virtual environment by executing:
 
@@ -60,6 +51,14 @@ poetry shell
 ```
 
 ## Run all tests
+
+Install bazel and buildifier (in Mac we recommend installing bazelisk with brew)
+
+```shell
+brew install bazelisk
+```
+
+Run all tests with bazel:
 
 ```shell
 bazel test //...:all

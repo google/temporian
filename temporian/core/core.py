@@ -20,78 +20,78 @@ from temporian.proto import core_pb2 as pb
 
 
 def does_nothing() -> None:
-  logging.info("Hello world")
+    logging.info("Hello world")
 
 
 def create_toy_processor() -> pb.Processor:
-  """Create a toy processor.
+    """Create a toy processor.
 
-  Theoretical result of:
-    x = t.read_event(table="sales_records")
-    y = t.sma(x["sales"], windows=5)
+    Theoretical result of:
+      x = t.read_event(table="sales_records")
+      y = t.sma(x["sales"], windows=5)
 
-  Returns:
-    Toy processor.
-  """
+    Returns:
+      Toy processor.
+    """
 
-  p = pb.Processor()
+    p = pb.Processor()
 
-  # The INPUT_PLACEHOLDER op injects data in the processor based on some input
-  # data provided by the user.
-  feed_op = pb.Operator(
-      id="op_1",
-      operator_def_key="INPUT_PLACEHOLDER",
-      attributes=[pb.Operator.Attribute(key="table", str="sales_records")],
-      outputs=[pb.Operator.EventArgument(key="data", event_id="event_1")],
-  )
-  p.operators.append(feed_op)
+    # The INPUT_PLACEHOLDER op injects data in the processor based on some input
+    # data provided by the user.
+    feed_op = pb.Operator(
+        id="op_1",
+        operator_def_key="INPUT_PLACEHOLDER",
+        attributes=[pb.Operator.Attribute(key="table", str="sales_records")],
+        outputs=[pb.Operator.EventArgument(key="data", event_id="event_1")],
+    )
+    p.operators.append(feed_op)
 
-  # Definition of the feed op results.
-  p.samplings.append(pb.Sampling(id="sampling_1"))
+    # Definition of the feed op results.
+    p.samplings.append(pb.Sampling(id="sampling_1"))
 
-  p.events.append(
-      pb.Event(
-          id="event_1",
-          sampling_id="sampling_1",
-          feature_ids=["sales"],
-      )
-  )
+    p.events.append(
+        pb.Event(
+            id="event_1",
+            sampling_id="sampling_1",
+            feature_ids=["sales"],
+        )
+    )
 
-  p.features.append(
-      pb.Feature(
-          id="sales",
-          type=pb.Feature.FLOAT,
-          sampling_id="sampling_1",
-      )
-  )
+    p.features.append(
+        pb.Feature(
+            id="sales",
+            type=pb.Feature.FLOAT,
+            sampling_id="sampling_1",
+        )
+    )
 
-  # We apply a SMA on the "price" feature using the same sampling rate as the
-  # sales.
-  sma = pb.Operator(
-      id="op_2",
-      operator_def_key="SMA",
-      attributes=[],
-      inputs=[pb.Operator.EventArgument(key="data", event_id="event_1")],
-      outputs=[pb.Operator.EventArgument(key="result", event_id="event_2")],
-  )
-  p.operators.append(sma)
+    # We apply a SMA on the "price" feature using the same sampling rate as the
+    # sales.
+    sma = pb.Operator(
+        id="op_2",
+        operator_def_key="SMA",
+        attributes=[],
+        inputs=[pb.Operator.EventArgument(key="data", event_id="event_1")],
+        outputs=[pb.Operator.EventArgument(key="result", event_id="event_2")],
+    )
+    p.operators.append(sma)
 
-  # Definition of the SMA op results.
+    # Definition of the SMA op results.
 
-  p.events.append(
-      pb.Event(
-          id="event_2",
-          sampling_id="sampling_1",
-          feature_ids=["sma_sales"],
-      )
-  )
+    p.events.append(
+        pb.Event(
+            id="event_2",
+            sampling_id="sampling_1",
+            feature_ids=["sma_sales"],
+        )
+    )
 
-  p.features.append(
-      pb.Feature(
-          id="sma_sales",
-          type=pb.Feature.FLOAT,
-          sampling_id="sampling_1",
-      )
-  )
+    p.features.append(
+        pb.Feature(
+            id="sma_sales",
+            type=pb.Feature.FLOAT,
+            sampling_id="sampling_1",
+        )
+    )
 
-  return p
+    return p

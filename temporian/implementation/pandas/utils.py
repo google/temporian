@@ -21,20 +21,20 @@ from temporian.implementation.pandas.data import sampling
 def get_index_and_timestamp_column_names(
     obj: Union[event.PandasEvent, sampling.PandasSampling]
 ) -> tuple[list[str], str]:
-  """Get the names of the index columns and the timestamp column from a
-  PandasEvent or PandasSampling.
+    """Get the names of the index columns and the timestamp column from a
+    PandasEvent or PandasSampling.
 
-  Args:
-      obj (Union[event.PandasEvent, sampling.PandasSampling]): the event or
-      sampling to get the index names of.
+    Args:
+        obj (Union[event.PandasEvent, sampling.PandasSampling]): the event or
+        sampling to get the index names of.
 
-  Returns:
-      Tuple[List[str], str]: output index and timestamp column names.
-  """
-  if isinstance(obj, event.PandasEvent):
-    obj = obj.index
+    Returns:
+        Tuple[List[str], str]: output index and timestamp column names.
+    """
+    if isinstance(obj, event.PandasEvent):
+        obj = obj.index
 
-  index_cols = obj.names[:-1]
-  timestamp_col = obj.names[-1]
+    index_cols = obj.names[:-1]
+    timestamp_col = obj.names[-1]
 
-  return index_cols, timestamp_col
+    return index_cols, timestamp_col

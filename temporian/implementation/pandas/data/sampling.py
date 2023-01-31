@@ -20,4 +20,4 @@ import pandas as pd
 
 
 class PandasSampling(pd.MultiIndex):
-  pass
+    pass

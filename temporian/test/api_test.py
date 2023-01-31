@@ -21,42 +21,43 @@ from temporian.implementation.pandas.data.event import PandasEvent
 
 
 class TFPTest(absltest.TestCase):
+    def test_does_nothing(self):
+        logging.info("Running a test")
+        t.does_nothing()
+        self.assertEqual(1, 1)
 
-  def test_does_nothing(self):
-    logging.info("Running a test")
-    t.does_nothing()
-    self.assertEqual(1, 1)
+    def test_create_toy_processor(self):
+        p = t.create_toy_processor()
+        logging.info("Processor:\n%s", p)
 
-  def test_create_toy_processor(self):
-    p = t.create_toy_processor()
-    logging.info("Processor:\n%s", p)
+    def disabled_test_create_processor(self):
+        a = t.place_holder(
+            features=[
+                t.Feature(name="f1", dtype=t.dtype.FLOAT),
+                t.Feature(name="f2", dtype=t.dtype.FLOAT),
+            ],
+            index=[],
+        )
 
-  def disabled_test_create_processor(self):
-    a = t.place_holder(
-        features=[
-            t.Feature(name="f1", dtype=t.dtype.FLOAT),
-            t.Feature(name="f2", dtype=t.dtype.FLOAT),
-        ],
-        index=[],
-    )
+        b = t.sma(data=a, window_length=7)
 
-    b = t.sma(data=a, window_length=7)
+        input_signal_data = PandasEvent(
+            {
+                "time": [0, 2, 4, 6],
+                "f1": [1, 2, 3, 4],
+                "f2": [5, 6, 7, 8],
+            }
+        )
 
-    input_signal_data = PandasEvent({
-        "time": [0, 2, 4, 6],
-        "f1": [1, 2, 3, 4],
-        "f2": [5, 6, 7, 8],
-    })
+        results = t.evaluate(
+            query={"b": b},
+            input_data={
+                a: input_signal_data,
+            },
+        )
 
-    results = t.evaluate(
-        query={"b": b},
-        input_data={
-            a: input_signal_data,
-        },
-    )
-
-    logging.info("results: %s", results)
+        logging.info("results: %s", results)
 
 
 if __name__ == "__main__":
-  absltest.main()
+    absltest.main()

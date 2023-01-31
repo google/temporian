@@ -20,33 +20,32 @@ from temporian.core.data import sampling as sampling_lib
 
 
 class Feature(object):
+    def __init__(
+        self,
+        name: str,
+        dtype: Any,
+        sampling: Optional[sampling_lib.Sampling] = None,
+        creator: Optional[Any] = None,
+    ):
+        self._name = name
+        self._sampling = sampling
+        self._dtype = dtype
+        self._creator = creator
 
-  def __init__(
-      self,
-      name: str,
-      dtype: Any,
-      sampling: Optional[sampling_lib.Sampling] = None,
-      creator: Optional[Any] = None,
-  ):
-    self._name = name
-    self._sampling = sampling
-    self._dtype = dtype
-    self._creator = creator
+    def __repr__(self):
+        return f"Feature<name:{self._name},dtype:{self._dtype},sampling:{self._sampling},creator:{self.creator()},id:{id(self)}>"
 
-  def __repr__(self):
-    return f'Feature<name:{self._name},dtype:{self._dtype},sampling:{self._sampling},creator:{self.creator()},id:{id(self)}>'
+    def name(self):
+        return self._name
 
-  def name(self):
-    return self._name
+    def dtype(self):
+        return self._dtype
 
-  def dtype(self):
-    return self._dtype
+    def sampling(self) -> Optional[sampling_lib.Sampling]:
+        return self._sampling
 
-  def sampling(self) -> Optional[sampling_lib.Sampling]:
-    return self._sampling
+    def creator(self):
+        return self._creator
 
-  def creator(self):
-    return self._creator
-
-  def set_sampling(self, sampling: sampling_lib.Sampling):
-    self._sampling = sampling
+    def set_sampling(self, sampling: sampling_lib.Sampling):
+        self._sampling = sampling

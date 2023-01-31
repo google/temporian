@@ -22,42 +22,46 @@ import pandas as pd
 
 from temporian.implementation.pandas.data.event import PandasEvent
 
-INPUT_1 = PandasEvent({
-    "user_id": [
-        151591562,
-        151591562,
-        191562515,
-    ],
-    "timestamp": [
-        pd.Timestamp("2020-12-20"),
-        pd.Timestamp(
-            "2020-12-20"
-        ),  # repeated timestamp on assingee event for user_id = 151591562
-        pd.Timestamp("2020-12-22"),
-    ],
-    "price": [
-        63.49,
-        133.21,
-        148.67,
-    ],
-}).set_index(["user_id", "timestamp"])
+INPUT_1 = PandasEvent(
+    {
+        "user_id": [
+            151591562,
+            151591562,
+            191562515,
+        ],
+        "timestamp": [
+            pd.Timestamp("2020-12-20"),
+            pd.Timestamp(
+                "2020-12-20"
+            ),  # repeated timestamp on assingee event for user_id = 151591562
+            pd.Timestamp("2020-12-22"),
+        ],
+        "price": [
+            63.49,
+            133.21,
+            148.67,
+        ],
+    }
+).set_index(["user_id", "timestamp"])
 
-INPUT_2 = PandasEvent({
-    "user_id": [
-        151591562,
-        191562515,
-        191562515,
-    ],
-    "timestamp": [
-        pd.Timestamp("2020-11-15"),
-        pd.Timestamp("2020-11-18"),
-        pd.Timestamp(
-            "2020-11-18"
-        ),  # repeated timestamp on assinged event for user_id = 191562515
-    ],
-    "price": [
-        190.47,
-        399.63,
-        446.01,
-    ],
-}).set_index(["user_id", "timestamp"])
+INPUT_2 = PandasEvent(
+    {
+        "user_id": [
+            151591562,
+            191562515,
+            191562515,
+        ],
+        "timestamp": [
+            pd.Timestamp("2020-11-15"),
+            pd.Timestamp("2020-11-18"),
+            pd.Timestamp(
+                "2020-11-18"
+            ),  # repeated timestamp on assinged event for user_id = 191562515
+        ],
+        "price": [
+            190.47,
+            399.63,
+            446.01,
+        ],
+    }
+).set_index(["user_id", "timestamp"])

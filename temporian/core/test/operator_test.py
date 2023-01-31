@@ -21,50 +21,54 @@ from temporian.proto import core_pb2 as pb
 
 
 class OperatorTest(absltest.TestCase):
+    def test_check_operator(self):
+        class ToyOperator(base.Operator):
+            @classmethod
+            def build_op_definition(cls) -> pb.OperatorDef:
+                return pb.OperatorDef(
+                    key="TOY",
+                    inputs=[
+                        pb.OperatorDef.Input(key="input"),
+                        pb.OperatorDef.Input(
+                            key="optional_input", is_optional=True
+                        ),
+                    ],
+                    outputs=[pb.OperatorDef.Output(key="output")],
+                )
 
-  def test_check_operator(self):
-    class ToyOperator(base.Operator):
+            def _get_pandas_implementation(self):
+                raise NotImplementedError()
 
-      @classmethod
-      def build_op_definition(cls) -> pb.OperatorDef:
-        return pb.OperatorDef(
-            key="TOY",
-            inputs=[
-                pb.OperatorDef.Input(key="input"),
-                pb.OperatorDef.Input(key="optional_input", is_optional=True),
-            ],
-            outputs=[pb.OperatorDef.Output(key="output")],
-        )
+        def build_fake_event():
+            return Event(features=[], sampling=Sampling(index=[]))
 
-      def _get_pandas_implementation(self):
-        raise NotImplementedError()
+        t = ToyOperator()
+        with self.assertRaisesRegex(ValueError, 'Missing input "input"'):
+            t.check()
 
-    def build_fake_event():
-      return Event(features=[], sampling=Sampling(index=[]))
+        t.add_input("input", build_fake_event())
+        with self.assertRaisesRegex(ValueError, 'Missing output "output"'):
+            t.check()
 
-    t = ToyOperator()
-    with self.assertRaisesRegex(ValueError, 'Missing input "input"'):
-      t.check()
+        with self.assertRaisesRegex(
+            ValueError, 'Already existing input "input"'
+        ):
+            t.add_input("input", build_fake_event())
 
-    t.add_input("input", build_fake_event())
-    with self.assertRaisesRegex(ValueError, 'Missing output "output"'):
-      t.check()
+        t.add_output("output", build_fake_event())
+        t.check()
 
-    with self.assertRaisesRegex(ValueError, 'Already existing input "input"'):
-      t.add_input("input", build_fake_event())
+        with self.assertRaisesRegex(
+            ValueError, 'Already existing output "output"'
+        ):
+            t.add_output("output", build_fake_event())
 
-    t.add_output("output", build_fake_event())
-    t.check()
-
-    with self.assertRaisesRegex(ValueError, 'Already existing output "output"'):
-      t.add_output("output", build_fake_event())
-
-    t.add_output("unexpected_output", build_fake_event())
-    with self.assertRaisesRegex(
-        ValueError, 'Unexpected output "unexpected_output"'
-    ):
-      t.check()
+        t.add_output("unexpected_output", build_fake_event())
+        with self.assertRaisesRegex(
+            ValueError, 'Unexpected output "unexpected_output"'
+        ):
+            t.check()
 
 
 if __name__ == "__main__":
-  absltest.main()
+    absltest.main()
