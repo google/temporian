@@ -64,7 +64,7 @@ class PrototypeTest(absltest.TestCase):
     # call sma operator
     sma_assigned_event = sma(assigned_event,
                              window_length="7d",
-                             sampling=assigned_event.sampling())
+                             sampling=assigned_event)
 
     # call assign operator with result of sma
     output_event = assign(output_event, sma_assigned_event)

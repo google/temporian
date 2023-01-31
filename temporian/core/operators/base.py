@@ -15,7 +15,7 @@
 """Operator module."""
 
 from abc import ABC
-from typing import Dict, Any
+from typing import Any, Union
 
 from temporian.core.data.event import Event
 from temporian.proto import core_pb2 as pb
@@ -58,7 +58,7 @@ class Operator(ABC):
   def __init__(self):
     self._inputs = {}
     self._outputs = {}
-    self._attributes = {}
+    self._attributes: dict[str, Union[str, int]] = {}
 
   def __str__(self):
     return f'Operator<key: {self.definition().key}, id: {id(self)}, attributes: {self.attributes()}>'
@@ -66,13 +66,13 @@ class Operator(ABC):
   def is_placeholder(self) -> bool:
     return self.definition().place_holder
 
-  def outputs(self) -> Dict[str, Event]:
+  def outputs(self) -> dict[str, Event]:
     return self._outputs
 
-  def inputs(self) -> Dict[str, Event]:
+  def inputs(self) -> dict[str, Event]:
     return self._inputs
 
-  def attributes(self) -> Dict[str, Any]:
+  def attributes(self) -> dict[str, Any]:
     return self._attributes
 
   def check(self) -> None:

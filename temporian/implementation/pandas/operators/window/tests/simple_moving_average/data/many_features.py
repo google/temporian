@@ -31,7 +31,7 @@ INPUT = PandasEvent(
 ).set_index(["timestamp"])
 
 # sampling covering daily range of dates
-SAMPLING = PandasSampling.from_arrays(
+SAMPLING = PandasEvent(index=PandasSampling.from_arrays(
     [[
         pd.Timestamp("2013-01-01"),
         pd.Timestamp("2013-01-02"),
@@ -47,7 +47,7 @@ SAMPLING = PandasSampling.from_arrays(
         pd.Timestamp("2013-01-12"),
     ]],
     names=["timestamp"],
-)
+))
 
 OUTPUT = PandasEvent(
     [

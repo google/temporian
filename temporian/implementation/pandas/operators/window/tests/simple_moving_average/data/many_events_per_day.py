@@ -32,7 +32,7 @@ INPUT = PandasEvent(
     columns=["timestamp", "value"],
 ).set_index(["timestamp"])
 
-SAMPLING = PandasSampling.from_arrays(
+SAMPLING = PandasEvent(index=PandasSampling.from_arrays(
     [[
         pd.Timestamp("2013-01-01"),
         pd.Timestamp("2013-01-02"),
@@ -42,7 +42,7 @@ SAMPLING = PandasSampling.from_arrays(
         pd.Timestamp("2013-01-04"),
     ]],
     names=["timestamp"],
-)
+))
 
 OUTPUT = PandasEvent(
     [
