@@ -16,10 +16,11 @@
 
 Tests that the assignee and assigned events cannot have different indexes.
 """
-
 import pandas as pd
 
-INPUT_1 = pd.DataFrame({
+from temporian.implementation.pandas.data.event import PandasEvent
+
+INPUT_1 = PandasEvent({
     "user_id": [
         151591562,
         193285921,
@@ -32,11 +33,9 @@ INPUT_1 = pd.DataFrame({
         63.49,
         55.12,
     ],
-}).set_index(
-    ["user_id", "timestamp"]
-)  # index is user_id
+}).set_index(["user_id", "timestamp"])  # index is user_id
 
-INPUT_2 = pd.DataFrame({
+INPUT_2 = PandasEvent({
     "product_id": [
         666964,
         574016,
@@ -49,6 +48,4 @@ INPUT_2 = pd.DataFrame({
         126.98,
         266.42,
     ],
-}).set_index(
-    ["product_id", "timestamp"]
-)  # index is product_id
+}).set_index(["product_id", "timestamp"])  # index is product_id

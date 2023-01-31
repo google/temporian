@@ -12,44 +12,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from absl.testing import absltest
 import pandas as pd
-
+from absl.testing import absltest
 from temporian.core import evaluator
 from temporian.core.data.event import Event
 from temporian.core.data.event import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.assign import assign
+from temporian.core.operators.simple_moving_average import sma
 from temporian.implementation.pandas.data import event as pandas_event
 
 
 class PrototypeTest(absltest.TestCase):
 
   def setUp(self) -> None:
-    super().setUp()
+    self.assignee_event = (
+        "temporian/test/test_data/prototype/assignee_event.csv")
 
-    self.assignee_event = "temporian/test/test_data/prototype/assignee_event.csv"
-
-    self.assigned_event = pandas_event.PandasEvent({
-        "product_id": [666964, 666964, 574016],
-        "timestamp": [
-            pd.Timestamp("2013-01-02", tz="UTC"),
-            pd.Timestamp("2013-01-03", tz="UTC"),
-            pd.Timestamp("2013-01-04", tz="UTC"),
+    self.assigned_event = pandas_event.PandasEvent(
+        [
+            [666964, pd.Timestamp("2013-01-02"), 740.0],
+            [666964, pd.Timestamp("2013-01-03"), 508.0],
+            [574016, pd.Timestamp("2013-01-04"), 573.0],
         ],
-        "costs": [740.0, 508.0, 573.0],
-    }).set_index(["product_id", "timestamp"])
+        columns=["product_id", "timestamp", "costs"],
+    ).set_index(["product_id", "timestamp"])
 
-    self.expected_output_event = pandas_event.PandasEvent({
-        "product_id": [666964, 666964, 574016],
-        "timestamp": [
-            pd.Timestamp("2013-01-02", tz="UTC"),
-            pd.Timestamp("2013-01-03", tz="UTC"),
-            pd.Timestamp("2013-01-04", tz="UTC"),
+    self.expected_output_event = pandas_event.PandasEvent(
+        [
+            [666964, pd.Timestamp("2013-01-02"), 1091.0, 740.0, 740.0],
+            [666964, pd.Timestamp("2013-01-03"), 919.0, 508.0, 624.0],
+            [574016, pd.Timestamp("2013-01-04"), 953.0, 573.0, 573.0],
         ],
-        "sales": [1091.0, 919.0, 953.0],
-        "costs": [740.0, 508.0, 573.0],
-    }).set_index(["product_id", "timestamp"])
+        columns=["product_id", "timestamp", "sales", "costs", "sma_costs"],
+    ).set_index(["product_id", "timestamp"])
 
   def test_prototoype(self) -> None:
     # instance input events
@@ -65,6 +61,14 @@ class PrototypeTest(absltest.TestCase):
     # call assign operator
     output_event = assign(assignee_event, assigned_event)
 
+    # call sma operator
+    sma_assigned_event = sma(assigned_event,
+                             window_length="7d",
+                             sampling=assigned_event)
+
+    # call assign operator with result of sma
+    output_event = assign(output_event, sma_assigned_event)
+
     # evaluate output
     output_event_pandas = evaluator.evaluate(
         output_event,
@@ -76,11 +80,6 @@ class PrototypeTest(absltest.TestCase):
         },
         backend="pandas",
     )
-
-    print(self.assignee_event)
-    print(self.assigned_event)
-    print(self.expected_output_event)
-    print(output_event_pandas)
 
     # validate
     self.assertEqual(

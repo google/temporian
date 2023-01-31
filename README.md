@@ -61,9 +61,6 @@ poetry shell
 
 ## Run all tests
 
-Go to the root `temporian` directory, activate the virtual
-environment and execute:
-
 ```shell
 bazel test //...:all
 ```

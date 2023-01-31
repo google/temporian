@@ -23,9 +23,8 @@ from temporian.core.data.feature import Feature
 from temporian.core.operators import base
 from temporian.implementation.pandas.data import event as pandas_event
 
-AvailableBackends = (
-    Any  # TODO: Use typing.Literal[tuple(backends.BACKENDS.keys())]
-)
+# TODO: Use typing.Literal[tuple(backends.BACKENDS.keys())]
+AvailableBackends = Any
 Data = Dict[Event, Union[str, pathlib.Path, pandas_event.PandasEvent]]
 Query = Union[Event, List[Event]]
 
@@ -50,8 +49,7 @@ def evaluate(
     # TODO: improve error message
     raise TypeError(
         f"schedule_graph query argument must be one of {Query}. Received"
-        f" {type(query)}."
-    )
+        f" {type(query)}.")
 
   # get features from events
   features_to_compute = [
@@ -68,14 +66,12 @@ def evaluate(
   schedule = get_operator_schedule(features_to_compute)
 
   # materialize input data. TODO: separate this logic
-  materialized_input_data = {
-      input_event: (
-          input_event_spec
-          if isinstance(input_event_spec, event)
-          else read_csv_fn(input_event_spec, input_event.sampling())
-      )
-      for input_event, input_event_spec in input_data.items()
-  }
+  materialized_input_data = {}
+  for input_event, input_event_spec in input_data.items():
+    if not isinstance(input_event_spec, event):
+      input_event_spec = read_csv_fn(input_event_spec, input_event.sampling())
+    materialized_input_data[input_event] = input_event_spec
+
   # evaluate schedule
   outputs = evaluate_schedule_fn(materialized_input_data, schedule)
 
@@ -100,10 +96,10 @@ def get_operator_schedule(query: List[Feature]) -> List[base.Operator]:
 
     # required input features to compute this feature
     creator_input_features = {
-        input_feature
-        for input_event in feature.creator().inputs().values()
+        input_feature for input_event in feature.creator().inputs().values()
         for input_feature in input_event.features()
     }
+
     # check if all required input features have already been visited
     if creator_input_features.issubset(visited_features):
       # feature can be computed - remove it from pending_features

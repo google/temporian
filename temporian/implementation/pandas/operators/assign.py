@@ -16,6 +16,7 @@
 
 from temporian.implementation.pandas.data.event import PandasEvent
 from temporian.implementation.pandas.operators.base import PandasOperator
+from temporian.implementation.pandas import utils
 
 
 class PandasAssignOperator(PandasOperator):
@@ -41,7 +42,8 @@ class PandasAssignOperator(PandasOperator):
       raise IndexError("Assign sequences must have the same index names.")
 
     # get index column names
-    index, timestamp = self.split_index(assignee_event)
+    index, timestamp = utils.get_index_and_timestamp_column_names(
+        assignee_event)
 
     # check there's no repeated timestamps index-wise in the assigned sequence
     if index:

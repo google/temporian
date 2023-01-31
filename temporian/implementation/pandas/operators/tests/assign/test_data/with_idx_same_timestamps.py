@@ -20,7 +20,9 @@ timestamps for all index values. Both input events are indexed.
 
 import pandas as pd
 
-INPUT_1 = pd.DataFrame({
+from temporian.implementation.pandas.data.event import PandasEvent
+
+INPUT_1 = PandasEvent({
     "product_id": [
         666964,
         666964,
@@ -38,7 +40,7 @@ INPUT_1 = pd.DataFrame({
     ],
 }).set_index(["product_id", "timestamp"])
 
-INPUT_2 = pd.DataFrame({
+INPUT_2 = PandasEvent({
     "product_id": [
         666964,
         666964,
@@ -56,7 +58,7 @@ INPUT_2 = pd.DataFrame({
     ],
 }).set_index(["product_id", "timestamp"])
 
-OUTPUT = pd.DataFrame({
+OUTPUT = PandasEvent({
     "product_id": [
         666964,
         666964,

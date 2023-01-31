@@ -25,9 +25,10 @@ def evaluate_schedule(
     schedule: List[base.Operator],
 ) -> Dict[event.Event, pandas_event.PandasEvent]:
   for operator in schedule:
+    operator_def = operator.definition()
     # get implementation
-    implementation = core_mapping.OPERATOR_IMPLEMENTATIONS[operator.definition(
-    ).key]()  # TODO: add operator attributes when instancing implementation
+    implementation = core_mapping.OPERATOR_IMPLEMENTATIONS[operator_def.key](
+        **operator.attributes())
 
     # construct operator inputs
     operator_inputs = {

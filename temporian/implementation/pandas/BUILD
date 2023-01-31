@@ -23,3 +23,13 @@ py_library(
         "//temporian/implementation/pandas/operators:core_mapping",
     ],
 )
+
+py_library(
+    name = "utils",
+    srcs = ["utils.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/pandas/data:event",
+        "//temporian/implementation/pandas/data:sampling",
+    ],
+)

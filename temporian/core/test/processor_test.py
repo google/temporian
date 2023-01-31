@@ -200,7 +200,7 @@ class ProcessorTest(absltest.TestCase):
 
     with self.assertRaisesRegex(
         ValueError,
-        "Missing input features.*from placeholder Operator<key:OpO1,",
+        "Missing input features.*from placeholder Operator<key: OpO1,",
     ):
       processor.infer_processor([], [o2.outputs()["output"]])
 

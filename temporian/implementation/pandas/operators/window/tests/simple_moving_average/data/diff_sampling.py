@@ -35,7 +35,7 @@ INPUT = PandasEvent(
 ).set_index(["id", "timestamp"])
 
 # sampling covering daily range of dates for each id independently
-SAMPLING = PandasSampling.from_tuples(
+SAMPLING = PandasEvent(index=PandasSampling.from_tuples(
     [
         (1, pd.Timestamp("2013-01-01")),
         (1, pd.Timestamp("2013-01-02")),
@@ -55,7 +55,7 @@ SAMPLING = PandasSampling.from_tuples(
         (2, pd.Timestamp("2013-01-14")),
     ],
     names=["id", "timestamp"],
-)
+))
 
 OUTPUT = PandasEvent(
     [

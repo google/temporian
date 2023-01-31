@@ -28,6 +28,7 @@ py_library(
     deps = [
         ":base",
         # pandas dep,
+        "//temporian/implementation/pandas:utils",
         "//temporian/implementation/pandas/data:event",
         "//temporian/implementation/pandas/data:sampling",
     ],

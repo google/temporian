@@ -18,6 +18,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/implementation/pandas:utils",
         "//temporian/implementation/pandas/data:event",
     ],
 )
@@ -37,5 +38,6 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":assign",
+        "//temporian/implementation/pandas/operators/window:simple_moving_average",
     ],
 )
