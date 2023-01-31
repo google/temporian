@@ -55,7 +55,7 @@ poetry shell
 Install bazel and buildifier (in Mac we recommend installing bazelisk with brew)
 
 ```shell
-brew install bazelisk buildifier
+brew install bazelisk
 ```
 
 Run all tests with bazel:
