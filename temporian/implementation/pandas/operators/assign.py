@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Implementation for the Assign operator."""
+from typing import Dict
 
 from temporian.implementation.pandas.data.event import PandasEvent
 from temporian.implementation.pandas.operators.base import PandasOperator
@@ -22,7 +23,7 @@ from temporian.implementation.pandas import utils
 class PandasAssignOperator(PandasOperator):
     def __call__(
         self, assignee_event: PandasEvent, assigned_event: PandasEvent
-    ) -> PandasEvent:
+    ) -> Dict[str, PandasEvent]:
         """Assign features to an event.
 
         Input event and features must have same index. Features cannot have more
