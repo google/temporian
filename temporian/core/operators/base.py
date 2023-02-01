@@ -127,7 +127,6 @@ class Operator(ABC):
             if key in self._attributes:
                 raise ValueError(f'Already existing attribute "{key}".')
             self._attributes[key] = value
-        print(str(self))
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
