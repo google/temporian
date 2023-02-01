@@ -14,12 +14,23 @@
 
 """A sampling."""
 
-from typing import List
+from typing import List, Optional, Any
 
 
 class Sampling(object):
-    def __init__(self, index: List[str]):
-        self._index = index
+    def __init__(
+        self,
+        index: List[str],
+        creator: Optional[Any] = None,
+    ):
+        self._index: List[str] = index
+        self._creator = creator
 
     def __repr__(self):
         return f"Sampling<index:{self._index},id:{id(self)}>"
+
+    def index(self) -> List[str]:
+        return self._index
+
+    def creator(self):
+        return self._creator

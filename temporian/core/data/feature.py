@@ -35,7 +35,7 @@ class Feature(object):
     def __repr__(self):
         return f"Feature<name:{self._name},dtype:{self._dtype},sampling:{self._sampling},creator:{self.creator()},id:{id(self)}>"
 
-    def name(self):
+    def name(self) -> str:
         return self._name
 
     def dtype(self):

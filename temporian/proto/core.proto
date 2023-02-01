@@ -78,7 +78,7 @@ message Event {
   repeated string feature_ids = 3;
 
   // Index of the event. Empty for global events.
-  repeated string index = 4;
+  repeated string index = 4; // DO NOT SUBMIT; TO REMOVE
 }
 
 // Schema of a feature
@@ -93,7 +93,7 @@ message Feature {
   optional string sampling_id = 3;
 
   // Index of the feature.
-  repeated string index = 4;
+  repeated string index = 4;  // DO NOT SUBMIT; TO REMOVE
 
   // Index of the event id who's operator creator also created this feature.
   optional string creator_event_id = 5;
