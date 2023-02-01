@@ -33,8 +33,18 @@ class Event(object):
         self._sampling = sampling
         self._creator = creator
 
-    def __repr__(self):
-        return f"Event<features:{self._features},sampling:{self._sampling},id:{id(self)}>"
+    def __repr__(self) -> str:
+        features_print = "\n\t\t".join(
+            [str(feature) for feature in self._features]
+        )
+        return (
+            "Event: { \n"
+            "\tfeatures: {\n"
+            f"\t\t{features_print}\n"
+            "\t},\n"
+            f"\tsampling: {self._sampling},\n"
+            f"\tid:{id(self)}\n}}"
+        )
 
     def sampling(self):
         return self._sampling
