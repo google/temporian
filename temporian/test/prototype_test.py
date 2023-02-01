@@ -97,8 +97,10 @@ class PrototypeTest(absltest.TestCase):
         assign_assign_event = assign(assign_output_1, assign_output_2)
 
         # call sma operator
-        sma_assigned_event = sma(
-            assigned_event, window_length="7d", sampling=assigned_event
+        sma_assigned_selected_event = sma(
+            assign_output_event["costs"],  # in-place select using []
+            window_length="7d",
+            sampling=assigned_event,
         )
 
         # call assign operator with result of sma
