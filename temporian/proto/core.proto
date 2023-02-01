@@ -76,9 +76,6 @@ message Event {
 
   // Features in the event.
   repeated string feature_ids = 3;
-
-  // Index of the event. Empty for global events.
-  repeated string index = 4; // DO NOT SUBMIT; TO REMOVE
 }
 
 // Schema of a feature
@@ -87,18 +84,17 @@ message Feature {
   // processor.
   optional string id = 1;
 
-  optional Type type = 2;
+  optional string name = 2;
+
+  optional DType dtype = 3;
 
   // Identifier of the sampling of the feature.
-  optional string sampling_id = 3;
-
-  // Index of the feature.
-  repeated string index = 4;  // DO NOT SUBMIT; TO REMOVE
+  optional string sampling_id = 4;
 
   // Index of the event id who's operator creator also created this feature.
   optional string creator_event_id = 5;
 
-  enum Type {
+  enum DType {
     UNDEFINED = 0;
     FLOAT = 1;
     INT64 = 2;

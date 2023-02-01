@@ -14,16 +14,18 @@
 
 """Serialization / unserialization of a processor."""
 
-from typing import List, Set, Union, Any
+from typing import List, Set, Union, Any, Dict
 
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators import base
 from temporian.core.data import dtype as dtype_lib
+from temporian.core import operator_lib
 
 from temporian.proto import core_pb2 as pb
 from temporian.core import processor
+from absl import logging
 
 
 def serialize(src: processor.Preprocessor) -> pb.Processor:
@@ -40,10 +42,28 @@ def serialize(src: processor.Preprocessor) -> pb.Processor:
 def unserialize(src: pb.Processor) -> processor.Preprocessor:
     """Unserializes a protobuffer into a processor."""
 
-    pass
+    # Decode the components.
+    samplings = {s.id: _unserialize_sampling(s) for s in src.samplings}
+    features = {s.id: _unserialize_feature(s, samplings) for s in src.features}
+    events = {
+        s.id: _unserialize_event(s, samplings, features) for s in src.events
+    }
+    operators = {s.id: _unserialize_operator(s, events) for s in src.operators}
+
+    # Set the creator fields.
+    # TODO: Set creator
+
+    logging.info("@@samplings: %s", samplings)
+    logging.info("@@features: %s", features)
+    logging.info("@@events: %s", events)
+    logging.info("@@operators: %s", operators)
+
+    return processor.Preprocessor()
 
 
 def _identifier(item: Any) -> str:
+    """Unique identifier about an object within a processor."""
+
     return str(id(item))
 
 
@@ -65,6 +85,15 @@ def _serialize_operator(src: base.Operator) -> pb.Operator:
     )
 
 
+def _unserialize_operator(
+    src: pb.Operator, events: Dict[str, Event]
+) -> base.Operator:
+    operator_class = operator_lib.get_operator_class(src.operator_def_key)
+    args = {}
+    # TODO: Set args
+    return operator_class(args)
+
+
 def _serialize_event(src: Event) -> pb.Event:
     return pb.Event(
         id=_identifier(src),
@@ -73,12 +102,42 @@ def _serialize_event(src: Event) -> pb.Event:
     )
 
 
+def _unserialize_event(
+    src: pb.Event, samplings: Dict[str, Sampling], features: Dict[str, Feature]
+) -> Event:
+    if src.sampling_id not in samplings:
+        raise ValueError("Non existing sampling")
+
+    def get_feature(key):
+        if key not in features:
+            raise ValueError("Nont existing feature")
+
+    return Event(
+        sampling=samplings[src.sampling_id],
+        features=[get_feature(f) for f in src.feature_ids],
+    )
+
+
 def _serialize_feature(src: Feature) -> pb.Feature:
     return pb.Feature(
         id=_identifier(src),
-        type=_type_to_proto(src.dtype()),
+        name=src.name(),
+        dtype=_type_to_proto(src.dtype()),
         sampling_id=_identifier(src.sampling()),
         creator_event_id=_identifier(src.creator()),
+    )
+
+
+def _unserialize_feature(
+    src: pb.Feature, samplings: Dict[str, Sampling]
+) -> Feature:
+    if src.sampling_id not in samplings:
+        raise ValueError("Non existing sampling")
+
+    return Feature(
+        name=src.name,
+        dtype=_type_from_proto(src.dtype),
+        sampling=samplings[src.sampling_id],
     )
 
 
@@ -90,9 +149,20 @@ def _serialize_sampling(src: Sampling) -> pb.Sampling:
     )
 
 
-def _type_to_proto(dtype) -> pb.Feature.Type:
+def _unserialize_sampling(src: pb.Sampling) -> Sampling:
+    return Sampling(index=src.index)
+
+
+def _type_to_proto(dtype) -> pb.Feature.DType:
     if dtype == dtype_lib.FLOAT:
         return pb.Feature.Type.FLOAT
+    else:
+        raise ValueError(f"Non supported type {dtype}")
+
+
+def _type_from_proto(dtype: pb.Feature.DType):
+    if dtype == pb.Feature.Type.FLOAT:
+        return dtype_lib.FLOAT
     else:
         raise ValueError(f"Non supported type {dtype}")
 

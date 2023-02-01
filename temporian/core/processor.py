@@ -45,10 +45,10 @@ class Preprocessor(object):
                 events.add(event)
         return events
 
-    def features(self):
+    def features(self) -> Set[Feature]:
         return self._features
 
-    def operators(self):
+    def operators(self) -> Set[base.Operator]:
         return self._operators
 
     def __repr__(self):
