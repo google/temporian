@@ -20,4 +20,29 @@ import pandas as pd
 
 
 class PandasSampling(pd.MultiIndex):
-    pass
+    def __new__(
+        cls,
+        levels=None,
+        codes=None,
+        sortorder=None,
+        names=None,
+        dtype=None,
+        copy=False,
+        name=None,
+        verify_integrity: bool = True,
+    ) -> pd.MultiIndex:
+        if not isinstance(levels[-1], pd.DatetimeIndex):
+            raise ValueError(
+                "The last level of a PandasSampling must be a DatetimeIndex."
+            )
+        return super().__new__(
+            cls,
+            levels,
+            codes,
+            sortorder,
+            names,
+            dtype,
+            copy,
+            name,
+            verify_integrity,
+        )
