@@ -29,24 +29,10 @@ class PandasSelectOperator(PandasOperator):
         # get index
         event_index = input_event.index
 
-        # get column positions
-        column_positions = {
-            col: pos for pos, col in enumerate(input_event.columns)
-        }
-        # get numpy array from DataFrame. This creates a view (doesn't
-        # duplicate memory)
-        input_event_arr = input_event.to_numpy()
-
-        # select columns from array. Once again this creates a view of the
-        # array
-        input_event_arr_select = input_event_arr[
-            :, [column_positions[column] for column in self.feature_names]
-        ]
-        # create PandasEvent from selected array. This creates a view of the
-        # input array
+        # create output event
         output_event = PandasEvent(
-            input_event_arr_select,
-            columns=self.feature_names,
+            data={col: input_event[col] for col in self.feature_names},
+            copy=False,
             index=event_index,
         )
         return {"output_event": output_event}
