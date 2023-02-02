@@ -24,3 +24,11 @@ def register_operator(operator_class):
     if definition.key in _OPERATORS:
         raise ValueError("Operator already registered")
     _OPERATORS[definition.key] = operator_class
+
+
+def get_operator_class(key: str):
+    """Gets an operator class from a registered key."""
+
+    if key not in _OPERATORS:
+        raise ValueError(f"Unknown operator {key}")
+    return _OPERATORS[key]

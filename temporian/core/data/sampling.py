@@ -34,3 +34,6 @@ class Sampling(object):
 
     def creator(self):
         return self._creator
+
+    def set_creator(self, creator):
+        self._creator = creator

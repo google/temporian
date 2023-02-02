@@ -62,6 +62,7 @@ py_library(
     srcs = ["serialize.py"],
     srcs_version = "PY3",
     deps = [
+        ":operator_lib",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
         "//temporian/core/data:sampling",

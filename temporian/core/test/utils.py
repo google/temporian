@@ -5,6 +5,7 @@ from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators import base
 from temporian.proto import core_pb2 as pb
+from temporian.core import operator_lib
 
 # The name of the operator is defined by the number of inputs and outputs.
 # For example "OpI1O2" has 1 input and 2 outputs.
@@ -21,7 +22,7 @@ class OpO1(base.Operator):
 
     def __init__(self):
         super().__init__()
-        sampling = Sampling(index=[])
+        sampling = Sampling(index=[], creator=self)
         self.add_output(
             "output",
             Event(
@@ -34,8 +35,8 @@ class OpO1(base.Operator):
         )
         self.check()
 
-    def _get_pandas_implementation(self):
-        raise NotImplementedError()
+
+operator_lib.register_operator(OpO1)
 
 
 class OpI1O1(base.Operator):
@@ -43,13 +44,13 @@ class OpI1O1(base.Operator):
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
             key="OpI1O1",
-            inputs=[pb.OperatorDef.Input(key="input")],
+            inputs=[pb.OperatorDef.Input(key="event")],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
 
-    def __init__(self, data: Event):
+    def __init__(self, event: Event):
         super().__init__()
-        self.add_input("input", data)
+        self.add_input("event", event)
         self.add_output(
             "output",
             Event(
@@ -57,17 +58,17 @@ class OpI1O1(base.Operator):
                     Feature(
                         "f1",
                         dtype.FLOAT,
-                        sampling=data.sampling(),
+                        sampling=event.sampling(),
                         creator=self,
                     )
                 ],
-                sampling=data.sampling(),
+                sampling=event.sampling(),
             ),
         )
         self.check()
 
-    def _get_pandas_implementation(self):
-        raise NotImplementedError()
+
+operator_lib.register_operator(OpI1O1)
 
 
 class OpI2O1(base.Operator):
@@ -76,16 +77,16 @@ class OpI2O1(base.Operator):
         return pb.OperatorDef(
             key="OpI2O1",
             inputs=[
-                pb.OperatorDef.Input(key="input_1"),
-                pb.OperatorDef.Input(key="input_2"),
+                pb.OperatorDef.Input(key="event_1"),
+                pb.OperatorDef.Input(key="event_2"),
             ],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
 
-    def __init__(self, input_1: Event, input_2: Event):
+    def __init__(self, event_1: Event, event_2: Event):
         super().__init__()
-        self.add_input("input_1", input_1)
-        self.add_input("input_2", input_2)
+        self.add_input("event_1", event_1)
+        self.add_input("event_2", event_2)
         self.add_output(
             "output",
             Event(
@@ -93,17 +94,17 @@ class OpI2O1(base.Operator):
                     Feature(
                         "f1",
                         dtype.FLOAT,
-                        sampling=input_1.sampling(),
+                        sampling=event_1.sampling(),
                         creator=self,
                     )
                 ],
-                sampling=input_1.sampling(),
+                sampling=event_1.sampling(),
             ),
         )
         self.check()
 
-    def _get_pandas_implementation(self):
-        raise NotImplementedError()
+
+operator_lib.register_operator(OpI2O1)
 
 
 class OpI1O2(base.Operator):
@@ -112,7 +113,7 @@ class OpI1O2(base.Operator):
         return pb.OperatorDef(
             key="OpI1O2",
             inputs=[
-                pb.OperatorDef.Input(key="input"),
+                pb.OperatorDef.Input(key="event"),
             ],
             outputs=[
                 pb.OperatorDef.Output(key="output_1"),
@@ -120,9 +121,9 @@ class OpI1O2(base.Operator):
             ],
         )
 
-    def __init__(self, data: Event):
+    def __init__(self, event: Event):
         super().__init__()
-        self.add_input("input", data)
+        self.add_input("event", event)
         self.add_output(
             "output_1",
             Event(
@@ -130,11 +131,11 @@ class OpI1O2(base.Operator):
                     Feature(
                         "f1",
                         dtype.FLOAT,
-                        sampling=data.sampling(),
+                        sampling=event.sampling(),
                         creator=self,
                     )
                 ],
-                sampling=data.sampling(),
+                sampling=event.sampling(),
             ),
         )
         self.add_output(
@@ -144,14 +145,14 @@ class OpI1O2(base.Operator):
                     Feature(
                         "f1",
                         dtype.FLOAT,
-                        sampling=data.sampling(),
+                        sampling=event.sampling(),
                         creator=self,
                     )
                 ],
-                sampling=data.sampling(),
+                sampling=event.sampling(),
             ),
         )
         self.check()
 
-    def _get_pandas_implementation(self):
-        raise NotImplementedError()
+
+operator_lib.register_operator(OpI1O2)

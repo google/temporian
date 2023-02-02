@@ -30,7 +30,7 @@ class PlaceHolder(base.Operator):
     def __init__(self, features: List[feature_lib.Feature], index: List[str]):
         super().__init__()
 
-        sampling = sampling_lib.Sampling(index=index)
+        sampling = sampling_lib.Sampling(index=index, creator=None)
 
         for feature in features:
             if feature.sampling() is not None:

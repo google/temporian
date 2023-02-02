@@ -35,8 +35,16 @@ class SerializeTest(absltest.TestCase):
         o5 = utils.OpI1O2(o4.outputs()["output"])
 
         original = processor.infer_processor(
-            [o1.outputs()["output"], o3.outputs()["output"]],
-            [o5.outputs()["output_1"], o4.outputs()["output"]],
+            {
+                "io_input_1": o1.outputs()["output"],
+                "io_input_2": o3.outputs()["output"],
+            },
+            {
+                "io_output_1": o5.outputs()["output_1"],
+                "io_output_2": o4.outputs()["output"],
+            },
+            # {"io_input_1": o1.outputs()["output"]},
+            # {"io_output_1": o2.outputs()["output"]},
         )
         logging.info("original:\n%s", original)
 
@@ -45,6 +53,40 @@ class SerializeTest(absltest.TestCase):
 
         restored = serialize.unserialize(proto)
         logging.info("restored:\n%s", restored)
+
+        self.assertEqual(len(original.samplings()), len(restored.samplings()))
+        self.assertEqual(len(original.features()), len(restored.features()))
+        self.assertEqual(len(original.operators()), len(restored.operators()))
+        self.assertEqual(len(original.events()), len(restored.events()))
+        self.assertEqual(original.inputs().keys(), restored.inputs().keys())
+        self.assertEqual(original.outputs().keys(), restored.outputs().keys())
+        # TODO: Deep equality tests.
+
+        # Ensures that "original" and "restored" don't link to the same objects.
+        self.assertFalse(
+            serialize.all_identifier(original.samplings())
+            & serialize.all_identifier(restored.samplings())
+        )
+        self.assertFalse(
+            serialize.all_identifier(original.features())
+            & serialize.all_identifier(restored.features())
+        )
+        self.assertFalse(
+            serialize.all_identifier(original.operators())
+            & serialize.all_identifier(restored.operators())
+        )
+        self.assertFalse(
+            serialize.all_identifier(original.events())
+            & serialize.all_identifier(restored.events())
+        )
+        self.assertFalse(
+            serialize.all_identifier(original.inputs())
+            & serialize.all_identifier(restored.inputs())
+        )
+        self.assertFalse(
+            serialize.all_identifier(original.outputs())
+            & serialize.all_identifier(restored.outputs())
+        )
 
 
 if __name__ == "__main__":

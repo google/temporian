@@ -49,3 +49,6 @@ class Feature(object):
 
     def set_sampling(self, sampling: sampling_lib.Sampling):
         self._sampling = sampling
+
+    def set_creator(self, creator):
+        self._creator = creator

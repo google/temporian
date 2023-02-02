@@ -34,8 +34,14 @@ class ProcessorTest(absltest.TestCase):
         o5 = utils.OpI1O2(o4.outputs()["output"])
 
         p = processor.infer_processor(
-            [o1.outputs()["output"], o3.outputs()["output"]],
-            [o5.outputs()["output_1"], o4.outputs()["output"]],
+            {
+                "io_input_1": o1.outputs()["output"],
+                "io_input_2": o3.outputs()["output"],
+            },
+            {
+                "io_output_1": o5.outputs()["output_1"],
+                "io_output_2": o4.outputs()["output"],
+            },
         )
         logging.info("Processor:\n%s", p)
 
@@ -45,7 +51,7 @@ class ProcessorTest(absltest.TestCase):
         # The two samplings created by the two input operators.
         self.assertLen(p.samplings(), 2)
         self.assertLen(p.events(), 6)
-        self.assertLen(p.features(), 7)
+        self.assertLen(p.features(), 8)
 
     def test_dependency_missing_input(self):
         o1 = utils.OpO1()
@@ -55,7 +61,7 @@ class ProcessorTest(absltest.TestCase):
             ValueError,
             "Missing input features.*from placeholder Operator<key: OpO1,",
         ):
-            processor.infer_processor([], [o2.outputs()["output"]])
+            processor.infer_processor({}, {"io_output": o2.outputs()["output"]})
 
 
 if __name__ == "__main__":

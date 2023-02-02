@@ -135,3 +135,12 @@ class Operator(ABC):
 
     def definition(self):
         return self.__class__.build_op_definition()
+
+    def set_inputs(self, inputs: dict[str, Event]) -> None:
+        self._inputs = inputs
+
+    def set_outputs(self, outputs: dict[str, Event]) -> None:
+        self._outputs = outputs
+
+    def set_attributes(self, attributes: dict[str, Event]) -> None:
+        self._attributes = attributes

@@ -27,6 +27,16 @@ message Processor {
   repeated Feature features = 3;
 
   repeated Sampling samplings = 4;
+
+  repeated IOSignature inputs = 5;
+
+  repeated IOSignature outputs = 6;
+}
+
+// The input or output of a processor.
+message IOSignature {
+    optional string key = 1;
+    optional string event_id = 2;
 }
 
 // Instantiation of an operator in a processor.
@@ -60,7 +70,6 @@ message Operator {
     oneof type {
       int64 integer_64 = 2;
       string str = 3;
-      string sampling_id = 4;
     }
   }
 }
