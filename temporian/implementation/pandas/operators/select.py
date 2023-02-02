@@ -25,14 +25,14 @@ class PandasSelectOperator(PandasOperator):
     def __init__(self, feature_names: List[str]) -> None:
         self.feature_names = feature_names
 
-    def __call__(self, input_event: PandasEvent) -> Dict[str, PandasEvent]:
+    def __call__(self, event: PandasEvent) -> Dict[str, PandasEvent]:
         # get index
-        event_index = input_event.index
+        event_index = event.index
 
         # create output event
         output_event = PandasEvent(
-            data={col: input_event[col] for col in self.feature_names},
+            data={col: event[col] for col in self.feature_names},
             copy=False,
             index=event_index,
         )
-        return {"output_event": output_event}
+        return {"event": output_event}

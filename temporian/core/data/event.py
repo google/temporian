@@ -41,7 +41,7 @@ class Event(object):
             self, feature_names
         )
         # return Event
-        return select_operator.outputs()["output_event"]
+        return select_operator.outputs()["event"]
 
     def __repr__(self) -> str:
         features_print = "\n\t\t".join(

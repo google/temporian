@@ -64,7 +64,8 @@ class PandasAssignOperator(PandasOperator):
             raise ValueError(
                 "Cannot have repeated timestamps in assigned EventSequence."
             )
-
+        output_event = assignee_event.join(
+            assigned_event, how="left", rsuffix="y"
+        )
         # make assignment
-        output = assignee_event.join(assigned_event, how="left", rsuffix="y")
-        return {"output": output}
+        return {"event": output_event}

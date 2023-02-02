@@ -57,7 +57,7 @@ class AssignOperatorTest(absltest.TestCase):
         )
         self.assertEqual(
             True,
-            with_idx_same_timestamps.OUTPUT.equals(operator_output["output"]),
+            with_idx_same_timestamps.OUTPUT.equals(operator_output["event"]),
         )
 
     def test_with_idx_more_timestamps(self) -> None:
@@ -66,7 +66,7 @@ class AssignOperatorTest(absltest.TestCase):
         )
         self.assertEqual(
             True,
-            with_idx_more_timestamps.OUTPUT.equals(operator_output["output"]),
+            with_idx_more_timestamps.OUTPUT.equals(operator_output["event"]),
         )
 
 

@@ -42,7 +42,7 @@ class AssignOperator(Operator):
         ]
         output_sampling = assignee_event.sampling()
         self.add_output(
-            "output",
+            "event",
             Event(
                 features=output_features, sampling=output_sampling, creator=self
             ),
@@ -57,7 +57,7 @@ class AssignOperator(Operator):
                 pb.OperatorDef.Input(key="assignee_event"),
                 pb.OperatorDef.Input(key="assigned_event"),
             ],
-            outputs=[pb.OperatorDef.Output(key="output")],
+            outputs=[pb.OperatorDef.Output(key="event")],
         )
 
 
@@ -68,4 +68,4 @@ def assign(
     assignee_event: Event,
     assigned_event: Event,
 ) -> Event:
-    return AssignOperator(assignee_event, assigned_event).outputs()["output"]
+    return AssignOperator(assignee_event, assigned_event).outputs()["event"]

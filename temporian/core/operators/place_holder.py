@@ -41,7 +41,7 @@ class PlaceHolder(base.Operator):
             feature.set_sampling(sampling)
 
         self.add_output(
-            "output",
+            "event",
             event_lib.Event(
                 features=features,
                 sampling=sampling,
@@ -56,7 +56,7 @@ class PlaceHolder(base.Operator):
         return pb.OperatorDef(
             key="PLACE_HOLDER",
             place_holder=True,
-            outputs=[pb.OperatorDef.Output(key="output")],
+            outputs=[pb.OperatorDef.Output(key="event")],
         )
 
 
@@ -66,4 +66,4 @@ operator_lib.register_operator(PlaceHolder)
 def place_holder(
     features: List[feature_lib.Feature], index: List[str]
 ) -> event_lib.Event:
-    return PlaceHolder(features=features, index=index).outputs()["output"]
+    return PlaceHolder(features=features, index=index).outputs()["event"]

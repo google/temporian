@@ -42,8 +42,8 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             window_length="7d"
         )
         output = operator(no_index.INPUT, no_index.SAMPLING)
-        pd.testing.assert_frame_equal(no_index.OUTPUT, output["output"])
-        self.assertTrue(no_index.OUTPUT.equals(output["output"]))
+        pd.testing.assert_frame_equal(no_index.OUTPUT, output["event"])
+        self.assertTrue(no_index.OUTPUT.equals(output["event"]))
 
     def test_same_sampling(self) -> None:
         """Test same sampling for all index values."""
@@ -51,8 +51,8 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             window_length="7d"
         )
         output = operator(same_sampling.INPUT, same_sampling.SAMPLING)
-        pd.testing.assert_frame_equal(same_sampling.OUTPUT, output["output"])
-        self.assertTrue(same_sampling.OUTPUT.equals(output["output"]))
+        pd.testing.assert_frame_equal(same_sampling.OUTPUT, output["event"])
+        self.assertTrue(same_sampling.OUTPUT.equals(output["event"]))
 
     def test_diff_sampling(self) -> None:
         """Test different sampling for each index value."""
@@ -60,8 +60,8 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             window_length="7d"
         )
         output = operator(diff_sampling.INPUT, diff_sampling.SAMPLING)
-        pd.testing.assert_frame_equal(diff_sampling.OUTPUT, output["output"])
-        self.assertTrue(diff_sampling.OUTPUT.equals(output["output"]))
+        pd.testing.assert_frame_equal(diff_sampling.OUTPUT, output["event"])
+        self.assertTrue(diff_sampling.OUTPUT.equals(output["event"]))
 
     def disabled_test_many_events_per_day(self) -> None:
         """Test several events occuring per day."""
@@ -72,9 +72,9 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             many_events_per_day.INPUT, many_events_per_day.SAMPLING
         )
         pd.testing.assert_frame_equal(
-            many_events_per_day.OUTPUT, output["output"]
+            many_events_per_day.OUTPUT, output["event"]
         )
-        self.assertTrue(many_events_per_day.OUTPUT.equals(output["output"]))
+        self.assertTrue(many_events_per_day.OUTPUT.equals(output["event"]))
 
     def disabled_test_many_features(self) -> None:
         """Test several events occuring per day."""
@@ -82,8 +82,8 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             window_length="7d"
         )
         output = operator(many_features.INPUT, many_features.SAMPLING)
-        pd.testing.assert_frame_equal(many_features.OUTPUT, output["output"])
-        self.assertTrue(many_features.OUTPUT.equals(output["output"]))
+        pd.testing.assert_frame_equal(many_features.OUTPUT, output["event"])
+        self.assertTrue(many_features.OUTPUT.equals(output["event"]))
 
 
 if __name__ == "__main__":

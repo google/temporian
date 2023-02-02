@@ -24,9 +24,7 @@ from temporian.proto import core_pb2 as pb
 class SelectOperator(Operator):
     """Select operator."""
 
-    def __init__(
-        self, input_event: Event, feature_names: Union[str, List[str]]
-    ):
+    def __init__(self, event: Event, feature_names: Union[str, List[str]]):
         super().__init__()
 
         # store selected feature names
@@ -35,19 +33,19 @@ class SelectOperator(Operator):
         self.add_attribute("feature_names", feature_names)
 
         # inputs
-        self.add_input("input_event", input_event)
+        self.add_input("event", event)
 
         # outputs
         output_features = []
         for feature_name in feature_names:
-            for feature in input_event.features():
+            for feature in event.features():
                 # TODO: maybe implement features attributes of Event as dict
                 # so we can index by name?
                 if feature.name() == feature_name:
                     output_features.append(feature)
-        output_sampling = input_event.sampling()
+        output_sampling = event.sampling()
         self.add_output(
-            "output_event",
+            "event",
             Event(
                 features=output_features,
                 sampling=output_sampling,
@@ -69,9 +67,9 @@ class SelectOperator(Operator):
                 ),
             ],
             inputs=[
-                pb.OperatorDef.Input(key="input_event"),
+                pb.OperatorDef.Input(key="event"),
             ],
-            outputs=[pb.OperatorDef.Output(key="output_event")],
+            outputs=[pb.OperatorDef.Output(key="event")],
         )
 
 
@@ -79,7 +77,7 @@ operator_lib.register_operator(SelectOperator)
 
 
 def select(
-    input_event: Event,
+    event: Event,
     feature_names: List[str],
 ) -> Event:
-    return SelectOperator(input_event, feature_names).outputs()["output_event"]
+    return SelectOperator(event, feature_names).outputs()["event"]
