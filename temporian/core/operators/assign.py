@@ -43,7 +43,9 @@ class AssignOperator(Operator):
         output_sampling = assignee_event.sampling()
         self.add_output(
             "output",
-            Event(features=output_features, sampling=output_sampling),
+            Event(
+                features=output_features, sampling=output_sampling, creator=self
+            ),
         )
         self.check()
 

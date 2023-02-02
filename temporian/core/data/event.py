@@ -14,7 +14,7 @@
 
 """An event is a collection (possibly empty) of timesampled feature values."""
 
-from typing import List
+from typing import Any, List, Optional
 
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
@@ -25,9 +25,13 @@ class Event(object):
         self,
         features: List[Feature],
         sampling: Sampling,
+        # TODO: make Operator the creator's type. I don't know how to circumvent
+        # the cyclical import error
+        creator: Optional[Any] = None,
     ):
         self._features = features
         self._sampling = sampling
+        self._creator = creator
 
     def __repr__(self):
         return f"Event<features:{self._features},sampling:{self._sampling},id:{id(self)}>"
@@ -37,3 +41,6 @@ class Event(object):
 
     def features(self):
         return self._features
+
+    def creator(self):
+        return self._creator

@@ -19,7 +19,6 @@ from typing import Any, Dict, List, Set, Union
 
 from temporian.core import backends
 from temporian.core.data.event import Event
-from temporian.core.data.feature import Feature
 from temporian.core.operators import base
 from temporian.implementation.pandas.data import event as pandas_event
 
@@ -58,15 +57,8 @@ def evaluate(
     evaluate_schedule_fn = selected_backend["evaluate_schedule_fn"]
     read_csv_fn = selected_backend["read_csv_fn"]
 
-    # get features from events
-    features_to_compute = {
-        feature
-        for event in events_to_compute
-        for feature in event.features()  # pytype: disable=attribute-error
-    }
-    # calculate opeartor schedule. Only using keys (operators) for now, discarding
-    # depth
-    schedule = get_operator_schedule(features_to_compute).keys()
+    # calculate opeartor schedule
+    schedule = get_operator_schedule(events_to_compute)
 
     # materialize input data. TODO: separate this logic
     materialized_input_data = {
@@ -83,45 +75,40 @@ def evaluate(
     return {event: outputs[event] for event in events_to_compute}
 
 
-def get_operator_schedule(query: Set[Feature]) -> Dict[base.Operator, int]:
-    """Calculates which operators need to be executed in which order to
-    compute a set of query features.
+def get_operator_schedule(query: List[Event]) -> List[base.Operator]:
+    # TODO: add depth calculation for parallelization
+    # TODO: Make "query" a Set
 
-    Args:
-        query: set of query features to be computed.
+    operators_to_compute = []  # TODO: implement as ordered set
+    visited_events = set()
+    pending_events = list(query.copy())  # TODO: implement as ordered set
+    while pending_events:
+        event = next(iter(pending_events))
+        visited_events.add(event)
 
-    Returns:
-        Dict[base.Operator, int]: dictionary mapping operators to their respective
-        depths in the compute graph. Depth is measured from bottom to top, i.e.
-        0 depth corresponds to the output features (query). Operators with the
-        same depth can be computed in parallel.
-    """
-    # start features. Depth initialized as 0
-    feature_depth = [(feature, 0) for feature in query]
+        if event.creator() is None:
+            # is input event
+            pending_events.remove(event)
+            continue
 
-    # get all features and depths required to compute the query. One feature can
-    # have multiple depths in this set (if it appears in more than one feature's
-    # compute path at different depths)
-    for feature, depth in feature_depth:
-        this_depth = depth + 1
-        for parent_feature in feature.parent_features():
-            feature_depth.append((parent_feature, this_depth))
+        # required input events to compute this event
+        creator_input_events = {
+            input_event for input_event in event.creator().inputs().values()
+        }
 
-    # refine previous set - get max depth for each feature, which ensures we
-    # compute the feature as soon as it's needed (most depth)
-    feature_max_depth = {feature: 0 for feature, _ in feature_depth}
-    for feature, depth in feature_depth:
-        feature_max_depth[feature] = max(feature_max_depth[feature], depth)
+        # check if all required input events have already been visited
+        if creator_input_events.issubset(visited_events):
+            # feature can be computed - remove it from pending_events
+            pending_events.remove(event)
 
-    # sort features according to their max depth, from deepest to shallowest
-    feature_sorted = dict(
-        sorted(feature_max_depth.items(), key=lambda item: -1 * item[1])
-    )
+            # add operator at the end of operators_to_compute
+            if event.creator() not in operators_to_compute:
+                operators_to_compute.append(event.creator())
 
-    # get operators from features
-    operator_sorted = {
-        feature.creator(): depth
-        for feature, depth in feature_sorted.items()
-        if feature.creator() is not None
-    }
-    return operator_sorted
+            continue
+
+        # add required input features at the beginning of pending_events
+        pending_events = list(creator_input_events) + pending_events
+
+    print(operators_to_compute)
+    return operators_to_compute
