@@ -17,7 +17,6 @@ from typing import List, Union
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
-from temporian.core.data.feature import Feature
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -30,29 +29,29 @@ class SelectOperator(Operator):
     ):
         super().__init__()
 
+        # store selected feature names
+        if isinstance(feature_names, str):
+            feature_names = [feature_names]
+        self.add_attribute("feature_names", feature_names)
+
         # inputs
         self.add_input("input_event", input_event)
 
         # outputs
         output_features = [
-            Feature(
-                name=feature.name(),
-                dtype=feature.dtype(),
-                sampling=feature.sampling(),
-                creator=self,
-            )
+            feature
             for feature in input_event.features()
             if feature.name() in feature_names
         ]
         output_sampling = input_event.sampling()
         self.add_output(
             "output_event",
-            Event(features=output_features, sampling=output_sampling),
+            Event(
+                features=output_features,
+                sampling=output_sampling,
+                creator=self,
+            ),
         )
-        # feature names
-        if isinstance(feature_names, str):
-            feature_names = [feature_names]
-        self.add_attribute("feature_names", feature_names)
 
         self.check()
 
