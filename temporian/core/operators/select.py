@@ -38,11 +38,13 @@ class SelectOperator(Operator):
         self.add_input("input_event", input_event)
 
         # outputs
-        output_features = [
-            feature
-            for feature in input_event.features()
-            if feature.name() in feature_names
-        ]
+        output_features = []
+        for feature_name in feature_names:
+            for feature in input_event.features():
+                # TODO: maybe implement features attributes of Event as dict
+                # so we can index by name?
+                if feature.name() == feature_name:
+                    output_features.append(feature)
         output_sampling = input_event.sampling()
         self.add_output(
             "output_event",
