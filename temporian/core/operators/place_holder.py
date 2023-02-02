@@ -26,6 +26,7 @@ from temporian.proto import core_pb2 as pb
 
 class PlaceHolder(base.Operator):
     """Place holder operator."""
+    # TODO: Replace this op with an helper function or remove it.
 
     def __init__(self, features: List[feature_lib.Feature], index: List[str]):
         super().__init__()

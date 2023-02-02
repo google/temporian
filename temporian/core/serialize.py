@@ -81,13 +81,13 @@ def serialize(src: processor.Preprocessor) -> pb.Processor:
 
     return pb.Processor(
         operators=[_serialize_operator(o) for o in src.operators()],
-        events=[_serialize_event(o) for o in src.events()],
+        events=[_serialize_event(e) for e in src.events()],
         features=[
-            _serialize_feature(o, src.input_features()) for o in src.features()
+            _serialize_feature(f, src.input_features()) for f in src.features()
         ],
         samplings=[
-            _serialize_sampling(o, src.input_samplings())
-            for o in src.samplings()
+            _serialize_sampling(s, src.input_samplings())
+            for s in src.samplings()
         ],
         inputs=[_serialize_io_signature(k, e) for k, e in src.inputs().items()],
         outputs=[
@@ -100,13 +100,13 @@ def unserialize(src: pb.Processor) -> processor.Preprocessor:
     """Unserializes a protobuffer into a processor."""
 
     # Decode the components.
-    # All the fieds except for the "creator" ones are set.
+    # All the fields except for the "creator" ones are set.
     samplings = {s.id: _unserialize_sampling(s) for s in src.samplings}
-    features = {s.id: _unserialize_feature(s, samplings) for s in src.features}
+    features = {f.id: _unserialize_feature(f, samplings) for f in src.features}
     events = {
-        s.id: _unserialize_event(s, samplings, features) for s in src.events
+        e.id: _unserialize_event(e, samplings, features) for e in src.events
     }
-    operators = {s.id: _unserialize_operator(s, events) for s in src.operators}
+    operators = {o.id: _unserialize_operator(o, events) for o in src.operators}
 
     # Set the creator fields.
     def get_creator(op_id: str) -> base.Operator:
@@ -186,13 +186,13 @@ def _unserialize_operator(
 ) -> base.Operator:
     operator_class = operator_lib.get_operator_class(src.operator_def_key)
 
-    def gen_event(key):
+    def get_event(key):
         if key not in events:
             raise ValueError(f"Non existing event {key}")
         return events[key]
 
-    input_args = {x.key: gen_event(x.event_id) for x in src.inputs}
-    output_args = {x.key: gen_event(x.event_id) for x in src.outputs}
+    input_args = {x.key: get_event(x.event_id) for x in src.inputs}
+    output_args = {x.key: get_event(x.event_id) for x in src.outputs}
     attribute_args = {x.key: _attribute_from_proto(x) for x in src.attributes}
 
     # We construct the operator.
@@ -259,7 +259,7 @@ def _serialize_feature(
     return pb.Feature(
         id=_identifier(src),
         name=src.name(),
-        dtype=_type_to_proto(src.dtype()),
+        dtype=_serialize_dtype(src.dtype()),
         sampling_id=_identifier(src.sampling()),
         creator_event_id=(
             _identifier(src.creator()) if src not in input_features else None
@@ -275,7 +275,7 @@ def _unserialize_feature(
 
     return Feature(
         name=src.name,
-        dtype=_type_from_proto(src.dtype),
+        dtype=_unserialize_dtype(src.dtype),
         sampling=samplings[src.sampling_id],
         creator=None,
     )
@@ -297,14 +297,14 @@ def _unserialize_sampling(src: pb.Sampling) -> Sampling:
     return Sampling(index=src.index, creator=None)
 
 
-def _type_to_proto(dtype) -> pb.Feature.DType:
+def _serialize_dtype(dtype) -> pb.Feature.DType:
     if dtype == dtype_lib.FLOAT:
         return pb.Feature.DType.FLOAT
     else:
         raise ValueError(f"Non supported type {dtype}")
 
 
-def _type_from_proto(dtype: pb.Feature.DType):
+def _unserialize_dtype(dtype: pb.Feature.DType):
     if dtype == pb.Feature.DType.FLOAT:
         return dtype_lib.FLOAT
     else:

@@ -43,8 +43,6 @@ class SerializeTest(absltest.TestCase):
                 "io_output_1": o5.outputs()["output_1"],
                 "io_output_2": o4.outputs()["output"],
             },
-            # {"io_input_1": o1.outputs()["output"]},
-            # {"io_output_1": o2.outputs()["output"]},
         )
         logging.info("original:\n%s", original)
 
@@ -80,12 +78,12 @@ class SerializeTest(absltest.TestCase):
             & serialize.all_identifier(restored.events())
         )
         self.assertFalse(
-            serialize.all_identifier(original.inputs())
-            & serialize.all_identifier(restored.inputs())
+            serialize.all_identifier(original.inputs().values())
+            & serialize.all_identifier(restored.inputs().values())
         )
         self.assertFalse(
-            serialize.all_identifier(original.outputs())
-            & serialize.all_identifier(restored.outputs())
+            serialize.all_identifier(original.outputs().values())
+            & serialize.all_identifier(restored.outputs().values())
         )
 
 

@@ -45,6 +45,18 @@ class Preprocessor(object):
     def events(self) -> Set[Event]:
         return self._events
 
+    def add_operator(self, operator: base.Operator) -> None:
+        self._operators.add(operator)
+
+    def add_sampling(self, sampling: Sampling) -> None:
+        self._samplings.add(sampling)
+
+    def add_feature(self, feature: Feature) -> None:
+        self._features.add(feature)
+
+    def add_event(self, event: Event) -> None:
+        self._events.add(event)
+
     def set_inputs(self, inputs: Dict[str, Event]) -> None:
         self._inputs = inputs
 
@@ -138,12 +150,12 @@ def infer_processor(
     pending_features: Set[Feature] = set()
     for output_event in outputs.values():
         pending_features.update(output_event.features())
-        p.samplings().add(output_event.sampling())
+        p.add_sampling(output_event.sampling())
 
     input_features: Set[Feature] = set()
     for input_event in inputs.values():
         input_features.update(input_event.features())
-        p.samplings().add(input_event.sampling())
+        p.add_sampling(input_event.sampling())
 
     done_features: Set[Feature] = set()
 
@@ -155,7 +167,7 @@ def infer_processor(
         feature = next(iter(pending_features))
         pending_features.remove(feature)
 
-        p.features().add(feature)
+        p.add_feature(feature)
 
         assert feature not in done_features
 
@@ -174,12 +186,12 @@ def infer_processor(
             )
 
         else:
-            p.operators().add(feature.creator())
-            p.samplings().add(feature.sampling())
+            p.add_operator(feature.creator())
+            p.add_sampling(feature.sampling())
 
             # Add the parent features.
             for input_event in feature.creator().inputs().values():
-                p.events().add(input_event)
+                p.add_event(input_event)
                 for input_feature in input_event.features():
                     if input_feature in done_features:
                         continue
@@ -189,9 +201,9 @@ def infer_processor(
 
             # Make sure that all operator outputs are listed.
             for output_event in feature.creator().outputs().values():
-                p.events().add(output_event)
+                p.add_event(output_event)
                 for output_feature in output_event.features():
-                    p.features().add(output_feature)
+                    p.add_feature(output_feature)
 
     if missing_features:
         raise ValueError(f"Missing input features: {missing_features}")

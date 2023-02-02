@@ -139,6 +139,8 @@ message OperatorDef {
 
   // If true, the operator is a placeholder. That is, the user has to provide
   // the features of this operator output.
+  //
+  // TODO: Possibly remove.
   optional bool place_holder = 5 [default = false];
 
   message Input {
