@@ -22,30 +22,15 @@ from temporian.implementation.pandas.data.event import PandasEvent
 
 INPUT_1 = PandasEvent(
     {
-        "A": [
-            1,
-            2,
-        ],
-        "timestamp": [
-            pd.Timestamp("2020-11-09"),
-            pd.Timestamp("2020-11-10"),
-        ],
-        "B": [
-            3,
-            4,
-        ],
+        "A": [1, 2],
+        "timestamp": [pd.Timestamp("2020-11-09"), pd.Timestamp("2020-11-10")],
+        "B": [3, 4],
     }
 ).set_index(["timestamp"])
 
 INPUT_2 = PandasEvent(
     {
-        "C": [
-            5,
-            6,
-        ],
-        "timestamp": [
-            pd.Timestamp("2020-11-09"),
-            pd.Timestamp("2020-11-10"),
-        ],
+        "C": [5, 6],
+        "timestamp": [pd.Timestamp("2020-11-09"), pd.Timestamp("2020-11-10")],
     }
 ).set_index(["timestamp"])

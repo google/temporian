@@ -46,14 +46,14 @@ class SumOperator(Operator):
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=f"sum_{event_1.features()[f].name()}_{event_2.features()[f].name()}",
-                dtype=f.dtype(),
+                name=f"sum_{event_1_f.name()}_{event_2_f.name()}",
+                dtype=event_1_f.dtype(),
                 sampling=sampling,
                 creator=self,
             )
-            for f in range(
-                event_1.shape[1]
-            )  # assuming event_1 and event_2 have the same shape
+            for event_1_f, event_2_f in zip(
+                event_1.features(), event_2.features()
+            )
         ]
 
         self.add_output(

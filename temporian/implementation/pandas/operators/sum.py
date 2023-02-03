@@ -61,7 +61,7 @@ class PandasSumOperator(PandasOperator):
                 "PER_FEATURE_NAME resolution not implemented yet."
             )
 
-        output_feature_names = "sum_" + event_1.columns + "_" + event_2.columns
+        output_feature_names = f"sum_{event_1.columns}_{event_2.columns}"
         output.columns = output_feature_names
 
         return {"output": output}
