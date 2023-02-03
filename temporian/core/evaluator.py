@@ -36,10 +36,10 @@ def evaluate(
     """Evaluates a query on data."""
 
     if isinstance(query, Event):
-        events_to_compute = [query]
+        events_to_compute = {query}
 
     elif isinstance(query, list):
-        events_to_compute = query
+        events_to_compute = set(query)
 
     elif isinstance(query, dict):
         raise NotImplementedError()
@@ -75,40 +75,64 @@ def evaluate(
     return {event: outputs[event] for event in events_to_compute}
 
 
-def get_operator_schedule(query: List[Event]) -> List[base.Operator]:
-    # TODO: add depth calculation for parallelization
-    # TODO: Make "query" a Set
+def get_operator_schedule(query: Set[Event]) -> List[base.Operator]:
+    """Calculates which operators need to be executed in which order to
+    compute a set of query events.
+    Args:
+        query: set of query events to be computed.
+    Returns:
+        ordered list of operators, such that the first operator should be
+        computed before the second, second before the third, etc.
+    """
 
-    operators_to_compute = []  # TODO: implement as ordered set
-    visited_events = set()
-    pending_events = list(query.copy())  # TODO: implement as ordered set
-    while pending_events:
-        event = next(iter(pending_events))
-        visited_events.add(event)
+    # TODO: add depth analysis for parallelization
+    def visit(
+        event: Event,
+        pending_events: Set[Event],
+        done_events: Set[Event],
+        sorted_ops: List[base.Operator],
+    ):
+        if event in done_events:
+            return
+        if event in pending_events:
+            raise RuntimeError(
+                "Compute graph has at least one cycle - aborting."
+            )
 
-        if event.creator() is None:
-            # is input event
-            pending_events.remove(event)
-            continue
+        # event pending - must wait for parent events
+        pending_events.add(event)
 
-        # required input events to compute this event
-        creator_input_events = {
-            input_event for input_event in event.creator().inputs().values()
-        }
+        # get parent events
+        parent_events = (
+            {}
+            if event.creator() is None
+            else {
+                parent_event
+                for parent_event in event.creator().inputs().values()
+            }
+        )
+        # recursion
+        for parent_event in parent_events:
+            visit(parent_event, pending_events, done_events, sorted_ops)
 
-        # check if all required input events have already been visited
-        if creator_input_events.issubset(visited_events):
-            # feature can be computed - remove it from pending_events
-            pending_events.remove(event)
+        # event cleared
+        pending_events.remove(event)
+        done_events.add(event)
 
-            # add operator at the end of operators_to_compute
-            if event.creator() not in operators_to_compute:
-                operators_to_compute.append(event.creator())
+        # add operator to schedule
+        if event.creator() is not None:
+            sorted_ops.append(event.creator())
 
-            continue
+    # events that have already been cleared for computation
+    done_events = set()
 
-        # add required input features at the beginning of pending_events
-        pending_events = list(creator_input_events) + pending_events
+    # events pending to be cleared for computation
+    pending_events = set()
 
-    print(operators_to_compute)
-    return operators_to_compute
+    # final operator schedule
+    sorted_ops = []
+    while not query.issubset(done_events):
+        event = next(iter(query))
+        visit(event, pending_events, done_events, sorted_ops)
+
+    return sorted_ops

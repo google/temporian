@@ -21,7 +21,6 @@ from temporian.core.data.event import Event
 from temporian.core.data.event import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.assign import assign
-from temporian.core.operators.select import select
 from temporian.core.operators.simple_moving_average import sma
 from temporian.implementation.pandas.data import event as pandas_event
 
@@ -92,13 +91,10 @@ class PrototypeTest(absltest.TestCase):
             features=[Feature(name="costs", dtype=float)],
             sampling=Sampling(["product_id", "timestamp"]),
         )
-        # call assign operator
-        output_event = assign(assignee_event, assigned_event)
-
         # call assign operators
         assign_output_1 = assign(assignee_event, assigned_event)
         assign_output_2 = assign(assignee_event, assigned_event)
-        final_assign_output = assign(assign_output_1, assign_output_2)
+        assign_assign_event = assign(assign_output_1, assign_output_2)
 
         # call sma operator
         sma_assigned_event = sma(
@@ -106,7 +102,7 @@ class PrototypeTest(absltest.TestCase):
         )
 
         # call assign operator with result of sma
-        output_event = assign(final_assign_output, sma_assigned_event)
+        output_event = assign(assign_assign_event, sma_assigned_event)
 
         # evaluate output
         output_event_pandas = evaluator.evaluate(
@@ -126,6 +122,7 @@ class PrototypeTest(absltest.TestCase):
                 output_event_pandas[output_event]
             ),
         )
+        logging.info(output_event_pandas)
 
 
 if __name__ == "__main__":
