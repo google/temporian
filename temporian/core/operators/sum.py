@@ -23,6 +23,14 @@ from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
+from enum import Enum
+
+
+class Resolution(str, Enum):
+    PER_FEATURE_IDX = "PER_FEATURE_IDX"
+    PER_FEATURE_NAME = "PER_FEATURE_NAME"
+
+
 class SumOperator(Operator):
     """Sum operator."""
 
@@ -30,7 +38,7 @@ class SumOperator(Operator):
         self,
         event_1: Event,
         event_2: Event,
-        resolution: Optional[str] = None,
+        resolution: Optional[Resolution] = Resolution.PER_FEATURE_IDX,
     ):
         super().__init__()
 

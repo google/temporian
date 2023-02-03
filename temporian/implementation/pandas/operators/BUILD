@@ -29,6 +29,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core/operators:sum",
         "//temporian/implementation/pandas/data:event",
     ],
 )
