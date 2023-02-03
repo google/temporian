@@ -14,6 +14,8 @@
 
 """Implementation for the sum operator."""
 
+from typing import Optional
+
 from temporian.implementation.pandas.data.event import PandasEvent
 from temporian.implementation.pandas.operators.base import PandasOperator
 
@@ -22,18 +24,20 @@ RESOLUTIONS = ["PER_FEATURE_IDX", "PER_FEATURE_NAME"]
 
 class PandasSumOperator(PandasOperator):
     def __call__(
-        self, event_1: PandasEvent, event_2: PandasEvent, resolution: str = None
+        self,
+        event_1: PandasEvent,
+        event_2: PandasEvent,
+        resolution: Optional[str] = "PER_FEATURE_IDX",
     ) -> PandasEvent:
-        """Sum two EventSequences.
+        """Sum two Event.
 
         Args:
-            event_1: First EventSequence.
-            event_2: Second EventSequence.
-            resolution: PER_FEATURE_IDX -> Sum is done to each feature index wise.
-                        PER_FEATURE_NAME (Not implemented yet) -> Sum is done to each feature name wise.
+            event_1: First Event.
+            event_2: Second Event.
+            resolution: Resolution of the output Event.
 
         Returns:
-            Sum of the two EventSequences.
+            Sum of the two Event.
 
         Raises:
             ValueError: If resolution is not one of PER_FEATURE_IDX or PER_FEATURE_NAME.
