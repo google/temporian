@@ -28,32 +28,32 @@ class SumOperator(Operator):
 
     def __init__(
         self,
-        data_1: Event,
-        data_2: Event,
+        event_1: Event,
+        event_2: Event,
         resolution: Optional[str] = None,
     ):
         super().__init__()
 
         # inputs
-        self.add_input("data_1_event", data_1)
-        self.add_input("data_2_event", data_2)
+        self.add_input("event_1", event_1)
+        self.add_input("event_2", event_2)
 
         if resolution is not None:
             self.add_attribute("resolution", resolution)
 
-        sampling = data_1.sampling()
+        sampling = event_1.sampling()
 
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=f"sum_{data_1.features()[f].name()}_{data_2.features()[f].name()}",
+                name=f"sum_{event_1.features()[f].name()}_{event_2.features()[f].name()}",
                 dtype=f.dtype(),
                 sampling=sampling,
                 creator=self,
             )
             for f in range(
-                data_1.shape[1]
-            )  # assuming data_1 and data_2 have the same shape
+                event_1.shape[1]
+            )  # assuming event_1 and event_2 have the same shape
         ]
 
         self.add_output(
@@ -77,8 +77,8 @@ class SumOperator(Operator):
                 ),
             ],
             inputs=[
-                pb.OperatorDef.Input(key="data_1_event"),
-                pb.OperatorDef.Input(key="data_2_event"),
+                pb.OperatorDef.Input(key="event_1"),
+                pb.OperatorDef.Input(key="event_2"),
             ],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
@@ -88,10 +88,10 @@ operator_lib.register_operator(SumOperator)
 
 
 def sum(
-    data_1: Event,
-    data_2: Event,
+    event_1: Event,
+    event_2: Event,
     resolution: Optional[str] = None,
 ) -> Event:
     return SumOperator(
-        data_1=data_1, data_2=data_2, resolution=resolution
+        event_1=event_1, event_2=event_2, resolution=resolution
     ).outputs()["output"]

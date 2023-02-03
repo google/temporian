@@ -27,7 +27,7 @@ class SumOperatorTest(absltest.TestCase):
     def test_different_shape(self) -> None:
         self.assertRaisesRegex(
             ValueError,
-            "data_1 and data_2 must have same shape.",
+            "event_1 and event_2 must have same shape.",
             self.operator,
             different_shape.INPUT_1,
             different_shape.INPUT_2,

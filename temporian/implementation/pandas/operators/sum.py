@@ -22,13 +22,13 @@ RESOLUTIONS = ["PER_FEATURE_IDX", "PER_FEATURE_NAME"]
 
 class PandasSumOperator(PandasOperator):
     def __call__(
-        self, data_1: PandasEvent, data_2: PandasEvent, resolution: str = None
+        self, event_1: PandasEvent, event_2: PandasEvent, resolution: str = None
     ) -> PandasEvent:
         """Sum two EventSequences.
 
         Args:
-            data_1: First EventSequence.
-            data_2: Second EventSequence.
+            event_1: First EventSequence.
+            event_2: Second EventSequence.
             resolution: PER_FEATURE_IDX -> Sum is done to each feature index wise.
                         PER_FEATURE_NAME (Not implemented yet) -> Sum is done to each feature name wise.
 
@@ -37,7 +37,7 @@ class PandasSumOperator(PandasOperator):
 
         Raises:
             ValueError: If resolution is not one of PER_FEATURE_IDX or PER_FEATURE_NAME.
-            ValueError: If data_1 and data_2 have different shape.
+            ValueError: If event_1 and event_2 have different shape.
             NotImplementedError: If resolution is PER_FEATURE_NAME.
         """
 
@@ -46,22 +46,22 @@ class PandasSumOperator(PandasOperator):
                 f"Resolution must be one of {RESOLUTIONS}, got {resolution}"
             )
 
-        # raise value error if data_1 and data_2 have different shape
-        if data_1.shape != data_2.shape:
-            raise ValueError("data_1 and data_2 must have same shape.")
+        # raise value error if event_1 and event_2 have different shape
+        if event_1.shape != event_2.shape:
+            raise ValueError("event_1 and event_2 must have same shape.")
 
         # sum each feautre index wise
         if resolution is None or resolution == "PER_FEATURE_IDX":
-            output = data_1.copy()
-            for i, column in enumerate(data_1.columns):
-                output.iloc[:, i] = data_1.iloc[:, i] + data_2.iloc[:, i]
+            output = event_1.copy()
+            for i, column in enumerate(event_1.columns):
+                output.iloc[:, i] = event_1.iloc[:, i] + event_2.iloc[:, i]
 
         if resolution == "PER_FEATURE_NAME":
             raise NotImplementedError(
                 "PER_FEATURE_NAME resolution not implemented yet."
             )
 
-        output_feature_names = "sum_" + data_1.columns + "_" + data_2.columns
+        output_feature_names = "sum_" + event_1.columns + "_" + event_2.columns
         output.columns = output_feature_names
 
         return {"output": output}
