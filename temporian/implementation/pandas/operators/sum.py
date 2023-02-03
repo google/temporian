@@ -14,8 +14,6 @@
 
 """Implementation for the sum operator."""
 
-from typing import Optional
-
 from temporian.core.operators.sum import Resolution
 from temporian.implementation.pandas.data.event import PandasEvent
 from temporian.implementation.pandas.operators.base import PandasOperator
@@ -26,27 +24,27 @@ class PandasSumOperator(PandasOperator):
         self,
         event_1: PandasEvent,
         event_2: PandasEvent,
-        resolution: Optional[Resolution] = Resolution.PER_FEATURE_IDX,
+        resolution: Resolution = Resolution.PER_FEATURE_IDX,
     ) -> PandasEvent:
         """Sum two Events.
 
         Args:
             event_1: First Event.
             event_2: Second Event.
-            resolution: Resolution of the output Event.
+            resolution: Resolution of the output Event. PER_FEATURE_IDX sum is done feature index wise. PER_FEATURE_NAME sum is done feature name wise.
 
         Returns:
-            Sum of the two Event.
+            Sum of the two Events according to resolution.
 
         Raises:
             ValueError: If event_1 and event_2 have different shape.
             NotImplementedError: If resolution is PER_FEATURE_NAME.
         """
-        # raise value error if event_1 and event_2 have different shape
+
         if event_1.shape != event_2.shape:
             raise ValueError("event_1 and event_2 must have same shape.")
 
-        # sum each feautre index wise
+        # sum each feature index wise
         if resolution == Resolution.PER_FEATURE_IDX:
             output = event_1.copy()
             for i, column in enumerate(event_1.columns):

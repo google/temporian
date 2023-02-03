@@ -14,8 +14,6 @@
 
 """Sum operator."""
 
-from typing import Optional
-
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
@@ -38,7 +36,7 @@ class SumOperator(Operator):
         self,
         event_1: Event,
         event_2: Event,
-        resolution: Optional[Resolution] = Resolution.PER_FEATURE_IDX,
+        resolution: Resolution = Resolution.PER_FEATURE_IDX,
     ):
         super().__init__()
 
@@ -46,8 +44,7 @@ class SumOperator(Operator):
         self.add_input("event_1", event_1)
         self.add_input("event_2", event_2)
 
-        if resolution is not None:
-            self.add_attribute("resolution", resolution)
+        self.add_attribute("resolution", resolution)
 
         sampling = event_1.sampling()
 
@@ -81,7 +78,7 @@ class SumOperator(Operator):
                 pb.OperatorDef.Attribute(
                     key="resolution",
                     type=pb.OperatorDef.Attribute.Type.STRING,
-                    is_optional=True,
+                    is_optional=False,
                 ),
             ],
             inputs=[
