@@ -11,16 +11,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from temporian.implementation.pandas.operators import assign
-from temporian.implementation.pandas.operators import select
-from temporian.implementation.pandas.operators.window import (
-    simple_moving_average,
-)
-
-OPERATOR_IMPLEMENTATIONS = {
-    "ASSIGN": assign.PandasAssignOperator,
-    "SIMPLE_MOVING_AVERAGE": simple_moving_average.PandasSimpleMovingAverageOperator,
-    "SELECT": select.PandasSelectOperator,
-    "SUM": sum.PandasSumOperator,
-}
