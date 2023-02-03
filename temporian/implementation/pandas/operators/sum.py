@@ -37,13 +37,8 @@ class PandasSumOperator(PandasOperator):
             Sum of the two Events according to resolution.
 
         Raises:
-            ValueError: If event_1 and event_2 have different shape.
             NotImplementedError: If resolution is PER_FEATURE_NAME.
         """
-
-        if event_1.shape != event_2.shape:
-            raise ValueError("event_1 and event_2 must have same shape.")
-
         # sum each feature index wise
         if resolution == Resolution.PER_FEATURE_IDX:
             output = event_1.copy()

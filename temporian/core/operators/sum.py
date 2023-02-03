@@ -46,6 +46,14 @@ class SumOperator(Operator):
 
         self.add_attribute("resolution", resolution)
 
+        if event_1.sampling() != event_2.sampling():
+            raise ValueError("event_1 and event_2 must have same sampling.")
+
+        if len(event_1.features()) != len(event_2.features()):
+            raise ValueError(
+                "event_1 and event_2 must have same number of features."
+            )
+
         sampling = event_1.sampling()
 
         # outputs
@@ -95,7 +103,7 @@ operator_lib.register_operator(SumOperator)
 def sum(
     event_1: Event,
     event_2: Event,
-    resolution: Optional[str] = None,
+    resolution: Resolution = Resolution.PER_FEATURE_IDX,
 ) -> Event:
     return SumOperator(
         event_1=event_1, event_2=event_2, resolution=resolution
