@@ -22,6 +22,7 @@ from temporian.core.data.event import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.assign import assign
 from temporian.core.operators.select import select
+from temporian.core.operators.sum import sum
 from temporian.core.operators.simple_moving_average import sma
 from temporian.implementation.pandas.data import event as pandas_event
 
@@ -48,27 +49,24 @@ class PrototypeTest(absltest.TestCase):
                     pd.Timestamp("2013-01-02"),
                     1091.0,
                     740.0,
-                    1091.0,
                     740.0,
-                    740.0,
+                    1831.0,
                 ],
                 [
                     666964,
                     pd.Timestamp("2013-01-03"),
                     919.0,
                     508.0,
-                    919.0,
-                    508.0,
                     624.0,
+                    1427.0,
                 ],
                 [
                     574016,
                     pd.Timestamp("2013-01-04"),
                     953.0,
                     573.0,
-                    953.0,
                     573.0,
-                    573.0,
+                    1526.0,
                 ],
             ],
             columns=[
@@ -76,22 +74,24 @@ class PrototypeTest(absltest.TestCase):
                 "timestamp",
                 "sales",
                 "costs",
-                "salesy",
-                "costsy",
                 "sma_costs",
+                "sum_sales_costs",
             ],
         ).set_index(["product_id", "timestamp"])
 
     def test_prototoype(self) -> None:
         # instance input events
+        sampling = Sampling(["product_id", "timestamp"])
+
         assignee_event = Event(
             features=[Feature(name="sales", dtype=float)],
-            sampling=Sampling(["product_id", "timestamp"]),
+            sampling=sampling,
         )
         assigned_event = Event(
             features=[Feature(name="costs", dtype=float)],
-            sampling=Sampling(["product_id", "timestamp"]),
+            sampling=sampling,
         )
+
         # call assign operators
         assign_output_1 = assign(assignee_event, assigned_event)
         assign_output_2 = assign(assignee_event, assigned_event)

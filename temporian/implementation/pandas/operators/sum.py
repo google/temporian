@@ -20,11 +20,17 @@ from temporian.implementation.pandas.operators.base import PandasOperator
 
 
 class PandasSumOperator(PandasOperator):
+    def __init__(
+        self, resolution: Resolution = Resolution.PER_FEATURE_IDX
+    ) -> None:
+        # use normal init from base class and add resolution as param
+        super().__init__()
+        self.resolution = resolution
+
     def __call__(
         self,
         event_1: PandasEvent,
         event_2: PandasEvent,
-        resolution: Resolution = Resolution.PER_FEATURE_IDX,
     ) -> PandasEvent:
         """Sum two Events.
 
@@ -37,20 +43,23 @@ class PandasSumOperator(PandasOperator):
             Sum of the two Events according to resolution.
 
         Raises:
+            IndexError: If index of both events is not equal.
             NotImplementedError: If resolution is PER_FEATURE_NAME.
         """
-        # sum each feature index wise
-        if resolution == Resolution.PER_FEATURE_IDX:
+        if not event_1.index.equals(event_2.index):
+            raise IndexError("Index of both events must be equal.")
+
+        if self.resolution == Resolution.PER_FEATURE_IDX:
             output = event_1.copy()
-            for i, column in enumerate(event_1.columns):
+            for i, _ in enumerate(event_1.columns):
                 output.iloc[:, i] = event_1.iloc[:, i] + event_2.iloc[:, i]
 
-        if resolution == Resolution.PER_FEATURE_NAME:
+        if self.resolution == Resolution.PER_FEATURE_NAME:
             raise NotImplementedError(
                 "PER_FEATURE_NAME resolution not implemented yet."
             )
 
-        output_feature_names = f"sum_{event_1.columns}_{event_2.columns}"
+        output_feature_names = "sum_" + event_1.columns + "_" + event_2.columns
         output.columns = output_feature_names
 
         return {"output": output}
