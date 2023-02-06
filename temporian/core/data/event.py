@@ -16,7 +16,6 @@
 
 from typing import Any, List, Optional
 
-import temporian
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
 
@@ -35,11 +34,13 @@ class Event(object):
         self._creator = creator
 
     def __getitem__(self, feature_names: List[str]) -> "Event":
+        # import select operator
+        from temporian.core.operators.select import SelectOperator
+
         # instance select operator. Import from base temporian package
         # to avoid circular import
-        select_operator = temporian.core.operators.select.SelectOperator(
-            self, feature_names
-        )
+        select_operator = SelectOperator(self, feature_names)
+
         # return Event
         return select_operator.outputs()["event"]
 
