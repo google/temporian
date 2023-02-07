@@ -16,7 +16,7 @@
 
 from google.protobuf import text_format
 
-from typing import Set, Union, Any, Dict, Tuple
+from typing import Set, Union, Any, Dict, Tuple, List, Optional
 
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
@@ -29,7 +29,10 @@ from temporian.core import processor
 
 
 def save(
-    inputs: Dict[str, Event], outputs: Dict[str, Event], path: str
+    inputs: Optional[processor.MultipleEventArg],
+    outputs: processor.MultipleEventArg,
+    path: str,
+    infer_inputs: bool = False,
 ) -> None:
     """Saves the computation between "inputs" and "outputs" into a file.
 
@@ -49,21 +52,38 @@ def save(
         inputs: The inputs events.
         outputs: The output events.
         path: The file path.
+        infer_inputs: If true, infers the inputs.
     """
 
     # TODO: Add support for compressed / binary serialization.
 
-    p = processor.infer_processor(inputs=inputs, outputs=outputs)
+    if infer_inputs:
+        if inputs is not None:
+            raise ValueError("If infer_inputs=True, inputs should be None")
+    else:
+        if inputs is None:
+            raise ValueError("If infer_inputs=False, inputs should be None")
+        inputs = processor.normalize_multiple_event_arg(inputs)
+
+    outputs = processor.normalize_multiple_event_arg(outputs)
+
+    p = processor.infer_processor(
+        inputs=inputs, outputs=outputs, infer_inputs=infer_inputs
+    )
     proto = serialize(p)
     with open(path, "w") as f:
         f.write(text_format.MessageToString(proto))
 
 
-def load(path: str) -> Tuple[Dict[str, Event], Dict[str, Event]]:
+def load(
+    path: str, squeeze: bool = False
+) -> Tuple[Dict[str, Event], Dict[str, Event]]:
     """Load a processor from a file.
 
     Args:
         path: File path.
+        squeeze: If true, and if the input/output contains a single event,
+            returns an event (instead of a dictionary of events).
 
     Returns:
         The inputs and outputs events.
@@ -73,7 +93,16 @@ def load(path: str) -> Tuple[Dict[str, Event], Dict[str, Event]]:
         proto = text_format.Parse(f.read(), pb.Processor())
     p = unserialize(proto)
 
-    return p.inputs(), p.outputs()
+    inputs = p.inputs()
+    outputs = p.outputs()
+
+    if squeeze and len(inputs) == 1:
+        inputs = list(inputs.values())[0]
+
+    if squeeze and len(outputs) == 1:
+        outputs = list(outputs.values())[0]
+
+    return inputs, outputs
 
 
 def serialize(src: processor.Preprocessor) -> pb.Processor:
@@ -233,6 +262,7 @@ def _serialize_event(src: Event) -> pb.Event:
         id=_identifier(src),
         sampling_id=_identifier(src.sampling()),
         feature_ids=[_identifier(f) for f in src.features()],
+        name=src.name(),
     )
 
 
@@ -250,6 +280,7 @@ def _unserialize_event(
     return Event(
         sampling=samplings[src.sampling_id],
         features=[get_feature(f) for f in src.feature_ids],
+        name=src.name,
     )
 
 

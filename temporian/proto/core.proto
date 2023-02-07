@@ -85,6 +85,8 @@ message Event {
 
   // Features in the event.
   repeated string feature_ids = 3;
+
+  optional string name = 4;
 }
 
 // Schema of a feature

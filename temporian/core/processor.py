@@ -14,12 +14,44 @@
 
 """Processor module."""
 
-from typing import List, Set, Dict
+from typing import List, Set, Dict, Union, Optional
+
+from collections import defaultdict
 
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators import base
+
+MultipleEventArg = Union[Dict[str, Event], List[Event], Event]
+
+
+def normalize_multiple_event_arg(src: MultipleEventArg) -> Dict[str, Event]:
+    """Normalize an event / collection of events into a dictionary of events."""
+
+    save_src = src
+
+    if isinstance(src, Event):
+        src = [src]
+
+    if isinstance(src, list):
+        new_src = {}
+        for event in src:
+            if event.name() is None:
+                raise ValueError(
+                    "Input / output event or list events need to be named "
+                    'with "set_name(...)". Alternatively, provide a '
+                    "dictionary of events."
+                )
+            new_src[event.name()] = event
+        src = new_src
+
+    if not isinstance(src, dict):
+        raise ValueError(
+            f'Unexpected event(s) "{save_src}". Expecting dict of events, '
+            "list of events, or a single event."
+        )
+    return src
 
 
 class Preprocessor(object):
@@ -107,7 +139,9 @@ class Preprocessor(object):
 
 
 def infer_processor(
-    inputs: Dict[str, Event], outputs: Dict[str, Event]
+    inputs: Optional[Dict[str, Event]],
+    outputs: Dict[str, Event],
+    infer_inputs: bool = False,
 ) -> Preprocessor:
     """Create a self contained processor.
 
@@ -120,13 +154,13 @@ def infer_processor(
     Args:
       inputs: Dictionary of available inputs.
       outputs: Dictionary of requested outputs.
+    infer_inputs: If true, infers the inputs.
 
     Returns:
       A preprocessor.
     """
 
     p = Preprocessor()
-    p.set_inputs(inputs)
     p.set_outputs(outputs)
 
     # The following algorithm lists all the intermediate and missing input
@@ -147,15 +181,25 @@ def infer_processor(
     #   else:
     #     add feature to the list of missing input features (will raise an error)
 
+    # List the events containing each possible feature:
+    # Used for the automatic input inference.
+    features_to_src_event: Dict[Feature, List[Event]] = defaultdict(lambda: [])
+
     pending_features: Set[Feature] = set()
     for output_event in outputs.values():
         pending_features.update(output_event.features())
         p.add_sampling(output_event.sampling())
+        for feature in output_event.features():
+            features_to_src_event[feature].append(pending_features)
 
     input_features: Set[Feature] = set()
-    for input_event in inputs.values():
-        input_features.update(input_event.features())
-        p.add_sampling(input_event.sampling())
+    if not infer_inputs:
+        p.set_inputs(inputs)
+        for input_event in inputs.values():
+            input_features.update(input_event.features())
+            p.add_sampling(input_event.sampling())
+    else:
+        infered_inputs: Dict[str, Event] = {}
 
     done_features: Set[Feature] = set()
 
@@ -177,7 +221,29 @@ def infer_processor(
 
         if feature.creator() is None:
             # The feature is missing.
-            missing_features.add(repr(feature))
+
+            if infer_inputs:
+                # Infer the inputs
+                if feature not in features_to_src_event:
+                    raise ValueError(
+                        f"Cannot determine the input of {feature}. "
+                        "No event found."
+                    )
+                if len(features_to_src_event[feature]) > 1:
+                    raise ValueError(
+                        f"Cannot determine the input of {feature}. "
+                        "Multiple potential events found."
+                    )
+
+                infered_input = list(features_to_src_event[feature])[0]
+                if infered_input.name() is None:
+                    raise ValueError(
+                        f"Infered input without a name: {infered_input}."
+                    )
+                infered_inputs[infered_input.name()] = infered_input
+                p.add_sampling(feature.sampling())
+            else:
+                missing_features.add(repr(feature))
 
         else:
             p.add_operator(feature.creator())
@@ -193,6 +259,9 @@ def infer_processor(
                         continue
                     pending_features.add(input_feature)
 
+                    if infer_inputs and input_feature.creator() is None:
+                        features_to_src_event[input_feature].append(input_event)
+
             # Make sure that all operator outputs are listed.
             for output_event in feature.creator().outputs().values():
                 p.add_event(output_event)
@@ -201,5 +270,8 @@ def infer_processor(
 
     if missing_features:
         raise ValueError(f"Missing input features: {missing_features}")
+
+    if infer_inputs:
+        p.set_inputs(infered_inputs)
 
     return p

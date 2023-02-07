@@ -1,4 +1,3 @@
-
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],
@@ -40,6 +39,7 @@ py_library(
     srcs = ["feature.py"],
     srcs_version = "PY3",
     deps = [
+        ":dtype",
         ":sampling",
     ],
 )

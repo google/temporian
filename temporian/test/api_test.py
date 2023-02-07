@@ -52,8 +52,8 @@ class TFPTest(absltest.TestCase):
     def test_serialization(self):
         a = t.input_event(
             [
-                t.Feature(name="f1", dtype=t.dtype.FLOAT),
-                t.Feature(name="f2", dtype=t.dtype.FLOAT),
+                t.Feature(name="f1"),
+                t.Feature(name="f2"),
             ]
         )
         b = t.sma(data=a, window_length=7)
@@ -70,6 +70,79 @@ class TFPTest(absltest.TestCase):
 
         self.assertSetEqual(set(inputs.keys()), {"a"})
         self.assertSetEqual(set(outputs.keys()), {"b"})
+
+    def test_serialization_v2(self):
+        a = t.input_event(
+            [
+                t.Feature(name="f1"),
+                t.Feature(name="f2"),
+            ],
+            name="my_input_event",
+        )
+        b = t.sma(data=a, window_length=7)
+        b.set_name("my_output_event")
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_processor.tem")
+            t.save(
+                inputs=a,
+                outputs=b,
+                path=path,
+            )
+
+            inputs, outputs = t.load(path=path)
+
+        self.assertSetEqual(set(inputs.keys()), {"my_input_event"})
+        self.assertSetEqual(set(outputs.keys()), {"my_output_event"})
+
+    def test_serialization_v3(self):
+        a = t.input_event(
+            [
+                t.Feature(name="f1"),
+                t.Feature(name="f2"),
+            ],
+            name="my_input_event",
+        )
+        b = t.sma(data=a, window_length=7)
+        b.set_name("my_output_event")
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_processor.tem")
+            t.save(
+                inputs=a,
+                outputs=b,
+                path=path,
+            )
+
+            i, o = t.load(path=path, squeeze=True)
+
+        self.assertEqual(i.name(), "my_input_event")
+        self.assertEqual(o.name(), "my_output_event")
+
+    def test_serialization_v4(self):
+        a = t.input_event(
+            [
+                t.Feature(name="f1"),
+                t.Feature(name="f2"),
+            ],
+            name="my_input_event",
+        )
+        b = t.sma(data=a, window_length=7)
+        b.set_name("my_output_event")
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_processor.tem")
+            t.save(
+                inputs=None,
+                outputs=b,
+                path=path,
+                infer_inputs=True,
+            )
+
+            i, o = t.load(path=path, squeeze=True)
+
+        self.assertEqual(i.name(), "my_input_event")
+        self.assertEqual(o.name(), "my_output_event")
 
 
 if __name__ == "__main__":

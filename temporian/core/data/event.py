@@ -14,7 +14,7 @@
 
 """An event is a collection (possibly empty) of timesampled feature values."""
 
-from typing import List
+from typing import List, Optional
 
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
@@ -25,12 +25,14 @@ class Event(object):
         self,
         features: List[Feature],
         sampling: Sampling,
+        name: Optional[str] = None,
     ):
         self._features = features
         self._sampling = sampling
+        self._name = name
 
     def __repr__(self):
-        return f"Event<features:{self._features},sampling:{self._sampling},id:{id(self)}>"
+        return f"Event<features:{self._features},sampling:{self._sampling},id:{id(self)},name:{self._name}>"
 
     def sampling(self):
         return self._sampling
@@ -38,8 +40,16 @@ class Event(object):
     def features(self):
         return self._features
 
+    def name(self) -> str:
+        return self._name
 
-def input_event(features: List[Feature], index: List[str] = []) -> Event:
+    def set_name(self, name) -> None:
+        self._name = name
+
+
+def input_event(
+    features: List[Feature], index: List[str] = [], name: Optional[str] = None
+) -> Event:
 
     sampling = Sampling(index=index, creator=None)
 
@@ -53,4 +63,5 @@ def input_event(features: List[Feature], index: List[str] = []) -> Event:
     return Event(
         features=features,
         sampling=sampling,
+        name=name,
     )

@@ -63,6 +63,55 @@ class ProcessorTest(absltest.TestCase):
         ):
             processor.infer_processor({}, {"io_output": o2.outputs()["output"]})
 
+    def test_automatic_input(self):
+        i1 = utils.create_input_event()
+        i1.set_name("io_input_1")
+        o2 = utils.OpI1O1(i1)
+        i3 = utils.create_input_event()
+        i3.set_name("io_input_2")
+        o4 = utils.OpI2O1(o2.outputs()["output"], i3)
+        o5 = utils.OpI1O2(o4.outputs()["output"])
+
+        p = processor.infer_processor(
+            None,
+            {
+                "io_output_1": o5.outputs()["output_1"],
+                "io_output_2": o4.outputs()["output"],
+            },
+            infer_inputs=True,
+        )
+        logging.info("Processor:\n%s", p)
+
+        # The two input operators are not listed.
+        self.assertLen(p.operators(), 3)
+
+        # The two samplings created by the two input operators.
+        self.assertLen(p.samplings(), 2)
+        self.assertLen(p.events(), 6)
+        self.assertLen(p.features(), 8)
+
+    def test_automatic_input_missing_name(self):
+        i1 = utils.create_input_event()
+        o2 = utils.OpI1O1(i1)
+
+        with self.assertRaisesRegex(ValueError, "Infered input without a name"):
+            processor.infer_processor(
+                None,
+                {"io_output_1": o2.outputs()["output"]},
+                infer_inputs=True,
+            )
+
+    def test_automatic_input_missing_name(self):
+        i1 = utils.create_input_event()
+        o2 = utils.OpI1O1(i1)
+
+        with self.assertRaisesRegex(ValueError, "Infered input without a name"):
+            processor.infer_processor(
+                None,
+                {"io_output_1": o2.outputs()["output"]},
+                infer_inputs=True,
+            )
+
 
 if __name__ == "__main__":
     absltest.main()
