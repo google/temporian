@@ -21,6 +21,7 @@ from temporian.core.data.event import Event
 from temporian.core.data.event import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.assign import assign
+from temporian.core.operators.select import select
 from temporian.core.operators.simple_moving_average import sma
 from temporian.implementation.pandas.data import event as pandas_event
 
@@ -98,7 +99,9 @@ class PrototypeTest(absltest.TestCase):
 
         # call sma operator
         sma_assigned_event = sma(
-            assigned_event, window_length="7d", sampling=assigned_event
+            assign_assign_event["costs"],  # in-place select using []
+            window_length="7d",
+            sampling=assigned_event,
         )
 
         # call assign operator with result of sma

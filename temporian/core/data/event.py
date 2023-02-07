@@ -33,8 +33,29 @@ class Event(object):
         self._sampling = sampling
         self._creator = creator
 
-    def __repr__(self):
-        return f"Event<features:{self._features},sampling:{self._sampling},id:{id(self)}>"
+    def __getitem__(self, feature_names: List[str]) -> "Event":
+        # import select operator
+        from temporian.core.operators.select import SelectOperator
+
+        # instance select operator. Import from base temporian package
+        # to avoid circular import
+        select_operator = SelectOperator(self, feature_names)
+
+        # return Event
+        return select_operator.outputs()["event"]
+
+    def __repr__(self) -> str:
+        features_print = "\n\t\t".join(
+            [str(feature) for feature in self._features]
+        )
+        return (
+            "Event: { \n"
+            "\tfeatures: {\n"
+            f"\t\t{features_print}\n"
+            "\t},\n"
+            f"\tsampling: {self._sampling},\n"
+            f"\tid:{id(self)}\n}}"
+        )
 
     def sampling(self):
         return self._sampling

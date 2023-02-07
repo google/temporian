@@ -170,6 +170,7 @@ message OperatorDef {
       UNDEFINED = 0;
       INTEGER_64 = 1;
       STRING = 2;
+      REPEATED_STRING=3;
     }
   }
 }

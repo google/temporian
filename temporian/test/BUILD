@@ -30,6 +30,7 @@ py_test(
         "//temporian/core/data:event",
         "//temporian/core/data:sampling",
         "//temporian/core/operators:assign",
+        "//temporian/core/operators:select",
         "//temporian/core/operators:simple_moving_average",
         "//temporian/implementation/pandas/data:event",
     ],

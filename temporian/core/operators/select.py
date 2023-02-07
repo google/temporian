@@ -12,52 +12,43 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Simple moving average operator."""
-
-from typing import Optional
+"""Select operator."""
+from typing import List, Union
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
-from temporian.core.data.feature import Feature
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
-class SimpleMovingAverage(Operator):
-    """Simple moving average operator."""
+class SelectOperator(Operator):
+    """Select operator."""
 
-    def __init__(
-        self,
-        event: Event,
-        window_length: str,
-        sampling: Optional[Event] = None,
-    ):
+    def __init__(self, event: Event, feature_names: Union[str, List[str]]):
         super().__init__()
 
-        self.add_attribute("window_length", window_length)
+        # store selected feature names
+        if isinstance(feature_names, str):
+            feature_names = [feature_names]
+        self.add_attribute("feature_names", feature_names)
 
-        if sampling is not None:
-            self.add_input("sampling", sampling)
-        else:
-            sampling = event.sampling()
-
+        # inputs
         self.add_input("event", event)
 
-        output_features = [  # pylint: disable=g-complex-comprehension
-            Feature(
-                name=f"sma_{f.name()}",
-                dtype=f.dtype(),
-                sampling=sampling,
-                creator=self,
-            )
-            for f in event.features()
-        ]
-
+        # outputs
+        output_features = []
+        for feature_name in feature_names:
+            for feature in event.features():
+                # TODO: maybe implement features attributes of Event as dict
+                # so we can index by name?
+                if feature.name() == feature_name:
+                    output_features.append(feature)
+        output_sampling = event.sampling()
         self.add_output(
             "event",
             Event(
                 features=output_features,
-                sampling=sampling,
+                sampling=output_sampling,
                 creator=self,
             ),
         )
@@ -67,32 +58,26 @@ class SimpleMovingAverage(Operator):
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
-            key="SIMPLE_MOVING_AVERAGE",
+            key="SELECT",
             attributes=[
                 pb.OperatorDef.Attribute(
-                    key="window_length",
-                    type=pb.OperatorDef.Attribute.Type.STRING,
+                    key="feature_names",
+                    type=pb.OperatorDef.Attribute.Type.REPEATED_STRING,
                     is_optional=False,
                 ),
             ],
             inputs=[
                 pb.OperatorDef.Input(key="event"),
-                pb.OperatorDef.Input(key="sampling", is_optional=True),
             ],
             outputs=[pb.OperatorDef.Output(key="event")],
         )
 
 
-operator_lib.register_operator(SimpleMovingAverage)
+operator_lib.register_operator(SelectOperator)
 
 
-def sma(
+def select(
     event: Event,
-    window_length: str,
-    sampling: Optional[Event] = None,
+    feature_names: List[str],
 ) -> Event:
-    return SimpleMovingAverage(
-        event=event,
-        window_length=window_length,
-        sampling=sampling,
-    ).outputs()["event"]
+    return SelectOperator(event, feature_names).outputs()["event"]

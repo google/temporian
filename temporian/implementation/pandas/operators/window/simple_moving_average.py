@@ -34,7 +34,7 @@ class PandasSimpleMovingAverageOperator(PandasWindowOperator):
 
     def __call__(
         self,
-        data: PandasEvent,
+        event: PandasEvent,
         sampling: Optional[PandasEvent] = None,
     ) -> Dict[str, PandasEvent]:
         """Apply a simple moving average to an event.
@@ -43,18 +43,18 @@ class PandasSimpleMovingAverageOperator(PandasWindowOperator):
         each of its features independently.
 
         Args:
-          data: the input event to apply a simple moving average to.
+          event: the input event to apply a simple moving average to.
           sampling: an event with the desired sampling for the output event.
-              If None, the original sampling of `data` will be used.
+              If None, the original sampling of `event` will be used.
 
         Returns:
           Dict[str, PandasEvent]: the output event of the operator.
         """
         # remove index to be able to filter using index values
-        data_no_index = data.reset_index()
+        event_no_index = event.reset_index()
 
         if sampling is None:
-            sampling = data
+            sampling = event
 
         # get index columns and name of timestamp column
         (
@@ -63,8 +63,8 @@ class PandasSimpleMovingAverageOperator(PandasWindowOperator):
         ) = utils.get_index_and_timestamp_column_names(sampling)
 
         # create output event with desired sampling
-        output = PandasEvent(
-            {f"sma_{col}": [None] * len(sampling) for col in data.columns},
+        output_event = PandasEvent(
+            {f"sma_{col}": [None] * len(sampling) for col in event.columns},
             dtype=float,
         ).set_index(sampling.index)
 
@@ -75,32 +75,32 @@ class PandasSimpleMovingAverageOperator(PandasWindowOperator):
             timestamp = values[-1]
 
             # filter by index_value
-            data_filtered = (
-                data_no_index[
-                    (data_no_index[index_columns] == index_value).squeeze()
+            event_filtered = (
+                event_no_index[
+                    (event_no_index[index_columns] == index_value).squeeze()
                 ]
                 if index_columns
-                else data_no_index
+                else event_no_index
             )
 
             # filter by window start/end dates
-            data_filtered = data_filtered[
-                (data_filtered[timestamp_column] <= timestamp)
+            event_filtered = event_filtered[
+                (event_filtered[timestamp_column] <= timestamp)
                 & (
-                    data_filtered[timestamp_column]
+                    event_filtered[timestamp_column]
                     >= timestamp - pd.Timedelta(self.window_length)
                 )
             ]
 
             # calculate average of window
             mean = (
-                data_filtered.set_index(sampling.index.names)
+                event_filtered.set_index(sampling.index.names)
                 .mean(axis=0)
                 .values
             )
 
             # set result in output event
             loc = index_value + (timestamp,)
-            output.loc[loc] = mean
+            output_event.loc[loc] = mean
 
-        return {"output": output}
+        return {"event": output_event}
