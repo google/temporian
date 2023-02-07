@@ -8,7 +8,9 @@ from temporian.implementation.numpy.data.sampling import NumpySampling
 
 
 class NumpyFeature:
-    def __init__(self, name: str, index: List[str], data: np.ndarray) -> None:
+    def __init__(
+        self, name: str, sampling: NumpySampling, data: np.ndarray
+    ) -> None:
         if len(data.shape) > 1:
             raise ValueError(
                 "NumpyFeatures can only be created from flat arrays. Passed"
@@ -16,13 +18,13 @@ class NumpyFeature:
             )
 
         self.name = name
-        self.index = index
+        self.sampling = sampling
         self.data = data
         self.dtype = self.data.dtype
 
     def schema(self) -> Feature:
         return Feature(
-            name=self.name, dtype=self.dtype, sampling=self.index.names
+            name=self.name, dtype=self.dtype, sampling=self.sampling.names
         )
 
     def __repr__(self) -> str:

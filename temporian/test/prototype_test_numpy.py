@@ -27,7 +27,7 @@ from temporian.implementation.numpy.data.sampling import NumpySampling
 
 class PrototypeTest(absltest.TestCase):
     def setUp(self) -> None:
-        # index name
+        # index_names
         index_names = ["store_id", "product_id"]
 
         # sampling
@@ -53,48 +53,48 @@ class PrototypeTest(absltest.TestCase):
                 ("A", 1): [
                     NumpyFeature(
                         name="sales",
-                        index=index_names,
+                        sampling=sampling,
                         data=np.array([14, 15, 16]),
                     ),
                     NumpyFeature(
                         name="costs",
-                        index=index_names,
+                        sampling=sampling,
                         data=np.array([11, 12, 13]),
                     ),
                 ],
                 ("A", 2): [
                     NumpyFeature(
                         name="sales",
-                        index=index_names,
+                        sampling=sampling,
                         data=np.array([10]),
                     ),
                     NumpyFeature(
                         name="costs",
-                        index=index_names,
+                        sampling=sampling,
                         data=np.array([9]),
                     ),
                 ],
                 ("B", 2): [
                     NumpyFeature(
                         name="sales",
-                        index=index_names,
+                        sampling=sampling,
                         data=np.array([7, 8]),
                     ),
                     NumpyFeature(
                         name="costs",
-                        index=index_names,
+                        sampling=sampling,
                         data=np.array([5, 6]),
                     ),
                 ],
                 ("B", 3): [
                     NumpyFeature(
                         name="sales",
-                        index=index_names,
+                        sampling=sampling,
                         data=np.array([3, 4]),
                     ),
                     NumpyFeature(
                         name="costs",
-                        index=index_names,
+                        sampling=sampling,
                         data=np.array([1, 2]),
                     ),
                 ],
@@ -107,28 +107,28 @@ class PrototypeTest(absltest.TestCase):
                 ("A", 1): [
                     NumpyFeature(
                         name="costs",
-                        index=index_names,
+                        sampling=sampling,
                         data=np.array([11, 12, 13]),
                     ),
                 ],
                 ("A", 2): [
                     NumpyFeature(
                         name="costs",
-                        index=index_names,
+                        sampling=sampling,
                         data=np.array([9]),
                     ),
                 ],
                 ("B", 2): [
                     NumpyFeature(
                         name="costs",
-                        index=index_names,
+                        sampling=sampling,
                         data=np.array([5, 6]),
                     ),
                 ],
                 ("B", 3): [
                     NumpyFeature(
                         name="costs",
-                        index=index_names,
+                        sampling=sampling,
                         data=np.array([1, 2]),
                     ),
                 ],
