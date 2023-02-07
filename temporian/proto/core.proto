@@ -27,6 +27,16 @@ message Processor {
   repeated Feature features = 3;
 
   repeated Sampling samplings = 4;
+
+  repeated IOSignature inputs = 5;
+
+  repeated IOSignature outputs = 6;
+}
+
+// The input or output of a processor.
+message IOSignature {
+    optional string key = 1;
+    optional string event_id = 2;
 }
 
 // Instantiation of an operator in a processor.
@@ -60,7 +70,6 @@ message Operator {
     oneof type {
       int64 integer_64 = 2;
       string str = 3;
-      string sampling_id = 4;
     }
   }
 }
@@ -76,9 +85,6 @@ message Event {
 
   // Features in the event.
   repeated string feature_ids = 3;
-
-  // Index of the event. Empty for global events.
-  repeated string index = 4;
 }
 
 // Schema of a feature
@@ -87,18 +93,17 @@ message Feature {
   // processor.
   optional string id = 1;
 
-  optional Type type = 2;
+  optional string name = 2;
+
+  optional DType dtype = 3;
 
   // Identifier of the sampling of the feature.
-  optional string sampling_id = 3;
-
-  // Index of the feature.
-  repeated string index = 4;
+  optional string sampling_id = 4;
 
   // Index of the event id who's operator creator also created this feature.
   optional string creator_event_id = 5;
 
-  enum Type {
+  enum DType {
     UNDEFINED = 0;
     FLOAT = 1;
     INT64 = 2;
@@ -134,6 +139,8 @@ message OperatorDef {
 
   // If true, the operator is a placeholder. That is, the user has to provide
   // the features of this operator output.
+  //
+  // TODO: Possibly remove.
   optional bool place_holder = 5 [default = false];
 
   message Input {

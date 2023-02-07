@@ -15,6 +15,7 @@ py_library(
         "//temporian/core:evaluator",
         "//temporian/core:operator_lib",
         "//temporian/core:processor",
+        "//temporian/core:serialize",
         "//temporian/core/data:dtype",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",

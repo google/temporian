@@ -14,7 +14,7 @@
 
 """Processor module."""
 
-from typing import List, Set
+from typing import List, Set, Dict
 
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
@@ -28,28 +28,56 @@ class Preprocessor(object):
     def __init__(self):
         self._operators: Set[base.Operator] = set()
         self._features: Set[Feature] = set()
+        self._events: Set[Event] = set()
+        self._samplings: Set[Sampling] = set()
+        self._inputs: Dict[str, Event] = {}
+        self._outputs: Dict[str, Event] = {}
 
     def samplings(self) -> Set[Sampling]:
-        samplings = set()
-        for feature in self._features:
-            if feature.sampling() is not None:
-                samplings.add(feature.sampling())
-        return samplings
+        return self._samplings
 
-    def events(self) -> Set[Event]:
-        events = set()
-        for operator in self._operators:
-            for event in operator.inputs().values():
-                events.add(event)
-            for event in operator.outputs().values():
-                events.add(event)
-        return events
-
-    def features(self):
+    def features(self) -> Set[Feature]:
         return self._features
 
-    def operators(self):
+    def operators(self) -> Set[base.Operator]:
         return self._operators
+
+    def events(self) -> Set[Event]:
+        return self._events
+
+    def add_operator(self, operator: base.Operator) -> None:
+        self._operators.add(operator)
+
+    def add_sampling(self, sampling: Sampling) -> None:
+        self._samplings.add(sampling)
+
+    def add_feature(self, feature: Feature) -> None:
+        self._features.add(feature)
+
+    def add_event(self, event: Event) -> None:
+        self._events.add(event)
+
+    def set_inputs(self, inputs: Dict[str, Event]) -> None:
+        self._inputs = inputs
+
+    def set_outputs(self, outputs: Dict[str, Event]) -> None:
+        self._outputs = outputs
+
+    def inputs(self) -> Dict[str, Event]:
+        return self._inputs
+
+    def outputs(self) -> Dict[str, Event]:
+        return self._outputs
+
+    def input_features(self) -> Set[Feature]:
+        return {
+            feature
+            for event in self.inputs().values()
+            for feature in event.features()
+        }
+
+    def input_samplings(self) -> Set[Sampling]:
+        return {event.sampling() for event in self.inputs().values()}
 
     def __repr__(self):
         s = "Preprocessor\n============\n"
@@ -61,27 +89,45 @@ class Preprocessor(object):
                 s += f"\t{e}\n"
             s += "\n"
 
-        p("Operators", self._operators)
-        p("Features", self._features)
+        p("Operators", self.operators())
+        p("Features", self.features())
         p("Samplings", self.samplings())
         p("Events", self.events())
+
+        def p2(title, dictionary):
+            nonlocal s
+            s += f"{title} ({len(dictionary)}):\n"
+            for k, v in dictionary.items():
+                s += f"\t{k}:{v}\n"
+            s += "\n"
+
+        p2("Inputs", self.inputs())
+        p2("Output", self.outputs())
         return s
 
 
-def infer_processor(inputs: List[Event], outputs: List[Event]) -> Preprocessor:
+def infer_processor(
+    inputs: Dict[str, Event], outputs: Dict[str, Event]
+) -> Preprocessor:
     """Create a self contained processor.
+
+    The processor contains all the features, samplings, events and operators
+    in between "inputs" and "outputs". The processor contains all the outputs
+    of all necessary operators (even it only part of those outputs are used).
 
     Fails if some inputs are missing.
 
     Args:
-      inputs: List of available inputs.
-      outputs: List of requested outputs.
+      inputs: Dictionary of available inputs.
+      outputs: Dictionary of requested outputs.
 
     Returns:
       A preprocessor.
     """
 
     p = Preprocessor()
+    p.set_inputs(inputs)
+    p.set_outputs(outputs)
 
     # The following algorithm lists all the intermediate and missing input
     # features of a computation graph.
@@ -102,24 +148,26 @@ def infer_processor(inputs: List[Event], outputs: List[Event]) -> Preprocessor:
     #     add feature to the list of missing input features (will raise an error)
 
     pending_features: Set[Feature] = set()
-    for output_event in outputs:
+    for output_event in outputs.values():
         pending_features.update(output_event.features())
+        p.add_sampling(output_event.sampling())
 
     input_features: Set[Feature] = set()
-    for input_event in inputs:
+    for input_event in inputs.values():
         input_features.update(input_event.features())
+        p.add_sampling(input_event.sampling())
 
     done_features: Set[Feature] = set()
 
-    # Text description of the missing features
+    # Text description of the missing features.
     missing_features: Set[str] = set()
 
     while pending_features:
-        # Select a feature from pending_features
+        # Select a feature from pending_features.
         feature = next(iter(pending_features))
         pending_features.remove(feature)
 
-        p.features().add(feature)
+        p.add_feature(feature)
 
         assert feature not in done_features
 
@@ -138,15 +186,24 @@ def infer_processor(inputs: List[Event], outputs: List[Event]) -> Preprocessor:
             )
 
         else:
-            p.operators().add(feature.creator())
-            # Add the parent features
+            p.add_operator(feature.creator())
+            p.add_sampling(feature.sampling())
+
+            # Add the parent features.
             for input_event in feature.creator().inputs().values():
+                p.add_event(input_event)
                 for input_feature in input_event.features():
                     if input_feature in done_features:
                         continue
                     if input_feature in pending_features:
                         continue
                     pending_features.add(input_feature)
+
+            # Make sure that all operator outputs are listed.
+            for output_event in feature.creator().outputs().values():
+                p.add_event(output_event)
+                for output_feature in output_event.features():
+                    p.add_feature(output_feature)
 
     if missing_features:
         raise ValueError(f"Missing input features: {missing_features}")

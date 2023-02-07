@@ -56,3 +56,16 @@ py_library(
         "//temporian/core/operators:base",
     ],
 )
+
+py_library(
+    name = "serialize",
+    srcs = ["serialize.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":operator_lib",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators:base",
+    ],
+)

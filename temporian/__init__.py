@@ -19,6 +19,7 @@ from temporian.core import evaluator
 from temporian.core import operator_lib
 from temporian.core import operators
 from temporian.core import processor
+from temporian.core import serialize
 from temporian.core.data import dtype
 from temporian.core.data import event
 from temporian.core.data import feature
@@ -27,10 +28,9 @@ from temporian.core.operators import base
 
 __version__ = "0.0.1"
 
-does_nothing = core.does_nothing
-create_toy_processor = core.create_toy_processor
-
 sma = operators.simple_moving_average.sma
 place_holder = operators.place_holder.place_holder
 evaluate = evaluator.evaluate
 Feature = feature.Feature
+load = serialize.load
+save = serialize.save

@@ -14,6 +14,8 @@
 
 from absl import logging
 from absl.testing import absltest
+import os
+import tempfile
 
 import temporian as t
 
@@ -21,16 +23,7 @@ from temporian.implementation.pandas.data.event import PandasEvent
 
 
 class TFPTest(absltest.TestCase):
-    def test_does_nothing(self):
-        logging.info("Running a test")
-        t.does_nothing()
-        self.assertEqual(1, 1)
-
-    def test_create_toy_processor(self):
-        p = t.create_toy_processor()
-        logging.info("Processor:\n%s", p)
-
-    def disabled_test_create_processor(self):
+    def disabled_test_evaluation(self):
         a = t.place_holder(
             features=[
                 t.Feature(name="f1", dtype=t.dtype.FLOAT),
@@ -55,8 +48,30 @@ class TFPTest(absltest.TestCase):
                 a: input_signal_data,
             },
         )
-
         logging.info("results: %s", results)
+
+    def test_serialization(self):
+        a = t.place_holder(
+            features=[
+                t.Feature(name="f1", dtype=t.dtype.FLOAT),
+                t.Feature(name="f2", dtype=t.dtype.FLOAT),
+            ],
+            index=[],
+        )
+        b = t.sma(data=a, window_length=7)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_processor.tem")
+            t.save(
+                inputs={"a": a},
+                outputs={"b": b},
+                path=path,
+            )
+
+            inputs, outputs = t.load(path=path)
+
+        self.assertSetEqual(set(inputs.keys()), {"a"})
+        self.assertSetEqual(set(outputs.keys()), {"b"})
 
 
 if __name__ == "__main__":

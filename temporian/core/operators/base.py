@@ -59,8 +59,8 @@ class Operator(ABC):
     """Operator interface."""
 
     def __init__(self):
-        self._inputs = {}
-        self._outputs = {}
+        self._inputs: dict[str, Event] = {}
+        self._outputs: dict[str, Event] = {}
         self._attributes: dict[str, Union[str, int]] = {}
 
     def __str__(self):
@@ -135,3 +135,12 @@ class Operator(ABC):
 
     def definition(self):
         return self.__class__.build_op_definition()
+
+    def set_inputs(self, inputs: dict[str, Event]) -> None:
+        self._inputs = inputs
+
+    def set_outputs(self, outputs: dict[str, Event]) -> None:
+        self._outputs = outputs
+
+    def set_attributes(self, attributes: dict[str, Event]) -> None:
+        self._attributes = attributes

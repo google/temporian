@@ -64,6 +64,8 @@ Run all tests with bazel:
 bazel test //...:all
 ```
 
+Note: You can use the Bazel test flag `--test_output=streamed` to see the test logs in realtime.
+
 ## Credits
 
 This project is a collaboration between Google and Tryolabs.
