@@ -39,7 +39,7 @@ class Event(object):
         return self._features
 
 
-def input_event(features: List[Feature], index: List[str] = []):
+def input_event(features: List[Feature], index: List[str] = []) -> Event:
 
     sampling = Sampling(index=index, creator=None)
 
