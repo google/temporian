@@ -13,7 +13,9 @@
 # limitations under the License.
 
 import pandas as pd
+from absl import logging
 from absl.testing import absltest
+
 from temporian.core import evaluator
 from temporian.core.data.event import Event
 from temporian.core.data.event import Feature
@@ -40,11 +42,43 @@ class PrototypeTest(absltest.TestCase):
 
         self.expected_output_event = pandas_event.PandasEvent(
             [
-                [666964, pd.Timestamp("2013-01-02"), 1091.0, 740.0, 740.0],
-                [666964, pd.Timestamp("2013-01-03"), 919.0, 508.0, 624.0],
-                [574016, pd.Timestamp("2013-01-04"), 953.0, 573.0, 573.0],
+                [
+                    666964,
+                    pd.Timestamp("2013-01-02"),
+                    1091.0,
+                    740.0,
+                    1091.0,
+                    740.0,
+                    740.0,
+                ],
+                [
+                    666964,
+                    pd.Timestamp("2013-01-03"),
+                    919.0,
+                    508.0,
+                    919.0,
+                    508.0,
+                    624.0,
+                ],
+                [
+                    574016,
+                    pd.Timestamp("2013-01-04"),
+                    953.0,
+                    573.0,
+                    953.0,
+                    573.0,
+                    573.0,
+                ],
             ],
-            columns=["product_id", "timestamp", "sales", "costs", "sma_costs"],
+            columns=[
+                "product_id",
+                "timestamp",
+                "sales",
+                "costs",
+                "salesy",
+                "costsy",
+                "sma_costs",
+            ],
         ).set_index(["product_id", "timestamp"])
 
     def test_prototoype(self) -> None:
@@ -57,9 +91,10 @@ class PrototypeTest(absltest.TestCase):
             features=[Feature(name="costs", dtype=float)],
             sampling=Sampling(["product_id", "timestamp"]),
         )
-
-        # call assign operator
-        output_event = assign(assignee_event, assigned_event)
+        # call assign operators
+        assign_output_1 = assign(assignee_event, assigned_event)
+        assign_output_2 = assign(assignee_event, assigned_event)
+        assign_assign_event = assign(assign_output_1, assign_output_2)
 
         # call sma operator
         sma_assigned_event = sma(
@@ -67,7 +102,7 @@ class PrototypeTest(absltest.TestCase):
         )
 
         # call assign operator with result of sma
-        output_event = assign(output_event, sma_assigned_event)
+        output_event = assign(assign_assign_event, sma_assigned_event)
 
         # evaluate output
         output_event_pandas = evaluator.evaluate(
@@ -80,7 +115,6 @@ class PrototypeTest(absltest.TestCase):
             },
             backend="pandas",
         )
-
         # validate
         self.assertEqual(
             True,
@@ -88,6 +122,7 @@ class PrototypeTest(absltest.TestCase):
                 output_event_pandas[output_event]
             ),
         )
+        logging.info(output_event_pandas)
 
 
 if __name__ == "__main__":

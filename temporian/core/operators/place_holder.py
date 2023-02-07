@@ -45,6 +45,7 @@ class PlaceHolder(base.Operator):
             event_lib.Event(
                 features=features,
                 sampling=sampling,
+                creator=self,
             ),
         )
 

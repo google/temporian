@@ -58,6 +58,7 @@ class SimpleMovingAverage(Operator):
             Event(
                 features=output_features,
                 sampling=sampling,
+                creator=self,
             ),
         )
 
