@@ -32,7 +32,7 @@ class TFPTest(absltest.TestCase):
             index=[],
         )
 
-        b = t.sma(data=a, window_length=7)
+        b = t.sma(event=a, window_length=7)
 
         input_signal_data = PandasEvent(
             {
@@ -58,7 +58,7 @@ class TFPTest(absltest.TestCase):
             ],
             index=[],
         )
-        b = t.sma(data=a, window_length=7)
+        b = t.sma(event=a, window_length=7)
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_processor.tem")
