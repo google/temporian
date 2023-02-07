@@ -1,6 +1,6 @@
 from temporian.core import processor
 from temporian.core.data import dtype
-from temporian.core.data.event import Event
+from temporian.core.data import event as event_lib
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators import base
@@ -10,33 +10,16 @@ from temporian.core import operator_lib
 # The name of the operator is defined by the number of inputs and outputs.
 # For example "OpI1O2" has 1 input and 2 outputs.
 
-
-class OpO1(base.Operator):
-    @classmethod
-    def build_op_definition(cls) -> pb.OperatorDef:
-        return pb.OperatorDef(
-            key="OpO1",
-            place_holder=True,
-            outputs=[pb.OperatorDef.Output(key="output")],
-        )
-
-    def __init__(self):
-        super().__init__()
-        sampling = Sampling(index=[], creator=self)
-        self.add_output(
-            "output",
-            Event(
-                features=[
-                    Feature("f1", dtype.FLOAT, sampling=sampling, creator=self),
-                    Feature("f2", dtype.FLOAT, sampling=sampling, creator=self),
-                ],
-                sampling=sampling,
-            ),
-        )
-        self.check()
+Event = event_lib.Event
 
 
-operator_lib.register_operator(OpO1)
+def create_input_event():
+    return event_lib.input_event(
+        features=[
+            Feature("f1", dtype.FLOAT),
+            Feature("f2", dtype.FLOAT),
+        ]
+    )
 
 
 class OpI1O1(base.Operator):

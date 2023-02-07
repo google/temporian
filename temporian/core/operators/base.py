@@ -69,9 +69,6 @@ class Operator(ABC):
             f" attributes: {self.attributes()}>"
         )
 
-    def is_placeholder(self) -> bool:
-        return self.definition().place_holder
-
     def outputs(self) -> dict[str, Event]:
         return self._outputs
 

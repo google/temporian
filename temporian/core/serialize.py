@@ -34,7 +34,7 @@ def save(
     """Saves the computation between "inputs" and "outputs" into a file.
 
     Usage example:
-        a = t.place_holder(...)
+        a = t.input_event(...)
         b = t.sma(a, window_length=7)
         t.save(inputs={"io_a": a}, outputs={"io_b": b}, path="processor.tem")
 

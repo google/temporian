@@ -14,5 +14,4 @@
 
 """Operators."""
 
-from temporian.core.operators import place_holder
 from temporian.core.operators import simple_moving_average
