@@ -32,7 +32,6 @@ def save(
     inputs: Optional[processor.MultipleEventArg],
     outputs: processor.MultipleEventArg,
     path: str,
-    infer_inputs: bool = False,
 ) -> None:
     """Saves the computation between "inputs" and "outputs" into a file.
 
@@ -49,27 +48,20 @@ def save(
 
 
     Args:
-        inputs: The inputs events.
-        outputs: The output events.
+        inputs: Input events. If None, the inputs is infered. In this case,
+            input event have to be named.
+        outputs: Output events.
         path: The file path.
-        infer_inputs: If true, infers the inputs.
     """
 
     # TODO: Add support for compressed / binary serialization.
 
-    if infer_inputs:
-        if inputs is not None:
-            raise ValueError("If infer_inputs=True, inputs should be None")
-    else:
-        if inputs is None:
-            raise ValueError("If infer_inputs=False, inputs should be None")
+    if inputs is not None:
         inputs = processor.normalize_multiple_event_arg(inputs)
 
     outputs = processor.normalize_multiple_event_arg(outputs)
 
-    p = processor.infer_processor(
-        inputs=inputs, outputs=outputs, infer_inputs=infer_inputs
-    )
+    p = processor.infer_processor(inputs=inputs, outputs=outputs)
     proto = serialize(p)
     with open(path, "w") as f:
         f.write(text_format.MessageToString(proto))
@@ -111,13 +103,8 @@ def serialize(src: processor.Preprocessor) -> pb.Processor:
     return pb.Processor(
         operators=[_serialize_operator(o) for o in src.operators()],
         events=[_serialize_event(e) for e in src.events()],
-        features=[
-            _serialize_feature(f, src.input_features()) for f in src.features()
-        ],
-        samplings=[
-            _serialize_sampling(s, src.input_samplings())
-            for s in src.samplings()
-        ],
+        features=[_serialize_feature(f) for f in src.features()],
+        samplings=[_serialize_sampling(s) for s in src.samplings()],
         inputs=[_serialize_io_signature(k, e) for k, e in src.inputs().items()],
         outputs=[
             _serialize_io_signature(k, e) for k, e in src.outputs().items()
@@ -143,15 +130,20 @@ def unserialize(src: pb.Processor) -> processor.Preprocessor:
             raise ValueError(f"Non existing creator operator {op_id}")
         return operators[op_id]
 
+    for src_event in src.events:
+        if src_event.creator_operator_id:
+            events[src_event.id].set_creator(
+                get_creator(src_event.creator_operator_id)
+            )
     for src_feature in src.features:
-        if src_feature.creator_event_id:
+        if src_feature.creator_operator_id:
             features[src_feature.id].set_creator(
-                get_creator(src_feature.creator_event_id)
+                get_creator(src_feature.creator_operator_id)
             )
     for src_sampling in src.samplings:
-        if src_sampling.creator_event_id:
+        if src_sampling.creator_operator_id:
             samplings[src_sampling.id].set_creator(
-                get_creator(src_sampling.creator_event_id)
+                get_creator(src_sampling.creator_operator_id)
             )
 
     # Copy extracted items.
@@ -263,6 +255,9 @@ def _serialize_event(src: Event) -> pb.Event:
         sampling_id=_identifier(src.sampling()),
         feature_ids=[_identifier(f) for f in src.features()],
         name=src.name(),
+        creator_operator_id=(
+            _identifier(src.creator()) if src.creator() is not None else None
+        ),
     )
 
 
@@ -281,19 +276,18 @@ def _unserialize_event(
         sampling=samplings[src.sampling_id],
         features=[get_feature(f) for f in src.feature_ids],
         name=src.name,
+        creator=None,
     )
 
 
-def _serialize_feature(
-    src: Feature, input_features: Set[Feature]
-) -> pb.Feature:
+def _serialize_feature(src: Feature) -> pb.Feature:
     return pb.Feature(
         id=_identifier(src),
         name=src.name(),
         dtype=_serialize_dtype(src.dtype()),
         sampling_id=_identifier(src.sampling()),
-        creator_event_id=(
-            _identifier(src.creator()) if src not in input_features else None
+        creator_operator_id=(
+            _identifier(src.creator()) if src.creator() is not None else None
         ),
     )
 
@@ -312,14 +306,12 @@ def _unserialize_feature(
     )
 
 
-def _serialize_sampling(
-    src: Sampling, input_samplings: Set[Feature]
-) -> pb.Sampling:
+def _serialize_sampling(src: Sampling) -> pb.Sampling:
     return pb.Sampling(
         id=_identifier(src),
         index=src.index(),
-        creator_event_id=(
-            _identifier(src.creator) if src not in input_samplings else None
+        creator_operator_id=(
+            _identifier(src.creator()) if src.creator() is not None else None
         ),
     )
 

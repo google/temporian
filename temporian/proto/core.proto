@@ -87,6 +87,8 @@ message Event {
   repeated string feature_ids = 3;
 
   optional string name = 4;
+
+  optional string creator_operator_id = 5;
 }
 
 // Schema of a feature
@@ -102,8 +104,7 @@ message Feature {
   // Identifier of the sampling of the feature.
   optional string sampling_id = 4;
 
-  // Index of the event id who's operator creator also created this feature.
-  optional string creator_event_id = 5;
+  optional string creator_operator_id = 5;
 
   enum DType {
     UNDEFINED = 0;
@@ -124,7 +125,7 @@ message Sampling {
   repeated string index = 2;
 
   // Index of the event id who's operator creator also created this feature.
-  optional string creator_event_id = 3;
+  optional string creator_operator_id = 3;
 }
 
 // Definition of an operator. No two operators definition can have the same key.

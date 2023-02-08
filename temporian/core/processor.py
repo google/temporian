@@ -141,137 +141,112 @@ class Preprocessor(object):
 def infer_processor(
     inputs: Optional[Dict[str, Event]],
     outputs: Dict[str, Event],
-    infer_inputs: bool = False,
 ) -> Preprocessor:
-    """Create a self contained processor.
-
-    The processor contains all the features, samplings, events and operators
-    in between "inputs" and "outputs". The processor contains all the outputs
-    of all necessary operators (even it only part of those outputs are used).
+    """Extracts all the objects between the outputs and inputs events.
 
     Fails if some inputs are missing.
 
     Args:
-      inputs: Dictionary of available inputs.
-      outputs: Dictionary of requested outputs.
-    infer_inputs: If true, infers the inputs.
+        inputs: Input events. If None, the inputs is infered. In this
+            case, input event have to be named.
+        outputs: Output events.
 
     Returns:
       A preprocessor.
     """
 
+    # The following algorithm lists all the events between the output and
+    # input events. Informally, the algorithm works as follow:
+    #
+    # pending_event <= use outputs
+    # done_event <= empty
+    #
+    # While pending event not empty:
+    #   Extract an event from pending_event
+    #   if event is a provided input event
+    #       continue
+    #   if event has not creator
+    #       record this event for future error / input inference
+    #       continue
+    #   Adds all the input events of event's creator op to the pending list
+
     p = Preprocessor()
     p.set_outputs(outputs)
 
-    # The following algorithm lists all the intermediate and missing input
-    # features of a computation graph.
-    #
-    # The algorithm works as follows:
-    #
-    # pending_features <= List of outputs
-    # done_features <= empty
-    #
-    # While pending feature not empty:
-    #   Extract a feature from pending_features
-    #   if feature is part of the provided input features => Continue
-    #   if feature has a creator operator
-    #     Adds all the features, of all the inputs of this operator to
-    #     pending_features. Skip the features already in pending_features or
-    #     done_features.
-    #   else:
-    #     add feature to the list of missing input features (will raise an error)
+    # The next event to process. Events are processed from the outputs to
+    # the inputs.
+    pending_events: Set[Event] = set()
+    pending_events.update(outputs.values())
 
-    # List the events containing each possible feature:
-    # Used for the automatic input inference.
-    features_to_src_event: Dict[Feature, List[Event]] = defaultdict(lambda: [])
+    # Index the input event for fast retrieval
+    input_events: Set[Event] = {}
 
-    pending_features: Set[Feature] = set()
-    for output_event in outputs.values():
-        pending_features.update(output_event.features())
-        p.add_sampling(output_event.sampling())
-        for feature in output_event.features():
-            features_to_src_event[feature].append(pending_features)
-
-    input_features: Set[Feature] = set()
-    if not infer_inputs:
+    if inputs is not None:
         p.set_inputs(inputs)
-        for input_event in inputs.values():
-            input_features.update(input_event.features())
-            p.add_sampling(input_event.sampling())
-    else:
-        infered_inputs: Dict[str, Event] = {}
+        input_events = set(inputs.values())
 
-    done_features: Set[Feature] = set()
+    # Features already processed.
+    done_events: Set[Event] = set()
 
-    # Text description of the missing features.
-    missing_features: Set[str] = set()
+    # List of the missing events. They will be used to infer the input features
+    # (if infer_inputs=True), or to raise an error (if infer_inputs=False).
+    missing_events: Set[Event] = set()
 
-    while pending_features:
-        # Select a feature from pending_features.
-        feature = next(iter(pending_features))
-        pending_features.remove(feature)
+    while pending_events:
+        # Select an event to process.
+        event = next(iter(pending_events))
+        pending_events.remove(event)
+        assert event not in done_events
 
-        p.add_feature(feature)
+        p.add_event(event)
 
-        assert feature not in done_features
-
-        if feature in input_features:
+        if event in input_events:
             # The feature is provided by the user.
             continue
 
-        if feature.creator() is None:
-            # The feature is missing.
+        if event.creator() is None:
+            # The event does not have a source.
+            missing_events.add(event)
+            continue
 
-            if infer_inputs:
-                # Infer the inputs
-                if feature not in features_to_src_event:
-                    raise ValueError(
-                        f"Cannot determine the input of {feature}. "
-                        "No event found."
-                    )
-                if len(features_to_src_event[feature]) > 1:
-                    raise ValueError(
-                        f"Cannot determine the input of {feature}. "
-                        "Multiple potential events found."
-                    )
+        # Record the operator.
+        p.add_operator(event.creator())
 
-                infered_input = list(features_to_src_event[feature])[0]
-                if infered_input.name() is None:
-                    raise ValueError(
-                        f"Infered input without a name: {infered_input}."
-                    )
-                infered_inputs[infered_input.name()] = infered_input
-                p.add_sampling(feature.sampling())
-            else:
-                missing_features.add(repr(feature))
+        # Add the parent events to the pending list.
+        for input_event in event.creator().inputs().values():
 
-        else:
-            p.add_operator(feature.creator())
-            p.add_sampling(feature.sampling())
+            if input_event in done_events:
+                # Already processed.
+                continue
 
-            # Add the parent features.
-            for input_event in feature.creator().inputs().values():
-                p.add_event(input_event)
-                for input_feature in input_event.features():
-                    if input_feature in done_features:
-                        continue
-                    if input_feature in pending_features:
-                        continue
-                    pending_features.add(input_feature)
+            pending_events.add(input_event)
 
-                    if infer_inputs and input_feature.creator() is None:
-                        features_to_src_event[input_feature].append(input_event)
+        # Record the operator outputs. While the user did not request
+        # them, they will be created (and so, we need to track them).
+        for output_event in event.creator().outputs().values():
+            p.add_event(output_event)
 
-            # Make sure that all operator outputs are listed.
-            for output_event in feature.creator().outputs().values():
-                p.add_event(output_event)
-                for output_feature in output_event.features():
-                    p.add_feature(output_feature)
-
-    if missing_features:
-        raise ValueError(f"Missing input features: {missing_features}")
-
-    if infer_inputs:
+    if inputs is None:
+        # Infer the inputs
+        infered_inputs: Dict[str, Event] = {}
+        for event in missing_events:
+            if event.name() is None:
+                raise ValueError(f"Cannot infer input on unnamed event {event}")
+            infered_inputs[event.name()] = event
         p.set_inputs(infered_inputs)
+
+    else:
+        # Fail if not all events are sourced.
+        if missing_events:
+            raise ValueError(
+                "One of multiple events are required but "
+                f"not provided as input:\n {missing_events}"
+            )
+
+    # Record all the features and samplings.
+    for e in p.events():
+        p.add_sampling(e.sampling())
+        for f in e.features():
+            p.add_feature(f)
 
     return p

@@ -140,6 +140,7 @@ class PrototypeTest(absltest.TestCase):
         event = Event(
             [Feature("sales", int), Feature("costs", int)],
             sampling=Sampling(["store_id", "product_id"]),
+            creator=None,
         )
         output_event = event["costs"]
 

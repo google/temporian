@@ -33,25 +33,61 @@ class OpI1O1(base.Operator):
 
     def __init__(self, event: Event):
         super().__init__()
+
         self.add_input("event", event)
         self.add_output(
             "output",
             Event(
                 features=[
                     Feature(
-                        "f1",
+                        "f3",
                         dtype.FLOAT64,
                         sampling=event.sampling(),
                         creator=self,
-                    )
+                    ),
+                    Feature(
+                        "f4",
+                        dtype.FLOAT64,
+                        sampling=event.sampling(),
+                        creator=self,
+                    ),
                 ],
-                sampling=event.sampling(),
+                sampling=Sampling(index=[], creator=self),
+                creator=self,
             ),
         )
         self.check()
 
 
 operator_lib.register_operator(OpI1O1)
+
+
+class OpI1O1NotCreator(base.Operator):
+    """Unlike OpI1O1, OpI1O1NotCreator only passes the features/sampling."""
+
+    @classmethod
+    def build_op_definition(cls) -> pb.OperatorDef:
+        return pb.OperatorDef(
+            key="OpI1O1NotCreator",
+            inputs=[pb.OperatorDef.Input(key="event")],
+            outputs=[pb.OperatorDef.Output(key="output")],
+        )
+
+    def __init__(self, event: Event):
+        super().__init__()
+        self.add_input("event", event)
+        self.add_output(
+            "output",
+            Event(
+                features=[f for f in event.features()],
+                sampling=event.sampling(),
+                creator=self,
+            ),
+        )
+        self.check()
+
+
+operator_lib.register_operator(OpI1O1NotCreator)
 
 
 class OpI2O1(base.Operator):
@@ -75,13 +111,20 @@ class OpI2O1(base.Operator):
             Event(
                 features=[
                     Feature(
-                        "f1",
+                        "f5",
                         dtype.FLOAT64,
                         sampling=event_1.sampling(),
                         creator=self,
-                    )
+                    ),
+                    Feature(
+                        "f6",
+                        dtype.FLOAT64,
+                        sampling=event_1.sampling(),
+                        creator=self,
+                    ),
                 ],
                 sampling=event_1.sampling(),
+                creator=self,
             ),
         )
         self.check()
@@ -119,6 +162,7 @@ class OpI1O2(base.Operator):
                     )
                 ],
                 sampling=event.sampling(),
+                creator=self,
             ),
         )
         self.add_output(
@@ -133,6 +177,7 @@ class OpI1O2(base.Operator):
                     )
                 ],
                 sampling=event.sampling(),
+                creator=self,
             ),
         )
         self.check()
