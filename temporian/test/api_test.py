@@ -24,12 +24,11 @@ from temporian.implementation.pandas.data.event import PandasEvent
 
 class TFPTest(absltest.TestCase):
     def disabled_test_evaluation(self):
-        a = t.place_holder(
-            features=[
+        a = t.input_event(
+            [
                 t.Feature(name="f1", dtype=t.dtype.FLOAT64),
                 t.Feature(name="f2", dtype=t.dtype.FLOAT64),
-            ],
-            index=[],
+            ]
         )
 
         b = t.sma(event=a, window_length=7)
@@ -51,12 +50,11 @@ class TFPTest(absltest.TestCase):
         logging.info("results: %s", results)
 
     def test_serialization(self):
-        a = t.place_holder(
-            features=[
+        a = t.input_event(
+            [
                 t.Feature(name="f1", dtype=t.dtype.FLOAT64),
                 t.Feature(name="f2", dtype=t.dtype.FLOAT64),
-            ],
-            index=[],
+            ]
         )
         b = t.sma(event=a, window_length=7)
 

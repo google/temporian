@@ -61,3 +61,20 @@ class Event(object):
 
     def creator(self):
         return self._creator
+
+
+def input_event(features: List[Feature], index: List[str] = []) -> Event:
+
+    sampling = Sampling(index=index, creator=None)
+
+    for feature in features:
+        if feature.sampling() is not None:
+            raise ValueError(
+                "Cannot call input_event on already linked features."
+            )
+        feature.set_sampling(sampling)
+
+    return Event(
+        features=features,
+        sampling=sampling,
+    )

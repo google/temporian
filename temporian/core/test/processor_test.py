@@ -27,16 +27,16 @@ from temporian.core.test import utils
 
 class ProcessorTest(absltest.TestCase):
     def test_dependency_basic(self):
-        o1 = utils.OpO1()
-        o2 = utils.OpI1O1(o1.outputs()["output"])
-        o3 = utils.OpO1()
-        o4 = utils.OpI2O1(o2.outputs()["output"], o3.outputs()["output"])
+        i1 = utils.create_input_event()
+        o2 = utils.OpI1O1(i1)
+        i3 = utils.create_input_event()
+        o4 = utils.OpI2O1(o2.outputs()["output"], i3)
         o5 = utils.OpI1O2(o4.outputs()["output"])
 
         p = processor.infer_processor(
             {
-                "io_input_1": o1.outputs()["output"],
-                "io_input_2": o3.outputs()["output"],
+                "io_input_1": i1,
+                "io_input_2": i3,
             },
             {
                 "io_output_1": o5.outputs()["output_1"],
@@ -54,12 +54,12 @@ class ProcessorTest(absltest.TestCase):
         self.assertLen(p.features(), 8)
 
     def test_dependency_missing_input(self):
-        o1 = utils.OpO1()
-        o2 = utils.OpI1O1(o1.outputs()["output"])
+        i = utils.create_input_event()
+        o2 = utils.OpI1O1(i)
 
         with self.assertRaisesRegex(
             ValueError,
-            "Missing input features.*from placeholder Operator<key: OpO1,",
+            "Missing input features.",
         ):
             processor.infer_processor({}, {"io_output": o2.outputs()["output"]})
 

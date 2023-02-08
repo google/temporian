@@ -29,8 +29,10 @@ from temporian.core.operators import base
 __version__ = "0.0.1"
 
 sma = operators.simple_moving_average.sma
-place_holder = operators.place_holder.place_holder
 evaluate = evaluator.evaluate
 Feature = feature.Feature
 load = serialize.load
 save = serialize.save
+input_event = event.input_event
+Event = event.Event
+Feature = feature.Feature

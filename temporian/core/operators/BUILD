@@ -12,7 +12,6 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":assign",
-        ":place_holder",
         ":simple_moving_average",
     ],
 )
@@ -36,20 +35,6 @@ py_library(
     srcs_version = "PY3",
     deps = [
         "//temporian/core/data:event",
-        "//temporian/proto:core_py_proto",
-    ],
-)
-
-py_library(
-    name = "place_holder",
-    srcs = ["place_holder.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":base",
-        "//temporian/core:operator_lib",
-        "//temporian/core/data:event",
-        "//temporian/core/data:feature",
-        "//temporian/core/data:sampling",
         "//temporian/proto:core_py_proto",
     ],
 )

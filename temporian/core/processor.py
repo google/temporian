@@ -179,12 +179,6 @@ def infer_processor(
             # The feature is missing.
             missing_features.add(repr(feature))
 
-        elif feature.creator().is_placeholder():
-            # The user is expected to see the input of placeholders.
-            missing_features.add(
-                f"{repr(feature)} from placeholder {feature.creator()}"
-            )
-
         else:
             p.add_operator(feature.creator())
             p.add_sampling(feature.sampling())
