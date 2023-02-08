@@ -14,4 +14,7 @@
 
 """Type of features."""
 
-FLOAT = "FLOAT"
+FLOAT64 = "FLOAT64"
+FLOAT32 = "FLOAT32"
+INT64 = "INT64"
+INT32 = "INT32"
