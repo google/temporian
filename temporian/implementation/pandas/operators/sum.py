@@ -23,7 +23,6 @@ class PandasSumOperator(PandasOperator):
     def __init__(
         self, resolution: Resolution = Resolution.PER_FEATURE_IDX
     ) -> None:
-        # use normal init from base class and add resolution as param
         super().__init__()
         self.resolution = resolution
 
@@ -62,4 +61,4 @@ class PandasSumOperator(PandasOperator):
         output_feature_names = "sum_" + event_1.columns + "_" + event_2.columns
         output.columns = output_feature_names
 
-        return {"output": output}
+        return {"event": output}

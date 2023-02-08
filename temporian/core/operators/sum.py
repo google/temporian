@@ -70,10 +70,11 @@ class SumOperator(Operator):
         ]
 
         self.add_output(
-            "output",
+            "event",
             Event(
                 features=output_features,
                 sampling=sampling,
+                creator=self,
             ),
         )
         self.check()
@@ -93,7 +94,7 @@ class SumOperator(Operator):
                 pb.OperatorDef.Input(key="event_1"),
                 pb.OperatorDef.Input(key="event_2"),
             ],
-            outputs=[pb.OperatorDef.Output(key="output")],
+            outputs=[pb.OperatorDef.Output(key="event")],
         )
 
 
@@ -107,4 +108,4 @@ def sum(
 ) -> Event:
     return SumOperator(
         event_1=event_1, event_2=event_2, resolution=resolution
-    ).outputs()["output"]
+    ).outputs()["event"]
