@@ -22,6 +22,7 @@ py_library(
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
         "//temporian/core/data:sampling",
+        "//temporian/core/data:dtype",
     ],
 )
 

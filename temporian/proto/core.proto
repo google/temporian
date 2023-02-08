@@ -105,8 +105,10 @@ message Feature {
 
   enum DType {
     UNDEFINED = 0;
-    FLOAT = 1;
+    FLOAT64 = 1;
     INT64 = 2;
+    FLOAT32 = 3;
+    INT32 = 4;
   }
 }
 

@@ -26,8 +26,8 @@ class TFPTest(absltest.TestCase):
     def disabled_test_evaluation(self):
         a = t.place_holder(
             features=[
-                t.Feature(name="f1", dtype=t.dtype.FLOAT),
-                t.Feature(name="f2", dtype=t.dtype.FLOAT),
+                t.Feature(name="f1", dtype=t.dtype.FLOAT64),
+                t.Feature(name="f2", dtype=t.dtype.FLOAT64),
             ],
             index=[],
         )
@@ -53,8 +53,8 @@ class TFPTest(absltest.TestCase):
     def test_serialization(self):
         a = t.place_holder(
             features=[
-                t.Feature(name="f1", dtype=t.dtype.FLOAT),
-                t.Feature(name="f2", dtype=t.dtype.FLOAT),
+                t.Feature(name="f1", dtype=t.dtype.FLOAT64),
+                t.Feature(name="f2", dtype=t.dtype.FLOAT64),
             ],
             index=[],
         )
