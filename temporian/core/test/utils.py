@@ -16,8 +16,8 @@ Event = event_lib.Event
 def create_input_event():
     return event_lib.input_event(
         features=[
-            Feature("f1", dtype.FLOAT),
-            Feature("f2", dtype.FLOAT),
+            Feature("f1", dtype.FLOAT32),
+            Feature("f2", dtype.FLOAT32),
         ]
     )
 
