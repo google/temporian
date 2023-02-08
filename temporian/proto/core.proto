@@ -105,8 +105,10 @@ message Feature {
 
   enum DType {
     UNDEFINED = 0;
-    FLOAT = 1;
+    FLOAT64 = 1;
     INT64 = 2;
+    FLOAT32 = 3;
+    INT32 = 4;
   }
 }
 
@@ -164,6 +166,7 @@ message OperatorDef {
       UNDEFINED = 0;
       INTEGER_64 = 1;
       STRING = 2;
+      REPEATED_STRING=3;
     }
   }
 }

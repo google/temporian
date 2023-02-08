@@ -15,11 +15,10 @@
 """Evaluator module."""
 
 import pathlib
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Set, Union
 
 from temporian.core import backends
 from temporian.core.data.event import Event
-from temporian.core.data.feature import Feature
 from temporian.core.operators import base
 from temporian.implementation.pandas.data import event as pandas_event
 
@@ -37,10 +36,10 @@ def evaluate(
     """Evaluates a query on data."""
 
     if isinstance(query, Event):
-        events_to_compute = [query]
+        events_to_compute = {query}
 
     elif isinstance(query, list):
-        events_to_compute = query
+        events_to_compute = set(query)
 
     elif isinstance(query, dict):
         raise NotImplementedError()
@@ -52,13 +51,6 @@ def evaluate(
             f" {type(query)}."
         )
 
-    # get features from events
-    features_to_compute = [
-        feature
-        for event in events_to_compute
-        for feature in event.features()  # pytype: disable=attribute-error
-    ]
-
     # get backend
     selected_backend = backends.BACKENDS[backend]
     event = selected_backend["event"]
@@ -66,58 +58,81 @@ def evaluate(
     read_csv_fn = selected_backend["read_csv_fn"]
 
     # calculate opeartor schedule
-    schedule = get_operator_schedule(features_to_compute)
+    schedule = get_operator_schedule(events_to_compute)
 
     # materialize input data. TODO: separate this logic
-    materialized_input_data = {}
-    for input_event, input_event_spec in input_data.items():
-        if not isinstance(input_event_spec, event):
-            input_event_spec = read_csv_fn(
-                input_event_spec, input_event.sampling()
-            )
-        materialized_input_data[input_event] = input_event_spec
-
+    materialized_input_data = {
+        input_event: (
+            input_event_spec
+            if isinstance(input_event_spec, event)
+            else read_csv_fn(input_event_spec, input_event.sampling())
+        )
+        for input_event, input_event_spec in input_data.items()
+    }
     # evaluate schedule
     outputs = evaluate_schedule_fn(materialized_input_data, schedule)
 
     return {event: outputs[event] for event in events_to_compute}
 
 
-def get_operator_schedule(query: List[Feature]) -> List[base.Operator]:
-    # TODO: add depth calculation for parallelization
-    # TODO: Make "query" a Set
+def get_operator_schedule(query: Set[Event]) -> List[base.Operator]:
+    """Calculates which operators need to be executed in which order to
+    compute a set of query events.
+    Args:
+        query: set of query events to be computed.
+    Returns:
+        ordered list of operators, such that the first operator should be
+        computed before the second, second before the third, etc.
+    """
 
-    operators_to_compute = []  # TODO: implement as ordered set
-    visited_features = set()
-    pending_features = list(query.copy())  # TODO: implement as ordered set
-    while pending_features:
-        feature = next(iter(pending_features))
-        visited_features.add(feature)
+    # TODO: add depth analysis for parallelization
+    def visit(
+        event: Event,
+        pending_events: Set[Event],
+        done_events: Set[Event],
+        sorted_ops: List[base.Operator],
+    ):
+        if event in done_events:
+            return
+        if event in pending_events:
+            raise RuntimeError(
+                "Compute graph has at least one cycle - aborting."
+            )
 
-        if feature.creator() is None:
-            # is input feature
-            pending_features.remove(feature)
-            continue
+        # event pending - must wait for parent events
+        pending_events.add(event)
 
-        # required input features to compute this feature
-        creator_input_features = {
-            input_feature
-            for input_event in feature.creator().inputs().values()
-            for input_feature in input_event.features()
-        }
+        # get parent events
+        parent_events = (
+            {}
+            if event.creator() is None
+            else {
+                parent_event
+                for parent_event in event.creator().inputs().values()
+            }
+        )
+        # recursion
+        for parent_event in parent_events:
+            visit(parent_event, pending_events, done_events, sorted_ops)
 
-        # check if all required input features have already been visited
-        if creator_input_features.issubset(visited_features):
-            # feature can be computed - remove it from pending_features
-            pending_features.remove(feature)
+        # event cleared
+        pending_events.remove(event)
+        done_events.add(event)
 
-            # add operator at the end of operators_to_compute
-            if feature.creator() not in operators_to_compute:
-                operators_to_compute.append(feature.creator())
+        # add operator to schedule
+        if event.creator() is not None:
+            sorted_ops.append(event.creator())
 
-            continue
+    # events that have already been cleared for computation
+    done_events = set()
 
-        # add required input features at the beginning of pending_features
-        pending_features = list(creator_input_features) + pending_features
+    # events pending to be cleared for computation
+    pending_events = set()
 
-    return operators_to_compute
+    # final operator schedule
+    sorted_ops = []
+    while not query.issubset(done_events):
+        event = next(iter(query))
+        visit(event, pending_events, done_events, sorted_ops)
+
+    return sorted_ops

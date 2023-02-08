@@ -40,7 +40,7 @@ class OpI1O1(base.Operator):
                 features=[
                     Feature(
                         "f1",
-                        dtype.FLOAT,
+                        dtype.FLOAT64,
                         sampling=event.sampling(),
                         creator=self,
                     )
@@ -76,7 +76,7 @@ class OpI2O1(base.Operator):
                 features=[
                     Feature(
                         "f1",
-                        dtype.FLOAT,
+                        dtype.FLOAT64,
                         sampling=event_1.sampling(),
                         creator=self,
                     )
@@ -113,7 +113,7 @@ class OpI1O2(base.Operator):
                 features=[
                     Feature(
                         "f1",
-                        dtype.FLOAT,
+                        dtype.FLOAT64,
                         sampling=event.sampling(),
                         creator=self,
                     )
@@ -127,7 +127,7 @@ class OpI1O2(base.Operator):
                 features=[
                     Feature(
                         "f1",
-                        dtype.FLOAT,
+                        dtype.FLOAT64,
                         sampling=event.sampling(),
                         creator=self,
                     )
