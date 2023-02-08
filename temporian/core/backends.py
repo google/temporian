@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from temporian.implementation.numpy import evaluator as numpy_evaluator
 from temporian.implementation.pandas import evaluator as pandas_evaluator
+from temporian.implementation.numpy.data import event as numpy_event
 from temporian.implementation.pandas.data import event as pandas_event
 
 
@@ -32,5 +34,10 @@ BACKENDS = {
         "event": pandas_event.PandasEvent,
         "evaluate_schedule_fn": pandas_evaluator.evaluate_schedule,
         "read_csv_fn": pandas_event.pandas_event_from_csv,
+    },
+    "numpy": {
+        "event": numpy_event.NumpyEvent,
+        "evaluate_schedule_fn": numpy_evaluator.evaluate_schedule,
+        "read_csv_fn": lambda path: raise_(NotImplementedError()),
     },
 }

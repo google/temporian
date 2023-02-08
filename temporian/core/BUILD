@@ -25,6 +25,9 @@ py_library(
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
         "//temporian/core/operators:base",
+        "//temporian/implementation/numpy:evaluator",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/pandas:evaluator",
         "//temporian/implementation/pandas/data:event",
     ],
 )

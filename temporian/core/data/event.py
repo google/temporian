@@ -35,14 +35,10 @@ class Event(object):
 
     def __getitem__(self, feature_names: List[str]) -> "Event":
         # import select operator
-        from temporian.core.operators.select import SelectOperator
+        from temporian.core.operators.select import select
 
-        # instance select operator. Import from base temporian package
-        # to avoid circular import
-        select_operator = SelectOperator(self, feature_names)
-
-        # return Event
-        return select_operator.outputs()["event"]
+        # return select output
+        return select(self, feature_names)
 
     def __repr__(self) -> str:
         features_print = "\n\t\t".join(

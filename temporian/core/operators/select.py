@@ -32,6 +32,14 @@ class SelectOperator(Operator):
             feature_names = [feature_names]
         self.add_attribute("feature_names", feature_names)
 
+        # verify all selected features exist in the input event
+        selected_features_set = set(feature_names)
+        event_features_set = set(
+            [feature.name() for feature in event.features()]
+        )
+        if not set(selected_features_set).issubset(event_features_set):
+            raise KeyError(selected_features_set.difference(event_features_set))
+
         # inputs
         self.add_input("event", event)
 
@@ -43,6 +51,7 @@ class SelectOperator(Operator):
                 # so we can index by name?
                 if feature.name() == feature_name:
                     output_features.append(feature)
+
         output_sampling = event.sampling()
         self.add_output(
             "event",
