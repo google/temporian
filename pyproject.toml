@@ -19,7 +19,6 @@ pandas = "^1.5.2"
 black = "^22.12.0"
 toml = "^0.10.2"
 pylint = "^2.15.10"
-ipykernel = "^6.20.2"
 
 [tool.black]
 line-length = 80
