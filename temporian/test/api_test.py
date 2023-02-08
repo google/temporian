@@ -26,12 +26,12 @@ class TFPTest(absltest.TestCase):
     def disabled_test_evaluation(self):
         a = t.input_event(
             [
-                t.Feature(name="f1", dtype=t.dtype.FLOAT),
-                t.Feature(name="f2", dtype=t.dtype.FLOAT),
+                t.Feature(name="f1", dtype=t.dtype.FLOAT64),
+                t.Feature(name="f2", dtype=t.dtype.FLOAT64),
             ]
         )
 
-        b = t.sma(data=a, window_length=7)
+        b = t.sma(event=a, window_length=7)
 
         input_signal_data = PandasEvent(
             {
@@ -56,7 +56,7 @@ class TFPTest(absltest.TestCase):
                 t.Feature(name="f2"),
             ]
         )
-        b = t.sma(data=a, window_length=7)
+        b = t.sma(event=a, window_length=7)
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_processor.tem")

@@ -16,8 +16,8 @@ Event = event_lib.Event
 def create_input_event():
     return event_lib.input_event(
         features=[
-            Feature("f1", dtype.FLOAT),
-            Feature("f2", dtype.FLOAT),
+            Feature("f1", dtype.FLOAT32),
+            Feature("f2", dtype.FLOAT32),
         ]
     )
 
@@ -40,7 +40,7 @@ class OpI1O1(base.Operator):
                 features=[
                     Feature(
                         "f1",
-                        dtype.FLOAT,
+                        dtype.FLOAT64,
                         sampling=event.sampling(),
                         creator=self,
                     )
@@ -76,7 +76,7 @@ class OpI2O1(base.Operator):
                 features=[
                     Feature(
                         "f1",
-                        dtype.FLOAT,
+                        dtype.FLOAT64,
                         sampling=event_1.sampling(),
                         creator=self,
                     )
@@ -113,7 +113,7 @@ class OpI1O2(base.Operator):
                 features=[
                     Feature(
                         "f1",
-                        dtype.FLOAT,
+                        dtype.FLOAT64,
                         sampling=event.sampling(),
                         creator=self,
                     )
@@ -127,7 +127,7 @@ class OpI1O2(base.Operator):
                 features=[
                     Feature(
                         "f1",
-                        dtype.FLOAT,
+                        dtype.FLOAT64,
                         sampling=event.sampling(),
                         creator=self,
                     )

@@ -14,7 +14,7 @@
 
 """An event is a collection (possibly empty) of timesampled feature values."""
 
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
@@ -25,14 +25,37 @@ class Event(object):
         self,
         features: List[Feature],
         sampling: Sampling,
+        creator: Optional[Any] = None,
+        # TODO: make Operator the creator's type. I don't know how to circumvent
+        # the cyclical import error
         name: Optional[str] = None,
     ):
         self._features = features
         self._sampling = sampling
         self._name = name
+        self._creator = creator
 
-    def __repr__(self):
-        return f"Event<features:{self._features},sampling:{self._sampling},id:{id(self)},name:{self._name}>"
+    def __getitem__(self, feature_names: List[str]) -> "Event":
+        # import select operator
+        from temporian.core.operators.select import select
+
+        # return select output
+        return select(self, feature_names)
+
+    def __repr__(self) -> str:
+        features_print = "\n\t\t".join(
+            [str(feature) for feature in self._features]
+        )
+        return (
+            "Event: { \n"
+            "\tfeatures: {\n"
+            f"\t\t{features_print}\n"
+            "\t},\n"
+            f"\tsampling: {self._sampling},\n"
+            f"\tname: {self._name},\n"
+            f"\tid:{id(self)}\n"
+            "}}"
+        )
 
     def sampling(self):
         return self._sampling
@@ -42,6 +65,9 @@ class Event(object):
 
     def name(self) -> str:
         return self._name
+
+    def creator(self):
+        return self._creator
 
     def set_name(self, name) -> None:
         self._name = name
