@@ -15,13 +15,11 @@
 import pandas as pd
 from absl import logging
 from absl.testing import absltest
-
 from temporian.core import evaluator
 from temporian.core.data.event import Event
 from temporian.core.data.event import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.assign import assign
-from temporian.core.operators.select import select
 from temporian.core.operators.sum import sum
 from temporian.core.operators.simple_moving_average import sma
 from temporian.implementation.pandas.data import event as pandas_event
@@ -92,20 +90,23 @@ class PrototypeTest(absltest.TestCase):
             sampling=sampling,
         )
 
-        # call assign operators
-        assign_output_1 = assign(assignee_event, assigned_event)
-        assign_output_2 = assign(assignee_event, assigned_event)
-        assign_assign_event = assign(assign_output_1, assign_output_2)
+        sum_events = sum(
+            event_1=assignee_event,
+            event_2=assigned_event,
+        )
+
+        # call assign operator
+        output_event = assign(assignee_event, assigned_event)
 
         # call sma operator
         sma_assigned_event = sma(
-            assign_assign_event["costs"],  # in-place select using []
-            window_length="7d",
-            sampling=assigned_event,
+            assigned_event, window_length="7d", sampling=assigned_event
         )
 
         # call assign operator with result of sma
-        output_event = assign(assign_assign_event, sma_assigned_event)
+        output_event = assign(output_event, sma_assigned_event)
+
+        output_event = assign(output_event, sum_events)
 
         # evaluate output
         output_event_pandas = evaluator.evaluate(
@@ -118,6 +119,7 @@ class PrototypeTest(absltest.TestCase):
             },
             backend="pandas",
         )
+
         # validate
         self.assertEqual(
             True,
@@ -125,7 +127,9 @@ class PrototypeTest(absltest.TestCase):
                 output_event_pandas[output_event]
             ),
         )
-        logging.info(output_event_pandas)
+
+        print(output_event_pandas[output_event])
+        # logging.info(output_event_pandas)
 
 
 if __name__ == "__main__":
