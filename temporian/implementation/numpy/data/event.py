@@ -30,7 +30,9 @@ class NumpyFeature:
 
     def schema(self) -> Feature:
         return Feature(
-            name=self.name, dtype=self.dtype, sampling=self.sampling.names
+            name=self.name,
+            dtype=self.core_dtype(),
+            sampling=self.sampling.names,
         )
 
     def __repr__(self) -> str:
