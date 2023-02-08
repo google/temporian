@@ -17,8 +17,7 @@ py_library(
     srcs = ["assign.py"],
     srcs_version = "PY3",
     deps = [
-        ":base",
-        "//temporian/implementation/numpy:utils",
+        # ":base",
         "//temporian/implementation/numpy/data:event",
     ],
 )
@@ -37,7 +36,9 @@ py_library(
     srcs = ["core_mapping.py"],
     srcs_version = "PY3",
     deps = [
+        ":assign",
         ":select",
+        ":sum",
     ],
 )
 
@@ -46,7 +47,8 @@ py_library(
     srcs = ["select.py"],
     srcs_version = "PY3",
     deps = [
-        ":sum",
+        # ":base",
+        "//temporian/implementation/pandas/data:event",
     ],
 )
 
@@ -55,6 +57,8 @@ py_library(
     srcs = ["sum.py"],
     srcs_version = "PY3",
     deps = [
+        # ":base",
+        "//temporian/core/operators:sum",
         "//temporian/implementation/numpy/data:event",
     ],
 )
