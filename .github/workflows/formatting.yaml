@@ -3,7 +3,7 @@ name: formatting
 on: push
 
 jobs:
-  test:
+  formatting:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
