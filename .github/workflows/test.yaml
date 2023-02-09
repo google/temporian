@@ -29,4 +29,4 @@ jobs:
         run: poetry install --no-interaction
 
       - name: Run tests
-        run: bazel test //...:all --test_output=errors
+        run: poetry run bazel test //...:all --test_output=errors
