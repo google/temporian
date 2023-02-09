@@ -64,7 +64,6 @@ class Event(object):
 
 
 def input_event(features: List[Feature], index: List[str] = []) -> Event:
-
     sampling = Sampling(index=index, creator=None)
 
     for feature in features:
