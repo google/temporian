@@ -1,4 +1,3 @@
-
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],
@@ -15,6 +14,15 @@ py_library(
 
 # Individual test data
 # =====================
+
+py_library(
+    name = "broadcast_assigned",
+    srcs = ["broadcast_assigned.py"],
+    srcs_version = "PY3",
+    deps = [
+        # pandas dep,
+    ],
+)
 
 py_library(
     name = "different_index",

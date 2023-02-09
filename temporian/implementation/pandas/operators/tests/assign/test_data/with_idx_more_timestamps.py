@@ -14,7 +14,7 @@
 
 """PandasAssignOperator - with index, more timestamps test.
 
-Tests the correct output when the assigned event has more timestamps than the assignee 
+Tests the correct output when the assigned event has more timestamps than the assignee
 event, for any index value. Both input events are indexed.
 """
 
