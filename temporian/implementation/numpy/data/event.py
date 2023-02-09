@@ -38,6 +38,21 @@ class NumpyFeature:
     def __repr__(self) -> str:
         return f"{self.name}: {self.data.__repr__()}"
 
+    def __eq__(self, __o: object) -> bool:
+        if not isinstance(__o, NumpyFeature):
+            return False
+
+        if self.name != __o.name:
+            return False
+
+        if self.sampling != __o.sampling:
+            return False
+
+        if not np.array_equal(self.data, __o.data, equal_nan=True):
+            return False
+
+        return True
+
     def core_dtype(self) -> Any:
         return DTYPE_MAPPING[self.dtype]
 
@@ -51,6 +66,22 @@ class NumpyEvent:
         self.data = data
         self.sampling = sampling
 
+    @property
+    def feature_count(self) -> int:
+        if len(self.data.keys()) == 0:
+            return 0
+
+        first_index = next(iter(self.data))
+        return len(self.data[first_index])
+
+    @property
+    def feature_names(self) -> List[str]:
+        if len(self.data.keys()) == 0:
+            return 0
+
+        first_index = next(iter(self.data))
+        return [feature.name for feature in self.data[first_index]]
+
     def schema(self) -> Event:
         return Event(
             features=[
@@ -61,6 +92,27 @@ class NumpyEvent:
 
     def __repr__(self) -> str:
         return self.data.__repr__()
+
+    def __eq__(self, __o: object) -> bool:
+        if not isinstance(__o, NumpyEvent):
+            return False
+
+        # Check equal sampling and index values
+        if self.sampling != __o.sampling:
+            return False
+
+        # check same features
+        if self.feature_names != __o.feature_names:
+            return False
+
+        # Check each feature is equal in each index
+        for index in self.data.keys():
+            for feature in self.data[index]:
+                if feature not in __o.data[index]:
+                    print(f"Feature {feature} not in {__o.data[index]}")
+                    return False
+
+        return True
 
 
 DTYPE_MAPPING = {
