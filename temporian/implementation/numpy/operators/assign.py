@@ -72,15 +72,15 @@ class NumpyAssignOperator:
                     sampling_2=assigned_event.sampling,
                     index=index,
                 )
-                for i, _ in enumerate(assigned_event.data[index]):
-                    event_2_feature = assigned_event.data[index][i]
+                # loop over assigned features
+                for assigned_feature in assigned_event.data[index]:
                     # filter indexes of timestamps that are equal to sampling_1 & sampling_2
-                    event_2_feature.data = np.take(
-                        event_2_feature.data, indices=equal_sampling_indexes
+                    assigned_feature.data = np.take(
+                        assigned_feature.data, indices=equal_sampling_indexes
                     )
                     # change sampling to same as assignee
-                    event_2_feature.sampling = assignee_event.sampling
-                    output.data[index].append(event_2_feature)
+                    assigned_feature.sampling = assignee_event.sampling
+                    output.data[index].append(assigned_feature)
             # If index is not in assigned, append the features of assigned with None values
             else:
                 for feature_name in assigned_event.feature_names:
