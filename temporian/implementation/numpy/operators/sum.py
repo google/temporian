@@ -23,11 +23,11 @@ class NumpySumOperator:
             Sum of the two Events according to resolution.
 
         Raises:
-            IndexError: If index of both events is not equal.
+            ValueError: If sampling of both events is not equal.
             NotImplementedError: If resolution is PER_FEATURE_NAME.
         """
-        if event_1.data.keys() != event_2.data.keys():
-            raise IndexError("Index of both events must be equal.")
+        if event_1.sampling != event_2.sampling:
+            raise ValueError("Sampling of both events must be equal.")
 
         output = NumpyEvent(data={}, sampling=event_1.sampling)
 
