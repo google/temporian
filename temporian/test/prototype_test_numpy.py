@@ -106,7 +106,6 @@ class PrototypeTest(absltest.TestCase):
                         sampling=sampling,
                         data=np.array([-7, -8]),
                     ),
-
                 ],
                 ("B", 3): [
                     NumpyFeature(
@@ -122,7 +121,7 @@ class PrototypeTest(absltest.TestCase):
         self.expected_output_event = NumpyEvent(
             data={
                 ("A", 1): [
-                     NumpyFeature(
+                    NumpyFeature(
                         name="sales",
                         sampling=sampling,
                         data=np.array([14, 15, 16]),
@@ -173,7 +172,6 @@ class PrototypeTest(absltest.TestCase):
             sampling=sampling,
         )
 
-
     def test_prototoype(self) -> None:
         sampling = Sampling(["store_id", "product_id"])
         event = Event(
@@ -188,7 +186,7 @@ class PrototypeTest(absltest.TestCase):
         )
 
         sum_event = sum(event, event_2)
-        output_event = assign(event,sum_event)
+        output_event = assign(event, sum_event)
 
         output_event_numpy = evaluator.evaluate(
             output_event,
@@ -201,18 +199,10 @@ class PrototypeTest(absltest.TestCase):
         )
 
         # validate
-        # self.assertEqual(
-        #     True,
-        #     self.expected_output_event.equals(
-        #         output_event_numpy[output_event]
-        #     ),
-        # )
-
-        materialized_output = output_event_numpy[output_event]
-        logging.info(f"\n{materialized_output=}")
-        logging.info("-" * 200)
-        logging.info(f"\n{self.expected_output_event=}")
-        logging.info("-" * 200)
+        self.assertEqual(
+            True,
+            self.expected_output_event == output_event_numpy[output_event],
+        )
 
 
 if __name__ == "__main__":
