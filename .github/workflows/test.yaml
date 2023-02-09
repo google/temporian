@@ -1,4 +1,4 @@
-name: Run bazel tests
+name: tests
 
 on: push
 
