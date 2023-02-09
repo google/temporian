@@ -46,6 +46,15 @@ py_library(
     srcs = ["select.py"],
     srcs_version = "PY3",
     deps = [
+        ":sum",
+    ],
+)
+
+py_library(
+    name = "sum",
+    srcs = ["sum.py"],
+    srcs_version = "PY3",
+    deps = [
         "//temporian/implementation/numpy/data:event",
     ],
 )
