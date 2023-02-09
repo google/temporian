@@ -16,11 +16,11 @@ class NumpySampling:
         if self.names != other.names:
             return False
 
+        if self.data.keys() != other.data.keys():
+            return False
+
+         # Check if both sampling have same timestamps per index
         for index in self.data:
-            # Check if both sampling have same indexes
-            if index not in other.data:
-                return False
-            # Check if both sampling have same timestamps
             if not np.array_equal(self.data[index], other.data[index]):
                 return False
 
