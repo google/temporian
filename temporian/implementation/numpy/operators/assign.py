@@ -13,10 +13,28 @@
 # limitations under the License.
 
 """Implementation for the Assign operator."""
-from typing import Dict
+from typing import Dict, List
 
 import numpy as np
 from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event import NumpyFeature
+
+
+def _get_equal_sampling_indexes(
+    sampling_1: "NumpySampling", sampling_2: "NumpySampling", index: tuple
+) -> np.ndarray:
+    """Get indexes of timestamps that are equal to sampling_1 & sampling_2
+      in a specific sampling index.
+
+    Args:
+        sampling_1 (NumpySampling): sampling of assignee event.
+        sampling_2 (NumpySampling): sampling of assigned event.
+        index (tuple): index to check.
+
+    Returns:
+        np.ndarray: indexes of timestamps that are equal to sampling_1 & sampling_2.
+    """
+    return np.where(sampling_1.data[index] == sampling_2.data[index])[0]
 
 
 class NumpyAssignOperator:
@@ -37,19 +55,45 @@ class NumpyAssignOperator:
         Returns:
             NumpyEvent: a new event with the features assigned.
         """
-        output = NumpyEvent(data=assignee_event.data.copy(), sampling=assignee_event.sampling)
+        # check both keys are the same
+        if assignee_event.sampling.names != assigned_event.sampling.names:
+            raise ValueError("Assign sequences must have the same index names.")
+
+        output = NumpyEvent(
+            data=assignee_event.data.copy(), sampling=assignee_event.sampling
+        )
 
         for index in assignee_event.data.keys():
+            # If index is in assigned append the features to the output event
             if index in assigned_event.data.keys():
-                different_sampling = np.where(np.array(assignee_event.sampling.data[index]) != np.array(assigned_event.sampling.data[index]))[0]
+                # get indexes of timestamps that are equal to sampling_1 & sampling_2
+                equal_sampling_indexes = _get_equal_sampling_indexes(
+                    sampling_1=assignee_event.sampling,
+                    sampling_2=assigned_event.sampling,
+                    index=index,
+                )
                 for i, _ in enumerate(assigned_event.data[index]):
                     event_2_feature = assigned_event.data[index][i]
-                    # get values with same timestamp as event 1
-                    event_2_feature = (event_2_feature[0], np.delete(event_2_feature[1], different_sampling))
+                    # filter indexes of timestamps that are equal to sampling_1 & sampling_2
+                    event_2_feature.data = np.take(
+                        event_2_feature.data, indices=equal_sampling_indexes
+                    )
+                    # change sampling to same as assignee
+                    event_2_feature.sampling = assignee_event.sampling
                     output.data[index].append(event_2_feature)
+            # If index is not in assigned, append the features of assigned with None values
             else:
-                for i, _ in enumerate(event_1[index]):
-                    output.data[index][i] += (None, [None for _ in range(len(sampling_1[index]))])
+                for feature_name in assigned_event.feature_names:
+                    output.data[index].append(
+                        NumpyFeature(
+                            name=feature_name,
+                            sampling=assignee_event.sampling,
+                            # create a list of None values with the same length as assignee sampling
+                            data=np.full(
+                                len(assignee_event.sampling.data[index]), np.nan
+                            ),
+                        )
+                    )
 
         # make assignment
         return {"event": output}
