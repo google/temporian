@@ -14,12 +14,44 @@
 
 """Processor module."""
 
-from typing import List, Set, Dict
+from typing import List, Set, Dict, Union, Optional
+
+from collections import defaultdict
 
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators import base
+
+MultipleEventArg = Union[Dict[str, Event], List[Event], Event]
+
+
+def normalize_multiple_event_arg(src: MultipleEventArg) -> Dict[str, Event]:
+    """Normalize an event / collection of events into a dictionary of events."""
+
+    save_src = src
+
+    if isinstance(src, Event):
+        src = [src]
+
+    if isinstance(src, list):
+        new_src = {}
+        for event in src:
+            if event.name() is None:
+                raise ValueError(
+                    "Input / output event or list events need to be named "
+                    'with "set_name(...)". Alternatively, provide a '
+                    "dictionary of events."
+                )
+            new_src[event.name()] = event
+        src = new_src
+
+    if not isinstance(src, dict):
+        raise ValueError(
+            f'Unexpected event(s) "{save_src}". Expecting dict of events, '
+            "list of events, or a single event."
+        )
+    return src
 
 
 class Preprocessor(object):
@@ -107,99 +139,114 @@ class Preprocessor(object):
 
 
 def infer_processor(
-    inputs: Dict[str, Event], outputs: Dict[str, Event]
+    inputs: Optional[Dict[str, Event]],
+    outputs: Dict[str, Event],
 ) -> Preprocessor:
-    """Create a self contained processor.
-
-    The processor contains all the features, samplings, events and operators
-    in between "inputs" and "outputs". The processor contains all the outputs
-    of all necessary operators (even it only part of those outputs are used).
+    """Extracts all the objects between the outputs and inputs events.
 
     Fails if some inputs are missing.
 
     Args:
-      inputs: Dictionary of available inputs.
-      outputs: Dictionary of requested outputs.
+        inputs: Input events. If None, the inputs is infered. In this
+            case, input event have to be named.
+        outputs: Output events.
 
     Returns:
       A preprocessor.
     """
 
+    # The following algorithm lists all the events between the output and
+    # input events. Informally, the algorithm works as follow:
+    #
+    # pending_event <= use outputs
+    # done_event <= empty
+    #
+    # While pending event not empty:
+    #   Extract an event from pending_event
+    #   if event is a provided input event
+    #       continue
+    #   if event has not creator
+    #       record this event for future error / input inference
+    #       continue
+    #   Adds all the input events of event's creator op to the pending list
+
     p = Preprocessor()
-    p.set_inputs(inputs)
     p.set_outputs(outputs)
 
-    # The following algorithm lists all the intermediate and missing input
-    # features of a computation graph.
-    #
-    # The algorithm works as follows:
-    #
-    # pending_features <= List of outputs
-    # done_features <= empty
-    #
-    # While pending feature not empty:
-    #   Extract a feature from pending_features
-    #   if feature is part of the provided input features => Continue
-    #   if feature has a creator operator
-    #     Adds all the features, of all the inputs of this operator to
-    #     pending_features. Skip the features already in pending_features or
-    #     done_features.
-    #   else:
-    #     add feature to the list of missing input features (will raise an error)
+    # The next event to process. Events are processed from the outputs to
+    # the inputs.
+    pending_events: Set[Event] = set()
+    pending_events.update(outputs.values())
 
-    pending_features: Set[Feature] = set()
-    for output_event in outputs.values():
-        pending_features.update(output_event.features())
-        p.add_sampling(output_event.sampling())
+    # Index the input event for fast retrieval
+    input_events: Set[Event] = {}
 
-    input_features: Set[Feature] = set()
-    for input_event in inputs.values():
-        input_features.update(input_event.features())
-        p.add_sampling(input_event.sampling())
+    if inputs is not None:
+        p.set_inputs(inputs)
+        input_events = set(inputs.values())
 
-    done_features: Set[Feature] = set()
+    # Features already processed.
+    done_events: Set[Event] = set()
 
-    # Text description of the missing features.
-    missing_features: Set[str] = set()
+    # List of the missing events. They will be used to infer the input features
+    # (if infer_inputs=True), or to raise an error (if infer_inputs=False).
+    missing_events: Set[Event] = set()
 
-    while pending_features:
-        # Select a feature from pending_features.
-        feature = next(iter(pending_features))
-        pending_features.remove(feature)
+    while pending_events:
+        # Select an event to process.
+        event = next(iter(pending_events))
+        pending_events.remove(event)
+        assert event not in done_events
 
-        p.add_feature(feature)
+        p.add_event(event)
 
-        assert feature not in done_features
-
-        if feature in input_features:
+        if event in input_events:
             # The feature is provided by the user.
             continue
 
-        if feature.creator() is None:
-            # The feature is missing.
-            missing_features.add(repr(feature))
+        if event.creator() is None:
+            # The event does not have a source.
+            missing_events.add(event)
+            continue
 
-        else:
-            p.add_operator(feature.creator())
-            p.add_sampling(feature.sampling())
+        # Record the operator.
+        p.add_operator(event.creator())
 
-            # Add the parent features.
-            for input_event in feature.creator().inputs().values():
-                p.add_event(input_event)
-                for input_feature in input_event.features():
-                    if input_feature in done_features:
-                        continue
-                    if input_feature in pending_features:
-                        continue
-                    pending_features.add(input_feature)
+        # Add the parent events to the pending list.
+        for input_event in event.creator().inputs().values():
 
-            # Make sure that all operator outputs are listed.
-            for output_event in feature.creator().outputs().values():
-                p.add_event(output_event)
-                for output_feature in output_event.features():
-                    p.add_feature(output_feature)
+            if input_event in done_events:
+                # Already processed.
+                continue
 
-    if missing_features:
-        raise ValueError(f"Missing input features: {missing_features}")
+            pending_events.add(input_event)
+
+        # Record the operator outputs. While the user did not request
+        # them, they will be created (and so, we need to track them).
+        for output_event in event.creator().outputs().values():
+            p.add_event(output_event)
+
+    if inputs is None:
+        # Infer the inputs
+        infered_inputs: Dict[str, Event] = {}
+        for event in missing_events:
+            if event.name() is None:
+                raise ValueError(f"Cannot infer input on unnamed event {event}")
+            infered_inputs[event.name()] = event
+        p.set_inputs(infered_inputs)
+
+    else:
+        # Fail if not all events are sourced.
+        if missing_events:
+            raise ValueError(
+                "One of multiple events are required but "
+                f"not provided as input:\n {missing_events}"
+            )
+
+    # Record all the features and samplings.
+    for e in p.events():
+        p.add_sampling(e.sampling())
+        for f in e.features():
+            p.add_feature(f)
 
     return p

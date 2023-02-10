@@ -191,6 +191,7 @@ class PrototypeTest(absltest.TestCase):
         event = Event(
             [Feature("sales", int), Feature("costs", int)],
             sampling=sampling,
+            creator=None,
         )
 
         event_2 = Event(
