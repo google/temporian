@@ -4,6 +4,9 @@
 signals before their use as input features with off-the-shelf tabular machine
 learning libraries (e.g., TensorFlow Decision Forests).
 
+![tests](https://github.com/google/temporian/actions/workflows/test.yaml/badge.svg)
+![formatting](https://github.com/google/temporian/actions/workflows/formatting.yaml/badge.svg)
+
 ## Requirements
 
 Dependencies are managed through [Poetry](https://python-poetry.org/). To

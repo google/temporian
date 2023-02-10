@@ -16,8 +16,6 @@
 
 from typing import List, Set, Dict, Union, Optional
 
-from collections import defaultdict
-
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
@@ -214,7 +212,6 @@ def infer_processor(
 
         # Add the parent events to the pending list.
         for input_event in event.creator().inputs().values():
-
             if input_event in done_events:
                 # Already processed.
                 continue

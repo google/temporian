@@ -9,7 +9,6 @@ class NumpySampling:
         self.data = data
 
     def __eq__(self, other):
-
         if not isinstance(other, NumpySampling):
             return False
 
@@ -19,7 +18,7 @@ class NumpySampling:
         if self.data.keys() != other.data.keys():
             return False
 
-         # Check if both sampling have same timestamps per index
+        # Check if both sampling have same timestamps per index
         for index in self.data:
             if not np.array_equal(self.data[index], other.data[index]):
                 return False
