@@ -43,10 +43,17 @@ class NumpyAssignOperator:
     ) -> Dict[str, NumpyEvent]:
         """Assign features to an event.
 
-        Input event and features must have same index. Features cannot have more
+        Assignee and assigned must have same index names. Features cannot have more
         than one row for a single index + timestamp occurence. Output event will
-        have same exact index and timestamps as input one. Assignment can be
-        understood as a left join on the index and timestamp columns.
+        have same exact index and timestamps (sampling) as the assignee event.
+
+        Assignment is done by matching the timestamps and index of the assignee and assigned.
+        The assigned features will be appended to the assignee features in the matching
+        indexes. If assignee event has more indexes values than assigned, the assigned features
+        will be broadcasted to the assignee indexes with np.nan values according
+        to the assignee sampling. If the assigned event has more timestamps in a matching
+        index, then those values will not be included in the output event.
+
 
         Args:
             assignee_event (NumpyEvent): event to assign the feature to.
@@ -54,6 +61,10 @@ class NumpyAssignOperator:
 
         Returns:
             NumpyEvent: a new event with the features assigned.
+
+        Raises:
+            ValueError: if assignee and assigned events have different indexes names.
+
         """
         # check both keys are the same
         if assignee_event.sampling.names != assigned_event.sampling.names:
