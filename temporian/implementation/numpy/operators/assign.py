@@ -66,22 +66,23 @@ def _convert_feature_to_new_sampling(
         data=np.full(len(common_timestamps), np.nan),
     )
 
-    # loop over common timestamps and if True, then add the feature value in
-    # the common timestamp. O(n*m) (n: len(common_timestamps), m: len(feature.data)
+    # Loop over common timestamps and if True, then add the feature value in
+    # the common timestamp.
     # Assuming that the feature data is sorted by timestamp, we can use binary search
     # to find the index of the common timestamp in the feature data, instead of
-    # numpy array search. This would make the algorithm O(n*log(m)). And we
-    # can make it more efficiently by trimming the array to the common timestamps
-    # when used because the next common timestamp will be after the previous one.
+    # numpy where search. This would make the algorithm O(n * (1 + log(m)))
+    # (n: len(common_timestamps), m: len(feature.data). Adding extra n for
+    # np.full at the beginning.
 
     for i, is_common in enumerate(common_timestamps):
         if is_common:
             # Get the sampling index of the common timestamp
             common_timestamp = new_sampling.data[index][i]
             # Get the index of the common timestamp in the feature
-            common_index = np.where(
-                feature.sampling.data[index] == common_timestamp
-            )[0]
+            # uses binary search because feature.data is sorted by timestamp
+            common_index = np.searchsorted(
+                feature.sampling.data[index], common_timestamp
+            )
             # Assign the feature value to the new feature
             new_feature.data[i] = feature.data[common_index]
 
