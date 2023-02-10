@@ -28,7 +28,7 @@ class SimpleMovingAverage(Operator):
 
     def __init__(
         self,
-        data: Event,
+        event: Event,
         window_length: str,
         sampling: Optional[Event] = None,
     ):
@@ -39,9 +39,9 @@ class SimpleMovingAverage(Operator):
         if sampling is not None:
             self.add_input("sampling", sampling)
         else:
-            sampling = data.sampling()
+            sampling = event.sampling()
 
-        self.add_input("data", data)
+        self.add_input("event", event)
 
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
@@ -50,14 +50,15 @@ class SimpleMovingAverage(Operator):
                 sampling=sampling,
                 creator=self,
             )
-            for f in data.features()
+            for f in event.features()
         ]
 
         self.add_output(
-            "output",
+            "event",
             Event(
                 features=output_features,
                 sampling=sampling,
+                creator=self,
             ),
         )
 
@@ -75,10 +76,10 @@ class SimpleMovingAverage(Operator):
                 ),
             ],
             inputs=[
-                pb.OperatorDef.Input(key="data"),
+                pb.OperatorDef.Input(key="event"),
                 pb.OperatorDef.Input(key="sampling", is_optional=True),
             ],
-            outputs=[pb.OperatorDef.Output(key="output")],
+            outputs=[pb.OperatorDef.Output(key="event")],
         )
 
 
@@ -86,12 +87,12 @@ operator_lib.register_operator(SimpleMovingAverage)
 
 
 def sma(
-    data: Event,
+    event: Event,
     window_length: str,
     sampling: Optional[Event] = None,
 ) -> Event:
     return SimpleMovingAverage(
-        data=data,
+        event=event,
         window_length=window_length,
         sampling=sampling,
-    ).outputs()["output"]
+    ).outputs()["event"]

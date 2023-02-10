@@ -24,6 +24,17 @@ py_library(
 )
 
 py_library(
+    name = "sum",
+    srcs = ["sum.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators:sum",
+        "//temporian/implementation/pandas/data:event",
+    ],
+)
+
+py_library(
     name = "base",
     srcs = ["base.py"],
     srcs_version = "PY3",
@@ -38,6 +49,18 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":assign",
+        ":select",
+        ":sum",
         "//temporian/implementation/pandas/operators/window:simple_moving_average",
+    ],
+)
+
+py_library(
+    name = "select",
+    srcs = ["select.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/implementation/pandas/data:event",
     ],
 )

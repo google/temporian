@@ -30,6 +30,19 @@ py_library(
 )
 
 py_library(
+    name = "sum",
+    srcs = ["sum.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
     name = "base",
     srcs = ["base.py"],
     srcs_version = "PY3",
@@ -42,6 +55,19 @@ py_library(
 py_library(
     name = "simple_moving_average",
     srcs = ["simple_moving_average.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "select",
+    srcs = ["select.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
