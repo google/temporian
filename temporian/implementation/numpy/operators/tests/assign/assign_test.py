@@ -27,7 +27,7 @@ from temporian.implementation.numpy.operators.tests.assign.test_data import (
 )
 
 from temporian.implementation.numpy.operators.tests.assign.test_data import (
-    broadcast_assigned,
+    less_assigned_indexes,
 )
 
 from temporian.implementation.numpy.operators.tests.assign.test_data import (
@@ -68,15 +68,15 @@ class AssignOperatorTest(absltest.TestCase):
             with_idx_same_timestamps.OUTPUT == operator_output["event"],
         )
 
-    def test_broadcast_assigned(self) -> None:
+    def test_less_assigned_indexes(self) -> None:
         operator_output = self.operator(
-            broadcast_assigned.INPUT_1,
-            broadcast_assigned.INPUT_2,
+            less_assigned_indexes.INPUT_1,
+            less_assigned_indexes.INPUT_2,
         )
 
         self.assertEqual(
             True,
-            broadcast_assigned.OUTPUT == operator_output["event"],
+            less_assigned_indexes.OUTPUT == operator_output["event"],
         )
 
     def test_complete_timestamps(self) -> None:

@@ -16,8 +16,8 @@ py_library(
 # =====================
 
 py_library(
-    name = "broadcast_assigned",
-    srcs = ["broadcast_assigned.py"],
+    name = "less_assigned_indexes",
+    srcs = ["less_assigned_indexes.py"],
     srcs_version = "PY3",
     deps = [
         # pandas dep,

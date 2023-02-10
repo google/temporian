@@ -12,7 +12,7 @@ py_test(
     deps = [
         # absl/testing:absltest dep,
         "//temporian/implementation/numpy/operators:assign",
-        "//temporian/implementation/numpy/operators/tests/assign/test_data:broadcast_assigned",
+        "//temporian/implementation/numpy/operators/tests/assign/test_data:less_assigned_indexes",
         "//temporian/implementation/numpy/operators/tests/assign/test_data:complete_timestamps",
         "//temporian/implementation/numpy/operators/tests/assign/test_data:different_index",
         "//temporian/implementation/numpy/operators/tests/assign/test_data:repeated_timestamps",

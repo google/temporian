@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""NumpyAssignOperator - broadcast assigned
+"""NumpyAssignOperator - less assigned indexes
 
-Tests that assigned features are broadcasted with None for index that dont exist.
+Tests that if assigned has less indexes than assignee, the features will be filled
+with NaNs.
 
 """
 import numpy as np

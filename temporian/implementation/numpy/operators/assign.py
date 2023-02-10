@@ -25,7 +25,7 @@ def _get_common_timestamps(
     sampling_1: NumpySampling, sampling_2: NumpySampling, index: tuple
 ) -> np.ndarray:
     """It returns a np.ndarray with same shape as sampling_1.data[index] with True
-    values where sampling_1.data[index] == sampling_2.data[index], and False otherwise.
+    values where sampling_1 and sampling_2 have the same timestamp.
 
     Args:
         sampling_1 (NumpySampling): sampling of assignee event.
@@ -34,6 +34,28 @@ def _get_common_timestamps(
 
     Returns:
         np.ndarray: boolean np.darray with same shape as sampling_1.data[index]
+
+    Examples:
+        >>> sampling_1 = NumpySampling(
+        ...     names=["user_id"],
+        ...     data={
+        ...         (151591562,): np.array(
+        ...             ["2022-02-05", "2022-02-06", "2022-02-07"],
+        ...             dtype="datetime64",
+        ...         ),
+        ...         }
+        ...     )
+        >>> sampling_2 = NumpySampling(
+        ...     names=["user_id"],
+        ...     data={
+        ...         (151591562,): np.array(
+        ...             ["2022-02-06", "2022-02-07", "2022-02-08"],
+        ...             dtype="datetime64",
+        ...         ),
+        ...         }
+        ...     )
+        >>> _get_common_timestamps(sampling_1, sampling_2, (151591562,))
+        array([False, True, True])
 
     """
     return np.isin(sampling_1.data[index], sampling_2.data[index])
@@ -48,7 +70,6 @@ def _convert_feature_to_new_sampling(
     """Convert feature to new sampling. It requires a boolean list with same length
     as the new sampling, where True values indicate that the feature has a value
     for that timestamp. And it needs the new sampling to assign to the new Feature object.
-
 
     Args:
         feature (NumpyFeature): feature to convert.
@@ -84,6 +105,9 @@ def _convert_feature_to_new_sampling(
             common_timestamp = new_sampling.data[index][i]
             # Get the index of the common timestamp in the feature
             # uses binary search because feature.data is sorted by timestamp
+            # last common index is used to speed up the search by trimming the
+            # feature data to the last found array index because as it sorted
+            # by timestamps, the next one will be after that one.
             common_index = np.searchsorted(
                 feature.sampling.data[index][last_common_index:],
                 common_timestamp,
@@ -101,21 +125,19 @@ class NumpyAssignOperator:
     ) -> Dict[str, NumpyEvent]:
         """Assign features to an event.
 
-        Assignee and assigned must have same index names. Features cannot have more
+        Assignee and assigned must have same index names. Assigned cannot have more
         than one row for a single index + timestamp occurence. Output event will
         have same exact index and timestamps (sampling) as the assignee event.
 
         Assignment is done by matching the timestamps and index of the assignee and assigned.
         The assigned features will be appended to the assignee features in the matching
-        indexes. If assignee event has more indexes values than assigned, the assigned features
-        will be broadcasted to the assignee indexes with np.nan values according
-        to the assignee sampling. If the assigned event has more timestamps in a matching
-        index, then those values will not be included in the output event.
-
+        indexes. Index values in the assigned event missing in the assignee event will
+        be filled with NaNs.  Index values present in the assigned event missing in
+        the assignee event will be ignored.
 
         Args:
-            assignee_event (NumpyEvent): event to assign the feature to.
-            assigned_event (NumpyEvent): features to assign to the event.
+            assignee_event (NumpyEvent): event where features will be assigned to.
+            assigned_event (NumpyEvent): event with features to assign.
 
         Returns:
             NumpyEvent: a new event with the features assigned.

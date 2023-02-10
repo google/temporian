@@ -172,7 +172,7 @@ class PrototypeTest(absltest.TestCase):
             sampling=sampling,
         )
 
-    def test_prototoype(self) -> None:
+    def test_prototype(self) -> None:
         sampling = Sampling(["store_id", "product_id"])
         event = Event(
             [Feature("sales", int), Feature("costs", int)],
