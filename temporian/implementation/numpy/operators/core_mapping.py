@@ -6,5 +6,5 @@ from temporian.implementation.numpy.operators.assign import NumpyAssignOperator
 OPERATOR_IMPLEMENTATIONS = {
     "SELECT": NumpySelectOperator,
     "SUM": NumpySumOperator,
-    "ASSIGN": NumpyAssignOperator
+    "ASSIGN": NumpyAssignOperator,
 }
