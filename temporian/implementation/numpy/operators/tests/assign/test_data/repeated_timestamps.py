@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""PandasAssignOperator - repeated timestamps test.
+"""NumpyAssignOperator - repeated timestamps test.
 
 Tests that there cannot exist repeated timestamps on the assigned event for any
 index value. Repeated timestamps are allowed on the assignee event.

@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""NumpySumOperator - correct sum
+"""NumpySumOperator - sum with nan
 
-Tests that sum two values with np.nan result in np.nan
-
+Tests that the sum of two values with np.nan result is np.nan
+and the sume of np.nan and value also result in np.nan
 """
 import numpy as np
 
