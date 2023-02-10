@@ -8,6 +8,9 @@ class NumpySampling:
         self.names = names
         self.data = data
 
+    def __repr__(self) -> str:
+        return f"{self.names}: {self.data.__repr__()}"
+
     def __eq__(self, other):
         if not isinstance(other, NumpySampling):
             return False
