@@ -44,6 +44,7 @@ sampling_2 = NumpySampling(
     data={
         (666964,): np.array(
             [  # missing timestamps from sampling_1 (2022-02-01, 2022-02-03, 2022-02-04)
+                "2022-01-31",  # not in sampling_1
                 "2022-02-02",  # its on sampling_1 but in different index
                 "2022-02-05",  # its on sampling_1 but in different index
                 "2022-02-07",  # not in sampling_1
@@ -72,7 +73,7 @@ INPUT_2 = NumpyEvent(
             NumpyFeature(
                 name="costs",
                 sampling=sampling_2,
-                data=np.array([1, 2, 3]),
+                data=np.array([1, 2, 3, 4]),
             ),
         ],
     },
@@ -91,7 +92,7 @@ OUTPUT = NumpyEvent(
                 name="costs",
                 sampling=sampling_1,
                 data=np.array(
-                    [np.nan, 1, np.nan, np.nan, 2]
+                    [np.nan, 2, np.nan, np.nan, 3]
                 ),  # np.nan on missing timestamps
                 # 1 and 2 value on different index
                 # missing 3 value as its timestamp is not in sampling_1

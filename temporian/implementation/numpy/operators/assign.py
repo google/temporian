@@ -43,6 +43,7 @@ def _convert_feature_to_new_sampling(
     feature: NumpyFeature,
     common_timestamps: List[bool],
     new_sampling: NumpySampling,
+    index: tuple,
 ):
     """Convert feature to new sampling. It requires a boolean list with same length
     as the new sampling, where True values indicate that the feature has a value
@@ -53,6 +54,7 @@ def _convert_feature_to_new_sampling(
         feature (NumpyFeature): feature to convert.
         common_timestamps (List[bool]): list of booleans indicating if sampling_2 has same timestamp in sampling_1
         new_sampling (NumpySampling): new sampling.
+        index (tuple): index to check.
 
     Returns:
         NumpyFeature: feature with new sampling.
@@ -64,14 +66,24 @@ def _convert_feature_to_new_sampling(
         data=np.full(len(common_timestamps), np.nan),
     )
 
-    # loop over common timestamps and if True, then add the common timestamp
-    # to the new feature. As timestamps are in order, we can use the last_i
-    # to know with which index of the feature we should take the data from.
-    last_i = 0
+    # loop over common timestamps and if True, then add the feature value in
+    # the common timestamp. O(n*m) (n: len(common_timestamps), m: len(feature.data)
+    # Assuming that the feature data is sorted by timestamp, we can use binary search
+    # to find the index of the common timestamp in the feature data, instead of
+    # numpy array search. This would make the algorithm O(n*log(m)). And we
+    # can make it more efficiently by trimming the array to the common timestamps
+    # when used because the next common timestamp will be after the previous one.
+
     for i, is_common in enumerate(common_timestamps):
         if is_common:
-            new_feature.data[i] = feature.data[last_i]
-            last_i += 1
+            # Get the sampling index of the common timestamp
+            common_timestamp = new_sampling.data[index][i]
+            # Get the index of the common timestamp in the feature
+            common_index = np.where(
+                feature.sampling.data[index] == common_timestamp
+            )[0]
+            # Assign the feature value to the new feature
+            new_feature.data[i] = feature.data[common_index]
 
     return new_feature
 
@@ -130,6 +142,7 @@ class NumpyAssignOperator:
                             feature=assigned_feature,
                             common_timestamps=common_timestamps,
                             new_sampling=assignee_event.sampling,
+                            index=index,
                         )
                     )
                     output.data[index].append(assigned_feature_filtered)
