@@ -17,13 +17,14 @@
 from typing import Any, Optional
 
 from temporian.core.data import sampling as sampling_lib
+from temporian.core.data import dtype as dtype_lib
 
 
 class Feature(object):
     def __init__(
         self,
         name: str,
-        dtype: Any,
+        dtype: Any = dtype_lib.FLOAT32,
         sampling: Optional[sampling_lib.Sampling] = None,
         creator: Optional[Any] = None,
     ):

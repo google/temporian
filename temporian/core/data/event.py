@@ -25,6 +25,7 @@ class Event(object):
         self,
         features: List[Feature],
         sampling: Sampling,
+        name: Optional[str] = None,
         # TODO: make Operator the creator's type. I don't know how to circumvent
         # the cyclical import error
         creator: Optional[Any] = None,
@@ -32,6 +33,7 @@ class Event(object):
         self._features = features
         self._sampling = sampling
         self._creator = creator
+        self._name = name
 
     def __getitem__(self, feature_names: List[str]) -> "Event":
         # import select operator
@@ -50,7 +52,10 @@ class Event(object):
             f"\t\t{features_print}\n"
             "\t},\n"
             f"\tsampling: {self._sampling},\n"
-            f"\tid:{id(self)}\n}}"
+            f"\tname: {self._name},\n"
+            f"\tcreator: {self._creator},\n"
+            f"\tid:{id(self)}\n"
+            "\t}"
         )
 
     def sampling(self):
@@ -59,11 +64,22 @@ class Event(object):
     def features(self):
         return self._features
 
+    def name(self) -> str:
+        return self._name
+
     def creator(self):
         return self._creator
 
+    def set_name(self, name) -> None:
+        self._name = name
 
-def input_event(features: List[Feature], index: List[str] = []) -> Event:
+    def set_creator(self, creator):
+        self._creator = creator
+
+
+def input_event(
+    features: List[Feature], index: List[str] = [], name: Optional[str] = None
+) -> Event:
     sampling = Sampling(index=index, creator=None)
 
     for feature in features:
@@ -76,4 +92,6 @@ def input_event(features: List[Feature], index: List[str] = []) -> Event:
     return Event(
         features=features,
         sampling=sampling,
+        name=name,
+        creator=None,
     )
