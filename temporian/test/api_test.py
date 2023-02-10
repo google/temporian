@@ -132,11 +132,7 @@ class TFPTest(absltest.TestCase):
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_processor.tem")
-            t.save(
-                inputs=None,
-                outputs=b,
-                path=path
-            )
+            t.save(inputs=None, outputs=b, path=path)
 
             i, o = t.load(path=path, squeeze=True)
 
