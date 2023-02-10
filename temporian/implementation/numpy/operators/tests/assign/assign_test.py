@@ -30,6 +30,10 @@ from temporian.implementation.numpy.operators.tests.assign.test_data import (
     broadcast_assigned,
 )
 
+from temporian.implementation.numpy.operators.tests.assign.test_data import (
+    complete_timestamps,
+)
+
 
 class AssignOperatorTest(absltest.TestCase):
     def setUp(self) -> None:
@@ -70,12 +74,20 @@ class AssignOperatorTest(absltest.TestCase):
             broadcast_assigned.INPUT_2,
         )
 
-        print(f"\nexpected result: {broadcast_assigned.OUTPUT}")
-        print(f"\nactual result: {operator_output['event']}")
-
         self.assertEqual(
             True,
             broadcast_assigned.OUTPUT == operator_output["event"],
+        )
+
+    def test_complete_timestamps(self) -> None:
+        operator_output = self.operator(
+            complete_timestamps.INPUT_1,
+            complete_timestamps.INPUT_2,
+        )
+
+        self.assertEqual(
+            True,
+            complete_timestamps.OUTPUT == operator_output["event"],
         )
 
 

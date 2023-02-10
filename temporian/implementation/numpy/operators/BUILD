@@ -18,6 +18,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
     ],
 )
 

@@ -25,6 +25,15 @@ py_library(
 )
 
 py_library(
+    name = "complete_timestamps",
+    srcs = ["complete_timestamps.py"],
+    srcs_version = "PY3",
+    deps = [
+        # pandas dep,
+    ],
+)
+
+py_library(
     name = "different_index",
     srcs = ["different_index.py"],
     srcs_version = "PY3",

@@ -18,13 +18,14 @@ from typing import Dict, List
 import numpy as np
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
+from temporian.implementation.numpy.data.sampling import NumpySampling
 
 
-def _get_equal_sampling_indexes(
-    sampling_1: "NumpySampling", sampling_2: "NumpySampling", index: tuple
+def _get_common_timestamps(
+    sampling_1: NumpySampling, sampling_2: NumpySampling, index: tuple
 ) -> np.ndarray:
-    """Get indexes of timestamps that are equal to sampling_1 & sampling_2
-      in a specific sampling index.
+    """It returns a np.ndarray with same shape as sampling_1.data[index] with True
+    values where sampling_1.data[index] == sampling_2.data[index], and False otherwise.
 
     Args:
         sampling_1 (NumpySampling): sampling of assignee event.
@@ -32,9 +33,47 @@ def _get_equal_sampling_indexes(
         index (tuple): index to check.
 
     Returns:
-        np.ndarray: indexes of timestamps that are equal to sampling_1 & sampling_2.
+        np.ndarray: boolean np.darray with same shape as sampling_1.data[index]
+
     """
-    return np.where(sampling_1.data[index] == sampling_2.data[index])[0]
+    return np.isin(sampling_1.data[index], sampling_2.data[index])
+
+
+def _convert_feature_to_new_sampling(
+    feature: NumpyFeature,
+    common_timestamps: List[bool],
+    new_sampling: NumpySampling,
+):
+    """Convert feature to new sampling. It requires a boolean list with same length
+    as the new sampling, where True values indicate that the feature has a value
+    for that timestamp. And it needs the new sampling to assign to the new Feature object.
+
+
+    Args:
+        feature (NumpyFeature): feature to convert.
+        common_timestamps (List[bool]): list of booleans indicating if sampling_2 has same timestamp in sampling_1
+        new_sampling (NumpySampling): new sampling.
+
+    Returns:
+        NumpyFeature: feature with new sampling.
+
+    """
+    new_feature = NumpyFeature(
+        name=feature.name,
+        sampling=new_sampling,
+        data=np.full(len(common_timestamps), np.nan),
+    )
+
+    # loop over common timestamps and if True, then add the common timestamp
+    # to the new feature. As timestamps are in order, we can use the last_i
+    # to know with which index of the feature we should take the data from.
+    last_i = 0
+    for i, is_common in enumerate(common_timestamps):
+        if is_common:
+            new_feature.data[i] = feature.data[last_i]
+            last_i += 1
+
+    return new_feature
 
 
 class NumpyAssignOperator:
@@ -77,21 +116,23 @@ class NumpyAssignOperator:
         for index in assignee_event.data.keys():
             # If index is in assigned append the features to the output event
             if index in assigned_event.data.keys():
-                # get indexes of timestamps that are equal to sampling_1 & sampling_2
-                equal_sampling_indexes = _get_equal_sampling_indexes(
+                # get timestamps that are equal to sampling_1 & sampling_2
+                common_timestamps = _get_common_timestamps(
                     sampling_1=assignee_event.sampling,
                     sampling_2=assigned_event.sampling,
                     index=index,
                 )
                 # loop over assigned features
                 for assigned_feature in assigned_event.data[index]:
-                    # filter indexes of timestamps that are equal to sampling_1 & sampling_2
-                    assigned_feature.data = np.take(
-                        assigned_feature.data, indices=equal_sampling_indexes
+                    # convert feature to new sampling
+                    assigned_feature_filtered = (
+                        _convert_feature_to_new_sampling(
+                            feature=assigned_feature,
+                            common_timestamps=common_timestamps,
+                            new_sampling=assignee_event.sampling,
+                        )
                     )
-                    # change sampling to same as assignee
-                    assigned_feature.sampling = assignee_event.sampling
-                    output.data[index].append(assigned_feature)
+                    output.data[index].append(assigned_feature_filtered)
             # If index is not in assigned, append the features of assigned with None values
             else:
                 for feature_name in assigned_event.feature_names:
