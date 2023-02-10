@@ -107,10 +107,10 @@ class NumpyEvent:
 
         # Check each feature is equal in each index
         for index in self.data.keys():
-            for feature in self.data[index]:
-                if feature not in __o.data[index]:
-                    print(f"Feature {feature} not in {__o.data[index]}")
-                    return False
+            if not all(
+                f1 == f2 for f1, f2 in zip(self.data[index], __o.data[index])
+            ):
+                return False
 
         return True
 
