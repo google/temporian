@@ -71,7 +71,7 @@ class TFPTest(absltest.TestCase):
         self.assertSetEqual(set(inputs.keys()), {"a"})
         self.assertSetEqual(set(outputs.keys()), {"b"})
 
-    def test_serialization_v2(self):
+    def test_serialization_single_event(self):
         a = t.input_event(
             [
                 t.Feature(name="f1"),
@@ -79,7 +79,7 @@ class TFPTest(absltest.TestCase):
             ],
             name="my_input_event",
         )
-        b = t.sma(data=a, window_length=7)
+        b = t.sma(event=a, window_length=7)
         b.set_name("my_output_event")
 
         with tempfile.TemporaryDirectory() as tempdir:
@@ -95,7 +95,7 @@ class TFPTest(absltest.TestCase):
         self.assertSetEqual(set(inputs.keys()), {"my_input_event"})
         self.assertSetEqual(set(outputs.keys()), {"my_output_event"})
 
-    def test_serialization_v3(self):
+    def test_serialization_squeeze_loading_results(self):
         a = t.input_event(
             [
                 t.Feature(name="f1"),
@@ -103,7 +103,7 @@ class TFPTest(absltest.TestCase):
             ],
             name="my_input_event",
         )
-        b = t.sma(data=a, window_length=7)
+        b = t.sma(event=a, window_length=7)
         b.set_name("my_output_event")
 
         with tempfile.TemporaryDirectory() as tempdir:
@@ -119,7 +119,7 @@ class TFPTest(absltest.TestCase):
         self.assertEqual(i.name(), "my_input_event")
         self.assertEqual(o.name(), "my_output_event")
 
-    def test_serialization_v4(self):
+    def test_serialization_infer_inputs(self):
         a = t.input_event(
             [
                 t.Feature(name="f1"),
@@ -127,7 +127,7 @@ class TFPTest(absltest.TestCase):
             ],
             name="my_input_event",
         )
-        b = t.sma(data=a, window_length=7)
+        b = t.sma(event=a, window_length=7)
         b.set_name("my_output_event")
 
         with tempfile.TemporaryDirectory() as tempdir:
@@ -135,8 +135,7 @@ class TFPTest(absltest.TestCase):
             t.save(
                 inputs=None,
                 outputs=b,
-                path=path,
-                infer_inputs=True,
+                path=path
             )
 
             i, o = t.load(path=path, squeeze=True)

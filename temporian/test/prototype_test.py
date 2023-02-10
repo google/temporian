@@ -83,11 +83,13 @@ class PrototypeTest(absltest.TestCase):
 
         assignee_event = Event(
             features=[Feature(name="sales", dtype=float)],
-            sampling=sampling,
+            sampling=Sampling(["product_id", "timestamp"]),
+            creator=None,
         )
         assigned_event = Event(
             features=[Feature(name="costs", dtype=float)],
-            sampling=sampling,
+            sampling=Sampling(["product_id", "timestamp"]),
+            creator=None,
         )
 
         sum_events = sum(

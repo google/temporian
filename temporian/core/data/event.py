@@ -52,9 +52,10 @@ class Event(object):
             f"\t\t{features_print}\n"
             "\t},\n"
             f"\tsampling: {self._sampling},\n"
-            f"\tid:{id(self)},\n"
-            f"\tname:{self._name}\n"
-            "}}"
+            f"\tname: {self._name},\n"
+            f"\tcreator: {self._creator},\n"
+            f"\tid:{id(self)}\n"
+            "\t}"
         )
 
     def sampling(self):
@@ -71,6 +72,9 @@ class Event(object):
 
     def set_name(self, name) -> None:
         self._name = name
+
+    def set_creator(self, creator):
+        self._creator = creator
 
 
 def input_event(
@@ -89,4 +93,5 @@ def input_event(
         features=features,
         sampling=sampling,
         name=name,
+        creator=None,
     )
