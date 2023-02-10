@@ -1,7 +1,7 @@
 # Temporian
 
 **Temporian** is a library to pre-process temporal
-signals before their use as input features with of-the-shelf tabular machine
+signals before their use as input features with off-the-shelf tabular machine
 learning libraries (e.g., TensorFlow Decision Forests).
 
 ## Requirements
@@ -26,7 +26,7 @@ and manage multiple Python versions. To install PyEnv, head over to the tool's
 installation instructions for your operating system.
 
 Once PyEnv is installed, you can download any Python version (e.g. 3.9.6) by
-running
+running:
 
 ```shell
 pyenv install 3.9.6
@@ -52,7 +52,7 @@ poetry shell
 
 ## Run all tests
 
-Install bazel and buildifier (in Mac we recommend installing bazelisk with brew)
+Install bazel and buildifier (in Mac we recommend installing bazelisk with brew):
 
 ```shell
 brew install bazelisk
@@ -64,7 +64,7 @@ Run all tests with bazel:
 bazel test //...:all
 ```
 
-Note: You can use the Bazel test flag `--test_output=streamed` to see the test logs in realtime.
+>__Note__: You can use the Bazel test flag `--test_output=streamed` to see the test logs in realtime.
 
 ## Credits
 
