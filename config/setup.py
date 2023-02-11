@@ -27,7 +27,7 @@ setup(
     project_urls={
         "Bug Tracker": "https://github.com/google/temporian/issues",
     },
-    # Update with members of the Google + Tyolabs collaboration.
+    # Update with members of the Google + Tryolabs collaboration.
     author=(
         "Mathieu Guillame-Bert, Ian Spektor, Guillermo Etchebarne, Diego"
         " Marvid, Richard Stotz"
