@@ -22,6 +22,7 @@ class SimpleMovingAverageNumpyImplementation:
         sampling: Optional[NumpyEvent] = None,
     ) -> Dict[str, NumpyEvent]:
 
+        # TODO: Add support for index.
         if sampling is not None:
             raise NotImplementedError("Sampling not implemented")
 
@@ -49,7 +50,10 @@ class SimpleMovingAverageNumpyImplementation:
 
 def _impl(src: np.array, time: np.array, win: Duration) -> np.array:
     # TODO: Implement in c++.
+    # TODO: Add support for missing (NaN) input values.
 
+    # This implementation is simple but expensive. It will create multiple
+    # O(n^2) arrays, where n is the number of time samples.
     r = time[:, np.newaxis] >= time[np.newaxis, :]  # Right side
     l = time[:, np.newaxis] <= (time[np.newaxis, :] + win)  # Left side
     m = r & l

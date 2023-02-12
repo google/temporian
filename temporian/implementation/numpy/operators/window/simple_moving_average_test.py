@@ -32,6 +32,8 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
     def setUp(self):
         pass
 
+    # TODO: Add more tests (index, sampling, nan, etc).
+
     def test_no_index(self):
         # TODO: Simplify test definition with "pd_to_event" when available.
         op = SimpleMovingAverage(
