@@ -17,6 +17,7 @@ py_library(
         "//temporian/core:processor",
         "//temporian/core:serialize",
         "//temporian/core/data:dtype",
+        "//temporian/core/data:duration",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
         "//temporian/core/data:sampling",

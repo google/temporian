@@ -21,6 +21,8 @@ from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
+from temporian.core.data import duration
+from temporian.core.data.duration import Duration
 
 
 class SimpleMovingAverage(Operator):
@@ -29,11 +31,12 @@ class SimpleMovingAverage(Operator):
     def __init__(
         self,
         event: Event,
-        window_length: str,
-        sampling: Optional[Event] = None,
+        window_length: Duration,
+        sampling: Optional[Event],
     ):
         super().__init__()
 
+        self._window_length = window_length
         self.add_attribute("window_length", window_length)
 
         if sampling is not None:
@@ -64,6 +67,9 @@ class SimpleMovingAverage(Operator):
 
         self.check()
 
+    def window_length(self):
+        return self._window_length
+
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
@@ -88,9 +94,27 @@ operator_lib.register_operator(SimpleMovingAverage)
 
 def sma(
     event: Event,
-    window_length: str,
+    window_length: Duration,
     sampling: Optional[Event] = None,
 ) -> Event:
+    """Simple Moving average
+
+    For each sampling, and for each feature independently, returns at time "t"
+    the average value of the feature in the time windows [t-window, t].
+
+    If "sampling" is provided, applies the operator for each timestamps of
+    "sampling". If "sampling" is not provided, apply the operator for each
+    timestamps of "event".
+
+    Args:
+        event: The features to average.
+        window_length: The window length for averaging.
+        sampling: If provided, define when the operator is applied. If not
+          provided, the operator is applied for each timestamp of "event".
+
+    Returns:
+        An event containing the moving average of each feature in "event".
+    """
     return SimpleMovingAverage(
         event=event,
         window_length=window_length,
