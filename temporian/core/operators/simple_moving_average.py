@@ -32,7 +32,7 @@ class SimpleMovingAverage(Operator):
         self,
         event: Event,
         window_length: Duration,
-        sampling: Optional[Event],
+        sampling: Optional[Event] = None,
     ):
         super().__init__()
 
