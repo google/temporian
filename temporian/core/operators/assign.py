@@ -36,11 +36,16 @@ class AssignOperator(Operator):
         self.add_input("assigned_event", assigned_event)
 
         # outputs
+        output_sampling = assignee_event.sampling()
         output_features = assignee_event.features() + [
-            Feature(name=feature.name(), dtype=feature.dtype(), creator=self)
+            Feature(
+                name=feature.name(),
+                dtype=feature.dtype(),
+                sampling=output_sampling,
+                creator=self,
+            )
             for feature in assigned_event.features()
         ]
-        output_sampling = assignee_event.sampling()
         self.add_output(
             "event",
             Event(

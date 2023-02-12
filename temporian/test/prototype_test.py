@@ -27,11 +27,9 @@ from temporian.implementation.pandas.data import event as pandas_event
 
 class PrototypeTest(absltest.TestCase):
     def setUp(self) -> None:
-        self.assignee_event = (
-            "temporian/test/test_data/prototype/assignee_event.csv"
-        )
+        self.input_1 = "temporian/test/test_data/prototype/input_1.csv"
 
-        self.assigned_event = pandas_event.PandasEvent(
+        self.data_input_1 = pandas_event.PandasEvent(
             [
                 [666964, pd.Timestamp("2013-01-02"), 740.0],
                 [666964, pd.Timestamp("2013-01-03"), 508.0],
@@ -40,7 +38,7 @@ class PrototypeTest(absltest.TestCase):
             columns=["product_id", "timestamp", "costs"],
         ).set_index(["product_id", "timestamp"])
 
-        self.expected_output_event = pandas_event.PandasEvent(
+        self.data_input_2 = pandas_event.PandasEvent(
             [
                 [
                     666964,
@@ -81,43 +79,41 @@ class PrototypeTest(absltest.TestCase):
         # instance input events
         sampling = Sampling(["product_id", "timestamp"])
 
-        assignee_event = Event(
+        input_1 = Event(
             features=[Feature(name="sales", dtype=float)],
             sampling=sampling,
             creator=None,
         )
-        assigned_event = Event(
+        input_2 = Event(
             features=[Feature(name="costs", dtype=float)],
             sampling=sampling,
             creator=None,
         )
 
-        sum_events = sum(
-            event_1=assignee_event,
-            event_2=assigned_event,
+        sum_1 = sum(
+            event_1=input_1,
+            event_2=input_2,
         )
 
         # call assign operator
-        output_event = assign(assignee_event, assigned_event)
+        merge_1 = assign(input_1, input_2)
 
         # call sma operator
-        sma_assigned_event = sma(
-            assigned_event, window_length="7d", sampling=assigned_event
-        )
+        sma_1 = sma(input_2, window_length="7d", sampling=input_2)
 
         # call assign operator with result of sma
-        output_event = assign(output_event, sma_assigned_event)
+        merge_2 = assign(merge_1, sma_1)
 
-        output_event = assign(output_event, sum_events)
+        output_event = assign(merge_2, sum_1)
 
         # evaluate output
         output_event_pandas = evaluator.evaluate(
             output_event,
             input_data={
                 # assignee event specified from disk
-                assignee_event: self.assignee_event,
+                input_1: self.data_input_1,
                 # assigned event loaded in ram
-                assigned_event: self.assigned_event,
+                input_2: self.data_input_2,
             },
             backend="pandas",
         )
@@ -125,9 +121,7 @@ class PrototypeTest(absltest.TestCase):
         # validate
         self.assertEqual(
             True,
-            self.expected_output_event.equals(
-                output_event_pandas[output_event]
-            ),
+            self.data_input_2.equals(output_event_pandas[output_event]),
         )
 
         print(output_event_pandas[output_event])

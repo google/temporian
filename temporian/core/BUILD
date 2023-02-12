@@ -22,6 +22,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":backends",
+        ":processor",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
         "//temporian/core/operators:base",

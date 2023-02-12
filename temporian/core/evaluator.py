@@ -16,16 +16,17 @@
 
 import pathlib
 from typing import Any, Dict, List, Set, Union
+from collections import defaultdict
 
 from temporian.core import backends
 from temporian.core.data.event import Event
 from temporian.core.operators import base
 from temporian.implementation.pandas.data import event as pandas_event
+from temporian.core import processor as processor_lib
 
-# TODO: Use typing.Literal[tuple(backends.BACKENDS.keys())]
 AvailableBackends = Any
 Data = Dict[Event, Union[str, pathlib.Path, pandas_event.PandasEvent]]
-Query = Union[Event, List[Event]]
+Query = Union[Event, List[Event], Set[Event]]
 
 
 def evaluate(
@@ -35,14 +36,16 @@ def evaluate(
 ) -> Dict[Event, Any]:
     """Evaluates a query on data."""
 
+    # Normalize query
+    normalized_query: List[Event] = {}
     if isinstance(query, Event):
-        events_to_compute = {query}
+        normalized_query = [query]
+
+    elif isinstance(query, set):
+        normalized_query = list(query)
 
     elif isinstance(query, list):
-        events_to_compute = set(query)
-
-    elif isinstance(query, dict):
-        raise NotImplementedError()
+        normalized_query = query
 
     else:
         # TODO: improve error message
@@ -51,14 +54,15 @@ def evaluate(
             f" {type(query)}."
         )
 
-    # get backend
+    # Select backend
     selected_backend = backends.BACKENDS[backend]
     event = selected_backend["event"]
     evaluate_schedule_fn = selected_backend["evaluate_schedule_fn"]
     read_csv_fn = selected_backend["read_csv_fn"]
 
-    # calculate opeartor schedule
-    schedule = get_operator_schedule(events_to_compute)
+    # Schedule execution
+    input_events = list(input_data.keys())
+    schedule = build_schedule(inputs=input_events, outputs=normalized_query)
 
     # materialize input data. TODO: separate this logic
     materialized_input_data = {
@@ -72,67 +76,100 @@ def evaluate(
     # evaluate schedule
     outputs = evaluate_schedule_fn(materialized_input_data, schedule)
 
-    return {event: outputs[event] for event in events_to_compute}
+    return {event: outputs[event] for event in normalized_query}
 
 
-def get_operator_schedule(query: Set[Event]) -> List[base.Operator]:
+def build_schedule(
+    inputs: List[Event], outputs: List[Event]
+) -> List[base.Operator]:
     """Calculates which operators need to be executed in which order to
-    compute a set of query events.
+    compute a set of output events given a set of input events.
+
+    This implementation is based on Kahn's algorithm.
+
     Args:
-        query: set of query events to be computed.
+        inputs: Input events.
+        outputs: Output events.
+
     Returns:
-        ordered list of operators, such that the first operator should be
+        Ordered list of operators, such that the first operator should be
         computed before the second, second before the third, etc.
     """
 
-    # TODO: add depth analysis for parallelization
-    def visit(
-        event: Event,
-        pending_events: Set[Event],
-        done_events: Set[Event],
-        sorted_ops: List[base.Operator],
-    ):
-        if event in done_events:
-            return
-        if event in pending_events:
-            raise RuntimeError(
-                "Compute graph has at least one cycle - aborting."
-            )
+    def list_to_dict(l: List[Any]) -> Dict[str, Any]:
+        """Converts a list into a dict with a text index key."""
+        return {str(i): x for i, x in enumerate(l)}
 
-        # event pending - must wait for parent events
-        pending_events.add(event)
+    # List all events and operators in between inputs and outputs.
+    #
+    # Fails if the outputs cannot be computed from the inputs e.g. some inputs
+    # are missing.
+    processor = processor_lib.infer_processor(
+        list_to_dict(inputs), list_to_dict(outputs)
+    )
 
-        # get parent events
-        parent_events = (
-            {}
-            if event.creator() is None
-            else {
-                parent_event
-                for parent_event in event.creator().inputs().values()
-            }
-        )
-        # recursion
-        for parent_event in parent_events:
-            visit(parent_event, pending_events, done_events, sorted_ops)
+    # print("@@@processor:\n", processor)
 
-        # event cleared
-        pending_events.remove(event)
-        done_events.add(event)
+    # Sequence of operators to execute. This is the result of the
+    # "build_schedule" function.
+    planned_ops: List[base.Operator] = []
 
-        # add operator to schedule
-        if event.creator() is not None:
-            sorted_ops.append(event.creator())
+    # Operators ready to be computed (i.e. ready to be added to "planned_ops")
+    # as all their inputs are already computed by "planned_ops" or specified by
+    # "inputs".
+    ready_ops: Set[base.Operator] = set()
 
-    # events that have already been cleared for computation
-    done_events = set()
+    # "event_to_op[e]" is the list of operators with event "e" as input.
+    event_to_op: Dict[Event, List[base.Operator]] = defaultdict(lambda: [])
 
-    # events pending to be cleared for computation
-    pending_events = set()
+    # "op_to_num_pending_inputs[op]" is the number of "not yet scheduled" inputs
+    # of operator "op". Operators in "op_to_num_pending_inputs" have not yet
+    # scheduled.
+    op_to_num_pending_inputs: Dict[base.Operator, int] = defaultdict(lambda: 0)
 
-    # final operator schedule
-    sorted_ops = []
-    while not query.issubset(done_events):
-        event = next(iter(query))
-        visit(event, pending_events, done_events, sorted_ops)
+    # Compute "event_to_op" and "op_to_num_pending_inputs".
+    inputs_set = set(inputs)
+    for op in processor.operators():
+        num_pending_inputs = 0
+        for input_event in op.inputs().values():
+            if input_event in inputs_set:
+                # This input is already available
+                continue
+            event_to_op[input_event].append(op)
+            num_pending_inputs += 1
+        if num_pending_inputs == 0:
+            # Ready to be scheduled
+            ready_ops.add(op)
+        else:
+            # Some of the inputs are missing.
+            op_to_num_pending_inputs[op] = num_pending_inputs
 
-    return sorted_ops
+    # Compute the schedule
+    while ready_ops:
+        # Get an op ready to be scheduled
+        op = next(iter(ready_ops))
+        ready_ops.remove(op)
+
+        # Schedule the op
+        planned_ops.append(op)
+
+        # Update all the ops that depends on "op". Enlist the ones that are
+        # ready to be computed
+        for output in op.outputs().values():
+            if output not in event_to_op:
+                continue
+            for new_op in event_to_op[output]:
+                # "new_op" depends on the result of "op".
+                assert new_op in op_to_num_pending_inputs
+                num_missing_inputs = op_to_num_pending_inputs[new_op] - 1
+                op_to_num_pending_inputs[new_op] = num_missing_inputs
+                assert num_missing_inputs >= 0
+
+                if num_missing_inputs == 0:
+                    # "new_op" can be computed
+                    ready_ops.add(new_op)
+                    del op_to_num_pending_inputs[new_op]
+
+    assert not op_to_num_pending_inputs
+
+    return planned_ops
