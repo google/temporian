@@ -18,8 +18,8 @@ class NumpyFeature:
         if data.dtype.type is np.string_:
             if data.dtype.type not in DTYPE_MAPPING:
                 raise ValueError(
-                    f"Unsupported dtype {data.dtype} for NumpyFeature. Supported"
-                    f" dtypes: {DTYPE_MAPPING.keys()}"
+                    f"Unsupported dtype {data.dtype} for NumpyFeature."
+                    f" Supported dtypes: {DTYPE_MAPPING.keys()}"
                 )
 
         self.name = name

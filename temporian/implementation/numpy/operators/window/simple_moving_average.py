@@ -21,7 +21,6 @@ class SimpleMovingAverageNumpyImplementation:
         event: NumpyEvent,
         sampling: Optional[NumpyEvent] = None,
     ) -> Dict[str, NumpyEvent]:
-
         # TODO: Add support for index.
         if sampling is not None:
             raise NotImplementedError("Sampling not implemented")
@@ -38,7 +37,6 @@ class SimpleMovingAverageNumpyImplementation:
 
             # For each feature
             for src_ts in src_mts:
-
                 dst_feature_name = f"sum_{src_ts.name}"
                 dst_ts_data = _impl(
                     src_ts.data, src_time, self._op.window_length()
