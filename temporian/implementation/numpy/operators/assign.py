@@ -58,7 +58,7 @@ def _get_common_timestamps(
         array([False, True, True])
 
     """
-    return np.isin(sampling_1.data[index], sampling_2.data[index])
+    return np.in1d(sampling_1.data[index], sampling_2.data[index])
 
 
 def _convert_feature_to_new_sampling(
@@ -144,11 +144,17 @@ class NumpyAssignOperator:
 
         Raises:
             ValueError: if assignee and assigned events have different indexes names.
+            ValueError: if assigned event has repeated timestamps for same index.
 
         """
-        # check both keys are the same
         if assignee_event.sampling.names != assigned_event.sampling.names:
             raise ValueError("Assign sequences must have the same index names.")
+
+        if assigned_event.sampling.has_repeated_timestamps:
+            raise ValueError(
+                "Assigned sequence cannot have repeated timestamps in the same"
+                " index."
+            )
 
         output = NumpyEvent(
             data=assignee_event.data.copy(), sampling=assignee_event.sampling
@@ -157,13 +163,13 @@ class NumpyAssignOperator:
         for index in assignee_event.data.keys():
             # If index is in assigned append the features to the output event
             if index in assigned_event.data.keys():
-                # get timestamps that are equal to sampling_1 & sampling_2
+                # Get timestamps that are equal to sampling_1 & sampling_2
                 common_timestamps = _get_common_timestamps(
                     sampling_1=assignee_event.sampling,
                     sampling_2=assigned_event.sampling,
                     index=index,
                 )
-                # loop over assigned features
+                # Loop over assigned features
                 for assigned_feature in assigned_event.data[index]:
                     # convert feature to new sampling
                     assigned_feature_filtered = (
@@ -182,7 +188,7 @@ class NumpyAssignOperator:
                         NumpyFeature(
                             name=feature_name,
                             sampling=assignee_event.sampling,
-                            # create a list of None values with the same length as assignee sampling
+                            # Create a list of None values with the same length as assignee sampling
                             data=np.full(
                                 len(assignee_event.sampling.data[index]), np.nan
                             ),
