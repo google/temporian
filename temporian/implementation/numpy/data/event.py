@@ -77,8 +77,11 @@ class NumpyEvent:
     @property
     def feature_names(self) -> List[str]:
         if len(self.data.keys()) == 0:
-            return 0
+            return []
 
+        # Only look at the feature in the first index
+        # to get the feature names. All features in all
+        # indexes should have the same names
         first_index = next(iter(self.data))
         return [feature.name for feature in self.data[first_index]]
 
@@ -101,15 +104,14 @@ class NumpyEvent:
         if self.sampling != __o.sampling:
             return False
 
-        # check same features
+        # Check same features
         if self.feature_names != __o.feature_names:
             return False
 
         # Check each feature is equal in each index
         for index in self.data.keys():
-            if not all(
-                f1 == f2 for f1, f2 in zip(self.data[index], __o.data[index])
-            ):
+            # Check both feature list are equal
+            if self.data[index] != __o.data[index]:
                 return False
 
         return True
