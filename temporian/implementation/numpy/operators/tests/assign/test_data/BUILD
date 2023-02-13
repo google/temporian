@@ -43,8 +43,17 @@ py_library(
 )
 
 py_library(
-    name = "repeated_timestamps",
-    srcs = ["repeated_timestamps.py"],
+    name = "assigned_repeated_timestamps",
+    srcs = ["assigned_repeated_timestamps.py"],
+    srcs_version = "PY3",
+    deps = [
+        # pandas dep,
+    ],
+)
+
+py_library(
+    name = "assignee_repeated_timestamps",
+    srcs = ["assignee_repeated_timestamps.py"],
     srcs_version = "PY3",
     deps = [
         # pandas dep,

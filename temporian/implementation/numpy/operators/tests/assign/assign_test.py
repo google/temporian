@@ -34,10 +34,47 @@ from temporian.implementation.numpy.operators.tests.assign.test_data import (
     complete_timestamps,
 )
 
+from temporian.implementation.numpy.operators.tests.assign.test_data import (
+    assigned_repeated_timestamps,
+)
+
+from temporian.implementation.numpy.operators.tests.assign.test_data import (
+    assignee_repeated_timestamps,
+)
+
 
 class AssignOperatorTest(absltest.TestCase):
     def setUp(self) -> None:
         self.operator = assign.NumpyAssignOperator()
+
+    def test_assigned_repeated_timestamps(self) -> None:
+        self.assertRaisesRegex(
+            ValueError,
+            (
+                "Assigned sequence cannot have repeated timestamps in the same"
+                " index."
+            ),
+            self.operator,
+            assigned_repeated_timestamps.INPUT_1,
+            assigned_repeated_timestamps.INPUT_2,
+        )
+
+    def test_assignee_repeated_timestamps(self) -> None:
+        operator_output = self.operator(
+            assignee_repeated_timestamps.INPUT_1,
+            assignee_repeated_timestamps.INPUT_2,
+        )
+
+        print("Actual:")
+        print(operator_output["event"])
+        print("-" * 80)
+        print("Expected:")
+        print(assignee_repeated_timestamps.OUTPUT)
+
+        self.assertEqual(
+            True,
+            assignee_repeated_timestamps.OUTPUT == operator_output["event"],
+        )
 
     def test_different_index(self) -> None:
         self.assertRaisesRegex(

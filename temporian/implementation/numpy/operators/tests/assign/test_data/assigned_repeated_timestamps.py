@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""NumpyAssignOperator - repeated timestamps test.
+"""NumpyAssignOperator - assigned repeated timestamps test.
 
 Tests that there cannot exist repeated timestamps on the assigned event for any
-index value. Repeated timestamps are allowed on the assignee event.
+index value.
 """
 
 import numpy as np
@@ -28,7 +28,11 @@ sampling_1 = NumpySampling(
     names=["user_id"],
     data={
         (151591562,): np.array(
-            ["2022-02-05", "2022-02-06", "2022-02-07"],
+            [
+                "2022-02-05",
+                "2022-02-06",
+                "2022-02-07",
+            ],
             dtype="datetime64",
         ),
         (191562515,): np.array(["2022-02-05"], dtype="datetime64"),
@@ -39,9 +43,50 @@ sampling_2 = NumpySampling(
     names=["user_id"],
     data={
         (151591562,): np.array(
-            ["2022-02-08", "2022-02-09", "2022-02-10"],
+            ["2022-02-08", "2022-02-09", "2022-02-09"],
+            # 2022-02-09 is repeated here should be a problem
             dtype="datetime64",
         ),
         (191562515,): np.array(["2022-02-08"], dtype="datetime64"),
     },
+)
+
+INPUT_1 = NumpyEvent(
+    data={
+        (151591562,): [
+            NumpyFeature(
+                name="sales",
+                sampling=sampling_1,
+                data=np.array([0.0, 0.0, 0.0]),
+            ),
+        ],
+        (191562515,): [
+            NumpyFeature(
+                name="sales",
+                sampling=sampling_1,
+                data=np.array([0.0]),
+            ),
+        ],
+    },
+    sampling=sampling_1,
+)
+
+INPUT_2 = NumpyEvent(
+    data={
+        (151591562,): [
+            NumpyFeature(
+                name="sales",
+                sampling=sampling_2,
+                data=np.array([0.0, 0.0, 0.0]),
+            ),
+        ],
+        (191562515,): [
+            NumpyFeature(
+                name="sales",
+                sampling=sampling_2,
+                data=np.array([0.0]),
+            ),
+        ],
+    },
+    sampling=sampling_2,
 )
