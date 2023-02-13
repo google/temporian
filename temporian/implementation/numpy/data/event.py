@@ -7,6 +7,13 @@ from temporian.core.data.feature import Feature
 from temporian.core.data import dtype
 from temporian.implementation.numpy.data.sampling import NumpySampling
 
+DTYPE_MAPPING = {
+    np.float64: dtype.FLOAT64,
+    np.float32: dtype.FLOAT32,
+    np.int64: dtype.INT64,
+    np.int32: dtype.INT32,
+}
+
 
 class NumpyFeature:
     def __init__(
@@ -115,11 +122,3 @@ class NumpyEvent:
                 return False
 
         return True
-
-
-DTYPE_MAPPING = {
-    np.float64: dtype.FLOAT64,
-    np.float32: dtype.FLOAT32,
-    np.int64: dtype.INT64,
-    np.int32: dtype.INT32,
-}
