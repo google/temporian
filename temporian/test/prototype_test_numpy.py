@@ -19,9 +19,9 @@ from temporian.core import evaluator
 from temporian.core.data.event import Event
 from temporian.core.data.event import Feature
 from temporian.core.data.sampling import Sampling
+from temporian.core.operators.assign import assign
 from temporian.core.operators.select import select
 from temporian.core.operators.sum import sum
-from temporian.core.operators.assign import assign
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling

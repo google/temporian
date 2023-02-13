@@ -73,7 +73,7 @@ def _convert_feature_to_new_sampling(
 
     Args:
         feature (NumpyFeature): feature to convert.
-        common_timestamps (List[bool]): list of booleans indicating if sampling_2 has same timestamp in sampling_1
+        common_timestamps (List[bool]): list of booleans indicating where feature's sampling has same timestamp as new sampling
         new_sampling (NumpySampling): new sampling.
         index (tuple): index to check.
 

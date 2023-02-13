@@ -26,7 +26,7 @@ from temporian.implementation.numpy.operators.tests.sum.test_data import (
 )
 
 
-class AssignOperatorTest(absltest.TestCase):
+class SumOperatorTest(absltest.TestCase):
     def setUp(self) -> None:
         self.operator = sum.NumpySumOperator()
 
