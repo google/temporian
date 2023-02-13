@@ -59,7 +59,6 @@ INPUT_1 = NumpyEvent(
         (666964,): [
             NumpyFeature(
                 name="sales",
-                sampling=sampling_1,
                 data=np.array([10, 11, 12, 13, 14]),
             ),
         ],
@@ -72,7 +71,6 @@ INPUT_2 = NumpyEvent(
         (666964,): [
             NumpyFeature(
                 name="costs",
-                sampling=sampling_2,
                 data=np.array([1, 2, 3, 4]),
             ),
         ],
@@ -85,12 +83,10 @@ OUTPUT = NumpyEvent(
         (666964,): [
             NumpyFeature(
                 name="sales",
-                sampling=sampling_1,
                 data=np.array([10, 11, 12, 13, 14]),
             ),
             NumpyFeature(
                 name="costs",
-                sampling=sampling_1,
                 data=np.array(
                     [np.nan, 2, np.nan, np.nan, 3]
                 ),  # np.nan on missing timestamps

@@ -61,20 +61,22 @@ def _get_common_timestamps(
     return np.in1d(sampling_1.data[index], sampling_2.data[index])
 
 
-def _convert_feature_to_new_sampling(
+def _convert_assigned_feature_to_assignee_sampling(
     feature: NumpyFeature,
     common_timestamps: List[bool],
-    new_sampling: NumpySampling,
+    assignee_sampling: NumpySampling,
+    assigned_sampling: NumpySampling,
     index: tuple,
-):
-    """Convert feature to new sampling. It requires a boolean list with same length
-    as the new sampling, where True values indicate that the feature has a value
-    for that timestamp. And it needs the new sampling to assign to the new Feature object.
+) -> NumpyFeature:
+    """Converts assigned feature to assignee sampling. It requires a boolean list with
+    same length as the assignee sampling, where True values indicate that the
+    assigned feature has the same timestamp.
 
     Args:
-        feature (NumpyFeature): feature to convert.
+        feature (NumpyFeature): assigned feature to convert.
         common_timestamps (List[bool]): list of booleans indicating where feature's sampling has same timestamp as new sampling
-        new_sampling (NumpySampling): new sampling.
+        assignee_sampling (NumpySampling): sampling of assignee event.
+        assigned_sampling (NumpySampling): sampling of assigned event.
         index (tuple): index to check.
 
     Returns:
@@ -83,12 +85,11 @@ def _convert_feature_to_new_sampling(
     """
     new_feature = NumpyFeature(
         name=feature.name,
-        sampling=new_sampling,
         data=np.full(len(common_timestamps), np.nan),
     )
 
-    # Loop over common timestamps and if True, then add the feature value in
-    # the common timestamp.
+    # Loop over common timestamps and if True, then add the assigned feature value
+    # in the common timestamp.
     # Assuming that the feature data is sorted by timestamp, we can use binary search
     # to find the index of the common timestamp in the feature data, instead of
     # numpy where search. This would make the algorithm O(n * (1 + log(m)))
@@ -102,14 +103,14 @@ def _convert_feature_to_new_sampling(
         last_common_index = 0
         if is_common:
             # Get the sampling index of the common timestamp
-            common_timestamp = new_sampling.data[index][i]
+            common_timestamp = assignee_sampling.data[index][i]
             # Get the index of the common timestamp in the feature
             # uses binary search because feature.data is sorted by timestamp
             # last common index is used to speed up the search by trimming the
             # feature data to the last found array index because as it sorted
             # by timestamps, the next one will be after that one.
             common_index = np.searchsorted(
-                feature.sampling.data[index][last_common_index:],
+                assigned_sampling.data[index][last_common_index:],
                 common_timestamp,
             )
             # Assign the feature value to the new feature
@@ -173,10 +174,11 @@ class NumpyAssignOperator:
                 for assigned_feature in assigned_event.data[index]:
                     # convert feature to new sampling
                     assigned_feature_filtered = (
-                        _convert_feature_to_new_sampling(
+                        _convert_assigned_feature_to_assignee_sampling(
                             feature=assigned_feature,
                             common_timestamps=common_timestamps,
-                            new_sampling=assignee_event.sampling,
+                            assignee_sampling=assignee_event.sampling,
+                            assigned_sampling=assigned_event.sampling,
                             index=index,
                         )
                     )
@@ -187,7 +189,6 @@ class NumpyAssignOperator:
                     output.data[index].append(
                         NumpyFeature(
                             name=feature_name,
-                            sampling=assignee_event.sampling,
                             # Create a list of None values with the same length as assignee sampling
                             data=np.full(
                                 len(assignee_event.sampling.data[index]), np.nan

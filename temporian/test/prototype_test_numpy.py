@@ -55,28 +55,24 @@ class PrototypeTest(absltest.TestCase):
                 ("A", 1): [
                     NumpyFeature(
                         name="sales",
-                        sampling=sampling,
                         data=np.array([14, 15, 16]),
                     ),
                 ],
                 ("A", 2): [
                     NumpyFeature(
                         name="sales",
-                        sampling=sampling,
                         data=np.array([10]),
                     ),
                 ],
                 ("B", 2): [
                     NumpyFeature(
                         name="sales",
-                        sampling=sampling,
                         data=np.array([7, 8]),
                     ),
                 ],
                 ("B", 3): [
                     NumpyFeature(
                         name="sales",
-                        sampling=sampling,
                         data=np.array([3, 4]),
                     ),
                 ],
@@ -89,28 +85,24 @@ class PrototypeTest(absltest.TestCase):
                 ("A", 1): [
                     NumpyFeature(
                         name="costs",
-                        sampling=sampling,
                         data=np.array([-14, -15, -16]),
                     ),
                 ],
                 ("A", 2): [
                     NumpyFeature(
                         name="costs",
-                        sampling=sampling,
                         data=np.array([-10]),
                     ),
                 ],
                 ("B", 2): [
                     NumpyFeature(
                         name="costs",
-                        sampling=sampling,
                         data=np.array([-7, -8]),
                     ),
                 ],
                 ("B", 3): [
                     NumpyFeature(
                         name="costs",
-                        sampling=sampling,
                         data=np.array([-3, -4]),
                     ),
                 ],
@@ -123,48 +115,40 @@ class PrototypeTest(absltest.TestCase):
                 ("A", 1): [
                     NumpyFeature(
                         name="sales",
-                        sampling=sampling,
                         data=np.array([14, 15, 16]),
                     ),
                     NumpyFeature(
                         name="sum_sales_costs",
-                        sampling=sampling,
                         data=np.array([0, 0, 0]),
                     ),
                 ],
                 ("A", 2): [
                     NumpyFeature(
                         name="sales",
-                        sampling=sampling,
                         data=np.array([10]),
                     ),
                     NumpyFeature(
                         name="sum_sales_costs",
-                        sampling=sampling,
                         data=np.array([0]),
                     ),
                 ],
                 ("B", 2): [
                     NumpyFeature(
                         name="sales",
-                        sampling=sampling,
                         data=np.array([7, 8]),
                     ),
                     NumpyFeature(
                         name="sum_sales_costs",
-                        sampling=sampling,
                         data=np.array([0, 0]),
                     ),
                 ],
                 ("B", 3): [
                     NumpyFeature(
                         name="sales",
-                        sampling=sampling,
                         data=np.array([3, 4]),
                     ),
                     NumpyFeature(
                         name="sum_sales_costs",
-                        sampling=sampling,
                         data=np.array([0, 0]),
                     ),
                 ],

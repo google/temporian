@@ -55,14 +55,12 @@ INPUT_1 = NumpyEvent(
         (151591562,): [
             NumpyFeature(
                 name="sales",
-                sampling=sampling_1,
                 data=np.array([10.0, 20.0, 30.0]),
             ),
         ],
         (191562515,): [
             NumpyFeature(
                 name="sales",
-                sampling=sampling_1,
                 data=np.array([40.0]),
             ),
         ],
@@ -75,14 +73,12 @@ INPUT_2 = NumpyEvent(
         (151591562,): [
             NumpyFeature(
                 name="costs",
-                sampling=sampling_2,
                 data=np.array([-10.0, -20.0, 0.0]),
             ),
         ],
         (191562515,): [
             NumpyFeature(
                 name="costs",
-                sampling=sampling_2,
                 data=np.array([0.0]),
             ),
         ],
@@ -95,12 +91,10 @@ OUTPUT = NumpyEvent(
         (151591562,): [
             NumpyFeature(
                 name="sales",
-                sampling=sampling_1,
                 data=np.array([10.0, 20.0, 30.0]),
             ),
             NumpyFeature(
                 name="costs",
-                sampling=sampling_1,
                 data=np.array([-10.0, -10.0, -20.0]),  # -10.0 is repeated here
                 # because the timestamp is repeated
             ),
@@ -108,12 +102,10 @@ OUTPUT = NumpyEvent(
         (191562515,): [
             NumpyFeature(
                 name="sales",
-                sampling=sampling_1,
                 data=np.array([40.0]),
             ),
             NumpyFeature(
                 name="costs",
-                sampling=sampling_1,
                 data=np.array([0.0]),
             ),
         ],

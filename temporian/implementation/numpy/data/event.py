@@ -16,9 +16,7 @@ DTYPE_MAPPING = {
 
 
 class NumpyFeature:
-    def __init__(
-        self, name: str, sampling: NumpySampling, data: np.ndarray
-    ) -> None:
+    def __init__(self, name: str, data: np.ndarray) -> None:
         if len(data.shape) > 1:
             raise ValueError(
                 "NumpyFeatures can only be created from flat arrays. Passed"
@@ -31,7 +29,6 @@ class NumpyFeature:
             )
 
         self.name = name
-        self.sampling = sampling
         self.data = data
         self.dtype = data.dtype.type
 
@@ -50,9 +47,6 @@ class NumpyFeature:
             return False
 
         if self.name != __o.name:
-            return False
-
-        if self.sampling != __o.sampling:
             return False
 
         if not np.array_equal(self.data, __o.data, equal_nan=True):

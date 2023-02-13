@@ -45,7 +45,6 @@ class NumpySumOperator:
                             f"sum_{event_1_feature.name}_{event_2_feature.name}"
                         ),
                         data=event_1_feature.data + event_2_feature.data,
-                        sampling=event_1_feature.sampling,
                     )
                 )
 

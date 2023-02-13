@@ -42,21 +42,18 @@ INPUT_1 = NumpyEvent(
         ("A",): [
             NumpyFeature(
                 name="sales",
-                sampling=sampling_1,
                 data=np.array([np.nan, 15, 16]),
             ),
         ],
         ("B",): [
             NumpyFeature(
                 name="sales",
-                sampling=sampling_1,
                 data=np.array([np.nan, 11]),
             ),
         ],
         ("C",): [
             NumpyFeature(
                 name="sales",
-                sampling=sampling_1,
                 data=np.array([9, np.nan]),
             ),
         ],
@@ -69,21 +66,18 @@ INPUT_2 = NumpyEvent(
         ("A",): [
             NumpyFeature(
                 name="costs",
-                sampling=sampling_2,
                 data=np.array([-14, -15, -16]),
             ),
         ],
         ("B",): [
             NumpyFeature(
                 name="costs",
-                sampling=sampling_2,
                 data=np.array([np.nan, -11]),
             ),
         ],
         ("C",): [
             NumpyFeature(
                 name="costs",
-                sampling=sampling_2,
                 data=np.array([-9, np.nan]),
             ),
         ],
@@ -96,21 +90,18 @@ OUTPUT = NumpyEvent(
         ("A",): [
             NumpyFeature(
                 name="sum_sales_costs",
-                sampling=sampling_1,
                 data=np.array([np.nan, 0, 0]),  # np.nan + value = np.nan
             ),
         ],
         ("B",): [
             NumpyFeature(
                 name="sum_sales_costs",
-                sampling=sampling_1,
                 data=np.array([np.nan, 0]),  # np.nan + np.nan = np.nan
             ),
         ],
         ("C",): [
             NumpyFeature(
                 name="sum_sales_costs",
-                sampling=sampling_1,
                 data=np.array([0, np.nan]),  # np.nan + np.nan = np.nan
             ),
         ],

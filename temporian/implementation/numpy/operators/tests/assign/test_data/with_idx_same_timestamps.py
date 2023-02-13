@@ -50,14 +50,12 @@ INPUT_1 = NumpyEvent(
         (666964,): [
             NumpyFeature(
                 name="sales",
-                sampling=sampling_1,
                 data=np.array([0.0, 100.0, 200.0]),
             ),
         ],
         (372306,): [
             NumpyFeature(
                 name="sales",
-                sampling=sampling_1,
                 data=np.array([1160.0]),
             ),
         ],
@@ -70,14 +68,12 @@ INPUT_2 = NumpyEvent(
         (666964,): [
             NumpyFeature(
                 name="costs",
-                sampling=sampling_2,
                 data=np.array([0.0, 250.0, 500.0]),
             ),
         ],
         (372306,): [
             NumpyFeature(
                 name="costs",
-                sampling=sampling_2,
                 data=np.array([508.0]),
             ),
         ],
@@ -90,24 +86,20 @@ OUTPUT = NumpyEvent(
         (666964,): [
             NumpyFeature(
                 name="sales",
-                sampling=sampling_1,
                 data=np.array([0.0, 100.0, 200.0]),
             ),
             NumpyFeature(
                 name="costs",
-                sampling=sampling_1,
                 data=np.array([0.0, 250.0, 500.0]),
             ),
         ],
         (372306,): [
             NumpyFeature(
                 name="sales",
-                sampling=sampling_1,
                 data=np.array([1160.0]),
             ),
             NumpyFeature(
                 name="costs",
-                sampling=sampling_1,
                 data=np.array([508.0]),
             ),
         ],
