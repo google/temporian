@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""NumpyAssignOperator - assigned repeated timestamps test.
+"""NumpyAssignOperator - assignee repeated timestamps test.
 
-Tests that there cannot exist repeated timestamps on the assigned event for any
-index value.
+Tests the correct functionality of the NumpyAssignOperator when the assignee
+has repeated timestamps.
+
 """
 
 import numpy as np
