@@ -108,8 +108,6 @@ def build_schedule(
         list_to_dict(inputs), list_to_dict(outputs)
     )
 
-    # print("@@@processor:\n", processor)
-
     # Sequence of operators to execute. This is the result of the
     # "build_schedule" function.
     planned_ops: List[base.Operator] = []
@@ -147,8 +145,7 @@ def build_schedule(
     # Compute the schedule
     while ready_ops:
         # Get an op ready to be scheduled
-        op = next(iter(ready_ops))
-        ready_ops.remove(op)
+        op = ready_ops.pop()
 
         # Schedule the op
         planned_ops.append(op)
