@@ -1,7 +1,6 @@
 from typing import Dict, List, Tuple, Any
 
 import numpy as np
-import pandas as pd
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.data import dtype
@@ -15,7 +14,7 @@ class NumpyFeature:
                 "NumpyFeatures can only be created from flat arrays. Passed"
                 f" input's shape: {len(data.shape)}"
             )
-        if data.dtype.type is np.string_:
+        if data.dtype.type is not np.string_:
             if data.dtype.type not in DTYPE_MAPPING:
                 raise ValueError(
                     f"Unsupported dtype {data.dtype} for NumpyFeature."

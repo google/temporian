@@ -11,7 +11,7 @@ class NumpySampling:
     def __repr__(self) -> str:
         return f"index:{self.index} data: {self.data.__repr__()}"
 
-    def __eq__(self, other):
+    def __eq__(self, other: "NumpySampling") -> bool:
         if not isinstance(other, NumpySampling):
             return False
 

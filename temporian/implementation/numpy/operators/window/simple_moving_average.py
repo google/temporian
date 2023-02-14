@@ -33,27 +33,31 @@ class SimpleMovingAverageNumpyImplementation:
         for index, src_mts in event.data.items():
             dst_mts = []
             dst_event.data[index] = dst_mts
-            src_time = event.sampling.data[index]
+            src_timestamps = event.sampling.data[index]
 
             # For each feature
             for src_ts in src_mts:
-                dst_feature_name = f"sum_{src_ts.name}"
+                dst_feature_name = f"sma_{src_ts.name}"
                 dst_ts_data = _impl(
-                    src_ts.data, src_time, self._op.window_length()
+                    src_ts.data, src_timestamps, self._op.window_length()
                 )
                 dst_mts.append(NumpyFeature(dst_feature_name, dst_ts_data))
 
         return {"event": dst_event}
 
 
-def _impl(src: np.array, time: np.array, win: Duration) -> np.array:
+def _impl(src: np.array, timestamps: np.array, win: Duration) -> np.array:
     # TODO: Implement in c++.
     # TODO: Add support for missing (NaN) input values.
+    # TODO: Both sides are currently inclusive. Check if this makes sense.
 
     # This implementation is simple but expensive. It will create multiple
     # O(n^2) arrays, where n is the number of time samples.
-    r = time[:, np.newaxis] >= time[np.newaxis, :]  # Right side
-    l = time[:, np.newaxis] <= (time[np.newaxis, :] + win)  # Left side
+
+    # Right side
+    r = timestamps[:, np.newaxis] >= timestamps[np.newaxis, :]
+    # Left side
+    l = timestamps[:, np.newaxis] <= (timestamps[np.newaxis, :] + win)
     m = r & l
     dst = np.sum(src * m, axis=1) / np.sum(m, axis=1)
 

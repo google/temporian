@@ -32,7 +32,8 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
     def setUp(self):
         pass
 
-    # TODO: Add more tests (index, sampling, nan, etc).
+    # TODO: Add more tests (index, sampling, nan, etc), notably the ones in the
+    # pandas backend.
 
     def test_no_index(self):
         # TODO: Simplify test definition with "pd_to_event" when available.
@@ -71,11 +72,11 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             data={
                 (): [
                     NumpyFeature(
-                        name="sum_a",
+                        name="sma_a",
                         data=np.array([10.0, 10.5, 11.0, 11.5, 14.0]),
                     ),
                     NumpyFeature(
-                        name="sum_b",
+                        name="sma_b",
                         data=np.array([20.0, 20.5, 21.0, 21.5, 24.0]),
                     ),
                 ]
