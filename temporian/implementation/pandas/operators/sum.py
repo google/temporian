@@ -45,6 +45,7 @@ class PandasSumOperator(PandasOperator):
             IndexError: If index of both events is not equal.
             NotImplementedError: If resolution is PER_FEATURE_NAME.
         """
+
         if not event_1.index.equals(event_2.index):
             raise IndexError("Index of both events must be equal.")
 
@@ -59,6 +60,7 @@ class PandasSumOperator(PandasOperator):
             )
 
         output_feature_names = "sum_" + event_1.columns + "_" + event_2.columns
+
         output.columns = output_feature_names
 
         return {"event": output}
