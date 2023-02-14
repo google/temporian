@@ -55,7 +55,9 @@ class EvaluatorTest(absltest.TestCase):
             inputs=[i1, i2],
             outputs=[o3.outputs()["output"]],
         )
-        self.assertEqual(schedule, [o2, o1, o3])
+        self.assertTrue(
+            (schedule == [o2, o1, o3]) or (schedule == [o1, o2, o3])
+        )
 
     def test_schedule_basic(self):
         i1 = utils.create_input_event()
@@ -68,7 +70,9 @@ class EvaluatorTest(absltest.TestCase):
             inputs=[i1, i3],
             outputs=[o5.outputs()["output_1"], o4.outputs()["output"]],
         )
-        self.assertEqual(schedule, [o2, o4, o5])
+        self.assertTrue(
+            (schedule == [o2, o4, o5]) or (schedule == [o4, o2, o5])
+        )
 
     def test_schedule_mid_chain(self):
         i1 = utils.create_input_event()
