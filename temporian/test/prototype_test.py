@@ -27,50 +27,43 @@ from temporian.implementation.pandas.data import event as pandas_event
 
 class PrototypeTest(absltest.TestCase):
     def setUp(self) -> None:
-        self.input_1 = "temporian/test/test_data/prototype/input_1.csv"
+        self.data_input_1 = (
+            "temporian/test/test_data/prototype/assignee_event.csv"
+        )
 
-        self.data_input_1 = pandas_event.PandasEvent(
+        self.data_input_2 = pandas_event.PandasEvent(
             [
                 [666964, pd.Timestamp("2013-01-02"), 740.0],
                 [666964, pd.Timestamp("2013-01-03"), 508.0],
                 [574016, pd.Timestamp("2013-01-04"), 573.0],
             ],
-            columns=["product_id", "timestamp", "sales"],
-        ).set_index(["product_id", "timestamp"])
-
-        self.data_input_2 = pandas_event.PandasEvent(
-            [
-                [666964, pd.Timestamp("2013-01-02"), 1091.0],
-                [666964, pd.Timestamp("2013-01-03"), 919.0],
-                [574016, pd.Timestamp("2013-01-04"), 953.0],
-            ],
             columns=["product_id", "timestamp", "costs"],
         ).set_index(["product_id", "timestamp"])
 
-        self.expected_output = pandas_event.PandasEvent(
+        self.expected_output_event = pandas_event.PandasEvent(
             [
                 [
                     666964,
                     pd.Timestamp("2013-01-02"),
+                    1091.0,
                     740.0,
-                    1091.0,
-                    1091.0,
+                    740.0,
                     1831.0,
                 ],
                 [
                     666964,
                     pd.Timestamp("2013-01-03"),
-                    508.0,
                     919.0,
-                    1005.0,
+                    508.0,
+                    624.0,
                     1427.0,
                 ],
                 [
                     574016,
                     pd.Timestamp("2013-01-04"),
+                    953.0,
                     573.0,
-                    953.0,
-                    953.0,
+                    573.0,
                     1526.0,
                 ],
             ],
@@ -130,7 +123,9 @@ class PrototypeTest(absltest.TestCase):
         # validate
         self.assertEqual(
             True,
-            self.expected_output.equals(output_event_pandas[output_event]),
+            self.expected_output_event.equals(
+                output_event_pandas[output_event]
+            ),
         )
 
 
