@@ -175,7 +175,7 @@ class PrototypeTest(absltest.TestCase):
         output_event_numpy = evaluator.evaluate(
             output_event,
             input_data={
-                # assignee event specified from disk
+                # left event specified from disk
                 event: self.event,
                 event_2: self.event_2,
             },

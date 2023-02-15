@@ -14,8 +14,8 @@
 
 """PandasAssignOperator - repeated timestamps test.
 
-Tests that there cannot exist repeated timestamps on the assigned event for any
-index value. Repeated timestamps are allowed on the assignee event.
+Tests that there cannot exist repeated timestamps on the right event for any
+index value. Repeated timestamps are allowed on the left event.
 """
 
 import pandas as pd

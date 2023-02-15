@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""NumpyAssignOperator - assigned repeated timestamps test.
+"""NumpyAssignOperator - right repeated timestamps test.
 
-Tests that there cannot exist repeated timestamps on the assigned event for any
+Tests that there cannot exist repeated timestamps on the right event for any
 index value.
 """
 

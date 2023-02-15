@@ -27,11 +27,9 @@ from temporian.implementation.pandas.data import event as pandas_event
 
 class PrototypeTest(absltest.TestCase):
     def setUp(self) -> None:
-        self.data_input_1 = (
-            "temporian/test/test_data/prototype/assignee_event.csv"
-        )
+        self.left_event = "temporian/test/test_data/prototype/left_event.csv"
 
-        self.data_input_2 = pandas_event.PandasEvent(
+        self.right_event = pandas_event.PandasEvent(
             [
                 [666964, pd.Timestamp("2013-01-02"), 740.0],
                 [666964, pd.Timestamp("2013-01-03"), 508.0],
@@ -81,41 +79,43 @@ class PrototypeTest(absltest.TestCase):
         # instance input events
         sampling = Sampling(["product_id", "timestamp"])
 
-        input_1 = Event(
+        left_event = Event(
             features=[Feature(name="sales", dtype=float)],
             sampling=sampling,
             creator=None,
         )
-        input_2 = Event(
+        right_event = Event(
             features=[Feature(name="costs", dtype=float)],
             sampling=sampling,
             creator=None,
         )
 
-        sum_1 = sum(
-            event_1=input_1,
-            event_2=input_2,
+        sum_events = sum(
+            event_1=left_event,
+            event_2=right_event,
         )
 
         # call assign operator
-        merge_1 = assign(input_1, input_2)
+        output_event = assign(left_event, right_event)
 
         # call sma operator
-        sma_1 = sma(input_2, window_length="7d", sampling=input_2)
+        sma_right_event = sma(
+            right_event, window_length="7d", sampling=right_event
+        )
 
         # call assign operator with result of sma
-        merge_2 = assign(merge_1, sma_1)
+        output_event = assign(output_event, sma_right_event)
 
-        output_event = assign(merge_2, sum_1)
+        output_event = assign(output_event, sum_events)
 
         # evaluate output
         output_event_pandas = evaluator.evaluate(
             output_event,
             input_data={
-                # assignee event specified from disk
-                input_1: self.data_input_1,
-                # assigned event loaded in ram
-                input_2: self.data_input_2,
+                # left event specified from disk
+                left_event: self.left_event,
+                # right event loaded in ram
+                right_event: self.right_event,
             },
             backend="pandas",
         )

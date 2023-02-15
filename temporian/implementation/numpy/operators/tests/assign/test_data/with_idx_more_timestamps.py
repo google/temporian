@@ -14,7 +14,7 @@
 
 """NumpyAssignOperator - with index, more timestamps test.
 
-Tests the correct output when the assigned event has more timestamps than the assignee
+Tests the correct output when the right event has more timestamps than the left
 event, for any index value. Both input events are indexed.
 """
 import numpy as np

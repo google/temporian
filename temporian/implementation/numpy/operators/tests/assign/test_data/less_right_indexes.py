@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""NumpyAssignOperator - less assigned indexes
+"""NumpyAssignOperator - less right indexes
 
-Tests that if assigned has less indexes than assignee, the features will be filled
+Tests that if right has less indexes than assignee, the features will be filled
 with NaNs.
 
 """

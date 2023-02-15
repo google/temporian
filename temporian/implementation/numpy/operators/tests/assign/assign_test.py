@@ -27,7 +27,7 @@ from temporian.implementation.numpy.operators.tests.assign.test_data import (
 )
 
 from temporian.implementation.numpy.operators.tests.assign.test_data import (
-    less_assigned_indexes,
+    less_right_indexes,
 )
 
 from temporian.implementation.numpy.operators.tests.assign.test_data import (
@@ -35,11 +35,11 @@ from temporian.implementation.numpy.operators.tests.assign.test_data import (
 )
 
 from temporian.implementation.numpy.operators.tests.assign.test_data import (
-    assigned_repeated_timestamps,
+    right_repeated_timestamps,
 )
 
 from temporian.implementation.numpy.operators.tests.assign.test_data import (
-    assignee_repeated_timestamps,
+    left_repeated_timestamps,
 )
 
 
@@ -47,27 +47,24 @@ class AssignOperatorTest(absltest.TestCase):
     def setUp(self) -> None:
         self.operator = assign.NumpyAssignOperator()
 
-    def test_assigned_repeated_timestamps(self) -> None:
+    def test_right_repeated_timestamps(self) -> None:
         self.assertRaisesRegex(
             ValueError,
-            (
-                "Assigned sequence cannot have repeated timestamps in the same"
-                " index."
-            ),
+            "right sequence cannot have repeated timestamps in the same index.",
             self.operator,
-            assigned_repeated_timestamps.INPUT_1,
-            assigned_repeated_timestamps.INPUT_2,
+            right_repeated_timestamps.INPUT_1,
+            right_repeated_timestamps.INPUT_2,
         )
 
-    def test_assignee_repeated_timestamps(self) -> None:
+    def test_left_repeated_timestamps(self) -> None:
         operator_output = self.operator(
-            assignee_repeated_timestamps.INPUT_1,
-            assignee_repeated_timestamps.INPUT_2,
+            left_repeated_timestamps.INPUT_1,
+            left_repeated_timestamps.INPUT_2,
         )
 
         self.assertEqual(
             True,
-            assignee_repeated_timestamps.OUTPUT == operator_output["event"],
+            left_repeated_timestamps.OUTPUT == operator_output["event"],
         )
 
     def test_different_index(self) -> None:
@@ -99,15 +96,15 @@ class AssignOperatorTest(absltest.TestCase):
             with_idx_same_timestamps.OUTPUT == operator_output["event"],
         )
 
-    def test_less_assigned_indexes(self) -> None:
+    def test_less_right_indexes(self) -> None:
         operator_output = self.operator(
-            less_assigned_indexes.INPUT_1,
-            less_assigned_indexes.INPUT_2,
+            less_right_indexes.INPUT_1,
+            less_right_indexes.INPUT_2,
         )
 
         self.assertEqual(
             True,
-            less_assigned_indexes.OUTPUT == operator_output["event"],
+            less_right_indexes.OUTPUT == operator_output["event"],
         )
 
     def test_complete_timestamps(self) -> None:

@@ -16,8 +16,8 @@ py_library(
 # =====================
 
 py_library(
-    name = "less_assigned_indexes",
-    srcs = ["less_assigned_indexes.py"],
+    name = "less_right_indexes",
+    srcs = ["less_right_indexes.py"],
     srcs_version = "PY3",
     deps = [
         # pandas dep,
@@ -43,8 +43,8 @@ py_library(
 )
 
 py_library(
-    name = "assigned_repeated_timestamps",
-    srcs = ["assigned_repeated_timestamps.py"],
+    name = "right_repeated_timestamps",
+    srcs = ["right_repeated_timestamps.py"],
     srcs_version = "PY3",
     deps = [
         # pandas dep,
@@ -52,8 +52,8 @@ py_library(
 )
 
 py_library(
-    name = "assignee_repeated_timestamps",
-    srcs = ["assignee_repeated_timestamps.py"],
+    name = "left_repeated_timestamps",
+    srcs = ["left_repeated_timestamps.py"],
     srcs_version = "PY3",
     deps = [
         # pandas dep,

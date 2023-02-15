@@ -14,7 +14,7 @@
 
 """NumpyAssignOperator - different index test.
 
-Tests that the assignee and assigned events cannot have different indexes.
+Tests that the left and right events cannot have different indexes.
 """
 import numpy as np
 

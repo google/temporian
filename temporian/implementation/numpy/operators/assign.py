@@ -23,61 +23,61 @@ from temporian.implementation.numpy.data.sampling import NumpySampling
 
 class NumpyAssignOperator:
     def __call__(
-        self, assignee_event: NumpyEvent, assigned_event: NumpyEvent
+        self, left_event: NumpyEvent, right_event: NumpyEvent
     ) -> Dict[str, NumpyEvent]:
         """Assign features to an event.
 
-        Assignee and assigned must have same index names. Assigned cannot have more
+        Left and right must have same index names. right cannot have more
         than one row for a single index + timestamp occurence. Output event will
-        have same exact index and timestamps (sampling) as the assignee event.
+        have same exact index and timestamps (sampling) as the left event.
 
-        Assignment is done by matching the timestamps and index of the assignee and assigned.
-        The assigned features will be appended to the assignee features in the matching
-        indexes. Index values in the assigned event missing in the assignee event will
-        be filled with NaNs.  Index values present in the assigned event missing in
-        the assignee event will be ignored.
+        Assignment is done by matching the timestamps and index of the left and right.
+        The right features will be appended to the left features in the matching
+        indexes. Index values in the right event missing in the left event will
+        be filled with NaNs.  Index values present in the right event missing in
+        the left event will be ignored.
 
         Args:
-            assignee_event (NumpyEvent): event where features will be assigned to.
-            assigned_event (NumpyEvent): event with features to assign.
+            left_event: event where features will be right to.
+            right_event: event with features to assign.
 
         Returns:
-            NumpyEvent: a new event with the features assigned.
+            NumpyEvent: a new event with the features right.
 
         Raises:
-            ValueError: if assignee and assigned events have different indexes names.
-            ValueError: if assigned event has repeated timestamps for same index.
+            ValueError: if left and right events have different indexes names.
+            ValueError: if right event has repeated timestamps for same index.
 
         """
-        if assignee_event.sampling.names != assigned_event.sampling.names:
+        if left_event.sampling.names != right_event.sampling.names:
             raise ValueError("Assign sequences must have the same index names.")
 
-        if assigned_event.sampling.has_repeated_timestamps:
+        if right_event.sampling.has_repeated_timestamps:
             raise ValueError(
-                "Assigned sequence cannot have repeated timestamps in the same"
+                "right sequence cannot have repeated timestamps in the same"
                 " index."
             )
 
         output = NumpyEvent(
-            data=assignee_event.data.copy(), sampling=assignee_event.sampling
+            data=left_event.data.copy(), sampling=left_event.sampling
         )
 
-        for index in assignee_event.data.keys():
+        for index in left_event.data.keys():
             output_data = output.data[index]
-            assignee_sampling_data = assignee_event.sampling.data[index]
-            number_timestamps = len(assignee_sampling_data)
+            left_sampling_data = left_event.sampling.data[index]
+            number_timestamps = len(left_sampling_data)
 
-            # If index is in assigned append the features to the output event
-            if index in assigned_event.data:
-                assigned_sampling_data = assigned_event.sampling.data[index]
+            # If index is in right append the features to the output event
+            if index in right_event.data:
+                right_sampling_data = right_event.sampling.data[index]
 
                 mask = (
-                    assignee_sampling_data[:, np.newaxis]
-                    == assigned_sampling_data[np.newaxis, :]
+                    left_sampling_data[:, np.newaxis]
+                    == right_sampling_data[np.newaxis, :]
                 )
                 mask_i, mask_j = mask.nonzero()
 
-                for feature in assigned_event.data[index]:
+                for feature in right_event.data[index]:
                     new_feature = NumpyFeature(
                         name=feature.name,
                         data=np.full(number_timestamps, np.nan),
@@ -85,13 +85,13 @@ class NumpyAssignOperator:
                     new_feature.data[mask_i] = feature.data[mask_j]
                     output_data.append(new_feature)
 
-            # If index is not in assigned, append the features of assigned with None values
+            # If index is not in right, append the features of right with None values
             else:
-                for feature_name in assigned_event.feature_names:
+                for feature_name in right_event.feature_names:
                     output_data.append(
                         NumpyFeature(
                             name=feature_name,
-                            # Create a list of None values with the same length as assignee sampling
+                            # Create a list of None values with the same length as left sampling
                             data=np.full(number_timestamps, np.nan),
                         )
                     )
