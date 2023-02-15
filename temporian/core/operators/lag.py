@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Lag operator."""
+from typing import Optional
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
@@ -28,14 +29,24 @@ class LagOperator(Operator):
     def __init__(
         self,
         event: Event,
-        duration: Duration,
+        duration: Optional[Duration] = None,
+        period: Optional[int] = None,
     ):
         super().__init__()
 
         # inputs
         self.add_input("event", event)
 
-        self.add_attribute("duration", duration)
+        if duration is None and period is None:
+            raise ValueError("Must specify either duration or period")
+
+        if duration is not None and period is not None:
+            raise ValueError("Must specify either duration or period, not both")
+
+        if duration:
+            self.add_attribute("duration", duration)
+        if period:
+            self.add_attribute("period", period)
 
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
@@ -66,7 +77,12 @@ class LagOperator(Operator):
                 pb.OperatorDef.Attribute(
                     key="duration",
                     type=pb.OperatorDef.Attribute.Type.FLOAT,
-                    is_optional=False,
+                    is_optional=True,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="period",
+                    type=pb.OperatorDef.Attribute.Type.INT,
+                    is_optional=True,
                 ),
             ],
             inputs=[
@@ -81,9 +97,11 @@ operator_lib.register_operator(LagOperator)
 
 def lag(
     event: Event,
-    duration: Duration,
+    duration: Optional[Duration] = None,
+    period: Optional[int] = None,
 ) -> Event:
     return LagOperator(
         event=event,
         duration=duration,
+        period=period,
     ).outputs()["event"]

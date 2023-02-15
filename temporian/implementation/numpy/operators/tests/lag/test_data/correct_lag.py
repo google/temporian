@@ -46,7 +46,9 @@ OUTPUT = NumpyEvent(
         ("A",): [
             NumpyFeature(
                 name="lag_sales",
-                data=np.array([np.nan, np.nan, 10.0, 11.0, 11.0, 14.0, 15.0]),
+                data=np.array(
+                    [np.nan, np.nan, 10.0, 11.0, np.nan, np.nan, np.nan]
+                ),
             ),
         ],
     },
