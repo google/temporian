@@ -8,11 +8,11 @@ py_library(
     srcs = ["utils.py"],
     srcs_version = "PY3",
     deps = [
+        "//temporian/core:operator_lib",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
         "//temporian/core/data:sampling",
         "//temporian/core/operators:base",
-        "//temporian/core:operator_lib"
     ],
 )
 
@@ -60,6 +60,24 @@ py_test(
         ":utils",
         "//temporian/core:processor",
         "//temporian/core:serialize",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators:base",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_test(
+    name = "evaluator_test",
+    srcs = ["evaluator_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/logging dep,
+        # absl/testing:absltest dep,
+        ":utils",
+        "//temporian/core:evaluator",
         "//temporian/core/data:dtype",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
