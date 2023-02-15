@@ -63,33 +63,36 @@ class NumpyAssignOperator:
         )
 
         for index in assignee_event.data.keys():
+            output_data = output.data[index]
+            assignee_sampling_data = assignee_event.sampling.data[index]
+            number_timestamps = len(assignee_sampling_data)
+
             # If index is in assigned append the features to the output event
-            if index in assigned_event.data.keys():
+            if index in assigned_event.data:
+                assigned_sampling_data = assigned_event.sampling.data[index]
+
                 mask = (
-                    assignee_event.sampling.data[index][:, np.newaxis]
-                    == assigned_event.sampling.data[index][np.newaxis, :]
+                    assignee_sampling_data[:, np.newaxis]
+                    == assigned_sampling_data[np.newaxis, :]
                 )
                 mask_i, mask_j = mask.nonzero()
+
                 for feature in assigned_event.data[index]:
                     new_feature = NumpyFeature(
                         name=feature.name,
-                        data=np.full(
-                            len(assignee_event.sampling.data[index]), np.nan
-                        ),
+                        data=np.full(number_timestamps, np.nan),
                     )
                     new_feature.data[mask_i] = feature.data[mask_j]
-                    output.data[index].append(new_feature)
+                    output_data.append(new_feature)
 
             # If index is not in assigned, append the features of assigned with None values
             else:
                 for feature_name in assigned_event.feature_names:
-                    output.data[index].append(
+                    output_data.append(
                         NumpyFeature(
                             name=feature_name,
                             # Create a list of None values with the same length as assignee sampling
-                            data=np.full(
-                                len(assignee_event.sampling.data[index]), np.nan
-                            ),
+                            data=np.full(number_timestamps, np.nan),
                         )
                     )
 

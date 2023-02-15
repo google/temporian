@@ -65,12 +65,6 @@ class AssignOperatorTest(absltest.TestCase):
             assignee_repeated_timestamps.INPUT_2,
         )
 
-        print("Actual:")
-        print(operator_output["event"])
-        print("-" * 80)
-        print("Expected:")
-        print(assignee_repeated_timestamps.OUTPUT)
-
         self.assertEqual(
             True,
             assignee_repeated_timestamps.OUTPUT == operator_output["event"],
