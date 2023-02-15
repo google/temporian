@@ -21,7 +21,7 @@ class SimpleMovingAverageNumpyImplementation:
         event: NumpyEvent,
         sampling: Optional[NumpyEvent] = None,
     ) -> Dict[str, NumpyEvent]:
-        # TODO: Add support for index.
+        # TODO: Add support for sampling.
         if sampling is not None:
             raise NotImplementedError("Sampling not implemented")
 

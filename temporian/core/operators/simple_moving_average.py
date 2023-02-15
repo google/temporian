@@ -76,7 +76,7 @@ class SimpleMovingAverage(Operator):
             attributes=[
                 pb.OperatorDef.Attribute(
                     key="window_length",
-                    type=pb.OperatorDef.Attribute.Type.STRING,
+                    type=pb.OperatorDef.Attribute.Type.FLOAT_64,
                     is_optional=False,
                 ),
             ],
