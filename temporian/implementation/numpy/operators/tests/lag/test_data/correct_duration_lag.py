@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""NumpySumOperator - correct sum
+"""NumpyLagOperator - correct duration lag
 
-Tests correct functionality of the sum operator
+Tests correct functionality of the lag operator with a duration of 2.
 
 """
 import numpy as np
