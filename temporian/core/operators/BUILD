@@ -30,6 +30,20 @@ py_library(
 )
 
 py_library(
+    name = "reindex",
+    srcs = ["reindex.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/core/data:sampling",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
     name = "sum",
     srcs = ["sum.py"],
     srcs_version = "PY3",
