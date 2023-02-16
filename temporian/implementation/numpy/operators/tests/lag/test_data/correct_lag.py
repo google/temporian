@@ -40,17 +40,19 @@ INPUT = NumpyEvent(
     sampling=sampling,
 )
 
+output_sampling = NumpySampling(
+    index=["store_id"],
+    data={("A",): np.array([-1, -0.5, 1, 1.5, 2, 8, 18])},
+)
 
 OUTPUT = NumpyEvent(
     data={
         ("A",): [
             NumpyFeature(
                 name="lag_sales",
-                data=np.array(
-                    [np.nan, np.nan, 10.0, 11.0, np.nan, np.nan, np.nan]
-                ),
+                data=np.array([10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0]),
             ),
         ],
     },
-    sampling=sampling,
+    sampling=output_sampling,
 )

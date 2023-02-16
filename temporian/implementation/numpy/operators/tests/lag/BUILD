@@ -12,7 +12,6 @@ py_test(
     deps = [
         # absl/testing:absltest dep,
         "//temporian/implementation/numpy/operators:lag",
-        "//temporian/implementation/numpy/operators/tests/lag/test_data:correct_duration_lag",
-        "//temporian/implementation/numpy/operators/tests/lag/test_data:correct_period_lag",
+        "//temporian/implementation/numpy/operators/tests/lag/test_data:correct_lag",
     ],
 )
