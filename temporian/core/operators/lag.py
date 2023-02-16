@@ -17,6 +17,7 @@
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
+from temporian.core.data.sampling import Sampling
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -41,7 +42,7 @@ class LagOperator(Operator):
             Feature(
                 name=f"lag_{f.name()}",
                 dtype=f.dtype(),
-                sampling=event.sampling,
+                sampling=Sampling(index=event.sampling.index, creator=self),
                 creator=self,
             )
             for f in event.features()
@@ -51,7 +52,7 @@ class LagOperator(Operator):
             "event",
             Event(
                 features=output_features,
-                sampling=event.sampling,
+                sampling=Sampling(index=event.sampling.index, creator=self),
                 creator=self,
             ),
         )
