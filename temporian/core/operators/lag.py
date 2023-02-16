@@ -19,7 +19,6 @@ from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
-from temporian.core.data.duration import Duration
 
 
 class LagOperator(Operator):
@@ -28,7 +27,7 @@ class LagOperator(Operator):
     def __init__(
         self,
         event: Event,
-        duration: Duration,
+        duration: float,
     ):
         super().__init__()
 
@@ -79,7 +78,7 @@ class LagOperator(Operator):
 operator_lib.register_operator(LagOperator)
 
 
-def lag(event: Event, duration: Duration) -> Event:
+def lag(event: Event, duration: float) -> Event:
     return LagOperator(
         event=event,
         duration=duration,

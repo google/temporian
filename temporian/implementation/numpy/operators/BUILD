@@ -27,7 +27,6 @@ py_library(
     srcs = ["lag.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/core/data:duration",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
     ],
