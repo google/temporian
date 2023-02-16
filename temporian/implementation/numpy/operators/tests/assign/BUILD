@@ -12,8 +12,11 @@ py_test(
     deps = [
         # absl/testing:absltest dep,
         "//temporian/implementation/numpy/operators:assign",
+        "//temporian/implementation/numpy/operators/tests/assign/test_data:right_repeated_timestamps",
+        "//temporian/implementation/numpy/operators/tests/assign/test_data:left_repeated_timestamps",
+        "//temporian/implementation/numpy/operators/tests/assign/test_data:less_right_indexes",
+        "//temporian/implementation/numpy/operators/tests/assign/test_data:complete_timestamps",
         "//temporian/implementation/numpy/operators/tests/assign/test_data:different_index",
-        "//temporian/implementation/numpy/operators/tests/assign/test_data:repeated_timestamps",
         "//temporian/implementation/numpy/operators/tests/assign/test_data:with_idx_more_timestamps",
         "//temporian/implementation/numpy/operators/tests/assign/test_data:with_idx_same_timestamps",
     ],

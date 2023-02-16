@@ -8,6 +8,22 @@ class NumpySampling:
         self.names = names
         self.data = data
 
+    @property
+    def has_repeated_timestamps(self) -> bool:
+        """Check if any index has repeated timestamps
+
+        Returns:
+            bool: True if any index has repeated timestamps
+        """
+        for index in self.data:
+            if len(self.data[index]) != len(np.unique(self.data[index])):
+                return True
+
+        return False
+
+    def __repr__(self) -> str:
+        return f"{self.names}: {self.data.__repr__()}"
+
     def __eq__(self, other):
         if not isinstance(other, NumpySampling):
             return False

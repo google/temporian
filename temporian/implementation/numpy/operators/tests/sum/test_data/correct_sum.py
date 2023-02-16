@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""NumpyAssignOperator - with index, more timestamps test.
+"""NumpySumOperator - correct sum
 
-Tests the correct output when the right event has more timestamps than the left
-event, for any index value. Both input events are indexed.
+Tests correct functionality of the sum operator
+
 """
 import numpy as np
 
@@ -24,39 +24,37 @@ from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
 
 sampling_1 = NumpySampling(
-    names=["product_id"],
+    names=["store_id"],
     data={
-        (666964,): np.array(
-            ["2022-02-05"],
+        ("A",): np.array(
+            ["2022-02-05", "2022-02-06", "2022-02-07"],
             dtype="datetime64",
         ),
-        (372306,): np.array(["2022-02-06"], dtype="datetime64"),
+        ("B",): np.array(["2022-02-05", "2022-02-06"], dtype="datetime64"),
+        ("C",): np.array(["2022-02-05", "2022-02-06"], dtype="datetime64"),
     },
 )
 
-sampling_2 = NumpySampling(
-    names=["product_id"],
-    data={
-        (666964,): np.array(
-            ["2022-02-05"],
-            dtype="datetime64",
-        ),
-        (372306,): np.array(["2022-02-06", "2022-02-07"], dtype="datetime64"),
-    },
-)
+sampling_2 = sampling_1
 
 INPUT_1 = NumpyEvent(
     data={
-        (666964,): [
+        ("A",): [
             NumpyFeature(
                 name="sales",
-                data=np.array([0.0]),
+                data=np.array([14, 15, 16]),
             ),
         ],
-        (372306,): [
+        ("B",): [
             NumpyFeature(
                 name="sales",
-                data=np.array([1160.0]),
+                data=np.array([10, 11]),
+            ),
+        ],
+        ("C",): [
+            NumpyFeature(
+                name="sales",
+                data=np.array([9, 10]),
             ),
         ],
     },
@@ -65,16 +63,22 @@ INPUT_1 = NumpyEvent(
 
 INPUT_2 = NumpyEvent(
     data={
-        (666964,): [
+        ("A",): [
             NumpyFeature(
                 name="costs",
-                data=np.array([0.0]),
+                data=np.array([-14, -15, -16]),
             ),
         ],
-        (372306,): [
+        ("B",): [
             NumpyFeature(
                 name="costs",
-                data=np.array([508.0, 573.0]),
+                data=np.array([-10, -11]),
+            ),
+        ],
+        ("C",): [
+            NumpyFeature(
+                name="costs",
+                data=np.array([-9, -10]),
             ),
         ],
     },
@@ -83,24 +87,22 @@ INPUT_2 = NumpyEvent(
 
 OUTPUT = NumpyEvent(
     data={
-        (666964,): [
+        ("A",): [
             NumpyFeature(
-                name="sales",
-                data=np.array([0.0]),
-            ),
-            NumpyFeature(
-                name="costs",
-                data=np.array([0.0]),
+                name="sum_sales_costs",
+                data=np.array([0, 0, 0]),
             ),
         ],
-        (372306,): [
+        ("B",): [
             NumpyFeature(
-                name="sales",
-                data=np.array([1160.0]),
+                name="sum_sales_costs",
+                data=np.array([0, 0]),
             ),
+        ],
+        ("C",): [
             NumpyFeature(
-                name="costs",
-                data=np.array([508.0]),
+                name="sum_sales_costs",
+                data=np.array([0, 0]),
             ),
         ],
     },
