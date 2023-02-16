@@ -37,8 +37,19 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":assign",
+        ":reindex",
         ":select",
         ":sum",
+    ],
+)
+
+py_library(
+    name = "reindex",
+    srcs = ["reindex.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/operators:reindex",
+        "//temporian/implementation/numpy/data:event",
     ],
 )
 
