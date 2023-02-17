@@ -6,12 +6,12 @@ package(
 # Tests
 # =====
 py_test(
-    name = "lag_test",
-    srcs = ["lag_test.py"],
+    name = "leak_test",
+    srcs = ["leak_test.py"],
     srcs_version = "PY3",
     deps = [
         # absl/testing:absltest dep,
-        "//temporian/core/operators:lag",
+        "//temporian/core/operators:leak",
         "//temporian/implementation/numpy/operators:lag",
     ],
 )

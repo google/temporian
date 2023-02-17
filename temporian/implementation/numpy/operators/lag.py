@@ -1,18 +1,24 @@
+from typing import Union
+
 from temporian.core.operators.lag import LagOperator
+from temporian.core.operators.leak import LeakOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.sampling import NumpySampling
 
 
 class LagNumpyImplementation:
-    def __init__(self, operator: LagOperator) -> None:
+    def __init__(self, operator: Union[LagOperator, LeakOperator]) -> None:
         super().__init__()
         self.operator = operator
 
     def __call__(self, event: NumpyEvent) -> NumpyEvent:
         duration = self.operator.attributes()["duration"]
 
-        if duration < 0:
-            raise ValueError("Duration must be positive")
+        if duration <= 0:
+            raise ValueError("Duration must be positive and non-zero.")
+
+        if isinstance(self.operator, LeakOperator):
+            duration = -duration
 
         new_sampling = NumpySampling(
             data={},
