@@ -9,6 +9,11 @@ class LagNumpyImplementation:
         self.operator = operator
 
     def __call__(self, event: NumpyEvent) -> NumpyEvent:
+        duration = self.operator.attributes()["duration"]
+
+        if duration < 0:
+            raise ValueError("Duration must be positive")
+
         new_sampling = NumpySampling(
             data={},
             names=event.sampling.names,
@@ -16,10 +21,9 @@ class LagNumpyImplementation:
         output = NumpyEvent(data=event.data, sampling=new_sampling)
 
         for index, timestamps in event.sampling.data.items():
-            new_sampling.data[index] = (
-                timestamps + self.operator.attributes()["duration"]
-            )
-            for feature in output.data[index]:
+            new_sampling.data[index] = timestamps + duration
+            output_data = output.data[index]
+            for feature in output_data:
                 feature.name = f"lag_{feature.name}"
 
         return {"event": output}
