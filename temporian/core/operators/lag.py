@@ -42,7 +42,7 @@ class LagOperator(Operator):
             Feature(
                 name=f"lag_{f.name()}",
                 dtype=f.dtype(),
-                sampling=Sampling(index=event.sampling.index, creator=self),
+                sampling=Sampling(index=event.sampling().index, creator=self),
                 creator=self,
             )
             for f in event.features()
@@ -52,7 +52,7 @@ class LagOperator(Operator):
             "event",
             Event(
                 features=output_features,
-                sampling=Sampling(index=event.sampling.index, creator=self),
+                sampling=Sampling(index=event.sampling().index, creator=self),
                 creator=self,
             ),
         )
@@ -65,7 +65,7 @@ class LagOperator(Operator):
             attributes=[
                 pb.OperatorDef.Attribute(
                     key="duration",
-                    type=pb.OperatorDef.Attribute.Type.FLOAT,
+                    type=pb.OperatorDef.Attribute.Type.FLOAT_64,
                     is_optional=False,
                 ),
             ],
