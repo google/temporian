@@ -53,3 +53,15 @@ py_test(
         "//temporian/implementation/numpy/data:event",
     ],
 )
+
+py_test(
+    name = "event_conversion_test",
+    srcs = ["event_conversion_test.py"],
+    data = ["test_data/prototype"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/testing:absltest dep,
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+    ],
+)
