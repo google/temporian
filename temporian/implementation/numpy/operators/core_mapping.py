@@ -13,4 +13,5 @@ OPERATOR_IMPLEMENTATIONS = {
     "ASSIGN": AssignNumpyImplementation,
     "ARITHMETIC": ArithmeticNumpyImplementation,
     "LAG": LagNumpyImplementation,
+    "LEAK": LagNumpyImplementation,
 }
