@@ -14,7 +14,6 @@ py_library(
         ":arithmetic",
         ":assign",
         ":lag",
-        ":leak",
         ":simple_moving_average",
         ":sum",
     ],
@@ -49,19 +48,6 @@ py_library(
 py_library(
     name = "lag",
     srcs = ["lag.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":base",
-        "//temporian/core:operator_lib",
-        "//temporian/core/data:event",
-        "//temporian/core/data:feature",
-        "//temporian/proto:core_py_proto",
-    ],
-)
-
-py_library(
-    name = "leak",
-    srcs = ["leak.py"],
     srcs_version = "PY3",
     deps = [
         ":base",

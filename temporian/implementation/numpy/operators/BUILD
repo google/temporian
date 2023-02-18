@@ -28,7 +28,6 @@ py_library(
     srcs_version = "PY3",
     deps = [
         "//temporian/core/operators:lag",
-        "//temporian/core/operators:leak",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
     ],

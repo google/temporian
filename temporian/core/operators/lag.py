@@ -84,3 +84,10 @@ def lag(event: Event, duration: float) -> Event:
         event=event,
         duration=duration,
     ).outputs()["event"]
+
+
+def leak(event: Event, duration: float) -> Event:
+    return LagOperator(
+        event=event,
+        duration=-duration,
+    ).outputs()["event"]
