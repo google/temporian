@@ -37,12 +37,14 @@ class LagOperator(Operator):
 
         self.add_attribute("duration", duration)
 
+        output_sampling = Sampling(index=event.sampling().index, creator=self)
+
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
                 name=f"lag_{f.name()}",
                 dtype=f.dtype(),
-                sampling=Sampling(index=event.sampling().index, creator=self),
+                sampling=output_sampling,
                 creator=self,
             )
             for f in event.features()
@@ -52,7 +54,7 @@ class LagOperator(Operator):
             "event",
             Event(
                 features=output_features,
-                sampling=Sampling(index=event.sampling().index, creator=self),
+                sampling=output_sampling,
                 creator=self,
             ),
         )
