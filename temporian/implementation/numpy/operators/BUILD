@@ -60,3 +60,14 @@ py_library(
         "//temporian/implementation/numpy/data:event",
     ],
 )
+
+py_library(
+    name = "multiply",
+    srcs = ["multiply.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/operators:multiply",
+        "//temporian/core/operators:sum",
+        "//temporian/implementation/numpy/data:event",
+    ],
+)
