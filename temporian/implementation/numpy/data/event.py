@@ -105,17 +105,30 @@ class NumpyEvent:
         Returns:
             NumpyEvent: NumpyEvent created from DataFrame
         """
+        # check if there is an index called timestamp_index_name
+        # TODO: Should we check if it can be a column as well? In that
+        # case, re indexing is not neccesary.
+        if timestamp_index_name not in df.index.names:
+            raise ValueError(
+                "DataFrame must have an index named by the attribute",
+                (
+                    "timestamp_index_name, current value is "
+                    f"{timestamp_index_name}"
+                ),
+            )
 
         # create df without timestamp in index in order to group each index
         # with its timestamps for conversion
-        df_without_ts_idx = df.reset_index(level="timestamp")
+        df_without_ts_idx = df.reset_index(level=timestamp_index_name)
         index_without_ts = df_without_ts_idx.index
         sampling = {}
         data = {}
 
+        group_by_index = df.groupby(index_without_ts.names)
+
         for index in index_without_ts.unique():
-            # get the df grouped by timestamp in a specific index
-            index_group = df.groupby(index_without_ts.names).get_group(index)
+            # get the df grouped by timestamp & features in a specific index
+            index_group = group_by_index.get_group(index)
 
             # get timestamps of group
             timestamps = index_group.index.get_level_values(
@@ -131,11 +144,10 @@ class NumpyEvent:
 
             # create NumpyFeatures for each column in index_group
             columns = index_group.loc[index]
-            data[index] = []
-            for column_name in index_group.columns:
-                data[index].append(
-                    NumpyFeature(column_name, columns[column_name].to_numpy())
-                )
+            data[index] = [
+                NumpyFeature(column_name, columns[column_name].to_numpy())
+                for column_name in index_group.columns
+            ]
 
         numpy_sampling = NumpySampling(
             names=index_without_ts.names, data=sampling
@@ -143,13 +155,18 @@ class NumpyEvent:
 
         return NumpyEvent(data=data, sampling=numpy_sampling)
 
-    def to_dataframe(self) -> pd.DataFrame:
+    def to_dataframe(
+        self, timestamp_index_name: str = "timestamp"
+    ) -> pd.DataFrame:
         """Function to convert a NumpyEvent to a pandas DataFrame
+
+        Args:
+            timestamp_index_name: Name for timestamp index. Defaults to "timestamp".
 
         Returns:
             pd.DataFrame: DataFrame created from NumpyEvent
         """
-        df_index = self.sampling.names + ["timestamp"]
+        df_index = self.sampling.names + [timestamp_index_name]
         df_features = self.feature_names
         columns = df_index + df_features
 
