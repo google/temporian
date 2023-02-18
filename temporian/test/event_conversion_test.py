@@ -50,7 +50,7 @@ class EventConversionTest(absltest.TestCase):
             sampling=numpy_sampling,
         )
 
-        numpy_event = NumpyEvent.dataframe_to_event(df)
+        numpy_event = NumpyEvent.from_dataframe(df)
 
         # validate
         self.assertEqual(
@@ -86,7 +86,7 @@ class EventConversionTest(absltest.TestCase):
             columns=["product_id", "timestamp", "costs"],
         ).set_index(["product_id", "timestamp"])
 
-        df = NumpyEvent.event_to_dataframe(numpy_event)
+        df = numpy_event.to_dataframe()
 
         # validate
         self.assertEqual(

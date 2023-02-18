@@ -92,7 +92,7 @@ class NumpyEvent:
         )
 
     @staticmethod
-    def dataframe_to_event(
+    def from_dataframe(
         df: pd.DataFrame,
         timestamp_index_name: str = "timestamp",
     ) -> "NumpyEvent":
@@ -143,24 +143,20 @@ class NumpyEvent:
 
         return NumpyEvent(data=data, sampling=numpy_sampling)
 
-    @staticmethod
-    def event_to_dataframe(event: "NumpyEvent") -> pd.DataFrame:
+    def to_dataframe(self) -> pd.DataFrame:
         """Function to convert a NumpyEvent to a pandas DataFrame
-
-        Args:
-            event: NumpyEvent to convert to DataFrame
 
         Returns:
             pd.DataFrame: DataFrame created from NumpyEvent
         """
-        df_index = event.sampling.names + ["timestamp"]
-        df_features = event.feature_names
+        df_index = self.sampling.names + ["timestamp"]
+        df_features = self.feature_names
         columns = df_index + df_features
 
         df = pd.DataFrame(data=[], columns=columns).set_index(df_index)
 
-        for index, features in event.data.items():
-            timestamps_index = event.sampling.data[index]
+        for index, features in self.data.items():
+            timestamps_index = self.sampling.data[index]
             for i, timestamp in enumerate(timestamps_index):
                 # add timestamp to index
                 new_index = index + (timestamp,)
@@ -169,8 +165,8 @@ class NumpyEvent:
                 ]
 
         # Convert to original dtypes, can be more efficient
-        first_index = list(event.data.keys())[0]
-        first_features = event.data[first_index]
+        first_index = list(self.data.keys())[0]
+        first_features = self.data[first_index]
         df = df.astype(
             {feature.name: type(feature.data[0]) for feature in first_features}
         )
