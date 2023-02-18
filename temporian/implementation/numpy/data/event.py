@@ -65,12 +65,21 @@ class NumpyEvent:
         self.sampling = sampling
 
     @property
+    def first_index(self) -> Tuple:
+        first_index = None
+        try:
+            first_index = next(iter(self.data))
+        except StopIteration:
+            return None
+
+        return first_index
+
+    @property
     def feature_count(self) -> int:
         if len(self.data.keys()) == 0:
             return 0
 
-        first_index = next(iter(self.data))
-        return len(self.data[first_index])
+        return len(self.data[self.first_index])
 
     @property
     def feature_names(self) -> List[str]:
@@ -80,8 +89,7 @@ class NumpyEvent:
         # Only look at the feature in the first index
         # to get the feature names. All features in all
         # indexes should have the same names
-        first_index = next(iter(self.data))
-        return [feature.name for feature in self.data[first_index]]
+        return [feature.name for feature in self.data[self.first_index]]
 
     def schema(self) -> Event:
         return Event(
@@ -182,7 +190,7 @@ class NumpyEvent:
                 ]
 
         # Convert to original dtypes, can be more efficient
-        first_index = list(self.data.keys())[0]
+        first_index = self.first_index
         first_features = self.data[first_index]
         df = df.astype(
             {feature.name: type(feature.data[0]) for feature in first_features}
