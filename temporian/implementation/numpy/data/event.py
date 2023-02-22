@@ -102,64 +102,55 @@ class NumpyEvent:
     @staticmethod
     def from_dataframe(
         df: pd.DataFrame,
-        timestamp_index_name: str = "timestamp",
+        index_names: List[str],
+        timestamp_name: str = "timestamp",
     ) -> "NumpyEvent":
         """Function to convert a pandas DataFrame to a NumpyEvent
 
         Args:
             df: DataFrame to convert to NumpyEvent
-            timestamp_index_name: Name for timestamp index. Defaults to "timestamp".
+            index_names: Names of the indexes of the DataFrame
+            timestamp_name: Name for timestamp index. Defaults to "timestamp".
 
         Returns:
             NumpyEvent: NumpyEvent created from DataFrame
         """
-        # check if there is an index called timestamp_index_name
-        # TODO: Should we check if it can be a column as well? In that
-        # case, re indexing is not neccesary.
-        if timestamp_index_name not in df.index.names:
+        # check index names and timestamp name are in df columns
+        if (
+            not all(index_name in df.columns for index_name in index_names)
+            or timestamp_name not in df.columns
+        ):
             raise ValueError(
-                "DataFrame must have an index named by the attribute",
-                (
-                    "timestamp_index_name, current value is "
-                    f"{timestamp_index_name}"
-                ),
+                f"Index names {index_names} and timestamp name {timestamp_name}"
+                " are not in DataFrame columns"
             )
 
-        # create df without timestamp in index in order to group each index
-        # with its timestamps for conversion
-        df_without_ts_idx = df.reset_index(level=timestamp_index_name)
-        index_without_ts = df_without_ts_idx.index
+        feature_columns = [
+            column
+            for column in df.columns
+            if column not in index_names + [timestamp_name]
+        ]
+
+        group_by_indexes = df.groupby(index_names)
+
         sampling = {}
         data = {}
 
-        group_by_index = df.groupby(index_without_ts.names)
+        for group in group_by_indexes.groups:
+            columns = group_by_indexes.get_group(group)
+            timestamp = columns[timestamp_name].to_numpy()
 
-        for index in index_without_ts.unique():
-            # get the df grouped by timestamp & features in a specific index
-            index_group = group_by_index.get_group(index)
+            # Convert group to tuple, useful when its only one value
+            if not isinstance(group, tuple):
+                group = (group,)
 
-            # get timestamps of group
-            timestamps = index_group.index.get_level_values(
-                timestamp_index_name
-            )
-            timestamps = timestamps.to_numpy()
-
-            # convert to tuple if not already, useful for single index
-            if type(index) != tuple:
-                index = (index,)
-
-            sampling[index] = timestamps
-
-            # create NumpyFeatures for each column in index_group
-            columns = index_group.loc[index]
-            data[index] = [
-                NumpyFeature(column_name, columns[column_name].to_numpy())
-                for column_name in index_group.columns
+            sampling[group] = timestamp
+            data[group] = [
+                NumpyFeature(feature, columns[feature].to_numpy())
+                for feature in feature_columns
             ]
 
-        numpy_sampling = NumpySampling(
-            names=index_without_ts.names, data=sampling
-        )
+        numpy_sampling = NumpySampling(names=index_names, data=sampling)
 
         return NumpyEvent(data=data, sampling=numpy_sampling)
 
@@ -181,8 +172,8 @@ class NumpyEvent:
         df = pd.DataFrame(data=[], columns=columns).set_index(df_index)
 
         for index, features in self.data.items():
-            timestamps_index = self.sampling.data[index]
-            for i, timestamp in enumerate(timestamps_index):
+            timestamps = self.sampling.data[index]
+            for i, timestamp in enumerate(timestamps):
                 # add timestamp to index
                 new_index = index + (timestamp,)
                 df.loc[new_index, df_features] = [
@@ -193,7 +184,7 @@ class NumpyEvent:
         first_index = self.first_index
         first_features = self.data[first_index]
         df = df.astype(
-            {feature.name: type(feature.data[0]) for feature in first_features}
+            {feature.name: feature.data[0].dtype for feature in first_features}
         )
 
         return df
