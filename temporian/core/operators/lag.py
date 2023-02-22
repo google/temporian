@@ -82,6 +82,9 @@ operator_lib.register_operator(LagOperator)
 
 
 def lag(event: Event, duration: float) -> Event:
+    if duration < 0:
+        raise ValueError("duration must be non-negative")
+
     return LagOperator(
         event=event,
         duration=duration,
@@ -89,6 +92,9 @@ def lag(event: Event, duration: float) -> Event:
 
 
 def leak(event: Event, duration: float) -> Event:
+    if duration < 0:
+        raise ValueError("duration must be non-negative")
+
     return LagOperator(
         event=event,
         duration=-duration,
