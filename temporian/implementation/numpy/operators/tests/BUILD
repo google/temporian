@@ -34,3 +34,14 @@ py_test(
         "//temporian/implementation/numpy/operators:assign",
     ],
 )
+
+py_test(
+    name = "lag_test",
+    srcs = ["lag_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/testing:absltest dep,
+        "//temporian/core/operators:lag",
+        "//temporian/implementation/numpy/operators:lag",
+    ],
+)
