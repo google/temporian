@@ -16,12 +16,12 @@ class LagNumpyImplementation:
             data={},
             names=event.sampling.names.copy(),
         )
-        output = NumpyEvent(data={}, sampling=new_sampling)
+        output_event = NumpyEvent(data={}, sampling=new_sampling)
 
         for index, timestamps in event.sampling.data.items():
             new_sampling.data[index] = timestamps + duration
-            output.data[index] = []
-            output_data = output.data[index]
+            output_event.data[index] = []
+            output_data = output_event.data[index]
             for feature in event.data[index]:
                 new_feature = NumpyFeature(
                     data=feature.data.copy(),
@@ -29,4 +29,4 @@ class LagNumpyImplementation:
                 )
                 output_data.append(new_feature)
 
-        return {"event": output}
+        return {"event": output_event}

@@ -70,10 +70,9 @@ class LagOperatorTest(absltest.TestCase):
             sampling=numpy_output_sampling,
         )
 
-        sampling = Sampling(["store_id"])
         event = Event(
             [Feature("sales", float)],
-            sampling=sampling,
+            sampling=Sampling(["store_id"]),
             creator=None,
         )
 
