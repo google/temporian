@@ -58,6 +58,26 @@ class Event(object):
             "\t}"
         )
 
+    def __add__(self, other):
+        from temporian.core.operators.arithmetic import sum
+
+        return sum(event_1=self, event_2=other)
+
+    def __sub__(self, other):
+        from temporian.core.operators.arithmetic import diff
+
+        return diff(event_1=self, event_2=other)
+
+    def __mul__(self, other):
+        from temporian.core.operators.arithmetic import multiply
+
+        return multiply(event_1=self, event_2=other)
+
+    def __truediv__(self, other):
+        from temporian.core.operators.arithmetic import divide
+
+        return divide(numerator=self, denominator=other)
+
     def sampling(self):
         return self._sampling
 
