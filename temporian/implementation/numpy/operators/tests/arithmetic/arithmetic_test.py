@@ -179,7 +179,7 @@ class ArithmeticOperatorTest(absltest.TestCase):
             data={
                 ("A",): [
                     NumpyFeature(
-                        name="quot_sales_costs",
+                        name="div_sales_costs",
                         data=np.array([np.inf, 0.0, np.nan, np.nan, 3.0]),
                     ),
                 ],

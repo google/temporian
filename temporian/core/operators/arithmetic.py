@@ -38,7 +38,7 @@ class ArithmeticOperation(str, Enum):
         if operation == ArithmeticOperation.MULTIPLICATION:
             return "prod"
         if operation == ArithmeticOperation.DIVISION:
-            return "quot"
+            return "div"
         raise ValueError(f"Unknown operation: {operation}.")
 
 
@@ -87,12 +87,12 @@ class ArithmeticOperator(Operator):
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=f"{prefix}_{event_1_f.name()}_{event_2_f.name()}",
-                dtype=event_1_f.dtype(),
+                name=f"{prefix}_{feature_1.name()}_{feature_2.name()}",
+                dtype=feature_1.dtype(),
                 sampling=sampling,
                 creator=self,
             )
-            for event_1_f, event_2_f in zip(
+            for feature_1, feature_2 in zip(
                 event_1.features(), event_2.features()
             )
         ]
@@ -147,7 +147,7 @@ def sum(
     ).outputs()["event"]
 
 
-def substraction(
+def substract(
     event_1: Event,
     event_2: Event,
     resolution: Resolution = Resolution.PER_FEATURE_IDX,
@@ -160,7 +160,7 @@ def substraction(
     ).outputs()["event"]
 
 
-def multiplication(
+def multiply(
     event_1: Event,
     event_2: Event,
     resolution: Resolution = Resolution.PER_FEATURE_IDX,
@@ -173,14 +173,14 @@ def multiplication(
     ).outputs()["event"]
 
 
-def division(
-    event_1: Event,
-    event_2: Event,
+def divide(
+    numerator: Event,
+    denominator: Event,
     resolution: Resolution = Resolution.PER_FEATURE_IDX,
 ) -> Event:
     return ArithmeticOperator(
-        event_1=event_1,
-        event_2=event_2,
+        event_1=numerator,
+        event_2=denominator,
         operation=ArithmeticOperation.DIVISION,
         resolution=resolution,
     ).outputs()["event"]
