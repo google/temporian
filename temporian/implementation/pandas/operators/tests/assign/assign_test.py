@@ -45,7 +45,7 @@ class AssignOperatorTest(absltest.TestCase):
     def test_repeated_timestamps(self) -> None:
         self.assertRaisesRegex(
             ValueError,
-            "Cannot have repeated timestamps in assigned EventSequence.",
+            "Cannot have repeated timestamps in right EventSequence.",
             self.operator,
             repeated_timestamps.INPUT_1,
             repeated_timestamps.INPUT_1,

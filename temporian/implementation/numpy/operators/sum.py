@@ -2,6 +2,7 @@ import numpy as np
 
 from temporian.core.operators.sum import Resolution
 from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event import NumpyFeature
 
 
 class NumpySumOperator:
@@ -39,9 +40,11 @@ class NumpySumOperator:
                 event_2_feature = event_2.data[event_index][i]
 
                 output.data[event_index].append(
-                    (
-                        f"sum_{event_1_feature.name}_{event_2_feature.name}",
-                        event_1_feature.data + event_2_feature.data,
+                    NumpyFeature(
+                        name=(
+                            f"sum_{event_1_feature.name}_{event_2_feature.name}"
+                        ),
+                        data=event_1_feature.data + event_2_feature.data,
                     )
                 )
 

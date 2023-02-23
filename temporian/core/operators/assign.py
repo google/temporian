@@ -26,21 +26,21 @@ class AssignOperator(Operator):
 
     def __init__(
         self,
-        assignee_event: Event,
-        assigned_event: Event,
+        left_event: Event,
+        right_event: Event,
     ):
         super().__init__()
 
         # inputs
-        self.add_input("assignee_event", assignee_event)
-        self.add_input("assigned_event", assigned_event)
+        self.add_input("left_event", left_event)
+        self.add_input("right_event", right_event)
 
         # outputs
-        output_features = assignee_event.features() + [
+        output_features = left_event.features() + [
             Feature(name=feature.name(), dtype=feature.dtype(), creator=self)
-            for feature in assigned_event.features()
+            for feature in right_event.features()
         ]
-        output_sampling = assignee_event.sampling()
+        output_sampling = left_event.sampling()
         self.add_output(
             "event",
             Event(
@@ -54,8 +54,8 @@ class AssignOperator(Operator):
         return pb.OperatorDef(
             key="ASSIGN",
             inputs=[
-                pb.OperatorDef.Input(key="assignee_event"),
-                pb.OperatorDef.Input(key="assigned_event"),
+                pb.OperatorDef.Input(key="left_event"),
+                pb.OperatorDef.Input(key="right_event"),
             ],
             outputs=[pb.OperatorDef.Output(key="event")],
         )
@@ -65,7 +65,7 @@ operator_lib.register_operator(AssignOperator)
 
 
 def assign(
-    assignee_event: Event,
-    assigned_event: Event,
+    left_event: Event,
+    right_event: Event,
 ) -> Event:
-    return AssignOperator(assignee_event, assigned_event).outputs()["event"]
+    return AssignOperator(left_event, right_event).outputs()["event"]

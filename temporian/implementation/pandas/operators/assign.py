@@ -22,7 +22,7 @@ from temporian.implementation.pandas import utils
 
 class PandasAssignOperator(PandasOperator):
     def __call__(
-        self, assignee_event: PandasEvent, assigned_event: PandasEvent
+        self, left_event: PandasEvent, right_event: PandasEvent
     ) -> Dict[str, PandasEvent]:
         """Assign features to an event.
 
@@ -32,40 +32,38 @@ class PandasAssignOperator(PandasOperator):
         understood as a left join on the index and timestamp columns.
 
         Args:
-            assignee_event (PandasEvent): event to assign the feature to.
-            assigned_event (PandasEvent): features to assign to the event.
+            left_event (PandasEvent): event to assign the feature to.
+            right_event (PandasEvent): features to assign to the event.
 
         Returns:
-            PandasEvent: a new event with the features assigned.
+            PandasEvent: a new event with the features right.
         """
         # assert indexes are the same
-        if assignee_event.index.names != assigned_event.index.names:
+        if left_event.index.names != right_event.index.names:
             raise IndexError("Assign sequences must have the same index names.")
 
         # get index column names
         index, timestamp = utils.get_index_and_timestamp_column_names(
-            assignee_event
+            left_event
         )
 
-        # check there's no repeated timestamps index-wise in the assigned sequence
+        # check there's no repeated timestamps index-wise in the right sequence
         if index:
             max_timestamps = (
-                assigned_event.reset_index()
+                right_event.reset_index()
                 .groupby(index)[timestamp]
                 .value_counts()
                 .max()
             )
         else:
             max_timestamps = (
-                assigned_event.reset_index()[timestamp].value_counts().max()
+                right_event.reset_index()[timestamp].value_counts().max()
             )
 
         if max_timestamps > 1:
             raise ValueError(
-                "Cannot have repeated timestamps in assigned EventSequence."
+                "Cannot have repeated timestamps in right EventSequence."
             )
-        output_event = assignee_event.join(
-            assigned_event, how="left", rsuffix="y"
-        )
+        output_event = left_event.join(right_event, how="left", rsuffix="y")
         # make assignment
         return {"event": output_event}

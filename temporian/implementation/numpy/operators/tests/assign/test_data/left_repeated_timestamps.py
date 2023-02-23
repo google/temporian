@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""NumpyAssignOperator - with index, more timestamps test.
+"""NumpyAssignOperator - assignee repeated timestamps test.
 
-Tests the correct output when the right event has more timestamps than the left
-event, for any index value. Both input events are indexed.
+Tests the correct functionality of the NumpyAssignOperator when the assignee
+has repeated timestamps.
+
 """
+
 import numpy as np
 
 from temporian.implementation.numpy.data.event import NumpyEvent
@@ -24,39 +26,43 @@ from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
 
 sampling_1 = NumpySampling(
-    names=["product_id"],
+    names=["user_id"],
     data={
-        (666964,): np.array(
-            ["2022-02-05"],
+        (151591562,): np.array(
+            [
+                "2022-02-05",
+                "2022-02-05",  # 2022-02-05 is repeated here should not be a problem
+                "2022-02-07",
+            ],
             dtype="datetime64",
         ),
-        (372306,): np.array(["2022-02-06"], dtype="datetime64"),
+        (191562515,): np.array(["2022-02-05"], dtype="datetime64"),
     },
 )
 
 sampling_2 = NumpySampling(
-    names=["product_id"],
+    names=["user_id"],
     data={
-        (666964,): np.array(
-            ["2022-02-05"],
+        (151591562,): np.array(
+            ["2022-02-05", "2022-02-07", "2022-02-09"],
             dtype="datetime64",
         ),
-        (372306,): np.array(["2022-02-06", "2022-02-07"], dtype="datetime64"),
+        (191562515,): np.array(["2022-02-05"], dtype="datetime64"),
     },
 )
 
 INPUT_1 = NumpyEvent(
     data={
-        (666964,): [
+        (151591562,): [
             NumpyFeature(
                 name="sales",
-                data=np.array([0.0]),
+                data=np.array([10.0, 20.0, 30.0]),
             ),
         ],
-        (372306,): [
+        (191562515,): [
             NumpyFeature(
                 name="sales",
-                data=np.array([1160.0]),
+                data=np.array([40.0]),
             ),
         ],
     },
@@ -65,16 +71,16 @@ INPUT_1 = NumpyEvent(
 
 INPUT_2 = NumpyEvent(
     data={
-        (666964,): [
+        (151591562,): [
+            NumpyFeature(
+                name="costs",
+                data=np.array([-10.0, -20.0, 0.0]),
+            ),
+        ],
+        (191562515,): [
             NumpyFeature(
                 name="costs",
                 data=np.array([0.0]),
-            ),
-        ],
-        (372306,): [
-            NumpyFeature(
-                name="costs",
-                data=np.array([508.0, 573.0]),
             ),
         ],
     },
@@ -83,24 +89,25 @@ INPUT_2 = NumpyEvent(
 
 OUTPUT = NumpyEvent(
     data={
-        (666964,): [
+        (151591562,): [
             NumpyFeature(
                 name="sales",
-                data=np.array([0.0]),
+                data=np.array([10.0, 20.0, 30.0]),
             ),
             NumpyFeature(
                 name="costs",
-                data=np.array([0.0]),
+                data=np.array([-10.0, -10.0, -20.0]),  # -10.0 is repeated here
+                # because the timestamp is repeated
             ),
         ],
-        (372306,): [
+        (191562515,): [
             NumpyFeature(
                 name="sales",
-                data=np.array([1160.0]),
+                data=np.array([40.0]),
             ),
             NumpyFeature(
                 name="costs",
-                data=np.array([508.0]),
+                data=np.array([0.0]),
             ),
         ],
     },

@@ -27,11 +27,9 @@ from temporian.implementation.pandas.data import event as pandas_event
 
 class PrototypeTest(absltest.TestCase):
     def setUp(self) -> None:
-        self.assignee_event = (
-            "temporian/test/test_data/prototype/assignee_event.csv"
-        )
+        self.left_event = "temporian/test/test_data/prototype/left_event.csv"
 
-        self.assigned_event = pandas_event.PandasEvent(
+        self.right_event = pandas_event.PandasEvent(
             [
                 [666964, pd.Timestamp("2013-01-02"), 740.0],
                 [666964, pd.Timestamp("2013-01-03"), 508.0],
@@ -81,32 +79,32 @@ class PrototypeTest(absltest.TestCase):
         # instance input events
         sampling = Sampling(["product_id", "timestamp"])
 
-        assignee_event = Event(
+        left_event = Event(
             features=[Feature(name="sales", dtype=float)],
             sampling=sampling,
             creator=None,
         )
-        assigned_event = Event(
+        right_event = Event(
             features=[Feature(name="costs", dtype=float)],
             sampling=sampling,
             creator=None,
         )
 
         sum_events = sum(
-            event_1=assignee_event,
-            event_2=assigned_event,
+            event_1=left_event,
+            event_2=right_event,
         )
 
         # call assign operator
-        output_event = assign(assignee_event, assigned_event)
+        output_event = assign(left_event, right_event)
 
         # call sma operator
-        sma_assigned_event = sma(
-            assigned_event, window_length="7d", sampling=assigned_event
+        sma_right_event = sma(
+            right_event, window_length="7d", sampling=right_event
         )
 
         # call assign operator with result of sma
-        output_event = assign(output_event, sma_assigned_event)
+        output_event = assign(output_event, sma_right_event)
 
         output_event = assign(output_event, sum_events)
 
@@ -114,10 +112,10 @@ class PrototypeTest(absltest.TestCase):
         output_event_pandas = evaluator.evaluate(
             output_event,
             input_data={
-                # assignee event specified from disk
-                assignee_event: self.assignee_event,
-                # assigned event loaded in ram
-                assigned_event: self.assigned_event,
+                # left event specified from disk
+                left_event: self.left_event,
+                # right event loaded in ram
+                right_event: self.right_event,
             },
             backend="pandas",
         )
@@ -129,9 +127,6 @@ class PrototypeTest(absltest.TestCase):
                 output_event_pandas[output_event]
             ),
         )
-
-        print(output_event_pandas[output_event])
-        # logging.info(output_event_pandas)
 
 
 if __name__ == "__main__":

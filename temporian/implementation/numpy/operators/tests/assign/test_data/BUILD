@@ -1,4 +1,3 @@
-
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],
@@ -17,6 +16,24 @@ py_library(
 # =====================
 
 py_library(
+    name = "less_right_indexes",
+    srcs = ["less_right_indexes.py"],
+    srcs_version = "PY3",
+    deps = [
+        # pandas dep,
+    ],
+)
+
+py_library(
+    name = "complete_timestamps",
+    srcs = ["complete_timestamps.py"],
+    srcs_version = "PY3",
+    deps = [
+        # pandas dep,
+    ],
+)
+
+py_library(
     name = "different_index",
     srcs = ["different_index.py"],
     srcs_version = "PY3",
@@ -26,8 +43,17 @@ py_library(
 )
 
 py_library(
-    name = "repeated_timestamps",
-    srcs = ["repeated_timestamps.py"],
+    name = "right_repeated_timestamps",
+    srcs = ["right_repeated_timestamps.py"],
+    srcs_version = "PY3",
+    deps = [
+        # pandas dep,
+    ],
+)
+
+py_library(
+    name = "left_repeated_timestamps",
+    srcs = ["left_repeated_timestamps.py"],
     srcs_version = "PY3",
     deps = [
         # pandas dep,

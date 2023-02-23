@@ -14,7 +14,7 @@
 
 """PandasAssignOperator - with index, more timestamps test.
 
-Tests the correct output when the assigned event has more timestamps than the assignee 
+Tests the correct output when the right event has more timestamps than the left
 event, for any index value. Both input events are indexed.
 """
 
@@ -51,7 +51,7 @@ INPUT_2 = PandasEvent(
             pd.Timestamp("2013-01-05"),
             pd.Timestamp(
                 "2013-01-07"
-            ),  # more timestamps than assignee event for porudct_id = 372306
+            ),  # more timestamps than left event for porudct_id = 372306
         ],
         "costs": [
             0.0,
@@ -69,9 +69,7 @@ OUTPUT = PandasEvent(
         ],
         "timestamp": [
             pd.Timestamp("2013-01-01"),
-            pd.Timestamp(
-                "2013-01-05"
-            ),  # assignee event's timestamps are preserved
+            pd.Timestamp("2013-01-05"),  # left event's timestamps are preserved
         ],
         "sales": [
             0.0,

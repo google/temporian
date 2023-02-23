@@ -1,4 +1,3 @@
-from temporian.core import processor
 from temporian.core.data import dtype
 from temporian.core.data import event as event_lib
 from temporian.core.data.feature import Feature
