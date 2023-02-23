@@ -18,9 +18,9 @@ Timestamples and durations are expressed with a double (noted float) in python.
 By convension, all calendar functions represent dates as Unix epoch in UTC.
 This datatype is equivalent to a double in C.
 """
+import datetime
 from typing import Union
 
-import datetime
 import numpy as np
 
 # Unit for durations
@@ -41,6 +41,10 @@ def hours(value: float) -> Duration:
 
 def days(value: float) -> Duration:
     return value * 60 * 60 * 24
+
+
+def weeks(value: float) -> Duration:
+    return value * 60 * 60 * 24 * 7
 
 
 def convert_date_to_duration(
@@ -79,3 +83,49 @@ def convert_numpy_datetime64_to_duration(date: np.datetime64) -> Duration:
 def convert_datetime_to_duration(date: datetime.datetime) -> Duration:
     """Convert datetime to duration epoch UTC"""
     return date.replace(tzinfo=datetime.timezone.utc).timestamp()
+
+
+def duration_abbreviation(duration: Duration, cutoff: str = None) -> str:
+    """Returns the abbreviation for a duration.
+
+    Args:
+        duration: Duration in seconds.
+        cutoff: Cutoff for the abbreviation. For example, if cutoff is "day", the
+        smallest unit will be days. Possible options are "year", "month", "week",
+        "day", "hour" and "minute". If None, the smallest unit will be seconds.
+
+    Returns:
+        Abbreviation for the duration.
+    """
+
+    duration_str = ""
+
+    if duration >= weeks(1):
+        duration_str += f"{int(duration / weeks(1))}w"
+        if cutoff == "week":
+            return duration_str
+        duration = duration % weeks(1)
+
+    if duration >= days(1):
+        duration_str += f"{int(duration / days(1))}d"
+        if cutoff == "day":
+            return duration_str
+        duration = duration % days(1)
+
+    if duration >= hours(1):
+        duration_str += f"{int(duration / hours(1))}h"
+        if cutoff == "hour":
+            return duration_str
+        duration = duration % hours(1)
+
+    if duration >= minutes(1):
+        duration_str += f"{int(duration / minutes(1))}min"
+        if cutoff == "minute":
+            return duration_str
+        duration = duration % minutes(1)
+
+    if duration >= seconds(1):
+        duration_str += f"{int(duration / seconds(1))}s"
+        duration = duration % seconds(1)
+
+    return duration_str

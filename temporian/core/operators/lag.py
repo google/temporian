@@ -16,6 +16,7 @@
 
 from temporian.core import operator_lib
 from temporian.core.data.duration import Duration
+from temporian.core.data.duration import duration_abbreviation
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
@@ -40,10 +41,12 @@ class LagOperator(Operator):
 
         output_sampling = Sampling(index=event.sampling().index, creator=self)
 
+        duration_str = duration_abbreviation(duration)
+
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=f"lag_{f.name()}",
+                name=f"lag[{duration_str}]_{f.name()}",
                 dtype=f.dtype(),
                 sampling=output_sampling,
                 creator=self,
