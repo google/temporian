@@ -32,7 +32,7 @@ class ArithmeticOperatorTest(absltest.TestCase):
 
     def setUp(self):
         self.numpy_input_sampling = NumpySampling(
-            names=["store_id"],
+            index=["store_id"],
             data={("A",): np.array([1, 2, 3, 4, 5])},
         )
 
