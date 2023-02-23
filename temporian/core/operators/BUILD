@@ -11,6 +11,7 @@ py_library(
     srcs = ["__init__.py"],
     srcs_version = "PY3",
     deps = [
+        ":arithmetic",
         ":assign",
         ":simple_moving_average",
     ],
@@ -19,19 +20,6 @@ py_library(
 py_library(
     name = "assign",
     srcs = ["assign.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":base",
-        "//temporian/core:operator_lib",
-        "//temporian/core/data:event",
-        "//temporian/core/data:feature",
-        "//temporian/proto:core_py_proto",
-    ],
-)
-
-py_library(
-    name = "sum",
-    srcs = ["sum.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
