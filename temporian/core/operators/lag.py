@@ -15,6 +15,7 @@
 """Lag operator."""
 
 from temporian.core import operator_lib
+from temporian.core.data.duration import Duration
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
@@ -28,7 +29,7 @@ class LagOperator(Operator):
     def __init__(
         self,
         event: Event,
-        duration: float,
+        duration: Duration,
     ):
         super().__init__()
 
@@ -81,7 +82,7 @@ class LagOperator(Operator):
 operator_lib.register_operator(LagOperator)
 
 
-def lag(event: Event, duration: float) -> Event:
+def lag(event: Event, duration: Duration) -> Event:
     if duration < 0:
         raise ValueError("duration must be non-negative")
 
@@ -91,7 +92,7 @@ def lag(event: Event, duration: float) -> Event:
     ).outputs()["event"]
 
 
-def leak(event: Event, duration: float) -> Event:
+def leak(event: Event, duration: Duration) -> Event:
     if duration < 0:
         raise ValueError("duration must be non-negative")
 
