@@ -21,7 +21,10 @@ from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
 
 
-class NumpyAssignOperator:
+class AssignNumpyImplementation:
+    def __init__(self, operator):
+        self._operator = operator
+
     def __call__(
         self, left_event: NumpyEvent, right_event: NumpyEvent
     ) -> Dict[str, NumpyEvent]:
