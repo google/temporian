@@ -31,5 +31,7 @@ py_library(
         "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
+        "//temporian/core/data:duration",
+        "//temporian/core/operators:simple_moving_average",
     ],
 )

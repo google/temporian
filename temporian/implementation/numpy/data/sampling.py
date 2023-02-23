@@ -4,8 +4,8 @@ import numpy as np
 
 
 class NumpySampling:
-    def __init__(self, names: List[str], data: Dict[Tuple, np.ndarray]) -> None:
-        self.names = names
+    def __init__(self, index: List[str], data: Dict[Tuple, np.ndarray]) -> None:
+        self.index = index
         self.data = data
 
     @property
@@ -22,13 +22,13 @@ class NumpySampling:
         return False
 
     def __repr__(self) -> str:
-        return f"{self.names}: {self.data.__repr__()}"
+        return f"index:{self.index} data:{self.data.__repr__()}"
 
     def __eq__(self, other):
         if not isinstance(other, NumpySampling):
             return False
 
-        if self.names != other.names:
+        if self.index != other.index:
             return False
 
         if self.data.keys() != other.data.keys():

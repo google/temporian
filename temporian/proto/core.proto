@@ -70,6 +70,7 @@ message Operator {
     oneof type {
       int64 integer_64 = 2;
       string str = 3;
+      double float_64 = 4;
     }
   }
 }
@@ -170,6 +171,7 @@ message OperatorDef {
       INTEGER_64 = 1;
       STRING = 2;
       REPEATED_STRING=3;
+      FLOAT_64 = 4;
     }
   }
 }

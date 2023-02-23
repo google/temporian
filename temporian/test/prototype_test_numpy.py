@@ -34,7 +34,7 @@ class PrototypeTest(absltest.TestCase):
 
         # sampling
         sampling = NumpySampling(
-            names=index_names,
+            index=index_names,
             data={
                 ("A", 1): np.array(
                     ["2022-02-05", "2022-02-06", "2022-02-07"],

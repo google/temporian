@@ -24,6 +24,7 @@ from temporian.core.data import dtype
 from temporian.core.data import event
 from temporian.core.data import feature
 from temporian.core.data import sampling
+from temporian.core.data import duration
 from temporian.core.operators import base
 
 __version__ = "0.0.1"

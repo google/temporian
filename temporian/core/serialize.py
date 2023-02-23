@@ -348,17 +348,21 @@ def _attribute_to_proto(
         return pb.Operator.Attribute(key=key, str=value)
     elif isinstance(value, int):
         return pb.Operator.Attribute(key=key, integer_64=value)
+    elif isinstance(value, float):
+        return pb.Operator.Attribute(key=key, float_64=value)
     else:
         raise ValueError(
             f"Non supported type {type(value)} for attribute {key}={value}"
         )
 
 
-def _attribute_from_proto(src: pb.Operator.Attribute) -> Union[str, int]:
+def _attribute_from_proto(src: pb.Operator.Attribute) -> Union[str, int, float]:
     if src.HasField("integer_64"):
         return src.integer_64
     elif src.HasField("str"):
         return src.str
+    elif src.HasField("float_64"):
+        return src.float_64
     else:
         raise ValueError(f"Non supported proto attribute {src}")
 

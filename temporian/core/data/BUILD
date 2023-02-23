@@ -43,3 +43,10 @@ py_library(
         ":sampling",
     ],
 )
+
+py_library(
+    name = "duration",
+    srcs = ["duration.py"],
+    srcs_version = "PY3",
+    deps = [],
+)
