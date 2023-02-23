@@ -14,7 +14,7 @@ class LagNumpyImplementation:
 
         new_sampling = NumpySampling(
             data={},
-            names=event.sampling.names.copy(),
+            index=event.sampling.index.copy(),
         )
         output_event = NumpyEvent(data={}, sampling=new_sampling)
 
