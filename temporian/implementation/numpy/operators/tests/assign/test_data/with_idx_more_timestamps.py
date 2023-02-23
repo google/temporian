@@ -24,7 +24,7 @@ from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
 
 sampling_1 = NumpySampling(
-    names=["product_id"],
+    index=["product_id"],
     data={
         (666964,): np.array(
             ["2022-02-05"],
@@ -35,7 +35,7 @@ sampling_1 = NumpySampling(
 )
 
 sampling_2 = NumpySampling(
-    names=["product_id"],
+    index=["product_id"],
     data={
         (666964,): np.array(
             ["2022-02-05"],

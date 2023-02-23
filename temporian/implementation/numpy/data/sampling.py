@@ -22,7 +22,7 @@ class NumpySampling:
         return False
 
     def __repr__(self) -> str:
-        return f"{self.names}: {self.data.__repr__()}"
+        return f"index:{self.index} data:{self.data.__repr__()}"
 
     def __eq__(self, other):
         if not isinstance(other, NumpySampling):

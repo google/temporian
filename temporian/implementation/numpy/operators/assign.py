@@ -49,7 +49,7 @@ class NumpyAssignOperator:
             ValueError: if right event has repeated timestamps for same index.
 
         """
-        if left_event.sampling.names != right_event.sampling.names:
+        if left_event.sampling.index != right_event.sampling.index:
             raise ValueError("Assign sequences must have the same index names.")
 
         if right_event.sampling.has_repeated_timestamps:
