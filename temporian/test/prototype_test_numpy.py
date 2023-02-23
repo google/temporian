@@ -20,8 +20,6 @@ from temporian.core.data.event import Event
 from temporian.core.data.event import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.assign import assign
-from temporian.core.operators.select import select
-from temporian.core.operators.sum import sum
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
@@ -50,7 +48,7 @@ class PrototypeTest(absltest.TestCase):
             },
         )
         # input event - contains two features, "sales" and "costs"
-        self.event = NumpyEvent(
+        self.event_1 = NumpyEvent(
             data={
                 ("A", 1): [
                     NumpyFeature(
@@ -158,7 +156,7 @@ class PrototypeTest(absltest.TestCase):
 
     def test_prototype(self) -> None:
         sampling = Sampling(["store_id", "product_id"])
-        event = Event(
+        event_1 = Event(
             [Feature("sales", int), Feature("costs", int)],
             sampling=sampling,
             creator=None,
@@ -169,14 +167,14 @@ class PrototypeTest(absltest.TestCase):
             sampling=sampling,
         )
 
-        sum_event = sum(event, event_2)
-        output_event = assign(event, sum_event)
+        sum_event = event_1 + event_2
+        output_event = assign(event_1, sum_event)
 
         output_event_numpy = evaluator.evaluate(
             output_event,
             input_data={
                 # left event specified from disk
-                event: self.event,
+                event_1: self.event_1,
                 event_2: self.event_2,
             },
             backend="numpy",

@@ -64,9 +64,9 @@ class Event(object):
         return sum(event_1=self, event_2=other)
 
     def __sub__(self, other):
-        from temporian.core.operators.arithmetic import diff
+        from temporian.core.operators.arithmetic import substract
 
-        return diff(event_1=self, event_2=other)
+        return substract(event_1=self, event_2=other)
 
     def __mul__(self, other):
         from temporian.core.operators.arithmetic import multiply
