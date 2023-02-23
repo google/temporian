@@ -39,7 +39,6 @@ py_library(
         ":arithmetic",
         ":assign",
         ":select",
-        ":sum",
     ],
 )
 
@@ -49,16 +48,6 @@ py_library(
     srcs_version = "PY3",
     deps = [
         "//temporian/implementation/pandas/data:event",
-    ],
-)
-
-py_library(
-    name = "sum",
-    srcs = ["sum.py"],
-    srcs_version = "PY3",
-    deps = [
-        "//temporian/core/operators:sum",
-        "//temporian/implementation/numpy/data:event",
     ],
 )
 

@@ -14,7 +14,6 @@
 
 from temporian.implementation.pandas.operators import assign
 from temporian.implementation.pandas.operators import select
-from temporian.implementation.pandas.operators import sum
 from temporian.implementation.pandas.operators.window import (
     simple_moving_average,
 )
@@ -23,5 +22,4 @@ OPERATOR_IMPLEMENTATIONS = {
     "ASSIGN": assign.PandasAssignOperator,
     "SIMPLE_MOVING_AVERAGE": simple_moving_average.PandasSimpleMovingAverageOperator,
     "SELECT": select.PandasSelectOperator,
-    "SUM": sum.PandasSumOperator,
 }
