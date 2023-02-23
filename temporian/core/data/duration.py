@@ -43,6 +43,19 @@ def days(value: float) -> Duration:
     return value * 60 * 60 * 24
 
 
+def weeks(value: float) -> Duration:
+    return value * 60 * 60 * 24 * 7
+
+
+# Could be 29, 30 or 31 days
+def months(value: float) -> Duration:
+    return value * 60 * 60 * 24 * 30
+
+
+def years(value: float) -> Duration:
+    return value * 60 * 60 * 24 * 365
+
+
 supported_date_types = (np.datetime64, time.struct_time, datetime.datetime)
 
 
@@ -103,3 +116,61 @@ def is_a_date(value: any) -> bool:
         if value is date_type:
             return True
     return False
+
+
+def duration_abbreviation(duration: Duration, cutoff: str = None) -> str:
+    """Returns the abbreviation for a duration.
+
+    Args:
+        duration: Duration in seconds.
+        cutoff: Cutoff for the abbreviation. For example, if cutoff is "day", the
+        smallest unit will be days. Possible options are "year", "month", "week",
+        "day", "hour" and "minute". If None, the smallest unit will be seconds.
+
+    Returns:
+        Abbreviation for the duration.
+    """
+
+    duration_str = ""
+
+    if duration >= years(1):
+        duration_str += f"{int(duration / years(1))}y"
+        if cutoff == "year":
+            return duration_str
+        duration = duration % years(1)
+
+    if duration >= months(1):
+        duration_str += f"{int(duration / months(1))}m"
+        if cutoff == "month":
+            return duration_str
+        duration = duration % months(1)
+
+    if duration >= weeks(1):
+        duration_str += f"{int(duration / weeks(1))}w"
+        if cutoff == "week":
+            return duration_str
+        duration = duration % weeks(1)
+
+    if duration >= days(1):
+        duration_str += f"{int(duration / days(1))}d"
+        if cutoff == "day":
+            return duration_str
+        duration = duration % days(1)
+
+    if duration >= hours(1):
+        duration_str += f"{int(duration / hours(1))}h"
+        if cutoff == "hour":
+            return duration_str
+        duration = duration % hours(1)
+
+    if duration >= minutes(1):
+        duration_str += f"{int(duration / minutes(1))}min"
+        if cutoff == "minute":
+            return duration_str
+        duration = duration % minutes(1)
+
+    if duration >= seconds(1):
+        duration_str += f"{int(duration / seconds(1))}s"
+        duration = duration % seconds(1)
+
+    return duration_str

@@ -1,3 +1,4 @@
+from temporian.core.data.duration import duration_abbreviation
 from temporian.core.operators.lag import LagOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
@@ -18,6 +19,8 @@ class LagNumpyImplementation:
         )
         output_event = NumpyEvent(data={}, sampling=new_sampling)
 
+        duration_str = duration_abbreviation(duration)
+
         for index, timestamps in event.sampling.data.items():
             new_sampling.data[index] = timestamps + duration
             output_event.data[index] = []
@@ -25,7 +28,7 @@ class LagNumpyImplementation:
             for feature in event.data[index]:
                 new_feature = NumpyFeature(
                     data=feature.data.copy(),
-                    name=f"lag_{feature.name}",
+                    name=f"lag[{duration_str}]_{feature.name}",
                 )
                 output_data.append(new_feature)
 

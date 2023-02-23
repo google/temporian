@@ -16,9 +16,9 @@ from absl.testing import absltest
 
 import numpy as np
 
-from temporian.core.data.sampling import Sampling
 from temporian.core.data.event import Event
 from temporian.core.data.event import Feature
+from temporian.core.data.sampling import Sampling
 from temporian.core.operators.lag import LagOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
@@ -60,7 +60,7 @@ class LagOperatorTest(absltest.TestCase):
             data={
                 ("A",): [
                     NumpyFeature(
-                        name="lag_sales",
+                        name="lag[2s]_sales",
                         data=np.array(
                             [10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0]
                         ),
