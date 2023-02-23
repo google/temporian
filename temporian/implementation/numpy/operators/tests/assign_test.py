@@ -46,7 +46,7 @@ class AssignOperatorTest(absltest.TestCase):
 
     def test_right_repeated_timestamps(self) -> None:
         numpy_sampling_left = NumpySampling(
-            names=["user_id"],
+            index=["user_id"],
             data={
                 (151591562,): np.array(
                     [
@@ -61,7 +61,7 @@ class AssignOperatorTest(absltest.TestCase):
         )
 
         numpy_sampling_right = NumpySampling(
-            names=["user_id"],
+            index=["user_id"],
             data={
                 (151591562,): np.array(
                     ["2022-02-08", "2022-02-09", "2022-02-09"],
@@ -127,7 +127,7 @@ class AssignOperatorTest(absltest.TestCase):
 
     def test_left_repeated_timestamps(self) -> None:
         numpy_sampling_left = NumpySampling(
-            names=["user_id"],
+            index=["user_id"],
             data={
                 (151591562,): np.array(
                     [
@@ -142,7 +142,7 @@ class AssignOperatorTest(absltest.TestCase):
         )
 
         numpy_sampling_right = NumpySampling(
-            names=["user_id"],
+            index=["user_id"],
             data={
                 (151591562,): np.array(
                     ["2022-02-05", "2022-02-07", "2022-02-09"],
@@ -235,7 +235,7 @@ class AssignOperatorTest(absltest.TestCase):
 
     def test_different_index(self) -> None:
         numpy_sampling_left_event = NumpySampling(
-            names=["store_id"],
+            index=["store_id"],
             data={
                 ("A",): np.array(
                     ["2022-02-05", "2022-02-06", "2022-02-07"],
@@ -248,7 +248,7 @@ class AssignOperatorTest(absltest.TestCase):
         )
 
         numpy_sampling_right_event = NumpySampling(
-            names=["product_id"],
+            index=["product_id"],
             data={
                 (1,): np.array(
                     ["2022-02-05", "2022-02-06", "2022-02-07"],
@@ -319,7 +319,7 @@ class AssignOperatorTest(absltest.TestCase):
         event, for any index value. Both input events are indexed.
         """
         numpy_sampling_left = NumpySampling(
-            names=["user_id"],
+            index=["user_id"],
             data={
                 (666964,): np.array(
                     ["2022-02-05"],
@@ -330,7 +330,7 @@ class AssignOperatorTest(absltest.TestCase):
         )
 
         numpy_sampling_right = NumpySampling(
-            names=["user_id"],
+            index=["user_id"],
             data={
                 (666964,): np.array(
                     ["2022-02-05"],
@@ -425,7 +425,7 @@ class AssignOperatorTest(absltest.TestCase):
         event, for any index value. Both input events are indexed.
         """
         numpy_sampling_left = NumpySampling(
-            names=["user_id"],
+            index=["user_id"],
             data={
                 (666964,): np.array(
                     ["2022-02-05", "2022-02-06", "2022-02-07"],
@@ -436,7 +436,7 @@ class AssignOperatorTest(absltest.TestCase):
         )
 
         numpy_sampling_right = NumpySampling(
-            names=["user_id"],
+            index=["user_id"],
             data={
                 (666964,): np.array(
                     ["2022-02-05", "2022-02-06", "2022-02-07"],
@@ -526,7 +526,7 @@ class AssignOperatorTest(absltest.TestCase):
 
     def test_less_right_indexes(self) -> None:
         numpy_sampling_left = NumpySampling(
-            names=["user_id"],
+            index=["user_id"],
             data={
                 ("A",): np.array(
                     ["2022-02-05", "2022-02-06", "2022-02-07"],
@@ -542,7 +542,7 @@ class AssignOperatorTest(absltest.TestCase):
         )
 
         numpy_sampling_right = NumpySampling(
-            names=["user_id"],
+            index=["user_id"],
             data={
                 ("A",): np.array(
                     ["2022-02-05", "2022-02-06", "2022-02-07"],
@@ -653,7 +653,7 @@ class AssignOperatorTest(absltest.TestCase):
         """Tests a correct output in a complete timestamps scenario. both samplings will have different timestamps and
         in different order."""
         numpy_sampling_left = NumpySampling(
-            names=["user_id"],
+            index=["user_id"],
             data={
                 (666964,): np.array(
                     [
@@ -669,7 +669,7 @@ class AssignOperatorTest(absltest.TestCase):
         )
 
         numpy_sampling_right = NumpySampling(
-            names=["user_id"],
+            index=["user_id"],
             data={
                 (666964,): np.array(
                     [  # missing timestamps from sampling_1 (2022-02-01, 2022-02-03, 2022-02-04)
