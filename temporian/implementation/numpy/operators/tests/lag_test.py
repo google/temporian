@@ -33,7 +33,7 @@ class LagOperatorTest(absltest.TestCase):
         """Test correct lag operator."""
         # DATA
         numpy_input_sampling = NumpySampling(
-            names=["store_id"],
+            index=["store_id"],
             data={("A",): np.array([1, 1.5, 3, 3.5, 4, 10, 20])},
         )
 
@@ -52,7 +52,7 @@ class LagOperatorTest(absltest.TestCase):
         )
 
         numpy_output_sampling = NumpySampling(
-            names=["store_id"],
+            index=["store_id"],
             data={("A",): np.array([3, 3.5, 5, 5.5, 6, 12, 22])},
         )
 
