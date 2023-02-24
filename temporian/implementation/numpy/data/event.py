@@ -131,22 +131,30 @@ class NumpyEvent:
             if column not in index_names + [timestamp_name]
         ]
 
-        group_by_indexes = df.groupby(index_names)
-
         sampling = {}
         data = {}
 
-        for group in group_by_indexes.groups:
-            columns = group_by_indexes.get_group(group)
-            timestamp = columns[timestamp_name].to_numpy()
+        if index_names:
+            group_by_indexes = df.groupby(index_names)
 
-            # Convert group to tuple, useful when its only one value
-            if not isinstance(group, tuple):
-                group = (group,)
+            for group in group_by_indexes.groups:
+                columns = group_by_indexes.get_group(group)
+                timestamp = columns[timestamp_name].to_numpy()
 
-            sampling[group] = timestamp
-            data[group] = [
-                NumpyFeature(feature, columns[feature].to_numpy())
+                # Convert group to tuple, useful when its only one value
+                if not isinstance(group, tuple):
+                    group = (group,)
+
+                sampling[group] = timestamp
+                data[group] = [
+                    NumpyFeature(feature, columns[feature].to_numpy())
+                    for feature in feature_columns
+                ]
+        else:
+            timestamp = df[timestamp_name].to_numpy()
+            sampling[()] = timestamp
+            data[()] = [
+                NumpyFeature(feature, df[feature].to_numpy())
                 for feature in feature_columns
             ]
 
@@ -175,8 +183,13 @@ class NumpyEvent:
             timestamps = self.sampling.data[index]
 
             for i, timestamp in enumerate(timestamps):
+                # If no index, index is timestamp
+                if len(index) == 0:
+                    new_index = timestamp
                 # add timestamp to index
-                new_index = index + (timestamp,)
+                else:
+                    new_index = index + (timestamp,)
+
                 df.loc[new_index, df_features] = [
                     feature.data[i] for feature in features
                 ]
