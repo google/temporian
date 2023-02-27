@@ -67,7 +67,7 @@ class AssignNumpyImplementation:
 
         for index, left_features in left_event.data.items():
             # Copy the features of left to the output event
-            output.data[index] = left_features.copy()
+            output.data[index] = [feature for feature in left_features]
             output_data = output.data[index]
             left_sampling_data = left_event.sampling.data[index]
             number_timestamps = len(left_sampling_data)
