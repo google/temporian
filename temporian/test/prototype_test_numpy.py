@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import numpy as np
+import pandas as pd
 from absl import logging
 from absl.testing import absltest
 
@@ -21,137 +22,66 @@ from temporian.core.data.event import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.assign import assign
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.event import NumpyFeature
-from temporian.implementation.numpy.data.sampling import NumpySampling
 
 
 class PrototypeTest(absltest.TestCase):
     def setUp(self) -> None:
-        # index_names
-        index_names = ["store_id", "product_id"]
-
-        # sampling
-        sampling = NumpySampling(
-            index=index_names,
-            data={
-                ("A", 1): np.array(
-                    ["2022-02-05", "2022-02-06", "2022-02-07"],
-                    dtype="datetime64",
-                ),
-                ("A", 2): np.array(["2022-02-06"], dtype="datetime64"),
-                ("B", 2): np.array(
-                    ["2022-02-06", "2022-02-07"], dtype="datetime64"
-                ),
-                ("B", 3): np.array(
-                    ["2022-02-05", "2022-02-06"], dtype="datetime64"
-                ),
-            },
-        )
-        # input event - contains two features, "sales" and "costs"
-        self.event_1 = NumpyEvent(
-            data={
-                ("A", 1): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([14, 15, 16]),
-                    ),
+        self.event_1 = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                data=[
+                    ["A", 1, "2022-02-05", 14],
+                    ["A", 1, "2022-02-06", 15],
+                    ["A", 1, "2022-02-07", 16],
+                    ["A", 2, "2022-02-06", 10],
+                    ["B", 2, "2022-02-06", 7],
+                    ["B", 2, "2022-02-07", 8],
+                    ["B", 3, "2022-02-05", 3],
+                    ["B", 3, "2022-02-06", 4],
                 ],
-                ("A", 2): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([10]),
-                    ),
-                ],
-                ("B", 2): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([7, 8]),
-                    ),
-                ],
-                ("B", 3): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([3, 4]),
-                    ),
-                ],
-            },
-            sampling=sampling,
+                columns=["store_id", "product_id", "timestamp", "sales"],
+            ),
+            index_names=["store_id", "product_id", "timestamp"],
         )
 
-        self.event_2 = NumpyEvent(
-            data={
-                ("A", 1): [
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([-14, -15, -16]),
-                    ),
+        self.event_2 = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                data=[
+                    ["A", 1, "2022-02-05", -14],
+                    ["A", 1, "2022-02-06", -15],
+                    ["A", 1, "2022-02-07", -16],
+                    ["A", 2, "2022-02-06", -10],
+                    ["B", 2, "2022-02-06", -7],
+                    ["B", 2, "2022-02-07", -8],
+                    ["B", 3, "2022-02-05", -3],
+                    ["B", 3, "2022-02-06", -4],
                 ],
-                ("A", 2): [
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([-10]),
-                    ),
-                ],
-                ("B", 2): [
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([-7, -8]),
-                    ),
-                ],
-                ("B", 3): [
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([-3, -4]),
-                    ),
-                ],
-            },
-            sampling=sampling,
+                columns=["store_id", "product_id", "timestamp", "costs"],
+            ),
+            index_names=["store_id", "product_id", "timestamp"],
         )
 
-        self.expected_output_event = NumpyEvent(
-            data={
-                ("A", 1): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([14, 15, 16]),
-                    ),
-                    NumpyFeature(
-                        name="sum_sales_costs",
-                        data=np.array([0, 0, 0]),
-                    ),
+        self.expected_output_event = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                data=[
+                    ["A", 1, "2022-02-05", 14, -14, 0],
+                    ["A", 1, "2022-02-06", 15, -15, 0],
+                    ["A", 1, "2022-02-07", 16, -16, 0],
+                    ["A", 2, "2022-02-06", 10, -10, 0],
+                    ["B", 2, "2022-02-06", 7, -7, 0],
+                    ["B", 2, "2022-02-07", 8, -8, 0],
+                    ["B", 3, "2022-02-05", 3, -3, 0],
+                    ["B", 3, "2022-02-06", 4, -4, 0],
                 ],
-                ("A", 2): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([10]),
-                    ),
-                    NumpyFeature(
-                        name="sum_sales_costs",
-                        data=np.array([0]),
-                    ),
+                columns=[
+                    "store_id",
+                    "product_id",
+                    "timestamp",
+                    "sales",
+                    "costs",
+                    "sum_sales_costs",
                 ],
-                ("B", 2): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([7, 8]),
-                    ),
-                    NumpyFeature(
-                        name="sum_sales_costs",
-                        data=np.array([0, 0]),
-                    ),
-                ],
-                ("B", 3): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([3, 4]),
-                    ),
-                    NumpyFeature(
-                        name="sum_sales_costs",
-                        data=np.array([0, 0]),
-                    ),
-                ],
-            },
-            sampling=sampling,
+            ),
+            index_names=["store_id", "product_id", "timestamp"],
         )
 
     def test_prototype(self) -> None:
@@ -167,8 +97,12 @@ class PrototypeTest(absltest.TestCase):
             sampling=sampling,
         )
 
+        # add costs feature to output
+        output_event = assign(event_1, event_2)
+        # add sum of sales and costs to output
+        # TODO: Sometimes works, sometimes doesn't
         sum_event = event_1 + event_2
-        output_event = assign(event_1, sum_event)
+        output_event = assign(output_event, sum_event)
 
         output_event_numpy = evaluator.evaluate(
             output_event,
