@@ -87,22 +87,21 @@ class PrototypeTest(absltest.TestCase):
     def test_prototype(self) -> None:
         sampling = Sampling(["store_id", "product_id"])
         event_1 = Event(
-            [Feature("sales", int), Feature("costs", int)],
+            [Feature("sales", int)],
             sampling=sampling,
             creator=None,
         )
 
         event_2 = Event(
-            [Feature("sales", int), Feature("costs", int)],
+            [Feature("costs", int)],
             sampling=sampling,
         )
 
         # add costs feature to output
         output_event = assign(event_1, event_2)
-        # add sum of sales and costs to output
-        # TODO: Sometimes works, sometimes doesn't
-        sum_event = event_1 + event_2
-        output_event = assign(output_event, sum_event)
+
+        # add sum of sales and costs
+        output_event = assign(output_event, event_1 + event_2)
 
         output_event_numpy = evaluator.evaluate(
             output_event,

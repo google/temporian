@@ -13,9 +13,11 @@
 # limitations under the License.
 
 """Implementation for the Assign operator."""
+from copy import deepcopy
 from typing import Dict, List
-
 import numpy as np
+
+
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
@@ -61,11 +63,11 @@ class AssignNumpyImplementation:
                 " index."
             )
 
-        output = NumpyEvent(
-            data=left_event.data.copy(), sampling=left_event.sampling
-        )
+        output = NumpyEvent(data={}, sampling=left_event.sampling)
 
-        for index in left_event.data.keys():
+        for index, left_features in left_event.data.items():
+            # Copy the features of left to the output event
+            output.data[index] = left_features.copy()
             output_data = output.data[index]
             left_sampling_data = left_event.sampling.data[index]
             number_timestamps = len(left_sampling_data)
