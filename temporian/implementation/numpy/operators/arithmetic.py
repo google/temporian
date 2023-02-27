@@ -38,6 +38,9 @@ class ArithmeticNumpyImplementation:
                 "Both events must have the same number of features."
             )
 
+        if not ArithmeticOperation.is_valid(operation):
+            raise ValueError(f"Unknown operation: {operation}.")
+
         output = NumpyEvent(data={}, sampling=event_1.sampling)
 
         if resolution == Resolution.PER_FEATURE_NAME:
@@ -47,12 +50,13 @@ class ArithmeticNumpyImplementation:
 
         prefix = ArithmeticOperation.prefix(operation)
 
-        for event_index, event_index_array in event_1.data.items():
+        for event_index, event_1_features in event_1.data.items():
             output.data[event_index] = []
 
-            for i in range(len(event_index_array)):
-                event_1_feature = event_1.data[event_index][i]
-                event_2_feature = event_2.data[event_index][i]
+            event_2_features = event_2.data[event_index]
+
+            for i, event_1_feature in enumerate(event_1_features):
+                event_2_feature = event_2_features[i]
 
                 data = None
 

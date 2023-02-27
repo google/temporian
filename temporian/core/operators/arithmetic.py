@@ -41,6 +41,10 @@ class ArithmeticOperation(str, Enum):
             return "div"
         raise ValueError(f"Unknown operation: {operation}.")
 
+    @staticmethod
+    def is_valid(operation: str) -> bool:
+        return operation in [op.value for op in ArithmeticOperation]
+
 
 class Resolution(str, Enum):
     PER_FEATURE_IDX = "PER_FEATURE_IDX"
@@ -55,7 +59,7 @@ class ArithmeticOperator(Operator):
         event_1: Event,
         event_2: Event,
         operation: ArithmeticOperation,
-        resolution: Resolution = Resolution.PER_FEATURE_IDX,
+        resolution: Resolution,
     ):
         super().__init__()
 
@@ -139,6 +143,21 @@ def sum(
     event_2: Event,
     resolution: Resolution = Resolution.PER_FEATURE_IDX,
 ) -> Event:
+    """
+    Sum two events.
+
+    Args:
+        event_1: First event
+        event_2: Second event
+        resolution: If resolution is Resolution.PER_FEATURE_IDX each feature
+            will be sum index wise. If resolution is Resolution.PER_FEATURE_NAME
+            each feature of event_1 will be sum with the feature in event_2
+            with the same name. Defaults to Resolution.PER_FEATURE_IDX.
+
+
+    Returns:
+        Event: Sum of event_1 and event_2 according to resolution.
+    """
     return ArithmeticOperator(
         event_1=event_1,
         event_2=event_2,
@@ -152,6 +171,21 @@ def substract(
     event_2: Event,
     resolution: Resolution = Resolution.PER_FEATURE_IDX,
 ) -> Event:
+    """
+    Substract two events.
+
+    Args:
+        event_1: First event
+        event_2: Second event
+        resolution: If resolution is Resolution.PER_FEATURE_IDX each feature
+            will be substract index wise. If resolution is
+            Resolution.PER_FEATURE_NAME each feature of event_1 will be
+            substract with the feature in event_2 with the same name.
+            Defaults to Resolution.PER_FEATURE_IDX.
+
+    Returns:
+        Event: Substraction of event_1 and event_2 according to resolution.
+    """
     return ArithmeticOperator(
         event_1=event_1,
         event_2=event_2,
@@ -165,6 +199,21 @@ def multiply(
     event_2: Event,
     resolution: Resolution = Resolution.PER_FEATURE_IDX,
 ) -> Event:
+    """
+    Multiply two events.
+
+    Args:
+        event_1: First event
+        event_2: Second event
+        resolution: If resolution is Resolution.PER_FEATURE_IDX each feature
+            will be multiply index wise. If resolution is
+            Resolution.PER_FEATURE_NAME each feature of event_1 will be
+            multiply with the feature in event_2 with the same name.
+            Defaults to Resolution.PER_FEATURE_IDX.
+
+    Returns:
+        Event: Multiplication of event_1 and event_2 according to resolution.
+    """
     return ArithmeticOperator(
         event_1=event_1,
         event_2=event_2,
@@ -178,6 +227,21 @@ def divide(
     denominator: Event,
     resolution: Resolution = Resolution.PER_FEATURE_IDX,
 ) -> Event:
+    """
+    Divide two events.
+
+    Args:
+        numerator: Numerator event
+        denominator: Denominator event
+        resolution: If resolution is Resolution.PER_FEATURE_IDX each feature
+            will be divide index wise. If resolution is
+            Resolution.PER_FEATURE_NAME each feature of numerator will be
+            divide with the feature in denominator with the same name.
+            Defaults to Resolution.PER_FEATURE_IDX.
+
+    Returns:
+        Event: Division of numerator and denominator according to resolution.
+    """
     return ArithmeticOperator(
         event_1=numerator,
         event_2=denominator,
