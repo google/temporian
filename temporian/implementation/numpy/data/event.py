@@ -158,7 +158,7 @@ class NumpyEvent:
                 for feature in feature_columns
             ]
 
-        numpy_sampling = NumpySampling(names=index_names, data=sampling)
+        numpy_sampling = NumpySampling(index=index_names, data=sampling)
 
         return NumpyEvent(data=data, sampling=numpy_sampling)
 
@@ -173,7 +173,7 @@ class NumpyEvent:
         Returns:
             pd.DataFrame: DataFrame created from NumpyEvent
         """
-        df_index = self.sampling.names + [timestamp_index_name]
+        df_index = self.sampling.index + [timestamp_index_name]
         df_features = self.feature_names
         columns = df_index + df_features
 

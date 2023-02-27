@@ -37,7 +37,7 @@ class EventConversionTest(absltest.TestCase):
                 (666964,): np.array([1.0, 2.0]),
                 (574016,): np.array([3.0]),
             },
-            names=["product_id"],
+            index=["product_id"],
         )
 
         expected_numpy_event = NumpyEvent(
@@ -74,7 +74,7 @@ class EventConversionTest(absltest.TestCase):
             data={
                 (): np.array([1.0, 2.0, 3.0]),
             },
-            names=[],
+            index=[],
         )
 
         expected_numpy_event = NumpyEvent(
@@ -108,7 +108,7 @@ class EventConversionTest(absltest.TestCase):
                 (666964,): np.array([1.0, 2.0]),
                 (574016,): np.array([3.0]),
             },
-            names=["product_id"],
+            index=["product_id"],
         )
 
         numpy_event = NumpyEvent(
@@ -143,7 +143,7 @@ class EventConversionTest(absltest.TestCase):
             data={
                 (): np.array([1.0, 2.0, 3.0]),
             },
-            names=[],
+            index=[],
         )
 
         numpy_event = NumpyEvent(
