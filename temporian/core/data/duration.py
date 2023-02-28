@@ -27,6 +27,10 @@ import numpy as np
 Duration = float
 
 
+def subseconds(value: float) -> Duration:
+    return value / 1000
+
+
 def seconds(value: float) -> Duration:
     return value
 
@@ -45,15 +49,6 @@ def days(value: float) -> Duration:
 
 def weeks(value: float) -> Duration:
     return value * 60 * 60 * 24 * 7
-
-
-# Could be 29, 30 or 31 days
-def months(value: float) -> Duration:
-    return value * 60 * 60 * 24 * 30
-
-
-def years(value: float) -> Duration:
-    return value * 60 * 60 * 24 * 365
 
 
 supported_date_types = (np.datetime64, time.struct_time, datetime.datetime)
@@ -118,32 +113,26 @@ def is_a_date(value: any) -> bool:
     return False
 
 
-def duration_abbreviation(duration: Duration, cutoff: str = None) -> str:
+def duration_abbreviation(
+    duration: Duration, cutoff: str = "subseconds"
+) -> str:
     """Returns the abbreviation for a duration.
 
     Args:
         duration: Duration in seconds.
         cutoff: Cutoff for the abbreviation. For example, if cutoff is "day", the
-        smallest unit will be days. Possible options are "year", "month", "week",
-        "day", "hour" and "minute". If None, the smallest unit will be seconds.
+        smallest unit will be days. Possible options are "week",
+        "day", "hour" and "minute", "seconds" and "subseconds". Default is
+        "subseconds".
 
     Returns:
         Abbreviation for the duration.
     """
+    # check cutt off is valid
+    if cutoff not in ["week", "day", "hour", "minute", "seconds", "subseconds"]:
+        raise ValueError(f"Invalid cutoff {cutoff}")
 
     duration_str = ""
-
-    if duration >= years(1):
-        duration_str += f"{int(duration / years(1))}y"
-        if cutoff == "year":
-            return duration_str
-        duration = duration % years(1)
-
-    if duration >= months(1):
-        duration_str += f"{int(duration / months(1))}m"
-        if cutoff == "month":
-            return duration_str
-        duration = duration % months(1)
 
     if duration >= weeks(1):
         duration_str += f"{int(duration / weeks(1))}w"
@@ -171,6 +160,12 @@ def duration_abbreviation(duration: Duration, cutoff: str = None) -> str:
 
     if duration >= seconds(1):
         duration_str += f"{int(duration / seconds(1))}s"
+        if cutoff == "seconds":
+            return duration_str
         duration = duration % seconds(1)
+
+    if duration >= subseconds(1):
+        duration_str += f"{int(duration / subseconds(1))}ms"
+        return duration_str
 
     return duration_str
