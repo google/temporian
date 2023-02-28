@@ -123,12 +123,12 @@ class EventConversionTest(absltest.TestCase):
 
         expected_df = pd.DataFrame(
             [
-                [666964, 1.0, 740.0],
-                [666964, 2.0, 508.0],
-                [574016, 3.0, 573.0],
+                [666964, 740.0, 1.0],
+                [666964, 508.0, 2.0],
+                [574016, 573.0, 3.0],
             ],
-            columns=["product_id", "timestamp", "costs"],
-        ).set_index(["product_id", "timestamp"])
+            columns=["product_id", "costs", "timestamp"],
+        )
 
         df = numpy_event.to_dataframe()
 
@@ -163,12 +163,12 @@ class EventConversionTest(absltest.TestCase):
 
         expected_df = pd.DataFrame(
             [
-                [666964, 1.0, 740.0],
-                [666964, 2.0, 508.0],
-                [574016, 3.0, 573.0],
+                [666964, 740.0, 1.0],
+                [666964, 508.0, 2.0],
+                [574016, 573.0, 3.0],
             ],
-            columns=["product_id", "timestamp", "costs"],
-        ).set_index(["timestamp"])
+            columns=["product_id", "costs", "timestamp"],
+        )
 
         df = numpy_event.to_dataframe()
 
