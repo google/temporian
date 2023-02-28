@@ -27,6 +27,10 @@ import numpy as np
 Duration = float
 
 
+def subseconds(value: float) -> Duration:
+    return value / 1000
+
+
 def seconds(value: float) -> Duration:
     return value
 
@@ -85,18 +89,24 @@ def convert_datetime_to_duration(date: datetime.datetime) -> Duration:
     return date.replace(tzinfo=datetime.timezone.utc).timestamp()
 
 
-def duration_abbreviation(duration: Duration, cutoff: str = None) -> str:
+def duration_abbreviation(
+    duration: Duration, cutoff: str = "subseconds"
+) -> str:
     """Returns the abbreviation for a duration.
 
     Args:
         duration: Duration in seconds.
         cutoff: Cutoff for the abbreviation. For example, if cutoff is "day", the
-        smallest unit will be days. Possible options are "year", "month", "week",
-        "day", "hour" and "minute". If None, the smallest unit will be seconds.
+        smallest unit will be days. Possible options are "week",
+        "day", "hour" and "minute", "seconds" and "subseconds". Default is
+        "subseconds".
 
     Returns:
         Abbreviation for the duration.
     """
+    # check cutt off is valid
+    if cutoff not in ["week", "day", "hour", "minute", "seconds", "subseconds"]:
+        raise ValueError(f"Invalid cutoff {cutoff}")
 
     duration_str = ""
 
@@ -126,6 +136,12 @@ def duration_abbreviation(duration: Duration, cutoff: str = None) -> str:
 
     if duration >= seconds(1):
         duration_str += f"{int(duration / seconds(1))}s"
+        if cutoff == "seconds":
+            return duration_str
         duration = duration % seconds(1)
+
+    if duration >= subseconds(1):
+        duration_str += f"{int(duration / subseconds(1))}ms"
+        return duration_str
 
     return duration_str

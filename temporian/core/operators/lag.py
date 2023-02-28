@@ -75,9 +75,7 @@ class LagOperator(Operator):
                     is_optional=False,
                 ),
             ],
-            inputs=[
-                pb.OperatorDef.Input(key="event"),
-            ],
+            inputs=[pb.OperatorDef.Input(key="event")],
             outputs=[pb.OperatorDef.Output(key="event")],
         )
 
