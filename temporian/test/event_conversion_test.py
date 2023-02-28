@@ -51,7 +51,103 @@ class EventConversionTest(absltest.TestCase):
         )
 
         numpy_event = NumpyEvent.from_dataframe(
-            df, index_names=["product_id"], timestamp_name="timestamp"
+            df, index_names=["product_id"], timestamp_column="timestamp"
+        )
+
+        # validate
+        self.assertEqual(
+            True,
+            numpy_event == expected_numpy_event,
+        )
+
+    def test_df_to_numpy_event_string(self) -> None:
+        df = pd.DataFrame(
+            [
+                [666964, 1.0, "740.0"],
+                [666964, 2.0, "508.0"],
+                [574016, 3.0, "573.0"],
+            ],
+            columns=["product_id", "timestamp", "costs"],
+        )
+
+        self.assertRaisesRegex(
+            ValueError,
+            "Unsupported dtype",
+            NumpyEvent.from_dataframe,
+            df,
+            ["product_id"],
+        )
+
+    def test_df_to_numpy_event_missing_values(self) -> None:
+        df = pd.DataFrame(
+            [
+                [666964, 1.0, 740.0],
+                [666964, 2.0],
+                [574016, 3.0, 573.0],
+            ],
+            columns=["product_id", "timestamp", "costs"],
+        )
+
+        numpy_sampling = NumpySampling(
+            data={
+                (666964,): np.array([1.0, 2.0]),
+                (574016,): np.array([3.0]),
+            },
+            index=["product_id"],
+        )
+
+        expected_numpy_event = NumpyEvent(
+            data={
+                (666964,): [
+                    NumpyFeature(data=np.array([740.0, np.nan]), name="costs")
+                ],
+                (574016,): [NumpyFeature(data=np.array([573.0]), name="costs")],
+            },
+            sampling=numpy_sampling,
+        )
+
+        numpy_event = NumpyEvent.from_dataframe(
+            df, index_names=["product_id"], timestamp_column="timestamp"
+        )
+
+        # validate
+        self.assertEqual(
+            True,
+            numpy_event == expected_numpy_event,
+        )
+
+    def test_df_to_numpy_event_datetime_index(self) -> None:
+        df = pd.DataFrame(
+            [
+                [666964, np.datetime64("2022-01-01"), 740.0],
+                [666964, np.datetime64("2022-01-02"), 508.0],
+                [574016, np.datetime64("2022-01-03"), 573.0],
+            ],
+            columns=["product_id", "timestamp", "costs"],
+        )
+
+        numpy_sampling = NumpySampling(
+            data={
+                (666964,): np.array(
+                    ["2022-01-01", "2022-01-02"], dtype="datetime64[D]"
+                ),
+                (574016,): np.array(["2022-01-03"], dtype="datetime64[D]"),
+            },
+            index=["product_id"],
+        )
+
+        expected_numpy_event = NumpyEvent(
+            data={
+                (666964,): [
+                    NumpyFeature(data=np.array([740.0, 508.0]), name="costs")
+                ],
+                (574016,): [NumpyFeature(data=np.array([573.0]), name="costs")],
+            },
+            sampling=numpy_sampling,
+        )
+
+        numpy_event = NumpyEvent.from_dataframe(
+            df, index_names=["product_id"], timestamp_column="timestamp"
         )
 
         # validate
@@ -93,7 +189,7 @@ class EventConversionTest(absltest.TestCase):
         )
 
         numpy_event = NumpyEvent.from_dataframe(
-            df, index_names=[], timestamp_name="timestamp"
+            df, index_names=[], timestamp_column="timestamp"
         )
 
         # validate
@@ -126,6 +222,46 @@ class EventConversionTest(absltest.TestCase):
                 [666964, 740.0, 1.0],
                 [666964, 508.0, 2.0],
                 [574016, 573.0, 3.0],
+            ],
+            columns=["product_id", "costs", "timestamp"],
+        )
+
+        df = numpy_event.to_dataframe()
+
+        # validate
+        self.assertEqual(
+            True,
+            df.equals(expected_df),
+        )
+
+    def test_numpy_event_to_df_with_datetimes(self) -> None:
+        numpy_sampling = NumpySampling(
+            data={
+                # make index a datetime
+                (666964,): np.array(
+                    ["2021-01-01", "2021-01-02"], dtype="datetime64"
+                ),
+                (574016,): np.array(["2021-01-03"], dtype="datetime64"),
+            },
+            index=["product_id"],
+        )
+
+        numpy_event = NumpyEvent(
+            data={
+                (666964,): [
+                    NumpyFeature(data=np.array([740.0, 508.0]), name="costs")
+                ],
+                (574016,): [NumpyFeature(data=np.array([573.0]), name="costs")],
+            },
+            sampling=numpy_sampling,
+        )
+
+        expected_df = pd.DataFrame(
+            [
+                # use timestamp as datetime from numpy
+                [666964, 740.0, np.datetime64("2021-01-01")],
+                [666964, 508.0, np.datetime64("2021-01-02")],
+                [574016, 573.0, np.datetime64("2021-01-03")],
             ],
             columns=["product_id", "costs", "timestamp"],
         )

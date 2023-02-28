@@ -65,7 +65,7 @@ class NumpyEvent:
         self.sampling = sampling
 
     @property
-    def first_index_level(self) -> Tuple:
+    def _first_index_level(self) -> Tuple:
         first_index_level = None
         try:
             first_index_level = next(iter(self.data))
@@ -79,7 +79,7 @@ class NumpyEvent:
         if len(self.data.keys()) == 0:
             return 0
 
-        return len(self.data[self.first_index_level])
+        return len(self.data[self._first_index_level])
 
     @property
     def feature_names(self) -> List[str]:
@@ -89,7 +89,7 @@ class NumpyEvent:
         # Only look at the feature in the first index
         # to get the feature names. All features in all
         # indexes should have the same names
-        return [feature.name for feature in self.data[self.first_index_level]]
+        return [feature.name for feature in self.data[self._first_index_level]]
 
     def schema(self) -> Event:
         return Event(
@@ -103,20 +103,23 @@ class NumpyEvent:
     def from_dataframe(
         df: pd.DataFrame,
         index_names: List[str],
-        timestamp_name: str = "timestamp",
+        timestamp_column: str = "timestamp",
     ) -> "NumpyEvent":
-        """Function to convert a pandas DataFrame to a NumpyEvent
+        """Function to convert a pandas DataFrame to a NumpyEvent. Supported
+        dtypes are: np.float64, np.float32, np.int64, np.int32, np.datetime64
+        (for timestamp column).
 
         Args:
             df: DataFrame to convert to NumpyEvent
             index_names: Names of the indexes of the DataFrame
-            timestamp_name: Name for timestamp index. Defaults to "timestamp".
+            timestamp_column: Name for timestamp index. Defaults to "timestamp".
 
         Returns:
             NumpyEvent: NumpyEvent created from DataFrame
 
         Raises:
-            ValueError: If index_names or timestamp_name are not in df columns
+            ValueError: If index_names or timestamp_column are not in df columns
+            ValueError: If a column has an unsupported dtype
 
         Example:
             >>> import pandas as pd
@@ -137,7 +140,7 @@ class NumpyEvent:
         # check index names and timestamp name are in df columns
         missing_columns = [
             column
-            for column in index_names + [timestamp_name]
+            for column in index_names + [timestamp_column]
             if column not in df.columns
         ]
 
@@ -147,15 +150,34 @@ class NumpyEvent:
                 f"Columns: {df.columns}"
             )
 
+        # check column dtypes, every dtype should be a key of DTYPE_MAPPING
+
+        for column in df.columns:
+            if df[column].dtype.type not in DTYPE_MAPPING:
+                # if its timestamp check if its a datetime64
+                # if its not timestamp, raise error
+                if (
+                    column == timestamp_column
+                    and df[column].dtype.type != np.datetime64
+                    or column != timestamp_column
+                ):
+                    raise ValueError(
+                        f"Unsupported dtype {df[column].dtype} for column"
+                        f" {column}. Supported dtypes: {DTYPE_MAPPING.keys()}"
+                    )
+
         # columns that are not indexes or timestamp
         feature_columns = [
             column
             for column in df.columns
-            if column not in index_names + [timestamp_name]
+            if column not in index_names + [timestamp_column]
         ]
 
         sampling = {}
         data = {}
+
+        # fill missing values with np.nan
+        df = df.fillna(np.nan)
 
         # The user provided an index
         if index_names:
@@ -163,7 +185,7 @@ class NumpyEvent:
 
             for group in group_by_indexes.groups:
                 columns = group_by_indexes.get_group(group)
-                timestamp = columns[timestamp_name].to_numpy()
+                timestamp = columns[timestamp_column].to_numpy()
 
                 # Convert group to tuple, useful when its only one value
                 if not isinstance(group, tuple):
@@ -176,7 +198,7 @@ class NumpyEvent:
                 ]
         # The user did not provide an index
         else:
-            timestamp = df[timestamp_name].to_numpy()
+            timestamp = df[timestamp_column].to_numpy()
             sampling[()] = timestamp
             data[()] = [
                 NumpyFeature(feature, df[feature].to_numpy())
@@ -213,7 +235,7 @@ class NumpyEvent:
                 df.loc[len(df)] = row
 
         # Convert to original dtypes, can be more efficient
-        first_index = self.first_index_level
+        first_index = self._first_index_level
         first_features = self.data[first_index]
 
         # get feature dtypes
