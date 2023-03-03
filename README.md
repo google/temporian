@@ -26,11 +26,6 @@ sma = t.simple_moving_average(
     window_length=t.day(5),
 )
 
-smd = t.simple_moving_standar_deviation(
-    input=event,
-    window_length=t.day(5),
-)
-
 lag = t.lag(
     input=event,
     lag=t.week(1),
@@ -38,7 +33,6 @@ lag = t.lag(
 
 # Assign features
 output_event = t.assign(event, sma)
-output_event = t.assign(output_event, smd)
 output_event = t.assign(output_event, lag)
 
 
@@ -58,7 +52,6 @@ output_event = t.evaluator.evaluate(
 Temporian currently supports the following features for pre-processing your temporal data:
 
 * **Standard Mean Average:** calculates the average value of each feature over a specified time window.
-* **Standard Mean Deviation:** calculates the standard deviation of each feature over a specified time window.
 * **Lag:** creates new features by shifting the time series data backward in time by a specified number of time steps.
 * **Leak:** creates new features by shifting the time series data forward in time by a specified number of time steps.
 * **Arithmetic Operations:** allows you to perform arithmetic operations (such as addition, subtraction, multiplication, and division) on time series data, between different events.
