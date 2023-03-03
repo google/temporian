@@ -14,17 +14,18 @@ A minimal end-to-end run looks as follows:
 import temporian as t
 
 # Load the data.
-event = t.read_event("path/to/data.csv")
+event_data = t.read_event("path/to/data.csv")
 
-# Difficult to explain
-schema_event = Event([Feature("sales", int), Feature("costs", int)])
+# Event schema
+event = t.Event([t.Feature("sales", int), t.Feature("costs", int)])
 
-# Create features
+# Create Simple Moving Average feature
 sma = t.simple_moving_average(
     input=event,
     window_length=t.day(5),
 )
 
+# Create Lag feature
 lag = t.lag(
     input=event,
     lag=t.week(1),
@@ -36,12 +37,12 @@ output_event = t.assign(output_event, lag)
 
 
 # Execute pre processing functions and get results
-output_event = t.evaluator.evaluate(
+output_event = t.evaluate(
     output_event,
     input_data={
-        schema_event: event,
-        },
-    )
+        event: event_data,
+    },
+)
 
 ```
 
@@ -50,11 +51,12 @@ output_event = t.evaluator.evaluate(
 ## Supported Features
 Temporian currently supports the following features for pre-processing your temporal data:
 
-* **Standard Mean Average:** calculates the average value of each feature over a specified time window.
+* **Simple Moving Average:** calculates the average value of each feature over a specified time window.
 * **Lag:** creates new features by shifting the time series data backward in time by a specified number of time steps.
 * **Leak:** creates new features by shifting the time series data forward in time by a specified number of time steps.
 * **Arithmetic Operations:** allows you to perform arithmetic operations (such as addition, subtraction, multiplication, and division) on time series data, between different events.
 
+More features comming soon...
 
 
 ## Requirements for Contributors
