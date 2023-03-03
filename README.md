@@ -3,8 +3,7 @@
 ![tests](https://github.com/google/temporian/actions/workflows/test.yaml/badge.svg) ![formatting](https://github.com/google/temporian/actions/workflows/formatting.yaml/badge.svg)
 
 
-**Temporian** is an open source library designed to streamline the pre-processing of temporal signals, making it faster and more efficient to use them as input features with popular tabular machine learning libraries such as TensorFlow Decision Forests. With Temporian, you can easily perform feature engineering on your temporal data, to improve the accuracy and speed of your forecasting models. Whether you're working with financial data, sensor data, or any other type of time series data, Temporian can help you achieve faster and more accurate results. Best of all, Temporian is completely free and open source, so you can use it however you like, whether for personal or commercial use.
-
+**Temporian** is a library to pre-process temporal signals before their use as input features with off-the-shelf tabular machine learning libraries (e.g., TensorFlow Decision Forests, scikit learn, XGBoost).
 
 
 ## Usage Example
