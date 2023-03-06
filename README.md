@@ -2,9 +2,7 @@
 
 ![tests](https://github.com/google/temporian/actions/workflows/test.yaml/badge.svg) ![formatting](https://github.com/google/temporian/actions/workflows/formatting.yaml/badge.svg)
 
-
-**Temporian** is a library to pre-process temporal signals before their use as input features with off-the-shelf tabular machine learning libraries (e.g., TensorFlow Decision Forests, scikit learn, XGBoost).
-
+**Temporian** is a library to pre-process temporal signals before their use as input features with off-the-shelf tabular machine learning libraries (e.g., TensorFlow Decision Forests, scikit-learn).
 
 ## Usage Example
 
@@ -13,7 +11,7 @@ A minimal end-to-end run looks as follows:
 ```python
 import temporian as t
 
-# Load the data.
+# Load the data
 event_data = t.read_event("path/to/data.csv")
 
 # Event schema
@@ -36,7 +34,7 @@ output_event = t.assign(event, sma)
 output_event = t.assign(output_event, lag)
 
 
-# Execute pre processing functions and get results
+# Execute pipeline and get results
 output_event = t.evaluate(
     output_event,
     input_data={
@@ -46,20 +44,18 @@ output_event = t.evaluate(
 
 ```
 
->__Warning__: The library is still under construction. This example usage is what we are aiming to build in the short term.
+> **Warning**: The library is still under construction. This example usage is what we are aiming to build in the short term.
 
 ## Supported Features
+
 Temporian currently supports the following features for pre-processing your temporal data:
 
-* **Simple Moving Average:** calculates the average value of each feature over a specified time window.
-* **Lag:** creates new features by shifting the time series data backward in time by a specified number of time steps.
-* **Leak:** creates new features by shifting the time series data forward in time by a specified number of time steps.
-* **Arithmetic Operations:** allows you to perform arithmetic operations (such as addition, subtraction, multiplication, and division) on time series data, between different events.
+- **Simple Moving Average:** calculates the average value of each feature over a specified time window.
+- **Lag:** creates new features by shifting the time series data backwards in time by a specified period.
+- **Arithmetic Operations:** allows you to perform arithmetic operations (such as addition, subtraction, multiplication, and division) on time series data, between different events.
+- More features coming soon!
 
-More features comming soon...
-
-
-## Requirements for Contributors
+## Environment Setup
 
 Dependencies are managed through [Poetry](https://python-poetry.org/). To
 install Poetry, execute the following command:
@@ -105,7 +101,7 @@ Finally, activate the virtual environment by executing:
 poetry shell
 ```
 
-## Testing for Contributors
+## Testing
 
 Install bazel and buildifier (in Mac we recommend installing bazelisk with brew):
 
@@ -119,7 +115,7 @@ Run all tests with bazel:
 bazel test //...:all
 ```
 
->__Note__: You can use the Bazel test flag `--test_output=streamed` to see the test logs in realtime.
+> **Note**: You can use the Bazel test flag `--test_output=streamed` to see the test logs in realtime.
 
 ## Credits
 
