@@ -1,13 +1,59 @@
-# Temporian
+![Temporian logo](resources/banner.png)
 
-**Temporian** is a library to pre-process temporal
-signals before their use as input features with off-the-shelf tabular machine
-learning libraries (e.g., TensorFlow Decision Forests).
+![tests](https://github.com/google/temporian/actions/workflows/test.yaml/badge.svg) ![formatting](https://github.com/google/temporian/actions/workflows/formatting.yaml/badge.svg)
 
-![tests](https://github.com/google/temporian/actions/workflows/test.yaml/badge.svg)
-![formatting](https://github.com/google/temporian/actions/workflows/formatting.yaml/badge.svg)
+**Temporian** is a library to pre-process temporal signals before their use as input features with off-the-shelf tabular machine learning libraries (e.g., TensorFlow Decision Forests, scikit-learn).
 
-## Requirements
+## Usage Example
+
+A minimal end-to-end run looks as follows:
+
+```python
+import temporian as tp
+
+# Load the data
+event_data = tp.read_event("path/to/data.csv")
+event = event_data.schema()
+
+# Create Simple Moving Average feature
+sma = tp.simple_moving_average(
+    input=event,
+    window_length=tp.day(5),
+)
+
+# Create Lag feature
+lag = tp.lag(
+    input=event,
+    lag=tp.week(1),
+)
+
+# Assign features
+output_event = tp.assign(event, sma)
+output_event = tp.assign(output_event, lag)
+
+
+# Execute pipeline and get results
+output_event = tp.evaluate(
+    output_event,
+    input_data={
+        event: event_data,
+    },
+)
+
+```
+
+> **Warning**: The library is still under construction. This example usage is what we are aiming to build in the short term.
+
+## Supported Features
+
+Temporian currently supports the following features for pre-processing your temporal data:
+
+- **Simple Moving Average:** calculates the average value of each feature over a specified time window.
+- **Lag:** creates new features by shifting the time series data backwards in time by a specified period.
+- **Arithmetic Operations:** allows you to perform arithmetic operations (such as addition, subtraction, multiplication, and division) on time series data, between different events.
+- More features coming soon!
+
+## Environment Setup
 
 Dependencies are managed through [Poetry](https://python-poetry.org/). To
 install Poetry, execute the following command:
@@ -53,7 +99,7 @@ Finally, activate the virtual environment by executing:
 poetry shell
 ```
 
-## Run all tests
+## Testing
 
 Install bazel and buildifier (in Mac we recommend installing bazelisk with brew):
 
@@ -67,7 +113,7 @@ Run all tests with bazel:
 bazel test //...:all
 ```
 
->__Note__: You can use the Bazel test flag `--test_output=streamed` to see the test logs in realtime.
+> **Note**: You can use the Bazel test flag `--test_output=streamed` to see the test logs in realtime.
 
 ## Credits
 
