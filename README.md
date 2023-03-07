@@ -9,31 +9,31 @@
 A minimal end-to-end run looks as follows:
 
 ```python
-import temporian as t
+import temporian as tp
 
 # Load the data
-event_data = t.read_event("path/to/data.csv")
+event_data = tp.read_event("path/to/data.csv")
 event = event_data.schema()
 
 # Create Simple Moving Average feature
-sma = t.simple_moving_average(
+sma = tp.simple_moving_average(
     input=event,
-    window_length=t.day(5),
+    window_length=tp.day(5),
 )
 
 # Create Lag feature
-lag = t.lag(
+lag = tp.lag(
     input=event,
-    lag=t.week(1),
+    lag=tp.week(1),
 )
 
 # Assign features
-output_event = t.assign(event, sma)
-output_event = t.assign(output_event, lag)
+output_event = tp.assign(event, sma)
+output_event = tp.assign(output_event, lag)
 
 
 # Execute pipeline and get results
-output_event = t.evaluate(
+output_event = tp.evaluate(
     output_event,
     input_data={
         event: event_data,
