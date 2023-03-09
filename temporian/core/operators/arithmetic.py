@@ -32,11 +32,11 @@ class ArithmeticOperation(str, Enum):
     @staticmethod
     def prefix(operation: "ArithmeticOperation") -> str:
         if operation == ArithmeticOperation.ADDITION:
-            return "sum"
+            return "add"
         if operation == ArithmeticOperation.SUBTRACTION:
-            return "diff"
+            return "sub"
         if operation == ArithmeticOperation.MULTIPLICATION:
-            return "prod"
+            return "mult"
         if operation == ArithmeticOperation.DIVISION:
             return "div"
         raise ValueError(f"Unknown operation: {operation}.")
