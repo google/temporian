@@ -29,7 +29,7 @@ def evaluate_schedule(
         # get implementation
         implementation = core_mapping.OPERATOR_IMPLEMENTATIONS[
             operator_def.key
-        ](**operator.attributes())
+        ](operator)
 
         # construct operator inputs
         operator_inputs = {
