@@ -20,6 +20,7 @@ from temporian.core import evaluator
 from temporian.core.data.event import Event, Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.assign import assign
+from temporian.core.operators.lag import lag
 from temporian.implementation.numpy.data.event import NumpyEvent
 
 
@@ -70,14 +71,14 @@ class PrototypeTest(absltest.TestCase):
         self.expected_output_event = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
-                    [TRYOLABS_SHOP, MATE_ID, 0.0, 14, -14, 0],
-                    [TRYOLABS_SHOP, MATE_ID, 1.0, 15, -15, 0],
-                    [TRYOLABS_SHOP, MATE_ID, 2.0, 16, -16, 0],
-                    [TRYOLABS_SHOP, BOOK_ID, 1.0, 10, -10, 0],
-                    [GOOGLE_SHOP, BOOK_ID, 1.0, 7, -7, 0],
-                    [GOOGLE_SHOP, BOOK_ID, 2.0, 8, -8, 0],
-                    [GOOGLE_SHOP, PIXEL_ID, 0.0, 3, -3, 0],
-                    [GOOGLE_SHOP, PIXEL_ID, 1.0, 4, -4, 0],
+                    [TRYOLABS_SHOP, MATE_ID, 0, 14, -14, 0, np.nan],
+                    [TRYOLABS_SHOP, MATE_ID, 1, 15, -15, 0, 14],
+                    [TRYOLABS_SHOP, MATE_ID, 2, 16, -16, 0, 15],
+                    [TRYOLABS_SHOP, BOOK_ID, 1, 10, -10, 0, np.nan],
+                    [GOOGLE_SHOP, BOOK_ID, 1, 7, -7, 0, np.nan],
+                    [GOOGLE_SHOP, BOOK_ID, 2, 8, -8, 0, 7],
+                    [GOOGLE_SHOP, PIXEL_ID, 0, 3, -3, 0, np.nan],
+                    [GOOGLE_SHOP, PIXEL_ID, 1, 4, -4, 0, 3],
                 ],
                 columns=[
                     "store_id",
@@ -86,6 +87,7 @@ class PrototypeTest(absltest.TestCase):
                     "sales",
                     "costs",
                     "add_sales_costs",
+                    "lag[1s]_sales",
                 ],
             ),
             index_names=["store_id", "product_id"],
@@ -104,11 +106,18 @@ class PrototypeTest(absltest.TestCase):
             sampling=sampling,
         )
 
+        lagged_sales = lag(
+            event_1,
+            duration=1,
+        )
+
         # add costs feature to output
         output_event = assign(event_1, event_2)
 
         # add sum of sales and costs
         output_event = assign(output_event, event_1 + event_2)
+
+        output_event = assign(output_event, lagged_sales)
 
         output_event_numpy = evaluator.evaluate(
             output_event,
@@ -119,6 +128,12 @@ class PrototypeTest(absltest.TestCase):
             },
             backend="numpy",
         )
+
+        if self.expected_output_event != output_event_numpy[output_event]:
+            print("expected")
+            print(self.expected_output_event.to_dataframe())
+            print("actual")
+            print(output_event_numpy[output_event].to_dataframe())
 
         # validate
         self.assertEqual(
