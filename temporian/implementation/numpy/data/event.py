@@ -1,11 +1,13 @@
-from typing import Dict, List, Tuple, Any
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
 
+from temporian.core.data import dtype
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
-from temporian.core.data import dtype
+from temporian.core.data.duration import convert_date_to_duration
+from temporian.core.data.duration import is_a_date
 from temporian.implementation.numpy.data.sampling import NumpySampling
 
 DTYPE_MAPPING = {
@@ -151,20 +153,16 @@ class NumpyEvent:
             )
 
         # check column dtypes, every dtype should be a key of DTYPE_MAPPING
-
         for column in df.columns:
-            if df[column].dtype.type not in DTYPE_MAPPING:
-                # if its timestamp check if its a datetime64
-                # if its not timestamp, raise error
-                if (
-                    column == timestamp_column
-                    and df[column].dtype.type != np.datetime64
-                    or column != timestamp_column
-                ):
-                    raise ValueError(
-                        f"Unsupported dtype {df[column].dtype} for column"
-                        f" {column}. Supported dtypes: {DTYPE_MAPPING.keys()}"
-                    )
+            # if it's a date, convert it to duration
+            if is_a_date(df[column].dtype.type):
+                df[column] = df[column].apply(convert_date_to_duration)
+            # if it's not a date, check if its a supported dtype
+            elif df[column].dtype.type not in DTYPE_MAPPING:
+                raise ValueError(
+                    f"Unsupported dtype {df[column].dtype} for column"
+                    f" {column}. Supported dtypes: {DTYPE_MAPPING.keys()}"
+                )
 
         # columns that are not indexes or timestamp
         feature_columns = [

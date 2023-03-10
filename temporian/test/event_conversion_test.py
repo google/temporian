@@ -126,12 +126,11 @@ class EventConversionTest(absltest.TestCase):
             columns=["product_id", "timestamp", "costs"],
         )
 
+        # dates converted to timestamp UTC epoch
         numpy_sampling = NumpySampling(
             data={
-                (666964,): np.array(
-                    ["2022-01-01", "2022-01-02"], dtype="datetime64[D]"
-                ),
-                (574016,): np.array(["2022-01-03"], dtype="datetime64[D]"),
+                (666964,): np.array([1640995200, 1641081600]),
+                (574016,): np.array([1641168000]),
             },
             index=["product_id"],
         )
@@ -238,10 +237,8 @@ class EventConversionTest(absltest.TestCase):
         numpy_sampling = NumpySampling(
             data={
                 # make index a datetime
-                (666964,): np.array(
-                    ["2021-01-01", "2021-01-02"], dtype="datetime64"
-                ),
-                (574016,): np.array(["2021-01-03"], dtype="datetime64"),
+                (666964,): np.array([1, 2]),
+                (574016,): np.array([3]),
             },
             index=["product_id"],
         )
@@ -259,9 +256,9 @@ class EventConversionTest(absltest.TestCase):
         expected_df = pd.DataFrame(
             [
                 # use timestamp as datetime from numpy
-                [666964, 740.0, np.datetime64("2021-01-01")],
-                [666964, 508.0, np.datetime64("2021-01-02")],
-                [574016, 573.0, np.datetime64("2021-01-03")],
+                [666964, 740.0, 1],
+                [666964, 508.0, 2],
+                [574016, 573.0, 3],
             ],
             columns=["product_id", "costs", "timestamp"],
         )
