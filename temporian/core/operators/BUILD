@@ -15,7 +15,6 @@ py_library(
         ":assign",
         ":lag",
         ":simple_moving_average",
-        ":sum",
     ],
 )
 
