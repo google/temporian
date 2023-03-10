@@ -78,7 +78,7 @@ class PrototypeTest(absltest.TestCase):
                     "timestamp",
                     "sales",
                     "costs",
-                    "sum_sales_costs",
+                    "add_sales_costs",
                 ],
             ),
             index_names=["store_id", "product_id", "timestamp"],

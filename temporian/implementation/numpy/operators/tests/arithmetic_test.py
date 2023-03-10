@@ -80,7 +80,7 @@ class ArithmeticOperatorTest(absltest.TestCase):
             data={
                 ("A",): [
                     NumpyFeature(
-                        name="sum_sales_costs",
+                        name="add_sales_costs",
                         data=np.array([10.0, 20.0, np.nan, np.nan, 40.0]),
                     ),
                 ],
@@ -113,7 +113,7 @@ class ArithmeticOperatorTest(absltest.TestCase):
             data={
                 ("A",): [
                     NumpyFeature(
-                        name="diff_sales_costs",
+                        name="sub_sales_costs",
                         data=np.array([10.0, -20.0, np.nan, np.nan, 20.0]),
                     ),
                 ],
@@ -146,7 +146,7 @@ class ArithmeticOperatorTest(absltest.TestCase):
             data={
                 ("A",): [
                     NumpyFeature(
-                        name="prod_sales_costs",
+                        name="mult_sales_costs",
                         data=np.array([0.0, 0.0, np.nan, np.nan, 300.0]),
                     ),
                 ],
