@@ -11,10 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import numpy as np
-import pandas as pd
 from absl import logging
 from absl.testing import absltest
+
+import numpy as np
+import pandas as pd
 
 from temporian.core import evaluator
 from temporian.core.data.event import Event, Feature
