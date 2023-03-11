@@ -8,9 +8,12 @@ from temporian.core.operators.simple_moving_average import (
     SimpleMovingAverage as SmaDef,
 )
 
+# TODO: Use a registration mechanism instead.
+# TODO: Make sure the implementation key is defined only one (in the operator
+# definition).
 OPERATOR_IMPLEMENTATIONS = {
     "SELECT": NumpySelectOperator,
     "SUM": NumpySumOperator,
     "ASSIGN": NumpyAssignOperator,
-    SmaDef.implementation_key(): SmaImp,
+    SmaDef.implementation_key(): SmaImp,  # Simple moving average
 }
