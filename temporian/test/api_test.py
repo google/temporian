@@ -18,12 +18,15 @@ import os
 import tempfile
 
 import temporian as t
+import numpy as np
 
 from temporian.implementation.pandas.data.event import PandasEvent
+from temporian.implementation.numpy.data.event import NumpyEvent, NumpyFeature
+from temporian.implementation.numpy.data.sampling import NumpySampling
 
 
 class TFPTest(absltest.TestCase):
-    def disabled_test_evaluation(self):
+    def test_evaluation(self):
         a = t.input_event(
             [
                 t.Feature(name="f1", dtype=t.dtype.FLOAT64),
@@ -33,12 +36,23 @@ class TFPTest(absltest.TestCase):
 
         b = t.sma(event=a, window_length=7)
 
-        input_signal_data = PandasEvent(
-            {
-                "time": [0, 2, 4, 6],
-                "f1": [1, 2, 3, 4],
-                "f2": [5, 6, 7, 8],
-            }
+        input_signal_data = NumpyEvent(
+            data={
+                (): [
+                    NumpyFeature(
+                        name="f1",
+                        data=np.array([1, 2, 3, 4]),
+                    ),
+                    NumpyFeature(
+                        name="f2",
+                        data=np.array([5, 6, 7, 8]),
+                    ),
+                ]
+            },
+            sampling=NumpySampling(
+                index=[],
+                data={(): np.array([0, 2, 4, 6], dtype=np.float64)},
+            ),
         )
 
         results = t.evaluate(
