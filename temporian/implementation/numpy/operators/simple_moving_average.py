@@ -2,7 +2,7 @@
 
 
 # TODO: Implement in c++.
-# TODO: Add support for missing (NaN) input values.
+# TODO: Create a base class or utility tools to handle window operators.
 
 
 from typing import Dict, Optional
