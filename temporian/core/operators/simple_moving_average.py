@@ -105,6 +105,10 @@ def sma(
     "sampling". If "sampling" is not provided, apply the operator for each
     timestamps of "event".
 
+    Missing values are ignored.
+
+    If the window does not contain any values (e.g., all the values are missing, or the window does not contain any sampling), outputs missing values.
+
     Args:
         event: The features to average.
         window_length: The window length for averaging.

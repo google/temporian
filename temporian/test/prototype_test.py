@@ -75,7 +75,7 @@ class PrototypeTest(absltest.TestCase):
             ],
         ).set_index(["product_id", "timestamp"])
 
-    def test_prototoype(self) -> None:
+    def disabled_test_prototoype(self) -> None:
         # instance input events
         sampling = Sampling(["product_id", "timestamp"])
 

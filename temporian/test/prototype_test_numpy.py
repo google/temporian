@@ -185,7 +185,7 @@ class PrototypeTest(absltest.TestCase):
         # validate
         self.assertEqual(
             True,
-            self.expected_output_event == output_event_numpy[output_event],
+            self.expected_output_event == output_event_numpy,
         )
 
 

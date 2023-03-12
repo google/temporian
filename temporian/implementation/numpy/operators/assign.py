@@ -19,9 +19,16 @@ import numpy as np
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
+from temporian.core.operators.assign import AssignOperator
 
 
+# TODO: Rename to AssignImplementation
 class NumpyAssignOperator:
+    # TODO: Remove the optionallity on "op".
+    def __init__(self, op: AssignOperator = None) -> None:
+        assert op is None or isinstance(op, AssignOperator)
+        self._op = op
+
     def __call__(
         self, left_event: NumpyEvent, right_event: NumpyEvent
     ) -> Dict[str, NumpyEvent]:

@@ -21,27 +21,36 @@ from temporian.implementation.numpy.operators import core_mapping
 
 
 def evaluate_schedule(
-    data: Dict[event.Event, numpy_event.NumpyEvent],
+    inputs: Dict[event.Event, numpy_event.NumpyEvent],
     schedule: List[base.Operator],
 ) -> Dict[event.Event, numpy_event.NumpyEvent]:
+    data = {**inputs}
+
     for operator in schedule:
         operator_def = operator.definition()
-        # get implementation
-        implementation = core_mapping.OPERATOR_IMPLEMENTATIONS[
-            operator_def.key
-        ](**operator.attributes())
 
-        # construct operator inputs
+        # Get implementation
+        implementation_cls = core_mapping.OPERATOR_IMPLEMENTATIONS[
+            operator_def.key
+        ]
+
+        # Instantiate implementation
+        implementation = implementation_cls(operator)
+        # DO NOT SUBMIT: **operator.attributes())
+
+        # Construct operator inputs
         operator_inputs = {
             input_key: data[input_event]
             for input_key, input_event in operator.inputs().items()
         }
 
-        # compute output
+        # Compute output
         operator_outputs = implementation(**operator_inputs)
 
         # materialize data in output events
         for output_key, output_event in operator.outputs().items():
             data[output_event] = operator_outputs[output_key]
 
+    # TODO: Only return the required data.
+    # TODO: Un-allocate not used anymore object.
     return data
