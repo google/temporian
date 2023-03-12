@@ -17,9 +17,9 @@ py_library(
     srcs = ["assign.py"],
     srcs_version = "PY3",
     deps = [
+        "//temporian/core/operators:assign",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
-        "//temporian/core/operators:assign"
     ],
 )
 
@@ -39,8 +39,8 @@ py_library(
     deps = [
         ":assign",
         ":select",
+        ":simple_moving_average",
         ":sum",
-        ":simple_moving_average"
     ],
 )
 
@@ -75,5 +75,19 @@ py_library(
         "//temporian/implementation/numpy/data:sampling",
         "//temporian/core/data:duration",
         "//temporian/core/operators:simple_moving_average",
+    ],
+)
+
+py_library(
+    name = "propagate",
+    srcs = ["propagate.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/data:duration",
+        "//temporian/core/operators:propagate",
+        "//temporian/implementation/numpy:utils",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
     ],
 )

@@ -79,3 +79,18 @@ py_library(
         "//temporian/proto:core_py_proto",
     ],
 )
+
+py_library(
+    name = "propagate",
+    srcs = ["propagate.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        ":select",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:duration",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/proto:core_py_proto",
+    ],
+)
