@@ -18,8 +18,9 @@ import os
 import tempfile
 
 import temporian as t
+import pandas as pd
 
-from temporian.implementation.pandas.data.event import PandasEvent
+from temporian.implementation.numpy.data.event import NumpyEvent
 
 
 class TFPTest(absltest.TestCase):
@@ -33,12 +34,15 @@ class TFPTest(absltest.TestCase):
 
         b = t.sma(event=a, window_length=7)
 
-        input_signal_data = PandasEvent(
+        df = pd.DataFrame(
             {
                 "time": [0, 2, 4, 6],
                 "f1": [1, 2, 3, 4],
                 "f2": [5, 6, 7, 8],
             }
+        )
+        input_signal_data = NumpyEvent.from_dataframe(
+            df, index_names=[], timestamp_column=["time"]
         )
 
         results = t.evaluate(
