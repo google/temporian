@@ -48,7 +48,7 @@ class PrototypeTest(absltest.TestCase):
                 ],
                 columns=["store_id", "product_id", "timestamp", "sales"],
             ),
-            index_names=["store_id", "product_id", "timestamp"],
+            index_names=["store_id", "product_id"],
         )
 
         self.event_2 = NumpyEvent.from_dataframe(
@@ -65,7 +65,7 @@ class PrototypeTest(absltest.TestCase):
                 ],
                 columns=["store_id", "product_id", "timestamp", "costs"],
             ),
-            index_names=["store_id", "product_id", "timestamp"],
+            index_names=["store_id", "product_id"],
         )
 
         self.expected_output_event = NumpyEvent.from_dataframe(
@@ -89,7 +89,7 @@ class PrototypeTest(absltest.TestCase):
                     "add_sales_costs",
                 ],
             ),
-            index_names=["store_id", "product_id", "timestamp"],
+            index_names=["store_id", "product_id"],
         )
 
     def test_prototype(self) -> None:
