@@ -152,6 +152,12 @@ class NumpyEvent:
                 f"Columns: {df.columns}"
             )
 
+        # check timestamp_column is not on index_names
+        if timestamp_column in index_names:
+            raise ValueError(
+                f"Timestamp column {timestamp_column} cannot be on index_names"
+            )
+
         # check column dtypes, every dtype should be a key of DTYPE_MAPPING
         for column in df.columns:
             # if it's a date, convert it to duration
