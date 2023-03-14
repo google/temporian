@@ -36,9 +36,9 @@ py_library(
     srcs = ["core_mapping.py"],
     srcs_version = "PY3",
     deps = [
+        ":arithmetic",
         ":assign",
         ":select",
-        ":sum",
     ],
 )
 
@@ -52,11 +52,11 @@ py_library(
 )
 
 py_library(
-    name = "sum",
-    srcs = ["sum.py"],
+    name = "arithmetic",
+    srcs = ["arithmetic.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/core/operators:sum",
+        "//temporian/core/operators:arithmetic",
         "//temporian/implementation/numpy/data:event",
     ],
 )
