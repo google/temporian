@@ -14,14 +14,13 @@
 
 import pandas as pd
 import numpy as np
-from absl import logging
 from absl.testing import absltest
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
 
 
-class EventConversionTest(absltest.TestCase):
+class DataFrameToEventTest(absltest.TestCase):
     def test_df_to_numpy_event(self) -> None:
         df = pd.DataFrame(
             [
@@ -55,10 +54,7 @@ class EventConversionTest(absltest.TestCase):
         )
 
         # validate
-        self.assertEqual(
-            True,
-            numpy_event == expected_numpy_event,
-        )
+        self.assertTrue(numpy_event == expected_numpy_event)
 
     def test_df_to_numpy_event_string(self) -> None:
         df = pd.DataFrame(
@@ -111,10 +107,7 @@ class EventConversionTest(absltest.TestCase):
         )
 
         # validate
-        self.assertEqual(
-            True,
-            numpy_event == expected_numpy_event,
-        )
+        self.assertTrue(numpy_event == expected_numpy_event)
 
     def test_df_to_numpy_event_datetime_index(self) -> None:
         df = pd.DataFrame(
@@ -150,10 +143,7 @@ class EventConversionTest(absltest.TestCase):
         )
 
         # validate
-        self.assertEqual(
-            True,
-            numpy_event == expected_numpy_event,
-        )
+        self.assertTrue(numpy_event == expected_numpy_event)
 
     def test_df_to_numpy_event_no_index(self) -> None:
         df = pd.DataFrame(
@@ -192,124 +182,7 @@ class EventConversionTest(absltest.TestCase):
         )
 
         # validate
-        self.assertEqual(
-            True,
-            numpy_event == expected_numpy_event,
-        )
-
-    def test_numpy_event_to_df(self) -> None:
-        numpy_sampling = NumpySampling(
-            data={
-                (666964,): np.array([1.0, 2.0]),
-                (574016,): np.array([3.0]),
-            },
-            index=["product_id"],
-        )
-
-        numpy_event = NumpyEvent(
-            data={
-                (666964,): [
-                    NumpyFeature(data=np.array([740.0, 508.0]), name="costs")
-                ],
-                (574016,): [NumpyFeature(data=np.array([573.0]), name="costs")],
-            },
-            sampling=numpy_sampling,
-        )
-
-        expected_df = pd.DataFrame(
-            [
-                [666964, 740.0, 1.0],
-                [666964, 508.0, 2.0],
-                [574016, 573.0, 3.0],
-            ],
-            columns=["product_id", "costs", "timestamp"],
-        )
-
-        df = numpy_event.to_dataframe()
-
-        # validate
-        self.assertEqual(
-            True,
-            df.equals(expected_df),
-        )
-
-    def test_numpy_event_to_df_with_datetimes(self) -> None:
-        numpy_sampling = NumpySampling(
-            data={
-                # make index a datetime
-                (666964,): np.array([1, 2]),
-                (574016,): np.array([3]),
-            },
-            index=["product_id"],
-        )
-
-        numpy_event = NumpyEvent(
-            data={
-                (666964,): [
-                    NumpyFeature(data=np.array([740.0, 508.0]), name="costs")
-                ],
-                (574016,): [NumpyFeature(data=np.array([573.0]), name="costs")],
-            },
-            sampling=numpy_sampling,
-        )
-
-        expected_df = pd.DataFrame(
-            [
-                # use timestamp as datetime from numpy
-                [666964, 740.0, 1],
-                [666964, 508.0, 2],
-                [574016, 573.0, 3],
-            ],
-            columns=["product_id", "costs", "timestamp"],
-        )
-
-        df = numpy_event.to_dataframe()
-
-        # validate
-        self.assertEqual(
-            True,
-            df.equals(expected_df),
-        )
-
-    def test_numpy_event_to_df_no_index(self) -> None:
-        numpy_sampling = NumpySampling(
-            data={
-                (): np.array([1.0, 2.0, 3.0]),
-            },
-            index=[],
-        )
-
-        numpy_event = NumpyEvent(
-            data={
-                (): [
-                    NumpyFeature(
-                        data=np.array([666964, 666964, 574016]),
-                        name="product_id",
-                    ),
-                    NumpyFeature(
-                        data=np.array([740.0, 508.0, 573.0]), name="costs"
-                    ),
-                ],
-            },
-            sampling=numpy_sampling,
-        )
-
-        expected_df = pd.DataFrame(
-            [
-                [666964, 740.0, 1.0],
-                [666964, 508.0, 2.0],
-                [574016, 573.0, 3.0],
-            ],
-            columns=["product_id", "costs", "timestamp"],
-        )
-
-        df = numpy_event.to_dataframe()
-
-        # validate
-        self.assertEqual(
-            True,
-            df.equals(expected_df),
-        )
+        self.assertTrue(numpy_event == expected_numpy_event)
 
 
 if __name__ == "__main__":
