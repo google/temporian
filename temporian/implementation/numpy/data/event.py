@@ -67,21 +67,25 @@ class NumpyEvent:
         self.sampling = sampling
 
     @property
-    def _first_index_level(self) -> Tuple:
-        first_index_level = None
+    def _first_index_value(self) -> Tuple:
+        first_index_value = None
         try:
-            first_index_level = next(iter(self.data))
+            first_index_value = next(iter(self.data))
         except StopIteration:
             return None
 
-        return first_index_level
+        return first_index_value
+
+    @property
+    def _first_index_features(self) -> List[NumpyFeature]:
+        return self.data[self._first_index_value]
 
     @property
     def feature_count(self) -> int:
         if len(self.data.keys()) == 0:
             return 0
 
-        return len(self.data[self._first_index_level])
+        return len(self._first_index_features)
 
     @property
     def feature_names(self) -> List[str]:
@@ -91,7 +95,7 @@ class NumpyEvent:
         # Only look at the feature in the first index
         # to get the feature names. All features in all
         # indexes should have the same names
-        return [feature.name for feature in self.data[self._first_index_level]]
+        return [feature.name for feature in self._first_index_features]
 
     def schema(self) -> Event:
         return Event(
@@ -107,21 +111,21 @@ class NumpyEvent:
         index_names: List[str],
         timestamp_column: str = "timestamp",
     ) -> "NumpyEvent":
-        """Function to convert a pandas DataFrame to a NumpyEvent. Supported
+        """Convert a pandas DataFrame to a NumpyEvent. Supported
         dtypes are: np.float64, np.float32, np.int64, np.int32, np.datetime64
         (for timestamp column).
 
         Args:
-            df: DataFrame to convert to NumpyEvent
-            index_names: Names of the indexes of the DataFrame
+            df: DataFrame to convert to NumpyEvent.
+            index_names: names of the DataFrame columns to be used as index for the event.
             timestamp_column: Name for timestamp index. Defaults to "timestamp".
 
         Returns:
-            NumpyEvent: NumpyEvent created from DataFrame
+            NumpyEvent: NumpyEvent created from DataFrame.
 
         Raises:
-            ValueError: If index_names or timestamp_column are not in df columns
-            ValueError: If a column has an unsupported dtype
+            ValueError: If index_names or timestamp_column are not in df columns.
+            ValueError: If a column has an unsupported dtype.
 
         Example:
             >>> import pandas as pd
@@ -135,9 +139,6 @@ class NumpyEvent:
             ...     columns=["product_id", "timestamp", "costs"],
             ... )
             >>> event = NumpyEvent.from_dataframe(df, index_names=["product_id"])
-            ]
-
-
         """
         # check index names and timestamp name are in df columns
         missing_columns = [
@@ -214,11 +215,13 @@ class NumpyEvent:
         return NumpyEvent(data=data, sampling=numpy_sampling)
 
     def to_dataframe(self) -> pd.DataFrame:
-        """Function to convert a NumpyEvent to a pandas DataFrame
+        """Convert a NumpyEvent to a pandas DataFrame.
 
         Returns:
-        pd.DataFrame: DataFrame created from NumpyEvent
+            pd.DataFrame: DataFrame created from NumpyEvent.
+
         """
+
         feature_names = self.feature_names
         index_names = self.sampling.index
         columns = index_names + feature_names + ["timestamp"]
@@ -239,8 +242,8 @@ class NumpyEvent:
                 df.loc[len(df)] = row
 
         # Convert to original dtypes, can be more efficient
-        first_index = self._first_index_level
-        first_features = self.data[first_index]
+        first_index = self._first_index_value
+        first_features = self._first_index_features
 
         # get feature dtypes
         features_dtypes = {
