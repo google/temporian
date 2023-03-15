@@ -17,7 +17,6 @@
 from temporian.core import core
 from temporian.core import evaluator
 from temporian.core import operator_lib
-from temporian.core import operators
 from temporian.core import processor
 from temporian.core import serialize
 from temporian.core.data import dtype
@@ -27,9 +26,20 @@ from temporian.core.data import sampling
 from temporian.core.data import duration
 from temporian.core.operators import base
 
+# Operators
+from temporian.core.operators.arithmetic import divide
+from temporian.core.operators.arithmetic import multiply
+from temporian.core.operators.arithmetic import substract
+from temporian.core.operators.arithmetic import sum
+from temporian.core.operators.assign import assign
+from temporian.core.operators.calendar_day import calendar_day
+from temporian.core.operators.lag import lag
+from temporian.core.operators.lag import leak
+from temporian.core.operators.select import select
+from temporian.core.operators.simple_moving_average import sma
+
 __version__ = "0.0.1"
 
-sma = operators.simple_moving_average.sma
 evaluate = evaluator.evaluate
 Feature = feature.Feature
 load = serialize.load

@@ -13,5 +13,3 @@
 # limitations under the License.
 
 """Operators."""
-
-from temporian.core.operators import simple_moving_average
