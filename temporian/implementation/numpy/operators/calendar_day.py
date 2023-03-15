@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from typing import Dict
+from datetime import datetime
 
 import numpy as np
 from temporian.core.operators.calendar_day import CalendarDayOperator
@@ -28,11 +29,17 @@ class CalendarDayNumpyImplementation:
     def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
         data = {}
         for index, timestamps in event.sampling.data.items():
-            datetimes = timestamps.astype("datetime64").astype(object)
-            days = np.array([datetime.day for datetime in datetimes])
-            data[index] = NumpyFeature(
-                data=days,
-                name="calendar_day",
-            )
+            print(timestamps)
+            print(timestamps.dtype)
+            days = np.array(
+                [datetime.fromtimestamp(ts).day for ts in timestamps]
+            ).astype(np.int32)
+
+            data[index] = [
+                NumpyFeature(
+                    data=days,
+                    name="calendar_day",
+                )
+            ]
 
         return {"event": NumpyEvent(data=data, sampling=event.sampling)}
