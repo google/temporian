@@ -95,6 +95,7 @@ class PrototypeTest(absltest.TestCase):
 
     def test_prototype(self) -> None:
         sampling = Sampling(["store_id", "product_id"])
+
         event_1 = Event(
             [Feature("sales", int)],
             sampling=sampling,
@@ -106,17 +107,17 @@ class PrototypeTest(absltest.TestCase):
             sampling=sampling,
         )
 
+        # assign second event to first
+        output_event = assign(event_1, event_2)
+
+        # create and assign sum feature
+        output_event = assign(output_event, event_1 + event_2)
+
+        # create and assign lag feature
         lagged_sales = lag(
             event_1,
             duration=1,
         )
-
-        # add costs feature to output
-        output_event = assign(event_1, event_2)
-
-        # add sum of sales and costs
-        output_event = assign(output_event, event_1 + event_2)
-
         output_event = assign(output_event, lagged_sales)
 
         output_event_numpy = evaluator.evaluate(

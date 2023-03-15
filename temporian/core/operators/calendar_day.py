@@ -34,7 +34,7 @@ class CalendarDayOperator(Operator):
         self.add_input("event", event)
 
         output_feature = Feature(
-            name="day",
+            name="calendar_day",
             dtype=dtype.INT32,
             sampling=event.sampling(),
             creator=self,

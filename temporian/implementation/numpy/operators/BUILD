@@ -13,22 +13,20 @@ py_library(
 )
 
 py_library(
-    name = "assign",
-    srcs = ["assign.py"],
+    name = "arithmetic",
+    srcs = ["arithmetic.py"],
     srcs_version = "PY3",
     deps = [
+        "//temporian/core/operators:arithmetic",
         "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:sampling",
     ],
 )
 
 py_library(
-    name = "lag",
-    srcs = ["lag.py"],
+    name = "assign",
+    srcs = ["assign.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/core/data:duration",
-        "//temporian/core/operators:lag",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
     ],
@@ -56,20 +54,32 @@ py_library(
 )
 
 py_library(
+    name = "calendar_day",
+    srcs = ["calendar_day.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/operators:calendar_day",
+        "//temporian/implementation/numpy/data:event",
+    ],
+)
+
+py_library(
+    name = "lag",
+    srcs = ["lag.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:duration",
+        "//temporian/core/operators:lag",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+    ],
+)
+
+py_library(
     name = "select",
     srcs = ["select.py"],
     srcs_version = "PY3",
     deps = [
         "//temporian/implementation/pandas/data:event",
-    ],
-)
-
-py_library(
-    name = "arithmetic",
-    srcs = ["arithmetic.py"],
-    srcs_version = "PY3",
-    deps = [
-        "//temporian/core/operators:arithmetic",
-        "//temporian/implementation/numpy/data:event",
     ],
 )
