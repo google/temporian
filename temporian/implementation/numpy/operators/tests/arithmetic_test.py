@@ -27,8 +27,8 @@ from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators import arithmetic
 
 
-class ArithmeticOperatorTest(absltest.TestCase):
-    """Test ArithmeticOperator."""
+class ArithmeticNumpyImplementationTest(absltest.TestCase):
+    """Test numpy implementation of arithmetic operator."""
 
     def setUp(self):
         self.numpy_event_1 = NumpyEvent.from_dataframe(

@@ -29,7 +29,9 @@ from temporian.implementation.numpy.operators.assign import (
 )
 
 
-class AssignOperatorTest(absltest.TestCase):
+class AssignNumpyImplementationTest(absltest.TestCase):
+    """Test numpy implementation of assign operator."""
+
     def setUp(self) -> None:
         self.sampling = Sampling(["user_id"])
         self.event_left = Event(
