@@ -68,30 +68,23 @@ class NumpyEvent:
 
     @property
     def _first_index_value(self) -> Tuple:
-        first_index_value = None
-        try:
-            first_index_value = next(iter(self.data))
-        except StopIteration:
+        if self.data is None or len(self.data) == 0:
             return None
 
-        return first_index_value
+        return next(iter(self.data))
 
     @property
     def _first_index_features(self) -> List[NumpyFeature]:
+        if self._first_index_value is None:
+            return []
         return self.data[self._first_index_value]
 
     @property
     def feature_count(self) -> int:
-        if len(self.data.keys()) == 0:
-            return 0
-
         return len(self._first_index_features)
 
     @property
     def feature_names(self) -> List[str]:
-        if len(self.data.keys()) == 0:
-            return []
-
         # Only look at the feature in the first index
         # to get the feature names. All features in all
         # indexes should have the same names
@@ -111,14 +104,14 @@ class NumpyEvent:
         index_names: List[str],
         timestamp_column: str = "timestamp",
     ) -> "NumpyEvent":
-        """Convert a pandas DataFrame to a NumpyEvent. Supported
-        dtypes are: np.float64, np.float32, np.int64, np.int32, np.datetime64
-        (for timestamp column).
-
+        """Convert a pandas DataFrame to a NumpyEvent.
         Args:
             df: DataFrame to convert to NumpyEvent.
-            index_names: names of the DataFrame columns to be used as index for the event.
-            timestamp_column: Name for timestamp index. Defaults to "timestamp".
+            index_names: names of the DataFrame columns to be used as index for
+                the event.
+            timestamp_column: Column containing timestamps. Supported date types:
+                {np.datetime64, pd.Timestamp, datetime.datetime}. Timestamps of
+                these types are converted implicitly to UTC epoch float.
 
         Returns:
             NumpyEvent: NumpyEvent created from DataFrame.
@@ -161,7 +154,7 @@ class NumpyEvent:
 
         # check column dtypes, every dtype should be a key of DTYPE_MAPPING
         for column in df.columns:
-            # if it's a date, convert it to duration
+            # if it's a date, convert it to UTC Epoch float
             if is_a_date(df[column].dtype.type):
                 df[column] = df[column].apply(convert_date_to_duration)
             # if it's not a date, check if its a supported dtype

@@ -16,11 +16,11 @@
 
 Timestamples and durations are expressed with a double (noted float) in python.
 By convension, all calendar functions represent dates as Unix epoch in UTC.
+This datatype is equivalent to a double in C.
 """
 from typing import Union
 
 import datetime
-import time
 import numpy as np
 
 # Unit for durations
@@ -43,16 +43,16 @@ def days(value: float) -> Duration:
     return value * 60 * 60 * 24
 
 
-supported_date_types = (np.datetime64, time.struct_time, datetime.datetime)
+supported_date_types = (np.datetime64, datetime.datetime)
 
 
 def convert_date_to_duration(
-    date: Union[np.datetime64, time.struct_time, datetime.datetime]
+    date: Union[np.datetime64, datetime.datetime]
 ) -> Duration:
     """Convert date to duration epoch UTC
 
     Args:
-        date (Union[np.datetime64, time.struct_time, datetime.datetime]):
+        date (Union[np.datetime64, datetime.datetime]):
             Date to convert
 
     Returns:
@@ -61,13 +61,10 @@ def convert_date_to_duration(
     Raises:
         TypeError: Unsupported type. Supported types are:
         - np.datetime64
-        - time.struct_time
         - datetime.datetime
     """
     if isinstance(date, np.datetime64):
         return convert_numpy_datetime64_to_duration(date)
-    if isinstance(date, time.struct_time):
-        return convert_struct_time_to_duration(date)
     if isinstance(date, datetime.datetime):
         return convert_datetime_to_duration(date)
 
@@ -79,15 +76,9 @@ def convert_numpy_datetime64_to_duration(date: np.datetime64) -> Duration:
     return date.astype("datetime64[s]").astype("float64")
 
 
-def convert_struct_time_to_duration(date: time.struct_time) -> Duration:
-    """Convert struct_time to duration epoch UTC"""
-    return float(time.mktime(date) - time.timezone)
-
-
 def convert_datetime_to_duration(date: datetime.datetime) -> Duration:
     """Convert datetime to duration epoch UTC"""
-    date = date.replace(tzinfo=datetime.timezone.utc)
-    return float(date.timestamp())
+    return date.replace(tzinfo=datetime.timezone.utc).timestamp()
 
 
 def is_a_date(value: any) -> bool:

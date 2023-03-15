@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
+import time
 import pandas as pd
 import numpy as np
 from absl.testing import absltest
@@ -109,12 +111,96 @@ class DataFrameToEventTest(absltest.TestCase):
         # validate
         self.assertTrue(numpy_event == expected_numpy_event)
 
-    def test_df_to_numpy_event_datetime_index(self) -> None:
+    def test_df_to_numpy_event_npdatetime64_index(self) -> None:
         df = pd.DataFrame(
             [
                 [666964, np.datetime64("2022-01-01"), 740.0],
                 [666964, np.datetime64("2022-01-02"), 508.0],
                 [574016, np.datetime64("2022-01-03"), 573.0],
+            ],
+            columns=["product_id", "timestamp", "costs"],
+        )
+
+        # dates converted to timestamp UTC epoch
+        numpy_sampling = NumpySampling(
+            data={
+                (666964,): np.array([1640995200, 1641081600]),
+                (574016,): np.array([1641168000]),
+            },
+            index=["product_id"],
+        )
+
+        expected_numpy_event = NumpyEvent(
+            data={
+                (666964,): [
+                    NumpyFeature(data=np.array([740.0, 508.0]), name="costs")
+                ],
+                (574016,): [NumpyFeature(data=np.array([573.0]), name="costs")],
+            },
+            sampling=numpy_sampling,
+        )
+
+        numpy_event = NumpyEvent.from_dataframe(
+            df, index_names=["product_id"], timestamp_column="timestamp"
+        )
+
+        # validate
+        self.assertTrue(numpy_event == expected_numpy_event)
+
+    def test_df_to_numpy_event_pdTimestamp_index(self) -> None:
+        df = pd.DataFrame(
+            [
+                [666964, pd.Timestamp("2022-01-01"), 740.0],
+                [666964, pd.Timestamp("2022-01-02"), 508.0],
+                [574016, pd.Timestamp("2022-01-03"), 573.0],
+            ],
+            columns=["product_id", "timestamp", "costs"],
+        )
+
+        # dates converted to timestamp UTC epoch
+        numpy_sampling = NumpySampling(
+            data={
+                (666964,): np.array([1640995200, 1641081600]),
+                (574016,): np.array([1641168000]),
+            },
+            index=["product_id"],
+        )
+
+        expected_numpy_event = NumpyEvent(
+            data={
+                (666964,): [
+                    NumpyFeature(data=np.array([740.0, 508.0]), name="costs")
+                ],
+                (574016,): [NumpyFeature(data=np.array([573.0]), name="costs")],
+            },
+            sampling=numpy_sampling,
+        )
+
+        numpy_event = NumpyEvent.from_dataframe(
+            df, index_names=["product_id"], timestamp_column="timestamp"
+        )
+
+        # validate
+        self.assertTrue(numpy_event == expected_numpy_event)
+
+    def test_df_to_numpy_event_datetime_index(self) -> None:
+        df = pd.DataFrame(
+            [
+                [
+                    666964,
+                    datetime.datetime.strptime("2022-01-01", "%Y-%m-%d"),
+                    740.0,
+                ],
+                [
+                    666964,
+                    datetime.datetime.strptime("2022-01-02", "%Y-%m-%d"),
+                    508.0,
+                ],
+                [
+                    574016,
+                    datetime.datetime.strptime("2022-01-03", "%Y-%m-%d"),
+                    573.0,
+                ],
             ],
             columns=["product_id", "timestamp", "costs"],
         )
