@@ -41,12 +41,13 @@ class LagOperator(Operator):
 
         output_sampling = Sampling(index=event.sampling().index, creator=self)
 
+        prefix = "lag" if duration > 0 else "leak"
         duration_str = duration_abbreviation(duration)
 
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=f"lag[{duration_str}]_{f.name()}",
+                name=f"{prefix}[{duration_str}]_{f.name()}",
                 dtype=f.dtype(),
                 sampling=output_sampling,
                 creator=self,
@@ -84,8 +85,8 @@ operator_lib.register_operator(LagOperator)
 
 
 def lag(event: Event, duration: Duration) -> Event:
-    if duration < 0:
-        raise ValueError("duration must be non-negative")
+    if duration <= 0:
+        raise ValueError("duration must greater than zero")
 
     return LagOperator(
         event=event,
@@ -94,8 +95,8 @@ def lag(event: Event, duration: Duration) -> Event:
 
 
 def leak(event: Event, duration: Duration) -> Event:
-    if duration < 0:
-        raise ValueError("duration must be non-negative")
+    if duration <= 0:
+        raise ValueError("duration must be greater than zero")
 
     return LagOperator(
         event=event,

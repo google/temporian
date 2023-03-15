@@ -13,23 +13,26 @@ class LagNumpyImplementation:
     def __call__(self, event: NumpyEvent) -> NumpyEvent:
         duration = self.operator.attributes()["duration"]
 
-        new_sampling = NumpySampling(
-            data={},
-            index=event.sampling.index.copy(),
-        )
-        output_event = NumpyEvent(data={}, sampling=new_sampling)
+        sampling_data = {}
+        output_data = {}
 
+        prefix = "lag" if duration > 0 else "leak"
         duration_str = duration_abbreviation(duration)
 
         for index, timestamps in event.sampling.data.items():
-            new_sampling.data[index] = timestamps + duration
-            output_event.data[index] = []
-            output_data = output_event.data[index]
+            sampling_data[index] = timestamps + duration
+            output_data[index] = []
             for feature in event.data[index]:
                 new_feature = NumpyFeature(
-                    data=feature.data.copy(),
-                    name=f"lag[{duration_str}]_{feature.name}",
+                    data=feature.data,
+                    name=f"{prefix}[{duration_str}]_{feature.name}",
                 )
-                output_data.append(new_feature)
+                output_data[index].append(new_feature)
+
+        new_sampling = NumpySampling(
+            data=sampling_data,
+            index=event.sampling.index.copy(),
+        )
+        output_event = NumpyEvent(data=output_data, sampling=new_sampling)
 
         return {"event": output_event}

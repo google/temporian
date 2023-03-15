@@ -19,6 +19,7 @@ By convension, all calendar functions represent dates as Unix epoch in UTC.
 This datatype is equivalent to a double in C.
 """
 import datetime
+from enum import Enum
 from typing import Union
 
 import numpy as np
@@ -27,7 +28,7 @@ import numpy as np
 Duration = float
 
 
-def subseconds(value: float) -> Duration:
+def milliseconds(value: float) -> Duration:
     return value / 1000
 
 
@@ -89,26 +90,49 @@ def convert_datetime_to_duration(date: datetime.datetime) -> Duration:
     return date.replace(tzinfo=datetime.timezone.utc).timestamp()
 
 
+class TimeUnit(str, Enum):
+    """Time unit for a duration."""
+
+    MILLISECONDS = "milliseconds"
+    SECONDS = "seconds"
+    MINUTES = "minutes"
+    HOURS = "hours"
+    DAYS = "days"
+    WEEKS = "weeks"
+
+    @staticmethod
+    def is_valid(value: any) -> bool:
+        return isinstance(value, TimeUnit) or (
+            isinstance(value, str)
+            and value in [item.value for item in TimeUnit]
+        )
+
+
 def duration_abbreviation(
-    duration: Duration, cutoff: str = "subseconds"
+    duration: Duration, cutoff: Union[str, TimeUnit] = "milliseconds"
 ) -> str:
     """Returns the abbreviation for a duration.
 
     Args:
         duration: Duration in seconds.
         cutoff: Cutoff for the abbreviation. For example, if cutoff is "day", the
-        smallest unit will be days. Possible options are "week",
-        "day", "hour" and "minute", "seconds" and "subseconds". Default is
-        "subseconds".
+            smallest unit will be days. Possible options are "week",
+            "day", "hour" and "minute", "seconds" and "milliseconds". Default is
+            "milliseconds".
 
     Returns:
         Abbreviation for the duration.
     """
-    # check cutt off is valid
-    if cutoff not in ["week", "day", "hour", "minute", "seconds", "subseconds"]:
-        raise ValueError(f"Invalid cutoff {cutoff}")
+    # check cuttoff is a TimeUnit or if its a string that is a valid TimeUnit
+    if not TimeUnit.is_valid(cutoff):
+        raise ValueError(
+            f"Invalid cutoff: {cutoff}. Possible options are: {list(TimeUnit)}"
+        )
 
     duration_str = ""
+
+    if duration < 0:
+        duration = -duration
 
     if duration >= weeks(1):
         duration_str += f"{int(duration / weeks(1))}w"
@@ -140,8 +164,8 @@ def duration_abbreviation(
             return duration_str
         duration = duration % seconds(1)
 
-    if duration >= subseconds(1):
-        duration_str += f"{int(duration / subseconds(1))}ms"
+    if duration >= milliseconds(1):
+        duration_str += f"{int(duration / milliseconds(1))}ms"
         return duration_str
 
     return duration_str
