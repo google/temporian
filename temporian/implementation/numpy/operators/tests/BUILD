@@ -15,7 +15,6 @@ py_test(
         "//temporian/core/data:sampling",
         "//temporian/core/operators:arithmetic",
         "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:sampling",
         "//temporian/implementation/numpy/operators:arithmetic",
     ],
 )

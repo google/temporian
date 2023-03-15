@@ -14,6 +14,7 @@
 
 from absl.testing import absltest
 import numpy as np
+import pandas as pd
 
 from temporian.core.data.event import Event
 from temporian.core.data.event import Feature
@@ -22,8 +23,6 @@ from temporian.core.operators.arithmetic import ArithmeticOperation
 from temporian.core.operators.arithmetic import ArithmeticOperator
 from temporian.core.operators.arithmetic import Resolution
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.event import NumpyFeature
-from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.implementation.numpy.operators import arithmetic
 
 
@@ -31,33 +30,32 @@ class ArithmeticOperatorTest(absltest.TestCase):
     """Test ArithmeticOperator."""
 
     def setUp(self):
-        self.numpy_input_sampling = NumpySampling(
-            index=["store_id"],
-            data={("A",): np.array([1, 2, 3, 4, 5])},
+        self.numpy_event_1 = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1, 10.0],
+                    [0, 2, 0.0],
+                    [0, 3, 12.0],
+                    [0, 4, np.nan],
+                    [0, 5, 30.0],
+                ],
+                columns=["store_id", "timestamp", "sales"],
+            ),
+            index_names=["store_id"],
         )
 
-        self.numpy_event_1 = NumpyEvent(
-            data={
-                ("A",): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([10.0, 0.0, 12.0, np.nan, 30.0]),
-                    ),
+        self.numpy_event_2 = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1, 0.0],
+                    [0, 2, 20.0],
+                    [0, 3, np.nan],
+                    [0, 4, 6.0],
+                    [0, 5, 10.0],
                 ],
-            },
-            sampling=self.numpy_input_sampling,
-        )
-
-        self.numpy_event_2 = NumpyEvent(
-            data={
-                ("A",): [
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([0, 20.0, np.nan, 6.0, 10.0]),
-                    ),
-                ],
-            },
-            sampling=self.numpy_input_sampling,
+                columns=["store_id", "timestamp", "costs"],
+            ),
+            index_names=["store_id"],
         )
 
         self.sampling = Sampling(["store_id"])
@@ -74,18 +72,19 @@ class ArithmeticOperatorTest(absltest.TestCase):
 
     def test_correct_sum(self) -> None:
         """Test correct sum operator."""
-        # DATA
 
-        numpy_output_event = NumpyEvent(
-            data={
-                ("A",): [
-                    NumpyFeature(
-                        name="add_sales_costs",
-                        data=np.array([10.0, 20.0, np.nan, np.nan, 40.0]),
-                    ),
+        numpy_output_event = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1, 10.0],
+                    [0, 2, 20.0],
+                    [0, 3, np.nan],
+                    [0, 4, np.nan],
+                    [0, 5, 40.0],
                 ],
-            },
-            sampling=self.numpy_input_sampling,
+                columns=["store_id", "timestamp", "add_sales_costs"],
+            ),
+            index_names=["store_id"],
         )
 
         operator = ArithmeticOperator(
@@ -101,24 +100,23 @@ class ArithmeticOperatorTest(absltest.TestCase):
             event_1=self.numpy_event_1, event_2=self.numpy_event_2
         )
 
-        self.assertEqual(
-            True,
-            numpy_output_event == operator_output["event"],
-        )
+        self.assertTrue(numpy_output_event == operator_output["event"])
 
     def test_correct_substraction(self) -> None:
         """Test correct substraction operator."""
 
-        numpy_output_event = NumpyEvent(
-            data={
-                ("A",): [
-                    NumpyFeature(
-                        name="sub_sales_costs",
-                        data=np.array([10.0, -20.0, np.nan, np.nan, 20.0]),
-                    ),
+        numpy_output_event = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1, 10.0],
+                    [0, 2, -20.0],
+                    [0, 3, np.nan],
+                    [0, 4, np.nan],
+                    [0, 5, 20.0],
                 ],
-            },
-            sampling=self.numpy_input_sampling,
+                columns=["store_id", "timestamp", "sub_sales_costs"],
+            ),
+            index_names=["store_id"],
         )
 
         operator = ArithmeticOperator(
@@ -134,24 +132,23 @@ class ArithmeticOperatorTest(absltest.TestCase):
             event_1=self.numpy_event_1, event_2=self.numpy_event_2
         )
 
-        self.assertEqual(
-            True,
-            numpy_output_event == operator_output["event"],
-        )
+        self.assertTrue(numpy_output_event == operator_output["event"])
 
     def test_correct_multiplication(self) -> None:
         """Test correct multiplication operator."""
 
-        numpy_output_event = NumpyEvent(
-            data={
-                ("A",): [
-                    NumpyFeature(
-                        name="mult_sales_costs",
-                        data=np.array([0.0, 0.0, np.nan, np.nan, 300.0]),
-                    ),
+        numpy_output_event = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1, 0.0],
+                    [0, 2, 0.0],
+                    [0, 3, np.nan],
+                    [0, 4, np.nan],
+                    [0, 5, 300.0],
                 ],
-            },
-            sampling=self.numpy_input_sampling,
+                columns=["store_id", "timestamp", "mult_sales_costs"],
+            ),
+            index_names=["store_id"],
         )
 
         operator = ArithmeticOperator(
@@ -167,24 +164,23 @@ class ArithmeticOperatorTest(absltest.TestCase):
             event_1=self.numpy_event_1, event_2=self.numpy_event_2
         )
 
-        self.assertEqual(
-            True,
-            numpy_output_event == operator_output["event"],
-        )
+        self.assertTrue(numpy_output_event == operator_output["event"])
 
     def test_correct_division(self) -> None:
         """Test correct division operator."""
 
-        numpy_output_event = NumpyEvent(
-            data={
-                ("A",): [
-                    NumpyFeature(
-                        name="div_sales_costs",
-                        data=np.array([np.inf, 0.0, np.nan, np.nan, 3.0]),
-                    ),
+        numpy_output_event = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1, np.inf],
+                    [0, 2, 0.0],
+                    [0, 3, np.nan],
+                    [0, 4, np.nan],
+                    [0, 5, 3.0],
                 ],
-            },
-            sampling=self.numpy_input_sampling,
+                columns=["store_id", "timestamp", "div_sales_costs"],
+            ),
+            index_names=["store_id"],
         )
 
         operator = ArithmeticOperator(
@@ -200,10 +196,7 @@ class ArithmeticOperatorTest(absltest.TestCase):
             event_1=self.numpy_event_1, event_2=self.numpy_event_2
         )
 
-        self.assertEqual(
-            True,
-            numpy_output_event == operator_output["event"],
-        )
+        self.assertTrue(numpy_output_event == operator_output["event"])
 
 
 if __name__ == "__main__":
