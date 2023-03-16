@@ -29,8 +29,6 @@ class CalendarDayNumpyImplementation:
     def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
         data = {}
         for index, timestamps in event.sampling.data.items():
-            print(timestamps)
-            print(timestamps.dtype)
             days = np.array(
                 [datetime.fromtimestamp(ts).day for ts in timestamps]
             ).astype(np.int32)
