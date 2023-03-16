@@ -19,8 +19,6 @@ class LagNumpyImplementation:
         prefix = "lag" if duration > 0 else "leak"
         duration_str = duration_abbreviation(duration)
 
-        duration_str = duration_abbreviation(duration)
-
         for index, timestamps in event.sampling.data.items():
             sampling_data[index] = timestamps + duration
             output_data[index] = []

@@ -31,12 +31,12 @@ class SelectOperatorTest(absltest.TestCase):
 
         self.df = pd.DataFrame(
             [
-                [self.A, 1, 10.0, -1.0, 0.0],
-                [self.A, 2, np.nan, -2.0, 32.0],
-                [self.B, 3, 12.0, -3.0, 27.0],
-                [self.B, 4, 13.0, -4.0, 28.0],
-                [self.C, 5, 14.0, np.nan, 29.0],
-                [self.C, 6, 15.0, -6.0, np.nan],
+                [self.A, 1.0, 10.0, -1.0, 0.0],
+                [self.A, 2.0, np.nan, -2.0, 32.0],
+                [self.B, 3.0, 12.0, -3.0, 27.0],
+                [self.B, 4.0, 13.0, -4.0, 28.0],
+                [self.C, 5.0, 14.0, np.nan, 29.0],
+                [self.C, 6.0, 15.0, -6.0, np.nan],
             ],
             columns=["store_id", "timestamp", "sales", "costs", "weather"],
         )
@@ -51,12 +51,12 @@ class SelectOperatorTest(absltest.TestCase):
         """Test correct select operator for one feature selection."""
         new_df = pd.DataFrame(
             [
-                [self.A, 1, 10.0],
-                [self.A, 2, np.nan],
-                [self.B, 3, 12.0],
-                [self.B, 4, 13.0],
-                [self.C, 5, 14.0],
-                [self.C, 6, 15.0],
+                [self.A, 1.0, 10.0],
+                [self.A, 2.0, np.nan],
+                [self.B, 3.0, 12.0],
+                [self.B, 4.0, 13.0],
+                [self.C, 5.0, 14.0],
+                [self.C, 6.0, 15.0],
             ],
             columns=["store_id", "timestamp", "sales"],
         )
@@ -74,12 +74,12 @@ class SelectOperatorTest(absltest.TestCase):
         """Test correct select operator for multiple features selection."""
         new_df = pd.DataFrame(
             [
-                [self.A, 1, 10.0, -1.0],
-                [self.A, 2, np.nan, -2.0],
-                [self.B, 3, 12.0, -3.0],
-                [self.B, 4, 13.0, -4.0],
-                [self.C, 5, 14.0, np.nan],
-                [self.C, 6, 15.0, -6.0],
+                [self.A, 1.0, 10.0, -1.0],
+                [self.A, 2.0, np.nan, -2.0],
+                [self.B, 3.0, 12.0, -3.0],
+                [self.B, 4.0, 13.0, -4.0],
+                [self.C, 5.0, 14.0, np.nan],
+                [self.C, 6.0, 15.0, -6.0],
             ],
             columns=["store_id", "timestamp", "sales", "costs"],
         )
