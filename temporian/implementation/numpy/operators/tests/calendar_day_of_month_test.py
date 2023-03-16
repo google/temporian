@@ -29,7 +29,7 @@ from temporian.implementation.numpy.operators.calendar_day_of_month import (
 )
 
 
-class CalendarDayNumpyImplementationTest(absltest.TestCase):
+class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
     """Test numpy implementation of calendar_day_of_month operator."""
 
     def test_day(self) -> None:
