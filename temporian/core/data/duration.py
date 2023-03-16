@@ -43,9 +43,6 @@ def days(value: float) -> Duration:
     return value * 60 * 60 * 24
 
 
-supported_date_types = (np.datetime64, datetime.datetime)
-
-
 def convert_date_to_duration(
     date: Union[np.datetime64, datetime.datetime]
 ) -> Duration:
@@ -63,6 +60,9 @@ def convert_date_to_duration(
         - np.datetime64
         - datetime.datetime
     """
+    # if it is already a duration, return it
+    if isinstance(date, float):
+        return date
     if isinstance(date, np.datetime64):
         return convert_numpy_datetime64_to_duration(date)
     if isinstance(date, datetime.datetime):
@@ -79,18 +79,3 @@ def convert_numpy_datetime64_to_duration(date: np.datetime64) -> Duration:
 def convert_datetime_to_duration(date: datetime.datetime) -> Duration:
     """Convert datetime to duration epoch UTC"""
     return date.replace(tzinfo=datetime.timezone.utc).timestamp()
-
-
-def is_a_date(value: any) -> bool:
-    """Check if the value is a supported date type.
-
-    Args:
-        value (any): Value to check
-
-    Returns:
-        bool: True if the value is a date, False otherwise
-    """
-    for date_type in supported_date_types:
-        if value is date_type:
-            return True
-    return False

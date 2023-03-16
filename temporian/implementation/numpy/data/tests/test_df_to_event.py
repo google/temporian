@@ -23,7 +23,7 @@ from temporian.implementation.numpy.data.sampling import NumpySampling
 
 
 class DataFrameToEventTest(absltest.TestCase):
-    def test_df_to_numpy_event(self) -> None:
+    def test_correct(self) -> None:
         df = pd.DataFrame(
             [
                 [666964, 1.0, 740.0],
@@ -58,7 +58,7 @@ class DataFrameToEventTest(absltest.TestCase):
         # validate
         self.assertTrue(numpy_event == expected_numpy_event)
 
-    def test_df_to_numpy_event_string(self) -> None:
+    def test_string_column(self) -> None:
         df = pd.DataFrame(
             [
                 [666964, 1.0, "740.0"],
@@ -76,7 +76,7 @@ class DataFrameToEventTest(absltest.TestCase):
             ["product_id"],
         )
 
-    def test_df_to_numpy_event_missing_values(self) -> None:
+    def test_missing_values(self) -> None:
         df = pd.DataFrame(
             [
                 [666964, 1.0, 740.0],
@@ -111,7 +111,7 @@ class DataFrameToEventTest(absltest.TestCase):
         # validate
         self.assertTrue(numpy_event == expected_numpy_event)
 
-    def test_df_to_numpy_event_npdatetime64_index(self) -> None:
+    def test_npdatetime64_index(self) -> None:
         df = pd.DataFrame(
             [
                 [666964, np.datetime64("2022-01-01"), 740.0],
@@ -147,7 +147,7 @@ class DataFrameToEventTest(absltest.TestCase):
         # validate
         self.assertTrue(numpy_event == expected_numpy_event)
 
-    def test_df_to_numpy_event_pdTimestamp_index(self) -> None:
+    def test_pdTimestamp_index(self) -> None:
         df = pd.DataFrame(
             [
                 [666964, pd.Timestamp("2022-01-01"), 740.0],
@@ -183,7 +183,7 @@ class DataFrameToEventTest(absltest.TestCase):
         # validate
         self.assertTrue(numpy_event == expected_numpy_event)
 
-    def test_df_to_numpy_event_datetime_index(self) -> None:
+    def test_datetime_index(self) -> None:
         df = pd.DataFrame(
             [
                 [
@@ -231,7 +231,7 @@ class DataFrameToEventTest(absltest.TestCase):
         # validate
         self.assertTrue(numpy_event == expected_numpy_event)
 
-    def test_df_to_numpy_event_no_index(self) -> None:
+    def test_no_index(self) -> None:
         df = pd.DataFrame(
             [
                 [666964, 1.0, 740.0],
@@ -269,6 +269,22 @@ class DataFrameToEventTest(absltest.TestCase):
 
         # validate
         self.assertTrue(numpy_event == expected_numpy_event)
+
+    def test_datetime_in_feature_column(self) -> None:
+        df = pd.DataFrame(
+            [
+                [666964, np.datetime64("2022-01-01"), 740.0],
+                [666964, np.datetime64("2022-01-02"), 508.0],
+                [574016, np.datetime64("2022-01-03"), 573.0],
+            ],
+            columns=["product_id", "costs", "timestamp"],
+        )
+
+        # assert it raises regex value error
+        with self.assertRaisesRegex(ValueError, "Unsupported dtype"):
+            NumpyEvent.from_dataframe(
+                df, index_names=["product_id"], timestamp_column="timestamp"
+            )
 
 
 if __name__ == "__main__":

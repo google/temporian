@@ -7,7 +7,6 @@ from temporian.core.data import dtype
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.data.duration import convert_date_to_duration
-from temporian.core.data.duration import is_a_date
 from temporian.implementation.numpy.data.sampling import NumpySampling
 
 DTYPE_MAPPING = {
@@ -152,13 +151,14 @@ class NumpyEvent:
                 f"Timestamp column {timestamp_column} cannot be on index_names"
             )
 
+        # convert timestamp column to UTC Epoch float
+        df[timestamp_column] = df[timestamp_column].apply(
+            convert_date_to_duration
+        )
+
         # check column dtypes, every dtype should be a key of DTYPE_MAPPING
         for column in df.columns:
-            # if it's a date, convert it to UTC Epoch float
-            if is_a_date(df[column].dtype.type):
-                df[column] = df[column].apply(convert_date_to_duration)
-            # if it's not a date, check if its a supported dtype
-            elif df[column].dtype.type not in DTYPE_MAPPING:
+            if df[column].dtype.type not in DTYPE_MAPPING:
                 raise ValueError(
                     f"Unsupported dtype {df[column].dtype} for column"
                     f" {column}. Supported dtypes: {DTYPE_MAPPING.keys()}"
