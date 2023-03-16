@@ -58,6 +58,15 @@ class ArithmeticNumpyImplementation:
             for i, event_1_feature in enumerate(event_1_features):
                 event_2_feature = event_2_features[i]
 
+                # check both features have the same dtype
+                if event_1_feature.dtype != event_2_feature.dtype:
+                    raise ValueError(
+                        "Both features must have the same dtype."
+                        f" event_1_feature: {event_1_feature} has dtype "
+                        f"{event_1_feature.dtype}, event_2_feature: "
+                        f"{event_2_feature} has dtype {event_2_feature.dtype}."
+                    )
+
                 data = None
 
                 if operation == ArithmeticOperation.ADDITION:
