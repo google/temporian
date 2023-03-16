@@ -12,16 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from absl.testing import absltest
 import numpy as np
 import pandas as pd
+from absl.testing import absltest
 
-from temporian.core.data.event import Event
-from temporian.core.data.event import Feature
+from temporian.core.data.event import Event, Feature
 from temporian.core.data.sampling import Sampling
-from temporian.core.operators.arithmetic import ArithmeticOperation
-from temporian.core.operators.arithmetic import ArithmeticOperator
-from temporian.core.operators.arithmetic import Resolution
+from temporian.core.operators.arithmetic import (
+    ArithmeticOperation,
+    ArithmeticOperator,
+    Resolution,
+)
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators import arithmetic
 
@@ -33,11 +34,11 @@ class ArithmeticOperatorTest(absltest.TestCase):
         self.numpy_event_1 = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
-                    [0, 1, 10.0],
-                    [0, 2, 0.0],
-                    [0, 3, 12.0],
-                    [0, 4, np.nan],
-                    [0, 5, 30.0],
+                    [0, 1.0, 10.0],
+                    [0, 2.0, 0.0],
+                    [0, 3.0, 12.0],
+                    [0, 4.0, np.nan],
+                    [0, 5.0, 30.0],
                 ],
                 columns=["store_id", "timestamp", "sales"],
             ),
@@ -47,11 +48,11 @@ class ArithmeticOperatorTest(absltest.TestCase):
         self.numpy_event_2 = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
-                    [0, 1, 0.0],
-                    [0, 2, 20.0],
-                    [0, 3, np.nan],
-                    [0, 4, 6.0],
-                    [0, 5, 10.0],
+                    [0, 1.0, 0.0],
+                    [0, 2.0, 20.0],
+                    [0, 3.0, np.nan],
+                    [0, 4.0, 6.0],
+                    [0, 5.0, 10.0],
                 ],
                 columns=["store_id", "timestamp", "costs"],
             ),
@@ -76,11 +77,11 @@ class ArithmeticOperatorTest(absltest.TestCase):
         numpy_output_event = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
-                    [0, 1, 10.0],
-                    [0, 2, 20.0],
-                    [0, 3, np.nan],
-                    [0, 4, np.nan],
-                    [0, 5, 40.0],
+                    [0, 1.0, 10.0],
+                    [0, 2.0, 20.0],
+                    [0, 3.0, np.nan],
+                    [0, 4.0, np.nan],
+                    [0, 5.0, 40.0],
                 ],
                 columns=["store_id", "timestamp", "add_sales_costs"],
             ),
@@ -108,11 +109,11 @@ class ArithmeticOperatorTest(absltest.TestCase):
         numpy_output_event = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
-                    [0, 1, 10.0],
-                    [0, 2, -20.0],
-                    [0, 3, np.nan],
-                    [0, 4, np.nan],
-                    [0, 5, 20.0],
+                    [0, 1.0, 10.0],
+                    [0, 2.0, -20.0],
+                    [0, 3.0, np.nan],
+                    [0, 4.0, np.nan],
+                    [0, 5.0, 20.0],
                 ],
                 columns=["store_id", "timestamp", "sub_sales_costs"],
             ),
@@ -140,11 +141,11 @@ class ArithmeticOperatorTest(absltest.TestCase):
         numpy_output_event = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
-                    [0, 1, 0.0],
-                    [0, 2, 0.0],
-                    [0, 3, np.nan],
-                    [0, 4, np.nan],
-                    [0, 5, 300.0],
+                    [0, 1.0, 0.0],
+                    [0, 2.0, 0.0],
+                    [0, 3.0, np.nan],
+                    [0, 4.0, np.nan],
+                    [0, 5.0, 300.0],
                 ],
                 columns=["store_id", "timestamp", "mult_sales_costs"],
             ),
@@ -172,11 +173,11 @@ class ArithmeticOperatorTest(absltest.TestCase):
         numpy_output_event = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
-                    [0, 1, np.inf],
-                    [0, 2, 0.0],
-                    [0, 3, np.nan],
-                    [0, 4, np.nan],
-                    [0, 5, 3.0],
+                    [0, 1.0, np.inf],
+                    [0, 2.0, 0.0],
+                    [0, 3.0, np.nan],
+                    [0, 4.0, np.nan],
+                    [0, 5.0, 3.0],
                 ],
                 columns=["store_id", "timestamp", "div_sales_costs"],
             ),

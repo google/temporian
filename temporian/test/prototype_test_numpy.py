@@ -17,8 +17,7 @@ from absl import logging
 from absl.testing import absltest
 
 from temporian.core import evaluator
-from temporian.core.data.event import Event
-from temporian.core.data.event import Feature
+from temporian.core.data.event import Event, Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.assign import assign
 from temporian.implementation.numpy.data.event import NumpyEvent
@@ -37,14 +36,14 @@ class PrototypeTest(absltest.TestCase):
         self.event_1 = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
-                    [TRYOLABS_SHOP, MATE_ID, 0, 14],
-                    [TRYOLABS_SHOP, MATE_ID, 1, 15],
-                    [TRYOLABS_SHOP, MATE_ID, 2, 16],
-                    [TRYOLABS_SHOP, BOOK_ID, 1, 10],
-                    [GOOGLE_SHOP, BOOK_ID, 1, 7],
-                    [GOOGLE_SHOP, BOOK_ID, 2, 8],
-                    [GOOGLE_SHOP, PIXEL_ID, 0, 3],
-                    [GOOGLE_SHOP, PIXEL_ID, 1, 4],
+                    [TRYOLABS_SHOP, MATE_ID, 0.0, 14],
+                    [TRYOLABS_SHOP, MATE_ID, 1.0, 15],
+                    [TRYOLABS_SHOP, MATE_ID, 2.0, 16],
+                    [TRYOLABS_SHOP, BOOK_ID, 1.0, 10],
+                    [GOOGLE_SHOP, BOOK_ID, 1.0, 7],
+                    [GOOGLE_SHOP, BOOK_ID, 2.0, 8],
+                    [GOOGLE_SHOP, PIXEL_ID, 0.0, 3],
+                    [GOOGLE_SHOP, PIXEL_ID, 1.0, 4],
                 ],
                 columns=["store_id", "product_id", "timestamp", "sales"],
             ),
@@ -54,14 +53,14 @@ class PrototypeTest(absltest.TestCase):
         self.event_2 = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
-                    [TRYOLABS_SHOP, MATE_ID, 0, -14],
-                    [TRYOLABS_SHOP, MATE_ID, 1, -15],
-                    [TRYOLABS_SHOP, MATE_ID, 2, -16],
-                    [TRYOLABS_SHOP, BOOK_ID, 1, -10],
-                    [GOOGLE_SHOP, BOOK_ID, 1, -7],
-                    [GOOGLE_SHOP, BOOK_ID, 2, -8],
-                    [GOOGLE_SHOP, PIXEL_ID, 0, -3],
-                    [GOOGLE_SHOP, PIXEL_ID, 1, -4],
+                    [TRYOLABS_SHOP, MATE_ID, 0.0, -14],
+                    [TRYOLABS_SHOP, MATE_ID, 1.0, -15],
+                    [TRYOLABS_SHOP, MATE_ID, 2.0, -16],
+                    [TRYOLABS_SHOP, BOOK_ID, 1.0, -10],
+                    [GOOGLE_SHOP, BOOK_ID, 1.0, -7],
+                    [GOOGLE_SHOP, BOOK_ID, 2.0, -8],
+                    [GOOGLE_SHOP, PIXEL_ID, 0.0, -3],
+                    [GOOGLE_SHOP, PIXEL_ID, 1.0, -4],
                 ],
                 columns=["store_id", "product_id", "timestamp", "costs"],
             ),
@@ -71,14 +70,14 @@ class PrototypeTest(absltest.TestCase):
         self.expected_output_event = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
-                    [TRYOLABS_SHOP, MATE_ID, 0, 14, -14, 0],
-                    [TRYOLABS_SHOP, MATE_ID, 1, 15, -15, 0],
-                    [TRYOLABS_SHOP, MATE_ID, 2, 16, -16, 0],
-                    [TRYOLABS_SHOP, BOOK_ID, 1, 10, -10, 0],
-                    [GOOGLE_SHOP, BOOK_ID, 1, 7, -7, 0],
-                    [GOOGLE_SHOP, BOOK_ID, 2, 8, -8, 0],
-                    [GOOGLE_SHOP, PIXEL_ID, 0, 3, -3, 0],
-                    [GOOGLE_SHOP, PIXEL_ID, 1, 4, -4, 0],
+                    [TRYOLABS_SHOP, MATE_ID, 0.0, 14, -14, 0],
+                    [TRYOLABS_SHOP, MATE_ID, 1.0, 15, -15, 0],
+                    [TRYOLABS_SHOP, MATE_ID, 2.0, 16, -16, 0],
+                    [TRYOLABS_SHOP, BOOK_ID, 1.0, 10, -10, 0],
+                    [GOOGLE_SHOP, BOOK_ID, 1.0, 7, -7, 0],
+                    [GOOGLE_SHOP, BOOK_ID, 2.0, 8, -8, 0],
+                    [GOOGLE_SHOP, PIXEL_ID, 0.0, 3, -3, 0],
+                    [GOOGLE_SHOP, PIXEL_ID, 1.0, 4, -4, 0],
                 ],
                 columns=[
                     "store_id",
