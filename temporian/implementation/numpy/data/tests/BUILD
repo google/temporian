@@ -32,6 +32,6 @@ py_test(
     srcs = ["test_sampling.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/implementation/pandas/data:sampling",
+        "//temporian/implementation/numpy/data:sampling",
     ],
 )

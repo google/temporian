@@ -21,18 +21,18 @@ from collections import defaultdict
 from temporian.core import backends
 from temporian.core.data.event import Event
 from temporian.core.operators import base
-from temporian.implementation.pandas.data import event as pandas_event
+from temporian.implementation.numpy.data import event as numpy_event
 from temporian.core import processor as processor_lib
 
 AvailableBackends = Any
-Data = Dict[Event, Union[str, pathlib.Path, pandas_event.PandasEvent]]
+Data = Dict[Event, Union[str, pathlib.Path, numpy_event.NumpyEvent]]
 Query = Union[Event, List[Event], Set[Event]]
 
 
 def evaluate(
     query: Query,
     input_data: Data,
-    backend: AvailableBackends = "pandas",
+    backend: AvailableBackends = "numpy",
 ) -> Dict[Event, Any]:
     """Evaluates a query on data."""
 
