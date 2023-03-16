@@ -16,7 +16,12 @@
 
 Timestamples and durations are expressed with a double (noted float) in python.
 By convension, all calendar functions represent dates as Unix epoch in UTC.
+This datatype is equivalent to a double in C.
 """
+from typing import Union
+
+import datetime
+import numpy as np
 
 # Unit for durations
 Duration = float
@@ -36,3 +41,41 @@ def hours(value: float) -> Duration:
 
 def days(value: float) -> Duration:
     return value * 60 * 60 * 24
+
+
+def convert_date_to_duration(
+    date: Union[np.datetime64, datetime.datetime]
+) -> Duration:
+    """Convert date to duration epoch UTC
+
+    Args:
+        date (Union[np.datetime64, datetime.datetime]):
+            Date to convert
+
+    Returns:
+        int: Duration epoch UTC
+
+    Raises:
+        TypeError: Unsupported type. Supported types are:
+        - np.datetime64
+        - datetime.datetime
+    """
+    # if it is already a duration, return it
+    if isinstance(date, float):
+        return date
+    if isinstance(date, np.datetime64):
+        return convert_numpy_datetime64_to_duration(date)
+    if isinstance(date, datetime.datetime):
+        return convert_datetime_to_duration(date)
+
+    raise TypeError(f"Unsupported type: {type(date)}")
+
+
+def convert_numpy_datetime64_to_duration(date: np.datetime64) -> Duration:
+    """Convert numpy datetime64 to duration epoch UTC"""
+    return date.astype("datetime64[s]").astype("float64")
+
+
+def convert_datetime_to_duration(date: datetime.datetime) -> Duration:
+    """Convert datetime to duration epoch UTC"""
+    return date.replace(tzinfo=datetime.timezone.utc).timestamp()
