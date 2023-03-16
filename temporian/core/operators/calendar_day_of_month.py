@@ -22,9 +22,9 @@ from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
-class CalendarDayOperator(Operator):
+class CalendarDayOfMonthOperator(Operator):
     """
-    Calendar operator to obtain the day of the month a timestamp belongs to.
+    Calendar operator to obtain the day of the month each timestamp belongs to.
     """
 
     def __init__(self, event: Event):
@@ -34,7 +34,7 @@ class CalendarDayOperator(Operator):
         self.add_input("event", event)
 
         output_feature = Feature(
-            name="calendar_day",
+            name="calendar_day_of_month",
             dtype=dtype.INT32,
             sampling=event.sampling(),
             creator=self,
@@ -61,10 +61,10 @@ class CalendarDayOperator(Operator):
         )
 
 
-operator_lib.register_operator(CalendarDayOperator)
+operator_lib.register_operator(CalendarDayOfMonthOperator)
 
 
-def calendar_day(event: Event) -> Event:
+def calendar_day_of_month(event: Event) -> Event:
     """Obtain the day of month each of the timestamps in an event belongs to.
 
     Args:
@@ -75,4 +75,4 @@ def calendar_day(event: Event) -> Event:
             each timestamp in `event`'s sampling belongs to, with the same
             sampling as `event`.
     """
-    return CalendarDayOperator(event).outputs()["event"]
+    return CalendarDayOfMonthOperator(event).outputs()["event"]

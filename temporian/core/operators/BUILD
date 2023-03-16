@@ -14,7 +14,7 @@ py_library(
         ":arithmetic",
         ":assign",
         ":base",
-        ":calendar_day",
+        ":calendar_day_of_month",
         ":lag",
         ":select",
         ":simple_moving_average",
@@ -58,8 +58,8 @@ py_library(
 )
 
 py_library(
-    name = "calendar_day",
-    srcs = ["calendar_day.py"],
+    name = "calendar_day_of_month",
+    srcs = ["calendar_day_of_month.py"],
     srcs_version = "PY3",
     deps = [
         ":base",

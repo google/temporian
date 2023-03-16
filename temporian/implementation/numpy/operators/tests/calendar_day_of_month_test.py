@@ -18,17 +18,19 @@ import numpy as np
 from temporian.core.data.event import Event
 from temporian.core.data.event import Feature
 from temporian.core.data.sampling import Sampling
-from temporian.core.operators.calendar_day import CalendarDayOperator
+from temporian.core.operators.calendar_day_of_month import (
+    CalendarDayOfMonthOperator,
+)
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
-from temporian.implementation.numpy.operators.calendar_day import (
-    CalendarDayNumpyImplementation,
+from temporian.implementation.numpy.operators.calendar_day_of_month import (
+    CalendarDayOfMonthNumpyImplementation,
 )
 
 
 class CalendarDayNumpyImplementationTest(absltest.TestCase):
-    """Test numpy implementation of calendar_day operator."""
+    """Test numpy implementation of calendar_day_of_month operator."""
 
     def test_day(self) -> None:
         """Test calendar day operator."""
@@ -72,7 +74,7 @@ class CalendarDayNumpyImplementationTest(absltest.TestCase):
             data={
                 (): [
                     NumpyFeature(
-                        name="calendar_day",
+                        name="calendar_day_of_month",
                         data=np.array([1, 15, 16, 17]),
                     ),
                 ],
@@ -80,8 +82,8 @@ class CalendarDayNumpyImplementationTest(absltest.TestCase):
             sampling=input_sampling_data,
         )
 
-        operator = CalendarDayOperator(input_event)
-        impl = CalendarDayNumpyImplementation(operator)
+        operator = CalendarDayOfMonthOperator(input_event)
+        impl = CalendarDayOfMonthNumpyImplementation(operator)
 
         output = impl(input_event_data)
 

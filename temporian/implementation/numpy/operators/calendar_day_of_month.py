@@ -16,13 +16,15 @@ from typing import Dict
 from datetime import datetime
 
 import numpy as np
-from temporian.core.operators.calendar_day import CalendarDayOperator
+from temporian.core.operators.calendar_day_of_month import (
+    CalendarDayOfMonthOperator,
+)
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 
 
-class CalendarDayNumpyImplementation:
-    def __init__(self, operator: CalendarDayOperator) -> None:
+class CalendarDayOfMonthNumpyImplementation:
+    def __init__(self, operator: CalendarDayOfMonthOperator) -> None:
         super().__init__()
         self.operator = operator
 
@@ -36,7 +38,7 @@ class CalendarDayNumpyImplementation:
             data[index] = [
                 NumpyFeature(
                     data=days,
-                    name="calendar_day",
+                    name="calendar_day_of_month",
                 )
             ]
 

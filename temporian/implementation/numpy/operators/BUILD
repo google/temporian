@@ -54,11 +54,11 @@ py_library(
 )
 
 py_library(
-    name = "calendar_day",
-    srcs = ["calendar_day.py"],
+    name = "calendar_day_of_month",
+    srcs = ["calendar_day_of_month.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/core/operators:calendar_day",
+        "//temporian/core/operators:calendar_day_of_month",
         "//temporian/implementation/numpy/data:event",
     ],
 )
