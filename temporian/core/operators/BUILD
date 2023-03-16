@@ -11,6 +11,7 @@ py_library(
     srcs = ["__init__.py"],
     srcs_version = "PY3",
     deps = [
+        ":arithmetic",
         ":assign",
         ":simple_moving_average",
     ],
@@ -30,8 +31,8 @@ py_library(
 )
 
 py_library(
-    name = "sum",
-    srcs = ["sum.py"],
+    name = "arithmetic",
+    srcs = ["arithmetic.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
