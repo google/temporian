@@ -71,14 +71,14 @@ class PrototypeTest(absltest.TestCase):
         self.expected_output_event = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
-                    [TRYOLABS_SHOP, MATE_ID, 0, 14, -14, 0, np.nan],
-                    [TRYOLABS_SHOP, MATE_ID, 1, 15, -15, 0, 14],
-                    [TRYOLABS_SHOP, MATE_ID, 2, 16, -16, 0, 15],
-                    [TRYOLABS_SHOP, BOOK_ID, 1, 10, -10, 0, np.nan],
-                    [GOOGLE_SHOP, BOOK_ID, 1, 7, -7, 0, np.nan],
-                    [GOOGLE_SHOP, BOOK_ID, 2, 8, -8, 0, 7],
-                    [GOOGLE_SHOP, PIXEL_ID, 0, 3, -3, 0, np.nan],
-                    [GOOGLE_SHOP, PIXEL_ID, 1, 4, -4, 0, 3],
+                    [TRYOLABS_SHOP, MATE_ID, 0.0, 14, -14, 0, np.nan],
+                    [TRYOLABS_SHOP, MATE_ID, 1.0, 15, -15, 0, 14],
+                    [TRYOLABS_SHOP, MATE_ID, 2.0, 16, -16, 0, 15],
+                    [TRYOLABS_SHOP, BOOK_ID, 1.0, 10, -10, 0, np.nan],
+                    [GOOGLE_SHOP, BOOK_ID, 1.0, 7, -7, 0, np.nan],
+                    [GOOGLE_SHOP, BOOK_ID, 2.0, 8, -8, 0, 7],
+                    [GOOGLE_SHOP, PIXEL_ID, 0.0, 3, -3, 0, np.nan],
+                    [GOOGLE_SHOP, PIXEL_ID, 1.0, 4, -4, 0, 3],
                 ],
                 columns=[
                     "store_id",
