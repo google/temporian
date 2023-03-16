@@ -44,3 +44,14 @@ py_test(
         "//temporian/implementation/numpy/operators:lag",
     ],
 )
+
+py_test(
+    name = "select_test",
+    srcs = ["select_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/testing:absltest dep,
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/operators:select",
+    ],
+)
