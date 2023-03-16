@@ -101,7 +101,7 @@ class NumpyEvent:
     @staticmethod
     def from_dataframe(
         df: pd.DataFrame,
-        index_names: List[str],
+        index_names: List[str] = [],
         timestamp_column: str = "timestamp",
     ) -> "NumpyEvent":
         """Convert a pandas DataFrame to a NumpyEvent.
