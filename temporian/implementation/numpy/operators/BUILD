@@ -23,6 +23,18 @@ py_library(
 )
 
 py_library(
+    name = "lag",
+    srcs = ["lag.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:duration",
+        "//temporian/core/operators:lag",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+    ],
+)
+
+py_library(
     name = "base",
     srcs = ["base.py"],
     srcs_version = "PY3",
@@ -38,6 +50,7 @@ py_library(
     deps = [
         ":arithmetic",
         ":assign",
+        ":lag",
         ":select",
     ],
 )

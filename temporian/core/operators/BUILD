@@ -13,6 +13,7 @@ py_library(
     deps = [
         ":arithmetic",
         ":assign",
+        ":lag",
         ":simple_moving_average",
     ],
 )
@@ -37,6 +38,20 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "lag",
+    srcs = ["lag.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:duration",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
         "//temporian/proto:core_py_proto",
