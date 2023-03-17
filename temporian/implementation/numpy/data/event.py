@@ -5,7 +5,6 @@ import pandas as pd
 
 from temporian.core.data import dtype
 from temporian.core.data.event import Event
-from temporian.core.data.feature import Feature
 from temporian.core.data.duration import convert_date_to_duration
 from temporian.implementation.numpy.data.sampling import NumpySampling
 
@@ -94,7 +93,7 @@ class NumpyEvent:
             features=[
                 feature.schema() for feature in list(self.data.values())[0]
             ],
-            sampling=self.sampling.names,
+            sampling=self.sampling.index,
         )
 
     @staticmethod
