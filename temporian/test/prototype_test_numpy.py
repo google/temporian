@@ -35,7 +35,7 @@ class PrototypeTest(absltest.TestCase):
         BOOK_ID = 2
         PIXEL_ID = 3
 
-        self.event_1 = NumpyEvent.from_dataframe(
+        self.event_1_data = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
                     [TRYOLABS_SHOP, MATE_ID, 0.0, 14],
@@ -52,7 +52,7 @@ class PrototypeTest(absltest.TestCase):
             index_names=["store_id", "product_id"],
         )
 
-        self.event_2 = NumpyEvent.from_dataframe(
+        self.event_2_data = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
                     [TRYOLABS_SHOP, MATE_ID, 0.0, -14],
@@ -95,17 +95,8 @@ class PrototypeTest(absltest.TestCase):
         )
 
     def test_prototype(self) -> None:
-        sampling = Sampling(["store_id", "product_id"])
-        event_1 = Event(
-            [Feature("sales", int)],
-            sampling=sampling,
-            creator=None,
-        )
-
-        event_2 = Event(
-            [Feature("costs", int)],
-            sampling=sampling,
-        )
+        event_1 = self.event_1_data.schema()
+        event_2 = self.event_2_data.schema()
 
         lagged_sales = lag(
             event_1,
@@ -122,11 +113,7 @@ class PrototypeTest(absltest.TestCase):
 
         output_event_numpy = evaluator.evaluate(
             output_event,
-            input_data={
-                # left event specified from disk
-                event_1: self.event_1,
-                event_2: self.event_2,
-            },
+            input_data=[event_1, event_2],
             backend="numpy",
         )
 
@@ -138,8 +125,7 @@ class PrototypeTest(absltest.TestCase):
 
         # validate
         self.assertEqual(
-            True,
-            self.expected_output_event == output_event_numpy[output_event],
+            self.expected_output_event, output_event_numpy[output_event]
         )
 
 

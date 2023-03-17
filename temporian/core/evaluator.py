@@ -60,6 +60,9 @@ def evaluate(
     evaluate_schedule_fn = selected_backend["evaluate_schedule_fn"]
     read_csv_fn = selected_backend["read_csv_fn"]
 
+    # input data is a list of events, create a dictionary with the event and the event data
+    input_data = {event: event.data for event in input_data}
+
     # Schedule execution
     input_events = list(input_data.keys())
     schedule = build_schedule(inputs=input_events, outputs=normalized_query)

@@ -6,6 +6,7 @@ import pandas as pd
 from temporian.core.data import dtype
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
+from temporian.core.data.sampling import Sampling
 from temporian.core.data.duration import convert_date_to_duration
 from temporian.implementation.numpy.data.sampling import NumpySampling
 
@@ -49,6 +50,9 @@ class NumpyFeature:
             return False
 
         return True
+
+    def schema(self) -> Feature:
+        return Feature(self.name, self.dtype)
 
     def core_dtype(self) -> Any:
         if self.dtype.type is np.string_:
@@ -94,7 +98,8 @@ class NumpyEvent:
             features=[
                 feature.schema() for feature in list(self.data.values())[0]
             ],
-            sampling=self.sampling.names,
+            sampling=Sampling(self.sampling.index),
+            data=self,
         )
 
     @staticmethod

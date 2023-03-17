@@ -29,11 +29,13 @@ class Event(object):
         # TODO: make Operator the creator's type. I don't know how to circumvent
         # the cyclical import error
         creator: Optional[Any] = None,
+        data: Optional["NumpyEvent"] = None,
     ):
         self._features = features
         self._sampling = sampling
         self._creator = creator
         self._name = name
+        self.data = data
 
     def __getitem__(self, feature_names: List[str]) -> "Event":
         # import select operator

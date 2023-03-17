@@ -76,9 +76,6 @@ class ArithmeticOperator(Operator):
         if not isinstance(resolution, Resolution):
             raise ValueError("resolution must be a Resolution.")
 
-        if event_1.sampling() != event_2.sampling():
-            raise ValueError("event_1 and event_2 must have same sampling.")
-
         if len(event_1.features()) != len(event_2.features()):
             raise ValueError(
                 "event_1 and event_2 must have same number of features."
