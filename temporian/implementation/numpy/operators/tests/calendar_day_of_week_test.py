@@ -71,52 +71,6 @@ class CalendarDayOfWeekNumpyImplementationTest(absltest.TestCase):
             output["event"]._first_index_features[0].dtype == np.int32
         )
 
-    # def test_with_index(self) -> None:
-    #     """Test calendar day of week operator with indexed event."""
-    #     input_event_data = NumpyEvent.from_dataframe(
-    #         pd.DataFrame(
-    #             data=[
-    #                 [pd.to_datetime("1970-01-01 00:00:00", utc=True), 1],
-    #                 [pd.to_datetime("2023-03-14 00:00:01", utc=True), 1],
-    #                 [pd.to_datetime("2023-03-14 00:00:01", utc=True), 2],
-    #                 [pd.to_datetime("2023-03-14 23:59:59", utc=True), 1],
-    #                 [pd.to_datetime("2023-03-15 12:00:00", utc=True), 2],
-    #             ],
-    #             columns=["timestamp", "id"],
-    #         ),
-    #         index_names=["id"],
-    #     )
-
-    #     input_event = input_event_data.schema()
-
-    #     output_event_data = NumpyEvent(
-    #         data={
-    #             (1,): [
-    #                 NumpyFeature(
-    #                     name="calendar_day_of_week",
-    #                     data=np.array([1, 14, 14]),
-    #                 ),
-    #             ],
-    #             (2,): [
-    #                 NumpyFeature(
-    #                     name="calendar_day_of_week",
-    #                     data=np.array([14, 15]),
-    #                 ),
-    #             ],
-    #         },
-    #         sampling=input_event_data.sampling,
-    #     )
-
-    #     operator = CalendarDayOfWeekOperator(input_event)
-    #     impl = CalendarDayOfWeekNumpyImplementation(operator)
-
-    #     output = impl(input_event_data)
-
-    #     self.assertTrue(output_event_data == output["event"])
-    #     self.assertTrue(
-    #         output["event"]._first_index_features[0].dtype == np.int32
-    #     )
-
 
 if __name__ == "__main__":
     absltest.main()
