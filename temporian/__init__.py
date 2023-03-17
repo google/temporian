@@ -25,6 +25,8 @@ from temporian.core.data import feature
 from temporian.core.data import sampling
 from temporian.core.data import duration
 from temporian.core.operators import base
+from temporian.io.read_event import read_event
+from temporian.io.save_event import save_event
 
 # Operators
 from temporian.core.operators.arithmetic import divide

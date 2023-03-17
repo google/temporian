@@ -34,3 +34,17 @@ py_test(
         "//temporian/implementation/numpy/data:event",
     ],
 )
+
+py_test(
+    name = "io_test",
+    srcs = ["io_test.py"],
+    data = ["test_data/io"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/logging dep,
+        # absl/testing:absltest dep,
+        # pandas dep,
+        "//temporian",
+        "//temporian/implementation/numpy/data:event",
+    ],
+)
