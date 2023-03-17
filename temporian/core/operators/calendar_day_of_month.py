@@ -27,16 +27,16 @@ class CalendarDayOfMonthOperator(Operator):
     Calendar operator to obtain the day of the month each timestamp belongs to.
     """
 
-    def __init__(self, event: Event):
+    def __init__(self, sampling: Event):
         super().__init__()
 
         # input
-        self.add_input("event", event)
+        self.add_input("sampling", sampling)
 
         output_feature = Feature(
             name="calendar_day_of_month",
             dtype=dtype.INT32,
-            sampling=event.sampling(),
+            sampling=sampling.sampling(),
             creator=self,
         )
 
@@ -45,7 +45,7 @@ class CalendarDayOfMonthOperator(Operator):
             "event",
             Event(
                 features=[output_feature],
-                sampling=event.sampling(),
+                sampling=sampling.sampling(),
                 creator=self,
             ),
         )
@@ -56,7 +56,7 @@ class CalendarDayOfMonthOperator(Operator):
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
             key="CALENDAR_DAY",
-            inputs=[pb.OperatorDef.Input(key="event")],
+            inputs=[pb.OperatorDef.Input(key="sampling")],
             outputs=[pb.OperatorDef.Output(key="event")],
         )
 
@@ -64,15 +64,16 @@ class CalendarDayOfMonthOperator(Operator):
 operator_lib.register_operator(CalendarDayOfMonthOperator)
 
 
-def calendar_day_of_month(event: Event) -> Event:
+def calendar_day_of_month(sampling: Event) -> Event:
     """Obtain the day of month each of the timestamps in an event belongs to.
+    Features in input event are ignored.
 
     Args:
-        event: the event to get the days of month from.
+        sampling: the event to get the days of month from.
 
     Returns:
         event with a single feature corresponding to the day of the month
             each timestamp in `event`'s sampling belongs to, with the same
             sampling as `event`.
     """
-    return CalendarDayOfMonthOperator(event).outputs()["event"]
+    return CalendarDayOfMonthOperator(sampling).outputs()["event"]

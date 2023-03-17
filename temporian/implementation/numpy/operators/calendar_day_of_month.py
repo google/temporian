@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from typing import Dict
-from datetime import datetime
+from datetime import datetime, timezone
 
 import numpy as np
 from temporian.core.operators.calendar_day_of_month import (
@@ -24,15 +24,20 @@ from temporian.implementation.numpy.data.event import NumpyFeature
 
 
 class CalendarDayOfMonthNumpyImplementation:
+    """Numpy implementation of the calendar_day_of_month operator."""
+
     def __init__(self, operator: CalendarDayOfMonthOperator) -> None:
         super().__init__()
         self.operator = operator
 
-    def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
+    def __call__(self, sampling: NumpyEvent) -> Dict[str, NumpyEvent]:
         data = {}
-        for index, timestamps in event.sampling.data.items():
+        for index, timestamps in sampling.sampling.data.items():
             days = np.array(
-                [datetime.fromtimestamp(ts).day for ts in timestamps]
+                [
+                    datetime.fromtimestamp(ts, tz=timezone.utc).day
+                    for ts in timestamps
+                ]
             ).astype(np.int32)
 
             data[index] = [
@@ -42,4 +47,4 @@ class CalendarDayOfMonthNumpyImplementation:
                 )
             ]
 
-        return {"event": NumpyEvent(data=data, sampling=event.sampling)}
+        return {"event": NumpyEvent(data=data, sampling=sampling.sampling)}

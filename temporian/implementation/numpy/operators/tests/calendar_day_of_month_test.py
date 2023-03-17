@@ -14,6 +14,7 @@
 
 from absl.testing import absltest
 import numpy as np
+import pandas as pd
 
 from temporian.core.data.event import Event
 from temporian.core.data.event import Feature
@@ -23,7 +24,6 @@ from temporian.core.operators.calendar_day_of_month import (
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
-from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.implementation.numpy.operators.calendar_day_of_month import (
     CalendarDayOfMonthNumpyImplementation,
 )
@@ -32,34 +32,18 @@ from temporian.implementation.numpy.operators.calendar_day_of_month import (
 class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
     """Test numpy implementation of calendar_day_of_month operator."""
 
-    def test_day(self) -> None:
-        """Test calendar day operator."""
-        input_sampling_data = NumpySampling(
-            index=[],
-            data={
-                (): np.array(
-                    [
-                        0,  # 1970-01-01
-                        1678895040,  # 2023-03-15
-                        1678981440,  # 2023-03-16
-                        1679067840,  # 2023-03-17
-                    ],
-                    dtype=np.float64,
-                ),
-            },
-        )
-
-        # we don't care about the actual feature values, just the sampling
-        input_event_data = NumpyEvent(
-            data={
-                (): [
-                    NumpyFeature(
-                        name="feature",
-                        data=np.array([0, 0, 0, 0]),
-                    ),
+    def test_no_index(self) -> None:
+        """Test calendar day operator with flat event."""
+        input_event_data = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                data=[
+                    [pd.to_datetime("1970-01-01 00:00:00", utc=True)],
+                    [pd.to_datetime("2023-03-14 00:00:01", utc=True)],
+                    [pd.to_datetime("2023-03-14 23:59:59", utc=True)],
+                    [pd.to_datetime("2023-03-15 12:00:00", utc=True)],
                 ],
-            },
-            sampling=input_sampling_data,
+                columns=["timestamp"],
+            ),
         )
 
         input_sampling = Sampling([])
@@ -75,11 +59,11 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
                 (): [
                     NumpyFeature(
                         name="calendar_day_of_month",
-                        data=np.array([1, 15, 16, 17]),
+                        data=np.array([1, 14, 14, 15]),
                     ),
                 ],
             },
-            sampling=input_sampling_data,
+            sampling=input_event_data.sampling,
         )
 
         operator = CalendarDayOfMonthOperator(input_event)
@@ -88,6 +72,9 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
         output = impl(input_event_data)
 
         self.assertTrue(output_event_data == output["event"])
+        self.assertTrue(
+            output["event"]._first_index_features[0].dtype == np.int32
+        )
 
 
 if __name__ == "__main__":

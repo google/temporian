@@ -100,14 +100,14 @@ class NumpyEvent:
     @staticmethod
     def from_dataframe(
         df: pd.DataFrame,
-        index_names: List[str] = [],
+        index_names: List[str] = None,
         timestamp_column: str = "timestamp",
     ) -> "NumpyEvent":
         """Convert a pandas DataFrame to a NumpyEvent.
         Args:
             df: DataFrame to convert to NumpyEvent.
             index_names: names of the DataFrame columns to be used as index for
-                the event.
+                the event. Defaults to [].
             timestamp_column: Column containing timestamps. Supported date types:
                 {np.datetime64, pd.Timestamp, datetime.datetime}. Timestamps of
                 these types are converted implicitly to UTC epoch float.
@@ -132,6 +132,9 @@ class NumpyEvent:
             ... )
             >>> event = NumpyEvent.from_dataframe(df, index_names=["product_id"])
         """
+        if index_names is None:
+            index_names = []
+
         # check index names and timestamp name are in df columns
         missing_columns = [
             column
