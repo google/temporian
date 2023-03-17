@@ -30,7 +30,7 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
     """Test numpy implementation of calendar_day_of_month operator."""
 
     def test_no_index(self) -> None:
-        """Test calendar day operator with flat event."""
+        """Test calendar day of month operator with flat event."""
         input_event_data = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
@@ -68,7 +68,7 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
         )
 
     def test_with_index(self) -> None:
-        """Test calendar day operator with indexed event."""
+        """Test calendar day of month operator with indexed event."""
         input_event_data = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[

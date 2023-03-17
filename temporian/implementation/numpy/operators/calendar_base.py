@@ -30,7 +30,9 @@ class BaseCalendarNumpyImplementation(ABC):
         for index, timestamps in sampling.sampling.data.items():
             days = np.array(
                 [
-                    datetime.fromtimestamp(ts, tz=timezone.utc).day
+                    self._get_value_from_datetime(
+                        datetime.fromtimestamp(ts, tz=timezone.utc)
+                    )
                     for ts in timestamps
                 ]
             ).astype(np.int32)
@@ -38,7 +40,7 @@ class BaseCalendarNumpyImplementation(ABC):
             data[index] = [
                 NumpyFeature(
                     data=days,
-                    name="calendar_day_of_month",
+                    name=self._output_feature_name,
                 )
             ]
 
@@ -59,3 +61,8 @@ class BaseCalendarNumpyImplementation(ABC):
             Any: the numeric value for the datetime. Will be converted to
                 float32 by __call__.
         """
+
+    @property
+    @abstractmethod
+    def _output_feature_name(self) -> str:
+        """Get the name of the generated feature in the output event."""

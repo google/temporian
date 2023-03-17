@@ -66,6 +66,16 @@ py_library(
 )
 
 py_library(
+    name = "calendar_day_of_week",
+    srcs = ["calendar_day_of_week.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":calendar_base",
+        "//temporian/core/operators:calendar_day_of_week",
+    ],
+)
+
+py_library(
     name = "lag",
     srcs = ["lag.py"],
     srcs_version = "PY3",
