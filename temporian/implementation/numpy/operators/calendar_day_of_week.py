@@ -12,23 +12,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any
-from datetime import datetime
+from typing import Dict
+from datetime import datetime, timezone
 
+import numpy as np
 from temporian.core.operators.calendar_day_of_month import (
     CalendarDayOfMonthOperator,
 )
-from temporian.implementation.numpy.operators.calendar_base import (
-    BaseCalendarNumpyImplementation,
-)
+from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event import NumpyFeature
 
 
-class CalendarDayOfMonthNumpyImplementation(BaseCalendarNumpyImplementation):
+class CalendarDayOfMonthNumpyImplementation:
     """Numpy implementation of the calendar_day_of_month operator."""
 
     def __init__(self, operator: CalendarDayOfMonthOperator) -> None:
         super().__init__()
         self.operator = operator
 
-    def _get_value_from_datetime(self, dt: datetime) -> Any:
-        return dt.day
+    def __call__(self, sampling: NumpyEvent) -> Dict[str, NumpyEvent]:
+        data = {}
+        for index, timestamps in sampling.sampling.data.items():
+            days = np.array(
+                [
+                    datetime.fromtimestamp(ts, tz=timezone.utc).day
+                    for ts in timestamps
+                ]
+            ).astype(np.int32)
+
+            data[index] = [
+                NumpyFeature(
+                    data=days,
+                    name="calendar_day_of_month",
+                )
+            ]
+
+        return {"event": NumpyEvent(data=data, sampling=sampling.sampling)}

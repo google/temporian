@@ -34,15 +34,6 @@ py_library(
 )
 
 py_library(
-    name = "base",
-    srcs = ["base.py"],
-    srcs_version = "PY3",
-    deps = [
-        "//temporian/implementation/numpy/data:event",
-    ],
-)
-
-py_library(
     name = "core_mapping",
     srcs = ["core_mapping.py"],
     srcs_version = "PY3",
@@ -56,12 +47,21 @@ py_library(
 )
 
 py_library(
+    name = "calendar_base",
+    srcs = ["calendar_base.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:event",
+    ],
+)
+
+py_library(
     name = "calendar_day_of_month",
     srcs = ["calendar_day_of_month.py"],
     srcs_version = "PY3",
     deps = [
+        ":calendar_base",
         "//temporian/core/operators:calendar_day_of_month",
-        "//temporian/implementation/numpy/data:event",
     ],
 )
 
