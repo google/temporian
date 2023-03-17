@@ -24,8 +24,8 @@ from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators import lag
 
 
-class LagOperatorTest(absltest.TestCase):
-    """Lag operator test."""
+class LagNumpyImplementationTest(absltest.TestCase):
+    """Test numpy implementation of lag operator."""
 
     def test_correct_lag(self) -> None:
         """Test correct lag operator."""

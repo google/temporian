@@ -22,6 +22,5 @@ py_library(
         "//temporian/core/data:feature",
         "//temporian/core/data:sampling",
         "//temporian/core/operators",
-        "//temporian/core/operators:base",
     ],
 )

@@ -1,3 +1,5 @@
+from typing import Dict
+
 from temporian.core.data.duration import duration_abbreviation
 from temporian.core.operators.lag import LagOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
@@ -10,7 +12,7 @@ class LagNumpyImplementation:
         super().__init__()
         self.operator = operator
 
-    def __call__(self, event: NumpyEvent) -> NumpyEvent:
+    def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
         duration = self.operator.attributes()["duration"]
 
         sampling_data = {}

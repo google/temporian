@@ -1,4 +1,5 @@
-import numpy as np
+from typing import Dict
+
 
 from temporian.core.operators.arithmetic import ArithmeticOperation
 from temporian.core.operators.arithmetic import ArithmeticOperator
@@ -13,7 +14,9 @@ class ArithmeticNumpyImplementation:
         super().__init__()
         self.operator = operator
 
-    def __call__(self, event_1: NumpyEvent, event_2: NumpyEvent) -> NumpyEvent:
+    def __call__(
+        self, event_1: NumpyEvent, event_2: NumpyEvent
+    ) -> Dict[str, NumpyEvent]:
         """Sum two Events.
 
         Args:
