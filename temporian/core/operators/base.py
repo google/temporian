@@ -133,7 +133,7 @@ class Operator(ABC):
         return self.__class__.build_op_definition()
 
     @classmethod
-    def implementation_key(cls):
+    def operator_key(cls):
         return cls.build_op_definition().key
 
     def set_inputs(self, inputs: dict[str, Event]) -> None:

@@ -21,5 +21,5 @@ OPERATOR_IMPLEMENTATIONS = {
     "ASSIGN": AssignNumpyImplementation,
     "ARITHMETIC": ArithmeticNumpyImplementation,
     "LAG": LagNumpyImplementation,
-    SmaDef.implementation_key(): SmaImp,  # Simple moving average
+    SmaDef.operator_key(): SmaImp,  # Simple moving average
 }

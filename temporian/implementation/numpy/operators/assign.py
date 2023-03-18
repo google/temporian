@@ -25,7 +25,7 @@ from temporian.core.operators.assign import AssignOperator
 
 
 class AssignNumpyImplementation:
-    def __init__(self, operator: AssignOperator = None):
+    def __init__(self, operator: AssignOperator):
         assert isinstance(operator, AssignOperator)
         self._operator = operator
 

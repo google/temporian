@@ -95,8 +95,8 @@ def _apply_accumulator_mask(src: np.array, mask: np.array) -> np.array:
     sum_values = np.sum(cross_product, axis=1)
     count_values = np.sum(mask, axis=1)
 
-    # TODO: Find a better way to hide divisions by zero without warnings.
-    mean = sum_values / np.maximum(1, count_values)
-    mean[np.equal(count_values, 0)] = np.nan
+    # Hide warning message when dividing by zero when count is nil.
+    with np.errstate(divide="ignore", invalid="ignore"):
+        mean = sum_values / count_values
 
     return mean

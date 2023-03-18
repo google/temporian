@@ -72,8 +72,8 @@ py_test(
 )
 
 py_test(
-    name = "simple_moving_average",
-    srcs = ["simple_moving_average.py"],
+    name = "simple_moving_average_test",
+    srcs = ["simple_moving_average_test.py"],
     srcs_version = "PY3",
     deps = [
         # absl/testing:absltest dep,

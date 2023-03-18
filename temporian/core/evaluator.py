@@ -26,19 +26,8 @@ from temporian.implementation.numpy.data import event as numpy_event
 from temporian.core import processor as processor_lib
 
 AvailableBackends = Any
-Data = Dict[Event, Union[str, pathlib.Path, numpy_event.PandasEvent]]
+Data = Dict[Event, Union[str, pathlib.Path, numpy_event.NumpyEvent]]
 Query = Union[Event, List[Event], Dict[str, Event]]
-
-
-class _EQueryType(Enum):
-    """Supports format of queries.
-
-    Matches "Query" defined above.
-    """
-
-    VALUE = 1
-    LIST = 2
-    DICT = 3
 
 
 def evaluate(
@@ -67,17 +56,14 @@ def evaluate(
     if isinstance(query, Event):
         # The query is a single value
         normalized_query = [query]
-        query_type = _EQueryType.VALUE
 
     elif isinstance(query, list):
         # The query is a list
         normalized_query = query
-        query_type = _EQueryType.LIST
 
     elif isinstance(query, dict):
         # The query is a dictionary
         normalized_query = list(query.values())
-        query_type = _EQueryType.DICT
 
     else:
         # TODO: improve error message
@@ -116,20 +102,20 @@ def evaluate(
     outputs = evaluate_schedule_fn(materialized_input_data, schedule)
 
     # Convert the result "outputs" into the same format as the query.
-    if query_type == _EQueryType.DICT:
+    if isinstance(query, Event):
+        return outputs[query]
+
+    elif isinstance(query, list):
+        return [outputs[k] for k in query]
+
+    elif isinstance(query, dict):
         return {
             query_key: outputs[query_evt]
             for query_key, query_evt in query.items()
         }
 
-    elif query_type == _EQueryType.LIST:
-        return [outputs[k] for k in query]
-
-    elif query_type == _EQueryType.VALUE:
-        return outputs[query]
-
     else:
-        raise ValueError("Internal error")  # DO NOT SUBMIT: Correct exception
+        raise RuntimeError("Unexpected case")
 
 
 def build_schedule(

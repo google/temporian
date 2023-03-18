@@ -18,13 +18,6 @@ import os
 import tempfile
 
 import temporian as t
-
-# DO NOT SUBMIT
-# import numpy as np
-# from temporian.implementation.pandas.data.event import PandasEvent
-# from temporian.implementation.numpy.data.event import NumpyEvent, NumpyFeature
-# from temporian.implementation.numpy.data.sampling import NumpySampling
-
 import pandas as pd
 from temporian.implementation.numpy.data.event import NumpyEvent
 
@@ -48,7 +41,7 @@ class TFPTest(absltest.TestCase):
             }
         )
         input_signal_data = NumpyEvent.from_dataframe(
-            df, index_names=[], timestamp_column=["time"]
+            df, index_names=[], timestamp_column="time"
         )
 
         results = t.evaluate(
