@@ -1,3 +1,7 @@
+"""Utilities for unit testing."""
+
+import pandas as pd
+
 from temporian.core.data import dtype
 from temporian.core.data import event as event_lib
 from temporian.core.data.feature import Feature
@@ -5,6 +9,7 @@ from temporian.core.data.sampling import Sampling
 from temporian.core.operators import base
 from temporian.proto import core_pb2 as pb
 from temporian.core import operator_lib
+from temporian.implementation.numpy.data.event import NumpyEvent
 
 # The name of the operator is defined by the number of inputs and outputs.
 # For example "OpI1O2" has 1 input and 2 outputs.
@@ -18,6 +23,18 @@ def create_input_event():
             Feature("f1", dtype.FLOAT32),
             Feature("f2", dtype.FLOAT32),
         ]
+    )
+
+
+def create_input_event_data():
+    return NumpyEvent.from_dataframe(
+        pd.DataFrame(
+            {
+                "timestamp": [0, 2, 4, 6],
+                "f1": [1.0, 2.0, 3.0, 4.0],
+                "f2": [5.0, 6.0, 7.0, 8.0],
+            }
+        )
     )
 
 

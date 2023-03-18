@@ -13,6 +13,7 @@ py_library(
         "//temporian/core/data:feature",
         "//temporian/core/data:sampling",
         "//temporian/core/operators:base",
+        "//temporian/implementation/numpy/data:event",
     ],
 )
 

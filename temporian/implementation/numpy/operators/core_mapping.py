@@ -12,6 +12,12 @@ from temporian.implementation.numpy.operators.simple_moving_average import (
 from temporian.core.operators.simple_moving_average import (
     SimpleMovingAverage as SmaDef,
 )
+from temporian.implementation.numpy.operators.propagate import (
+    PropagateNumpyImplementation as PropagateImp,
+)
+from temporian.core.operators.propagate import (
+    Propagate as PropagateDef,
+)
 
 # TODO: Use a registration mechanism instead.
 # TODO: Make sure the implementation key is defined only one (in the operator
@@ -22,4 +28,5 @@ OPERATOR_IMPLEMENTATIONS = {
     "ARITHMETIC": ArithmeticNumpyImplementation,
     "LAG": LagNumpyImplementation,
     SmaDef.operator_key(): SmaImp,  # Simple moving average
+    PropagateDef.operator_key(): PropagateImp,
 }

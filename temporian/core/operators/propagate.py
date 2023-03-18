@@ -21,7 +21,6 @@ from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
-from temporian.core.data.duration import Duration
 from temporian.core.operators.select import select
 from temporian.core.data.sampling import Sampling
 
@@ -39,10 +38,28 @@ class Propagate(Operator):
         self.add_input("event", event)
         self.add_input("add_index", add_index)
 
-        # TODO: Check for compatible feature type
-        new_index = event.sampling().index() + [
-            f.name for f in add_index.features()
-        ]
+        # TODO: Constraint the type of features supported in "add_event".
+
+        if event.sampling() != add_index.sampling():
+            raise ValueError(
+                "event and add_index should have the same sampling"
+            )
+
+        if len(add_index.features()) == 0:
+            raise ValueError("add_index contains no features")
+
+        self._added_index = [k.name() for k in add_index.features()]
+
+        overlap_features = set(self._added_index).intersection(
+            event.sampling().index()
+        )
+        if len(overlap_features) > 0:
+            raise ValueError(
+                "add_index contains feature names already present in the"
+                f" index: {list(overlap_features)}"
+            )
+
+        new_index = event.sampling().index() + self._added_index
         sampling = Sampling(index=new_index, creator=None)
 
         output_features = [  # pylint: disable=g-complex-comprehension
@@ -66,6 +83,11 @@ class Propagate(Operator):
 
         self.check()
 
+    def added_index(self) -> list[str]:
+        """New items in the index."""
+
+        return self._added_index
+
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
@@ -84,9 +106,13 @@ operator_lib.register_operator(Propagate)
 
 def propagate(
     event: Event,
-    add_index: Union[Event, List[str]],
+    add_index: Union[Event, str, List[str]],
 ) -> Event:
-    """Propagates / duplicate events to a new index or set of indexes.
+    """Extands index and propagates feature values.
+
+    Extends the index of `event` over the features of `add_event`. Feature
+    values from `event` are duplicated over the new index. `add_event` can be a
+    string or list of string representing features in `event`, or an event.
 
     For example, suppose an index-less event sequence containing two features
     "f_1" and "f_2", and containing 16 timestamps. Suppose "f_1" is a numerical
@@ -96,10 +122,20 @@ def propagate(
     sequence will contain 4 indexed time sequences each containing 16
     timestamps.
 
-    TODO: Need to standardize the naming convention.
+    Example:
+
+    If `event` is indexed by ["x"] and contain two features "f1" and "f2", and
+    if `add_event` is also indexed by ["x"] and contains two features "y" and
+    "z", the result is an event indexed by ["x", "y", "z"] and containing
+    features "f1" and "f2".
+
+    Constraints:
+
+    - If `add_index` is an event, `event` and `add_index` have the same index
+      and same sampling.
 
     Args:
-        event: The event sequence to propagate.
+        event: The event to propagate.
         add_index: The features to index over. If add_index` is a list of
           strings, those string should refer to existing features of `event`
 
@@ -107,9 +143,16 @@ def propagate(
         An event sequence propagated over `add_index`.
     """
 
+    if isinstance(add_index, str):
+        add_index = [add_index]
+
     if isinstance(add_index, list):
-        add_index = select(event=event, feature_names=add_index)
-        # TODO: Remove "add_index" from "event".
+        add_index_set = set(add_index)
+        add_index = select(event, add_index)
+        remaining_features = [
+            f.name() for f in event.features() if f.name not in add_index_set
+        ]
+        event = select(event, remaining_features)
 
     return Propagate(
         event=event,

@@ -87,8 +87,8 @@ py_test(
 )
 
 py_test(
-    name = "propagate",
-    srcs = ["propagate.py"],
+    name = "propagate_test",
+    srcs = ["propagate_test.py"],
     srcs_version = "PY3",
     deps = [
         "//temporian/core/data:dtype",
