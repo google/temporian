@@ -31,7 +31,9 @@ py_test(
         "//temporian/core/operators:assign",
         "//temporian/core/operators:lag",
         "//temporian/core/operators:select",
+        "//temporian/core/operators:arithmetic",
         "//temporian/implementation/numpy/data:event",
+        "//temporian",
     ],
 )
 

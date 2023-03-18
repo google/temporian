@@ -29,16 +29,25 @@ from temporian.io.read_event import read_event
 from temporian.io.save_event import save_event
 
 # Operators
-from temporian.core.operators.arithmetic import divide
-from temporian.core.operators.arithmetic import multiply
-from temporian.core.operators.arithmetic import substract
-from temporian.core.operators.arithmetic import sum
-from temporian.core.operators.assign import assign
-from temporian.core.operators.calendar_day_of_month import calendar_day_of_month
-from temporian.core.operators.lag import lag
-from temporian.core.operators.lag import leak
-from temporian.core.operators.select import select
-from temporian.core.operators.simple_moving_average import sma
+from temporian.core.operators.all_operators import *
+
+# Do not submit
+# from temporian.core.operators.arithmetic import divide
+# from temporian.core.operators.arithmetic import multiply
+# from temporian.core.operators.arithmetic import substract
+# from temporian.core.operators.arithmetic import sum
+# from temporian.core.operators.assign import assign
+# from temporian.core.operators.calendar_day_of_month import calendar_day_of_month
+# from temporian.core.operators.lag import lag
+# from temporian.core.operators.lag import leak
+# from temporian.core.operators.select import select
+# from temporian.core.operators.simple_moving_average import sma
+
+
+from temporian.core.operator_lib import registered_operators as get_operators
+
+# Load all the implementations
+from temporian.implementation.numpy.operators import all_operators as _impls
 
 __version__ = "0.0.1"
 

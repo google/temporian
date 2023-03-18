@@ -19,6 +19,9 @@ import pandas as pd
 
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators import select
+from temporian.core.operators.select import SelectOperator
+from temporian.core.data import event as event_lib
+from temporian.core.data import dtype as dtype_lib
 
 
 class SelectOperatorTest(absltest.TestCase):
@@ -29,7 +32,7 @@ class SelectOperatorTest(absltest.TestCase):
         self.B = 1
         self.C = 2
 
-        self.df = pd.DataFrame(
+        df = pd.DataFrame(
             [
                 [self.A, 1.0, 10.0, -1.0, 0.0],
                 [self.A, 2.0, np.nan, -2.0, 32.0],
@@ -43,8 +46,17 @@ class SelectOperatorTest(absltest.TestCase):
 
         self.features = ["sales", "costs", "weather"]
 
-        self.numpy_event = NumpyEvent.from_dataframe(
-            self.df, index_names=["store_id"]
+        self.input_event = event_lib.input_event(
+            [
+                event_lib.Feature(name="sales", dtype=dtype_lib.FLOAT64),
+                event_lib.Feature(name="costs", dtype=dtype_lib.FLOAT64),
+                event_lib.Feature(name="weather", dtype=dtype_lib.FLOAT64),
+            ],
+            index=["store_id"],
+        )
+
+        self.input_event_data = NumpyEvent.from_dataframe(
+            df, index_names=["store_id"]
         )
 
     def test_select_one_feature(self) -> None:
@@ -61,8 +73,9 @@ class SelectOperatorTest(absltest.TestCase):
             columns=["store_id", "timestamp", "sales"],
         )
 
-        operator = select.NumpySelectOperator(feature_names="sales")
-        selected_event = operator(self.numpy_event)["event"]
+        op = SelectOperator(self.input_event, feature_names=["sales"])
+        implementation = select.NumpySelectOperator(op)
+        selected_event = implementation(self.input_event_data)["event"]
 
         expected_event = NumpyEvent.from_dataframe(
             new_df, index_names=["store_id"]
@@ -84,8 +97,9 @@ class SelectOperatorTest(absltest.TestCase):
             columns=["store_id", "timestamp", "sales", "costs"],
         )
 
-        operator = select.NumpySelectOperator(feature_names=["sales", "costs"])
-        selected_event = operator(self.numpy_event)["event"]
+        op = SelectOperator(self.input_event, feature_names=["sales", "costs"])
+        implementation = select.NumpySelectOperator(op)
+        selected_event = implementation(self.input_event_data)["event"]
 
         expected_event = NumpyEvent.from_dataframe(
             new_df, index_names=["store_id"]

@@ -12,6 +12,7 @@ import numpy as np
 from temporian.implementation.numpy.data.event import NumpyEvent, NumpyFeature
 from temporian.core.data.duration import Duration
 from temporian.core.operators.simple_moving_average import SimpleMovingAverage
+from temporian.implementation.numpy import implementation_lib
 
 
 class SimpleMovingAverageNumpyImplementation:
@@ -55,6 +56,11 @@ class SimpleMovingAverageNumpyImplementation:
                 dst_mts.append(NumpyFeature(dst_feature_name, dst_ts_data))
 
         return {"event": dst_event}
+
+
+implementation_lib.register_operator_implementation(
+    SimpleMovingAverage, SimpleMovingAverageNumpyImplementation
+)
 
 
 def _build_accumulator_mask(

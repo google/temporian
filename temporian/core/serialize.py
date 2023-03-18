@@ -317,7 +317,7 @@ def _serialize_sampling(src: Sampling) -> pb.Sampling:
 
 
 def _unserialize_sampling(src: pb.Sampling) -> Sampling:
-    return Sampling(index=src.index, creator=None)
+    return Sampling(index=list(src.index), creator=None)
 
 
 def _serialize_dtype(dtype) -> pb.Feature.DType:

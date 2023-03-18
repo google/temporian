@@ -7,6 +7,21 @@ package(
 # =========
 
 py_library(
+    name = "all_operators",
+    srcs = ["all_operators.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":arithmetic",
+        ":assign",
+        ":calendar_day_of_month",
+        ":lag",
+        ":propagate",
+        ":select",
+        ":simple_moving_average",
+    ],
+)
+
+py_library(
     name = "operators",
     srcs = ["__init__.py"],
     srcs_version = "PY3",
@@ -18,6 +33,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         "//temporian/core/operators:arithmetic",
+        "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
     ],
 )
@@ -28,6 +44,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         "//temporian/core/operators:assign",
+        "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
     ],
@@ -43,25 +60,12 @@ py_library(
 )
 
 py_library(
-    name = "core_mapping",
-    srcs = ["core_mapping.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":arithmetic",
-        ":assign",
-        ":lag",
-        ":propagate",
-        ":select",
-        ":simple_moving_average",
-    ],
-)
-
-py_library(
     name = "calendar_day_of_month",
     srcs = ["calendar_day_of_month.py"],
     srcs_version = "PY3",
     deps = [
         "//temporian/core/operators:calendar_day_of_month",
+        "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
     ],
 )
@@ -73,6 +77,7 @@ py_library(
     deps = [
         "//temporian/core/data:duration",
         "//temporian/core/operators:lag",
+        "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
     ],
@@ -83,6 +88,8 @@ py_library(
     srcs = ["select.py"],
     srcs_version = "PY3",
     deps = [
+        "//temporian/core/operators:select",
+        "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
     ],
 )
@@ -93,12 +100,12 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
-        # numpy dep,
+        "//temporian/core/data:duration",
+        "//temporian/core/operators:simple_moving_average",
+        "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
-        "//temporian/core/data:duration",
-        "//temporian/core/operators:simple_moving_average",
     ],
 )
 
@@ -108,8 +115,8 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
-        "//temporian/core/data:duration",
         "//temporian/core/operators:propagate",
+        "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",

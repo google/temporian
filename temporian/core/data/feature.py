@@ -28,6 +28,11 @@ class Feature(object):
         sampling: Optional[sampling_lib.Sampling] = None,
         creator: Optional[Any] = None,
     ):
+        assert isinstance(name, str), f"Got {name}"
+        assert sampling is None or isinstance(
+            sampling, sampling_lib.Sampling
+        ), f"Got {sampling}"
+
         self._name = name
         self._sampling = sampling
         self._dtype = dtype

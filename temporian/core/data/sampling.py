@@ -23,6 +23,8 @@ class Sampling(object):
         index: List[str],
         creator: Optional[Any] = None,
     ):
+        assert isinstance(index, list), f"Got {index}"
+
         self._index: List[str] = index
         self._creator = creator
 

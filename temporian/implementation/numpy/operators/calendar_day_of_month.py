@@ -21,6 +21,7 @@ from temporian.core.operators.calendar_day_of_month import (
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
+from temporian.implementation.numpy import implementation_lib
 
 
 class CalendarDayOfMonthNumpyImplementation:
@@ -48,3 +49,8 @@ class CalendarDayOfMonthNumpyImplementation:
             ]
 
         return {"event": NumpyEvent(data=data, sampling=sampling.sampling)}
+
+
+implementation_lib.register_operator_implementation(
+    CalendarDayOfMonthOperator, CalendarDayOfMonthNumpyImplementation
+)

@@ -5,6 +5,7 @@ import pandas as pd
 
 from temporian.core.data import dtype
 from temporian.core.data.event import Event
+from temporian.core.data.sampling import Sampling
 from temporian.core.data.duration import convert_date_to_duration
 from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.utils import string
@@ -51,7 +52,7 @@ class NumpyFeature:
         return True
 
     def core_dtype(self) -> Any:
-        if self.dtype.type is np.string_:
+        if hasattr(self.dtype, "type") and self.dtype.type is np.string_:
             return dtype.STRING
         return DTYPE_MAPPING[self.dtype]
 
@@ -94,7 +95,7 @@ class NumpyEvent:
             features=[
                 feature.schema() for feature in list(self.data.values())[0]
             ],
-            sampling=self.sampling.index,
+            sampling=Sampling(index=self.sampling.index),
         )
 
     @staticmethod

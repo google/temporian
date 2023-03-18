@@ -9,6 +9,7 @@ import itertools
 from temporian.implementation.numpy.data.event import NumpyEvent, NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.core.operators.propagate import Propagate
+from temporian.implementation.numpy import implementation_lib
 
 
 class PropagateNumpyImplementation:
@@ -70,3 +71,8 @@ class PropagateNumpyImplementation:
                 dst_event.data[dst_index] = dst_mts
 
         return {"event": dst_event}
+
+
+implementation_lib.register_operator_implementation(
+    Propagate, PropagateNumpyImplementation
+)

@@ -14,16 +14,16 @@
 
 """Evaluator module."""
 
+import sys
 import pathlib
 from typing import Any, Dict, List, Set, Union
 from collections import defaultdict
-from enum import Enum
 
-from temporian.core import backends
 from temporian.core.data.event import Event
 from temporian.core.operators import base
 from temporian.implementation.numpy.data import event as numpy_event
 from temporian.core import processor as processor_lib
+from temporian.implementation.numpy import evaluator as numpy_evaluator
 
 AvailableBackends = Any
 Data = Dict[Event, Union[str, pathlib.Path, numpy_event.NumpyEvent]]
@@ -33,7 +33,8 @@ Query = Union[Event, List[Event], Dict[str, Event]]
 def evaluate(
     query: Query,
     input_data: Data,
-    backend: AvailableBackends = "numpy",
+    verbose: int = 0,
+    check_execution: bool = True,
 ) -> Dict[Event, Any]:
     """Evaluates a query on data.
 
@@ -41,7 +42,14 @@ def evaluate(
         query: Events to compute. Support event, dict and list of events.
         input_data: Dictionary of event and event values to use for the
           computation.
-        backend: Type of backend to use.
+        verbose: If >0, prints details about the execution on the standard error
+          output. The larger the number, the more information is displayed.
+        check_execution: If true, the input and output of the op implementation
+          are validated to check any bug in the library internal code. If false,
+          checks are skipped.
+
+    TODO: Create an internal configuration object for options such as
+    "check_execution".
 
     Returns:
         An object with the same structure as "event" containing the results. For
@@ -72,34 +80,19 @@ def evaluate(
             f" {type(query)}."
         )
 
-    # Select execution backend
-    selected_backend = backends.BACKENDS[backend]
-    event = selected_backend["event"]
-    evaluate_schedule_fn = selected_backend["evaluate_schedule_fn"]
-
-    read_csv_fn = selected_backend["read_csv_fn"]
-
     # Schedule execution
     input_events = list(input_data.keys())
-    schedule = build_schedule(inputs=input_events, outputs=normalized_query)
-
-    # Materialize input data.
-    # TODO: separate this logic
-    # TODO: Make it possible to support other IO systems.
-    materialized_input_data = {
-        input_event: (
-            input_event_spec
-            if isinstance(input_event_spec, event)
-            else read_csv_fn(input_event_spec, input_event.sampling())
-        )
-        for input_event, input_event_spec in input_data.items()
-    }
+    schedule = build_schedule(
+        inputs=input_events, outputs=normalized_query, verbose=verbose
+    )
 
     # Evaluate schedule
     #
     # Note: "outputs" is a dictionary of event (including the query events) to
     # event data.
-    outputs = evaluate_schedule_fn(materialized_input_data, schedule)
+    outputs = numpy_evaluator.evaluate_schedule(
+        input_data, schedule, verbose=verbose, check_execution=check_execution
+    )
 
     # Convert the result "outputs" into the same format as the query.
     if isinstance(query, Event):
@@ -119,7 +112,9 @@ def evaluate(
 
 
 def build_schedule(
-    inputs: List[Event], outputs: List[Event]
+    inputs: List[Event],
+    outputs: List[Event],
+    verbose: int = 0,
 ) -> List[base.Operator]:
     """Calculates which operators need to be executed in which order to
     compute a set of output events given a set of input events.
@@ -129,6 +124,8 @@ def build_schedule(
     Args:
         inputs: Input events.
         outputs: Output events.
+        verbose: If >0, prints details about the execution on the standard error
+          output. The larger the number, the more information is displayed.
 
     Returns:
         Ordered list of operators, such that the first operator should be
@@ -146,6 +143,9 @@ def build_schedule(
     processor = processor_lib.infer_processor(
         list_to_dict(inputs), list_to_dict(outputs)
     )
+
+    if verbose >= 2:
+        print("Processor:\n", processor, file=sys.stderr)
 
     # Sequence of operators to execute. This is the result of the
     # "build_schedule" function.
@@ -207,5 +207,8 @@ def build_schedule(
                     del op_to_num_pending_inputs[new_op]
 
     assert not op_to_num_pending_inputs
+
+    if verbose >= 2:
+        print("Schedule:\n", planned_ops, file=sys.stderr)
 
     return planned_ops

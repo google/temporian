@@ -68,6 +68,7 @@ py_test(
         # absl/testing:absltest dep,
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/operators:select",
+        "//temporian/core/operators:select",
     ],
 )
 
