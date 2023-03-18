@@ -23,5 +23,7 @@ py_library(
         "//temporian/core/data:sampling",
         "//temporian/core/operators",
         "//temporian/core/operators:base",
+        "//temporian/io:read_event",
+        "//temporian/io:save_event",
     ],
 )

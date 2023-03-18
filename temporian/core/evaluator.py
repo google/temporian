@@ -22,11 +22,11 @@ from enum import Enum
 from temporian.core import backends
 from temporian.core.data.event import Event
 from temporian.core.operators import base
-from temporian.implementation.pandas.data import event as pandas_event
+from temporian.implementation.numpy.data import event as numpy_event
 from temporian.core import processor as processor_lib
 
 AvailableBackends = Any
-Data = Dict[Event, Union[str, pathlib.Path, pandas_event.PandasEvent]]
+Data = Dict[Event, Union[str, pathlib.Path, numpy_event.PandasEvent]]
 Query = Union[Event, List[Event], Dict[str, Event]]
 
 

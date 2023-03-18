@@ -117,4 +117,4 @@ bazel test //...:all
 
 ## Credits
 
-This project is a collaboration between Google and Tryolabs.
+This project is a collaboration between Google and [Tryolabs](https://tryolabs.com/).

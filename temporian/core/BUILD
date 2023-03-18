@@ -28,8 +28,6 @@ py_library(
         "//temporian/core/operators:base",
         "//temporian/implementation/numpy:evaluator",
         "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/pandas:evaluator",
-        "//temporian/implementation/pandas/data:event",
     ],
 )
 
@@ -38,8 +36,8 @@ py_library(
     srcs = ["backends.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/implementation/pandas:evaluator",
-        "//temporian/implementation/pandas/data:event",
+        "//temporian/implementation/numpy:evaluator",
+        "//temporian/implementation/numpy/data:event",
     ],
 )
 
