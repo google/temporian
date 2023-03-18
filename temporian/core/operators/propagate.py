@@ -60,7 +60,7 @@ class Propagate(Operator):
             )
 
         new_index = event.sampling().index() + self._added_index
-        sampling = Sampling(index=new_index, creator=None)
+        sampling = Sampling(index=new_index, creator=self)
 
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
