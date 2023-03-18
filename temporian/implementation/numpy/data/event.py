@@ -1,9 +1,11 @@
-from typing import Dict, List, Tuple, Any
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
-from temporian.core.data.event import Event
-from temporian.core.data.feature import Feature
+import pandas as pd
+
 from temporian.core.data import dtype
+from temporian.core.data.event import Event
+from temporian.core.data.duration import convert_date_to_duration
 from temporian.implementation.numpy.data.sampling import NumpySampling
 
 DTYPE_MAPPING = {
@@ -63,31 +65,199 @@ class NumpyEvent:
         self.sampling = sampling
 
     @property
-    def feature_count(self) -> int:
-        if len(self.data.keys()) == 0:
-            return 0
+    def _first_index_value(self) -> Tuple:
+        if self.data is None or len(self.data) == 0:
+            return None
 
-        first_index = next(iter(self.data))
-        return len(self.data[first_index])
+        return next(iter(self.data))
+
+    @property
+    def _first_index_features(self) -> List[NumpyFeature]:
+        if self._first_index_value is None:
+            return []
+        return self.data[self._first_index_value]
+
+    @property
+    def feature_count(self) -> int:
+        return len(self._first_index_features)
 
     @property
     def feature_names(self) -> List[str]:
-        if len(self.data.keys()) == 0:
-            return []
-
         # Only look at the feature in the first index
         # to get the feature names. All features in all
         # indexes should have the same names
-        first_index = next(iter(self.data))
-        return [feature.name for feature in self.data[first_index]]
+        return [feature.name for feature in self._first_index_features]
 
     def schema(self) -> Event:
         return Event(
             features=[
                 feature.schema() for feature in list(self.data.values())[0]
             ],
-            sampling=self.sampling.names,
+            sampling=self.sampling.index,
         )
+
+    @staticmethod
+    def from_dataframe(
+        df: pd.DataFrame,
+        index_names: List[str] = None,
+        timestamp_column: str = "timestamp",
+    ) -> "NumpyEvent":
+        """Convert a pandas DataFrame to a NumpyEvent.
+        Args:
+            df: DataFrame to convert to NumpyEvent.
+            index_names: names of the DataFrame columns to be used as index for
+                the event. Defaults to [].
+            timestamp_column: Column containing timestamps. Supported date types:
+                {np.datetime64, pd.Timestamp, datetime.datetime}. Timestamps of
+                these types are converted implicitly to UTC epoch float.
+
+        Returns:
+            NumpyEvent: NumpyEvent created from DataFrame.
+
+        Raises:
+            ValueError: If index_names or timestamp_column are not in df columns.
+            ValueError: If a column has an unsupported dtype.
+
+        Example:
+            >>> import pandas as pd
+            >>> from temporian.implementation.numpy.data.event import NumpyEvent
+            >>> df = pd.DataFrame(
+            ...     data=[
+            ...         [666964, 1.0, 740.0],
+            ...         [666964, 2.0, 508.0],
+            ...         [574016, 3.0, 573.0],
+            ...     ],
+            ...     columns=["product_id", "timestamp", "costs"],
+            ... )
+            >>> event = NumpyEvent.from_dataframe(df, index_names=["product_id"])
+        """
+        if index_names is None:
+            index_names = []
+
+        # check index names and timestamp name are in df columns
+        missing_columns = [
+            column
+            for column in index_names + [timestamp_column]
+            if column not in df.columns
+        ]
+
+        if missing_columns:
+            raise ValueError(
+                f"Missing columns {missing_columns} in DataFrame. "
+                f"Columns: {df.columns}"
+            )
+
+        # check timestamp_column is not on index_names
+        if timestamp_column in index_names:
+            raise ValueError(
+                f"Timestamp column {timestamp_column} cannot be on index_names"
+            )
+
+        # convert timestamp column to UTC Epoch float
+        df[timestamp_column] = df[timestamp_column].apply(
+            convert_date_to_duration
+        )
+
+        # check column dtypes, every dtype should be a key of DTYPE_MAPPING
+        for column in df.columns:
+            if df[column].dtype.type not in DTYPE_MAPPING:
+                raise ValueError(
+                    f"Unsupported dtype {df[column].dtype} for column"
+                    f" {column}. Supported dtypes: {DTYPE_MAPPING.keys()}"
+                )
+
+        # columns that are not indexes or timestamp
+        feature_columns = [
+            column
+            for column in df.columns
+            if column not in index_names + [timestamp_column]
+        ]
+
+        sampling = {}
+        data = {}
+
+        # fill missing values with np.nan
+        df = df.fillna(np.nan)
+
+        # The user provided an index
+        if index_names:
+            group_by_indexes = df.groupby(index_names)
+
+            for group in group_by_indexes.groups:
+                columns = group_by_indexes.get_group(group)
+                timestamp = columns[timestamp_column].to_numpy()
+
+                # Convert group to tuple, useful when its only one value
+                if not isinstance(group, tuple):
+                    group = (group,)
+
+                sampling[group] = timestamp
+                data[group] = [
+                    NumpyFeature(feature, columns[feature].to_numpy())
+                    for feature in feature_columns
+                ]
+        # The user did not provide an index
+        else:
+            timestamp = df[timestamp_column].to_numpy()
+            sampling[()] = timestamp
+            data[()] = [
+                NumpyFeature(feature, df[feature].to_numpy())
+                for feature in feature_columns
+            ]
+
+        numpy_sampling = NumpySampling(index=index_names, data=sampling)
+
+        return NumpyEvent(data=data, sampling=numpy_sampling)
+
+    def to_dataframe(self) -> pd.DataFrame:
+        """Convert a NumpyEvent to a pandas DataFrame.
+
+        Returns:
+            pd.DataFrame: DataFrame created from NumpyEvent.
+
+        """
+
+        feature_names = self.feature_names
+        index_names = self.sampling.index
+        columns = index_names + feature_names + ["timestamp"]
+
+        df = pd.DataFrame(data=[], columns=columns)
+
+        # append every feature to the dataframe. without index
+        for index, features in self.data.items():
+            timestamps = self.sampling.data[index]
+
+            for i, timestamp in enumerate(timestamps):
+                # add row to dataframe
+                row = (
+                    list(index)
+                    + [feature.data[i] for feature in features]
+                    + [timestamp]
+                )
+                df.loc[len(df)] = row
+
+        # Convert to original dtypes, can be more efficient
+        first_index = self._first_index_value
+        first_features = self._first_index_features
+
+        # get feature dtypes
+        features_dtypes = {
+            feature.name: feature.data[0].dtype for feature in first_features
+        }
+
+        # get tuple index dtypes
+        index_dtypes = {
+            index_name: type(first_index[i])
+            for i, index_name in enumerate(self.sampling.index)
+        }
+
+        # get timestamp dtype
+        first_timestamp = self.sampling.data[first_index][0]
+        sampling_dtype = {"timestamp": first_timestamp.dtype}
+
+        df = df.astype({**features_dtypes, **index_dtypes, **sampling_dtype})
+
+        return df
 
     def __repr__(self) -> str:
         return self.data.__repr__() + " " + self.sampling.__repr__()

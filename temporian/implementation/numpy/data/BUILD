@@ -19,6 +19,7 @@ py_library(
     deps = [
         # pandas dep,
         ":sampling",
+        "//temporian/core/data:duration",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
         "//temporian/core/data:sampling",

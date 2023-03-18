@@ -17,16 +17,17 @@
 import pathlib
 from typing import Any, Dict, List, Set, Union
 from collections import defaultdict
+from enum import Enum
 
 from temporian.core import backends
 from temporian.core.data.event import Event
 from temporian.core.operators import base
-from temporian.implementation.pandas.data import event as pandas_event
+from temporian.implementation.numpy.data import event as numpy_event
 from temporian.core import processor as processor_lib
 
 AvailableBackends = Any
-Data = Dict[Event, Union[str, pathlib.Path, pandas_event.PandasEvent]]
-Query = Union[Event, List[Event], Set[Event], Dict[str, Event]]
+Data = Dict[Event, Union[str, pathlib.Path, numpy_event.NumpyEvent]]
+Query = Union[Event, List[Event], Dict[str, Event]]
 
 
 def evaluate(
@@ -49,27 +50,20 @@ def evaluate(
         the returned value will be a list of event values with the same order.
     """
 
-    # Normalize query into a list
+    # Normalize the user query into a list query events.
     normalized_query: List[Event] = {}
-
-    Q_TYPE_DICT = "DICT"
-    Q_TYPE_LIST = "LIST"
-    Q_TYPE_VALUE = "VALUE"
 
     if isinstance(query, Event):
         # The query is a single value
         normalized_query = [query]
-        query_type = Q_TYPE_VALUE
 
     elif isinstance(query, list):
         # The query is a list
         normalized_query = query
-        query_type = Q_TYPE_LIST
 
     elif isinstance(query, dict):
         # The query is a dictionary
         normalized_query = list(query.values())
-        query_type = Q_TYPE_DICT
 
     else:
         # TODO: improve error message
@@ -102,23 +96,26 @@ def evaluate(
     }
 
     # Evaluate schedule
+    #
+    # Note: "outputs" is a dictionary of event (including the query events) to
+    # event data.
     outputs = evaluate_schedule_fn(materialized_input_data, schedule)
 
     # Convert the result "outputs" into the same format as the query.
-    if query_type == Q_TYPE_DICT:
+    if isinstance(query, Event):
+        return outputs[query]
+
+    elif isinstance(query, list):
+        return [outputs[k] for k in query]
+
+    elif isinstance(query, dict):
         return {
             query_key: outputs[query_evt]
             for query_key, query_evt in query.items()
         }
 
-    elif query_type == Q_TYPE_LIST:
-        return [outputs[k] for k in query]
-
-    elif query_type == Q_TYPE_VALUE:
-        return outputs[query]
-
     else:
-        raise ValueError("Internal error")  # DO NOT SUBMIT: Correct exception
+        raise RuntimeError("Unexpected case")
 
 
 def build_schedule(

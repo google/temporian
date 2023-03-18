@@ -36,7 +36,6 @@ def evaluate_schedule(
 
         # Instantiate implementation
         implementation = implementation_cls(operator)
-        # DO NOT SUBMIT: **operator.attributes())
 
         # Construct operator inputs
         operator_inputs = {

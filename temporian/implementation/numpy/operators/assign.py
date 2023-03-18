@@ -13,21 +13,21 @@
 # limitations under the License.
 
 """Implementation for the Assign operator."""
+from copy import deepcopy
 from typing import Dict, List
-
 import numpy as np
+
+
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.core.operators.assign import AssignOperator
 
 
-# TODO: Rename to AssignImplementation
-class NumpyAssignOperator:
-    # TODO: Remove the optionallity on "op".
-    def __init__(self, op: AssignOperator = None) -> None:
-        assert op is None or isinstance(op, AssignOperator)
-        self._op = op
+class AssignNumpyImplementation:
+    def __init__(self, operator: AssignOperator):
+        assert isinstance(operator, AssignOperator)
+        self._operator = operator
 
     def __call__(
         self, left_event: NumpyEvent, right_event: NumpyEvent
@@ -65,11 +65,11 @@ class NumpyAssignOperator:
                 " index."
             )
 
-        output = NumpyEvent(
-            data=left_event.data.copy(), sampling=left_event.sampling
-        )
+        output = NumpyEvent(data={}, sampling=left_event.sampling)
 
-        for index in left_event.data.keys():
+        for index, left_features in left_event.data.items():
+            # Copy the features of left to the output event
+            output.data[index] = [feature for feature in left_features]
             output_data = output.data[index]
             left_sampling_data = left_event.sampling.data[index]
             number_timestamps = len(left_sampling_data)
