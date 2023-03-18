@@ -17,6 +17,7 @@
 import pathlib
 from typing import Any, Dict, List, Set, Union
 from collections import defaultdict
+from enum import Enum
 
 from temporian.core import backends
 from temporian.core.data.event import Event
@@ -26,7 +27,7 @@ from temporian.core import processor as processor_lib
 
 AvailableBackends = Any
 Data = Dict[Event, Union[str, pathlib.Path, numpy_event.NumpyEvent]]
-Query = Union[Event, List[Event], Set[Event]]
+Query = Union[Event, List[Event], Dict[str, Event]]
 
 
 def evaluate(
@@ -34,18 +35,35 @@ def evaluate(
     input_data: Data,
     backend: AvailableBackends = "numpy",
 ) -> Dict[Event, Any]:
-    """Evaluates a query on data."""
+    """Evaluates a query on data.
 
-    # Normalize query
+    Args:
+        query: Events to compute. Support event, dict and list of events.
+        input_data: Dictionary of event and event values to use for the
+          computation.
+        backend: Type of backend to use.
+
+    Returns:
+        An object with the same structure as "event" containing the results. For
+        instance, if "event" is a dictionary of events, the returned object
+        will be a dictionary of event results. If "event" is a list of events,
+        the returned value will be a list of event values with the same order.
+    """
+
+    # Normalize the user query into a list query events.
     normalized_query: List[Event] = {}
+
     if isinstance(query, Event):
+        # The query is a single value
         normalized_query = [query]
 
-    elif isinstance(query, set):
-        normalized_query = list(query)
-
     elif isinstance(query, list):
+        # The query is a list
         normalized_query = query
+
+    elif isinstance(query, dict):
+        # The query is a dictionary
+        normalized_query = list(query.values())
 
     else:
         # TODO: improve error message
@@ -54,17 +72,20 @@ def evaluate(
             f" {type(query)}."
         )
 
-    # Select backend
+    # Select execution backend
     selected_backend = backends.BACKENDS[backend]
     event = selected_backend["event"]
     evaluate_schedule_fn = selected_backend["evaluate_schedule_fn"]
+
     read_csv_fn = selected_backend["read_csv_fn"]
 
     # Schedule execution
     input_events = list(input_data.keys())
     schedule = build_schedule(inputs=input_events, outputs=normalized_query)
 
-    # materialize input data. TODO: separate this logic
+    # Materialize input data.
+    # TODO: separate this logic
+    # TODO: Make it possible to support other IO systems.
     materialized_input_data = {
         input_event: (
             input_event_spec
@@ -73,10 +94,28 @@ def evaluate(
         )
         for input_event, input_event_spec in input_data.items()
     }
-    # evaluate schedule
+
+    # Evaluate schedule
+    #
+    # Note: "outputs" is a dictionary of event (including the query events) to
+    # event data.
     outputs = evaluate_schedule_fn(materialized_input_data, schedule)
 
-    return {event: outputs[event] for event in normalized_query}
+    # Convert the result "outputs" into the same format as the query.
+    if isinstance(query, Event):
+        return outputs[query]
+
+    elif isinstance(query, list):
+        return [outputs[k] for k in query]
+
+    elif isinstance(query, dict):
+        return {
+            query_key: outputs[query_evt]
+            for query_key, query_evt in query.items()
+        }
+
+    else:
+        raise RuntimeError("Unexpected case")
 
 
 def build_schedule(

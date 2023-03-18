@@ -132,6 +132,10 @@ class Operator(ABC):
     def definition(self):
         return self.__class__.build_op_definition()
 
+    @classmethod
+    def operator_key(cls):
+        return cls.build_op_definition().key
+
     def set_inputs(self, inputs: dict[str, Event]) -> None:
         self._inputs = inputs
 

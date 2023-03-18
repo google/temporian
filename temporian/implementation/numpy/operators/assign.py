@@ -21,10 +21,12 @@ import numpy as np
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
+from temporian.core.operators.assign import AssignOperator
 
 
 class AssignNumpyImplementation:
-    def __init__(self, operator):
+    def __init__(self, operator: AssignOperator):
+        assert isinstance(operator, AssignOperator)
         self._operator = operator
 
     def __call__(

@@ -72,6 +72,8 @@ def convert_date_to_duration(
     # if it is already a duration, return it
     if isinstance(date, float):
         return date
+    if isinstance(date, int):
+        return float(date)
     if isinstance(date, np.datetime64):
         return convert_numpy_datetime64_to_duration(date)
     if isinstance(date, datetime.datetime):

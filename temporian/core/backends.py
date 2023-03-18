@@ -20,6 +20,7 @@ def raise_(exception: Exception):
     raise exception
 
 
+# TODO: Use a registration mechanism instead of listing the backends.
 BACKENDS = {
     "cpp": {
         "event": lambda: raise_(NotImplementedError()),

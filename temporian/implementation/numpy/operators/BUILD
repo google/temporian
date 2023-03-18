@@ -27,6 +27,7 @@ py_library(
     srcs = ["assign.py"],
     srcs_version = "PY3",
     deps = [
+        "//temporian/core/operators:assign",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
     ],
@@ -50,6 +51,7 @@ py_library(
         ":assign",
         ":lag",
         ":select",
+        ":simple_moving_average",
     ],
 )
 
@@ -81,5 +83,20 @@ py_library(
     srcs_version = "PY3",
     deps = [
         "//temporian/implementation/numpy/data:event",
+    ],
+)
+
+py_library(
+    name = "simple_moving_average",
+    srcs = ["simple_moving_average.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        # numpy dep,
+        "//temporian/implementation/numpy:utils",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/core/data:duration",
+        "//temporian/core/operators:simple_moving_average",
     ],
 )

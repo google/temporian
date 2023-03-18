@@ -131,16 +131,16 @@ class PrototypeTest(absltest.TestCase):
             backend="numpy",
         )
 
-        if self.expected_output_event != output_event_numpy[output_event]:
+        if self.expected_output_event != output_event_numpy:
             print("expected")
             print(self.expected_output_event.to_dataframe())
             print("actual")
-            print(output_event_numpy[output_event].to_dataframe())
+            print(output_event_numpy.to_dataframe())
 
         # validate
         self.assertEqual(
             True,
-            self.expected_output_event == output_event_numpy[output_event],
+            self.expected_output_event == output_event_numpy,
         )
 
 
