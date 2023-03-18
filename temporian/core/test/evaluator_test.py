@@ -87,6 +87,26 @@ class EvaluatorTest(absltest.TestCase):
         )
         self.assertEqual(schedule, [o4, o5])
 
+    def test_evaluate_value(self):
+        i1 = utils.create_input_event()
+        result = evaluator.evaluate(i1, {i1: TODO})
+        self.assertIsInstance(result, Event)
+
+    def test_evaluate_list(self):
+        i1 = utils.create_input_event()
+        i2 = utils.create_input_event()
+        result = evaluator.evaluate([i1, i2], {i1: TODO, i2: TODO})
+        self.assertIsInstance(result, list)
+        self.assertLen(result, 2)
+
+    def test_evaluate_dict(self):
+        i1 = utils.create_input_event()
+        i2 = utils.create_input_event()
+        result = evaluator.evaluate({"i1": i1, "i2": i2}, {i1: TODO, i2: TODO})
+        self.assertIsInstance(result, dict)
+        self.assertLen(result, 2)
+        self.assertEqual(set(result.keys()), {"i1", "i2"})
+
 
 if __name__ == "__main__":
     absltest.main()

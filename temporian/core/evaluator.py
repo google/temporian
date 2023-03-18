@@ -17,6 +17,7 @@
 import pathlib
 from typing import Any, Dict, List, Set, Union
 from collections import defaultdict
+from enum import Enum
 
 from temporian.core import backends
 from temporian.core.data.event import Event
@@ -26,7 +27,18 @@ from temporian.core import processor as processor_lib
 
 AvailableBackends = Any
 Data = Dict[Event, Union[str, pathlib.Path, pandas_event.PandasEvent]]
-Query = Union[Event, List[Event], Set[Event], Dict[str, Event]]
+Query = Union[Event, List[Event], Dict[str, Event]]
+
+
+class _EQueryType(Enum):
+    """Supports format of queries.
+
+    Matches "Query" defined above.
+    """
+
+    VALUE = 1
+    LIST = 2
+    DICT = 3
 
 
 def evaluate(
@@ -49,27 +61,23 @@ def evaluate(
         the returned value will be a list of event values with the same order.
     """
 
-    # Normalize query into a list
+    # Normalize the user query into a list query events.
     normalized_query: List[Event] = {}
-
-    Q_TYPE_DICT = "DICT"
-    Q_TYPE_LIST = "LIST"
-    Q_TYPE_VALUE = "VALUE"
 
     if isinstance(query, Event):
         # The query is a single value
         normalized_query = [query]
-        query_type = Q_TYPE_VALUE
+        query_type = _EQueryType.VALUE
 
     elif isinstance(query, list):
         # The query is a list
         normalized_query = query
-        query_type = Q_TYPE_LIST
+        query_type = _EQueryType.LIST
 
     elif isinstance(query, dict):
         # The query is a dictionary
         normalized_query = list(query.values())
-        query_type = Q_TYPE_DICT
+        query_type = _EQueryType.DICT
 
     else:
         # TODO: improve error message
@@ -102,19 +110,22 @@ def evaluate(
     }
 
     # Evaluate schedule
+    #
+    # Note: "outputs" is a dictionary of event (including the query events) to
+    # event data.
     outputs = evaluate_schedule_fn(materialized_input_data, schedule)
 
     # Convert the result "outputs" into the same format as the query.
-    if query_type == Q_TYPE_DICT:
+    if query_type == _EQueryType.DICT:
         return {
             query_key: outputs[query_evt]
             for query_key, query_evt in query.items()
         }
 
-    elif query_type == Q_TYPE_LIST:
+    elif query_type == _EQueryType.LIST:
         return [outputs[k] for k in query]
 
-    elif query_type == Q_TYPE_VALUE:
+    elif query_type == _EQueryType.VALUE:
         return outputs[query]
 
     else:
