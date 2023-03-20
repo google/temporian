@@ -61,20 +61,44 @@ class DataFrameToEventTest(absltest.TestCase):
     def test_string_column(self) -> None:
         df = pd.DataFrame(
             [
-                [666964, 1.0, "740.0"],
-                [666964, 2.0, "508.0"],
-                [574016, 3.0, "573.0"],
+                [666964, 1.0, "740"],
+                [666964, 2.0, np.nan],
+                [574016, 3.0, ""],
             ],
             columns=["product_id", "timestamp", "costs"],
         )
 
-        self.assertRaisesRegex(
-            ValueError,
-            "Unsupported dtype",
-            NumpyEvent.from_dataframe,
-            df,
-            ["product_id"],
+        numpy_sampling = NumpySampling(
+            data={
+                (666964,): np.array([1.0, 2.0]),
+                (574016,): np.array([3.0]),
+            },
+            index=["product_id"],
         )
+
+        expected_numpy_event = NumpyEvent(
+            data={
+                (666964,): [
+                    NumpyFeature(
+                        data=np.array(["740", np.nan]).astype(np.string_),
+                        name="costs",
+                    )
+                ],
+                (574016,): [
+                    NumpyFeature(
+                        data=np.array([""]).astype(np.string_), name="costs"
+                    )
+                ],
+            },
+            sampling=numpy_sampling,
+        )
+
+        numpy_event = NumpyEvent.from_dataframe(
+            df, index_names=["product_id"], timestamp_column="timestamp"
+        )
+
+        # validate
+        self.assertTrue(numpy_event == expected_numpy_event)
 
     def test_missing_values(self) -> None:
         df = pd.DataFrame(

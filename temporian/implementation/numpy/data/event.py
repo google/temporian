@@ -46,10 +46,10 @@ class NumpyFeature:
         if self.name != __o.name:
             return False
 
-        if not np.array_equal(self.data, __o.data, equal_nan=True):
-            return False
+        if self.dtype is np.string_:
+            return np.array_equal(self.data, __o.data)
 
-        return True
+        return np.array_equal(self.data, __o.data, equal_nan=True)
 
     def core_dtype(self) -> Any:
         if self.dtype.type is np.string_:
@@ -173,7 +173,11 @@ class NumpyEvent:
 
         # check column dtypes, every dtype should be a key of DTYPE_MAPPING
         for column in df.columns:
-            if df[column].dtype.type not in DTYPE_MAPPING:
+            # if dtype is object, convert to string
+            if df[column].dtype.type is np.object_:
+                df[column] = df[column].astype(np.string_)
+
+            elif df[column].dtype.type not in DTYPE_MAPPING:
                 raise ValueError(
                     f"Unsupported dtype {df[column].dtype} for column"
                     f" {column}. Supported dtypes: {DTYPE_MAPPING.keys()}"
