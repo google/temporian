@@ -44,6 +44,13 @@ class NumpySampling:
 
         return False
 
+    @property
+    def dtypes(self) -> Dict[str, type]:
+        first_idx_lvl = next(iter(self.data))
+        return {
+            name: type(value) for name, value in zip(self.index, first_idx_lvl)
+        }
+
     def __repr__(self) -> str:
         with np.printoptions(precision=4, threshold=20):
             data_repr = []
