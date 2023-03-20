@@ -76,6 +76,55 @@ class DataFrameToEventTest(absltest.TestCase):
             ["product_id"],
         )
 
+    def test_categorical_column(self) -> None:
+        df = pd.DataFrame(
+            [
+                [666964, 1.0, "A"],
+                [666964, 2.0, "B"],
+                [574016, 3.0, "A"],
+            ],
+            columns=["product_id", "timestamp", "costs"],
+        )
+
+        # convert costs to categorical
+        df["costs"] = df["costs"].astype("category")
+        cat_dict = dict(zip(df["costs"].cat.categories, df["costs"].cat.codes))
+
+        numpy_sampling = NumpySampling(
+            data={
+                (666964,): np.array([1.0, 2.0]),
+                (574016,): np.array([3.0]),
+            },
+            index=["product_id"],
+        )
+
+        expected_numpy_event = NumpyEvent(
+            data={
+                (666964,): [
+                    NumpyFeature(
+                        data=np.array([cat_dict["A"], cat_dict["B"]]).astype(
+                            np.int32
+                        ),
+                        name="costs",
+                    )
+                ],
+                (574016,): [
+                    NumpyFeature(
+                        data=np.array([cat_dict["A"]]).astype(np.int32),
+                        name="costs",
+                    )
+                ],
+            },
+            sampling=numpy_sampling,
+        )
+
+        numpy_event = NumpyEvent.from_dataframe(
+            df, index_names=["product_id"], timestamp_column="timestamp"
+        )
+
+        # validate
+        self.assertTrue(numpy_event == expected_numpy_event)
+
     def test_missing_values(self) -> None:
         df = pd.DataFrame(
             [

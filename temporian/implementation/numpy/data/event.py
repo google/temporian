@@ -160,6 +160,11 @@ class NumpyEvent:
 
         # check column dtypes, every dtype should be a key of DTYPE_MAPPING
         for column in df.columns:
+            # check if its a categorical column
+            if df[column].dtype.name == "category":
+                # TODO: we force int32 because we don't support int8 nor int16 yet
+                df[column] = df[column].cat.codes.astype(np.int32)
+
             if df[column].dtype.type not in DTYPE_MAPPING:
                 raise ValueError(
                     f"Unsupported dtype {df[column].dtype} for column"
