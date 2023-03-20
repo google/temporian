@@ -27,8 +27,7 @@ class CalendarDayOfWeekNumpyImplementation(BaseCalendarNumpyImplementation):
     """Numpy implementation of the calendar_day_of_week operator."""
 
     def __init__(self, operator: CalendarDayOfWeekOperator) -> None:
-        super().__init__()
-        self.operator = operator
+        super().__init__(operator)
 
     def _get_value_from_datetime(self, dt: datetime) -> Any:
         return dt.weekday()

@@ -13,10 +13,11 @@
 # limitations under the License.
 
 from abc import ABC, abstractmethod
-from typing import Dict, Any
 from datetime import datetime, timezone
+from typing import Dict, Any
 
 import numpy as np
+from temporian.core.operators.calendar_base import BaseCalendarOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 
@@ -24,6 +25,10 @@ from temporian.implementation.numpy.data.event import NumpyFeature
 class BaseCalendarNumpyImplementation(ABC):
     """Abstract base class to implement common logic of numpy implementation of
     calendar operators."""
+
+    def __init__(self, operator: BaseCalendarOperator) -> None:
+        super().__init__()
+        self.operator = operator
 
     def __call__(self, sampling: NumpyEvent) -> Dict[str, NumpyEvent]:
         data = {}
@@ -40,7 +45,7 @@ class BaseCalendarNumpyImplementation(ABC):
             data[index] = [
                 NumpyFeature(
                     data=days,
-                    name=self._output_feature_name,
+                    name=self.operator.output_feature_name,
                 )
             ]
 
@@ -61,8 +66,3 @@ class BaseCalendarNumpyImplementation(ABC):
             Any: the numeric value for the datetime. Will be converted to
                 int32 by __call__.
         """
-
-    @property
-    @abstractmethod
-    def _output_feature_name(self) -> str:
-        """Get the name of the generated feature in the output event."""
