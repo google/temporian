@@ -283,3 +283,18 @@ py_test(
         "//temporian/implementation/numpy/operators:prefix",
     ],
 )
+
+py_test(
+    name = "reset_index_test",
+    srcs = ["reset_index_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/testing:absltest dep,
+        "//temporian/core/data:event",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators:reset_index",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/operators:reset_index",
+    ],
+)
