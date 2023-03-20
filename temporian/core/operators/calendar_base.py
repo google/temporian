@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Calendar day of month operator."""
+"""Base calendar operator."""
+
 from abc import ABC, abstractmethod
 
 from temporian.core.data import dtype
