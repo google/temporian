@@ -67,6 +67,13 @@ class NumpyEvent:
         # indexes should have the same names
         return [feature.name for feature in self.first_index_features()]
 
+    @property
+    def dtypes(self) -> Dict[str, type]:
+        return {
+            feature.name: feature.dtype
+            for feature in self._first_index_features
+        }
+
     def schema(self) -> Event:
         return Event(
             features=[
