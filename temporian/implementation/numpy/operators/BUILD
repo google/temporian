@@ -63,6 +63,7 @@ py_library(
     srcs = ["select.py"],
     srcs_version = "PY3",
     deps = [
+        "//temporian/core/operators:select",
         "//temporian/implementation/numpy/data:event",
     ],
 )
