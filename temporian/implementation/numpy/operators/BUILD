@@ -81,6 +81,17 @@ py_library(
 )
 
 py_library(
+    name = "reset_index",
+    srcs = ["reset_index.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/operators:reset_index",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+    ],
+)
+
+py_library(
     name = "select",
     srcs = ["select.py"],
     srcs_version = "PY3",
