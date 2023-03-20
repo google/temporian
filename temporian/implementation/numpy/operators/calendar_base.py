@@ -59,7 +59,7 @@ class BaseCalendarNumpyImplementation(ABC):
 
         Returns:
             Any: the numeric value for the datetime. Will be converted to
-                float32 by __call__.
+                int32 by __call__.
         """
 
     @property

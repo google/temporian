@@ -63,9 +63,6 @@ class CalendarDayOfWeekNumpyImplementationTest(absltest.TestCase):
 
         output = impl(input_event_data)
 
-        print(output_event_data)
-        print(output["event"])
-
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(
             output["event"]._first_index_features[0].dtype == np.int32
