@@ -15,50 +15,24 @@
 """Calendar day of week operator."""
 
 from temporian.core import operator_lib
-from temporian.core.data import dtype
 from temporian.core.data.event import Event
-from temporian.core.data.feature import Feature
-from temporian.core.operators.base import Operator
-from temporian.proto import core_pb2 as pb
+from temporian.core.operators.calendar_base import BaseCalendarOperator
 
 
-class CalendarDayOfWeekOperator(Operator):
+class CalendarDayOfWeekOperator(BaseCalendarOperator):
     """
     Calendar operator to obtain the day of the week each timestamp belongs to.
     """
 
-    def __init__(self, sampling: Event):
-        super().__init__()
-
-        # input
-        self.add_input("sampling", sampling)
-
-        output_feature = Feature(
-            name="calendar_day_of_week",
-            dtype=dtype.INT32,
-            sampling=sampling.sampling(),
-            creator=self,
-        )
-
-        # output
-        self.add_output(
-            "event",
-            Event(
-                features=[output_feature],
-                sampling=sampling.sampling(),
-                creator=self,
-            ),
-        )
-
-        self.check()
+    @classmethod
+    @property
+    def operator_def_key(cls) -> str:
+        return "CALENDAR_DAY_OF_WEEK"
 
     @classmethod
-    def build_op_definition(cls) -> pb.OperatorDef:
-        return pb.OperatorDef(
-            key="CALENDAR_DAY_OF_WEEK",
-            inputs=[pb.OperatorDef.Input(key="sampling")],
-            outputs=[pb.OperatorDef.Output(key="event")],
-        )
+    @property
+    def output_feature_name(cls) -> str:
+        return "calendar_day_of_week"
 
 
 operator_lib.register_operator(CalendarDayOfWeekOperator)
