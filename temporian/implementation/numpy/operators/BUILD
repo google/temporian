@@ -101,12 +101,10 @@ py_library(
     srcs = ["simple_moving_average.py"],
     srcs_version = "PY3",
     deps = [
-        ":base",
-        # numpy dep,
+        "//temporian/core/data:duration",
+        "//temporian/core/operators:simple_moving_average",
         "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
-        "//temporian/core/data:duration",
-        "//temporian/core/operators:simple_moving_average",
     ],
 )
