@@ -23,6 +23,7 @@ from temporian.core.data.event import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.assign import assign
 from temporian.core.operators.lag import lag
+from temporian.core.operators.lag import leak
 from temporian.core.operators.lag import LagOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators.lag import LagNumpyImplementation
@@ -194,6 +195,70 @@ class LagNumpyImplementationTest(absltest.TestCase):
         operator_output = lag_implementation(event=numpy_input_event)
 
         self.assertTrue(numpy_output_event == operator_output["event"])
+
+    def test_correct_multiple_leaks(self) -> None:
+        """Test correct leak operator with duration list."""
+        numpy_input_event = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1.0, 10.0],
+                    [0, 2.0, 11.0],
+                    [0, 3.0, 12.0],
+                    [0, 4.0, 13.0],
+                    [0, 5.0, 14.0],
+                    [0, 6.0, 15.0],
+                    [0, 7.0, 16.0],
+                ],
+                columns=["store_id", "timestamp", "sales"],
+            ),
+            index_names=["store_id"],
+        )
+
+        expected_numpy_output_event = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1.0, 10.0, 11.0, 12.0],
+                    [0, 2.0, 11.0, 12.0, 13.0],
+                    [0, 3.0, 12.0, 13.0, 14.0],
+                    [0, 4.0, 13.0, 14.0, 15.0],
+                    [0, 5.0, 14.0, 15.0, 16.0],
+                    [0, 6.0, 15.0, 16.0, np.nan],
+                    [0, 7.0, 16.0, np.nan, np.nan],
+                ],
+                columns=[
+                    "store_id",
+                    "timestamp",
+                    "sales",
+                    "leak[1s]_sales",
+                    "leak[2s]_sales",
+                ],
+            ),
+            index_names=["store_id"],
+        )
+
+        event = numpy_input_event.schema()
+
+        # lag multiple durations
+        leaks = leak(event=event, duration=[1, 2])
+
+        # assign multiple lags to output event
+        output_event = event
+        for leaked_event in leaks:
+            output_event = assign(output_event, leaked_event)
+
+        # evaluate
+        output_event_numpy = evaluator.evaluate(
+            output_event,
+            input_data={
+                event: numpy_input_event,
+            },
+            backend="numpy",
+        )
+
+        # validate
+        self.assertEqual(
+            expected_numpy_output_event, output_event_numpy[output_event]
+        )
 
 
 if __name__ == "__main__":

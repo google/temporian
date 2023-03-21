@@ -143,9 +143,10 @@ def leak(event: Event, duration: Duration) -> Event:
 
     Args:
         event: Event to leak.
-        duration: Duration to leak by.
+        duration: Duration to leak by. Can be a list of Durations.
 
     Returns:
-        Leaked event.
+        Leaked event. If a list of Durations is provided, a list of leaked
+        events is returned.
     """
     return _base_lag(event=event, duration=duration, should_leak=True)
