@@ -40,9 +40,9 @@ class SimpleMovingAverage(Operator):
 
         if sampling is not None:
             self.add_input("sampling", sampling)
-            real_sampling = sampling.sampling()
+            effective_sampling = sampling.sampling()
         else:
-            real_sampling = event.sampling()
+            effective_sampling = event.sampling()
 
         self.add_input("event", event)
 
@@ -50,7 +50,7 @@ class SimpleMovingAverage(Operator):
             Feature(
                 name=f"sma_{f.name()}",
                 dtype=f.dtype(),
-                sampling=real_sampling,
+                sampling=effective_sampling,
                 creator=self,
             )
             for f in event.features()
@@ -60,7 +60,7 @@ class SimpleMovingAverage(Operator):
             "event",
             Event(
                 features=output_features,
-                sampling=real_sampling,
+                sampling=effective_sampling,
                 creator=self,
             ),
         )

@@ -21,14 +21,15 @@ from temporian.implementation.numpy import implementation_lib
 
 class RegisteredOperatorsTest(absltest.TestCase):
     def test_base(self):
+        # Note: The operators are stored alphabetically.
         expected_implementations = [
             "ARITHMETIC",
-            "SIMPLE_MOVING_AVERAGE",
-            "CALENDAR_DAY",
             "ASSIGN",
-            "SELECT",
-            "PROPAGATE",
+            "CALENDAR_DAY",
             "LAG",
+            "PROPAGATE",
+            "SELECT",
+            "SIMPLE_MOVING_AVERAGE",
         ]
 
         self.assertSetEqual(

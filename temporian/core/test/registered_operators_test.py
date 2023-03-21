@@ -22,13 +22,14 @@ from temporian.core.operators import all_operators
 
 class RegisteredOperatorsTest(absltest.TestCase):
     def test_base(self):
+        # Note: The operators are stored alphabetically.
         expected_operators = [
             "ARITHMETIC",
-            "CALENDAR_DAY",
             "ASSIGN",
-            "SELECT",
-            "PROPAGATE",
+            "CALENDAR_DAY",
             "LAG",
+            "PROPAGATE",
+            "SELECT",
             "SIMPLE_MOVING_AVERAGE",
         ]
 

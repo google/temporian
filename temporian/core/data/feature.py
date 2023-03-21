@@ -28,6 +28,8 @@ class Feature(object):
         sampling: Optional[sampling_lib.Sampling] = None,
         creator: Optional[Any] = None,
     ):
+        # TODO: Find a simple, efficient and consistant way to check the type
+        # of arguments in the API.
         assert isinstance(name, str), f"Got {name}"
         assert sampling is None or isinstance(
             sampling, sampling_lib.Sampling
