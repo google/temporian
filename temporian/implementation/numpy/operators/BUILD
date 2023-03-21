@@ -34,15 +34,6 @@ py_library(
 )
 
 py_library(
-    name = "base",
-    srcs = ["base.py"],
-    srcs_version = "PY3",
-    deps = [
-        "//temporian/implementation/numpy/data:event",
-    ],
-)
-
-py_library(
     name = "core_mapping",
     srcs = ["core_mapping.py"],
     srcs_version = "PY3",
@@ -56,12 +47,31 @@ py_library(
 )
 
 py_library(
+    name = "calendar_base",
+    srcs = ["calendar_base.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:event",
+    ],
+)
+
+py_library(
     name = "calendar_day_of_month",
     srcs = ["calendar_day_of_month.py"],
     srcs_version = "PY3",
     deps = [
+        ":calendar_base",
         "//temporian/core/operators:calendar_day_of_month",
-        "//temporian/implementation/numpy/data:event",
+    ],
+)
+
+py_library(
+    name = "calendar_day_of_week",
+    srcs = ["calendar_day_of_week.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":calendar_base",
+        "//temporian/core/operators:calendar_day_of_week",
     ],
 )
 
@@ -91,12 +101,10 @@ py_library(
     srcs = ["simple_moving_average.py"],
     srcs_version = "PY3",
     deps = [
-        ":base",
-        # numpy dep,
+        "//temporian/core/data:duration",
+        "//temporian/core/operators:simple_moving_average",
         "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
-        "//temporian/core/data:duration",
-        "//temporian/core/operators:simple_moving_average",
     ],
 )

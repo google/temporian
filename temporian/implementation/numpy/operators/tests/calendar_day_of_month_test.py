@@ -16,9 +16,6 @@ from absl.testing import absltest
 import numpy as np
 import pandas as pd
 
-from temporian.core.data.event import Event
-from temporian.core.data.event import Feature
-from temporian.core.data.sampling import Sampling
 from temporian.core.operators.calendar_day_of_month import (
     CalendarDayOfMonthOperator,
 )
@@ -33,7 +30,7 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
     """Test numpy implementation of calendar_day_of_month operator."""
 
     def test_no_index(self) -> None:
-        """Test calendar day operator with flat event."""
+        """Test calendar day of month operator with flat event."""
         input_event_data = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
@@ -71,7 +68,7 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
         )
 
     def test_with_index(self) -> None:
-        """Test calendar day operator with flat event."""
+        """Test calendar day of month operator with indexed event."""
         input_event_data = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
