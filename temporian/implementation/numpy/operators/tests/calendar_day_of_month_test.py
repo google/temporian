@@ -16,12 +16,12 @@ from absl.testing import absltest
 import numpy as np
 import pandas as pd
 
-from temporian.core.operators.calendar_day_of_month import (
+from temporian.core.operators.calendar.day_of_month import (
     CalendarDayOfMonthOperator,
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
-from temporian.implementation.numpy.operators.calendar_day_of_month import (
+from temporian.implementation.numpy.operators.calendar.day_of_month import (
     CalendarDayOfMonthNumpyImplementation,
 )
 

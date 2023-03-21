@@ -42,10 +42,10 @@ py_test(
         # absl/testing:absltest dep,
         "//temporian/core/data:event",
         "//temporian/core/data:sampling",
-        "//temporian/core/operators:calendar_day_of_month",
+        "//temporian/core/operators/calendar:day_of_month",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
-        "//temporian/implementation/numpy/operators:calendar_day_of_month",
+        "//temporian/implementation/numpy/operators/calendar:day_of_month",
     ],
 )
 
@@ -57,10 +57,10 @@ py_test(
         # absl/testing:absltest dep,
         "//temporian/core/data:event",
         "//temporian/core/data:sampling",
-        "//temporian/core/operators:calendar_day_of_week",
+        "//temporian/core/operators/calendar:day_of_week",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
-        "//temporian/implementation/numpy/operators:calendar_day_of_week",
+        "//temporian/implementation/numpy/operators/calendar:day_of_week",
     ],
 )
 

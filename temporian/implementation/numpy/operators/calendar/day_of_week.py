@@ -15,10 +15,10 @@
 from typing import Any
 from datetime import datetime
 
-from temporian.core.operators.calendar_day_of_week import (
+from temporian.core.operators.calendar.day_of_week import (
     CalendarDayOfWeekOperator,
 )
-from temporian.implementation.numpy.operators.calendar_base import (
+from temporian.implementation.numpy.operators.calendar.base import (
     BaseCalendarNumpyImplementation,
 )
 

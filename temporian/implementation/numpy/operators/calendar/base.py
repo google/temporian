@@ -17,7 +17,7 @@ from datetime import datetime, timezone
 from typing import Dict, Any
 
 import numpy as np
-from temporian.core.operators.calendar_base import BaseCalendarOperator
+from temporian.core.operators.calendar.base import BaseCalendarOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 

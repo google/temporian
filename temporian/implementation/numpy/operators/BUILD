@@ -47,35 +47,6 @@ py_library(
 )
 
 py_library(
-    name = "calendar_base",
-    srcs = ["calendar_base.py"],
-    srcs_version = "PY3",
-    deps = [
-        "//temporian/implementation/numpy/data:event",
-    ],
-)
-
-py_library(
-    name = "calendar_day_of_month",
-    srcs = ["calendar_day_of_month.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":calendar_base",
-        "//temporian/core/operators:calendar_day_of_month",
-    ],
-)
-
-py_library(
-    name = "calendar_day_of_week",
-    srcs = ["calendar_day_of_week.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":calendar_base",
-        "//temporian/core/operators:calendar_day_of_week",
-    ],
-)
-
-py_library(
     name = "lag",
     srcs = ["lag.py"],
     srcs_version = "PY3",
