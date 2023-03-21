@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Lag operator."""
+from typing import List
+from typing import Union
 
 from temporian.core import operator_lib
 from temporian.core.data.duration import Duration
@@ -84,21 +86,66 @@ class LagOperator(Operator):
 operator_lib.register_operator(LagOperator)
 
 
-def lag(event: Event, duration: Duration) -> Event:
-    if duration <= 0:
-        raise ValueError("duration must greater than zero")
+def _base_lag(
+    event: Event,
+    duration: Union[Duration, List[Duration]],
+    should_leak: bool = False,
+) -> Event:
+    """Base Lag function."""
+    if isinstance(duration, list):
+        used_duration = duration
+        if should_leak:
+            used_duration = [-d for d in duration]
+
+        if not all(isinstance(d, (Duration, int)) and d > 0 for d in duration):
+            raise ValueError(
+                "duration must be a list of positive Durations. Got"
+                f" {duration}, type {type(duration)}"
+            )
+
+        return [
+            LagOperator(event=event, duration=d).outputs()["event"]
+            for d in used_duration
+        ]
+
+    if not isinstance(duration, (Duration, int)) or duration <= 0:
+        raise ValueError(
+            f"duration must be a positive Duration. Got {duration}, type"
+            f" {type(duration)}"
+        )
+
+    used_duration = duration if not should_leak else -duration
 
     return LagOperator(
         event=event,
-        duration=duration,
+        duration=used_duration,
     ).outputs()["event"]
+
+
+def lag(
+    event: Event, duration: Union[Duration, List[Duration]]
+) -> Union[Event, List[Event]]:
+    """Lag operator.
+
+    Args:
+        event: Event to lag.
+        duration: Duration to lag by. Can be a list of Durations.
+
+    Returns:
+        Lagged event. If a list of Durations is provided, a list of lagged
+        events is returned.
+    """
+    return _base_lag(event=event, duration=duration)
 
 
 def leak(event: Event, duration: Duration) -> Event:
-    if duration <= 0:
-        raise ValueError("duration must be greater than zero")
+    """Leak operator.
 
-    return LagOperator(
-        event=event,
-        duration=-duration,
-    ).outputs()["event"]
+    Args:
+        event: Event to leak.
+        duration: Duration to leak by.
+
+    Returns:
+        Leaked event.
+    """
+    return _base_lag(event=event, duration=duration, should_leak=True)
