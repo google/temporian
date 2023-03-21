@@ -55,19 +55,18 @@ def weeks(value: float) -> Duration:
 def convert_date_to_duration(
     date: Union[np.datetime64, datetime.datetime]
 ) -> Duration:
-    """Convert date to duration epoch UTC
+    """Convert date to Unix timestamp.
 
     Args:
-        date (Union[np.datetime64, datetime.datetime]):
-            Date to convert
+        date: the date to convert.
 
     Returns:
-        int: Duration epoch UTC
+        int: unix timestamp (seconds elapsed from unix epoch).
 
     Raises:
-        TypeError: Unsupported type. Supported types are:
-        - np.datetime64
-        - datetime.datetime
+        TypeError: unsupported type. Supported types are:
+            - np.datetime64
+            - datetime.datetime
     """
     # if it is already a duration, return it
     if isinstance(date, float):

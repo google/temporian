@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
-import time
-import pandas as pd
-import numpy as np
 from absl.testing import absltest
+import datetime
+import numpy as np
+import pandas as pd
+
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling

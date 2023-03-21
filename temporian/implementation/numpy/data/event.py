@@ -8,6 +8,7 @@ from temporian.core.data.event import Event
 from temporian.core.data.event import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.data.duration import convert_date_to_duration
+from temporian.core.data.sampling import Sampling
 from temporian.implementation.numpy.data.sampling import NumpySampling
 
 DTYPE_MAPPING = {
@@ -98,7 +99,10 @@ class NumpyEvent:
             features=[
                 feature.schema() for feature in list(self.data.values())[0]
             ],
-            sampling=Sampling(self.sampling.index),
+            sampling=Sampling(
+                index=self.sampling.index,
+                is_unix_timestamp=self.sampling.is_unix_timestamp,
+            ),
         )
 
     @staticmethod
@@ -210,7 +214,9 @@ class NumpyEvent:
                 for feature in feature_columns
             ]
 
-        numpy_sampling = NumpySampling(index=index_names, data=sampling)
+        numpy_sampling = NumpySampling(
+            index=index_names, data=sampling, is_unix_timestamp=True
+        )
 
         return NumpyEvent(data=data, sampling=numpy_sampling)
 
