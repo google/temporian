@@ -103,15 +103,27 @@ class PropagateOperatorTest(absltest.TestCase):
 
         expected_output = NumpyEvent(
             data={
-                ("X1", 1, 1,): [
+                (
+                    "X1",
+                    1,
+                    1,
+                ): [
                     NumpyFeature("a", np.array([1, 2, 3])),
                     NumpyFeature("b", np.array([4, 5, 6])),
                 ],
-                ("X1", 1, 2,): [
+                (
+                    "X1",
+                    1,
+                    2,
+                ): [
                     NumpyFeature("a", np.array([1, 2, 3])),
                     NumpyFeature("b", np.array([4, 5, 6])),
                 ],
-                ("X1", 2, 1,): [
+                (
+                    "X1",
+                    2,
+                    1,
+                ): [
                     NumpyFeature("a", np.array([1, 2, 3])),
                     NumpyFeature("b", np.array([4, 5, 6])),
                 ],
