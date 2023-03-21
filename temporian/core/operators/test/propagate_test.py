@@ -36,14 +36,14 @@ class PropagateOperatorTest(absltest.TestCase):
             ],
             sampling=sampling,
         )
-        add_index = event_lib.input_event(
+        to = event_lib.input_event(
             [
                 Feature("c", dtype_lib.STRING),
                 Feature("d", dtype_lib.STRING),
             ],
             sampling=sampling,
         )
-        _ = propagate(event=event, add_index=add_index)
+        _ = propagate(event=event, to=to)
 
     def test_str_add_event(self):
         sampling = Sampling(index=["x"])
@@ -56,9 +56,9 @@ class PropagateOperatorTest(absltest.TestCase):
             ],
             sampling=sampling,
         )
-        _ = propagate(event=event, add_index=["c", "d"])
+        _ = propagate(event=event, to=["c", "d"])
 
-    def test_error_unknown_add_index(self):
+    def test_error_unknown_to(self):
         sampling = Sampling(index=["x"])
         event = event_lib.input_event(
             [
@@ -69,9 +69,9 @@ class PropagateOperatorTest(absltest.TestCase):
             sampling=sampling,
         )
         with self.assertRaisesRegex(KeyError, "{'c2'}"):
-            _ = propagate(event=event, add_index=["c2"])
+            _ = propagate(event=event, to=["c2"])
 
-    def test_error_empty_add_index(self):
+    def test_error_empty_to(self):
         sampling = Sampling(index=["x"])
         event = event_lib.input_event(
             [
@@ -81,10 +81,8 @@ class PropagateOperatorTest(absltest.TestCase):
             ],
             sampling=sampling,
         )
-        with self.assertRaisesRegex(
-            ValueError, "add_index contains no features"
-        ):
-            _ = propagate(event=event, add_index=[])
+        with self.assertRaisesRegex(ValueError, "to contains no features"):
+            _ = propagate(event=event, to=[])
 
     def test_error_non_matching_sampling(self):
         event = event_lib.input_event(
@@ -94,7 +92,7 @@ class PropagateOperatorTest(absltest.TestCase):
             ],
             sampling=Sampling(index=["x"]),
         )
-        add_index = event_lib.input_event(
+        to = event_lib.input_event(
             [
                 Feature("c", dtype_lib.STRING),
                 Feature("d", dtype_lib.STRING),
@@ -102,9 +100,9 @@ class PropagateOperatorTest(absltest.TestCase):
             sampling=Sampling(index=["x"]),
         )
         with self.assertRaisesRegex(
-            ValueError, "event and add_index should have the same sampling"
+            ValueError, "event and to should have the same sampling"
         ):
-            _ = propagate(event=event, add_index=add_index)
+            _ = propagate(event=event, to=to)
 
 
 if __name__ == "__main__":

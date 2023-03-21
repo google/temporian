@@ -31,31 +31,29 @@ class Propagate(Operator):
     def __init__(
         self,
         event: Event,
-        add_index: Event,
+        to: Event,
     ):
         super().__init__()
 
         self.add_input("event", event)
-        self.add_input("add_index", add_index)
+        self.add_input("to", to)
 
         # TODO: Constraint the type of features supported in "add_event".
 
-        if event.sampling() != add_index.sampling():
-            raise ValueError(
-                "event and add_index should have the same sampling"
-            )
+        if event.sampling() != to.sampling():
+            raise ValueError("event and to should have the same sampling")
 
-        if len(add_index.features()) == 0:
-            raise ValueError("add_index contains no features")
+        if len(to.features()) == 0:
+            raise ValueError("to contains no features")
 
-        self._added_index = [k.name() for k in add_index.features()]
+        self._added_index = [k.name() for k in to.features()]
 
         overlap_features = set(self._added_index).intersection(
             event.sampling().index()
         )
         if len(overlap_features) > 0:
             raise ValueError(
-                "add_index contains feature names already present in the"
+                "to contains feature names already present in the"
                 f" index: {list(overlap_features)}"
             )
 
@@ -95,7 +93,7 @@ class Propagate(Operator):
             attributes=[],
             inputs=[
                 pb.OperatorDef.Input(key="event"),
-                pb.OperatorDef.Input(key="add_index"),
+                pb.OperatorDef.Input(key="to"),
             ],
             outputs=[pb.OperatorDef.Output(key="event")],
         )
@@ -106,9 +104,9 @@ operator_lib.register_operator(Propagate)
 
 def propagate(
     event: Event,
-    add_index: Union[Event, str, List[str]],
+    to: Union[Event, str, List[str]],
 ) -> Event:
-    """Extands index and propagates feature values.
+    """Extends index and propagates feature values.
 
     Extends the index of `event` over the features of `add_event`. Feature
     values from `event` are duplicated over the new index. `add_event` can be a
@@ -131,30 +129,30 @@ def propagate(
 
     Constraints:
 
-    - If `add_index` is an event, `event` and `add_index` have the same index
+    - If `to` is an event, `event` and `to` have the same index
       and same sampling.
 
     Args:
         event: The event to propagate.
-        add_index: The features to index over. If add_index` is a list of
-          strings, those string should refer to existing features of `event`
+        to: The features to index over. If `to` is a list of
+          strings, those strings should refer to existing features of `event`.
 
     Returns:
-        An event sequence propagated over `add_index`.
+        An event sequence propagated over `to`.
     """
 
-    if isinstance(add_index, str):
-        add_index = [add_index]
+    if isinstance(to, str):
+        to = [to]
 
-    if isinstance(add_index, list):
-        add_index_set = set(add_index)
-        add_index = select(event, add_index)
+    if isinstance(to, list):
+        to_set = set(to)
+        to = select(event, to)
         remaining_features = [
-            f.name() for f in event.features() if f.name not in add_index_set
+            f.name() for f in event.features() if f.name not in to_set
         ]
         event = select(event, remaining_features)
 
     return Propagate(
         event=event,
-        add_index=add_index,
+        to=to,
     ).outputs()["event"]

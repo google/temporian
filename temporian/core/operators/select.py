@@ -28,11 +28,10 @@ class SelectOperator(Operator):
         super().__init__()
 
         # store selected feature names
-        if isinstance(feature_names, list):
-            pass
-        elif isinstance(feature_names, str):
+        if isinstance(feature_names, str):
             feature_names = [feature_names]
-        else:
+
+        if not isinstance(feature_names, list):
             raise ValueError(
                 "Unexpected type for feature_names. Expect str or list of"
                 f" str. Got '{feature_names}' instead."
