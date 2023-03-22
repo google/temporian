@@ -92,34 +92,34 @@ def _base_lag(
     should_leak: bool = False,
 ) -> Event:
     """Base Lag function."""
-    if isinstance(duration, list):
-        used_duration = duration
-        if should_leak:
-            used_duration = [-d for d in duration]
 
-        if not all(isinstance(d, (Duration, int)) and d > 0 for d in duration):
-            raise ValueError(
-                "duration must be a list of positive Durations. Got"
-                f" {duration}, type {type(duration)}"
-            )
+    if isinstance(duration, (Duration, int)):
+        duration = [duration]
 
-        return [
-            LagOperator(event=event, duration=d).outputs()["event"]
-            for d in used_duration
-        ]
-
-    if not isinstance(duration, (Duration, int)) or duration <= 0:
+    if not isinstance(duration, list):
         raise ValueError(
-            f"duration must be a positive Duration. Got {duration}, type"
-            f" {type(duration)}"
+            "duration must be a list of Durations. Got"
+            f" {duration}, type {type(duration)}"
         )
 
-    used_duration = duration if not should_leak else -duration
+    if not all(isinstance(d, (Duration, int)) and d > 0 for d in duration):
+        raise ValueError(
+            "duration must be a list of positive Durations. Got"
+            f" {duration}, type {type(duration)}"
+        )
 
-    return LagOperator(
-        event=event,
-        duration=used_duration,
-    ).outputs()["event"]
+    used_duration = duration if not should_leak else [-d for d in duration]
+
+    if len(used_duration) == 1:
+        return LagOperator(
+            event=event,
+            duration=used_duration[0],
+        ).outputs()["event"]
+
+    return [
+        LagOperator(event=event, duration=d).outputs()["event"]
+        for d in used_duration
+    ]
 
 
 def lag(
