@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""ResetIndex operator."""
+"""DropIndex operator."""
+from typing import List, Optional, Union
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
@@ -22,20 +23,49 @@ from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
-class ResetIndexOperator(Operator):
-    """ResetIndex operator."""
+class DropIndexOperator(Operator):
+    """DropIndex operator."""
 
-    def __init__(self, event: Event):
+    def __init__(
+        self,
+        event: Event,
+        labels: Optional[Union[List[str], str]] = None,
+        keep: bool = True,
+    ) -> None:
         super().__init__()
+
+        # if no labels are provided, drop the entire index
+        if labels is None:
+            labels = event.sampling().index()
+
+        if isinstance(labels, str):
+            labels = [labels]
+
+        # check that requested labels exist in sampling
+        if any([label not in event.sampling().index() for label in labels]):
+            raise KeyError(
+                [
+                    label
+                    for label in labels
+                    if label not in event.sampling().index()
+                ]
+            )
 
         # input event
         self.add_input("event", event)
 
+        # attributes
+        self.add_attribute("labels", labels)
+        self.add_attribute("keep", keep)
+
         # output features
         output_features = [
-            Feature(name=feature_name)
+            Feature(name=feature_name, dtype=None)  # TODO: fix dtype
             for feature_name in event.sampling().index()
-        ] + event.features()
+        ] + [
+            Feature(name=feature.name, dtype=feature.dtype)
+            for feature in event.features()
+        ]
 
         # output sampling
         output_sampling = Sampling(index=None)
@@ -54,11 +84,16 @@ class ResetIndexOperator(Operator):
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
-            key="SELECT",
+            key="DROP_INDEX",
             attributes=[
                 pb.OperatorDef.Attribute(
-                    key="feature_names",
+                    key="labels",
                     type=pb.OperatorDef.Attribute.Type.REPEATED_STRING,
+                    is_optional=False,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="keep",
+                    type=pb.OperatorDef.Attribute.Type.BOOL,
                     is_optional=False,
                 ),
             ],
@@ -69,10 +104,10 @@ class ResetIndexOperator(Operator):
         )
 
 
-operator_lib.register_operator(ResetIndexOperator)
+operator_lib.register_operator(DropIndexOperator)
 
 
-def reset_index(
-    event: Event,
+def drop_index(
+    event: Event, labels: Optional[List[str]] = None, keep: bool = True
 ) -> Event:
-    return ResetIndexOperator(event).outputs()["event"]
+    return DropIndexOperator(event, labels, keep).outputs()["event"]

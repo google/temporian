@@ -85,8 +85,8 @@ py_library(
 )
 
 py_library(
-    name = "reset_index",
-    srcs = ["reset_index.py"],
+    name = "drop_index",
+    srcs = ["drop_index.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
