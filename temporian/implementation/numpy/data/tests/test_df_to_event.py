@@ -110,6 +110,7 @@ class DataFrameToEventTest(absltest.TestCase):
 
         # validate
         self.assertTrue(numpy_event == expected_numpy_event)
+        self.assertFalse(numpy_event.sampling.is_unix_timestamp)
 
     def test_npdatetime64_index(self) -> None:
         df = pd.DataFrame(
@@ -146,6 +147,7 @@ class DataFrameToEventTest(absltest.TestCase):
 
         # validate
         self.assertTrue(numpy_event == expected_numpy_event)
+        self.assertTrue(numpy_event.sampling.is_unix_timestamp)
 
     def test_pdTimestamp_index(self) -> None:
         df = pd.DataFrame(
@@ -182,6 +184,7 @@ class DataFrameToEventTest(absltest.TestCase):
 
         # validate
         self.assertTrue(numpy_event == expected_numpy_event)
+        self.assertTrue(numpy_event.sampling.is_unix_timestamp)
 
     def test_datetime_index(self) -> None:
         df = pd.DataFrame(
@@ -230,6 +233,7 @@ class DataFrameToEventTest(absltest.TestCase):
 
         # validate
         self.assertTrue(numpy_event == expected_numpy_event)
+        self.assertTrue(numpy_event.sampling.is_unix_timestamp)
 
     def test_no_index(self) -> None:
         df = pd.DataFrame(

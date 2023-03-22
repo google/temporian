@@ -162,7 +162,12 @@ class NumpyEvent:
                 f"Timestamp column {timestamp_column} cannot be on index_names"
             )
 
-        # convert timestamp column to UTC Epoch float
+        # check if created sampling's values will be unix timestamps
+        is_unix_timestamp = pd.api.types.is_datetime64_any_dtype(
+            df[timestamp_column]
+        )
+
+        # convert timestamp column to float
         df[timestamp_column] = df[timestamp_column].apply(
             convert_date_to_duration
         )
@@ -215,7 +220,9 @@ class NumpyEvent:
             ]
 
         numpy_sampling = NumpySampling(
-            index=index_names, data=sampling, is_unix_timestamp=True
+            index=index_names,
+            data=sampling,
+            is_unix_timestamp=is_unix_timestamp,
         )
 
         return NumpyEvent(data=data, sampling=numpy_sampling)
