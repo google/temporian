@@ -121,9 +121,7 @@ class PrototypeTest(absltest.TestCase):
         )
 
         # validate
-        self.assertEqual(
-            self.expected_output_event, output_event_numpy[output_event]
-        )
+        self.assertEqual(self.expected_output_event, output_event_numpy)
 
 
 if __name__ == "__main__":
