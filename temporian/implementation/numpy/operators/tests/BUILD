@@ -81,6 +81,8 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # absl/testing:absltest dep,
+        "//temporian/core:evaluator",
+        "//temporian/core/operators:select",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/operators:select",
     ],
