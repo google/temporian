@@ -175,7 +175,13 @@ class NumpyEvent:
         for column in df.columns:
             # if dtype is object, convert to string
             if df[column].dtype.type is np.object_:
-                df[column] = df[column].astype(np.string_)
+                try:
+                    df[column] = df[column].astype(np.string_)
+                except ValueError as exc:
+                    raise ValueError(
+                        f"Column {column} has dtype object, but cannot be"
+                        " converted to string."
+                    ) from exc
 
             elif df[column].dtype.type not in DTYPE_MAPPING:
                 raise ValueError(
