@@ -51,3 +51,58 @@ py_library(
         "//temporian/core/data:event",
     ],
 )
+
+py_library(
+    name = "hour",
+    srcs = ["hour.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:event",
+    ],
+)
+
+py_library(
+    name = "minute",
+    srcs = ["minute.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:event",
+    ],
+)
+
+py_library(
+    name = "month",
+    srcs = ["month.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:event",
+    ],
+)
+
+py_library(
+    name = "second",
+    srcs = ["second.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:event",
+    ],
+)
+
+py_library(
+    name = "year",
+    srcs = ["year.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:event",
+    ],
+)
