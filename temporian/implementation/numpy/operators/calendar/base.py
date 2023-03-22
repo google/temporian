@@ -12,21 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict
+from abc import ABC, abstractmethod
 from datetime import datetime, timezone
+from typing import Dict, Any
 
 import numpy as np
-from temporian.core.operators.calendar_day_of_month import (
-    CalendarDayOfMonthOperator,
-)
+from temporian.core.operators.calendar.base import BaseCalendarOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 
 
-class CalendarDayOfMonthNumpyImplementation:
-    """Numpy implementation of the calendar_day_of_month operator."""
+class BaseCalendarNumpyImplementation(ABC):
+    """Abstract base class to implement common logic of numpy implementation of
+    calendar operators."""
 
-    def __init__(self, operator: CalendarDayOfMonthOperator) -> None:
+    def __init__(self, operator: BaseCalendarOperator) -> None:
         super().__init__()
         self.operator = operator
 
@@ -35,7 +35,9 @@ class CalendarDayOfMonthNumpyImplementation:
         for index, timestamps in sampling.sampling.data.items():
             days = np.array(
                 [
-                    datetime.fromtimestamp(ts, tz=timezone.utc).day
+                    self._get_value_from_datetime(
+                        datetime.fromtimestamp(ts, tz=timezone.utc)
+                    )
                     for ts in timestamps
                 ]
             ).astype(np.int32)
@@ -43,8 +45,24 @@ class CalendarDayOfMonthNumpyImplementation:
             data[index] = [
                 NumpyFeature(
                     data=days,
-                    name="calendar_day_of_month",
+                    name=self.operator.output_feature_name,
                 )
             ]
 
         return {"event": NumpyEvent(data=data, sampling=sampling.sampling)}
+
+    @abstractmethod
+    def _get_value_from_datetime(self, dt: datetime) -> Any:
+        """Get the value of the datetime object that corresponds to each
+        specific calendar operator. E.g., calendar_day_of_month will take the
+        datetime's day, and calendar_hour will take the its hour.
+
+        Must be implemented by subclasses.
+
+        Args:
+            dt: the datetime to get the value from.
+
+        Returns:
+            Any: the numeric value for the datetime. Will be converted to
+                int32 by __call__.
+        """

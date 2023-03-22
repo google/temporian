@@ -17,6 +17,8 @@ from absl.testing import absltest
 import numpy as np
 import pandas as pd
 
+from temporian.core import evaluator
+from temporian.core.operators.select import SelectOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators import select
 
@@ -47,6 +49,8 @@ class SelectOperatorTest(absltest.TestCase):
             self.df, index_names=["store_id"]
         )
 
+        self.event = self.numpy_event.schema()
+
     def test_select_one_feature(self) -> None:
         """Test correct select operator for one feature selection."""
         new_df = pd.DataFrame(
@@ -61,8 +65,9 @@ class SelectOperatorTest(absltest.TestCase):
             columns=["store_id", "timestamp", "sales"],
         )
 
-        operator = select.NumpySelectOperator(feature_names="sales")
-        selected_event = operator(self.numpy_event)["event"]
+        operator = SelectOperator(event=self.event, feature_names="sales")
+        impl = select.SelectNumpyImplementation(operator)
+        selected_event = impl(self.numpy_event)["event"]
 
         expected_event = NumpyEvent.from_dataframe(
             new_df, index_names=["store_id"]
@@ -84,14 +89,48 @@ class SelectOperatorTest(absltest.TestCase):
             columns=["store_id", "timestamp", "sales", "costs"],
         )
 
-        operator = select.NumpySelectOperator(feature_names=["sales", "costs"])
-        selected_event = operator(self.numpy_event)["event"]
+        operator = SelectOperator(
+            event=self.event, feature_names=["sales", "costs"]
+        )
+        impl = select.SelectNumpyImplementation(operator)
+        selected_event = impl(self.numpy_event)["event"]
 
         expected_event = NumpyEvent.from_dataframe(
             new_df, index_names=["store_id"]
         )
 
         self.assertTrue(selected_event == expected_event)
+
+    def test_select_with_core(self) -> None:
+        """Test correct select operator with core."""
+        new_df = pd.DataFrame(
+            [
+                [self.A, 1.0, 10.0],
+                [self.A, 2.0, np.nan],
+                [self.B, 3.0, 12.0],
+                [self.B, 4.0, 13.0],
+                [self.C, 5.0, 14.0],
+                [self.C, 6.0, 15.0],
+            ],
+            columns=["store_id", "timestamp", "sales"],
+        )
+        expected_event = NumpyEvent.from_dataframe(
+            new_df, index_names=["store_id"]
+        )
+
+        input_event = self.numpy_event.schema()
+        output_event = input_event["sales"]
+
+        output_event_numpy = evaluator.evaluate(
+            output_event,
+            input_data={
+                # left event specified from disk
+                input_event: self.numpy_event,
+            },
+            backend="numpy",
+        )
+
+        self.assertEqual(expected_event, output_event_numpy)
 
 
 if __name__ == "__main__":
