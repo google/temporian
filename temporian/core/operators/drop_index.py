@@ -34,22 +34,8 @@ class DropIndexOperator(Operator):
     ) -> None:
         super().__init__()
 
-        # if no labels are provided, drop the entire index
-        if labels is None:
-            labels = event.sampling().index()
-
-        if isinstance(labels, str):
-            labels = [labels]
-
-        # check that requested labels exist in sampling
-        if any([label not in event.sampling().index() for label in labels]):
-            raise KeyError(
-                [
-                    label
-                    for label in labels
-                    if label not in event.sampling().index()
-                ]
-            )
+        # process labels
+        labels = self._process_labels(event, labels)
 
         # input event
         self.add_input("event", event)
@@ -59,16 +45,16 @@ class DropIndexOperator(Operator):
         self.add_attribute("keep", keep)
 
         # output features
-        output_features = [
-            Feature(name=feature_name, dtype=None)  # TODO: fix dtype
-            for feature_name in event.sampling().index()
-        ] + [
-            Feature(name=feature.name, dtype=feature.dtype)
-            for feature in event.features()
-        ]
+        output_features = self._generate_output_features(event, labels, keep)
 
         # output sampling
-        output_sampling = Sampling(index=None)
+        output_sampling = Sampling(
+            index=[
+                index_name
+                for index_name in event.sampling().index()
+                if index_name not in labels
+            ]
+        )
 
         # output event
         self.add_output(
@@ -80,6 +66,40 @@ class DropIndexOperator(Operator):
             ),
         )
         self.check()
+
+    def _process_labels(
+        self, event: Event, labels: Optional[Union[List[str], str]]
+    ) -> List[str]:
+        if labels is None:
+            return event.sampling().index()
+
+        if isinstance(labels, str):
+            labels = [labels]
+
+        missing_labels = [
+            label for label in labels if label not in event.sampling().index()
+        ]
+        if missing_labels:
+            raise KeyError(missing_labels)
+
+        return labels
+
+    def _generate_output_features(
+        self, event: Event, labels: List[str], keep: bool
+    ) -> List[Feature]:
+        output_features = [
+            Feature(name=feature.name, dtype=feature.dtype)
+            for feature in event.features()
+        ]
+        if keep:
+            output_features.extend(
+                [
+                    Feature(name=feature_name, dtype=None)  # TODO: fix dtype
+                    for feature_name in labels
+                ]
+            )
+
+        return output_features
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
