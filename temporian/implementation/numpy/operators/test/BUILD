@@ -173,6 +173,21 @@ py_test(
 )
 
 py_test(
+    name = "drop_index_test",
+    srcs = ["drop_index_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/testing:absltest dep,
+        "//temporian/core/data:event",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators:drop_index",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/operators:drop_index",
+    ],
+)
+
+py_test(
     name = "select_test",
     srcs = ["select_test.py"],
     srcs_version = "PY3",
@@ -281,20 +296,5 @@ py_test(
         "//temporian/core/operators:prefix",
         "//temporian/implementation/numpy:evaluator",
         "//temporian/implementation/numpy/operators:prefix",
-    ],
-)
-
-py_test(
-    name = "reset_index_test",
-    srcs = ["reset_index_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # absl/testing:absltest dep,
-        "//temporian/core/data:event",
-        "//temporian/core/data:sampling",
-        "//temporian/core/operators:reset_index",
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:sampling",
-        "//temporian/implementation/numpy/operators:reset_index",
     ],
 )
