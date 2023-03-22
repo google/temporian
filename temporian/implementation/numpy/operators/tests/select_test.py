@@ -130,7 +130,7 @@ class SelectOperatorTest(absltest.TestCase):
             backend="numpy",
         )
 
-        self.assertEqual(expected_event, output_event_numpy[output_event])
+        self.assertEqual(expected_event, output_event_numpy)
 
 
 if __name__ == "__main__":
