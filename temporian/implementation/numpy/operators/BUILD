@@ -81,11 +81,11 @@ py_library(
 )
 
 py_library(
-    name = "reset_index",
-    srcs = ["reset_index.py"],
+    name = "drop_index",
+    srcs = ["drop_index.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/core/operators:reset_index",
+        "//temporian/core/operators:drop_index",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
     ],
