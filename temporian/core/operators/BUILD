@@ -14,11 +14,12 @@ py_library(
         ":arithmetic",
         ":assign",
         ":base",
-        ":calendar_day_of_month",
         ":lag",
         ":propagate",
         ":select",
         ":simple_moving_average",
+        "//temporian/core/operators/calendar:day_of_month",
+        "//temporian/core/operators/calendar:day_of_week",
     ],
 )
 
@@ -54,19 +55,6 @@ py_library(
     srcs_version = "PY3",
     deps = [
         "//temporian/core/data:event",
-        "//temporian/proto:core_py_proto",
-    ],
-)
-
-py_library(
-    name = "calendar_day_of_month",
-    srcs = ["calendar_day_of_month.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":base",
-        "//temporian/core:operator_lib",
-        "//temporian/core/data:event",
-        "//temporian/core/data:feature",
         "//temporian/proto:core_py_proto",
     ],
 )
