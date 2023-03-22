@@ -16,18 +16,18 @@ from absl.testing import absltest
 import numpy as np
 import pandas as pd
 
-from temporian.core.operators.calendar.year import (
-    CalendarYearOperator,
+from temporian.core.operators.calendar.month import (
+    CalendarMonthOperator,
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
-from temporian.implementation.numpy.operators.calendar.year import (
-    CalendarYearNumpyImplementation,
+from temporian.implementation.numpy.operators.calendar.month import (
+    CalendarMonthNumpyImplementation,
 )
 
 
-class CalendarYearNumpyImplementationTest(absltest.TestCase):
-    """Test numpy implementation of calendar_year operator."""
+class CalendarMonthNumpyImplementationTest(absltest.TestCase):
+    """Test numpy implementation of calendar_month operator."""
 
     def test_basic(self) -> None:
         "Basic test with flat event."
@@ -36,9 +36,10 @@ class CalendarYearNumpyImplementationTest(absltest.TestCase):
                 data=[
                     [pd.to_datetime("1970-01-01 00:00:00", utc=True)],
                     [pd.to_datetime("2021-01-01 00:00:00", utc=True)],
-                    [pd.to_datetime("2021-01-01 00:00:01", utc=True)],
+                    [pd.to_datetime("2021-07-15 12:30:00", utc=True)],
                     [pd.to_datetime("2021-12-31 23:59:59", utc=True)],
                     [pd.to_datetime("2045-12-31 23:59:59", utc=True)],
+                    [pd.to_datetime("2045-12-01 00:00:00", utc=True)],
                 ],
                 columns=["timestamp"],
             ),
@@ -50,16 +51,16 @@ class CalendarYearNumpyImplementationTest(absltest.TestCase):
             data={
                 (): [
                     NumpyFeature(
-                        name="calendar_year",
-                        data=np.array([1970, 2021, 2021, 2021, 2045]),
+                        name="calendar_month",
+                        data=np.array([1, 1, 7, 12, 12, 12]),
                     ),
                 ],
             },
             sampling=input_event_data.sampling,
         )
 
-        operator = CalendarYearOperator(input_event)
-        impl = CalendarYearNumpyImplementation(operator)
+        operator = CalendarMonthOperator(input_event)
+        impl = CalendarMonthNumpyImplementation(operator)
 
         output = impl(input_event_data)
 
