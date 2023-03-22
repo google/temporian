@@ -131,7 +131,8 @@ def _impl(
             # increment pointer
             ptr += this_block_length
 
-    # finally, sort according to timestamps
+    # finally, sort according to timestamps. TODO: this is merging sorted
+    # arrays, we should later improve this code by avoiding the full sort
     for dst_idx_lvl in dst_event_data.keys():
         sorted_idxs = np.argsort(dst_samp_data[dst_idx_lvl], kind="mergesort")
 
