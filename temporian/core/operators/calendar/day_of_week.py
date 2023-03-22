@@ -16,7 +16,7 @@
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
-from temporian.core.operators.calendar_base import BaseCalendarOperator
+from temporian.core.operators.calendar.base import BaseCalendarOperator
 
 
 class CalendarDayOfWeekOperator(BaseCalendarOperator):

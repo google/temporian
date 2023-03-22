@@ -15,10 +15,10 @@
 from typing import Any
 from datetime import datetime
 
-from temporian.core.operators.calendar_day_of_month import (
+from temporian.core.operators.calendar.day_of_month import (
     CalendarDayOfMonthOperator,
 )
-from temporian.implementation.numpy.operators.calendar_base import (
+from temporian.implementation.numpy.operators.calendar.base import (
     BaseCalendarNumpyImplementation,
 )
 
@@ -27,8 +27,11 @@ class CalendarDayOfMonthNumpyImplementation(BaseCalendarNumpyImplementation):
     """Numpy implementation of the calendar_day_of_month operator."""
 
     def __init__(self, operator: CalendarDayOfMonthOperator) -> None:
-        super().__init__()
-        self.operator = operator
+        super().__init__(operator)
 
     def _get_value_from_datetime(self, dt: datetime) -> Any:
         return dt.day
+
+    @property
+    def _output_feature_name(self) -> str:
+        return "calendar_day_of_month"
