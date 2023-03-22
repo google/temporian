@@ -8,6 +8,7 @@ from temporian.core.data.event import Event
 from temporian.core.data.event import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.data.duration import convert_date_to_duration
+from temporian.core.data.sampling import Sampling
 from temporian.implementation.numpy.data.sampling import NumpySampling
 
 DTYPE_MAPPING = {
@@ -98,7 +99,10 @@ class NumpyEvent:
             features=[
                 feature.schema() for feature in list(self.data.values())[0]
             ],
-            sampling=Sampling(self.sampling.index),
+            sampling=Sampling(
+                index=self.sampling.index,
+                is_unix_timestamp=self.sampling.is_unix_timestamp,
+            ),
         )
 
     @staticmethod
@@ -158,7 +162,12 @@ class NumpyEvent:
                 f"Timestamp column {timestamp_column} cannot be on index_names"
             )
 
-        # convert timestamp column to UTC Epoch float
+        # check if created sampling's values will be unix timestamps
+        is_unix_timestamp = pd.api.types.is_datetime64_any_dtype(
+            df[timestamp_column]
+        )
+
+        # convert timestamp column to float
         df[timestamp_column] = df[timestamp_column].apply(
             convert_date_to_duration
         )
@@ -210,7 +219,11 @@ class NumpyEvent:
                 for feature in feature_columns
             ]
 
-        numpy_sampling = NumpySampling(index=index_names, data=sampling)
+        numpy_sampling = NumpySampling(
+            index=index_names,
+            data=sampling,
+            is_unix_timestamp=is_unix_timestamp,
+        )
 
         return NumpyEvent(data=data, sampling=numpy_sampling)
 

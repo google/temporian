@@ -31,6 +31,13 @@ class BaseCalendarOperator(Operator, ABC):
     def __init__(self, sampling: Event):
         super().__init__()
 
+        if not sampling.sampling().is_unix_timestamp():
+            raise ValueError(
+                "Calendar operators can only be applied on events with unix"
+                " timestamps as sampling. This can be specified with"
+                " is_unix_timestamp=True when manually creating a sampling."
+            )
+
         # input
         self.add_input("sampling", sampling)
 

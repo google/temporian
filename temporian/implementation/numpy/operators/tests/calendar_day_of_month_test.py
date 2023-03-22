@@ -16,6 +16,8 @@ from absl.testing import absltest
 import numpy as np
 import pandas as pd
 
+from temporian.core.data.event import Event
+from temporian.core.data.sampling import Sampling
 from temporian.core.operators.calendar.day_of_month import (
     CalendarDayOfMonthOperator,
 )
@@ -112,6 +114,20 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
         self.assertTrue(
             output["event"]._first_index_features[0].dtype == np.int32
         )
+
+    # TODO: move this test to core operators' test suite when created
+    # since its testing BaseCalendarOperator's logic, not
+    # CalendarDayOfMonthNumpyImplementation's
+    def test_invalid_sampling(self) -> None:
+        """
+        Test calendar operator with a non-utc timestamp
+        sampling.
+        """
+        input_event = Event(
+            features=[], sampling=Sampling(index=[], is_unix_timestamp=False)
+        )
+        with self.assertRaises(ValueError):
+            CalendarDayOfMonthOperator(input_event)
 
 
 if __name__ == "__main__":
