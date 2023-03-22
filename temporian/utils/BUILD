@@ -12,3 +12,12 @@ bzl_library(
     name = "compile_bzl",
     srcs = ["compile.bzl"],
 )
+
+# Libraries
+# =========
+
+py_library(
+    name = "string",
+    srcs = ["string.py"],
+    srcs_version = "PY3",
+)

@@ -12,33 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from absl import logging
 from absl.testing import absltest
-import pandas as pd
 
 from temporian.core import evaluator
-from temporian.core.data import dtype
-from temporian.core.data.event import Event
-from temporian.core.data.feature import Feature
-from temporian.core.data.sampling import Sampling
-from temporian.core.operators import base
-from temporian.proto import core_pb2 as pb
 from temporian.core.test import utils
 from temporian.implementation.numpy.data.event import NumpyEvent
 
 
 class EvaluatorTest(absltest.TestCase):
-    def toy_event_data(self):
-        return NumpyEvent.from_dataframe(
-            pd.DataFrame(
-                {
-                    "timestamp": [0, 2, 4, 6],
-                    "f1": [1, 2, 3, 4],
-                    "f2": [5, 6, 7, 8],
-                }
-            )
-        )
-
     def test_schedule_trivial(self):
         a = utils.create_input_event()
         b = utils.OpI1O1(a)
@@ -102,14 +83,18 @@ class EvaluatorTest(absltest.TestCase):
 
     def test_evaluate_value(self):
         i1 = utils.create_input_event()
-        result = evaluator.evaluate(i1, {i1: self.toy_event_data()})
+        result = evaluator.evaluate(i1, {i1: utils.create_input_event_data()})
         self.assertIsInstance(result, NumpyEvent)
 
     def test_evaluate_list(self):
         i1 = utils.create_input_event()
         i2 = utils.create_input_event()
         result = evaluator.evaluate(
-            [i1, i2], {i1: self.toy_event_data(), i2: self.toy_event_data()}
+            [i1, i2],
+            {
+                i1: utils.create_input_event_data(),
+                i2: utils.create_input_event_data(),
+            },
         )
         self.assertIsInstance(result, list)
         self.assertLen(result, 2)
@@ -119,7 +104,10 @@ class EvaluatorTest(absltest.TestCase):
         i2 = utils.create_input_event()
         result = evaluator.evaluate(
             {"i1": i1, "i2": i2},
-            {i1: self.toy_event_data(), i2: self.toy_event_data()},
+            {
+                i1: utils.create_input_event_data(),
+                i2: utils.create_input_event_data(),
+            },
         )
         self.assertIsInstance(result, dict)
         self.assertLen(result, 2)

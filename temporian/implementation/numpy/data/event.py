@@ -9,6 +9,7 @@ from temporian.core.data.event import Event
 from temporian.core.data.event import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.implementation.numpy.data.sampling import NumpySampling
+from temporian.utils import string
 
 DTYPE_MAPPING = {
     np.float64: dtype.FLOAT64,
@@ -263,7 +264,29 @@ class NumpyEvent:
         return df
 
     def __repr__(self) -> str:
-        return self.data.__repr__() + " " + self.sampling.__repr__()
+        def repr_features(features: list[NumpyFeature]) -> str:
+            """Repr for a list of features."""
+
+            return "\n".join(
+                [
+                    f"{f.name} <{np.dtype(f.dtype).name}>: {f.data}"
+                    for f in features
+                ]
+            )
+
+        # Representation of the "data" field
+        data_repr = string.indent(
+            "\n".join(
+                f"{k}:\n{string.indent(repr_features(v))}"
+                for k, v in self.data.items()
+            ),
+            4,
+        )
+
+        # Representation of the "sampling" field
+        sampling_repr = string.indent(self.sampling.__repr__(), 4)
+
+        return f"Event\n  data:\n{data_repr}\n  sampling:\n{sampling_repr}"
 
     def __eq__(self, __o: object) -> bool:
         if not isinstance(__o, NumpyEvent):

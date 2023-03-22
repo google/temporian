@@ -35,3 +35,10 @@ py_test(
         "//temporian/implementation/numpy/data:sampling",
     ],
 )
+
+py_test(
+    name = "event_test",
+    srcs = ["event_test.py"],
+    srcs_version = "PY3",
+    deps = ["//temporian/implementation/numpy/data:event"],
+)

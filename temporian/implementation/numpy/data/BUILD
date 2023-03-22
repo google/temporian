@@ -24,6 +24,7 @@ py_library(
         "//temporian/core/data:feature",
         "//temporian/core/data:sampling",
         "//temporian/core/data:dtype",
+        "//temporian/utils:string",
     ],
 )
 
@@ -32,6 +33,6 @@ py_library(
     srcs = ["sampling.py"],
     srcs_version = "PY3",
     deps = [
-        # pandas dep,
+        "//temporian/utils:string",
     ],
 )

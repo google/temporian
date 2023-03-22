@@ -2,6 +2,8 @@ from typing import Dict, List, Tuple
 
 import numpy as np
 
+from temporian.utils import string
+
 
 class NumpySampling:
     def __init__(
@@ -28,7 +30,8 @@ class NumpySampling:
         return False
 
     def __repr__(self) -> str:
-        return f"index:{self.index} data:{self.data.__repr__()}"
+        data_repr = "\n".join(f"{k}: {v}" for k, v in self.data.items())
+        return f"index: {self.index}\ndata:\n{string.indent(data_repr)}\n"
 
     def __eq__(self, other):
         if not isinstance(other, NumpySampling):
