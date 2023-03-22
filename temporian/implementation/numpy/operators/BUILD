@@ -87,7 +87,6 @@ py_library(
     srcs = ["propagate.py"],
     srcs_version = "PY3",
     deps = [
-        ":base",
         "//temporian/core/data:duration",
         "//temporian/core/operators:propagate",
         "//temporian/implementation/numpy:utils",

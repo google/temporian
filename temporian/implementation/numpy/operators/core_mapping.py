@@ -16,6 +16,7 @@ from temporian.implementation.numpy.operators.propagate import (
 )
 from temporian.core.operators.propagate import (
     Propagate as PropagateDef,
+)
 from temporian.implementation.numpy.operators.select import (
     SelectNumpyImplementation,
 )
