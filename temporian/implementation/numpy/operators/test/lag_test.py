@@ -142,9 +142,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
         )
 
         # validate
-        self.assertEqual(
-            expected_numpy_output_event, output_event_numpy[output_event]
-        )
+        self.assertEqual(expected_numpy_output_event, output_event_numpy)
 
     def test_correct_leak(self) -> None:
         """Test correct leak operator."""
@@ -256,9 +254,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
         )
 
         # validate
-        self.assertEqual(
-            expected_numpy_output_event, output_event_numpy[output_event]
-        )
+        self.assertEqual(expected_numpy_output_event, output_event_numpy)
 
 
 if __name__ == "__main__":
