@@ -241,16 +241,11 @@ class NumpyEvent:
 
         for index, features in self.data.items():
             timestamps = self.sampling.data[index]
-
-            for i, timestamp in enumerate(timestamps):
-                # add row to dictionary
-                row = (
-                    list(index)
-                    + [feature.data[i] for feature in features]
-                    + [timestamp]
-                )
-                for i, column_name in enumerate(columns):
-                    data[column_name].append(row[i])
+            data["timestamp"].extend(timestamps)
+            for feature in features:
+                data[feature.name].extend(feature.data)
+            for index_key in self.sampling.index:
+                data[index_key].extend(index * len(timestamps))
 
         # Converting dictionary to pandas DataFrame
         df = pd.DataFrame(data)
