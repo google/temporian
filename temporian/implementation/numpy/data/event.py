@@ -4,10 +4,9 @@ import numpy as np
 import pandas as pd
 
 from temporian.core.data import dtype
+from temporian.core.data.duration import convert_date_to_duration
 from temporian.core.data.event import Event
 from temporian.core.data.event import Feature
-from temporian.core.data.sampling import Sampling
-from temporian.core.data.duration import convert_date_to_duration
 from temporian.core.data.sampling import Sampling
 from temporian.implementation.numpy.data.sampling import NumpySampling
 
@@ -232,48 +231,24 @@ class NumpyEvent:
 
         Returns:
             pd.DataFrame: DataFrame created from NumpyEvent.
-
         """
+        # Creating an empty dictionary to store the data
+        data = {}
 
-        feature_names = self.feature_names
-        index_names = self.sampling.index
-        columns = index_names + feature_names + ["timestamp"]
+        columns = self.sampling.index + self.feature_names + ["timestamp"]
+        for column_name in columns:
+            data[column_name] = []
 
-        df = pd.DataFrame(data=[], columns=columns)
-
-        # append every feature to the dataframe. without index
         for index, features in self.data.items():
             timestamps = self.sampling.data[index]
+            data["timestamp"].extend(timestamps)
+            for feature in features:
+                data[feature.name].extend(feature.data)
+            for index_key in self.sampling.index:
+                data[index_key].extend(index * len(timestamps))
 
-            for i, timestamp in enumerate(timestamps):
-                # add row to dataframe
-                row = (
-                    list(index)
-                    + [feature.data[i] for feature in features]
-                    + [timestamp]
-                )
-                df.loc[len(df)] = row
-
-        # Convert to original dtypes, can be more efficient
-        first_index = self._first_index_value
-        first_features = self._first_index_features
-
-        # get feature dtypes
-        features_dtypes = {
-            feature.name: feature.data[0].dtype for feature in first_features
-        }
-
-        # get tuple index dtypes
-        index_dtypes = {
-            index_name: type(first_index[i])
-            for i, index_name in enumerate(self.sampling.index)
-        }
-
-        # get timestamp dtype
-        first_timestamp = self.sampling.data[first_index][0]
-        sampling_dtype = {"timestamp": first_timestamp.dtype}
-
-        df = df.astype({**features_dtypes, **index_dtypes, **sampling_dtype})
+        # Converting dictionary to pandas DataFrame
+        df = pd.DataFrame(data)
 
         return df
 
