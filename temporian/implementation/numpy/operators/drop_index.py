@@ -16,6 +16,18 @@ IndexMetadata = Dict[
 def _impl(
     event: NumpyEvent, drop_idx_names: List[str], keep: bool
 ) -> NumpyEvent:
+    """
+    Implementation function to drop specified index names from a NumpyEvent.
+
+    Args:
+        event: The input NumpyEvent.
+        drop_idx_names: The list of index names to drop.
+        keep: A boolean indicating whether to keep the dropped index data as
+            features.
+
+    Returns:
+        The modified NumpyEvent with the specified index names dropped.
+    """
     # source index names
     src_idx_names = event.sampling.index
 
@@ -144,9 +156,24 @@ def _impl(
 
 class DropIndexNumpyImplementation:
     def __init__(self, operator: DropIndexOperator) -> None:
+        """
+        Initializes an instance of the DropIndexNumpyImplementation class.
+
+        Args:
+            operator: The DropIndexOperator instance.
+        """
         self.operator = operator
 
     def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
+        """
+        Calls the implementation function with the specified event.
+
+        Args:
+            event: The input NumpyEvent.
+
+        Returns:
+            A dictionary with the modified NumpyEvent.
+        """
         # get attributes
         drop_idx_names = self.operator.attributes()["labels"]
         keep = self.operator.attributes()["keep"]
