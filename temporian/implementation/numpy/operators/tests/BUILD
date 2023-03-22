@@ -95,17 +95,17 @@ py_test(
 )
 
 py_test(
-    name = "calendar_month_test",
-    srcs = ["calendar_month_test.py"],
+    name = "calendar_second_test",
+    srcs = ["calendar_second_test.py"],
     srcs_version = "PY3",
     deps = [
         # absl/testing:absltest dep,
         "//temporian/core/data:event",
         "//temporian/core/data:sampling",
-        "//temporian/core/operators/calendar:month",
+        "//temporian/core/operators/calendar:second",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
-        "//temporian/implementation/numpy/operators/calendar:month",
+        "//temporian/implementation/numpy/operators/calendar:second",
     ],
 )
 
