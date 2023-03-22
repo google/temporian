@@ -16,18 +16,18 @@ from absl.testing import absltest
 import numpy as np
 import pandas as pd
 
-from temporian.core.operators.calendar.hour import (
-    CalendarHourOperator,
+from temporian.core.operators.calendar.minute import (
+    CalendarMinuteOperator,
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
-from temporian.implementation.numpy.operators.calendar.hour import (
-    CalendarHourNumpyImplementation,
+from temporian.implementation.numpy.operators.calendar.minute import (
+    CalendarMinuteNumpyImplementation,
 )
 
 
-class CalendarHourNumpyImplementationTest(absltest.TestCase):
-    """Test numpy implementation of calendar_hour operator."""
+class CalendarMinuteNumpyImplementationTest(absltest.TestCase):
+    """Test numpy implementation of calendar_minute operator."""
 
     def test_basic(self) -> None:
         "Basic test with flat event."
@@ -35,10 +35,11 @@ class CalendarHourNumpyImplementationTest(absltest.TestCase):
             pd.DataFrame(
                 data=[
                     [pd.to_datetime("1970-01-01 00:00:00", utc=True)],
-                    [pd.to_datetime("1970-01-01 01:00:00", utc=True)],
-                    [pd.to_datetime("1970-01-01 01:59:59", utc=True)],
-                    [pd.to_datetime("2023-06-06 12:00:00", utc=True)],
-                    [pd.to_datetime("2023-06-06 23:59:59", utc=True)],
+                    [pd.to_datetime("2023-01-01 00:01:00", utc=True)],
+                    [pd.to_datetime("2023-01-01 00:30:00", utc=True)],
+                    [pd.to_datetime("2023-01-01 00:59:00", utc=True)],
+                    [pd.to_datetime("2023-01-01 23:01:00", utc=True)],
+                    [pd.to_datetime("2023-01-01 23:59:59", utc=True)],
                 ],
                 columns=["timestamp"],
             ),
@@ -50,16 +51,16 @@ class CalendarHourNumpyImplementationTest(absltest.TestCase):
             data={
                 (): [
                     NumpyFeature(
-                        name="calendar_hour",
-                        data=np.array([0, 1, 1, 12, 23]),
+                        name="calendar_minute",
+                        data=np.array([0, 1, 30, 59, 1, 59]),
                     ),
                 ],
             },
             sampling=input_event_data.sampling,
         )
 
-        operator = CalendarHourOperator(input_event)
-        impl = CalendarHourNumpyImplementation(operator)
+        operator = CalendarMinuteOperator(input_event)
+        impl = CalendarMinuteNumpyImplementation(operator)
 
         output = impl(input_event_data)
 
