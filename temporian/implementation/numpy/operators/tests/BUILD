@@ -65,6 +65,21 @@ py_test(
 )
 
 py_test(
+    name = "calendar_hour_test",
+    srcs = ["calendar_hour_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/testing:absltest dep,
+        "//temporian/core/data:event",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators/calendar:hour",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/operators/calendar:hour",
+    ],
+)
+
+py_test(
     name = "calendar_month_test",
     srcs = ["calendar_month_test.py"],
     srcs_version = "PY3",
