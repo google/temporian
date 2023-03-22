@@ -12,42 +12,42 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Calendar month operator."""
+"""Calendar hour operator."""
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
 from temporian.core.operators.calendar.base import BaseCalendarOperator
 
 
-class CalendarMonthOperator(BaseCalendarOperator):
+class CalendarHourOperator(BaseCalendarOperator):
     """
-    Calendar operator to obtain the month each timestamp belongs to.
+    Calendar operator to obtain the hour each timestamp belongs to.
     """
 
     @classmethod
     @property
     def operator_def_key(cls) -> str:
-        return "CALENDAR_MONTH"
+        return "CALENDAR_HOUR"
 
     @classmethod
     @property
     def output_feature_name(cls) -> str:
-        return "calendar_month"
+        return "calendar_hour"
 
 
-operator_lib.register_operator(CalendarMonthOperator)
+operator_lib.register_operator(CalendarHourOperator)
 
 
-def calendar_month(sampling: Event) -> Event:
-    """Obtain the month each of the timestamps in an event's sampling belongs
-    to. Features in input event are ignored. Output feature contains numbers
-    between 1 and 12.
+def calendar_hour(sampling: Event) -> Event:
+    """Obtain the hour each of the timestamps in an event's sampling belongs to.
+    Features in input event are ignored. Output feature contains numbers
+    between 0 and 23.
 
     Args:
-        sampling: the event to get the months from.
+        sampling: the event to get the hours from.
 
     Returns:
-        event with a single feature corresponding to the month each timestamp in
+        event with a single feature corresponding to the hour each timestamp in
             `event`'s sampling belongs to, with the same sampling as `event`.
     """
-    return CalendarMonthOperator(sampling).outputs()["event"]
+    return CalendarHourOperator(sampling).outputs()["event"]
