@@ -17,6 +17,8 @@ py_library(
         ":lag",
         ":select",
         ":simple_moving_average",
+        "//temporian/core/operators/calendar:day_of_month",
+        "//temporian/core/operators/calendar:day_of_week",
     ],
 )
 
