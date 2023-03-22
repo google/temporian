@@ -1,4 +1,5 @@
-from typing import Dict, List
+from collections import defaultdict
+from typing import Dict, List, Union
 
 import numpy as np
 
@@ -6,6 +7,10 @@ from temporian.core.operators.drop_index import DropIndexOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
+
+IndexMetadata = Dict[
+    str, Union[int, List[List[NumpyFeature]], List[np.ndarray]]
+]
 
 
 def _impl(
@@ -43,12 +48,12 @@ def _impl(
     ]
     # intialize empty dict mapping destination index levels to block lengths,
     # features, and timestamps
-    dst_idx_metadata: Dict[
-        tuple, Dict[str, int | List[List[NumpyFeature]] | List[np.array]]
-    ] = {}
+    dst_idx_metadata: Dict[tuple, IndexMetadata] = defaultdict(
+        lambda: {"block_length": 0, "timestamps": [], "features": []}
+    )
 
     # loop over source index levels gathering destination index metadata
-    for src_idx_lvl, timestamps in src_samp_data.items():  # TODO : fix iter
+    for src_idx_lvl, timestamps in src_samp_data.items():
         # destination index level
         dst_idx_lvl = tuple((src_idx_lvl[i] for i in keep_idx_pos))
 
@@ -70,24 +75,12 @@ def _impl(
             if keep
             else []
         )
-        # use try - except here. Could instead check if key already exists in
-        # dict (more readable code), but it's slower
-        try:
-            # store metadata
-            dst_idx_metadata[dst_idx_lvl]["block_length"] += this_block_length
-            dst_idx_metadata[dst_idx_lvl]["timestamps"].append(timestamps)
-            dst_idx_metadata[dst_idx_lvl]["features"].append(
-                drop_feats + event.data[src_idx_lvl]
-            )
-
-        except KeyError:
-            # first time destination index level is encountered - create entry
-            dst_idx_metadata[dst_idx_lvl] = {}
-            dst_idx_metadata[dst_idx_lvl]["block_length"] = this_block_length
-            dst_idx_metadata[dst_idx_lvl]["timestamps"] = [timestamps]
-            dst_idx_metadata[dst_idx_lvl]["features"] = [
-                drop_feats + event.data[src_idx_lvl]
-            ]
+        # store metadata
+        dst_idx_metadata[dst_idx_lvl]["block_length"] += this_block_length
+        dst_idx_metadata[dst_idx_lvl]["timestamps"].append(timestamps)
+        dst_idx_metadata[dst_idx_lvl]["features"].append(
+            drop_feats + event.data[src_idx_lvl]
+        )
 
     # allocate memory for destination sampling & event
     # sampling
