@@ -199,6 +199,21 @@ py_test(
 )
 
 py_test(
+    name = "set_index_test",
+    srcs = ["set_index_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/testing:absltest dep,
+        "//temporian/core/data:event",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators:set_index",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/operators:set_index",
+    ],
+)
+
+py_test(
     name = "simple_moving_average_test",
     srcs = ["simple_moving_average_test.py"],
     srcs_version = "PY3",
