@@ -62,8 +62,8 @@ class DataFrameToEventTest(absltest.TestCase):
         df = pd.DataFrame(
             [
                 [666964, 1.0, "740"],
-                [666964, 2.0, np.nan],
-                [574016, 3.0, ""],
+                [666964, 2.0, "400"],
+                [574016, 3.0, "200"],
             ],
             columns=["product_id", "timestamp", "costs"],
         )
@@ -80,13 +80,13 @@ class DataFrameToEventTest(absltest.TestCase):
             data={
                 (666964,): [
                     NumpyFeature(
-                        data=np.array(["740", np.nan]).astype(np.string_),
+                        data=np.array(["740", "400"]).astype(np.string_),
                         name="costs",
                     )
                 ],
                 (574016,): [
                     NumpyFeature(
-                        data=np.array([""]).astype(np.string_), name="costs"
+                        data=np.array(["200"]).astype(np.string_), name="costs"
                     )
                 ],
             },
@@ -99,6 +99,22 @@ class DataFrameToEventTest(absltest.TestCase):
 
         # validate
         self.assertTrue(numpy_event == expected_numpy_event)
+
+    def test_mixed_types_in_string_column(self) -> None:
+        df = pd.DataFrame(
+            [
+                [666964, 1.0, "740", "A"],
+                [666964, 2.0, "400", 101],
+                [574016, 3.0, np.nan, "B"],
+            ],
+            columns=["product_id", "timestamp", "costs", "sales"],
+        )
+
+        # Not allowed
+        with self.assertRaises(ValueError):
+            NumpyEvent.from_dataframe(
+                df, index_names=["product_id"], timestamp_column="timestamp"
+            )
 
     def test_missing_values(self) -> None:
         df = pd.DataFrame(
