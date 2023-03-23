@@ -14,9 +14,9 @@
 
 """Serialization / unserialization of a processor."""
 
-from google.protobuf import text_format
+from typing import Set, Union, Any, Dict, Tuple, Optional
 
-from typing import Set, Union, Any, Dict, Tuple, List, Optional
+from google.protobuf import text_format
 
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature

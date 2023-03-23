@@ -7,16 +7,6 @@ package(
 # =========
 
 py_library(
-    name = "core",
-    srcs = ["core.py"],
-    srcs_version = "PY3",
-    deps = [
-        # absl/logging dep,
-        "//temporian/proto:core_py_proto",
-    ],
-)
-
-py_library(
     name = "evaluator",
     srcs = ["evaluator.py"],
     srcs_version = "PY3",

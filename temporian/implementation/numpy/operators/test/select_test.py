@@ -21,9 +21,6 @@ from temporian.core import evaluator
 from temporian.core.operators.select import SelectOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators import select
-from temporian.core.operators.select import SelectOperator
-from temporian.core.data import event as event_lib
-from temporian.core.data import dtype as dtype_lib
 
 
 class SelectOperatorTest(absltest.TestCase):

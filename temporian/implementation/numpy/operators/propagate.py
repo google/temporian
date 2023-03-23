@@ -3,8 +3,6 @@
 
 from typing import Dict
 
-import numpy as np
-
 from temporian.implementation.numpy.data.event import NumpyEvent, NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.core.operators.propagate import Propagate

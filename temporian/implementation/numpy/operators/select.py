@@ -3,7 +3,6 @@ from typing import Dict
 from temporian.core.operators.select import SelectOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy import implementation_lib
-from temporian.core.operators.select import SelectOperator
 
 
 class SelectNumpyImplementation:

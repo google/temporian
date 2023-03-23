@@ -13,14 +13,13 @@
 # limitations under the License.
 
 """Implementation for the Assign operator."""
-from copy import deepcopy
-from typing import Dict, List
+
+from typing import Dict
 import numpy as np
 
 
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
-from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.core.operators.assign import AssignOperator
 from temporian.implementation.numpy import implementation_lib
 

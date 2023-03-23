@@ -14,7 +14,6 @@
 
 """Temporian."""
 
-from temporian.core import core
 from temporian.core import evaluator
 from temporian.core import operator_lib
 from temporian.core import processor

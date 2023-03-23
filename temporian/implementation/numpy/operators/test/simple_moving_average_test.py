@@ -14,7 +14,6 @@
 
 from absl.testing import absltest
 
-import pandas as pd
 import numpy as np
 
 from temporian.core.operators.simple_moving_average import SimpleMovingAverage
