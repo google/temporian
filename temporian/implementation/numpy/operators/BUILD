@@ -13,11 +13,12 @@ py_library(
     deps = [
         ":arithmetic",
         ":assign",
-        ":calendar_day_of_month",
         ":lag",
         ":propagate",
         ":select",
         ":simple_moving_average",
+        "//temporian/implementation/numpy/operators/calendar:day_of_month",
+        "//temporian/implementation/numpy/operators/calendar:day_of_week",
     ],
 )
 

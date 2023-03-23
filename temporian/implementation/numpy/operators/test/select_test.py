@@ -48,20 +48,10 @@ class SelectOperatorTest(absltest.TestCase):
 
         self.features = ["sales", "costs", "weather"]
 
-        self.input_event = event_lib.input_event(
-            [
-                event_lib.Feature(name="sales", dtype=dtype_lib.FLOAT64),
-                event_lib.Feature(name="costs", dtype=dtype_lib.FLOAT64),
-                event_lib.Feature(name="weather", dtype=dtype_lib.FLOAT64),
-            ],
-            index=["store_id"],
-        )
-
         self.input_event_data = NumpyEvent.from_dataframe(
             df, index_names=["store_id"]
         )
-
-        self.event = self.numpy_event.schema()
+        self.input_event = self.input_event_data.schema()
 
     def test_select_one_feature(self) -> None:
         """Test correct select operator for one feature selection."""
@@ -77,9 +67,9 @@ class SelectOperatorTest(absltest.TestCase):
             columns=["store_id", "timestamp", "sales"],
         )
 
-        operator = SelectOperator(event=self.event, feature_names="sales")
+        operator = SelectOperator(event=self.input_event, feature_names="sales")
         impl = select.SelectNumpyImplementation(operator)
-        selected_event = impl(self.numpy_event)["event"]
+        selected_event = impl(self.input_event_data)["event"]
 
         expected_event = NumpyEvent.from_dataframe(
             new_df, index_names=["store_id"]
@@ -102,10 +92,10 @@ class SelectOperatorTest(absltest.TestCase):
         )
 
         operator = SelectOperator(
-            event=self.event, feature_names=["sales", "costs"]
+            event=self.input_event, feature_names=["sales", "costs"]
         )
         impl = select.SelectNumpyImplementation(operator)
-        selected_event = impl(self.numpy_event)["event"]
+        selected_event = impl(self.input_event_data)["event"]
 
         expected_event = NumpyEvent.from_dataframe(
             new_df, index_names=["store_id"]
@@ -130,19 +120,15 @@ class SelectOperatorTest(absltest.TestCase):
             new_df, index_names=["store_id"]
         )
 
-        input_event = self.numpy_event.schema()
-        output_event = input_event["sales"]
-
-        output_event_numpy = evaluator.evaluate(
-            output_event,
+        output_event_data = evaluator.evaluate(
+            self.input_event["sales"],
             input_data={
                 # left event specified from disk
-                input_event: self.numpy_event,
+                self.input_event: self.input_event_data,
             },
-            backend="numpy",
         )
 
-        self.assertEqual(expected_event, output_event_numpy)
+        self.assertEqual(expected_event, output_event_data)
 
 
 if __name__ == "__main__":

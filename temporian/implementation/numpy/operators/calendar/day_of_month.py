@@ -15,6 +15,7 @@
 from typing import Any
 from datetime import datetime
 
+from temporian.implementation.numpy import implementation_lib
 from temporian.core.operators.calendar.day_of_month import (
     CalendarDayOfMonthOperator,
 )
@@ -35,3 +36,8 @@ class CalendarDayOfMonthNumpyImplementation(BaseCalendarNumpyImplementation):
     @property
     def _output_feature_name(self) -> str:
         return "calendar_day_of_month"
+
+
+implementation_lib.register_operator_implementation(
+    CalendarDayOfMonthOperator, CalendarDayOfMonthNumpyImplementation
+)

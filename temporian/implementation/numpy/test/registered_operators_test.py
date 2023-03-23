@@ -25,7 +25,8 @@ class RegisteredOperatorsTest(absltest.TestCase):
         expected_implementations = [
             "ARITHMETIC",
             "ASSIGN",
-            "CALENDAR_DAY",
+            "CALENDAR_DAY_OF_MONTH",
+            "CALENDAR_DAY_OF_WEEK",
             "LAG",
             "PROPAGATE",
             "SELECT",

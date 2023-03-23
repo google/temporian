@@ -71,10 +71,10 @@ class PrototypeTest(absltest.TestCase):
             index_names=["store_id", "product_id"],
         )
 
-        # TODO: This is dangerous. An alternative solution would be to assume
-        # that events don't have the same sampling, and then to resample one
-        # of the event to the other one.
-        self.event_2.sampling = self.event_1.sampling
+        # TODO: Remove the following line when "from_dataframe" support creating
+        # event data with shared sampling. Note that "event_1_data" and
+        # "event_2_data" should have the same sampling in this tests.
+        self.event_1_data.sampling = self.event_2_data.sampling
 
         self.expected_output_event = NumpyEvent.from_dataframe(
             pd.DataFrame(
