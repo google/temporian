@@ -126,6 +126,58 @@ class EventToDataFrameTest(absltest.TestCase):
         # validate
         self.assertTrue(df.equals(expected_df))
 
+    def test_numpy_event_to_df_multiple_index(self) -> None:
+        numpy_event = NumpyEvent(
+            data={
+                ("X1", "Y1"): [
+                    NumpyFeature(
+                        name="sma_a",
+                        data=np.array([10.0, 10.5, 11.0]),
+                    )
+                ],
+                ("X2", "Y1"): [
+                    NumpyFeature(
+                        name="sma_a",
+                        data=np.array([13.0, 13.5, 14.0]),
+                    )
+                ],
+                ("X2", "Y2"): [
+                    NumpyFeature(
+                        name="sma_a",
+                        data=np.array([16.0, 16.5, 17.0]),
+                    )
+                ],
+            },
+            sampling=NumpySampling(
+                index=["x", "y"],
+                data={
+                    ("X1", "Y1"): np.array([1.0, 2.0, 3.0], dtype=np.float64),
+                    ("X2", "Y1"): np.array([1.1, 2.1, 3.1], dtype=np.float64),
+                    ("X2", "Y2"): np.array([1.2, 2.2, 3.2], dtype=np.float64),
+                },
+            ),
+        )
+
+        expected_df = pd.DataFrame(
+            [
+                ["X1", "Y1", 10.0, 1.0],
+                ["X1", "Y1", 10.5, 2.0],
+                ["X1", "Y1", 11.0, 3.0],
+                ["X2", "Y1", 13.0, 1.1],
+                ["X2", "Y1", 13.5, 2.1],
+                ["X2", "Y1", 14.0, 3.1],
+                ["X2", "Y2", 16.0, 1.2],
+                ["X2", "Y2", 16.5, 2.2],
+                ["X2", "Y2", 17.0, 3.2],
+            ],
+            columns=["x", "y", "sma_a", "timestamp"],
+        )
+
+        df = numpy_event.to_dataframe()
+
+        # validate
+        self.assertTrue(df.equals(expected_df))
+
 
 if __name__ == "__main__":
     absltest.main()
