@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -29,7 +29,7 @@ class NumpyFeature:
         if data.dtype.type is not np.string_:
             if data.dtype.type not in DTYPE_MAPPING:
                 raise ValueError(
-                    f"Unsupported dtype {data.dtype} for NumpyFeature."
+                    f"Unsupported dtype {data.dtype} for NumpyFeature: {name}."
                     f" Supported dtypes: {DTYPE_MAPPING.keys()}"
                 )
 
@@ -140,6 +140,17 @@ class NumpyEvent:
             ... )
             >>> event = NumpyEvent.from_dataframe(df, index_names=["product_id"])
         """
+
+        def decode_group(
+            group: Union[Any, Tuple[Any]]
+        ) -> Union[Any, Tuple[Any]]:
+            """Replaces string bytes with strings"""
+            if isinstance(group, tuple):
+                return tuple(
+                    e.decode() if isinstance(e, bytes) else e for e in group
+                )
+            return group.decode() if isinstance(group, bytes) else group
+
         if index_names is None:
             index_names = []
 
@@ -218,6 +229,10 @@ class NumpyEvent:
                 columns = group_by_indexes.get_group(group)
                 timestamp = columns[timestamp_column].to_numpy()
 
+                # Decodes indexes, if they are string bytes they will be
+                # converted to normal strings.
+                group = decode_group(group)
+
                 # Convert group to tuple, useful when its only one value
                 if not isinstance(group, tuple):
                     group = (group,)
@@ -271,6 +286,11 @@ class NumpyEvent:
 
         # Converting dictionary to pandas DataFrame
         df = pd.DataFrame(data)
+
+        # Convert binary strings to strings
+        df = df.applymap(
+            lambda x: x.decode("utf-8") if isinstance(x, bytes) else x
+        )
 
         return df
 

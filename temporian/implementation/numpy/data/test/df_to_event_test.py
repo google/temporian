@@ -179,6 +179,59 @@ class DataFrameToEventTest(absltest.TestCase):
         # validate
         self.assertTrue(numpy_event == expected_numpy_event)
 
+    def test_binary_string_in_index(self):
+        numpy_event = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    ["X1", "Y1", 10.0, 1],
+                    ["X1", "Y1", 11.0, 2],
+                    ["X1", "Y1", 12.0, 3],
+                    ["X2", "Y1", 13.0, 1.1],
+                    ["X2", "Y1", 14.0, 2.1],
+                    ["X2", "Y1", 15.0, 3.1],
+                    ["X2", "Y2", 16.0, 1.2],
+                    ["X2", "Y2", 17.0, 2.2],
+                    ["X2", "Y2", 18.0, 3.2],
+                ],
+                columns=["x", "y", "a", "timestamp"],
+            ),
+            index_names=["x", "y"],
+        )
+
+        expected_numpy_event = NumpyEvent(
+            data={
+                ("X1", "Y1"): [
+                    NumpyFeature(
+                        name="a",
+                        data=np.array([10.0, 11.0, 12.0]),
+                    )
+                ],
+                ("X2", "Y1"): [
+                    NumpyFeature(
+                        name="a",
+                        data=np.array([13.0, 14.0, 15.0]),
+                    )
+                ],
+                ("X2", "Y2"): [
+                    NumpyFeature(
+                        name="a",
+                        data=np.array([16.0, 17.0, 18.0]),
+                    )
+                ],
+            },
+            sampling=NumpySampling(
+                index=["x", "y"],
+                data={
+                    ("X1", "Y1"): np.array([1, 2, 3], dtype=np.float64),
+                    ("X2", "Y1"): np.array([1.1, 2.1, 3.1], dtype=np.float64),
+                    ("X2", "Y2"): np.array([1.2, 2.2, 3.2], dtype=np.float64),
+                },
+            ),
+        )
+
+        # validate
+        self.assertTrue(numpy_event == expected_numpy_event)
+
     def test_missing_values(self) -> None:
         df = pd.DataFrame(
             [
