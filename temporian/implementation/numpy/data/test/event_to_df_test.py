@@ -178,6 +178,47 @@ class EventToDataFrameTest(absltest.TestCase):
         # validate
         self.assertTrue(df.equals(expected_df))
 
+    def test_numpy_event_to_df_string_feature(self) -> None:
+        numpy_sampling = NumpySampling(
+            data={
+                (666964,): np.array([1.0, 2.0]),
+                (574016,): np.array([3.0]),
+            },
+            index=["product_id"],
+        )
+
+        numpy_event = NumpyEvent(
+            data={
+                (666964,): [
+                    NumpyFeature(
+                        data=np.array(["740.0", "508.0"]).astype(np.string_),
+                        name="costs",
+                    )
+                ],
+                (574016,): [
+                    NumpyFeature(
+                        data=np.array(["573.0"]).astype(np.string_),
+                        name="costs",
+                    )
+                ],
+            },
+            sampling=numpy_sampling,
+        )
+
+        expected_df = pd.DataFrame(
+            [
+                [666964, "740.0", 1.0],
+                [666964, "508.0", 2.0],
+                [574016, "573.0", 3.0],
+            ],
+            columns=["product_id", "costs", "timestamp"],
+        )
+
+        df = numpy_event.to_dataframe()
+
+        # validate
+        self.assertTrue(df.equals(expected_df))
+
 
 if __name__ == "__main__":
     absltest.main()
