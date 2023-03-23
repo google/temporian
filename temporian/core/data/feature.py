@@ -30,10 +30,15 @@ class Feature(object):
     ):
         # TODO: Find a simple, efficient and consistant way to check the type
         # of arguments in the API.
-        assert isinstance(name, str), f"Got {name}"
+        assert isinstance(
+            name, str
+        ), f"`name` must be a string. Got name={name} instead."
         assert sampling is None or isinstance(
             sampling, sampling_lib.Sampling
-        ), f"Got {sampling}"
+        ), (
+            "`sampling` must be None or a Sampling. Got"
+            f" sampling={sampling} instead."
+        )
 
         self._name = name
         self._sampling = sampling
