@@ -36,11 +36,16 @@ class AssignOperator(Operator):
         self.add_input("right_event", right_event)
 
         # outputs
+        output_sampling = left_event.sampling()
         output_features = left_event.features() + [
-            Feature(name=feature.name(), dtype=feature.dtype(), creator=self)
+            Feature(
+                name=feature.name(),
+                dtype=feature.dtype(),
+                creator=self,
+                sampling=output_sampling,
+            )
             for feature in right_event.features()
         ]
-        output_sampling = left_event.sampling()
         self.add_output(
             "event",
             Event(
@@ -68,4 +73,5 @@ def assign(
     left_event: Event,
     right_event: Event,
 ) -> Event:
+    # TODO: Write documentation.
     return AssignOperator(left_event, right_event).outputs()["event"]

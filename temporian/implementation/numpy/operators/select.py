@@ -2,6 +2,7 @@ from typing import Dict
 
 from temporian.core.operators.select import SelectOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy import implementation_lib
 
 
 class SelectNumpyImplementation:
@@ -25,3 +26,8 @@ class SelectNumpyImplementation:
             event.sampling,
         )
         return {"event": output_event}
+
+
+implementation_lib.register_operator_implementation(
+    SelectOperator, SelectNumpyImplementation
+)

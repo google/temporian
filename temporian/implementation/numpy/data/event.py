@@ -53,7 +53,7 @@ class NumpyFeature:
         return np.array_equal(self.data, __o.data, equal_nan=True)
 
     def core_dtype(self) -> Any:
-        if self.dtype.type is np.string_:
+        if hasattr(self.dtype, "type") and self.dtype.type is np.string_:
             return dtype.STRING
         return DTYPE_MAPPING[self.dtype]
 

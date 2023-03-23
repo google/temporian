@@ -14,7 +14,7 @@
 
 """Propagate operator."""
 
-from typing import Optional, List, Union
+from typing import List, Union
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event

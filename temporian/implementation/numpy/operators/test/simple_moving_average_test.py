@@ -14,7 +14,6 @@
 
 from absl.testing import absltest
 
-import pandas as pd
 import numpy as np
 
 from temporian.core.operators.simple_moving_average import SimpleMovingAverage
@@ -49,6 +48,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             window_length=5,
             sampling=None,
         )
+        self.assertEqual(op.list_matching_io_samplings(), [("event", "event")])
         instance = SimpleMovingAverageNumpyImplementation(op)
 
         input_data = NumpyEvent(
@@ -101,6 +101,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             window_length=5,
             sampling=None,
         )
+        self.assertEqual(op.list_matching_io_samplings(), [("event", "event")])
         instance = SimpleMovingAverageNumpyImplementation(op)
 
         input_data = NumpyEvent(
@@ -176,6 +177,9 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             ),
             window_length=3,
             sampling=event_lib.input_event([]),
+        )
+        self.assertEqual(
+            op.list_matching_io_samplings(), [("sampling", "event")]
         )
         instance = SimpleMovingAverageNumpyImplementation(op)
 

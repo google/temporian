@@ -13,15 +13,15 @@
 # limitations under the License.
 
 """Implementation for the Assign operator."""
-from copy import deepcopy
-from typing import Dict, List
+
+from typing import Dict
 import numpy as np
 
 
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
-from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.core.operators.assign import AssignOperator
+from temporian.implementation.numpy import implementation_lib
 
 
 class AssignNumpyImplementation:
@@ -87,6 +87,8 @@ class AssignNumpyImplementation:
                 for feature in right_event.data[index]:
                     new_feature = NumpyFeature(
                         name=feature.name,
+                        # TODO: Bug: The dtype is set to float64 independently
+                        # of the dtype in the op definition.
                         data=np.full(number_timestamps, np.nan),
                     )
                     new_feature.data[mask_i] = feature.data[mask_j]
@@ -105,3 +107,8 @@ class AssignNumpyImplementation:
 
         # make assignment
         return {"event": output}
+
+
+implementation_lib.register_operator_implementation(
+    AssignOperator, AssignNumpyImplementation
+)

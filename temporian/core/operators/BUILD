@@ -7,13 +7,12 @@ package(
 # =========
 
 py_library(
-    name = "operators",
-    srcs = ["__init__.py"],
+    name = "all_operators",
+    srcs = ["all_operators.py"],
     srcs_version = "PY3",
     deps = [
         ":arithmetic",
         ":assign",
-        ":base",
         ":lag",
         ":propagate",
         ":select",

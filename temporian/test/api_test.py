@@ -35,9 +35,9 @@ class TFPTest(absltest.TestCase):
 
         df = pd.DataFrame(
             {
-                "time": [0, 2, 4, 6],
-                "f1": [1, 2, 3, 4],
-                "f2": [5, 6, 7, 8],
+                "time": [0.0, 2.0, 4.0, 6.0],
+                "f1": [1.0, 2.0, 3.0, 4.0],
+                "f2": [5.0, 6.0, 7.0, 8.0],
             }
         )
         input_signal_data = NumpyEvent.from_dataframe(
@@ -49,6 +49,7 @@ class TFPTest(absltest.TestCase):
             input_data={
                 a: input_signal_data,
             },
+            verbose=2,
         )
         logging.info("results: %s", results)
 
@@ -141,6 +142,11 @@ class TFPTest(absltest.TestCase):
 
         self.assertEqual(i.name(), "my_input_event")
         self.assertEqual(o.name(), "my_output_event")
+
+    def test_list_registered_operators(self):
+        logging.info("The operators:")
+        for k, v in t.get_operators().items():
+            logging.info("  %s: %s", k, v)
 
 
 if __name__ == "__main__":

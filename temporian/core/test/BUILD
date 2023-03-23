@@ -87,3 +87,13 @@ py_test(
         "//temporian/proto:core_py_proto",
     ],
 )
+
+py_test(
+    name = "registered_operators_test",
+    srcs = ["registered_operators_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core:operator_lib",
+        "//temporian/core/operators:all_operators",
+    ],
+)

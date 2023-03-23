@@ -14,21 +14,32 @@
 
 """Operator lib module."""
 
+from typing import Any
+
 _OPERATORS = {}
 
 
 def register_operator(operator_class):
     """Registers an operator."""
 
-    definition = operator_class.build_op_definition()
-    if definition.key in _OPERATORS:
+    op_key = operator_class.operator_key()
+    if op_key in _OPERATORS:
         raise ValueError("Operator already registered")
-    _OPERATORS[definition.key] = operator_class
+    _OPERATORS[op_key] = operator_class
 
 
 def get_operator_class(key: str):
     """Gets an operator class from a registered key."""
 
     if key not in _OPERATORS:
-        raise ValueError(f"Unknown operator {key}")
+        raise ValueError(
+            f"Unknown operator '{key}'. "
+            f"Available operators are: {list(_OPERATORS.keys())}."
+        )
     return _OPERATORS[key]
+
+
+def registered_operators() -> dict[str, Any]:
+    """List the registered operators."""
+
+    return _OPERATORS

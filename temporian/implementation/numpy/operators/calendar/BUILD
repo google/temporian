@@ -29,6 +29,7 @@ py_library(
     deps = [
         ":base",
         "//temporian/core/operators/calendar:day_of_month",
+        "//temporian/implementation/numpy:implementation_lib",
     ],
 )
 
@@ -39,5 +40,6 @@ py_library(
     deps = [
         ":base",
         "//temporian/core/operators/calendar:day_of_week",
+        "//temporian/implementation/numpy:implementation_lib",
     ],
 )
