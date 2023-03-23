@@ -12,53 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Calendar operators."""
+"""Calendar day of month operator."""
 
 from temporian.core import operator_lib
-from temporian.core.data import dtype
 from temporian.core.data.event import Event
-from temporian.core.data.feature import Feature
-from temporian.core.operators.base import Operator
-from temporian.proto import core_pb2 as pb
+from temporian.core.operators.calendar.base import BaseCalendarOperator
 
 
-class CalendarDayOfMonthOperator(Operator):
+class CalendarDayOfMonthOperator(BaseCalendarOperator):
     """
     Calendar operator to obtain the day of the month each timestamp belongs to.
     """
 
-    def __init__(self, sampling: Event):
-        super().__init__()
-
-        # input
-        self.add_input("sampling", sampling)
-
-        output_feature = Feature(
-            name="calendar_day_of_month",
-            dtype=dtype.INT32,
-            sampling=sampling.sampling(),
-            creator=self,
-        )
-
-        # output
-        self.add_output(
-            "event",
-            Event(
-                features=[output_feature],
-                sampling=sampling.sampling(),
-                creator=self,
-            ),
-        )
-
-        self.check()
+    @classmethod
+    @property
+    def operator_def_key(cls) -> str:
+        return "CALENDAR_DAY_OF_MONTH"
 
     @classmethod
-    def build_op_definition(cls) -> pb.OperatorDef:
-        return pb.OperatorDef(
-            key="CALENDAR_DAY",
-            inputs=[pb.OperatorDef.Input(key="sampling")],
-            outputs=[pb.OperatorDef.Output(key="event")],
-        )
+    @property
+    def output_feature_name(cls) -> str:
+        return "calendar_day_of_month"
 
 
 operator_lib.register_operator(CalendarDayOfMonthOperator)
@@ -66,7 +40,8 @@ operator_lib.register_operator(CalendarDayOfMonthOperator)
 
 def calendar_day_of_month(sampling: Event) -> Event:
     """Obtain the day of month each of the timestamps in an event belongs to.
-    Features in input event are ignored.
+    Features in input event are ignored. Output feature contains numbers
+    between 1 and 31.
 
     Args:
         sampling: the event to get the days of month from.

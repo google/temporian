@@ -22,11 +22,13 @@ class Sampling(object):
         self,
         index: List[str],
         creator: Optional[Any] = None,
+        is_unix_timestamp: bool = False,
     ):
         assert isinstance(index, list), f"Got {index}"
 
         self._index: List[str] = index
         self._creator = creator
+        self._is_unix_timestamp = is_unix_timestamp
 
     def __repr__(self):
         return f"Sampling<index:{self._index},id:{id(self)}>"
@@ -39,3 +41,6 @@ class Sampling(object):
 
     def set_creator(self, creator):
         self._creator = creator
+
+    def is_unix_timestamp(self) -> bool:
+        return self._is_unix_timestamp

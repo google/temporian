@@ -11,11 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from absl import logging
-from absl.testing import absltest
-
 import numpy as np
 import pandas as pd
+from absl import logging
+from absl.testing import absltest
 
 from temporian.core import evaluator
 from temporian.core.data.event import Event, Feature
@@ -38,7 +37,7 @@ class PrototypeTest(absltest.TestCase):
         BOOK_ID = 2
         PIXEL_ID = 3
 
-        self.event_1 = NumpyEvent.from_dataframe(
+        self.event_1_data = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
                     [TRYOLABS_SHOP, MATE_ID, 0.0, 14],
@@ -55,7 +54,7 @@ class PrototypeTest(absltest.TestCase):
             index_names=["store_id", "product_id"],
         )
 
-        self.event_2 = NumpyEvent.from_dataframe(
+        self.event_2_data = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
                     [TRYOLABS_SHOP, MATE_ID, 0.0, -14],
@@ -115,6 +114,11 @@ class PrototypeTest(absltest.TestCase):
             sampling=sampling,
         )
 
+        # TODO: Once "event_1_data.schema()" and "event_2_data.schema()" return the same sampling, replace the block above with:
+
+        # event_1 = self.event_1_data.schema()
+        # event_2 = self.event_2_data.schema()
+
         # assign second event to first
         output_event = assign(event_1, event_2)
 
@@ -132,25 +136,16 @@ class PrototypeTest(absltest.TestCase):
             output_event,
             input_data={
                 # left event specified from disk
-                event_1: self.event_1,
-                event_2: self.event_2,
+                event_1: self.event_1_data,
+                event_2: self.event_2_data,
             },
             # TODO: The assign operator has some issues with dtypes. Re-enable
             # checking when solved.
             check_execution=False,
         )
 
-        if self.expected_output_event != output_event_numpy:
-            print("expected")
-            print(self.expected_output_event.to_dataframe())
-            print("actual")
-            print(output_event_numpy.to_dataframe())
-
         # validate
-        self.assertEqual(
-            True,
-            self.expected_output_event == output_event_numpy,
-        )
+        self.assertEqual(self.expected_output_event, output_event_numpy)
 
 
 if __name__ == "__main__":

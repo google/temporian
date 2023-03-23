@@ -24,10 +24,18 @@ from temporian.proto import core_pb2 as pb
 class SelectOperator(Operator):
     """Select operator."""
 
-    def __init__(self, event: Event, feature_names: List[str]):
+    def __init__(self, event: Event, feature_names: Union[str, List[str]]):
         super().__init__()
 
         # store selected feature names
+        if isinstance(feature_names, str):
+            feature_names = [feature_names]
+
+        if not isinstance(feature_names, list):
+            raise ValueError(
+                "Unexpected type for feature_names. Expect str or list of"
+                f" str. Got '{feature_names}' instead."
+            )
         self.add_attribute("feature_names", feature_names)
 
         # verify all selected features exist in the input event

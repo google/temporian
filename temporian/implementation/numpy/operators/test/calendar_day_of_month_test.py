@@ -17,14 +17,13 @@ import numpy as np
 import pandas as pd
 
 from temporian.core.data.event import Event
-from temporian.core.data.event import Feature
 from temporian.core.data.sampling import Sampling
-from temporian.core.operators.calendar_day_of_month import (
+from temporian.core.operators.calendar.day_of_month import (
     CalendarDayOfMonthOperator,
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
-from temporian.implementation.numpy.operators.calendar_day_of_month import (
+from temporian.implementation.numpy.operators.calendar.day_of_month import (
     CalendarDayOfMonthNumpyImplementation,
 )
 
@@ -33,7 +32,7 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
     """Test numpy implementation of calendar_day_of_month operator."""
 
     def test_no_index(self) -> None:
-        """Test calendar day operator with flat event."""
+        """Test calendar day of month operator with flat event."""
         input_event_data = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
@@ -71,7 +70,7 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
         )
 
     def test_with_index(self) -> None:
-        """Test calendar day operator with flat event."""
+        """Test calendar day of month operator with indexed event."""
         input_event_data = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
@@ -115,6 +114,20 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
         self.assertTrue(
             output["event"]._first_index_features[0].dtype == np.int32
         )
+
+    # TODO: move this test to core operators' test suite when created
+    # since its testing BaseCalendarOperator's logic, not
+    # CalendarDayOfMonthNumpyImplementation's
+    def test_invalid_sampling(self) -> None:
+        """
+        Test calendar operator with a non-utc timestamp
+        sampling.
+        """
+        input_event = Event(
+            features=[], sampling=Sampling(index=[], is_unix_timestamp=False)
+        )
+        with self.assertRaises(ValueError):
+            CalendarDayOfMonthOperator(input_event)
 
 
 if __name__ == "__main__":

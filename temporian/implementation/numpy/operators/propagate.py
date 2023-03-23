@@ -4,7 +4,6 @@
 from typing import Dict
 
 import numpy as np
-import itertools
 
 from temporian.implementation.numpy.data.event import NumpyEvent, NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
@@ -13,19 +12,19 @@ from temporian.implementation.numpy import implementation_lib
 
 
 class PropagateNumpyImplementation:
-    """Numpy implementation for the propagat operator."""
+    """Numpy implementation for the propagate operator."""
 
-    def __init__(self, op: Propagate) -> None:
-        assert isinstance(op, Propagate)
-        self._op = op
+    def __init__(self, operator: Propagate) -> None:
+        assert isinstance(operator, Propagate)
+        self._operator = operator
 
     def __call__(
-        self,
-        event: NumpyEvent,
-        add_event: NumpyEvent = None,
+        self, event: NumpyEvent, to: NumpyEvent
     ) -> Dict[str, NumpyEvent]:
-        # All the features of "add_event" are added as part of the new index.
-        added_index = self._op.added_index()
+        # All the features of "to" are added as part of the new index.
+        added_index = self._operator.added_index()
+        num_new_index = len(added_index)
+
         dst_sampling = NumpySampling(
             index=event.sampling.index + added_index, data={}
         )
@@ -33,24 +32,28 @@ class PropagateNumpyImplementation:
 
         # For each index
         for src_index_item, src_event_item in event.data.items():
-            src_add_event_item = add_event.data[src_index_item]
+            src_to_item = to.data[src_index_item]
             src_timestamps_item = event.sampling.data[src_index_item]
 
             # TODO: Change the NumpyEvent structure so that feature names are
             # not repeated for each index value, and such that features can be
             # refered by an integer accross all index values. When done, remove
             # the following assets.
-            assert len(src_add_event_item) == len(added_index)
-            index_uniques = []
+            assert len(src_to_item) == len(added_index)
             for idx, key in enumerate(added_index):
-                assert key == src_add_event_item[idx].name
+                assert key == src_to_item[idx].name
 
-            index_uniques = [
-                np.unique(src_add_event_item[idx].data)
-                for idx in range(len(added_index))
-            ]
+            num_values = len(src_to_item[0].data)
+            unique_index_values = set(
+                [
+                    tuple(
+                        [src_to_item[j].data[i] for j in range(num_new_index)]
+                    )
+                    for i in range(num_values)
+                ]
+            )
 
-            for extra_index in itertools.product(*index_uniques):
+            for extra_index in unique_index_values:
                 dst_index = src_index_item + extra_index
 
                 # Copy the sampling data

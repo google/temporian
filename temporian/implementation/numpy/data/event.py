@@ -4,9 +4,10 @@ import numpy as np
 import pandas as pd
 
 from temporian.core.data import dtype
-from temporian.core.data.event import Event
-from temporian.core.data.sampling import Sampling
 from temporian.core.data.duration import convert_date_to_duration
+from temporian.core.data.event import Event
+from temporian.core.data.event import Feature
+from temporian.core.data.sampling import Sampling
 from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.utils import string
 
@@ -46,15 +47,18 @@ class NumpyFeature:
         if self.name != __o.name:
             return False
 
-        if not np.array_equal(self.data, __o.data, equal_nan=True):
-            return False
+        if self.dtype is np.string_:
+            return np.array_equal(self.data, __o.data)
 
-        return True
+        return np.array_equal(self.data, __o.data, equal_nan=True)
 
     def core_dtype(self) -> Any:
         if hasattr(self.dtype, "type") and self.dtype.type is np.string_:
             return dtype.STRING
         return DTYPE_MAPPING[self.dtype]
+
+    def schema(self) -> Feature:
+        return Feature(self.name, self.dtype)
 
 
 class NumpyEvent:
@@ -95,7 +99,10 @@ class NumpyEvent:
             features=[
                 feature.schema() for feature in list(self.data.values())[0]
             ],
-            sampling=Sampling(index=self.sampling.index),
+            sampling=Sampling(
+                index=self.sampling.index,
+                is_unix_timestamp=self.sampling.is_unix_timestamp,
+            ),
         )
 
     @staticmethod
@@ -155,14 +162,29 @@ class NumpyEvent:
                 f"Timestamp column {timestamp_column} cannot be on index_names"
             )
 
-        # convert timestamp column to UTC Epoch float
+        # check if created sampling's values will be unix timestamps
+        is_unix_timestamp = pd.api.types.is_datetime64_any_dtype(
+            df[timestamp_column]
+        )
+
+        # convert timestamp column to float
         df[timestamp_column] = df[timestamp_column].apply(
             convert_date_to_duration
         )
 
         # check column dtypes, every dtype should be a key of DTYPE_MAPPING
         for column in df.columns:
-            if df[column].dtype.type not in DTYPE_MAPPING:
+            # if dtype is object, convert to string
+            if df[column].dtype.type is np.object_:
+                try:
+                    df[column] = df[column].astype(np.string_)
+                except ValueError as exc:
+                    raise ValueError(
+                        f"Column {column} has dtype object, but cannot be"
+                        " converted to string."
+                    ) from exc
+
+            elif df[column].dtype.type not in DTYPE_MAPPING:
                 raise ValueError(
                     f"Unsupported dtype {df[column].dtype} for column"
                     f" {column}. Supported dtypes: {DTYPE_MAPPING.keys()}"
@@ -207,7 +229,11 @@ class NumpyEvent:
                 for feature in feature_columns
             ]
 
-        numpy_sampling = NumpySampling(index=index_names, data=sampling)
+        numpy_sampling = NumpySampling(
+            index=index_names,
+            data=sampling,
+            is_unix_timestamp=is_unix_timestamp,
+        )
 
         return NumpyEvent(data=data, sampling=numpy_sampling)
 
@@ -216,48 +242,24 @@ class NumpyEvent:
 
         Returns:
             pd.DataFrame: DataFrame created from NumpyEvent.
-
         """
+        # Creating an empty dictionary to store the data
+        data = {}
 
-        feature_names = self.feature_names
-        index_names = self.sampling.index
-        columns = index_names + feature_names + ["timestamp"]
+        columns = self.sampling.index + self.feature_names + ["timestamp"]
+        for column_name in columns:
+            data[column_name] = []
 
-        df = pd.DataFrame(data=[], columns=columns)
-
-        # append every feature to the dataframe. without index
         for index, features in self.data.items():
             timestamps = self.sampling.data[index]
+            data["timestamp"].extend(timestamps)
+            for feature in features:
+                data[feature.name].extend(feature.data)
+            for index_key in self.sampling.index:
+                data[index_key].extend(index * len(timestamps))
 
-            for i, timestamp in enumerate(timestamps):
-                # add row to dataframe
-                row = (
-                    list(index)
-                    + [feature.data[i] for feature in features]
-                    + [timestamp]
-                )
-                df.loc[len(df)] = row
-
-        # Convert to original dtypes, can be more efficient
-        first_index = self._first_index_value
-        first_features = self._first_index_features
-
-        # get feature dtypes
-        features_dtypes = {
-            feature.name: feature.data[0].dtype for feature in first_features
-        }
-
-        # get tuple index dtypes
-        index_dtypes = {
-            index_name: type(first_index[i])
-            for i, index_name in enumerate(self.sampling.index)
-        }
-
-        # get timestamp dtype
-        first_timestamp = self.sampling.data[first_index][0]
-        sampling_dtype = {"timestamp": first_timestamp.dtype}
-
-        df = df.astype({**features_dtypes, **index_dtypes, **sampling_dtype})
+        # Converting dictionary to pandas DataFrame
+        df = pd.DataFrame(data)
 
         return df
 

@@ -51,26 +51,6 @@ py_library(
 )
 
 py_library(
-    name = "base",
-    srcs = ["base.py"],
-    srcs_version = "PY3",
-    deps = [
-        "//temporian/implementation/numpy/data:event",
-    ],
-)
-
-py_library(
-    name = "calendar_day_of_month",
-    srcs = ["calendar_day_of_month.py"],
-    srcs_version = "PY3",
-    deps = [
-        "//temporian/core/operators:calendar_day_of_month",
-        "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
-    ],
-)
-
-py_library(
     name = "lag",
     srcs = ["lag.py"],
     srcs_version = "PY3",
@@ -99,7 +79,6 @@ py_library(
     srcs = ["simple_moving_average.py"],
     srcs_version = "PY3",
     deps = [
-        ":base",
         "//temporian/core/data:duration",
         "//temporian/core/operators:simple_moving_average",
         "//temporian/implementation/numpy:implementation_lib",
@@ -114,7 +93,7 @@ py_library(
     srcs = ["propagate.py"],
     srcs_version = "PY3",
     deps = [
-        ":base",
+        "//temporian/core/data:duration",
         "//temporian/core/operators:propagate",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy:utils",

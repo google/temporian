@@ -1,19 +1,19 @@
 from typing import Dict
 
+from temporian.core.operators.select import SelectOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy import implementation_lib
 from temporian.core.operators.select import SelectOperator
 
 
-class NumpySelectOperator:
+class SelectNumpyImplementation:
     """Select a subset of features from an event."""
 
-    def __init__(self, op: SelectOperator) -> None:
-        assert isinstance(op, SelectOperator)
-        self._op = op
+    def __init__(self, operator: SelectOperator) -> None:
+        self.operator = operator
 
     def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
-        feature_names = self._op.attributes()["feature_names"]
+        feature_names = self.operator.attributes()["feature_names"]
 
         output_event = NumpyEvent(
             {
@@ -30,5 +30,5 @@ class NumpySelectOperator:
 
 
 implementation_lib.register_operator_implementation(
-    SelectOperator, NumpySelectOperator
+    SelectOperator, SelectNumpyImplementation
 )

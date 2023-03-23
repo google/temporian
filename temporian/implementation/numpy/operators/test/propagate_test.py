@@ -42,7 +42,7 @@ class PropagateOperatorTest(absltest.TestCase):
             ],
             sampling=sampling,
         )
-        add_index = event_lib.input_event(
+        to = event_lib.input_event(
             [
                 feature_lib.Feature(name="c", dtype=dtype_lib.STRING),
                 feature_lib.Feature(name="d", dtype=dtype_lib.STRING),
@@ -51,6 +51,8 @@ class PropagateOperatorTest(absltest.TestCase):
         )
 
         # Create input data
+        # TODO: Use "from_dataframe" when it suppose sampling sharing.
+
         sampling = NumpySampling(
             index=["x"],
             data={
@@ -73,7 +75,7 @@ class PropagateOperatorTest(absltest.TestCase):
             sampling=sampling,
         )
 
-        add_event = NumpyEvent(
+        to_data = NumpyEvent(
             data={
                 ("X1",): [
                     NumpyFeature("c", np.array([1, 2, 1])),
@@ -94,7 +96,6 @@ class PropagateOperatorTest(absltest.TestCase):
                 ("X1", 1, 1): np.array([0.1, 0.2, 0.3], dtype=np.float64),
                 ("X1", 1, 2): np.array([0.1, 0.2, 0.3], dtype=np.float64),
                 ("X1", 2, 1): np.array([0.1, 0.2, 0.3], dtype=np.float64),
-                ("X1", 2, 2): np.array([0.1, 0.2, 0.3], dtype=np.float64),
                 ("X2", 1, 1): np.array([0.4, 0.5], dtype=np.float64),
                 ("X2", 1, 2): np.array([0.4, 0.5], dtype=np.float64),
             },
@@ -126,14 +127,6 @@ class PropagateOperatorTest(absltest.TestCase):
                     NumpyFeature("a", np.array([1, 2, 3])),
                     NumpyFeature("b", np.array([4, 5, 6])),
                 ],
-                (
-                    "X1",
-                    2,
-                    2,
-                ): [
-                    NumpyFeature("a", np.array([1, 2, 3])),
-                    NumpyFeature("b", np.array([4, 5, 6])),
-                ],
                 ("X2", 1, 1): [
                     NumpyFeature("a", np.array([7, 8])),
                     NumpyFeature("b", np.array([9, 10])),
@@ -147,9 +140,9 @@ class PropagateOperatorTest(absltest.TestCase):
         )
 
         # Run op
-        op = Propagate(event=event, add_index=add_index)
+        op = Propagate(event=event, to=to)
         instance = PropagateNumpyImplementation(op)
-        output = instance(event=input_data, add_event=add_event)["event"]
+        output = instance(event=input_data, to=to_data)["event"]
         self.assertEqual(output, expected_output)
 
 
