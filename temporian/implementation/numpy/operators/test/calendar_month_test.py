@@ -16,29 +16,30 @@ from absl.testing import absltest
 import numpy as np
 import pandas as pd
 
-from temporian.core.operators.calendar.day_of_week import (
-    CalendarDayOfWeekOperator,
+from temporian.core.operators.calendar.month import (
+    CalendarMonthOperator,
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
-from temporian.implementation.numpy.operators.calendar.day_of_week import (
-    CalendarDayOfWeekNumpyImplementation,
+from temporian.implementation.numpy.operators.calendar.month import (
+    CalendarMonthNumpyImplementation,
 )
 
 
-class CalendarDayOfWeekNumpyImplementationTest(absltest.TestCase):
-    """Test numpy implementation of calendar_day_of_week operator."""
+class CalendarMonthNumpyImplementationTest(absltest.TestCase):
+    """Test numpy implementation of calendar_month operator."""
 
     def test_basic(self) -> None:
         "Basic test with flat event."
         input_event_data = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
-                    [pd.to_datetime("Monday Mar 13 12:00:00 2023", utc=True)],
-                    [pd.to_datetime("Tuesday Mar 14 12:00:00 2023", utc=True)],
-                    [pd.to_datetime("Friday Mar 17 00:00:01 2023", utc=True)],
-                    [pd.to_datetime("Friday Mar 17 23:59:59 2023", utc=True)],
-                    [pd.to_datetime("Sunday Mar 19 23:59:59 2023", utc=True)],
+                    [pd.to_datetime("1970-01-01 00:00:00", utc=True)],
+                    [pd.to_datetime("2021-01-01 00:00:00", utc=True)],
+                    [pd.to_datetime("2021-07-15 12:30:00", utc=True)],
+                    [pd.to_datetime("2021-12-31 23:59:59", utc=True)],
+                    [pd.to_datetime("2045-12-31 23:59:59", utc=True)],
+                    [pd.to_datetime("2045-12-01 00:00:00", utc=True)],
                 ],
                 columns=["timestamp"],
             ),
@@ -50,16 +51,16 @@ class CalendarDayOfWeekNumpyImplementationTest(absltest.TestCase):
             data={
                 (): [
                     NumpyFeature(
-                        name="calendar_day_of_week",
-                        data=np.array([0, 1, 4, 4, 6]),
+                        name="calendar_month",
+                        data=np.array([1, 1, 7, 12, 12, 12]),
                     ),
                 ],
             },
             sampling=input_event_data.sampling,
         )
 
-        operator = CalendarDayOfWeekOperator(input_event)
-        impl = CalendarDayOfWeekNumpyImplementation(operator)
+        operator = CalendarMonthOperator(input_event)
+        impl = CalendarMonthNumpyImplementation(operator)
 
         output = impl(input_event_data)
 

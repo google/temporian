@@ -65,6 +65,96 @@ py_test(
 )
 
 py_test(
+    name = "calendar_day_of_year_test",
+    srcs = ["calendar_day_of_year_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/testing:absltest dep,
+        "//temporian/core/data:event",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators/calendar:day_of_year",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/operators/calendar:day_of_year",
+    ],
+)
+
+py_test(
+    name = "calendar_hour_test",
+    srcs = ["calendar_hour_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/testing:absltest dep,
+        "//temporian/core/data:event",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators/calendar:hour",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/operators/calendar:hour",
+    ],
+)
+
+py_test(
+    name = "calendar_iso_week_test",
+    srcs = ["calendar_iso_week_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/testing:absltest dep,
+        "//temporian/core/data:event",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators/calendar:iso_week",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/operators/calendar:iso_week",
+    ],
+)
+
+py_test(
+    name = "calendar_minute_test",
+    srcs = ["calendar_minute_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/testing:absltest dep,
+        "//temporian/core/data:event",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators/calendar:minute",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/operators/calendar:minute",
+    ],
+)
+
+py_test(
+    name = "calendar_second_test",
+    srcs = ["calendar_second_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/testing:absltest dep,
+        "//temporian/core/data:event",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators/calendar:second",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/operators/calendar:second",
+    ],
+)
+
+py_test(
+    name = "calendar_year_test",
+    srcs = ["calendar_year_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/testing:absltest dep,
+        "//temporian/core/data:event",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators/calendar:year",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/operators/calendar:year",
+    ],
+)
+
+py_test(
     name = "lag_test",
     srcs = ["lag_test.py"],
     srcs_version = "PY3",

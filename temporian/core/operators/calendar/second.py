@@ -12,43 +12,42 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Calendar day of week operator."""
+"""Calendar second operator."""
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
 from temporian.core.operators.calendar.base import BaseCalendarOperator
 
 
-class CalendarDayOfWeekOperator(BaseCalendarOperator):
+class CalendarSecondOperator(BaseCalendarOperator):
     """
-    Calendar operator to obtain the day of the week each timestamp belongs to.
+    Calendar operator to obtain the second each timestamp belongs to.
     """
 
     @classmethod
     @property
     def operator_def_key(cls) -> str:
-        return "CALENDAR_DAY_OF_WEEK"
+        return "CALENDAR_SECOND"
 
     @classmethod
     @property
     def output_feature_name(cls) -> str:
-        return "calendar_day_of_week"
+        return "calendar_second"
 
 
-operator_lib.register_operator(CalendarDayOfWeekOperator)
+operator_lib.register_operator(CalendarSecondOperator)
 
 
-def calendar_day_of_week(sampling: Event) -> Event:
-    """Obtain the day of the week each of the timestamps in an event's sampling
-    belongs to. Features in input event are ignored. Output feature contains
-    numbers from 0 (Monday) to 6 (Sunday).
+def calendar_second(sampling: Event) -> Event:
+    """Obtain the second each of the timestamps in an event's sampling belongs
+    to. Features in input event are ignored. Output feature contains numbers
+    between 0 and 59.
 
     Args:
-        sampling: the event to get the days of week from.
+        sampling: the event to get the seconds from.
 
     Returns:
-        event with a single feature corresponding to the day of the week
-            each timestamp in `event`'s sampling belongs to, with the same
-            sampling as `event`.
+        event with a single feature corresponding to the second each timestamp
+            in `event`'s sampling belongs to, with the same sampling as `event`.
     """
-    return CalendarDayOfWeekOperator(sampling).outputs()["event"]
+    return CalendarSecondOperator(sampling).outputs()["event"]

@@ -39,9 +39,9 @@ operator_lib.register_operator(CalendarDayOfMonthOperator)
 
 
 def calendar_day_of_month(sampling: Event) -> Event:
-    """Obtain the day of month each of the timestamps in an event belongs to.
-    Features in input event are ignored. Output feature contains numbers
-    between 1 and 31.
+    """Obtain the day of month each of the timestamps in an event's sampling
+    belongs to. Features in input event are ignored. Output feature contains
+    numbers between 1 and 31.
 
     Args:
         sampling: the event to get the days of month from.

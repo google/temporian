@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from absl.testing import absltest
+import math
 
 import numpy as np
 
@@ -25,7 +26,6 @@ from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.core.data import event as event_lib
 from temporian.core.data import feature as feature_lib
 from temporian.core.data import dtype as dtype_lib
-import math
 
 
 class SimpleMovingAverageOperatorTest(absltest.TestCase):

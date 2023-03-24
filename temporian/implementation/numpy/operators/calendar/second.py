@@ -16,24 +16,24 @@ from typing import Any
 from datetime import datetime
 
 from temporian.implementation.numpy import implementation_lib
-from temporian.core.operators.calendar.day_of_month import (
-    CalendarDayOfMonthOperator,
+from temporian.core.operators.calendar.second import (
+    CalendarSecondOperator,
 )
 from temporian.implementation.numpy.operators.calendar.base import (
     BaseCalendarNumpyImplementation,
 )
 
 
-class CalendarDayOfMonthNumpyImplementation(BaseCalendarNumpyImplementation):
-    """Numpy implementation of the calendar_day_of_month operator."""
+class CalendarSecondNumpyImplementation(BaseCalendarNumpyImplementation):
+    """Numpy implementation of the calendar_second operator."""
 
-    def __init__(self, operator: CalendarDayOfMonthOperator) -> None:
+    def __init__(self, operator: CalendarSecondOperator) -> None:
         super().__init__(operator)
 
     def _get_value_from_datetime(self, dt: datetime) -> Any:
-        return dt.day
+        return dt.second
 
 
 implementation_lib.register_operator_implementation(
-    CalendarDayOfMonthOperator, CalendarDayOfMonthNumpyImplementation
+    CalendarSecondOperator, CalendarSecondNumpyImplementation
 )
