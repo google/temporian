@@ -6,8 +6,8 @@ package(
 # Tests
 # =====
 py_test(
-    name = "test_df_to_event",
-    srcs = ["test_df_to_event.py"],
+    name = "df_to_event_test",
+    srcs = ["df_to_event_test.py"],
     srcs_version = "PY3",
     deps = [
         # absl/testing:absltest dep,
@@ -17,8 +17,8 @@ py_test(
 )
 
 py_test(
-    name = "test_event_to_df",
-    srcs = ["test_event_to_df.py"],
+    name = "event_to_df_test",
+    srcs = ["event_to_df_test.py"],
     srcs_version = "PY3",
     deps = [
         # absl/testing:absltest dep,
@@ -28,10 +28,17 @@ py_test(
 )
 
 py_test(
-    name = "test_sampling",
-    srcs = ["test_sampling.py"],
+    name = "sampling_test",
+    srcs = ["sampling_test.py"],
     srcs_version = "PY3",
     deps = [
         "//temporian/implementation/numpy/data:sampling",
     ],
+)
+
+py_test(
+    name = "event_test",
+    srcs = ["event_test.py"],
+    srcs_version = "PY3",
+    deps = ["//temporian/implementation/numpy/data:event"],
 )

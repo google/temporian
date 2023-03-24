@@ -30,6 +30,12 @@ class SelectOperator(Operator):
         # store selected feature names
         if isinstance(feature_names, str):
             feature_names = [feature_names]
+
+        if not isinstance(feature_names, list):
+            raise ValueError(
+                "Unexpected type for feature_names. Expect str or list of"
+                f" str. Got '{feature_names}' instead."
+            )
         self.add_attribute("feature_names", feature_names)
 
         # verify all selected features exist in the input event
@@ -89,4 +95,14 @@ def select(
     event: Event,
     feature_names: List[str],
 ) -> Event:
+    if isinstance(feature_names, list):
+        pass
+    elif isinstance(feature_names, str):
+        feature_names = [feature_names]
+    else:
+        raise ValueError(
+            "Unexpected type for feature_names. Expect str or list of"
+            f" str. Got '{feature_names}' instead."
+        )
+
     return SelectOperator(event, feature_names).outputs()["event"]

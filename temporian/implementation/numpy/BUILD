@@ -17,10 +17,10 @@ py_library(
     srcs = ["evaluator.py"],
     srcs_version = "PY3",
     deps = [
+        ":implementation_lib",
         "//temporian/core/data:event",
         "//temporian/core/operators:base",
         "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/operators:core_mapping",
     ],
 )
 
@@ -32,4 +32,10 @@ py_library(
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
     ],
+)
+
+py_library(
+    name = "implementation_lib",
+    srcs = ["implementation_lib.py"],
+    srcs_version = "PY3",
 )

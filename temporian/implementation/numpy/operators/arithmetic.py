@@ -19,6 +19,7 @@ from temporian.core.operators.arithmetic import ArithmeticOperator
 from temporian.core.operators.arithmetic import Resolution
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
+from temporian.implementation.numpy import implementation_lib
 
 
 class ArithmeticNumpyImplementation:
@@ -101,3 +102,8 @@ class ArithmeticNumpyImplementation:
                 )
 
         return {"event": output}
+
+
+implementation_lib.register_operator_implementation(
+    ArithmeticOperator, ArithmeticNumpyImplementation
+)

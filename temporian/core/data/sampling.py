@@ -24,6 +24,8 @@ class Sampling(object):
         creator: Optional[Any] = None,
         is_unix_timestamp: bool = False,
     ):
+        assert isinstance(index, list), f"Got {index}"
+
         self._index: List[str] = index
         self._creator = creator
         self._is_unix_timestamp = is_unix_timestamp

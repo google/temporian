@@ -5,6 +5,7 @@ from temporian.core.operators.lag import LagOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
+from temporian.implementation.numpy import implementation_lib
 
 
 class LagNumpyImplementation:
@@ -38,3 +39,8 @@ class LagNumpyImplementation:
         output_event = NumpyEvent(data=output_data, sampling=new_sampling)
 
         return {"event": output_event}
+
+
+implementation_lib.register_operator_implementation(
+    LagOperator, LagNumpyImplementation
+)

@@ -98,9 +98,13 @@ class Event(object):
 
 
 def input_event(
-    features: List[Feature], index: List[str] = [], name: Optional[str] = None
+    features: List[Feature],
+    index: List[str] = [],
+    name: Optional[str] = None,
+    sampling: Optional[Sampling] = None,
 ) -> Event:
-    sampling = Sampling(index=index, creator=None)
+    if sampling is None:
+        sampling = Sampling(index=index, creator=None)
 
     for feature in features:
         if feature.sampling() is not None:

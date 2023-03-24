@@ -7,14 +7,14 @@ package(
 # =========
 
 py_library(
-    name = "operators",
-    srcs = ["__init__.py"],
+    name = "all_operators",
+    srcs = ["all_operators.py"],
     srcs_version = "PY3",
     deps = [
         ":arithmetic",
         ":assign",
-        ":base",
         ":lag",
+        ":propagate",
         ":select",
         ":simple_moving_average",
         "//temporian/core/operators/calendar:day_of_month",
@@ -99,6 +99,21 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:duration",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "propagate",
+    srcs = ["propagate.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        ":select",
         "//temporian/core:operator_lib",
         "//temporian/core/data:duration",
         "//temporian/core/data:event",

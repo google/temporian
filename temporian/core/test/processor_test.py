@@ -12,15 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from absl import logging
 from absl.testing import absltest
 
 from temporian.core import processor
-from temporian.core.data import dtype
-from temporian.core.data.event import Event
-from temporian.core.data.feature import Feature
-from temporian.core.data.sampling import Sampling
-from temporian.core.operators import base
 from temporian.proto import core_pb2 as pb
 from temporian.core.test import utils
 

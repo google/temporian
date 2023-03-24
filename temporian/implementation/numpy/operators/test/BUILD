@@ -171,6 +171,8 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # absl/testing:absltest dep,
+        "//temporian/core:evaluator",
+        "//temporian/core/operators:select",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/operators:select",
     ],
@@ -188,5 +190,18 @@ py_test(
         "//temporian/core/data:feature",
         "//temporian/core/data:dtype",
         "//temporian/core/operators:simple_moving_average",
+    ],
+)
+
+py_test(
+    name = "propagate_test",
+    srcs = ["propagate_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/core/operators:propagate",
+        "//temporian/implementation/numpy/operators:propagate",
     ],
 )

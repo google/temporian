@@ -13,6 +13,7 @@ py_library(
         "//temporian/core/data:feature",
         "//temporian/core/data:sampling",
         "//temporian/core/operators:base",
+        "//temporian/implementation/numpy/data:event",
     ],
 )
 
@@ -84,5 +85,15 @@ py_test(
         "//temporian/core/data:sampling",
         "//temporian/core/operators:base",
         "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_test(
+    name = "registered_operators_test",
+    srcs = ["registered_operators_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core:operator_lib",
+        "//temporian/core/operators:all_operators",
     ],
 )

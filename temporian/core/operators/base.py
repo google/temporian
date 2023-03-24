@@ -46,12 +46,7 @@ class OperatorExceptionDecorator(object):
 
         if exc_val:
             # Add operator details in the exception.
-            exc_val.args += (
-                (
-                    "In operator"
-                    f' "{self._operator.__class__.build_op_definition().key}".'
-                ),
-            )
+            exc_val.args += (f'In operator "{self._operator}".',)
         return False
 
 
@@ -144,3 +139,20 @@ class Operator(ABC):
 
     def set_attributes(self, attributes: dict[str, Event]) -> None:
         self._attributes = attributes
+
+    def list_matching_io_samplings(self) -> list[tuple[str, str]]:
+        """List pairs of input/output pairs with the same sampling.
+
+        This function is used to check the correct implementation of ops are
+        runtime.
+        """
+
+        # TODO: Optimize the number of matches: We don't need all the currently
+        # computed matches to check the output validity.
+        matches: list[tuple[str, str]] = []
+        for output_key, output_value in self._outputs.items():
+            for input_key, input_value in self._inputs.items():
+                if output_value.sampling() is input_value.sampling():
+                    matches.append((input_key, output_key))
+
+        return matches

@@ -14,9 +14,9 @@
 
 """Serialization / unserialization of a processor."""
 
-from google.protobuf import text_format
+from typing import Set, Union, Any, Dict, Tuple, Optional
 
-from typing import Set, Union, Any, Dict, Tuple, List, Optional
+from google.protobuf import text_format
 
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
@@ -317,7 +317,7 @@ def _serialize_sampling(src: Sampling) -> pb.Sampling:
 
 
 def _unserialize_sampling(src: pb.Sampling) -> Sampling:
-    return Sampling(index=src.index, creator=None)
+    return Sampling(index=list(src.index), creator=None)
 
 
 def _serialize_dtype(dtype) -> pb.Feature.DType:
