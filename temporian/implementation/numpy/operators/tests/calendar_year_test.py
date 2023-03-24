@@ -34,6 +34,7 @@ class CalendarYearNumpyImplementationTest(absltest.TestCase):
         input_event_data = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
+                    [pd.to_datetime("1960-01-01 00:00:00", utc=True)],
                     [pd.to_datetime("1970-01-01 00:00:00", utc=True)],
                     [pd.to_datetime("2021-01-01 00:00:00", utc=True)],
                     [pd.to_datetime("2021-01-01 00:00:01", utc=True)],
@@ -51,7 +52,7 @@ class CalendarYearNumpyImplementationTest(absltest.TestCase):
                 (): [
                     NumpyFeature(
                         name="calendar_year",
-                        data=np.array([1970, 2021, 2021, 2021, 2045]),
+                        data=np.array([1960, 1970, 2021, 2021, 2021, 2045]),
                     ),
                 ],
             },
