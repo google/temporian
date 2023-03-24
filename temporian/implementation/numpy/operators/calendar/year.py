@@ -31,7 +31,3 @@ class CalendarYearNumpyImplementation(BaseCalendarNumpyImplementation):
 
     def _get_value_from_datetime(self, dt: datetime) -> Any:
         return dt.year
-
-    @property
-    def _output_feature_name(self) -> str:
-        return "calendar_year"

@@ -31,7 +31,3 @@ class CalendarDayOfMonthNumpyImplementation(BaseCalendarNumpyImplementation):
 
     def _get_value_from_datetime(self, dt: datetime) -> Any:
         return dt.day
-
-    @property
-    def _output_feature_name(self) -> str:
-        return "calendar_day_of_month"

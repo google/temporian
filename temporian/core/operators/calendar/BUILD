@@ -53,6 +53,17 @@ py_library(
 )
 
 py_library(
+    name = "day_of_year",
+    srcs = ["day_of_year.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:event",
+    ],
+)
+
+py_library(
     name = "hour",
     srcs = ["hour.py"],
     srcs_version = "PY3",
