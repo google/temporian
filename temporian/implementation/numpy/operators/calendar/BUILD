@@ -63,6 +63,16 @@ py_library(
 )
 
 py_library(
+    name = "iso_week",
+    srcs = ["iso_week.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators/calendar:iso_week",
+    ],
+)
+
+py_library(
     name = "minute",
     srcs = ["minute.py"],
     srcs_version = "PY3",

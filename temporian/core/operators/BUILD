@@ -21,6 +21,7 @@ py_library(
         "//temporian/core/operators/calendar:day_of_week",
         "//temporian/core/operators/calendar:day_of_year",
         "//temporian/core/operators/calendar:hour",
+        "//temporian/core/operators/calendar:iso_week",
         "//temporian/core/operators/calendar:minute",
         "//temporian/core/operators/calendar:month",
         "//temporian/core/operators/calendar:second",

@@ -95,6 +95,21 @@ py_test(
 )
 
 py_test(
+    name = "calendar_iso_week_test",
+    srcs = ["calendar_iso_week_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/testing:absltest dep,
+        "//temporian/core/data:event",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators/calendar:iso_week",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/operators/calendar:iso_week",
+    ],
+)
+
+py_test(
     name = "calendar_minute_test",
     srcs = ["calendar_minute_test.py"],
     srcs_version = "PY3",

@@ -75,6 +75,17 @@ py_library(
 )
 
 py_library(
+    name = "iso_week",
+    srcs = ["iso_week.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:event",
+    ],
+)
+
+py_library(
     name = "minute",
     srcs = ["minute.py"],
     srcs_version = "PY3",
