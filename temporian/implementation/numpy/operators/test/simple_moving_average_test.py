@@ -18,7 +18,9 @@ import math
 import pandas as pd
 import numpy as np
 
-from temporian.core.operators.simple_moving_average import SimpleMovingAverage
+from temporian.core.operators.window.simple_moving_average import (
+    SimpleMovingAverageOperator,
+)
 from temporian.implementation.numpy.operators.simple_moving_average import (
     SimpleMovingAverageNumpyImplementation,
 )
@@ -52,7 +54,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             )
         )
 
-        op = SimpleMovingAverage(
+        op = SimpleMovingAverageOperator(
             event=input_data.schema(),
             window_length=5,
             sampling=None,
@@ -98,7 +100,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             index_names=["x", "y"],
         )
 
-        op = SimpleMovingAverage(
+        op = SimpleMovingAverageOperator(
             event=input_data.schema(),
             window_length=5,
             sampling=None,
@@ -144,7 +146,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             )
         )
 
-        op = SimpleMovingAverage(
+        op = SimpleMovingAverageOperator(
             event=input_data.schema(),
             window_length=3,
             sampling=event_lib.input_event([]),
@@ -204,7 +206,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             )
         )
 
-        op = SimpleMovingAverage(
+        op = SimpleMovingAverageOperator(
             event=input_data.schema(),
             window_length=1,
             sampling=event_lib.input_event([]),

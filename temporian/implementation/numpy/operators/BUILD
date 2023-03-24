@@ -81,7 +81,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         "//temporian/core/data:duration",
-        "//temporian/core/operators:simple_moving_average",
+        "//temporian/core/operators/window:simple_moving_average",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event",

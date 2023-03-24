@@ -1,4 +1,4 @@
-"""Implementation for the SimpleMovingAverage operator."""
+"""Implementation for the simple moving average operator."""
 
 
 # TODO: Implement in c++.
@@ -11,15 +11,17 @@ import numpy as np
 
 from temporian.implementation.numpy.data.event import NumpyEvent, NumpyFeature
 from temporian.core.data.duration import Duration
-from temporian.core.operators.simple_moving_average import SimpleMovingAverage
+from temporian.core.operators.window.simple_moving_average import (
+    SimpleMovingAverageOperator,
+)
 from temporian.implementation.numpy import implementation_lib
 
 
 class SimpleMovingAverageNumpyImplementation:
     """Numpy implementation for the simple moving average operator."""
 
-    def __init__(self, op: SimpleMovingAverage) -> None:
-        assert isinstance(op, SimpleMovingAverage)
+    def __init__(self, op: SimpleMovingAverageOperator) -> None:
+        assert isinstance(op, SimpleMovingAverageOperator)
         self._op = op
 
     def __call__(
@@ -59,7 +61,7 @@ class SimpleMovingAverageNumpyImplementation:
 
 
 implementation_lib.register_operator_implementation(
-    SimpleMovingAverage, SimpleMovingAverageNumpyImplementation
+    SimpleMovingAverageOperator, SimpleMovingAverageNumpyImplementation
 )
 
 

@@ -190,7 +190,7 @@ py_test(
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
         "//temporian/core/data:dtype",
-        "//temporian/core/operators:simple_moving_average",
+        "//temporian/core/operators/window:simple_moving_average",
     ],
 )
 
