@@ -17,7 +17,20 @@ py_library(
     srcs = ["base.py"],
     srcs_version = "PY3",
     deps = [
+        "//temporian/core/data:duration",
         "//temporian/core/operators/window:base",
+        "//temporian/implementation/numpy/data:event",
+    ],
+)
+
+py_library(
+    name = "simple_moving_average",
+    srcs = ["simple_moving_average.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators/window:simple_moving_average",
+        "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
     ],
 )

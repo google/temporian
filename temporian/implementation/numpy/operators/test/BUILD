@@ -186,11 +186,11 @@ py_test(
     deps = [
         # absl/testing:absltest dep,
         # pandas dep,
-        "//temporian/implementation/numpy/operators:simple_moving_average",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
         "//temporian/core/data:dtype",
         "//temporian/core/operators/window:simple_moving_average",
+        "//temporian/implementation/numpy/operators/window:simple_moving_average",
     ],
 )
 

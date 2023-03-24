@@ -13,11 +13,11 @@
 # limitations under the License.
 
 from abc import ABC, abstractmethod
-from datetime import datetime, timezone
-from typing import Dict, Any
+from typing import Dict, Optional
 
 import numpy as np
-from temporian.core.operators.calendar.base import BaseCalendarOperator
+from temporian.core.data.duration import Duration
+from temporian.core.operators.window.base import BaseWindowOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 
@@ -26,43 +26,96 @@ class BaseWindowNumpyImplementation(ABC):
     """Abstract base class to implement common logic of numpy implementation of
     window operators."""
 
-    def __init__(self, operator: BaseCalendarOperator) -> None:
+    def __init__(self, op: BaseWindowOperator) -> None:
         super().__init__()
-        self.operator = operator
+        assert isinstance(op, BaseWindowOperator)
+        self._op = op
 
-    def __call__(self, sampling: NumpyEvent) -> Dict[str, NumpyEvent]:
-        data = {}
-        for index, timestamps in sampling.sampling.data.items():
-            days = np.array(
-                [
-                    self._get_value_from_datetime(
-                        datetime.fromtimestamp(ts, tz=timezone.utc)
-                    )
-                    for ts in timestamps
-                ]
-            ).astype(np.int32)
+    def __call__(
+        self,
+        event: NumpyEvent,
+        sampling: Optional[NumpyEvent] = None,
+    ) -> Dict[str, NumpyEvent]:
+        if sampling is None:
+            sampling = event
 
-            data[index] = [
-                NumpyFeature(
-                    data=days,
-                    name=self.operator.output_feature_name,
+        dst_event = NumpyEvent(data={}, sampling=sampling.sampling)
+
+        # Naming convention:
+        #   mts => multi time series
+        #   ts => time series
+        #   dst => destination
+        #   src => source
+
+        # For each index
+        for index, src_mts in event.data.items():
+            dst_mts = []
+            dst_event.data[index] = dst_mts
+            src_timestamps = event.sampling.data[index]
+            sampling_timestamps = sampling.sampling.data[index]
+
+            mask = self._build_accumulator_mask(
+                src_timestamps, sampling_timestamps, self._op.window_length()
+            )
+
+            # For each feature
+            for src_ts in src_mts:
+                dst_feature_name = (
+                    f"{self._op.output_feature_prefix}_{src_ts.name}"
                 )
-            ]
+                dst_ts_data = self._apply_accumulator_mask(src_ts.data, mask)
+                dst_mts.append(NumpyFeature(dst_feature_name, dst_ts_data))
 
-        return {"event": NumpyEvent(data=data, sampling=sampling.sampling)}
+        return {"event": dst_event}
+
+    def _build_accumulator_mask(
+        self,
+        data_timestamps: np.array,
+        sampling_timestamps: np.array,
+        win: Duration,
+    ) -> np.array:
+        """Creates a 2d boolean matrix containing the summing instructions.
+
+        The returned matrix "m[i,j]" is defined as:
+            m[i,j] is true iif. input value "j" is averaged in the output value "i".
+        """
+
+        # This implementation is simple but expensive. It will create multiple
+        # O(n^2) arrays, where n is the number of time samples.
+
+        right_side = (
+            sampling_timestamps[:, np.newaxis] >= data_timestamps[np.newaxis, :]
+        )
+
+        # TODO: Make left side inclusivity/exclusivity a parameter.
+        left_side = sampling_timestamps[:, np.newaxis] <= (
+            data_timestamps[np.newaxis, :] + win
+        )
+
+        return right_side & left_side
+
+    def _apply_accumulator_mask(
+        self, src: np.array, mask: np.array
+    ) -> np.array:
+        """Sums elements according to an accumulator mask."""
+
+        # Broadcast of feature values to requested timestamps.
+        cross_product = src * mask
+
+        # Replace masked values with NaN
+        cross_product[
+            mask == False  # pylint: disable=singleton-comparison
+        ] = np.nan
+
+        return self._calculate_window_operation(cross_product)
 
     @abstractmethod
-    def _get_value_from_datetime(self, dt: datetime) -> Any:
-        """Get the value of the datetime object that corresponds to each
-        specific calendar operator. E.g., calendar_day_of_month will take the
-        datetime's day, and calendar_hour will take the its hour.
-
-        Must be implemented by subclasses.
+    def _calculate_window_operation(self, values: np.array) -> np.array:
+        """Calculates the window operation on the given values.
 
         Args:
-            dt: the datetime to get the value from.
+            values: Numpy array of values.
 
         Returns:
-            Any: the numeric value for the datetime. Will be converted to
-                int32 by __call__.
+            Array of values after the window operation.
         """

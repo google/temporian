@@ -21,14 +21,14 @@ import numpy as np
 from temporian.core.operators.window.simple_moving_average import (
     SimpleMovingAverageOperator,
 )
-from temporian.implementation.numpy.operators.simple_moving_average import (
+from temporian.implementation.numpy.operators.window.simple_moving_average import (
     SimpleMovingAverageNumpyImplementation,
 )
-from temporian.implementation.numpy.data.event import NumpyEvent, NumpyFeature
-from temporian.implementation.numpy.data.sampling import NumpySampling
+from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.core.data import event as event_lib
 from temporian.core.data import feature as feature_lib
 from temporian.core.data import dtype as dtype_lib
+import math
 
 
 class SimpleMovingAverageOperatorTest(absltest.TestCase):
