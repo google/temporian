@@ -15,6 +15,7 @@
 from typing import Any
 from datetime import datetime
 
+from temporian.implementation.numpy import implementation_lib
 from temporian.core.operators.calendar.hour import (
     CalendarHourOperator,
 )
@@ -31,3 +32,8 @@ class CalendarHourNumpyImplementation(BaseCalendarNumpyImplementation):
 
     def _get_value_from_datetime(self, dt: datetime) -> Any:
         return dt.hour
+
+
+implementation_lib.register_operator_implementation(
+    CalendarHourOperator, CalendarHourNumpyImplementation
+)

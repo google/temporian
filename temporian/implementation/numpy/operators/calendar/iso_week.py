@@ -15,6 +15,7 @@
 from typing import Any
 from datetime import datetime
 
+from temporian.implementation.numpy import implementation_lib
 from temporian.core.operators.calendar.iso_week import (
     CalendarISOWeekOperator,
 )
@@ -31,3 +32,8 @@ class CalendarISOWeekNumpyImplementation(BaseCalendarNumpyImplementation):
 
     def _get_value_from_datetime(self, dt: datetime) -> Any:
         return dt.isocalendar()[1]
+
+
+implementation_lib.register_operator_implementation(
+    CalendarISOWeekOperator, CalendarISOWeekNumpyImplementation
+)

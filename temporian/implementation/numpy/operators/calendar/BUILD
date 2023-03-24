@@ -51,6 +51,7 @@ py_library(
     deps = [
         ":base",
         "//temporian/core/operators/calendar:day_of_year",
+        "//temporian/implementation/numpy:implementation_lib",
     ],
 )
 
@@ -61,6 +62,7 @@ py_library(
     deps = [
         ":base",
         "//temporian/core/operators/calendar:hour",
+        "//temporian/implementation/numpy:implementation_lib",
     ],
 )
 
@@ -71,6 +73,7 @@ py_library(
     deps = [
         ":base",
         "//temporian/core/operators/calendar:iso_week",
+        "//temporian/implementation/numpy:implementation_lib",
     ],
 )
 
@@ -81,6 +84,7 @@ py_library(
     deps = [
         ":base",
         "//temporian/core/operators/calendar:minute",
+        "//temporian/implementation/numpy:implementation_lib",
     ],
 )
 
@@ -91,6 +95,7 @@ py_library(
     deps = [
         ":base",
         "//temporian/core/operators/calendar:month",
+        "//temporian/implementation/numpy:implementation_lib",
     ],
 )
 
@@ -101,6 +106,7 @@ py_library(
     deps = [
         ":base",
         "//temporian/core/operators/calendar:second",
+        "//temporian/implementation/numpy:implementation_lib",
     ],
 )
 
@@ -111,5 +117,6 @@ py_library(
     deps = [
         ":base",
         "//temporian/core/operators/calendar:year",
+        "//temporian/implementation/numpy:implementation_lib",
     ],
 )
