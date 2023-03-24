@@ -93,16 +93,12 @@ def _apply_accumulator_mask(src: np.array, mask: np.array) -> np.array:
     # Broadcast of feature values to requested timestamps.
     cross_product = src * mask
 
-    # Ignore nan (i.e. missing) values
-    nan_mask = np.isnan(cross_product)
-    cross_product[nan_mask] = 0.0
-    mask[nan_mask] = False
+    # Replace masked values with NaN
+    cross_product[
+        mask == False  # pylint: disable=singleton-comparison
+    ] = np.nan
 
-    sum_values = np.sum(cross_product, axis=1)
-    count_values = np.sum(mask, axis=1)
-
-    # Hide warning message when dividing by zero when count is nil.
-    with np.errstate(divide="ignore", invalid="ignore"):
-        mean = sum_values / count_values
+    # Calculate the mean using numpy.nanmean
+    mean = np.nanmean(cross_product, axis=1)
 
     return mean
