@@ -195,6 +195,21 @@ py_test(
 )
 
 py_test(
+    name = "moving_standard_deviation_test",
+    srcs = ["moving_standard_deviation_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/testing:absltest dep,
+        # pandas dep,
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/core/data:dtype",
+        "//temporian/core/operators/window:moving_standard_deviation",
+        "//temporian/implementation/numpy/operators/window:moving_standard_deviation",
+    ],
+)
+
+py_test(
     name = "propagate_test",
     srcs = ["propagate_test.py"],
     srcs_version = "PY3",

@@ -31,6 +31,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "PROPAGATE",
             "SELECT",
             "SIMPLE_MOVING_AVERAGE",
+            "MOVING_STANDARD_DEVIATION",
         ]
 
         self.assertSetEqual(

@@ -40,3 +40,15 @@ py_library(
         "//temporian/core/data:event",
     ],
 )
+
+py_library(
+    name = "moving_standard_deviation",
+    srcs = ["moving_standard_deviation.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:duration",
+        "//temporian/core/data:event",
+    ],
+)
