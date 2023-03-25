@@ -36,11 +36,11 @@ class EventTest(absltest.TestCase):
             """Event
   data:
     (1,):
-      a <int64>: [1 2 3]
-      b <int64>: [4 5 6]
+      a <INT64>: [1 2 3]
+      b <INT64>: [4 5 6]
     (2,):
-      a <int64>: [7 8]
-      b <int64>: [ 9 10]
+      a <INT64>: [7 8]
+      b <INT64>: [ 9 10]
   sampling:
     index: ['x']
     data:

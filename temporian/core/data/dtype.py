@@ -14,8 +14,13 @@
 
 """Type of features."""
 
+
+from typing import Union
+
 FLOAT64 = "FLOAT64"
 FLOAT32 = "FLOAT32"
 INT64 = "INT64"
 INT32 = "INT32"
 STRING = "STRING"
+
+DType = Union[FLOAT64, FLOAT32, INT64, INT32, STRING]

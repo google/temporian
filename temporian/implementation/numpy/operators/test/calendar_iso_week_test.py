@@ -24,6 +24,7 @@ from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.operators.calendar.iso_week import (
     CalendarISOWeekNumpyImplementation,
 )
+from temporian.core.data import dtype
 
 
 class CalendarISOWeekNumpyImplementationTest(absltest.TestCase):
@@ -80,7 +81,7 @@ class CalendarISOWeekNumpyImplementationTest(absltest.TestCase):
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(
-            output["event"]._first_index_features[0].dtype == np.int32
+            output["event"]._first_index_features[0].dtype == dtype.INT32
         )
 
 
