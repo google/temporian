@@ -55,9 +55,7 @@ class SampleNumpyImplementation:
             for src_ts, (output_missing_value, output_np_dtype) in zip(
                 src_mts, output_missing_and_np_dtypes
             ):
-
-                # TODO: Test if running all the following operation in c++
-                # directly would be significantly faster.
+                # TODO: Check if running the following block in c++ is faster.
                 dst_ts_data = np.full(
                     shape=len(sampling_timestamps),
                     fill_value=output_missing_value,

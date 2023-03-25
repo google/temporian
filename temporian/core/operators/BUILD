@@ -17,6 +17,7 @@ py_library(
         ":propagate",
         ":select",
         ":simple_moving_average",
+        ":sample",
         "//temporian/core/operators/calendar:day_of_month",
         "//temporian/core/operators/calendar:day_of_week",
         "//temporian/core/operators/calendar:day_of_year",
