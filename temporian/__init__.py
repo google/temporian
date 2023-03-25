@@ -29,6 +29,8 @@ from temporian.io.save_event import save_event
 
 from temporian.implementation.numpy.data.event import NumpyEvent as EventData
 
+from temporian.implementation.numpy.data.plotter import plot
+
 # Operators
 from temporian.core.operators.all_operators import *
 

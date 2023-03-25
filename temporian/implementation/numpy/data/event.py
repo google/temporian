@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Optional, Sequence
 
 import numpy as np
 import pandas as pd
@@ -92,6 +92,7 @@ class NumpyEvent:
     def feature_count(self) -> int:
         return len(self._first_index_features)
 
+    # TODO: Turn into function. Let's only use property for inexpensive code.
     @property
     def feature_names(self) -> List[str]:
         # Only look at the feature in the first index
@@ -309,3 +310,15 @@ class NumpyEvent:
                 return False
 
         return True
+
+    def index(self) -> Sequence[Any]:
+        """Sequence of available indexes."""
+
+        return self.data.keys()
+
+    def plot(self, *args, **wargs) -> Any:
+        """Plots an event. See tp.plot for details."""
+
+        from temporian.implementation.numpy.data import plotter
+
+        return plotter.plot(event=self, *args, **wargs)

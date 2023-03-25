@@ -23,6 +23,7 @@ py_library(
         "//temporian/core/operators:all_operators",
         "//temporian/core/operators:base",
         "//temporian/implementation/numpy/operators:all_operators",
+        "//temporian/implementation/numpy/data:plotter",
         "//temporian/io:read_event",
         "//temporian/io:save_event",
     ],

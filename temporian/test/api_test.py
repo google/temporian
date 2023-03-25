@@ -54,6 +54,10 @@ class TFPTest(absltest.TestCase):
         )
         logging.info("results: %s", result_data)
 
+        with tempfile.TemporaryDirectory() as tempdir:
+            result_data.plot().savefig(os.path.join(tempdir, "p1.png"))
+            t.plot([i1_data, i2_data]).savefig(os.path.join(tempdir, "p2.png"))
+
     def test_serialization(self):
         a = t.input_event(
             [

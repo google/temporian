@@ -42,3 +42,10 @@ py_test(
     srcs_version = "PY3",
     deps = ["//temporian/implementation/numpy/data:event"],
 )
+
+py_test(
+    name = "plotter_test",
+    srcs = ["plotter_test.py"],
+    srcs_version = "PY3",
+    deps = ["//temporian/implementation/numpy/data:event","//temporian/implementation/numpy/data:plotter"],
+)
