@@ -15,7 +15,8 @@
 """Type of features."""
 
 
-from typing import Union
+from typing import Union, Any
+import math
 
 FLOAT64 = "FLOAT64"
 FLOAT32 = "FLOAT32"
@@ -24,3 +25,16 @@ INT32 = "INT32"
 STRING = "STRING"
 
 DType = Union[FLOAT64, FLOAT32, INT64, INT32, STRING]
+
+
+def MissingValue(dtype: DType) -> Any:
+    """Value used as a replacement of missing values."""
+
+    if dtype in [FLOAT64, FLOAT32]:
+        return math.nan
+    elif dtype in [INT64, INT32]:
+        return 0
+    elif dtype == STRING:
+        return ""
+    else:
+        raise ValueError(f"Non implemented type {dtype}")

@@ -205,3 +205,16 @@ py_test(
         "//temporian/implementation/numpy/operators:propagate",
     ],
 )
+
+py_test(
+    name = "sample_test",
+    srcs = ["sample_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/core/operators:sample",
+        "//temporian/implementation/numpy/operators:sample",
+    ],
+)

@@ -102,3 +102,18 @@ py_library(
         "//temporian/implementation/numpy/data:sampling",
     ],
 )
+
+py_library(
+    name = "sample",
+    srcs = ["sample.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:duration",
+        "//temporian/core/operators:sample",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy:utils",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy_cc/operators:sample",
+    ],
+)

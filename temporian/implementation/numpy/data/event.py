@@ -18,6 +18,13 @@ DTYPE_MAPPING = {
     np.int32: dtype.INT32,
 }
 
+DTYPE_REVERSE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
+DTYPE_REVERSE_MAPPING[dtype.STRING] = np.string_
+
+
+def dtype_to_np_dtype(src: dtype.DType) -> Any:
+    return DTYPE_REVERSE_MAPPING[src]
+
 
 class NumpyFeature:
     def __init__(self, name: str, data: np.ndarray) -> None:
