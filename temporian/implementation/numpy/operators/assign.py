@@ -14,9 +14,9 @@
 
 """Implementation for the Assign operator."""
 
-from typing import Dict
+from typing import Dict, Optional
 import numpy as np
-
+import copy
 
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
@@ -30,7 +30,11 @@ class AssignNumpyImplementation:
         self._operator = operator
 
     def __call__(
-        self, left_event: NumpyEvent, right_event: NumpyEvent
+        self,
+        event_1: NumpyEvent,
+        event_2: NumpyEvent,
+        event_3: Optional[NumpyEvent] = None,
+        event_4: Optional[NumpyEvent] = None,
     ) -> Dict[str, NumpyEvent]:
         """Assign features to an event.
 
@@ -56,57 +60,22 @@ class AssignNumpyImplementation:
             ValueError: if right event has repeated timestamps for same index.
 
         """
-        if left_event.sampling.index != right_event.sampling.index:
-            raise ValueError("Assign sequences must have the same index names.")
+        events = [event_1, event_2]
+        if event_3 is not None:
+            events.append(event_3)
+        if event_4 is not None:
+            events.append(event_4)
 
-        if right_event.sampling.has_repeated_timestamps:
-            raise ValueError(
-                "right sequence cannot have repeated timestamps in the same"
-                " index."
-            )
+        dst_event = NumpyEvent(data={}, sampling=event_1.sampling)
 
-        output = NumpyEvent(data={}, sampling=left_event.sampling)
-
-        for index, left_features in left_event.data.items():
-            # Copy the features of left to the output event
-            output.data[index] = [feature for feature in left_features]
-            output_data = output.data[index]
-            left_sampling_data = left_event.sampling.data[index]
-            number_timestamps = len(left_sampling_data)
-
-            # If index is in right append the features to the output event
-            if index in right_event.data:
-                right_sampling_data = right_event.sampling.data[index]
-
-                mask = (
-                    left_sampling_data[:, np.newaxis]
-                    == right_sampling_data[np.newaxis, :]
-                )
-                mask_i, mask_j = mask.nonzero()
-
-                for feature in right_event.data[index]:
-                    new_feature = NumpyFeature(
-                        name=feature.name,
-                        # TODO: Bug: The dtype is set to float64 independently
-                        # of the dtype in the op definition.
-                        data=np.full(number_timestamps, np.nan),
-                    )
-                    new_feature.data[mask_i] = feature.data[mask_j]
-                    output_data.append(new_feature)
-
-            # If index is not in right, append the features of right with None values
-            else:
-                for feature_name in right_event.feature_names:
-                    output_data.append(
-                        NumpyFeature(
-                            name=feature_name,
-                            # Create a list of None values with the same length as left sampling
-                            data=np.full(number_timestamps, np.nan),
-                        )
-                    )
+        for index in event_1.data.keys():
+            dst_features = []
+            for event in events:
+                dst_features.extend(copy.copy(event.data[index]))
+            dst_event.data[index] = dst_features
 
         # make assignment
-        return {"event": output}
+        return {"event": dst_event}
 
 
 implementation_lib.register_operator_implementation(

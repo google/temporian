@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Simple moving average operator."""
+"""Assign operator."""
+
+from typing import Dict, Optional
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
@@ -22,34 +24,50 @@ from temporian.proto import core_pb2 as pb
 
 
 class AssignOperator(Operator):
-    """Simple moving average operator."""
+    """Assign operator."""
 
     def __init__(
         self,
-        left_event: Event,
-        right_event: Event,
+        event_1: Event,
+        event_2: Event,
+        event_3: Optional[Event] = None,
+        event_4: Optional[Event] = None,
     ):
         super().__init__()
 
+        events = [event_1, event_2]
+        if event_3 is not None:
+            events.append(event_3)
+        if event_4 is not None:
+            events.append(event_4)
+
         # inputs
-        self.add_input("left_event", left_event)
-        self.add_input("right_event", right_event)
+        output_features = []
+        feature_names = set()
+        for idx, event in enumerate(events):
+            self.add_input(f"event_{idx+1}", event)
+            output_features.extend(event.features())
+
+            for f in event.features():
+                if f.name() in feature_names:
+                    raise ValueError(
+                        f"Feature {f.name()} is defined in multiple "
+                        "input events."
+                    )
+                feature_names.add(f.name())
+
+            if event.sampling() is not events[0].sampling():
+                raise ValueError(
+                    "All the events do not have the same sampling."
+                )
 
         # outputs
-        output_sampling = left_event.sampling()
-        output_features = left_event.features() + [
-            Feature(
-                name=feature.name(),
-                dtype=feature.dtype(),
-                creator=self,
-                sampling=output_sampling,
-            )
-            for feature in right_event.features()
-        ]
         self.add_output(
             "event",
             Event(
-                features=output_features, sampling=output_sampling, creator=self
+                features=output_features,
+                sampling=events[0].sampling(),
+                creator=self,
             ),
         )
         self.check()
@@ -59,8 +77,10 @@ class AssignOperator(Operator):
         return pb.OperatorDef(
             key="ASSIGN",
             inputs=[
-                pb.OperatorDef.Input(key="left_event"),
-                pb.OperatorDef.Input(key="right_event"),
+                pb.OperatorDef.Input(key="event_1"),
+                pb.OperatorDef.Input(key="event_2"),
+                pb.OperatorDef.Input(key="event_3", is_optional=True),
+                pb.OperatorDef.Input(key="event_4", is_optional=True),
             ],
             outputs=[pb.OperatorDef.Output(key="event")],
         )
@@ -70,8 +90,36 @@ operator_lib.register_operator(AssignOperator)
 
 
 def assign(
-    left_event: Event,
-    right_event: Event,
+    event_1: Event,
+    event_2: Event,
+    event_3: Optional[Event] = None,
+    event_4: Optional[Event] = None,
 ) -> Event:
-    # TODO: Write documentation.
-    return AssignOperator(left_event, right_event).outputs()["event"]
+    """Concatenates together events with the same sampling.
+
+    Example:
+        event_1 = ... # Feature A & B
+        event_2 = ... # Feature C & D
+        event_3 = ... # Feature E & F
+
+        # Output has features A, B, C, D, E & F
+        output = np.assign(event_1, event_2, event_3)
+
+    All the events should have the same sampling. To concatenate events with a
+    different sampling, use the operator 'tp.sample(...)' before.
+
+    Example:
+
+        # Assume event_1, event_2 and event_3 dont have the same sampling
+        event_1 = ... # Feature A & B
+        event_2 = ... # Feature C & D
+        event_3 = ... # Feature E & F
+
+        # Output has features A, B, C, D, E & F, and the same sampling as
+        # event_1
+        output = np.assign(event_1,
+            tp.sample(event_2, sampling=event_1),
+            tp.sample(event_3, sampling=event_1))
+    """
+
+    return AssignOperator(event_1, event_2, event_3, event_4).outputs()["event"]

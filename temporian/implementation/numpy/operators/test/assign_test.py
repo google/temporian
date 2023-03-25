@@ -15,11 +15,14 @@
 from absl.testing import absltest
 
 import numpy as np
+import pandas as pd
 
 from temporian.core.data.event import Event
 from temporian.core.data.event import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.assign import AssignOperator
+from temporian.core.data import event as event_lib
+from temporian.core.data import dtype as dtype_lib
 
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
@@ -33,717 +36,116 @@ class AssignNumpyImplementationTest(absltest.TestCase):
     """Test numpy implementation of assign operator."""
 
     def setUp(self) -> None:
-        self.sampling = Sampling(["user_id"])
-        self.event_left = Event(
-            [Feature("sales", float)],
-            sampling=self.sampling,
-            creator=None,
+        pass
+
+    def test_base(self):
+        common_data = {
+            "timestamp": np.array([1, 1, 2, 3, 4]),
+            "user_id": ["user_1", "user_1", "user_1", "user_1", "user_2"],
+        }
+
+        event_1_data = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                {
+                    **common_data,
+                    "feature_1": [10, 11, 12, 13, 14],
+                }
+            ),
+            index_names=["user_id"],
         )
 
-        self.event_right = Event(
-            [Feature("costs", float)],
-            sampling=self.sampling,
-            creator=None,
+        event_2_data = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                {
+                    **common_data,
+                    "feature_2": [20, 21, 22, 23, 24],
+                    "feature_3": [30, 31, 32, 33, 34],
+                }
+            ),
+            index_names=["user_id"],
         )
 
-    def test_right_repeated_timestamps(self) -> None:
-        numpy_sampling_left = NumpySampling(
-            index=["user_id"],
-            data={
-                (151591562,): np.array(
-                    [
-                        "2022-02-05",
-                        "2022-02-06",
-                        "2022-02-07",
-                    ],
-                    dtype="datetime64",
-                ),
-                (191562515,): np.array(["2022-02-05"], dtype="datetime64"),
-            },
+        event_3_data = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                {
+                    **common_data,
+                    "feature_4": [40, 41, 42, 43, 44],
+                }
+            ),
+            index_names=["user_id"],
         )
 
-        numpy_sampling_right = NumpySampling(
-            index=["user_id"],
-            data={
-                (151591562,): np.array(
-                    ["2022-02-08", "2022-02-09", "2022-02-09"],
-                    # 2022-02-09 is repeated here should be a problem
-                    dtype="datetime64",
-                ),
-                (191562515,): np.array(["2022-02-08"], dtype="datetime64"),
-            },
+        expected_output_data = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                {
+                    **common_data,
+                    "feature_1": [10, 11, 12, 13, 14],
+                    "feature_2": [20, 21, 22, 23, 24],
+                    "feature_3": [30, 31, 32, 33, 34],
+                    "feature_4": [40, 41, 42, 43, 44],
+                }
+            ),
+            index_names=["user_id"],
         )
 
-        numpy_left_event = NumpyEvent(
-            data={
-                (151591562,): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([0.0, 0.0, 0.0]),
-                    ),
-                ],
-                (191562515,): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([0.0]),
-                    ),
-                ],
-            },
-            sampling=numpy_sampling_left,
-        )
-
-        numpy_right_event = NumpyEvent(
-            data={
-                (151591562,): [
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([0.0, 0.0, 0.0]),
-                    ),
-                ],
-                (191562515,): [
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([0.0]),
-                    ),
-                ],
-            },
-            sampling=numpy_sampling_right,
-        )
+        # TODO: Update when "from_dataframe" support the creation of events
+        # with shared sampling.
+        event_1 = event_1_data.schema()
+        event_2 = event_2_data.schema()
+        event_3 = event_3_data.schema()
+        event_2._sampling = event_1._sampling
+        event_3._sampling = event_1._sampling
 
         operator = AssignOperator(
-            left_event=self.event_left, right_event=self.event_right
+            event_1,
+            event_2,
+            event_3,
+            None,
         )
-        assign_implementation = AssignNumpyImplementation(
-            operator=operator,
+        implementation = AssignNumpyImplementation(operator=operator)
+        output = implementation(event_1_data, event_2_data, event_3_data, None)
+
+        self.assertEqual(
+            output["event"],
+            expected_output_data,
         )
 
-        # output_event = assign_implementation(left_event=numpy_left_event, right_event=numpy_right_event))
-
-        self.assertRaisesRegex(
+    def test_non_matching_sampling(self):
+        with self.assertRaisesRegex(
             ValueError,
-            "right sequence cannot have repeated timestamps in the same index.",
-            assign_implementation,
-            numpy_left_event,
-            numpy_right_event,
-        )
-
-    def test_left_repeated_timestamps(self) -> None:
-        numpy_sampling_left = NumpySampling(
-            index=["user_id"],
-            data={
-                (151591562,): np.array(
-                    [
-                        "2022-02-05",
-                        "2022-02-05",  # 2022-02-05 is repeated here should not be a problem
-                        "2022-02-07",
-                    ],
-                    dtype="datetime64",
+            "All the events do not have the same sampling.",
+        ):
+            _ = AssignOperator(
+                event_lib.input_event(
+                    [Feature(name="a", dtype=dtype_lib.FLOAT64)],
+                    sampling=Sampling(index=["x"]),
                 ),
-                (191562515,): np.array(["2022-02-05"], dtype="datetime64"),
-            },
-        )
-
-        numpy_sampling_right = NumpySampling(
-            index=["user_id"],
-            data={
-                (151591562,): np.array(
-                    ["2022-02-05", "2022-02-07", "2022-02-09"],
-                    dtype="datetime64",
+                event_lib.input_event(
+                    [Feature(name="b", dtype=dtype_lib.FLOAT64)],
+                    sampling=Sampling(index=["x"]),
                 ),
-                (191562515,): np.array(["2022-02-05"], dtype="datetime64"),
-            },
-        )
+                None,
+                None,
+            )
 
-        numpy_left_event = NumpyEvent(
-            data={
-                (151591562,): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([10.0, 20.0, 30.0]),
-                    ),
-                ],
-                (191562515,): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([40.0]),
-                    ),
-                ],
-            },
-            sampling=numpy_sampling_left,
-        )
-
-        numpy_right_event = NumpyEvent(
-            data={
-                (151591562,): [
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([-10.0, -20.0, 0.0]),
-                    ),
-                ],
-                (191562515,): [
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([0.0]),
-                    ),
-                ],
-            },
-            sampling=numpy_sampling_right,
-        )
-
-        expected_numpy_event = NumpyEvent(
-            data={
-                (151591562,): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([10.0, 20.0, 30.0]),
-                    ),
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array(
-                            [-10.0, -10.0, -20.0]
-                        ),  # -10.0 is repeated here
-                        # because the timestamp is repeated
-                    ),
-                ],
-                (191562515,): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([40.0]),
-                    ),
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([0.0]),
-                    ),
-                ],
-            },
-            sampling=numpy_sampling_left,
-        )
-
-        operator = AssignOperator(
-            left_event=self.event_left, right_event=self.event_right
-        )
-        assign_implementation = AssignNumpyImplementation(
-            operator=operator,
-        )
-
-        output_event = assign_implementation(
-            left_event=numpy_left_event, right_event=numpy_right_event
-        )
-
-        self.assertEqual(
-            True,
-            output_event["event"] == expected_numpy_event,
-        )
-
-    def test_different_index(self) -> None:
-        numpy_sampling_left_event = NumpySampling(
-            index=["store_id"],
-            data={
-                ("A",): np.array(
-                    ["2022-02-05", "2022-02-06", "2022-02-07"],
-                    dtype="datetime64",
-                ),
-                ("B",): np.array(
-                    ["2022-02-05", "2022-02-06"], dtype="datetime64"
-                ),
-            },
-        )
-
-        numpy_sampling_right_event = NumpySampling(
-            index=["product_id"],
-            data={
-                (1,): np.array(
-                    ["2022-02-05", "2022-02-06", "2022-02-07"],
-                    dtype="datetime64",
-                ),
-                (2,): np.array(
-                    ["2022-02-05", "2022-02-06"], dtype="datetime64"
-                ),
-            },
-        )
-
-        numpy_left_event = NumpyEvent(
-            data={
-                ("A",): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([14, 15, 16]),
-                    ),
-                ],
-                ("B",): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([10, 11]),
-                    ),
-                ],
-            },
-            sampling=numpy_sampling_left_event,
-        )
-
-        numpy_right_event = NumpyEvent(
-            data={
-                (1,): [
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([-14, -15, -16]),
-                    ),
-                ],
-                (2,): [
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([-10, -11]),
-                    ),
-                ],
-            },
-            sampling=numpy_sampling_right_event,
-        )
-
-        left_event = Event([Feature("sales")], Sampling(["store_id"]))
-        right_event = Event([Feature("costs")], Sampling(["product_id"]))
-
-        operator = AssignOperator(
-            left_event=left_event, right_event=right_event
-        )
-        assign_implementation = AssignNumpyImplementation(
-            operator=operator,
-        )
-
-        self.assertRaisesRegex(
+    def test_duplicate_feature(self):
+        with self.assertRaisesRegex(
             ValueError,
-            "Assign sequences must have the same index names.",
-            assign_implementation,
-            numpy_left_event,
-            numpy_right_event,
-        )
-
-    def test_with_idx_more_timestamps(self) -> None:
-        """Tests the correct output when the right event has more timestamps than the left
-        event, for any index value. Both input events are indexed.
-        """
-        numpy_sampling_left = NumpySampling(
-            index=["user_id"],
-            data={
-                (666964,): np.array(
-                    ["2022-02-05"],
-                    dtype="datetime64",
+            "Feature a is defined in multiple input events",
+        ):
+            sampling = Sampling(index=["x"])
+            _ = AssignOperator(
+                event_lib.input_event(
+                    [Feature(name="a", dtype=dtype_lib.FLOAT64)],
+                    sampling=sampling,
                 ),
-                (372306,): np.array(["2022-02-06"], dtype="datetime64"),
-            },
-        )
-
-        numpy_sampling_right = NumpySampling(
-            index=["user_id"],
-            data={
-                (666964,): np.array(
-                    ["2022-02-05"],
-                    dtype="datetime64",
+                event_lib.input_event(
+                    [Feature(name="a", dtype=dtype_lib.FLOAT64)],
+                    sampling=sampling,
                 ),
-                (372306,): np.array(
-                    ["2022-02-06", "2022-02-07"], dtype="datetime64"
-                ),
-            },
-        )
-
-        numpy_left_event = NumpyEvent(
-            data={
-                (666964,): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([0.0]),
-                    ),
-                ],
-                (372306,): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([1160.0]),
-                    ),
-                ],
-            },
-            sampling=numpy_sampling_left,
-        )
-
-        numpy_right_event = NumpyEvent(
-            data={
-                (666964,): [
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([0.0]),
-                    ),
-                ],
-                (372306,): [
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([508.0, 573.0]),
-                    ),
-                ],
-            },
-            sampling=numpy_sampling_right,
-        )
-
-        expected_output = NumpyEvent(
-            data={
-                (666964,): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([0.0]),
-                    ),
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([0.0]),
-                    ),
-                ],
-                (372306,): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([1160.0]),
-                    ),
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([508.0]),
-                    ),
-                ],
-            },
-            sampling=numpy_sampling_left,
-        )
-
-        operator = AssignOperator(
-            left_event=self.event_left, right_event=self.event_right
-        )
-        assign_implementation = AssignNumpyImplementation(
-            operator=operator,
-        )
-
-        output_event = assign_implementation(
-            left_event=numpy_left_event, right_event=numpy_right_event
-        )
-
-        self.assertEqual(
-            True,
-            output_event["event"] == expected_output,
-        )
-
-    def test_with_idx_same_timestamps(self) -> None:
-        """Tests the correct output when the right event has same timestamps than the left
-        event, for any index value. Both input events are indexed.
-        """
-        numpy_sampling_left = NumpySampling(
-            index=["user_id"],
-            data={
-                (666964,): np.array(
-                    ["2022-02-05", "2022-02-06", "2022-02-07"],
-                    dtype="datetime64",
-                ),
-                (372306,): np.array(["2022-02-06"], dtype="datetime64"),
-            },
-        )
-
-        numpy_sampling_right = NumpySampling(
-            index=["user_id"],
-            data={
-                (666964,): np.array(
-                    ["2022-02-05", "2022-02-06", "2022-02-07"],
-                    dtype="datetime64",
-                ),
-                (372306,): np.array(["2022-02-06"], dtype="datetime64"),
-            },
-        )
-
-        numpy_left_event = NumpyEvent(
-            data={
-                (666964,): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([0.0, 100.0, 200.0]),
-                    ),
-                ],
-                (372306,): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([1160.0]),
-                    ),
-                ],
-            },
-            sampling=numpy_sampling_left,
-        )
-
-        numpy_right_event = NumpyEvent(
-            data={
-                (666964,): [
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([0.0, 250.0, 500.0]),
-                    ),
-                ],
-                (372306,): [
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([508.0]),
-                    ),
-                ],
-            },
-            sampling=numpy_sampling_right,
-        )
-
-        expected_output = NumpyEvent(
-            data={
-                (666964,): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([0.0, 100.0, 200.0]),
-                    ),
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([0.0, 250.0, 500.0]),
-                    ),
-                ],
-                (372306,): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([1160.0]),
-                    ),
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([508.0]),
-                    ),
-                ],
-            },
-            sampling=numpy_sampling_left,
-        )
-
-        operator = AssignOperator(
-            left_event=self.event_left, right_event=self.event_right
-        )
-        assign_implementation = AssignNumpyImplementation(
-            operator=operator,
-        )
-
-        output_event = assign_implementation(
-            left_event=numpy_left_event, right_event=numpy_right_event
-        )
-
-        self.assertEqual(
-            True,
-            output_event["event"] == expected_output,
-        )
-
-    def test_less_right_indexes(self) -> None:
-        numpy_sampling_left = NumpySampling(
-            index=["user_id"],
-            data={
-                ("A",): np.array(
-                    ["2022-02-05", "2022-02-06", "2022-02-07"],
-                    dtype="datetime64",
-                ),
-                ("B",): np.array(
-                    ["2022-02-05", "2022-02-06"], dtype="datetime64"
-                ),
-                ("C",): np.array(
-                    ["2022-02-05", "2022-02-06"], dtype="datetime64"
-                ),
-            },
-        )
-
-        numpy_sampling_right = NumpySampling(
-            index=["user_id"],
-            data={
-                ("A",): np.array(
-                    ["2022-02-05", "2022-02-06", "2022-02-07"],
-                    dtype="datetime64",
-                ),
-                # Missing B index that will be broadcasted
-                ("C",): np.array(
-                    ["2022-02-05", "2022-02-06"], dtype="datetime64"
-                ),
-            },
-        )
-
-        numpy_left_event = NumpyEvent(
-            data={
-                ("A",): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([14, 15, 16]),
-                    ),
-                ],
-                ("B",): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([10, 11]),
-                    ),
-                ],
-                ("C",): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([9, 10]),
-                    ),
-                ],
-            },
-            sampling=numpy_sampling_left,
-        )
-
-        numpy_right_event = NumpyEvent(
-            data={
-                ("A",): [
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([-14, -15, -16]),
-                    ),
-                ],
-                ("C",): [
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([-9, -10]),
-                    ),
-                ],
-            },
-            sampling=numpy_sampling_right,
-        )
-
-        expected_output = NumpyEvent(
-            data={
-                ("A",): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([14, 15, 16]),
-                    ),
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([-14, -15, -16]),
-                    ),
-                ],
-                ("B",): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([10, 11]),
-                    ),
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([np.nan, np.nan]),  # broadcasted feature
-                    ),
-                ],
-                ("C",): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([9, 10]),
-                    ),
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([-9, -10]),
-                    ),
-                ],
-            },
-            sampling=numpy_sampling_left,
-        )
-
-        operator = AssignOperator(
-            left_event=self.event_left, right_event=self.event_right
-        )
-        assign_implementation = AssignNumpyImplementation(
-            operator=operator,
-        )
-
-        output_event = assign_implementation(
-            left_event=numpy_left_event, right_event=numpy_right_event
-        )
-
-        self.assertEqual(
-            True,
-            output_event["event"] == expected_output,
-        )
-
-    def test_complete_timestamps(self) -> None:
-        """Tests a correct output in a complete timestamps scenario. both samplings will have different timestamps and
-        in different order."""
-        numpy_sampling_left = NumpySampling(
-            index=["user_id"],
-            data={
-                (666964,): np.array(
-                    [
-                        "2022-02-01",
-                        "2022-02-02",
-                        "2022-02-03",
-                        "2022-02-04",
-                        "2022-02-05",
-                    ],
-                    dtype="datetime64",
-                ),
-            },
-        )
-
-        numpy_sampling_right = NumpySampling(
-            index=["user_id"],
-            data={
-                (666964,): np.array(
-                    [  # missing timestamps from sampling_1 (2022-02-01, 2022-02-03, 2022-02-04)
-                        "2022-01-31",  # not in sampling_1
-                        "2022-02-02",  # its on sampling_1 but in different index
-                        "2022-02-05",  # its on sampling_1 but in different index
-                        "2022-02-07",  # not in sampling_1
-                    ],
-                    dtype="datetime64",
-                ),
-            },
-        )
-
-        numpy_left_event = NumpyEvent(
-            data={
-                (666964,): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([10, 11, 12, 13, 14]),
-                    ),
-                ],
-            },
-            sampling=numpy_sampling_left,
-        )
-
-        numpy_right_event = NumpyEvent(
-            data={
-                (666964,): [
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array([1, 2, 3, 4]),
-                    ),
-                ],
-            },
-            sampling=numpy_sampling_right,
-        )
-
-        expected_output = NumpyEvent(
-            data={
-                (666964,): [
-                    NumpyFeature(
-                        name="sales",
-                        data=np.array([10, 11, 12, 13, 14]),
-                    ),
-                    NumpyFeature(
-                        name="costs",
-                        data=np.array(
-                            [np.nan, 2, np.nan, np.nan, 3]
-                        ),  # np.nan on missing timestamps
-                        # 1 and 2 value on different index
-                        # missing 3 value as its timestamp is not in sampling_1
-                    ),
-                ],
-            },
-            sampling=numpy_sampling_left,
-        )
-
-        operator = AssignOperator(
-            left_event=self.event_left, right_event=self.event_right
-        )
-        assign_implementation = AssignNumpyImplementation(
-            operator=operator,
-        )
-
-        output_event = assign_implementation(
-            left_event=numpy_left_event, right_event=numpy_right_event
-        )
-
-        self.assertEqual(
-            True,
-            output_event["event"] == expected_output,
-        )
+                None,
+                None,
+            )
 
 
 if __name__ == "__main__":
