@@ -28,6 +28,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "CALENDAR_DAY_OF_MONTH",
             "CALENDAR_DAY_OF_WEEK",
             "LAG",
+            "PREFIX",
             "PROPAGATE",
             "SAMPLE",
             "SELECT",

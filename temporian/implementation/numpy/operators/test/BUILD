@@ -218,3 +218,16 @@ py_test(
         "//temporian/implementation/numpy/operators:sample",
     ],
 )
+
+py_test(
+    name = "prefix_test",
+    srcs = ["prefix_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/core/operators:prefix",
+        "//temporian/implementation/numpy/operators:prefix",
+    ],
+)

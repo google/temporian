@@ -1,5 +1,7 @@
 from typing import NamedTuple, Optional, Union, List, Any
 from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.core.data import duration
+import datetime
 
 import numpy as np
 
@@ -13,6 +15,8 @@ class Options(NamedTuple):
     height_per_plot_px: int
     width_px: int
     max_points: Optional[int]
+    min_time: Optional[duration.Timestamp]
+    max_time: Optional[duration.Timestamp]
 
 
 def plot(
@@ -22,6 +26,8 @@ def plot(
     width_px: int = 1024,
     height_per_plot_px: int = 150,
     max_points: Optional[int] = None,
+    min_time: Optional[duration.Timestamp] = None,
+    max_time: Optional[duration.Timestamp] = None,
 ):
     """Plots an event.
 
@@ -33,6 +39,8 @@ def plot(
         width_px: Width of the figure in pixel.
         height_per_plot_px: Height of each sub-plot (one per feature) in pixel.
         max_points: Maximum number of points to plot.
+        min_time: If set, only plot events after min_time.
+        max_time: If set, only plot events before min_time.
     """
 
     if isinstance(event, list):
@@ -51,6 +59,8 @@ def plot(
         width_px=width_px,
         height_per_plot_px=height_per_plot_px,
         max_points=max_points,
+        min_time=min_time,
+        max_time=max_time,
     )
 
     if backend not in BACKENDS:
@@ -101,6 +111,12 @@ def _plot_matplotlib(events: List[NumpyEvent], index: tuple, options: Options):
         if options.max_points is not None and len(xs) > options.max_points:
             xs = xs[: options.max_points]
 
+        if event.sampling.is_unix_timestamp:
+            xs = [
+                datetime.datetime.fromtimestamp(x, tz=datetime.timezone.utc)
+                for x in xs
+            ]
+
         if len(feature_names) == 0:
             # Plot the ticks
 
@@ -114,6 +130,7 @@ def _plot_matplotlib(events: List[NumpyEvent], index: tuple, options: Options):
                 color=colors[feature_idx % len(colors)],
                 name="[sampling]",
                 marker="+",
+                is_unix_timestamp=event.sampling.is_unix_timestamp,
             )
 
             plot_idx += 1
@@ -132,6 +149,7 @@ def _plot_matplotlib(events: List[NumpyEvent], index: tuple, options: Options):
                 options=options,
                 color=colors[feature_idx % len(colors)],
                 name=feature_name,
+                is_unix_timestamp=event.sampling.is_unix_timestamp,
             )
 
             plot_idx += 1
@@ -140,10 +158,28 @@ def _plot_matplotlib(events: List[NumpyEvent], index: tuple, options: Options):
     return fig
 
 
-def _matplotlib_sub_plot(ax, xs, ys, options, color, name, **wargs):
+def _matplotlib_sub_plot(
+    ax, xs, ys, options, color, name, is_unix_timestamp, **wargs
+):
     import matplotlib.ticker as ticker
 
     ax.plot(xs, ys, lw=0.5, color=color, **wargs)
+
+    if options.min_time is not None or options.max_time is not None:
+        args = {}
+        if options.min_time is not None:
+            args["left"] = (
+                duration.convert_date_to_duration(options.min_time)
+                if not is_unix_timestamp
+                else options.min_time
+            )
+        if options.max_time is not None:
+            args["right"] = (
+                duration.convert_date_to_duration(options.max_time)
+                if not is_unix_timestamp
+                else options.max_time
+            )
+        ax.set_xlim(**args)
 
     ax.xaxis.set_tick_params(labelsize=8)
     ax.xaxis.set_major_locator(ticker.MaxNLocator(10))

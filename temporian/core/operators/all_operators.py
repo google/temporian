@@ -15,5 +15,6 @@ from temporian.core.operators.lag import leak
 from temporian.core.operators.select import select
 from temporian.core.operators.simple_moving_average import sma
 from temporian.core.operators.propagate import propagate
+from temporian.core.operators.prefix import prefix
 
 # pylint: enable=unused-import

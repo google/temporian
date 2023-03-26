@@ -301,7 +301,7 @@ class NumpyEvent:
         sampling_repr = string.indent(self.sampling.__repr__())
 
         return (
-            f"data({len(self.data)}):\n{data_repr}\nsampling:\n{sampling_repr}"
+            f"data ({len(self.data)}):\n{data_repr}\nsampling:\n{sampling_repr}"
         )
 
     def __eq__(self, __o: object) -> bool:
