@@ -46,6 +46,7 @@ class SimpleMovingAverage(Operator):
 
         self.add_input("event", event)
 
+        # TODO: Remve auto prefix
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
                 name=f"sma_{f.name()}",
