@@ -30,6 +30,7 @@ from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.implementation.numpy.operators.assign import (
     AssignNumpyImplementation,
 )
+from temporian.implementation.numpy.evaluator import run_with_check
 
 
 class AssignNumpyImplementationTest(absltest.TestCase):
@@ -93,8 +94,11 @@ class AssignNumpyImplementationTest(absltest.TestCase):
         event_1 = event_1_data.schema()
         event_2 = event_2_data.schema()
         event_3 = event_3_data.schema()
+
         event_2._sampling = event_1._sampling
         event_3._sampling = event_1._sampling
+        event_2_data.sampling = event_1_data.sampling
+        event_3_data.sampling = event_1_data.sampling
 
         operator = AssignOperator(
             event_1,
@@ -103,7 +107,15 @@ class AssignNumpyImplementationTest(absltest.TestCase):
             None,
         )
         implementation = AssignNumpyImplementation(operator=operator)
-        output = implementation(event_1_data, event_2_data, event_3_data, None)
+        output = run_with_check(
+            operator,
+            implementation,
+            {
+                "event_1": event_1_data,
+                "event_2": event_2_data,
+                "event_3": event_3_data,
+            },
+        )
 
         self.assertEqual(
             output["event"],

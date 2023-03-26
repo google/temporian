@@ -26,6 +26,7 @@ from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.core.data import event as event_lib
 from temporian.core.data import feature as feature_lib
 from temporian.core.data import dtype as dtype_lib
+from temporian.implementation.numpy.evaluator import run_with_check
 
 
 class SimpleMovingAverageOperatorTest(absltest.TestCase):
@@ -69,7 +70,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
                 data={(): np.array([1, 2, 3, 5, 20], dtype=np.float64)},
             ),
         )
-        output = instance(event=input_data)
+        output = run_with_check(op, instance, {"event": input_data})
         expected_output = NumpyEvent(
             data={
                 (): [
@@ -134,7 +135,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
                 },
             ),
         )
-        output = instance(event=input_data)
+        output = run_with_check(op, instance, {"event": input_data})
 
         expected_output = NumpyEvent(
             data={
@@ -210,7 +211,9 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             ),
         )
 
-        output = instance(event=input_data, sampling=sampling_data)
+        output = run_with_check(
+            op, instance, {"event": input_data, "sampling": sampling_data}
+        )
 
         expected_output = NumpyEvent(
             data={
@@ -271,7 +274,9 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             ),
         )
 
-        output = instance(event=input_data, sampling=sampling_data)
+        output = run_with_check(
+            op, instance, {"event": input_data, "sampling": sampling_data}
+        )
 
         expected_output = NumpyEvent(
             data={

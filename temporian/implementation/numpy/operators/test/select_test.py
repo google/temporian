@@ -21,6 +21,7 @@ from temporian.core import evaluator
 from temporian.core.operators.select import SelectOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators import select
+from temporian.implementation.numpy.evaluator import run_with_check
 
 
 class SelectOperatorTest(absltest.TestCase):
@@ -66,7 +67,9 @@ class SelectOperatorTest(absltest.TestCase):
 
         operator = SelectOperator(event=self.input_event, feature_names="sales")
         impl = select.SelectNumpyImplementation(operator)
-        selected_event = impl(self.input_event_data)["event"]
+        selected_event = run_with_check(
+            operator, impl, {"event": self.input_event_data}
+        )["event"]
 
         expected_event = NumpyEvent.from_dataframe(
             new_df, index_names=["store_id"]
@@ -92,7 +95,9 @@ class SelectOperatorTest(absltest.TestCase):
             event=self.input_event, feature_names=["sales", "costs"]
         )
         impl = select.SelectNumpyImplementation(operator)
-        selected_event = impl(self.input_event_data)["event"]
+        selected_event = run_with_check(
+            operator, impl, {"event": self.input_event_data}
+        )["event"]
 
         expected_event = NumpyEvent.from_dataframe(
             new_df, index_names=["store_id"]

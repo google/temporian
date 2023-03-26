@@ -46,7 +46,7 @@ class ArithmeticNumpyImplementation:
         resolution = self.operator.attributes()["resolution"]
         operation = self.operator.attributes()["operation"]
 
-        if event_1.sampling != event_2.sampling:
+        if event_1.sampling is not event_2.sampling:
             raise ValueError("Sampling of both events must be equal.")
 
         if event_1.feature_count != event_2.feature_count:

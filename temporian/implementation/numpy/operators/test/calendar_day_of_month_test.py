@@ -27,6 +27,7 @@ from temporian.implementation.numpy.operators.calendar.day_of_month import (
     CalendarDayOfMonthNumpyImplementation,
 )
 from temporian.core.data import dtype
+from temporian.implementation.numpy.evaluator import run_with_check
 
 
 class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
@@ -62,8 +63,7 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
 
         operator = CalendarDayOfMonthOperator(input_event)
         impl = CalendarDayOfMonthNumpyImplementation(operator)
-
-        output = impl(input_event_data)
+        output = run_with_check(operator, impl, {"sampling": input_event_data})
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(
@@ -108,8 +108,7 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
 
         operator = CalendarDayOfMonthOperator(input_event)
         impl = CalendarDayOfMonthNumpyImplementation(operator)
-
-        output = impl(input_event_data)
+        output = run_with_check(operator, impl, {"sampling": input_event_data})
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(

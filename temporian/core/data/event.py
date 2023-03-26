@@ -48,7 +48,7 @@ class Event(object):
             [string.indent(repr(feature)) for feature in self._features]
         )
         return (
-            f"features:\n"
+            "features:\n"
             f"{features_print}\n"
             f"sampling: {self._sampling},\n"
             f"name: {self._name},\n"

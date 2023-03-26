@@ -25,6 +25,7 @@ from temporian.implementation.numpy.operators.calendar.minute import (
     CalendarMinuteNumpyImplementation,
 )
 from temporian.core.data import dtype
+from temporian.implementation.numpy.evaluator import run_with_check
 
 
 class CalendarMinuteNumpyImplementationTest(absltest.TestCase):
@@ -62,8 +63,7 @@ class CalendarMinuteNumpyImplementationTest(absltest.TestCase):
 
         operator = CalendarMinuteOperator(input_event)
         impl = CalendarMinuteNumpyImplementation(operator)
-
-        output = impl(input_event_data)
+        output = run_with_check(operator, impl, {"sampling": input_event_data})
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(

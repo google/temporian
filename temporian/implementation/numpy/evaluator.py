@@ -45,8 +45,10 @@ def evaluate_schedule(
 
         if verbose == 1:
             print(
-                f"    {operator_idx+1} / {len(schedule)}:"
-                f" {operator.operator_key()}",
+                (
+                    f"    {operator_idx+1} / {len(schedule)}:"
+                    f" {operator.operator_key()}"
+                ),
                 file=sys.stderr,
                 end="",
             )
@@ -70,20 +72,20 @@ def evaluate_schedule(
 
         # Compute output
         begin_time = time.perf_counter()
-        operator_outputs = implementation(**operator_inputs)
+        if check_execution:
+            operator_outputs = run_with_check(
+                operator=operator,
+                implementation=implementation,
+                inputs=operator_inputs,
+            )
+        else:
+            operator_outputs = implementation(**operator_inputs)
         end_time = time.perf_counter()
 
         if verbose == 1:
             print(f" [{end_time - begin_time:.5f} s]", file=sys.stderr)
         elif verbose >= 2:
             print(f"Duration: {end_time - begin_time} s", file=sys.stderr)
-
-        if check_execution:
-            _check_output(
-                inputs=operator_inputs,
-                outputs=operator_outputs,
-                operator=operator,
-            )
 
         # materialize data in output events
         for output_key, output_event in operator.outputs().items():
@@ -92,6 +94,22 @@ def evaluate_schedule(
     # TODO: Only return the required data.
     # TODO: Un-allocate not used anymore object.
     return data
+
+
+def run_with_check(
+    operator: Operator,
+    implementation,
+    inputs: Dict[str, numpy_event.NumpyEvent],
+) -> Dict[str, numpy_event.NumpyEvent]:
+    """Runs an operator implementation and check the results."""
+
+    outputs = implementation(**inputs)
+    _check_output(
+        inputs=inputs,
+        outputs=outputs,
+        operator=operator,
+    )
+    return outputs
 
 
 def _check_features(
@@ -212,7 +230,8 @@ def _check_output(
                         f"The sampling of input '{input_key}' and output "
                         f"'{output_key}' are expected to have THE SAME "
                         "sampling. However, a different sampling was generated "
-                        "during the op execution."
+                        f"during the op execution ({input_real.sampling} "
+                        f"vs {output_real.sampling})."
                     )
                 if (
                     not expected_matching_sampling

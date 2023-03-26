@@ -25,6 +25,7 @@ from temporian.implementation.numpy.operators.calendar.second import (
     CalendarSecondNumpyImplementation,
 )
 from temporian.core.data import dtype
+from temporian.implementation.numpy.evaluator import run_with_check
 
 
 class CalendarSecondNumpyImplementationTest(absltest.TestCase):
@@ -61,8 +62,7 @@ class CalendarSecondNumpyImplementationTest(absltest.TestCase):
 
         operator = CalendarSecondOperator(input_event)
         impl = CalendarSecondNumpyImplementation(operator)
-
-        output = impl(input_event_data)
+        output = run_with_check(operator, impl, {"sampling": input_event_data})
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(

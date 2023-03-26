@@ -40,6 +40,12 @@ class Feature(object):
             f" sampling={sampling} instead."
         )
 
+        if dtype not in dtype_lib.ALL_TYPES:
+            raise ValueError(
+                f"Invalid dtype feature constructor. Got {dtype}. "
+                f"Expecting one of {dtype_lib.ALL_TYPES} instead."
+            )
+
         self._name = name
         self._sampling = sampling
         self._dtype = dtype

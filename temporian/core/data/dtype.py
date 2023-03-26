@@ -26,6 +26,8 @@ STRING = "STRING"
 
 DType = Union[FLOAT64, FLOAT32, INT64, INT32, STRING]
 
+ALL_TYPES = [FLOAT64, FLOAT32, INT64, INT32, STRING]
+
 
 def MissingValue(dtype: DType) -> Any:
     """Value used as a replacement of missing values."""

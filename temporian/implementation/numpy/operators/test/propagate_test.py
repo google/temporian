@@ -26,6 +26,7 @@ from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.core.data import event as event_lib
 from temporian.core.data import feature as feature_lib
 from temporian.core.data import dtype as dtype_lib
+from temporian.implementation.numpy.evaluator import run_with_check
 
 
 class PropagateOperatorTest(absltest.TestCase):
@@ -44,8 +45,8 @@ class PropagateOperatorTest(absltest.TestCase):
         )
         to = event_lib.input_event(
             [
-                feature_lib.Feature(name="c", dtype=dtype_lib.STRING),
-                feature_lib.Feature(name="d", dtype=dtype_lib.STRING),
+                feature_lib.Feature(name="c", dtype=dtype_lib.INT64),
+                feature_lib.Feature(name="d", dtype=dtype_lib.INT64),
             ],
             sampling=sampling,
         )
@@ -64,12 +65,12 @@ class PropagateOperatorTest(absltest.TestCase):
         input_data = NumpyEvent(
             data={
                 ("X1",): [
-                    NumpyFeature("a", np.array([1, 2, 3])),
-                    NumpyFeature("b", np.array([4, 5, 6])),
+                    NumpyFeature("a", np.array([1, 2, 3], dtype=np.float64)),
+                    NumpyFeature("b", np.array([4, 5, 6], dtype=np.float64)),
                 ],
                 ("X2",): [
-                    NumpyFeature("a", np.array([7, 8])),
-                    NumpyFeature("b", np.array([9, 10])),
+                    NumpyFeature("a", np.array([7, 8], dtype=np.float64)),
+                    NumpyFeature("b", np.array([9, 10], dtype=np.float64)),
                 ],
             },
             sampling=sampling,
@@ -78,12 +79,12 @@ class PropagateOperatorTest(absltest.TestCase):
         to_data = NumpyEvent(
             data={
                 ("X1",): [
-                    NumpyFeature("c", np.array([1, 2, 1])),
-                    NumpyFeature("d", np.array([1, 1, 2])),
+                    NumpyFeature("c", np.array([1, 2, 1], dtype=np.int64)),
+                    NumpyFeature("d", np.array([1, 1, 2], dtype=np.int64)),
                 ],
                 ("X2",): [
-                    NumpyFeature("c", np.array([1, 1])),
-                    NumpyFeature("d", np.array([2, 1])),
+                    NumpyFeature("c", np.array([1, 1], dtype=np.int64)),
+                    NumpyFeature("d", np.array([2, 1], dtype=np.int64)),
                 ],
             },
             sampling=sampling,
@@ -108,32 +109,32 @@ class PropagateOperatorTest(absltest.TestCase):
                     1,
                     1,
                 ): [
-                    NumpyFeature("a", np.array([1, 2, 3])),
-                    NumpyFeature("b", np.array([4, 5, 6])),
+                    NumpyFeature("a", np.array([1, 2, 3], dtype=np.float64)),
+                    NumpyFeature("b", np.array([4, 5, 6], dtype=np.float64)),
                 ],
                 (
                     "X1",
                     1,
                     2,
                 ): [
-                    NumpyFeature("a", np.array([1, 2, 3])),
-                    NumpyFeature("b", np.array([4, 5, 6])),
+                    NumpyFeature("a", np.array([1, 2, 3], dtype=np.float64)),
+                    NumpyFeature("b", np.array([4, 5, 6], dtype=np.float64)),
                 ],
                 (
                     "X1",
                     2,
                     1,
                 ): [
-                    NumpyFeature("a", np.array([1, 2, 3])),
-                    NumpyFeature("b", np.array([4, 5, 6])),
+                    NumpyFeature("a", np.array([1, 2, 3], dtype=np.float64)),
+                    NumpyFeature("b", np.array([4, 5, 6], dtype=np.float64)),
                 ],
                 ("X2", 1, 1): [
-                    NumpyFeature("a", np.array([7, 8])),
-                    NumpyFeature("b", np.array([9, 10])),
+                    NumpyFeature("a", np.array([7, 8], dtype=np.float64)),
+                    NumpyFeature("b", np.array([9, 10], dtype=np.float64)),
                 ],
                 ("X2", 1, 2): [
-                    NumpyFeature("a", np.array([7, 8])),
-                    NumpyFeature("b", np.array([9, 10])),
+                    NumpyFeature("a", np.array([7, 8], dtype=np.float64)),
+                    NumpyFeature("b", np.array([9, 10], dtype=np.float64)),
                 ],
             },
             sampling=expected_sampling,
@@ -142,7 +143,9 @@ class PropagateOperatorTest(absltest.TestCase):
         # Run op
         op = Propagate(event=event, to=to)
         instance = PropagateNumpyImplementation(op)
-        output = instance(event=input_data, to=to_data)["event"]
+        output = run_with_check(
+            op, instance, {"event": input_data, "to": to_data}
+        )["event"]
         self.assertEqual(output, expected_output)
 
 
