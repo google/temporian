@@ -17,7 +17,7 @@ class Options(NamedTuple):
 
 def plot(
     event: Union[List[NumpyEvent], NumpyEvent],
-    index: Union[tuple, Any] = (),
+    index: Optional[Union[tuple, Any]] = (),
     backend: str = DEFAULT_BACKEND,
     width_px: int = 1024,
     height_per_plot_px: int = 150,
@@ -27,12 +27,21 @@ def plot(
 
     Args:
         index: The index of the event to plot. Use 'event.index()' for the
-            list of available indices.
+            list of available indices. If index=None, select arbitrarily
+            (non deterministically) an index to plot.
         backend: Plotting library to use.
         width_px: Width of the figure in pixel.
         height_per_plot_px: Height of each sub-plot (one per feature) in pixel.
         max_points: Maximum number of points to plot.
     """
+
+    if isinstance(event, list):
+        events = event
+    else:
+        events = [event]
+
+    if index is None and len(events) > 0:
+        index = events[0]._first_index_value
 
     if not isinstance(index, tuple):
         index = (index,)
@@ -49,11 +58,6 @@ def plot(
             f"Unknown plotting backend {backend}. Available "
             "backends: {BACKENDS}"
         )
-
-    if isinstance(event, list):
-        events = event
-    else:
-        events = [event]
 
     return BACKENDS[backend](events=events, index=index, options=options)
 

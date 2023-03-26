@@ -21,6 +21,12 @@ DTYPE_MAPPING = {
 DTYPE_REVERSE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
 DTYPE_REVERSE_MAPPING[dtype.STRING] = np.string_
 
+# Maximum of printed index when calling repr(event)
+MAX_NUM_PRINTED_INDEX = 5
+
+# Maximum of printed features when calling repr(event)
+MAX_NUM_PRINTED_FEATURES = 10
+
 
 def dtype_to_np_dtype(src: dtype.DType) -> Any:
     return DTYPE_REVERSE_MAPPING[src]
@@ -273,23 +279,30 @@ class NumpyEvent:
         def repr_features(features: list[NumpyFeature]) -> str:
             """Repr for a list of features."""
 
-            return "\n".join(
-                [f"{f.name} <{f.dtype}>: {f.data}" for f in features]
-            )
+            feature_repr = []
+            for idx, f in enumerate(features):
+                if idx > MAX_NUM_PRINTED_FEATURES:
+                    feature_repr.append("...")
+                    break
+                feature_repr.append(f"{f.name} <{f.dtype}>: {f.data}")
+            return "\n".join(feature_repr)
 
         # Representation of the "data" field
-        data_repr = string.indent(
-            "\n".join(
-                f"{k}:\n{string.indent(repr_features(v))}"
-                for k, v in self.data.items()
-            ),
-            4,
-        )
+        with np.printoptions(precision=4, threshold=6):
+            data_repr = []
+            for idx, (k, v) in enumerate(self.data.items()):
+                if idx > MAX_NUM_PRINTED_INDEX:
+                    data_repr.append("...")
+                    break
+                data_repr.append(f"{k}:\n{string.indent(repr_features(v))}")
+            data_repr = string.indent("\n".join(data_repr))
 
         # Representation of the "sampling" field
-        sampling_repr = string.indent(self.sampling.__repr__(), 4)
+        sampling_repr = string.indent(self.sampling.__repr__())
 
-        return f"Event\n  data:\n{data_repr}\n  sampling:\n{sampling_repr}"
+        return (
+            f"data({len(self.data)}):\n{data_repr}\nsampling:\n{sampling_repr}"
+        )
 
     def __eq__(self, __o: object) -> bool:
         if not isinstance(__o, NumpyEvent):

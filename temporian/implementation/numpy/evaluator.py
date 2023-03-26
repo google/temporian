@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import sys
+import time
 
 from typing import Dict, List
 
@@ -31,7 +32,7 @@ def evaluate_schedule(
 ) -> Dict[event.Event, numpy_event.NumpyEvent]:
     data = {**inputs}
 
-    for operator in schedule:
+    for operator_idx, operator in enumerate(schedule):
         operator_def = operator.definition()
 
         # Get implementation
@@ -42,8 +43,18 @@ def evaluate_schedule(
         # Instantiate implementation
         implementation = implementation_cls(operator)
 
-        if verbose >= 2:
-            print(f"Execute {operator}", file=sys.stderr)
+        if verbose == 1:
+            print(
+                f"    {operator_idx+1} / {len(schedule)}:"
+                f" {operator.operator_key()}",
+                file=sys.stderr,
+                end="",
+            )
+        elif verbose >= 2:
+            print(
+                f"Run {operator}",
+                file=sys.stderr,
+            )
 
         # Construct operator inputs
         operator_inputs = {
@@ -58,7 +69,14 @@ def evaluate_schedule(
             )
 
         # Compute output
+        begin_time = time.perf_counter()
         operator_outputs = implementation(**operator_inputs)
+        end_time = time.perf_counter()
+
+        if verbose == 1:
+            print(f" [{end_time - begin_time:.5f} s]", file=sys.stderr)
+        elif verbose >= 2:
+            print(f"Duration: {end_time - begin_time} s", file=sys.stderr)
 
         if check_execution:
             _check_output(

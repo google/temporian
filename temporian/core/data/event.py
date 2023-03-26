@@ -18,6 +18,7 @@ from typing import Any, List, Optional
 
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
+from temporian.utils import string
 
 
 class Event(object):
@@ -43,19 +44,16 @@ class Event(object):
         return select(self, feature_names)
 
     def __repr__(self) -> str:
-        features_print = "\n\t\t".join(
-            [str(feature) for feature in self._features]
+        features_print = "\n".join(
+            [string.indent(repr(feature)) for feature in self._features]
         )
         return (
-            "Event: { \n"
-            "\tfeatures: {\n"
-            f"\t\t{features_print}\n"
-            "\t},\n"
-            f"\tsampling: {self._sampling},\n"
-            f"\tname: {self._name},\n"
-            f"\tcreator: {self._creator},\n"
-            f"\tid:{id(self)}\n"
-            "\t}"
+            f"features:\n"
+            f"{features_print}\n"
+            f"sampling: {self._sampling},\n"
+            f"name: {self._name},\n"
+            f"creator: {self._creator},\n"
+            f"id:{id(self)}\n"
         )
 
     def __add__(self, other):
