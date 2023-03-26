@@ -33,7 +33,6 @@ class NumpySampling:
         return False
 
     def __repr__(self) -> str:
-
         with np.printoptions(precision=4, threshold=6):
             data_repr = []
             for idx, (k, v) in enumerate(self.data.items()):
