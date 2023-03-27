@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Dict, List, Union
+from typing import Dict, List
 
 import numpy as np
 
@@ -7,10 +7,7 @@ from temporian.core.operators.set_index import SetIndexOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
-
-IndexMetadata = Dict[
-    str, Union[int, List[List[NumpyFeature]], List[np.ndarray]]
-]
+from temporian.implementation.numpy.operators.utils import _sort_by_timestamp
 
 
 def _append_impl(event: NumpyEvent, append_feat_names: List[str]) -> NumpyEvent:
@@ -48,6 +45,7 @@ def _append_impl(event: NumpyEvent, append_feat_names: List[str]) -> NumpyEvent:
 
             # initialize event & sampling destination entries
             dst_event_data[dst_idx_lvl] = []
+
             # fill event data
             for idx in keep_feats_pos:
                 dst_event_data[dst_idx_lvl].append(
@@ -60,19 +58,10 @@ def _append_impl(event: NumpyEvent, append_feat_names: List[str]) -> NumpyEvent:
             dst_samp_data[dst_idx_lvl] = event.sampling.data[src_idx_lvl][
                 dst_idx_suff_pos
             ]
-            # finally, sort according to timestamps. TODO: this is merging sorted
-            # arrays, we should later improve this code by avoiding the full sort
-            for dst_idx_lvl in dst_event_data.keys():
-                sorted_idxs = np.argsort(
-                    dst_samp_data[dst_idx_lvl], kind="mergesort"
-                )
-                # sampling
-                dst_samp_data[dst_idx_lvl] = dst_samp_data[dst_idx_lvl][
-                    sorted_idxs
-                ]
-                # event
-                for feature in dst_event_data[dst_idx_lvl]:
-                    feature.data = feature.data[sorted_idxs]
+
+    # finally, sort according to timestamps. TODO: this is merging sorted
+    # arrays, we should later improve this code by avoiding the full sort
+    _sort_by_timestamp(dst_event_data, dst_samp_data)
 
     return NumpyEvent(
         dst_event_data, NumpySampling(dst_idx_names, dst_samp_data)
