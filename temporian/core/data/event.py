@@ -88,6 +88,10 @@ class Event(object):
         return self._features
 
     @property
+    def feature_names(self) -> List[str]:
+        return [feature.name() for feature in self._features]
+
+    @property
     def name(self) -> str:
         return self._name
 
