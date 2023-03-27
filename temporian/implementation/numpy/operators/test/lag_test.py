@@ -21,7 +21,6 @@ from temporian.core import evaluator
 from temporian.core.data.event import Event
 from temporian.core.data.event import Feature
 from temporian.core.data.sampling import Sampling
-from temporian.core.operators.assign import assign
 from temporian.core.operators.lag import lag
 from temporian.core.operators.lag import leak
 from temporian.core.operators.lag import LagOperator
@@ -152,7 +151,6 @@ class LagNumpyImplementationTest(absltest.TestCase):
             input_data={
                 event: numpy_input_event,
             },
-            backend="numpy",
         )
 
         # validate
@@ -168,7 +166,6 @@ class LagNumpyImplementationTest(absltest.TestCase):
             input_data={
                 event: numpy_input_event,
             },
-            backend="numpy",
         )
 
         # validate
@@ -296,7 +293,6 @@ class LagNumpyImplementationTest(absltest.TestCase):
             input_data={
                 event: numpy_input_event,
             },
-            backend="numpy",
         )
 
         # validate
@@ -312,7 +308,6 @@ class LagNumpyImplementationTest(absltest.TestCase):
             input_data={
                 event: numpy_input_event,
             },
-            backend="numpy",
         )
 
         # validate
