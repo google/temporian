@@ -67,7 +67,7 @@ class DropIndexOperator(Operator):
         self, event: Event, index_names: List[str], keep: bool
     ) -> List[Feature]:
         output_features = [
-            Feature(name=feature.name, dtype=feature.dtype)
+            Feature(name=feature.name(), dtype=feature.dtype())
             for feature in event.features()
         ]
         if keep:
