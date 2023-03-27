@@ -139,27 +139,61 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         # validate output
         self.assertEqual(op_numpy_output_evt, expected_numpy_output_evt)
 
-    def test_drop_nothing(self) -> None:
-        # output NumPy event
+    def test_drop_item_id_keep_false(self) -> None:
+        # output NumPy event. Need to do some re-ordering due to timestamp
+        # collisions in sort
         expected_numpy_output_evt = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
-                    [0, 2, 0.1, 13.0],
-                    [0, 2, 0.2, 14.0],
-                    [1, 2, 0.3, 15.0],
-                    [1, 3, 0.3, 17.0],
-                    [0, 1, 0.4, 10.0],
-                    [1, 2, 0.4, 16.0],
-                    [0, 1, 0.5, 11.0],
-                    [0, 1, 0.6, 12.0],
+                    [0, 0.1, 13.0],
+                    [0, 0.2, 14.0],
+                    [1, 0.3, 15.0],
+                    [1, 0.3, 17.0],
+                    [0, 0.4, 10.0],
+                    [1, 0.4, 16.0],
+                    [0, 0.5, 11.0],
+                    [0, 0.6, 12.0],
                 ],
-                columns=["store_id", "item_id", "timestamp", "sales"],
+                columns=["store_id", "timestamp", "sales"],
             ),
-            index_names=["store_id", "item_id"],
+            index_names=["store_id"],
         )
         # instance core operator
-        operator = DropIndexOperator(self.input_evt, index_names=[], keep=True)
+        operator = DropIndexOperator(
+            self.input_evt, index_names=["item_id"], keep=False
+        )
+        # instance operator implementation
+        operator_impl = DropIndexNumpyImplementation(operator)
 
+        # call operator
+        op_numpy_output_evt = operator_impl(event=self.numpy_input_evt)["event"]
+
+        # validate output
+        self.assertEqual(op_numpy_output_evt, expected_numpy_output_evt)
+
+    def test_drop_store_id_keep_false(self) -> None:
+        # output NumPy event. Need to do some re-ordering due to timestamp
+        # collisions in sort
+        expected_numpy_output_evt = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [2, 0.1, 13.0],
+                    [2, 0.2, 14.0],
+                    [2, 0.3, 15.0],
+                    [3, 0.3, 17.0],
+                    [1, 0.4, 10.0],
+                    [2, 0.4, 16.0],
+                    [1, 0.5, 11.0],
+                    [1, 0.6, 12.0],
+                ],
+                columns=["item_id", "timestamp", "sales"],
+            ),
+            index_names=["item_id"],
+        )
+        # instance core operator
+        operator = DropIndexOperator(
+            self.input_evt, index_names=["store_id"], keep=False
+        )
         # instance operator implementation
         operator_impl = DropIndexNumpyImplementation(operator)
 
