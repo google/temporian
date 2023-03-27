@@ -273,9 +273,11 @@ class NumpyEvent:
         df = pd.DataFrame(data)
 
         # Convert binary strings to strings
-        df = df.applymap(
-            lambda x: x.decode("utf-8") if isinstance(x, bytes) else x
-        )
+        for col in df.columns:
+            if df[col].dtype.type == np.object_:
+                df[col] = df[col].apply(
+                    lambda x: x.decode("utf-8") if isinstance(x, bytes) else x
+                )
 
         return df
 
