@@ -55,19 +55,13 @@ def _append_impl(event: NumpyEvent, append_feat_names: List[str]) -> NumpyEvent:
             # create destination index
             dst_idx_lvl = src_idx_lvl + tuple(target_dst_idx_suff)
 
-            # initialize event & sampling destination entries
-            dst_event_data[dst_idx_lvl] = []
-
-            # fill event data
-            for feat_name, feat_pos in dst_feat_pos.items():
-                dst_event_data[dst_idx_lvl].append(
-                    NumpyFeature(
-                        feat_name,
-                        event.data[src_idx_lvl][feat_pos].data[
-                            dst_idx_suff_pos
-                        ],
-                    )
+            dst_event_data[dst_idx_lvl] = [
+                NumpyFeature(
+                    feat_name,
+                    event.data[src_idx_lvl][feat_pos].data[dst_idx_suff_pos],
                 )
+                for feat_name, feat_pos in dst_feat_pos.items()
+            ]
             # fill sampling data
             dst_samp_data[dst_idx_lvl] = event.sampling.data[src_idx_lvl][
                 dst_idx_suff_pos
