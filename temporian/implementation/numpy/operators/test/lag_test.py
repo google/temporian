@@ -99,23 +99,40 @@ class LagNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id"],
         )
-
-        expected_numpy_output_event = NumpyEvent.from_dataframe(
+        expected_lag_1_numpy_output_event = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
-                    [0, 1.0, 10.0, np.nan, np.nan],
-                    [0, 2.0, 11.0, 10.0, np.nan],
-                    [0, 3.0, 12.0, 11.0, 10.0],
-                    [0, 4.0, 13.0, 12.0, 11.0],
-                    [0, 5.0, 14.0, 13.0, 12.0],
-                    [0, 6.0, 15.0, 14.0, 13.0],
-                    [0, 7.0, 16.0, 15.0, 14.0],
+                    [0, 2.0, 10.0],
+                    [0, 3.0, 11.0],
+                    [0, 4.0, 12.0],
+                    [0, 5.0, 13.0],
+                    [0, 6.0, 14.0],
+                    [0, 7.0, 15.0],
+                    [0, 8.0, 16.0],
                 ],
                 columns=[
                     "store_id",
                     "timestamp",
-                    "sales",
                     "lag[1s]_sales",
+                ],
+            ),
+            index_names=["store_id"],
+        )
+
+        expected_lag_2_numpy_output_event = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 3.0, 10.0],
+                    [0, 4.0, 11.0],
+                    [0, 5.0, 12.0],
+                    [0, 6.0, 13.0],
+                    [0, 7.0, 14.0],
+                    [0, 8.0, 15.0],
+                    [0, 9.0, 16.0],
+                ],
+                columns=[
+                    "store_id",
+                    "timestamp",
                     "lag[2s]_sales",
                 ],
             ),
@@ -127,14 +144,11 @@ class LagNumpyImplementationTest(absltest.TestCase):
         # lag multiple durations
         lags = lag(event=event, duration=[1, 2])
 
-        # assign multiple lags to output event
-        output_event = event
-        for lagged_event in lags:
-            output_event = assign(output_event, lagged_event)
+        lag_1 = lags[0]
 
         # evaluate
-        output_event_numpy = evaluator.evaluate(
-            output_event,
+        output_event_numpy_lag_1 = evaluator.evaluate(
+            lag_1,
             input_data={
                 event: numpy_input_event,
             },
@@ -142,7 +156,25 @@ class LagNumpyImplementationTest(absltest.TestCase):
         )
 
         # validate
-        self.assertEqual(expected_numpy_output_event, output_event_numpy)
+        self.assertEqual(
+            expected_lag_1_numpy_output_event, output_event_numpy_lag_1
+        )
+
+        lag_2 = lags[1]
+
+        # evaluate
+        output_event_numpy_lag_2 = evaluator.evaluate(
+            lag_2,
+            input_data={
+                event: numpy_input_event,
+            },
+            backend="numpy",
+        )
+
+        # validate
+        self.assertEqual(
+            expected_lag_2_numpy_output_event, output_event_numpy_lag_2
+        )
 
     def test_correct_leak(self) -> None:
         """Test correct leak operator."""
@@ -211,23 +243,40 @@ class LagNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id"],
         )
-
-        expected_numpy_output_event = NumpyEvent.from_dataframe(
+        expected_leak_1_numpy_output_event = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
-                    [0, 1.0, 10.0, 11.0, 12.0],
-                    [0, 2.0, 11.0, 12.0, 13.0],
-                    [0, 3.0, 12.0, 13.0, 14.0],
-                    [0, 4.0, 13.0, 14.0, 15.0],
-                    [0, 5.0, 14.0, 15.0, 16.0],
-                    [0, 6.0, 15.0, 16.0, np.nan],
-                    [0, 7.0, 16.0, np.nan, np.nan],
+                    [0, 0.0, 10.0],
+                    [0, 1.0, 11.0],
+                    [0, 2.0, 12.0],
+                    [0, 3.0, 13.0],
+                    [0, 4.0, 14.0],
+                    [0, 5.0, 15.0],
+                    [0, 6.0, 16.0],
                 ],
                 columns=[
                     "store_id",
                     "timestamp",
-                    "sales",
                     "leak[1s]_sales",
+                ],
+            ),
+            index_names=["store_id"],
+        )
+
+        expected_leak_2_numpy_output_event = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, -1.0, 10.0],
+                    [0, 0.0, 11.0],
+                    [0, 1.0, 12.0],
+                    [0, 2.0, 13.0],
+                    [0, 3.0, 14.0],
+                    [0, 4.0, 15.0],
+                    [0, 5.0, 16.0],
+                ],
+                columns=[
+                    "store_id",
+                    "timestamp",
                     "leak[2s]_sales",
                 ],
             ),
@@ -236,17 +285,14 @@ class LagNumpyImplementationTest(absltest.TestCase):
 
         event = numpy_input_event.schema()
 
-        # lag multiple durations
+        # leak multiple durations
         leaks = leak(event=event, duration=[1, 2])
 
-        # assign multiple lags to output event
-        output_event = event
-        for leaked_event in leaks:
-            output_event = assign(output_event, leaked_event)
+        leak_1 = leaks[0]
 
         # evaluate
-        output_event_numpy = evaluator.evaluate(
-            output_event,
+        output_event_numpy_leak_1 = evaluator.evaluate(
+            leak_1,
             input_data={
                 event: numpy_input_event,
             },
@@ -254,7 +300,25 @@ class LagNumpyImplementationTest(absltest.TestCase):
         )
 
         # validate
-        self.assertEqual(expected_numpy_output_event, output_event_numpy)
+        self.assertEqual(
+            expected_leak_1_numpy_output_event, output_event_numpy_leak_1
+        )
+
+        leak_2 = leaks[1]
+
+        # evaluate
+        output_event_numpy_leak_2 = evaluator.evaluate(
+            leak_2,
+            input_data={
+                event: numpy_input_event,
+            },
+            backend="numpy",
+        )
+
+        # validate
+        self.assertEqual(
+            expected_leak_2_numpy_output_event, output_event_numpy_leak_2
+        )
 
 
 if __name__ == "__main__":

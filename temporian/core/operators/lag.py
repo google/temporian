@@ -26,6 +26,9 @@ from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
+NUMERIC = Union[int, float]
+
+
 class LagOperator(Operator):
     """Lag operator."""
 
@@ -86,27 +89,27 @@ class LagOperator(Operator):
 operator_lib.register_operator(LagOperator)
 
 
-def _base_lag(
+def _implementation(
     event: Event,
     duration: Union[Duration, List[Duration]],
     should_leak: bool = False,
 ) -> Event:
-    """Base Lag function."""
-
-    if isinstance(duration, (Duration, int)):
-        duration = [duration]
+    """Lag & Leak Implementation."""
 
     if not isinstance(duration, list):
+        duration = [duration]
+
+    if not all(isinstance(d, NUMERIC) and d > 0 for d in duration):
         raise ValueError(
-            "duration must be a list of Durations. Got"
+            "duration must be a list of positive numbers. Got"
             f" {duration}, type {type(duration)}"
         )
 
-    if not all(isinstance(d, (Duration, int)) and d > 0 for d in duration):
-        raise ValueError(
-            "duration must be a list of positive Durations. Got"
-            f" {duration}, type {type(duration)}"
-        )
+    # Ensure that all durations are of type Duration. This converts ints to
+    # float64 for consistent behavior.
+    duration = [
+        Duration(d) if not isinstance(d, Duration) else d for d in duration
+    ]
 
     used_duration = duration if not should_leak else [-d for d in duration]
 
@@ -125,7 +128,8 @@ def _base_lag(
 def lag(
     event: Event, duration: Union[Duration, List[Duration]]
 ) -> Union[Event, List[Event]]:
-    """Lag operator.
+    """Lag operator. Shifts the event sampling backwards in time by a specified
+    duration.
 
     Args:
         event: Event to lag.
@@ -135,18 +139,21 @@ def lag(
         Lagged event. If a list of Durations is provided, a list of lagged
         events is returned.
     """
-    return _base_lag(event=event, duration=duration)
+    return _implementation(event=event, duration=duration)
 
 
-def leak(event: Event, duration: Duration) -> Event:
-    """Leak operator.
+def leak(
+    event: Event, duration: Union[Duration, List[Duration]]
+) -> Union[Event, List[Event]]:
+    """Leak operator. Shifts the event sampling forward in time by a specified
+    duration.
 
     Args:
         event: Event to leak.
-        duration: Duration to leak by. Can be a list of Durations.
+        duration: Duration to shift the sampling. Can be a list of Durations.
 
     Returns:
         Leaked event. If a list of Durations is provided, a list of leaked
         events is returned.
     """
-    return _base_lag(event=event, duration=duration, should_leak=True)
+    return _implementation(event=event, duration=duration, should_leak=True)
