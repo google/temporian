@@ -62,8 +62,8 @@ class DataFrameToEventTest(absltest.TestCase):
         df = pd.DataFrame(
             [
                 [666964, 1.0, "740"],
-                [666964, 2.0, np.nan],
-                [574016, 3.0, ""],
+                [666964, 2.0, "400"],
+                [574016, 3.0, "200"],
             ],
             columns=["product_id", "timestamp", "costs"],
         )
@@ -80,14 +80,93 @@ class DataFrameToEventTest(absltest.TestCase):
             data={
                 (666964,): [
                     NumpyFeature(
-                        data=np.array(["740", np.nan]).astype(np.string_),
+                        data=np.array(["740", "400"]).astype(np.string_),
                         name="costs",
                     )
                 ],
                 (574016,): [
                     NumpyFeature(
-                        data=np.array([""]).astype(np.string_), name="costs"
+                        data=np.array(["200"]).astype(np.string_), name="costs"
                     )
+                ],
+            },
+            sampling=numpy_sampling,
+        )
+
+        numpy_event = NumpyEvent.from_dataframe(
+            df, index_names=["product_id"], timestamp_column="timestamp"
+        )
+
+        # validate
+        self.assertTrue(numpy_event == expected_numpy_event)
+
+    def test_mixed_types_in_string_column(self) -> None:
+        df = pd.DataFrame(
+            [
+                [666964, 1.0, "740", "A"],
+                [666964, 2.0, "400", 101],
+                [574016, 3.0, np.nan, "B"],
+            ],
+            columns=["product_id", "timestamp", "costs", "sales"],
+        )
+
+        # Not allowed
+        with self.assertRaises(ValueError):
+            NumpyEvent.from_dataframe(
+                df, index_names=["product_id"], timestamp_column="timestamp"
+            )
+
+    def test_multiple_string_formats(self) -> None:
+        df = pd.DataFrame(
+            [
+                [666964, 1.0, "740", "A", "D"],
+                [666964, 2.0, "400", "B", "E"],
+                [574016, 3.0, "200", "C", "F"],
+            ],
+            columns=["product_id", "timestamp", "costs", "sales", "sales2"],
+        )
+
+        # set dtype of column costs to string
+        df["costs"] = df["costs"].astype(str)
+        # set dtype of column sales to pandas string
+        df["sales"] = df["sales"].astype("string")
+        # set dtype of column sales2 to np.string_
+        df["sales2"] = df["sales2"].astype(np.string_)
+
+        numpy_sampling = NumpySampling(
+            data={
+                (666964,): np.array([1.0, 2.0]),
+                (574016,): np.array([3.0]),
+            },
+            index=["product_id"],
+        )
+
+        expected_numpy_event = NumpyEvent(
+            data={
+                (666964,): [
+                    NumpyFeature(
+                        data=np.array(["740", "400"]).astype(np.string_),
+                        name="costs",
+                    ),
+                    NumpyFeature(
+                        data=np.array(["A", "B"]).astype(np.string_),
+                        name="sales",
+                    ),
+                    NumpyFeature(
+                        data=np.array(["D", "E"]).astype(np.string_),
+                        name="sales2",
+                    ),
+                ],
+                (574016,): [
+                    NumpyFeature(
+                        data=np.array(["200"]).astype(np.string_), name="costs"
+                    ),
+                    NumpyFeature(
+                        data=np.array(["C"]).astype(np.string_), name="sales"
+                    ),
+                    NumpyFeature(
+                        data=np.array(["F"]).astype(np.string_), name="sales2"
+                    ),
                 ],
             },
             sampling=numpy_sampling,

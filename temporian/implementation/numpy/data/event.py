@@ -174,17 +174,24 @@ class NumpyEvent:
 
         # check column dtypes, every dtype should be a key of DTYPE_MAPPING
         for column in df.columns:
-            # if dtype is object, convert to string
+            # if dtype is object, check if it only contains string values
             if df[column].dtype.type is np.object_:
-                try:
-                    df[column] = df[column].astype(np.string_)
-                except ValueError as exc:
+                if not df[column].apply(lambda x: isinstance(x, str)).all():
                     raise ValueError(
-                        f"Column {column} has dtype object, but cannot be"
-                        " converted to string."
-                    ) from exc
+                        "Object columns are only allowed if they contain only"
+                        " string values"
+                    )
+                # convert object column to np.string_
+                df[column] = df[column].astype(np.string_)
 
-            elif df[column].dtype.type not in DTYPE_MAPPING:
+            # convert pandas' StringDtype to np.string_
+            elif df[column].dtype.type is str:
+                df[column] = df[column].astype(np.string_)
+
+            elif (
+                df[column].dtype.type not in DTYPE_MAPPING
+                and df[column].dtype.type != np.string_
+            ):
                 raise ValueError(
                     f"Unsupported dtype {df[column].dtype} for column"
                     f" {column}. Supported dtypes: {DTYPE_MAPPING.keys()}"
