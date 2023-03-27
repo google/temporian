@@ -119,17 +119,19 @@ class DataFrameToEventTest(absltest.TestCase):
     def test_multiple_string_formats(self) -> None:
         df = pd.DataFrame(
             [
-                [666964, 1.0, "740", "A"],
-                [666964, 2.0, "400", "B"],
-                [574016, 3.0, "200", "C"],
+                [666964, 1.0, "740", "A", "D"],
+                [666964, 2.0, "400", "B", "E"],
+                [574016, 3.0, "200", "C", "F"],
             ],
-            columns=["product_id", "timestamp", "costs", "sales"],
+            columns=["product_id", "timestamp", "costs", "sales", "sales2"],
         )
 
         # set dtype of column costs to string
         df["costs"] = df["costs"].astype(str)
-        # set dtype of column sales to string
+        # set dtype of column sales to pandas string
         df["sales"] = df["sales"].astype("string")
+        # set dtype of column sales2 to np.string_
+        df["sales2"] = df["sales2"].astype(np.string_)
 
         numpy_sampling = NumpySampling(
             data={
@@ -150,6 +152,10 @@ class DataFrameToEventTest(absltest.TestCase):
                         data=np.array(["A", "B"]).astype(np.string_),
                         name="sales",
                     ),
+                    NumpyFeature(
+                        data=np.array(["D", "E"]).astype(np.string_),
+                        name="sales2",
+                    ),
                 ],
                 (574016,): [
                     NumpyFeature(
@@ -157,6 +163,9 @@ class DataFrameToEventTest(absltest.TestCase):
                     ),
                     NumpyFeature(
                         data=np.array(["C"]).astype(np.string_), name="sales"
+                    ),
+                    NumpyFeature(
+                        data=np.array(["F"]).astype(np.string_), name="sales2"
                     ),
                 ],
             },

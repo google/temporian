@@ -186,7 +186,10 @@ class NumpyEvent:
             elif df[column].dtype.type is str:
                 df[column] = df[column].astype(np.string_)
 
-            elif df[column].dtype.type not in DTYPE_MAPPING:
+            elif (
+                df[column].dtype.type not in DTYPE_MAPPING
+                and df[column].dtype.type != np.string_
+            ):
                 raise ValueError(
                     f"Unsupported dtype {df[column].dtype} for column"
                     f" {column}. Supported dtypes: {DTYPE_MAPPING.keys()}"
