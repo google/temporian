@@ -183,6 +183,9 @@ class NumpyEvent:
                 # convert string column to np.string_
                 df[column] = df[column].astype(np.string_)
 
+            elif df[column].dtype.type is str:
+                df[column] = df[column].astype(np.string_)
+
             elif df[column].dtype.type not in DTYPE_MAPPING:
                 raise ValueError(
                     f"Unsupported dtype {df[column].dtype} for column"

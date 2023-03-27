@@ -116,6 +116,60 @@ class DataFrameToEventTest(absltest.TestCase):
                 df, index_names=["product_id"], timestamp_column="timestamp"
             )
 
+    def test_multiple_string_formats(self) -> None:
+        df = pd.DataFrame(
+            [
+                [666964, 1.0, "740", "A"],
+                [666964, 2.0, "400", "B"],
+                [574016, 3.0, "200", "C"],
+            ],
+            columns=["product_id", "timestamp", "costs", "sales"],
+        )
+
+        # set dtype of column costs to string
+        df["costs"] = df["costs"].astype(str)
+        # set dtype of column sales to string
+        df["sales"] = df["sales"].astype("string")
+
+        numpy_sampling = NumpySampling(
+            data={
+                (666964,): np.array([1.0, 2.0]),
+                (574016,): np.array([3.0]),
+            },
+            index=["product_id"],
+        )
+
+        expected_numpy_event = NumpyEvent(
+            data={
+                (666964,): [
+                    NumpyFeature(
+                        data=np.array(["740", "400"]).astype(np.string_),
+                        name="costs",
+                    ),
+                    NumpyFeature(
+                        data=np.array(["A", "B"]).astype(np.string_),
+                        name="sales",
+                    ),
+                ],
+                (574016,): [
+                    NumpyFeature(
+                        data=np.array(["200"]).astype(np.string_), name="costs"
+                    ),
+                    NumpyFeature(
+                        data=np.array(["C"]).astype(np.string_), name="sales"
+                    ),
+                ],
+            },
+            sampling=numpy_sampling,
+        )
+
+        numpy_event = NumpyEvent.from_dataframe(
+            df, index_names=["product_id"], timestamp_column="timestamp"
+        )
+
+        # validate
+        self.assertTrue(numpy_event == expected_numpy_event)
+
     def test_missing_values(self) -> None:
         df = pd.DataFrame(
             [
