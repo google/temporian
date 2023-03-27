@@ -26,9 +26,6 @@ from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
-NUMERIC = Union[int, float]
-
-
 class LagOperator(Operator):
     """Lag operator."""
 
@@ -99,7 +96,7 @@ def _implementation(
     if not isinstance(duration, list):
         duration = [duration]
 
-    if not all(isinstance(d, NUMERIC) and d > 0 for d in duration):
+    if not all(isinstance(d, (int, float)) and d > 0 for d in duration):
         raise ValueError(
             "duration must be a list of positive numbers. Got"
             f" {duration}, type {type(duration)}"
