@@ -16,9 +16,6 @@ from absl.testing import absltest
 
 import pandas as pd
 
-from temporian.core.data.event import Event
-from temporian.core.data.event import Feature
-from temporian.core.data.sampling import Sampling
 from temporian.core.operators.drop_index import DropIndexOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators.drop_index import (
@@ -28,11 +25,6 @@ from temporian.implementation.numpy.operators.drop_index import (
 
 class DropIndexNumpyImplementationTest(absltest.TestCase):
     def setUp(self) -> None:
-        # input event
-        self.input_evt = Event(
-            features=[Feature("sales", dtype=float)],
-            sampling=Sampling(index=["store_id", "item_id"]),
-        )
         # input NumPy event
         self.numpy_input_evt = NumpyEvent.from_dataframe(
             pd.DataFrame(
@@ -50,6 +42,8 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id", "item_id"],
         )
+        # input event
+        self.input_evt = self.numpy_input_evt.schema()
 
     def test_drop_all(self) -> None:
         # output NumPy event
@@ -70,8 +64,9 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
             index_names=None,
         )
         # instance core operator
-        operator = DropIndexOperator(self.input_evt)
-
+        operator = DropIndexOperator(
+            self.input_evt, index_names=["store_id", "item_id"], keep=True
+        )
         # instance operator implementation
         operator_impl = DropIndexNumpyImplementation(operator)
 
@@ -81,7 +76,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         # validate output
         self.assertEqual(op_numpy_output_evt, expected_numpy_output_evt)
 
-    def test_drop_item(self) -> None:
+    def test_drop_item_id(self) -> None:
         # output NumPy event. Need to do some re-ordering due to timestamp
         # collisions in sort
         expected_numpy_output_evt = NumpyEvent.from_dataframe(
@@ -101,8 +96,9 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id"],
         )
         # instance core operator
-        operator = DropIndexOperator(self.input_evt, labels="item_id")
-
+        operator = DropIndexOperator(
+            self.input_evt, index_names=["item_id"], keep=True
+        )
         # instance operator implementation
         operator_impl = DropIndexNumpyImplementation(operator)
 
@@ -112,7 +108,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         # validate output
         self.assertEqual(op_numpy_output_evt, expected_numpy_output_evt)
 
-    def test_drop_store(self) -> None:
+    def test_drop_store_id(self) -> None:
         # output NumPy event
         expected_numpy_output_evt = NumpyEvent.from_dataframe(
             pd.DataFrame(
@@ -131,8 +127,9 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
             index_names=["item_id"],
         )
         # instance core operator
-        operator = DropIndexOperator(self.input_evt, labels="store_id")
-
+        operator = DropIndexOperator(
+            self.input_evt, index_names=["store_id"], keep=True
+        )
         # instance operator implementation
         operator_impl = DropIndexNumpyImplementation(operator)
 
@@ -161,7 +158,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id", "item_id"],
         )
         # instance core operator
-        operator = DropIndexOperator(self.input_evt, labels=[])
+        operator = DropIndexOperator(self.input_evt, index_names=[], keep=True)
 
         # instance operator implementation
         operator_impl = DropIndexNumpyImplementation(operator)
@@ -171,17 +168,6 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
 
         # validate output
         self.assertEqual(op_numpy_output_evt, expected_numpy_output_evt)
-
-    def test_bad_inputs(self) -> None:
-        # single, non-existing label
-        with self.assertRaisesRegex(KeyError, r"\['dept_id'\]"):
-            operator = DropIndexOperator(self.input_evt, labels="dept_id")
-
-        # one non-existing label
-        with self.assertRaisesRegex(KeyError, r"\['dept_id'\]"):
-            operator = DropIndexOperator(
-                self.input_evt, labels=["store_id", "item_id", "dept_id"]
-            )
 
 
 if __name__ == "__main__":

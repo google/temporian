@@ -178,8 +178,6 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # absl/testing:absltest dep,
-        "//temporian/core/data:event",
-        "//temporian/core/data:sampling",
         "//temporian/core/operators:drop_index",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
