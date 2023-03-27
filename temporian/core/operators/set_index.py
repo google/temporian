@@ -73,7 +73,7 @@ class SetIndexOperator(Operator):
         self, event: Event, labels: List[str]
     ) -> List[Feature]:
         output_features = [
-            Feature(name=feature.name, dtype=feature.dtype)
+            Feature(name=feature.name(), dtype=feature.dtype())
             for feature in event.features()
             if feature.name not in labels
         ]
