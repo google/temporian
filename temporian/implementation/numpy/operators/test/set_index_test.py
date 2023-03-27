@@ -119,6 +119,76 @@ class SetIndexNumpyImplementationTest(absltest.TestCase):
         # validate output
         self.assertEqual(op_numpy_output_evt, expected_numpy_output_evt)
 
+    def test_set_single(self) -> None:
+        # output NumPy event
+        expected_numpy_output_evt = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 2, 0.1, 13.0],
+                    [0, 2, 0.2, 14.0],
+                    [0, 1, 0.4, 10.0],
+                    [0, 1, 0.5, 11.0],
+                    [0, 1, 0.6, 12.0],
+                    [1, 2, 0.3, 15.0],
+                    [1, 3, 0.3, 17.0],
+                    [1, 2, 0.4, 16.0],
+                ],
+                columns=[
+                    "store_id",
+                    "item_id",
+                    "timestamp",
+                    "sales",
+                ],
+            ),
+            index_names=["store_id"],
+        )
+        operator = SetIndexOperator(
+            self.input_evt, labels=["store_id"], append=False
+        )
+        # instance operator implementation
+        operator_impl = SetIndexNumpyImplementation(operator)
+
+        # call operator
+        op_numpy_output_evt = operator_impl(event=self.numpy_input_evt)["event"]
+
+        # validate output
+        self.assertEqual(op_numpy_output_evt, expected_numpy_output_evt)
+
+    def test_set_multiple(self) -> None:
+        # output NumPy event
+        expected_numpy_output_evt = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 2, 0.1, 13.0],
+                    [0, 2, 0.2, 14.0],
+                    [0, 1, 0.4, 10.0],
+                    [0, 1, 0.5, 11.0],
+                    [0, 1, 0.6, 12.0],
+                    [1, 2, 0.3, 15.0],
+                    [1, 2, 0.4, 16.0],
+                    [1, 3, 0.3, 17.0],
+                ],
+                columns=[
+                    "store_id",
+                    "item_id",
+                    "timestamp",
+                    "sales",
+                ],
+            ),
+            index_names=["store_id", "item_id"],
+        )
+        operator = SetIndexOperator(
+            self.input_evt, labels=["store_id", "item_id"], append=False
+        )
+        # instance operator implementation
+        operator_impl = SetIndexNumpyImplementation(operator)
+
+        # call operator
+        op_numpy_output_evt = operator_impl(event=self.numpy_input_evt)["event"]
+
+        # validate output
+        self.assertEqual(op_numpy_output_evt, expected_numpy_output_evt)
+
 
 if __name__ == "__main__":
     absltest.main()
