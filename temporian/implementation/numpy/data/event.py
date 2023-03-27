@@ -174,15 +174,17 @@ class NumpyEvent:
 
         # check column dtypes, every dtype should be a key of DTYPE_MAPPING
         for column in df.columns:
-            # if dtype is object, check if it is a string column
+            # if dtype is object, check if it only contains string values
             if df[column].dtype.type is np.object_:
                 if not df[column].apply(lambda x: isinstance(x, str)).all():
                     raise ValueError(
-                        "String columns with mixed types are not supported"
+                        "Object columns are only allowed if they contain only"
+                        " string values"
                     )
-                # convert string column to np.string_
+                # convert object column to np.string_
                 df[column] = df[column].astype(np.string_)
 
+            # convert pandas' StringDtype to np.string_
             elif df[column].dtype.type is str:
                 df[column] = df[column].astype(np.string_)
 
