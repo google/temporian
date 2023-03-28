@@ -26,7 +26,7 @@ class NumpyFeature:
                 "NumpyFeatures can only be created from flat arrays. Passed"
                 f" input's shape: {len(data.shape)}"
             )
-        if data.dtype.type is not np.string_:
+        if data.dtype.type is not np.str_:
             if data.dtype.type not in DTYPE_MAPPING:
                 raise ValueError(
                     f"Unsupported dtype {data.dtype} for NumpyFeature: {name}."
@@ -47,13 +47,13 @@ class NumpyFeature:
         if self.name != __o.name:
             return False
 
-        if self.dtype is np.string_:
+        if self.dtype is np.str_:
             return np.array_equal(self.data, __o.data)
 
         return np.array_equal(self.data, __o.data, equal_nan=True)
 
     def core_dtype(self) -> Any:
-        if hasattr(self.dtype, "type") and self.dtype.type is np.string_:
+        if hasattr(self.dtype, "type") and self.dtype.type is np.str_:
             return dtype.STRING
         return DTYPE_MAPPING[self.dtype]
 
@@ -223,10 +223,17 @@ class NumpyEvent:
                     group = (group,)
 
                 sampling[group] = timestamp
+
                 data[group] = [
-                    NumpyFeature(feature, columns[feature].to_numpy())
+                    NumpyFeature(
+                        feature,
+                        columns[feature].to_numpy(
+                            dtype=columns[feature].dtype.type
+                        ),
+                    )
                     for feature in feature_columns
                 ]
+
         # The user did not provide an index
         else:
             timestamp = df[timestamp_column].to_numpy()
@@ -271,13 +278,6 @@ class NumpyEvent:
 
         # Converting dictionary to pandas DataFrame
         df = pd.DataFrame(data)
-
-        # Convert binary strings to strings
-        for col in df.columns:
-            if df[col].dtype.type == np.object_:
-                df[col] = df[col].apply(
-                    lambda x: x.decode("utf-8") if isinstance(x, bytes) else x
-                )
 
         return df
 

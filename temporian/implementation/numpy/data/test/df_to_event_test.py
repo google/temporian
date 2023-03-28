@@ -62,8 +62,8 @@ class DataFrameToEventTest(absltest.TestCase):
         df = pd.DataFrame(
             [
                 [666964, 1.0, "740"],
-                [666964, 2.0, "400"],
-                [574016, 3.0, "200"],
+                [666964, 2.0, "B"],
+                [574016, 3.0, ""],
             ],
             columns=["product_id", "timestamp", "costs"],
         )
@@ -80,13 +80,13 @@ class DataFrameToEventTest(absltest.TestCase):
             data={
                 (666964,): [
                     NumpyFeature(
-                        data=np.array(["740", "400"]).astype(np.string_),
+                        data=np.array(["740", "B"]).astype(np.str_),
                         name="costs",
                     )
                 ],
                 (574016,): [
                     NumpyFeature(
-                        data=np.array(["200"]).astype(np.string_), name="costs"
+                        data=np.array([""]).astype(np.str_), name="costs"
                     )
                 ],
             },
@@ -179,7 +179,7 @@ class DataFrameToEventTest(absltest.TestCase):
         # validate
         self.assertTrue(numpy_event == expected_numpy_event)
 
-    def test_binary_string_in_index(self):
+    def test_string_in_index(self):
         numpy_event = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
@@ -200,19 +200,19 @@ class DataFrameToEventTest(absltest.TestCase):
 
         expected_numpy_event = NumpyEvent(
             data={
-                (b"X1", b"Y1"): [
+                ("X1", "Y1"): [
                     NumpyFeature(
                         name="a",
                         data=np.array([10.0, 11.0, 12.0]),
                     )
                 ],
-                (b"X2", b"Y1"): [
+                ("X2", "Y1"): [
                     NumpyFeature(
                         name="a",
                         data=np.array([13.0, 14.0, 15.0]),
                     )
                 ],
-                (b"X2", b"Y2"): [
+                ("X2", "Y2"): [
                     NumpyFeature(
                         name="a",
                         data=np.array([16.0, 17.0, 18.0]),
@@ -222,9 +222,9 @@ class DataFrameToEventTest(absltest.TestCase):
             sampling=NumpySampling(
                 index=["x", "y"],
                 data={
-                    (b"X1", b"Y1"): np.array([1, 2, 3], dtype=np.float64),
-                    (b"X2", b"Y1"): np.array([1.1, 2.1, 3.1], dtype=np.float64),
-                    (b"X2", b"Y2"): np.array([1.2, 2.2, 3.2], dtype=np.float64),
+                    ("X1", "Y1"): np.array([1, 2, 3], dtype=np.float64),
+                    ("X2", "Y1"): np.array([1.1, 2.1, 3.1], dtype=np.float64),
+                    ("X2", "Y2"): np.array([1.2, 2.2, 3.2], dtype=np.float64),
                 },
             ),
         )

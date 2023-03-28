@@ -191,13 +191,13 @@ class EventToDataFrameTest(absltest.TestCase):
             data={
                 (666964,): [
                     NumpyFeature(
-                        data=np.array(["740.0", "508.0"]).astype(np.string_),
+                        data=np.array(["740.0", "508.0"]).astype(np.str_),
                         name="costs",
                     )
                 ],
                 (574016,): [
                     NumpyFeature(
-                        data=np.array(["573.0"]).astype(np.string_),
+                        data=np.array(["573.0"]).astype(np.str_),
                         name="costs",
                     )
                 ],
