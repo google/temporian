@@ -40,7 +40,7 @@ class MovingStandardDeviationOperator(BaseWindowOperator):
 operator_lib.register_operator(MovingStandardDeviationOperator)
 
 
-def msd(
+def moving_standard_deviation(
     event: Event,
     window_length: Duration,
     sampling: Optional[Event] = None,

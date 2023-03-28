@@ -12,6 +12,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        ":moving_standard_deviation",
         ":simple_moving_average",
     ],
 )
