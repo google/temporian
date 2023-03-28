@@ -145,27 +145,27 @@ class DataFrameToEventTest(absltest.TestCase):
             data={
                 (666964,): [
                     NumpyFeature(
-                        data=np.array(["740", "400"]).astype(np.string_),
+                        data=np.array(["740", "400"]).astype(np.str_),
                         name="costs",
                     ),
                     NumpyFeature(
-                        data=np.array(["A", "B"]).astype(np.string_),
+                        data=np.array(["A", "B"]).astype(np.str_),
                         name="sales",
                     ),
                     NumpyFeature(
-                        data=np.array(["D", "E"]).astype(np.string_),
+                        data=np.array(["D", "E"]).astype(np.str_),
                         name="sales2",
                     ),
                 ],
                 (574016,): [
                     NumpyFeature(
-                        data=np.array(["200"]).astype(np.string_), name="costs"
+                        data=np.array(["200"]).astype(np.str_), name="costs"
                     ),
                     NumpyFeature(
-                        data=np.array(["C"]).astype(np.string_), name="sales"
+                        data=np.array(["C"]).astype(np.str_), name="sales"
                     ),
                     NumpyFeature(
-                        data=np.array(["F"]).astype(np.string_), name="sales2"
+                        data=np.array(["F"]).astype(np.str_), name="sales2"
                     ),
                 ],
             },

@@ -182,15 +182,15 @@ class NumpyEvent:
                         " string values"
                     )
                 # convert object column to np.string_
-                df[column] = df[column].astype(np.string_)
+                df[column] = df[column].astype("string")
 
             # convert pandas' StringDtype to np.string_
-            elif df[column].dtype.type is str:
-                df[column] = df[column].astype(np.string_)
+            elif df[column].dtype.type is np.string_:
+                df[column] = df[column].str.decode("utf-8").astype("string")
 
             elif (
                 df[column].dtype.type not in DTYPE_MAPPING
-                and df[column].dtype.type != np.string_
+                and df[column].dtype.type is not str
             ):
                 raise ValueError(
                     f"Unsupported dtype {df[column].dtype} for column"
