@@ -62,8 +62,8 @@ class DataFrameToEventTest(absltest.TestCase):
         df = pd.DataFrame(
             [
                 [666964, 1.0, "740"],
-                [666964, 2.0, "400"],
-                [574016, 3.0, "200"],
+                [666964, 2.0, "B"],
+                [574016, 3.0, ""],
             ],
             columns=["product_id", "timestamp", "costs"],
         )
@@ -80,13 +80,13 @@ class DataFrameToEventTest(absltest.TestCase):
             data={
                 (666964,): [
                     NumpyFeature(
-                        data=np.array(["740", "400"]).astype(np.string_),
+                        data=np.array(["740", "B"]).astype(np.str_),
                         name="costs",
                     )
                 ],
                 (574016,): [
                     NumpyFeature(
-                        data=np.array(["200"]).astype(np.string_), name="costs"
+                        data=np.array([""]).astype(np.str_), name="costs"
                     )
                 ],
             },
@@ -145,27 +145,27 @@ class DataFrameToEventTest(absltest.TestCase):
             data={
                 (666964,): [
                     NumpyFeature(
-                        data=np.array(["740", "400"]).astype(np.string_),
+                        data=np.array(["740", "400"]).astype(np.str_),
                         name="costs",
                     ),
                     NumpyFeature(
-                        data=np.array(["A", "B"]).astype(np.string_),
+                        data=np.array(["A", "B"]).astype(np.str_),
                         name="sales",
                     ),
                     NumpyFeature(
-                        data=np.array(["D", "E"]).astype(np.string_),
+                        data=np.array(["D", "E"]).astype(np.str_),
                         name="sales2",
                     ),
                 ],
                 (574016,): [
                     NumpyFeature(
-                        data=np.array(["200"]).astype(np.string_), name="costs"
+                        data=np.array(["200"]).astype(np.str_), name="costs"
                     ),
                     NumpyFeature(
-                        data=np.array(["C"]).astype(np.string_), name="sales"
+                        data=np.array(["C"]).astype(np.str_), name="sales"
                     ),
                     NumpyFeature(
-                        data=np.array(["F"]).astype(np.string_), name="sales2"
+                        data=np.array(["F"]).astype(np.str_), name="sales2"
                     ),
                 ],
             },
@@ -174,6 +174,59 @@ class DataFrameToEventTest(absltest.TestCase):
 
         numpy_event = NumpyEvent.from_dataframe(
             df, index_names=["product_id"], timestamp_column="timestamp"
+        )
+
+        # validate
+        self.assertTrue(numpy_event == expected_numpy_event)
+
+    def test_string_in_index(self):
+        numpy_event = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    ["X1", "Y1", 10.0, 1],
+                    ["X1", "Y1", 11.0, 2],
+                    ["X1", "Y1", 12.0, 3],
+                    ["X2", "Y1", 13.0, 1.1],
+                    ["X2", "Y1", 14.0, 2.1],
+                    ["X2", "Y1", 15.0, 3.1],
+                    ["X2", "Y2", 16.0, 1.2],
+                    ["X2", "Y2", 17.0, 2.2],
+                    ["X2", "Y2", 18.0, 3.2],
+                ],
+                columns=["x", "y", "a", "timestamp"],
+            ),
+            index_names=["x", "y"],
+        )
+
+        expected_numpy_event = NumpyEvent(
+            data={
+                ("X1", "Y1"): [
+                    NumpyFeature(
+                        name="a",
+                        data=np.array([10.0, 11.0, 12.0]),
+                    )
+                ],
+                ("X2", "Y1"): [
+                    NumpyFeature(
+                        name="a",
+                        data=np.array([13.0, 14.0, 15.0]),
+                    )
+                ],
+                ("X2", "Y2"): [
+                    NumpyFeature(
+                        name="a",
+                        data=np.array([16.0, 17.0, 18.0]),
+                    )
+                ],
+            },
+            sampling=NumpySampling(
+                index=["x", "y"],
+                data={
+                    ("X1", "Y1"): np.array([1, 2, 3], dtype=np.float64),
+                    ("X2", "Y1"): np.array([1.1, 2.1, 3.1], dtype=np.float64),
+                    ("X2", "Y2"): np.array([1.2, 2.2, 3.2], dtype=np.float64),
+                },
+            ),
         )
 
         # validate

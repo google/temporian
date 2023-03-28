@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -26,10 +26,10 @@ class NumpyFeature:
                 "NumpyFeatures can only be created from flat arrays. Passed"
                 f" input's shape: {len(data.shape)}"
             )
-        if data.dtype.type is not np.string_:
+        if data.dtype.type is not np.str_:
             if data.dtype.type not in DTYPE_MAPPING:
                 raise ValueError(
-                    f"Unsupported dtype {data.dtype} for NumpyFeature."
+                    f"Unsupported dtype {data.dtype} for NumpyFeature: {name}."
                     f" Supported dtypes: {DTYPE_MAPPING.keys()}"
                 )
 
@@ -47,13 +47,13 @@ class NumpyFeature:
         if self.name != __o.name:
             return False
 
-        if self.dtype is np.string_:
+        if self.dtype is np.str_:
             return np.array_equal(self.data, __o.data)
 
         return np.array_equal(self.data, __o.data, equal_nan=True)
 
     def core_dtype(self) -> Any:
-        if hasattr(self.dtype, "type") and self.dtype.type is np.string_:
+        if hasattr(self.dtype, "type") and self.dtype.type is np.str_:
             return dtype.STRING
         return DTYPE_MAPPING[self.dtype]
 
@@ -182,15 +182,15 @@ class NumpyEvent:
                         " string values"
                     )
                 # convert object column to np.string_
-                df[column] = df[column].astype(np.string_)
+                df[column] = df[column].astype("string")
 
             # convert pandas' StringDtype to np.string_
-            elif df[column].dtype.type is str:
-                df[column] = df[column].astype(np.string_)
+            elif df[column].dtype.type is np.string_:
+                df[column] = df[column].str.decode("utf-8").astype("string")
 
             elif (
                 df[column].dtype.type not in DTYPE_MAPPING
-                and df[column].dtype.type != np.string_
+                and df[column].dtype.type is not str
             ):
                 raise ValueError(
                     f"Unsupported dtype {df[column].dtype} for column"
@@ -223,10 +223,17 @@ class NumpyEvent:
                     group = (group,)
 
                 sampling[group] = timestamp
+
                 data[group] = [
-                    NumpyFeature(feature, columns[feature].to_numpy())
+                    NumpyFeature(
+                        feature,
+                        columns[feature].to_numpy(
+                            dtype=columns[feature].dtype.type
+                        ),
+                    )
                     for feature in feature_columns
                 ]
+
         # The user did not provide an index
         else:
             timestamp = df[timestamp_column].to_numpy()
@@ -262,8 +269,12 @@ class NumpyEvent:
             data["timestamp"].extend(timestamps)
             for feature in features:
                 data[feature.name].extend(feature.data)
-            for index_key in self.sampling.index:
-                data[index_key].extend(index * len(timestamps))
+
+            if not isinstance(index, tuple):
+                index = (index,)
+
+            for i, index_key in enumerate(self.sampling.index):
+                data[index_key].extend([index[i]] * len(timestamps))
 
         # Converting dictionary to pandas DataFrame
         df = pd.DataFrame(data)
