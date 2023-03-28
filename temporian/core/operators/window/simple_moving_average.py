@@ -40,7 +40,7 @@ class SimpleMovingAverageOperator(BaseWindowOperator):
 operator_lib.register_operator(SimpleMovingAverageOperator)
 
 
-def sma(
+def standard_moving_average(
     event: Event,
     window_length: Duration,
     sampling: Optional[Event] = None,
