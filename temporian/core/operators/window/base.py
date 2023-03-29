@@ -52,7 +52,7 @@ class BaseWindowOperator(Operator, ABC):
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
                 name=f"{self.output_feature_prefix}_{f.name()}",
-                dtype=f.dtype(),
+                dtype=f.dtype(),  # TODO: This might not be correct
                 sampling=effective_sampling,
                 creator=self,
             )

@@ -28,6 +28,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "CALENDAR_DAY_OF_MONTH",
             "CALENDAR_DAY_OF_WEEK",
             "LAG",
+            "MOVING_COUNT",
             "MOVING_STANDARD_DEVIATION",
             "MOVING_SUM",
             "PROPAGATE",

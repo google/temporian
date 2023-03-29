@@ -13,6 +13,7 @@ from temporian.implementation.numpy.operators.window import (
     moving_standard_deviation,
 )
 from temporian.implementation.numpy.operators.window import moving_sum
+from temporian.implementation.numpy.operators.window import moving_count
 from temporian.implementation.numpy.operators.calendar import day_of_month
 from temporian.implementation.numpy.operators.calendar import day_of_week
 
