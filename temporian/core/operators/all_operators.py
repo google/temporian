@@ -18,6 +18,7 @@ from temporian.core.operators.window.simple_moving_average import (
 from temporian.core.operators.window.moving_standard_deviation import (
     moving_standard_deviation,
 )
+from temporian.core.operators.window.moving_sum import moving_sum
 from temporian.core.operators.propagate import propagate
 
 # pylint: enable=unused-import

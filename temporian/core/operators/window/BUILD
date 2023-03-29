@@ -13,6 +13,7 @@ py_library(
     deps = [
         ":base",
         ":moving_standard_deviation",
+        ":moving_sum",
         ":simple_moving_average",
     ],
 )
@@ -45,6 +46,18 @@ py_library(
 py_library(
     name = "moving_standard_deviation",
     srcs = ["moving_standard_deviation.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:duration",
+        "//temporian/core/data:event",
+    ],
+)
+
+py_library(
+    name = "moving_sum",
+    srcs = ["moving_sum.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
