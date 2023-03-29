@@ -13,11 +13,13 @@
 # limitations under the License.
 
 """Moving Sum operator."""
-from typing import Optional
+from typing import Optional, List
 
 from temporian.core import operator_lib
 from temporian.core.data.duration import Duration
 from temporian.core.data.event import Event
+from temporian.core.data.feature import Feature
+from temporian.core.data.sampling import Sampling
 from temporian.core.operators.window.base import BaseWindowOperator
 
 
@@ -31,10 +33,26 @@ class MovingSumOperator(BaseWindowOperator):
     def operator_def_key(cls) -> str:
         return "MOVING_SUM"
 
-    @classmethod
     @property
-    def output_feature_prefix(cls) -> str:
+    def prefix(self) -> str:
         return "moving_sum"
+
+    def output_features(
+        self,
+        event: Event,
+        sampling: Sampling,
+    ) -> List[Feature]:
+        features = [  # pylint: disable=g-complex-comprehension
+            Feature(
+                name=f"{self.prefix}_{f.name()}",
+                dtype=f.dtype(),
+                sampling=sampling,
+                creator=self,
+            )
+            for f in event.features()
+        ]
+
+        return features
 
 
 operator_lib.register_operator(MovingSumOperator)

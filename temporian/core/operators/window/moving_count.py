@@ -13,11 +13,14 @@
 # limitations under the License.
 
 """Moving Count operator."""
-from typing import Optional
+from typing import Optional, List
 
 from temporian.core import operator_lib
 from temporian.core.data.duration import Duration
+from temporian.core.data.dtype import INT64
 from temporian.core.data.event import Event
+from temporian.core.data.feature import Feature
+from temporian.core.data.sampling import Sampling
 from temporian.core.operators.window.base import BaseWindowOperator
 
 
@@ -31,10 +34,26 @@ class MovingCountOperator(BaseWindowOperator):
     def operator_def_key(cls) -> str:
         return "MOVING_COUNT"
 
-    @classmethod
     @property
-    def output_feature_prefix(cls) -> str:
+    def prefix(self) -> str:
         return "moving_count"
+
+    def output_features(
+        self,
+        event: Event,
+        sampling: Sampling,
+    ) -> List[Feature]:
+        features = [  # pylint: disable=g-complex-comprehension
+            Feature(
+                name=f"{self.prefix}_{f.name()}",
+                dtype=INT64,
+                sampling=sampling,
+                creator=self,
+            )
+            for f in event.features()
+        ]
+
+        return features
 
 
 operator_lib.register_operator(MovingCountOperator)

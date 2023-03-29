@@ -12,6 +12,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        ":moving_count",
         ":moving_standard_deviation",
         ":moving_sum",
         ":simple_moving_average",
@@ -26,6 +27,7 @@ py_library(
         "//temporian/core/data:dtype",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/core/data:sampling",
         "//temporian/core/operators:base",
         "//temporian/proto:core_py_proto",
     ],
@@ -40,6 +42,8 @@ py_library(
         "//temporian/core:operator_lib",
         "//temporian/core/data:duration",
         "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/core/data:sampling",
     ],
 )
 
@@ -52,6 +56,8 @@ py_library(
         "//temporian/core:operator_lib",
         "//temporian/core/data:duration",
         "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/core/data:sampling",
     ],
 )
 
@@ -64,6 +70,8 @@ py_library(
         "//temporian/core:operator_lib",
         "//temporian/core/data:duration",
         "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/core/data:sampling",
     ],
 )
 
@@ -76,5 +84,7 @@ py_library(
         "//temporian/core:operator_lib",
         "//temporian/core/data:duration",
         "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/core/data:sampling",
     ],
 )

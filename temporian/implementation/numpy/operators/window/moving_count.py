@@ -51,7 +51,7 @@ class MovingCountNumpyImplementation(BaseWindowNumpyImplementation):
                     count for each row (window) in the input array.
 
         """
-        return np.count_nonzero(~np.isnan(values), axis=1)
+        return np.count_nonzero(~np.isnan(values), axis=1).astype(np.int64)
 
 
 implementation_lib.register_operator_implementation(

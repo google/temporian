@@ -60,9 +60,7 @@ class BaseWindowNumpyImplementation(ABC):
 
             # For each feature
             for src_ts in src_mts:
-                dst_feature_name = (
-                    f"{self._op.output_feature_prefix}_{src_ts.name}"
-                )
+                dst_feature_name = f"{self._op.prefix}_{src_ts.name}"
                 dst_ts_data = self._apply_accumulator_mask(src_ts.data, mask)
                 dst_mts.append(NumpyFeature(dst_feature_name, dst_ts_data))
 
