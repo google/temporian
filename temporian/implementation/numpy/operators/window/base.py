@@ -107,15 +107,27 @@ class BaseWindowNumpyImplementation(ABC):
             mask == False  # pylint: disable=singleton-comparison
         ] = np.nan
 
-        return self._calculate_window_operation(cross_product)
+        return self._apply_operation(cross_product)
 
     @abstractmethod
-    def _calculate_window_operation(self, values: np.array) -> np.array:
-        """Calculates the window operation on the given values.
+    def _apply_operation(self, values: np.array) -> np.array:
+        """
+        Applies a window operator to each of the values in each row of the
+        input array.
+
+        The input array should have a shape (n, m), where 'n' is the length of
+        the feature and 'm' is the size of the window. Each row represents a
+        window of data points, with 'nan' values used for padding when the
+        window size is smaller than the number of data points in the time
+        series. The function should compute the operation for each row (window).
 
         Args:
-            values: Numpy array of values.
+            values: A 2D NumPy array with shape (n, m) where each row represents
+                a  window of data points. 'n' is the length of the feature, and
+                'm' is the size of the window. The array can contain 'nan'
+                values as padding.
 
         Returns:
-            Array of values after the window operation.
+            np.array: A 1D NumPy array with shape (n,) containing the operation
+                    for each row (window) in the input array.
         """

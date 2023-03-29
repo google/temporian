@@ -13,7 +13,7 @@ from temporian.core.operators.lag import lag
 from temporian.core.operators.lag import leak
 from temporian.core.operators.select import select
 from temporian.core.operators.window.simple_moving_average import (
-    standard_moving_average,
+    simple_moving_average,
 )
 from temporian.core.operators.window.moving_standard_deviation import (
     moving_standard_deviation,
