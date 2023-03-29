@@ -16,6 +16,8 @@
 from typing import Optional, List
 
 from temporian.core import operator_lib
+from temporian.core.data.dtype import FLOAT32
+from temporian.core.data.dtype import FLOAT64
 from temporian.core.data.duration import Duration
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
@@ -45,7 +47,7 @@ class SimpleMovingAverageOperator(BaseWindowOperator):
         features = [  # pylint: disable=g-complex-comprehension
             Feature(
                 name=f"{self.prefix}_{f.name()}",
-                dtype=f.dtype(),
+                dtype=FLOAT32 if f.dtype() == FLOAT32 else FLOAT64,
                 sampling=sampling,
                 creator=self,
             )

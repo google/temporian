@@ -16,8 +16,8 @@
 from typing import Optional, List
 
 from temporian.core import operator_lib
-from temporian.core.data.duration import Duration
 from temporian.core.data.dtype import INT64
+from temporian.core.data.duration import Duration
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
