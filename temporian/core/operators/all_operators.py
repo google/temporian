@@ -12,7 +12,12 @@ from temporian.core.operators.calendar.day_of_week import calendar_day_of_week
 from temporian.core.operators.lag import lag
 from temporian.core.operators.lag import leak
 from temporian.core.operators.select import select
-from temporian.core.operators.simple_moving_average import sma
+from temporian.core.operators.window.simple_moving_average import (
+    simple_moving_average,
+)
+from temporian.core.operators.window.moving_standard_deviation import (
+    moving_standard_deviation,
+)
 from temporian.core.operators.propagate import propagate
 
 # pylint: enable=unused-import

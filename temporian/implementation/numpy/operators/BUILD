@@ -16,9 +16,10 @@ py_library(
         ":lag",
         ":propagate",
         ":select",
-        ":simple_moving_average",
         "//temporian/implementation/numpy/operators/calendar:day_of_month",
         "//temporian/implementation/numpy/operators/calendar:day_of_week",
+        "//temporian/implementation/numpy/operators/window:moving_standard_deviation",
+        "//temporian/implementation/numpy/operators/window:simple_moving_average",
     ],
 )
 
@@ -72,20 +73,6 @@ py_library(
         "//temporian/core/operators:select",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
-    ],
-)
-
-py_library(
-    name = "simple_moving_average",
-    srcs = ["simple_moving_average.py"],
-    srcs_version = "PY3",
-    deps = [
-        "//temporian/core/data:duration",
-        "//temporian/core/operators:simple_moving_average",
-        "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy:utils",
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:sampling",
     ],
 )
 

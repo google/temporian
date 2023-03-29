@@ -186,11 +186,26 @@ py_test(
     deps = [
         # absl/testing:absltest dep,
         # pandas dep,
-        "//temporian/implementation/numpy/operators:simple_moving_average",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
         "//temporian/core/data:dtype",
-        "//temporian/core/operators:simple_moving_average",
+        "//temporian/core/operators/window:simple_moving_average",
+        "//temporian/implementation/numpy/operators/window:simple_moving_average",
+    ],
+)
+
+py_test(
+    name = "moving_standard_deviation_test",
+    srcs = ["moving_standard_deviation_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/testing:absltest dep,
+        # pandas dep,
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/core/data:dtype",
+        "//temporian/core/operators/window:moving_standard_deviation",
+        "//temporian/implementation/numpy/operators/window:moving_standard_deviation",
     ],
 )
 
