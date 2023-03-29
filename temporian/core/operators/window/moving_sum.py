@@ -23,7 +23,7 @@ from temporian.core.operators.window.base import BaseWindowOperator
 
 class MovingSumOperator(BaseWindowOperator):
     """
-    Window operator to compute the simple moving average.
+    Window operator to compute the moving sum.
     """
 
     @classmethod
@@ -56,7 +56,8 @@ def moving_sum(
 
     Missing values are ignored.
 
-    If the window does not contain any values (e.g., all the values are missing, or the window does not contain any sampling), outputs missing values.
+    If the window does not contain any values (e.g., all the values are missing,
+    or the window does not contain any sampling), outputs missing values.
 
     Args:
         event: The features to sum.
