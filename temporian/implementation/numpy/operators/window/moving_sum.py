@@ -29,14 +29,27 @@ class MovingSumNumpyImplementation(BaseWindowNumpyImplementation):
     def __init__(self, operator: MovingSumOperator) -> None:
         super().__init__(operator)
 
-    def _calculate_window_operation(self, values: np.array) -> np.array:
-        """Calculates the moving sum of the values in the window.
+    def _apply_operation(self, values: np.array) -> np.array:
+        """
+        Calculates the moving sum of the values in each row of the input array.
+
+        The input array should have a shape (n, m), where 'n' is the length of
+        the feature and 'm' is the size of the window. Each row represents a
+        window of data points, with 'nan' values used for padding when the
+        window size is  smaller than the number of data points in the time
+        series. The function  computes the moving sum for each row (window) by
+        ignoring the 'nan' values.
 
         Args:
-            values: The values in the window.
+            values: A 2D NumPy array with shape (n, m) where each row represents
+                a  window of data points. 'n' is the length of the feature, and
+                'm' is the size of the window. The array can contain 'nan'
+                values as padding.
 
         Returns:
-            The simple moving average of the values in the window.
+            np.array: A 1D NumPy array with shape (n,) containing the moving
+                    sum for each row (window) in the input array.
+
         """
         return np.nansum(values, axis=1)
 
