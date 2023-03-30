@@ -173,13 +173,13 @@ class MovingSumOperatorTest(absltest.TestCase):
         expected_output = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
-                    [0, -1.0],
+                    [np.nan, -1.0],
                     [10.0, 1.0],
                     [10.0, 1.1],
                     [33.0, 3.0],
                     [33.0, 3.5],
                     [39.0, 6.0],
-                    [0, 10.0],
+                    [np.nan, 10.0],
                 ],
                 columns=["moving_sum_a", "timestamp"],
             )
@@ -231,12 +231,12 @@ class MovingSumOperatorTest(absltest.TestCase):
         expected_output = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
-                    [0, 1],
+                    [np.nan, 1],
                     [11.0, 2],
                     [11.0, 2.5],
                     [11.0, 3],
-                    [0, 3.5],
-                    [0, 4],
+                    [np.nan, 3.5],
+                    [np.nan, 4],
                     [13.0, 5],
                     [27.0, 6],
                 ],

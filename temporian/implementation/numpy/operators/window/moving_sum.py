@@ -51,7 +51,13 @@ class MovingSumNumpyImplementation(BaseWindowNumpyImplementation):
                     each row (window) in the input array.
 
         """
-        return np.nansum(values, axis=1)
+        # compute the sum for each row ignoring the np.nan values
+        result = np.nansum(values, axis=1)
+        # check which rows are all np.nan
+        all_nan_rows = np.isnan(values).all(axis=1)
+        # set the result for those rows to np.nan
+        result[all_nan_rows] = np.nan
+        return result
 
 
 implementation_lib.register_operator_implementation(

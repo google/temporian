@@ -24,7 +24,7 @@ from temporian.implementation.numpy.operators.window.base import (
 
 
 class MovingCountNumpyImplementation(BaseWindowNumpyImplementation):
-    """Numpy implementation of the moving sum operator."""
+    """Numpy implementation of the moving count operator."""
 
     def __init__(self, operator: MovingCountOperator) -> None:
         super().__init__(operator)
