@@ -25,7 +25,9 @@ py_library(
         "//temporian/core/operators/calendar:month",
         "//temporian/core/operators/calendar:second",
         "//temporian/core/operators/calendar:year",
+        "//temporian/core/operators/window:moving_count",
         "//temporian/core/operators/window:moving_standard_deviation",
+        "//temporian/core/operators/window:moving_sum",
         "//temporian/core/operators/window:simple_moving_average",
     ],
 )

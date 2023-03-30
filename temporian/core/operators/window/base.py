@@ -21,6 +21,7 @@ from typing import Optional
 from temporian.core.data.duration import Duration
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
+from temporian.core.data.sampling import Sampling
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -51,8 +52,8 @@ class BaseWindowOperator(Operator, ABC):
 
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=f"{self.output_feature_prefix}_{f.name()}",
-                dtype=f.dtype(),
+                name=f"{self.prefix}_{f.name()}",
+                dtype=self.get_feature_dtype(f),
                 sampling=effective_sampling,
                 creator=self,
             )
@@ -98,8 +99,18 @@ class BaseWindowOperator(Operator, ABC):
     def operator_def_key(cls) -> str:
         """Get the key of the operator definition."""
 
-    @classmethod
+    @abstractmethod
+    def get_feature_dtype(self, feature: Feature) -> str:
+        """Get the dtype of the output feature.
+
+        Args:
+            feature: feature to get the dtype for.
+
+        Returns:
+            str: The dtype of the output feature.
+        """
+
     @property
     @abstractmethod
-    def output_feature_prefix(cls) -> str:
-        """Get the prefix of the generated feature in the output event."""
+    def prefix(self) -> str:
+        """Get the prefix to use for the output features."""

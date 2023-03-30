@@ -210,6 +210,36 @@ py_test(
 )
 
 py_test(
+    name = "moving_sum_test",
+    srcs = ["moving_sum_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/testing:absltest dep,
+        # pandas dep,
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/core/data:dtype",
+        "//temporian/core/operators/window:moving_sum",
+        "//temporian/implementation/numpy/operators/window:moving_sum",
+    ],
+)
+
+py_test(
+    name = "moving_count_test",
+    srcs = ["moving_count_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/testing:absltest dep,
+        # pandas dep,
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/core/data:dtype",
+        "//temporian/core/operators/window:moving_count",
+        "//temporian/implementation/numpy/operators/window:moving_count",
+    ],
+)
+
+py_test(
     name = "propagate_test",
     srcs = ["propagate_test.py"],
     srcs_version = "PY3",

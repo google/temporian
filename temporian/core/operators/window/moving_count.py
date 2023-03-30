@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Moving Standard Deviation operator."""
+"""Moving Count operator."""
 from typing import Optional, List
 
 from temporian.core import operator_lib
-from temporian.core.data.dtype import FLOAT32
-from temporian.core.data.dtype import FLOAT64
+from temporian.core.data.dtype import INT64
 from temporian.core.data.duration import Duration
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
@@ -25,19 +24,19 @@ from temporian.core.data.sampling import Sampling
 from temporian.core.operators.window.base import BaseWindowOperator
 
 
-class MovingStandardDeviationOperator(BaseWindowOperator):
+class MovingCountOperator(BaseWindowOperator):
     """
-    Window operator to compute the moving standard deviation.
+    Window operator to compute the moving count.
     """
 
     @classmethod
     @property
     def operator_def_key(cls) -> str:
-        return "MOVING_STANDARD_DEVIATION"
+        return "MOVING_COUNT"
 
     @property
     def prefix(self) -> str:
-        return "msd"
+        return "moving_count"
 
     def get_feature_dtype(self, feature: Feature) -> str:
         """Returns the dtype of the output feature.
@@ -48,21 +47,21 @@ class MovingStandardDeviationOperator(BaseWindowOperator):
         Returns:
             str: The dtype of the output feature.
         """
-        return FLOAT32 if feature.dtype() == FLOAT32 else FLOAT64
+        return INT64
 
 
-operator_lib.register_operator(MovingStandardDeviationOperator)
+operator_lib.register_operator(MovingCountOperator)
 
 
-def moving_standard_deviation(
+def moving_count(
     event: Event,
     window_length: Duration,
     sampling: Optional[Event] = None,
 ) -> Event:
-    """Moving Standard Deviation
+    """Moving Count.
 
     For each t in sampling, and for each feature independently, returns at time
-    t the standard deviation for the feature in the window
+    t the number of non nan values for the feature in the window
     [t - window_length, t].
 
     If `sampling` is provided, applies the operator for each timestamp in
@@ -75,16 +74,15 @@ def moving_standard_deviation(
     or the window does not contain any sampling), outputs missing values.
 
     Args:
-        event: The features to average.
-        window_length: The window length for the standard deviation.
+        event: The features to count.
+        window_length: The window length for counting.
         sampling: If provided, define when the operator is applied. If not
           provided, the operator is applied for each timestamp of `event`.
 
     Returns:
-        An event containing the moving standard deviation of each feature in
-    `event`.
+        An event containing the non-nan count of each feature in `event`.
     """
-    return MovingStandardDeviationOperator(
+    return MovingCountOperator(
         event=event,
         window_length=window_length,
         sampling=sampling,

@@ -15,32 +15,30 @@
 import numpy as np
 
 from temporian.implementation.numpy import implementation_lib
-from temporian.core.operators.window.simple_moving_average import (
-    SimpleMovingAverageOperator,
+from temporian.core.operators.window.moving_sum import (
+    MovingSumOperator,
 )
 from temporian.implementation.numpy.operators.window.base import (
     BaseWindowNumpyImplementation,
 )
 
 
-class SimpleMovingAverageNumpyImplementation(BaseWindowNumpyImplementation):
-    """Numpy implementation of the simple moving average operator."""
+class MovingSumNumpyImplementation(BaseWindowNumpyImplementation):
+    """Numpy implementation of the moving sum operator."""
 
-    def __init__(self, operator: SimpleMovingAverageOperator) -> None:
+    def __init__(self, operator: MovingSumOperator) -> None:
         super().__init__(operator)
 
     def _apply_operation(self, values: np.array) -> np.array:
         """
-        Calculates the average of the values in each row of the input array.
-
+        Calculates the sum of the values in each row of the input array.
 
         The input array should have a shape (n, m), where 'n' is the length of
         the feature and 'm' is the size of the window. Each row represents a
         window of data points, with 'nan' values used for padding when the
         window size is  smaller than the number of data points in the time
-        series. The function  computes the average for each row (window) by
-        ignoring the 'nan' values.
-
+        series. The function  computes the sum for each row (window) by ignoring
+        the 'nan' values.
 
         Args:
             values: A 2D NumPy array with shape (n, m) where each row represents
@@ -49,14 +47,19 @@ class SimpleMovingAverageNumpyImplementation(BaseWindowNumpyImplementation):
                 values as padding.
 
         Returns:
-            np.array: A 1D NumPy array with shape (n,) containing the average
-                    for each row (window) in the input array.
+            np.array: A 1D NumPy array with shape (n,) containing the sum for
+                    each row (window) in the input array.
 
         """
-
-        return np.nanmean(values, axis=1)
+        # compute the sum for each row ignoring the np.nan values
+        result = np.nansum(values, axis=1)
+        # check which rows are all np.nan
+        all_nan_rows = np.isnan(values).all(axis=1)
+        # set the result for those rows to np.nan
+        result[all_nan_rows] = np.nan
+        return result
 
 
 implementation_lib.register_operator_implementation(
-    SimpleMovingAverageOperator, SimpleMovingAverageNumpyImplementation
+    MovingSumOperator, MovingSumNumpyImplementation
 )

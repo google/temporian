@@ -15,32 +15,31 @@
 import numpy as np
 
 from temporian.implementation.numpy import implementation_lib
-from temporian.core.operators.window.simple_moving_average import (
-    SimpleMovingAverageOperator,
+from temporian.core.operators.window.moving_count import (
+    MovingCountOperator,
 )
 from temporian.implementation.numpy.operators.window.base import (
     BaseWindowNumpyImplementation,
 )
 
 
-class SimpleMovingAverageNumpyImplementation(BaseWindowNumpyImplementation):
-    """Numpy implementation of the simple moving average operator."""
+class MovingCountNumpyImplementation(BaseWindowNumpyImplementation):
+    """Numpy implementation of the moving count operator."""
 
-    def __init__(self, operator: SimpleMovingAverageOperator) -> None:
+    def __init__(self, operator: MovingCountOperator) -> None:
         super().__init__(operator)
 
     def _apply_operation(self, values: np.array) -> np.array:
         """
-        Calculates the average of the values in each row of the input array.
-
+        Calculates the non-nan count of the values in each row of the input
+        array.
 
         The input array should have a shape (n, m), where 'n' is the length of
         the feature and 'm' is the size of the window. Each row represents a
         window of data points, with 'nan' values used for padding when the
         window size is  smaller than the number of data points in the time
-        series. The function  computes the average for each row (window) by
+        series. The function  computes the count for each row (window) while
         ignoring the 'nan' values.
-
 
         Args:
             values: A 2D NumPy array with shape (n, m) where each row represents
@@ -49,14 +48,13 @@ class SimpleMovingAverageNumpyImplementation(BaseWindowNumpyImplementation):
                 values as padding.
 
         Returns:
-            np.array: A 1D NumPy array with shape (n,) containing the average
-                    for each row (window) in the input array.
+            np.array: A 1D NumPy array with shape (n,) containing the non-nan
+                    count for each row (window) in the input array.
 
         """
-
-        return np.nanmean(values, axis=1)
+        return np.count_nonzero(~np.isnan(values), axis=1).astype(np.int64)
 
 
 implementation_lib.register_operator_implementation(
-    SimpleMovingAverageOperator, SimpleMovingAverageNumpyImplementation
+    MovingCountOperator, MovingCountNumpyImplementation
 )

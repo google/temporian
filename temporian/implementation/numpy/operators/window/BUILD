@@ -46,3 +46,27 @@ py_library(
         "//temporian/implementation/numpy/data:event",
     ],
 )
+
+py_library(
+    name = "moving_sum",
+    srcs = ["moving_sum.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators/window:moving_sum",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event",
+    ],
+)
+
+py_library(
+    name = "moving_count",
+    srcs = ["moving_count.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators/window:moving_count",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event",
+    ],
+)
