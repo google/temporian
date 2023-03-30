@@ -163,6 +163,11 @@ class NumpyEvent:
             convert_date_to_duration
         )
 
+        # sort by timestamp
+        # TODO: we may consider using kind="mergesort" if we know that most of
+        # the time the data will be sorted.
+        df = df.sort_values(by=timestamp_column)
+
         # check column dtypes, every dtype should be a key of DTYPE_MAPPING
         for column in df.columns:
             # if dtype is object, check if it only contains string values
