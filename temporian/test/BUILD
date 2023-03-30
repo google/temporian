@@ -24,16 +24,8 @@ py_test(
     data = ["test_data/prototype"],
     srcs_version = "PY3",
     deps = [
-        # absl/testing:absltest dep,
-        "//temporian/core:evaluator",
-        "//temporian/core/data:event",
-        "//temporian/core/data:sampling",
-        "//temporian/core/operators:assign",
-        "//temporian/core/operators:lag",
-        "//temporian/core/operators:select",
-        "//temporian/core/operators:arithmetic",
-        "//temporian/implementation/numpy/data:event",
         "//temporian",
+        "//temporian/implementation/numpy/data:event",
     ],
 )
 

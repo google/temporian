@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple, Optional, Sequence
+from typing import Any, Dict, List, Tuple, Sequence
 
 import numpy as np
 import pandas as pd

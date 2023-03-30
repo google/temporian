@@ -1,6 +1,5 @@
 """Implementation for the Sample operator."""
 
-
 from typing import Dict
 import numpy as np
 
@@ -9,7 +8,6 @@ from temporian.implementation.numpy.data.event import (
     NumpyFeature,
     dtype_to_np_dtype,
 )
-from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.core.operators.sample import Sample
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy_cc.operators import sample as sample_cc
