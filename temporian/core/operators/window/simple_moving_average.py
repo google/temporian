@@ -39,22 +39,16 @@ class SimpleMovingAverageOperator(BaseWindowOperator):
     def prefix(self) -> str:
         return "sma"
 
-    def output_features(
-        self,
-        event: Event,
-        sampling: Sampling,
-    ) -> List[Feature]:
-        features = [  # pylint: disable=g-complex-comprehension
-            Feature(
-                name=f"{self.prefix}_{f.name()}",
-                dtype=FLOAT32 if f.dtype() == FLOAT32 else FLOAT64,
-                sampling=sampling,
-                creator=self,
-            )
-            for f in event.features()
-        ]
+    def get_feature_dtype(self, feature: Feature) -> str:
+        """Returns the dtype of the output feature.
 
-        return features
+        Args:
+            feature: feature to get the dtype for.
+
+        Returns:
+            str: The dtype of the output feature.
+        """
+        return FLOAT32 if feature.dtype() == FLOAT32 else FLOAT64
 
 
 operator_lib.register_operator(SimpleMovingAverageOperator)

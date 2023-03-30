@@ -50,14 +50,21 @@ class BaseWindowOperator(Operator, ABC):
 
         self.add_input("event", event)
 
+        output_features = [  # pylint: disable=g-complex-comprehension
+            Feature(
+                name=f"{self.prefix}_{f.name()}",
+                dtype=self.get_feature_dtype(f),
+                sampling=effective_sampling,
+                creator=self,
+            )
+            for f in event.features()
+        ]
+
         # output
         self.add_output(
             "event",
             Event(
-                features=self.output_features(
-                    event=event,
-                    sampling=effective_sampling,
-                ),
+                features=output_features,
                 sampling=effective_sampling,
                 creator=self,
             ),
@@ -93,10 +100,15 @@ class BaseWindowOperator(Operator, ABC):
         """Get the key of the operator definition."""
 
     @abstractmethod
-    def output_features(
-        self, event: Event, sampling: Sampling
-    ) -> list[Feature]:
-        """Get the list of features in the output event."""
+    def get_feature_dtype(self, feature: Feature) -> str:
+        """Get the dtype of the output feature.
+
+        Args:
+            feature: feature to get the dtype for.
+
+        Returns:
+            str: The dtype of the output feature.
+        """
 
     @property
     @abstractmethod
