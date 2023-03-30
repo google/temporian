@@ -66,12 +66,13 @@ def moving_count(
 ) -> Event:
     """Moving Count.
 
-    For each sampling, and for each feature independently, returns at time "t"
-    the number of non values of the feature in the time windows [t-window, t].
+    For each t in sampling, and for each feature independently, returns at time
+    t the number of non nan values for the feature in the window
+    [t - window_length, t].
 
-    If "sampling" is provided, applies the operator for each timestamps of
-    "sampling". If "sampling" is not provided, apply the operator for each
-    timestamps of "event".
+    If `sampling` is provided, applies the operator for each timestamp in
+    `sampling`. If `sampling` is not provided, applies the operator for each
+    timestamp in `event`.
 
     Missing values are ignored.
 
@@ -82,10 +83,10 @@ def moving_count(
         event: The features to count.
         window_length: The window length for counting.
         sampling: If provided, define when the operator is applied. If not
-          provided, the operator is applied for each timestamp of "event".
+          provided, the operator is applied for each timestamp of `event`.
 
     Returns:
-        An event containing the moving count of each feature in "event".
+        An event containing the non-nan count of each feature in `event`.
     """
     return MovingCountOperator(
         event=event,

@@ -31,15 +31,15 @@ class SimpleMovingAverageNumpyImplementation(BaseWindowNumpyImplementation):
 
     def _apply_operation(self, values: np.array) -> np.array:
         """
-        Calculates the simple moving average of the values in each row of the
-        input array.
+        Calculates the average of the values in each row of the input array.
+
 
         The input array should have a shape (n, m), where 'n' is the length of
         the feature and 'm' is the size of the window. Each row represents a
         window of data points, with 'nan' values used for padding when the
         window size is  smaller than the number of data points in the time
-        series. The function  computes the simple moving average for each row
-        (window) by ignoring the 'nan' values.
+        series. The function  computes the average for each row (window) by
+        ignoring the 'nan' values.
 
 
         Args:
@@ -49,8 +49,8 @@ class SimpleMovingAverageNumpyImplementation(BaseWindowNumpyImplementation):
                 values as padding.
 
         Returns:
-            np.array: A 1D NumPy array with shape (n,) containing the simple
-                    moving average for each row (window) in the input array.
+            np.array: A 1D NumPy array with shape (n,) containing the average
+                    for each row (window) in the input array.
 
         """
 

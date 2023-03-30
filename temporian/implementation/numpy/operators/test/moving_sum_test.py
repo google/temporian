@@ -35,9 +35,6 @@ class MovingSumOperatorTest(absltest.TestCase):
     def setUp(self):
         pass
 
-    # TODO: Import tests from pandas backend.
-    # TODO: Simplify tests with "pd_to_event".
-
     def test_flat(self):
         """A simple time sequence."""
 

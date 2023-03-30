@@ -35,9 +35,6 @@ class MovingCountOperatorTest(absltest.TestCase):
     def setUp(self):
         pass
 
-    # TODO: Import tests from pandas backend.
-    # TODO: Simplify tests with "pd_to_event".
-
     def test_flat(self):
         """A simple time sequence."""
 
@@ -45,8 +42,8 @@ class MovingCountOperatorTest(absltest.TestCase):
             pd.DataFrame(
                 [
                     [10.0, 20.0, 1],
-                    [11.0, 21.0, 2],
-                    [12.0, 22.0, 3],
+                    [00.0, 21.0, 2],
+                    [12.0, 00.0, 3],
                     [13.0, 23.0, 5],
                     [14.0, 24.0, 20],
                 ],

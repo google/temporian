@@ -67,12 +67,13 @@ def moving_standard_deviation(
 ) -> Event:
     """Moving Standard Deviation
 
-    For each sampling, and for each feature independently, returns at time "t"
-    the standard deviation of the feature in the time windows [t-window, t].
+    For each t in sampling, and for each feature independently, returns at time
+    t the standard deviation for the feature in the window
+    [t - window_length, t].
 
-    If "sampling" is provided, applies the operator for each timestamps of
-    "sampling". If "sampling" is not provided, apply the operator for each
-    timestamps of "event".
+    If `sampling` is provided, applies the operator for each timestamp in
+    `sampling`. If `sampling` is not provided, applies the operator for each
+    timestamp in `event`.
 
     Missing values are ignored.
 
@@ -83,11 +84,11 @@ def moving_standard_deviation(
         event: The features to average.
         window_length: The window length for the standard deviation.
         sampling: If provided, define when the operator is applied. If not
-          provided, the operator is applied for each timestamp of "event".
+          provided, the operator is applied for each timestamp of `event`.
 
     Returns:
         An event containing the moving standard deviation of each feature in
-    "event".
+    `event`.
     """
     return MovingStandardDeviationOperator(
         event=event,
