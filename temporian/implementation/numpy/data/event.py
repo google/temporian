@@ -26,16 +26,18 @@ class NumpyFeature:
                 "NumpyFeatures can only be created from flat arrays. Passed"
                 f" input's shape: {len(data.shape)}"
             )
-        if data.dtype.type is not np.str_:
+        if data.dtype.type is np.str_:
+            self.dtype: dtype.DType = dtype.STRING
+        else:
             if data.dtype.type not in DTYPE_MAPPING:
                 raise ValueError(
                     f"Unsupported dtype {data.dtype} for NumpyFeature: {name}."
                     f" Supported dtypes: {DTYPE_MAPPING.keys()}"
                 )
+            self.dtype: dtype.DType = DTYPE_MAPPING[data.dtype.type]
 
         self.name = name
         self.data = data
-        self.dtype = data.dtype.type
 
     def __repr__(self) -> str:
         return f"{self.name}: {self.data.__repr__()}"
@@ -47,15 +49,10 @@ class NumpyFeature:
         if self.name != __o.name:
             return False
 
-        if self.dtype is np.str_:
+        if self.dtype == dtype.STRING:
             return np.array_equal(self.data, __o.data)
 
         return np.array_equal(self.data, __o.data, equal_nan=True)
-
-    def core_dtype(self) -> Any:
-        if hasattr(self.dtype, "type") and self.dtype.type is np.str_:
-            return dtype.STRING
-        return DTYPE_MAPPING[self.dtype]
 
     def schema(self) -> Feature:
         return Feature(self.name, self.dtype)
@@ -286,10 +283,7 @@ class NumpyEvent:
             """Repr for a list of features."""
 
             return "\n".join(
-                [
-                    f"{f.name} <{np.dtype(f.dtype).name}>: {f.data}"
-                    for f in features
-                ]
+                [f"{f.name} <{f.dtype}>: {f.data}" for f in features]
             )
 
         # Representation of the "data" field

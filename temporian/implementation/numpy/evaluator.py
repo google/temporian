@@ -114,11 +114,11 @@ def _check_features(
                     f"effective={feature.name}"
                 )
 
-            if feature_def.dtype() != feature.core_dtype():
+            if feature_def.dtype() != feature.dtype:
                 raise RuntimeError(
                     f"Non matching {label} feature dtype. "
                     f"expected={feature_def.dtype()} vs "
-                    f"effective={feature.core_dtype()}"
+                    f"effective={feature.dtype}"
                 )
 
 

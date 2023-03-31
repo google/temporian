@@ -34,7 +34,7 @@ def evaluate(
     query: Query,
     input_data: Data,
     verbose: int = 0,
-    check_execution: bool = False,  # TODO: Change to True before release.
+    check_execution: bool = True,
 ) -> Dict[Event, Any]:
     """Evaluates a query on data.
 
