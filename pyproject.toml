@@ -10,7 +10,7 @@ authors = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.9,<3.11"
 absl-py = "^1.3.0"
 protobuf = "^4.21.12"
 pandas = "^1.5.2"
@@ -21,6 +21,7 @@ black = "^22.12.0"
 toml = "^0.10.2"
 pylint = "^2.15.10"
 memory-profiler = "^0.61.0"
+scalene = "^1.5.20"
 
 [tool.black]
 line-length = 80
