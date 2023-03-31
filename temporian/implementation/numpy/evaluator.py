@@ -27,6 +27,7 @@ def evaluate_schedule(
     inputs: Dict[event.Event, numpy_event.NumpyEvent],
     schedule: List[base.Operator],
     verbose: int,
+    check_execution: bool,
 ) -> Dict[event.Event, numpy_event.NumpyEvent]:
     data = {**inputs}
 
@@ -64,7 +65,10 @@ def evaluate_schedule(
 
         # Compute output
         begin_time = time.perf_counter()
-        operator_outputs = implementation.call(**operator_inputs)
+        if check_execution:
+            operator_outputs = implementation.call(**operator_inputs)
+        else:
+            operator_outputs = implementation(**operator_inputs)
         end_time = time.perf_counter()
 
         if verbose == 1:
