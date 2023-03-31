@@ -28,7 +28,7 @@ py_test(
         "//temporian/core:evaluator",
         "//temporian/core/data:event",
         "//temporian/core/data:sampling",
-        "//temporian/core/operators:assign",
+        "//temporian/core/operators:glue",
         "//temporian/core/operators:lag",
         "//temporian/core/operators:select",
         "//temporian/core/operators:arithmetic",

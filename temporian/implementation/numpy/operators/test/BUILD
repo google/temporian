@@ -20,17 +20,17 @@ py_test(
 )
 
 py_test(
-    name = "assign_test",
-    srcs = ["assign_test.py"],
+    name = "glue_test",
+    srcs = ["glue_test.py"],
     srcs_version = "PY3",
     deps = [
         # absl/testing:absltest dep,
         "//temporian/core/data:event",
         "//temporian/core/data:sampling",
-        "//temporian/core/operators:assign",
+        "//temporian/core/operators:glue",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
-        "//temporian/implementation/numpy/operators:assign",
+        "//temporian/implementation/numpy/operators:glue",
     ],
 )
 

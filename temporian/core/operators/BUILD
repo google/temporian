@@ -12,7 +12,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":arithmetic",
-        ":assign",
+        ":glue",
         ":lag",
         ":propagate",
         ":select",
@@ -44,8 +44,8 @@ py_library(
 )
 
 py_library(
-    name = "assign",
-    srcs = ["assign.py"],
+    name = "glue",
+    srcs = ["glue.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
