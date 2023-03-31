@@ -65,9 +65,10 @@ def get_resulting_dtype(dtype1: DType, dtype2: DType) -> DType:
     }
 
     if dtype1 not in dtype_hierarchy or dtype2 not in dtype_hierarchy:
+        supported_dtypes = ", ".join(dtype_hierarchy.keys())
         raise ValueError(
-            f"Invalid dtype(s): [{dtype1}, {dtype2}]. Supported dtypes: int32,"
-            " int64, float32, float64"
+            f"Invalid dtype(s): [{dtype1}, {dtype2}]. Supported dtypes:"
+            f" {supported_dtypes}"
         )
 
     # Find the highest hierarchy value between the two input dtypes
