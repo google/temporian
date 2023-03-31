@@ -33,7 +33,7 @@ class NumpyFeature:
                 "NumpyFeatures can only be created from flat arrays. Passed"
                 f" input's shape: {len(data.shape)}"
             )
-        if data.dtype.type is np.str_ or data.dtype.type is np.string_:
+        if data.dtype.type is np.str_:
             self.dtype: dtype.DType = dtype.STRING
         else:
             if data.dtype.type not in DTYPE_MAPPING:

@@ -17,6 +17,7 @@
 from enum import Enum
 
 from temporian.core import operator_lib
+from temporian.core.data.dtype import get_resulting_dtype
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.operators.base import Operator
@@ -84,21 +85,6 @@ class ArithmeticOperator(Operator):
                 "event_1 and event_2 must have same number of features."
             )
 
-        # check that features have same dtype
-        for feature_1, feature_2 in zip(event_1.features(), event_2.features()):
-            if feature_1.dtype() != feature_2.dtype():
-                raise ValueError(
-                    (
-                        "event_1 and event_2 must have same dtype for each"
-                        " feature."
-                    ),
-                    (
-                        f"feature_1: {feature_1}, feature_2: {feature_2} have"
-                        " dtypes:"
-                    ),
-                    f"{feature_1.dtype()}, {feature_2.dtype()}.",
-                )
-
         sampling = event_1.sampling()
 
         prefix = ArithmeticOperation.prefix(operation)
@@ -107,7 +93,7 @@ class ArithmeticOperator(Operator):
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
                 name=f"{prefix}_{feature_1.name()}_{feature_2.name()}",
-                dtype=feature_1.dtype(),
+                dtype=get_resulting_dtype(feature_1.dtype(), feature_2.dtype()),
                 sampling=sampling,
                 creator=self,
             )

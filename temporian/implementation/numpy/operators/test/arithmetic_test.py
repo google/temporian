@@ -59,17 +59,9 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id"],
         )
 
-        self.sampling = Sampling(["store_id"])
-        self.event_1 = Event(
-            [Feature("sales", float)],
-            sampling=self.sampling,
-            creator=None,
-        )
-        self.event_2 = Event(
-            [Feature("costs", float)],
-            sampling=self.sampling,
-            creator=None,
-        )
+        self.event_1 = self.numpy_event_1.schema()
+        self.event_2 = self.numpy_event_2.schema()
+        self.event_1.sampling = self.event_2.sampling
 
     def test_correct_sum(self) -> None:
         """Test correct sum operator."""
