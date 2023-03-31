@@ -27,7 +27,6 @@ from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.core.data import event as event_lib
 from temporian.core.data import feature as feature_lib
 from temporian.core.data import dtype as dtype_lib
-from temporian.implementation.numpy.evaluator import run_with_check
 
 
 class SampleOperatorTest(absltest.TestCase):
@@ -76,9 +75,9 @@ class SampleOperatorTest(absltest.TestCase):
         # Run op
         op = Sample(event=event, sampling=sampling)
         instance = SampleNumpyImplementation(op)
-        output = run_with_check(
-            op, instance, {"event": event_data, "sampling": sampling_data}
-        )["event"]
+        output = instance.call(event=event_data, sampling=sampling_data)[
+            "event"
+        ]
 
         self.assertEqual(output, expected_output)
 

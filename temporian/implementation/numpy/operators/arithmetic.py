@@ -20,12 +20,12 @@ from temporian.core.operators.arithmetic import Resolution
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy import implementation_lib
+from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
-class ArithmeticNumpyImplementation:
+class ArithmeticNumpyImplementation(OperatorImplementation):
     def __init__(self, operator: ArithmeticOperator) -> None:
-        super().__init__()
-        self.operator = operator
+        super().__init__(operator)
 
     def __call__(
         self, event_1: NumpyEvent, event_2: NumpyEvent

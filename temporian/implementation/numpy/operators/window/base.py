@@ -20,16 +20,16 @@ from temporian.core.data.duration import Duration
 from temporian.core.operators.window.base import BaseWindowOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
+from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
-class BaseWindowNumpyImplementation(ABC):
+class BaseWindowNumpyImplementation(OperatorImplementation):
     """Abstract base class to implement common logic of numpy implementation of
     window operators."""
 
-    def __init__(self, op: BaseWindowOperator) -> None:
-        super().__init__()
-        assert isinstance(op, BaseWindowOperator)
-        self._op = op
+    def __init__(self, operator: BaseWindowOperator) -> None:
+        super().__init__(operator)
+        assert isinstance(operator, BaseWindowOperator)
 
     def __call__(
         self,
@@ -55,12 +55,14 @@ class BaseWindowNumpyImplementation(ABC):
             sampling_timestamps = sampling.sampling.data[index]
 
             mask = self._build_accumulator_mask(
-                src_timestamps, sampling_timestamps, self._op.window_length()
+                src_timestamps,
+                sampling_timestamps,
+                self.operator.window_length(),
             )
 
             # For each feature
             for src_ts in src_mts:
-                dst_feature_name = f"{self._op.prefix}_{src_ts.name}"
+                dst_feature_name = f"{self.operator.prefix}_{src_ts.name}"
                 dst_ts_data = self._apply_accumulator_mask(src_ts.data, mask)
                 dst_mts.append(NumpyFeature(dst_feature_name, dst_ts_data))
 
@@ -102,8 +104,8 @@ class BaseWindowNumpyImplementation(ABC):
 
         # Replace masked values with NaN
         cross_product[
-            mask == False  # pylint: disable=singleton-comparison
-        ] = np.nan
+            mask == False
+        ] = np.nan  # pylint: disable=singleton-comparison
 
         return self._apply_operation(cross_product)
 

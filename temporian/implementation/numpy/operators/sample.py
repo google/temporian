@@ -14,14 +14,15 @@ from temporian.core.operators.sample import Sample
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy_cc.operators import sample as sample_cc
 from temporian.core.data import dtype
+from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
-class SampleNumpyImplementation:
+class SampleNumpyImplementation(OperatorImplementation):
     """Numpy implementation for the Sample operator."""
 
     def __init__(self, operator: Sample) -> None:
         assert isinstance(operator, Sample)
-        self._operator = operator
+        super().__init__(operator)
 
     def __call__(
         self, event: NumpyEvent, sampling: NumpyEvent

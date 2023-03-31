@@ -6,12 +6,12 @@ from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.implementation.numpy import implementation_lib
+from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
-class LagNumpyImplementation:
+class LagNumpyImplementation(OperatorImplementation):
     def __init__(self, operator: LagOperator) -> None:
-        super().__init__()
-        self.operator = operator
+        super().__init__(operator)
 
     def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
         duration = self.operator.attributes()["duration"]

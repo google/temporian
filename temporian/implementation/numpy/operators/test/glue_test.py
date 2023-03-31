@@ -30,7 +30,6 @@ from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.implementation.numpy.operators.glue import (
     GlueNumpyImplementation,
 )
-from temporian.implementation.numpy.evaluator import run_with_check
 
 
 class GlueNumpyImplementationTest(absltest.TestCase):
@@ -106,14 +105,8 @@ class GlueNumpyImplementationTest(absltest.TestCase):
             event_2=event_3,
         )
         implementation = GlueNumpyImplementation(operator=operator)
-        output = run_with_check(
-            operator,
-            implementation,
-            {
-                "event_1": event_1_data,
-                "event_2": event_2_data,
-                "event_3": event_3_data,
-            },
+        output = implementation.call(
+            event_0=event_1_data, event_1=event_2_data, event_2=event_3_data
         )
 
         self.assertEqual(

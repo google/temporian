@@ -25,7 +25,6 @@ from temporian.implementation.numpy.operators.calendar.day_of_week import (
     CalendarDayOfWeekNumpyImplementation,
 )
 from temporian.core.data import dtype
-from temporian.implementation.numpy.evaluator import run_with_check
 
 
 class CalendarDayOfWeekNumpyImplementationTest(absltest.TestCase):
@@ -62,7 +61,7 @@ class CalendarDayOfWeekNumpyImplementationTest(absltest.TestCase):
 
         operator = CalendarDayOfWeekOperator(input_event)
         impl = CalendarDayOfWeekNumpyImplementation(operator)
-        output = run_with_check(operator, impl, {"sampling": input_event_data})
+        output = impl.call(sampling=input_event_data)
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(

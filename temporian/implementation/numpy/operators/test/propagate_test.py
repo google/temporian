@@ -26,7 +26,6 @@ from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.core.data import event as event_lib
 from temporian.core.data import feature as feature_lib
 from temporian.core.data import dtype as dtype_lib
-from temporian.implementation.numpy.evaluator import run_with_check
 
 
 class PropagateOperatorTest(absltest.TestCase):
@@ -143,9 +142,7 @@ class PropagateOperatorTest(absltest.TestCase):
         # Run op
         op = Propagate(event=event, to=to)
         instance = PropagateNumpyImplementation(op)
-        output = run_with_check(
-            op, instance, {"event": input_data, "to": to_data}
-        )["event"]
+        output = instance.call(event=input_data, to=to_data)["event"]
         self.assertEqual(output, expected_output)
 
 

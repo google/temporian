@@ -25,7 +25,6 @@ from temporian.implementation.numpy.operators.calendar.iso_week import (
     CalendarISOWeekNumpyImplementation,
 )
 from temporian.core.data import dtype
-from temporian.implementation.numpy.evaluator import run_with_check
 
 
 class CalendarISOWeekNumpyImplementationTest(absltest.TestCase):
@@ -77,7 +76,7 @@ class CalendarISOWeekNumpyImplementationTest(absltest.TestCase):
 
         operator = CalendarISOWeekOperator(input_event)
         impl = CalendarISOWeekNumpyImplementation(operator)
-        output = run_with_check(operator, impl, {"sampling": input_event_data})
+        output = impl.call(sampling=input_event_data)
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(

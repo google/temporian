@@ -28,7 +28,6 @@ from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.core.data import event as event_lib
 from temporian.core.data import feature as feature_lib
 from temporian.core.data import dtype as dtype_lib
-from temporian.implementation.numpy.evaluator import run_with_check
 import math
 
 
@@ -62,8 +61,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
         )
         self.assertEqual(op.list_matching_io_samplings(), [("event", "event")])
         instance = SimpleMovingAverageNumpyImplementation(op)
-
-        output = run_with_check(op, instance, {"event": input_data})
+        output = instance.call(event=input_data)
 
         expected_output = NumpyEvent.from_dataframe(
             pd.DataFrame(
@@ -109,8 +107,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
         self.assertEqual(op.list_matching_io_samplings(), [("event", "event")])
         instance = SimpleMovingAverageNumpyImplementation(op)
 
-        output = run_with_check(op, instance, {"event": input_data})
-
+        output = instance.call(event=input_data)
         expected_output = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
@@ -172,10 +169,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             )
         )
 
-        output = run_with_check(
-            op, instance, {"event": input_data, "sampling": sampling_data}
-        )
-
+        output = instance.call(event=input_data, sampling=sampling_data)
         expected_output = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
@@ -232,10 +226,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             )
         )
 
-        output = run_with_check(
-            op, instance, {"event": input_data, "sampling": sampling_data}
-        )
-
+        output = instance.call(event=input_data, sampling=sampling_data)
         expected_output = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
