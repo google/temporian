@@ -2,7 +2,6 @@
 
 
 from typing import Dict
-import numpy as np
 
 from temporian.implementation.numpy.data.event import (
     NumpyEvent,
@@ -24,13 +23,11 @@ class PrefixNumpyImplementation:
         dst_event = NumpyEvent(data={}, sampling=event.sampling)
 
         # For each index value
-        for index, src_mts in event.data.items():
-            dst_mts = []
-            dst_event.data[index] = dst_mts
-
-            # For each feature
-            for src_ts in src_mts:
-                dst_mts.append(NumpyFeature(prefix + src_ts.name, src_ts.data))
+        for index, features in event.data.items():
+            dst_event.data[index] = [
+                NumpyFeature(prefix + feature.name, feature.data)
+                for feature in features
+            ]
 
         return {"event": dst_event}
 

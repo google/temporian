@@ -12,15 +12,18 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":arithmetic",
-        ":assign",
+        ":glue",
         ":lag",
         ":prefix",
         ":propagate",
         ":select",
-        ":simple_moving_average",
         ":sample",
         "//temporian/implementation/numpy/operators/calendar:day_of_month",
         "//temporian/implementation/numpy/operators/calendar:day_of_week",
+        "//temporian/implementation/numpy/operators/window:moving_count",
+        "//temporian/implementation/numpy/operators/window:moving_standard_deviation",
+        "//temporian/implementation/numpy/operators/window:moving_sum",
+        "//temporian/implementation/numpy/operators/window:simple_moving_average",
     ],
 )
 
@@ -42,11 +45,11 @@ py_library(
 )
 
 py_library(
-    name = "assign",
-    srcs = ["assign.py"],
+    name = "glue",
+    srcs = ["glue.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/core/operators:assign",
+        "//temporian/core/operators:glue",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
@@ -74,20 +77,6 @@ py_library(
         "//temporian/core/operators:select",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
-    ],
-)
-
-py_library(
-    name = "simple_moving_average",
-    srcs = ["simple_moving_average.py"],
-    srcs_version = "PY3",
-    deps = [
-        "//temporian/core/data:duration",
-        "//temporian/core/operators:simple_moving_average",
-        "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy:utils",
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:sampling",
     ],
 )
 
