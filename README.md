@@ -27,9 +27,9 @@ lag = tp.lag(
     lag=tp.week(1),
 )
 
-# Assign features
-output_event = tp.assign(event, sma)
-output_event = tp.assign(output_event, lag)
+# Glue features
+output_event = tp.glue(event, sma)
+output_event = tp.glue(output_event, lag)
 
 
 # Execute pipeline and get results
