@@ -40,7 +40,7 @@ class TFPTest(absltest.TestCase):
 
         i1 = i1_data.schema()
         i2 = i2_data.schema()
-        h1 = t.sma(event=i1, window_length=7)
+        h1 = t.simple_moving_average(event=i1, window_length=7)
         h2 = t.sample(event=h1, sampling=i2)
         result = h2["sma_f2"]
 

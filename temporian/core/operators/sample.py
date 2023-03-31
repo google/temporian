@@ -92,7 +92,6 @@ def sample(
                 feature_1:  1.0, 2.0, 3.0, 4.0
             sampling:
                 timestamps: -1, 1, 6, 10
-            na_replace: nan (default)
 
         Output:
             timestamps: -1, 1, 6, 10
