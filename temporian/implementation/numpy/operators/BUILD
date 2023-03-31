@@ -14,6 +14,7 @@ py_library(
         ":arithmetic",
         ":glue",
         ":lag",
+        ":prefix",
         ":propagate",
         ":select",
         ":sample",
@@ -105,5 +106,20 @@ py_library(
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
         "//temporian/implementation/numpy_cc/operators:sample",
+    ],
+)
+
+
+py_library(
+    name = "prefix",
+    srcs = ["prefix.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:duration",
+        "//temporian/core/operators:prefix",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy:utils",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
     ],
 )

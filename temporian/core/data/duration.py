@@ -27,6 +27,8 @@ import numpy as np
 # Unit for durations
 Duration = float
 
+Timestamp = Union[np.datetime64, datetime.datetime, int, float]
+
 
 def milliseconds(value: float) -> Duration:
     return value / 1000
@@ -52,9 +54,7 @@ def weeks(value: float) -> Duration:
     return value * 60 * 60 * 24 * 7
 
 
-def convert_date_to_duration(
-    date: Union[np.datetime64, datetime.datetime, int, float]
-) -> Duration:
+def convert_date_to_duration(date: Timestamp) -> Duration:
     """Convert date value to float.
 
     If a float or int, it is returned as float.

@@ -14,6 +14,7 @@
 
 """Evaluator module."""
 
+import time
 import sys
 import pathlib
 from typing import Any, Dict, List, Set, Union
@@ -33,7 +34,7 @@ Query = Union[Event, List[Event], Dict[str, Event]]
 def evaluate(
     query: Query,
     input_data: Data,
-    verbose: int = 0,
+    verbose: int = 1,
     check_execution: bool = True,
 ) -> Dict[Event, Any]:
     """Evaluates a query on data.
@@ -58,6 +59,8 @@ def evaluate(
         the returned value will be a list of event values with the same order.
     """
 
+    begin_time = time.perf_counter()
+
     # Normalize the user query into a list query events.
     normalized_query: List[Event] = {}
 
@@ -80,11 +83,23 @@ def evaluate(
             f" {type(query)}."
         )
 
+    if verbose >= 1:
+        print("Build schedule", file=sys.stderr)
+
     # Schedule execution
     input_events = list(input_data.keys())
     schedule = build_schedule(
         inputs=input_events, outputs=normalized_query, verbose=verbose
     )
+
+    if verbose == 1:
+        print(
+            f"Run {len(schedule)} operators",
+            file=sys.stderr,
+        )
+
+    elif verbose >= 2:
+        print("Schedule:\n", schedule, file=sys.stderr)
 
     # Evaluate schedule
     #
@@ -93,6 +108,11 @@ def evaluate(
     outputs = numpy_evaluator.evaluate_schedule(
         input_data, schedule, verbose=verbose, check_execution=check_execution
     )
+
+    end_time = time.perf_counter()
+
+    if verbose == 1:
+        print(f"Execution in {end_time - begin_time:.5f} s", file=sys.stderr)
 
     # Convert the result "outputs" into the same format as the query.
     if isinstance(query, Event):
@@ -207,8 +227,5 @@ def build_schedule(
                     del op_to_num_pending_inputs[new_op]
 
     assert not op_to_num_pending_inputs
-
-    if verbose >= 2:
-        print("Schedule:\n", planned_ops, file=sys.stderr)
 
     return planned_ops

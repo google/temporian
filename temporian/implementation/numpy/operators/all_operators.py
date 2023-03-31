@@ -4,6 +4,7 @@
 from temporian.implementation.numpy.operators import arithmetic
 from temporian.implementation.numpy.operators import glue
 from temporian.implementation.numpy.operators import lag
+from temporian.implementation.numpy.operators import prefix
 from temporian.implementation.numpy.operators import propagate
 from temporian.implementation.numpy.operators import select
 from temporian.implementation.numpy.operators import sample

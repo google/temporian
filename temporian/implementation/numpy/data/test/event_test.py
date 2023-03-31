@@ -30,19 +30,18 @@ class EventTest(absltest.TestCase):
 
         self.assertEqual(
             repr(event),
-            """Event
-  data:
+            """data (2):
     (1,):
-      a <INT64>: [1 2 3]
-      b <INT64>: [4 5 6]
+        a <INT64>: [1 2 3]
+        b <INT64>: [4 5 6]
     (2,):
-      a <INT64>: [7 8]
-      b <INT64>: [ 9 10]
-  sampling:
+        a <INT64>: [7 8]
+        b <INT64>: [ 9 10]
+sampling:
     index: ['x']
-    data:
-      (1,): [0.1 0.2 0.3]
-      (2,): [0.4 0.5]
+    data (2):
+        (1,): [0.1 0.2 0.3]
+        (2,): [0.4 0.5]
 """,
         )
 
