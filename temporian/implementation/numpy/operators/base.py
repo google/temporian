@@ -1,16 +1,13 @@
 from abc import ABC, abstractmethod
 
-from typing import Dict, List
-from temporian.implementation.numpy.data.event import NumpyFeature, NumpyEvent
+from typing import Dict
+from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.core.data.event import Event
-from temporian.core.data.feature import Feature
-from temporian.core.data.sampling import Sampling
-from temporian.core.operators.base import Operator
 from temporian.core.operators.base import Operator, OperatorExceptionDecorator
 
 
 class OperatorImplementation(ABC):
-    def __init__(self, operator):
+    def __init__(self, operator: Operator):
         self._operator = operator
         # TODO: Check operator type
 
