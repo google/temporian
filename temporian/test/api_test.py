@@ -31,7 +31,7 @@ class TFPTest(absltest.TestCase):
             ]
         )
 
-        b = t.sma(event=a, window_length=7)
+        b = t.simple_moving_average(event=a, window_length=7)
 
         df = pd.DataFrame(
             {
@@ -60,7 +60,7 @@ class TFPTest(absltest.TestCase):
                 t.Feature(name="f2"),
             ]
         )
-        b = t.sma(event=a, window_length=7)
+        b = t.simple_moving_average(event=a, window_length=7)
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_processor.tem")
@@ -83,7 +83,7 @@ class TFPTest(absltest.TestCase):
             ],
             name="my_input_event",
         )
-        b = t.sma(event=a, window_length=7)
+        b = t.simple_moving_average(event=a, window_length=7)
         b.set_name("my_output_event")
 
         with tempfile.TemporaryDirectory() as tempdir:
@@ -107,7 +107,7 @@ class TFPTest(absltest.TestCase):
             ],
             name="my_input_event",
         )
-        b = t.sma(event=a, window_length=7)
+        b = t.simple_moving_average(event=a, window_length=7)
         b.set_name("my_output_event")
 
         with tempfile.TemporaryDirectory() as tempdir:
@@ -131,7 +131,7 @@ class TFPTest(absltest.TestCase):
             ],
             name="my_input_event",
         )
-        b = t.sma(event=a, window_length=7)
+        b = t.simple_moving_average(event=a, window_length=7)
         b.set_name("my_output_event")
 
         with tempfile.TemporaryDirectory() as tempdir:
