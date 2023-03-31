@@ -3,14 +3,14 @@ package(
     licenses = ["notice"],
 )
 
-py_library(
-    name = "complete",
-    srcs = ["complete.py"],
-    srcs_version = "PY3",
-    deps = [
-        "//temporian",
-    ],
-)
+# py_library(
+#     name = "complete",
+#     srcs = ["complete.py"],
+#     srcs_version = "PY3",
+#     deps = [
+#         "//temporian",
+#     ],
+# )
 
 # FAILS: ImportError: cannot import name 'sample' from 'temporian.implementation.numpy_cc.operators' (unknown location)
 # Don't seem to be able to specify :complete as a build dependency, only as data
@@ -55,11 +55,33 @@ py_library(
 
 # HACKY: Run scalene from inside a python file, so that I can specify python deps while running it in the test architecture
 # Also, I'm not seeing memory reporting in the dashboard
-py_test(
-    name = "run",
-    srcs = ["run.py"],
+# py_test(
+#     name = "run",
+#     srcs = ["run.py"],
+#     srcs_version = "PY3",
+#     deps = [
+#         ":complete",
+#     ],
+# )
+
+# py_binary(
+#     name = "run",
+#     srcs = ["run.py"],
+#     srcs_version = "PY3",
+#     deps = [
+#         ":complete",
+#     ],
+# )
+
+py_binary(
+    name = "complete",
+    srcs = ["complete.py"],
     srcs_version = "PY3",
-    deps = [
-        ":complete",
-    ],
+    deps = ["//temporian"],
+)
+
+sh_binary(
+    name = "run",
+    srcs = ["run.sh"],
+    data = [":complete"],
 )
