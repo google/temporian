@@ -33,6 +33,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "MOVING_STANDARD_DEVIATION",
             "MOVING_SUM",
             "PROPAGATE",
+            "SAMPLE",
             "SELECT",
             "SIMPLE_MOVING_AVERAGE",
         ]

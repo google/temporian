@@ -16,6 +16,7 @@ py_library(
         ":lag",
         ":propagate",
         ":select",
+        ":sample",
         "//temporian/implementation/numpy/operators/calendar:day_of_month",
         "//temporian/implementation/numpy/operators/calendar:day_of_week",
         "//temporian/implementation/numpy/operators/window:moving_count",
@@ -89,5 +90,20 @@ py_library(
         "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
+    ],
+)
+
+py_library(
+    name = "sample",
+    srcs = ["sample.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:duration",
+        "//temporian/core/operators:sample",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy:utils",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy_cc/operators:sample",
     ],
 )

@@ -24,34 +24,35 @@ from temporian.implementation.numpy.data.event import NumpyEvent
 
 class TFPTest(absltest.TestCase):
     def test_evaluation(self):
-        a = t.input_event(
-            [
-                t.Feature(name="f1", dtype=t.dtype.FLOAT64),
-                t.Feature(name="f2", dtype=t.dtype.FLOAT64),
-            ]
+        i1_data = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                {
+                    "timestamp": [0.0, 2.0, 4.0, 6.0],
+                    "f1": [1.0, 2.0, 3.0, 4.0],
+                    "f2": [5.0, 6.0, 7.0, 8.0],
+                }
+            )
         )
 
-        b = t.simple_moving_average(event=a, window_length=7)
-
-        df = pd.DataFrame(
-            {
-                "time": [0.0, 2.0, 4.0, 6.0],
-                "f1": [1.0, 2.0, 3.0, 4.0],
-                "f2": [5.0, 6.0, 7.0, 8.0],
-            }
-        )
-        input_signal_data = NumpyEvent.from_dataframe(
-            df, index_names=[], timestamp_column="time"
+        i2_data = NumpyEvent.from_dataframe(
+            pd.DataFrame({"timestamp": [1.0, 2.0, 2.0]})
         )
 
-        results = t.evaluate(
-            query={"b": b},
+        i1 = i1_data.schema()
+        i2 = i2_data.schema()
+        h1 = t.simple_moving_average(event=i1, window_length=7)
+        h2 = t.sample(event=h1, sampling=i2)
+        result = h2["sma_f2"]
+
+        result_data = t.evaluate(
+            query=result,
             input_data={
-                a: input_signal_data,
+                i1: i1_data,
+                i2: i2_data,
             },
             verbose=2,
         )
-        logging.info("results: %s", results)
+        logging.info("results: %s", result_data)
 
     def test_serialization(self):
         a = t.input_event(

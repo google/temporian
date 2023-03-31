@@ -27,6 +27,8 @@ from temporian.core.operators import base
 from temporian.io.read_event import read_event
 from temporian.io.save_event import save_event
 
+from temporian.implementation.numpy.data.event import NumpyEvent as EventData
+
 # Operators
 from temporian.core.operators.all_operators import *
 
