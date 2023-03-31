@@ -38,3 +38,43 @@ def MissingValue(dtype: DType) -> Any:
         return ""
     else:
         raise ValueError(f"Non implemented type {dtype}")
+
+
+def get_resulting_dtype(dtype1: DType, dtype2: DType) -> DType:
+    """
+    Get the resulting dtype when combining two arrays with the specified dtypes.
+
+    This function takes two dtypes as input and returns the expected
+    output dtype based on a simplified dtype hierarchy.
+
+    Args:
+        dtype1: The dtype of the first array.
+        dtype2: The dtype of the second array.
+
+    Returns:
+        DType: The resulting dtype
+
+    Raises:
+        ValueError: If either of the input dtypes is not supported.
+    """
+    dtype_hierarchy = {
+        INT32: 1,
+        INT64: 2,
+        FLOAT32: 3,
+        FLOAT64: 4,
+    }
+
+    if dtype1 not in dtype_hierarchy or dtype2 not in dtype_hierarchy:
+        raise ValueError(
+            "Invalid dtype(s). Supported dtypes: int32, int64, float32, float64"
+        )
+
+    # Find the highest hierarchy value between the two input dtypes
+    max_hierarchy = max(dtype_hierarchy[dtype1], dtype_hierarchy[dtype2])
+
+    # Get the key (dtype) corresponding to the highest hierarchy
+    resulting_dtype = next(
+        key for key, value in dtype_hierarchy.items() if value == max_hierarchy
+    )
+
+    return resulting_dtype
