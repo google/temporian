@@ -36,3 +36,10 @@ py_library(
         "//temporian/utils:string",
     ],
 )
+
+py_library(
+    name = "plotter",
+    srcs = ["plotter.py"],
+    srcs_version = "PY3",
+    deps = [ ":event"  ],
+)

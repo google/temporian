@@ -4,10 +4,11 @@ import numpy as np
 
 from temporian.implementation.numpy.data.event import NumpyEvent, NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
+from temporian.implementation.numpy.data import plotter
 
 
-class EventTest(absltest.TestCase):
-    def test_repr(self):
+class PlotterTest(absltest.TestCase):
+    def test_plot(self):
         event = NumpyEvent(
             data={
                 (1,): [
@@ -27,24 +28,7 @@ class EventTest(absltest.TestCase):
                 },
             ),
         )
-
-        self.assertEqual(
-            repr(event),
-            """Event
-  data:
-    (1,):
-      a <INT64>: [1 2 3]
-      b <INT64>: [4 5 6]
-    (2,):
-      a <INT64>: [7 8]
-      b <INT64>: [ 9 10]
-  sampling:
-    index: ['x']
-    data:
-      (1,): [0.1 0.2 0.3]
-      (2,): [0.4 0.5]
-""",
-        )
+        _ = plotter.plot(event, index=1)
 
 
 if __name__ == "__main__":
