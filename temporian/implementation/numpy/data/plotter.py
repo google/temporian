@@ -47,7 +47,7 @@ def plot(
     if backend not in BACKENDS:
         raise ValueError(
             f"Unknown plotting backend {backend}. Available "
-            "backends: {BACKENDS}"
+            f"backends: {BACKENDS}"
         )
 
     if isinstance(event, list):
@@ -72,7 +72,9 @@ def _plot_matplotlib(events: List[NumpyEvent], index: tuple, options: Options):
             raise ValueError(
                 f"Index '{index}' does not exist in event. Check the available"
                 " indexes with 'event.index()' and provide one of those index"
-                " to the 'index' argument of 'plot'."
+                " to the 'index' argument of 'plot'. Alternatively, set "
+                '"index=None" to select a random index value (e.g., '
+                f"{event._first_index_value}."
             )
         num_features = len(event.feature_names)
         if num_features == 0:

@@ -45,9 +45,9 @@ class SampleNumpyImplementation:
             sampling_timestamps = sampling.sampling.data[index]
 
             (
-                sampling_indices,
-                first_valid_indice,
-            ) = sample_cc.build_sampling_indices(
+                sampling_idxs,
+                first_valid_idx,
+            ) = sample_cc.build_sampling_idxs(
                 src_timestamps, sampling_timestamps
             )
 
@@ -61,8 +61,8 @@ class SampleNumpyImplementation:
                     fill_value=output_missing_value,
                     dtype=output_np_dtype,
                 )
-                dst_ts_data[first_valid_indice:] = src_ts.data[
-                    sampling_indices[first_valid_indice:]
+                dst_ts_data[first_valid_idx:] = src_ts.data[
+                    sampling_idxs[first_valid_idx:]
                 ]
 
                 dst_mts.append(NumpyFeature(src_ts.name, dst_ts_data))
