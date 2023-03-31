@@ -2,7 +2,7 @@
 
 # pylint: disable=unused-import
 from temporian.implementation.numpy.operators import arithmetic
-from temporian.implementation.numpy.operators import assign
+from temporian.implementation.numpy.operators import glue
 from temporian.implementation.numpy.operators import lag
 from temporian.implementation.numpy.operators import propagate
 from temporian.implementation.numpy.operators import select
