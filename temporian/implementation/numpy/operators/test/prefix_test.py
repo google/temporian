@@ -59,7 +59,8 @@ class PrefixOperatorTest(absltest.TestCase):
         # Run op
         op = Prefix("hello_", event=event)
         instance = PrefixNumpyImplementation(op)
-        output = instance(event=event_data)["event"]
+        output = instance.call(event=event_data)["event"]
+
         self.assertEqual(output, expected_output)
 
 

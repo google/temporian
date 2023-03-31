@@ -93,8 +93,11 @@ class GlueNumpyImplementationTest(absltest.TestCase):
         event_1 = event_1_data.schema()
         event_2 = event_2_data.schema()
         event_3 = event_3_data.schema()
+
         event_2._sampling = event_1._sampling
         event_3._sampling = event_1._sampling
+        event_2_data.sampling = event_1_data.sampling
+        event_3_data.sampling = event_1_data.sampling
 
         operator = GlueOperator(
             event_0=event_1,
@@ -102,7 +105,7 @@ class GlueNumpyImplementationTest(absltest.TestCase):
             event_2=event_3,
         )
         implementation = GlueNumpyImplementation(operator=operator)
-        output = implementation(
+        output = implementation.call(
             event_0=event_1_data, event_1=event_2_data, event_2=event_3_data
         )
 

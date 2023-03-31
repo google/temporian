@@ -61,8 +61,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
         )
         self.assertEqual(op.list_matching_io_samplings(), [("event", "event")])
         instance = SimpleMovingAverageNumpyImplementation(op)
-
-        output = instance(event=input_data)
+        output = instance.call(event=input_data)
 
         expected_output = NumpyEvent.from_dataframe(
             pd.DataFrame(
@@ -108,8 +107,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
         self.assertEqual(op.list_matching_io_samplings(), [("event", "event")])
         instance = SimpleMovingAverageNumpyImplementation(op)
 
-        output = instance(event=input_data)
-
+        output = instance.call(event=input_data)
         expected_output = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
@@ -171,8 +169,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             )
         )
 
-        output = instance(event=input_data, sampling=sampling_data)
-
+        output = instance.call(event=input_data, sampling=sampling_data)
         expected_output = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
@@ -229,8 +226,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             )
         )
 
-        output = instance(event=input_data, sampling=sampling_data)
-
+        output = instance.call(event=input_data, sampling=sampling_data)
         expected_output = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [

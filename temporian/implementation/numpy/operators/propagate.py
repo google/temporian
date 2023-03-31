@@ -7,14 +7,15 @@ from temporian.implementation.numpy.data.event import NumpyEvent, NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.core.operators.propagate import Propagate
 from temporian.implementation.numpy import implementation_lib
+from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
-class PropagateNumpyImplementation:
+class PropagateNumpyImplementation(OperatorImplementation):
     """Numpy implementation for the propagate operator."""
 
     def __init__(self, operator: Propagate) -> None:
         assert isinstance(operator, Propagate)
-        self._operator = operator
+        super().__init__(operator)
 
     def __call__(
         self, event: NumpyEvent, to: NumpyEvent

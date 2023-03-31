@@ -9,14 +9,15 @@ from temporian.implementation.numpy.data.event import (
 )
 from temporian.core.operators.prefix import Prefix
 from temporian.implementation.numpy import implementation_lib
+from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
-class PrefixNumpyImplementation:
+class PrefixNumpyImplementation(OperatorImplementation):
     """Numpy implementation for the Prefix operator."""
 
     def __init__(self, operator: Prefix) -> None:
         assert isinstance(operator, Prefix)
-        self._operator = operator
+        super().__init__(operator)
 
     def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
         prefix = self._operator.prefix()

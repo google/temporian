@@ -62,8 +62,7 @@ class CalendarMinuteNumpyImplementationTest(absltest.TestCase):
 
         operator = CalendarMinuteOperator(input_event)
         impl = CalendarMinuteNumpyImplementation(operator)
-
-        output = impl(input_event_data)
+        output = impl.call(sampling=input_event_data)
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(

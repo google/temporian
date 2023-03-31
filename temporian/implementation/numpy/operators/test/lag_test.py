@@ -27,6 +27,8 @@ from temporian.core.operators.lag import LagOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators.lag import LagNumpyImplementation
 
+from temporian.core.data import dtype as dtype_lib
+
 
 class LagNumpyImplementationTest(absltest.TestCase):
     """Test numpy implementation of lag operator."""
@@ -66,7 +68,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
         )
 
         event = Event(
-            [Feature("sales", float)],
+            [Feature("sales", dtype_lib.FLOAT64)],
             sampling=Sampling(["store_id"]),
             creator=None,
         )
@@ -77,7 +79,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
         )
 
         lag_implementation = LagNumpyImplementation(operator)
-        operator_output = lag_implementation(event=numpy_input_event)
+        operator_output = lag_implementation.call(event=numpy_input_event)
 
         self.assertTrue(numpy_output_event == operator_output["event"])
 
@@ -208,7 +210,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
         )
 
         event = Event(
-            [Feature("sales", float)],
+            [Feature("sales", dtype_lib.FLOAT64)],
             sampling=Sampling(["store_id"]),
             creator=None,
         )
@@ -219,7 +221,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
         )
 
         lag_implementation = LagNumpyImplementation(operator)
-        operator_output = lag_implementation(event=numpy_input_event)
+        operator_output = lag_implementation.call(event=numpy_input_event)
 
         self.assertTrue(numpy_output_event == operator_output["event"])
 

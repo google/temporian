@@ -20,15 +20,15 @@ import numpy as np
 from temporian.core.operators.calendar.base import BaseCalendarOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
+from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
-class BaseCalendarNumpyImplementation(ABC):
+class BaseCalendarNumpyImplementation(OperatorImplementation):
     """Abstract base class to implement common logic of numpy implementation of
     calendar operators."""
 
     def __init__(self, operator: BaseCalendarOperator) -> None:
-        super().__init__()
-        self.operator = operator
+        super().__init__(operator)
 
     def __call__(self, sampling: NumpyEvent) -> Dict[str, NumpyEvent]:
         data = {}

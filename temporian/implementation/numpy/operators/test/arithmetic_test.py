@@ -25,6 +25,7 @@ from temporian.core.operators.arithmetic import (
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators import arithmetic
+from temporian.core.data import dtype as dtype_lib
 
 
 class ArithmeticNumpyImplementationTest(absltest.TestCase):
@@ -59,14 +60,16 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id"],
         )
 
+        self.numpy_event_2.sampling = self.numpy_event_1.sampling
+
         self.sampling = Sampling(["store_id"])
         self.event_1 = Event(
-            [Feature("sales", float)],
+            [Feature("sales", dtype_lib.FLOAT64)],
             sampling=self.sampling,
             creator=None,
         )
         self.event_2 = Event(
-            [Feature("costs", float)],
+            [Feature("costs", dtype_lib.FLOAT64)],
             sampling=self.sampling,
             creator=None,
         )
@@ -97,7 +100,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
 
         sum_implementation = arithmetic.ArithmeticNumpyImplementation(operator)
 
-        operator_output = sum_implementation(
+        operator_output = sum_implementation.call(
             event_1=self.numpy_event_1, event_2=self.numpy_event_2
         )
 
@@ -128,11 +131,9 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         )
 
         sub_implementation = arithmetic.ArithmeticNumpyImplementation(operator)
-
-        operator_output = sub_implementation(
+        operator_output = sub_implementation.call(
             event_1=self.numpy_event_1, event_2=self.numpy_event_2
         )
-
         self.assertTrue(numpy_output_event == operator_output["event"])
 
     def test_correct_multiplication(self) -> None:
@@ -161,7 +162,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
 
         mult_implementation = arithmetic.ArithmeticNumpyImplementation(operator)
 
-        operator_output = mult_implementation(
+        operator_output = mult_implementation.call(
             event_1=self.numpy_event_1, event_2=self.numpy_event_2
         )
 
@@ -193,7 +194,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
 
         div_implementation = arithmetic.ArithmeticNumpyImplementation(operator)
 
-        operator_output = div_implementation(
+        operator_output = div_implementation.call(
             event_1=self.numpy_event_1, event_2=self.numpy_event_2
         )
 

@@ -17,6 +17,7 @@ py_library(
     srcs = ["base.py"],
     srcs_version = "PY3",
     deps = [
+        "//temporian/implementation/numpy/operators:base",
         "//temporian/core/operators/calendar:base",
         "//temporian/implementation/numpy/data:event",
     ],

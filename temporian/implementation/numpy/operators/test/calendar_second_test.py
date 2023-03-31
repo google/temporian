@@ -61,8 +61,7 @@ class CalendarSecondNumpyImplementationTest(absltest.TestCase):
 
         operator = CalendarSecondOperator(input_event)
         impl = CalendarSecondNumpyImplementation(operator)
-
-        output = impl(input_event_data)
+        output = impl.call(sampling=input_event_data)
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(

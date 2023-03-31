@@ -66,7 +66,7 @@ class SelectOperatorTest(absltest.TestCase):
 
         operator = SelectOperator(event=self.input_event, feature_names="sales")
         impl = select.SelectNumpyImplementation(operator)
-        selected_event = impl(self.input_event_data)["event"]
+        selected_event = impl.call(event=self.input_event_data)["event"]
 
         expected_event = NumpyEvent.from_dataframe(
             new_df, index_names=["store_id"]
@@ -92,7 +92,7 @@ class SelectOperatorTest(absltest.TestCase):
             event=self.input_event, feature_names=["sales", "costs"]
         )
         impl = select.SelectNumpyImplementation(operator)
-        selected_event = impl(self.input_event_data)["event"]
+        selected_event = impl.call(event=self.input_event_data)["event"]
 
         expected_event = NumpyEvent.from_dataframe(
             new_df, index_names=["store_id"]

@@ -20,12 +20,12 @@ from temporian.core.operators.arithmetic import Resolution
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy import implementation_lib
+from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
-class ArithmeticNumpyImplementation:
+class ArithmeticNumpyImplementation(OperatorImplementation):
     def __init__(self, operator: ArithmeticOperator) -> None:
-        super().__init__()
-        self.operator = operator
+        super().__init__(operator)
 
     def __call__(
         self, event_1: NumpyEvent, event_2: NumpyEvent
@@ -46,7 +46,7 @@ class ArithmeticNumpyImplementation:
         resolution = self.operator.attributes()["resolution"]
         operation = self.operator.attributes()["operation"]
 
-        if event_1.sampling != event_2.sampling:
+        if event_1.sampling is not event_2.sampling:
             raise ValueError("Sampling of both events must be equal.")
 
         if event_1.feature_count != event_2.feature_count:
