@@ -11,35 +11,35 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-print("Imports")
-import pandas as pd
+"""
+Basic benchmarking script for temporian.
 
-# from scalene import scalene_profiler
+The script creates two events, applies some operators, and evaluates the graph.
+"""
+
+import pandas as pd
+import temporian as tp
 from temporian.implementation.numpy.data.event import NumpyEvent
 
-# Even if not used, ensure that all the necessary code is loaded.
-import temporian as tp
-import numpy as np
-import random
 
-N = 100000
+# control size of benchmark
+# N = 10000 takes about 20s
+# TODO: receive N as an argument to enable passing via bazel run ... -- --N=...
+N = 10000
+
 # store ids
 TRYOLABS_SHOP = 42
 GOOGLE_SHOP = 101
+
 # product ids
 MATE_ID = 1
 BOOK_ID = 2
 PIXEL_ID = 3
 
 
+@profile
 def main():
-    print("Large memory usage")
-    # a = np.random.random(1_000_000_000)
-    # a = [random.random() for x in range(1_000_000)]
-
-    print("Running benchmark")
-
-    # scalene_profiler.start()
+    print(f"Running basic benchmark with N={N}...")
 
     event_1_data = NumpyEvent.from_dataframe(
         pd.DataFrame(
@@ -85,65 +85,24 @@ def main():
         index_names=["store_id", "product_id"],
     )
 
-    # TODO: Remove the following line when "from_dataframe" support creating
-    # event data with shared sampling. Note that "event_1_data" and
-    # "event_2_data" should have the same sampling in this tests.
     event_1_data.sampling = event_2_data.sampling
 
     event_1 = event_1_data.schema()
     event_2 = event_2_data.schema()
     event_2._sampling = event_1._sampling
 
-    expected_output_event = NumpyEvent.from_dataframe(
-        pd.DataFrame(
-            data=[
-                *(
-                    [
-                        [TRYOLABS_SHOP, MATE_ID, 0.0, 14, -14, 0],
-                        [TRYOLABS_SHOP, MATE_ID, 1.0, 15, -15, 14],
-                        [TRYOLABS_SHOP, MATE_ID, 2.0, 16, -16, 15],
-                        [TRYOLABS_SHOP, BOOK_ID, 1.0, 10, -10, 0],
-                        [GOOGLE_SHOP, BOOK_ID, 1.0, 7, -7, 0],
-                        [GOOGLE_SHOP, BOOK_ID, 2.0, 8, -8, 7],
-                        [GOOGLE_SHOP, PIXEL_ID, 0.0, 3, -3, 0],
-                        [GOOGLE_SHOP, PIXEL_ID, 1.0, 4, -4, 3],
-                    ]
-                    * N
-                )
-            ],
-            columns=[
-                "store_id",
-                "product_id",
-                "timestamp",
-                "sales",
-                "costs",
-                "lag[1s]_sales",
-            ],
-        ),
-        index_names=["store_id", "product_id"],
-    )
-
     a = tp.assign(event_1, event_2)
-    # create and assign sum feature
-    # TODO: Restore when arithmetic operator is fixed.
-    # b = tp.assign(a, event_1 + event_2)
-    c = tp.lag(event_1, duration=1)
+    c = tp.sma(a, window_length=1000)
     d = tp.assign(a, tp.sample(c, a))
-    output_event = d
 
-    output_event_numpy = tp.evaluate(
-        output_event,
+    tp.evaluate(
+        d,
         input_data={
             event_1: event_1_data,
             event_2: event_2_data,
         },
-        # TODO: The assign operator has some issues with dtypes. Re-enable
-        # checking when solved.
-        check_execution=True,
+        check_execution=False,
     )
-
-    # Turn profiling off
-    # scalene_profiler.stop()
 
 
 if __name__ == "__main__":

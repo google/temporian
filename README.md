@@ -48,10 +48,10 @@ output_event = tp.evaluate(
 
 Temporian currently supports the following features for pre-processing your temporal data:
 
-- **Simple Moving Average:** calculates the average value of each feature over a specified time window.
-- **Lag:** creates new features by shifting the time series data backwards in time by a specified period.
-- **Arithmetic Operations:** allows you to perform arithmetic operations (such as addition, subtraction, multiplication, and division) on time series data, between different events.
-- More features coming soon!
+-   **Simple Moving Average:** calculates the average value of each feature over a specified time window.
+-   **Lag:** creates new features by shifting the time series data backwards in time by a specified period.
+-   **Arithmetic Operations:** allows you to perform arithmetic operations (such as addition, subtraction, multiplication, and division) on time series data, between different events.
+-   More features coming soon!
 
 ## Environment Setup
 
@@ -114,6 +114,15 @@ bazel test //...:all
 ```
 
 > **Note**: You can use the Bazel test flag `--test_output=streamed` to see the test logs in realtime.
+
+## Benchmarking
+
+Basic time and memory benchmaking is available through the following commands:
+
+```shell
+bazel run benchmark:time
+bazel run benchmark:memory
+```
 
 ## Credits
 
