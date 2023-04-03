@@ -120,12 +120,15 @@ bazel test //...:all
 Time and memory benchmarking is available through the following commands:
 
 ```shell
-bazel run benchmark:time
-bazel run benchmark:memory
-bazel run benchmark:memory -- -p
+bazel run benchmark:time -- [name]
+bazel run benchmark:memory -- [name] [-p]
 ```
 
-`-p` flag displays memory over time plot instead of line-by-line memory consumption.
+where `[name]` is the name of one of the python scripts in
+[benchmark/scripts](benchmark/scripts), e.g. `-- basic`.
+
+`-p` flag displays memory over time plot instead of line-by-line memory
+consumption.
 
 ## Credits
 

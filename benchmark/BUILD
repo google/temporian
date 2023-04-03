@@ -6,11 +6,15 @@ package(
 sh_binary(
     name = "time",
     srcs = ["time.sh"],
-    data = ["//benchmark/scripts"],
+    data = [
+        "//benchmark/scripts",
+    ],
 )
 
 sh_binary(
     name = "memory",
     srcs = ["memory.sh"],
-    data = ["//benchmark/scripts"],
+    data = [
+        "//benchmark/scripts",
+    ],
 )

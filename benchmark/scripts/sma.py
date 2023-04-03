@@ -39,7 +39,7 @@ STORE, PRODUCT, TIMESTAMP, SALES, COSTS = (
 
 @profile
 def main():
-    print(f"Running basic benchmark with N={N}...")
+    print(f"Running lag benchmark with N={N}...")
 
     # Integer ids from 0 to 9
     ids = list(range(int(10)))
@@ -48,7 +48,7 @@ def main():
     product_ids = np.random.choice(ids, N)
     store_ids = np.random.choice(ids, N)
 
-    event_1_data = NumpyEvent.from_dataframe(
+    event_data = NumpyEvent.from_dataframe(
         pd.DataFrame(
             {
                 STORE: store_ids,
@@ -60,33 +60,14 @@ def main():
         index_names=[STORE, PRODUCT],
     )
 
-    event_2_data = NumpyEvent.from_dataframe(
-        pd.DataFrame(
-            {
-                STORE: store_ids,
-                PRODUCT: product_ids,
-                TIMESTAMP: timestamps,
-                COSTS: np.random.randn(N) * 100,
-            }
-        ),
-        index_names=[STORE, PRODUCT],
-    )
+    event = event_data.schema()
 
-    event_1_data.sampling = event_2_data.sampling
-
-    event_1 = event_1_data.schema()
-    event_2 = event_2_data.schema()
-    event_2._sampling = event_1._sampling
-
-    a = tp.assign(event_1, event_2)
-    b = tp.sma(a, window_length=10)
-    c = tp.assign(a, tp.sample(b, a))
+    sma = tp.sma(event, window_length=10)
 
     res: NumpyEvent = tp.evaluate(
-        c,
+        sma,
         input_data={
-            event_1: event_1_data,
-            event_2: event_2_data,
+            event: event_data,
         },
         check_execution=False,
     )
