@@ -114,10 +114,10 @@ def _implementation(
         return LagOperator(
             event=event,
             duration=used_duration[0],
-        ).outputs()["event"]
+        ).outputs["event"]
 
     return [
-        LagOperator(event=event, duration=d).outputs()["event"]
+        LagOperator(event=event, duration=d).outputs["event"]
         for d in used_duration
     ]
 

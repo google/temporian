@@ -14,7 +14,7 @@ class LagNumpyImplementation(OperatorImplementation):
         super().__init__(operator)
 
     def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
-        duration = self.operator.attributes()["duration"]
+        duration = self.operator.attributes["duration"]
 
         sampling_data = {}
         output_data = {}

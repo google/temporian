@@ -57,7 +57,7 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
             mask = self._build_accumulator_mask(
                 src_timestamps,
                 sampling_timestamps,
-                self.operator.window_length(),
+                self.operator.window_length,
             )
 
             # For each feature

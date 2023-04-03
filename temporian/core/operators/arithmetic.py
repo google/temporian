@@ -176,7 +176,7 @@ def sum(
         event_2=event_2,
         operation=ArithmeticOperation.ADDITION,
         resolution=resolution,
-    ).outputs()["event"]
+    ).outputs["event"]
 
 
 def substract(
@@ -204,7 +204,7 @@ def substract(
         event_2=event_2,
         operation=ArithmeticOperation.SUBTRACTION,
         resolution=resolution,
-    ).outputs()["event"]
+    ).outputs["event"]
 
 
 def multiply(
@@ -232,7 +232,7 @@ def multiply(
         event_2=event_2,
         operation=ArithmeticOperation.MULTIPLICATION,
         resolution=resolution,
-    ).outputs()["event"]
+    ).outputs["event"]
 
 
 def divide(
@@ -260,4 +260,4 @@ def divide(
         event_2=denominator,
         operation=ArithmeticOperation.DIVISION,
         resolution=resolution,
-    ).outputs()["event"]
+    ).outputs["event"]

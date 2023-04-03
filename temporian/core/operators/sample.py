@@ -105,4 +105,4 @@ def sample(
         A sampled event.
     """
 
-    return Sample(event=event, sampling=sampling).outputs()["event"]
+    return Sample(event=event, sampling=sampling).outputs["event"]

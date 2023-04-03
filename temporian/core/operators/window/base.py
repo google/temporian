@@ -73,7 +73,8 @@ class BaseWindowOperator(Operator, ABC):
 
         self.check()
 
-    def window_length(self):
+    @property
+    def window_length(self) -> Duration:
         return self._window_length
 
     @classmethod

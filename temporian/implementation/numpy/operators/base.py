@@ -85,14 +85,14 @@ def _check_input(
     with OperatorExceptionDecorator(operator):
         # Check input keys
         effective_input_keys = set(inputs.keys())
-        expected_input_keys = set(operator.inputs().keys())
+        expected_input_keys = set(operator.inputs.keys())
         if effective_input_keys != expected_input_keys:
             raise RuntimeError(
                 "Non matching number of inputs. "
                 f"{effective_input_keys} vs {expected_input_keys}"
             )
 
-        _check_features(inputs, definitions=operator.inputs(), label="input")
+        _check_features(inputs, definitions=operator.inputs, label="input")
 
 
 def _check_output(
@@ -105,14 +105,14 @@ def _check_output(
     with OperatorExceptionDecorator(operator):
         # Check output keys
         effective_output_keys = set(outputs.keys())
-        expected_output_keys = set(operator.outputs().keys())
+        expected_output_keys = set(operator.outputs.keys())
         if effective_output_keys != expected_output_keys:
             raise RuntimeError(
                 "Non matching number of outputs. "
                 f"{effective_output_keys} vs {expected_output_keys}"
             )
 
-        for output_key, output_def in operator.outputs().items():
+        for output_key, output_def in operator.outputs.items():
             output_real = outputs[output_key]
 
             # Check sampling
@@ -126,7 +126,7 @@ def _check_output(
 
             # Check copy or referencing of sampling data.
             matching_samplings = set(operator.list_matching_io_samplings())
-            for input_key in operator.inputs().keys():
+            for input_key in operator.inputs.keys():
                 input_real = inputs[input_key]
                 expected_matching_sampling = (
                     input_key,
@@ -161,6 +161,4 @@ def _check_output(
                     )
 
         # Check features
-        _check_features(
-            outputs, definitions=operator.outputs(), label="outputs"
-        )
+        _check_features(outputs, definitions=operator.outputs, label="outputs")

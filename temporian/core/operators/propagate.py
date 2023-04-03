@@ -155,4 +155,4 @@ def propagate(
     return Propagate(
         event=event,
         to=to,
-    ).outputs()["event"]
+    ).outputs["event"]

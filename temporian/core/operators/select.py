@@ -103,4 +103,4 @@ def select(
             f" str. Got '{feature_names}' instead."
         )
 
-    return SelectOperator(event, feature_names).outputs()["event"]
+    return SelectOperator(event, feature_names).outputs["event"]

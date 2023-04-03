@@ -127,4 +127,4 @@ def glue(
 
     # Note: The event should be called "event_{idx}" with idx in [0, MAX_NUM_ARGUMENTS).
     dict_events = {f"event_{idx}": event for idx, event in enumerate(events)}
-    return GlueOperator(**dict_events).outputs()["event"]
+    return GlueOperator(**dict_events).outputs["event"]

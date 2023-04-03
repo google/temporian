@@ -88,4 +88,4 @@ def moving_standard_deviation(
         event=event,
         window_length=window_length,
         sampling=sampling,
-    ).outputs()["event"]
+    ).outputs["event"]
