@@ -224,8 +224,8 @@ from absl.testing import absltest
 
 import pandas as pd
 from temporian.core.operators.{lower_op} import {capitalized_op}
-from temporian.implementation.numpy.operators.rename_allo import (
-    RenameAlloNumpyImplementation,
+from temporian.implementation.numpy.operators.{lower_op} import (
+    {capitalized_op}NumpyImplementation,
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
 
