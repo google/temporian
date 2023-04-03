@@ -23,8 +23,8 @@ FLAGS = flags.FLAGS
 
 flags.DEFINE_string(
     "operator",
-    "my_new_operator",
-    "Name of the operator. Show be lower-case with _.",
+    "",
+    "Name of the operator. Should be lower-case with _ e.g., my_new_operator",
 )
 
 
