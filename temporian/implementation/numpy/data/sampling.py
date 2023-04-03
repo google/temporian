@@ -4,6 +4,9 @@ import numpy as np
 
 from temporian.utils import string
 
+# Maximum of printed index when calling repr(event)
+MAX_NUM_PRINTED_INDEX = 5
+
 
 class NumpySampling:
     def __init__(
@@ -30,8 +33,15 @@ class NumpySampling:
         return False
 
     def __repr__(self) -> str:
-        data_repr = "\n".join(f"{k}: {v}" for k, v in self.data.items())
-        return f"index: {self.index}\ndata:\n{string.indent(data_repr)}\n"
+        with np.printoptions(precision=4, threshold=6):
+            data_repr = []
+            for idx, (k, v) in enumerate(self.data.items()):
+                if idx > MAX_NUM_PRINTED_INDEX:
+                    data_repr.append("...")
+                    break
+                data_repr.append(f"{k}: {v}")
+            data_repr = string.indent("\n".join(data_repr))
+        return f"index: {self.index}\ndata ({len(self.data)}):\n{data_repr}\n"
 
     def __eq__(self, other):
         if not isinstance(other, NumpySampling):

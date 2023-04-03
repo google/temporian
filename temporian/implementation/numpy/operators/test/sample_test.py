@@ -75,7 +75,10 @@ class SampleOperatorTest(absltest.TestCase):
         # Run op
         op = Sample(event=event, sampling=sampling)
         instance = SampleNumpyImplementation(op)
-        output = instance(event=event_data, sampling=sampling_data)["event"]
+        output = instance.call(event=event_data, sampling=sampling_data)[
+            "event"
+        ]
+
         self.assertEqual(output, expected_output)
 
 

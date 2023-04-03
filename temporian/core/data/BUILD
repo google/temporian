@@ -25,6 +25,7 @@ py_library(
     deps = [
         ":feature",
         ":sampling",
+        "//temporian/utils:string",
     ],
 )
 

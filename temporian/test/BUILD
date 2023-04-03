@@ -25,7 +25,6 @@ py_test(
     srcs_version = "PY3",
     deps = [
         "//temporian",
-        "//temporian/implementation/numpy/data:event",
     ],
 )
 

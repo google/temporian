@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Assign operator."""
+"""Glue operator."""
 
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
@@ -22,30 +22,36 @@ from temporian.core.data.feature import Feature
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
+# Maximum number of arguments taken by the glue operator
+MAX_NUM_ARGUMENTS = 10
 
-class AssignOperator(Operator):
-    """Assign operator."""
+
+class GlueOperator(Operator):
+    """Glue operator."""
 
     def __init__(
         self,
-        event_1: Event,
-        event_2: Event,
-        event_3: Optional[Event] = None,
-        event_4: Optional[Event] = None,
+        **dict_events: Dict[str, Event],
     ):
         super().__init__()
 
-        events = [event_1, event_2]
-        if event_3 is not None:
-            events.append(event_3)
-        if event_4 is not None:
-            events.append(event_4)
+        # Note: Support for dictionaries of events is required for
+        # serialization.
+
+        if len(dict_events) < 2:
+            raise ValueError("At least two arguments should be provided")
+
+        if len(dict_events) >= MAX_NUM_ARGUMENTS:
+            raise ValueError(
+                f"Too much (>{MAX_NUM_ARGUMENTS}) arguments provided"
+            )
 
         # inputs
         output_features = []
         feature_names = set()
-        for idx, event in enumerate(events):
-            self.add_input(f"event_{idx+1}", event)
+        first_sampling = None
+        for key, event in dict_events.items():
+            self.add_input(key, event)
             output_features.extend(event.features())
 
             for f in event.features():
@@ -56,7 +62,9 @@ class AssignOperator(Operator):
                     )
                 feature_names.add(f.name())
 
-            if event.sampling() is not events[0].sampling():
+            if first_sampling is None:
+                first_sampling = event.sampling()
+            elif event.sampling() is not first_sampling:
                 raise ValueError(
                     "All the events do not have the same sampling."
                 )
@@ -66,7 +74,7 @@ class AssignOperator(Operator):
             "event",
             Event(
                 features=output_features,
-                sampling=events[0].sampling(),
+                sampling=first_sampling,
                 creator=self,
             ),
         )
@@ -75,25 +83,21 @@ class AssignOperator(Operator):
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
-            key="ASSIGN",
+            key="GLUE",
+            # TODO: Add support to array of events arguments.
             inputs=[
-                pb.OperatorDef.Input(key="event_1"),
-                pb.OperatorDef.Input(key="event_2"),
-                pb.OperatorDef.Input(key="event_3", is_optional=True),
-                pb.OperatorDef.Input(key="event_4", is_optional=True),
+                pb.OperatorDef.Input(key=f"event_{idx}", is_optional=idx >= 2)
+                for idx in range(MAX_NUM_ARGUMENTS)
             ],
             outputs=[pb.OperatorDef.Output(key="event")],
         )
 
 
-operator_lib.register_operator(AssignOperator)
+operator_lib.register_operator(GlueOperator)
 
 
-def assign(
-    event_1: Event,
-    event_2: Event,
-    event_3: Optional[Event] = None,
-    event_4: Optional[Event] = None,
+def glue(
+    *events: List[Event],
 ) -> Event:
     """Concatenates together events with the same sampling.
 
@@ -103,7 +107,7 @@ def assign(
         event_3 = ... # Feature E & F
 
         # Output has features A, B, C, D, E & F
-        output = np.assign(event_1, event_2, event_3)
+        output = np.glue(event_1, event_2, event_3)
 
     All the events should have the same sampling. To concatenate events with a
     different sampling, use the operator 'tp.sample(...)' before.
@@ -117,9 +121,11 @@ def assign(
 
         # Output has features A, B, C, D, E & F, and the same sampling as
         # event_1
-        output = np.assign(event_1,
+        output = np.glue(event_1,
             tp.sample(event_2, sampling=event_1),
             tp.sample(event_3, sampling=event_1))
     """
 
-    return AssignOperator(event_1, event_2, event_3, event_4).outputs()["event"]
+    # Note: The event should be called "event_{idx}" with idx in [0, MAX_NUM_ARGUMENTS).
+    dict_events = {f"event_{idx}": event for idx, event in enumerate(events)}
+    return GlueOperator(**dict_events).outputs()["event"]

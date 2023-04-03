@@ -62,8 +62,7 @@ class CalendarYearNumpyImplementationTest(absltest.TestCase):
 
         operator = CalendarYearOperator(input_event)
         impl = CalendarYearNumpyImplementation(operator)
-
-        output = impl(input_event_data)
+        output = impl.call(sampling=input_event_data)
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(

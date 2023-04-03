@@ -20,20 +20,20 @@ import pandas as pd
 from temporian.core.data.event import Event
 from temporian.core.data.event import Feature
 from temporian.core.data.sampling import Sampling
-from temporian.core.operators.assign import AssignOperator
+from temporian.core.operators.glue import GlueOperator
 from temporian.core.data import event as event_lib
 from temporian.core.data import dtype as dtype_lib
 
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
-from temporian.implementation.numpy.operators.assign import (
-    AssignNumpyImplementation,
+from temporian.implementation.numpy.operators.glue import (
+    GlueNumpyImplementation,
 )
 
 
-class AssignNumpyImplementationTest(absltest.TestCase):
-    """Test numpy implementation of assign operator."""
+class GlueNumpyImplementationTest(absltest.TestCase):
+    """Test numpy implementation of glue operator."""
 
     def setUp(self) -> None:
         pass
@@ -93,17 +93,21 @@ class AssignNumpyImplementationTest(absltest.TestCase):
         event_1 = event_1_data.schema()
         event_2 = event_2_data.schema()
         event_3 = event_3_data.schema()
+
         event_2._sampling = event_1._sampling
         event_3._sampling = event_1._sampling
+        event_2_data.sampling = event_1_data.sampling
+        event_3_data.sampling = event_1_data.sampling
 
-        operator = AssignOperator(
-            event_1,
-            event_2,
-            event_3,
-            None,
+        operator = GlueOperator(
+            event_0=event_1,
+            event_1=event_2,
+            event_2=event_3,
         )
-        implementation = AssignNumpyImplementation(operator=operator)
-        output = implementation(event_1_data, event_2_data, event_3_data, None)
+        implementation = GlueNumpyImplementation(operator=operator)
+        output = implementation.call(
+            event_0=event_1_data, event_1=event_2_data, event_2=event_3_data
+        )
 
         self.assertEqual(
             output["event"],
@@ -115,17 +119,15 @@ class AssignNumpyImplementationTest(absltest.TestCase):
             ValueError,
             "All the events do not have the same sampling.",
         ):
-            _ = AssignOperator(
-                event_lib.input_event(
+            _ = GlueOperator(
+                event_0=event_lib.input_event(
                     [Feature(name="a", dtype=dtype_lib.FLOAT64)],
                     sampling=Sampling(index=["x"]),
                 ),
-                event_lib.input_event(
+                event_1=event_lib.input_event(
                     [Feature(name="b", dtype=dtype_lib.FLOAT64)],
                     sampling=Sampling(index=["x"]),
                 ),
-                None,
-                None,
             )
 
     def test_duplicate_feature(self):
@@ -134,17 +136,15 @@ class AssignNumpyImplementationTest(absltest.TestCase):
             "Feature a is defined in multiple input events",
         ):
             sampling = Sampling(index=["x"])
-            _ = AssignOperator(
-                event_lib.input_event(
+            _ = GlueOperator(
+                event_0=event_lib.input_event(
                     [Feature(name="a", dtype=dtype_lib.FLOAT64)],
                     sampling=sampling,
                 ),
-                event_lib.input_event(
+                event_1=event_lib.input_event(
                     [Feature(name="a", dtype=dtype_lib.FLOAT64)],
                     sampling=sampling,
                 ),
-                None,
-                None,
             )
 
 

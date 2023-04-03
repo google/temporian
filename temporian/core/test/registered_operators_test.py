@@ -25,10 +25,14 @@ class RegisteredOperatorsTest(absltest.TestCase):
         # Note: The operators are stored alphabetically.
         expected_operators = [
             "ARITHMETIC",
-            "ASSIGN",
+            "GLUE",
             "CALENDAR_DAY_OF_MONTH",
             "CALENDAR_DAY_OF_WEEK",
             "LAG",
+            "MOVING_COUNT",
+            "MOVING_STANDARD_DEVIATION",
+            "MOVING_SUM",
+            "PREFIX",
             "PROPAGATE",
             "SAMPLE",
             "SELECT",

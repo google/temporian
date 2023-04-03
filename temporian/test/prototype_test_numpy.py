@@ -98,12 +98,12 @@ class PrototypeTest(absltest.TestCase):
         )
 
     def test_prototype(self) -> None:
-        a = tp.assign(self.event_1, self.event_2)
-        # create and assign sum feature
+        a = tp.glue(self.event_1, self.event_2)
+        # create and glue sum feature
         # TODO: Restore when arithmetic operator is fixed.
-        # b = tp.assign(a, self.event_1 + self.event_2)
+        # b = tp.glue(a, self.event_1 + self.event_2)
         c = tp.lag(self.event_1, duration=1)
-        d = tp.assign(a, tp.sample(c, a))
+        d = tp.glue(a, tp.sample(c, a))
         output_event = d
 
         output_event_numpy = tp.evaluate(
@@ -112,13 +112,10 @@ class PrototypeTest(absltest.TestCase):
                 self.event_1: self.event_1_data,
                 self.event_2: self.event_2_data,
             },
-            # TODO: The assign operator has some issues with dtypes. Re-enable
+            # TODO: The glue operator has some issues with dtypes. Re-enable
             # checking when solved.
             check_execution=True,
         )
-
-        print(output_event_numpy)
-
         self.assertEqual(self.expected_output_event, output_event_numpy)
 
 

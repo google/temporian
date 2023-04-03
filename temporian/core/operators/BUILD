@@ -12,12 +12,12 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":arithmetic",
-        ":assign",
+        ":glue",
         ":lag",
         ":propagate",
         ":select",
-        ":simple_moving_average",
         ":sample",
+        ":prefix",
         "//temporian/core/operators/calendar:day_of_month",
         "//temporian/core/operators/calendar:day_of_week",
         "//temporian/core/operators/calendar:day_of_year",
@@ -27,6 +27,10 @@ py_library(
         "//temporian/core/operators/calendar:month",
         "//temporian/core/operators/calendar:second",
         "//temporian/core/operators/calendar:year",
+        "//temporian/core/operators/window:moving_count",
+        "//temporian/core/operators/window:moving_standard_deviation",
+        "//temporian/core/operators/window:moving_sum",
+        "//temporian/core/operators/window:simple_moving_average",
     ],
 )
 
@@ -44,8 +48,8 @@ py_library(
 )
 
 py_library(
-    name = "assign",
-    srcs = ["assign.py"],
+    name = "glue",
+    srcs = ["glue.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
@@ -95,20 +99,6 @@ py_library(
 )
 
 py_library(
-    name = "simple_moving_average",
-    srcs = ["simple_moving_average.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":base",
-        "//temporian/core:operator_lib",
-        "//temporian/core/data:duration",
-        "//temporian/core/data:event",
-        "//temporian/core/data:feature",
-        "//temporian/proto:core_py_proto",
-    ],
-)
-
-py_library(
     name = "propagate",
     srcs = ["propagate.py"],
     srcs_version = "PY3",
@@ -126,6 +116,21 @@ py_library(
 py_library(
     name = "sample",
     srcs = ["sample.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        ":select",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:duration",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "prefix",
+    srcs = ["prefix.py"],
     srcs_version = "PY3",
     deps = [
         ":base",

@@ -40,13 +40,25 @@ class Feature(object):
             f" sampling={sampling} instead."
         )
 
+        if dtype not in dtype_lib.ALL_TYPES:
+            raise ValueError(
+                f"Invalid dtype feature constructor. Got {dtype}. "
+                f"Expecting one of {dtype_lib.ALL_TYPES} instead."
+            )
+
         self._name = name
         self._sampling = sampling
         self._dtype = dtype
         self._creator = creator
 
     def __repr__(self):
-        return f"Feature<name:{self._name},dtype:{self._dtype},sampling:{self._sampling},creator:{self.creator()},id:{id(self)}>"
+        return (
+            f"name: {self._name}\n"
+            f"  dtype: {self._dtype}\n"
+            f"  sampling: {self._sampling}\n"
+            f"  creator: {self.creator()}\n"
+            f"  id: {id(self)}"
+        )
 
     def name(self) -> str:
         return self._name

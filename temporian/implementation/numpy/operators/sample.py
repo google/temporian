@@ -12,14 +12,15 @@ from temporian.core.operators.sample import Sample
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy_cc.operators import sample as sample_cc
 from temporian.core.data import dtype
+from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
-class SampleNumpyImplementation:
+class SampleNumpyImplementation(OperatorImplementation):
     """Numpy implementation for the Sample operator."""
 
     def __init__(self, operator: Sample) -> None:
         assert isinstance(operator, Sample)
-        self._operator = operator
+        super().__init__(operator)
 
     def __call__(
         self, event: NumpyEvent, sampling: NumpyEvent
@@ -43,9 +44,9 @@ class SampleNumpyImplementation:
             sampling_timestamps = sampling.sampling.data[index]
 
             (
-                sampling_indices,
-                first_valid_indice,
-            ) = sample_cc.build_sampling_indices(
+                sampling_idxs,
+                first_valid_idx,
+            ) = sample_cc.build_sampling_idxs(
                 src_timestamps, sampling_timestamps
             )
 
@@ -59,8 +60,8 @@ class SampleNumpyImplementation:
                     fill_value=output_missing_value,
                     dtype=output_np_dtype,
                 )
-                dst_ts_data[first_valid_indice:] = src_ts.data[
-                    sampling_indices[first_valid_indice:]
+                dst_ts_data[first_valid_idx:] = src_ts.data[
+                    sampling_idxs[first_valid_idx:]
                 ]
 
                 dst_mts.append(NumpyFeature(src_ts.name, dst_ts_data))

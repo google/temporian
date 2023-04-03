@@ -19,7 +19,13 @@ DTYPE_MAPPING = {
 }
 
 DTYPE_REVERSE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
-DTYPE_REVERSE_MAPPING[dtype.STRING] = np.string_
+DTYPE_REVERSE_MAPPING[dtype.STRING] = np.str_
+
+# Maximum of printed index when calling repr(event)
+MAX_NUM_PRINTED_INDEX = 5
+
+# Maximum of printed features when calling repr(event)
+MAX_NUM_PRINTED_FEATURES = 10
 
 
 def dtype_to_np_dtype(src: dtype.DType) -> Any:
@@ -33,14 +39,14 @@ class NumpyFeature:
                 "NumpyFeatures can only be created from flat arrays. Passed"
                 f" input's shape: {len(data.shape)}"
             )
-
-        if data.dtype.type is np.string_:
+        if data.dtype.type is np.str_ or data.dtype.type is np.string_:
             self.dtype: dtype.DType = dtype.STRING
         else:
             if data.dtype.type not in DTYPE_MAPPING:
                 raise ValueError(
-                    f"Unsupported dtype {data.dtype} for NumpyFeature."
-                    f" Supported dtypes: {DTYPE_MAPPING.keys(), np.string_}"
+                    f"Unsupported dtype {data.dtype} for NumpyFeature: {name}."
+                    f" Supported dtypes: {DTYPE_MAPPING.keys()}, np.str_ and "
+                    "np.string_"
                 )
             self.dtype: dtype.DType = DTYPE_MAPPING[data.dtype.type]
 
@@ -180,17 +186,24 @@ class NumpyEvent:
 
         # check column dtypes, every dtype should be a key of DTYPE_MAPPING
         for column in df.columns:
-            # if dtype is object, convert to string
+            # if dtype is object, check if it only contains string values
             if df[column].dtype.type is np.object_:
-                try:
-                    df[column] = df[column].astype(np.string_)
-                except ValueError as exc:
+                if not df[column].apply(lambda x: isinstance(x, str)).all():
                     raise ValueError(
-                        f"Column {column} has dtype object, but cannot be"
-                        " converted to string."
-                    ) from exc
+                        "Object columns are only allowed if they contain only"
+                        " string values"
+                    )
+                # convert object column to np.string_
+                df[column] = df[column].astype("string")
 
-            elif df[column].dtype.type not in DTYPE_MAPPING:
+            # convert pandas' StringDtype to np.string_
+            elif df[column].dtype.type is np.string_:
+                df[column] = df[column].str.decode("utf-8").astype("string")
+
+            elif (
+                df[column].dtype.type not in DTYPE_MAPPING
+                and df[column].dtype.type is not str
+            ):
                 raise ValueError(
                     f"Unsupported dtype {df[column].dtype} for column"
                     f" {column}. Supported dtypes: {DTYPE_MAPPING.keys()}"
@@ -222,10 +235,17 @@ class NumpyEvent:
                     group = (group,)
 
                 sampling[group] = timestamp
+
                 data[group] = [
-                    NumpyFeature(feature, columns[feature].to_numpy())
+                    NumpyFeature(
+                        feature,
+                        columns[feature].to_numpy(
+                            dtype=columns[feature].dtype.type
+                        ),
+                    )
                     for feature in feature_columns
                 ]
+
         # The user did not provide an index
         else:
             timestamp = df[timestamp_column].to_numpy()
@@ -261,8 +281,12 @@ class NumpyEvent:
             data["timestamp"].extend(timestamps)
             for feature in features:
                 data[feature.name].extend(feature.data)
-            for index_key in self.sampling.index:
-                data[index_key].extend(index * len(timestamps))
+
+            if not isinstance(index, tuple):
+                index = (index,)
+
+            for i, index_key in enumerate(self.sampling.index):
+                data[index_key].extend([index[i]] * len(timestamps))
 
         # Converting dictionary to pandas DataFrame
         df = pd.DataFrame(data)
@@ -273,23 +297,30 @@ class NumpyEvent:
         def repr_features(features: list[NumpyFeature]) -> str:
             """Repr for a list of features."""
 
-            return "\n".join(
-                [f"{f.name} <{f.dtype}>: {f.data}" for f in features]
-            )
+            feature_repr = []
+            for idx, f in enumerate(features):
+                if idx > MAX_NUM_PRINTED_FEATURES:
+                    feature_repr.append("...")
+                    break
+                feature_repr.append(f"{f.name} <{f.dtype}>: {f.data}")
+            return "\n".join(feature_repr)
 
         # Representation of the "data" field
-        data_repr = string.indent(
-            "\n".join(
-                f"{k}:\n{string.indent(repr_features(v))}"
-                for k, v in self.data.items()
-            ),
-            4,
-        )
+        with np.printoptions(precision=4, threshold=6):
+            data_repr = []
+            for idx, (k, v) in enumerate(self.data.items()):
+                if idx > MAX_NUM_PRINTED_INDEX:
+                    data_repr.append("...")
+                    break
+                data_repr.append(f"{k}:\n{string.indent(repr_features(v))}")
+            data_repr = string.indent("\n".join(data_repr))
 
         # Representation of the "sampling" field
-        sampling_repr = string.indent(self.sampling.__repr__(), 4)
+        sampling_repr = string.indent(self.sampling.__repr__())
 
-        return f"Event\n  data:\n{data_repr}\n  sampling:\n{sampling_repr}"
+        return (
+            f"data ({len(self.data)}):\n{data_repr}\nsampling:\n{sampling_repr}"
+        )
 
     def __eq__(self, __o: object) -> bool:
         if not isinstance(__o, NumpyEvent):
