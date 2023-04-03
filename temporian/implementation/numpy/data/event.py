@@ -35,6 +35,10 @@ class NumpyEvent:
     def sampling(self) -> NumpySampling:
         return self._sampling
 
+    @sampling.setter
+    def sampling(self, sampling: NumpySampling) -> None:
+        self._sampling = sampling
+
     def first_index_value(self) -> Tuple:
         if self.data is None or len(self.data) == 0:
             return None

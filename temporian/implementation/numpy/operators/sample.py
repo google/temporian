@@ -3,8 +3,8 @@
 from typing import Dict
 import numpy as np
 
-from temporian.implementation.numpy.data.event import (
-    NumpyEvent,
+from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.feature import (
     NumpyFeature,
     dtype_to_np_dtype,
 )
