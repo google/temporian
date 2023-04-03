@@ -27,7 +27,7 @@ class EventToDataFrameTest(absltest.TestCase):
                 (666964,): np.array([1.0, 2.0]),
                 (574016,): np.array([3.0]),
             },
-            index=["product_id"],
+            index={"product_id": np.int64},
         )
 
         numpy_event = NumpyEvent(
@@ -61,7 +61,7 @@ class EventToDataFrameTest(absltest.TestCase):
                 (666964,): np.array([1, 2]),
                 (574016,): np.array([3]),
             },
-            index=["product_id"],
+            index={"product_id": np.int64},
         )
 
         numpy_event = NumpyEvent(
@@ -94,7 +94,7 @@ class EventToDataFrameTest(absltest.TestCase):
             data={
                 (): np.array([1.0, 2.0, 3.0]),
             },
-            index=[],
+            index={},
         )
 
         numpy_event = NumpyEvent(
@@ -149,7 +149,7 @@ class EventToDataFrameTest(absltest.TestCase):
                 ],
             },
             sampling=NumpySampling(
-                index=["x", "y"],
+                index={"x": np.str_, "y": np.str_},
                 data={
                     ("X1", "Y1"): np.array([1.0, 2.0, 3.0], dtype=np.float64),
                     ("X2", "Y1"): np.array([1.1, 2.1, 3.1], dtype=np.float64),
@@ -184,7 +184,7 @@ class EventToDataFrameTest(absltest.TestCase):
                 (666964,): np.array([1.0, 2.0]),
                 (574016,): np.array([3.0]),
             },
-            index=["product_id"],
+            index={"product_id": np.int64},
         )
 
         numpy_event = NumpyEvent(

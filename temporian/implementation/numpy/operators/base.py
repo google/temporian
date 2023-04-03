@@ -1,9 +1,13 @@
 from abc import ABC, abstractmethod
-
 from typing import Dict
-from temporian.implementation.numpy.data.event import NumpyEvent
+
+import numpy as np
+
+from temporian.core.data import dtype as dtype_lib
 from temporian.core.data.event import Event
 from temporian.core.operators.base import Operator, OperatorExceptionDecorator
+from temporian.implementation.numpy.data.event import DTYPE_MAPPING
+from temporian.implementation.numpy.data.event import NumpyEvent
 
 
 class OperatorImplementation(ABC):
@@ -43,12 +47,17 @@ def _check_features(
     for key, item_def in definitions:
         item_real = values[key]
 
-        # Check sampling
-        if item_real.sampling.index != item_def.sampling().index():
+        # Check sampling. TODO: create .schema() NumpySampling method
+        if {
+            index_name: dtype_lib.STRING
+            if index_dtype is np.str_
+            else DTYPE_MAPPING[index_dtype]
+            for index_name, index_dtype in item_real.sampling.index.items()
+        } != item_def.sampling().index():
             raise RuntimeError(
                 f"Non matching {label} sampling. "
                 f"effective={item_real.sampling.index} vs "
-                f"expected={item_def.sampling().index()}"
+                f"expected={(item_def.sampling().index())}"
             )
         # Check features
         features = item_real._first_index_features
@@ -117,8 +126,13 @@ def _check_output(
         for output_key, output_def in operator.outputs().items():
             output_real = outputs[output_key]
 
-            # Check sampling
-            if output_real.sampling.index != output_def.sampling().index():
+            # Check sampling. TODO: create .schema() NumpySampling method
+            if {
+                index_name: dtype_lib.STRING
+                if index_dtype is np.str_
+                else DTYPE_MAPPING[index_dtype]
+                for index_name, index_dtype in output_real.sampling.index.items()
+            } != output_def.sampling().index():
                 raise RuntimeError(
                     f"Non matching sampling. {output_real.sampling.index} vs"
                     f" {output_def.sampling().index()}"

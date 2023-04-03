@@ -14,26 +14,31 @@
 
 """A sampling."""
 
-from typing import List, Optional, Any
+from typing import Any, Dict, Optional, Union
+
+from temporian.core.data import dtype as dtype_lib
+
+
+IndexDtypes = Union[dtype_lib.INT32, dtype_lib.INT64, dtype_lib.STRING]
 
 
 class Sampling(object):
     def __init__(
         self,
-        index: List[str],
+        index: Dict[str, IndexDtypes],
         creator: Optional[Any] = None,
         is_unix_timestamp: bool = False,
     ):
-        assert isinstance(index, list), f"Got {index}"
+        assert isinstance(index, dict), f"Got {index}"
 
-        self._index: List[str] = index
+        self._index: Dict[str, IndexDtypes] = index
         self._creator = creator
         self._is_unix_timestamp = is_unix_timestamp
 
     def __repr__(self):
         return f"Sampling<index:{self._index},id:{id(self)}>"
 
-    def index(self) -> List[str]:
+    def index(self) -> Dict[str, IndexDtypes]:
         return self._index
 
     def creator(self):

@@ -34,7 +34,7 @@ class PropagateOperatorTest(absltest.TestCase):
 
     def test_base(self):
         # Define input
-        sampling = Sampling(index=["x"])
+        sampling = Sampling(index={"x": dtype_lib.STRING})
         event = event_lib.input_event(
             [
                 feature_lib.Feature(name="a", dtype=dtype_lib.FLOAT64),
@@ -54,7 +54,7 @@ class PropagateOperatorTest(absltest.TestCase):
         # TODO: Use "from_dataframe" when it suppose sampling sharing.
 
         sampling = NumpySampling(
-            index=["x"],
+            index={"x": np.str_},
             data={
                 ("X1",): np.array([0.1, 0.2, 0.3], dtype=np.float64),
                 ("X2",): np.array([0.4, 0.5], dtype=np.float64),
@@ -91,7 +91,7 @@ class PropagateOperatorTest(absltest.TestCase):
 
         # Expected output
         expected_sampling = NumpySampling(
-            index=["x", "c", "d"],
+            index={"x": np.str_, "c": np.int64, "d": np.int64},
             data={
                 ("X1", 1, 1): np.array([0.1, 0.2, 0.3], dtype=np.float64),
                 ("X1", 1, 2): np.array([0.1, 0.2, 0.3], dtype=np.float64),

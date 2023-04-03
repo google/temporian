@@ -20,7 +20,7 @@ class EventTest(absltest.TestCase):
                 ],
             },
             sampling=NumpySampling(
-                index=["x"],
+                index={"x": np.int32},
                 data={
                     (1,): np.array([0.1, 0.2, 0.3]),
                     (2,): np.array([0.4, 0.5]),
@@ -38,7 +38,7 @@ class EventTest(absltest.TestCase):
         a <INT64>: [7 8]
         b <INT64>: [ 9 10]
 sampling:
-    index: ['x']
+    index: {'x': <class 'numpy.int32'>}
     data (2):
         (1,): [0.1 0.2 0.3]
         (2,): [0.4 0.5]

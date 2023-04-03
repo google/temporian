@@ -16,6 +16,7 @@ import numpy as np
 import pandas as pd
 from absl.testing import absltest
 
+from temporian.core.data import dtype as dtype_lib
 from temporian.core.data.event import Event, Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.arithmetic import (
@@ -62,7 +63,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
 
         self.numpy_event_2.sampling = self.numpy_event_1.sampling
 
-        self.sampling = Sampling(["store_id"])
+        self.sampling = Sampling({"store_id": dtype_lib.INT64})
         self.event_1 = Event(
             [Feature("sales", dtype_lib.FLOAT64)],
             sampling=self.sampling,

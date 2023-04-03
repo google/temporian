@@ -14,7 +14,6 @@
 
 from absl.testing import absltest
 
-import numpy as np
 import pandas as pd
 
 from temporian.core import evaluator
@@ -69,7 +68,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
 
         event = Event(
             [Feature("sales", dtype_lib.FLOAT64)],
-            sampling=Sampling(["store_id"]),
+            sampling=Sampling({"store_id": dtype_lib.INT64}),
             creator=None,
         )
 
@@ -211,7 +210,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
 
         event = Event(
             [Feature("sales", dtype_lib.FLOAT64)],
-            sampling=Sampling(["store_id"]),
+            sampling=Sampling({"store_id": dtype_lib.INT64}),
             creator=None,
         )
 

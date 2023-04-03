@@ -317,26 +317,26 @@ def _serialize_sampling(src: Sampling) -> pb.Sampling:
 
 
 def _unserialize_sampling(src: pb.Sampling) -> Sampling:
-    return Sampling(index=list(src.index), creator=None)
+    return Sampling(index=dict(src.index), creator=None)
 
 
-def _serialize_dtype(dtype) -> pb.Feature.DType:
+def _serialize_dtype(dtype) -> pb.DType:
     if dtype not in DTYPE_MAPPING:
         raise ValueError(f"Non supported type {dtype}")
     return DTYPE_MAPPING[dtype]
 
 
-def _unserialize_dtype(dtype: pb.Feature.DType):
+def _unserialize_dtype(dtype: pb.DType):
     if dtype not in INV_DTYPE_MAPPING:
         raise ValueError(f"Non supported type {dtype}")
     return INV_DTYPE_MAPPING[dtype]
 
 
 DTYPE_MAPPING = {
-    dtype_lib.FLOAT64: pb.Feature.DType.FLOAT64,
-    dtype_lib.FLOAT32: pb.Feature.DType.FLOAT32,
-    dtype_lib.INT64: pb.Feature.DType.INT64,
-    dtype_lib.INT32: pb.Feature.DType.INT32,
+    dtype_lib.FLOAT64: pb.DType.FLOAT64,
+    dtype_lib.FLOAT32: pb.DType.FLOAT32,
+    dtype_lib.INT64: pb.DType.INT64,
+    dtype_lib.INT32: pb.DType.INT32,
 }
 INV_DTYPE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
 

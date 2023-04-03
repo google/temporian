@@ -40,7 +40,7 @@ class OperatorTest(absltest.TestCase):
                 raise NotImplementedError()
 
         def build_fake_event():
-            return Event(features=[], sampling=Sampling(index=[]), creator=None)
+            return Event(features=[], sampling=Sampling(index={}), creator=None)
 
         t = ToyOperator()
         with self.assertRaisesRegex(ValueError, 'Missing input "input"'):

@@ -14,9 +14,10 @@
 
 """An event is a collection (possibly empty) of timesampled feature values."""
 
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 
 from temporian.core.data.feature import Feature
+from temporian.core.data.sampling import IndexDtypes
 from temporian.core.data.sampling import Sampling
 from temporian.utils import string
 
@@ -97,7 +98,7 @@ class Event(object):
 
 def input_event(
     features: List[Feature],
-    index: List[str] = [],
+    index: Dict[str, IndexDtypes] = {},
     name: Optional[str] = None,
     sampling: Optional[Sampling] = None,
 ) -> Event:

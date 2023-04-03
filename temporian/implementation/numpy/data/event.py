@@ -112,7 +112,13 @@ class NumpyEvent:
                 feature.schema() for feature in list(self.data.values())[0]
             ],
             sampling=Sampling(
-                index=self.sampling.index,
+                index={
+                    # TODO: create .schema() NumpySampling method
+                    index_name: dtype.STRING
+                    if index_dtype is np.str_
+                    else DTYPE_MAPPING[index_dtype]
+                    for index_name, index_dtype in self.sampling.index.items()
+                },
                 is_unix_timestamp=self.sampling.is_unix_timestamp,
             ),
         )
@@ -256,7 +262,12 @@ class NumpyEvent:
             ]
 
         numpy_sampling = NumpySampling(
-            index=index_names,
+            index={
+                index_name: df.dtypes[index_name].type
+                if df.dtypes[index_name].type is not str
+                else np.str_
+                for index_name in index_names
+            },
             data=sampling,
             is_unix_timestamp=is_unix_timestamp,
         )
@@ -272,7 +283,7 @@ class NumpyEvent:
         # Creating an empty dictionary to store the data
         data = {}
 
-        columns = self.sampling.index + self.feature_names + ["timestamp"]
+        columns = list(self.sampling.index) + self.feature_names + ["timestamp"]
         for column_name in columns:
             data[column_name] = []
 

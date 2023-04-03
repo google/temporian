@@ -1,4 +1,4 @@
-from typing import Dict, List, Tuple
+from typing import Dict, Tuple
 
 import numpy as np
 
@@ -11,10 +11,11 @@ MAX_NUM_PRINTED_INDEX = 5
 class NumpySampling:
     def __init__(
         self,
-        index: List[str],
+        index: Dict[str, np.dtype],
         data: Dict[Tuple, np.ndarray],
         is_unix_timestamp: bool = False,
     ) -> None:
+        assert isinstance(index, dict)
         self.index = index
         self.data = data
         self.is_unix_timestamp = is_unix_timestamp

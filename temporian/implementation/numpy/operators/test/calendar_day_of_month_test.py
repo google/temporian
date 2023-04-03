@@ -123,7 +123,7 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
         sampling.
         """
         input_event = Event(
-            features=[], sampling=Sampling(index=[], is_unix_timestamp=False)
+            features=[], sampling=Sampling(index={}, is_unix_timestamp=False)
         )
         with self.assertRaises(ValueError):
             CalendarDayOfMonthOperator(input_event)

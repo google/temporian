@@ -3,9 +3,10 @@
 
 from typing import Dict
 
+from temporian.core.operators.propagate import Propagate
+from temporian.implementation.numpy.data.event import DTYPE_REVERSE_MAPPING
 from temporian.implementation.numpy.data.event import NumpyEvent, NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
-from temporian.core.operators.propagate import Propagate
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
@@ -21,11 +22,14 @@ class PropagateNumpyImplementation(OperatorImplementation):
         self, event: NumpyEvent, to: NumpyEvent
     ) -> Dict[str, NumpyEvent]:
         # All the features of "to" are added as part of the new index.
-        added_index = self._operator.added_index()
+        added_index = {
+            index_name: DTYPE_REVERSE_MAPPING[index_dtype]
+            for index_name, index_dtype in self._operator.added_index().items()
+        }
         num_new_index = len(added_index)
 
         dst_sampling = NumpySampling(
-            index=event.sampling.index + added_index, data={}
+            index={**event.sampling.index, **added_index}, data={}
         )
         dst_event = NumpyEvent(data={}, sampling=dst_sampling)
 

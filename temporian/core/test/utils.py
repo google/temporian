@@ -68,7 +68,7 @@ class OpI1O1(base.Operator):
                         creator=self,
                     ),
                 ],
-                sampling=Sampling(index=[], creator=self),
+                sampling=Sampling(index={}, creator=self),
                 creator=self,
             ),
         )

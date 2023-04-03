@@ -46,10 +46,10 @@ class Propagate(Operator):
         if len(to.features()) == 0:
             raise ValueError("to contains no features")
 
-        self._added_index = [k.name() for k in to.features()]
+        self._added_index = {k.name(): k.dtype() for k in to.features()}
 
         overlap_features = set(self._added_index).intersection(
-            event.sampling().index()
+            set(event.sampling().index())
         )
         if len(overlap_features) > 0:
             raise ValueError(
@@ -57,7 +57,7 @@ class Propagate(Operator):
                 f" index: {list(overlap_features)}"
             )
 
-        new_index = event.sampling().index() + self._added_index
+        new_index = {**event.sampling().index(), **self._added_index}
         sampling = Sampling(index=new_index, creator=self)
 
         output_features = [  # pylint: disable=g-complex-comprehension

@@ -92,6 +92,15 @@ message Event {
   optional string creator_operator_id = 5;
 }
 
+// Data types for Features and Samplings
+enum DType {
+  UNDEFINED = 0;
+  FLOAT64 = 1;
+  INT64 = 2;
+  FLOAT32 = 3;
+  INT32 = 4;
+}
+
 // Schema of a feature
 message Feature {
   // Identifier of the feature. Should be unique in all the features in the
@@ -106,14 +115,6 @@ message Feature {
   optional string sampling_id = 4;
 
   optional string creator_operator_id = 5;
-
-  enum DType {
-    UNDEFINED = 0;
-    FLOAT64 = 1;
-    INT64 = 2;
-    FLOAT32 = 3;
-    INT32 = 4;
-  }
 }
 
 // Schema of a sampling.
@@ -123,7 +124,7 @@ message Sampling {
   optional string id = 1;
 
   // Index of the sampling.
-  repeated string index = 2;
+  map<string, DType> index = 2;
 
   // Index of the event id who's operator creator also created this feature.
   optional string creator_operator_id = 3;

@@ -28,7 +28,7 @@ class PropagateOperatorTest(absltest.TestCase):
         pass
 
     def test_basic(self):
-        sampling = Sampling(index=["x"])
+        sampling = Sampling(index={"x": dtype_lib.STRING})
         event = event_lib.input_event(
             [
                 Feature("a", dtype_lib.FLOAT64),
@@ -46,7 +46,7 @@ class PropagateOperatorTest(absltest.TestCase):
         _ = propagate(event=event, to=to)
 
     def test_str_add_event(self):
-        sampling = Sampling(index=["x"])
+        sampling = Sampling(index={"x": dtype_lib.STRING})
         event = event_lib.input_event(
             [
                 Feature("a", dtype_lib.FLOAT64),
@@ -59,7 +59,7 @@ class PropagateOperatorTest(absltest.TestCase):
         _ = propagate(event=event, to=["c", "d"])
 
     def test_error_unknown_to(self):
-        sampling = Sampling(index=["x"])
+        sampling = Sampling(index={"x": dtype_lib.STRING})
         event = event_lib.input_event(
             [
                 Feature("a", dtype_lib.FLOAT64),
@@ -72,7 +72,7 @@ class PropagateOperatorTest(absltest.TestCase):
             _ = propagate(event=event, to=["c2"])
 
     def test_error_empty_to(self):
-        sampling = Sampling(index=["x"])
+        sampling = Sampling(index={"x": dtype_lib.STRING})
         event = event_lib.input_event(
             [
                 Feature("a", dtype_lib.FLOAT64),
@@ -90,14 +90,14 @@ class PropagateOperatorTest(absltest.TestCase):
                 Feature("a", dtype_lib.FLOAT64),
                 Feature("b", dtype_lib.FLOAT64),
             ],
-            sampling=Sampling(index=["x"]),
+            sampling=Sampling(index={"x": dtype_lib.STRING}),
         )
         to = event_lib.input_event(
             [
                 Feature("c", dtype_lib.STRING),
                 Feature("d", dtype_lib.STRING),
             ],
-            sampling=Sampling(index=["x"]),
+            sampling=Sampling(index={"x": dtype_lib.STRING}),
         )
         with self.assertRaisesRegex(
             ValueError, "event and to should have the same sampling"
