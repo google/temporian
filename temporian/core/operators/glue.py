@@ -52,19 +52,18 @@ class GlueOperator(Operator):
         first_sampling = None
         for key, event in dict_events.items():
             self.add_input(key, event)
-            output_features.extend(event.features())
+            output_features.extend(event.features)
 
-            for f in event.features():
-                if f.name() in feature_names:
+            for f in event.features:
+                if f.name in feature_names:
                     raise ValueError(
-                        f"Feature {f.name()} is defined in multiple "
-                        "input events."
+                        f"Feature {f.name} is defined in multiple input events."
                     )
-                feature_names.add(f.name())
+                feature_names.add(f.name)
 
             if first_sampling is None:
-                first_sampling = event.sampling()
-            elif event.sampling() is not first_sampling:
+                first_sampling = event.sampling
+            elif event.sampling is not first_sampling:
                 raise ValueError(
                     "All the events do not have the same sampling."
                 )

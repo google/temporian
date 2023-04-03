@@ -132,18 +132,18 @@ def unserialize(src: pb.Processor) -> processor.Preprocessor:
 
     for src_event in src.events:
         if src_event.creator_operator_id:
-            events[src_event.id].set_creator(
-                get_creator(src_event.creator_operator_id)
+            events[src_event.id].creator = get_creator(
+                src_event.creator_operator_id
             )
     for src_feature in src.features:
         if src_feature.creator_operator_id:
-            features[src_feature.id].set_creator(
-                get_creator(src_feature.creator_operator_id)
+            features[src_feature.id].creator = get_creator(
+                src_feature.creator_operator_id
             )
     for src_sampling in src.samplings:
         if src_sampling.creator_operator_id:
-            samplings[src_sampling.id].set_creator(
-                get_creator(src_sampling.creator_operator_id)
+            samplings[src_sampling.id].creator = get_creator(
+                src_sampling.creator_operator_id
             )
 
     # Copy extracted items.
@@ -252,11 +252,11 @@ def _unserialize_operator(
 def _serialize_event(src: Event) -> pb.Event:
     return pb.Event(
         id=_identifier(src),
-        sampling_id=_identifier(src.sampling()),
-        feature_ids=[_identifier(f) for f in src.features()],
-        name=src.name(),
+        sampling_id=_identifier(src.sampling),
+        feature_ids=[_identifier(f) for f in src.features],
+        name=src.name,
         creator_operator_id=(
-            _identifier(src.creator()) if src.creator() is not None else None
+            _identifier(src.creator) if src.creator is not None else None
         ),
     )
 
@@ -283,11 +283,11 @@ def _unserialize_event(
 def _serialize_feature(src: Feature) -> pb.Feature:
     return pb.Feature(
         id=_identifier(src),
-        name=src.name(),
-        dtype=_serialize_dtype(src.dtype()),
-        sampling_id=_identifier(src.sampling()),
+        name=src.name,
+        dtype=_serialize_dtype(src.dtype),
+        sampling_id=_identifier(src.sampling),
         creator_operator_id=(
-            _identifier(src.creator()) if src.creator() is not None else None
+            _identifier(src.creator) if src.creator is not None else None
         ),
     )
 
@@ -309,9 +309,9 @@ def _unserialize_feature(
 def _serialize_sampling(src: Sampling) -> pb.Sampling:
     return pb.Sampling(
         id=_identifier(src),
-        index=src.index(),
+        index=src.index,
         creator_operator_id=(
-            _identifier(src.creator()) if src.creator() is not None else None
+            _identifier(src.creator) if src.creator is not None else None
         ),
     )
 

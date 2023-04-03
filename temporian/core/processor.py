@@ -35,13 +35,13 @@ def normalize_multiple_event_arg(src: MultipleEventArg) -> Dict[str, Event]:
     if isinstance(src, list):
         new_src = {}
         for event in src:
-            if event.name() is None:
+            if event.name is None:
                 raise ValueError(
                     "Input / output event or list events need to be named "
-                    'with "set_name(...)". Alternatively, provide a '
+                    'with "event.name = ...". Alternatively, provide a '
                     "dictionary of events."
                 )
-            new_src[event.name()] = event
+            new_src[event.name] = event
         src = new_src
 
     if not isinstance(src, dict):
@@ -103,11 +103,11 @@ class Preprocessor(object):
         return {
             feature
             for event in self.inputs().values()
-            for feature in event.features()
+            for feature in event.features
         }
 
     def input_samplings(self) -> Set[Sampling]:
-        return {event.sampling() for event in self.inputs().values()}
+        return {event.sampling for event in self.inputs().values()}
 
     def __repr__(self):
         s = "Preprocessor\n============\n"
@@ -202,16 +202,16 @@ def infer_processor(
             # The feature is provided by the user.
             continue
 
-        if event.creator() is None:
+        if event.creator is None:
             # The event does not have a source.
             missing_events.add(event)
             continue
 
         # Record the operator.
-        p.add_operator(event.creator())
+        p.add_operator(event.creator)
 
         # Add the parent events to the pending list.
-        for input_event in event.creator().inputs().values():
+        for input_event in event.creator.inputs().values():
             if input_event in done_events:
                 # Already processed.
                 continue
@@ -220,16 +220,16 @@ def infer_processor(
 
         # Record the operator outputs. While the user did not request
         # them, they will be created (and so, we need to track them).
-        for output_event in event.creator().outputs().values():
+        for output_event in event.creator.outputs().values():
             p.add_event(output_event)
 
     if inputs is None:
         # Infer the inputs
         infered_inputs: Dict[str, Event] = {}
         for event in missing_events:
-            if event.name() is None:
+            if event.name is None:
                 raise ValueError(f"Cannot infer input on unnamed event {event}")
-            infered_inputs[event.name()] = event
+            infered_inputs[event.name] = event
         p.set_inputs(infered_inputs)
 
     else:
@@ -242,8 +242,8 @@ def infer_processor(
 
     # Record all the features and samplings.
     for e in p.events():
-        p.add_sampling(e.sampling())
-        for f in e.features():
+        p.add_sampling(e.sampling)
+        for f in e.features:
             p.add_feature(f)
 
     return p

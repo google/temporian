@@ -79,9 +79,9 @@ class Feature(object):
         return self._creator
 
     @sampling.setter
-    def set_sampling(self, sampling: Optional[Sampling]):
+    def sampling(self, sampling: Optional[Sampling]):
         self._sampling = sampling
 
     @creator.setter
-    def set_creator(self, creator: Optional[Operator]):
+    def creator(self, creator: Optional[Operator]):
         self._creator = creator

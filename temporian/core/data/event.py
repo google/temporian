@@ -95,11 +95,11 @@ class Event(object):
         return self._creator
 
     @name.setter
-    def set_name(self, name: str):
+    def name(self, name: str):
         self._name = name
 
     @creator.setter
-    def set_creator(self, creator: Optional[Operator]):
+    def creator(self, creator: Optional[Operator]):
         self._creator = creator
 
 
@@ -117,7 +117,7 @@ def input_event(
             raise ValueError(
                 "Cannot call input_event on already linked features."
             )
-        feature.set_sampling(sampling)
+        feature.sampling = sampling
 
     return Event(
         features=features,

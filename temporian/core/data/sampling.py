@@ -51,5 +51,5 @@ class Sampling(object):
         return self._is_unix_timestamp
 
     @creator.setter
-    def set_creator(self, creator: Optional[Operator]):
+    def creator(self, creator: Optional[Operator]):
         self._creator = creator

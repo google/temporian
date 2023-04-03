@@ -32,7 +32,7 @@ def plot(
     """Plots an event.
 
     Args:
-        index: The index of the event to plot. Use 'event.index()' for the
+        index: The index of the event to plot. Use 'event.index' for the
             list of available indices. If index=None, select arbitrarily
             (non deterministically) an index to plot.
         backend: Plotting library to use.
@@ -85,7 +85,7 @@ def _plot_matplotlib(events: List[NumpyEvent], index: tuple, options: Options):
         if index not in event.data:
             raise ValueError(
                 f"Index '{index}' does not exist in event. Check the available"
-                " indexes with 'event.index()' and provide one of those index"
+                " indexes with 'event.index' and provide one of those index"
                 " to the 'index' argument of 'plot'. Alternatively, set "
                 '"index=None" to select a random index value (e.g., '
                 f"{event._first_index_value}."

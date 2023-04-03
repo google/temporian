@@ -44,21 +44,21 @@ class BaseWindowOperator(Operator, ABC):
 
         if sampling is not None:
             self.add_input("sampling", sampling)
-            effective_sampling = sampling.sampling()
+            effective_sampling = sampling.sampling
         else:
-            effective_sampling = event.sampling()
+            effective_sampling = event.sampling
 
         self.add_input("event", event)
 
         # TODO: Remve auto prefix
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=f"{self.prefix}_{f.name()}",
+                name=f"{self.prefix}_{f.name}",
                 dtype=self.get_feature_dtype(f),
                 sampling=effective_sampling,
                 creator=self,
             )
-            for f in event.features()
+            for f in event.features
         ]
 
         # output

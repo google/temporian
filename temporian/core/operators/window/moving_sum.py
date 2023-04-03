@@ -46,7 +46,7 @@ class MovingSumOperator(BaseWindowOperator):
         Returns:
             str: The dtype of the output feature.
         """
-        return feature.dtype()
+        return feature.dtype
 
 
 operator_lib.register_operator(MovingSumOperator)

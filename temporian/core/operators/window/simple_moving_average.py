@@ -48,7 +48,7 @@ class SimpleMovingAverageOperator(BaseWindowOperator):
         Returns:
             str: The dtype of the output feature.
         """
-        return FLOAT32 if feature.dtype() == FLOAT32 else FLOAT64
+        return FLOAT32 if feature.dtype == FLOAT32 else FLOAT64
 
 
 operator_lib.register_operator(SimpleMovingAverageOperator)

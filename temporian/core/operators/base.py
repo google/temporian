@@ -152,7 +152,7 @@ class Operator(ABC):
         matches: list[tuple[str, str]] = []
         for output_key, output_value in self._outputs.items():
             for input_key, input_value in self._inputs.items():
-                if output_value.sampling() is input_value.sampling():
+                if output_value.sampling is input_value.sampling:
                     matches.append((input_key, output_key))
 
         return matches

@@ -40,38 +40,38 @@ def _check_features(
     # TODO: Check that the index and features have the same number of
     # observations.
 
-    for key, item_def in definitions:
+    for key, item_def in definitions.items():
         item_real = values[key]
 
         # Check sampling
-        if item_real.sampling.index != item_def.sampling().index():
+        if item_real.sampling.index != item_def.sampling.index:
             raise RuntimeError(
                 f"Non matching {label} sampling. "
                 f"effective={item_real.sampling.index} vs "
-                f"expected={item_def.sampling().index()}"
+                f"expected={item_def.sampling.index}"
             )
         # Check features
         features = item_real._first_index_features
 
-        if len(item_def.features()) != len(features):
+        if len(item_def.features) != len(features):
             raise RuntimeError(
                 f"Non matching number of {label} features. "
-                f"expected={len(item_def.features())} vs "
+                f"expected={len(item_def.features)} vs "
                 f"effective={len(features)}"
             )
 
-        for feature_def, feature in zip(item_def.features(), features):
-            if feature_def.name() != feature.name:
+        for feature_def, feature in zip(item_def.features, features):
+            if feature_def.name != feature.name:
                 raise RuntimeError(
                     f"Non matching {label} feature name. "
-                    f"expected={feature_def.name()} vs "
+                    f"expected={feature_def.name} vs "
                     f"effective={feature.name}"
                 )
 
-            if feature_def.dtype() != feature.dtype:
+            if feature_def.dtype != feature.dtype:
                 raise RuntimeError(
                     f"Non matching {label} feature dtype. "
-                    f"expected={feature_def.dtype()} vs "
+                    f"expected={feature_def.dtype} vs "
                     f"effective={feature.dtype}"
                 )
 
@@ -92,9 +92,7 @@ def _check_input(
                 f"{effective_input_keys} vs {expected_input_keys}"
             )
 
-        _check_features(
-            inputs, definitions=operator.inputs().items(), label="input"
-        )
+        _check_features(inputs, definitions=operator.inputs(), label="input")
 
 
 def _check_output(
@@ -118,10 +116,10 @@ def _check_output(
             output_real = outputs[output_key]
 
             # Check sampling
-            if output_real.sampling.index != output_def.sampling().index():
+            if output_real.sampling.index != output_def.sampling.index:
                 raise RuntimeError(
                     f"Non matching sampling. {output_real.sampling.index} vs"
-                    f" {output_def.sampling().index()}"
+                    f" {output_def.sampling.index}"
                 )
 
             # TODO: Check copy or referencing of feature data.
@@ -164,5 +162,5 @@ def _check_output(
 
         # Check features
         _check_features(
-            outputs, definitions=operator.outputs().items(), label="outputs"
+            outputs, definitions=operator.outputs(), label="outputs"
         )

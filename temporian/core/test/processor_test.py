@@ -94,10 +94,10 @@ class ProcessorTest(absltest.TestCase):
         """Infer automatically the input."""
 
         i1 = utils.create_input_event()
-        i1.set_name("io_input_1")
+        i1.name = "io_input_1"
         o2 = utils.OpI1O1(i1)
         i3 = utils.create_input_event()
-        i3.set_name("io_input_2")
+        i3.name = "io_input_2"
         o4 = utils.OpI2O1(o2.outputs()["output"], i3)
         o5 = utils.OpI1O2(o4.outputs()["output"])
 
@@ -131,7 +131,7 @@ class ProcessorTest(absltest.TestCase):
         """Automated inference when the input is the same as the output."""
 
         i1 = utils.create_input_event()
-        i1.set_name("io_1")
+        i1.name = "io_1"
 
         p = processor.infer_processor(None, {"io_2": i1})
 

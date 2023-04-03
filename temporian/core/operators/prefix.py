@@ -40,19 +40,19 @@ class Prefix(Operator):
         # new one.
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=prefix + f.name(),
-                dtype=f.dtype(),
-                sampling=event.sampling(),
+                name=prefix + f.name,
+                dtype=f.dtype,
+                sampling=event.sampling,
                 creator=self,
             )
-            for f in event.features()
+            for f in event.features
         ]
 
         self.add_output(
             "event",
             Event(
                 features=output_features,
-                sampling=event.sampling(),
+                sampling=event.sampling,
                 creator=self,
             ),
         )
