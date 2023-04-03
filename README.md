@@ -120,17 +120,12 @@ bazel test //...:all
 Time and memory benchmarking is available through the following commands:
 
 ```shell
-bazel run benchmark:time -- --foo=bar
-bazel run benchmark:memory -- --foo=bar
+bazel run benchmark:time
+bazel run benchmark:memory
+bazel run benchmark:memory -- -p
 ```
 
-Some tips:
-
--   Flags passed after `--` are forwarded to the [time](benchmark/time.sh) and
-    [memory](benchmark/memory.sh) benchmark scripts
--   Use `@profile` decorator wrapping any function (in one of the benchmark
-    scripts or wherever in the codebase) for it to be analyzed line-by-line. No
-    need to import it. **Remove them from the codebase after you're done.**
+`-p` flag displays memory over time plot instead of line-by-line memory consumption.
 
 ## Credits
 

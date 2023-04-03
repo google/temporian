@@ -37,7 +37,6 @@ STORE, PRODUCT, TIMESTAMP, SALES, COSTS = (
 )
 
 
-@profile
 def main():
     print(f"Running basic benchmark with N={N}...")
 
