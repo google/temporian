@@ -21,7 +21,11 @@ from absl import flags
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string("operator", "Jane Random", "Name of the operator")
+flags.DEFINE_string(
+    "operator",
+    "my_new_operator",
+    "Name of the operator. Show be lower-case with _.",
+)
 
 
 def licence():
