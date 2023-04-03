@@ -117,12 +117,20 @@ bazel test //...:all
 
 ## Benchmarking
 
-Basic time and memory benchmaking is available through the following commands:
+Time and memory benchmarking is available through the following commands:
 
 ```shell
-bazel run benchmark:time
-bazel run benchmark:memory
+bazel run benchmark:time -- --foo=bar
+bazel run benchmark:memory -- --foo=bar
 ```
+
+Some tips:
+
+-   Flags passed after `--` are forwarded to the [time](benchmark/time.sh) and
+    [memory](benchmark/memory.sh) benchmark scripts
+-   Use `@profile` decorator wrapping any function (in one of the benchmark
+    scripts or wherever in the codebase) for it to be analyzed line-by-line. No
+    need to import it. **Remove them from the codebase after you're done.**
 
 ## Credits
 
