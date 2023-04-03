@@ -49,7 +49,7 @@ def plot(
         events = [event]
 
     if index is None and len(events) > 0:
-        index = events[0]._first_index_value
+        index = events[0].first_index_value()
 
     if not isinstance(index, tuple):
         index = (index,)
@@ -88,9 +88,9 @@ def _plot_matplotlib(events: List[NumpyEvent], index: tuple, options: Options):
                 " indexes with 'event.index' and provide one of those index"
                 " to the 'index' argument of 'plot'. Alternatively, set "
                 '"index=None" to select a random index value (e.g., '
-                f"{event._first_index_value}."
+                f"{event.first_index_value()}."
             )
-        num_features = len(event.feature_names)
+        num_features = len(event.feature_names())
         if num_features == 0:
             # We plot the sampling
             num_features = 1
@@ -107,7 +107,7 @@ def _plot_matplotlib(events: List[NumpyEvent], index: tuple, options: Options):
 
     plot_idx = 0
     for event in events:
-        feature_names = event.feature_names
+        feature_names = event.feature_names()
 
         xs = event.sampling.data[index]
         if options.max_points is not None and len(xs) > options.max_points:

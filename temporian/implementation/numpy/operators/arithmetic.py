@@ -18,7 +18,7 @@ from temporian.core.operators.arithmetic import ArithmeticOperation
 from temporian.core.operators.arithmetic import ArithmeticOperator
 from temporian.core.operators.arithmetic import Resolution
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.event import NumpyFeature
+from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 

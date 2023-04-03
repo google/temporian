@@ -215,7 +215,7 @@ def _unserialize_operator(
     attribute_args = {x.key: _attribute_from_proto(x) for x in src.attributes}
 
     # We construct the operator.
-    op = operator_class(**input_args, **attribute_args)
+    op: base.Operator = operator_class(**input_args, **attribute_args)
 
     # Check that the operator signature matches the expected one.
     if op.inputs.keys() != input_args.keys():

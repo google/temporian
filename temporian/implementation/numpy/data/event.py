@@ -3,23 +3,13 @@ from typing import Any, Dict, List, Tuple, Sequence
 import numpy as np
 import pandas as pd
 
-from temporian.core.data import dtype
 from temporian.core.data.duration import convert_date_to_duration
 from temporian.core.data.event import Event
-from temporian.core.data.event import Feature
 from temporian.core.data.sampling import Sampling
+from temporian.implementation.numpy.data.feature import NumpyFeature
+from temporian.implementation.numpy.data.feature import DTYPE_MAPPING
 from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.utils import string
-
-DTYPE_MAPPING = {
-    np.float64: dtype.FLOAT64,
-    np.float32: dtype.FLOAT32,
-    np.int64: dtype.INT64,
-    np.int32: dtype.INT32,
-}
-
-DTYPE_REVERSE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
-DTYPE_REVERSE_MAPPING[dtype.STRING] = np.str_
 
 # Maximum of printed index when calling repr(event)
 MAX_NUM_PRINTED_INDEX = 5
@@ -28,83 +18,42 @@ MAX_NUM_PRINTED_INDEX = 5
 MAX_NUM_PRINTED_FEATURES = 10
 
 
-def dtype_to_np_dtype(src: dtype.DType) -> Any:
-    return DTYPE_REVERSE_MAPPING[src]
-
-
-class NumpyFeature:
-    def __init__(self, name: str, data: np.ndarray) -> None:
-        if len(data.shape) > 1:
-            raise ValueError(
-                "NumpyFeatures can only be created from flat arrays. Passed"
-                f" input's shape: {len(data.shape)}"
-            )
-        if data.dtype.type is np.str_ or data.dtype.type is np.string_:
-            self.dtype: dtype.DType = dtype.STRING
-        else:
-            if data.dtype.type not in DTYPE_MAPPING:
-                raise ValueError(
-                    f"Unsupported dtype {data.dtype} for NumpyFeature: {name}."
-                    f" Supported dtypes: {DTYPE_MAPPING.keys()}, np.str_ and "
-                    "np.string_"
-                )
-            self.dtype: dtype.DType = DTYPE_MAPPING[data.dtype.type]
-
-        self.name = name
-        self.data = data
-
-    def __repr__(self) -> str:
-        return f"{self.name}: {self.data.__repr__()}"
-
-    def __eq__(self, __o: object) -> bool:
-        if not isinstance(__o, NumpyFeature):
-            return False
-
-        if self.name != __o.name:
-            return False
-
-        if self.dtype == dtype.STRING:
-            return np.array_equal(self.data, __o.data)
-
-        return np.array_equal(self.data, __o.data, equal_nan=True)
-
-    def schema(self) -> Feature:
-        return Feature(self.name, self.dtype)
-
-
 class NumpyEvent:
     def __init__(
         self,
         data: Dict[Tuple, List[NumpyFeature]],
         sampling: NumpySampling,
     ) -> None:
-        self.data = data
-        self.sampling = sampling
+        self._data = data
+        self._sampling = sampling
 
     @property
-    def _first_index_value(self) -> Tuple:
+    def data(self) -> Dict[Tuple, List[NumpyFeature]]:
+        return self._data
+
+    @property
+    def sampling(self) -> NumpySampling:
+        return self._sampling
+
+    def first_index_value(self) -> Tuple:
         if self.data is None or len(self.data) == 0:
             return None
 
         return next(iter(self.data))
 
-    @property
-    def _first_index_features(self) -> List[NumpyFeature]:
-        if self._first_index_value is None:
+    def first_index_features(self) -> List[NumpyFeature]:
+        if self.first_index_value() is None:
             return []
-        return self.data[self._first_index_value]
+        return self.data[self.first_index_value()]
 
-    @property
     def feature_count(self) -> int:
-        return len(self._first_index_features)
+        return len(self.first_index_features())
 
-    # TODO: Turn into function. Let's only use property for inexpensive code.
-    @property
     def feature_names(self) -> List[str]:
         # Only look at the feature in the first index
         # to get the feature names. All features in all
         # indexes should have the same names
-        return [feature.name for feature in self._first_index_features]
+        return [feature.name for feature in self.first_index_features()]
 
     def schema(self) -> Event:
         return Event(
@@ -272,7 +221,7 @@ class NumpyEvent:
         # Creating an empty dictionary to store the data
         data = {}
 
-        columns = self.sampling.index + self.feature_names + ["timestamp"]
+        columns = self.sampling.index + self.feature_names() + ["timestamp"]
         for column_name in columns:
             data[column_name] = []
 
@@ -331,7 +280,7 @@ class NumpyEvent:
             return False
 
         # Check same features
-        if self.feature_names != __o.feature_names:
+        if self.feature_names() != __o.feature_names():
             return False
 
         # Check each feature is equal in each index

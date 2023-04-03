@@ -51,7 +51,7 @@ def _check_features(
                 f"expected={item_def.sampling.index}"
             )
         # Check features
-        features = item_real._first_index_features
+        features = item_real.first_index_features()
 
         if len(item_def.features) != len(features):
             raise RuntimeError(

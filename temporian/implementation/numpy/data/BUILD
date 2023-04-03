@@ -17,14 +17,23 @@ py_library(
     srcs = ["event.py"],
     srcs_version = "PY3",
     deps = [
-        # pandas dep,
+        ":feature",
         ":sampling",
+        "//temporian/core/data:dtype",
         "//temporian/core/data:duration",
         "//temporian/core/data:event",
-        "//temporian/core/data:feature",
         "//temporian/core/data:sampling",
-        "//temporian/core/data:dtype",
         "//temporian/utils:string",
+    ],
+)
+
+py_library(
+    name = "feature",
+    srcs = ["feature.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:feature",
     ],
 )
 
@@ -41,5 +50,5 @@ py_library(
     name = "plotter",
     srcs = ["plotter.py"],
     srcs_version = "PY3",
-    deps = [ ":event"  ],
+    deps = [":event"],
 )
