@@ -22,13 +22,14 @@ from collections import defaultdict
 
 from temporian.core.data.event import Event
 from temporian.core.operators import base
-from temporian.implementation.numpy.data import event as numpy_event
+from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.core import processor as processor_lib
 from temporian.implementation.numpy import evaluator as numpy_evaluator
 
 AvailableBackends = Any
-Data = Dict[Event, Union[str, pathlib.Path, numpy_event.NumpyEvent]]
+Data = Dict[Event, Union[str, pathlib.Path, NumpyEvent]]
 Query = Union[Event, List[Event], Dict[str, Event]]
+Result = Union[NumpyEvent, List[NumpyEvent], Dict[str, NumpyEvent]]
 
 
 def evaluate(
@@ -36,7 +37,7 @@ def evaluate(
     input_data: Data,
     verbose: int = 1,
     check_execution: bool = True,
-) -> Dict[Event, Any]:
+) -> Result:
     """Evaluates a query on data.
 
     Args:
