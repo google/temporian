@@ -24,7 +24,10 @@ class RegisteredOperatorsTest(absltest.TestCase):
     def test_base(self):
         # Note: The operators are stored alphabetically.
         expected_operators = [
-            "ARITHMETIC",
+            "ADDITION",
+            "SUBTRACTION",
+            "MULTIPLICATION",
+            "DIVISION",
             "GLUE",
             "CALENDAR_DAY_OF_MONTH",
             "CALENDAR_DAY_OF_WEEK",

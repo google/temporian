@@ -19,17 +19,25 @@ from absl.testing import absltest
 from temporian.core.data.event import Event, Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.arithmetic import (
-    ArithmeticOperation,
-    ArithmeticOperator,
+    AdditionOperator,
+    SubtractionOperator,
+    MultiplicationOperator,
+    DivisionOperator,
     Resolution,
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.operators import arithmetic
+from temporian.implementation.numpy.operators.arithmetic import (
+    AdditionNumpyImplementation,
+    SubtractionNumpyImplementation,
+    MultiplicationNumpyImplementation,
+    DivisionNumpyImplementation,
+)
 from temporian.core.data import dtype as dtype_lib
 
 
 class ArithmeticNumpyImplementationTest(absltest.TestCase):
-    """Test numpy implementation of arithmetic operator."""
+    """Test numpy implementation of all arithmetic operators:
+    addition, subtraction, division and multiplication"""
 
     def setUp(self):
         self.numpy_event_1 = NumpyEvent.from_dataframe(
@@ -91,14 +99,13 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id"],
         )
 
-        operator = ArithmeticOperator(
+        operator = AdditionOperator(
             event_1=self.event_1,
             event_2=self.event_2,
-            operation=ArithmeticOperation.ADDITION,
             resolution=Resolution.PER_FEATURE_IDX,
         )
 
-        sum_implementation = arithmetic.ArithmeticNumpyImplementation(operator)
+        sum_implementation = AdditionNumpyImplementation(operator)
 
         operator_output = sum_implementation.call(
             event_1=self.numpy_event_1, event_2=self.numpy_event_2
@@ -123,14 +130,13 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id"],
         )
 
-        operator = ArithmeticOperator(
+        operator = SubtractionOperator(
             event_1=self.event_1,
             event_2=self.event_2,
-            operation=ArithmeticOperation.SUBTRACTION,
             resolution=Resolution.PER_FEATURE_IDX,
         )
 
-        sub_implementation = arithmetic.ArithmeticNumpyImplementation(operator)
+        sub_implementation = SubtractionNumpyImplementation(operator)
         operator_output = sub_implementation.call(
             event_1=self.numpy_event_1, event_2=self.numpy_event_2
         )
@@ -153,14 +159,13 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id"],
         )
 
-        operator = ArithmeticOperator(
+        operator = MultiplicationOperator(
             event_1=self.event_1,
             event_2=self.event_2,
-            operation=ArithmeticOperation.MULTIPLICATION,
             resolution=Resolution.PER_FEATURE_IDX,
         )
 
-        mult_implementation = arithmetic.ArithmeticNumpyImplementation(operator)
+        mult_implementation = MultiplicationNumpyImplementation(operator)
 
         operator_output = mult_implementation.call(
             event_1=self.numpy_event_1, event_2=self.numpy_event_2
@@ -185,14 +190,13 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id"],
         )
 
-        operator = ArithmeticOperator(
+        operator = DivisionOperator(
             event_1=self.event_1,
             event_2=self.event_2,
-            operation=ArithmeticOperation.DIVISION,
             resolution=Resolution.PER_FEATURE_IDX,
         )
 
-        div_implementation = arithmetic.ArithmeticNumpyImplementation(operator)
+        div_implementation = DivisionNumpyImplementation(operator)
 
         operator_output = div_implementation.call(
             event_1=self.numpy_event_1, event_2=self.numpy_event_2

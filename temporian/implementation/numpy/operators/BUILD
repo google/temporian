@@ -1,23 +1,27 @@
 package(
-    default_visibility = ["//visibility:public"],
-    licenses = ["notice"],
+    default_visibility=["//visibility:public"],
+    licenses=["notice"],
 )
 
 # Libraries
 # =========
 
 py_library(
-    name = "all_operators",
-    srcs = ["all_operators.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":arithmetic",
+    name="all_operators",
+    srcs=["all_operators.py"],
+    srcs_version="PY3",
+    deps=[
         ":glue",
         ":lag",
         ":prefix",
         ":propagate",
         ":select",
         ":sample",
+        "//temporian/implementation/numpy/operators/arithmetic:arithmetic",
+        "//temporian/implementation/numpy/operators/arithmetic:addition",
+        "//temporian/implementation/numpy/operators/arithmetic:subtraction",
+        "//temporian/implementation/numpy/operators/arithmetic:multiplication",
+        "//temporian/implementation/numpy/operators/arithmetic:division",
         "//temporian/implementation/numpy/operators/calendar:day_of_month",
         "//temporian/implementation/numpy/operators/calendar:day_of_week",
         "//temporian/implementation/numpy/operators/window:moving_count",
@@ -28,33 +32,22 @@ py_library(
 )
 
 py_library(
-    name = "operators",
-    srcs = ["__init__.py"],
-    srcs_version = "PY3",
+    name="operators",
+    srcs=["__init__.py"],
+    srcs_version="PY3",
 )
 
 py_library(
-    name = "base",
-    srcs = ["base.py"],
-    srcs_version = "PY3",
+    name="base",
+    srcs=["base.py"],
+    srcs_version="PY3",
 )
 
 py_library(
-    name = "arithmetic",
-    srcs = ["arithmetic.py"],
-    srcs_version = "PY3",
-    deps = [ ":base",
-        "//temporian/core/operators:arithmetic",
-        "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
-    ],
-)
-
-py_library(
-    name = "glue",
-    srcs = ["glue.py"],
-    srcs_version = "PY3",
-    deps = [
+    name="glue",
+    srcs=["glue.py"],
+    srcs_version="PY3",
+    deps=[
         ":base",
         "//temporian/core/operators:glue",
         "//temporian/implementation/numpy:implementation_lib",
@@ -64,10 +57,11 @@ py_library(
 )
 
 py_library(
-    name = "lag",
-    srcs = ["lag.py"],
-    srcs_version = "PY3",
-    deps = [ ":base",
+    name="lag",
+    srcs=["lag.py"],
+    srcs_version="PY3",
+    deps=[
+        ":base",
         "//temporian/core/data:duration",
         "//temporian/core/operators:lag",
         "//temporian/implementation/numpy:implementation_lib",
@@ -77,10 +71,11 @@ py_library(
 )
 
 py_library(
-    name = "select",
-    srcs = ["select.py"],
-    srcs_version = "PY3",
-    deps = [ ":base",
+    name="select",
+    srcs=["select.py"],
+    srcs_version="PY3",
+    deps=[
+        ":base",
         "//temporian/core/operators:select",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
@@ -88,10 +83,11 @@ py_library(
 )
 
 py_library(
-    name = "propagate",
-    srcs = ["propagate.py"],
-    srcs_version = "PY3",
-    deps = [ ":base",
+    name="propagate",
+    srcs=["propagate.py"],
+    srcs_version="PY3",
+    deps=[
+        ":base",
         "//temporian/core/data:duration",
         "//temporian/core/operators:propagate",
         "//temporian/implementation/numpy:implementation_lib",
@@ -102,10 +98,11 @@ py_library(
 )
 
 py_library(
-    name = "sample",
-    srcs = ["sample.py"],
-    srcs_version = "PY3",
-    deps = [ ":base",
+    name="sample",
+    srcs=["sample.py"],
+    srcs_version="PY3",
+    deps=[
+        ":base",
         "//temporian/core/data:duration",
         "//temporian/core/operators:sample",
         "//temporian/implementation/numpy:implementation_lib",
@@ -118,10 +115,11 @@ py_library(
 
 
 py_library(
-    name = "prefix",
-    srcs = ["prefix.py"],
-    srcs_version = "PY3",
-    deps = [ ":base",
+    name="prefix",
+    srcs=["prefix.py"],
+    srcs_version="PY3",
+    deps=[
+        ":base",
         "//temporian/core/data:duration",
         "//temporian/core/operators:prefix",
         "//temporian/implementation/numpy:implementation_lib",
