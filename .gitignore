@@ -8,3 +8,6 @@ profile.*
 
 # C++ binaries
 *.so
+
+# Mkdocs build
+site/
