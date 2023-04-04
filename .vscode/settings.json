@@ -27,4 +27,5 @@
     },
     "files.trimFinalNewlines": true,
     "files.trimTrailingWhitespace": true,
+    "prettier.tabWidth": 2,
 }

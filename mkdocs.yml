@@ -1,6 +1,40 @@
 site_name: Temporian
-plugins:
-- search
-- mkdocstrings
+
 theme:
   name: material
+
+plugins:
+  - search
+  - autorefs
+  - gen-files:
+      scripts:
+        - docs/gen_ref_pages.py
+  - literate-nav:
+      nav_file: SUMMARY.md
+  - section-index
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [temporian]
+          import:
+            - https://docs.python.org/3/objects.inv
+          # options:
+          #   heading_level: 1
+          #   show_source: true
+          #   docstring_style: numpy
+          #   show_root_heading: true
+          #   show_category_heading: true
+          #   show_if_no_docstring: true
+          #   members_order: source
+          #   show_submodules: false
+          #   show_signature_annotations: true
+          #   merge_init_into_class: true
+          #   separate_signature: true
+
+watch:
+  - README.md
+  - temporian
+
+nav:
+  - Code Reference: reference/

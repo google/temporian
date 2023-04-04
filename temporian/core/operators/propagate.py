@@ -135,7 +135,7 @@ def propagate(
     Args:
         event: The event to propagate.
         to: The features to index over. If `to` is a list of
-          strings, those strings should refer to existing features of `event`.
+            strings, those strings should refer to existing features of `event`.
 
     Returns:
         An event sequence propagated over `to`.
