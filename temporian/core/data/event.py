@@ -38,7 +38,7 @@ class Event(object):
         self._creator = creator
         self._name = name
 
-    def __getitem__(self, feature_names: List[str]) -> "Event":
+    def __getitem__(self, feature_names: List[str]) -> Event:
         # import select operator
         from temporian.core.operators.select import select
 

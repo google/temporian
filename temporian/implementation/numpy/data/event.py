@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Any, Dict, List, Tuple, Sequence
 
 import numpy as np
@@ -75,7 +76,7 @@ class NumpyEvent:
         df: pd.DataFrame,
         index_names: List[str] = None,
         timestamp_column: str = "timestamp",
-    ) -> "NumpyEvent":
+    ) -> NumpyEvent:
         """Convert a pandas DataFrame to a NumpyEvent.
         Args:
             df: DataFrame to convert to NumpyEvent.
