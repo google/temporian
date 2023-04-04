@@ -70,7 +70,7 @@ class MovingSumOperatorTest(absltest.TestCase):
                     [46.0, 86.0, 5],
                     [14.0, 24.0, 20],
                 ],
-                columns=["moving_sum_a", "moving_sum_b", "timestamp"],
+                columns=["a", "b", "timestamp"],
             )
         )
 
@@ -120,7 +120,7 @@ class MovingSumOperatorTest(absltest.TestCase):
                     ["X2", "Y2", 33.0, 2.2],
                     ["X2", "Y2", 51.0, 3.2],
                 ],
-                columns=["x", "y", "moving_sum_a", "timestamp"],
+                columns=["x", "y", "a", "timestamp"],
             ),
             index_names=["x", "y"],
         )
@@ -181,7 +181,7 @@ class MovingSumOperatorTest(absltest.TestCase):
                     [39.0, 6.0],
                     [np.nan, 10.0],
                 ],
-                columns=["moving_sum_a", "timestamp"],
+                columns=["a", "timestamp"],
             )
         )
 
@@ -240,7 +240,7 @@ class MovingSumOperatorTest(absltest.TestCase):
                     [13.0, 5],
                     [27.0, 6],
                 ],
-                columns=["moving_sum_a", "timestamp"],
+                columns=["a", "timestamp"],
             )
         )
 

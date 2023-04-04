@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from abc import ABC, abstractmethod
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 
 import numpy as np
 from temporian.core.data.duration import Duration
@@ -41,32 +41,37 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
 
         dst_event = NumpyEvent(data={}, sampling=sampling.sampling)
 
-        # Naming convention:
-        #   mts => multi time series
-        #   ts => time series
-        #   dst => destination
-        #   src => source
-
         # For each index
-        for index, src_mts in event.data.items():
-            dst_mts = []
-            dst_event.data[index] = dst_mts
+        for index, src_features in event.data.items():
+            dst_features = []
+            dst_event.data[index] = dst_features
             src_timestamps = event.sampling.data[index]
             sampling_timestamps = sampling.sampling.data[index]
 
-            mask = self._build_accumulator_mask(
-                src_timestamps,
-                sampling_timestamps,
-                self.operator.window_length(),
+            self._compute(
+                src_timestamps, src_features, sampling_timestamps, dst_features
             )
 
-            # For each feature
-            for src_ts in src_mts:
-                dst_feature_name = f"{self.operator.prefix}_{src_ts.name}"
-                dst_ts_data = self._apply_accumulator_mask(src_ts.data, mask)
-                dst_mts.append(NumpyFeature(dst_feature_name, dst_ts_data))
-
         return {"event": dst_event}
+
+    def _compute(
+        self,
+        src_timestamps: np.ndarray,
+        src_features: List[NumpyFeature],
+        sampling_timestamps: np.ndarray,
+        dst_features: List[NumpyFeature],
+    ):
+        mask = self._build_accumulator_mask(
+            src_timestamps,
+            sampling_timestamps,
+            self.operator.window_length(),
+        )
+
+        # For each feature
+        for src_ts in src_features:
+            dst_feature_name = src_ts.name
+            dst_ts_data = self._apply_accumulator_mask(src_ts.data, mask)
+            dst_features.append(NumpyFeature(dst_feature_name, dst_ts_data))
 
     def _build_accumulator_mask(
         self,
@@ -103,9 +108,9 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
         cross_product = src * mask
 
         # Replace masked values with NaN
-        cross_product[
-            mask == False
-        ] = np.nan  # pylint: disable=singleton-comparison
+        cross_product[mask == False] = (
+            np.nan
+        )  # pylint: disable=singleton-comparison
 
         return self._apply_operation(cross_product)
 

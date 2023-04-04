@@ -35,10 +35,6 @@ class MovingStandardDeviationOperator(BaseWindowOperator):
     def operator_def_key(cls) -> str:
         return "MOVING_STANDARD_DEVIATION"
 
-    @property
-    def prefix(self) -> str:
-        return "msd"
-
     def get_feature_dtype(self, feature: Feature) -> str:
         """Returns the dtype of the output feature.
 

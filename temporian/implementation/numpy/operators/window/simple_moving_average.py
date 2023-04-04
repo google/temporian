@@ -12,8 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import List
+
 import numpy as np
 
+from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy import implementation_lib
 from temporian.core.operators.window.simple_moving_average import (
     SimpleMovingAverageOperator,
@@ -21,6 +25,13 @@ from temporian.core.operators.window.simple_moving_average import (
 from temporian.implementation.numpy.operators.window.base import (
     BaseWindowNumpyImplementation,
 )
+from temporian.implementation.numpy_cc.operators import window as window_cc
+from temporian.core.data import dtype
+
+FN_MAP = {
+    dtype.FLOAT32: window_cc.simple_moving_average_float32,
+    dtype.FLOAT64: window_cc.simple_moving_average_float64,
+}
 
 
 class SimpleMovingAverageNumpyImplementation(BaseWindowNumpyImplementation):
@@ -29,32 +40,28 @@ class SimpleMovingAverageNumpyImplementation(BaseWindowNumpyImplementation):
     def __init__(self, operator: SimpleMovingAverageOperator) -> None:
         super().__init__(operator)
 
+    def _compute(
+        self,
+        src_timestamps: np.ndarray,
+        src_features: List[NumpyFeature],
+        sampling_timestamps: np.ndarray,
+        dst_features: List[NumpyFeature],
+    ):
+        for src_ts in src_features:
+            fn = window_cc.simple_moving_average_float64
+            args = {
+                "event_timestamps": src_timestamps,
+                "event_values": src_ts.data,
+                "window_length": self.operator.window_length(),
+            }
+            if self.operator.has_sampling():
+                args["sampling_timestamps"] = sampling_timestamps
+            dst_feature = fn(**args)
+            print("@@@@@@@@ dst_feature:", dst_feature, flush=True)
+            dst_features.append(NumpyFeature(src_ts.name, dst_feature))
+
     def _apply_operation(self, values: np.array) -> np.array:
-        """
-        Calculates the average of the values in each row of the input array.
-
-
-        The input array should have a shape (n, m), where 'n' is the length of
-        the feature and 'm' is the size of the window. Each row represents a
-        window of data points, with 'nan' values used for padding when the
-        window size is  smaller than the number of data points in the time
-        series. The function  computes the average for each row (window) by
-        ignoring the 'nan' values.
-
-
-        Args:
-            values: A 2D NumPy array with shape (n, m) where each row represents
-                a  window of data points. 'n' is the length of the feature, and
-                'm' is the size of the window. The array can contain 'nan'
-                values as padding.
-
-        Returns:
-            np.array: A 1D NumPy array with shape (n,) containing the average
-                    for each row (window) in the input array.
-
-        """
-
-        return np.nanmean(values, axis=1)
+        raise NotImplementedError()
 
 
 implementation_lib.register_operator_implementation(

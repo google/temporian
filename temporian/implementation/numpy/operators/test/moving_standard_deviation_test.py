@@ -70,7 +70,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
                     [math.sqrt(1.25), math.sqrt(1.25), 5],
                     [0, 0, 20],
                 ],
-                columns=["msd_a", "msd_b", "timestamp"],
+                columns=["a", "b", "timestamp"],
             )
         )
 
@@ -120,7 +120,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
                     ["X2", "Y2", 0.5, 2.2],
                     ["X2", "Y2", math.sqrt(2 / 3), 3.2],
                 ],
-                columns=["x", "y", "msd_a", "timestamp"],
+                columns=["x", "y", "a", "timestamp"],
             ),
             index_names=["x", "y"],
         )
@@ -181,7 +181,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
                     [math.sqrt(2 / 3), 6.0],
                     [math.nan, 10.0],
                 ],
-                columns=["msd_a", "timestamp"],
+                columns=["a", "timestamp"],
             )
         )
 
@@ -240,7 +240,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
                     [0, 5],
                     [0.5, 6],
                 ],
-                columns=["msd_a", "timestamp"],
+                columns=["a", "timestamp"],
             )
         )
 

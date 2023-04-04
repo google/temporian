@@ -72,7 +72,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
                     [11.5, 21.5, 5],
                     [14.0, 24.0, 20],
                 ],
-                columns=["sma_a", "sma_b", "timestamp"],
+                columns=["a", "b", "timestamp"],
             )
         )
 
@@ -121,7 +121,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
                     ["X2", "Y2", 16.5, 2.2],
                     ["X2", "Y2", 17.0, 3.2],
                 ],
-                columns=["x", "y", "sma_a", "timestamp"],
+                columns=["x", "y", "a", "timestamp"],
             ),
             index_names=["x", "y"],
         )
@@ -181,7 +181,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
                     [13.0, 6.0],
                     [math.nan, 10.0],
                 ],
-                columns=["sma_a", "timestamp"],
+                columns=["a", "timestamp"],
             )
         )
 
@@ -239,7 +239,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
                     [13.0, 5],
                     [13.5, 6],
                 ],
-                columns=["sma_a", "timestamp"],
+                columns=["a", "timestamp"],
             )
         )
 

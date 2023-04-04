@@ -14,3 +14,13 @@ py_library(
     name = "sample",
     data = [":sample.so"],
 )
+
+pybind_extension(
+    name = "window",
+    srcs = ["window.cc"],
+)
+
+py_library(
+    name = "window",
+    data = [":window.so"],
+)

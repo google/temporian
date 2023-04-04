@@ -16,7 +16,7 @@
 from typing import Optional, List
 
 from temporian.core import operator_lib
-from temporian.core.data.dtype import INT64
+from temporian.core.data.dtype import INT32
 from temporian.core.data.duration import Duration
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
@@ -34,10 +34,6 @@ class MovingCountOperator(BaseWindowOperator):
     def operator_def_key(cls) -> str:
         return "MOVING_COUNT"
 
-    @property
-    def prefix(self) -> str:
-        return "moving_count"
-
     def get_feature_dtype(self, feature: Feature) -> str:
         """Returns the dtype of the output feature.
 
@@ -47,7 +43,7 @@ class MovingCountOperator(BaseWindowOperator):
         Returns:
             str: The dtype of the output feature.
         """
-        return INT64
+        return INT32
 
 
 operator_lib.register_operator(MovingCountOperator)

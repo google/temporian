@@ -70,7 +70,7 @@ class MovingCountOperatorTest(absltest.TestCase):
                     [4, 4, 5],
                     [1, 1, 20],
                 ],
-                columns=["moving_count_a", "moving_count_b", "timestamp"],
+                columns=["a", "b", "timestamp"],
             )
         )
 
@@ -120,7 +120,7 @@ class MovingCountOperatorTest(absltest.TestCase):
                     ["X2", "Y2", 2, 2.2],
                     ["X2", "Y2", 3, 3.2],
                 ],
-                columns=["x", "y", "moving_count_a", "timestamp"],
+                columns=["x", "y", "a", "timestamp"],
             ),
             index_names=["x", "y"],
         )
@@ -181,7 +181,7 @@ class MovingCountOperatorTest(absltest.TestCase):
                     [3, 6.0],
                     [0, 10.0],
                 ],
-                columns=["moving_count_a", "timestamp"],
+                columns=["a", "timestamp"],
             )
         )
 
@@ -240,7 +240,7 @@ class MovingCountOperatorTest(absltest.TestCase):
                     [1, 5],
                     [2, 6],
                 ],
-                columns=["moving_count_a", "timestamp"],
+                columns=["a", "timestamp"],
             )
         )
 

@@ -33,10 +33,6 @@ class MovingSumOperator(BaseWindowOperator):
     def operator_def_key(cls) -> str:
         return "MOVING_SUM"
 
-    @property
-    def prefix(self) -> str:
-        return "moving_sum"
-
     def get_feature_dtype(self, feature: Feature) -> str:
         """Returns the dtype of the output feature.
 
