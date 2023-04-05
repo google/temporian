@@ -22,7 +22,7 @@ from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
 class PropagateNumpyImplementation(OperatorImplementation):
-    """Numpy implementation for the propagate operator."""
+    """Numpy implementation of the propagate operator."""
 
     def __init__(self, operator: Propagate) -> None:
         assert isinstance(operator, Propagate)

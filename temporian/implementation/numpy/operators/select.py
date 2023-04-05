@@ -21,6 +21,8 @@ from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
 class SelectNumpyImplementation(OperatorImplementation):
+    """Numpy implementation of the select operator."""
+
     def __init__(self, operator: SelectOperator) -> None:
         super().__init__(operator)
 

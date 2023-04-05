@@ -22,6 +22,8 @@ from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
 class GlueNumpyImplementation(OperatorImplementation):
+    """Numpy implementation of the glue operator."""
+
     def __init__(self, operator: GlueOperator):
         super().__init__(operator)
         assert isinstance(operator, GlueOperator)

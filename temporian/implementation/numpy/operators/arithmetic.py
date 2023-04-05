@@ -24,6 +24,8 @@ from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
 class ArithmeticNumpyImplementation(OperatorImplementation):
+    """Numpy implementation of the arithmetic operator."""
+
     def __init__(self, operator: ArithmeticOperator) -> None:
         super().__init__(operator)
 

@@ -24,6 +24,8 @@ from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
 class LagNumpyImplementation(OperatorImplementation):
+    """Numpy implementation of the lag and leak operators."""
+
     def __init__(self, operator: LagOperator) -> None:
         super().__init__(operator)
 

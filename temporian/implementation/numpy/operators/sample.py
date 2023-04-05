@@ -28,7 +28,7 @@ from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
 class SampleNumpyImplementation(OperatorImplementation):
-    """Numpy implementation for the sample operator."""
+    """Numpy implementation of the sample operator."""
 
     def __init__(self, operator: Sample) -> None:
         assert isinstance(operator, Sample)

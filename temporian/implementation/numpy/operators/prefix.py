@@ -24,7 +24,7 @@ from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
 class PrefixNumpyImplementation(OperatorImplementation):
-    """Numpy implementation for the prefix operator."""
+    """Numpy implementation of the prefix operator."""
 
     def __init__(self, operator: Prefix) -> None:
         assert isinstance(operator, Prefix)
