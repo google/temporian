@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Lag operator class and API call definitions."""
+"""Lag operator class and public API function definitions."""
 
 from typing import List
 from typing import Union

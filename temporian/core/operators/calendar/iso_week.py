@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Calendar ISO week operator class and API call definitions."""
+"""Calendar ISO week operator class and public API function definitions."""
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Propagate operator."""
+"""Propagate operator class and public API function definition."""
 
 from typing import List, Union
 
@@ -26,8 +26,6 @@ from temporian.core.data.sampling import Sampling
 
 
 class Propagate(Operator):
-    """Propagate operator."""
-
     def __init__(
         self,
         event: Event,
@@ -129,16 +127,15 @@ def propagate(
 
     Constraints:
 
-    - If `to` is an event, `event` and `to` have the same index
-      and same sampling.
+    - If `to` is an event, `event` and `to` have the same index and sampling.
 
     Args:
         event: The event to propagate.
-        to: The features to index over. If `to` is a list of
-            strings, those strings should refer to existing features of `event`.
+        to: The features to index over. If `to` is a list of strings, those
+            strings should refer to existing features of `event`.
 
     Returns:
-        An event sequence propagated over `to`.
+        Event sequence propagated over `to`.
     """
 
     if isinstance(to, str):

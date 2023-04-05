@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Moving count operator class and API call definition."""
+"""Moving count operator class and public API function definition."""
 
 from typing import Optional
 

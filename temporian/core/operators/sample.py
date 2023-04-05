@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Sample operator."""
-
-from typing import List, Union, Any, Dict
+"""Sample operator class and public API function definition."""
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
@@ -24,8 +22,6 @@ from temporian.proto import core_pb2 as pb
 
 
 class Sample(Operator):
-    """Sample operator."""
-
     def __init__(
         self,
         event: Event,
@@ -77,7 +73,7 @@ def sample(
     event: Event,
     sampling: Event,
 ) -> Event:
-    """Samples an event according to a sampling.
+    """Samples an event at each timestamp of a sampling.
 
     If a timestamp in 'sampling' does not have a corresponding timestamp in
     'event', the last timestamp in 'event' is used instead. If this timestamp
@@ -99,10 +95,10 @@ def sample(
 
     Args:
         event: The event to sample.
-        sampling: The timestamp of the sampling.
+        sampling: The event to use the sampling of.
 
     Returns:
-        A sampled event.
+        A sampled event, with same sampling as `sampling`.
     """
 
     return Sample(event=event, sampling=sampling).outputs()["event"]
