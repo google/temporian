@@ -50,7 +50,7 @@ class NumpyEvent:
         return self.data[self.first_index_value()]
 
     @property
-    def dtypes(self) -> Dict[str, type]:
+    def dtypes(self) -> Dict[str, dtype_lib.DType]:
         return {
             feature.name: feature.dtype
             for feature in self._first_index_features
