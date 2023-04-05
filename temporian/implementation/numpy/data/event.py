@@ -1,9 +1,10 @@
 from __future__ import annotations
-from typing import Any, Dict, List, Tuple, Sequence
+from typing import Any, Dict, List, Optional, Tuple, Sequence
 
 import numpy as np
 import pandas as pd
 
+from temporian.core.data import dtype as dtype_lib
 from temporian.core.data.duration import convert_date_to_duration
 from temporian.core.data.event import Event
 from temporian.core.data.sampling import Sampling
@@ -17,6 +18,12 @@ MAX_NUM_PRINTED_INDEX = 5
 
 # Maximum of printed features when calling repr(event)
 MAX_NUM_PRINTED_FEATURES = 10
+
+PYTHON_DTYPE_MAPPING = {
+    str: dtype_lib.STRING,
+    # TODO: fix this, int doesn't have to be INT64 necessarily
+    int: dtype_lib.INT64,
+}
 
 
 class NumpyEvent:
@@ -40,7 +47,7 @@ class NumpyEvent:
     def sampling(self, sampling: NumpySampling) -> None:
         self._sampling = sampling
 
-    def first_index_value(self) -> Tuple:
+    def first_index_value(self) -> Optional[Tuple]:
         if self.data is None or len(self.data) == 0:
             return None
 
@@ -66,7 +73,12 @@ class NumpyEvent:
                 feature.schema() for feature in list(self.data.values())[0]
             ],
             sampling=Sampling(
-                index=self.sampling.index,
+                index=[
+                    (index_name, PYTHON_DTYPE_MAPPING[type(index_value)])
+                    for index_name, index_value in zip(
+                        self.sampling.index, self.first_index_value()
+                    )
+                ],
                 is_unix_timestamp=self.sampling.is_unix_timestamp,
             ),
         )
