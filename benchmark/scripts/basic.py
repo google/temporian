@@ -78,9 +78,9 @@ def main():
     event_2 = event_2_data.schema()
     event_2._sampling = event_1._sampling
 
-    a = tp.assign(event_1, event_2)
-    b = tp.sma(a, window_length=10)
-    c = tp.assign(a, tp.sample(b, a))
+    a = tp.glue(event_1, event_2)
+    b = tp.simple_moving_average(a, window_length=10)
+    c = tp.glue(a, tp.sample(b, a))
 
     res: NumpyEvent = tp.evaluate(
         c,
