@@ -15,7 +15,7 @@
 """A sampling."""
 
 from __future__ import annotations
-from typing import List, NamedTuple, Optional, Tuple, TYPE_CHECKING, Union
+from typing import Dict, List, NamedTuple, Optional, Tuple, TYPE_CHECKING, Union
 
 from temporian.core.data import dtype as dtype_lib
 
@@ -56,6 +56,12 @@ class Sampling(object):
     @property
     def index_names(self) -> List[str]:
         return [index_level.name for index_level in self._index]
+
+    @property
+    def index_dtypes(self) -> Dict[str, IndexDtypes]:
+        return {
+            index_level.name: index_level.dtype for index_level in self._index
+        }
 
     @property
     def creator(self) -> Optional[Operator]:
