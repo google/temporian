@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""An event is a collection (possibly empty) of timesampled feature values."""
+"""Event class definition."""
 
 from typing import Any, List, Optional
 
@@ -22,6 +22,27 @@ from temporian.utils import string
 
 
 class Event(object):
+    """Collection of feature values for a certain sampling.
+
+    An event can be thought of as a list of multivariate series, where each item
+    in the list corresponds to an index value in the event's sampling, and each
+    variable to one of the event's features.
+
+    An event holds no actual data, but rather describes the structure (or
+    "schema") of data during evaluation.
+
+    Events are generally created by applying operators to other events, but can
+    also be created manually or spawned from raw data via `.schema()`.
+
+    Attributes:
+        creator: the operator that created this event. Can be None if it wasn't
+            created by an operator.
+        features: the event's features. Each feature in the event has its same
+            sampling.
+        name: The name of the event. Can be None.
+        sampling: The event's sampling.
+    """
+
     def __init__(
         self,
         features: List[Feature],
@@ -101,6 +122,7 @@ def input_event(
     name: Optional[str] = None,
     sampling: Optional[Sampling] = None,
 ) -> Event:
+    """Creates an event with the specified attributes."""
     if sampling is None:
         sampling = Sampling(index=index, creator=None)
 
