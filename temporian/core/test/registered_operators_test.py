@@ -25,21 +25,21 @@ class RegisteredOperatorsTest(absltest.TestCase):
         # Note: The operators are stored alphabetically.
         expected_operators = [
             "ADDITION",
-            "SUBTRACTION",
-            "MULTIPLICATION",
-            "DIVISION",
-            "GLUE",
             "CALENDAR_DAY_OF_MONTH",
             "CALENDAR_DAY_OF_WEEK",
+            "DIVISION",
+            "GLUE",
             "LAG",
             "MOVING_COUNT",
             "MOVING_STANDARD_DEVIATION",
             "MOVING_SUM",
+            "MULTIPLICATION",
             "PREFIX",
             "PROPAGATE",
             "SAMPLE",
             "SELECT",
             "SIMPLE_MOVING_AVERAGE",
+            "SUBTRACTION",
         ]
 
         self.assertSetEqual(

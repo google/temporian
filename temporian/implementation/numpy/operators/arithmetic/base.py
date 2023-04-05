@@ -35,7 +35,7 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
     def __call__(
         self, event_1: NumpyEvent, event_2: NumpyEvent
     ) -> Dict[str, NumpyEvent]:
-        """Apply the corresponding arithmetic operation to two Events.
+        """Apply the corresponding arithmetic operation between two Events.
 
         Args:
             event_1: First Event.

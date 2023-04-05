@@ -38,7 +38,7 @@ class AdditionOperator(BaseArithmeticOperator):
 operator_lib.register_operator(AdditionOperator)
 
 
-def sum(
+def add(
     event_1: Event,
     event_2: Event,
     resolution: Resolution = Resolution.PER_FEATURE_IDX,
