@@ -73,8 +73,9 @@ class DropIndexNumpyImplementation:
             this_block_length = len(timestamps)
 
             # create a feature for each dropped index level
-            drop_feats = (
-                [
+            drop_feats = []
+            if keep:
+                drop_feats = [
                     NumpyFeature(
                         idx_name,
                         np.array(
@@ -84,9 +85,7 @@ class DropIndexNumpyImplementation:
                     )
                     for idx_name, i in zip(drop_index_names, drop_index_pos)
                 ]
-                if keep
-                else []
-            )
+
             # store metadata
             dst_index_metadata[dst_index_lvl][
                 "block_length"
