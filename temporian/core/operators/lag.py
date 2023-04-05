@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-"""Lag operator."""
 from typing import List
 from typing import Union
 
@@ -27,8 +25,6 @@ from temporian.proto import core_pb2 as pb
 
 
 class LagOperator(Operator):
-    """Lag operator."""
-
     def __init__(
         self,
         event: Event,
@@ -91,7 +87,7 @@ def _implementation(
     duration: Union[Duration, List[Duration]],
     should_leak: bool = False,
 ) -> Event:
-    """Lag & Leak Implementation."""
+    """Lags or leaks `event` depending on `should_leak`."""
 
     if not isinstance(duration, list):
         duration = [duration]
@@ -125,16 +121,19 @@ def _implementation(
 def lag(
     event: Event, duration: Union[Duration, List[Duration]]
 ) -> Union[Event, List[Event]]:
-    """Lag operator. Shifts the event sampling backwards in time by a specified
-    duration.
+    """Shifts the event's sampling forwards in time by a specified duration.
+
+    Each timestamp in `event`'s sampling is shifted forwards by the specified
+    duration. If `duration` is a list, then the event will be lagged by each
+    duration in the list, and a list of events will be returned.
 
     Args:
-        event: Event to lag.
-        duration: Duration to lag by. Can be a list of Durations.
+        event: Event to lag the sampling of.
+        duration: Duration or list of Durations to lag by.
 
     Returns:
-        Lagged event. If a list of Durations is provided, a list of lagged
-        events is returned.
+        The lagged event, or list of lagged events if a Duration list was
+        provided.
     """
     return _implementation(event=event, duration=duration)
 
@@ -142,15 +141,18 @@ def lag(
 def leak(
     event: Event, duration: Union[Duration, List[Duration]]
 ) -> Union[Event, List[Event]]:
-    """Leak operator. Shifts the event sampling forward in time by a specified
-    duration.
+    """Shifts the event's sampling backwards in time by a specified duration.
+
+    Each timestamp in `event`'s sampling is shifted backwards by the specified
+    duration. If `duration` is a list, then the event will be leaked by each
+    duration in the list, and a list of events will be returned.
 
     Args:
-        event: Event to leak.
-        duration: Duration to shift the sampling. Can be a list of Durations.
+        event: Event to leak the sampling of.
+        duration: Duration or list of Durations to leak by.
 
     Returns:
-        Leaked event. If a list of Durations is provided, a list of leaked
-        events is returned.
+        The leaked event, or list of leaked events if a Duration list was
+        provided.
     """
     return _implementation(event=event, duration=duration, should_leak=True)

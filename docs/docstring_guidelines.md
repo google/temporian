@@ -60,6 +60,35 @@ def lag_operator_test(self):
     """Test for lag operator."""
 ```
 
+### Modules
+
+A module's docstring should describe the contents and usage of the module.
+
+Note that in Python every file is a module.
+
+In temporian we do not (yet) consider module docstrings to be mandatory.
+
+Example:
+
+```
+    """A one-line summary of the module, terminated by a period.
+
+    Leave one blank line.  The rest of this docstring should contain an
+    overall description of the module.  Optionally, it may also contain a brief
+    description of exported classes and functions and/or usage examples.
+
+    Typical usage example:
+
+    foo = ClassFoo()
+    bar = foo.FunctionBar()
+    """
+```
+
+#### Test modules
+
+Module-level docstrings for test files are not required and should only be
+included when there is additional information that can be provided.
+
 ### Functions and methods
 
 A docstring is **mandatory** for every function that has one or more of the
@@ -163,35 +192,6 @@ Example:
         eggs: An integer count of the eggs we have laid.
     """
 ```
-
-### Modules
-
-A module's docstring should describe the contents and usage of the module.
-
-Note that in Python every file is a module.
-
-In temporian we do not (yet) consider module docstrings to be mandatory.
-
-Example:
-
-```
-    """A one-line summary of the module, terminated by a period.
-
-    Leave one blank line.  The rest of this docstring should contain an
-    overall description of the module.  Optionally, it may also contain a brief
-    description of exported classes and functions and/or usage examples.
-
-    Typical usage example:
-
-    foo = ClassFoo()
-    bar = foo.FunctionBar()
-    """
-```
-
-#### Test modules
-
-Module-level docstrings for test files are not required and should only be
-included when there is additional information that can be provided.
 
 ## Sources
 
