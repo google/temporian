@@ -15,8 +15,9 @@
 """An event is a collection (possibly empty) of timesampled feature values."""
 
 from __future__ import annotations
-from typing import List, Optional, Tuple, TYPE_CHECKING
+from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
 
+from temporian.core.data import dtype as dtype_lib
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.data.sampling import IndexDtypes
@@ -90,6 +91,10 @@ class Event(object):
     @property
     def feature_names(self) -> List[str]:
         return [feature.name for feature in self._features]
+
+    @property
+    def dtypes(self) -> Dict[str, dtype_lib.DType]:
+        return {feature.name: feature.dtype for feature in self._features}
 
     @property
     def name(self) -> str:

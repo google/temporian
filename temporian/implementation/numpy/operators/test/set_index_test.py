@@ -2,9 +2,6 @@ from absl.testing import absltest
 
 import pandas as pd
 
-from temporian.core.data.event import Event
-from temporian.core.data.event import Feature
-from temporian.core.data.sampling import Sampling
 from temporian.core.operators.set_index import SetIndexOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators.set_index import (
@@ -14,15 +11,6 @@ from temporian.implementation.numpy.operators.set_index import (
 
 class SetIndexNumpyImplementationTest(absltest.TestCase):
     def setUp(self) -> None:
-        # input event
-        self.input_evt = Event(
-            features=[
-                Feature("store_id", dtype=int),
-                Feature("item_id", dtype=int),
-                Feature("sales", dtype=float),
-            ],
-            sampling=Sampling(index=["state_id"]),
-        )
         # input NumPy event
         self.numpy_input_evt = NumpyEvent.from_dataframe(
             pd.DataFrame(
@@ -46,6 +34,8 @@ class SetIndexNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["state_id"],
         )
+        # input event
+        self.input_evt = self.numpy_input_evt.schema()
 
     def test_append_single(self) -> None:
         # output NumPy event

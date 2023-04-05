@@ -34,12 +34,17 @@ class SetIndexOperator(Operator):
         output_features = self._generate_output_features(event, labels)
 
         # output sampling
+
         output_sampling = Sampling(
             index=[
-                index_name for index_name in event.sampling().index() + labels
+                (index_name, index_dtype)
+                for index_name, index_dtype in event.sampling.index_dtypes.items()
             ]
+            + [(index_name, event.dtypes[index_name]) for index_name in labels]
             if append
-            else labels
+            else [
+                (index_name, event.dtypes[index_name]) for index_name in labels
+            ]
         )
         # output event
         self.add_output(
@@ -62,7 +67,7 @@ class SetIndexOperator(Operator):
         missing_labels = [
             label
             for label in labels
-            if label not in [feature.name() for feature in event.features()]
+            if label not in [feature.name for feature in event.features]
         ]
         if missing_labels:
             raise KeyError(missing_labels)
@@ -73,8 +78,8 @@ class SetIndexOperator(Operator):
         self, event: Event, labels: List[str]
     ) -> List[Feature]:
         output_features = [
-            Feature(name=feature.name(), dtype=feature.dtype())
-            for feature in event.features()
+            Feature(name=feature.name, dtype=feature.dtype)
+            for feature in event.features
             if feature.name not in labels
         ]
         return output_features
@@ -108,4 +113,4 @@ operator_lib.register_operator(SetIndexOperator)
 def set_index(
     event: Event, labels: Optional[List[str]] = None, append: bool = True
 ) -> Event:
-    return SetIndexOperator(event, labels, append).outputs()["event"]
+    return SetIndexOperator(event, labels, append).outputs["event"]

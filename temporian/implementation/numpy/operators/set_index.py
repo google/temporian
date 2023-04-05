@@ -4,6 +4,7 @@ from typing import Dict, List
 import numpy as np
 
 from temporian.core.operators.set_index import SetIndexOperator
+from temporian.implementation.numpy.data.feature import DTYPE_REVERSE_MAPPING
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
@@ -28,13 +29,13 @@ def _append_impl(event: NumpyEvent, append_feat_names: List[str]) -> NumpyEvent:
 
     # positions of features that are going to be part of the destination index
     dst_idx_pos = [
-        event.feature_names.index(append_feat_name)
+        event.feature_names().index(append_feat_name)
         for append_feat_name in append_feat_names
     ]
     # positions of features that are being kept
     dst_feat_pos = {
         feat_name: pos
-        for pos, feat_name in enumerate(event.feature_names)
+        for pos, feat_name in enumerate(event.feature_names())
         if feat_name not in append_feat_names
     }
     # initialize destination event & sampling data
@@ -91,13 +92,13 @@ def _set_impl(event: NumpyEvent, set_feat_names: List[str]) -> NumpyEvent:
     """
     # positions of features that are going to be part of the destination index
     dst_idx_pos = [
-        event.feature_names.index(append_feat_name)
+        event.feature_names().index(append_feat_name)
         for append_feat_name in set_feat_names
     ]
     # positions of features that are being kept
     dst_feat_pos = {
         feat_name: pos
-        for pos, feat_name in enumerate(event.feature_names)
+        for pos, feat_name in enumerate(event.feature_names())
         if feat_name not in set_feat_names
     }
     # intialize empty dict mapping destination index levels to block lengths
@@ -135,7 +136,7 @@ def _set_impl(event: NumpyEvent, set_feat_names: List[str]) -> NumpyEvent:
                 name=feat_name,
                 data=np.array(
                     metadata["features"][feat_name],
-                    dtype=event.dtypes[feat_name],
+                    dtype=DTYPE_REVERSE_MAPPING[event.dtypes[feat_name]],
                 ),
             )
             for feat_name in dst_feat_pos
@@ -177,8 +178,8 @@ class SetIndexNumpyImplementation:
             "event".
         """
         # get attributes
-        labels = self.operator.attributes()["labels"]
-        append = self.operator.attributes()["append"]
+        labels = self.operator.attributes["labels"]
+        append = self.operator.attributes["append"]
 
         if append:
             return {"event": _append_impl(event, labels)}
