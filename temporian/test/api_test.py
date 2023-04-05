@@ -89,7 +89,7 @@ class TFPTest(absltest.TestCase):
             name="my_input_event",
         )
         b = t.simple_moving_average(event=a, window_length=7)
-        b.set_name("my_output_event")
+        b.name = "my_output_event"
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_processor.tem")
@@ -113,7 +113,7 @@ class TFPTest(absltest.TestCase):
             name="my_input_event",
         )
         b = t.simple_moving_average(event=a, window_length=7)
-        b.set_name("my_output_event")
+        b.name = "my_output_event"
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_processor.tem")
@@ -125,8 +125,8 @@ class TFPTest(absltest.TestCase):
 
             i, o = t.load(path=path, squeeze=True)
 
-        self.assertEqual(i.name(), "my_input_event")
-        self.assertEqual(o.name(), "my_output_event")
+        self.assertEqual(i.name, "my_input_event")
+        self.assertEqual(o.name, "my_output_event")
 
     def test_serialization_infer_inputs(self):
         a = t.input_event(
@@ -137,7 +137,7 @@ class TFPTest(absltest.TestCase):
             name="my_input_event",
         )
         b = t.simple_moving_average(event=a, window_length=7)
-        b.set_name("my_output_event")
+        b.name = "my_output_event"
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_processor.tem")
@@ -145,8 +145,8 @@ class TFPTest(absltest.TestCase):
 
             i, o = t.load(path=path, squeeze=True)
 
-        self.assertEqual(i.name(), "my_input_event")
-        self.assertEqual(o.name(), "my_output_event")
+        self.assertEqual(i.name, "my_input_event")
+        self.assertEqual(o.name, "my_output_event")
 
     def test_list_registered_operators(self):
         logging.info("The operators:")

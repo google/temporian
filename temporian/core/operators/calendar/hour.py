@@ -50,4 +50,4 @@ def calendar_hour(sampling: Event) -> Event:
         event with a single feature corresponding to the hour each timestamp in
             `event`'s sampling belongs to, with the same sampling as `event`.
     """
-    return CalendarHourOperator(sampling).outputs()["event"]
+    return CalendarHourOperator(sampling).outputs["event"]

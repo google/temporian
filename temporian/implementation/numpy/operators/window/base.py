@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import Dict, Optional
 
 import numpy as np
 from temporian.core.data.duration import Duration
 from temporian.core.operators.window.base import BaseWindowOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.event import NumpyFeature
+from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -57,7 +57,7 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
             mask = self._build_accumulator_mask(
                 src_timestamps,
                 sampling_timestamps,
-                self.operator.window_length(),
+                self.operator.window_length,
             )
 
             # For each feature

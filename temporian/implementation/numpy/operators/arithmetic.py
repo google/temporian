@@ -18,7 +18,7 @@ from temporian.core.operators.arithmetic import ArithmeticOperation
 from temporian.core.operators.arithmetic import ArithmeticOperator
 from temporian.core.operators.arithmetic import Resolution
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.event import NumpyFeature
+from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
@@ -43,13 +43,13 @@ class ArithmeticNumpyImplementation(OperatorImplementation):
             ValueError: If sampling of both events is not equal.
             NotImplementedError: If resolution is PER_FEATURE_NAME.
         """
-        resolution = self.operator.attributes()["resolution"]
-        operation = self.operator.attributes()["operation"]
+        resolution = self.operator.attributes["resolution"]
+        operation = self.operator.attributes["operation"]
 
         if event_1.sampling is not event_2.sampling:
             raise ValueError("Sampling of both events must be equal.")
 
-        if event_1.feature_count != event_2.feature_count:
+        if event_1.feature_count() != event_2.feature_count():
             raise ValueError(
                 "Both events must have the same number of features."
             )

@@ -41,7 +41,7 @@ class LagOperator(Operator):
 
         self.add_attribute("duration", duration)
 
-        output_sampling = Sampling(index=event.sampling().index(), creator=self)
+        output_sampling = Sampling(index=event.sampling.index, creator=self)
 
         prefix = "lag" if duration > 0 else "leak"
         duration_str = duration_abbreviation(duration)
@@ -49,12 +49,12 @@ class LagOperator(Operator):
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=f"{prefix}[{duration_str}]_{f.name()}",
-                dtype=f.dtype(),
+                name=f"{prefix}[{duration_str}]_{f.name}",
+                dtype=f.dtype,
                 sampling=output_sampling,
                 creator=self,
             )
-            for f in event.features()
+            for f in event.features
         ]
 
         self.add_output(
@@ -114,10 +114,10 @@ def _implementation(
         return LagOperator(
             event=event,
             duration=used_duration[0],
-        ).outputs()["event"]
+        ).outputs["event"]
 
     return [
-        LagOperator(event=event, duration=d).outputs()["event"]
+        LagOperator(event=event, duration=d).outputs["event"]
         for d in used_duration
     ]
 
