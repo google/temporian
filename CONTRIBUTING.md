@@ -1,8 +1,6 @@
 # How to Contribute
 
-Contributions for TensorFlow Decision Forests and its engine Yggdrasil Decision Forests are  welcome.
-
-See [github.com/google/yggdrasil-decision-forests](https://github.com/google/yggdrasil-decision-forests) for Yggdrasil Decision Forests.
+Contributions for Temporian are welcome.
 
 ## Pull Request Checklist
 
