@@ -72,7 +72,7 @@ class DropIndexNumpyImplementation:
             # number of samples in this index level
             this_block_length = len(timestamps)
 
-            # collapse index level
+            # create a feature for each dropped index level
             drop_feats = (
                 [
                     NumpyFeature(
