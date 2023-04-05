@@ -28,9 +28,12 @@ class DropIndexOperator(Operator):
         self,
         event: Event,
         index_names: List[str],
-        keep,
+        keep: bool,
     ) -> None:
         super().__init__()
+
+        self._index_names = index_names
+        self._keep = keep
 
         # input event
         self.add_input("event", event)
@@ -92,9 +95,7 @@ class DropIndexOperator(Operator):
     def dst_feat_names(self) -> List[str]:
         feature_names = self.inputs["event"].feature_names
         return (
-            self.attributes["index_names"] + feature_names
-            if self.attributes["keep"]
-            else feature_names
+            self._index_names + feature_names if self._keep else feature_names
         )
 
     @property
@@ -102,16 +103,16 @@ class DropIndexOperator(Operator):
         return [
             index_level.name
             for index_level in self.inputs["event"].sampling.index
-            if index_level.name not in self.attributes["index_names"]
+            if index_level.name not in self._index_names
         ]
 
     @property
     def index_names(self) -> List[str]:
-        return self.attributes["index_names"]
+        return self._index_names
 
     @property
     def keep(self) -> bool:
-        return self.attributes["keep"]
+        return self._keep
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
