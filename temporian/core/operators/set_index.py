@@ -15,23 +15,23 @@ class SetIndexOperator(Operator):
     def __init__(
         self,
         event: Event,
-        labels: Optional[Union[List[str], str]] = None,
+        feature_names: Optional[Union[List[str], str]] = None,
         append: bool = False,
     ) -> None:
         super().__init__()
 
-        # process labels
-        labels = self._process_labels(event, labels)
+        # process feature_names
+        feature_names = self._process_feature_names(event, feature_names)
 
         # input event
         self.add_input("event", event)
 
         # attributes
-        self.add_attribute("labels", labels)
+        self.add_attribute("feature_names", feature_names)
         self.add_attribute("append", append)
 
         # output features
-        output_features = self._generate_output_features(event, labels)
+        output_features = self._generate_output_features(event, feature_names)
 
         # output sampling
 
@@ -40,10 +40,14 @@ class SetIndexOperator(Operator):
                 (index_name, index_dtype)
                 for index_name, index_dtype in event.sampling.index_dtypes.items()
             ]
-            + [(index_name, event.dtypes[index_name]) for index_name in labels]
+            + [
+                (index_name, event.dtypes[index_name])
+                for index_name in feature_names
+            ]
             if append
             else [
-                (index_name, event.dtypes[index_name]) for index_name in labels
+                (index_name, event.dtypes[index_name])
+                for index_name in feature_names
             ]
         )
         # output event
@@ -57,30 +61,30 @@ class SetIndexOperator(Operator):
         )
         self.check()
 
-    def _process_labels(
+    def _process_feature_names(
         self,
         event: Event,
-        labels: Optional[Union[List[str], str]],
+        feature_names: Optional[Union[List[str], str]],
     ) -> List[str]:
-        if isinstance(labels, str):
-            labels = [labels]
-        missing_labels = [
+        if isinstance(feature_names, str):
+            feature_names = [feature_names]
+        missing_feature_names = [
             label
-            for label in labels
+            for label in feature_names
             if label not in [feature.name for feature in event.features]
         ]
-        if missing_labels:
-            raise KeyError(missing_labels)
+        if missing_feature_names:
+            raise KeyError(missing_feature_names)
 
-        return labels
+        return feature_names
 
     def _generate_output_features(
-        self, event: Event, labels: List[str]
+        self, event: Event, feature_names: List[str]
     ) -> List[Feature]:
         output_features = [
             Feature(name=feature.name, dtype=feature.dtype)
             for feature in event.features
-            if feature.name not in labels
+            if feature.name not in feature_names
         ]
         return output_features
 
@@ -90,7 +94,7 @@ class SetIndexOperator(Operator):
             key="SET_INDEX",
             attributes=[
                 pb.OperatorDef.Attribute(
-                    key="labels",
+                    key="feature_names",
                     type=pb.OperatorDef.Attribute.Type.REPEATED_STRING,
                     is_optional=False,
                 ),
@@ -111,6 +115,6 @@ operator_lib.register_operator(SetIndexOperator)
 
 
 def set_index(
-    event: Event, labels: Optional[List[str]] = None, append: bool = True
+    event: Event, feature_names: List[str], append: bool = False
 ) -> Event:
-    return SetIndexOperator(event, labels, append).outputs["event"]
+    return SetIndexOperator(event, feature_names, append).outputs["event"]

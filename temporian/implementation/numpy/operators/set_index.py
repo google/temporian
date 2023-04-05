@@ -178,10 +178,10 @@ class SetIndexNumpyImplementation:
             "event".
         """
         # get attributes
-        labels = self.operator.attributes["labels"]
+        feature_names = self.operator.attributes["feature_names"]
         append = self.operator.attributes["append"]
 
         if append:
-            return {"event": _append_impl(event, labels)}
+            return {"event": _append_impl(event, feature_names)}
 
-        return {"event": _set_impl(event, labels)}
+        return {"event": _set_impl(event, feature_names)}

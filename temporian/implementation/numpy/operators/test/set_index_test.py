@@ -62,7 +62,7 @@ class SetIndexNumpyImplementationTest(absltest.TestCase):
             index_names=["state_id", "store_id"],
         )
         operator = SetIndexOperator(
-            self.input_evt, labels="store_id", append=True
+            self.input_evt, feature_names="store_id", append=True
         )
         # instance operator implementation
         operator_impl = SetIndexNumpyImplementation(operator)
@@ -98,7 +98,9 @@ class SetIndexNumpyImplementationTest(absltest.TestCase):
             index_names=["state_id", "store_id", "item_id"],
         )
         operator = SetIndexOperator(
-            self.input_evt, labels=["store_id", "item_id"], append=True
+            self.input_evt,
+            feature_names=["store_id", "item_id"],
+            append=True,
         )
         # instance operator implementation
         operator_impl = SetIndexNumpyImplementation(operator)
@@ -133,7 +135,7 @@ class SetIndexNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id"],
         )
         operator = SetIndexOperator(
-            self.input_evt, labels=["store_id"], append=False
+            self.input_evt, feature_names=["store_id"], append=False
         )
         # instance operator implementation
         operator_impl = SetIndexNumpyImplementation(operator)
@@ -168,7 +170,9 @@ class SetIndexNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id", "item_id"],
         )
         operator = SetIndexOperator(
-            self.input_evt, labels=["store_id", "item_id"], append=False
+            self.input_evt,
+            feature_names=["store_id", "item_id"],
+            append=False,
         )
         # instance operator implementation
         operator_impl = SetIndexNumpyImplementation(operator)
