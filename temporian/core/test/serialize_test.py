@@ -17,11 +17,6 @@ from absl.testing import absltest
 
 from temporian.core import serialize
 from temporian.core import processor
-from temporian.core.data import dtype
-from temporian.core.data.event import Event
-from temporian.core.data.feature import Feature
-from temporian.core.data.sampling import Sampling
-from temporian.core.operators import base
 from temporian.proto import core_pb2 as pb
 from temporian.core.test import utils
 
@@ -62,28 +57,28 @@ class SerializeTest(absltest.TestCase):
 
         # Ensures that "original" and "restored" don't link to the same objects.
         self.assertFalse(
-            serialize.all_identifier(original.samplings())
-            & serialize.all_identifier(restored.samplings())
+            serialize.all_identifiers(original.samplings())
+            & serialize.all_identifiers(restored.samplings())
         )
         self.assertFalse(
-            serialize.all_identifier(original.features())
-            & serialize.all_identifier(restored.features())
+            serialize.all_identifiers(original.features())
+            & serialize.all_identifiers(restored.features())
         )
         self.assertFalse(
-            serialize.all_identifier(original.operators())
-            & serialize.all_identifier(restored.operators())
+            serialize.all_identifiers(original.operators())
+            & serialize.all_identifiers(restored.operators())
         )
         self.assertFalse(
-            serialize.all_identifier(original.events())
-            & serialize.all_identifier(restored.events())
+            serialize.all_identifiers(original.events())
+            & serialize.all_identifiers(restored.events())
         )
         self.assertFalse(
-            serialize.all_identifier(original.inputs().values())
-            & serialize.all_identifier(restored.inputs().values())
+            serialize.all_identifiers(original.inputs().values())
+            & serialize.all_identifiers(restored.inputs().values())
         )
         self.assertFalse(
-            serialize.all_identifier(original.outputs().values())
-            & serialize.all_identifier(restored.outputs().values())
+            serialize.all_identifiers(original.outputs().values())
+            & serialize.all_identifiers(restored.outputs().values())
         )
 
 

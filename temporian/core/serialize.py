@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Serialization / unserialization of a processor."""
+"""Serialization / unserialization of a processor and its components."""
 
 from typing import Set, Union, Any, Dict, Tuple, Optional
 
@@ -33,7 +33,7 @@ def save(
     outputs: processor.MultipleEventArg,
     path: str,
 ) -> None:
-    """Saves the computation between "inputs" and "outputs" into a file.
+    """Saves the processor between `inputs` and `outputs` to a file.
 
     Usage example:
         a = t.input_event(...)
@@ -46,12 +46,11 @@ def save(
             input_data{inputs["io_a"]: pandas.DataFrame(...)}
         ))
 
-
     Args:
-        inputs: Input events. If None, the inputs is infered. In this case,
+        inputs: Input events. If None, the inputs is inferred. In this case,
             input event have to be named.
         outputs: Output events.
-        path: The file path.
+        path: The file path to save to.
     """
 
     # TODO: Add support for compressed / binary serialization.
@@ -70,15 +69,15 @@ def save(
 def load(
     path: str, squeeze: bool = False
 ) -> Tuple[Dict[str, Event], Dict[str, Event]]:
-    """Load a processor from a file.
+    """Loads a processor from a file.
 
     Args:
-        path: File path.
+        path: File path to load from.
         squeeze: If true, and if the input/output contains a single event,
             returns an event (instead of a dictionary of events).
 
     Returns:
-        The inputs and outputs events.
+        The input and output events.
     """
 
     with open(path, "r") as f:
@@ -98,7 +97,7 @@ def load(
 
 
 def serialize(src: processor.Preprocessor) -> pb.Processor:
-    """Serializes a processor into an equivalent protobuffer."""
+    """Serializes a processor into a protobuffer."""
 
     return pb.Processor(
         operators=[_serialize_operator(o) for o in src.operators()],
@@ -173,14 +172,12 @@ def unserialize(src: pb.Processor) -> processor.Preprocessor:
 
 
 def _identifier(item: Any) -> str:
-    """Unique identifier about an object within a processor."""
-
+    """Creates a unique identifier for an object within a processor."""
     return str(id(item))
 
 
-def all_identifier(collection: Any) -> Set[str]:
+def all_identifiers(collection: Any) -> Set[str]:
     """Builds the set of identifiers of a collections of events/features/..."""
-
     return {_identifier(x) for x in collection}
 
 

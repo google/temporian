@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Evaluator module."""
+"""Construction and evaluation of an operator schedule for a set of inputs."""
 
 import time
 import sys
@@ -38,26 +38,26 @@ def evaluate(
     verbose: int = 1,
     check_execution: bool = True,
 ) -> Result:
-    """Evaluates a query on data.
+    """Evaluates events on data.
 
     Args:
-        query: Events to compute. Support event, dict and list of events.
+        query: Events to compute. Supports event, dict and list of events.
         input_data: Dictionary of event and event values to use for the
-          computation.
+            computation.
         verbose: If >0, prints details about the execution on the standard error
-          output. The larger the number, the more information is displayed.
+            output. The larger the number, the more information is displayed.
         check_execution: If true, the input and output of the op implementation
-          are validated to check any bug in the library internal code. If false,
-          checks are skipped.
+            are validated to check any bug in the library internal code. If
+            false, checks are skipped.
 
     TODO: Create an internal configuration object for options such as
     "check_execution".
 
     Returns:
-        An object with the same structure as "event" containing the results. For
-        instance, if "event" is a dictionary of events, the returned object
-        will be a dictionary of event results. If "event" is a list of events,
-        the returned value will be a list of event values with the same order.
+        An object with the same structure as `event` containing the results.
+        If `event` is a dictionary of events, the returned object will be a
+        dictionary of event results. If `event` is a list of events, the
+        returned value will be a list of event values with the same order.
     """
 
     begin_time = time.perf_counter()
@@ -146,7 +146,7 @@ def build_schedule(
         inputs: Input events.
         outputs: Output events.
         verbose: If >0, prints details about the execution on the standard error
-          output. The larger the number, the more information is displayed.
+            output. The larger the number, the more information is displayed.
 
     Returns:
         Ordered list of operators, such that the first operator should be
