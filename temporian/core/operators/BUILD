@@ -1,26 +1,23 @@
 package(
-    default_visibility=["//visibility:public"],
-    licenses=["notice"],
+    default_visibility = ["//visibility:public"],
+    licenses = ["notice"],
 )
 
 # Libraries
 # =========
 
 py_library(
-    name="all_operators",
-    srcs=["all_operators.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "all_operators",
+    srcs = ["all_operators.py"],
+    srcs_version = "PY3",
+    deps = [
         ":glue",
         ":lag",
-        ":propagate",
-        ":select",
-        ":sample",
         ":prefix",
-        "//temporian/core/operators/arithmetic:arithmetic",
-        "//temporian/core/operators/arithmetic:subtraction",
-        "//temporian/core/operators/arithmetic:multiplication",
-        "//temporian/core/operators/arithmetic:division",
+        ":propagate",
+        ":sample",
+        ":select",
+        "//temporian/core/operators/arithmetic",
         "//temporian/core/operators/calendar:day_of_month",
         "//temporian/core/operators/calendar:day_of_week",
         "//temporian/core/operators/calendar:day_of_year",
@@ -38,10 +35,10 @@ py_library(
 )
 
 py_library(
-    name="glue",
-    srcs=["glue.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "glue",
+    srcs = ["glue.py"],
+    srcs_version = "PY3",
+    deps = [
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:event",
@@ -51,34 +48,20 @@ py_library(
 )
 
 py_library(
-    name="base",
-    srcs=["base.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "base",
+    srcs = ["base.py"],
+    srcs_version = "PY3",
+    deps = [
         "//temporian/core/data:event",
         "//temporian/proto:core_py_proto",
     ],
 )
 
 py_library(
-    name="lag",
-    srcs=["lag.py"],
-    srcs_version="PY3",
-    deps=[
-        ":base",
-        "//temporian/core:operator_lib",
-        "//temporian/core/data:duration",
-        "//temporian/core/data:event",
-        "//temporian/core/data:feature",
-        "//temporian/proto:core_py_proto",
-    ],
-)
-
-py_library(
-    name="select",
-    srcs=["select.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "lag",
+    srcs = ["lag.py"],
+    srcs_version = "PY3",
+    deps = [
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:duration",
@@ -89,10 +72,24 @@ py_library(
 )
 
 py_library(
-    name="propagate",
-    srcs=["propagate.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "select",
+    srcs = ["select.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:duration",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "propagate",
+    srcs = ["propagate.py"],
+    srcs_version = "PY3",
+    deps = [
         ":base",
         ":select",
         "//temporian/core:operator_lib",
@@ -104,10 +101,10 @@ py_library(
 )
 
 py_library(
-    name="sample",
-    srcs=["sample.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "sample",
+    srcs = ["sample.py"],
+    srcs_version = "PY3",
+    deps = [
         ":base",
         ":select",
         "//temporian/core:operator_lib",
@@ -119,10 +116,10 @@ py_library(
 )
 
 py_library(
-    name="prefix",
-    srcs=["prefix.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "prefix",
+    srcs = ["prefix.py"],
+    srcs_version = "PY3",
+    deps = [
         ":base",
         ":select",
         "//temporian/core:operator_lib",

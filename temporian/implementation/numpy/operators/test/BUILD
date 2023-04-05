@@ -1,25 +1,25 @@
 package(
-    default_visibility=["//visibility:public"],
-    licenses=["notice"],
+    default_visibility = ["//visibility:public"],
+    licenses = ["notice"],
 )
 
 # Tests
 # =====
 py_test(
-    name="arithmetic_test",
-    srcs=["arithmetic_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "arithmetic_test",
+    srcs = ["arithmetic_test.py"],
+    srcs_version = "PY3",
+    deps = [
         # absl/testing:absltest dep,
         "//temporian/core/data:event",
         "//temporian/core/data:sampling",
-        "//temporian/core/operators/arithmetic:arithmetic",
+        "//temporian/core/operators/arithmetic",
         "//temporian/core/operators/arithmetic:addition",
         "//temporian/core/operators/arithmetic:subtraction",
         "//temporian/core/operators/arithmetic:multiplication",
         "//temporian/core/operators/arithmetic:division",
         "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/operators/arithmetic:arithmetic",
+        "//temporian/implementation/numpy/operators/arithmetic",
         "//temporian/implementation/numpy/operators/arithmetic:addition",
         "//temporian/implementation/numpy/operators/arithmetic:subtraction",
         "//temporian/implementation/numpy/operators/arithmetic:multiplication",
@@ -29,10 +29,10 @@ py_test(
 )
 
 py_test(
-    name="glue_test",
-    srcs=["glue_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "glue_test",
+    srcs = ["glue_test.py"],
+    srcs_version = "PY3",
+    deps = [
         # absl/testing:absltest dep,
         "//temporian/core/data:event",
         "//temporian/core/data:sampling",
@@ -45,10 +45,10 @@ py_test(
 )
 
 py_test(
-    name="calendar_day_of_month_test",
-    srcs=["calendar_day_of_month_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "calendar_day_of_month_test",
+    srcs = ["calendar_day_of_month_test.py"],
+    srcs_version = "PY3",
+    deps = [
         # absl/testing:absltest dep,
         "//temporian/core/data:event",
         "//temporian/core/data:sampling",
@@ -61,10 +61,10 @@ py_test(
 )
 
 py_test(
-    name="calendar_day_of_week_test",
-    srcs=["calendar_day_of_week_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "calendar_day_of_week_test",
+    srcs = ["calendar_day_of_week_test.py"],
+    srcs_version = "PY3",
+    deps = [
         # absl/testing:absltest dep,
         "//temporian/core/data:event",
         "//temporian/core/data:sampling",
@@ -77,10 +77,10 @@ py_test(
 )
 
 py_test(
-    name="calendar_day_of_year_test",
-    srcs=["calendar_day_of_year_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "calendar_day_of_year_test",
+    srcs = ["calendar_day_of_year_test.py"],
+    srcs_version = "PY3",
+    deps = [
         # absl/testing:absltest dep,
         "//temporian/core/data:event",
         "//temporian/core/data:sampling",
@@ -93,10 +93,10 @@ py_test(
 )
 
 py_test(
-    name="calendar_hour_test",
-    srcs=["calendar_hour_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "calendar_hour_test",
+    srcs = ["calendar_hour_test.py"],
+    srcs_version = "PY3",
+    deps = [
         # absl/testing:absltest dep,
         "//temporian/core/data:event",
         "//temporian/core/data:sampling",
@@ -109,10 +109,10 @@ py_test(
 )
 
 py_test(
-    name="calendar_iso_week_test",
-    srcs=["calendar_iso_week_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "calendar_iso_week_test",
+    srcs = ["calendar_iso_week_test.py"],
+    srcs_version = "PY3",
+    deps = [
         # absl/testing:absltest dep,
         "//temporian/core/data:event",
         "//temporian/core/data:sampling",
@@ -125,10 +125,10 @@ py_test(
 )
 
 py_test(
-    name="calendar_minute_test",
-    srcs=["calendar_minute_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "calendar_minute_test",
+    srcs = ["calendar_minute_test.py"],
+    srcs_version = "PY3",
+    deps = [
         # absl/testing:absltest dep,
         "//temporian/core/data:event",
         "//temporian/core/data:sampling",
@@ -141,10 +141,10 @@ py_test(
 )
 
 py_test(
-    name="calendar_second_test",
-    srcs=["calendar_second_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "calendar_second_test",
+    srcs = ["calendar_second_test.py"],
+    srcs_version = "PY3",
+    deps = [
         # absl/testing:absltest dep,
         "//temporian/core/data:event",
         "//temporian/core/data:sampling",
@@ -157,10 +157,10 @@ py_test(
 )
 
 py_test(
-    name="calendar_year_test",
-    srcs=["calendar_year_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "calendar_year_test",
+    srcs = ["calendar_year_test.py"],
+    srcs_version = "PY3",
+    deps = [
         # absl/testing:absltest dep,
         "//temporian/core/data:event",
         "//temporian/core/data:sampling",
@@ -173,10 +173,10 @@ py_test(
 )
 
 py_test(
-    name="lag_test",
-    srcs=["lag_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "lag_test",
+    srcs = ["lag_test.py"],
+    srcs_version = "PY3",
+    deps = [
         # absl/testing:absltest dep,
         "//temporian/core:evaluator",
         "//temporian/core/operators:lag",
@@ -186,10 +186,10 @@ py_test(
 )
 
 py_test(
-    name="select_test",
-    srcs=["select_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "select_test",
+    srcs = ["select_test.py"],
+    srcs_version = "PY3",
+    deps = [
         # absl/testing:absltest dep,
         "//temporian/core:evaluator",
         "//temporian/core/operators:select",
@@ -200,10 +200,10 @@ py_test(
 )
 
 py_test(
-    name="simple_moving_average_test",
-    srcs=["simple_moving_average_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "simple_moving_average_test",
+    srcs = ["simple_moving_average_test.py"],
+    srcs_version = "PY3",
+    deps = [
         # absl/testing:absltest dep,
         # pandas dep,
         "//temporian/core/data:event",
@@ -216,10 +216,10 @@ py_test(
 )
 
 py_test(
-    name="moving_standard_deviation_test",
-    srcs=["moving_standard_deviation_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "moving_standard_deviation_test",
+    srcs = ["moving_standard_deviation_test.py"],
+    srcs_version = "PY3",
+    deps = [
         # absl/testing:absltest dep,
         # pandas dep,
         "//temporian/core/data:event",
@@ -231,10 +231,10 @@ py_test(
 )
 
 py_test(
-    name="moving_sum_test",
-    srcs=["moving_sum_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "moving_sum_test",
+    srcs = ["moving_sum_test.py"],
+    srcs_version = "PY3",
+    deps = [
         # absl/testing:absltest dep,
         # pandas dep,
         "//temporian/core/data:event",
@@ -246,10 +246,10 @@ py_test(
 )
 
 py_test(
-    name="moving_count_test",
-    srcs=["moving_count_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "moving_count_test",
+    srcs = ["moving_count_test.py"],
+    srcs_version = "PY3",
+    deps = [
         # absl/testing:absltest dep,
         # pandas dep,
         "//temporian/core/data:event",
@@ -261,43 +261,43 @@ py_test(
 )
 
 py_test(
-    name="propagate_test",
-    srcs=["propagate_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "propagate_test",
+    srcs = ["propagate_test.py"],
+    srcs_version = "PY3",
+    deps = [
         "//temporian/core/data:dtype",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
         "//temporian/core/operators:propagate",
-        "//temporian/implementation/numpy/operators:propagate",
         "//temporian/implementation/numpy:evaluator",
+        "//temporian/implementation/numpy/operators:propagate",
     ],
 )
 
 py_test(
-    name="sample_test",
-    srcs=["sample_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "sample_test",
+    srcs = ["sample_test.py"],
+    srcs_version = "PY3",
+    deps = [
         "//temporian/core/data:dtype",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
         "//temporian/core/operators:sample",
-        "//temporian/implementation/numpy/operators:sample",
         "//temporian/implementation/numpy:evaluator",
+        "//temporian/implementation/numpy/operators:sample",
     ],
 )
 
 py_test(
-    name="prefix_test",
-    srcs=["prefix_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "prefix_test",
+    srcs = ["prefix_test.py"],
+    srcs_version = "PY3",
+    deps = [
         "//temporian/core/data:dtype",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
         "//temporian/core/operators:prefix",
-        "//temporian/implementation/numpy/operators:prefix",
         "//temporian/implementation/numpy:evaluator",
+        "//temporian/implementation/numpy/operators:prefix",
     ],
 )
