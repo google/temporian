@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Calendar day of year operator."""
+"""Calendar day of year operator class and API call definitions."""
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
@@ -20,10 +20,6 @@ from temporian.core.operators.calendar.base import BaseCalendarOperator
 
 
 class CalendarDayOfYearOperator(BaseCalendarOperator):
-    """
-    Calendar operator to obtain the day of the year each timestamp belongs to.
-    """
-
     @classmethod
     @property
     def operator_def_key(cls) -> str:
@@ -39,16 +35,17 @@ operator_lib.register_operator(CalendarDayOfYearOperator)
 
 
 def calendar_day_of_year(sampling: Event) -> Event:
-    """Obtain the day of year each of the timestamps in an event's sampling
-    belongs to. Features in input event are ignored. Output feature contains
-    numbers between 1 and 366.
+    """Obtains the day of year the timestamps in an event's sampling are in.
+
+    Features in input event are ignored. Output feature contains numbers between
+    1 and 366.
 
     Args:
-        sampling: the event to get the days of year from.
+        sampling: The event to get the days of year from.
 
     Returns:
-        event with a single feature corresponding to the day of the year
-            each timestamp in `event`'s sampling belongs to, with the same
-            sampling as `event`.
+        Event with a single feature corresponding to the day of the year each
+        timestamp in `event`'s sampling belongs to, with the same sampling as
+        `event`.
     """
     return CalendarDayOfYearOperator(sampling).outputs()["event"]
