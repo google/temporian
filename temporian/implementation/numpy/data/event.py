@@ -43,6 +43,19 @@ class NumpyEvent:
     def sampling(self) -> NumpySampling:
         return self._sampling
 
+    @property
+    def _first_index_features(self) -> List[NumpyFeature]:
+        if self.first_index_value() is None:
+            return []
+        return self.data[self.first_index_value()]
+
+    @property
+    def dtypes(self) -> Dict[str, type]:
+        return {
+            feature.name: feature.dtype
+            for feature in self._first_index_features
+        }
+
     @sampling.setter
     def sampling(self, sampling: NumpySampling) -> None:
         self._sampling = sampling
@@ -66,13 +79,6 @@ class NumpyEvent:
         # to get the feature names. All features in all
         # indexes should have the same names
         return [feature.name for feature in self.first_index_features()]
-
-    @property
-    def dtypes(self) -> Dict[str, type]:
-        return {
-            feature.name: feature.dtype
-            for feature in self._first_index_features
-        }
 
     def schema(self) -> Event:
         return Event(

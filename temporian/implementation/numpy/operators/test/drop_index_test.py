@@ -74,6 +74,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         op_numpy_output_evt = operator_impl(event=self.numpy_input_evt)["event"]
 
         # validate output
+        print(op_numpy_output_evt, expected_numpy_output_evt)
         self.assertEqual(op_numpy_output_evt, expected_numpy_output_evt)
 
     def test_drop_item_id(self) -> None:

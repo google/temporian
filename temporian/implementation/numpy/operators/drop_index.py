@@ -6,6 +6,7 @@ import numpy as np
 from temporian.core.operators.drop_index import DropIndexOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
+from temporian.implementation.numpy.data.feature import DTYPE_REVERSE_MAPPING
 from temporian.implementation.numpy.data.sampling import NumpySampling
 
 IndexMetadata = Dict[
@@ -78,7 +79,7 @@ class DropIndexNumpyImplementation:
                         idx_name,
                         np.array(
                             [src_index_lvl[i]] * this_block_length,
-                            dtype=dst_dtypes[idx_name],
+                            dtype=DTYPE_REVERSE_MAPPING[dst_dtypes[idx_name]],
                         ),
                     )
                     for idx_name, i in zip(drop_index_names, drop_index_pos)
@@ -108,7 +109,7 @@ class DropIndexNumpyImplementation:
                     name=dst_feat_name,
                     data=np.empty(
                         metadata["block_length"],
-                        dtype=dst_dtypes[dst_feat_name],
+                        dtype=DTYPE_REVERSE_MAPPING[dst_dtypes[dst_feat_name]],
                     ),
                 )
                 for dst_feat_name in dst_feat_names

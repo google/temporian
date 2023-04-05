@@ -48,7 +48,7 @@ class DropIndexOperator(Operator):
         output_sampling = Sampling(
             index=[
                 index_name
-                for index_name in event.sampling().index()
+                for index_name in event.sampling.index
                 if index_name not in index_names
             ]
         )
@@ -67,48 +67,51 @@ class DropIndexOperator(Operator):
         self, event: Event, index_names: List[str], keep: bool
     ) -> List[Feature]:
         output_features = [
-            Feature(name=feature.name(), dtype=feature.dtype())
-            for feature in event.features()
+            Feature(name=feature.name, dtype=feature.dtype)
+            for feature in event.features
         ]
         if keep:
-            for feature_name in index_names:
+            for index_name in index_names:
                 # check no other feature exists with this name
-                if feature_name in event.feature_names:
+                if index_name in event.feature_names:
                     raise ValueError(
-                        f"Feature name {feature_name} coming from index already"
+                        f"Feature name {index_name} coming from index already"
                         " exists in event."
                     )  # TODO: add automatic suffix instead of raising error? add capability to rename index
 
                 output_features.append(
-                    Feature(name=feature_name, dtype=None)  # TODO: fix dtype
+                    Feature(
+                        name=index_name,
+                        dtype=event.sampling.index_dtypes[index_name],
+                    )  # TODO: fix dtype
                 )
 
         return output_features
 
     @property
     def dst_feat_names(self) -> List[str]:
-        feature_names = self.inputs()["event"].feature_names
+        feature_names = self.inputs["event"].feature_names
         return (
-            self.attributes()["index_names"] + feature_names
-            if self.attributes()["keep"]
+            self.attributes["index_names"] + feature_names
+            if self.attributes["keep"]
             else feature_names
         )
 
     @property
     def dst_index_names(self) -> List[str]:
         return [
-            name
-            for name in self.inputs()["event"].sampling().index()
-            if name not in self.attributes()["index_names"]
+            index_level.name
+            for index_level in self.inputs["event"].sampling.index
+            if index_level.name not in self.attributes["index_names"]
         ]
 
     @property
     def index_names(self) -> List[str]:
-        return self.attributes()["index_names"]
+        return self.attributes["index_names"]
 
     @property
     def keep(self) -> bool:
-        return self.attributes()["keep"]
+        return self.attributes["keep"]
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
@@ -118,12 +121,10 @@ class DropIndexOperator(Operator):
                 pb.OperatorDef.Attribute(
                     key="index_names",
                     type=pb.OperatorDef.Attribute.Type.REPEATED_STRING,
-                    is_optional=False,
                 ),
                 pb.OperatorDef.Attribute(
                     key="keep",
                     type=pb.OperatorDef.Attribute.Type.BOOL,
-                    is_optional=False,
                 ),
             ],
             inputs=[
@@ -140,7 +141,7 @@ def _process_index_names(
     event: Event, index_names: Optional[Union[List[str], str]]
 ) -> List[str]:
     if index_names is None:
-        return event.sampling().index()
+        return event.sampling.index
 
     if isinstance(index_names, str):
         index_names = [index_names]
@@ -152,7 +153,7 @@ def _process_index_names(
     missing_index_names = [
         index_name
         for index_name in index_names
-        if index_name not in event.sampling().index()
+        if index_name not in event.sampling.index
     ]
     if missing_index_names:
         raise KeyError(
@@ -217,4 +218,4 @@ def drop_index(
            names ['X', 'Y', 'Z', 'A', 'B', 'C'].
     """
     index_names = _process_index_names(event, index_names)
-    return DropIndexOperator(event, index_names, keep).outputs()["event"]
+    return DropIndexOperator(event, index_names, keep).outputs["event"]
