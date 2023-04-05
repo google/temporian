@@ -9,6 +9,42 @@ from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.implementation.numpy.operators.utils import _sort_by_timestamp
+from temporian.implementation.numpy.operators.base import OperatorImplementation
+
+
+class SetIndexNumpyImplementation(OperatorImplementation):
+    """
+    A class that represents the implementation of the SetIndexOperator for
+    NumpyEvent objects.
+
+    Attributes:
+        operator (SetIndexOperator): The SetIndexOperator object.
+    """
+
+    def __init__(self, operator: SetIndexOperator) -> None:
+        super().__init__(operator)
+
+    def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
+        """
+        Execute the SetIndexOperator to the given NumpyEvent and return the
+        updated NumpyEvent.
+
+        Args:
+            event:
+                The input NumpyEvent object.
+
+        Returns:
+            A dictionary containing the resulting NumpyEvent object with the key
+            "event".
+        """
+        # get attributes
+        feature_names = self.operator.attributes["feature_names"]
+        append = self.operator.attributes["append"]
+
+        if append:
+            return {"event": _append_impl(event, feature_names)}
+
+        return {"event": _set_impl(event, feature_names)}
 
 
 def _append_impl(event: NumpyEvent, append_feat_names: List[str]) -> NumpyEvent:
@@ -150,38 +186,3 @@ def _set_impl(event: NumpyEvent, set_feat_names: List[str]) -> NumpyEvent:
     return NumpyEvent(
         dst_event_data, NumpySampling(set_feat_names, dst_samp_data)
     )
-
-
-class SetIndexNumpyImplementation:
-    """
-    A class that represents the implementation of the SetIndexOperator for
-    NumpyEvent objects.
-
-    Attributes:
-        operator (SetIndexOperator): The SetIndexOperator object.
-    """
-
-    def __init__(self, operator: SetIndexOperator) -> None:
-        self.operator = operator
-
-    def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
-        """
-        Execute the SetIndexOperator to the given NumpyEvent and return the
-        updated NumpyEvent.
-
-        Args:
-            event:
-                The input NumpyEvent object.
-
-        Returns:
-            A dictionary containing the resulting NumpyEvent object with the key
-            "event".
-        """
-        # get attributes
-        feature_names = self.operator.attributes["feature_names"]
-        append = self.operator.attributes["append"]
-
-        if append:
-            return {"event": _append_impl(event, feature_names)}
-
-        return {"event": _set_impl(event, feature_names)}

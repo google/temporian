@@ -109,6 +109,7 @@ py_library(
     srcs = ["set_index.py"],
     srcs_version = "PY3",
     deps = [
+        ":base",
         ":utils",
         "//temporian/core/operators:set_index",
         "//temporian/implementation/numpy/data:event",

@@ -68,7 +68,9 @@ class SetIndexNumpyImplementationTest(absltest.TestCase):
         operator_impl = SetIndexNumpyImplementation(operator)
 
         # call operator
-        op_numpy_output_evt = operator_impl(event=self.numpy_input_evt)["event"]
+        op_numpy_output_evt = operator_impl.call(event=self.numpy_input_evt)[
+            "event"
+        ]
 
         # validate output
         self.assertEqual(op_numpy_output_evt, expected_numpy_output_evt)
@@ -106,7 +108,9 @@ class SetIndexNumpyImplementationTest(absltest.TestCase):
         operator_impl = SetIndexNumpyImplementation(operator)
 
         # call operator
-        op_numpy_output_evt = operator_impl(event=self.numpy_input_evt)["event"]
+        op_numpy_output_evt = operator_impl.call(event=self.numpy_input_evt)[
+            "event"
+        ]
 
         # validate output
         self.assertEqual(op_numpy_output_evt, expected_numpy_output_evt)
@@ -141,7 +145,9 @@ class SetIndexNumpyImplementationTest(absltest.TestCase):
         operator_impl = SetIndexNumpyImplementation(operator)
 
         # call operator
-        op_numpy_output_evt = operator_impl(event=self.numpy_input_evt)["event"]
+        op_numpy_output_evt = operator_impl.call(event=self.numpy_input_evt)[
+            "event"
+        ]
 
         # validate output
         self.assertEqual(op_numpy_output_evt, expected_numpy_output_evt)
@@ -178,7 +184,9 @@ class SetIndexNumpyImplementationTest(absltest.TestCase):
         operator_impl = SetIndexNumpyImplementation(operator)
 
         # call operator
-        op_numpy_output_evt = operator_impl(event=self.numpy_input_evt)["event"]
+        op_numpy_output_evt = operator_impl.call(event=self.numpy_input_evt)[
+            "event"
+        ]
 
         # validate output
         self.assertEqual(op_numpy_output_evt, expected_numpy_output_evt)
