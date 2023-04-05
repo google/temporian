@@ -8,12 +8,12 @@ from temporian.implementation.numpy.data.event import NumpyFeature
 def _sort_by_timestamp(
     event_data: Dict[str, List[NumpyFeature]], samp_data: Dict[str, np.array]
 ) -> None:
-    """Sorts the data in dst_event_data and dst_samp_data according to their
-    timestamps.
+    """Sorts the data in event_data and samp_data according to their
+    timestamps. This operations is done inplace.
 
-    This function takes in two dictionaries, dst_event_data and dst_samp_data,
+    This function takes in two dictionaries, event and samp_data,
     that contain event data and sampling data, respectively. It sorts the data
-    in both dictionaries based on the timestamps in dst_samp_data using a
+    in both dictionaries based on the timestamps in samp_data using a
     "mergesort" algorithm.
 
     Args:
