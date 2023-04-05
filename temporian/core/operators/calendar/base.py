@@ -24,7 +24,7 @@ from temporian.proto import core_pb2 as pb
 
 
 class BaseCalendarOperator(Operator, ABC):
-    """Interface definition and common logic implementation for calendar ops."""
+    """Interface definition and common logic for calendar operators."""
 
     def __init__(self, sampling: Event):
         super().__init__()
