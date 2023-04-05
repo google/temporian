@@ -30,27 +30,11 @@ class MovingCountNumpyImplementation(BaseWindowNumpyImplementation):
         super().__init__(operator)
 
     def _apply_operation(self, values: np.array) -> np.array:
-        """
-        Calculates the non-nan count of the values in each row of the input
-        array.
+        """Calculates the count of the values in each row in the input.
 
-        The input array should have a shape (n, m), where 'n' is the length of
-        the feature and 'm' is the size of the window. Each row represents a
-        window of data points, with 'nan' values used for padding when the
-        window size is  smaller than the number of data points in the time
-        series. The function  computes the count for each row (window) while
-        ignoring the 'nan' values.
+        NaNs are not counted.
 
-        Args:
-            values: A 2D NumPy array with shape (n, m) where each row represents
-                a  window of data points. 'n' is the length of the feature, and
-                'm' is the size of the window. The array can contain 'nan'
-                values as padding.
-
-        Returns:
-            np.array: A 1D NumPy array with shape (n,) containing the non-nan
-                    count for each row (window) in the input array.
-
+        See base class for further info.
         """
         return np.count_nonzero(~np.isnan(values), axis=1).astype(np.int64)
 
