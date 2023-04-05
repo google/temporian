@@ -50,8 +50,8 @@ class DropIndexOperator(Operator):
         # output sampling
         output_sampling = Sampling(
             index=[
-                index_name
-                for index_name in event.sampling.index
+                (index_name, index_dtype)
+                for index_name, index_dtype in event.sampling.index_dtypes.items()
                 if index_name not in index_names
             ]
         )
@@ -74,7 +74,8 @@ class DropIndexOperator(Operator):
             for feature in event.features
         ]
         if keep:
-            for index_name in index_names:
+            output_features = ([None] * len(index_names)) + output_features
+            for i, index_name in enumerate(index_names):
                 # check no other feature exists with this name
                 if index_name in event.feature_names:
                     raise ValueError(
@@ -82,11 +83,9 @@ class DropIndexOperator(Operator):
                         " exists in event."
                     )  # TODO: add automatic suffix instead of raising error? add capability to rename index
 
-                output_features.append(
-                    Feature(
-                        name=index_name,
-                        dtype=event.sampling.index_dtypes[index_name],
-                    )  # TODO: fix dtype
+                output_features[i] = Feature(
+                    name=index_name,
+                    dtype=event.sampling.index_dtypes[index_name],
                 )
 
         return output_features

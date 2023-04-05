@@ -85,6 +85,7 @@ py_library(
     srcs = ["drop_index.py"],
     srcs_version = "PY3",
     deps = [
+        ":base",
         "//temporian/core/operators:drop_index",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",

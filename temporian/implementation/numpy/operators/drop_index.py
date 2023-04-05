@@ -8,13 +8,14 @@ from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.data.feature import DTYPE_REVERSE_MAPPING
 from temporian.implementation.numpy.data.sampling import NumpySampling
+from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 IndexMetadata = Dict[
     str, Union[int, List[List[NumpyFeature]], List[np.ndarray]]
 ]
 
 
-class DropIndexNumpyImplementation:
+class DropIndexNumpyImplementation(OperatorImplementation):
     def __init__(self, operator: DropIndexOperator) -> None:
         """
         Initializes an instance of the DropIndexNumpyImplementation class.
@@ -22,7 +23,7 @@ class DropIndexNumpyImplementation:
         Args:
             operator: The DropIndexOperator instance.
         """
-        self.operator = operator
+        super().__init__(operator)
 
     def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
         """
