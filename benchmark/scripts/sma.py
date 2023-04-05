@@ -11,10 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-Basic benchmarking script for temporian.
+"""Benchmarking script for the simple moving average operator.
 
-The script creates two events, applies some operators, and evaluates the graph.
+The script creates an event, applies an sma on it, and evaluates the graph.
 """
 
 import numpy as np
