@@ -30,14 +30,15 @@ class ArithmeticNumpyImplementation(OperatorImplementation):
     def __call__(
         self, event_1: NumpyEvent, event_2: NumpyEvent
     ) -> Dict[str, NumpyEvent]:
-        """Sum two Events.
+        """Sums two NumpyEvents.
 
         Args:
-            event_1: First Event.
-            event_2: Second Event.
+            event_1: First event.
+            event_2: Second event.
 
         Returns:
-            Arithmetic of the two Events according to resolution and arithmetic operator.
+            Result of the arithmetic operation of the two Events according to
+            resolution and operator.
 
         Raises:
             ValueError: If sampling of both events is not equal.
