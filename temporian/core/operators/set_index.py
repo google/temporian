@@ -96,12 +96,10 @@ class SetIndexOperator(Operator):
                 pb.OperatorDef.Attribute(
                     key="feature_names",
                     type=pb.OperatorDef.Attribute.Type.REPEATED_STRING,
-                    is_optional=False,
                 ),
                 pb.OperatorDef.Attribute(
                     key="append",
                     type=pb.OperatorDef.Attribute.Type.BOOL,
-                    is_optional=False,
                 ),
             ],
             inputs=[
