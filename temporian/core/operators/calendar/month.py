@@ -50,4 +50,4 @@ def calendar_month(sampling: Event) -> Event:
         event with a single feature corresponding to the month each timestamp in
             `event`'s sampling belongs to, with the same sampling as `event`.
     """
-    return CalendarMonthOperator(sampling).outputs()["event"]
+    return CalendarMonthOperator(sampling).outputs["event"]

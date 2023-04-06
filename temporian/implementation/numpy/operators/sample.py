@@ -3,8 +3,8 @@
 from typing import Dict
 import numpy as np
 
-from temporian.implementation.numpy.data.event import (
-    NumpyEvent,
+from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.feature import (
     NumpyFeature,
     dtype_to_np_dtype,
 )
@@ -28,11 +28,11 @@ class SampleNumpyImplementation(OperatorImplementation):
         dst_event = NumpyEvent(data={}, sampling=sampling.sampling)
 
         # Type and replacement values
-        output_features = self._operator.outputs()["event"].features()
+        output_features = self._operator.outputs["event"].features
         output_missing_and_np_dtypes = [
             (
-                dtype.MissingValue(f.dtype()),
-                dtype_to_np_dtype(f.dtype()),
+                dtype.MissingValue(f.dtype),
+                dtype_to_np_dtype(f.dtype),
             )
             for f in output_features
         ]

@@ -13,7 +13,7 @@ class SelectNumpyImplementation(OperatorImplementation):
         super().__init__(operator)
 
     def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
-        feature_names = self.operator.attributes()["feature_names"]
+        feature_names = self.operator.attributes["feature_names"]
 
         output_event = NumpyEvent(
             {

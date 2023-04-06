@@ -18,7 +18,7 @@ import numpy as np
 import pandas as pd
 
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.event import NumpyFeature
+from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
 
 

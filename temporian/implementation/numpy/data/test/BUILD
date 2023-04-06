@@ -12,6 +12,7 @@ py_test(
     deps = [
         # absl/testing:absltest dep,
         "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:feature",
         "//temporian/implementation/numpy/data:sampling",
     ],
 )
@@ -23,6 +24,7 @@ py_test(
     deps = [
         # absl/testing:absltest dep,
         "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:feature",
         "//temporian/implementation/numpy/data:sampling",
     ],
 )
@@ -47,5 +49,8 @@ py_test(
     name = "plotter_test",
     srcs = ["plotter_test.py"],
     srcs_version = "PY3",
-    deps = ["//temporian/implementation/numpy/data:event","//temporian/implementation/numpy/data:plotter"],
+    deps = [
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:plotter",
+    ],
 )

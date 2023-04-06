@@ -46,21 +46,21 @@ class BaseWindowOperator(Operator, ABC):
         if sampling is not None:
             self.add_input("sampling", sampling)
             self._has_sampling = True
-            effective_sampling = sampling.sampling()
+            effective_sampling = sampling.sampling
         else:
-            effective_sampling = event.sampling()
+            effective_sampling = event.sampling
             self._has_sampling = False
 
         self.add_input("event", event)
 
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=f.name(),
+                name=f.name,
                 dtype=self.get_feature_dtype(f),
                 sampling=effective_sampling,
                 creator=self,
             )
-            for f in event.features()
+            for f in event.features
         ]
         self._output_dtypes = [feature.dtype() for feature in output_features]
 
@@ -76,6 +76,7 @@ class BaseWindowOperator(Operator, ABC):
 
         self.check()
 
+    @property
     def window_length(self) -> Duration:
         return self._window_length
 

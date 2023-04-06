@@ -14,33 +14,42 @@
 
 """A sampling."""
 
-from typing import List, Optional, Any
+from __future__ import annotations
+from typing import List, Optional, TYPE_CHECKING
+
+
+if TYPE_CHECKING:
+    from temporian.core.operators.base import Operator
 
 
 class Sampling(object):
     def __init__(
         self,
         index: List[str],
-        creator: Optional[Any] = None,
+        creator: Optional[Operator] = None,
         is_unix_timestamp: bool = False,
     ):
         assert isinstance(index, list), f"Got {index}"
 
-        self._index: List[str] = index
+        self._index = index
         self._creator = creator
         self._is_unix_timestamp = is_unix_timestamp
 
     def __repr__(self):
-        return f"Sampling<index:{self._index},id:{id(self)}>"
+        return f"Sampling<index:{self.index},id:{id(self)}>"
 
+    @property
     def index(self) -> List[str]:
         return self._index
 
-    def creator(self):
+    @property
+    def creator(self) -> Optional[Operator]:
         return self._creator
 
-    def set_creator(self, creator):
-        self._creator = creator
-
+    @property
     def is_unix_timestamp(self) -> bool:
         return self._is_unix_timestamp
+
+    @creator.setter
+    def creator(self, creator: Optional[Operator]):
+        self._creator = creator

@@ -20,7 +20,7 @@ from temporian.core.operators.calendar.year import (
     CalendarYearOperator,
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.event import NumpyFeature
+from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.operators.calendar.year import (
     CalendarYearNumpyImplementation,
 )
@@ -66,7 +66,7 @@ class CalendarYearNumpyImplementationTest(absltest.TestCase):
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(
-            output["event"]._first_index_features[0].dtype == dtype.INT32
+            output["event"].first_index_features()[0].dtype == dtype.INT32
         )
 
 

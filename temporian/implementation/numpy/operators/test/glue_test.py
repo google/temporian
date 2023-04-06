@@ -17,7 +17,6 @@ from absl.testing import absltest
 import numpy as np
 import pandas as pd
 
-from temporian.core.data.event import Event
 from temporian.core.data.event import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.glue import GlueOperator
@@ -25,8 +24,6 @@ from temporian.core.data import event as event_lib
 from temporian.core.data import dtype as dtype_lib
 
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.event import NumpyFeature
-from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.implementation.numpy.operators.glue import (
     GlueNumpyImplementation,
 )

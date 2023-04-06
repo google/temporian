@@ -50,4 +50,4 @@ def calendar_minute(sampling: Event) -> Event:
         event with a single feature corresponding to the minute each timestamp
             in `event`'s sampling belongs to, with the same sampling as `event`.
     """
-    return CalendarMinuteOperator(sampling).outputs()["event"]
+    return CalendarMinuteOperator(sampling).outputs["event"]

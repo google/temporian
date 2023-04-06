@@ -18,7 +18,7 @@ from typing import Dict, Optional, List, Any
 import numpy as np
 from temporian.core.operators.window.base import BaseWindowOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.event import NumpyFeature
+from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -69,7 +69,7 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
             args = {
                 "event_timestamps": src_timestamps,
                 "event_values": src_ts.data,
-                "window_length": self.operator.window_length(),
+                "window_length": self.operator.window_length,
             }
             if self.operator.has_sampling():
                 args["sampling_timestamps"] = sampling_timestamps

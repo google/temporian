@@ -38,19 +38,19 @@ class Sample(Operator):
 
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=f.name(),
-                dtype=f.dtype(),
-                sampling=sampling.sampling(),
+                name=f.name,
+                dtype=f.dtype,
+                sampling=sampling.sampling,
                 creator=self,
             )
-            for f in event.features()
+            for f in event.features
         ]
 
         self.add_output(
             "event",
             Event(
                 features=output_features,
-                sampling=sampling.sampling(),
+                sampling=sampling.sampling,
                 creator=self,
             ),
         )
@@ -105,4 +105,4 @@ def sample(
         A sampled event.
     """
 
-    return Sample(event=event, sampling=sampling).outputs()["event"]
+    return Sample(event=event, sampling=sampling).outputs["event"]
