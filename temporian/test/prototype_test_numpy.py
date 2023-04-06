@@ -11,16 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import numpy as np
 import pandas as pd
-from absl import logging
 from absl.testing import absltest
 
-from temporian.core import evaluator
-from temporian.core.data.event import Event, Feature
-from temporian.core.data.sampling import Sampling
-from temporian.core.operators.glue import glue
-from temporian.core.operators.lag import lag
 from temporian.implementation.numpy.data.event import NumpyEvent
 
 # Even if not used, ensure that all the necessary code is loaded.

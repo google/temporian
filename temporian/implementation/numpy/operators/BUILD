@@ -16,8 +16,8 @@ py_library(
         ":lag",
         ":prefix",
         ":propagate",
-        ":select",
         ":sample",
+        ":select",
         "//temporian/implementation/numpy/operators/calendar:day_of_month",
         "//temporian/implementation/numpy/operators/calendar:day_of_week",
         "//temporian/implementation/numpy/operators/window:moving_count",
@@ -43,10 +43,12 @@ py_library(
     name = "arithmetic",
     srcs = ["arithmetic.py"],
     srcs_version = "PY3",
-    deps = [ ":base",
+    deps = [
+        ":base",
         "//temporian/core/operators:arithmetic",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:feature",
     ],
 )
 
@@ -67,11 +69,13 @@ py_library(
     name = "lag",
     srcs = ["lag.py"],
     srcs_version = "PY3",
-    deps = [ ":base",
+    deps = [
+        ":base",
         "//temporian/core/data:duration",
         "//temporian/core/operators:lag",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:feature",
         "//temporian/implementation/numpy/data:sampling",
     ],
 )
@@ -80,7 +84,8 @@ py_library(
     name = "select",
     srcs = ["select.py"],
     srcs_version = "PY3",
-    deps = [ ":base",
+    deps = [
+        ":base",
         "//temporian/core/operators:select",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
@@ -91,7 +96,8 @@ py_library(
     name = "propagate",
     srcs = ["propagate.py"],
     srcs_version = "PY3",
-    deps = [ ":base",
+    deps = [
+        ":base",
         "//temporian/core/data:duration",
         "//temporian/core/operators:propagate",
         "//temporian/implementation/numpy:implementation_lib",
@@ -105,7 +111,8 @@ py_library(
     name = "sample",
     srcs = ["sample.py"],
     srcs_version = "PY3",
-    deps = [ ":base",
+    deps = [
+        ":base",
         "//temporian/core/data:duration",
         "//temporian/core/operators:sample",
         "//temporian/implementation/numpy:implementation_lib",
@@ -116,12 +123,12 @@ py_library(
     ],
 )
 
-
 py_library(
     name = "prefix",
     srcs = ["prefix.py"],
     srcs_version = "PY3",
-    deps = [ ":base",
+    deps = [
+        ":base",
         "//temporian/core/data:duration",
         "//temporian/core/operators:prefix",
         "//temporian/implementation/numpy:implementation_lib",

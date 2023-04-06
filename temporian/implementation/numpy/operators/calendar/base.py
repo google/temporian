@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from datetime import datetime, timezone
 from typing import Dict, Any
 
 import numpy as np
 from temporian.core.operators.calendar.base import BaseCalendarOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.event import NumpyFeature
+from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 

@@ -4,3 +4,6 @@ build --announce_rc
 build --noincompatible_strict_action_env
 build:linux --copt=-fdiagnostics-color=always
 build --color=yes
+
+build --cxxopt=-std=c++17
+build --host_cxxopt=-std=c++17

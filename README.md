@@ -115,6 +115,21 @@ bazel test //...:all
 
 > **Note**: You can use the Bazel test flag `--test_output=streamed` to see the test logs in realtime.
 
+## Benchmarking
+
+Time and memory benchmarking is available through the following commands:
+
+```shell
+bazel -c opt run benchmark:time -- [name]
+bazel -c opt run benchmark:memory -- [name] [-p]
+```
+
+where `[name]` is the name of one of the python scripts in
+[benchmark/scripts](benchmark/scripts), e.g. `-- basic`.
+
+`-p` flag displays memory over time plot instead of line-by-line memory
+consumption.
+
 ## Credits
 
 This project is a collaboration between Google and [Tryolabs](https://tryolabs.com/).

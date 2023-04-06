@@ -58,13 +58,13 @@ class OpI1O1(base.Operator):
                     Feature(
                         "f3",
                         dtype.FLOAT64,
-                        sampling=event.sampling(),
+                        sampling=event.sampling,
                         creator=self,
                     ),
                     Feature(
                         "f4",
                         dtype.FLOAT64,
-                        sampling=event.sampling(),
+                        sampling=event.sampling,
                         creator=self,
                     ),
                 ],
@@ -95,8 +95,8 @@ class OpI1O1NotCreator(base.Operator):
         self.add_output(
             "output",
             Event(
-                features=[f for f in event.features()],
-                sampling=event.sampling(),
+                features=[f for f in event.features],
+                sampling=event.sampling,
                 creator=self,
             ),
         )
@@ -129,17 +129,17 @@ class OpI2O1(base.Operator):
                     Feature(
                         "f5",
                         dtype.FLOAT64,
-                        sampling=event_1.sampling(),
+                        sampling=event_1.sampling,
                         creator=self,
                     ),
                     Feature(
                         "f6",
                         dtype.FLOAT64,
-                        sampling=event_1.sampling(),
+                        sampling=event_1.sampling,
                         creator=self,
                     ),
                 ],
-                sampling=event_1.sampling(),
+                sampling=event_1.sampling,
                 creator=self,
             ),
         )
@@ -173,11 +173,11 @@ class OpI1O2(base.Operator):
                     Feature(
                         "f1",
                         dtype.FLOAT64,
-                        sampling=event.sampling(),
+                        sampling=event.sampling,
                         creator=self,
                     )
                 ],
-                sampling=event.sampling(),
+                sampling=event.sampling,
                 creator=self,
             ),
         )
@@ -188,11 +188,11 @@ class OpI1O2(base.Operator):
                     Feature(
                         "f1",
                         dtype.FLOAT64,
-                        sampling=event.sampling(),
+                        sampling=event.sampling,
                         creator=self,
                     )
                 ],
-                sampling=event.sampling(),
+                sampling=event.sampling,
                 creator=self,
             ),
         )

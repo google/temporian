@@ -15,9 +15,21 @@ class NumpySampling:
         data: Dict[Tuple, np.ndarray],
         is_unix_timestamp: bool = False,
     ) -> None:
-        self.index = index
-        self.data = data
-        self.is_unix_timestamp = is_unix_timestamp
+        self._index = index
+        self._data = data
+        self._is_unix_timestamp = is_unix_timestamp
+
+    @property
+    def index(self) -> List[str]:
+        return self._index
+
+    @property
+    def data(self) -> Dict[Tuple, np.ndarray]:
+        return self._data
+
+    @property
+    def is_unix_timestamp(self) -> bool:
+        return self._is_unix_timestamp
 
     @property
     def has_repeated_timestamps(self) -> bool:
@@ -33,7 +45,7 @@ class NumpySampling:
         return False
 
     def __repr__(self) -> str:
-        with np.printoptions(precision=4, threshold=6):
+        with np.printoptions(precision=4, threshold=20):
             data_repr = []
             for idx, (k, v) in enumerate(self.data.items()):
                 if idx > MAX_NUM_PRINTED_INDEX:

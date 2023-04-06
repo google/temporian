@@ -85,8 +85,8 @@ def load(
         proto = text_format.Parse(f.read(), pb.Processor())
     p = unserialize(proto)
 
-    inputs = p.inputs()
-    outputs = p.outputs()
+    inputs = p.inputs
+    outputs = p.outputs
 
     if squeeze and len(inputs) == 1:
         inputs = list(inputs.values())[0]
@@ -101,14 +101,12 @@ def serialize(src: processor.Preprocessor) -> pb.Processor:
     """Serializes a processor into an equivalent protobuffer."""
 
     return pb.Processor(
-        operators=[_serialize_operator(o) for o in src.operators()],
-        events=[_serialize_event(e) for e in src.events()],
-        features=[_serialize_feature(f) for f in src.features()],
-        samplings=[_serialize_sampling(s) for s in src.samplings()],
-        inputs=[_serialize_io_signature(k, e) for k, e in src.inputs().items()],
-        outputs=[
-            _serialize_io_signature(k, e) for k, e in src.outputs().items()
-        ],
+        operators=[_serialize_operator(o) for o in src.operators],
+        events=[_serialize_event(e) for e in src.events],
+        features=[_serialize_feature(f) for f in src.features],
+        samplings=[_serialize_sampling(s) for s in src.samplings],
+        inputs=[_serialize_io_signature(k, e) for k, e in src.inputs.items()],
+        outputs=[_serialize_io_signature(k, e) for k, e in src.outputs.items()],
     )
 
 
@@ -132,30 +130,30 @@ def unserialize(src: pb.Processor) -> processor.Preprocessor:
 
     for src_event in src.events:
         if src_event.creator_operator_id:
-            events[src_event.id].set_creator(
-                get_creator(src_event.creator_operator_id)
+            events[src_event.id].creator = get_creator(
+                src_event.creator_operator_id
             )
     for src_feature in src.features:
         if src_feature.creator_operator_id:
-            features[src_feature.id].set_creator(
-                get_creator(src_feature.creator_operator_id)
+            features[src_feature.id].creator = get_creator(
+                src_feature.creator_operator_id
             )
     for src_sampling in src.samplings:
         if src_sampling.creator_operator_id:
-            samplings[src_sampling.id].set_creator(
-                get_creator(src_sampling.creator_operator_id)
+            samplings[src_sampling.id].creator = get_creator(
+                src_sampling.creator_operator_id
             )
 
     # Copy extracted items.
     p = processor.Preprocessor()
     for sampling in samplings.values():
-        p.samplings().add(sampling)
+        p.samplings.add(sampling)
     for event in events.values():
-        p.events().add(event)
+        p.events.add(event)
     for feature in features.values():
-        p.features().add(feature)
+        p.features.add(feature)
     for operator in operators.values():
-        p.operators().add(operator)
+        p.operators.add(operator)
 
     # IO Signature
     def get_event(event_id: str) -> Event:
@@ -164,10 +162,10 @@ def unserialize(src: pb.Processor) -> processor.Preprocessor:
         return events[event_id]
 
     for item in src.inputs:
-        p.inputs()[item.key] = get_event(item.event_id)
+        p.inputs[item.key] = get_event(item.event_id)
 
     for item in src.outputs:
-        p.outputs()[item.key] = get_event(item.event_id)
+        p.outputs[item.key] = get_event(item.event_id)
 
     return p
 
@@ -190,14 +188,14 @@ def _serialize_operator(src: base.Operator) -> pb.Operator:
         operator_def_key=src.definition().key,
         inputs=[
             pb.Operator.EventArgument(key=k, event_id=_identifier(v))
-            for k, v in src.inputs().items()
+            for k, v in src.inputs.items()
         ],
         outputs=[
             pb.Operator.EventArgument(key=k, event_id=_identifier(v))
-            for k, v in src.outputs().items()
+            for k, v in src.outputs.items()
         ],
         attributes=[
-            _attribute_to_proto(k, v) for k, v in src.attributes().items()
+            _attribute_to_proto(k, v) for k, v in src.attributes.items()
         ],
     )
 
@@ -217,46 +215,46 @@ def _unserialize_operator(
     attribute_args = {x.key: _attribute_from_proto(x) for x in src.attributes}
 
     # We construct the operator.
-    op = operator_class(**input_args, **attribute_args)
+    op: base.Operator = operator_class(**input_args, **attribute_args)
 
     # Check that the operator signature matches the expected one.
-    if op.inputs().keys() != input_args.keys():
+    if op.inputs.keys() != input_args.keys():
         raise ValueError(
             f"Restoring the operator {src.operator_def_key} lead "
             "to an unexpected input signature. "
-            f"Expected: {input_args.keys()} Effective: {op.inputs().keys()}"
+            f"Expected: {input_args.keys()} Effective: {op.inputs.keys()}"
         )
 
-    if op.outputs().keys() != output_args.keys():
+    if op.outputs.keys() != output_args.keys():
         raise ValueError(
             f"Restoring the operator {src.operator_def_key} lead "
             "to an unexpected output signature. "
-            f"Expected: {output_args.keys()} Effective: {op.outputs().keys()}"
+            f"Expected: {output_args.keys()} Effective: {op.outputs.keys()}"
         )
 
-    if op.attributes().keys() != attribute_args.keys():
+    if op.attributes.keys() != attribute_args.keys():
         raise ValueError(
             f"Restoring the operator {src.operator_def_key} lead to an"
             " unexpected attributes signature. Expected:"
-            f" {attribute_args.keys()} Effective: {op.attributes().keys()}"
+            f" {attribute_args.keys()} Effective: {op.attributes.keys()}"
         )
     # TODO: Deep check of equality of the inputs / outputs / attributes
 
     # Override the inputs / outputs / attributes
-    op.set_inputs(input_args)
-    op.set_outputs(output_args)
-    op.set_attributes(attribute_args)
+    op.inputs = input_args
+    op.outputs = output_args
+    op.attributes = attribute_args
     return op
 
 
 def _serialize_event(src: Event) -> pb.Event:
     return pb.Event(
         id=_identifier(src),
-        sampling_id=_identifier(src.sampling()),
-        feature_ids=[_identifier(f) for f in src.features()],
-        name=src.name(),
+        sampling_id=_identifier(src.sampling),
+        feature_ids=[_identifier(f) for f in src.features],
+        name=src.name,
         creator_operator_id=(
-            _identifier(src.creator()) if src.creator() is not None else None
+            _identifier(src.creator) if src.creator is not None else None
         ),
     )
 
@@ -283,11 +281,11 @@ def _unserialize_event(
 def _serialize_feature(src: Feature) -> pb.Feature:
     return pb.Feature(
         id=_identifier(src),
-        name=src.name(),
-        dtype=_serialize_dtype(src.dtype()),
-        sampling_id=_identifier(src.sampling()),
+        name=src.name,
+        dtype=_serialize_dtype(src.dtype),
+        sampling_id=_identifier(src.sampling),
         creator_operator_id=(
-            _identifier(src.creator()) if src.creator() is not None else None
+            _identifier(src.creator) if src.creator is not None else None
         ),
     )
 
@@ -309,9 +307,9 @@ def _unserialize_feature(
 def _serialize_sampling(src: Sampling) -> pb.Sampling:
     return pb.Sampling(
         id=_identifier(src),
-        index=src.index(),
+        index=src.index,
         creator_operator_id=(
-            _identifier(src.creator()) if src.creator() is not None else None
+            _identifier(src.creator) if src.creator is not None else None
         ),
     )
 

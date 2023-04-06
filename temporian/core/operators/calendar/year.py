@@ -49,4 +49,4 @@ def calendar_year(sampling: Event) -> Event:
         event with a single feature corresponding to the year each timestamp in
             `event`'s sampling belongs to, with the same sampling as `event`.
     """
-    return CalendarYearOperator(sampling).outputs()["event"]
+    return CalendarYearOperator(sampling).outputs["event"]

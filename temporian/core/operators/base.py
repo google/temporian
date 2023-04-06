@@ -61,17 +61,50 @@ class Operator(ABC):
     def __str__(self):
         return (
             f"Operator<key: {self.definition().key}, id: {id(self)},"
-            f" attributes: {self.attributes()}>"
+            f" attributes: {self.attributes}>"
         )
 
-    def outputs(self) -> dict[str, Event]:
-        return self._outputs
+    @property
+    def attributes(self) -> dict[str, Any]:
+        return self._attributes
 
+    @property
     def inputs(self) -> dict[str, Event]:
         return self._inputs
 
-    def attributes(self) -> dict[str, Any]:
-        return self._attributes
+    @property
+    def outputs(self) -> dict[str, Event]:
+        return self._outputs
+
+    @attributes.setter
+    def attributes(self, attributes: dict[str, Any]):
+        self._attributes = attributes
+
+    @inputs.setter
+    def inputs(self, inputs: dict[str, Event]):
+        self._inputs = inputs
+
+    @outputs.setter
+    def outputs(self, outputs: dict[str, Event]):
+        self._outputs = outputs
+
+    def add_input(self, key: str, event: Event) -> None:
+        with OperatorExceptionDecorator(self):
+            if key in self.inputs:
+                raise ValueError(f'Already existing input "{key}".')
+            self.inputs[key] = event
+
+    def add_output(self, key: str, event: Event) -> None:
+        with OperatorExceptionDecorator(self):
+            if key in self.outputs:
+                raise ValueError(f'Already existing output "{key}".')
+            self.outputs[key] = event
+
+    def add_attribute(self, key: str, value: Any) -> None:
+        with OperatorExceptionDecorator(self):
+            if key in self.attributes:
+                raise ValueError(f'Already existing attribute "{key}".')
+            self.attributes[key] = value
 
     def check(self) -> None:
         """Ensures that the operator is valid."""
@@ -102,43 +135,16 @@ class Operator(ABC):
                 if available_output not in [v.key for v in definition.outputs]:
                     raise ValueError(f'Unexpected output "{available_output}".')
 
-    def add_input(self, key: str, event: Event) -> None:
-        with OperatorExceptionDecorator(self):
-            if key in self._inputs:
-                raise ValueError(f'Already existing input "{key}".')
-            self._inputs[key] = event
-
-    def add_output(self, key: str, event: Event) -> None:
-        with OperatorExceptionDecorator(self):
-            if key in self._outputs:
-                raise ValueError(f'Already existing output "{key}".')
-            self._outputs[key] = event
-
-    def add_attribute(self, key: str, value: Any) -> None:
-        with OperatorExceptionDecorator(self):
-            if key in self._attributes:
-                raise ValueError(f'Already existing attribute "{key}".')
-            self._attributes[key] = value
-
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         raise NotImplementedError()
 
     def definition(self):
-        return self.__class__.build_op_definition()
+        return self.build_op_definition()
 
     @classmethod
-    def operator_key(cls):
+    def operator_key(cls) -> str:
         return cls.build_op_definition().key
-
-    def set_inputs(self, inputs: dict[str, Event]) -> None:
-        self._inputs = inputs
-
-    def set_outputs(self, outputs: dict[str, Event]) -> None:
-        self._outputs = outputs
-
-    def set_attributes(self, attributes: dict[str, Event]) -> None:
-        self._attributes = attributes
 
     def list_matching_io_samplings(self) -> list[tuple[str, str]]:
         """List pairs of input/output pairs with the same sampling.
@@ -152,7 +158,7 @@ class Operator(ABC):
         matches: list[tuple[str, str]] = []
         for output_key, output_value in self._outputs.items():
             for input_key, input_value in self._inputs.items():
-                if output_value.sampling() is input_value.sampling():
+                if output_value.sampling is input_value.sampling:
                     matches.append((input_key, output_key))
 
         return matches

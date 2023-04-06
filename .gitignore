@@ -2,3 +2,9 @@ bazel*
 .venv
 **/__pycache__/
 my_example
+
+# benchmark outputs
+profile.*
+
+# C++ binaries
+*.so
