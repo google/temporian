@@ -28,7 +28,7 @@ flags.DEFINE_string(
 )
 
 
-def license():
+def license_content():
     """Google license."""
 
     return """# Copyright 2021 Google LLC.
@@ -74,7 +74,7 @@ def main(argv):
         encoding="utf-8",
     ) as file:
         file.write(
-            f'''{license()}
+            f'''{license_content()}
 
 """{capitalized_op} operator class and public API function definitions."""
 
@@ -160,7 +160,7 @@ py_library(
         encoding="utf-8",
     ) as file:
         file.write(
-            f'''{license()}
+            f'''{license_content()}
 
 """Implementation for the {capitalized_op} operator."""
 
@@ -231,7 +231,7 @@ py_library(
         encoding="utf-8",
     ) as file:
         file.write(
-            f"""{license()}
+            f"""{license_content()}
 
 from absl.testing import absltest
 
