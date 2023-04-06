@@ -45,7 +45,7 @@ class NumpySampling:
         return False
 
     def __repr__(self) -> str:
-        with np.printoptions(precision=4, threshold=6):
+        with np.printoptions(precision=4, threshold=20):
             data_repr = []
             for idx, (k, v) in enumerate(self.data.items()):
                 if idx > MAX_NUM_PRINTED_INDEX:

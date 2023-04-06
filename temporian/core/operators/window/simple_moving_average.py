@@ -35,10 +35,6 @@ class SimpleMovingAverageOperator(BaseWindowOperator):
     def operator_def_key(cls) -> str:
         return "SIMPLE_MOVING_AVERAGE"
 
-    @property
-    def prefix(self) -> str:
-        return "sma"
-
     def get_feature_dtype(self, feature: Feature) -> str:
         """Returns the dtype of the output feature.
 

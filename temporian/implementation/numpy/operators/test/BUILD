@@ -196,6 +196,7 @@ py_test(
         "//temporian/core/operators/window:simple_moving_average",
         "//temporian/implementation/numpy:evaluator",
         "//temporian/implementation/numpy/operators/window:simple_moving_average",
+        "//temporian/implementation/numpy_cc/operators:window",
     ],
 )
 
@@ -209,6 +210,7 @@ py_test(
         "//temporian/core/data:feature",
         "//temporian/core/operators/window:moving_standard_deviation",
         "//temporian/implementation/numpy/operators/window:moving_standard_deviation",
+        "//temporian/implementation/numpy_cc/operators:window",
     ],
 )
 
@@ -222,6 +224,7 @@ py_test(
         "//temporian/core/data:feature",
         "//temporian/core/operators/window:moving_sum",
         "//temporian/implementation/numpy/operators/window:moving_sum",
+        "//temporian/implementation/numpy_cc/operators:window",
     ],
 )
 
@@ -235,6 +238,7 @@ py_test(
         "//temporian/core/data:feature",
         "//temporian/core/operators/window:moving_count",
         "//temporian/implementation/numpy/operators/window:moving_count",
+        "//temporian/implementation/numpy_cc/operators:window",
     ],
 )
 
