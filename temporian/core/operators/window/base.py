@@ -62,7 +62,7 @@ class BaseWindowOperator(Operator, ABC):
             )
             for f in event.features
         ]
-        self._output_dtypes = [feature.dtype() for feature in output_features]
+        self._output_dtypes = [feature.dtype for feature in output_features]
 
         # output
         self.add_output(
@@ -80,9 +80,11 @@ class BaseWindowOperator(Operator, ABC):
     def window_length(self) -> Duration:
         return self._window_length
 
+    @property
     def has_sampling(self) -> bool:
         return self._has_sampling
 
+    @property
     def output_dtypes(self) -> List[dtype.DType]:
         return self._output_dtypes
 

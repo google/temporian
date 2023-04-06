@@ -5,6 +5,8 @@ package(
 
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension")
 
+# TODO: Merge all the extensions into a single .so file.
+
 pybind_extension(
     name = "sample",
     srcs = ["sample.cc"],

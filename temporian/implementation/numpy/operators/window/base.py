@@ -71,7 +71,7 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
                 "event_values": src_ts.data,
                 "window_length": self.operator.window_length,
             }
-            if self.operator.has_sampling():
+            if self.operator.has_sampling:
                 args["sampling_timestamps"] = sampling_timestamps
             dst_feature = implementation(**args)
             dst_features.append(NumpyFeature(src_ts.name, dst_feature))
