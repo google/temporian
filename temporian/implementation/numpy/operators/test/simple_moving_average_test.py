@@ -29,14 +29,78 @@ from temporian.core.data import event as event_lib
 from temporian.core.data import feature as feature_lib
 from temporian.core.data import dtype as dtype_lib
 import math
+from temporian.implementation.numpy_cc.operators import window as window_cc
+from numpy.testing import assert_array_equal
+
+
+def _f64(l):
+    return np.array(l, np.float64)
+
+
+def _f32(l):
+    return np.array(l, np.float32)
+
+
+nan = math.nan
+cc_sma = window_cc.simple_moving_average
 
 
 class SimpleMovingAverageOperatorTest(absltest.TestCase):
-    def setUp(self):
-        pass
+    def test_cc_empty(self):
+        a_f64 = _f64([])
+        a_f32 = _f32([])
+        assert_array_equal(cc_sma(a_f64, a_f32, 5.0), a_f32)
+        assert_array_equal(cc_sma(a_f64, a_f64, 5.0), a_f64)
+        assert_array_equal(
+            cc_sma(a_f64, a_f32, a_f64, 5.0),
+            a_f32,
+        )
+        assert_array_equal(
+            cc_sma(a_f64, a_f64, a_f64, 5.0),
+            a_f64,
+        )
 
-    # TODO: Import tests from pandas backend.
-    # TODO: Simplify tests with "pd_to_event".
+    def test_cc_wo_sampling(self):
+        assert_array_equal(
+            cc_sma(
+                _f64([1, 2, 3, 5, 20]),
+                _f32([10, 11, 12, 13, 14]),
+                5.0,
+            ),
+            _f32([10.0, 10.5, 11.0, 11.5, 14.0]),
+        )
+
+    def test_cc_w_sampling(self):
+        assert_array_equal(
+            cc_sma(
+                _f64([1, 2, 3, 5, 6]),
+                _f32([10, 11, 12, 13, 14]),
+                _f64([-1.0, 1.0, 1.1, 3.0, 3.5, 6.0, 10.0]),
+                3.0,
+            ),
+            _f32([nan, 10.0, 10.0, 11.0, 11.0, 13.5, nan]),
+        )
+
+    def test_cc_w_nan_wo_sampling(self):
+        assert_array_equal(
+            cc_sma(
+                _f64([1, 1.5, 2, 5, 20]),
+                _f32([10, nan, nan, 13, 14]),
+                1.0,
+            ),
+            _f32([10.0, 10.0, nan, 13.0, 14.0]),
+        )
+
+    def test_cc_w_nan_w_sampling(self):
+        assert_array_equal(
+            cc_sma(
+                _f64([1, 2, 3, 5, 6]),
+                _f32([nan, 11, nan, 13, 14]),
+                _f64([1.0, 2.0, 2.5, 3.0, 3.5, 4.0, 5.0, 6.0]),
+                1.0,
+            ),
+            _f32([nan, 11.0, 11.0, nan, nan, nan, 13.0, 14]),
+        )
 
     def test_flat(self):
         """A simple time sequence."""
@@ -173,13 +237,13 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
         expected_output = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
-                    [math.nan, -1.0],
+                    [nan, -1.0],
                     [10.0, 1.0],
                     [10.0, 1.1],
                     [11.0, 3.0],
                     [11.0, 3.5],
-                    [13.0, 6.0],
-                    [math.nan, 10.0],
+                    [13.5, 6.0],
+                    [nan, 10.0],
                 ],
                 columns=["a", "timestamp"],
             )
@@ -193,9 +257,9 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
         input_data = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
-                    [math.nan, 1],
+                    [nan, 1],
                     [11.0, 2],
-                    [math.nan, 3],
+                    [nan, 3],
                     [13.0, 5],
                     [14.0, 6],
                 ],
@@ -230,14 +294,14 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
         expected_output = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
-                    [math.nan, 1],
+                    [nan, 1],
                     [11.0, 2],
                     [11.0, 2.5],
-                    [11.0, 3],
-                    [math.nan, 3.5],
-                    [math.nan, 4],
+                    [nan, 3],
+                    [nan, 3.5],
+                    [nan, 4],
                     [13.0, 5],
-                    [13.5, 6],
+                    [14.0, 6],
                 ],
                 columns=["a", "timestamp"],
             )

@@ -26,14 +26,31 @@ from temporian.implementation.numpy.operators.window.moving_standard_deviation i
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.core.data import event as event_lib
 import math
+from temporian.implementation.numpy_cc.operators import window as window_cc
+from numpy.testing import assert_almost_equal
+
+
+def _f64(l):
+    return np.array(l, np.float64)
+
+
+def _f32(l):
+    return np.array(l, np.float32)
+
+
+nan = math.nan
 
 
 class MovingStandardDeviationOperatorTest(absltest.TestCase):
-    def setUp(self):
-        pass
-
-    # TODO: Import tests from pandas backend.
-    # TODO: Simplify tests with "pd_to_event".
+    def test_cc_wo_sampling(self):
+        assert_almost_equal(
+            window_cc.moving_standard_deviation(
+                _f64([1, 2, 3, 5, 20]),
+                _f32([10, nan, 12, 13, 14]),
+                5.0,
+            ),
+            _f32([0.0, 0.0, 1.0, 1.247219, 0.0]),
+        )
 
     def test_flat(self):
         """A simple time sequence."""
@@ -145,7 +162,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
 
         op = MovingStandardDeviationOperator(
             event=input_data.schema(),
-            window_length=3,
+            window_length=3.1,
             sampling=event_lib.input_event([]),
         )
         self.assertEqual(
@@ -205,7 +222,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
 
         op = MovingStandardDeviationOperator(
             event=input_data.schema(),
-            window_length=1,
+            window_length=1.1,
             sampling=event_lib.input_event([]),
         )
         instance = MovingStandardDeviationNumpyImplementation(op)

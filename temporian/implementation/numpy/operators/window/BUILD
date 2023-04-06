@@ -46,6 +46,7 @@ py_library(
         "//temporian/core/operators/window:moving_standard_deviation",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy_cc/operators:window",
     ],
 )
 
@@ -58,6 +59,7 @@ py_library(
         "//temporian/core/operators/window:moving_sum",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy_cc/operators:window",
     ],
 )
 
@@ -70,5 +72,6 @@ py_library(
         "//temporian/core/operators/window:moving_count",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy_cc/operators:window",
     ],
 )
