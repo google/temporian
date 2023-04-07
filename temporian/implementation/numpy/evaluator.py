@@ -34,7 +34,7 @@ def evaluate_schedule(
     Args:
         inputs: Mapping of core Events to materialized NumpyEvents.
         schedule: sequence of operators to apply on the data.
-        verbose: If > 0 prints details about the execution on the standard error
+        verbose: If >0, prints details about the execution on the standard error
             output. The larger the number, the more information is displayed.
         check_execution: If True, data of the intermediate results of the
             operators is checked against its expected structure and raises if

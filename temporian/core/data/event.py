@@ -24,23 +24,20 @@ from temporian.utils import string
 class Event(object):
     """Collection of feature values for a certain sampling.
 
-    An event can be thought of as a list of multivariate series, where each item
-    in the list corresponds to an index value in the event's sampling, and each
-    variable to one of the event's features.
+    An event represents the structure, or schema, of a collection of indexed
+    multivariate time series. An event does not contain any actual data, but is
+    instead used as a reference to describe the format of the input,
+    intermediate results, or output of a Processor (i.e., a computation graph).
 
-    An event holds no actual data, but rather describes the structure (or
-    "schema") of data during evaluation.
+    Informally, an event defines the name and data types of each time series, as
+    well as the key and data type of the index (if any).
 
-    Events are generally created by applying operators to other events, but can
-    also be created manually or spawned from raw data via `.schema()`.
-
-    Attributes:
-        creator: the operator that created this event. Can be None if it wasn't
-            created by an operator.
-        features: the event's features. Each feature in the event has its same
-            sampling.
-        name: The name of the event. Can be None.
-        sampling: The event's sampling.
+    There are several ways to create an event:
+    - Through the `.schema()` method in a NumpyEvent.
+    - Through applying operators to other events.
+    - Manually using the `tp.input_event(...)` method to specify the name and
+        data types of each time series and the key and data type of the index.
+    - (Not recommended) By instantiating the Event class directly.
     """
 
     def __init__(
