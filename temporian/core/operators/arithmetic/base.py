@@ -14,7 +14,7 @@
 
 """Base class for arithmetic operators"""
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from enum import Enum
 
 from temporian.core import operator_lib
@@ -29,7 +29,7 @@ class Resolution(str, Enum):
     PER_FEATURE_NAME = "PER_FEATURE_NAME"
 
 
-class BaseArithmeticOperator(Operator, ABC):
+class BaseArithmeticOperator(Operator):
     """Base Arithmetic operator."""
 
     def __init__(

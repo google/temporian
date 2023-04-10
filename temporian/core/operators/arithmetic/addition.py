@@ -44,7 +44,7 @@ def add(
     resolution: Resolution = Resolution.PER_FEATURE_IDX,
 ) -> Event:
     """
-    Sum two events.
+    Add two events.
 
     Args:
         event_1: First event

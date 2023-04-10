@@ -57,14 +57,14 @@ class Event(object):
         )
 
     def __add__(self, other):
-        from temporian.core.operators.arithmetic import sum
+        from temporian.core.operators.arithmetic import add
 
-        return sum(event_1=self, event_2=other)
+        return add(event_1=self, event_2=other)
 
     def __sub__(self, other):
-        from temporian.core.operators.arithmetic import substract
+        from temporian.core.operators.arithmetic import subtract
 
-        return substract(event_1=self, event_2=other)
+        return subtract(event_1=self, event_2=other)
 
     def __mul__(self, other):
         from temporian.core.operators.arithmetic import multiply
