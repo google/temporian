@@ -14,10 +14,10 @@ py_library(
         ":arithmetic",
         ":glue",
         ":lag",
-        ":propagate",
-        ":select",
-        ":sample",
         ":prefix",
+        ":propagate",
+        ":sample",
+        ":select",
         "//temporian/core/operators/calendar:day_of_month",
         "//temporian/core/operators/calendar:day_of_week",
         "//temporian/core/operators/calendar:day_of_year",
@@ -108,6 +108,20 @@ py_library(
         "//temporian/core/data:duration",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "set_index",
+    srcs = ["set_index.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/core/data:sampling",
         "//temporian/proto:core_py_proto",
     ],
 )

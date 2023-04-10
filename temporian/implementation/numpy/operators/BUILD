@@ -105,6 +105,19 @@ py_library(
 )
 
 py_library(
+    name = "set_index",
+    srcs = ["set_index.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        ":utils",
+        "//temporian/core/operators:set_index",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+    ],
+)
+
+py_library(
     name = "propagate",
     srcs = ["propagate.py"],
     srcs_version = "PY3",
@@ -147,5 +160,14 @@ py_library(
         "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
+    ],
+)
+
+py_library(
+    name = "utils",
+    srcs = ["utils.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:event",
     ],
 )
