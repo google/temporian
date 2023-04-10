@@ -15,6 +15,7 @@
 """Division Operator"""
 
 from temporian.core import operator_lib
+from temporian.core.data import dtype
 from temporian.core.data.event import Event
 from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
 from temporian.core.operators.arithmetic import Resolution
@@ -33,6 +34,9 @@ class DivisionOperator(BaseArithmeticOperator):
     @property
     def prefix(self) -> str:
         return "div"
+
+    def _get_output_dtype(self, input_dtype):
+        return dtype.FLOAT64
 
 
 operator_lib.register_operator(DivisionOperator)

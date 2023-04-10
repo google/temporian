@@ -34,6 +34,9 @@ class AdditionOperator(BaseArithmeticOperator):
     def prefix(self) -> str:
         return "add"
 
+    def _get_output_dtype(self, input_dtype):
+        return input_dtype
+
 
 operator_lib.register_operator(AdditionOperator)
 
