@@ -15,53 +15,89 @@
 """A sampling."""
 
 from __future__ import annotations
+from enum import Enum
 from typing import Dict, List, NamedTuple, Optional, Tuple, TYPE_CHECKING, Union
 
-from temporian.core.data import dtype as dtype_lib
+from temporian.core.data.dtype import DType
 
 if TYPE_CHECKING:
     from temporian.core.operators.base import Operator
 
 
-IndexDtypes = Union[dtype_lib.INT32, dtype_lib.INT64, dtype_lib.STRING]
+class IndexDTypes(Enum):
+    INT32 = DType.INT32.value
+    INT64 = DType.INT64.value
+    STRING = DType.STRING.value
 
 
 class IndexLevel(NamedTuple):
     name: str
-    dtype: IndexDtypes
+    dtype: IndexDTypes
+
+
+class Index:
+    def __init__(
+        self,
+        levels: Union[Tuple[str, IndexDTypes], List[Tuple[str, IndexDTypes]]],
+    ) -> None:
+        if isinstance(levels, tuple):
+            levels = [levels]
+
+        self._levels = []
+        for name, dtype in levels:
+            # type check name
+            if not isinstance(name, str):
+                raise TypeError(
+                    f"Index level {(name, dtype)}'s name's type must be string."
+                    f" Got {type(name)}."
+                )
+            # type check dtype
+            if all(
+                dtype.value != index_dtype.value for index_dtype in IndexDTypes
+            ):
+                raise TypeError(
+                    f"Index level {(name, dtype)}'s dtype's type must be one of"
+                    f" {IndexDTypes}. Got {type(dtype)}."
+                )
+            self._levels.append(IndexLevel(name, dtype))
+
+    def __repr__(self) -> str:
+        return f"Index({self._levels})"
+
+    @property
+    def levels(self) -> List[IndexLevel]:
+        return self._levels
+
+    @property
+    def names(self) -> List[str]:
+        return [index_level.name for index_level in self._levels]
+
+    @property
+    def dtypes(self) -> Dict[str, IndexDTypes]:
+        return {
+            index_level.name: index_level.dtype for index_level in self._levels
+        }
 
 
 class Sampling(object):
     def __init__(
         self,
-        index: List[Union[Tuple[str, IndexDtypes], IndexLevel]],
+        index_levels: Union[
+            Tuple[str, IndexDTypes], List[Tuple[str, IndexDTypes]]
+        ],
         creator: Optional[Operator] = None,
         is_unix_timestamp: bool = False,
     ):
-        assert isinstance(index, list), f"Got {index}"
-        if len(index) > 0:
-            assert isinstance(index[0], tuple), f"Got {index[0]}"
-
-        self._index = self._parse_index(index)
+        self._index = Index(index_levels)
         self._creator = creator
         self._is_unix_timestamp = is_unix_timestamp
 
     def __repr__(self):
-        return f"Sampling<index:{self.index},id:{id(self)}>"
+        return f"Sampling<index:{self.index}, id:{id(self)}>"
 
     @property
-    def index(self) -> List[IndexLevel]:
+    def index(self) -> Index:
         return self._index
-
-    @property
-    def index_names(self) -> List[str]:
-        return [index_level.name for index_level in self._index]
-
-    @property
-    def index_dtypes(self) -> Dict[str, IndexDtypes]:
-        return {
-            index_level.name: index_level.dtype for index_level in self._index
-        }
 
     @property
     def creator(self) -> Optional[Operator]:
@@ -74,14 +110,3 @@ class Sampling(object):
     @creator.setter
     def creator(self, creator: Optional[Operator]):
         self._creator = creator
-
-    def _parse_index(
-        self, index: List[Union[Tuple[str, IndexDtypes], IndexLevel]]
-    ) -> List[IndexLevel]:
-        if all([isinstance(index_level, IndexLevel) for index_level in index]):
-            return index
-
-        return [
-            IndexLevel(index_name, index_dtype)
-            for index_name, index_dtype in index
-        ]

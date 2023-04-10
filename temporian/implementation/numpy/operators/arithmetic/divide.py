@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import numpy as np
-from temporian.core.data import dtype
+
+from temporian.core.data.dtype import DType
 from temporian.implementation.numpy.operators.arithmetic.base import (
     BaseArithmeticNumpyImplementation,
     NumpyFeature,
@@ -30,7 +31,7 @@ class DivideNumpyImplementation(BaseArithmeticNumpyImplementation):
     def _do_operation(
         self, event_1_feature: NumpyFeature, event_2_feature: NumpyFeature
     ) -> np.ndarray:
-        if event_1_feature.dtype in [dtype.INT32, dtype.INT64]:
+        if event_1_feature.dtype in [DType.INT32, DType.INT64]:
             raise ValueError(
                 "Cannot use the divide operator on feature "
                 f"{event_1_feature.name} of type {event_1_feature.dtype}. "

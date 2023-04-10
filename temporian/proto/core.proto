@@ -75,6 +75,15 @@ message Operator {
   }
 }
 
+// Data types
+enum DType {
+  UNDEFINED = 0;
+  FLOAT64 = 1;
+  INT64 = 2;
+  FLOAT32 = 3;
+  INT32 = 4;
+}
+
 // Schema of an event
 message Event {
   // Identifier of the event. Should be unique across all the events of the
@@ -106,24 +115,24 @@ message Feature {
   optional string sampling_id = 4;
 
   optional string creator_operator_id = 5;
-
-  enum DType {
-    UNDEFINED = 0;
-    FLOAT64 = 1;
-    INT64 = 2;
-    FLOAT32 = 3;
-    INT32 = 4;
-  }
 }
 
 // Schema of a sampling.
 message Sampling {
+  // Index of the sampling
+  message Index {
+    // Level names
+    repeated string names = 1;
+
+    // Level dtypes
+    repeated DType dtypes = 2;
+  }
   // Identifier of the sampling. Should be unique across all the samplings of
   // the processor.
   optional string id = 1;
 
   // Index of the sampling.
-  repeated string index = 2;
+  optional Index index = 2;
 
   // Index of the event id who's operator creator also created this feature.
   optional string creator_operator_id = 3;

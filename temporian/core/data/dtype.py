@@ -15,28 +15,30 @@
 """Type of features."""
 
 
-from typing import Union, Any
 import math
-
-FLOAT64 = "FLOAT64"
-FLOAT32 = "FLOAT32"
-INT64 = "INT64"
-INT32 = "INT32"
-STRING = "STRING"
-
-DType = Union[FLOAT64, FLOAT32, INT64, INT32, STRING]
-
-ALL_TYPES = [FLOAT64, FLOAT32, INT64, INT32, STRING]
+from enum import Enum
+from typing import Union
 
 
-def MissingValue(dtype: DType) -> Any:
+class DType(Enum):
+    FLOAT64 = "FLOAT64"
+    FLOAT32 = "FLOAT32"
+    INT64 = "INT64"
+    INT32 = "INT32"
+    STRING = "STRING"
+
+    def __str__(self) -> str:
+        return self.value
+
+
+def MissingValue(dtype: DType) -> Union[float, int, str]:
     """Value used as a replacement of missing values."""
 
-    if dtype in [FLOAT64, FLOAT32]:
+    if dtype in [DType.FLOAT64, DType.FLOAT32]:
         return math.nan
-    elif dtype in [INT64, INT32]:
+    elif dtype in [DType.INT64, DType.INT32]:
         return 0
-    elif dtype == STRING:
+    elif dtype == DType.STRING:
         return ""
     else:
         raise ValueError(f"Non implemented type {dtype}")
