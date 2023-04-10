@@ -59,8 +59,8 @@ def get_resulting_dtype(dtype1: DType, dtype2: DType) -> DType:
     """
     dtype_hierarchy = {
         INT32: 1,
-        INT64: 2,
-        FLOAT32: 3,
+        FLOAT32: 2,
+        INT64: 3,
         FLOAT64: 4,
     }
 
@@ -73,6 +73,12 @@ def get_resulting_dtype(dtype1: DType, dtype2: DType) -> DType:
 
     # Find the highest hierarchy value between the two input dtypes
     max_hierarchy = max(dtype_hierarchy[dtype1], dtype_hierarchy[dtype2])
+
+    # handle special case with int64 and float32
+    if (dtype1 == INT64 and dtype2 == FLOAT32) or (
+        dtype1 == FLOAT32 and dtype2 == INT64
+    ):
+        return FLOAT64
 
     # Get the key (dtype) corresponding to the highest hierarchy
     resulting_dtype = next(
