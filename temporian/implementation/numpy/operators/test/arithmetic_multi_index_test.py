@@ -51,16 +51,22 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
         self.numpy_event_1 = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
-                    [TRYOLABS_SHOP, MATE_ID, 0.0, -14.0],
-                    [TRYOLABS_SHOP, MATE_ID, 1.0, 15.0],
-                    [TRYOLABS_SHOP, MATE_ID, 2.0, 16],
-                    [TRYOLABS_SHOP, BOOK_ID, 1.0, 10],
-                    [GOOGLE_SHOP, BOOK_ID, 1.0, 0],
-                    [GOOGLE_SHOP, BOOK_ID, 2.0, 8],
-                    [GOOGLE_SHOP, PIXEL_ID, 0.0, 3],
-                    [GOOGLE_SHOP, PIXEL_ID, 1.0, 4],
+                    [TRYOLABS_SHOP, MATE_ID, 0.0, -14.0, 1],
+                    [TRYOLABS_SHOP, MATE_ID, 1.0, 15.0, 2],
+                    [TRYOLABS_SHOP, MATE_ID, 2.0, 16, 3],
+                    [TRYOLABS_SHOP, BOOK_ID, 1.0, 10, 4],
+                    [GOOGLE_SHOP, BOOK_ID, 1.0, 0, 5],
+                    [GOOGLE_SHOP, BOOK_ID, 2.0, 8, 6],
+                    [GOOGLE_SHOP, PIXEL_ID, 0.0, 3, 7],
+                    [GOOGLE_SHOP, PIXEL_ID, 1.0, 4, 8],
                 ],
-                columns=["store_id", "product_id", "timestamp", "sales"],
+                columns=[
+                    "store_id",
+                    "product_id",
+                    "timestamp",
+                    "sales",
+                    "revenue",
+                ],
             ),
             index_names=["store_id", "product_id"],
         )
@@ -68,104 +74,114 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
         self.numpy_event_2 = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
-                    [GOOGLE_SHOP, BOOK_ID, 1.0, 3],
-                    [TRYOLABS_SHOP, MATE_ID, 0.0, 4.5],
-                    [TRYOLABS_SHOP, MATE_ID, 1.0, -5.5],
-                    [GOOGLE_SHOP, BOOK_ID, 2.0, -8],
-                    [TRYOLABS_SHOP, MATE_ID, 2.0, 16],
-                    [TRYOLABS_SHOP, BOOK_ID, 1.0, 0],
-                    [GOOGLE_SHOP, PIXEL_ID, 0.0, 3],
-                    [GOOGLE_SHOP, PIXEL_ID, 1.0, 5],
+                    [GOOGLE_SHOP, BOOK_ID, 1.0, 3, -8],
+                    [TRYOLABS_SHOP, MATE_ID, 0.0, 4.5, 5],
+                    [TRYOLABS_SHOP, MATE_ID, 1.0, -5.5, 3],
+                    [GOOGLE_SHOP, BOOK_ID, 2.0, -8, 2],
+                    [TRYOLABS_SHOP, MATE_ID, 2.0, 16, 1],
+                    [TRYOLABS_SHOP, BOOK_ID, 1.0, 0, 2],
+                    [GOOGLE_SHOP, PIXEL_ID, 0.0, 3, 4],
+                    [GOOGLE_SHOP, PIXEL_ID, 1.0, 5, 3],
                 ],
-                columns=["store_id", "product_id", "timestamp", "costs"],
+                columns=[
+                    "store_id",
+                    "product_id",
+                    "timestamp",
+                    "costs",
+                    "sales",
+                ],
             ),
             index_names=["store_id", "product_id"],
         )
 
-        # Expected result after addition
+        # Expected result after addition PER_FEATURE_IDX
         self.numpy_expected_add = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
-                    [TRYOLABS_SHOP, MATE_ID, 0.0, -9.5],
-                    [TRYOLABS_SHOP, MATE_ID, 1.0, 9.5],
-                    [TRYOLABS_SHOP, MATE_ID, 2.0, 32],
-                    [TRYOLABS_SHOP, BOOK_ID, 1.0, 10],
-                    [GOOGLE_SHOP, BOOK_ID, 1.0, 3],
-                    [GOOGLE_SHOP, BOOK_ID, 2.0, 0],
-                    [GOOGLE_SHOP, PIXEL_ID, 0.0, 6],
-                    [GOOGLE_SHOP, PIXEL_ID, 1.0, 9],
+                    [TRYOLABS_SHOP, MATE_ID, 0.0, -9.5, 6],
+                    [TRYOLABS_SHOP, MATE_ID, 1.0, 9.5, 5],
+                    [TRYOLABS_SHOP, MATE_ID, 2.0, 32, 4],
+                    [TRYOLABS_SHOP, BOOK_ID, 1.0, 10, 6],
+                    [GOOGLE_SHOP, BOOK_ID, 1.0, 3, -3],
+                    [GOOGLE_SHOP, BOOK_ID, 2.0, 0, 8],
+                    [GOOGLE_SHOP, PIXEL_ID, 0.0, 6, 11],
+                    [GOOGLE_SHOP, PIXEL_ID, 1.0, 9, 11],
                 ],
                 columns=[
                     "store_id",
                     "product_id",
                     "timestamp",
                     "add_sales_costs",
+                    "add_revenue_sales",
                 ],
             ),
             index_names=["store_id", "product_id"],
         )
-        # Expected result after subtraction
+        # Expected result after subtraction PER_FEATURE_IDX
         self.numpy_expected_subtract = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
-                    [TRYOLABS_SHOP, MATE_ID, 0.0, -18.5],
-                    [TRYOLABS_SHOP, MATE_ID, 1.0, 20.5],
-                    [TRYOLABS_SHOP, MATE_ID, 2.0, 0],
-                    [TRYOLABS_SHOP, BOOK_ID, 1.0, 10],
-                    [GOOGLE_SHOP, BOOK_ID, 1.0, -3],
-                    [GOOGLE_SHOP, BOOK_ID, 2.0, 16],
-                    [GOOGLE_SHOP, PIXEL_ID, 0.0, 0],
-                    [GOOGLE_SHOP, PIXEL_ID, 1.0, -1],
+                    [TRYOLABS_SHOP, MATE_ID, 0.0, -18.5, -4],
+                    [TRYOLABS_SHOP, MATE_ID, 1.0, 20.5, -1],
+                    [TRYOLABS_SHOP, MATE_ID, 2.0, 0, 2],
+                    [TRYOLABS_SHOP, BOOK_ID, 1.0, 10, 2],
+                    [GOOGLE_SHOP, BOOK_ID, 1.0, -3, 13],
+                    [GOOGLE_SHOP, BOOK_ID, 2.0, 16, 4],
+                    [GOOGLE_SHOP, PIXEL_ID, 0.0, 0, 3],
+                    [GOOGLE_SHOP, PIXEL_ID, 1.0, -1, 5],
                 ],
                 columns=[
                     "store_id",
                     "product_id",
                     "timestamp",
                     "sub_sales_costs",
+                    "sub_revenue_sales",
                 ],
             ),
             index_names=["store_id", "product_id"],
         )
-        # Expected result after multiplication
+        # Expected result after multiplication PER_FEATURE_IDX
         self.numpy_expected_multiply = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
-                    [TRYOLABS_SHOP, MATE_ID, 0.0, -63],
-                    [TRYOLABS_SHOP, MATE_ID, 1.0, -82.5],
-                    [TRYOLABS_SHOP, MATE_ID, 2.0, 256],
-                    [TRYOLABS_SHOP, BOOK_ID, 1.0, 0],
-                    [GOOGLE_SHOP, BOOK_ID, 1.0, 0],
-                    [GOOGLE_SHOP, BOOK_ID, 2.0, -64],
-                    [GOOGLE_SHOP, PIXEL_ID, 0.0, 9],
-                    [GOOGLE_SHOP, PIXEL_ID, 1.0, 20],
+                    [TRYOLABS_SHOP, MATE_ID, 0.0, -63, 5],
+                    [TRYOLABS_SHOP, MATE_ID, 1.0, -82.5, 6],
+                    [TRYOLABS_SHOP, MATE_ID, 2.0, 256, 3],
+                    [TRYOLABS_SHOP, BOOK_ID, 1.0, 0, 8],
+                    [GOOGLE_SHOP, BOOK_ID, 1.0, 0, -40],
+                    [GOOGLE_SHOP, BOOK_ID, 2.0, -64, 12],
+                    [GOOGLE_SHOP, PIXEL_ID, 0.0, 9, 28],
+                    [GOOGLE_SHOP, PIXEL_ID, 1.0, 20, 24],
                 ],
                 columns=[
                     "store_id",
                     "product_id",
                     "timestamp",
                     "mult_sales_costs",
+                    "mult_revenue_sales",
                 ],
             ),
             index_names=["store_id", "product_id"],
         )
-        # Expected result after division
+        # Expected result after division PER_FEATURE_IDX
         self.numpy_expected_divide = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
-                    [TRYOLABS_SHOP, MATE_ID, 0.0, -14 / 4.5],
-                    [TRYOLABS_SHOP, MATE_ID, 1.0, -15 / 5.5],
-                    [TRYOLABS_SHOP, MATE_ID, 2.0, 1],
-                    [TRYOLABS_SHOP, BOOK_ID, 1.0, np.inf],
-                    [GOOGLE_SHOP, BOOK_ID, 1.0, 0],
-                    [GOOGLE_SHOP, BOOK_ID, 2.0, -1],
-                    [GOOGLE_SHOP, PIXEL_ID, 0.0, 1],
-                    [GOOGLE_SHOP, PIXEL_ID, 1.0, 0.8],
+                    [TRYOLABS_SHOP, MATE_ID, 0.0, -14 / 4.5, 0.2],
+                    [TRYOLABS_SHOP, MATE_ID, 1.0, -15 / 5.5, 2 / 3],
+                    [TRYOLABS_SHOP, MATE_ID, 2.0, 1, 3],
+                    [TRYOLABS_SHOP, BOOK_ID, 1.0, np.inf, 2],
+                    [GOOGLE_SHOP, BOOK_ID, 1.0, 0, -0.625],
+                    [GOOGLE_SHOP, BOOK_ID, 2.0, -1, 3],
+                    [GOOGLE_SHOP, PIXEL_ID, 0.0, 1, 1.75],
+                    [GOOGLE_SHOP, PIXEL_ID, 1.0, 0.8, 8 / 3],
                 ],
                 columns=[
                     "store_id",
                     "product_id",
                     "timestamp",
                     "div_sales_costs",
+                    "div_revenue_sales",
                 ],
             ),
             index_names=["store_id", "product_id"],
@@ -175,12 +191,18 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
 
         self.sampling = Sampling(["store_id", "product_id"])
         self.event_1 = Event(
-            [Feature("sales", dtype_lib.FLOAT64)],
+            [
+                Feature("sales", dtype_lib.FLOAT64),
+                Feature("revenue", dtype_lib.INT64),
+            ],
             sampling=self.sampling,
             creator=None,
         )
         self.event_2 = Event(
-            [Feature("costs", dtype_lib.FLOAT64)],
+            [
+                Feature("costs", dtype_lib.FLOAT64),
+                Feature("sales", dtype_lib.INT64),
+            ],
             sampling=self.sampling,
             creator=None,
         )
