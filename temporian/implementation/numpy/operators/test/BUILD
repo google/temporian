@@ -29,6 +29,29 @@ py_test(
 )
 
 py_test(
+    name = "arithmetic_multi_index_test",
+    srcs = ["arithmetic_multi_index_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/testing:absltest dep,
+        "//temporian/core/data:event",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators/arithmetic",
+        "//temporian/core/operators/arithmetic:addition",
+        "//temporian/core/operators/arithmetic:subtraction",
+        "//temporian/core/operators/arithmetic:multiplication",
+        "//temporian/core/operators/arithmetic:division",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/operators/arithmetic",
+        "//temporian/implementation/numpy/operators/arithmetic:addition",
+        "//temporian/implementation/numpy/operators/arithmetic:subtraction",
+        "//temporian/implementation/numpy/operators/arithmetic:multiplication",
+        "//temporian/implementation/numpy/operators/arithmetic:division",
+        "//temporian/implementation/numpy:evaluator",
+    ],
+)
+
+py_test(
     name = "glue_test",
     srcs = ["glue_test.py"],
     srcs_version = "PY3",
