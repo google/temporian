@@ -43,6 +43,19 @@ class NumpyEvent:
     def sampling(self) -> NumpySampling:
         return self._sampling
 
+    @property
+    def _first_index_features(self) -> List[NumpyFeature]:
+        if self.first_index_value() is None:
+            return []
+        return self.data[self.first_index_value()]
+
+    @property
+    def dtypes(self) -> Dict[str, type]:
+        return {
+            feature.name: feature.dtype
+            for feature in self._first_index_features
+        }
+
     @sampling.setter
     def sampling(self, sampling: NumpySampling) -> None:
         self._sampling = sampling
