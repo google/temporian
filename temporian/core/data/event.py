@@ -15,10 +15,11 @@
 """An event is a collection (possibly empty) of timesampled feature values."""
 
 from __future__ import annotations
-from typing import List, Optional, TYPE_CHECKING
+from typing import List, Optional, Tuple, TYPE_CHECKING
 
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
+from temporian.core.data.sampling import IndexDtypes
 from temporian.utils import string
 
 if TYPE_CHECKING:
@@ -105,7 +106,7 @@ class Event(object):
 
 def input_event(
     features: List[Feature],
-    index: List[str] = [],
+    index: List[Tuple[str, IndexDtypes]] = [],
     name: Optional[str] = None,
     sampling: Optional[Sampling] = None,
 ) -> Event:
