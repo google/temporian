@@ -17,12 +17,12 @@
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
 from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
-from temporian.core.operators.arithmetic import Resolution
 
 
 class MultiplicationOperator(BaseArithmeticOperator):
     """
-    Apply arithmetic multiplication to two events
+    Apply arithmetic multiplication to two events, feature to feature according
+    to their position.
     """
 
     @classmethod
@@ -34,9 +34,6 @@ class MultiplicationOperator(BaseArithmeticOperator):
     def prefix(self) -> str:
         return "mult"
 
-    def _get_output_dtype(self, input_dtype):
-        return input_dtype
-
 
 operator_lib.register_operator(MultiplicationOperator)
 
@@ -44,25 +41,18 @@ operator_lib.register_operator(MultiplicationOperator)
 def multiply(
     event_1: Event,
     event_2: Event,
-    resolution: Resolution = Resolution.PER_FEATURE_IDX,
 ) -> Event:
     """
-    Multiply two events.
+    Multiply two events, according to feature position.
 
     Args:
         event_1: First event
         event_2: Second event
-        resolution: If resolution is Resolution.PER_FEATURE_IDX each feature
-            will be multiply index wise. If resolution is
-            Resolution.PER_FEATURE_NAME each feature of event_1 will be
-            multiply with the feature in event_2 with the same name.
-            Defaults to Resolution.PER_FEATURE_IDX.
 
     Returns:
-        Event: Multiplication of event_1 and event_2 according to resolution.
+        Event: Multiplication of event_1 features and event_2 features.
     """
     return MultiplicationOperator(
         event_1=event_1,
         event_2=event_2,
-        resolution=resolution,
     ).outputs()["event"]

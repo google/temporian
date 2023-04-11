@@ -18,7 +18,6 @@ from temporian.core import operator_lib
 from temporian.core.data import dtype
 from temporian.core.data.event import Event
 from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
-from temporian.core.operators.arithmetic import Resolution
 
 
 class DivisionOperator(BaseArithmeticOperator):
@@ -35,9 +34,6 @@ class DivisionOperator(BaseArithmeticOperator):
     def prefix(self) -> str:
         return "div"
 
-    def _get_output_dtype(self, input_dtype):
-        return dtype.FLOAT64
-
 
 operator_lib.register_operator(DivisionOperator)
 
@@ -45,7 +41,6 @@ operator_lib.register_operator(DivisionOperator)
 def divide(
     numerator: Event,
     denominator: Event,
-    resolution: Resolution = Resolution.PER_FEATURE_IDX,
 ) -> Event:
     """
     Divide two events.
@@ -53,17 +48,10 @@ def divide(
     Args:
         numerator: Numerator event
         denominator: Denominator event
-        resolution: If resolution is Resolution.PER_FEATURE_IDX each feature
-            will be divide index wise. If resolution is
-            Resolution.PER_FEATURE_NAME each feature of numerator will be
-            divide with the feature in denominator with the same name.
-            Defaults to Resolution.PER_FEATURE_IDX.
-
     Returns:
-        Event: Division of numerator and denominator according to resolution.
+        Event: Division of numerator features and denominator features
     """
     return DivisionOperator(
         event_1=numerator,
         event_2=denominator,
-        resolution=resolution,
     ).outputs()["event"]

@@ -17,12 +17,12 @@
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
 from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
-from temporian.core.operators.arithmetic import Resolution
 
 
 class SubtractionOperator(BaseArithmeticOperator):
     """
-    Subtract second event from the first one
+    Subtract second event from the first one, feature to feature according
+    to their position.
     """
 
     @classmethod
@@ -34,9 +34,6 @@ class SubtractionOperator(BaseArithmeticOperator):
     def prefix(self) -> str:
         return "sub"
 
-    def _get_output_dtype(self, input_dtype):
-        return input_dtype
-
 
 operator_lib.register_operator(SubtractionOperator)
 
@@ -44,25 +41,18 @@ operator_lib.register_operator(SubtractionOperator)
 def subtract(
     event_1: Event,
     event_2: Event,
-    resolution: Resolution = Resolution.PER_FEATURE_IDX,
 ) -> Event:
     """
-    Subtract two events.
+    Subtract event_2 from event_1.
 
     Args:
         event_1: First event
         event_2: Second event
-        resolution: If resolution is Resolution.PER_FEATURE_IDX each feature
-            will be subtract index wise. If resolution is
-            Resolution.PER_FEATURE_NAME each feature of event_1 will be
-            subtract with the feature in event_2 with the same name.
-            Defaults to Resolution.PER_FEATURE_IDX.
 
     Returns:
-        Event: Subtraction of event_1 and event_2 according to resolution.
+        Event: Subtraction of event_2 features from event_1.
     """
     return SubtractionOperator(
         event_1=event_1,
         event_2=event_2,
-        resolution=resolution,
     ).outputs()["event"]

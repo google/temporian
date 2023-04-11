@@ -23,7 +23,6 @@ from temporian.core.operators.arithmetic import (
     SubtractionOperator,
     MultiplicationOperator,
     DivisionOperator,
-    Resolution,
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators.arithmetic import (
@@ -102,7 +101,6 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         operator = AdditionOperator(
             event_1=self.event_1,
             event_2=self.event_2,
-            resolution=Resolution.PER_FEATURE_IDX,
         )
 
         sum_implementation = AdditionNumpyImplementation(operator)
@@ -133,7 +131,6 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         operator = SubtractionOperator(
             event_1=self.event_1,
             event_2=self.event_2,
-            resolution=Resolution.PER_FEATURE_IDX,
         )
 
         sub_implementation = SubtractionNumpyImplementation(operator)
@@ -162,7 +159,6 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         operator = MultiplicationOperator(
             event_1=self.event_1,
             event_2=self.event_2,
-            resolution=Resolution.PER_FEATURE_IDX,
         )
 
         mult_implementation = MultiplicationNumpyImplementation(operator)
@@ -193,7 +189,6 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         operator = DivisionOperator(
             event_1=self.event_1,
             event_2=self.event_2,
-            resolution=Resolution.PER_FEATURE_IDX,
         )
 
         div_implementation = DivisionNumpyImplementation(operator)

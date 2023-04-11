@@ -17,7 +17,6 @@
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
 from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
-from temporian.core.operators.arithmetic import Resolution
 
 
 class AdditionOperator(BaseArithmeticOperator):
@@ -34,9 +33,6 @@ class AdditionOperator(BaseArithmeticOperator):
     def prefix(self) -> str:
         return "add"
 
-    def _get_output_dtype(self, input_dtype):
-        return input_dtype
-
 
 operator_lib.register_operator(AdditionOperator)
 
@@ -44,25 +40,18 @@ operator_lib.register_operator(AdditionOperator)
 def add(
     event_1: Event,
     event_2: Event,
-    resolution: Resolution = Resolution.PER_FEATURE_IDX,
 ) -> Event:
     """
-    Add two events.
+    Add two events
 
     Args:
         event_1: First event
         event_2: Second event
-        resolution: If resolution is Resolution.PER_FEATURE_IDX each feature
-            will be sum index wise. If resolution is Resolution.PER_FEATURE_NAME
-            each feature of event_1 will be sum with the feature in event_2
-            with the same name. Defaults to Resolution.PER_FEATURE_IDX.
-
 
     Returns:
-        Event: Sum of event_1 and event_2 according to resolution.
+        Event: Sum of event_1 and event_2 features
     """
     return AdditionOperator(
         event_1=event_1,
         event_2=event_2,
-        resolution=resolution,
     ).outputs()["event"]

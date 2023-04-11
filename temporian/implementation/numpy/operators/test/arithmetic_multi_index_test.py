@@ -23,7 +23,6 @@ from temporian.core.operators.arithmetic import (
     SubtractionOperator,
     MultiplicationOperator,
     DivisionOperator,
-    Resolution,
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators.arithmetic import (
@@ -48,10 +47,11 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
         BOOK_ID = 2
         PIXEL_ID = 3
 
+        # 2 index columns, 2 feature columns (float64 and float32)
         self.numpy_event_1 = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
-                    [TRYOLABS_SHOP, MATE_ID, 0.0, -14.0, 1],
+                    [TRYOLABS_SHOP, MATE_ID, 0.0, -14.0, 1.0],
                     [TRYOLABS_SHOP, MATE_ID, 1.0, 15.0, 2],
                     [TRYOLABS_SHOP, MATE_ID, 2.0, 16, 3],
                     [TRYOLABS_SHOP, BOOK_ID, 1.0, 10, 4],
@@ -67,6 +67,8 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
                     "sales",
                     "revenue",
                 ],
+            ).astype(
+                {"revenue": np.float32}  # Default is float64
             ),
             index_names=["store_id", "product_id"],
         )
@@ -74,7 +76,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
         self.numpy_event_2 = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
-                    [GOOGLE_SHOP, BOOK_ID, 1.0, 3, -8],
+                    [GOOGLE_SHOP, BOOK_ID, 1.0, 3, -8.0],
                     [TRYOLABS_SHOP, MATE_ID, 0.0, 4.5, 5],
                     [TRYOLABS_SHOP, MATE_ID, 1.0, -5.5, 3],
                     [GOOGLE_SHOP, BOOK_ID, 2.0, -8, 2],
@@ -90,6 +92,8 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
                     "costs",
                     "sales",
                 ],
+            ).astype(
+                {"sales": np.float32}  # Default is float64
             ),
             index_names=["store_id", "product_id"],
         )
@@ -114,6 +118,8 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
                     "add_sales_costs",
                     "add_revenue_sales",
                 ],
+            ).astype(
+                {"add_revenue_sales": np.float32}  # Default is float64
             ),
             index_names=["store_id", "product_id"],
         )
@@ -137,6 +143,8 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
                     "sub_sales_costs",
                     "sub_revenue_sales",
                 ],
+            ).astype(
+                {"sub_revenue_sales": np.float32}  # Default is float64
             ),
             index_names=["store_id", "product_id"],
         )
@@ -160,6 +168,8 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
                     "mult_sales_costs",
                     "mult_revenue_sales",
                 ],
+            ).astype(
+                {"mult_revenue_sales": np.float32}  # Default is float64
             ),
             index_names=["store_id", "product_id"],
         )
@@ -183,6 +193,8 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
                     "div_sales_costs",
                     "div_revenue_sales",
                 ],
+            ).astype(
+                {"div_revenue_sales": np.float32}  # Default is float64
             ),
             index_names=["store_id", "product_id"],
         )
@@ -193,7 +205,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
         self.event_1 = Event(
             [
                 Feature("sales", dtype_lib.FLOAT64),
-                Feature("revenue", dtype_lib.INT64),
+                Feature("revenue", dtype_lib.FLOAT32),
             ],
             sampling=self.sampling,
             creator=None,
@@ -201,7 +213,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
         self.event_2 = Event(
             [
                 Feature("costs", dtype_lib.FLOAT64),
-                Feature("sales", dtype_lib.INT64),
+                Feature("sales", dtype_lib.FLOAT32),
             ],
             sampling=self.sampling,
             creator=None,
@@ -213,7 +225,6 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
         operator = AdditionOperator(
             event_1=self.event_1,
             event_2=self.event_2,
-            resolution=Resolution.PER_FEATURE_IDX,
         )
 
         add_implementation = AdditionNumpyImplementation(operator)
@@ -230,7 +241,6 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
         operator = SubtractionOperator(
             event_1=self.event_1,
             event_2=self.event_2,
-            resolution=Resolution.PER_FEATURE_IDX,
         )
 
         sub_implementation = SubtractionNumpyImplementation(operator)
@@ -247,7 +257,6 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
         operator = MultiplicationOperator(
             event_1=self.event_1,
             event_2=self.event_2,
-            resolution=Resolution.PER_FEATURE_IDX,
         )
 
         mult_implementation = MultiplicationNumpyImplementation(operator)
@@ -266,7 +275,6 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
         operator = DivisionOperator(
             event_1=self.event_1,
             event_2=self.event_2,
-            resolution=Resolution.PER_FEATURE_IDX,
         )
 
         div_implementation = DivisionNumpyImplementation(operator)

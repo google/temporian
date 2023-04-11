@@ -25,11 +25,6 @@ from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
-class Resolution(str, Enum):
-    PER_FEATURE_IDX = "PER_FEATURE_IDX"
-    PER_FEATURE_NAME = "PER_FEATURE_NAME"
-
-
 class BaseArithmeticOperator(Operator):
     """Base Arithmetic operator."""
 
@@ -37,18 +32,12 @@ class BaseArithmeticOperator(Operator):
         self,
         event_1: Event,
         event_2: Event,
-        resolution: Resolution,
     ):
         super().__init__()
 
         # inputs
         self.add_input("event_1", event_1)
         self.add_input("event_2", event_2)
-
-        self.add_attribute("resolution", resolution)
-
-        if not isinstance(resolution, Resolution):
-            raise ValueError("resolution must be a Resolution.")
 
         if event_1.sampling() is not event_2.sampling():
             raise ValueError("event_1 and event_2 must have same sampling.")
@@ -79,7 +68,7 @@ class BaseArithmeticOperator(Operator):
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
                 name=f"{self.prefix}_{feature_1.name()}_{feature_2.name()}",
-                dtype=self._get_output_dtype(feature_1.dtype()),
+                dtype=feature_1.dtype(),
                 sampling=sampling,
                 creator=self,
             )
@@ -102,13 +91,7 @@ class BaseArithmeticOperator(Operator):
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
             key=cls.operator_def_key,
-            attributes=[
-                pb.OperatorDef.Attribute(
-                    key="resolution",
-                    type=pb.OperatorDef.Attribute.Type.STRING,
-                    is_optional=False,
-                ),
-            ],
+            attributes=[],
             inputs=[
                 pb.OperatorDef.Input(key="event_1"),
                 pb.OperatorDef.Input(key="event_2"),
@@ -126,7 +109,3 @@ class BaseArithmeticOperator(Operator):
     @abstractmethod
     def prefix(self) -> str:
         """Get the prefix to use for the output features."""
-
-    @abstractmethod
-    def _get_output_dtype(self, input_dtype: dtype.DType) -> dtype.DType:
-        """Get the output data type from the input feature types."""

@@ -26,7 +26,7 @@ class DivisionNumpyImplementation(BaseArithmeticNumpyImplementation):
         super().__init__(operator)
 
     def _do_operation(self, event_1_data, event_2_data):
-        return event_1_data / event_2_data
+        return (event_1_data / event_2_data).astype(event_1_data.dtype)
 
 
 implementation_lib.register_operator_implementation(

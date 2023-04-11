@@ -32,14 +32,14 @@ class ArithmeticOperatorsTest(absltest.TestCase):
         self.event_1 = event_lib.input_event(
             features=[
                 Feature("f1", dtype.FLOAT32),
-                Feature("f2", dtype.INT32),
+                Feature("f2", dtype.FLOAT64),
             ],
             sampling=self.sampling,
         )
         self.event_2 = event_lib.input_event(
             features=[
                 Feature("f3", dtype.FLOAT32),
-                Feature("f4", dtype.INT32),
+                Feature("f4", dtype.FLOAT64),
             ],
             sampling=self.sampling,
         )
@@ -56,7 +56,7 @@ class ArithmeticOperatorsTest(absltest.TestCase):
         assert event_out.features()[0].name() == "add_f1_f3"
         assert event_out.features()[1].name() == "add_f2_f4"
         assert event_out.features()[0].dtype() == dtype.FLOAT32
-        assert event_out.features()[1].dtype() == dtype.INT32
+        assert event_out.features()[1].dtype() == dtype.FLOAT64
 
     def test_subtraction(self):
         event_out = self.event_1 - self.event_2
@@ -67,7 +67,7 @@ class ArithmeticOperatorsTest(absltest.TestCase):
         assert event_out.features()[0].name() == "sub_f1_f3"
         assert event_out.features()[1].name() == "sub_f2_f4"
         assert event_out.features()[0].dtype() == dtype.FLOAT32
-        assert event_out.features()[1].dtype() == dtype.INT32
+        assert event_out.features()[1].dtype() == dtype.FLOAT64
 
     def test_multiplication(self):
         event_out = self.event_1 * self.event_2
@@ -78,7 +78,7 @@ class ArithmeticOperatorsTest(absltest.TestCase):
         assert event_out.features()[0].name() == "mult_f1_f3"
         assert event_out.features()[1].name() == "mult_f2_f4"
         assert event_out.features()[0].dtype() == dtype.FLOAT32
-        assert event_out.features()[1].dtype() == dtype.INT32
+        assert event_out.features()[1].dtype() == dtype.FLOAT64
 
     def test_division(self):
         event_out = self.event_1 / self.event_2
@@ -88,7 +88,7 @@ class ArithmeticOperatorsTest(absltest.TestCase):
         assert event_out.features()[1].creator() is event_out.creator()
         assert event_out.features()[0].name() == "div_f1_f3"
         assert event_out.features()[1].name() == "div_f2_f4"
-        assert event_out.features()[0].dtype() == dtype.FLOAT64
+        assert event_out.features()[0].dtype() == dtype.FLOAT32
         assert event_out.features()[1].dtype() == dtype.FLOAT64
 
 

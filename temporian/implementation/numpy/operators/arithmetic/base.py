@@ -15,7 +15,6 @@
 from typing import Dict
 from abc import ABC, abstractmethod
 
-from temporian.core.operators.arithmetic import Resolution
 from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
@@ -42,13 +41,11 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
             event_2: Second Event.
 
         Returns:
-            Arithmetic of the two Events according to resolution and arithmetic operator.
+            Arithmetic of the two Events according to the operator.
 
         Raises:
             ValueError: If sampling of both events is not equal.
-            NotImplementedError: If resolution is PER_FEATURE_NAME.
         """
-        resolution = self.operator.attributes()["resolution"]
 
         if event_1.sampling is not event_2.sampling:
             raise ValueError("Sampling of both events must be equal.")
@@ -59,11 +56,6 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
             )
 
         output = NumpyEvent(data={}, sampling=event_1.sampling)
-
-        if resolution == Resolution.PER_FEATURE_NAME:
-            raise NotImplementedError(
-                "PER_FEATURE_NAME is not implemented yet."
-            )
 
         prefix = self._operator.prefix
 
