@@ -71,3 +71,15 @@ py_library(
         "//temporian/implementation/numpy/data:event",
     ],
 )
+
+py_library(
+    name = "floordiv",
+    srcs = ["floordiv.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators/arithmetic:floordiv",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event",
+    ],
+)

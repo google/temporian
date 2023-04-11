@@ -25,8 +25,8 @@ class SubtractionNumpyImplementation(BaseArithmeticNumpyImplementation):
     def __init__(self, operator: SubtractionOperator) -> None:
         super().__init__(operator)
 
-    def _do_operation(self, event_1_data, event_2_data):
-        return event_1_data - event_2_data
+    def _do_operation(self, event_1_feature, event_2_feature):
+        return event_1_feature.data - event_2_feature.data
 
 
 implementation_lib.register_operator_implementation(

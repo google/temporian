@@ -12,63 +12,45 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Division Operator"""
+"""Floor or integer division Operator"""
 
 from temporian.core import operator_lib
-from temporian.core.data import dtype
 from temporian.core.data.event import Event
 from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
 
 
-class DivisionOperator(BaseArithmeticOperator):
+class FloorDivideOperator(BaseArithmeticOperator):
     """
-    Divide first event by second one
+    Integer divide first event by second one (i.e: a//b)
     """
-
-    def __init__(
-        self,
-        event_1: Event,
-        event_2: Event,
-    ):
-        super().__init__(event_1, event_2)
-
-        # Assuming previous dtype check of event_1 and event_2 features
-        for feat in event_1.features():
-            if feat.dtype() in [dtype.INT32, dtype.INT64]:
-                raise ValueError(
-                    "Cannot use the divide operator on feature "
-                    f"{feat.name()} of type {feat.dtype()}. Cast to "
-                    "a floating point type or use "
-                    "floordiv operator (//) instead, on these integer types."
-                )
 
     @classmethod
     @property
     def operator_def_key(cls) -> str:
-        return "DIVISION"
+        return "FLOORDIV"
 
     @property
     def prefix(self) -> str:
-        return "div"
+        return "floordiv"
 
 
-operator_lib.register_operator(DivisionOperator)
+operator_lib.register_operator(FloorDivideOperator)
 
 
-def divide(
+def floordiv(
     numerator: Event,
     denominator: Event,
 ) -> Event:
     """
-    Divide two events.
+    Divide two events and take the result floor.
 
     Args:
         numerator: Numerator event
         denominator: Denominator event
     Returns:
-        Event: Division of numerator features and denominator features
+        Event: Integer division of numerator features and denominator features
     """
-    return DivisionOperator(
+    return FloorDivideOperator(
         event_1=numerator,
         event_2=denominator,
     ).outputs()["event"]

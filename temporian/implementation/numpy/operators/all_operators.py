@@ -12,6 +12,7 @@ from temporian.implementation.numpy.operators.arithmetic import addition
 from temporian.implementation.numpy.operators.arithmetic import subtraction
 from temporian.implementation.numpy.operators.arithmetic import multiplication
 from temporian.implementation.numpy.operators.arithmetic import division
+from temporian.implementation.numpy.operators.arithmetic import floordiv
 
 from temporian.implementation.numpy.operators.window import (
     simple_moving_average,

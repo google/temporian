@@ -20,6 +20,7 @@ py_library(
         "//temporian/implementation/numpy/operators/arithmetic",
         "//temporian/implementation/numpy/operators/arithmetic:addition",
         "//temporian/implementation/numpy/operators/arithmetic:division",
+        "//temporian/implementation/numpy/operators/arithmetic:floordiv",
         "//temporian/implementation/numpy/operators/arithmetic:multiplication",
         "//temporian/implementation/numpy/operators/arithmetic:subtraction",
         "//temporian/implementation/numpy/operators/calendar:day_of_month",

@@ -26,7 +26,7 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
         super().__init__(operator)
 
     @abstractmethod
-    def _do_operation(self, event_1_data, event_2_data):
+    def _do_operation(self, event_1_feature, event_2_feature):
         """
         Perform the actual arithmetic operation corresponding to the subclass
         """
@@ -76,9 +76,7 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
                         f"{event_2_feature} has dtype {event_2_feature.dtype}."
                     )
 
-                data = self._do_operation(
-                    event_1_feature.data, event_2_feature.data
-                )
+                data = self._do_operation(event_1_feature, event_2_feature)
 
                 output.data[event_index].append(
                     NumpyFeature(

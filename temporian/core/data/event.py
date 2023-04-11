@@ -76,6 +76,11 @@ class Event(object):
 
         return divide(numerator=self, denominator=other)
 
+    def __floordiv__(self, other):
+        from temporian.core.operators.arithmetic import floordiv
+
+        return floordiv(numerator=self, denominator=other)
+
     def sampling(self):
         return self._sampling
 

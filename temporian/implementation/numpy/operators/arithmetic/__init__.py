@@ -11,5 +11,8 @@ from temporian.implementation.numpy.operators.arithmetic.multiplication import (
 from temporian.implementation.numpy.operators.arithmetic.division import (
     DivisionNumpyImplementation,
 )
+from temporian.implementation.numpy.operators.arithmetic.floordiv import (
+    FloorDivideNumpyImplementation,
+)
 
 # pylint: enable=unused-import

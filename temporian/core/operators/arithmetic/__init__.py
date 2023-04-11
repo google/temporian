@@ -5,6 +5,10 @@ from temporian.core.operators.arithmetic.division import (
     divide,
     DivisionOperator,
 )
+from temporian.core.operators.arithmetic.floordiv import (
+    floordiv,
+    FloorDivideOperator,
+)
 from temporian.core.operators.arithmetic.subtraction import (
     subtract,
     SubtractionOperator,
