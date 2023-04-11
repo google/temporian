@@ -1,6 +1,8 @@
 """Imports all the packages containing operator definitions."""
 
 # pylint: disable=unused-import
+from temporian.core.operators.equal import equal
+
 from temporian.core.operators.arithmetic import divide
 from temporian.core.operators.arithmetic import multiply
 from temporian.core.operators.arithmetic import substract

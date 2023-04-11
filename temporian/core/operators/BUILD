@@ -12,6 +12,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":arithmetic",
+        ":equal",
         ":glue",
         ":lag",
         ":prefix",
@@ -41,6 +42,20 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "equal",
+    srcs = ["equal.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:dtype",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
         "//temporian/proto:core_py_proto",
