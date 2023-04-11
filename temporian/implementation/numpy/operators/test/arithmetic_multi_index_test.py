@@ -23,6 +23,7 @@ from temporian.core.operators.arithmetic import (
     SubtractionOperator,
     MultiplicationOperator,
     DivisionOperator,
+    FloorDivideOperator,
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators.arithmetic import (
@@ -30,6 +31,7 @@ from temporian.implementation.numpy.operators.arithmetic import (
     SubtractionNumpyImplementation,
     MultiplicationNumpyImplementation,
     DivisionNumpyImplementation,
+    FloorDivideNumpyImplementation,
 )
 from temporian.core.data import dtype as dtype_lib
 
@@ -98,7 +100,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id", "product_id"],
         )
 
-        # Expected result after addition PER_FEATURE_IDX
+        # Expected result after addition
         self.numpy_expected_add = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
@@ -123,7 +125,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id", "product_id"],
         )
-        # Expected result after subtraction PER_FEATURE_IDX
+        # Expected result after subtraction
         self.numpy_expected_subtract = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
@@ -148,7 +150,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id", "product_id"],
         )
-        # Expected result after multiplication PER_FEATURE_IDX
+        # Expected result after multiplication
         self.numpy_expected_multiply = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
@@ -173,7 +175,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id", "product_id"],
         )
-        # Expected result after division PER_FEATURE_IDX
+        # Expected result after division
         self.numpy_expected_divide = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
@@ -195,6 +197,32 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
                 ],
             ).astype(
                 {"div_revenue_sales": np.float32}  # Default is float64
+            ),
+            index_names=["store_id", "product_id"],
+        )
+
+        # Expected result after floor division
+        self.numpy_expected_floordiv = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [TRYOLABS_SHOP, MATE_ID, 0.0, -4.0, 0],
+                    [TRYOLABS_SHOP, MATE_ID, 1.0, -3.0, 0],
+                    [TRYOLABS_SHOP, MATE_ID, 2.0, 1, 3],
+                    [TRYOLABS_SHOP, BOOK_ID, 1.0, np.inf, 2],
+                    [GOOGLE_SHOP, BOOK_ID, 1.0, 0, -1],
+                    [GOOGLE_SHOP, BOOK_ID, 2.0, -1, 3],
+                    [GOOGLE_SHOP, PIXEL_ID, 0.0, 1, 1],
+                    [GOOGLE_SHOP, PIXEL_ID, 1.0, 0, 2],
+                ],
+                columns=[
+                    "store_id",
+                    "product_id",
+                    "timestamp",
+                    "floordiv_sales_costs",
+                    "floordiv_revenue_sales",
+                ],
+            ).astype(
+                {"floordiv_revenue_sales": np.float32}  # Default is float64
             ),
             index_names=["store_id", "product_id"],
         )
@@ -284,6 +312,28 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
         )
 
         self.assertTrue(self.numpy_expected_divide == operator_output["event"])
+
+    def test_correct_floordiv(self) -> None:
+        """Test correct floordiv operator."""
+
+        operator = FloorDivideOperator(
+            event_1=self.event_1,
+            event_2=self.event_2,
+        )
+
+        div_implementation = FloorDivideNumpyImplementation(operator)
+
+        operator_output = div_implementation.call(
+            event_1=self.numpy_event_1, event_2=self.numpy_event_2
+        )
+
+        print("EXPECTED:")
+        print(self.numpy_expected_floordiv)
+        print("ACTUAL:")
+        print(operator_output["event"])
+        self.assertTrue(
+            self.numpy_expected_floordiv == operator_output["event"]
+        )
 
 
 if __name__ == "__main__":

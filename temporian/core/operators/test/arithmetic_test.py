@@ -21,6 +21,7 @@ from temporian.core.data.sampling import Sampling
 from temporian.core.operators.arithmetic import (
     AdditionOperator,
     DivisionOperator,
+    FloorDivideOperator,
     MultiplicationOperator,
     SubtractionOperator,
 )
@@ -29,6 +30,8 @@ from temporian.core.operators.arithmetic import (
 class ArithmeticOperatorsTest(absltest.TestCase):
     def setUp(self):
         self.sampling = Sampling(index=["x"])
+
+        # Events with floating point types
         self.event_1 = event_lib.input_event(
             features=[
                 Feature("f1", dtype.FLOAT32),
@@ -40,6 +43,22 @@ class ArithmeticOperatorsTest(absltest.TestCase):
             features=[
                 Feature("f3", dtype.FLOAT32),
                 Feature("f4", dtype.FLOAT64),
+            ],
+            sampling=self.sampling,
+        )
+
+        # Events with integer types (only for division operations)
+        self.event_3 = event_lib.input_event(
+            features=[
+                Feature("f5", dtype.INT32),
+                Feature("f6", dtype.INT64),
+            ],
+            sampling=self.sampling,
+        )
+        self.event_4 = event_lib.input_event(
+            features=[
+                Feature("f7", dtype.INT32),
+                Feature("f8", dtype.INT64),
             ],
             sampling=self.sampling,
         )
@@ -90,6 +109,24 @@ class ArithmeticOperatorsTest(absltest.TestCase):
         assert event_out.features()[1].name() == "div_f2_f4"
         assert event_out.features()[0].dtype() == dtype.FLOAT32
         assert event_out.features()[1].dtype() == dtype.FLOAT64
+
+    def test_floordiv(self):
+        # First, check that truediv is not supported for integer types
+        with self.assertRaisesRegex(
+            ValueError, "Cannot use the divide operator"
+        ):
+            event_out = self.event_3 / self.event_4
+
+        # Check floordiv operator instead
+        event_out = self.event_3 // self.event_4
+        assert isinstance(event_out.creator(), FloorDivideOperator)
+        assert event_out.sampling() is self.sampling
+        assert event_out.features()[0].creator() is event_out.creator()
+        assert event_out.features()[1].creator() is event_out.creator()
+        assert event_out.features()[0].name() == "floordiv_f5_f7"
+        assert event_out.features()[1].name() == "floordiv_f6_f8"
+        assert event_out.features()[0].dtype() == dtype.INT32
+        assert event_out.features()[1].dtype() == dtype.INT64
 
 
 if __name__ == "__main__":
