@@ -20,6 +20,20 @@ py_test(
 )
 
 py_test(
+    name = "equal_test",
+    srcs = ["equal_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:event",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators:equal",
+        "//temporian/implementation/numpy:evaluator",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/operators:equal",
+    ],
+)
+
+py_test(
     name = "glue_test",
     srcs = ["glue_test.py"],
     srcs_version = "PY3",
