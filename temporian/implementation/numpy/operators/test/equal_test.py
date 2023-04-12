@@ -264,6 +264,21 @@ class EqualOperatorTest(absltest.TestCase):
 
         self.assertEqual(equal_event, expected_event)
 
+    def test_value_unsupported_type(self):
+        """Test operator raises error when value is not a supported type."""
+
+        class MyClass:
+            def __init__(self, a_variable) -> None:
+                self.a_variable = a_variable
+
+        value = MyClass(10)
+
+        operator = EqualOperator(event=self.input_event, value=value)
+        impl = equal.EqualNumpyImplementation(operator)
+
+        with self.assertRaises(ValueError):
+            impl.call(event=self.input_event_data)["event"]
+
 
 if __name__ == "__main__":
     absltest.main()

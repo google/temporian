@@ -46,6 +46,13 @@ class EqualNumpyImplementation(OperatorImplementation):
 
         value_dtype = np.dtype(type(value))
 
+        # check that value dtype is supported
+        if value_dtype not in DTYPE_REVERSE_MAPPING.values():
+            raise ValueError(
+                f"Value dtype {value_dtype} not supported for EqualOperator."
+                f" Supported dtypes are {DTYPE_REVERSE_MAPPING.values()}"
+            )
+
         output_event = NumpyEvent(data={}, sampling=event.sampling)
 
         for index_value, features in event.data.items():
