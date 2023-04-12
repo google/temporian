@@ -33,7 +33,7 @@ from temporian.implementation.numpy.operators.arithmetic import (
     DivideNumpyImplementation,
     FloorDivideNumpyImplementation,
 )
-from temporian.core.data import dtype as dtype_lib
+from temporian.core.data import dtype
 
 
 class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
@@ -229,19 +229,21 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
 
         self.numpy_event_2.sampling = self.numpy_event_1.sampling
 
-        self.sampling = Sampling(["store_id", "product_id"])
+        self.sampling = Sampling(
+            [("store_id", dtype.INT32), ("product_id", dtype.INT64)]
+        )
         self.event_1 = Event(
             [
-                Feature("sales", dtype_lib.FLOAT64),
-                Feature("revenue", dtype_lib.FLOAT32),
+                Feature("sales", dtype.FLOAT64),
+                Feature("revenue", dtype.FLOAT32),
             ],
             sampling=self.sampling,
             creator=None,
         )
         self.event_2 = Event(
             [
-                Feature("costs", dtype_lib.FLOAT64),
-                Feature("sales", dtype_lib.FLOAT32),
+                Feature("costs", dtype.FLOAT64),
+                Feature("sales", dtype.FLOAT32),
             ],
             sampling=self.sampling,
             creator=None,

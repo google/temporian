@@ -54,4 +54,4 @@ def add(
     return AddOperator(
         event_1=event_1,
         event_2=event_2,
-    ).outputs()["event"]
+    ).outputs["event"]

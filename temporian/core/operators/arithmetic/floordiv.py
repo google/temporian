@@ -53,4 +53,4 @@ def floordiv(
     return FloorDivOperator(
         event_1=numerator,
         event_2=denominator,
-    ).outputs()["event"]
+    ).outputs["event"]

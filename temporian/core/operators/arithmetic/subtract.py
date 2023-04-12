@@ -55,4 +55,4 @@ def subtract(
     return SubtractOperator(
         event_1=event_1,
         event_2=event_2,
-    ).outputs()["event"]
+    ).outputs["event"]

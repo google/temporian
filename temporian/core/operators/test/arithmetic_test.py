@@ -29,7 +29,7 @@ from temporian.core.operators.arithmetic import (
 
 class ArithmeticOperatorsTest(absltest.TestCase):
     def setUp(self):
-        self.sampling = Sampling(index=["x"])
+        self.sampling = Sampling(index=[("x", dtype.INT32)])
 
         # Events with floating point types
         self.event_1 = event_lib.input_event(
@@ -65,50 +65,48 @@ class ArithmeticOperatorsTest(absltest.TestCase):
 
     def test_addition(self):
         event_out = self.event_1 + self.event_2
-        print(
-            f"Creator: type={type(event_out.creator())} {event_out.creator()}"
-        )
-        assert isinstance(event_out.creator(), AddOperator)
-        assert event_out.sampling() is self.sampling
-        assert event_out.features()[0].creator() is event_out.creator()
-        assert event_out.features()[1].creator() is event_out.creator()
-        assert event_out.features()[0].name() == "add_f1_f3"
-        assert event_out.features()[1].name() == "add_f2_f4"
-        assert event_out.features()[0].dtype() == dtype.FLOAT32
-        assert event_out.features()[1].dtype() == dtype.FLOAT64
+        print(f"Creator: type={type(event_out.creator)} {event_out.creator}")
+        assert isinstance(event_out.creator, AddOperator)
+        assert event_out.sampling is self.sampling
+        assert event_out.features[0].creator is event_out.creator
+        assert event_out.features[1].creator is event_out.creator
+        assert event_out.features[0].name == "add_f1_f3"
+        assert event_out.features[1].name == "add_f2_f4"
+        assert event_out.features[0].dtype == dtype.FLOAT32
+        assert event_out.features[1].dtype == dtype.FLOAT64
 
     def test_subtraction(self):
         event_out = self.event_1 - self.event_2
-        assert isinstance(event_out.creator(), SubtractOperator)
-        assert event_out.sampling() is self.sampling
-        assert event_out.features()[0].creator() is event_out.creator()
-        assert event_out.features()[1].creator() is event_out.creator()
-        assert event_out.features()[0].name() == "sub_f1_f3"
-        assert event_out.features()[1].name() == "sub_f2_f4"
-        assert event_out.features()[0].dtype() == dtype.FLOAT32
-        assert event_out.features()[1].dtype() == dtype.FLOAT64
+        assert isinstance(event_out.creator, SubtractOperator)
+        assert event_out.sampling is self.sampling
+        assert event_out.features[0].creator is event_out.creator
+        assert event_out.features[1].creator is event_out.creator
+        assert event_out.features[0].name == "sub_f1_f3"
+        assert event_out.features[1].name == "sub_f2_f4"
+        assert event_out.features[0].dtype == dtype.FLOAT32
+        assert event_out.features[1].dtype == dtype.FLOAT64
 
     def test_multiplication(self):
         event_out = self.event_1 * self.event_2
-        assert isinstance(event_out.creator(), MultiplyOperator)
-        assert event_out.sampling() is self.sampling
-        assert event_out.features()[0].creator() is event_out.creator()
-        assert event_out.features()[1].creator() is event_out.creator()
-        assert event_out.features()[0].name() == "mult_f1_f3"
-        assert event_out.features()[1].name() == "mult_f2_f4"
-        assert event_out.features()[0].dtype() == dtype.FLOAT32
-        assert event_out.features()[1].dtype() == dtype.FLOAT64
+        assert isinstance(event_out.creator, MultiplyOperator)
+        assert event_out.sampling is self.sampling
+        assert event_out.features[0].creator is event_out.creator
+        assert event_out.features[1].creator is event_out.creator
+        assert event_out.features[0].name == "mult_f1_f3"
+        assert event_out.features[1].name == "mult_f2_f4"
+        assert event_out.features[0].dtype == dtype.FLOAT32
+        assert event_out.features[1].dtype == dtype.FLOAT64
 
     def test_division(self):
         event_out = self.event_1 / self.event_2
-        assert isinstance(event_out.creator(), DivideOperator)
-        assert event_out.sampling() is self.sampling
-        assert event_out.features()[0].creator() is event_out.creator()
-        assert event_out.features()[1].creator() is event_out.creator()
-        assert event_out.features()[0].name() == "div_f1_f3"
-        assert event_out.features()[1].name() == "div_f2_f4"
-        assert event_out.features()[0].dtype() == dtype.FLOAT32
-        assert event_out.features()[1].dtype() == dtype.FLOAT64
+        assert isinstance(event_out.creator, DivideOperator)
+        assert event_out.sampling is self.sampling
+        assert event_out.features[0].creator is event_out.creator
+        assert event_out.features[1].creator is event_out.creator
+        assert event_out.features[0].name == "div_f1_f3"
+        assert event_out.features[1].name == "div_f2_f4"
+        assert event_out.features[0].dtype == dtype.FLOAT32
+        assert event_out.features[1].dtype == dtype.FLOAT64
 
     def test_floordiv(self):
         # First, check that truediv is not supported for integer types
@@ -119,14 +117,14 @@ class ArithmeticOperatorsTest(absltest.TestCase):
 
         # Check floordiv operator instead
         event_out = self.event_3 // self.event_4
-        assert isinstance(event_out.creator(), FloorDivOperator)
-        assert event_out.sampling() is self.sampling
-        assert event_out.features()[0].creator() is event_out.creator()
-        assert event_out.features()[1].creator() is event_out.creator()
-        assert event_out.features()[0].name() == "floordiv_f5_f7"
-        assert event_out.features()[1].name() == "floordiv_f6_f8"
-        assert event_out.features()[0].dtype() == dtype.INT32
-        assert event_out.features()[1].dtype() == dtype.INT64
+        assert isinstance(event_out.creator, FloorDivOperator)
+        assert event_out.sampling is self.sampling
+        assert event_out.features[0].creator is event_out.creator
+        assert event_out.features[1].creator is event_out.creator
+        assert event_out.features[0].name == "floordiv_f5_f7"
+        assert event_out.features[1].name == "floordiv_f6_f8"
+        assert event_out.features[0].dtype == dtype.INT32
+        assert event_out.features[1].dtype == dtype.INT64
 
 
 if __name__ == "__main__":

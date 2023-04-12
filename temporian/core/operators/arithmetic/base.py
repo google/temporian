@@ -15,10 +15,7 @@
 """Base class for arithmetic operators"""
 
 from abc import abstractmethod
-from enum import Enum
 
-from temporian.core import operator_lib
-from temporian.core.data import dtype
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.operators.base import Operator
@@ -39,17 +36,17 @@ class BaseArithmeticOperator(Operator):
         self.add_input("event_1", event_1)
         self.add_input("event_2", event_2)
 
-        if event_1.sampling() is not event_2.sampling():
+        if event_1.sampling is not event_2.sampling:
             raise ValueError("event_1 and event_2 must have same sampling.")
 
-        if len(event_1.features()) != len(event_2.features()):
+        if len(event_1.features) != len(event_2.features):
             raise ValueError(
                 "event_1 and event_2 must have same number of features."
             )
 
         # check that features have same dtype
-        for feature_1, feature_2 in zip(event_1.features(), event_2.features()):
-            if feature_1.dtype() != feature_2.dtype():
+        for feature_1, feature_2 in zip(event_1.features, event_2.features):
+            if feature_1.dtype != feature_2.dtype:
                 raise ValueError(
                     (
                         "event_1 and event_2 must have same dtype for each"
@@ -59,22 +56,20 @@ class BaseArithmeticOperator(Operator):
                         f"feature_1: {feature_1}, feature_2: {feature_2} have"
                         " dtypes:"
                     ),
-                    f"{feature_1.dtype()}, {feature_2.dtype()}.",
+                    f"{feature_1.dtype}, {feature_2.dtype}.",
                 )
 
-        sampling = event_1.sampling()
+        sampling = event_1.sampling
 
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=f"{self.prefix}_{feature_1.name()}_{feature_2.name()}",
-                dtype=feature_1.dtype(),
+                name=f"{self.prefix}_{feature_1.name}_{feature_2.name}",
+                dtype=feature_1.dtype,
                 sampling=sampling,
                 creator=self,
             )
-            for feature_1, feature_2 in zip(
-                event_1.features(), event_2.features()
-            )
+            for feature_1, feature_2 in zip(event_1.features, event_2.features)
         ]
 
         self.add_output(

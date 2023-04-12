@@ -33,11 +33,11 @@ class DivideOperator(BaseArithmeticOperator):
         super().__init__(event_1, event_2)
 
         # Assuming previous dtype check of event_1 and event_2 features
-        for feat in event_1.features():
-            if feat.dtype() in [dtype.INT32, dtype.INT64]:
+        for feat in event_1.features:
+            if feat.dtype in [dtype.INT32, dtype.INT64]:
                 raise ValueError(
                     "Cannot use the divide operator on feature "
-                    f"{feat.name()} of type {feat.dtype()}. Cast to "
+                    f"{feat.name} of type {feat.dtype}. Cast to "
                     "a floating point type or use "
                     "floordiv operator (//) instead, on these integer types."
                 )
@@ -71,4 +71,4 @@ def divide(
     return DivideOperator(
         event_1=numerator,
         event_2=denominator,
-    ).outputs()["event"]
+    ).outputs["event"]
