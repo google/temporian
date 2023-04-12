@@ -37,6 +37,9 @@ class EqualNumpyImplementation(OperatorImplementation):
             ):  # Both are Unicode strings
                 return True
 
+            if dtype1.kind == "b" and dtype2.kind == "b":  # Both are booleans
+                return True
+
             return False
 
         value = self.operator.attributes["value"]
