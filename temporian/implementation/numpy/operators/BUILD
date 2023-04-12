@@ -11,13 +11,18 @@ py_library(
     srcs = ["all_operators.py"],
     srcs_version = "PY3",
     deps = [
-        ":arithmetic",
         ":glue",
         ":lag",
         ":prefix",
         ":propagate",
         ":sample",
         ":select",
+        "//temporian/implementation/numpy/operators/arithmetic",
+        "//temporian/implementation/numpy/operators/arithmetic:add",
+        "//temporian/implementation/numpy/operators/arithmetic:divide",
+        "//temporian/implementation/numpy/operators/arithmetic:floordiv",
+        "//temporian/implementation/numpy/operators/arithmetic:multiply",
+        "//temporian/implementation/numpy/operators/arithmetic:subtract",
         "//temporian/implementation/numpy/operators/calendar:day_of_month",
         "//temporian/implementation/numpy/operators/calendar:day_of_week",
         "//temporian/implementation/numpy/operators/window:moving_count",
@@ -37,19 +42,6 @@ py_library(
     name = "base",
     srcs = ["base.py"],
     srcs_version = "PY3",
-)
-
-py_library(
-    name = "arithmetic",
-    srcs = ["arithmetic.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":base",
-        "//temporian/core/operators:arithmetic",
-        "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:feature",
-    ],
 )
 
 py_library(

@@ -11,40 +11,43 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import numpy as np
 from typing import Dict
+from abc import ABC, abstractmethod
 
-from temporian.core.operators.arithmetic import ArithmeticOperation
-from temporian.core.operators.arithmetic import ArithmeticOperator
-from temporian.core.operators.arithmetic import Resolution
+from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.feature import NumpyFeature
-from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
-class ArithmeticNumpyImplementation(OperatorImplementation):
-    def __init__(self, operator: ArithmeticOperator) -> None:
+class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
+    def __init__(self, operator: BaseArithmeticOperator) -> None:
         super().__init__(operator)
+
+    @abstractmethod
+    def _do_operation(
+        self, event_1_feature: NumpyFeature, event_2_feature: NumpyFeature
+    ) -> np.ndarray:
+        """
+        Perform the actual arithmetic operation corresponding to the subclass
+        """
 
     def __call__(
         self, event_1: NumpyEvent, event_2: NumpyEvent
     ) -> Dict[str, NumpyEvent]:
-        """Sum two Events.
+        """Apply the corresponding arithmetic operation between two Events.
 
         Args:
             event_1: First Event.
             event_2: Second Event.
 
         Returns:
-            Arithmetic of the two Events according to resolution and arithmetic operator.
+            Arithmetic of the two Events according to the operator.
 
         Raises:
             ValueError: If sampling of both events is not equal.
-            NotImplementedError: If resolution is PER_FEATURE_NAME.
         """
-        resolution = self.operator.attributes["resolution"]
-        operation = self.operator.attributes["operation"]
 
         if event_1.sampling is not event_2.sampling:
             raise ValueError("Sampling of both events must be equal.")
@@ -54,17 +57,9 @@ class ArithmeticNumpyImplementation(OperatorImplementation):
                 "Both events must have the same number of features."
             )
 
-        if not ArithmeticOperation.is_valid(operation):
-            raise ValueError(f"Unknown operation: {operation}.")
-
         output = NumpyEvent(data={}, sampling=event_1.sampling)
 
-        if resolution == Resolution.PER_FEATURE_NAME:
-            raise NotImplementedError(
-                "PER_FEATURE_NAME is not implemented yet."
-            )
-
-        prefix = ArithmeticOperation.prefix(operation)
+        prefix = self._operator.prefix
 
         for event_index, event_1_features in event_1.data.items():
             output.data[event_index] = []
@@ -83,27 +78,13 @@ class ArithmeticNumpyImplementation(OperatorImplementation):
                         f"{event_2_feature} has dtype {event_2_feature.dtype}."
                     )
 
-                data = None
-
-                if operation == ArithmeticOperation.ADDITION:
-                    data = event_1_feature.data + event_2_feature.data
-                elif operation == ArithmeticOperation.SUBTRACTION:
-                    data = event_1_feature.data - event_2_feature.data
-                elif operation == ArithmeticOperation.MULTIPLICATION:
-                    data = event_1_feature.data * event_2_feature.data
-                elif operation == ArithmeticOperation.DIVISION:
-                    data = event_1_feature.data / event_2_feature.data
+                result = self._do_operation(event_1_feature, event_2_feature)
 
                 output.data[event_index].append(
                     NumpyFeature(
                         name=f"{prefix}_{event_1_feature.name}_{event_2_feature.name}",
-                        data=data,
+                        data=result,
                     )
                 )
 
         return {"event": output}
-
-
-implementation_lib.register_operator_implementation(
-    ArithmeticOperator, ArithmeticNumpyImplementation
-)

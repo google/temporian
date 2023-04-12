@@ -11,13 +11,13 @@ py_library(
     srcs = ["all_operators.py"],
     srcs_version = "PY3",
     deps = [
-        ":arithmetic",
         ":glue",
         ":lag",
         ":prefix",
         ":propagate",
         ":sample",
         ":select",
+        "//temporian/core/operators/arithmetic",
         "//temporian/core/operators/calendar:day_of_month",
         "//temporian/core/operators/calendar:day_of_week",
         "//temporian/core/operators/calendar:day_of_year",
@@ -31,19 +31,6 @@ py_library(
         "//temporian/core/operators/window:moving_standard_deviation",
         "//temporian/core/operators/window:moving_sum",
         "//temporian/core/operators/window:simple_moving_average",
-    ],
-)
-
-py_library(
-    name = "arithmetic",
-    srcs = ["arithmetic.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":base",
-        "//temporian/core:operator_lib",
-        "//temporian/core/data:event",
-        "//temporian/core/data:feature",
-        "//temporian/proto:core_py_proto",
     ],
 )
 
