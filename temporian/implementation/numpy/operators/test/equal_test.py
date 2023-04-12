@@ -38,8 +38,6 @@ class EqualOperatorTest(absltest.TestCase):
             columns=["timestamp", "sales", "costs", "weather"],
         )
 
-        df["weather"] = df["weather"].astype(np.int64)
-
         self.input_event_data = NumpyEvent.from_dataframe(df)
 
         self.input_event = self.input_event_data.schema()
@@ -48,7 +46,7 @@ class EqualOperatorTest(absltest.TestCase):
         """Test equal when value is a float."""
         new_df = pd.DataFrame(
             [
-                [1.0, True, False, True],
+                [1.0, True, False, False],
                 [2.0, False, False, False],
                 [3.0, False, False, False],
                 [4.0, False, False, False],
@@ -65,7 +63,7 @@ class EqualOperatorTest(absltest.TestCase):
 
         operator = EqualOperator(event=self.input_event, value=10.0)
         impl = equal.EqualNumpyImplementation(operator)
-        equal_event = impl.call(event=self.input_event_data)["event"]
+        equal_event = impl(event=self.input_event_data)["event"]
 
         expected_event = NumpyEvent.from_dataframe(new_df)
 
@@ -92,7 +90,82 @@ class EqualOperatorTest(absltest.TestCase):
 
         operator = EqualOperator(event=self.input_event, value="10")
         impl = equal.EqualNumpyImplementation(operator)
-        equal_event = impl.call(event=self.input_event_data)["event"]
+        equal_event = impl(event=self.input_event_data)["event"]
+
+        expected_event = NumpyEvent.from_dataframe(new_df)
+
+        self.assertEqual(equal_event, expected_event)
+
+    def test_int_equal(self) -> None:
+        """Test equal when value is an int."""
+        new_df = pd.DataFrame(
+            [
+                [1.0, False, False, True],
+                [2.0, False, False, False],
+                [3.0, False, False, False],
+                [4.0, False, False, False],
+                [5.0, False, False, False],
+                [6.0, False, False, False],
+            ],
+            columns=[
+                "timestamp",
+                "sales_equal_10",
+                "costs_equal_10",
+                "weather_equal_10",
+            ],
+        )
+
+        operator = EqualOperator(event=self.input_event, value=10)
+        impl = equal.EqualNumpyImplementation(operator)
+        equal_event = impl(event=self.input_event_data)["event"]
+
+        expected_event = NumpyEvent.from_dataframe(new_df)
+
+        self.assertEqual(equal_event, expected_event)
+
+    def test_int_equal_with_int32_column(self) -> None:
+        """Test equal when value is an int64 and a column is an int32."""
+
+        df = pd.DataFrame(
+            [
+                [1.0, 10.0, "A", 10],
+                [2.0, np.nan, "A", 12],
+                [3.0, 12.0, "B", 40],
+                [4.0, 13.0, "B", 100],
+                [5.0, 14.0, "10.0", 0],
+                [6.0, 15.0, "10", 15],
+            ],
+            columns=["timestamp", "sales", "costs", "weather"],
+        )
+
+        # convert weather column to int32 to check different general dtypes.
+        df["weather"] = df["weather"].astype(np.int32)
+
+        self.input_event_data = NumpyEvent.from_dataframe(df)
+        self.input_event = self.input_event_data.schema()
+
+        new_df = pd.DataFrame(
+            [
+                [1.0, False, False, True],
+                [2.0, False, False, False],
+                [3.0, False, False, False],
+                [4.0, False, False, False],
+                [5.0, False, False, False],
+                [6.0, False, False, False],
+            ],
+            columns=[
+                "timestamp",
+                "sales_equal_10",
+                "costs_equal_10",
+                "weather_equal_10",
+            ],
+        )
+
+        # default python int of value=10 is int64.
+        # the comparison will be true because we check general dtypes.
+        operator = EqualOperator(event=self.input_event, value=10)
+        impl = equal.EqualNumpyImplementation(operator)
+        equal_event = impl(event=self.input_event_data)["event"]
 
         expected_event = NumpyEvent.from_dataframe(new_df)
 
