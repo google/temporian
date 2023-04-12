@@ -58,6 +58,39 @@ class DataFrameToEventTest(absltest.TestCase):
         # validate
         self.assertTrue(numpy_event == expected_numpy_event)
 
+    def test_timestamp_order(self) -> None:
+        df = pd.DataFrame(
+            [
+                [1.0, 100.0],
+                [3.0, 300.0],
+                [2.0, 200.0],
+            ],
+            columns=["timestamp", "costs"],
+        )
+
+        numpy_sampling = NumpySampling(
+            data={
+                (): np.array([1.0, 2.0, 3.0]),
+            },
+            index=[],
+        )
+
+        expected_numpy_event = NumpyEvent(
+            data={
+                (): [
+                    NumpyFeature(
+                        data=np.array([100.0, 200.0, 300.0]), name="costs"
+                    )
+                ],
+            },
+            sampling=numpy_sampling,
+        )
+
+        numpy_event = NumpyEvent.from_dataframe(df)
+
+        # validate
+        self.assertTrue(numpy_event == expected_numpy_event)
+
     def test_string_column(self) -> None:
         df = pd.DataFrame(
             [

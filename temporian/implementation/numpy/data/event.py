@@ -101,6 +101,7 @@ class NumpyEvent:
         df: pd.DataFrame,
         index_names: List[str] = None,
         timestamp_column: str = "timestamp",
+        is_sorted: bool = False,
     ) -> NumpyEvent:
         """Convert a pandas DataFrame to a NumpyEvent.
         Args:
@@ -110,6 +111,9 @@ class NumpyEvent:
             timestamp_column: Column containing timestamps. Supported date types:
                 {np.datetime64, pd.Timestamp, datetime.datetime}. Timestamps of
                 these types are converted implicitly to UTC epoch float.
+            is_sorted: If True, the DataFrame is assumed to be sorted by
+                timestamp. If False, the DataFrame will be sorted by timestamp.
+
 
         Returns:
             NumpyEvent: NumpyEvent created from DataFrame.
@@ -162,6 +166,12 @@ class NumpyEvent:
         df[timestamp_column] = df[timestamp_column].apply(
             convert_date_to_duration
         )
+
+        # sort by timestamp if it's not sorted
+        # TODO: we may consider using kind="mergesort" if we know that most of
+        # the time the data will be sorted.
+        if not is_sorted and not np.all(np.diff(df[timestamp_column]) >= 0):
+            df = df.sort_values(by=timestamp_column)
 
         # check column dtypes, every dtype should be a key of DTYPE_MAPPING
         for column in df.columns:
