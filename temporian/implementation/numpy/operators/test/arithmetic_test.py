@@ -19,17 +19,17 @@ from absl.testing import absltest
 from temporian.core.data.event import Event, Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.arithmetic import (
-    AdditionOperator,
-    SubtractionOperator,
-    MultiplicationOperator,
-    DivisionOperator,
+    AddOperator,
+    SubtractOperator,
+    MultiplyOperator,
+    DivideOperator,
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators.arithmetic import (
-    AdditionNumpyImplementation,
-    SubtractionNumpyImplementation,
-    MultiplicationNumpyImplementation,
-    DivisionNumpyImplementation,
+    AddNumpyImplementation,
+    SubtractNumpyImplementation,
+    MultiplyNumpyImplementation,
+    DivideNumpyImplementation,
 )
 from temporian.core.data import dtype as dtype_lib
 
@@ -98,12 +98,12 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id"],
         )
 
-        operator = AdditionOperator(
+        operator = AddOperator(
             event_1=self.event_1,
             event_2=self.event_2,
         )
 
-        sum_implementation = AdditionNumpyImplementation(operator)
+        sum_implementation = AddNumpyImplementation(operator)
 
         operator_output = sum_implementation.call(
             event_1=self.numpy_event_1, event_2=self.numpy_event_2
@@ -128,12 +128,12 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id"],
         )
 
-        operator = SubtractionOperator(
+        operator = SubtractOperator(
             event_1=self.event_1,
             event_2=self.event_2,
         )
 
-        sub_implementation = SubtractionNumpyImplementation(operator)
+        sub_implementation = SubtractNumpyImplementation(operator)
         operator_output = sub_implementation.call(
             event_1=self.numpy_event_1, event_2=self.numpy_event_2
         )
@@ -156,12 +156,12 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id"],
         )
 
-        operator = MultiplicationOperator(
+        operator = MultiplyOperator(
             event_1=self.event_1,
             event_2=self.event_2,
         )
 
-        mult_implementation = MultiplicationNumpyImplementation(operator)
+        mult_implementation = MultiplyNumpyImplementation(operator)
 
         operator_output = mult_implementation.call(
             event_1=self.numpy_event_1, event_2=self.numpy_event_2
@@ -186,12 +186,12 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id"],
         )
 
-        operator = DivisionOperator(
+        operator = DivideOperator(
             event_1=self.event_1,
             event_2=self.event_2,
         )
 
-        div_implementation = DivisionNumpyImplementation(operator)
+        div_implementation = DivideNumpyImplementation(operator)
 
         operator_output = div_implementation.call(
             event_1=self.numpy_event_1, event_2=self.numpy_event_2

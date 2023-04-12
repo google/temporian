@@ -19,9 +19,9 @@ from temporian.core.data.event import Event
 from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
 
 
-class FloorDivideOperator(BaseArithmeticOperator):
+class FloorDivOperator(BaseArithmeticOperator):
     """
-    Integer divide first event by second one (i.e: a//b)
+    Integer division of first event by second one (i.e: a//b)
     """
 
     @classmethod
@@ -34,7 +34,7 @@ class FloorDivideOperator(BaseArithmeticOperator):
         return "floordiv"
 
 
-operator_lib.register_operator(FloorDivideOperator)
+operator_lib.register_operator(FloorDivOperator)
 
 
 def floordiv(
@@ -50,7 +50,7 @@ def floordiv(
     Returns:
         Event: Integer division of numerator features and denominator features
     """
-    return FloorDivideOperator(
+    return FloorDivOperator(
         event_1=numerator,
         event_2=denominator,
     ).outputs()["event"]

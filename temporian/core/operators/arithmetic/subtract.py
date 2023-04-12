@@ -19,7 +19,7 @@ from temporian.core.data.event import Event
 from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
 
 
-class SubtractionOperator(BaseArithmeticOperator):
+class SubtractOperator(BaseArithmeticOperator):
     """
     Subtract second event from the first one, feature to feature according
     to their position.
@@ -35,7 +35,7 @@ class SubtractionOperator(BaseArithmeticOperator):
         return "sub"
 
 
-operator_lib.register_operator(SubtractionOperator)
+operator_lib.register_operator(SubtractOperator)
 
 
 def subtract(
@@ -52,7 +52,7 @@ def subtract(
     Returns:
         Event: Subtraction of event_2 features from event_1.
     """
-    return SubtractionOperator(
+    return SubtractOperator(
         event_1=event_1,
         event_2=event_2,
     ).outputs()["event"]

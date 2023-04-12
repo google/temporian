@@ -19,18 +19,18 @@ from absl.testing import absltest
 from temporian.core.data.event import Event, Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.arithmetic import (
-    AdditionOperator,
-    SubtractionOperator,
-    MultiplicationOperator,
-    DivisionOperator,
-    FloorDivideOperator,
+    AddOperator,
+    SubtractOperator,
+    MultiplyOperator,
+    DivideOperator,
+    FloorDivOperator,
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators.arithmetic import (
-    AdditionNumpyImplementation,
-    SubtractionNumpyImplementation,
-    MultiplicationNumpyImplementation,
-    DivisionNumpyImplementation,
+    AddNumpyImplementation,
+    SubtractNumpyImplementation,
+    MultiplyNumpyImplementation,
+    DivideNumpyImplementation,
     FloorDivideNumpyImplementation,
 )
 from temporian.core.data import dtype as dtype_lib
@@ -250,12 +250,12 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
     def test_correct_addition(self) -> None:
         """Test correct addition operator."""
 
-        operator = AdditionOperator(
+        operator = AddOperator(
             event_1=self.event_1,
             event_2=self.event_2,
         )
 
-        add_implementation = AdditionNumpyImplementation(operator)
+        add_implementation = AddNumpyImplementation(operator)
 
         operator_output = add_implementation.call(
             event_1=self.numpy_event_1, event_2=self.numpy_event_2
@@ -266,12 +266,12 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
     def test_correct_subtraction(self) -> None:
         """Test correct subtraction operator."""
 
-        operator = SubtractionOperator(
+        operator = SubtractOperator(
             event_1=self.event_1,
             event_2=self.event_2,
         )
 
-        sub_implementation = SubtractionNumpyImplementation(operator)
+        sub_implementation = SubtractNumpyImplementation(operator)
         operator_output = sub_implementation.call(
             event_1=self.numpy_event_1, event_2=self.numpy_event_2
         )
@@ -282,12 +282,12 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
     def test_correct_multiplication(self) -> None:
         """Test correct multiplication operator."""
 
-        operator = MultiplicationOperator(
+        operator = MultiplyOperator(
             event_1=self.event_1,
             event_2=self.event_2,
         )
 
-        mult_implementation = MultiplicationNumpyImplementation(operator)
+        mult_implementation = MultiplyNumpyImplementation(operator)
 
         operator_output = mult_implementation.call(
             event_1=self.numpy_event_1, event_2=self.numpy_event_2
@@ -300,12 +300,12 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
     def test_correct_division(self) -> None:
         """Test correct division operator."""
 
-        operator = DivisionOperator(
+        operator = DivideOperator(
             event_1=self.event_1,
             event_2=self.event_2,
         )
 
-        div_implementation = DivisionNumpyImplementation(operator)
+        div_implementation = DivideNumpyImplementation(operator)
 
         operator_output = div_implementation.call(
             event_1=self.numpy_event_1, event_2=self.numpy_event_2
@@ -316,7 +316,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
     def test_correct_floordiv(self) -> None:
         """Test correct floordiv operator."""
 
-        operator = FloorDivideOperator(
+        operator = FloorDivOperator(
             event_1=self.event_1,
             event_2=self.event_2,
         )

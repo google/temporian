@@ -15,7 +15,7 @@
 from temporian.implementation.numpy.operators.arithmetic.base import (
     BaseArithmeticNumpyImplementation,
 )
-from temporian.core.operators.arithmetic import FloorDivideOperator
+from temporian.core.operators.arithmetic import FloorDivOperator
 from temporian.implementation.numpy import implementation_lib
 
 
@@ -23,7 +23,7 @@ class FloorDivideNumpyImplementation(BaseArithmeticNumpyImplementation):
     """Actual numpy implementation to divide of first event by the second one
     and take the result floor"""
 
-    def __init__(self, operator: FloorDivideOperator) -> None:
+    def __init__(self, operator: FloorDivOperator) -> None:
         super().__init__(operator)
 
     def _do_operation(self, event_1_feature, event_2_feature):
@@ -31,5 +31,5 @@ class FloorDivideNumpyImplementation(BaseArithmeticNumpyImplementation):
 
 
 implementation_lib.register_operator_implementation(
-    FloorDivideOperator, FloorDivideNumpyImplementation
+    FloorDivOperator, FloorDivideNumpyImplementation
 )

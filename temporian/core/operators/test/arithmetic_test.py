@@ -19,11 +19,11 @@ from temporian.core.data import dtype
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.arithmetic import (
-    AdditionOperator,
-    DivisionOperator,
-    FloorDivideOperator,
-    MultiplicationOperator,
-    SubtractionOperator,
+    AddOperator,
+    DivideOperator,
+    FloorDivOperator,
+    MultiplyOperator,
+    SubtractOperator,
 )
 
 
@@ -68,7 +68,7 @@ class ArithmeticOperatorsTest(absltest.TestCase):
         print(
             f"Creator: type={type(event_out.creator())} {event_out.creator()}"
         )
-        assert isinstance(event_out.creator(), AdditionOperator)
+        assert isinstance(event_out.creator(), AddOperator)
         assert event_out.sampling() is self.sampling
         assert event_out.features()[0].creator() is event_out.creator()
         assert event_out.features()[1].creator() is event_out.creator()
@@ -79,7 +79,7 @@ class ArithmeticOperatorsTest(absltest.TestCase):
 
     def test_subtraction(self):
         event_out = self.event_1 - self.event_2
-        assert isinstance(event_out.creator(), SubtractionOperator)
+        assert isinstance(event_out.creator(), SubtractOperator)
         assert event_out.sampling() is self.sampling
         assert event_out.features()[0].creator() is event_out.creator()
         assert event_out.features()[1].creator() is event_out.creator()
@@ -90,7 +90,7 @@ class ArithmeticOperatorsTest(absltest.TestCase):
 
     def test_multiplication(self):
         event_out = self.event_1 * self.event_2
-        assert isinstance(event_out.creator(), MultiplicationOperator)
+        assert isinstance(event_out.creator(), MultiplyOperator)
         assert event_out.sampling() is self.sampling
         assert event_out.features()[0].creator() is event_out.creator()
         assert event_out.features()[1].creator() is event_out.creator()
@@ -101,7 +101,7 @@ class ArithmeticOperatorsTest(absltest.TestCase):
 
     def test_division(self):
         event_out = self.event_1 / self.event_2
-        assert isinstance(event_out.creator(), DivisionOperator)
+        assert isinstance(event_out.creator(), DivideOperator)
         assert event_out.sampling() is self.sampling
         assert event_out.features()[0].creator() is event_out.creator()
         assert event_out.features()[1].creator() is event_out.creator()
@@ -119,7 +119,7 @@ class ArithmeticOperatorsTest(absltest.TestCase):
 
         # Check floordiv operator instead
         event_out = self.event_3 // self.event_4
-        assert isinstance(event_out.creator(), FloorDivideOperator)
+        assert isinstance(event_out.creator(), FloorDivOperator)
         assert event_out.sampling() is self.sampling
         assert event_out.features()[0].creator() is event_out.creator()
         assert event_out.features()[1].creator() is event_out.creator()

@@ -25,48 +25,48 @@ py_library(
 )
 
 py_library(
-    name = "addition",
-    srcs = ["addition.py"],
+    name = "add",
+    srcs = ["add.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
-        "//temporian/core/operators/arithmetic:addition",
+        "//temporian/core/operators/arithmetic:add",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
     ],
 )
 
 py_library(
-    name = "subtraction",
-    srcs = ["subtraction.py"],
+    name = "subtract",
+    srcs = ["subtract.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
-        "//temporian/core/operators/arithmetic:subtraction",
+        "//temporian/core/operators/arithmetic:subtract",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
     ],
 )
 
 py_library(
-    name = "multiplication",
-    srcs = ["multiplication.py"],
+    name = "multiply",
+    srcs = ["multiply.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
-        "//temporian/core/operators/arithmetic:multiplication",
+        "//temporian/core/operators/arithmetic:multiply",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
     ],
 )
 
 py_library(
-    name = "division",
-    srcs = ["division.py"],
+    name = "divide",
+    srcs = ["divide.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
-        "//temporian/core/operators/arithmetic:division",
+        "//temporian/core/operators/arithmetic:divide",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
     ],

@@ -15,14 +15,14 @@
 from temporian.implementation.numpy.operators.arithmetic.base import (
     BaseArithmeticNumpyImplementation,
 )
-from temporian.core.operators.arithmetic import SubtractionOperator
+from temporian.core.operators.arithmetic import SubtractOperator
 from temporian.implementation.numpy import implementation_lib
 
 
-class SubtractionNumpyImplementation(BaseArithmeticNumpyImplementation):
+class SubtractNumpyImplementation(BaseArithmeticNumpyImplementation):
     """Numpy implementation to divide second event from the first one"""
 
-    def __init__(self, operator: SubtractionOperator) -> None:
+    def __init__(self, operator: SubtractOperator) -> None:
         super().__init__(operator)
 
     def _do_operation(self, event_1_feature, event_2_feature):
@@ -30,5 +30,5 @@ class SubtractionNumpyImplementation(BaseArithmeticNumpyImplementation):
 
 
 implementation_lib.register_operator_implementation(
-    SubtractionOperator, SubtractionNumpyImplementation
+    SubtractOperator, SubtractNumpyImplementation
 )

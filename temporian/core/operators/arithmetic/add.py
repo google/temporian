@@ -19,7 +19,7 @@ from temporian.core.data.event import Event
 from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
 
 
-class AdditionOperator(BaseArithmeticOperator):
+class AddOperator(BaseArithmeticOperator):
     """
     Apply arithmetic addition to two events
     """
@@ -34,7 +34,7 @@ class AdditionOperator(BaseArithmeticOperator):
         return "add"
 
 
-operator_lib.register_operator(AdditionOperator)
+operator_lib.register_operator(AddOperator)
 
 
 def add(
@@ -51,7 +51,7 @@ def add(
     Returns:
         Event: Sum of event_1 and event_2 features
     """
-    return AdditionOperator(
+    return AddOperator(
         event_1=event_1,
         event_2=event_2,
     ).outputs()["event"]

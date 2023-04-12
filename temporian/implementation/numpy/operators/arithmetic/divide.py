@@ -16,14 +16,14 @@ from temporian.core.data import dtype
 from temporian.implementation.numpy.operators.arithmetic.base import (
     BaseArithmeticNumpyImplementation,
 )
-from temporian.core.operators.arithmetic import DivisionOperator
+from temporian.core.operators.arithmetic import DivideOperator
 from temporian.implementation.numpy import implementation_lib
 
 
-class DivisionNumpyImplementation(BaseArithmeticNumpyImplementation):
+class DivideNumpyImplementation(BaseArithmeticNumpyImplementation):
     """Actual numpy implementation to divide first event by the second one"""
 
-    def __init__(self, operator: DivisionOperator) -> None:
+    def __init__(self, operator: DivideOperator) -> None:
         super().__init__(operator)
 
     def _do_operation(self, event_1_feature, event_2_feature):
@@ -40,5 +40,5 @@ class DivisionNumpyImplementation(BaseArithmeticNumpyImplementation):
 
 
 implementation_lib.register_operator_implementation(
-    DivisionOperator, DivisionNumpyImplementation
+    DivideOperator, DivideNumpyImplementation
 )

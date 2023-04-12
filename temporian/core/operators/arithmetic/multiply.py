@@ -19,7 +19,7 @@ from temporian.core.data.event import Event
 from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
 
 
-class MultiplicationOperator(BaseArithmeticOperator):
+class MultiplyOperator(BaseArithmeticOperator):
     """
     Apply arithmetic multiplication to two events, feature to feature according
     to their position.
@@ -35,7 +35,7 @@ class MultiplicationOperator(BaseArithmeticOperator):
         return "mult"
 
 
-operator_lib.register_operator(MultiplicationOperator)
+operator_lib.register_operator(MultiplyOperator)
 
 
 def multiply(
@@ -52,7 +52,7 @@ def multiply(
     Returns:
         Event: Multiplication of event_1 features and event_2 features.
     """
-    return MultiplicationOperator(
+    return MultiplyOperator(
         event_1=event_1,
         event_2=event_2,
     ).outputs()["event"]

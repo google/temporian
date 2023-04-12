@@ -1,21 +1,21 @@
 # pylint: disable=unused-import
 
-from temporian.core.operators.arithmetic.addition import add, AdditionOperator
-from temporian.core.operators.arithmetic.division import (
+from temporian.core.operators.arithmetic.add import add, AddOperator
+from temporian.core.operators.arithmetic.divide import (
     divide,
-    DivisionOperator,
+    DivideOperator,
 )
 from temporian.core.operators.arithmetic.floordiv import (
     floordiv,
-    FloorDivideOperator,
+    FloorDivOperator,
 )
-from temporian.core.operators.arithmetic.subtraction import (
+from temporian.core.operators.arithmetic.subtract import (
     subtract,
-    SubtractionOperator,
+    SubtractOperator,
 )
-from temporian.core.operators.arithmetic.multiplication import (
+from temporian.core.operators.arithmetic.multiply import (
     multiply,
-    MultiplicationOperator,
+    MultiplyOperator,
 )
 
 # pylint: enable=unused-import

@@ -15,20 +15,20 @@
 from temporian.implementation.numpy.operators.arithmetic.base import (
     BaseArithmeticNumpyImplementation,
 )
-from temporian.core.operators.arithmetic import AdditionOperator
+from temporian.core.operators.arithmetic import MultiplyOperator
 from temporian.implementation.numpy import implementation_lib
 
 
-class AdditionNumpyImplementation(BaseArithmeticNumpyImplementation):
-    """Numpy implementation of arithmetic addition"""
+class MultiplyNumpyImplementation(BaseArithmeticNumpyImplementation):
+    """Numpy implementation of arithmetic multiplication"""
 
-    def __init__(self, operator: AdditionOperator) -> None:
+    def __init__(self, operator: MultiplyOperator) -> None:
         super().__init__(operator)
 
     def _do_operation(self, event_1_feature, event_2_feature):
-        return event_1_feature.data + event_2_feature.data
+        return event_1_feature.data * event_2_feature.data
 
 
 implementation_lib.register_operator_implementation(
-    AdditionOperator, AdditionNumpyImplementation
+    MultiplyOperator, MultiplyNumpyImplementation
 )

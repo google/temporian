@@ -11,12 +11,12 @@ py_library(
     srcs = ["__init__.py"],
     srcs_version = "PY3",
     deps = [
-        ":addition",
+        ":add",
         ":base",
-        ":division",
+        ":divide",
         ":floordiv",
-        ":multiplication",
-        ":subtraction",
+        ":multiply",
+        ":subtract",
     ],
 )
 
@@ -33,8 +33,8 @@ py_library(
 )
 
 py_library(
-    name = "addition",
-    srcs = ["addition.py"],
+    name = "add",
+    srcs = ["add.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
@@ -44,8 +44,8 @@ py_library(
 )
 
 py_library(
-    name = "subtraction",
-    srcs = ["subtraction.py"],
+    name = "subtract",
+    srcs = ["subtract.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
@@ -55,8 +55,8 @@ py_library(
 )
 
 py_library(
-    name = "multiplication",
-    srcs = ["multiplication.py"],
+    name = "multiply",
+    srcs = ["multiply.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
@@ -66,8 +66,8 @@ py_library(
 )
 
 py_library(
-    name = "division",
-    srcs = ["division.py"],
+    name = "divide",
+    srcs = ["divide.py"],
     srcs_version = "PY3",
     deps = [
         ":base",

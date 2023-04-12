@@ -20,7 +20,7 @@ from temporian.core.data.event import Event
 from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
 
 
-class DivisionOperator(BaseArithmeticOperator):
+class DivideOperator(BaseArithmeticOperator):
     """
     Divide first event by second one
     """
@@ -52,7 +52,7 @@ class DivisionOperator(BaseArithmeticOperator):
         return "div"
 
 
-operator_lib.register_operator(DivisionOperator)
+operator_lib.register_operator(DivideOperator)
 
 
 def divide(
@@ -68,7 +68,7 @@ def divide(
     Returns:
         Event: Division of numerator features and denominator features
     """
-    return DivisionOperator(
+    return DivideOperator(
         event_1=numerator,
         event_2=denominator,
     ).outputs()["event"]
