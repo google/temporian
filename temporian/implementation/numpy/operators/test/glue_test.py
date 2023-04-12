@@ -17,7 +17,6 @@ from absl.testing import absltest
 import numpy as np
 import pandas as pd
 
-from temporian.core.data.event import Event
 from temporian.core.data.event import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.glue import GlueOperator
@@ -25,8 +24,6 @@ from temporian.core.data import event as event_lib
 from temporian.core.data import dtype as dtype_lib
 
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.event import NumpyFeature
-from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.implementation.numpy.operators.glue import (
     GlueNumpyImplementation,
 )
@@ -122,11 +119,11 @@ class GlueNumpyImplementationTest(absltest.TestCase):
             _ = GlueOperator(
                 event_0=event_lib.input_event(
                     [Feature(name="a", dtype=dtype_lib.FLOAT64)],
-                    sampling=Sampling(index=["x"]),
+                    sampling=Sampling(index=[("x", dtype_lib.INT64)]),
                 ),
                 event_1=event_lib.input_event(
                     [Feature(name="b", dtype=dtype_lib.FLOAT64)],
-                    sampling=Sampling(index=["x"]),
+                    sampling=Sampling(index=[("x", dtype_lib.INT64)]),
                 ),
             )
 
@@ -135,7 +132,7 @@ class GlueNumpyImplementationTest(absltest.TestCase):
             ValueError,
             "Feature a is defined in multiple input events",
         ):
-            sampling = Sampling(index=["x"])
+            sampling = Sampling(index=[("x", dtype_lib.INT64)])
             _ = GlueOperator(
                 event_0=event_lib.input_event(
                     [Feature(name="a", dtype=dtype_lib.FLOAT64)],

@@ -22,6 +22,7 @@ from temporian.core.data.feature import Feature
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 from temporian.core.operators.select import select
+from temporian.core.data.sampling import IndexLevel
 from temporian.core.data.sampling import Sampling
 
 
@@ -40,16 +41,16 @@ class Propagate(Operator):
 
         # TODO: Constraint the type of features supported in "add_event".
 
-        if event.sampling() != to.sampling():
+        if event.sampling != to.sampling:
             raise ValueError("event and to should have the same sampling")
 
-        if len(to.features()) == 0:
+        if len(to.features) == 0:
             raise ValueError("to contains no features")
 
-        self._added_index = [k.name() for k in to.features()]
+        self._added_index = [IndexLevel(k.name, k.dtype) for k in to.features]
 
         overlap_features = set(self._added_index).intersection(
-            event.sampling().index()
+            event.sampling.index
         )
         if len(overlap_features) > 0:
             raise ValueError(
@@ -57,17 +58,17 @@ class Propagate(Operator):
                 f" index: {list(overlap_features)}"
             )
 
-        new_index = event.sampling().index() + self._added_index
+        new_index = event.sampling.index + self._added_index
         sampling = Sampling(index=new_index, creator=self)
 
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=f.name(),
-                dtype=f.dtype(),
+                name=f.name,
+                dtype=f.dtype,
                 sampling=sampling,
                 creator=self,
             )
-            for f in event.features()
+            for f in event.features
         ]
 
         self.add_output(
@@ -148,11 +149,11 @@ def propagate(
         to_set = set(to)
         to = select(event, to)
         remaining_features = [
-            f.name() for f in event.features() if f.name not in to_set
+            f.name for f in event.features if f.name not in to_set
         ]
         event = select(event, remaining_features)
 
     return Propagate(
         event=event,
         to=to,
-    ).outputs()["event"]
+    ).outputs["event"]

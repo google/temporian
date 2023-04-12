@@ -62,7 +62,7 @@ def main():
 
     event = event_data.schema()
 
-    sma = tp.sma(event, window_length=10)
+    sma = tp.simple_moving_average(event, window_length=10)
 
     res: NumpyEvent = tp.evaluate(
         sma,
@@ -73,7 +73,7 @@ def main():
     )
 
     # Print output's first row, useful to check reproducibility
-    print(res._first_index_features)
+    print(res.first_index_features())
 
 
 if __name__ == "__main__":

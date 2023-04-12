@@ -67,6 +67,19 @@ py_library(
         "//temporian/core/operators:lag",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:feature",
+        "//temporian/implementation/numpy/data:sampling",
+    ],
+)
+
+py_library(
+    name = "drop_index",
+    srcs = ["drop_index.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators:drop_index",
+        "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
     ],
 )
@@ -80,6 +93,19 @@ py_library(
         "//temporian/core/operators:select",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
+    ],
+)
+
+py_library(
+    name = "set_index",
+    srcs = ["set_index.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        ":utils",
+        "//temporian/core/operators:set_index",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
     ],
 )
 
@@ -126,5 +152,14 @@ py_library(
         "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
+    ],
+)
+
+py_library(
+    name = "utils",
+    srcs = ["utils.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:event",
     ],
 )

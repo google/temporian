@@ -14,11 +14,17 @@
 
 """An event is a collection (possibly empty) of timesampled feature values."""
 
-from typing import Any, List, Optional
+from __future__ import annotations
+from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
 
+from temporian.core.data import dtype as dtype_lib
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
+from temporian.core.data.sampling import IndexDtypes
 from temporian.utils import string
+
+if TYPE_CHECKING:
+    from temporian.core.operators.base import Operator
 
 
 class Event(object):
@@ -27,16 +33,14 @@ class Event(object):
         features: List[Feature],
         sampling: Sampling,
         name: Optional[str] = None,
-        # TODO: make Operator the creator's type. I don't know how to circumvent
-        # the cyclical import error
-        creator: Optional[Any] = None,
+        creator: Optional[Operator] = None,
     ):
         self._features = features
         self._sampling = sampling
         self._creator = creator
         self._name = name
 
-    def __getitem__(self, feature_names: List[str]) -> "Event":
+    def __getitem__(self, feature_names: List[str]) -> Event:
         # import select operator
         from temporian.core.operators.select import select
 
@@ -81,28 +85,42 @@ class Event(object):
 
         return floordiv(numerator=self, denominator=other)
 
-    def sampling(self):
+    @property
+    def sampling(self) -> Sampling:
         return self._sampling
 
-    def features(self):
+    @property
+    def features(self) -> List[Feature]:
         return self._features
 
+    @property
+    def feature_names(self) -> List[str]:
+        return [feature.name for feature in self._features]
+
+    @property
+    def dtypes(self) -> Dict[str, dtype_lib.DType]:
+        return {feature.name: feature.dtype for feature in self._features}
+
+    @property
     def name(self) -> str:
         return self._name
 
-    def creator(self):
+    @property
+    def creator(self) -> Optional[Operator]:
         return self._creator
 
-    def set_name(self, name) -> None:
+    @name.setter
+    def name(self, name: str):
         self._name = name
 
-    def set_creator(self, creator):
+    @creator.setter
+    def creator(self, creator: Optional[Operator]):
         self._creator = creator
 
 
 def input_event(
     features: List[Feature],
-    index: List[str] = [],
+    index: List[Tuple[str, IndexDtypes]] = [],
     name: Optional[str] = None,
     sampling: Optional[Sampling] = None,
 ) -> Event:
@@ -110,11 +128,11 @@ def input_event(
         sampling = Sampling(index=index, creator=None)
 
     for feature in features:
-        if feature.sampling() is not None:
+        if feature.sampling is not None:
             raise ValueError(
                 "Cannot call input_event on already linked features."
             )
-        feature.set_sampling(sampling)
+        feature.sampling = sampling
 
     return Event(
         features=features,

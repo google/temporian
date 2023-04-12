@@ -14,12 +14,10 @@
 
 """Implementation for the Glue operator."""
 
-from typing import Dict, Optional
-import numpy as np
+from typing import Dict
 import copy
 
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.core.operators.glue import GlueOperator
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.base import OperatorImplementation

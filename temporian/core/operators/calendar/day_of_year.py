@@ -51,4 +51,4 @@ def calendar_day_of_year(sampling: Event) -> Event:
             each timestamp in `event`'s sampling belongs to, with the same
             sampling as `event`.
     """
-    return CalendarDayOfYearOperator(sampling).outputs()["event"]
+    return CalendarDayOfYearOperator(sampling).outputs["event"]

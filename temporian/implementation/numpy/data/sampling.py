@@ -2,10 +2,18 @@ from typing import Dict, List, Tuple
 
 import numpy as np
 
+from temporian.core.data import dtype as dtype_lib
 from temporian.utils import string
 
 # Maximum of printed index when calling repr(event)
 MAX_NUM_PRINTED_INDEX = 5
+
+# same as in numpy/data/event.py, can't import due to circular import error
+PYTHON_DTYPE_MAPPING = {
+    str: dtype_lib.STRING,
+    # TODO: fix this, int doesn't have to be INT64 necessarily
+    int: dtype_lib.INT64,
+}
 
 
 class NumpySampling:
@@ -15,9 +23,21 @@ class NumpySampling:
         data: Dict[Tuple, np.ndarray],
         is_unix_timestamp: bool = False,
     ) -> None:
-        self.index = index
-        self.data = data
-        self.is_unix_timestamp = is_unix_timestamp
+        self._index = index
+        self._data = data
+        self._is_unix_timestamp = is_unix_timestamp
+
+    @property
+    def index(self) -> List[str]:
+        return self._index
+
+    @property
+    def data(self) -> Dict[Tuple, np.ndarray]:
+        return self._data
+
+    @property
+    def is_unix_timestamp(self) -> bool:
+        return self._is_unix_timestamp
 
     @property
     def has_repeated_timestamps(self) -> bool:
@@ -32,8 +52,16 @@ class NumpySampling:
 
         return False
 
+    @property
+    def dtypes(self) -> Dict[str, type]:
+        first_idx_lvl = next(iter(self.data))
+        return {
+            name: PYTHON_DTYPE_MAPPING[type(value)]
+            for name, value in zip(self.index, first_idx_lvl)
+        }
+
     def __repr__(self) -> str:
-        with np.printoptions(precision=4, threshold=6):
+        with np.printoptions(precision=4, threshold=20):
             data_repr = []
             for idx, (k, v) in enumerate(self.data.items()):
                 if idx > MAX_NUM_PRINTED_INDEX:

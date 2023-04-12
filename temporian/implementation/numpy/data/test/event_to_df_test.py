@@ -16,7 +16,7 @@ import pandas as pd
 import numpy as np
 from absl.testing import absltest
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.event import NumpyFeature
+from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
 
 

@@ -17,7 +17,7 @@ from abc import ABC, abstractmethod
 
 from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.event import NumpyFeature
+from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -50,7 +50,7 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
         if event_1.sampling is not event_2.sampling:
             raise ValueError("Sampling of both events must be equal.")
 
-        if event_1.feature_count != event_2.feature_count:
+        if event_1.feature_count() != event_2.feature_count():
             raise ValueError(
                 "Both events must have the same number of features."
             )

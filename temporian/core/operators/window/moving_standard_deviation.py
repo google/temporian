@@ -35,10 +35,6 @@ class MovingStandardDeviationOperator(BaseWindowOperator):
     def operator_def_key(cls) -> str:
         return "MOVING_STANDARD_DEVIATION"
 
-    @property
-    def prefix(self) -> str:
-        return "msd"
-
     def get_feature_dtype(self, feature: Feature) -> str:
         """Returns the dtype of the output feature.
 
@@ -48,7 +44,7 @@ class MovingStandardDeviationOperator(BaseWindowOperator):
         Returns:
             str: The dtype of the output feature.
         """
-        return FLOAT32 if feature.dtype() == FLOAT32 else FLOAT64
+        return FLOAT32 if feature.dtype == FLOAT32 else FLOAT64
 
 
 operator_lib.register_operator(MovingStandardDeviationOperator)
@@ -88,4 +84,4 @@ def moving_standard_deviation(
         event=event,
         window_length=window_length,
         sampling=sampling,
-    ).outputs()["event"]
+    ).outputs["event"]

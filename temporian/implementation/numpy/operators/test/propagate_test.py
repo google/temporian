@@ -34,7 +34,7 @@ class PropagateOperatorTest(absltest.TestCase):
 
     def test_base(self):
         # Define input
-        sampling = Sampling(index=["x"])
+        sampling = Sampling(index=[("x", dtype_lib.STRING)])
         event = event_lib.input_event(
             [
                 feature_lib.Feature(name="a", dtype=dtype_lib.FLOAT64),

@@ -18,7 +18,7 @@ import numpy as np
 import pandas as pd
 
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.event import NumpyFeature
+from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
 
 
@@ -54,6 +54,39 @@ class DataFrameToEventTest(absltest.TestCase):
         numpy_event = NumpyEvent.from_dataframe(
             df, index_names=["product_id"], timestamp_column="timestamp"
         )
+
+        # validate
+        self.assertTrue(numpy_event == expected_numpy_event)
+
+    def test_timestamp_order(self) -> None:
+        df = pd.DataFrame(
+            [
+                [1.0, 100.0],
+                [3.0, 300.0],
+                [2.0, 200.0],
+            ],
+            columns=["timestamp", "costs"],
+        )
+
+        numpy_sampling = NumpySampling(
+            data={
+                (): np.array([1.0, 2.0, 3.0]),
+            },
+            index=[],
+        )
+
+        expected_numpy_event = NumpyEvent(
+            data={
+                (): [
+                    NumpyFeature(
+                        data=np.array([100.0, 200.0, 300.0]), name="costs"
+                    )
+                ],
+            },
+            sampling=numpy_sampling,
+        )
+
+        numpy_event = NumpyEvent.from_dataframe(df)
 
         # validate
         self.assertTrue(numpy_event == expected_numpy_event)

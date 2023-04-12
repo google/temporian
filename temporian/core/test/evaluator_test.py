@@ -26,7 +26,7 @@ class EvaluatorTest(absltest.TestCase):
 
         schedule = evaluator.build_schedule(
             inputs=[a],
-            outputs=[b.outputs()["output"]],
+            outputs=[b.outputs["output"]],
         )
         self.assertEqual(schedule, [b])
 
@@ -44,10 +44,10 @@ class EvaluatorTest(absltest.TestCase):
         i2 = utils.create_input_event()
         o1 = utils.OpI1O1(i1)
         o2 = utils.OpI1O1(i2)
-        o3 = utils.OpI2O1(o1.outputs()["output"], o2.outputs()["output"])
+        o3 = utils.OpI2O1(o1.outputs["output"], o2.outputs["output"])
         schedule = evaluator.build_schedule(
             inputs=[i1, i2],
-            outputs=[o3.outputs()["output"]],
+            outputs=[o3.outputs["output"]],
         )
         self.assertTrue(
             (schedule == [o2, o1, o3]) or (schedule == [o1, o2, o3])
@@ -57,12 +57,12 @@ class EvaluatorTest(absltest.TestCase):
         i1 = utils.create_input_event()
         o2 = utils.OpI1O1(i1)
         i3 = utils.create_input_event()
-        o4 = utils.OpI2O1(o2.outputs()["output"], i3)
-        o5 = utils.OpI1O2(o4.outputs()["output"])
+        o4 = utils.OpI2O1(o2.outputs["output"], i3)
+        o5 = utils.OpI1O2(o4.outputs["output"])
 
         schedule = evaluator.build_schedule(
             inputs=[i1, i3],
-            outputs=[o5.outputs()["output_1"], o4.outputs()["output"]],
+            outputs=[o5.outputs["output_1"], o4.outputs["output"]],
         )
         self.assertTrue(
             (schedule == [o2, o4, o5]) or (schedule == [o4, o2, o5])
@@ -71,13 +71,13 @@ class EvaluatorTest(absltest.TestCase):
     def test_schedule_mid_chain(self):
         i1 = utils.create_input_event()
         o2 = utils.OpI1O1(i1)
-        o3 = utils.OpI1O1(o2.outputs()["output"])
-        o4 = utils.OpI1O1(o3.outputs()["output"])
-        o5 = utils.OpI1O1(o4.outputs()["output"])
+        o3 = utils.OpI1O1(o2.outputs["output"])
+        o4 = utils.OpI1O1(o3.outputs["output"])
+        o5 = utils.OpI1O1(o4.outputs["output"])
 
         schedule = evaluator.build_schedule(
-            inputs=[o3.outputs()["output"]],
-            outputs=[o5.outputs()["output"]],
+            inputs=[o3.outputs["output"]],
+            outputs=[o5.outputs["output"]],
         )
         self.assertEqual(schedule, [o4, o5])
 
