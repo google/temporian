@@ -34,9 +34,7 @@ class DivideNumpyImplementation(BaseArithmeticNumpyImplementation):
                 "Cast to a floating point type or use "
                 "floordiv operator (//) instead, on these integer types."
             )
-        return (event_1_feature.data / event_2_feature.data).astype(
-            event_1_feature.data.dtype
-        )
+        return event_1_feature.data / event_2_feature.data
 
 
 implementation_lib.register_operator_implementation(

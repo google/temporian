@@ -329,10 +329,6 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             event_1=self.numpy_event_1, event_2=self.numpy_event_2
         )
 
-        print("EXPECTED:")
-        print(self.numpy_expected_floordiv)
-        print("ACTUAL:")
-        print(operator_output["event"])
         self.assertTrue(
             self.numpy_expected_floordiv == operator_output["event"]
         )
