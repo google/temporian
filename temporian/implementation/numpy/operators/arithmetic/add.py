@@ -11,9 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import numpy as np
 from temporian.implementation.numpy.operators.arithmetic.base import (
     BaseArithmeticNumpyImplementation,
+    NumpyFeature,
 )
 from temporian.core.operators.arithmetic import AddOperator
 from temporian.implementation.numpy import implementation_lib
@@ -25,7 +26,9 @@ class AddNumpyImplementation(BaseArithmeticNumpyImplementation):
     def __init__(self, operator: AddOperator) -> None:
         super().__init__(operator)
 
-    def _do_operation(self, event_1_feature, event_2_feature):
+    def _do_operation(
+        self, event_1_feature: NumpyFeature, event_2_feature: NumpyFeature
+    ) -> np.ndarray:
         return event_1_feature.data + event_2_feature.data
 
 

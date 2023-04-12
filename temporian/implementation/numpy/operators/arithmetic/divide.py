@@ -11,10 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import numpy as np
 from temporian.core.data import dtype
 from temporian.implementation.numpy.operators.arithmetic.base import (
     BaseArithmeticNumpyImplementation,
+    NumpyFeature,
 )
 from temporian.core.operators.arithmetic import DivideOperator
 from temporian.implementation.numpy import implementation_lib
@@ -26,7 +27,9 @@ class DivideNumpyImplementation(BaseArithmeticNumpyImplementation):
     def __init__(self, operator: DivideOperator) -> None:
         super().__init__(operator)
 
-    def _do_operation(self, event_1_feature, event_2_feature):
+    def _do_operation(
+        self, event_1_feature: NumpyFeature, event_2_feature: NumpyFeature
+    ) -> np.ndarray:
         if event_1_feature.dtype in [dtype.INT32, dtype.INT64]:
             raise ValueError(
                 "Cannot use the divide operator on feature "

@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import numpy as np
 from typing import Dict
 from abc import ABC, abstractmethod
 
@@ -26,7 +26,9 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
         super().__init__(operator)
 
     @abstractmethod
-    def _do_operation(self, event_1_feature, event_2_feature):
+    def _do_operation(
+        self, event_1_feature: NumpyFeature, event_2_feature: NumpyFeature
+    ) -> np.ndarray:
         """
         Perform the actual arithmetic operation corresponding to the subclass
         """
@@ -76,12 +78,12 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
                         f"{event_2_feature} has dtype {event_2_feature.dtype}."
                     )
 
-                data = self._do_operation(event_1_feature, event_2_feature)
+                result = self._do_operation(event_1_feature, event_2_feature)
 
                 output.data[event_index].append(
                     NumpyFeature(
                         name=f"{prefix}_{event_1_feature.name}_{event_2_feature.name}",
-                        data=data,
+                        data=result,
                     )
                 )
 
