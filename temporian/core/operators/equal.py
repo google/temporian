@@ -61,7 +61,8 @@ class EqualOperator(Operator):
             attributes=[
                 pb.OperatorDef.Attribute(
                     key="value",
-                    type=pb.OperatorDef.Attribute.Type.BOOL,
+                    # dtype depends on value dtype, this is not always float64
+                    type=pb.OperatorDef.Attribute.Type.FLOAT_64,
                     is_optional=False,
                 ),
             ],

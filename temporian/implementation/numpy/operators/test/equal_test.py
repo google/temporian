@@ -63,7 +63,7 @@ class EqualOperatorTest(absltest.TestCase):
 
         operator = EqualOperator(event=self.input_event, value=10.0)
         impl = equal.EqualNumpyImplementation(operator)
-        equal_event = impl(event=self.input_event_data)["event"]
+        equal_event = impl.call(event=self.input_event_data)["event"]
 
         expected_event = NumpyEvent.from_dataframe(new_df)
 
@@ -90,7 +90,7 @@ class EqualOperatorTest(absltest.TestCase):
 
         operator = EqualOperator(event=self.input_event, value="10")
         impl = equal.EqualNumpyImplementation(operator)
-        equal_event = impl(event=self.input_event_data)["event"]
+        equal_event = impl.call(event=self.input_event_data)["event"]
 
         expected_event = NumpyEvent.from_dataframe(new_df)
 
@@ -117,7 +117,7 @@ class EqualOperatorTest(absltest.TestCase):
 
         operator = EqualOperator(event=self.input_event, value=10)
         impl = equal.EqualNumpyImplementation(operator)
-        equal_event = impl(event=self.input_event_data)["event"]
+        equal_event = impl.call(event=self.input_event_data)["event"]
 
         expected_event = NumpyEvent.from_dataframe(new_df)
 
@@ -165,7 +165,7 @@ class EqualOperatorTest(absltest.TestCase):
         # the comparison will be true because we check general dtypes.
         operator = EqualOperator(event=self.input_event, value=10)
         impl = equal.EqualNumpyImplementation(operator)
-        equal_event = impl(event=self.input_event_data)["event"]
+        equal_event = impl.call(event=self.input_event_data)["event"]
 
         expected_event = NumpyEvent.from_dataframe(new_df)
 
@@ -213,7 +213,7 @@ class EqualOperatorTest(absltest.TestCase):
         # the comparison will be true because we check general dtypes.
         operator = EqualOperator(event=self.input_event, value=10.0)
         impl = equal.EqualNumpyImplementation(operator)
-        equal_event = impl(event=self.input_event_data)["event"]
+        equal_event = impl.call(event=self.input_event_data)["event"]
 
         expected_event = NumpyEvent.from_dataframe(new_df)
 
@@ -258,7 +258,7 @@ class EqualOperatorTest(absltest.TestCase):
 
         operator = EqualOperator(event=self.input_event, value=True)
         impl = equal.EqualNumpyImplementation(operator)
-        equal_event = impl(event=self.input_event_data)["event"]
+        equal_event = impl.call(event=self.input_event_data)["event"]
 
         expected_event = NumpyEvent.from_dataframe(new_df)
 
