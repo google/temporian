@@ -24,7 +24,8 @@ class RegisteredOperatorsTest(absltest.TestCase):
         # Note: The operators are stored alphabetically.
         expected_implementations = [
             "ARITHMETIC",
-            "EQUAL",
+            "EQUAL_FEATURE",
+            "EQUAL_SCALAR",
             "CALENDAR_DAY_OF_MONTH",
             "CALENDAR_DAY_OF_WEEK",
             "GLUE",

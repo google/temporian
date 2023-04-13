@@ -26,7 +26,8 @@ py_test(
     deps = [
         "//temporian/core/data:event",
         "//temporian/core/data:sampling",
-        "//temporian/core/operators:equal",
+        "//temporian/core/operators:select",
+        "//temporian/core/operators/boolean:equal_scalar",
         "//temporian/implementation/numpy:evaluator",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/operators:equal",

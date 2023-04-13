@@ -1,11 +1,11 @@
-from typing import Dict
+from typing import Dict, Union
 
 import numpy as np
 
-from temporian.core.operators.equal import EqualOperator
+from temporian.core.operators.boolean.equal_scalar import EqualScalarOperator
+from temporian.core.operators.boolean.equal_feature import EqualFeatureOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.feature import NumpyFeature
-from temporian.implementation.numpy.data.feature import DTYPE_REVERSE_MAPPING
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
@@ -13,63 +13,42 @@ from temporian.implementation.numpy.operators.base import OperatorImplementation
 class EqualNumpyImplementation(OperatorImplementation):
     """New event with booleans where features are equal to a value."""
 
-    def __init__(self, operator: EqualOperator) -> None:
+    def __init__(
+        self, operator: Union[EqualScalarOperator, EqualFeatureOperator]
+    ) -> None:
+        assert isinstance(
+            operator, (EqualScalarOperator, EqualFeatureOperator)
+        ), (
+            "Expected operator to be of type EqualScalarOperator or"
+            f" EqualFeatureOperator, got {type(operator)}"
+        )
         super().__init__(operator)
 
-    def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
-        def are_same_general_type(dtype1, dtype2) -> bool:
-            """Check if two dtypes are of the same general type."""
+    def __call__(
+        self, event: NumpyEvent, event_2: NumpyEvent = None
+    ) -> Dict[str, NumpyEvent]:
+        name = ""
 
-            # convert temporian dtypes to numpy dtypes
-            if dtype1 in DTYPE_REVERSE_MAPPING:
-                dtype1 = np.dtype(DTYPE_REVERSE_MAPPING[dtype1])
-            if dtype2 in DTYPE_REVERSE_MAPPING:
-                dtype2 = np.dtype(DTYPE_REVERSE_MAPPING[dtype2])
+        # if operator is EqualScalarOperator, value is the scalar
+        if isinstance(self.operator, EqualScalarOperator):
+            value = self.operator.attributes["value"]
+            name = value
 
-            if dtype1.kind == "i" and dtype2.kind == "i":  # Both are integers
-                return True
-
-            if dtype1.kind == "f" and dtype2.kind == "f":  # Both are floats
-                return True
-
-            if (
-                dtype1.kind == "U" and dtype2.kind == "U"
-            ):  # Both are Unicode strings
-                return True
-
-            if dtype1.kind == "b" and dtype2.kind == "b":  # Both are booleans
-                return True
-
-            return False
-
-        value = self.operator.attributes["value"]
-
-        value_dtype = np.dtype(type(value))
-
-        # check that value dtype is supported
-        if value_dtype not in DTYPE_REVERSE_MAPPING.values():
-            raise ValueError(
-                f"Value dtype {value_dtype} not supported for EqualOperator."
-                f" Supported dtypes are {DTYPE_REVERSE_MAPPING.values()}"
-            )
+        # if operator is EqualFeatureOperator, value is the feature array
+        if isinstance(self.operator, EqualFeatureOperator):
+            value = event_2.data
+            name = self.operator.inputs["event_2"]
 
         output_event = NumpyEvent(data={}, sampling=event.sampling)
 
         for index_value, features in event.data.items():
-            equal_features = []
-            for feature in features:
-                # compare general dtypes. all ints, all floats, all strings.
-                if are_same_general_type(feature.dtype, value_dtype):
-                    equal_feature = np.equal(feature.data, value)
-                else:
-                    equal_feature = np.full(
-                        feature.data.shape, False, dtype=np.bool_
-                    )
-
-                equal_np_feature = NumpyFeature(
-                    f"{feature.name}_equal_{value}", equal_feature
+            equal_features = [
+                NumpyFeature(
+                    self.operator.feature_name(feature, name),
+                    np.equal(feature.data, value),
                 )
-                equal_features.append(equal_np_feature)
+                for feature in features
+            ]
 
             output_event.data[index_value] = equal_features
 
@@ -77,5 +56,9 @@ class EqualNumpyImplementation(OperatorImplementation):
 
 
 implementation_lib.register_operator_implementation(
-    EqualOperator, EqualNumpyImplementation
+    EqualScalarOperator, EqualNumpyImplementation
+)
+
+implementation_lib.register_operator_implementation(
+    EqualFeatureOperator, EqualNumpyImplementation
 )

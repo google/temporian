@@ -41,3 +41,57 @@ def MissingValue(dtype: DType) -> Any:
         return ""
     else:
         raise ValueError(f"Non implemented type {dtype}")
+
+
+def python_type_to_temporian_dtype(python_type: Any) -> DType:
+    """
+    Convert a Python type to its corresponding Temporian dtype.
+
+    Args:
+        python_type: The Python type to be converted.
+
+    Returns:
+        The corresponding Temporian dtype.
+
+    Raises:
+        ValueError: If the input Python type is not supported.
+    """
+    if issubclass(python_type, float):
+        return FLOAT64  # Assuming default float type is FLOAT64
+    if issubclass(python_type, int):
+        return INT64  # Assuming default int type is INT64
+    if issubclass(python_type, str):
+        return STRING
+    if issubclass(python_type, bool):
+        return BOOLEAN
+
+    raise ValueError(f"Unsupported Python type: {python_type}")
+
+
+def same_kind(dtype1: DType, dtype2: DType) -> bool:
+    """
+    Check if two dtypes are of the same kind.
+
+    Args:
+        dtype1: The first dtype.
+        dtype2: The second dtype.
+
+    Returns:
+        True if the two dtypes are of the same kind, False otherwise.
+    """
+    floats = [FLOAT64, FLOAT32]
+    ints = [INT64, INT32]
+
+    if dtype1 in floats and dtype2 in floats:
+        return True
+
+    if dtype1 in ints and dtype2 in ints:
+        return True
+
+    if dtype1 == STRING and dtype2 == STRING:
+        return True
+
+    if dtype1 == BOOLEAN and dtype2 == BOOLEAN:
+        return True
+
+    return False

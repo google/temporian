@@ -59,7 +59,8 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
-        "//temporian/core/operators:equal",
+        "//temporian/core/operators/boolean:equal_feature",
+        "//temporian/core/operators/boolean:equal_scalar",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:feature",

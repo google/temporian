@@ -17,12 +17,12 @@ from absl.testing import absltest
 import numpy as np
 import pandas as pd
 
-from temporian.core.operators.equal import EqualOperator
+from temporian.core.operators.boolean.equal_scalar import EqualScalarOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators import equal
 
 
-class EqualOperatorTest(absltest.TestCase):
+class EqualScalarOperatorTest(absltest.TestCase):
     """Equal operator test."""
 
     def setUp(self):
@@ -44,26 +44,40 @@ class EqualOperatorTest(absltest.TestCase):
 
     def test_float_equal(self) -> None:
         """Test equal when value is a float."""
+        df = pd.DataFrame(
+            [
+                [1.0, 10.0],
+                [2.0, np.nan],
+                [3.0, 12.0],
+                [4.0, 13.0],
+                [5.0, 14.0],
+                [6.0, 15.0],
+            ],
+            columns=["timestamp", "sales"],
+        )
+
+        input_event_data = NumpyEvent.from_dataframe(df)
+
+        input_event = input_event_data.schema()
+
         new_df = pd.DataFrame(
             [
-                [1.0, True, False, False],
-                [2.0, False, False, False],
-                [3.0, False, False, False],
-                [4.0, False, False, False],
-                [5.0, False, False, False],
-                [6.0, False, False, False],
+                [1.0, True],
+                [2.0, False],
+                [3.0, False],
+                [4.0, False],
+                [5.0, False],
+                [6.0, False],
             ],
             columns=[
                 "timestamp",
                 "sales_equal_10.0",
-                "costs_equal_10.0",
-                "weather_equal_10.0",
             ],
         )
 
-        operator = EqualOperator(event=self.input_event, value=10.0)
+        operator = EqualScalarOperator(event=input_event, value=10.0)
         impl = equal.EqualNumpyImplementation(operator)
-        equal_event = impl.call(event=self.input_event_data)["event"]
+        equal_event = impl.call(event=input_event_data)["event"]
 
         expected_event = NumpyEvent.from_dataframe(new_df)
 
@@ -71,26 +85,40 @@ class EqualOperatorTest(absltest.TestCase):
 
     def test_string_equal(self) -> None:
         """Test equal when value is a string."""
+        df = pd.DataFrame(
+            [
+                [1.0, "A"],
+                [2.0, "A"],
+                [3.0, "B"],
+                [4.0, "B"],
+                [5.0, "10.0"],
+                [6.0, "10"],
+            ],
+            columns=["timestamp", "costs"],
+        )
+
+        input_event_data = NumpyEvent.from_dataframe(df)
+
+        input_event = input_event_data.schema()
+
         new_df = pd.DataFrame(
             [
-                [1.0, False, False, False],
-                [2.0, False, False, False],
-                [3.0, False, False, False],
-                [4.0, False, False, False],
-                [5.0, False, False, False],
-                [6.0, False, True, False],
+                [1.0, False],
+                [2.0, False],
+                [3.0, False],
+                [4.0, False],
+                [5.0, False],
+                [6.0, True],
             ],
             columns=[
                 "timestamp",
-                "sales_equal_10",
                 "costs_equal_10",
-                "weather_equal_10",
             ],
         )
 
-        operator = EqualOperator(event=self.input_event, value="10")
+        operator = EqualScalarOperator(event=input_event, value="10")
         impl = equal.EqualNumpyImplementation(operator)
-        equal_event = impl.call(event=self.input_event_data)["event"]
+        equal_event = impl.call(event=input_event_data)["event"]
 
         expected_event = NumpyEvent.from_dataframe(new_df)
 
@@ -98,26 +126,41 @@ class EqualOperatorTest(absltest.TestCase):
 
     def test_int_equal(self) -> None:
         """Test equal when value is an int."""
+
+        df = pd.DataFrame(
+            [
+                [1.0, 10],
+                [2.0, 11],
+                [3.0, 100],
+                [4.0, 20],
+                [5.0, 0],
+                [6.0, 40],
+            ],
+            columns=["timestamp", "weather"],
+        )
+
+        input_event_data = NumpyEvent.from_dataframe(df)
+
+        input_event = input_event_data.schema()
+
         new_df = pd.DataFrame(
             [
-                [1.0, False, False, True],
-                [2.0, False, False, False],
-                [3.0, False, False, False],
-                [4.0, False, False, False],
-                [5.0, False, False, False],
-                [6.0, False, False, False],
+                [1.0, True],
+                [2.0, False],
+                [3.0, False],
+                [4.0, False],
+                [5.0, False],
+                [6.0, False],
             ],
             columns=[
                 "timestamp",
-                "sales_equal_10",
-                "costs_equal_10",
                 "weather_equal_10",
             ],
         )
 
-        operator = EqualOperator(event=self.input_event, value=10)
+        operator = EqualScalarOperator(event=input_event, value=10)
         impl = equal.EqualNumpyImplementation(operator)
-        equal_event = impl.call(event=self.input_event_data)["event"]
+        equal_event = impl.call(event=input_event_data)["event"]
 
         expected_event = NumpyEvent.from_dataframe(new_df)
 
@@ -128,44 +171,41 @@ class EqualOperatorTest(absltest.TestCase):
 
         df = pd.DataFrame(
             [
-                [1.0, 10.0, "A", 10],
-                [2.0, np.nan, "A", 12],
-                [3.0, 12.0, "B", 40],
-                [4.0, 13.0, "B", 100],
-                [5.0, 14.0, "10.0", 0],
-                [6.0, 15.0, "10", 15],
+                [1.0, 10],
+                [2.0, 11],
+                [3.0, 100],
+                [4.0, 20],
+                [5.0, 0],
+                [6.0, 40],
             ],
-            columns=["timestamp", "sales", "costs", "weather"],
+            columns=["timestamp", "weather"],
         )
 
-        # convert weather column to int32 to check different general dtypes.
         df["weather"] = df["weather"].astype(np.int32)
 
-        self.input_event_data = NumpyEvent.from_dataframe(df)
-        self.input_event = self.input_event_data.schema()
+        input_event_data = NumpyEvent.from_dataframe(df)
+
+        input_event = input_event_data.schema()
 
         new_df = pd.DataFrame(
             [
-                [1.0, False, False, True],
-                [2.0, False, False, False],
-                [3.0, False, False, False],
-                [4.0, False, False, False],
-                [5.0, False, False, False],
-                [6.0, False, False, False],
+                [1.0, True],
+                [2.0, False],
+                [3.0, False],
+                [4.0, False],
+                [5.0, False],
+                [6.0, False],
             ],
             columns=[
                 "timestamp",
-                "sales_equal_10",
-                "costs_equal_10",
                 "weather_equal_10",
             ],
         )
 
-        # default python int of value=10 is int64.
-        # the comparison will be true because we check general dtypes.
-        operator = EqualOperator(event=self.input_event, value=10)
+        # The column is int32, but value is int64. It should still work.
+        operator = EqualScalarOperator(event=input_event, value=10)
         impl = equal.EqualNumpyImplementation(operator)
-        equal_event = impl.call(event=self.input_event_data)["event"]
+        equal_event = impl.call(event=input_event_data)["event"]
 
         expected_event = NumpyEvent.from_dataframe(new_df)
 
@@ -176,89 +216,41 @@ class EqualOperatorTest(absltest.TestCase):
 
         df = pd.DataFrame(
             [
-                [1.0, 10.0, "A", 10],
-                [2.0, np.nan, "A", 12],
-                [3.0, 12.0, "B", 40],
-                [4.0, 13.0, "B", 100],
-                [5.0, 14.0, "10.0", 0],
-                [6.0, 15.0, "10", 15],
+                [1.0, 10.0],
+                [2.0, np.nan],
+                [3.0, 12.0],
+                [4.0, 13.0],
+                [5.0, 14.0],
+                [6.0, 15.0],
             ],
-            columns=["timestamp", "sales", "costs", "weather"],
+            columns=["timestamp", "sales"],
         )
 
-        # convert weather column to int32 to check different general dtypes.
         df["sales"] = df["sales"].astype(np.float32)
 
-        self.input_event_data = NumpyEvent.from_dataframe(df)
-        self.input_event = self.input_event_data.schema()
+        input_event_data = NumpyEvent.from_dataframe(df)
+
+        input_event = input_event_data.schema()
 
         new_df = pd.DataFrame(
             [
-                [1.0, True, False, False],
-                [2.0, False, False, False],
-                [3.0, False, False, False],
-                [4.0, False, False, False],
-                [5.0, False, False, False],
-                [6.0, False, False, False],
+                [1.0, True],
+                [2.0, False],
+                [3.0, False],
+                [4.0, False],
+                [5.0, False],
+                [6.0, False],
             ],
             columns=[
                 "timestamp",
                 "sales_equal_10.0",
-                "costs_equal_10.0",
-                "weather_equal_10.0",
             ],
         )
 
-        # default python float of value=10 is float64.
-        # the comparison will be true because we check general dtypes.
-        operator = EqualOperator(event=self.input_event, value=10.0)
+        # The column is float32, but value is float64. It should still work.
+        operator = EqualScalarOperator(event=input_event, value=10.0)
         impl = equal.EqualNumpyImplementation(operator)
-        equal_event = impl.call(event=self.input_event_data)["event"]
-
-        expected_event = NumpyEvent.from_dataframe(new_df)
-
-        self.assertEqual(equal_event, expected_event)
-
-    def test_boolean_equal(self) -> None:
-        """Test equal when value is a boolean."""
-
-        # this functionality is useless, but dont see the reason why raise an
-        # error if the value is a boolean.
-        df = pd.DataFrame(
-            [
-                [1.0, 10.0, "A", False],
-                [2.0, np.nan, "A", False],
-                [3.0, 12.0, "B", True],
-                [4.0, 13.0, "B", True],
-                [5.0, 14.0, "10.0", False],
-                [6.0, 15.0, "10", False],
-            ],
-            columns=["timestamp", "sales", "costs", "weather"],
-        )
-
-        self.input_event_data = NumpyEvent.from_dataframe(df)
-        self.input_event = self.input_event_data.schema()
-
-        new_df = pd.DataFrame(
-            [
-                [1.0, False, False, False],
-                [2.0, False, False, False],
-                [3.0, False, False, True],
-                [4.0, False, False, True],
-                [5.0, False, False, False],
-                [6.0, False, False, False],
-            ],
-            columns=[
-                "timestamp",
-                "sales_equal_True",
-                "costs_equal_True",
-                "weather_equal_True",
-            ],
-        )
-
-        operator = EqualOperator(event=self.input_event, value=True)
-        impl = equal.EqualNumpyImplementation(operator)
-        equal_event = impl.call(event=self.input_event_data)["event"]
+        equal_event = impl.call(event=input_event_data)["event"]
 
         expected_event = NumpyEvent.from_dataframe(new_df)
 
@@ -273,11 +265,8 @@ class EqualOperatorTest(absltest.TestCase):
 
         value = MyClass(10)
 
-        operator = EqualOperator(event=self.input_event, value=value)
-        impl = equal.EqualNumpyImplementation(operator)
-
         with self.assertRaises(ValueError):
-            impl.call(event=self.input_event_data)["event"]
+            operator = EqualScalarOperator(event=self.input_event, value=value)
 
 
 if __name__ == "__main__":
