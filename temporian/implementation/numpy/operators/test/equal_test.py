@@ -19,7 +19,7 @@ import pandas as pd
 
 from temporian.core.operators.boolean.equal_scalar import EqualScalarOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.operators import equal
+from temporian.implementation.numpy.operators.boolean import equal
 
 
 class EqualScalarOperatorTest(absltest.TestCase):

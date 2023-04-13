@@ -12,13 +12,13 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":arithmetic",
-        ":equal",
         ":glue",
         ":lag",
         ":prefix",
         ":propagate",
         ":sample",
         ":select",
+        "//temporian/implementation/numpy/operators/boolean:equal",
         "//temporian/implementation/numpy/operators/calendar:day_of_month",
         "//temporian/implementation/numpy/operators/calendar:day_of_week",
         "//temporian/implementation/numpy/operators/window:moving_count",
@@ -47,20 +47,6 @@ py_library(
     deps = [
         ":base",
         "//temporian/core/operators:arithmetic",
-        "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:feature",
-    ],
-)
-
-py_library(
-    name = "equal",
-    srcs = ["equal.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":base",
-        "//temporian/core/operators/boolean:equal_feature",
-        "//temporian/core/operators/boolean:equal_scalar",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:feature",

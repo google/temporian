@@ -30,7 +30,7 @@ py_test(
         "//temporian/core/operators/boolean:equal_scalar",
         "//temporian/implementation/numpy:evaluator",
         "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/operators:equal",
+        "//temporian/implementation/numpy/operators/boolean:equal",
     ],
 )
 
