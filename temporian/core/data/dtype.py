@@ -26,6 +26,7 @@ class DType(Enum):
     INT64 = "INT64"
     INT32 = "INT32"
     STRING = "STRING"
+    BOOLEAN = "BOOLEAN"
 
     def __str__(self) -> str:
         return self.value

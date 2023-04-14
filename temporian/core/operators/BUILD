@@ -11,6 +11,7 @@ py_library(
     srcs = ["all_operators.py"],
     srcs_version = "PY3",
     deps = [
+        ":filter",
         ":glue",
         ":lag",
         ":prefix",
@@ -53,6 +54,20 @@ py_library(
     srcs_version = "PY3",
     deps = [
         "//temporian/core/data:event",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "filter",
+    srcs = ["filter.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
         "//temporian/proto:core_py_proto",
     ],
 )
