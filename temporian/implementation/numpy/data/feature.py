@@ -9,6 +9,7 @@ DTYPE_MAPPING = {
     np.float32: DType.FLOAT32,
     np.int64: DType.INT64,
     np.int32: DType.INT32,
+    np.bool_: DType.BOOLEAN,
 }
 
 DTYPE_REVERSE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}

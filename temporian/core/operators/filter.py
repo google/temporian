@@ -17,6 +17,7 @@ from temporian.core import operator_lib
 from temporian.core.data.dtype import BOOLEAN
 from temporian.core.data.feature import Feature
 from temporian.core.data.event import Event
+from temporian.core.data.sampling import Sampling
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -35,10 +36,10 @@ class FilterOperator(Operator):
             )
 
         # check that condition is a boolean feature
-        if condition.features[0].type != BOOLEAN:
+        if condition.features[0].dtype != BOOLEAN:
             raise ValueError(
                 "Condition must be a boolean feature. Got"
-                f" {condition.features[0].type} instead."
+                f" {condition.features[0].dtype} instead."
             )
 
         # check both events have same sampling
@@ -52,18 +53,21 @@ class FilterOperator(Operator):
         self.add_input("event", event)
         self.add_input("condition", condition)
 
+        output_sampling = Sampling(index=event.sampling.index, creator=self)
+
+        self.condition_name = condition.features[0].name
+
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=f"{f.name}_filtered_by_{condition.features[0].name}",
+                name=self.feature_name(f),
                 dtype=f.dtype,
-                sampling=event.sampling,
+                sampling=output_sampling,
                 creator=self,
             )
             for f in event.features
         ]
 
-        output_sampling = event.sampling
         self.add_output(
             "event",
             Event(
@@ -86,6 +90,9 @@ class FilterOperator(Operator):
             ],
             outputs=[pb.OperatorDef.Output(key="event")],
         )
+
+    def feature_name(self, feature: Feature) -> str:
+        return f"{feature.name}_filtered_by_{self.condition_name}"
 
 
 operator_lib.register_operator(FilterOperator)

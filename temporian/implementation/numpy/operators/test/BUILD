@@ -55,6 +55,19 @@ py_test(
 )
 
 py_test(
+    name = "filter_test",
+    srcs = ["filter_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators:filter",
+        "//temporian/implementation/numpy:evaluator",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/operators:filter_event",
+    ],
+)
+
+py_test(
     name = "glue_test",
     srcs = ["glue_test.py"],
     srcs_version = "PY3",

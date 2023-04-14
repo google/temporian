@@ -89,6 +89,10 @@ class Event(object):
     def sampling(self) -> Sampling:
         return self._sampling
 
+    @sampling.setter
+    def sampling(self, sampling: Sampling):
+        self._sampling = sampling
+
     @property
     def features(self) -> List[Feature]:
         return self._features
