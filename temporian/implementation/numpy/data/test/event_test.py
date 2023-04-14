@@ -2,47 +2,45 @@ from absl.testing import absltest
 
 import numpy as np
 
-from temporian.implementation.numpy.data.event import NumpyEvent, NumpyFeature
-from temporian.implementation.numpy.data.sampling import NumpySampling
+from temporian.implementation.numpy.data.event import IndexData
+from temporian.implementation.numpy.data.event import NumpyEvent
 
 
 class EventTest(absltest.TestCase):
     def test_repr(self):
         event = NumpyEvent(
             data={
-                (1,): [
-                    NumpyFeature("a", np.array([1, 2, 3])),
-                    NumpyFeature("b", np.array([4, 5, 6])),
-                ],
-                (2,): [
-                    NumpyFeature("a", np.array([7, 8])),
-                    NumpyFeature("b", np.array([9, 10])),
-                ],
+                (1,): IndexData(
+                    features=[
+                        np.array([1, 2, 3]),
+                        np.array([4, 5, 6]),
+                    ],
+                    timestamps=np.array([0.1, 0.2, 0.3]),
+                ),
+                (2,): IndexData(
+                    features=[
+                        np.array([7, 8]),
+                        np.array([9, 10]),
+                    ],
+                    timestamps=np.array([0.4, 0.5]),
+                ),
             },
-            sampling=NumpySampling(
-                index=["x"],
-                data={
-                    (1,): np.array([0.1, 0.2, 0.3]),
-                    (2,): np.array([0.4, 0.5]),
-                },
-            ),
+            feature_names=["a", "b"],
+            index_names="x",
+            is_unix_timestamp=False,
         )
-
+        print(event)
         self.assertEqual(
             repr(event),
-            """data (2):
+            """data:
+		index_names=['x']
+		feature_names=['a', 'b']
     (1,):
-        a <INT64> (3): [1 2 3]
-        b <INT64> (3): [4 5 6]
+        a<int64>: data=[1 2 3])
+        b<int64>: data=[4 5 6])
     (2,):
-        a <INT64> (2): [7 8]
-        b <INT64> (2): [ 9 10]
-sampling:
-    index: ['x']
-    data (2):
-        (1,) (3): [0.1 0.2 0.3]
-        (2,) (2): [0.4 0.5]
-""",
+        a<int64>: data=[7 8])
+        b<int64>: data=[ 9 10])""",
         )
 
 
