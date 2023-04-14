@@ -240,7 +240,9 @@ class NumpyEvent:
             timestamp = df[timestamp_column].to_numpy()
             sampling[()] = timestamp
             data[()] = [
-                NumpyFeature(feature, df[feature].to_numpy())
+                NumpyFeature(
+                    feature, df[feature].to_numpy(dtype=df[feature].dtype.type)
+                )
                 for feature in feature_columns
             ]
 

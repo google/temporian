@@ -25,7 +25,13 @@ class FilterNumpyImplementation(OperatorImplementation):
             condition_feature = features[0].data
 
             # filtered sampling
-            new_sampling[index] = event.sampling.data[index][condition_feature]
+            filtered_sampling = event.sampling.data[index][condition_feature]
+
+            # if filtered sampling is empty, skip
+            if len(filtered_sampling) == 0:
+                continue
+
+            new_sampling[index] = filtered_sampling
 
             # filter features
             event_filtered_data[index] = [
