@@ -31,26 +31,34 @@ class BaseBooleanNumpyImplementation(OperatorImplementation):
         super().__init__(operator)
 
     def __call__(
-        self, event: NumpyEvent, event_2: NumpyEvent = None
+        self, event_1: NumpyEvent, event_2: NumpyEvent = None
     ) -> Dict[str, NumpyEvent]:
-        name = ""
-
         # if operator is a Scalar Operator, value is the scalar
         if isinstance(self.operator, BaseBooleanScalarOperator):
             value = self.operator.attributes["value"]
-            name = value
 
-        # if operator is Feature Operator, value is the feature array
-        if isinstance(self.operator, BaseBooleanFeatureOperator):
-            value = event_2.data
-            name = self.operator.inputs["event_2"]
+        if event_2 and event_1.sampling != event_2.sampling:
+            raise ValueError(
+                "Event 1 and event 2 must have same sampling. Current"
+                f" samplings: {event_1.sampling}, {event_2.sampling}"
+            )
 
-        output_event = NumpyEvent(data={}, sampling=event.sampling)
+        # this is needed for .call() to work. It says that event_2 has different
+        # sampling than output.
+        if event_2:
+            event_2.sampling = event_1.sampling
 
-        for index_value, features in event.data.items():
+        output_event = NumpyEvent(data={}, sampling=event_1.sampling)
+
+        for index_value, features in event_1.data.items():
+            # if operator is Feature Operator, value is the feature array
+            if isinstance(self.operator, BaseBooleanFeatureOperator):
+                # get first and only feature in event_2
+                value = event_2.data[index_value][0].data
+
             equal_features = [
                 NumpyFeature(
-                    self.operator.feature_name(feature, name),
+                    self.operator.feature_name(feature),
                     self.operation(feature.data, value),
                 )
                 for feature in features

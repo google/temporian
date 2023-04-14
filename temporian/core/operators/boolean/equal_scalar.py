@@ -40,7 +40,7 @@ operator_lib.register_operator(EqualScalarOperator)
 
 
 def equal_scalar(
-    event: Event,
+    event_1: Event,
     value: any,
 ) -> Event:
     """Equal scalar.
@@ -49,7 +49,7 @@ def equal_scalar(
     the feature is equal to the scalar value, and False otherwise.
 
     Args:
-        event: event to compare.
+        event_1: event to compare.
         value: scalar value to compare to.
 
     Returns:
@@ -59,4 +59,4 @@ def equal_scalar(
         ValueError: if the event feature dtypes are different from the value
             dtype.
     """
-    return EqualScalarOperator(event, value).outputs["event"]
+    return EqualScalarOperator(event_1, value).outputs["event"]

@@ -62,9 +62,11 @@ class BaseBooleanFeatureOperator(Operator, ABC):
                 f" {event_2_feature}. Current feature dtypes: {event_1.dtypes}"
             )
 
+        self.value_name = event_2_feature.name
+
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=self.feature_name(f, event_2_feature),
+                name=self.feature_name(f),
                 dtype=dtype_lib.BOOLEAN,
                 sampling=f.sampling,
                 creator=self,
@@ -102,9 +104,9 @@ class BaseBooleanFeatureOperator(Operator, ABC):
     def operator_def_key(cls) -> str:
         """Get the key of the operator definition."""
 
-    def feature_name(self, feature_1: Feature, feature_2: Feature) -> str:
+    def feature_name(self, feature: Feature) -> str:
         """Returns the name of the feature to be created."""
-        return f"{feature_1.name}_{self.operation_name}_{feature_2.name}"
+        return f"{feature.name}_{self.operation_name}_{self.value_name}"
 
     @property
     @abstractmethod

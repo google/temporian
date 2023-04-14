@@ -20,14 +20,27 @@ py_test(
 )
 
 py_test(
-    name = "equal_test",
-    srcs = ["equal_test.py"],
+    name = "equal_scalar_test",
+    srcs = ["equal_scalar_test.py"],
     srcs_version = "PY3",
     deps = [
         "//temporian/core/data:event",
         "//temporian/core/data:sampling",
-        "//temporian/core/operators:select",
         "//temporian/core/operators/boolean:equal_scalar",
+        "//temporian/implementation/numpy:evaluator",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/operators/boolean:equal",
+    ],
+)
+
+py_test(
+    name = "equal_feature_test",
+    srcs = ["equal_feature_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:event",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators/boolean:equal_feature",
         "//temporian/implementation/numpy:evaluator",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/operators/boolean:equal",

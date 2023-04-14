@@ -23,24 +23,7 @@ from temporian.implementation.numpy.operators.boolean import equal
 
 
 class EqualScalarOperatorTest(absltest.TestCase):
-    """Equal operator test."""
-
-    def setUp(self):
-        df = pd.DataFrame(
-            [
-                [1.0, 10.0, "A", 10],
-                [2.0, np.nan, "A", 12],
-                [3.0, 12.0, "B", 40],
-                [4.0, 13.0, "B", 100],
-                [5.0, 14.0, "10.0", 0],
-                [6.0, 15.0, "10", 15],
-            ],
-            columns=["timestamp", "sales", "costs", "weather"],
-        )
-
-        self.input_event_data = NumpyEvent.from_dataframe(df)
-
-        self.input_event = self.input_event_data.schema()
+    """Equal scalar operator test."""
 
     def test_float_equal(self) -> None:
         """Test equal when value is a float."""
@@ -75,9 +58,9 @@ class EqualScalarOperatorTest(absltest.TestCase):
             ],
         )
 
-        operator = EqualScalarOperator(event=input_event, value=10.0)
+        operator = EqualScalarOperator(event_1=input_event, value=10.0)
         impl = equal.EqualNumpyImplementation(operator)
-        equal_event = impl.call(event=input_event_data)["event"]
+        equal_event = impl.call(event_1=input_event_data)["event"]
 
         expected_event = NumpyEvent.from_dataframe(new_df)
 
@@ -116,9 +99,9 @@ class EqualScalarOperatorTest(absltest.TestCase):
             ],
         )
 
-        operator = EqualScalarOperator(event=input_event, value="10")
+        operator = EqualScalarOperator(event_1=input_event, value="10")
         impl = equal.EqualNumpyImplementation(operator)
-        equal_event = impl.call(event=input_event_data)["event"]
+        equal_event = impl.call(event_1=input_event_data)["event"]
 
         expected_event = NumpyEvent.from_dataframe(new_df)
 
@@ -158,9 +141,9 @@ class EqualScalarOperatorTest(absltest.TestCase):
             ],
         )
 
-        operator = EqualScalarOperator(event=input_event, value=10)
+        operator = EqualScalarOperator(event_1=input_event, value=10)
         impl = equal.EqualNumpyImplementation(operator)
-        equal_event = impl.call(event=input_event_data)["event"]
+        equal_event = impl.call(event_1=input_event_data)["event"]
 
         expected_event = NumpyEvent.from_dataframe(new_df)
 
@@ -203,9 +186,9 @@ class EqualScalarOperatorTest(absltest.TestCase):
         )
 
         # The column is int32, but value is int64. It should still work.
-        operator = EqualScalarOperator(event=input_event, value=10)
+        operator = EqualScalarOperator(event_1=input_event, value=10)
         impl = equal.EqualNumpyImplementation(operator)
-        equal_event = impl.call(event=input_event_data)["event"]
+        equal_event = impl.call(event_1=input_event_data)["event"]
 
         expected_event = NumpyEvent.from_dataframe(new_df)
 
@@ -248,9 +231,9 @@ class EqualScalarOperatorTest(absltest.TestCase):
         )
 
         # The column is float32, but value is float64. It should still work.
-        operator = EqualScalarOperator(event=input_event, value=10.0)
+        operator = EqualScalarOperator(event_1=input_event, value=10.0)
         impl = equal.EqualNumpyImplementation(operator)
-        equal_event = impl.call(event=input_event_data)["event"]
+        equal_event = impl.call(event_1=input_event_data)["event"]
 
         expected_event = NumpyEvent.from_dataframe(new_df)
 
@@ -258,6 +241,21 @@ class EqualScalarOperatorTest(absltest.TestCase):
 
     def test_value_unsupported_type(self):
         """Test operator raises error when value is not a supported type."""
+        df = pd.DataFrame(
+            [
+                [1.0, 10.0],
+                [2.0, np.nan],
+                [3.0, 12.0],
+                [4.0, 13.0],
+                [5.0, 14.0],
+                [6.0, 15.0],
+            ],
+            columns=["timestamp", "sales"],
+        )
+
+        input_event_data = NumpyEvent.from_dataframe(df)
+
+        input_event = input_event_data.schema()
 
         class MyClass:
             def __init__(self, a_variable) -> None:
@@ -266,7 +264,7 @@ class EqualScalarOperatorTest(absltest.TestCase):
         value = MyClass(10)
 
         with self.assertRaises(ValueError):
-            operator = EqualScalarOperator(event=self.input_event, value=value)
+            operator = EqualScalarOperator(event_1=input_event, value=value)
 
 
 if __name__ == "__main__":

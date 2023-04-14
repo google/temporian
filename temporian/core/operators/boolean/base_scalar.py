@@ -28,13 +28,13 @@ class BaseBooleanScalarOperator(Operator, ABC):
     Base boolean scalar operator to implement common logic.
     """
 
-    def __init__(self, event: Event, value: any):
+    def __init__(self, event_1: Event, value: any):
         super().__init__()
 
         self.add_attribute("value", value)
 
         # inputs
-        self.add_input("event", event)
+        self.add_input("event_1", event_1)
 
         # convert value type to temporian dtype
         value_dtype = dtype_lib.python_type_to_temporian_dtype(type(value))
@@ -42,24 +42,26 @@ class BaseBooleanScalarOperator(Operator, ABC):
         # ensure all features have same dtype as value
         if not all(
             dtype_lib.same_kind(dtype, value_dtype)
-            for dtype in event.dtypes.values()
+            for dtype in event_1.dtypes.values()
         ):
             raise ValueError(
                 f"All features must have the same dtype ({value_dtype}) as"
-                f" value {value}. Current feature dtypes: {event.dtypes}"
+                f" value {value}. Current feature dtypes: {event_1.dtypes}"
             )
+
+        self.value_name = str(value)
 
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=self.feature_name(f, value),
+                name=self.feature_name(f),
                 dtype=dtype_lib.BOOLEAN,
                 sampling=f.sampling,
                 creator=self,
             )
-            for f in event.features
+            for f in event_1.features
         ]
 
-        output_sampling = event.sampling
+        output_sampling = event_1.sampling
         self.add_output(
             "event",
             Event(
@@ -84,7 +86,7 @@ class BaseBooleanScalarOperator(Operator, ABC):
                 ),
             ],
             inputs=[
-                pb.OperatorDef.Input(key="event"),
+                pb.OperatorDef.Input(key="event_1"),
             ],
             outputs=[pb.OperatorDef.Output(key="event")],
         )
@@ -95,9 +97,9 @@ class BaseBooleanScalarOperator(Operator, ABC):
     def operator_def_key(cls) -> str:
         """Get the key of the operator definition."""
 
-    def feature_name(self, feature: Feature, value: any) -> str:
+    def feature_name(self, feature: Feature) -> str:
         """Returns the name of the feature to be created."""
-        return f"{feature.name}_{self.operation_name}_{value}"
+        return f"{feature.name}_{self.operation_name}_{self.value_name}"
 
     @property
     @abstractmethod
