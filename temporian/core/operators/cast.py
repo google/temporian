@@ -16,7 +16,7 @@
 from typing import List, Union, Mapping
 from temporian.core.data.feature import Feature
 
-from temporian.core.data.dtype import DType
+from temporian.core.data.dtype import DType, ALL_TYPES
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
 from temporian.core.operators.base import Operator
@@ -30,14 +30,15 @@ class CastOperator(Operator):
         self,
         event: Event,
         to: Union[DType, Mapping[Union[str, DType], DType]],
+        check_overflow: bool = False,
     ):
         super().__init__()
 
         # Check that all origin keys are DType or feature_names
-        if not isinstance(to, DType):
+        if to not in ALL_TYPES:  # Will be 'not isinstance(to, DType)'
             for origin_key in to:
                 if (
-                    not isinstance(origin_key, DType)
+                    origin_key not in ALL_TYPES  # Also here
                     and origin_key not in event.feature_names
                 ):
                     raise ValueError(f"Invalid key to cast: {origin_key}")
@@ -45,7 +46,7 @@ class CastOperator(Operator):
         # Convert any input format to feature_name->target_dtype
         target_dtypes = {}
         for feature in event.features:
-            if isinstance(to, DType):
+            if to in ALL_TYPES:  # isinstance(to, DType):
                 target_dtypes[feature.name] = to
             elif feature.name in to:
                 target_dtypes[feature.name] = to[feature.name]
@@ -54,6 +55,7 @@ class CastOperator(Operator):
             else:
                 target_dtypes[feature.name] = feature.dtype
         self.add_attribute("target_dtypes", target_dtypes)
+        self.add_attribute("check_overflow", check_overflow)
 
         # inputs
         self.add_input("event", event)
@@ -102,6 +104,11 @@ class CastOperator(Operator):
                     type=pb.OperatorDef.Attribute.Type.MAP_STR_STR,
                     is_optional=False,
                 ),
+                pb.OperatorDef.Attribute(
+                    key="check_overflow",
+                    type=pb.OperatorDef.Attribute.Type.BOOL,
+                    is_optional=False,
+                ),
             ],
             inputs=[
                 pb.OperatorDef.Input(key="event"),
@@ -116,5 +123,6 @@ operator_lib.register_operator(CastOperator)
 def cast(
     event: Event,
     to: Union[DType, Mapping[Union[str, DType], DType]],
+    check_overflow: bool = False,
 ) -> Event:
-    return CastOperator(event, to).outputs["event"]
+    return CastOperator(event, to, check_overflow).outputs["event"]
