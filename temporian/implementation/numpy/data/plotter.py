@@ -1,11 +1,11 @@
+import datetime
 from typing import NamedTuple, Optional, Union, List, Any
 
-from click import option
-from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.core.data import duration
-import datetime
-
 import numpy as np
+from click import option
+
+from temporian.core.data import duration
+from temporian.implementation.numpy.data.event import NumpyEvent
 
 DEFAULT_BACKEND = "matplotlib"
 
@@ -210,7 +210,6 @@ def _matplotlib_sub_plot(
     import matplotlib.ticker as ticker
 
     ax.plot(xs, ys, lw=0.5, color=color, **wargs)
-
     if options.min_time is not None or options.max_time is not None:
         args = {}
         if options.min_time is not None:
