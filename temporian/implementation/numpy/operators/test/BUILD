@@ -55,6 +55,19 @@ py_test(
 )
 
 py_test(
+    name = "cast_test",
+    srcs = ["cast_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators:cast",
+        "//temporian/implementation/numpy:evaluator",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/operators:cast",
+    ],
+)
+
+py_test(
     name = "glue_test",
     srcs = ["glue_test.py"],
     srcs_version = "PY3",
