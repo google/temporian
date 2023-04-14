@@ -26,7 +26,7 @@ class EqualFeatureOperatorTest(absltest.TestCase):
     """Equal feature operator test."""
 
     def test_float_equal(self) -> None:
-        """Test equal when value is a float."""
+        """Test equal when event_1 and event_2 are float64."""
         df_1 = pd.DataFrame(
             [
                 [1.0, 10.0],
@@ -91,190 +91,405 @@ class EqualFeatureOperatorTest(absltest.TestCase):
 
         self.assertEqual(equal_event, expected_event)
 
-    # def test_string_equal(self) -> None:
-    #     """Test equal when value is a string."""
-    #     df = pd.DataFrame(
-    #         [
-    #             [1.0, "A"],
-    #             [2.0, "A"],
-    #             [3.0, "B"],
-    #             [4.0, "B"],
-    #             [5.0, "10.0"],
-    #             [6.0, "10"],
-    #         ],
-    #         columns=["timestamp", "costs"],
-    #     )
+    def test_string_equal(self) -> None:
+        """Test equal when event_1 and event_2 are strings."""
+        df_1 = pd.DataFrame(
+            [
+                [1.0, "A"],
+                [2.0, "A"],
+                [3.0, "B"],
+                [4.0, "B"],
+                [5.0, "10.0"],
+                [6.0, "10"],
+            ],
+            columns=["timestamp", "costs"],
+        )
 
-    #     input_event_data = NumpyEvent.from_dataframe(df)
+        input_event_1_data = NumpyEvent.from_dataframe(df_1)
 
-    #     input_event = input_event_data.schema()
+        input_event_1 = input_event_1_data.schema()
 
-    #     new_df = pd.DataFrame(
-    #         [
-    #             [1.0, False],
-    #             [2.0, False],
-    #             [3.0, False],
-    #             [4.0, False],
-    #             [5.0, False],
-    #             [6.0, True],
-    #         ],
-    #         columns=[
-    #             "timestamp",
-    #             "costs_equal_10",
-    #         ],
-    #     )
+        df_2 = pd.DataFrame(
+            [
+                [1.0, "A"],
+                [2.0, "X"],
+                [3.0, "X"],
+                [4.0, "B"],
+                [5.0, "10.00"],
+                [6.0, "100"],
+            ],
+            columns=["timestamp", "old_costs"],
+        )
 
-    #     operator = EqualScalarOperator(event=input_event, value="10")
-    #     impl = equal.EqualNumpyImplementation(operator)
-    #     equal_event = impl.call(event=input_event_data)["event"]
+        input_event_2_data = NumpyEvent.from_dataframe(df_2)
 
-    #     expected_event = NumpyEvent.from_dataframe(new_df)
+        input_event_2 = input_event_2_data.schema()
+        input_event_2.sampling = input_event_1.sampling
 
-    #     self.assertEqual(equal_event, expected_event)
+        new_df = pd.DataFrame(
+            [
+                [1.0, True],
+                [2.0, False],
+                [3.0, False],
+                [4.0, True],
+                [5.0, False],
+                [6.0, False],
+            ],
+            columns=[
+                "timestamp",
+                "costs_equal_old_costs",
+            ],
+        )
 
-    # def test_int_equal(self) -> None:
-    #     """Test equal when value is an int."""
+        operator = EqualFeatureOperator(
+            event_1=input_event_1, event_2=input_event_2
+        )
+        impl = equal.EqualNumpyImplementation(operator)
+        equal_event = impl.call(
+            event_1=input_event_1_data, event_2=input_event_2_data
+        )["event"]
 
-    #     df = pd.DataFrame(
-    #         [
-    #             [1.0, 10],
-    #             [2.0, 11],
-    #             [3.0, 100],
-    #             [4.0, 20],
-    #             [5.0, 0],
-    #             [6.0, 40],
-    #         ],
-    #         columns=["timestamp", "weather"],
-    #     )
+        expected_event = NumpyEvent.from_dataframe(new_df)
 
-    #     input_event_data = NumpyEvent.from_dataframe(df)
+        if not expected_event == (equal_event):
+            print(expected_event.to_dataframe())
+            print(equal_event.to_dataframe())
 
-    #     input_event = input_event_data.schema()
+        self.assertEqual(equal_event, expected_event)
 
-    #     new_df = pd.DataFrame(
-    #         [
-    #             [1.0, True],
-    #             [2.0, False],
-    #             [3.0, False],
-    #             [4.0, False],
-    #             [5.0, False],
-    #             [6.0, False],
-    #         ],
-    #         columns=[
-    #             "timestamp",
-    #             "weather_equal_10",
-    #         ],
-    #     )
+    def test_int_equal(self) -> None:
+        """Test equal when event_1 and event_2 are int64."""
 
-    #     operator = EqualScalarOperator(event=input_event, value=10)
-    #     impl = equal.EqualNumpyImplementation(operator)
-    #     equal_event = impl.call(event=input_event_data)["event"]
+        df_1 = pd.DataFrame(
+            [
+                [1.0, 1],
+                [2.0, 2],
+                [3.0, 3],
+                [4.0, 4],
+                [5.0, 5],
+                [6.0, 6],
+            ],
+            columns=["timestamp", "column_1"],
+        )
 
-    #     expected_event = NumpyEvent.from_dataframe(new_df)
+        input_event_1_data = NumpyEvent.from_dataframe(df_1)
 
-    #     self.assertEqual(equal_event, expected_event)
+        input_event_1 = input_event_1_data.schema()
 
-    # def test_int_equal_with_int32_column(self) -> None:
-    #     """Test equal when value is an int64 and a column is an int32."""
+        df_2 = pd.DataFrame(
+            [
+                [1.0, -1],
+                [2.0, -2],
+                [3.0, -3],
+                [4.0, 4],
+                [5.0, 5],
+                [6.0, 6],
+            ],
+            columns=["timestamp", "column_2"],
+        )
 
-    #     df = pd.DataFrame(
-    #         [
-    #             [1.0, 10],
-    #             [2.0, 11],
-    #             [3.0, 100],
-    #             [4.0, 20],
-    #             [5.0, 0],
-    #             [6.0, 40],
-    #         ],
-    #         columns=["timestamp", "weather"],
-    #     )
+        input_event_2_data = NumpyEvent.from_dataframe(df_2)
 
-    #     df["weather"] = df["weather"].astype(np.int32)
+        input_event_2 = input_event_2_data.schema()
+        input_event_2.sampling = input_event_1.sampling
 
-    #     input_event_data = NumpyEvent.from_dataframe(df)
+        new_df = pd.DataFrame(
+            [
+                [1.0, False],
+                [2.0, False],
+                [3.0, False],
+                [4.0, True],
+                [5.0, True],
+                [6.0, True],
+            ],
+            columns=[
+                "timestamp",
+                "column_1_equal_column_2",
+            ],
+        )
 
-    #     input_event = input_event_data.schema()
+        operator = EqualFeatureOperator(
+            event_1=input_event_1, event_2=input_event_2
+        )
+        impl = equal.EqualNumpyImplementation(operator)
+        equal_event = impl.call(
+            event_1=input_event_1_data, event_2=input_event_2_data
+        )["event"]
 
-    #     new_df = pd.DataFrame(
-    #         [
-    #             [1.0, True],
-    #             [2.0, False],
-    #             [3.0, False],
-    #             [4.0, False],
-    #             [5.0, False],
-    #             [6.0, False],
-    #         ],
-    #         columns=[
-    #             "timestamp",
-    #             "weather_equal_10",
-    #         ],
-    #     )
+        expected_event = NumpyEvent.from_dataframe(new_df)
 
-    #     # The column is int32, but value is int64. It should still work.
-    #     operator = EqualScalarOperator(event=input_event, value=10)
-    #     impl = equal.EqualNumpyImplementation(operator)
-    #     equal_event = impl.call(event=input_event_data)["event"]
+        if not expected_event == (equal_event):
+            print(expected_event.to_dataframe())
+            print(equal_event.to_dataframe())
 
-    #     expected_event = NumpyEvent.from_dataframe(new_df)
+        self.assertEqual(equal_event, expected_event)
 
-    #     self.assertEqual(equal_event, expected_event)
+    def test_int_equal_with_int32_column(self) -> None:
+        """Test equal when event_1 has an int64 feature and event_2 has an int32
+        feature.
+        """
 
-    # def test_float_equal_with_float32_column(self) -> None:
-    #     """Test equal when value is an int64 and a column is an int32."""
+        df_1 = pd.DataFrame(
+            [
+                [1.0, 1],
+                [2.0, 2],
+                [3.0, 3],
+                [4.0, 4],
+                [5.0, 5],
+                [6.0, 6],
+            ],
+            columns=["timestamp", "column_1"],
+        )
 
-    #     df = pd.DataFrame(
-    #         [
-    #             [1.0, 10.0],
-    #             [2.0, np.nan],
-    #             [3.0, 12.0],
-    #             [4.0, 13.0],
-    #             [5.0, 14.0],
-    #             [6.0, 15.0],
-    #         ],
-    #         columns=["timestamp", "sales"],
-    #     )
+        input_event_1_data = NumpyEvent.from_dataframe(df_1)
 
-    #     df["sales"] = df["sales"].astype(np.float32)
+        input_event_1 = input_event_1_data.schema()
 
-    #     input_event_data = NumpyEvent.from_dataframe(df)
+        df_2 = pd.DataFrame(
+            [
+                [1.0, -1],
+                [2.0, -2],
+                [3.0, -3],
+                [4.0, 4],
+                [5.0, 5],
+                [6.0, 6],
+            ],
+            columns=["timestamp", "column_2"],
+        )
 
-    #     input_event = input_event_data.schema()
+        df_2["column_2"] = df_2["column_2"].astype("int32")
 
-    #     new_df = pd.DataFrame(
-    #         [
-    #             [1.0, True],
-    #             [2.0, False],
-    #             [3.0, False],
-    #             [4.0, False],
-    #             [5.0, False],
-    #             [6.0, False],
-    #         ],
-    #         columns=[
-    #             "timestamp",
-    #             "sales_equal_10.0",
-    #         ],
-    #     )
+        input_event_2_data = NumpyEvent.from_dataframe(df_2)
 
-    #     # The column is float32, but value is float64. It should still work.
-    #     operator = EqualScalarOperator(event=input_event, value=10.0)
-    #     impl = equal.EqualNumpyImplementation(operator)
-    #     equal_event = impl.call(event=input_event_data)["event"]
+        input_event_2 = input_event_2_data.schema()
+        input_event_2.sampling = input_event_1.sampling
 
-    #     expected_event = NumpyEvent.from_dataframe(new_df)
+        new_df = pd.DataFrame(
+            [
+                [1.0, False],
+                [2.0, False],
+                [3.0, False],
+                [4.0, True],
+                [5.0, True],
+                [6.0, True],
+            ],
+            columns=[
+                "timestamp",
+                "column_1_equal_column_2",
+            ],
+        )
 
-    #     self.assertEqual(equal_event, expected_event)
+        operator = EqualFeatureOperator(
+            event_1=input_event_1, event_2=input_event_2
+        )
+        impl = equal.EqualNumpyImplementation(operator)
+        equal_event = impl.call(
+            event_1=input_event_1_data, event_2=input_event_2_data
+        )["event"]
 
-    # def test_value_unsupported_type(self):
-    #     """Test operator raises error when value is not a supported type."""
+        expected_event = NumpyEvent.from_dataframe(new_df)
 
-    #     class MyClass:
-    #         def __init__(self, a_variable) -> None:
-    #             self.a_variable = a_variable
+        if not expected_event == (equal_event):
+            print(expected_event.to_dataframe())
+            print(equal_event.to_dataframe())
 
-    #     value = MyClass(10)
+        self.assertEqual(equal_event, expected_event)
 
-    #     with self.assertRaises(ValueError):
-    #         operator = EqualScalarOperator(event=self.input_event, value=value)
+    def test_float_equal_with_float32_column(self) -> None:
+        """Test equal when event_1 has a float64 feature and event_2 has a
+        float32 feature.
+        """
+
+        df_1 = pd.DataFrame(
+            [
+                [1.0, 10.0],
+                [2.0, np.nan],
+                [3.0, 12.0],
+                [4.0, 13.0],
+                [5.0, 14.0],
+                [6.0, 15.0],
+            ],
+            columns=["timestamp", "sales"],
+        )
+
+        input_event_1_data = NumpyEvent.from_dataframe(df_1)
+
+        input_event_1 = input_event_1_data.schema()
+
+        df_2 = pd.DataFrame(
+            [
+                [1.0, 0],
+                [2.0, np.nan],
+                [3.0, 12.1],
+                [4.0, 13.0],
+                [5.0, 14.2],
+                [6.0, 15.0],
+            ],
+            columns=["timestamp", "costs"],
+        )
+
+        df_2["costs"] = df_2["costs"].astype("float32")
+
+        input_event_2_data = NumpyEvent.from_dataframe(df_2)
+
+        input_event_2 = input_event_2_data.schema()
+        input_event_2.sampling = input_event_1.sampling
+
+        new_df = pd.DataFrame(
+            [
+                [1.0, False],
+                [2.0, False],  # np.nan comparison returns false
+                [3.0, False],
+                [4.0, True],
+                [5.0, False],
+                [6.0, True],
+            ],
+            columns=[
+                "timestamp",
+                "sales_equal_costs",
+            ],
+        )
+
+        operator = EqualFeatureOperator(
+            event_1=input_event_1, event_2=input_event_2
+        )
+        impl = equal.EqualNumpyImplementation(operator)
+        equal_event = impl.call(
+            event_1=input_event_1_data, event_2=input_event_2_data
+        )["event"]
+
+        expected_event = NumpyEvent.from_dataframe(new_df)
+
+        if not expected_event == (equal_event):
+            print(expected_event.to_dataframe())
+            print(equal_event.to_dataframe())
+
+        self.assertEqual(equal_event, expected_event)
+
+    def test_equal_with_different_dtypes_in_event_1(self):
+        """Test operator raises error when event_1 has multiple dtypes."""
+
+        df_1 = pd.DataFrame(
+            [
+                [1.0, 10.0, 10],
+                [2.0, np.nan, 0],
+                [3.0, 12.0, 12],
+                [4.0, 13.0, 13],
+                [5.0, 14.0, 14],
+                [6.0, 15.0, 15],
+            ],
+            columns=["timestamp", "sales", "sales_int"],
+        )
+
+        input_event_1_data = NumpyEvent.from_dataframe(df_1)
+
+        input_event_1 = input_event_1_data.schema()
+
+        df_2 = pd.DataFrame(
+            [
+                [1.0, 10.0],
+                [2.0, np.nan],
+                [3.0, 12.0],
+                [4.0, 13.0],
+                [5.0, 14.0],
+                [6.0, 15.0],
+            ],
+            columns=["timestamp", "costs"],
+        )
+
+        input_event_2_data = NumpyEvent.from_dataframe(df_2)
+
+        input_event_2 = input_event_2_data.schema()
+        input_event_2.sampling = input_event_1.sampling
+
+        with self.assertRaises(ValueError):
+            operator = EqualFeatureOperator(
+                event_1=input_event_1, event_2=input_event_2
+            )
+
+    def test_event_2_with_multiple_features(self):
+        """Test operator raises error when event_2 has multiple features."""
+
+        df_1 = pd.DataFrame(
+            [
+                [1.0, 10.0],
+                [2.0, np.nan],
+                [3.0, 12.0],
+                [4.0, 13.0],
+                [5.0, 14.0],
+                [6.0, 15.0],
+            ],
+            columns=["timestamp", "sales"],
+        )
+
+        input_event_1_data = NumpyEvent.from_dataframe(df_1)
+
+        input_event_1 = input_event_1_data.schema()
+
+        df_2 = pd.DataFrame(
+            [
+                [1.0, 10.0, 1.0],
+                [2.0, np.nan, 3.2],
+                [3.0, 12.0, 4.0],
+                [4.0, 13.0, 5.0],
+                [5.0, 14.0, 6.0],
+                [6.0, 15.0, 7.0],
+            ],
+            columns=["timestamp", "costs", "costs_2"],
+        )
+
+        input_event_2_data = NumpyEvent.from_dataframe(df_2)
+
+        input_event_2 = input_event_2_data.schema()
+        input_event_2.sampling = input_event_1.sampling
+
+        with self.assertRaises(ValueError):
+            operator = EqualFeatureOperator(
+                event_1=input_event_1, event_2=input_event_2
+            )
+
+    def test_event_1_and_event_2_different_dtypes(self):
+        """Test operator raises error when event_1 and event_2 have different
+        dtypes.
+        """
+
+        df_1 = pd.DataFrame(
+            [
+                [1.0, 10.0],
+                [2.0, np.nan],
+                [3.0, 12.0],
+                [4.0, 13.0],
+                [5.0, 14.0],
+                [6.0, 15.0],
+            ],
+            columns=["timestamp", "sales"],
+        )
+
+        input_event_1_data = NumpyEvent.from_dataframe(df_1)
+
+        input_event_1 = input_event_1_data.schema()
+
+        df_2 = pd.DataFrame(
+            [
+                [1.0, 10],
+                [2.0, 0],
+                [3.0, 12],
+                [4.0, 13],
+                [5.0, 14],
+                [6.0, 15],
+            ],
+            columns=["timestamp", "costs"],
+        )
+
+        input_event_2_data = NumpyEvent.from_dataframe(df_2)
+
+        input_event_2 = input_event_2_data.schema()
+        input_event_2.sampling = input_event_1.sampling
+
+        with self.assertRaises(ValueError):
+            operator = EqualFeatureOperator(
+                event_1=input_event_1, event_2=input_event_2
+            )
 
 
 if __name__ == "__main__":
