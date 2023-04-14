@@ -5,19 +5,20 @@ package(
 
 # Libraries
 # =========
-# FIXME: add set_index and drop_index here and in tests
 py_library(
     name = "all_operators",
     srcs = ["all_operators.py"],
     srcs_version = "PY3",
     deps = [
         ":cast",
+        ":drop_index",
         ":glue",
         ":lag",
         ":prefix",
         ":propagate",
         ":sample",
         ":select",
+        ":set_index",
         "//temporian/core/operators/arithmetic",
         "//temporian/core/operators/calendar:day_of_month",
         "//temporian/core/operators/calendar:day_of_week",

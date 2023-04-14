@@ -1,13 +1,15 @@
 """Imports all the packages containing operator implementations."""
 
 # pylint: disable=unused-import
+from temporian.implementation.numpy.operators import cast
+from temporian.implementation.numpy.operators import drop_index
 from temporian.implementation.numpy.operators import glue
 from temporian.implementation.numpy.operators import lag
 from temporian.implementation.numpy.operators import prefix
 from temporian.implementation.numpy.operators import propagate
 from temporian.implementation.numpy.operators import select
+from temporian.implementation.numpy.operators import set_index
 from temporian.implementation.numpy.operators import sample
-from temporian.implementation.numpy.operators import cast
 
 from temporian.implementation.numpy.operators.arithmetic import add
 from temporian.implementation.numpy.operators.arithmetic import subtract

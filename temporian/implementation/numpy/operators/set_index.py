@@ -4,6 +4,7 @@ from typing import Dict, List
 import numpy as np
 
 from temporian.core.operators.set_index import SetIndexOperator
+from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.data.feature import DTYPE_REVERSE_MAPPING
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
@@ -186,3 +187,8 @@ def _set_impl(event: NumpyEvent, set_feat_names: List[str]) -> NumpyEvent:
     return NumpyEvent(
         dst_event_data, NumpySampling(set_feat_names, dst_samp_data)
     )
+
+
+implementation_lib.register_operator_implementation(
+    SetIndexOperator, SetIndexNumpyImplementation
+)

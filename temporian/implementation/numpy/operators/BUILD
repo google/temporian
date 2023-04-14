@@ -12,12 +12,14 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":cast",
+        ":drop_index",
         ":glue",
         ":lag",
         ":prefix",
         ":propagate",
         ":sample",
         ":select",
+        ":set_index",
         "//temporian/implementation/numpy/operators/arithmetic",
         "//temporian/implementation/numpy/operators/arithmetic:add",
         "//temporian/implementation/numpy/operators/arithmetic:divide",
@@ -59,6 +61,19 @@ py_library(
 )
 
 py_library(
+    name = "drop_index",
+    srcs = ["drop_index.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators:drop_index",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+    ],
+)
+
+py_library(
     name = "glue",
     srcs = ["glue.py"],
     srcs_version = "PY3",
@@ -87,37 +102,15 @@ py_library(
 )
 
 py_library(
-    name = "drop_index",
-    srcs = ["drop_index.py"],
+    name = "prefix",
+    srcs = ["prefix.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
-        "//temporian/core/operators:drop_index",
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:sampling",
-    ],
-)
-
-py_library(
-    name = "select",
-    srcs = ["select.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":base",
-        "//temporian/core/operators:select",
+        "//temporian/core/data:duration",
+        "//temporian/core/operators:prefix",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
-    ],
-)
-
-py_library(
-    name = "set_index",
-    srcs = ["set_index.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":base",
-        ":utils",
-        "//temporian/core/operators:set_index",
+        "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
     ],
@@ -155,15 +148,26 @@ py_library(
 )
 
 py_library(
-    name = "prefix",
-    srcs = ["prefix.py"],
+    name = "select",
+    srcs = ["select.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
-        "//temporian/core/data:duration",
-        "//temporian/core/operators:prefix",
+        "//temporian/core/operators:select",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy:utils",
+        "//temporian/implementation/numpy/data:event",
+    ],
+)
+
+py_library(
+    name = "set_index",
+    srcs = ["set_index.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        ":utils",
+        "//temporian/core/operators:set_index",
+        "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
     ],

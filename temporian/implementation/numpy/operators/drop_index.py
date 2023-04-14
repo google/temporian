@@ -4,6 +4,7 @@ from typing import Dict, List, Union
 import numpy as np
 
 from temporian.core.operators.drop_index import DropIndexOperator
+from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.data.feature import DTYPE_REVERSE_MAPPING
@@ -160,3 +161,8 @@ class DropIndexNumpyImplementation(OperatorImplementation):
                 dst_event_data, NumpySampling(dst_index_names, dst_samp_data)
             )
         }
+
+
+implementation_lib.register_operator_implementation(
+    DropIndexOperator, DropIndexNumpyImplementation
+)

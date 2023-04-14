@@ -28,6 +28,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "CALENDAR_DAY_OF_WEEK",
             "CAST",
             "DIVISION",
+            "DROP_INDEX",
             "FLOORDIV",
             "GLUE",
             "LAG",
@@ -39,6 +40,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "PROPAGATE",
             "SAMPLE",
             "SELECT",
+            "SET_INDEX",
             "SIMPLE_MOVING_AVERAGE",
             "SUBTRACTION",
         ]
