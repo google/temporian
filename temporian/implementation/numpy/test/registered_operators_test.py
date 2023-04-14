@@ -26,6 +26,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "ADDITION",
             "CALENDAR_DAY_OF_MONTH",
             "CALENDAR_DAY_OF_WEEK",
+            "CAST",
             "DIVISION",
             "FLOORDIV",
             "GLUE",

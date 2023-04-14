@@ -1,6 +1,7 @@
 """Imports all the packages containing operator definitions."""
 
 # pylint: disable=unused-import
+# FIXME: missing drop_index and set_index
 from temporian.core.operators.arithmetic import divide
 from temporian.core.operators.arithmetic import multiply
 from temporian.core.operators.arithmetic import subtract
@@ -15,6 +16,7 @@ from temporian.core.operators.prefix import prefix
 from temporian.core.operators.propagate import propagate
 from temporian.core.operators.sample import sample
 from temporian.core.operators.select import select
+from temporian.core.operators.cast import cast
 
 from temporian.core.operators.window.simple_moving_average import (
     simple_moving_average,

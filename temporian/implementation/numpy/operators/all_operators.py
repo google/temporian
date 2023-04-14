@@ -7,6 +7,7 @@ from temporian.implementation.numpy.operators import prefix
 from temporian.implementation.numpy.operators import propagate
 from temporian.implementation.numpy.operators import select
 from temporian.implementation.numpy.operators import sample
+from temporian.implementation.numpy.operators import cast
 
 from temporian.implementation.numpy.operators.arithmetic import add
 from temporian.implementation.numpy.operators.arithmetic import subtract

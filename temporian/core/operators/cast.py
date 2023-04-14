@@ -14,7 +14,7 @@
 
 """Type cast operator."""
 from typing import List, Union, Mapping
-from temporian import Feature
+from temporian.core.data.feature import Feature
 
 from temporian.core.data.dtype import DType
 from temporian.core import operator_lib
@@ -29,7 +29,7 @@ class CastOperator(Operator):
     def __init__(
         self,
         event: Event,
-        to: Union(DType, Mapping[Union[str, DType], DType]),
+        to: Union[DType, Mapping[Union[str, DType], DType]],
     ):
         super().__init__()
 
@@ -115,6 +115,6 @@ operator_lib.register_operator(CastOperator)
 
 def cast(
     event: Event,
-    to: Union(DType, Mapping[Union[str, DType], DType]),
+    to: Union[DType, Mapping[Union[str, DType], DType]],
 ) -> Event:
     return CastOperator(event, to).outputs["event"]

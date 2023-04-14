@@ -11,6 +11,7 @@ py_library(
     srcs = ["all_operators.py"],
     srcs_version = "PY3",
     deps = [
+        ":cast",
         ":glue",
         ":lag",
         ":prefix",
@@ -42,6 +43,19 @@ py_library(
     name = "base",
     srcs = ["base.py"],
     srcs_version = "PY3",
+)
+
+py_library(
+    name = "cast",
+    srcs = ["cast.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators:cast",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+    ],
 )
 
 py_library(

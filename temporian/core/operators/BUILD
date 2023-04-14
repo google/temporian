@@ -5,12 +5,13 @@ package(
 
 # Libraries
 # =========
-
+# FIXME: add set_index and drop_index here and in tests
 py_library(
     name = "all_operators",
     srcs = ["all_operators.py"],
     srcs_version = "PY3",
     deps = [
+        ":cast",
         ":glue",
         ":lag",
         ":prefix",
@@ -35,8 +36,18 @@ py_library(
 )
 
 py_library(
-    name = "glue",
-    srcs = ["glue.py"],
+    name = "base",
+    srcs = ["base.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:event",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "cast",
+    srcs = ["cast.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
@@ -48,23 +59,12 @@ py_library(
 )
 
 py_library(
-    name = "base",
-    srcs = ["base.py"],
-    srcs_version = "PY3",
-    deps = [
-        "//temporian/core/data:event",
-        "//temporian/proto:core_py_proto",
-    ],
-)
-
-py_library(
-    name = "lag",
-    srcs = ["lag.py"],
+    name = "glue",
+    srcs = ["glue.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:duration",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
         "//temporian/proto:core_py_proto",
@@ -86,8 +86,8 @@ py_library(
 )
 
 py_library(
-    name = "select",
-    srcs = ["select.py"],
+    name = "lag",
+    srcs = ["lag.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
@@ -100,15 +100,16 @@ py_library(
 )
 
 py_library(
-    name = "set_index",
-    srcs = ["set_index.py"],
+    name = "prefix",
+    srcs = ["prefix.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
+        ":select",
         "//temporian/core:operator_lib",
+        "//temporian/core/data:duration",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
-        "//temporian/core/data:sampling",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -144,16 +145,29 @@ py_library(
 )
 
 py_library(
-    name = "prefix",
-    srcs = ["prefix.py"],
+    name = "select",
+    srcs = ["select.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
-        ":select",
         "//temporian/core:operator_lib",
         "//temporian/core/data:duration",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "set_index",
+    srcs = ["set_index.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/core/data:sampling",
         "//temporian/proto:core_py_proto",
     ],
 )
