@@ -115,20 +115,50 @@ bazel test //...:all
 
 > **Note**: You can use the Bazel test flag `--test_output=streamed` to see the test logs in realtime.
 
-## Benchmarking
+## Benchmarking and profiling
 
-Time and memory benchmarking is available through the following commands:
+Benchmarking and profiling of pre-configured scripts is available as follow:
+
+**Time and memory profiling**
 
 ```shell
-bazel -c opt run benchmark:time -- [name]
-bazel -c opt run benchmark:memory -- [name] [-p]
+bazel run -c opt benchmark:profile_time -- [name]
+bazel run -c opt benchmark:profile_memory -- [name] [-p]
 ```
 
 where `[name]` is the name of one of the python scripts in
-[benchmark/scripts](benchmark/scripts), e.g. `-- basic`.
+[benchmark/scripts](benchmark/scripts), e.g. `bazel run -c opt benchmark:profile_time -- basic`.
 
 `-p` flag displays memory over time plot instead of line-by-line memory
 consumption.
+
+**Time benchmarking**
+
+```shell
+bazel run -c opt benchmark:benchmark_time
+```
+
+Example of results:
+
+```
+================================================================
+Name                              Wall time (s)    CPU time (s)
+================================================================
+from_dataframe:100                   0.01601       0.01600
+from_dataframe:10000                 0.03091       0.03091
+from_dataframe:1000000               1.05764       1.05122
+----------------------------------------------------------------
+simple_moving_average:100            0.00108       0.00108
+simple_moving_average:10000          0.00150       0.00150
+simple_moving_average:1000000        0.00839       0.00839
+----------------------------------------------------------------
+select_and_glue:100                  0.00076       0.00076
+select_and_glue:10000                0.00074       0.00074
+select_and_glue:1000000              0.00104       0.00104
+----------------------------------------------------------------
+...
+================================================================
+```
 
 ## Credits
 
