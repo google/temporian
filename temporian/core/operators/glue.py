@@ -23,7 +23,7 @@ from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 # Maximum number of arguments taken by the glue operator
-MAX_NUM_ARGUMENTS = 10
+MAX_NUM_ARGUMENTS = 30
 
 
 class GlueOperator(Operator):

@@ -9,6 +9,14 @@ from temporian.core.operators.arithmetic import sum
 from temporian.core.operators.glue import glue
 from temporian.core.operators.calendar.day_of_month import calendar_day_of_month
 from temporian.core.operators.calendar.day_of_week import calendar_day_of_week
+from temporian.core.operators.calendar.day_of_year import calendar_day_of_year
+from temporian.core.operators.calendar.month import calendar_month
+from temporian.core.operators.calendar.iso_week import calendar_iso_week
+from temporian.core.operators.calendar.hour import calendar_hour
+from temporian.core.operators.calendar.minute import calendar_minute
+from temporian.core.operators.calendar.second import calendar_second
+from temporian.core.operators.calendar.year import calendar_year
+
 from temporian.core.operators.lag import lag
 from temporian.core.operators.lag import leak
 from temporian.core.operators.prefix import prefix

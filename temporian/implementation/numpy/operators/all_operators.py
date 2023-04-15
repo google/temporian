@@ -19,5 +19,13 @@ from temporian.implementation.numpy.operators.window import moving_sum
 from temporian.implementation.numpy.operators.window import moving_count
 from temporian.implementation.numpy.operators.calendar import day_of_month
 from temporian.implementation.numpy.operators.calendar import day_of_week
+from temporian.implementation.numpy.operators.calendar import day_of_year
+from temporian.implementation.numpy.operators.calendar import year
+from temporian.implementation.numpy.operators.calendar import month
+from temporian.implementation.numpy.operators.calendar import iso_week
+from temporian.implementation.numpy.operators.calendar import hour
+from temporian.implementation.numpy.operators.calendar import minute
+from temporian.implementation.numpy.operators.calendar import second
+
 
 # pylint: enable=unused-import

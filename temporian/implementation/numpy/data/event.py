@@ -106,6 +106,8 @@ class NumpyEvent:
             ... )
             >>> event = NumpyEvent.from_dataframe(df, index_names=["product_id"])
         """
+        df = df.copy(deep=False)
+
         if index_names is None:
             index_names = []
 
@@ -134,6 +136,7 @@ class NumpyEvent:
         )
 
         # convert timestamp column to float
+        # TODO: This is taking a lot of time. Don't use apply.
         df[timestamp_column] = df[timestamp_column].apply(
             convert_date_to_duration
         )
@@ -142,10 +145,15 @@ class NumpyEvent:
         for column in df.columns:
             # if dtype is object, check if it only contains string values
             if df[column].dtype.type is np.object_:
-                if not df[column].apply(lambda x: isinstance(x, str)).all():
+                df[column] = df[column].fillna("")
+                # TODO: Don't use apply.
+                is_string = df[column].apply(lambda x: isinstance(x, str))
+                if not is_string.all():
                     raise ValueError(
-                        "Object columns are only allowed if they contain only"
-                        " string values"
+                        f'Cannot convert column "{column}". Column of type'
+                        ' "Object" can only values. However, the following'
+                        " non-string values were found: "
+                        f" {df[column][~is_string]}"
                     )
                 # convert object column to np.string_
                 df[column] = df[column].astype("string")
@@ -172,9 +180,6 @@ class NumpyEvent:
 
         sampling = {}
         data = {}
-
-        # fill missing values with np.nan
-        df = df.fillna(np.nan)
 
         # The user provided an index
         if index_names:
@@ -205,7 +210,10 @@ class NumpyEvent:
             timestamp = df[timestamp_column].to_numpy()
             sampling[()] = timestamp
             data[()] = [
-                NumpyFeature(feature, df[feature].to_numpy())
+                NumpyFeature(
+                    feature,
+                    df[feature].to_numpy(dtype=df[feature].dtype.type),
+                )
                 for feature in feature_columns
             ]
 
