@@ -52,6 +52,7 @@ print("================")
 
 # During development, set nrows to a small value (e.g. nrows=100) to
 # only load a sample of the dataset.
+# TODO: Default to None when fast enough.
 nrows = 100
 
 raw_path = lambda x: os.path.join(raw_data_dir, x)
@@ -239,14 +240,15 @@ augmented_sales = tp.glue(
 )
 
 # Lagged sales
-for lag in [1, 2, 3, 7]:
-    augmented_sales = tp.glue(
-        augmented_sales,
+lagged_sales = []
+for lag in [1, 2, 3]:
+    lagged_sales.append(
         tp.sample(
             tp.prefix(f"lag_{lag}.", tp.lag(sales, tp.duration.days(lag))),
-            augmented_sales,
-        ),
+            sales,
+        )
     )
+lagged_sales = tp.glue(*lagged_sales)
 
 
 calendar_events = tp.glue(
@@ -255,13 +257,25 @@ calendar_events = tp.glue(
     tp.calendar_month(sales),
 )
 
+label_sales = []
+for lag in [1, 2, 3]:
+    label_sales.append(
+        tp.sample(
+            tp.prefix(f"leak_{lag}.", tp.leak(sales, tp.duration.days(lag))),
+            sales,
+        )
+    )
+label_sales = tp.glue(*label_sales)
+
 # TODO: Sales at other levels (need remove index)
 # TODO: Last calendar events (need since_last, filter)
 # TODO: Skip early time (start + a few days)
 # TODO: Skip before first sales (need filter)
 # TODO: Comparators + boolean operators
 
-tabular_dataset = tp.glue(augmented_sales, calendar_events)
+tabular_dataset = tp.glue(
+    lagged_sales, label_sales, augmented_sales, calendar_events
+)
 
 # We run the computation
 tabular_dataset_data = tp.evaluate(
@@ -271,7 +285,6 @@ tabular_dataset_data = tp.evaluate(
         calendar: calendar_data,
         sell_prices: sell_prices_data,
     },
-    # check_execution=False,
 )
 
 # Plot results
