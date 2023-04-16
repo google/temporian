@@ -44,11 +44,11 @@ def _check_features(
         item_real = values[key]
 
         # Check sampling
-        if item_real.sampling.index != item_def.sampling.index:
+        if item_real.sampling.index != item_def.sampling.index_names:
             raise RuntimeError(
                 f"Non matching {label} sampling. "
                 f"effective={item_real.sampling.index} vs "
-                f"expected={item_def.sampling.index}"
+                f"expected={item_def.sampling.index_names}"
             )
         # Check features
         features = item_real.first_index_features()
@@ -116,10 +116,10 @@ def _check_output(
             output_real = outputs[output_key]
 
             # Check sampling
-            if output_real.sampling.index != output_def.sampling.index:
+            if output_real.sampling.index != output_def.sampling.index_names:
                 raise RuntimeError(
                     f"Non matching sampling. {output_real.sampling.index} vs"
-                    f" {output_def.sampling.index}"
+                    f" {output_def.sampling.index_names}"
                 )
 
             # TODO: Check copy or referencing of feature data.

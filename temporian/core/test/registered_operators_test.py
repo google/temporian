@@ -24,8 +24,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
     def test_base(self):
         # Note: The operators are stored alphabetically.
         expected_operators = [
-            "ARITHMETIC",
-            "GLUE",
+            "ADDITION",
             "CALENDAR_DAY_OF_MONTH",
             "CALENDAR_DAY_OF_WEEK",
             "CALENDAR_ISO_WEEK",
@@ -35,15 +34,20 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "CALENDAR_MONTH",
             "CALENDAR_HOUR",
             "CALENDAR_SECOND",
+            "DIVISION",
+            "FLOORDIV",
+            "GLUE",
             "LAG",
             "MOVING_COUNT",
             "MOVING_STANDARD_DEVIATION",
             "MOVING_SUM",
+            "MULTIPLICATION",
             "PREFIX",
             "PROPAGATE",
             "SAMPLE",
             "SELECT",
             "SIMPLE_MOVING_AVERAGE",
+            "SUBTRACTION",
         ]
 
         self.assertSetEqual(

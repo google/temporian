@@ -3,8 +3,8 @@
 # pylint: disable=unused-import
 from temporian.core.operators.arithmetic import divide
 from temporian.core.operators.arithmetic import multiply
-from temporian.core.operators.arithmetic import substract
-from temporian.core.operators.arithmetic import sum
+from temporian.core.operators.arithmetic import subtract
+from temporian.core.operators.arithmetic import add
 
 from temporian.core.operators.glue import glue
 from temporian.core.operators.calendar.day_of_month import calendar_day_of_month

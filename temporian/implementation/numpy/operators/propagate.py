@@ -21,7 +21,9 @@ class PropagateNumpyImplementation(OperatorImplementation):
         self, event: NumpyEvent, to: NumpyEvent
     ) -> Dict[str, NumpyEvent]:
         # All the features of "to" are added as part of the new index.
-        added_index = self._operator.added_index()
+        added_index = [
+            index_level.name for index_level in self._operator.added_index()
+        ]
         num_new_index = len(added_index)
 
         dst_sampling = NumpySampling(

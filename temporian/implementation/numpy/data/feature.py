@@ -48,6 +48,10 @@ class NumpyFeature:
     def data(self) -> np.ndarray:
         return self._data
 
+    @data.setter
+    def data(self, new_data: np.ndarray):
+        self._data = new_data
+
     def __repr__(self) -> str:
         return f"{self.name}: {self.data.__repr__()}"
 
