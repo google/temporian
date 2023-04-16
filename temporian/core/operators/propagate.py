@@ -22,6 +22,7 @@ from temporian.core.data.feature import Feature
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 from temporian.core.operators.select import select
+from temporian.core.data.sampling import IndexLevel
 from temporian.core.data.sampling import Sampling
 
 
@@ -46,7 +47,7 @@ class Propagate(Operator):
         if len(to.features) == 0:
             raise ValueError("to contains no features")
 
-        self._added_index = [k.name for k in to.features]
+        self._added_index = [IndexLevel(k.name, k.dtype) for k in to.features]
 
         overlap_features = set(self._added_index).intersection(
             event.sampling.index

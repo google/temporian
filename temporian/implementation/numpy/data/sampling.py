@@ -2,10 +2,18 @@ from typing import Dict, List, Tuple
 
 import numpy as np
 
+from temporian.core.data import dtype as dtype_lib
 from temporian.utils import string
 
 # Maximum of printed index when calling repr(event)
 MAX_NUM_PRINTED_INDEX = 5
+
+# same as in numpy/data/event.py, can't import due to circular import error
+PYTHON_DTYPE_MAPPING = {
+    str: dtype_lib.STRING,
+    # TODO: fix this, int doesn't have to be INT64 necessarily
+    int: dtype_lib.INT64,
+}
 
 
 class NumpySampling:
@@ -43,6 +51,14 @@ class NumpySampling:
                 return True
 
         return False
+
+    @property
+    def dtypes(self) -> Dict[str, type]:
+        first_idx_lvl = next(iter(self.data))
+        return {
+            name: PYTHON_DTYPE_MAPPING[type(value)]
+            for name, value in zip(self.index, first_idx_lvl)
+        }
 
     def __repr__(self) -> str:
         with np.printoptions(precision=4, threshold=20):

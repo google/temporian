@@ -172,6 +172,7 @@ message OperatorDef {
       STRING = 2;
       REPEATED_STRING=3;
       FLOAT_64 = 4;
+      BOOL = 5;
     }
   }
 }

@@ -12,10 +12,45 @@ py_test(
     deps = [
         "//temporian/core/data:event",
         "//temporian/core/data:sampling",
-        "//temporian/core/operators:arithmetic",
+        "//temporian/core/operators/arithmetic",
+        "//temporian/core/operators/arithmetic:add",
+        "//temporian/core/operators/arithmetic:divide",
+        "//temporian/core/operators/arithmetic:floordiv",
+        "//temporian/core/operators/arithmetic:multiply",
+        "//temporian/core/operators/arithmetic:subtract",
         "//temporian/implementation/numpy:evaluator",
         "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/operators:arithmetic",
+        "//temporian/implementation/numpy/operators/arithmetic",
+        "//temporian/implementation/numpy/operators/arithmetic:add",
+        "//temporian/implementation/numpy/operators/arithmetic:divide",
+        "//temporian/implementation/numpy/operators/arithmetic:floordiv",
+        "//temporian/implementation/numpy/operators/arithmetic:multiply",
+        "//temporian/implementation/numpy/operators/arithmetic:subtract",
+    ],
+)
+
+py_test(
+    name = "arithmetic_multi_index_test",
+    srcs = ["arithmetic_multi_index_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/testing:absltest dep,
+        "//temporian/core/data:event",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators/arithmetic",
+        "//temporian/core/operators/arithmetic:add",
+        "//temporian/core/operators/arithmetic:subtract",
+        "//temporian/core/operators/arithmetic:multiply",
+        "//temporian/core/operators/arithmetic:divide",
+        "//temporian/core/operators/arithmetic:floordiv",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/operators/arithmetic",
+        "//temporian/implementation/numpy/operators/arithmetic:add",
+        "//temporian/implementation/numpy/operators/arithmetic:subtract",
+        "//temporian/implementation/numpy/operators/arithmetic:multiply",
+        "//temporian/implementation/numpy/operators/arithmetic:divide",
+        "//temporian/implementation/numpy/operators/arithmetic:floordiv",
+        "//temporian/implementation/numpy:evaluator",
     ],
 )
 
@@ -173,6 +208,19 @@ py_test(
 )
 
 py_test(
+    name = "drop_index_test",
+    srcs = ["drop_index_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/testing:absltest dep,
+        "//temporian/core/operators:drop_index",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/operators:drop_index",
+    ],
+)
+
+py_test(
     name = "select_test",
     srcs = ["select_test.py"],
     srcs_version = "PY3",
@@ -182,6 +230,21 @@ py_test(
         "//temporian/implementation/numpy:evaluator",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/operators:select",
+    ],
+)
+
+py_test(
+    name = "set_index_test",
+    srcs = ["set_index_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/testing:absltest dep,
+        "//temporian/core/data:event",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators:set_index",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/operators:set_index",
     ],
 )
 

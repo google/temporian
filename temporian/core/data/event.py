@@ -15,10 +15,12 @@
 """An event is a collection (possibly empty) of timesampled feature values."""
 
 from __future__ import annotations
-from typing import List, Optional, TYPE_CHECKING
+from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
 
+from temporian.core.data import dtype as dtype_lib
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
+from temporian.core.data.sampling import IndexDtypes
 from temporian.utils import string
 
 if TYPE_CHECKING:
@@ -59,14 +61,14 @@ class Event(object):
         )
 
     def __add__(self, other):
-        from temporian.core.operators.arithmetic import sum
+        from temporian.core.operators.arithmetic import add
 
-        return sum(event_1=self, event_2=other)
+        return add(event_1=self, event_2=other)
 
     def __sub__(self, other):
-        from temporian.core.operators.arithmetic import substract
+        from temporian.core.operators.arithmetic import subtract
 
-        return substract(event_1=self, event_2=other)
+        return subtract(event_1=self, event_2=other)
 
     def __mul__(self, other):
         from temporian.core.operators.arithmetic import multiply
@@ -78,6 +80,11 @@ class Event(object):
 
         return divide(numerator=self, denominator=other)
 
+    def __floordiv__(self, other):
+        from temporian.core.operators.arithmetic import floordiv
+
+        return floordiv(numerator=self, denominator=other)
+
     @property
     def sampling(self) -> Sampling:
         return self._sampling
@@ -85,6 +92,14 @@ class Event(object):
     @property
     def features(self) -> List[Feature]:
         return self._features
+
+    @property
+    def feature_names(self) -> List[str]:
+        return [feature.name for feature in self._features]
+
+    @property
+    def dtypes(self) -> Dict[str, dtype_lib.DType]:
+        return {feature.name: feature.dtype for feature in self._features}
 
     @property
     def name(self) -> str:
@@ -105,7 +120,7 @@ class Event(object):
 
 def input_event(
     features: List[Feature],
-    index: List[str] = [],
+    index: List[Tuple[str, IndexDtypes]] = [],
     name: Optional[str] = None,
     sampling: Optional[Sampling] = None,
 ) -> Event:
