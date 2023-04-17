@@ -17,6 +17,12 @@ from temporian.implementation.numpy.operators.arithmetic import multiply
 from temporian.implementation.numpy.operators.arithmetic import divide
 from temporian.implementation.numpy.operators.arithmetic import floordiv
 
+from temporian.implementation.numpy.operators.arithmetic_scalar import add
+from temporian.implementation.numpy.operators.arithmetic_scalar import subtract
+from temporian.implementation.numpy.operators.arithmetic_scalar import multiply
+from temporian.implementation.numpy.operators.arithmetic_scalar import divide
+from temporian.implementation.numpy.operators.arithmetic_scalar import floordiv
+
 from temporian.implementation.numpy.operators.window import (
     simple_moving_average,
 )
