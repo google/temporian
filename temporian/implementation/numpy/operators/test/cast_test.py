@@ -114,7 +114,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
 
         operator = CastOperator(
             event=self.input_event,
-            to={
+            target={
                 "float_64": dtype.FLOAT32,
                 "int_64": dtype.INT32,
                 "str": dtype.FLOAT64,
@@ -133,7 +133,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
 
         operator = CastOperator(
             event=self.input_event,
-            to={
+            target={
                 dtype.FLOAT64: dtype.FLOAT32,
                 dtype.INT64: dtype.INT32,
                 dtype.STRING: dtype.FLOAT64,
@@ -155,7 +155,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
 
         operator = CastOperator(
             event=self.input_event,
-            to={
+            target={
                 "float_64": dtype.FLOAT32,
                 dtype.INT64: dtype.STRING,  # No effect (feature name below precedes)
                 "int_64": dtype.INT32,
@@ -176,7 +176,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
 
         operator = CastOperator(
             event=self.input_event,
-            to={
+            target={
                 "float_64": dtype.FLOAT64,
                 dtype.INT64: dtype.INT64,
                 dtype.STRING: dtype.STRING,
@@ -197,7 +197,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
 
         operator = CastOperator(
             event=self.input_event,
-            to={
+            target={
                 "int_64": dtype.INT32,
             },
             check_overflow=True,
@@ -213,7 +213,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
 
         operator = CastOperator(
             event=self.input_event,
-            to={
+            target={
                 dtype.FLOAT64: dtype.FLOAT32,
             },
             check_overflow=True,
@@ -229,7 +229,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
 
         operator = CastOperator(
             event=self.input_event,
-            to={
+            target={
                 "float_64": dtype.INT64,
             },
             check_overflow=True,

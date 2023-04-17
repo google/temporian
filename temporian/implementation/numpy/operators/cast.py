@@ -15,15 +15,34 @@ from temporian.implementation.numpy.operators.base import OperatorImplementation
 class CastNumpyImplementation(OperatorImplementation):
     def __init__(self, operator: CastOperator) -> None:
         super().__init__(operator)
+        self.dtype_limits = {
+            tp_dtypes.INT32: np.iinfo(np.int32),
+            tp_dtypes.INT64: np.iinfo(np.int64),
+            tp_dtypes.FLOAT32: np.finfo(np.float32),
+            tp_dtypes.FLOAT64: np.finfo(np.float64),
+            tp_dtypes.STRING: np.finfo(np.float64),  # Use highest dtype
+        }
+
+    def _can_overflow(
+        self, origin_dtype: tp_dtypes.DType, dst_dtype: tp_dtypes.DType
+    ):
+        return (
+            self.dtype_limits[origin_dtype].max
+            > self.dtype_limits[dst_dtype].max
+        )
+
+    def _check_overflow(self, data, origin_dtype, dst_dtype):
+        if self._can_overflow(origin_dtype, dst_dtype) and np.any(
+            (data < self.dtype_limits[dst_dtype].min)
+            | (data > self.dtype_limits[dst_dtype].max)
+        ):
+            raise ValueError(
+                f"Overflow casting {origin_dtype}->{dst_dtype} {data=}"
+            )
 
     def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
         target_dtypes = self.operator.attributes["target_dtypes"]
         check_overflow = self.operator.attributes["check_overflow"]
-        dtype_limits = {
-            tp_dtypes.INT32: np.iinfo(np.int32),
-            tp_dtypes.FLOAT32: np.finfo(np.float32),
-            tp_dtypes.INT64: np.iinfo(np.int64),  # may overflow from float64
-        }
 
         # Reuse event if actually no features changed dtype
         if all(
@@ -40,26 +59,22 @@ class CastNumpyImplementation(OperatorImplementation):
 
             for feature in features:
                 # Reuse if both features have the same dtype
-                tp_dtype = target_dtypes[feature.name]
-                if feature.dtype == tp_dtype:
+                dst_dtype = target_dtypes[feature.name]
+                if feature.dtype == dst_dtype:
                     output.data[event_index].append(feature)
                 else:
                     # Check overflow when needed
-                    if check_overflow and tp_dtype in dtype_limits:
-                        if np.any(
-                            (feature.data < dtype_limits[tp_dtype].min)
-                            | (feature.data > dtype_limits[tp_dtype].max)
-                        ):
-                            raise ValueError(
-                                f"Overflow casting to {tp_dtype} at index"
-                                f" {event_index}: {feature.data}"
-                            )
+                    if check_overflow:
+                        self._check_overflow(
+                            feature.data, feature.dtype, dst_dtype
+                        )
+
                     # Create new feature
                     output.data[event_index].append(
                         NumpyFeature(
                             name=feature.name,  # Note: not renaming feature
                             data=feature.data.astype(
-                                DTYPE_REVERSE_MAPPING[tp_dtype]
+                                DTYPE_REVERSE_MAPPING[dst_dtype]
                             ),
                         )
                     )
