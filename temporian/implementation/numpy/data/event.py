@@ -125,6 +125,19 @@ class NumpyEvent:
         return [feature.dtype for feature in self._first_index_features]
 
     @property
+    def index_dtypes(self) -> Dict[str, dtype.DType]:
+        return (
+            {
+                index_name: PYTHON_DTYPE_MAPPING[type(index_key)]
+                for index_name, index_key in zip(
+                    self._index_names, self.first_index_key()
+                )
+            }
+            if self._data
+            else {}
+        )
+
+    @property
     def feature_count(self) -> int:
         return len(self._feature_names)
 
