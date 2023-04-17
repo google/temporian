@@ -373,7 +373,7 @@ class NumpyEvent:
                     break
 
                 feature_repr.append(
-                    f"{feature_name}<{feature.dtype}>: data={feature})"
+                    f"{feature_name}<{feature.dtype}>: {feature})"
                 )
             return "\n".join(feature_repr)
 
@@ -385,12 +385,10 @@ class NumpyEvent:
                     data_repr.append("...")
                     break
                 data_repr.append(
-                    f"{index_key}:\n{string.indent(repr_features(index_data.features))}"
+                    f"{index_key}:"
+                    f" {index_data.timestamps}\n{string.indent(repr_features(index_data.features))}"
                 )
             data_repr = string.indent("\n".join(data_repr))
-
-        # Representation of the "sampling" field
-        # sampling_repr = string.indent(self.sampling.__repr__())
 
         return (
             "data:"
