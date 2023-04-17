@@ -53,7 +53,7 @@ class NumpyFeature:
         self._data = new_data
 
     def __repr__(self) -> str:
-        return f"{self.name}: {self.data.__repr__()}"
+        return f"{self.name} ({len(self.data)}): {self.data.__repr__()}"
 
     def __eq__(self, __o: object) -> bool:
         if not isinstance(__o, NumpyFeature):

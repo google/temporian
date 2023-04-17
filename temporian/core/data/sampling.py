@@ -30,6 +30,9 @@ class IndexLevel(NamedTuple):
     name: str
     dtype: IndexDtypes
 
+    def __repr__(self):
+        return f'"{self.name}"({self.dtype})'
+
 
 class Sampling(object):
     def __init__(
@@ -57,6 +60,10 @@ class Sampling(object):
     def index_names(self) -> List[str]:
         return [index_level.name for index_level in self._index]
 
+    def index_dtypes_list(self) -> List[IndexDtypes]:
+        return [index_level.dtype for index_level in self._index]
+
+    # TODO: Remove, replace with index_dtypes_list.
     @property
     def index_dtypes(self) -> Dict[str, IndexDtypes]:
         return {

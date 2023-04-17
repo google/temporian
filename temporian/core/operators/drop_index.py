@@ -27,35 +27,30 @@ class DropIndexOperator(Operator):
     def __init__(
         self,
         event: Event,
-        index_names: List[str],
+        index_to_drop: List[str],
         keep: bool,
     ) -> None:
         super().__init__()
 
-        self._index_names = index_names
+        # "index_to_drop" is the list of indexes in "event" to drop. If "keep"
+        # is true, those indexes will be converted into features.
+        self._index_to_drop = index_to_drop
         self._keep = keep
 
-        # input event
         self.add_input("event", event)
-
-        # attributes
-        self.add_attribute("index_names", index_names)
+        self.add_attribute("index_to_drop", index_to_drop)
         self.add_attribute("keep", keep)
 
-        # output features
-        output_features = self._generate_output_features(
-            event, index_names, keep
-        )
+        output_features = self._output_features(event, index_to_drop, keep)
 
-        # output sampling
         output_sampling = Sampling(
             index=[
                 (index_name, index_dtype)
                 for index_name, index_dtype in event.sampling.index_dtypes.items()
-                if index_name not in index_names
+                if index_name not in index_to_drop
             ]
         )
-        # output event
+
         self.add_output(
             "event",
             Event(
@@ -66,48 +61,54 @@ class DropIndexOperator(Operator):
         )
         self.check()
 
-    def _generate_output_features(
-        self, event: Event, index_names: List[str], keep: bool
+    def _output_features(
+        self, event: Event, index_to_drop: List[str], keep: bool
     ) -> List[Feature]:
-        output_features = [
-            Feature(name=feature.name, dtype=feature.dtype)
-            for feature in event.features
-        ]
+        new_features = []
         if keep:
-            output_features = ([None] * len(index_names)) + output_features
-            for i, index_name in enumerate(index_names):
+            # Convert the index to drop into features.
+            #
+            # Note: The new features are added first.
+
+            new_features = []
+            for index_name in index_to_drop:
                 # check no other feature exists with this name
                 if index_name in event.feature_names:
                     raise ValueError(
                         f"Feature name {index_name} coming from index already"
                         " exists in event."
-                    )  # TODO: add automatic suffix instead of raising error? add capability to rename index
+                    )
 
-                output_features[i] = Feature(
-                    name=index_name,
-                    dtype=event.sampling.index_dtypes[index_name],
+                new_features.append(
+                    Feature(
+                        name=index_name,
+                        dtype=event.sampling.index_dtypes[index_name],
+                    )
                 )
 
-        return output_features
+        existing_features = [
+            Feature(name=feature.name, dtype=feature.dtype)
+            for feature in event.features
+        ]
+        return new_features + existing_features
 
-    @property
-    def dst_feat_names(self) -> List[str]:
+    def dst_feature_names(self) -> List[str]:
         feature_names = self.inputs["event"].feature_names
-        return (
-            self._index_names + feature_names if self._keep else feature_names
-        )
+        if self._keep:
+            return self._index_to_drop + feature_names
+        else:
+            return feature_names
 
-    @property
     def dst_index_names(self) -> List[str]:
         return [
             index_level.name
             for index_level in self.inputs["event"].sampling.index
-            if index_level.name not in self._index_names
+            if index_level.name not in self._index_to_drop
         ]
 
     @property
-    def index_names(self) -> List[str]:
-        return self._index_names
+    def index_to_drop(self) -> List[str]:
+        return self._index_to_drop
 
     @property
     def keep(self) -> bool:
@@ -137,11 +138,11 @@ class DropIndexOperator(Operator):
 operator_lib.register_operator(DropIndexOperator)
 
 
-def _process_index_names(
+def _normalize_index_to_drop(
     event: Event, index_names: Optional[Union[List[str], str]]
 ) -> List[str]:
     if index_names is None:
-        return event.sampling.index
+        return event.sampling.index_names
 
     if isinstance(index_names, str):
         index_names = [index_names]
@@ -153,11 +154,12 @@ def _process_index_names(
     missing_index_names = [
         index_name
         for index_name in index_names
-        if index_name not in event.sampling.index
+        if index_name not in event.sampling.index_names
     ]
     if missing_index_names:
         raise KeyError(
-            f"{missing_index_names} are missing from the input event's index."
+            f"Dropped indexes {missing_index_names} are missing from the"
+            f" input index. The input index is {event.sampling.index}."
         )
 
     return index_names
@@ -165,7 +167,7 @@ def _process_index_names(
 
 def drop_index(
     event: Event,
-    index_names: Optional[Union[str, List[str]]] = None,
+    index_to_drop: Optional[Union[str, List[str]]] = None,
     keep: bool = True,
 ) -> Event:
     """
@@ -177,7 +179,7 @@ def drop_index(
         event:
             The input `Event` object from which the specified index columns
             should be removed.
-        index_names:
+        index_to_drop:
             The index column(s) to be removed from the input `Event`.
             This can be a single column name (str) or a list of column names
             (List[str]). If not specified or set to `None`, all index columns in
@@ -217,5 +219,5 @@ def drop_index(
            Output `Event` will have index names [] (empty index) and features
            names ['X', 'Y', 'Z', 'A', 'B', 'C'].
     """
-    index_names = _process_index_names(event, index_names)
-    return DropIndexOperator(event, index_names, keep).outputs["event"]
+    index_to_drop = _normalize_index_to_drop(event, index_to_drop)
+    return DropIndexOperator(event, index_to_drop, keep).outputs["event"]

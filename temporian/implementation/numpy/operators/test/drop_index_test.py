@@ -65,7 +65,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         )
         # instance core operator
         operator = DropIndexOperator(
-            self.input_evt, index_names=["store_id", "item_id"], keep=True
+            self.input_evt, index_to_drop=["store_id", "item_id"], keep=True
         )
         # instance operator implementation
         operator_impl = DropIndexNumpyImplementation(operator)
@@ -100,7 +100,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         )
         # instance core operator
         operator = DropIndexOperator(
-            self.input_evt, index_names=["item_id"], keep=True
+            self.input_evt, index_to_drop=["item_id"], keep=True
         )
         # instance operator implementation
         operator_impl = DropIndexNumpyImplementation(operator)
@@ -133,7 +133,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         )
         # instance core operator
         operator = DropIndexOperator(
-            self.input_evt, index_names=["store_id"], keep=True
+            self.input_evt, index_to_drop=["store_id"], keep=True
         )
         # instance operator implementation
         operator_impl = DropIndexNumpyImplementation(operator)
@@ -167,7 +167,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         )
         # instance core operator
         operator = DropIndexOperator(
-            self.input_evt, index_names=["item_id"], keep=False
+            self.input_evt, index_to_drop=["item_id"], keep=False
         )
         # instance operator implementation
         operator_impl = DropIndexNumpyImplementation(operator)
@@ -201,7 +201,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         )
         # instance core operator
         operator = DropIndexOperator(
-            self.input_evt, index_names=["store_id"], keep=False
+            self.input_evt, index_to_drop=["store_id"], keep=False
         )
         # instance operator implementation
         operator_impl = DropIndexNumpyImplementation(operator)
@@ -213,6 +213,40 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
 
         # validate output
         self.assertEqual(op_numpy_output_evt, expected_numpy_output_evt)
+
+    def test_str_index(self):
+        event_data = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                {
+                    "timestamp": [1, 2, 2, 3],
+                    "a": [1, 2, 3, 4],
+                    "d": ["D1", "D2", "D3", "D4"],
+                    "b": ["B1", "B1", "B2", "B2"],
+                    "c": ["C1", "C2", "C1", "C2"],
+                }
+            ),
+            index_names=["b", "c"],
+        )
+        event = event_data.schema()
+
+        expected_output = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                {
+                    "timestamp": [1, 2, 2, 3],
+                    "b": ["B1", "B1", "B2", "B2"],
+                    "a": [1, 2, 3, 4],
+                    "d": ["D1", "D2", "D3", "D4"],
+                    "c": ["C1", "C2", "C1", "C2"],
+                }
+            ),
+            index_names=["c"],
+        )
+
+        # Run op
+        op = DropIndexOperator(event=event, index_to_drop=["b"], keep=True)
+        instance = DropIndexNumpyImplementation(op)
+        output = instance.call(event=event_data)["event"]
+        self.assertEqual(output, expected_output)
 
 
 if __name__ == "__main__":

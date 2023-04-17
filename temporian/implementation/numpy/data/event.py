@@ -49,12 +49,18 @@ class NumpyEvent:
             return []
         return self.data[self.first_index_value()]
 
+    # TODO: To remove
     @property
     def dtypes(self) -> Dict[str, dtype_lib.DType]:
         return {
             feature.name: feature.dtype
             for feature in self._first_index_features
         }
+
+    # TODO: Rename to "dtypes".
+    def dtypes_list(self) -> List[dtype_lib.DType]:
+        # TODO: Handle case where there is no data.
+        return [feature.dtype for feature in self._first_index_features]
 
     @sampling.setter
     def sampling(self, sampling: NumpySampling) -> None:
@@ -299,7 +305,9 @@ class NumpyEvent:
                 if idx > MAX_NUM_PRINTED_FEATURES:
                     feature_repr.append("...")
                     break
-                feature_repr.append(f"{f.name} <{f.dtype}>: {f.data}")
+                feature_repr.append(
+                    f"{f.name} <{f.dtype}> ({len(f.data)}): {f.data}"
+                )
             return "\n".join(feature_repr)
 
         # Representation of the "data" field

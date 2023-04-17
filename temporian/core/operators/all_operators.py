@@ -16,7 +16,8 @@ from temporian.core.operators.calendar.hour import calendar_hour
 from temporian.core.operators.calendar.minute import calendar_minute
 from temporian.core.operators.calendar.second import calendar_second
 from temporian.core.operators.calendar.year import calendar_year
-
+from temporian.core.operators.set_index import set_index
+from temporian.core.operators.drop_index import drop_index
 from temporian.core.operators.lag import lag
 from temporian.core.operators.lag import leak
 from temporian.core.operators.prefix import prefix
@@ -32,5 +33,6 @@ from temporian.core.operators.window.moving_standard_deviation import (
 )
 from temporian.core.operators.window.moving_sum import moving_sum
 from temporian.core.operators.window.moving_count import moving_count
+from temporian.core.operators.unique_timestamps import unique_timestamps
 
 # pylint: enable=unused-import

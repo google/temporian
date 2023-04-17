@@ -28,7 +28,7 @@ class PlotterTest(absltest.TestCase):
                 },
             ),
         )
-        _ = plotter.plot(event, index=1)
+        _ = plotter.plot(event, indexes=(1,))
 
 
 if __name__ == "__main__":

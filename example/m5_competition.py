@@ -201,7 +201,7 @@ print("============")
 
 plot_options = {
     # Only plot the first index / first product.
-    "index": None,
+    # "index": None,
     # We only plot 1year of data to make the plot more readable.
     "min_time": datetime(2015, 1, 1),
     "max_time": datetime(2016, 1, 1),
@@ -227,8 +227,6 @@ calendar = calendar_data.schema()
 sell_prices = sell_prices_data.schema()
 
 augmented_sales = tp.glue(
-    # Raw sales
-    sales,
     # Moving average of sales
     tp.prefix("sma_7.", tp.simple_moving_average(sales, tp.duration.days(7))),
     tp.prefix("sma_28.", tp.simple_moving_average(sales, tp.duration.days(28))),
@@ -267,6 +265,21 @@ for lag in [1, 2, 3]:
     )
 label_sales = tp.glue(*label_sales)
 
+# Sum of the sales of all the items in the same departement sampled each day.
+sales_per_dept = tp.drop_index(sales, "item_id")
+sum_dayly_sales_per_dept = tp.prefix(
+    "per_dept.sum_28_",
+    tp.moving_sum(
+        sales_per_dept["sales"],
+        tp.duration.days(28),
+        tp.unique_timestamps(sales_per_dept["item_id"]),
+    ),
+)
+
+sales_aggregated_item_level = tp.sample(
+    tp.propagate(sum_dayly_sales_per_dept, sales), sales
+)
+
 # TODO: Sales at other levels (need remove index)
 # TODO: Last calendar events (need since_last, filter)
 # TODO: Skip early time (start + a few days)
@@ -274,7 +287,12 @@ label_sales = tp.glue(*label_sales)
 # TODO: Comparators + boolean operators
 
 tabular_dataset = tp.glue(
-    lagged_sales, label_sales, augmented_sales, calendar_events
+    sales,  # Raw sales
+    sales_aggregated_item_level,
+    # lagged_sales,
+    # label_sales,
+    # augmented_sales,
+    # calendar_events,
 )
 
 # We run the computation

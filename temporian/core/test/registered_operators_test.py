@@ -48,6 +48,9 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "SELECT",
             "SIMPLE_MOVING_AVERAGE",
             "SUBTRACTION",
+            "SET_INDEX",
+            "DROP_INDEX",
+            "UNIQUE_TIMESTAMPS",
         ]
 
         self.assertSetEqual(

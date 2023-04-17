@@ -57,7 +57,8 @@ class GlueOperator(Operator):
             for f in event.features:
                 if f.name in feature_names:
                     raise ValueError(
-                        f"Feature {f.name} is defined in multiple input events."
+                        f'Feature "{f.name}" is defined in multiple input'
+                        " events."
                     )
                 feature_names.add(f.name)
 
@@ -65,7 +66,8 @@ class GlueOperator(Operator):
                 first_sampling = event.sampling
             elif event.sampling is not first_sampling:
                 raise ValueError(
-                    "All the events do not have the same sampling."
+                    "All glue arguments should have the same sampling."
+                    f" {first_sampling} is different from {event.sampling}."
                 )
 
         # outputs
@@ -120,10 +122,13 @@ def glue(
 
         # Output has features A, B, C, D, E & F, and the same sampling as
         # event_1
-        output = np.glue(event_1,
+        output = tp.glue(event_1,
             tp.sample(event_2, sampling=event_1),
             tp.sample(event_3, sampling=event_1))
     """
+
+    if len(events) == 1:
+        return events[0]
 
     # Note: The event should be called "event_{idx}" with idx in [0, MAX_NUM_ARGUMENTS).
     dict_events = {f"event_{idx}": event for idx, event in enumerate(events)}

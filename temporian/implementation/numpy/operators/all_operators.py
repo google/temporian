@@ -7,7 +7,8 @@ from temporian.implementation.numpy.operators import prefix
 from temporian.implementation.numpy.operators import propagate
 from temporian.implementation.numpy.operators import select
 from temporian.implementation.numpy.operators import sample
-
+from temporian.implementation.numpy.operators import set_index
+from temporian.implementation.numpy.operators import drop_index
 from temporian.implementation.numpy.operators.arithmetic import add
 from temporian.implementation.numpy.operators.arithmetic import subtract
 from temporian.implementation.numpy.operators.arithmetic import multiply
@@ -31,6 +32,6 @@ from temporian.implementation.numpy.operators.calendar import iso_week
 from temporian.implementation.numpy.operators.calendar import hour
 from temporian.implementation.numpy.operators.calendar import minute
 from temporian.implementation.numpy.operators.calendar import second
-
+from temporian.implementation.numpy.operators import unique_timestamps
 
 # pylint: enable=unused-import
