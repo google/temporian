@@ -104,9 +104,7 @@ def filter_event(
     event: Event,
     condition: Event,
 ) -> Event:
-    """Filter operator.
-
-    Removes event features samplings and values where the condition is False.
+    """Filters out events for which the condition is false.
 
     Args:
         event: event to filter
