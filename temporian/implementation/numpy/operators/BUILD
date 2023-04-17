@@ -30,6 +30,7 @@ py_library(
         "//temporian/implementation/numpy/operators/arithmetic_scalar",
         "//temporian/implementation/numpy/operators/arithmetic_scalar:add",
         "//temporian/implementation/numpy/operators/arithmetic_scalar:divide",
+        "//temporian/implementation/numpy/operators/arithmetic_scalar:equal",
         "//temporian/implementation/numpy/operators/arithmetic_scalar:floordiv",
         "//temporian/implementation/numpy/operators/arithmetic_scalar:multiply",
         "//temporian/implementation/numpy/operators/arithmetic_scalar:subtract",

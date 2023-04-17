@@ -39,6 +39,19 @@ py_library(
 )
 
 py_library(
+    name = "equal",
+    srcs = ["equal.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators/arithmetic_scalar:equal",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:feature",
+    ],
+)
+
+py_library(
     name = "subtract",
     srcs = ["subtract.py"],
     srcs_version = "PY3",

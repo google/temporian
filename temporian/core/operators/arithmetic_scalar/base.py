@@ -42,6 +42,9 @@ class BaseArithmeticScalarOperator(Operator):
         # check that every dtype of event feature is equal to value dtype
         value_dtype = python_type_to_temporian_dtype(type(value))
 
+        # TODO: Check if we want to compare kind of dtype or just dtype
+        # it makes sense to allow subtypes of the same kind. Value will
+        # always be 64 bits. We need a way to allow 32 bits.
         for feature in event.features:
             if feature.dtype != value_dtype:
                 raise ValueError(

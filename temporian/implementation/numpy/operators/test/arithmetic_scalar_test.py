@@ -21,6 +21,7 @@ from temporian.core.operators.arithmetic_scalar import (
     SubtractScalarOperator,
     MultiplyScalarOperator,
     DivideScalarOperator,
+    EqualScalarOperator,
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators.arithmetic_scalar import (
@@ -28,6 +29,7 @@ from temporian.implementation.numpy.operators.arithmetic_scalar import (
     SubtractScalarNumpyImplementation,
     MultiplyScalarNumpyImplementation,
     DivideScalarNumpyImplementation,
+    EqualScalarNumpyImplementation,
 )
 
 
@@ -182,6 +184,52 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                 event=self.event,
                 value=value,
             )
+
+    def test_correct_equal(self) -> None:
+        """Test correct equal operator."""
+
+        self.event_data = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1.0, 10.0],
+                    [0, 2.0, 0.0],
+                    [0, 3.0, 0.1],
+                    [0, 4.0, np.nan],
+                    [0, 5.0, 0.0],
+                ],
+                columns=["store_id", "timestamp", "sales"],
+            ),
+            index_names=["store_id"],
+        )
+
+        self.event = self.event_data.schema()
+
+        value = 0.0
+
+        numpy_output_event = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1.0, False],
+                    [0, 2.0, True],
+                    [0, 3.0, False],
+                    [0, 4.0, False],
+                    [0, 5.0, True],
+                ],
+                columns=["store_id", "timestamp", "equal_sales_0.0"],
+            ),
+            index_names=["store_id"],
+        )
+
+        operator = EqualScalarOperator(
+            event=self.event,
+            value=value,
+        )
+
+        impl = EqualScalarNumpyImplementation(operator)
+
+        operator_output = impl.call(event=self.event_data)
+
+        self.assertEqual(numpy_output_event, operator_output["event"])
 
 
 if __name__ == "__main__":
