@@ -1,16 +1,14 @@
 from collections import defaultdict
-from typing import Dict, List, Union, NamedTuple
+from typing import Dict, List
 
 import numpy as np
 
 from temporian.core.operators.drop_index import DropIndexOperator
 from temporian.implementation.numpy import implementation_lib
+from temporian.implementation.numpy.data.event import IndexData
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.data.feature import DTYPE_REVERSE_MAPPING
-from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.implementation.numpy.operators.base import OperatorImplementation
-from temporian.implementation.numpy import implementation_lib
 
 
 class DstIndexGroup:
@@ -35,8 +33,8 @@ class DropIndexNumpyImplementation(OperatorImplementation):
         index_to_drop = self.operator.index_to_drop
         keep = self.operator.keep
         dst_feature_names = self.operator.dst_feature_names()
-        src_index_dtypes = event.sampling.dtypes
-        src_index_names = event.sampling.index
+        src_index_dtypes = event.index_dtypes
+        src_index_names = event.index_names
 
         # Idx in src_index_names of the indexes to keep in the output.
         final_index_idxs = [
@@ -88,7 +86,6 @@ class DropIndexNumpyImplementation(OperatorImplementation):
         #
         # TODO: this is merging sorted arrays, we should later improve this code
         # by avoiding the full sort
-        dst_sampling_data = {}
         dst_event_data = {}
         for dst_index_lvl, group in dst_index_groups.items():
             # Append together all the timestamps.
@@ -96,9 +93,6 @@ class DropIndexNumpyImplementation(OperatorImplementation):
 
             # Sort the timestamps.
             sorted_idxs = np.argsort(local_dst_sampling_data, kind="mergesort")
-            dst_sampling_data[dst_index_lvl] = local_dst_sampling_data[
-                sorted_idxs
-            ]
 
             # Append together and sort (according to the timestamps) all the feature values.
             local_dst_event_data = []
@@ -107,21 +101,18 @@ class DropIndexNumpyImplementation(OperatorImplementation):
             ):
                 raw_data = [f[dst_feature_idx] for f in group.features]
                 local_dst_event_data.append(
-                    NumpyFeature(
-                        name=dst_feature_name,
-                        data=np.concatenate(raw_data)[sorted_idxs],
-                    )
+                    data=np.concatenate(raw_data)[sorted_idxs],
                 )
-            dst_event_data[dst_index_lvl] = local_dst_event_data
+            dst_event_data[dst_index_lvl] = IndexData(
+                local_dst_event_data, local_dst_sampling_data[sorted_idxs]
+            )
 
         return {
             "event": NumpyEvent(
-                dst_event_data,
-                NumpySampling(
-                    self.operator.dst_index_names(),
-                    dst_sampling_data,
-                    is_unix_timestamp=event.sampling.is_unix_timestamp,
-                ),
+                data=dst_event_data,
+                feature_names=dst_feature_names,
+                index_names=self.operator.dst_feature_names(),
+                is_unix_timestamp=event.is_unix_timestamp,
             )
         }
 
