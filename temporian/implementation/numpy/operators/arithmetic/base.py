@@ -52,7 +52,7 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
         if event_1.sampling != event_2.sampling:
             raise ValueError("Sampling of both events must be equal.")
 
-        if event_1.feature_count() != event_2.feature_count():
+        if event_1.feature_count != event_2.feature_count:
             raise ValueError(
                 "Both events must have the same number of features."
             )
@@ -68,7 +68,7 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
                 event_2_feature = event_2_features[i]
 
                 # check both features have the same dtype
-                if event_1_feature.dtype != event_2_feature.dtype:
+                if event_1_feature.dtype.type != event_2_feature.dtype.type:
                     raise ValueError(
                         "Both features must have the same dtype."
                         f" event_1_feature: {event_1_feature} has dtype "
