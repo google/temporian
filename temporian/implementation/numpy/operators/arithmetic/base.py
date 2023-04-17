@@ -16,8 +16,8 @@ from typing import Dict
 from abc import ABC, abstractmethod
 
 from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
+from temporian.implementation.numpy.data.event import IndexData
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -27,7 +27,7 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
 
     @abstractmethod
     def _do_operation(
-        self, event_1_feature: NumpyFeature, event_2_feature: NumpyFeature
+        self, event_1_feature: np.ndarray, event_2_feature: np.ndarray
     ) -> np.ndarray:
         """
         Perform the actual arithmetic operation corresponding to the subclass
@@ -57,14 +57,22 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
                 "Both events must have the same number of features."
             )
 
-        output = NumpyEvent(data={}, sampling=event_1.sampling)
-
-        for event_index, event_1_features in event_1.data.items():
-            output.data[event_index] = []
-
-            event_2_features = event_2.data[event_index]
-
-            for i, event_1_feature in enumerate(event_1_features):
+        prefix = self._operator.prefix
+        output = NumpyEvent(
+            data={},
+            feature_names=[
+                f"{prefix}_{feature_name_1}_{feature_name_2}"
+                for feature_name_1, feature_name_2 in zip(
+                    event_1.feature_names, event_2.feature_names
+                )
+            ],
+            index_names=event_1.index_names,
+            is_unix_timestamp=event_1.is_unix_timestamp,
+        )
+        for index_key, index_data in event_1.data.items():
+            output.data[index_key] = IndexData([], index_data.timestamps)
+            event_2_features = event_2.data[index_key].features
+            for i, event_1_feature in enumerate(index_data.features):
                 event_2_feature = event_2_features[i]
 
                 # check both features have the same dtype
@@ -77,14 +85,6 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
                     )
 
                 result = self._do_operation(event_1_feature, event_2_feature)
-
-                output.data[event_index].append(
-                    NumpyFeature(
-                        name=self._operator.output_feature_name(
-                            event_1_feature, event_2_feature
-                        ),
-                        data=result,
-                    )
-                )
+                output.data[index_key].features.append(result)
 
         return {"event": output}

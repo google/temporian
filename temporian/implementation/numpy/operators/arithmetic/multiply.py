@@ -14,7 +14,6 @@
 import numpy as np
 from temporian.implementation.numpy.operators.arithmetic.base import (
     BaseArithmeticNumpyImplementation,
-    NumpyFeature,
 )
 from temporian.core.operators.arithmetic import MultiplyOperator
 from temporian.implementation.numpy import implementation_lib
@@ -27,9 +26,9 @@ class MultiplyNumpyImplementation(BaseArithmeticNumpyImplementation):
         super().__init__(operator)
 
     def _do_operation(
-        self, event_1_feature: NumpyFeature, event_2_feature: NumpyFeature
+        self, event_1_feature: np.ndarray, event_2_feature: np.ndarray
     ) -> np.ndarray:
-        return event_1_feature.data * event_2_feature.data
+        return event_1_feature * event_2_feature
 
 
 implementation_lib.register_operator_implementation(
