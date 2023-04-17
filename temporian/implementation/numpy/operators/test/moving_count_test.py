@@ -26,9 +26,6 @@ from temporian.implementation.numpy.operators.window.moving_count import (
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.core.data import event as event_lib
-from temporian.core.data import feature as feature_lib
-from temporian.core.data import dtype as dtype_lib
-import math
 from temporian.implementation.numpy_cc.operators import window as window_cc
 from numpy.testing import assert_array_equal
 
