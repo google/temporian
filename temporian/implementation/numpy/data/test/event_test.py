@@ -35,12 +35,12 @@ class EventTest(absltest.TestCase):
             """data:
 		index_names=['x']
 		feature_names=['a', 'b']
-    (1,):
-        a<int64>: data=[1 2 3])
-        b<int64>: data=[4 5 6])
-    (2,):
-        a<int64>: data=[7 8])
-        b<int64>: data=[ 9 10])""",
+    (1,): [0.1 0.2 0.3]
+        a<int64>: [1 2 3])
+        b<int64>: [4 5 6])
+    (2,): [0.4 0.5]
+        a<int64>: [7 8])
+        b<int64>: [ 9 10])""",
         )
 
 
