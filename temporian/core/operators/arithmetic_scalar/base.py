@@ -16,6 +16,7 @@
 
 from abc import abstractmethod
 
+from temporian.core.data.dtype import DType
 from temporian.core.data.dtype import python_type_to_temporian_dtype
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
@@ -52,7 +53,7 @@ class BaseArithmeticScalarOperator(Operator):
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
                 name=f"{self.prefix}_{feature.name}_{value}",
-                dtype=value_dtype,
+                dtype=self.output_feature_dtype(feature),
                 sampling=event.sampling,
                 creator=self,
             )
@@ -96,3 +97,6 @@ class BaseArithmeticScalarOperator(Operator):
     @abstractmethod
     def prefix(self) -> str:
         """Get the prefix to use for the output features."""
+
+    def output_feature_dtype(self, feature: Feature) -> DType:
+        return feature.dtype

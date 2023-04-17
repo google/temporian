@@ -37,6 +37,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "CALENDAR_SECOND",
             "DIVISION",
             "DIVISION_SCALAR",
+            "EQUAL_SCALAR",
             "FILTER",
             "FLOORDIV",
             "FLOORDIV_SCALAR",

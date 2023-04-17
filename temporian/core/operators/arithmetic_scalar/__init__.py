@@ -21,4 +21,9 @@ from temporian.core.operators.arithmetic_scalar.multiply import (
     MultiplyScalarOperator,
 )
 
+from temporian.core.operators.arithmetic_scalar.equal import (
+    equal_scalar,
+    EqualScalarOperator,
+)
+
 # pylint: enable=unused-import
