@@ -30,6 +30,27 @@ py_test(
 )
 
 py_test(
+    name = "arithmetic_scalar_test",
+    srcs = ["arithmetic_scalar_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/operators/arithmetic_scalar",
+        "//temporian/core/operators/arithmetic_scalar:add",
+        "//temporian/core/operators/arithmetic_scalar:divide",
+        "//temporian/core/operators/arithmetic_scalar:floordiv",
+        "//temporian/core/operators/arithmetic_scalar:multiply",
+        "//temporian/core/operators/arithmetic_scalar:subtract",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/operators/arithmetic_scalar",
+        "//temporian/implementation/numpy/operators/arithmetic_scalar:add",
+        "//temporian/implementation/numpy/operators/arithmetic_scalar:divide",
+        "//temporian/implementation/numpy/operators/arithmetic_scalar:floordiv",
+        "//temporian/implementation/numpy/operators/arithmetic_scalar:multiply",
+        "//temporian/implementation/numpy/operators/arithmetic_scalar:subtract",
+    ],
+)
+
+py_test(
     name = "arithmetic_multi_index_test",
     srcs = ["arithmetic_multi_index_test.py"],
     srcs_version = "PY3",

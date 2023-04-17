@@ -36,6 +36,8 @@ class BaseArithmeticScalarOperator(Operator):
         # inputs
         self.add_input("event", event)
 
+        self.add_attribute("value", value)
+
         # check that every dtype of event feature is equal to value dtype
         value_dtype = python_type_to_temporian_dtype(type(value))
 
@@ -50,7 +52,7 @@ class BaseArithmeticScalarOperator(Operator):
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
                 name=f"{self.prefix}_{feature.name}_{value}",
-                dtype=value.dtype,
+                dtype=value_dtype,
                 sampling=event.sampling,
                 creator=self,
             )
