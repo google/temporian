@@ -14,14 +14,12 @@
 
 """Propagate operator."""
 
-from typing import List, Union
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.base import Operator
-from temporian.core.operators.select import select
 from temporian.proto import core_pb2 as pb
 
 
