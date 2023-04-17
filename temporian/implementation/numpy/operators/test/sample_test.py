@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import math
 from absl.testing import absltest
 
 import pandas as pd
 import numpy as np
-import math
+
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.sample import Sample
 from temporian.implementation.numpy.operators.sample import (
