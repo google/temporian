@@ -76,14 +76,14 @@ class PrototypeTest(absltest.TestCase):
         self.expected_output_event = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
-                    [TRYOLABS_SHOP, MATE_ID, 0.0, 14, -14, 0],
-                    [TRYOLABS_SHOP, MATE_ID, 1.0, 15, -15, 14],
-                    [TRYOLABS_SHOP, MATE_ID, 2.0, 16, -16, 15],
-                    [TRYOLABS_SHOP, BOOK_ID, 1.0, 10, -10, 0],
-                    [GOOGLE_SHOP, BOOK_ID, 1.0, 7, -7, 0],
-                    [GOOGLE_SHOP, BOOK_ID, 2.0, 8, -8, 7],
-                    [GOOGLE_SHOP, PIXEL_ID, 0.0, 3, -3, 0],
-                    [GOOGLE_SHOP, PIXEL_ID, 1.0, 4, -4, 3],
+                    [TRYOLABS_SHOP, MATE_ID, 0.0, 14, -14, 0, 24],
+                    [TRYOLABS_SHOP, MATE_ID, 1.0, 15, -15, 14, 25],
+                    [TRYOLABS_SHOP, MATE_ID, 2.0, 16, -16, 15, 26],
+                    [TRYOLABS_SHOP, BOOK_ID, 1.0, 10, -10, 0, 20],
+                    [GOOGLE_SHOP, BOOK_ID, 1.0, 7, -7, 0, 17],
+                    [GOOGLE_SHOP, BOOK_ID, 2.0, 8, -8, 7, 18],
+                    [GOOGLE_SHOP, PIXEL_ID, 0.0, 3, -3, 0, 13],
+                    [GOOGLE_SHOP, PIXEL_ID, 1.0, 4, -4, 3, 14],
                 ],
                 columns=[
                     "store_id",
@@ -92,6 +92,7 @@ class PrototypeTest(absltest.TestCase):
                     "sales",
                     "costs",
                     "lag[1s]_sales",
+                    "add_sales_10",
                 ],
             ),
             index_names=["store_id", "product_id"],
@@ -104,7 +105,9 @@ class PrototypeTest(absltest.TestCase):
         # b = tp.glue(a, self.event_1 + self.event_2)
         c = tp.lag(self.event_1, duration=1)
         d = tp.glue(a, tp.sample(c, a))
-        output_event = d
+        sum_sales = self.event_1["sales"] + 10
+        e = tp.glue(d, sum_sales)
+        output_event = e
 
         output_event_numpy = tp.evaluate(
             output_event,
