@@ -151,7 +151,7 @@ class NumpyEvent:
 
         return next(iter(self._data))
 
-    def first_index_features(self) -> List[NumpyFeature]:
+    def first_index_features(self) -> IndexData:
         if self.first_index_key() is None:
             return []
         return self.data[self.first_index_key()]
@@ -413,7 +413,6 @@ class NumpyEvent:
 
         # check unix timestamp
         if self._is_unix_timestamp != __o.is_unix_timestamp:
-            print("u")
             return False
 
         # check same data
