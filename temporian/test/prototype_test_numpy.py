@@ -30,7 +30,7 @@ class PrototypeTest(absltest.TestCase):
         BOOK_ID = 2
         PIXEL_ID = 3
 
-        self.event_1_data = NumpyEvent.from_dataframe(
+        self.numpy_event_1 = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
                     [TRYOLABS_SHOP, MATE_ID, 0.0, 14],
@@ -46,8 +46,7 @@ class PrototypeTest(absltest.TestCase):
             ),
             index_names=["store_id", "product_id"],
         )
-
-        self.event_2_data = NumpyEvent.from_dataframe(
+        self.numpy_event_2 = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
                     [TRYOLABS_SHOP, MATE_ID, 0.0, -14],
@@ -65,12 +64,11 @@ class PrototypeTest(absltest.TestCase):
         )
 
         # TODO: Remove the following line when "from_dataframe" support creating
-        # event data with shared sampling. Note that "event_1_data" and
-        # "event_2_data" should have the same sampling in this tests.
-        self.event_1_data.sampling = self.event_2_data.sampling
+        # event data with shared sampling. Note that "numpy_event_1" and
+        # "numpy_event_2" should have the same sampling in this tests.
 
-        self.event_1 = self.event_1_data.schema()
-        self.event_2 = self.event_2_data.schema()
+        self.event_1 = self.numpy_event_1.schema()
+        self.event_2 = self.numpy_event_2.schema()
         self.event_2._sampling = self.event_1._sampling
 
         self.expected_output_event = NumpyEvent.from_dataframe(
@@ -112,8 +110,8 @@ class PrototypeTest(absltest.TestCase):
         output_event_numpy = tp.evaluate(
             output_event,
             input_data={
-                self.event_1: self.event_1_data,
-                self.event_2: self.event_2_data,
+                self.event_1: self.numpy_event_1,
+                self.event_2: self.numpy_event_2,
             },
             # TODO: The glue operator has some issues with dtypes. Re-enable
             # checking when solved.
