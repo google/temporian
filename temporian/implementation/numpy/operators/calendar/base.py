@@ -18,8 +18,8 @@ from typing import Dict, Any
 
 import numpy as np
 from temporian.core.operators.calendar.base import BaseCalendarOperator
+from temporian.implementation.numpy.data.event import IndexData
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -32,24 +32,25 @@ class BaseCalendarNumpyImplementation(OperatorImplementation):
 
     def __call__(self, sampling: NumpyEvent) -> Dict[str, NumpyEvent]:
         data = {}
-        for index, timestamps in sampling.sampling.data.items():
+        for index_key, index_data in sampling.data.items():
             days = np.array(
                 [
                     self._get_value_from_datetime(
                         datetime.fromtimestamp(ts, tz=timezone.utc)
                     )
-                    for ts in timestamps
+                    for ts in index_data.timestamps
                 ]
             ).astype(np.int32)
 
-            data[index] = [
-                NumpyFeature(
-                    data=days,
-                    name=self.operator.output_feature_name,
-                )
-            ]
+            data[index_key] = IndexData([days], index_data.timestamps)
 
-        return {"event": NumpyEvent(data=data, sampling=sampling.sampling)}
+        return {
+            "event": NumpyEvent(
+                data=data,
+                feature_names=[self.operator.output_feature_name],
+                index_names=sampling.index_names,
+            )
+        }
 
     @abstractmethod
     def _get_value_from_datetime(self, dt: datetime) -> Any:

@@ -19,12 +19,11 @@ import pandas as pd
 from temporian.core.operators.calendar.minute import (
     CalendarMinuteOperator,
 )
+from temporian.implementation.numpy.data.event import IndexData
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.operators.calendar.minute import (
     CalendarMinuteNumpyImplementation,
 )
-from temporian.core.data.dtype import DType
 
 
 class CalendarMinuteNumpyImplementationTest(absltest.TestCase):
@@ -45,28 +44,24 @@ class CalendarMinuteNumpyImplementationTest(absltest.TestCase):
                 columns=["timestamp"],
             ),
         )
-
         input_event = input_event_data.schema()
-
         output_event_data = NumpyEvent(
             data={
-                (): [
-                    NumpyFeature(
-                        name="calendar_minute",
-                        data=np.array([0, 1, 30, 59, 1, 59]),
-                    ),
-                ],
+                (): IndexData(
+                    [np.array([0, 1, 30, 59, 1, 59]).astype(np.int32)],
+                    input_event_data.first_index_features().timestamps,
+                ),
             },
-            sampling=input_event_data.sampling,
+            feature_names="calendar_minute",
+            index_names=[],
         )
-
         operator = CalendarMinuteOperator(input_event)
         impl = CalendarMinuteNumpyImplementation(operator)
         output = impl.call(sampling=input_event_data)
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(
-            output["event"].first_index_features()[0].dtype == DType.INT32
+            output["event"].first_index_features().features[0].dtype == np.int32
         )
 
 

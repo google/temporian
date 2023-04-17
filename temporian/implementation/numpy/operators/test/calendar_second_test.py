@@ -19,12 +19,11 @@ import pandas as pd
 from temporian.core.operators.calendar.second import (
     CalendarSecondOperator,
 )
+from temporian.implementation.numpy.data.event import IndexData
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.operators.calendar.second import (
     CalendarSecondNumpyImplementation,
 )
-from temporian.core.data.dtype import DType
 
 
 class CalendarSecondNumpyImplementationTest(absltest.TestCase):
@@ -44,28 +43,24 @@ class CalendarSecondNumpyImplementationTest(absltest.TestCase):
                 columns=["timestamp"],
             ),
         )
-
         input_event = input_event_data.schema()
-
         output_event_data = NumpyEvent(
             data={
-                (): [
-                    NumpyFeature(
-                        name="calendar_second",
-                        data=np.array([0, 1, 59, 30, 59]),
-                    ),
-                ],
+                (): IndexData(
+                    [np.array([0, 1, 59, 30, 59]).astype(np.int32)],
+                    input_event_data.first_index_features().timestamps,
+                ),
             },
-            sampling=input_event_data.sampling,
+            feature_names="calendar_second",
+            index_names=[],
         )
-
         operator = CalendarSecondOperator(input_event)
         impl = CalendarSecondNumpyImplementation(operator)
         output = impl.call(sampling=input_event_data)
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(
-            output["event"].first_index_features()[0].dtype == DType.INT32
+            output["event"].first_index_features().features[0].dtype == np.int32
         )
 
 

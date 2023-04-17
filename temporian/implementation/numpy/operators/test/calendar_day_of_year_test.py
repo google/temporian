@@ -19,12 +19,11 @@ import pandas as pd
 from temporian.core.operators.calendar.day_of_year import (
     CalendarDayOfYearOperator,
 )
+from temporian.implementation.numpy.data.event import IndexData
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.operators.calendar.day_of_year import (
     CalendarDayOfYearNumpyImplementation,
 )
-from temporian.core.data.dtype import DType
 
 
 class CalendarDayOfYearNumpyImplementationTest(absltest.TestCase):
@@ -47,28 +46,24 @@ class CalendarDayOfYearNumpyImplementationTest(absltest.TestCase):
                 columns=["timestamp"],
             ),
         )
-
         input_event = input_event_data.schema()
-
         output_event_data = NumpyEvent(
             data={
-                (): [
-                    NumpyFeature(
-                        name="calendar_day_of_year",
-                        data=np.array([1, 2, 15, 166, 365, 366]),
-                    ),
-                ],
+                (): IndexData(
+                    [np.array([1, 2, 15, 166, 365, 366]).astype(np.int32)],
+                    input_event_data.first_index_features().timestamps,
+                ),
             },
-            sampling=input_event_data.sampling,
+            feature_names="calendar_day_of_year",
+            index_names=[],
         )
-
         operator = CalendarDayOfYearOperator(input_event)
         impl = CalendarDayOfYearNumpyImplementation(operator)
         output = impl.call(sampling=input_event_data)
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(
-            output["event"].first_index_features()[0].dtype == DType.INT32
+            output["event"].first_index_features().features[0].dtype == np.int32
         )
 
 

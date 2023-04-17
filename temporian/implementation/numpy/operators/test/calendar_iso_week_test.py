@@ -19,12 +19,11 @@ import pandas as pd
 from temporian.core.operators.calendar.iso_week import (
     CalendarISOWeekOperator,
 )
+from temporian.implementation.numpy.data.event import IndexData
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.operators.calendar.iso_week import (
     CalendarISOWeekNumpyImplementation,
 )
-from temporian.core.data.dtype import DType
 
 
 class CalendarISOWeekNumpyImplementationTest(absltest.TestCase):
@@ -59,28 +58,24 @@ class CalendarISOWeekNumpyImplementationTest(absltest.TestCase):
                 columns=["timestamp"],
             ),
         )
-
         input_event = input_event_data.schema()
-
         output_event_data = NumpyEvent(
             data={
-                (): [
-                    NumpyFeature(
-                        name="calendar_iso_week",
-                        data=np.array([1, 1, 2, 52, 1, 2, 12, 52]),
-                    ),
-                ],
+                (): IndexData(
+                    [np.array([1, 1, 2, 52, 1, 2, 12, 52]).astype(np.int32)],
+                    input_event_data.first_index_features().timestamps,
+                ),
             },
-            sampling=input_event_data.sampling,
+            feature_names="calendar_iso_week",
+            index_names=[],
         )
-
         operator = CalendarISOWeekOperator(input_event)
         impl = CalendarISOWeekNumpyImplementation(operator)
         output = impl.call(sampling=input_event_data)
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(
-            output["event"].first_index_features()[0].dtype == DType.INT32
+            output["event"].first_index_features().features[0].dtype == np.int32
         )
 
 
