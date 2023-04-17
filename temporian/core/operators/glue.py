@@ -18,7 +18,6 @@ from typing import Dict, Optional, List
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
-from temporian.core.data.feature import Feature
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
