@@ -2,9 +2,8 @@ from typing import Dict
 
 from temporian.core.data.duration import duration_abbreviation
 from temporian.core.operators.lag import LagOperator
+from temporian.implementation.numpy.data.event import IndexData
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.feature import NumpyFeature
-from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
@@ -15,26 +14,21 @@ class LagNumpyImplementation(OperatorImplementation):
 
     def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
         duration = self.operator.attributes["duration"]
-
-        sampling_data = {}
-        output_data = {}
-
-        for index, timestamps in event.sampling.data.items():
-            sampling_data[index] = timestamps + duration
-            output_data[index] = []
-            for feature in event.data[index]:
-                new_feature = NumpyFeature(
-                    data=feature.data,
-                    name=feature.name,
-                )
-                output_data[index].append(new_feature)
-
-        new_sampling = NumpySampling(
-            data=sampling_data,
-            index=event.sampling.index.copy(),
-            is_unix_timestamp=event.sampling.is_unix_timestamp,
+        prefix = "lag" if duration > 0 else "leak"
+        duration_str = duration_abbreviation(duration)
+        output_event = NumpyEvent(
+            {},
+            feature_names=[
+                f"{prefix}[{duration_str}]_{feature_name}"
+                for feature_name in event.feature_names
+            ],
+            index_names=event.index_names,
+            is_unix_timestamp=event.is_unix_timestamp,
         )
-        output_event = NumpyEvent(data=output_data, sampling=new_sampling)
+        for index_key, index_data in event.data.items():
+            output_event.data[index_key] = IndexData(
+                index_data.features, index_data.timestamps.copy() + duration
+            )
 
         return {"event": output_event}
 
