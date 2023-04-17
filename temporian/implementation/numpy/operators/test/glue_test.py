@@ -40,8 +40,7 @@ class GlueNumpyImplementationTest(absltest.TestCase):
             "timestamp": np.array([1, 1, 2, 3, 4]),
             "user_id": ["user_1", "user_1", "user_1", "user_1", "user_2"],
         }
-
-        event_1_data = NumpyEvent.from_dataframe(
+        numpy_event_1 = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 {
                     **common_data,
@@ -50,8 +49,7 @@ class GlueNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["user_id"],
         )
-
-        event_2_data = NumpyEvent.from_dataframe(
+        numpy_event_2 = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 {
                     **common_data,
@@ -61,8 +59,7 @@ class GlueNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["user_id"],
         )
-
-        event_3_data = NumpyEvent.from_dataframe(
+        numpy_event_3 = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 {
                     **common_data,
@@ -71,8 +68,7 @@ class GlueNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["user_id"],
         )
-
-        expected_output_data = NumpyEvent.from_dataframe(
+        expected_numpy_output_event = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 {
                     **common_data,
@@ -87,14 +83,12 @@ class GlueNumpyImplementationTest(absltest.TestCase):
 
         # TODO: Update when "from_dataframe" support the creation of events
         # with shared sampling.
-        event_1 = event_1_data.schema()
-        event_2 = event_2_data.schema()
-        event_3 = event_3_data.schema()
+        event_1 = numpy_event_1.schema()
+        event_2 = numpy_event_2.schema()
+        event_3 = numpy_event_3.schema()
 
         event_2._sampling = event_1._sampling
         event_3._sampling = event_1._sampling
-        event_2_data.sampling = event_1_data.sampling
-        event_3_data.sampling = event_1_data.sampling
 
         operator = GlueOperator(
             event_0=event_1,
@@ -103,12 +97,11 @@ class GlueNumpyImplementationTest(absltest.TestCase):
         )
         implementation = GlueNumpyImplementation(operator=operator)
         output = implementation.call(
-            event_0=event_1_data, event_1=event_2_data, event_2=event_3_data
+            event_0=numpy_event_1, event_1=numpy_event_2, event_2=numpy_event_3
         )
-
         self.assertEqual(
             output["event"],
-            expected_output_data,
+            expected_numpy_output_event,
         )
 
     def test_non_matching_sampling(self):

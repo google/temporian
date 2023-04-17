@@ -17,6 +17,7 @@
 from typing import Dict
 import copy
 
+from temporian.implementation.numpy.data.event import IndexData
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.core.operators.glue import GlueOperator
 from temporian.implementation.numpy import implementation_lib
@@ -35,18 +36,29 @@ class GlueNumpyImplementation(OperatorImplementation):
         # The features are always ordered by the argument name of the event.
         #
         # Example:
-        #   if dict_events = {"event_0":X, "event_3":Z, "event_2": Y}
+        #   if dict_events = {"event_0": X, "event_3": Z, "event_2": Y}
         #   then, "events" if guarenteed to be [X, Y, Z].
         events = list(list(zip(*sorted(list(dict_events.items()))))[1])
         assert len(events) >= 2
 
-        dst_event = NumpyEvent(data={}, sampling=events[0].sampling)
-
-        for index in events[0].data.keys():
-            dst_features = []
-            for event in events:
-                dst_features.extend(copy.copy(event.data[index]))
-            dst_event.data[index] = dst_features
+        dst_event = NumpyEvent(
+            data={},
+            feature_names=[
+                feature_name
+                for event in events
+                for feature_name in event.feature_names
+            ],
+            index_names=events[0].index_names,
+            is_unix_timestamp=events[0].is_unix_timestamp,
+        )
+        for index_key, index_data in events[0].data.items():
+            dst_event.data[index_key] = IndexData(
+                index_data.features, index_data.timestamps
+            )
+            for event in events[1:]:
+                dst_event.data[index_key].features.extend(
+                    copy.copy(event.data[index_key].features)
+                )
 
         # make gluement
         return {"event": dst_event}
