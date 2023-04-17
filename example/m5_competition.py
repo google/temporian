@@ -23,11 +23,11 @@ import numpy as np
 from datetime import datetime, timezone, timedelta
 import urllib.request
 import zipfile
+import tempfile
 
 # Directory used to download the raw M5 dataset and to export the tabular
 # dataset.
-# work_directory = os.path.join(tempfile.gettempdir(), "m5")
-work_directory = "/mnt/g/projects/work/temporian/tmp"
+work_directory = os.path.join(tempfile.gettempdir(), "m5")
 os.makedirs(work_directory, exist_ok=True)
 print("Use work directory:", work_directory)
 
@@ -52,7 +52,8 @@ print("================")
 
 # During development, set nrows to a small value (e.g. nrows=100) to
 # only load a sample of the dataset.
-# TODO: Default to None when fast enough.
+#
+# TODO: Set to None when fast enough.
 nrows = 100
 
 raw_path = lambda x: os.path.join(raw_data_dir, x)
@@ -160,15 +161,6 @@ sales_raw["sales"] = sales_raw["sales"].astype(np.float32)
 print("Convert to Temporian Events")
 print("===========================")
 
-# TODO: Remove
-print("sales_raw:")
-sales_raw.info()
-print("sell_prices_raw:")
-sell_prices_raw.info()
-print("calendar_raw:")
-calendar_raw.info()
-
-# TODO: Do the grouping by index during the processing.
 sales_data = tp.EventData.from_dataframe(
     sales_raw,
     index_names=["item_id", "dept_id", "cat_id", "store_id", "state_id"],
@@ -185,7 +177,7 @@ print("sales_data:\n", sales_data)
 print("sell_prices_data:\n", sell_prices_data)
 print("calendar_data:\n", calendar_data)
 
-# How that out data is in the Temporian format. We can delete the Pandas
+# Now that our data is in the Temporian format. We can delete the Pandas
 # dataframe objects.
 
 print("Release Pandas dataframes")
@@ -200,9 +192,7 @@ print("Plot raw data")
 print("============")
 
 plot_options = {
-    # Only plot the first index / first product.
-    # "index": None,
-    # We only plot 1year of data to make the plot more readable.
+    # We only plot the 1st year of data to make the plot more readable.
     "min_time": datetime(2015, 1, 1),
     "max_time": datetime(2016, 1, 1),
 }
@@ -230,16 +220,14 @@ augmented_sales = tp.glue(
     # Moving average of sales
     tp.prefix("sma_7.", tp.simple_moving_average(sales, tp.duration.days(7))),
     tp.prefix("sma_28.", tp.simple_moving_average(sales, tp.duration.days(28))),
-    tp.prefix("sma_84.", tp.simple_moving_average(sales, tp.duration.days(84))),
     # Sum of sales
     tp.prefix("sum_7.", tp.moving_sum(sales, tp.duration.days(7))),
     tp.prefix("sum_28.", tp.moving_sum(sales, tp.duration.days(28))),
-    tp.prefix("sum_84.", tp.moving_sum(sales, tp.duration.days(84))),
 )
 
 # Lagged sales
 lagged_sales = []
-for lag in [1, 2, 3]:
+for lag in [1, 2]:
     lagged_sales.append(
         tp.sample(
             tp.prefix(f"lag_{lag}.", tp.lag(sales, tp.duration.days(lag))),
@@ -265,22 +253,23 @@ for lag in [1, 2, 3]:
     )
 label_sales = tp.glue(*label_sales)
 
-# Sum of the sales of all the items in the same departement sampled each day.
+# Sum of the sales, sampled each day, per departement.
 sales_per_dept = tp.drop_index(sales, "item_id")
+sampling_once_per_day = tp.unique_timestamps(sales_per_dept["item_id"])
 sum_dayly_sales_per_dept = tp.prefix(
     "per_dept.sum_28_",
     tp.moving_sum(
         sales_per_dept["sales"],
         tp.duration.days(28),
-        tp.unique_timestamps(sales_per_dept["item_id"]),
+        sampling_once_per_day,
     ),
 )
 
+# For each item, add the sum of departement sales for this specific item.
 sales_aggregated_item_level = tp.sample(
     tp.propagate(sum_dayly_sales_per_dept, sales), sales
 )
 
-# TODO: Sales at other levels (need remove index)
 # TODO: Last calendar events (need since_last, filter)
 # TODO: Skip early time (start + a few days)
 # TODO: Skip before first sales (need filter)
@@ -289,10 +278,10 @@ sales_aggregated_item_level = tp.sample(
 tabular_dataset = tp.glue(
     sales,  # Raw sales
     sales_aggregated_item_level,
-    # lagged_sales,
-    # label_sales,
-    # augmented_sales,
-    # calendar_events,
+    lagged_sales,
+    label_sales,
+    augmented_sales,
+    calendar_events,
 )
 
 # We run the computation

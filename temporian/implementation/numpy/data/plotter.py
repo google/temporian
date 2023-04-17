@@ -31,7 +31,7 @@ def plot(
     max_points: Optional[int] = None,
     min_time: Optional[duration.Timestamp] = None,
     max_time: Optional[duration.Timestamp] = None,
-    max_num_plots: int = 30,
+    max_num_plots: int = 20,
 ):
     """Plots an event.
 
@@ -116,7 +116,7 @@ def _plot_matplotlib(
         print(
             f"The number of plots ({num_plots}) is larger than "
             f'"options.max_num_plots={options.max_num_plots}". Only the first '
-            "plot will be printed."
+            "plots will be printed."
         )
         num_plots = options.max_num_plots
 
@@ -173,6 +173,9 @@ def _plot_matplotlib(
                 plot_idx += 1
 
             for feature_idx, feature_name in enumerate(feature_names):
+                if plot_idx >= num_plots:
+                    break
+
                 ax = axs[plot_idx, 0]
 
                 ys = event.data[index][feature_idx].data
