@@ -16,7 +16,7 @@
 from typing import Union, Mapping, Optional
 from temporian.core.data.feature import Feature
 
-from temporian.core.data.dtype import DType, ALL_TYPES
+from temporian.core.data.dtype import DType
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
 from temporian.core.operators.base import Operator
@@ -101,13 +101,13 @@ class CastOperator(Operator):
             )
 
         # Check: to_dtype is actually a dtype
-        if to_dtype is not None and to_dtype not in ALL_TYPES:
+        if to_dtype is not None and not isinstance(to_dtype, DType):
             raise ValueError(f"Cast: expected DType but got {type(to_dtype)=}")
 
         # Check: from_dtypes is a dict {dtype: dtype}
         if from_dtypes is not None and (
             not isinstance(from_dtypes, Mapping)
-            or any(key not in ALL_TYPES for key in from_dtypes)
+            or any(not isinstance(key, DType) for key in from_dtypes)
         ):
             raise ValueError(
                 "Cast: target can be a dict with only DType or feature keys"
@@ -239,10 +239,14 @@ def cast(
 
     # Further type verifications are done in the operator
     if isinstance(target, Mapping):
-        if target.keys()[0] in event.feature_names:
+        if all(key in event.feature_names for key in target):
             from_features = target
-        else:
+        elif all(isinstance(key, DType) for key in target):
             from_dtypes = target
+        else:
+            raise ValueError(
+                "Cast: mapping keys should be all DType or feature names"
+            )
     else:
         to_dtype = target
 
