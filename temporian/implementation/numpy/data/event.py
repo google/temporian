@@ -281,14 +281,14 @@ class NumpyEvent:
             # if dtype is object, check if it only contains string values
             if df[column].dtype.type is np.object_:
                 df[column] = df[column].fillna("")
-                # TODO: Don't use apply.
-                is_string = df[column].apply(lambda x: isinstance(x, str))
-                if not is_string.all():
+                # Check if there are any non-string elements in the column
+                non_string_mask = df[column].map(type) != str
+                if non_string_mask.any():
                     raise ValueError(
                         f'Cannot convert column "{column}". Column of type'
-                        ' "Object" can only values. However, the following'
-                        " non-string values were found: "
-                        f" {df[column][~is_string]}"
+                        ' "Object" can only have string values. However, the'
+                        " following non-string values were found: "
+                        f" {df[column][non_string_mask]}"
                     )
                 # convert object column to np.string_
                 df[column] = df[column].astype("string")
