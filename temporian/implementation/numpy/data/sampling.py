@@ -13,6 +13,7 @@ PYTHON_DTYPE_MAPPING = {
     str: DType.STRING,
     # TODO: fix this, int doesn't have to be INT64 necessarily
     int: DType.INT64,
+    np.int64: DType.INT64,
 }
 
 

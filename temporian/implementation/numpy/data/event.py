@@ -22,6 +22,7 @@ PYTHON_DTYPE_MAPPING = {
     str: DType.STRING,
     # TODO: fix this, int doesn't have to be INT64 necessarily
     int: DType.INT64,
+    np.int64: DType.INT64,
 }
 
 DTYPE_MAPPING = {
@@ -317,21 +318,22 @@ class NumpyEvent:
 
         data = {}
         if index_names:
-            # user provided an index
-            group_by_indexes = df.groupby(index_names, sort=False)
+            grouping_key = (
+                index_names[0] if len(index_names) == 1 else index_names
+            )
+            group_by_indexes = df.groupby(grouping_key)
 
-            for group in group_by_indexes.groups:
-                columns = group_by_indexes.get_group(group)
-                timestamps = columns[timestamp_column].to_numpy()
+            for index, group in group_by_indexes:
+                timestamps = group[timestamp_column].to_numpy()
 
                 # Convert group to tuple, useful when its only one value
-                if not isinstance(group, tuple):
-                    group = (group,)
+                if not isinstance(index, tuple):
+                    index = (index,)
 
-                data[group] = IndexData(
+                data[index] = IndexData(
                     features=[
-                        columns[feature_name].to_numpy(
-                            dtype=columns[feature_name].dtype.type
+                        group[feature_name].to_numpy(
+                            dtype=group[feature_name].dtype.type
                         )
                         for feature_name in feature_names
                     ],
