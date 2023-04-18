@@ -36,57 +36,22 @@ class CastOperator(Operator):
     ):
         super().__init__()
 
-        # --- Parameters checking ---
-        # Check: only one of these params aren't None
-        oneof_args = [to_dtype, from_dtypes, from_features]
-        if sum(arg is not None for arg in oneof_args) != 1:
-            raise ValueError(
-                "One and only one of to_dtype, from_dtypes or from_features"
-                " should be provided to CastOperator."
-            )
-        # Check: to_dtype
-        if to_dtype is not None and to_dtype not in ALL_TYPES:
-            raise ValueError(f"Cast: expected DType but got {type(to_dtype)=}")
-        # Check: from_dtypes
-        if from_dtypes is not None and (
-            not isinstance(from_dtypes, Mapping)
-            or any(key not in ALL_TYPES for key in from_dtypes)
-        ):
-            raise ValueError(
-                "Cast: target can be a dict with only DType or feature keys"
-            )
-        # Check: from_features
-        if from_features is not None and (
-            not isinstance(from_features, Mapping)
-            or any(key not in event.feature_names for key in from_features)
-        ):
-            raise ValueError(
-                "Cast: target can be a dict with only DType or feature keys"
-            )
+        # Check that provided arguments are coherent
+        self._check_args(event, to_dtype, from_dtypes, from_features)
 
-        # --- Convert to {feature_name: target_dtype} ---
-        target_dtypes = {}
-        for feature in event.features:
-            if to_dtype is not None:
-                # cast all features this dtype
-                target_dtypes[feature.name] = to_dtype
-            elif from_features is not None:
-                # Cast by feature name (use same feature.dtype if not found)
-                target_dtypes[feature.name] = from_features.get(
-                    feature.name, feature.dtype
-                )
-            elif from_dtypes is not None:
-                # Cast by dtype (use same feature.dtype if not found)
-                target_dtypes[feature.name] = from_dtypes.get(
-                    feature.dtype, feature.dtype
-                )
+        # Convert to {feature_name: target_dtype}
+        target_dtypes = self._get_feature_dtype_map(
+            event, to_dtype, from_dtypes, from_features
+        )
+
+        # Attributes
         self.add_attribute("target_dtypes", target_dtypes)
         self.add_attribute("check_overflow", check_overflow)
 
-        # inputs
+        # Inputs
         self.add_input("event", event)
 
-        # outputs
+        # Output event features
         output_features = []
         reuse_event = True
         for feature in event.features:
@@ -119,6 +84,67 @@ class CastOperator(Operator):
         )
 
         self.check()
+
+    def _check_args(
+        self,
+        event: Event,
+        to_dtype: Optional[DType] = None,
+        from_dtypes: Optional[Mapping[DType, DType]] = None,
+        from_features: Optional[Mapping[str, DType]] = None,
+    ) -> None:
+        # Check that only one of these args was provided
+        oneof_args = [to_dtype, from_dtypes, from_features]
+        if sum(arg is not None for arg in oneof_args) != 1:
+            raise ValueError(
+                "One and only one of to_dtype, from_dtypes or from_features"
+                " should be provided to CastOperator."
+            )
+
+        # Check: to_dtype is actually a dtype
+        if to_dtype is not None and to_dtype not in ALL_TYPES:
+            raise ValueError(f"Cast: expected DType but got {type(to_dtype)=}")
+
+        # Check: from_dtypes is a dict {dtype: dtype}
+        if from_dtypes is not None and (
+            not isinstance(from_dtypes, Mapping)
+            or any(key not in ALL_TYPES for key in from_dtypes)
+        ):
+            raise ValueError(
+                "Cast: target can be a dict with only DType or feature keys"
+            )
+
+        # Check: from_features is {feature_name: dtype}
+        if from_features is not None and (
+            not isinstance(from_features, Mapping)
+            or any(key not in event.feature_names for key in from_features)
+        ):
+            raise ValueError(
+                "Cast: target can be a dict with only DType or feature keys"
+            )
+
+    def _get_feature_dtype_map(
+        self,
+        event: Event,
+        to_dtype: Optional[DType] = None,
+        from_dtypes: Optional[Mapping[DType, DType]] = None,
+        from_features: Optional[Mapping[str, DType]] = None,
+    ) -> dict:
+        target_dtypes = {}
+        for feature in event.features:
+            if to_dtype is not None:
+                # cast all features this dtype
+                target_dtypes[feature.name] = to_dtype
+            elif from_features is not None:
+                # Cast by feature name (use same feature.dtype if not found)
+                target_dtypes[feature.name] = from_features.get(
+                    feature.name, feature.dtype
+                )
+            elif from_dtypes is not None:
+                # Cast by dtype (use same feature.dtype if not found)
+                target_dtypes[feature.name] = from_dtypes.get(
+                    feature.dtype, feature.dtype
+                )
+        return target_dtypes
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:

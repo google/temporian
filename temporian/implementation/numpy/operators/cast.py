@@ -1,7 +1,8 @@
-import numpy as np
-import temporian.core.data.dtype as tp_dtypes
-
 from typing import Dict
+
+import numpy as np
+
+import temporian.core.data.dtype as tp_dtypes
 from temporian.core.operators.cast import CastOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.feature import (
@@ -26,7 +27,7 @@ class CastNumpyImplementation(OperatorImplementation):
 
     def _can_overflow(
         self, origin_dtype: tp_dtypes.DType, dst_dtype: tp_dtypes.DType
-    ):
+    ) -> bool:
         # Don't check overflow for BOOLEAN or STRING:
         #  - boolean: makes no sense, everybody knows what to expect.
         #  - string: on orig_dtype, too costly to convert to numeric dtype
@@ -41,7 +42,12 @@ class CastNumpyImplementation(OperatorImplementation):
             > self._dtype_limits[dst_dtype].max
         )
 
-    def _check_overflow(self, data, origin_dtype, dst_dtype):
+    def _check_overflow(
+        self,
+        data: np.ndarray,
+        origin_dtype: tp_dtypes.DType,
+        dst_dtype: tp_dtypes.DType,
+    ) -> None:
         if self._can_overflow(origin_dtype, dst_dtype) and np.any(
             (data < self._dtype_limits[dst_dtype].min)
             | (data > self._dtype_limits[dst_dtype].max)
