@@ -70,8 +70,6 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         self.event_1 = self.numpy_event_1.schema()
         self.event_2 = self.numpy_event_2.schema()
 
-        self.numpy_event_2.sampling = self.numpy_event_1.sampling
-
         self.sampling = Sampling([("store_id", DType.INT64)])
         self.event_1 = Event(
             [Feature("sales", DType.FLOAT64)],
