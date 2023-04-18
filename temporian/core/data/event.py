@@ -20,7 +20,7 @@ from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
 from temporian.core.data.dtype import DType
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
-from temporian.core.data.sampling import IndexDTypes
+from temporian.core.data.sampling import IndexDType
 from temporian.utils import string
 
 if TYPE_CHECKING:
@@ -120,7 +120,7 @@ class Event(object):
 
 def input_event(
     features: List[Feature],
-    index_levels: List[Tuple[str, IndexDTypes]] = [],
+    index_levels: List[Tuple[str, IndexDType]] = [],
     name: Optional[str] = None,
     sampling: Optional[Sampling] = None,
 ) -> Event:

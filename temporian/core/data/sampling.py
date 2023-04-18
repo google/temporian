@@ -16,7 +16,16 @@
 
 from __future__ import annotations
 from enum import Enum
-from typing import Dict, List, NamedTuple, Optional, Tuple, TYPE_CHECKING, Union
+from typing import (
+    Dict,
+    Iterator,
+    List,
+    NamedTuple,
+    Optional,
+    Tuple,
+    TYPE_CHECKING,
+    Union,
+)
 
 from temporian.core.data.dtype import DType
 
@@ -24,7 +33,7 @@ if TYPE_CHECKING:
     from temporian.core.operators.base import Operator
 
 
-class IndexDTypes(Enum):
+class IndexDType(Enum):
     INT32 = DType.INT32.value
     INT64 = DType.INT64.value
     STRING = DType.STRING.value
@@ -32,15 +41,15 @@ class IndexDTypes(Enum):
 
 class IndexLevel(NamedTuple):
     name: str
-    dtype: IndexDTypes
+    dtype: IndexDType
 
 
 class Index:
     def __init__(
         self,
-        levels: Union[Tuple[str, IndexDTypes], List[Tuple[str, IndexDTypes]]],
+        levels: Union[Tuple[str, DType], List[Tuple[str, DType]]],
     ) -> None:
-        if isinstance(levels, tuple):
+        if isinstance(levels, Tuple):
             levels = [levels]
 
         self._levels = []
@@ -53,16 +62,19 @@ class Index:
                 )
             # type check dtype
             if all(
-                dtype.value != index_dtype.value for index_dtype in IndexDTypes
+                dtype.value != index_dtype.value for index_dtype in IndexDType
             ):
                 raise TypeError(
                     f"Index level {(name, dtype)}'s dtype's type must be one of"
-                    f" {IndexDTypes}. Got {type(dtype)}."
+                    f" {IndexDType}. Got {type(dtype)}."
                 )
             self._levels.append(IndexLevel(name, dtype))
 
     def __repr__(self) -> str:
         return f"Index({self._levels})"
+
+    def __iter__(self) -> Iterator[IndexLevel]:
+        return iter(self._levels)
 
     @property
     def levels(self) -> List[IndexLevel]:
@@ -73,22 +85,24 @@ class Index:
         return [index_level.name for index_level in self._levels]
 
     @property
-    def dtypes(self) -> Dict[str, IndexDTypes]:
-        return {
-            index_level.name: index_level.dtype for index_level in self._levels
-        }
+    def dtypes(self) -> List[IndexDType]:
+        return [index_level.dtype for index_level in self._levels]
 
 
 class Sampling(object):
     def __init__(
         self,
         index_levels: Union[
-            Tuple[str, IndexDTypes], List[Tuple[str, IndexDTypes]]
+            Tuple[str, IndexDType], List[Tuple[str, IndexDType]], Index
         ],
         creator: Optional[Operator] = None,
         is_unix_timestamp: bool = False,
-    ):
-        self._index = Index(index_levels)
+    ) -> None:
+        self._index = (
+            Index(index_levels)
+            if not isinstance(index_levels, Index)
+            else index_levels
+        )
         self._creator = creator
         self._is_unix_timestamp = is_unix_timestamp
 

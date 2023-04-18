@@ -30,15 +30,30 @@ class DType(Enum):
     def __str__(self) -> str:
         return self.value
 
+    @property
+    def is_float(self) -> bool:
+        return self in (DType.FLOAT64, DType.FLOAT32)
 
-def MissingValue(dtype: DType) -> Union[float, int, str]:
-    """Value used as a replacement of missing values."""
+    @property
+    def is_integer(self) -> bool:
+        return self in (DType.INT64, DType.INT32)
 
-    if dtype in [DType.FLOAT64, DType.FLOAT32]:
-        return math.nan
-    elif dtype in [DType.INT64, DType.INT32]:
-        return 0
-    elif dtype == DType.STRING:
-        return ""
-    else:
-        raise ValueError(f"Non implemented type {dtype}")
+    def missing_value(self) -> Union[float, int, str]:
+        """
+        Returns missing value for specific dtype.
+
+        Returns:
+            The default missing value for the given data type.
+        """
+
+        if self.is_float:
+            return math.nan
+
+        elif self.is_integer:
+            return 0
+
+        elif self == DType.STRING:
+            return ""
+
+        else:
+            raise ValueError(f"Non-implemented type {self}")

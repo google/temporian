@@ -46,12 +46,11 @@ class DropIndexOperator(Operator):
         output_features = self._generate_output_features(
             event, index_names, keep
         )
-
         # output sampling
         output_sampling = Sampling(
             index_levels=[
                 (index_name, index_dtype)
-                for index_name, index_dtype in event.sampling.index.dtypes.items()
+                for index_name, index_dtype in event.sampling.index
                 if index_name not in index_names
             ]
         )
@@ -85,7 +84,9 @@ class DropIndexOperator(Operator):
 
                 output_features[i] = Feature(
                     name=index_name,
-                    dtype=event.sampling.index.dtypes[index_name],
+                    dtype=event.sampling.index.dtypes[
+                        event.sampling.index.names.index(index_name)
+                    ],
                 )
 
         return output_features
@@ -98,20 +99,19 @@ class DropIndexOperator(Operator):
         )
 
     @property
-    def dst_index_names(self) -> List[str]:
-        return [
-            index_lvl_name
-            for index_lvl_name in self.inputs["event"].sampling.index.names
-            if index_lvl_name not in self._index_names
-        ]
-
-    @property
     def index_names(self) -> List[str]:
         return self._index_names
 
     @property
     def keep(self) -> bool:
         return self._keep
+
+    def dst_index_names(self) -> List[str]:
+        return [
+            index_lvl_name
+            for index_lvl_name in self.inputs["event"].sampling.index.names
+            if index_lvl_name not in self._index_names
+        ]
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:

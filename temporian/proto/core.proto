@@ -117,16 +117,20 @@ message Feature {
   optional string creator_operator_id = 5;
 }
 
+message Index {
+  message IndexLevel {
+    // Index level names
+    optional string name = 1;
+
+    // Index level dtypes
+    optional DType dtype = 2;
+  }
+
+  repeated IndexLevel levels = 1;
+}
+
 // Schema of a sampling.
 message Sampling {
-  // Index of the sampling
-  message Index {
-    // Level names
-    repeated string names = 1;
-
-    // Level dtypes
-    repeated DType dtypes = 2;
-  }
   // Identifier of the sampling. Should be unique across all the samplings of
   // the processor.
   optional string id = 1;

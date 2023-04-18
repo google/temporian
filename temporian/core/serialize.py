@@ -18,14 +18,14 @@ from typing import Set, Union, Any, Dict, Tuple, Optional
 
 from google.protobuf import text_format
 
+from temporian.core import operator_lib
+from temporian.core import processor
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators import base
 from temporian.core.data.dtype import DType
-from temporian.core import operator_lib
 from temporian.proto import core_pb2 as pb
-from temporian.core import processor
 
 
 def save(
@@ -307,8 +307,11 @@ def _unserialize_feature(
 def _serialize_sampling(src: Sampling) -> pb.Sampling:
     return pb.Sampling(
         id=_identifier(src),
-        index=pb.Sampling.Index(
-            names=src.index.names, dtypes=list(src.index.dtypes.values())
+        index=pb.Index(
+            levels=[
+                pb.Index.IndexLevel(name, dtype)
+                for name, dtype in zip(src.index.names, src.index.dtypes)
+            ]
         ),
         creator_operator_id=(
             _identifier(src.creator) if src.creator is not None else None
@@ -318,12 +321,10 @@ def _serialize_sampling(src: Sampling) -> pb.Sampling:
 
 def _unserialize_sampling(src: pb.Sampling) -> Sampling:
     return Sampling(
-        index_levels=list(
-            [
-                (name, dtype)
-                for name, dtype in zip(src.index.names, src.index.dtypes)
-            ]
-        ),
+        index_levels=[
+            (index_level.name, index_level.dtype)
+            for index_level in src.index.levels
+        ],
         creator=None,
     )
 
