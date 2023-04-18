@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """Type cast operator."""
-from typing import List, Union, Mapping
+from typing import Union, Mapping, Optional
 from temporian.core.data.feature import Feature
 
 from temporian.core.data.dtype import DType, ALL_TYPES
@@ -29,42 +29,57 @@ class CastOperator(Operator):
     def __init__(
         self,
         event: Event,
-        target: Union[DType, Mapping[Union[str, DType], DType]],
+        to_dtype: Optional[DType] = None,
+        from_dtypes: Optional[Mapping[DType, DType]] = None,
+        from_features: Optional[Mapping[str, DType]] = None,
         check_overflow: bool = True,
     ):
         super().__init__()
 
-        # Check that all origin keys are DType or feature_names
-        if target not in ALL_TYPES:  # Will be 'not isinstance(to, DType)'
-            if not isinstance(target, Mapping):
-                raise ValueError(
-                    "Cast parameter 'to' must be a temporian dtype or a Mapping"
-                )
-            for origin_key in target:
-                if (
-                    origin_key not in ALL_TYPES  # Also here
-                    and origin_key not in event.feature_names
-                ):
-                    raise KeyError(
-                        f"Invalid key to cast: {origin_key}. "
-                        "Expected dtype or feature name."
-                    )
+        # --- Parameters checking ---
+        # Check: only one of these params aren't None
+        oneof_args = [to_dtype, from_dtypes, from_features]
+        if sum(arg is not None for arg in oneof_args) != 1:
+            raise ValueError(
+                "One and only one of to_dtype, from_dtypes or from_features"
+                " should be provided to CastOperator."
+            )
+        # Check: to_dtype
+        if to_dtype is not None and to_dtype not in ALL_TYPES:
+            raise ValueError(f"Cast: expected DType but got {type(to_dtype)=}")
+        # Check: from_dtypes
+        if from_dtypes is not None and (
+            not isinstance(from_dtypes, Mapping)
+            or any(key not in ALL_TYPES for key in from_dtypes)
+        ):
+            raise ValueError(
+                "Cast: target can be a dict with only DType or feature keys"
+            )
+        # Check: from_features
+        if from_features is not None and (
+            not isinstance(from_features, Mapping)
+            or any(key not in event.feature_names for key in from_features)
+        ):
+            raise ValueError(
+                "Cast: target can be a dict with only DType or feature keys"
+            )
 
-        # Convert any input format to feature_name->target_dtype
+        # --- Convert to {feature_name: target_dtype} ---
         target_dtypes = {}
         for feature in event.features:
-            if target in ALL_TYPES:
-                # "to" is a dtype, not map: cast all features this dtype
-                target_dtypes[feature.name] = target
-            elif feature.name in target:
-                # Cast by feature name
-                target_dtypes[feature.name] = target[feature.name]
-            elif feature.dtype in target:
-                # Cast by dtype
-                target_dtypes[feature.name] = target[feature.dtype]
-            else:
-                # Keep same dtype
-                target_dtypes[feature.name] = feature.dtype
+            if to_dtype is not None:
+                # cast all features this dtype
+                target_dtypes[feature.name] = to_dtype
+            elif from_features is not None:
+                # Cast by feature name (use same feature.dtype if not found)
+                target_dtypes[feature.name] = from_features.get(
+                    feature.name, feature.dtype
+                )
+            elif from_dtypes is not None:
+                # Cast by dtype (use same feature.dtype if not found)
+                target_dtypes[feature.name] = from_dtypes.get(
+                    feature.dtype, feature.dtype
+                )
         self.add_attribute("target_dtypes", target_dtypes)
         self.add_attribute("check_overflow", check_overflow)
 
@@ -133,7 +148,7 @@ operator_lib.register_operator(CastOperator)
 
 def cast(
     event: Event,
-    target: Union[DType, Mapping[Union[str, DType], DType]],
+    target: Union[DType, Union[Mapping[str, DType], Mapping[DType, DType]]],
     check_overflow: bool = True,
 ) -> Event:
     """
@@ -146,7 +161,8 @@ def cast(
         target:
             A single dtype or a map. Providing a single dtype will cast all
             columns to it. The mapping keys can be either feature names or
-            the original dtypes, and the values are the target dtypes for them.
+            the original dtypes (and not both types mixed),
+            and the values are the target dtypes for them.
             All dtypes must be temporian types (see `dtype.py`)
         check_overflow:
             A flag to check overflow when casting to a dtype with a shorter
@@ -157,7 +173,7 @@ def cast(
     Returns:
         A new `Event` (or the same if no features actually changed dtype), with
         the same feature names as the input one, but with the new dtypes as
-        specified in `to`.
+        specified in `target`.
 
     Raises:
         ValueError:
@@ -167,9 +183,9 @@ def cast(
             If trying to cast a non-numeric string to numeric dtype.
         ValueError:
             If the `target` parameter is not a dtype nor a mapping.
-        KeyError:
+        ValueError:
             If `target` is a mapping, but some of the keys are not a dtype nor
-            a feature in `event.feature_names`.
+            a feature in `event.feature_names`, or if those types are mixed.
 
     Examples:
         Given an input `Event` with features 'A' (`INT64`), 'B'
@@ -184,8 +200,30 @@ def cast(
             Convert features 'A' and 'B' to `INT32`, 'D' to `FLOAT32`, leave 'C'
             unchanged.
 
-        3. `cast(event, target={'A': dtype.FLOAT32, dtype.INT64: dtype.INT32})`
-            Convert 'A' to `FLOAT32` (feature name key takes precedence) and any
-            other feature of type `INT64` to `INT32` (in this case, only 'B').
+        3. `cast(event, target={'A': dtype.FLOAT32, 'B': dtype.INT32})`
+            Convert 'A' to `FLOAT32` and 'B' to `INT32`.
+
+        4. `cast(event, target={'A': dtype.FLOAT32, dtype.FLOAT64: dtype.INT32})`
+            Raises ValueError: don't mix dtype and feature name keys
     """
-    return CastOperator(event, target, check_overflow).outputs["event"]
+    # Convert 'target' to one of these:
+    to_dtype = None
+    from_features = None
+    from_dtypes = None
+
+    # Further type verifications are done in the operator
+    if isinstance(target, Mapping):
+        if target.keys()[0] in event.feature_names:
+            from_features = target
+        else:
+            from_dtypes = target
+    else:
+        to_dtype = target
+
+    return CastOperator(
+        event,
+        to_dtype=to_dtype,
+        from_features=from_features,
+        from_dtypes=from_dtypes,
+        check_overflow=check_overflow,
+    ).outputs["event"]

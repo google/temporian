@@ -15,26 +15,36 @@ from temporian.implementation.numpy.operators.base import OperatorImplementation
 class CastNumpyImplementation(OperatorImplementation):
     def __init__(self, operator: CastOperator) -> None:
         super().__init__(operator)
-        self.dtype_limits = {
+        self._dtype_limits = {
             tp_dtypes.INT32: np.iinfo(np.int32),
             tp_dtypes.INT64: np.iinfo(np.int64),
             tp_dtypes.FLOAT32: np.finfo(np.float32),
             tp_dtypes.FLOAT64: np.finfo(np.float64),
-            tp_dtypes.STRING: np.finfo(np.float64),  # Use highest dtype
         }
+
+        self._nocheck_dtypes = [tp_dtypes.BOOLEAN, tp_dtypes.STRING]
 
     def _can_overflow(
         self, origin_dtype: tp_dtypes.DType, dst_dtype: tp_dtypes.DType
     ):
+        # Don't check overflow for BOOLEAN or STRING:
+        #  - boolean: makes no sense, everybody knows what to expect.
+        #  - string: on orig_dtype, too costly to convert to numeric dtype
+        #            and compare to the limit. On dst_type, there's no limit.
+        if (
+            origin_dtype in self._nocheck_dtypes
+            or dst_dtype in self._nocheck_dtypes
+        ):
+            return False
         return (
-            self.dtype_limits[origin_dtype].max
-            > self.dtype_limits[dst_dtype].max
+            self._dtype_limits[origin_dtype].max
+            > self._dtype_limits[dst_dtype].max
         )
 
     def _check_overflow(self, data, origin_dtype, dst_dtype):
         if self._can_overflow(origin_dtype, dst_dtype) and np.any(
-            (data < self.dtype_limits[dst_dtype].min)
-            | (data > self.dtype_limits[dst_dtype].max)
+            (data < self._dtype_limits[dst_dtype].min)
+            | (data > self._dtype_limits[dst_dtype].max)
         ):
             raise ValueError(
                 f"Overflow casting {origin_dtype}->{dst_dtype} {data=}"

@@ -32,30 +32,29 @@ class CastNumpyImplementationTest(absltest.TestCase):
 
     def setUp(self):
         # store ids
-        TRYOLABS_SHOP = 42
+        TRYO_SHOP = 42
         GOOGLE_SHOP = 101
         # product ids
         MATE_ID = 1
         BOOK_ID = 2
         PIXEL_ID = 3
 
-        # 2 index columns, 3 features: float64, int64, str
-        above_int32 = np.iinfo(np.int32).max + 1
-        below_int32 = np.iinfo(np.int32).min - 1
-        above_int64 = np.finfo(np.float64).max  # above float32 too
-        below_int64 = np.finfo(np.float64).min
+        # Some numbers above int32 and below int64
+        abv_i32 = np.iinfo(np.int32).max + 1
+        blw_i64 = np.finfo(np.float64).min  # below float32 too
 
+        # 2 index columns, 3 features: float64, int64, str, boolean
         self.numpy_in_event = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
-                    [TRYOLABS_SHOP, MATE_ID, 0.0, -14.0, above_int32, "1.2"],
-                    [TRYOLABS_SHOP, MATE_ID, 1.0, 15.0, below_int32, "2.0"],
-                    [TRYOLABS_SHOP, MATE_ID, 2.0, 16, 3, "000000"],
-                    [TRYOLABS_SHOP, BOOK_ID, 1.0, 10, 4, "100"],
-                    [GOOGLE_SHOP, BOOK_ID, 1.0, 0, 5, "3.2"],
-                    [GOOGLE_SHOP, BOOK_ID, 2.0, above_int64, 6, "001"],
-                    [GOOGLE_SHOP, PIXEL_ID, 0.0, -1, -8, "-3.5"],
-                    [GOOGLE_SHOP, PIXEL_ID, 1.0, below_int64, 8, "-2"],
+                    [TRYO_SHOP, MATE_ID, 0.0, -14.0, abv_i32, "1.2", True],
+                    [TRYO_SHOP, MATE_ID, 1.0, 15.0, 0, "2.0", True],
+                    [TRYO_SHOP, MATE_ID, 2.0, 16, 3, "000000", True],
+                    [TRYO_SHOP, BOOK_ID, 1.0, 10, 4, "100", False],
+                    [GOOGLE_SHOP, BOOK_ID, 1.0, 0, 5, "3.2", False],
+                    [GOOGLE_SHOP, BOOK_ID, 2.0, 0, 6, "001", True],
+                    [GOOGLE_SHOP, PIXEL_ID, 0.0, -1, -8, "-3.5", False],
+                    [GOOGLE_SHOP, PIXEL_ID, 1.0, blw_i64, 8, "-2", False],
                 ],
                 columns=[
                     "store_id",
@@ -65,6 +64,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
                     "float_64",
                     "int_64",
                     "str",
+                    "boolean",
                 ],
             ),
             index_names=["store_id", "product_id"],
@@ -74,14 +74,14 @@ class CastNumpyImplementationTest(absltest.TestCase):
             pd.DataFrame(
                 data=[
                     # Note: astype() below will truncate above/below numbers
-                    [TRYOLABS_SHOP, MATE_ID, 0.0, -14.0, above_int32, 1.2],
-                    [TRYOLABS_SHOP, MATE_ID, 1.0, 15.0, below_int32, 2],
-                    [TRYOLABS_SHOP, MATE_ID, 2.0, 16, 3, 0],
-                    [TRYOLABS_SHOP, BOOK_ID, 1.0, 10, 4, 100],
-                    [GOOGLE_SHOP, BOOK_ID, 1.0, 0, 5, 3.2],
-                    [GOOGLE_SHOP, BOOK_ID, 2.0, above_int64, 6, 1],
-                    [GOOGLE_SHOP, PIXEL_ID, 0.0, -1, -8, -3.5],
-                    [GOOGLE_SHOP, PIXEL_ID, 1.0, below_int64, 8, -2],
+                    [TRYO_SHOP, MATE_ID, 0.0, -14.0, abv_i32, 1.2, 1],
+                    [TRYO_SHOP, MATE_ID, 1.0, 15.0, 0, 2, 1],
+                    [TRYO_SHOP, MATE_ID, 2.0, 16, 3, 0, 1],
+                    [TRYO_SHOP, BOOK_ID, 1.0, 10, 4, 100, 0],
+                    [GOOGLE_SHOP, BOOK_ID, 1.0, 0, 5, 3.2, 0],
+                    [GOOGLE_SHOP, BOOK_ID, 2.0, 0, 6, 1, 1],
+                    [GOOGLE_SHOP, PIXEL_ID, 0.0, -1, -8, -3.5, 0],
+                    [GOOGLE_SHOP, PIXEL_ID, 1.0, blw_i64, 8, -2, 0],
                 ],
                 columns=[
                     "store_id",
@@ -90,6 +90,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
                     "float_64",
                     "int_64",
                     "str",
+                    "boolean",
                 ],
                 # Even more tricky: these columns won't match their type
             ).astype({"float_64": np.float32, "int_64": np.int32}),
@@ -104,6 +105,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
                 Feature("float_64", dtype.FLOAT64),
                 Feature("int_64", dtype.INT64),
                 Feature("str", dtype.STRING),
+                Feature("boolean", dtype.BOOLEAN),
             ],
             sampling=self.sampling,
             creator=None,
@@ -114,10 +116,11 @@ class CastNumpyImplementationTest(absltest.TestCase):
 
         operator = CastOperator(
             event=self.input_event,
-            target={
+            from_features={
                 "float_64": dtype.FLOAT32,
                 "int_64": dtype.INT32,
                 "str": dtype.FLOAT64,
+                "boolean": dtype.INT64,
             },
             check_overflow=False,
         )
@@ -133,34 +136,12 @@ class CastNumpyImplementationTest(absltest.TestCase):
 
         operator = CastOperator(
             event=self.input_event,
-            target={
+            from_dtypes={
                 dtype.FLOAT64: dtype.FLOAT32,
                 dtype.INT64: dtype.INT32,
                 dtype.STRING: dtype.FLOAT64,
+                dtype.BOOLEAN: dtype.INT64,
                 dtype.INT32: dtype.INT64,  # This one should have no effect
-            },
-            check_overflow=False,
-        )
-
-        cast_implementation = CastNumpyImplementation(operator)
-
-        operator_output = cast_implementation.call(event=self.numpy_in_event)
-
-        self.assertTrue(self.numpy_expected_event == operator_output["event"])
-
-    def test_cast_mixed_keys(self) -> None:
-        """Test correct casting, some cols by origin dtype,
-        others by feature name, without overflow check.
-        """
-
-        operator = CastOperator(
-            event=self.input_event,
-            target={
-                "float_64": dtype.FLOAT32,
-                dtype.INT64: dtype.STRING,  # No effect (feature name below precedes)
-                "int_64": dtype.INT32,
-                dtype.STRING: dtype.FLOAT64,
-                dtype.FLOAT64: dtype.STRING,  # No effect (feature name above precedes)
             },
             check_overflow=False,
         )
@@ -176,11 +157,11 @@ class CastNumpyImplementationTest(absltest.TestCase):
 
         operator = CastOperator(
             event=self.input_event,
-            target={
-                "float_64": dtype.FLOAT64,
+            from_dtypes={
+                dtype.FLOAT64: dtype.FLOAT64,
                 dtype.INT64: dtype.INT64,
                 dtype.STRING: dtype.STRING,
-                dtype.FLOAT64: dtype.STRING,  # No effect (feature name above precedes)
+                dtype.BOOLEAN: dtype.BOOLEAN,
             },
             check_overflow=True,
         )
@@ -197,7 +178,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
 
         operator = CastOperator(
             event=self.input_event,
-            target={
+            from_features={
                 "int_64": dtype.INT32,
             },
             check_overflow=True,
@@ -213,7 +194,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
 
         operator = CastOperator(
             event=self.input_event,
-            target={
+            from_dtypes={
                 dtype.FLOAT64: dtype.FLOAT32,
             },
             check_overflow=True,
@@ -225,11 +206,11 @@ class CastNumpyImplementationTest(absltest.TestCase):
             _ = cast_implementation.call(event=self.numpy_in_event)
 
     def test_overflow_float64_int64(self) -> None:
-        """Test overflow check for int64, coming from the sky"""
+        """Test overflow check for int64, coming from max float64"""
 
         operator = CastOperator(
             event=self.input_event,
-            target={
+            from_features={
                 "float_64": dtype.INT64,
             },
             check_overflow=True,
@@ -239,6 +220,24 @@ class CastNumpyImplementationTest(absltest.TestCase):
 
         with self.assertRaisesRegex(ValueError, "Overflow"):
             _ = cast_implementation.call(event=self.numpy_in_event)
+
+    def test_no_overflow_boolean(self) -> None:
+        """Test that no overflow error is raised when
+        converting to boolean type"""
+
+        operator = CastOperator(
+            event=self.input_event,
+            from_features={
+                "int_64": dtype.BOOLEAN,
+                "float_64": dtype.BOOLEAN,
+            },
+            check_overflow=True,
+        )
+
+        cast_implementation = CastNumpyImplementation(operator)
+
+        # This shouldn't raise error
+        _ = cast_implementation.call(event=self.numpy_in_event)
 
 
 if __name__ == "__main__":
