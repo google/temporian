@@ -51,8 +51,8 @@ class SampleOperatorTest(absltest.TestCase):
         sampling_data = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 {
-                    "timestamp": [-1, 1, 6, 10, 2, 2],
-                    "x": [1, 1, 1, 1, 2, 2],
+                    "timestamp": [-1, 1, 6, 10, 2, 2, 1],
+                    "x": [1, 1, 1, 1, 2, 2, 3],
                 }
             ),
             index_names=["x"],
@@ -62,11 +62,11 @@ class SampleOperatorTest(absltest.TestCase):
         expected_output = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 {
-                    "timestamp": [-1, 1, 6, 10, 2, 2],
-                    "a": [math.nan, 1.0, 2.0, 4.0, 6.0, 6.0],
-                    "b": [0, 5, 6, 8, 10, 10],
-                    "c": ["", "A", "B", "D", "F", "F"],
-                    "x": [1, 1, 1, 1, 2, 2],
+                    "timestamp": [-1, 1, 6, 10, 2, 2, 1],
+                    "a": [math.nan, 1.0, 2.0, 4.0, 6.0, 6.0, math.nan],
+                    "b": [0, 5, 6, 8, 10, 10, 0],
+                    "c": ["", "A", "B", "D", "F", "F", ""],
+                    "x": [1, 1, 1, 1, 2, 2, 3],
                 }
             ),
             index_names=["x"],
