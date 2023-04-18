@@ -45,9 +45,9 @@ class DropIndexOperator(Operator):
 
         output_sampling = Sampling(
             index_levels=[
-                (index_name, index_dtype)
-                for index_name, index_dtype in event.sampling.index
-                if index_name not in index_to_drop
+                index_level
+                for index_level in event.sampling.index.levels
+                if index_level.name not in index_to_drop
             ]
         )
 
@@ -79,9 +79,8 @@ class DropIndexOperator(Operator):
                         " exists in event."
                     )
 
-                # TODO: Don't recompute the "dtypes" and "names" at each
-                #   iteration.
-                # TODO: Remove linear search.
+                # TODO: Don't recompute the "dtypes/names" at each iteration.
+                # TODO: Replace linear search with hasmap search.
                 new_features.append(
                     Feature(
                         name=index_name,
@@ -105,6 +104,7 @@ class DropIndexOperator(Operator):
             return feature_names
 
     def dst_index_names(self) -> List[str]:
+        # TODO: Avoid instentiating the "names" array.
         return [
             index_lvl_name
             for index_lvl_name in self.inputs["event"].sampling.index.names

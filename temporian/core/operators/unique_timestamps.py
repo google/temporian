@@ -33,7 +33,7 @@ class UniqueTimestamps(Operator):
             Event(
                 features=[],
                 sampling=Sampling(
-                    index=event.sampling.index,
+                    index_levels=event.sampling.index,
                     creator=self,
                     is_unix_timestamp=event.sampling.is_unix_timestamp,
                 ),

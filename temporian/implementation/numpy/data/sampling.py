@@ -54,7 +54,7 @@ class NumpySampling:
 
     # TODO: To remove
     @property
-    def dtypes(self) -> Dict[str, type]:
+    def dtypes(self) -> Dict[str, DType]:
         first_idx_lvl = next(iter(self.data))
         return {
             name: PYTHON_DTYPE_MAPPING[type(value)]
@@ -62,7 +62,7 @@ class NumpySampling:
         }
 
     # TODO: Rename to "dtypes".
-    def dtypes_list(self) -> List[dtype_lib.DType]:
+    def dtypes_list(self) -> List[DType]:
         # TODO: Handle case where there is no data.
         # TODO: Handle non supported type PYTHON_DTYPE_MAPPING.
         first_idx_lvl = next(iter(self.data))

@@ -61,7 +61,7 @@ class Propagate(Operator):
                 )
 
         output_sampling = Sampling(
-            index=sampling.sampling.index.levels, creator=self
+            index_levels=sampling.sampling.index, creator=self
         )
 
         output_features = [  # pylint: disable=g-complex-comprehension

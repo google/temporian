@@ -91,6 +91,11 @@ class Index:
     def dtypes(self) -> List[IndexDType]:
         return [index_level.dtype for index_level in self._levels]
 
+    def __eq__(self, other):
+        if not isinstance(other, Index):
+            return False
+        return self.levels == other.levels
+
 
 class Sampling(object):
     def __init__(
@@ -123,6 +128,7 @@ class Sampling(object):
     def index(self) -> Index:
         return self._index
 
+    @property
     def creator(self) -> Optional[Operator]:
         return self._creator
 
@@ -130,6 +136,7 @@ class Sampling(object):
     def is_unix_timestamp(self) -> bool:
         return self._is_unix_timestamp
 
+    # TODO: Remove setter
     @creator.setter
     def creator(self, creator: Optional[Operator]):
         self._creator = creator
