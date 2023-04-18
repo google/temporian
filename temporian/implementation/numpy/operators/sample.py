@@ -8,10 +8,10 @@ from temporian.implementation.numpy.data.feature import (
     NumpyFeature,
     dtype_to_np_dtype,
 )
+from temporian.core.data.dtype import DType
 from temporian.core.operators.sample import Sample
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy_cc.operators import sample as sample_cc
-from temporian.core.data import dtype
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -31,7 +31,7 @@ class SampleNumpyImplementation(OperatorImplementation):
         output_features = self._operator.outputs["event"].features
         output_missing_and_np_dtypes = [
             (
-                dtype.MissingValue(f.dtype),
+                f.dtype.missing_value(),
                 dtype_to_np_dtype(f.dtype),
             )
             for f in output_features

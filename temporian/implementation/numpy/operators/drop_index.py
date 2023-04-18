@@ -118,7 +118,7 @@ class DropIndexNumpyImplementation(OperatorImplementation):
             "event": NumpyEvent(
                 dst_event_data,
                 NumpySampling(
-                    self.operator.dst_index_names(),
+                    dst_feature_names,
                     dst_sampling_data,
                     is_unix_timestamp=event.sampling.is_unix_timestamp,
                 ),

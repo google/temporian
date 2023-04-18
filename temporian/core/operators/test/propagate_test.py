@@ -20,7 +20,7 @@ from temporian.core.data.sampling import Sampling
 from temporian.core.operators.propagate import propagate
 from temporian.core.data import event as event_lib
 from temporian.core.data.feature import Feature
-from temporian.core.data import dtype as dtype_lib
+from temporian.core.data.dtype import DType
 
 
 class PropagateOperatorTest(absltest.TestCase):
@@ -30,15 +30,15 @@ class PropagateOperatorTest(absltest.TestCase):
     def test_basic(self):
         event = event_lib.input_event(
             [
-                Feature("a", dtype_lib.FLOAT64),
-                Feature("b", dtype_lib.FLOAT64),
+                Feature("a", DType.FLOAT64),
+                Feature("b", DType.FLOAT64),
             ],
-            sampling=Sampling(index=[("x", dtype_lib.STRING)]),
+            sampling=Sampling(index_levels=[("x", DType.STRING)]),
         )
         sampling = event_lib.input_event(
             [],
             sampling=Sampling(
-                index=[("x", dtype_lib.STRING), ("y", dtype_lib.STRING)]
+                index_levels=[("x", DType.STRING), ("y", DType.STRING)]
             ),
         )
         _ = propagate(event=event, sampling=sampling)
@@ -46,15 +46,15 @@ class PropagateOperatorTest(absltest.TestCase):
     def test_error_wrong_index(self):
         event = event_lib.input_event(
             [
-                Feature("a", dtype_lib.FLOAT64),
-                Feature("b", dtype_lib.FLOAT64),
+                Feature("a", DType.FLOAT64),
+                Feature("b", DType.FLOAT64),
             ],
-            sampling=Sampling(index=[("z", dtype_lib.STRING)]),
+            sampling=Sampling(index_levels=[("z", DType.STRING)]),
         )
         sampling = event_lib.input_event(
             [],
             sampling=Sampling(
-                index=[("x", dtype_lib.STRING), ("y", dtype_lib.STRING)]
+                index_levels=[("x", DType.STRING), ("y", DType.STRING)]
             ),
         )
         with self.assertRaisesRegex(
@@ -66,15 +66,15 @@ class PropagateOperatorTest(absltest.TestCase):
     def test_error_wrong_index_type(self):
         event = event_lib.input_event(
             [
-                Feature("a", dtype_lib.FLOAT64),
-                Feature("b", dtype_lib.FLOAT64),
+                Feature("a", DType.FLOAT64),
+                Feature("b", DType.FLOAT64),
             ],
-            sampling=Sampling(index=[("x", dtype_lib.INT32)]),
+            sampling=Sampling(index_levels=[("x", DType.INT32)]),
         )
         sampling = event_lib.input_event(
             [],
             sampling=Sampling(
-                index=[("x", dtype_lib.STRING), ("y", dtype_lib.STRING)]
+                index_levels=[("x", DType.STRING), ("y", DType.STRING)]
             ),
         )
         with self.assertRaisesRegex(

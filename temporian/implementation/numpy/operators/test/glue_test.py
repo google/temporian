@@ -21,7 +21,7 @@ from temporian.core.data.event import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.glue import GlueOperator
 from temporian.core.data import event as event_lib
-from temporian.core.data import dtype as dtype_lib
+from temporian.core.data.dtype import DType
 
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators.glue import (
@@ -118,12 +118,12 @@ class GlueNumpyImplementationTest(absltest.TestCase):
         ):
             _ = GlueOperator(
                 event_0=event_lib.input_event(
-                    [Feature(name="a", dtype=dtype_lib.FLOAT64)],
-                    sampling=Sampling(index=[("x", dtype_lib.INT64)]),
+                    [Feature(name="a", dtype=DType.FLOAT64)],
+                    sampling=Sampling(index_levels=[("x", DType.INT64)]),
                 ),
                 event_1=event_lib.input_event(
-                    [Feature(name="b", dtype=dtype_lib.FLOAT64)],
-                    sampling=Sampling(index=[("x", dtype_lib.INT64)]),
+                    [Feature(name="b", dtype=DType.FLOAT64)],
+                    sampling=Sampling(index_levels=[("x", DType.INT64)]),
                 ),
             )
 
@@ -132,14 +132,14 @@ class GlueNumpyImplementationTest(absltest.TestCase):
             ValueError,
             'Feature "a" is defined in multiple input events',
         ):
-            sampling = Sampling(index=[("x", dtype_lib.INT64)])
+            sampling = Sampling(index_levels=[("x", DType.INT64)])
             _ = GlueOperator(
                 event_0=event_lib.input_event(
-                    [Feature(name="a", dtype=dtype_lib.FLOAT64)],
+                    [Feature(name="a", dtype=DType.FLOAT64)],
                     sampling=sampling,
                 ),
                 event_1=event_lib.input_event(
-                    [Feature(name="a", dtype=dtype_lib.FLOAT64)],
+                    [Feature(name="a", dtype=DType.FLOAT64)],
                     sampling=sampling,
                 ),
             )

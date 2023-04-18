@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Tuple, Sequence
 import numpy as np
 import pandas as pd
 
-from temporian.core.data import dtype as dtype_lib
+from temporian.core.data.dtype import DType
 from temporian.core.data.duration import convert_date_to_duration
 from temporian.core.data.event import Event
 from temporian.core.data.sampling import Sampling
@@ -20,9 +20,9 @@ MAX_NUM_PRINTED_INDEX = 5
 MAX_NUM_PRINTED_FEATURES = 10
 
 PYTHON_DTYPE_MAPPING = {
-    str: dtype_lib.STRING,
+    str: DType.STRING,
     # TODO: fix this, int doesn't have to be INT64 necessarily
-    int: dtype_lib.INT64,
+    int: DType.INT64,
 }
 
 
@@ -51,7 +51,7 @@ class NumpyEvent:
 
     # TODO: To remove
     @property
-    def dtypes(self) -> Dict[str, dtype_lib.DType]:
+    def dtypes(self) -> Dict[str, DType]:
         return {
             feature.name: feature.dtype
             for feature in self._first_index_features
@@ -92,7 +92,7 @@ class NumpyEvent:
                 feature.schema() for feature in list(self.data.values())[0]
             ],
             sampling=Sampling(
-                index=[
+                index_levels=[
                     (index_name, PYTHON_DTYPE_MAPPING[type(index_value)])
                     for index_name, index_value in zip(
                         self.sampling.index, self.first_index_value()

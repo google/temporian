@@ -26,7 +26,7 @@ from temporian.implementation.numpy.data.event import NumpyEvent, NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.core.data import event as event_lib
 from temporian.core.data import feature as feature_lib
-from temporian.core.data import dtype as dtype_lib
+from temporian.core.data.dtype import DType
 
 
 class PropagateOperatorTest(absltest.TestCase):

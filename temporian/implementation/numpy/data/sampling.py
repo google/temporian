@@ -2,7 +2,7 @@ from typing import Dict, List, Tuple
 
 import numpy as np
 
-from temporian.core.data import dtype as dtype_lib
+from temporian.core.data.dtype import DType
 from temporian.utils import string
 
 # Maximum of printed index when calling repr(event)
@@ -10,9 +10,9 @@ MAX_NUM_PRINTED_INDEX = 5
 
 # same as in numpy/data/event.py, can't import due to circular import error
 PYTHON_DTYPE_MAPPING = {
-    str: dtype_lib.STRING,
+    str: DType.STRING,
     # TODO: fix this, int doesn't have to be INT64 necessarily
-    int: dtype_lib.INT64,
+    int: DType.INT64,
 }
 
 

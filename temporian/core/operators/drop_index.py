@@ -44,9 +44,9 @@ class DropIndexOperator(Operator):
         output_features = self._output_features(event, index_to_drop, keep)
 
         output_sampling = Sampling(
-            index=[
+            index_levels=[
                 (index_name, index_dtype)
-                for index_name, index_dtype in event.sampling.index_dtypes.items()
+                for index_name, index_dtype in event.sampling.index
                 if index_name not in index_to_drop
             ]
         )
@@ -79,10 +79,15 @@ class DropIndexOperator(Operator):
                         " exists in event."
                     )
 
+                # TODO: Don't recompute the "dtypes" and "names" at each
+                #   iteration.
+                # TODO: Remove linear search.
                 new_features.append(
                     Feature(
                         name=index_name,
-                        dtype=event.sampling.index_dtypes[index_name],
+                        dtype=event.sampling.index.dtypes[
+                            event.sampling.index.names.index(index_name)
+                        ],
                     )
                 )
 
@@ -101,9 +106,9 @@ class DropIndexOperator(Operator):
 
     def dst_index_names(self) -> List[str]:
         return [
-            index_level.name
-            for index_level in self.inputs["event"].sampling.index
-            if index_level.name not in self._index_to_drop
+            index_lvl_name
+            for index_lvl_name in self.inputs["event"].sampling.index.names
+            if index_lvl_name not in self._index_to_drop
         ]
 
     @property
@@ -142,7 +147,7 @@ def _normalize_index_to_drop(
     event: Event, index_names: Optional[Union[List[str], str]]
 ) -> List[str]:
     if index_names is None:
-        return event.sampling.index_names
+        return event.sampling.index.names
 
     if isinstance(index_names, str):
         index_names = [index_names]
@@ -150,11 +155,12 @@ def _normalize_index_to_drop(
     if len(index_names) == 0:
         raise ValueError("Cannot specify empty list as `index_names` argument.")
 
+    # TODO: Don't recompute name each time.
     # check if any index names are missing from the index
     missing_index_names = [
         index_name
         for index_name in index_names
-        if index_name not in event.sampling.index_names
+        if index_name not in event.sampling.index.names
     ]
     if missing_index_names:
         raise KeyError(

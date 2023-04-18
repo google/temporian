@@ -19,11 +19,10 @@ from typing import List, Union
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
-from temporian.core.operators.base import Operator
-from temporian.proto import core_pb2 as pb
-from temporian.core.operators.select import select
-from temporian.core.data.sampling import IndexLevel
 from temporian.core.data.sampling import Sampling
+from temporian.core.operators.base import Operator
+from temporian.core.operators.select import select
+from temporian.proto import core_pb2 as pb
 
 
 class Propagate(Operator):
@@ -40,8 +39,8 @@ class Propagate(Operator):
         self.add_input("sampling", sampling)
 
         self._index_mapping: list[int] = []
-        sampling_index_name = sampling.sampling.index_names
-        sampling_index_dtypes = sampling.sampling.index_dtypes_list()
+        sampling_index_name = sampling.sampling.index.names
+        sampling_index_dtypes = sampling.sampling.index.dtypes
         for index in event.sampling.index:
             try:
                 sampling_idx = sampling_index_name.index(index.name)
@@ -61,7 +60,9 @@ class Propagate(Operator):
                     f" {index.dtype} != {sampling_index_dtypes[sampling_idx]}"
                 )
 
-        output_sampling = Sampling(index=sampling.sampling.index, creator=self)
+        output_sampling = Sampling(
+            index=sampling.sampling.index.levels, creator=self
+        )
 
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(

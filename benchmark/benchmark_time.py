@@ -17,14 +17,32 @@ Benchmark Python API.
 """
 
 import time
-import numpy as np
-import temporian as tp
-from temporian.implementation.numpy.data.event import NumpyEvent
-import pandas as pd
 from typing import List, NamedTuple, Union
 
+import numpy as np
+import temporian as tp
+import pandas as pd
 
-def _build_toy_dataset(n, data_prefix="", data2_is_categorical_integer=False):
+from temporian.implementation.numpy.data.event import NumpyEvent
+
+# TODO(gbm): Add flag to control which benchmark to run.
+
+
+def _build_toy_dataset(
+    n: int, data_prefix="", data2_is_categorical_integer=False
+) -> NumpyEvent:
+    """Builds a toy dataset with two features.
+
+    Args:
+        n: Number of timestamps.
+        data_prefix: Optional prefix in the feature names.
+        data2_is_categorical_integer: If true, the second feature is
+            categorical. If false (default), the second feature is numerical.
+
+    Returns:
+        A NumpyEvent containing the toy dataset.
+    """
+
     np.random.seed(0)
     index_values = list(range(int(10)))
     timestamps = np.sort(np.random.randn(n) * n)

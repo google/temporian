@@ -18,7 +18,7 @@ from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
 
 from temporian.core.data.sampling import Sampling
-from temporian.core.data import dtype as dtype_lib
+from temporian.core.data.dtype import DType
 
 if TYPE_CHECKING:
     from temporian.core.operators.base import Operator
@@ -28,7 +28,7 @@ class Feature(object):
     def __init__(
         self,
         name: str,
-        dtype: dtype_lib.DType = dtype_lib.FLOAT32,
+        dtype: DType = DType.FLOAT32,
         sampling: Optional[Sampling] = None,
         creator: Optional[Operator] = None,
     ):
@@ -42,10 +42,10 @@ class Feature(object):
             f" sampling={sampling} instead."
         )
 
-        if dtype not in dtype_lib.ALL_TYPES:
+        if not isinstance(dtype, DType):
             raise ValueError(
                 f"Invalid dtype feature constructor. Got {dtype}. "
-                f"Expecting one of {dtype_lib.ALL_TYPES} instead."
+                f"Expecting one of {DType} instead."
             )
 
         self._name = name
@@ -68,7 +68,7 @@ class Feature(object):
         return self._name
 
     @property
-    def dtype(self) -> dtype_lib.DType:
+    def dtype(self) -> DType:
         return self._dtype
 
     @property
