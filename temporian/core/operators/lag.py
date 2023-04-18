@@ -41,7 +41,9 @@ class LagOperator(Operator):
 
         self.add_attribute("duration", duration)
 
-        output_sampling = Sampling(index=event.sampling.index, creator=self)
+        output_sampling = Sampling(
+            index_levels=event.sampling.index.levels, creator=self
+        )
 
         prefix = "lag" if duration > 0 else "leak"
         duration_str = duration_abbreviation(duration)

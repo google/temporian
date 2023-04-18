@@ -24,7 +24,7 @@ from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.operators.calendar.day_of_year import (
     CalendarDayOfYearNumpyImplementation,
 )
-from temporian.core.data import dtype
+from temporian.core.data.dtype import DType
 
 
 class CalendarDayOfYearNumpyImplementationTest(absltest.TestCase):
@@ -68,7 +68,7 @@ class CalendarDayOfYearNumpyImplementationTest(absltest.TestCase):
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(
-            output["event"].first_index_features()[0].dtype == dtype.INT32
+            output["event"].first_index_features()[0].dtype == DType.INT32
         )
 
 
