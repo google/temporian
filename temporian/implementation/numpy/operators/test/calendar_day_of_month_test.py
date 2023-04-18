@@ -26,7 +26,7 @@ from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.operators.calendar.day_of_month import (
     CalendarDayOfMonthNumpyImplementation,
 )
-from temporian.core.data import dtype
+from temporian.core.data.dtype import DType
 
 
 class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
@@ -66,7 +66,7 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(
-            output["event"].first_index_features()[0].dtype == dtype.INT32
+            output["event"].first_index_features()[0].dtype == DType.INT32
         )
 
     def test_with_index(self) -> None:
@@ -111,7 +111,7 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(
-            output["event"].first_index_features()[0].dtype == dtype.INT32
+            output["event"].first_index_features()[0].dtype == DType.INT32
         )
 
     # TODO: move this test to core operators' test suite when created
@@ -123,7 +123,8 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
         sampling.
         """
         input_event = Event(
-            features=[], sampling=Sampling(index=[], is_unix_timestamp=False)
+            features=[],
+            sampling=Sampling(index_levels=[], is_unix_timestamp=False),
         )
         with self.assertRaises(ValueError):
             CalendarDayOfMonthOperator(input_event)

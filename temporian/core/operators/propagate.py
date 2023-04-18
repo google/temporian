@@ -19,11 +19,10 @@ from typing import List, Union
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
-from temporian.core.operators.base import Operator
-from temporian.proto import core_pb2 as pb
-from temporian.core.operators.select import select
-from temporian.core.data.sampling import IndexLevel
 from temporian.core.data.sampling import Sampling
+from temporian.core.operators.base import Operator
+from temporian.core.operators.select import select
+from temporian.proto import core_pb2 as pb
 
 
 class Propagate(Operator):
@@ -47,10 +46,10 @@ class Propagate(Operator):
         if len(to.features) == 0:
             raise ValueError("to contains no features")
 
-        self._added_index = [IndexLevel(k.name, k.dtype) for k in to.features]
+        self._added_index_lvls = [(k.name, k.dtype) for k in to.features]
 
-        overlap_features = set(self._added_index).intersection(
-            event.sampling.index
+        overlap_features = set(self._added_index_lvls).intersection(
+            event.sampling.index.levels
         )
         if len(overlap_features) > 0:
             raise ValueError(
@@ -58,8 +57,8 @@ class Propagate(Operator):
                 f" index: {list(overlap_features)}"
             )
 
-        new_index = event.sampling.index + self._added_index
-        sampling = Sampling(index=new_index, creator=self)
+        new_index = event.sampling.index.levels + self._added_index_lvls
+        sampling = Sampling(index_levels=new_index, creator=self)
 
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
@@ -82,10 +81,10 @@ class Propagate(Operator):
 
         self.check()
 
-    def added_index(self) -> list[str]:
+    def added_index(self) -> List[str]:
         """New items in the index."""
 
-        return self._added_index
+        return self._added_index_lvls
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:

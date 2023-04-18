@@ -36,9 +36,9 @@ class SetIndexOperator(Operator):
         # output sampling
 
         output_sampling = Sampling(
-            index=[
+            index_levels=[
                 (index_name, index_dtype)
-                for index_name, index_dtype in event.sampling.index_dtypes.items()
+                for index_name, index_dtype in event.sampling.index
             ]
             + [
                 (index_name, event.dtypes[index_name])

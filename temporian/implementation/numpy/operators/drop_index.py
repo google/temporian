@@ -38,7 +38,7 @@ class DropIndexNumpyImplementation(OperatorImplementation):
         # get attributes from operator
         drop_index_names = self.operator.index_names
         keep = self.operator.keep
-        dst_index_names = self.operator.dst_index_names
+        dst_index_names = self.operator.dst_index_names()
         dst_feat_names = self.operator.dst_feat_names
 
         # source index names

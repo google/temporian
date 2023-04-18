@@ -15,7 +15,7 @@
 from absl.testing import absltest
 
 from temporian.core.data import event as event_lib
-from temporian.core.data import dtype
+from temporian.core.data.dtype import DType
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.arithmetic import (
@@ -29,20 +29,20 @@ from temporian.core.operators.arithmetic import (
 
 class ArithmeticOperatorsTest(absltest.TestCase):
     def setUp(self):
-        self.sampling = Sampling(index=[("x", dtype.INT32)])
+        self.sampling = Sampling(index_levels=[("x", DType.INT32)])
 
         # Events with floating point types
         self.event_1 = event_lib.input_event(
             features=[
-                Feature("f1", dtype.FLOAT32),
-                Feature("f2", dtype.FLOAT64),
+                Feature("f1", DType.FLOAT32),
+                Feature("f2", DType.FLOAT64),
             ],
             sampling=self.sampling,
         )
         self.event_2 = event_lib.input_event(
             features=[
-                Feature("f3", dtype.FLOAT32),
-                Feature("f4", dtype.FLOAT64),
+                Feature("f3", DType.FLOAT32),
+                Feature("f4", DType.FLOAT64),
             ],
             sampling=self.sampling,
         )
@@ -50,15 +50,15 @@ class ArithmeticOperatorsTest(absltest.TestCase):
         # Events with integer types (only for division operations)
         self.event_3 = event_lib.input_event(
             features=[
-                Feature("f5", dtype.INT32),
-                Feature("f6", dtype.INT64),
+                Feature("f5", DType.INT32),
+                Feature("f6", DType.INT64),
             ],
             sampling=self.sampling,
         )
         self.event_4 = event_lib.input_event(
             features=[
-                Feature("f7", dtype.INT32),
-                Feature("f8", dtype.INT64),
+                Feature("f7", DType.INT32),
+                Feature("f8", DType.INT64),
             ],
             sampling=self.sampling,
         )
@@ -72,8 +72,8 @@ class ArithmeticOperatorsTest(absltest.TestCase):
         assert event_out.features[1].creator is event_out.creator
         assert event_out.features[0].name == "add_f1_f3"
         assert event_out.features[1].name == "add_f2_f4"
-        assert event_out.features[0].dtype == dtype.FLOAT32
-        assert event_out.features[1].dtype == dtype.FLOAT64
+        assert event_out.features[0].dtype == DType.FLOAT32
+        assert event_out.features[1].dtype == DType.FLOAT64
 
     def test_subtraction(self):
         event_out = self.event_1 - self.event_2
@@ -83,8 +83,8 @@ class ArithmeticOperatorsTest(absltest.TestCase):
         assert event_out.features[1].creator is event_out.creator
         assert event_out.features[0].name == "sub_f1_f3"
         assert event_out.features[1].name == "sub_f2_f4"
-        assert event_out.features[0].dtype == dtype.FLOAT32
-        assert event_out.features[1].dtype == dtype.FLOAT64
+        assert event_out.features[0].dtype == DType.FLOAT32
+        assert event_out.features[1].dtype == DType.FLOAT64
 
     def test_multiplication(self):
         event_out = self.event_1 * self.event_2
@@ -94,8 +94,8 @@ class ArithmeticOperatorsTest(absltest.TestCase):
         assert event_out.features[1].creator is event_out.creator
         assert event_out.features[0].name == "mult_f1_f3"
         assert event_out.features[1].name == "mult_f2_f4"
-        assert event_out.features[0].dtype == dtype.FLOAT32
-        assert event_out.features[1].dtype == dtype.FLOAT64
+        assert event_out.features[0].dtype == DType.FLOAT32
+        assert event_out.features[1].dtype == DType.FLOAT64
 
     def test_division(self):
         event_out = self.event_1 / self.event_2
@@ -105,8 +105,8 @@ class ArithmeticOperatorsTest(absltest.TestCase):
         assert event_out.features[1].creator is event_out.creator
         assert event_out.features[0].name == "div_f1_f3"
         assert event_out.features[1].name == "div_f2_f4"
-        assert event_out.features[0].dtype == dtype.FLOAT32
-        assert event_out.features[1].dtype == dtype.FLOAT64
+        assert event_out.features[0].dtype == DType.FLOAT32
+        assert event_out.features[1].dtype == DType.FLOAT64
 
     def test_floordiv(self):
         # First, check that truediv is not supported for integer types
@@ -123,8 +123,8 @@ class ArithmeticOperatorsTest(absltest.TestCase):
         assert event_out.features[1].creator is event_out.creator
         assert event_out.features[0].name == "floordiv_f5_f7"
         assert event_out.features[1].name == "floordiv_f6_f8"
-        assert event_out.features[0].dtype == dtype.INT32
-        assert event_out.features[1].dtype == dtype.INT64
+        assert event_out.features[0].dtype == DType.INT32
+        assert event_out.features[1].dtype == DType.INT64
 
 
 if __name__ == "__main__":

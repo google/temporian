@@ -25,7 +25,7 @@ from temporian.implementation.numpy.data.event import NumpyEvent, NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.core.data import event as event_lib
 from temporian.core.data import feature as feature_lib
-from temporian.core.data import dtype as dtype_lib
+from temporian.core.data.dtype import DType
 
 
 class PropagateOperatorTest(absltest.TestCase):
@@ -34,18 +34,18 @@ class PropagateOperatorTest(absltest.TestCase):
 
     def test_base(self):
         # Define input
-        sampling = Sampling(index=[("x", dtype_lib.STRING)])
+        sampling = Sampling(index_levels=[("x", DType.STRING)])
         event = event_lib.input_event(
             [
-                feature_lib.Feature(name="a", dtype=dtype_lib.FLOAT64),
-                feature_lib.Feature(name="b", dtype=dtype_lib.FLOAT64),
+                feature_lib.Feature(name="a", dtype=DType.FLOAT64),
+                feature_lib.Feature(name="b", dtype=DType.FLOAT64),
             ],
             sampling=sampling,
         )
         to = event_lib.input_event(
             [
-                feature_lib.Feature(name="c", dtype=dtype_lib.INT64),
-                feature_lib.Feature(name="d", dtype=dtype_lib.INT64),
+                feature_lib.Feature(name="c", dtype=DType.INT64),
+                feature_lib.Feature(name="d", dtype=DType.INT64),
             ],
             sampling=sampling,
         )

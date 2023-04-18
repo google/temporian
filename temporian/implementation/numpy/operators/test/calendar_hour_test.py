@@ -24,7 +24,7 @@ from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.operators.calendar.hour import (
     CalendarHourNumpyImplementation,
 )
-from temporian.core.data import dtype
+from temporian.core.data.dtype import DType
 
 
 class CalendarHourNumpyImplementationTest(absltest.TestCase):
@@ -65,7 +65,7 @@ class CalendarHourNumpyImplementationTest(absltest.TestCase):
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(
-            output["event"].first_index_features()[0].dtype == dtype.INT32
+            output["event"].first_index_features()[0].dtype == DType.INT32
         )
 
 
