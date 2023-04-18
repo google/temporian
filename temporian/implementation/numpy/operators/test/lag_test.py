@@ -14,10 +14,10 @@
 
 from absl.testing import absltest
 
-import numpy as np
 import pandas as pd
 
 from temporian.core import evaluator
+from temporian.core.data.dtype import DType
 from temporian.core.data.event import Event
 from temporian.core.data.event import Feature
 from temporian.core.data.sampling import Sampling
@@ -26,8 +26,6 @@ from temporian.core.operators.lag import leak
 from temporian.core.operators.lag import LagOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators.lag import LagNumpyImplementation
-
-from temporian.core.data import dtype as dtype_lib
 
 
 class LagNumpyImplementationTest(absltest.TestCase):
@@ -68,8 +66,8 @@ class LagNumpyImplementationTest(absltest.TestCase):
         )
 
         event = Event(
-            [Feature("sales", dtype_lib.FLOAT64)],
-            sampling=Sampling([("store_id", dtype_lib.INT64)]),
+            [Feature("sales", DType.FLOAT64)],
+            sampling=Sampling([("store_id", DType.INT64)]),
             creator=None,
         )
 
@@ -210,8 +208,8 @@ class LagNumpyImplementationTest(absltest.TestCase):
         )
 
         event = Event(
-            [Feature("sales", dtype_lib.FLOAT64)],
-            sampling=Sampling([("store_id", dtype_lib.INT64)]),
+            [Feature("sales", DType.FLOAT64)],
+            sampling=Sampling([("store_id", DType.INT64)]),
             creator=None,
         )
 

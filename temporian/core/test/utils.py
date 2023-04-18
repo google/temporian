@@ -2,7 +2,7 @@
 
 import pandas as pd
 
-from temporian.core.data import dtype
+from temporian.core.data.dtype import DType
 from temporian.core.data import event as event_lib
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
@@ -20,8 +20,8 @@ Event = event_lib.Event
 def create_input_event():
     return event_lib.input_event(
         features=[
-            Feature("f1", dtype.FLOAT32),
-            Feature("f2", dtype.FLOAT32),
+            Feature("f1", DType.FLOAT32),
+            Feature("f2", DType.FLOAT32),
         ]
     )
 
@@ -57,18 +57,18 @@ class OpI1O1(base.Operator):
                 features=[
                     Feature(
                         "f3",
-                        dtype.FLOAT64,
+                        DType.FLOAT64,
                         sampling=event.sampling,
                         creator=self,
                     ),
                     Feature(
                         "f4",
-                        dtype.FLOAT64,
+                        DType.FLOAT64,
                         sampling=event.sampling,
                         creator=self,
                     ),
                 ],
-                sampling=Sampling(index=[], creator=self),
+                sampling=Sampling(index_levels=[], creator=self),
                 creator=self,
             ),
         )
@@ -128,13 +128,13 @@ class OpI2O1(base.Operator):
                 features=[
                     Feature(
                         "f5",
-                        dtype.FLOAT64,
+                        DType.FLOAT64,
                         sampling=event_1.sampling,
                         creator=self,
                     ),
                     Feature(
                         "f6",
-                        dtype.FLOAT64,
+                        DType.FLOAT64,
                         sampling=event_1.sampling,
                         creator=self,
                     ),
@@ -172,7 +172,7 @@ class OpI1O2(base.Operator):
                 features=[
                     Feature(
                         "f1",
-                        dtype.FLOAT64,
+                        DType.FLOAT64,
                         sampling=event.sampling,
                         creator=self,
                     )
@@ -187,7 +187,7 @@ class OpI1O2(base.Operator):
                 features=[
                     Feature(
                         "f1",
-                        dtype.FLOAT64,
+                        DType.FLOAT64,
                         sampling=event.sampling,
                         creator=self,
                     )

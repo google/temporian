@@ -15,7 +15,7 @@
 """Division Operator"""
 
 from temporian.core import operator_lib
-from temporian.core.data import dtype
+from temporian.core.data.dtype import DType
 from temporian.core.data.event import Event
 from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
 
@@ -34,7 +34,7 @@ class DivideOperator(BaseArithmeticOperator):
 
         # Assuming previous dtype check of event_1 and event_2 features
         for feat in event_1.features:
-            if feat.dtype in [dtype.INT32, dtype.INT64]:
+            if feat.dtype in [DType.INT32, DType.INT64]:
                 raise ValueError(
                     "Cannot use the divide operator on feature "
                     f"{feat.name} of type {feat.dtype}. Cast to "

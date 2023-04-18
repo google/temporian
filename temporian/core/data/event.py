@@ -17,10 +17,10 @@
 from __future__ import annotations
 from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
 
-from temporian.core.data import dtype as dtype_lib
+from temporian.core.data.dtype import DType
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
-from temporian.core.data.sampling import IndexDtypes
+from temporian.core.data.sampling import IndexDType
 from temporian.utils import string
 
 if TYPE_CHECKING:
@@ -98,7 +98,7 @@ class Event(object):
         return [feature.name for feature in self._features]
 
     @property
-    def dtypes(self) -> Dict[str, dtype_lib.DType]:
+    def dtypes(self) -> Dict[str, DType]:
         return {feature.name: feature.dtype for feature in self._features}
 
     @property
@@ -120,12 +120,12 @@ class Event(object):
 
 def input_event(
     features: List[Feature],
-    index: List[Tuple[str, IndexDtypes]] = [],
+    index_levels: List[Tuple[str, IndexDType]] = [],
     name: Optional[str] = None,
     sampling: Optional[Sampling] = None,
 ) -> Event:
     if sampling is None:
-        sampling = Sampling(index=index, creator=None)
+        sampling = Sampling(index_levels=index_levels, creator=None)
 
     for feature in features:
         if feature.sampling is not None:

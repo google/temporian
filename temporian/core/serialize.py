@@ -18,14 +18,14 @@ from typing import Set, Union, Any, Dict, Tuple, Optional
 
 from google.protobuf import text_format
 
+from temporian.core import operator_lib
+from temporian.core import processor
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators import base
-from temporian.core.data import dtype as dtype_lib
-from temporian.core import operator_lib
+from temporian.core.data.dtype import DType
 from temporian.proto import core_pb2 as pb
-from temporian.core import processor
 
 
 def save(
@@ -307,7 +307,12 @@ def _unserialize_feature(
 def _serialize_sampling(src: Sampling) -> pb.Sampling:
     return pb.Sampling(
         id=_identifier(src),
-        index=src.index,
+        index=pb.Index(
+            levels=[
+                pb.Index.IndexLevel(name, dtype)
+                for name, dtype in zip(src.index.names, src.index.dtypes)
+            ]
+        ),
         creator_operator_id=(
             _identifier(src.creator) if src.creator is not None else None
         ),
@@ -315,26 +320,32 @@ def _serialize_sampling(src: Sampling) -> pb.Sampling:
 
 
 def _unserialize_sampling(src: pb.Sampling) -> Sampling:
-    return Sampling(index=list(src.index), creator=None)
+    return Sampling(
+        index_levels=[
+            (index_level.name, index_level.dtype)
+            for index_level in src.index.levels
+        ],
+        creator=None,
+    )
 
 
-def _serialize_dtype(dtype) -> pb.Feature.DType:
+def _serialize_dtype(dtype) -> pb.DType:
     if dtype not in DTYPE_MAPPING:
         raise ValueError(f"Non supported type {dtype}")
     return DTYPE_MAPPING[dtype]
 
 
-def _unserialize_dtype(dtype: pb.Feature.DType):
+def _unserialize_dtype(dtype: pb.DType):
     if dtype not in INV_DTYPE_MAPPING:
         raise ValueError(f"Non supported type {dtype}")
     return INV_DTYPE_MAPPING[dtype]
 
 
 DTYPE_MAPPING = {
-    dtype_lib.FLOAT64: pb.Feature.DType.FLOAT64,
-    dtype_lib.FLOAT32: pb.Feature.DType.FLOAT32,
-    dtype_lib.INT64: pb.Feature.DType.INT64,
-    dtype_lib.INT32: pb.Feature.DType.INT32,
+    DType.FLOAT64: pb.DType.FLOAT64,
+    DType.FLOAT32: pb.DType.FLOAT32,
+    DType.INT64: pb.DType.INT64,
+    DType.INT32: pb.DType.INT32,
 }
 INV_DTYPE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
 

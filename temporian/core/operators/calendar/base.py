@@ -16,7 +16,7 @@
 
 from abc import ABC, abstractmethod
 
-from temporian.core.data import dtype
+from temporian.core.data.dtype import DType
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.operators.base import Operator
@@ -43,7 +43,7 @@ class BaseCalendarOperator(Operator, ABC):
 
         output_feature = Feature(
             name=self.output_feature_name,
-            dtype=dtype.INT32,
+            dtype=DType.INT32,
             sampling=sampling.sampling,
             creator=self,
         )
