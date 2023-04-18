@@ -258,9 +258,17 @@ class NumpyEvent:
         )
         # convert timestamp column to float
         # TODO: This is taking a lot of time. Don't use apply.
-        df[timestamp_column] = df[timestamp_column].apply(
-            convert_date_to_duration
-        )
+
+        # if timestamp column is of kind int convert to float
+        if df[timestamp_column].dtype.kind == "i":
+            df[timestamp_column] = df[timestamp_column].astype("float64")
+
+        elif df[timestamp_column].dtype.type not in DTYPE_MAPPING.keys():
+            df[timestamp_column] = pd.to_datetime(
+                df[timestamp_column], errors="raise"
+            )
+            # convert from nanoseconds to seconds and float
+            df[timestamp_column] = df[timestamp_column].astype("int64") / 1e9
 
         # sort by timestamp if it's not sorted
         # TODO: we may consider using kind="mergesort" if we know that most of
