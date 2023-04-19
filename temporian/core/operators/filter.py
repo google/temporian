@@ -98,9 +98,8 @@ class FilterOperator(Operator):
 operator_lib.register_operator(FilterOperator)
 
 
-# Added `_event` to the function name to avoid name collision with the
-# `filter` function in the `builtins` module.
-def filter_event(
+# pylint: disable=redefined-builtin
+def filter(
     event: Event,
     condition: Event,
 ) -> Event:
