@@ -16,18 +16,12 @@ import math
 from absl.testing import absltest
 
 import pandas as pd
-import numpy as np
 
-from temporian.core.data.sampling import Sampling
 from temporian.core.operators.sample import Sample
 from temporian.implementation.numpy.operators.sample import (
     SampleNumpyImplementation,
 )
-from temporian.implementation.numpy.data.event import NumpyEvent, NumpyFeature
-from temporian.implementation.numpy.data.sampling import NumpySampling
-from temporian.core.data import event as event_lib
-from temporian.core.data import feature as feature_lib
-from temporian.core.data import dtype as dtype_lib
+from temporian.implementation.numpy.data.event import NumpyEvent
 
 
 class SampleOperatorTest(absltest.TestCase):

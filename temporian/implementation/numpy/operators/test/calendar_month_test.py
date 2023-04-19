@@ -16,15 +16,14 @@ from absl.testing import absltest
 import numpy as np
 import pandas as pd
 
+from temporian.core.data.dtype import DType
 from temporian.core.operators.calendar.month import (
     CalendarMonthOperator,
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.operators.calendar.month import (
     CalendarMonthNumpyImplementation,
 )
-from temporian.core.data.dtype import DType
 
 
 class CalendarMonthNumpyImplementationTest(absltest.TestCase):

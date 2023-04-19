@@ -10,8 +10,6 @@ from temporian.core.data.duration import convert_date_to_duration
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
-from temporian.implementation.numpy.data.feature import NumpyFeature
-from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.utils import string
 
 # Maximum of printed index when calling repr(event)
@@ -102,10 +100,6 @@ class NumpyEvent:
         return self._is_unix_timestamp
 
     @property
-    def sampling(self) -> NumpySampling:
-        raise NotImplementedError()
-
-    @property
     def _first_index_features(self) -> List[np.ndarray]:
         return list(self._data.values())[0].features
 
@@ -125,7 +119,7 @@ class NumpyEvent:
         return [feature.dtype for feature in self._first_index_features]
 
     @property
-    def index_dtypes(self) -> Dict[str, dtype.DType]:
+    def index_dtypes(self) -> Dict[str, DType]:
         return (
             {
                 index_name: PYTHON_DTYPE_MAPPING[type(index_key)]
@@ -140,10 +134,6 @@ class NumpyEvent:
     @property
     def feature_count(self) -> int:
         return len(self._feature_names)
-
-    @sampling.setter
-    def sampling(self, sampling: NumpySampling) -> None:
-        raise NotImplementedError()
 
     def first_index_key(self) -> Optional[Tuple]:
         if self._data is None or len(self._data) == 0:

@@ -1,12 +1,10 @@
-from typing import Dict, List
+from typing import Dict
 
 import numpy as np
 
-from temporian.implementation.numpy.data.event import NumpyFeature
-
 
 def _sort_by_timestamp(
-    event_data: Dict[str, List[NumpyFeature]], samp_data: Dict[str, np.array]
+    event_data: Dict, samp_data: Dict[str, np.array]
 ) -> None:
     """Sorts the data in event_data and samp_data according to their
     timestamps. This operations is done inplace.

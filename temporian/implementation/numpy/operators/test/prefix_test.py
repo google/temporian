@@ -12,21 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from absl.testing import absltest
 
 import pandas as pd
-import numpy as np
-import math
-from temporian.core.data.sampling import Sampling
+from absl.testing import absltest
+
 from temporian.core.operators.prefix import Prefix
 from temporian.implementation.numpy.operators.prefix import (
     PrefixNumpyImplementation,
 )
-from temporian.implementation.numpy.data.event import NumpyEvent, NumpyFeature
-from temporian.implementation.numpy.data.sampling import NumpySampling
-from temporian.core.data import event as event_lib
-from temporian.core.data import feature as feature_lib
-from temporian.core.data import dtype as dtype_lib
+from temporian.implementation.numpy.data.event import NumpyEvent
 
 
 class PrefixOperatorTest(absltest.TestCase):

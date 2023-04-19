@@ -3,12 +3,9 @@
 
 from typing import Dict
 
-from temporian.implementation.numpy.data.event import (
-    NumpyEvent,
-    NumpyFeature,
-)
 from temporian.core.operators.prefix import Prefix
 from temporian.implementation.numpy import implementation_lib
+from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
