@@ -71,6 +71,16 @@ message Operator {
       int64 integer_64 = 2;
       string str = 3;
       double float_64 = 4;
+      ListString list_str = 5;
+      bool boolean = 6;
+      MapStrStr map_str_str = 7;
+    }
+
+    message ListString{
+      repeated string value = 1;
+    }
+    message MapStrStr{
+      map<string, string> value = 1;
     }
   }
 }
@@ -82,6 +92,8 @@ enum DType {
   INT64 = 2;
   FLOAT32 = 3;
   INT32 = 4;
+  BOOLEAN = 5;
+  STRING = 6;
 }
 
 // Schema of an event

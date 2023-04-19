@@ -135,6 +135,16 @@ class Operator(ABC):
                 if available_output not in [v.key for v in definition.outputs]:
                     raise ValueError(f'Unexpected output "{available_output}".')
 
+            # Check that expected attributes are present
+            for expected_attr in definition.attributes:
+                if expected_attr.key not in self._attributes:
+                    raise ValueError(f'Missing attr. "{expected_attr.key}".')
+
+            # Check that no unexpected attributes are present
+            for available_attr in self._attributes:
+                if available_attr not in [v.key for v in definition.attributes]:
+                    raise ValueError(f'Unexpected attr. "{available_attr}".')
+
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         raise NotImplementedError()
