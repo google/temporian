@@ -69,7 +69,6 @@ class FilterOperatorTest(absltest.TestCase):
 
         condition_data = NumpyEvent.from_dataframe(condition_df)
         condition = condition_data.schema()
-        condition._sampling = event._sampling
 
         operator = FilterOperator(event=event, condition=condition)
         impl = FilterNumpyImplementation(operator)
@@ -126,7 +125,6 @@ class FilterOperatorTest(absltest.TestCase):
 
         condition_data = NumpyEvent.from_dataframe(condition_df)
         condition = condition_data.schema()
-        condition._sampling = event._sampling
 
         operator = FilterOperator(event=event, condition=condition)
         impl = FilterNumpyImplementation(operator)
@@ -188,7 +186,6 @@ class FilterOperatorTest(absltest.TestCase):
             condition_df, index_names=["product"]
         )
         condition = condition_data.schema()
-        condition._sampling = event._sampling
 
         operator = FilterOperator(event=event, condition=condition)
         impl = FilterNumpyImplementation(operator)
@@ -253,7 +250,6 @@ class FilterOperatorTest(absltest.TestCase):
             condition_df, index_names=["product", "id"]
         )
         condition = condition_data.schema()
-        condition._sampling = event._sampling
 
         operator = FilterOperator(event=event, condition=condition)
         impl = FilterNumpyImplementation(operator)

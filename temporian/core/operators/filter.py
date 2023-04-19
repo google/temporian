@@ -43,7 +43,7 @@ class FilterOperator(Operator):
             )
 
         # check both events have same sampling
-        if event.sampling != condition.sampling:
+        if event.sampling.index != condition.sampling.index:
             raise ValueError(
                 "Event and condition must have the same sampling. Got"
                 f" {event.sampling} and {condition.sampling} instead."

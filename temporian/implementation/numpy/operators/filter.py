@@ -17,6 +17,10 @@ class FilterNumpyImplementation(OperatorImplementation):
     def __call__(
         self, event: NumpyEvent, condition: NumpyEvent
     ) -> Dict[str, NumpyEvent]:
+        # check if sampling is equal
+        if event.sampling != condition.sampling:
+            raise ValueError("Sampling of event and condition must be equal.")
+
         new_sampling = {}
         event_filtered_data = {}
 
