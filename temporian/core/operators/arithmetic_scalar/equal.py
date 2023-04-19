@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Performs equality between events features and a scalar value"""
+from typing import Union
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import BOOLEAN
@@ -48,7 +49,7 @@ operator_lib.register_operator(EqualScalarOperator)
 
 def equal_scalar(
     event: Event,
-    value: any,
+    value: Union[float, int, str, bool],
 ) -> Event:
     """
     Performs equality between events features and a scalar value.

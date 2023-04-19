@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Division Scalar Operator"""
+from typing import Union
 
 from temporian.core import operator_lib
 from temporian.core.data import dtype
@@ -59,7 +60,7 @@ operator_lib.register_operator(DivideScalarOperator)
 
 def divide_scalar(
     numerator: Event,
-    denominator: any,
+    denominator: Union[float, int, str, bool],
 ) -> Event:
     """
     Divides and event and a scalar value.

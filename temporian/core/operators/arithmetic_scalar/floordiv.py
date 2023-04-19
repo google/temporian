@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Floor or integer division scalar Operator"""
+from typing import Union
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
@@ -41,7 +42,7 @@ operator_lib.register_operator(FloorDivScalarOperator)
 
 def floordiv_scalar(
     numerator: Event,
-    denominator: any,
+    denominator: Union[float, int, str, bool],
 ) -> Event:
     """
     Divides and event and a scalar and takes the result floor.

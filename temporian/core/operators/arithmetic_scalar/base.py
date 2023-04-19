@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """Base class for arithmetic scalar operators"""
-
+from typing import Union
 from abc import abstractmethod
 
 from temporian.core.data.dtype import DType
@@ -30,7 +30,7 @@ class BaseArithmeticScalarOperator(Operator):
     def __init__(
         self,
         event: Event,
-        value: any,
+        value: Union[float, int, str, bool],
     ):
         super().__init__()
 

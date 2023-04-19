@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Arithmetic Addition Scalar Operator"""
+from typing import Union
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
@@ -41,7 +42,7 @@ operator_lib.register_operator(AddScalarOperator)
 
 def add_scalar(
     event: Event,
-    value: any,
+    value: Union[float, int, str, bool],
 ) -> Event:
     """
     Adds an event and a scalar value.

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Subtract a scalar from an event"""
+from typing import Union
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
@@ -42,7 +43,7 @@ operator_lib.register_operator(SubtractScalarOperator)
 
 def subtract_scalar(
     event: Event,
-    value: any,
+    value: Union[float, int, str, bool],
 ) -> Event:
     """
     Subtracts value from event.
