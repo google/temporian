@@ -46,7 +46,7 @@ class CastNumpyImplementation(OperatorImplementation):
         origin_dtype: DType,
         dst_dtype: DType,
     ) -> None:
-        if self._can_overflow(origin_dtype, dst_dtype) and np.any(
+        if np.any(
             (data < self._dtype_limits[dst_dtype].min)
             | (data > self._dtype_limits[dst_dtype].max)
         ):
@@ -56,7 +56,7 @@ class CastNumpyImplementation(OperatorImplementation):
 
     def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
         target_dtypes = self.operator.attributes["target_dtypes"]
-        check_overflow = self.operator.attributes["check_overflow"]
+        check = self.operator.attributes["check_overflow"]
 
         # Reuse event if actually no features changed dtype
         if all(
@@ -68,28 +68,32 @@ class CastNumpyImplementation(OperatorImplementation):
         # Create new event, some features may be reused
         output = NumpyEvent(data={}, sampling=event.sampling)
 
-        for event_index, features in event.data.items():
-            output.data[event_index] = []
+        for feat_idx, feature_name in enumerate(event.feature_names()):
+            dst_dtype = target_dtypes[feature_name]
+            orig_dtype = event.dtypes[feature_name]
+            check_feature = check and self._can_overflow(orig_dtype, dst_dtype)
+            # Numpy dest type
+            dst_dtype_np = DTYPE_REVERSE_MAPPING[dst_dtype]
+            for event_index, features in event.data.items():
+                feature = features[feat_idx]
+                # Initialize row with first feature
+                if feat_idx == 0:
+                    output.data[event_index] = []
 
-            for feature in features:
                 # Reuse if both features have the same dtype
-                dst_dtype = target_dtypes[feature.name]
                 if feature.dtype == dst_dtype:
                     output.data[event_index].append(feature)
                 else:
+                    data = feature.data
                     # Check overflow when needed
-                    if check_overflow:
-                        self._check_overflow(
-                            feature.data, feature.dtype, dst_dtype
-                        )
+                    if check_feature:
+                        self._check_overflow(data, orig_dtype, dst_dtype)
 
                     # Create new feature
                     output.data[event_index].append(
                         NumpyFeature(
-                            name=feature.name,  # Note: not renaming feature
-                            data=feature.data.astype(
-                                DTYPE_REVERSE_MAPPING[dst_dtype]
-                            ),
+                            name=feature_name,
+                            data=data.astype(dst_dtype_np),
                         )
                     )
 
