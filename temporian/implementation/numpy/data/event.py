@@ -63,7 +63,7 @@ class IndexData:
 
 
 class NumpyEvent:
-    # tolerance levels when comparing float features in __eq__
+    # tolerance levels for comparing float features in __eq__
     rtol: float = 1e-9
     atol: float = 1e-9
 
@@ -119,6 +119,9 @@ class NumpyEvent:
         return [feature.dtype for feature in self._first_index_features]
 
     @property
+    def feature_count(self) -> int:
+        return len(self._feature_names)
+
     def index_dtypes(self) -> Dict[str, DType]:
         return (
             {
@@ -130,10 +133,6 @@ class NumpyEvent:
             if self._data
             else {}
         )
-
-    @property
-    def feature_count(self) -> int:
-        return len(self._feature_names)
 
     def first_index_key(self) -> Optional[Tuple]:
         if self._data is None or len(self._data) == 0:
