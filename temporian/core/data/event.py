@@ -15,7 +15,7 @@
 """An event is a collection (possibly empty) of timesampled feature values."""
 
 from __future__ import annotations
-from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
+from typing import Dict, List, Optional, Tuple, TYPE_CHECKING, Any
 
 from temporian.core.data.dtype import DType
 from temporian.core.data.feature import Feature
@@ -63,7 +63,7 @@ class Event(object):
             f"id:{id(self)}\n"
         )
 
-    def __add__(self, other):
+    def __add__(self, other: Any) -> Event:
         if isinstance(other, Event):
             from temporian.core.operators.arithmetic import add
 
@@ -79,10 +79,10 @@ class Event(object):
             "Only Event and scalar values of type int or float are supported."
         )
 
-    def __radd__(self, other):
+    def __radd__(self, other: Any) -> Event:
         return self.__add__(other)
 
-    def __sub__(self, other):
+    def __sub__(self, other: Any) -> Event:
         if isinstance(other, Event):
             from temporian.core.operators.arithmetic import subtract
 
@@ -100,7 +100,7 @@ class Event(object):
             "Only Event and scalar values of type int or float are supported."
         )
 
-    def __mul__(self, other):
+    def __mul__(self, other: Any) -> Event:
         if isinstance(other, Event):
             from temporian.core.operators.arithmetic import multiply
 
@@ -118,10 +118,10 @@ class Event(object):
             "Only Event and scalar values of type int or float are supported."
         )
 
-    def __rmul__(self, other):
+    def __rmul__(self, other: Any) -> Event:
         return self.__mul__(other)
 
-    def __truediv__(self, other):
+    def __truediv__(self, other: Any) -> Event:
         if isinstance(other, Event):
             from temporian.core.operators.arithmetic import divide
 
@@ -137,7 +137,7 @@ class Event(object):
             "Only Event and scalar values of type int or float are supported."
         )
 
-    def __floordiv__(self, other):
+    def __floordiv__(self, other: Any) -> Event:
         if isinstance(other, Event):
             from temporian.core.operators.arithmetic import floordiv
 
