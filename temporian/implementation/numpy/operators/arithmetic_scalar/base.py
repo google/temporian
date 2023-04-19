@@ -11,9 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import numpy as np
-from typing import Dict
+from typing import Dict, Union
 from abc import ABC, abstractmethod
+
+import numpy as np
 
 from temporian.core.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarOperator,
@@ -28,7 +29,9 @@ class BaseArithmeticScalarNumpyImplementation(OperatorImplementation, ABC):
         super().__init__(operator)
 
     @abstractmethod
-    def _do_operation(self, feature: NumpyFeature, value: any) -> np.ndarray:
+    def _do_operation(
+        self, feature: NumpyFeature, value: Union[float, int, str, bool]
+    ) -> np.ndarray:
         """
         Perform the actual arithmetic operation corresponding to the subclass
         """

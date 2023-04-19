@@ -52,7 +52,7 @@ def equal_scalar(
     value: Union[float, int, str, bool],
 ) -> Event:
     """
-    Performs equality between events features and a scalar value.
+    Performs equality element-wise between events features and a scalar value.
 
     Args:
         event: Event to compare values to.

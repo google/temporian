@@ -42,7 +42,7 @@ class DivideScalarOperator(BaseArithmeticScalarOperator):
                     "Cannot use the divide operator on feature "
                     f"{feat.name} of type {feat.dtype}. Cast to "
                     "a floating point type or use "
-                    "floordiv operator (//) instead on integer features."
+                    "floordiv operator (//)."
                 )
 
     @classmethod
@@ -63,7 +63,7 @@ def divide_scalar(
     denominator: Union[float, int, str, bool],
 ) -> Event:
     """
-    Divides and event and a scalar value.
+    Divides element-wise an event and a scalar value.
 
     Args:
         numerator: Numerator event

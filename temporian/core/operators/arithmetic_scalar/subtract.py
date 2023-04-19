@@ -46,7 +46,7 @@ def subtract_scalar(
     value: Union[float, int, str, bool],
 ) -> Event:
     """
-    Subtracts value from event.
+    Subtracts element-wise value from event.
 
     Args:
         event: Event to perform subtraction to.

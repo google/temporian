@@ -45,7 +45,7 @@ def floordiv_scalar(
     denominator: Union[float, int, str, bool],
 ) -> Event:
     """
-    Divides and event and a scalar and takes the result floor.
+    Divides element-wise an event and a scalar and takes the result floor.
 
     Args:
         numerator: Numerator event

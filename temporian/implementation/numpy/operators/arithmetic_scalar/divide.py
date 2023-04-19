@@ -11,8 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Union
+
 import numpy as np
-from temporian.core.data import dtype
+
 from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarNumpyImplementation,
@@ -27,7 +29,9 @@ class DivideScalarNumpyImplementation(BaseArithmeticScalarNumpyImplementation):
     def __init__(self, operator: DivideScalarOperator) -> None:
         super().__init__(operator)
 
-    def _do_operation(self, feature: NumpyFeature, value: any) -> np.ndarray:
+    def _do_operation(
+        self, feature: NumpyFeature, value: Union[float, int, str, bool]
+    ) -> np.ndarray:
         return feature.data / value
 
 

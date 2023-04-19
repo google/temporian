@@ -45,7 +45,7 @@ def add_scalar(
     value: Union[float, int, str, bool],
 ) -> Event:
     """
-    Adds an event and a scalar value.
+    Adds element-wise an event and a scalar value.
 
     Args:
         event: Event to perform addition to.

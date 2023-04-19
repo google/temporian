@@ -45,7 +45,7 @@ def multiply_scalar(
     value: Union[float, int, str, bool],
 ) -> Event:
     """
-    Multiply an event and a scalar, according to feature position.
+    Multiplies element-wise an event features and a scalar value.
 
     Args:
         event_1: event to perform multiplication to.
