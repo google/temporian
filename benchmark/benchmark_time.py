@@ -65,6 +65,7 @@ def _build_toy_dataset(
             }
         ),
         index_names=["index_1", "index_2"],
+        is_sorted=True,
     )
 
 
@@ -220,7 +221,9 @@ def benchmark_from_dataframe(runner):
 
                     runner.benchmark(
                         benchmark_name,
-                        lambda: NumpyEvent.from_dataframe(df, index_names),
+                        lambda: NumpyEvent.from_dataframe(
+                            df, index_names, is_sorted=True
+                        ),
                     )
 
 
