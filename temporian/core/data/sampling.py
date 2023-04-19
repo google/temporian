@@ -88,6 +88,9 @@ class Index:
     def dtypes(self) -> List[IndexDType]:
         return [index_level.dtype for index_level in self._levels]
 
+    def __eq__(self, other: Index) -> bool:
+        return self._levels == other._levels
+
 
 class Sampling(object):
     def __init__(

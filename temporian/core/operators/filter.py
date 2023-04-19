@@ -14,7 +14,7 @@
 
 """Filter operator."""
 from temporian.core import operator_lib
-from temporian.core.data.dtype import BOOLEAN
+from temporian.core.data.dtype import DType
 from temporian.core.data.feature import Feature
 from temporian.core.data.event import Event
 from temporian.core.data.sampling import Sampling
@@ -36,7 +36,7 @@ class FilterOperator(Operator):
             )
 
         # check that condition is a boolean feature
-        if condition.features[0].dtype != BOOLEAN:
+        if condition.features[0].dtype != DType.BOOLEAN:
             raise ValueError(
                 "Condition must be a boolean feature. Got"
                 f" {condition.features[0].dtype} instead."
@@ -53,7 +53,9 @@ class FilterOperator(Operator):
         self.add_input("event", event)
         self.add_input("condition", condition)
 
-        output_sampling = Sampling(index=event.sampling.index, creator=self)
+        output_sampling = Sampling(
+            index_levels=event.sampling.index, creator=self
+        )
 
         self.condition_name = condition.features[0].name
 
