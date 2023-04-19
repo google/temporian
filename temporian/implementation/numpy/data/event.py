@@ -44,10 +44,6 @@ DTYPE_REVERSE_MAPPING = {
 }
 
 
-def dtype_to_np_dtype(src: DType) -> Any:
-    return DTYPE_REVERSE_MAPPING[src]
-
-
 @dataclass
 class IndexData:
     features: List[np.ndarray]
