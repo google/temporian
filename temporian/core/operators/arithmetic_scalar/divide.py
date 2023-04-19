@@ -31,9 +31,10 @@ class DivideScalarOperator(BaseArithmeticScalarOperator):
     def __init__(
         self,
         event: Event,
-        value: any,
+        value: Union[float, int, str, bool],
+        is_value_first: bool = False,
     ):
-        super().__init__(event, value)
+        super().__init__(event, value, is_value_first)
 
         # Assuming previous dtype check of event_1 and event_2 features
         for feat in event.features:
@@ -57,21 +58,39 @@ class DivideScalarOperator(BaseArithmeticScalarOperator):
 
 operator_lib.register_operator(DivideScalarOperator)
 
+SCALAR = Union[float, int, str, bool]
+
 
 def divide_scalar(
-    numerator: Event,
-    denominator: Union[float, int, str, bool],
+    numerator: Union[Event, SCALAR],
+    denominator: Union[Event, SCALAR],
 ) -> Event:
     """
     Divides element-wise an event and a scalar value.
 
     Args:
-        numerator: Numerator event
-        denominator: Denominator value
+        numerator: Numerator event or value.
+        denominator: Denominator event or value.
     Returns:
-        Event: Division of numerator features and denominator value
+        Event: Division of numerator and denominator.
     """
-    return DivideScalarOperator(
-        event=numerator,
-        value=denominator,
-    ).outputs["event"]
+    scalars_types = (float, int, str, bool)
+
+    if isinstance(numerator, Event) and isinstance(denominator, scalars_types):
+        return DivideScalarOperator(
+            event=numerator,
+            value=denominator,
+        ).outputs["event"]
+
+    if isinstance(numerator, scalars_types) and isinstance(denominator, Event):
+        return DivideScalarOperator(
+            event=denominator,
+            value=numerator,
+            is_value_first=True,
+        ).outputs["event"]
+
+    raise ValueError(
+        "Invalid input types for divide_scalar. "
+        "Expected (Event, SCALAR) or (SCALAR, Event), "
+        f"got ({type(numerator)}, {type(denominator)})."
+    )

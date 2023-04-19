@@ -32,6 +32,9 @@ class DivideScalarNumpyImplementation(BaseArithmeticScalarNumpyImplementation):
     def _do_operation(
         self, feature: NumpyFeature, value: Union[float, int, str, bool]
     ) -> np.ndarray:
+        if self._operator.attributes["is_value_first"]:
+            return value / feature.data
+
         return feature.data / value
 
 

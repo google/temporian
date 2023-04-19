@@ -21,6 +21,7 @@ from temporian.core.operators.arithmetic_scalar import (
     SubtractScalarOperator,
     MultiplyScalarOperator,
     DivideScalarOperator,
+    FloorDivScalarOperator,
     EqualScalarOperator,
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
@@ -29,6 +30,7 @@ from temporian.implementation.numpy.operators.arithmetic_scalar import (
     SubtractScalarNumpyImplementation,
     MultiplyScalarNumpyImplementation,
     DivideScalarNumpyImplementation,
+    FloorDivideScalarNumpyImplementation,
     EqualScalarNumpyImplementation,
 )
 
@@ -114,6 +116,38 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         self.assertEqual(numpy_output_event, operator_output["event"])
 
+    def test_correct_substraction_value_first(self) -> None:
+        """Test correct substraction operator when value is the first.
+        operand.
+        """
+        value = 10.0
+
+        numpy_output_event = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1.0, 0.0],
+                    [0, 2.0, 10.0],
+                    [0, 3.0, -2.0],
+                    [0, 4.0, np.nan],
+                    [0, 5.0, -20.0],
+                ],
+                columns=["store_id", "timestamp", "sub_sales_10.0"],
+            ),
+            index_names=["store_id"],
+        )
+
+        operator = SubtractScalarOperator(
+            event=self.event,
+            value=value,
+            is_value_first=True,
+        )
+
+        impl = SubtractScalarNumpyImplementation(operator)
+
+        operator_output = impl.call(event=self.event_data)
+
+        self.assertEqual(numpy_output_event, operator_output["event"])
+
     def test_correct_multiplication(self) -> None:
         """Test correct multiplication operator."""
 
@@ -169,6 +203,96 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         )
 
         impl = DivideScalarNumpyImplementation(operator)
+
+        operator_output = impl.call(event=self.event_data)
+
+        self.assertEqual(numpy_output_event, operator_output["event"])
+
+    def test_correct_division_with_value_as_numerator(self) -> None:
+        """Test correct division operator with value as numerator."""
+        value = 10.0
+
+        numpy_output_event = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1.0, 1.0],
+                    [0, 2.0, np.inf],
+                    [0, 3.0, 10.0 / 12.0],
+                    [0, 4.0, np.nan],
+                    [0, 5.0, 1.0 / 3.0],
+                ],
+                columns=["store_id", "timestamp", "div_sales_10.0"],
+            ),
+            index_names=["store_id"],
+        )
+
+        operator = DivideScalarOperator(
+            event=self.event,
+            value=value,
+            is_value_first=True,
+        )
+
+        impl = DivideScalarNumpyImplementation(operator)
+
+        operator_output = impl.call(event=self.event_data)
+
+        self.assertEqual(numpy_output_event, operator_output["event"])
+
+    def test_correct_floor_division(self) -> None:
+        """Test correct floor division operator."""
+
+        value = 10.0
+
+        numpy_output_event = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1.0, 1.0],
+                    [0, 2.0, 0.0],
+                    [0, 3.0, 1.0],
+                    [0, 4.0, np.nan],
+                    [0, 5.0, 3.0],
+                ],
+                columns=["store_id", "timestamp", "floordiv_sales_10.0"],
+            ),
+            index_names=["store_id"],
+        )
+
+        operator = FloorDivScalarOperator(
+            event=self.event,
+            value=value,
+        )
+
+        impl = FloorDivideScalarNumpyImplementation(operator)
+
+        operator_output = impl.call(event=self.event_data)
+
+        self.assertEqual(numpy_output_event, operator_output["event"])
+
+    def test_correct_floor_division_with_value_as_numerator(self) -> None:
+        """Test correct floor division operator with value as numerator."""
+        value = 10.0
+
+        numpy_output_event = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1.0, 1.0],
+                    [0, 2.0, np.inf],
+                    [0, 3.0, 10.0 // 12.0],
+                    [0, 4.0, np.nan],
+                    [0, 5.0, 1.0 // 3.0],
+                ],
+                columns=["store_id", "timestamp", "floordiv_sales_10.0"],
+            ),
+            index_names=["store_id"],
+        )
+
+        operator = FloorDivScalarOperator(
+            event=self.event,
+            value=value,
+            is_value_first=True,
+        )
+
+        impl = FloorDivideScalarNumpyImplementation(operator)
 
         operator_output = impl.call(event=self.event_data)
 

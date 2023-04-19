@@ -41,21 +41,40 @@ class SubtractScalarOperator(BaseArithmeticScalarOperator):
 operator_lib.register_operator(SubtractScalarOperator)
 
 
+SCALAR = Union[float, int, str, bool]
+
+
 def subtract_scalar(
-    event: Event,
-    value: Union[float, int, str, bool],
+    minuend: Union[Event, SCALAR],
+    subtrahend: Union[Event, SCALAR],
 ) -> Event:
     """
-    Subtracts element-wise value from event.
+    Subtracts the subtrahend from the minuend and returns the difference.
 
     Args:
-        event: Event to perform subtraction to.
-        value: Scalar value to subtract from all event features.
+        minuend: The number or event being subtracted from.
+        subtrahend: The number or event being subtracted.
 
     Returns:
-        Event: Event with the subtraction of event features and value.
+        Event: Event with the difference between the minuend and subtrahend.
     """
-    return SubtractScalarOperator(
-        event=event,
-        value=value,
-    ).outputs["event"]
+    scalars_types = (float, int, str, bool)
+
+    if isinstance(minuend, Event) and isinstance(subtrahend, scalars_types):
+        return SubtractScalarOperator(
+            event=minuend,
+            value=subtrahend,
+        ).outputs["event"]
+
+    if isinstance(minuend, scalars_types) and isinstance(subtrahend, Event):
+        return SubtractScalarOperator(
+            event=subtrahend,
+            value=minuend,
+            is_value_first=True,
+        ).outputs["event"]
+
+    raise ValueError(
+        "Invalid input types for subtract_scalar. "
+        "Expected (Event, SCALAR) or (SCALAR, Event), "
+        f"got ({type(minuend)}, {type(subtrahend)})."
+    )

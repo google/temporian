@@ -31,6 +31,7 @@ class BaseArithmeticScalarOperator(Operator):
         self,
         event: Event,
         value: Union[float, int, str, bool],
+        is_value_first: bool = False,  # useful for non-commutative operators
     ):
         super().__init__()
 
@@ -38,6 +39,7 @@ class BaseArithmeticScalarOperator(Operator):
         self.add_input("event", event)
 
         self.add_attribute("value", value)
+        self.add_attribute("is_value_first", is_value_first)
 
         # check that every dtype of event feature is equal to value dtype
         value_dtype = python_type_to_temporian_dtype(type(value))
@@ -81,6 +83,11 @@ class BaseArithmeticScalarOperator(Operator):
                 pb.OperatorDef.Attribute(
                     key="value",
                     type=pb.OperatorDef.Attribute.Type.ANY,
+                    is_optional=False,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="is_value_first",
+                    type=pb.OperatorDef.Attribute.Type.BOOL,
                     is_optional=False,
                 ),
             ],

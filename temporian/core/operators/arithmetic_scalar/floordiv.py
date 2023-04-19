@@ -40,20 +40,39 @@ class FloorDivScalarOperator(BaseArithmeticScalarOperator):
 operator_lib.register_operator(FloorDivScalarOperator)
 
 
+SCALAR = Union[float, int, str, bool]
+
+
 def floordiv_scalar(
-    numerator: Event,
-    denominator: Union[float, int, str, bool],
+    numerator: Union[Event, SCALAR],
+    denominator: Union[Event, SCALAR],
 ) -> Event:
     """
     Divides element-wise an event and a scalar and takes the result floor.
 
     Args:
-        numerator: Numerator event
-        denominator: Denominator scalar value
+        numerator: Numerator.
+        denominator: Denominator.
     Returns:
         Event: Integer division of numerator features and denominator value
     """
-    return FloorDivScalarOperator(
-        event=numerator,
-        value=denominator,
-    ).outputs["event"]
+    scalars_types = (float, int, str, bool)
+
+    if isinstance(numerator, Event) and isinstance(denominator, scalars_types):
+        return FloorDivScalarOperator(
+            event=numerator,
+            value=denominator,
+        ).outputs["event"]
+
+    if isinstance(numerator, scalars_types) and isinstance(denominator, Event):
+        return FloorDivScalarOperator(
+            event=denominator,
+            value=numerator,
+            is_value_first=True,
+        ).outputs["event"]
+
+    raise ValueError(
+        "Invalid input types for floordiv_scalar. "
+        "Expected (Event, SCALAR) or (SCALAR, Event), "
+        f"got ({type(numerator)}, {type(denominator)})."
+    )
