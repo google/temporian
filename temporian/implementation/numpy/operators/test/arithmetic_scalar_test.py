@@ -174,6 +174,57 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         self.assertEqual(numpy_output_event, operator_output["event"])
 
+    def test_correct_sum_multi_index(self) -> None:
+        """Test correct sum operator with multiple indexes."""
+
+        event_data = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 101, 1.0, 10.0],
+                    [0, 203, 2.0, 0.0],
+                    [1, 83, 3.0, 12.0],
+                    [1, 21, 4.0, np.nan],
+                    [2, 310, 5.0, 30.0],
+                ],
+                columns=["store_id", "product_id", "timestamp", "sales"],
+            ),
+            index_names=["store_id", "product_id"],
+        )
+
+        value = 10.0
+
+        numpy_output_event = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 101, 1.0, 20.0],
+                    [0, 203, 2.0, 10.0],
+                    [1, 83, 3.0, 22.0],
+                    [1, 21, 4.0, np.nan],
+                    [2, 310, 5.0, 40.0],
+                ],
+                columns=[
+                    "store_id",
+                    "product_id",
+                    "timestamp",
+                    "add_sales_10.0",
+                ],
+            ),
+            index_names=["store_id", "product_id"],
+        )
+
+        event = event_data.schema()
+
+        operator = AddScalarOperator(
+            event=event,
+            value=value,
+        )
+
+        impl = AddScalarNumpyImplementation(operator)
+
+        operator_output = impl.call(event=event_data)
+
+        self.assertEqual(numpy_output_event, operator_output["event"])
+
     def test_addition_different_dtypes(self) -> None:
         """Test correct addition operator with different dtypes."""
 
