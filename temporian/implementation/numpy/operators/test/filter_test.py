@@ -19,7 +19,7 @@ import pandas as pd
 
 from temporian.core.operators.filter import FilterOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.operators.filter_event import (
+from temporian.implementation.numpy.operators.filter import (
     FilterNumpyImplementation,
 )
 

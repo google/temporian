@@ -11,7 +11,7 @@ py_library(
     srcs = ["all_operators.py"],
     srcs_version = "PY3",
     deps = [
-        ":filter_event",
+        ":filter",
         ":glue",
         ":lag",
         ":prefix",
@@ -46,8 +46,8 @@ py_library(
 )
 
 py_library(
-    name = "filter_event",
-    srcs = ["filter_event.py"],
+    name = "filter",
+    srcs = ["filter.py"],
     srcs_version = "PY3",
     deps = [
         ":base",

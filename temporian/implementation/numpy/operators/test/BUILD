@@ -63,7 +63,7 @@ py_test(
         "//temporian/core/operators:filter",
         "//temporian/implementation/numpy:evaluator",
         "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/operators:filter_event",
+        "//temporian/implementation/numpy/operators:filter",
     ],
 )
 
