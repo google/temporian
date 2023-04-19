@@ -41,7 +41,7 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
         dst_event_data = {}
 
         # For each index
-        for index_key, index_data in event.data.items():
+        for index_key, index_data in event.iterindex():
             dst_features = []
             sampling_timestamps = sampling.data[index_key].timestamps
             dst_event_data[index_key] = IndexData(

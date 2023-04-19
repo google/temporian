@@ -37,8 +37,7 @@ class SampleNumpyImplementation(OperatorImplementation):
             feature_names=event.feature_names,
             index_names=event.index_names,
         )
-        # for index, src_mts in event.data.items():
-        for index_key, index_data in sampling.data.items():
+        for index_key, index_data in sampling.iterindex():
             dst_mts = []
             dst_event.data[index_key] = IndexData(
                 dst_mts, index_data.timestamps

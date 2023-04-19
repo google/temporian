@@ -76,7 +76,7 @@ def _append_impl(event: NumpyEvent, append_feat_names: List[str]) -> NumpyEvent:
     }
     # initialize destination event & sampling data
     dst_event_data = {}
-    for src_idx_lvl, src_idx_lvl_data in event.data.items():
+    for src_idx_lvl, src_idx_lvl_data in event.iterindex():
         dst_idx_suffs = [
             tuple(x)
             for x in zip(*[src_idx_lvl_data.features[i] for i in dst_idx_pos])
@@ -151,7 +151,7 @@ def _set_impl(event: NumpyEvent, set_feat_names: List[str]) -> NumpyEvent:
         }
     )
     # loop over source index levels gathering destination indexes
-    for src_idx_lvl, src_idx_lvl_data in event.data.items():
+    for src_idx_lvl, src_idx_lvl_data in event.iterindex():
         dst_idx_lvls = [
             tuple(x)
             for x in zip(*[src_idx_lvl_data.features[i] for i in dst_idx_pos])

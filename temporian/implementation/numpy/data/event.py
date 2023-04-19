@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -121,6 +121,9 @@ class NumpyEvent:
     @property
     def feature_count(self) -> int:
         return len(self._feature_names)
+
+    def iterindex(self) -> Iterable[Tuple[Tuple, IndexData]]:
+        yield from self.data.items()
 
     def index_dtypes(self) -> Dict[str, DType]:
         return (
