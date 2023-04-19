@@ -5,10 +5,10 @@ from typing import Dict
 import numpy as np
 
 from temporian.core.operators.sample import Sample
+from temporian.implementation.numpy import implementation_lib
+from temporian.implementation.numpy.data.event import DTYPE_REVERSE_MAPPING
 from temporian.implementation.numpy.data.event import IndexData
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.feature import dtype_to_np_dtype
-from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy_cc.operators import sample as sample_cc
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
@@ -17,8 +17,8 @@ class SampleNumpyImplementation(OperatorImplementation):
     """Numpy implementation for the Sample operator."""
 
     def __init__(self, operator: Sample) -> None:
-        assert isinstance(operator, Sample)
         super().__init__(operator)
+        assert isinstance(operator, Sample)
 
     def __call__(
         self, event: NumpyEvent, sampling: NumpyEvent
@@ -28,32 +28,36 @@ class SampleNumpyImplementation(OperatorImplementation):
         output_missing_and_np_dtypes = [
             (
                 f.dtype.missing_value(),
-                dtype_to_np_dtype(f.dtype),
+                DTYPE_REVERSE_MAPPING[f.dtype],
             )
             for f in output_features
         ]
+        # create output event
         dst_event = NumpyEvent(
             data={},
             feature_names=event.feature_names,
             index_names=event.index_names,
+            is_unix_timestamp=event.is_unix_timestamp,
         )
+        # iterate over destination sampling
         for index_key, index_data in sampling.iterindex():
+            # intialize destination index data
             dst_mts = []
             dst_event[index_key] = IndexData(dst_mts, index_data.timestamps)
-            sampling_timestamps = index_data.timestamps
 
             if index_key not in event.data:
-                # No matchin events to sample from.
+                # No matching events to sample from
                 for (
                     output_missing_value,
                     output_np_dtype,
                 ) in output_missing_and_np_dtypes:
-                    dst_ts_data = np.full(
-                        shape=len(sampling_timestamps),
-                        fill_value=output_missing_value,
-                        dtype=output_np_dtype,
+                    dst_mts.append(
+                        np.full(
+                            shape=len(index_data),
+                            fill_value=output_missing_value,
+                            dtype=output_np_dtype,
+                        )
                     )
-                    dst_mts.append(dst_ts_data)
                 continue
 
             src_mts = event[index_key].features
@@ -62,7 +66,7 @@ class SampleNumpyImplementation(OperatorImplementation):
                 sampling_idxs,
                 first_valid_idx,
             ) = sample_cc.build_sampling_idxs(
-                src_timestamps, sampling_timestamps
+                src_timestamps, index_data.timestamps
             )
             # For each feature
             for src_ts, (output_missing_value, output_np_dtype) in zip(
@@ -70,7 +74,7 @@ class SampleNumpyImplementation(OperatorImplementation):
             ):
                 # TODO: Check if running the following block in c++ is faster.
                 dst_ts_data = np.full(
-                    shape=len(sampling_timestamps),
+                    shape=len(index_data),
                     fill_value=output_missing_value,
                     dtype=src_ts.data.dtype,
                 )

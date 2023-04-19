@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import numpy as np
+
+from temporian.core.operators.arithmetic import FloorDivOperator
+from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.arithmetic.base import (
     BaseArithmeticNumpyImplementation,
 )
-from temporian.core.operators.arithmetic import FloorDivOperator
-from temporian.implementation.numpy import implementation_lib
 
 
 class FloorDivideNumpyImplementation(BaseArithmeticNumpyImplementation):
@@ -25,6 +26,7 @@ class FloorDivideNumpyImplementation(BaseArithmeticNumpyImplementation):
 
     def __init__(self, operator: FloorDivOperator) -> None:
         super().__init__(operator)
+        assert isinstance(operator, FloorDivOperator)
 
     def _do_operation(
         self, event_1_feature: np.ndarray, event_2_feature: np.ndarray

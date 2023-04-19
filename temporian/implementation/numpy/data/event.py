@@ -1,4 +1,5 @@
 from __future__ import annotations
+from copy import deepcopy
 from dataclasses import dataclass
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
@@ -63,6 +64,9 @@ class IndexData:
         self.features = features
         self.timestamps = timestamps
 
+    def __len__(self) -> int:
+        return len(self.timestamps)
+
 
 class NumpyEvent:
     # tolerance levels for comparing float features in __eq__
@@ -123,6 +127,9 @@ class NumpyEvent:
     @property
     def feature_count(self) -> int:
         return len(self._feature_names)
+
+    def copy(self) -> NumpyEvent:
+        return deepcopy(self)
 
     def iterindex(self) -> Iterable[Tuple[Tuple, IndexData]]:
         yield from self.data.items()

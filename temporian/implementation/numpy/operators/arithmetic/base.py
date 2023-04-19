@@ -11,9 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import numpy as np
 from typing import Dict
 from abc import ABC, abstractmethod
+
+import numpy as np
 
 from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
 from temporian.implementation.numpy.data.event import IndexData
@@ -24,6 +25,7 @@ from temporian.implementation.numpy.operators.base import OperatorImplementation
 class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
     def __init__(self, operator: BaseArithmeticOperator) -> None:
         super().__init__(operator)
+        assert isinstance(operator, BaseArithmeticOperator)
 
     @abstractmethod
     def _do_operation(
@@ -57,24 +59,32 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
                 "Both events must have the same number of features."
             )
 
+        # gather operator outputs
         prefix = self._operator.prefix
-        output = NumpyEvent(
+
+        # create destination event
+        dst_feature_names = [
+            f"{prefix}_{feature_name_1}_{feature_name_2}"
+            for feature_name_1, feature_name_2 in zip(
+                event_1.feature_names, event_2.feature_names
+            )
+        ]
+        dst_event = NumpyEvent(
             data={},
-            feature_names=[
-                f"{prefix}_{feature_name_1}_{feature_name_2}"
-                for feature_name_1, feature_name_2 in zip(
-                    event_1.feature_names, event_2.feature_names
-                )
-            ],
+            feature_names=dst_feature_names,
             index_names=event_1.index_names,
             is_unix_timestamp=event_1.is_unix_timestamp,
         )
-        for index_key, index_data in event_1.data.items():
-            output[index_key] = IndexData([], index_data.timestamps)
-            event_2_features = event_2[index_key].features
-            for i, event_1_feature in enumerate(index_data.features):
-                event_2_feature = event_2_features[i]
+        for index_key, index_data in event_1.iterindex():
+            # initialize destination index data
+            dst_event[index_key] = IndexData([], index_data.timestamps)
 
+            # iterate over index key features
+            event_1_features = index_data.features
+            event_2_features = event_2[index_key].features
+            for event_1_feature, event_2_feature in zip(
+                event_1_features, event_2_features
+            ):
                 # check both features have the same dtype
                 if event_1_feature.dtype.type != event_2_feature.dtype.type:
                     raise ValueError(
@@ -85,6 +95,6 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
                     )
 
                 result = self._do_operation(event_1_feature, event_2_feature)
-                output[index_key].features.append(result)
+                dst_event[index_key].features.append(result)
 
-        return {"event": output}
+        return {"event": dst_event}

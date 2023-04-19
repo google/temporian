@@ -35,6 +35,7 @@ class FilterNumpyImplementation(OperatorImplementation):
                 event_feature[index_mask]
                 for event_feature in event[index_key].features
             ]
+            # set filtered data
             output_event[index_key] = IndexData(
                 filtered_features, filtered_timestamps
             )

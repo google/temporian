@@ -16,6 +16,7 @@ from abc import abstractmethod
 from typing import Dict, Optional, List, Any
 
 import numpy as np
+
 from temporian.core.operators.window.base import BaseWindowOperator
 from temporian.implementation.numpy.data.event import IndexData
 from temporian.implementation.numpy.data.event import NumpyEvent
@@ -35,32 +36,31 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
         event: NumpyEvent,
         sampling: Optional[NumpyEvent] = None,
     ) -> Dict[str, NumpyEvent]:
+        # if no sampling is provided, apply operator to the event's own
+        # timestamps
         if sampling is None:
             sampling = event
 
-        dst_event_data = {}
-
+        # create destination event
+        dst_event = NumpyEvent(
+            {},
+            feature_names=event.feature_names,
+            index_names=sampling.index_names,
+            is_unix_timestamp=sampling.is_unix_timestamp,
+        )
         # For each index
         for index_key, index_data in event.iterindex():
             dst_features = []
-            sampling_timestamps = sampling[index_key].timestamps
-            dst_event_data[index_key] = IndexData(
-                dst_features, sampling_timestamps
-            )
+            dst_timestamps = sampling[index_key].timestamps
+            dst_event[index_key] = IndexData(dst_features, dst_timestamps)
             self._compute(
                 src_timestamps=index_data.timestamps,
                 src_features=index_data.features,
-                sampling_timestamps=sampling_timestamps,
+                sampling_timestamps=dst_timestamps,
                 dst_features=dst_features,
             )
 
-        return {
-            "event": NumpyEvent(
-                dst_event_data,
-                feature_names=event.feature_names,
-                index_names=sampling.index_names,
-            )
-        }
+        return {"event": dst_event}
 
     @abstractmethod
     def _implementation(self) -> Any:
@@ -75,12 +75,12 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
     ) -> None:
         implementation = self._implementation()
         for src_ts in src_features:
-            args = {
+            kwargs = {
                 "event_timestamps": src_timestamps,
                 "event_values": src_ts,
                 "window_length": self.operator.window_length,
             }
-            if self.operator.has_sampling:
-                args["sampling_timestamps"] = sampling_timestamps
-            dst_feature = implementation(**args)
+            if self._operator.has_sampling:
+                kwargs["sampling_timestamps"] = sampling_timestamps
+            dst_feature = implementation(**kwargs)
             dst_features.append(dst_feature)

@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import numpy as np
+
+from temporian.core.operators.arithmetic import MultiplyOperator
+from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.arithmetic.base import (
     BaseArithmeticNumpyImplementation,
 )
-from temporian.core.operators.arithmetic import MultiplyOperator
-from temporian.implementation.numpy import implementation_lib
 
 
 class MultiplyNumpyImplementation(BaseArithmeticNumpyImplementation):
@@ -24,6 +25,7 @@ class MultiplyNumpyImplementation(BaseArithmeticNumpyImplementation):
 
     def __init__(self, operator: MultiplyOperator) -> None:
         super().__init__(operator)
+        assert isinstance(operator, MultiplyOperator)
 
     def _do_operation(
         self, event_1_feature: np.ndarray, event_2_feature: np.ndarray

@@ -17,6 +17,7 @@ from datetime import datetime, timezone
 from typing import Dict, Any
 
 import numpy as np
+
 from temporian.core.operators.calendar.base import BaseCalendarOperator
 from temporian.implementation.numpy.data.event import IndexData
 from temporian.implementation.numpy.data.event import NumpyEvent
@@ -29,28 +30,30 @@ class BaseCalendarNumpyImplementation(OperatorImplementation):
 
     def __init__(self, operator: BaseCalendarOperator) -> None:
         super().__init__(operator)
+        assert isinstance(operator, BaseCalendarOperator)
 
     def __call__(self, sampling: NumpyEvent) -> Dict[str, NumpyEvent]:
-        data = {}
-        for index_key, index_data in sampling.data.items():
-            days = np.array(
+        # create destination event
+        dst_event = NumpyEvent(
+            data={},
+            feature_names=[self.operator.output_feature_name],
+            index_names=sampling.index_names,
+        )
+        for index_key, index_data in sampling.iterindex():
+            value = np.array(
                 [
                     self._get_value_from_datetime(
                         datetime.fromtimestamp(ts, tz=timezone.utc)
                     )
                     for ts in index_data.timestamps
                 ]
-            ).astype(np.int32)
+            ).astype(
+                np.int32
+            )  # TODO: parametrize output dtype
 
-            data[index_key] = IndexData([days], index_data.timestamps)
+            dst_event[index_key] = IndexData(value, index_data.timestamps)
 
-        return {
-            "event": NumpyEvent(
-                data=data,
-                feature_names=[self.operator.output_feature_name],
-                index_names=sampling.index_names,
-            )
-        }
+        return {"event": dst_event}
 
     @abstractmethod
     def _get_value_from_datetime(self, dt: datetime) -> Any:

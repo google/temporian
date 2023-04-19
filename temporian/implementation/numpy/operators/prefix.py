@@ -13,11 +13,14 @@ class PrefixNumpyImplementation(OperatorImplementation):
     """Numpy implementation for the Prefix operator."""
 
     def __init__(self, operator: Prefix) -> None:
-        assert isinstance(operator, Prefix)
         super().__init__(operator)
+        assert isinstance(operator, Prefix)
 
     def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
+        # gather operator attributes
         prefix = self._operator.prefix()
+
+        # create output event
         dst_event = NumpyEvent(
             data=event.data,
             feature_names=[

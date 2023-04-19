@@ -14,8 +14,8 @@ class PropagateNumpyImplementation(OperatorImplementation):
     """Numpy implementation for the propagate operator."""
 
     def __init__(self, operator: Propagate) -> None:
-        assert isinstance(operator, Propagate)
         super().__init__(operator)
+        assert isinstance(operator, Propagate)
 
     def __call__(
         self, event: NumpyEvent, sampling: NumpyEvent
