@@ -81,7 +81,8 @@ class FilterOperatorTest(absltest.TestCase):
         self.assertEqual(filtered_event, expected_event)
 
     def test_simple_filter_two_features(self) -> None:
-        """Test correct filter operator for without MultiIndex and two features."""
+        """Test correct filter operator for without MultiIndex and two features.
+        """
 
         event_df = pd.DataFrame(
             [
