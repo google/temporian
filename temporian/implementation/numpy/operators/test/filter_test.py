@@ -43,9 +43,6 @@ class FilterOperatorTest(absltest.TestCase):
             columns=["timestamp", "sales"],
         )
 
-        event_data = NumpyEvent.from_dataframe(event_df)
-        event = event_data.schema()
-
         condition_df = pd.DataFrame(
             [
                 [1.0, True],
@@ -58,6 +55,18 @@ class FilterOperatorTest(absltest.TestCase):
             columns=["timestamp", "low_sales"],
         )
 
+        expected_df = pd.DataFrame(
+            [
+                [1.0, 10.0],
+                [2.0, np.nan],
+                [3.0, 12.0],
+            ],
+            columns=["timestamp", "sales_filtered_by_low_sales"],
+        )
+
+        event_data = NumpyEvent.from_dataframe(event_df)
+        event = event_data.schema()
+
         condition_data = NumpyEvent.from_dataframe(condition_df)
         condition = condition_data.schema()
         condition._sampling = event._sampling
@@ -67,15 +76,6 @@ class FilterOperatorTest(absltest.TestCase):
         filtered_event = impl.call(event=event_data, condition=condition_data)[
             "event"
         ]
-
-        expected_df = pd.DataFrame(
-            [
-                [1.0, 10.0],
-                [2.0, np.nan],
-                [3.0, 12.0],
-            ],
-            columns=["timestamp", "sales_filtered_by_low_sales"],
-        )
 
         expected_event = NumpyEvent.from_dataframe(expected_df)
 
@@ -96,9 +96,6 @@ class FilterOperatorTest(absltest.TestCase):
             columns=["timestamp", "sales", "product"],
         )
 
-        event_data = NumpyEvent.from_dataframe(event_df)
-        event = event_data.schema()
-
         condition_df = pd.DataFrame(
             [
                 [1.0, True],
@@ -110,16 +107,6 @@ class FilterOperatorTest(absltest.TestCase):
             ],
             columns=["timestamp", "low_sales"],
         )
-
-        condition_data = NumpyEvent.from_dataframe(condition_df)
-        condition = condition_data.schema()
-        condition._sampling = event._sampling
-
-        operator = FilterOperator(event=event, condition=condition)
-        impl = FilterNumpyImplementation(operator)
-        filtered_event = impl.call(event=event_data, condition=condition_data)[
-            "event"
-        ]
 
         expected_df = pd.DataFrame(
             [
@@ -134,12 +121,25 @@ class FilterOperatorTest(absltest.TestCase):
             ],
         )
 
+        event_data = NumpyEvent.from_dataframe(event_df)
+        event = event_data.schema()
+
+        condition_data = NumpyEvent.from_dataframe(condition_df)
+        condition = condition_data.schema()
+        condition._sampling = event._sampling
+
+        operator = FilterOperator(event=event, condition=condition)
+        impl = FilterNumpyImplementation(operator)
+        filtered_event = impl.call(event=event_data, condition=condition_data)[
+            "event"
+        ]
+
         expected_event = NumpyEvent.from_dataframe(expected_df)
 
         self.assertEqual(filtered_event, expected_event)
 
-    def test_filter_with_multiple_index(self) -> None:
-        """Test correct filter operator with multpile index."""
+    def test_filter_with_one_index(self) -> None:
+        """Test correct filter operator with one index apart from timestamps."""
 
         event_df = pd.DataFrame(
             [
@@ -152,11 +152,6 @@ class FilterOperatorTest(absltest.TestCase):
             ],
             columns=["timestamp", "sales", "product"],
         )
-
-        event_data = NumpyEvent.from_dataframe(
-            event_df, index_names=["product"]
-        )
-        event = event_data.schema()
 
         # must have same index for filtering
         condition_df = pd.DataFrame(
@@ -171,18 +166,6 @@ class FilterOperatorTest(absltest.TestCase):
             columns=["timestamp", "low_sales", "product"],
         )
 
-        condition_data = NumpyEvent.from_dataframe(
-            condition_df, index_names=["product"]
-        )
-        condition = condition_data.schema()
-        condition._sampling = event._sampling
-
-        operator = FilterOperator(event=event, condition=condition)
-        impl = FilterNumpyImplementation(operator)
-        filtered_event = impl.call(event=event_data, condition=condition_data)[
-            "event"
-        ]
-
         expected_df = pd.DataFrame(
             [
                 ["A", 1.0, 10.0],
@@ -196,8 +179,90 @@ class FilterOperatorTest(absltest.TestCase):
             ],
         )
 
+        event_data = NumpyEvent.from_dataframe(
+            event_df, index_names=["product"]
+        )
+        event = event_data.schema()
+
+        condition_data = NumpyEvent.from_dataframe(
+            condition_df, index_names=["product"]
+        )
+        condition = condition_data.schema()
+        condition._sampling = event._sampling
+
+        operator = FilterOperator(event=event, condition=condition)
+        impl = FilterNumpyImplementation(operator)
+        filtered_event = impl.call(event=event_data, condition=condition_data)[
+            "event"
+        ]
+
         expected_event = NumpyEvent.from_dataframe(
             expected_df, index_names=["product"]
+        )
+
+        self.assertEqual(filtered_event, expected_event)
+
+    def test_filter_with_one_index(self) -> None:
+        """Test correct filter operator with multiple index."""
+
+        event_df = pd.DataFrame(
+            [
+                [1.0, 10.0, "A", 101],
+                [2.0, np.nan, "A", 102],
+                [3.0, 12.0, "B", 103],
+                [4.0, 13.0, "B", 104],
+                [5.0, 14.0, "C", 105],
+                [6.0, 15.0, "C", 106],
+            ],
+            columns=["timestamp", "sales", "product", "id"],
+        )
+
+        # must have same index for filtering
+        condition_df = pd.DataFrame(
+            [
+                [1.0, True, "A", 101],
+                [2.0, True, "A", 102],
+                [3.0, True, "B", 103],
+                [4.0, False, "B", 104],
+                [5.0, False, "C", 105],
+                [6.0, False, "C", 106],
+            ],
+            columns=["timestamp", "low_sales", "product", "id"],
+        )
+
+        expected_df = pd.DataFrame(
+            [
+                ["A", 101, 1.0, 10.0],
+                ["A", 102, 2.0, np.nan],
+                ["B", 103, 3.0, 12.0],
+            ],
+            columns=[
+                "product",
+                "id",
+                "timestamp",
+                "sales_filtered_by_low_sales",
+            ],
+        )
+
+        event_data = NumpyEvent.from_dataframe(
+            event_df, index_names=["product", "id"]
+        )
+        event = event_data.schema()
+
+        condition_data = NumpyEvent.from_dataframe(
+            condition_df, index_names=["product", "id"]
+        )
+        condition = condition_data.schema()
+        condition._sampling = event._sampling
+
+        operator = FilterOperator(event=event, condition=condition)
+        impl = FilterNumpyImplementation(operator)
+        filtered_event = impl.call(event=event_data, condition=condition_data)[
+            "event"
+        ]
+
+        expected_event = NumpyEvent.from_dataframe(
+            expected_df, index_names=["product", "id"]
         )
 
         self.assertEqual(filtered_event, expected_event)
