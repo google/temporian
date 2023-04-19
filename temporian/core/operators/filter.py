@@ -60,7 +60,7 @@ class FilterOperator(Operator):
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=self.feature_name(f),
+                name=f.name,
                 dtype=f.dtype,
                 sampling=output_sampling,
                 creator=self,
@@ -90,9 +90,6 @@ class FilterOperator(Operator):
             ],
             outputs=[pb.OperatorDef.Output(key="event")],
         )
-
-    def feature_name(self, feature: Feature) -> str:
-        return f"{feature.name}_filtered_by_{self.condition_name}"
 
 
 operator_lib.register_operator(FilterOperator)

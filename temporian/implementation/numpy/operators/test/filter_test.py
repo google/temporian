@@ -61,7 +61,7 @@ class FilterOperatorTest(absltest.TestCase):
                 [2.0, np.nan],
                 [3.0, 12.0],
             ],
-            columns=["timestamp", "sales_filtered_by_low_sales"],
+            columns=["timestamp", "sales"],
         )
 
         event_data = NumpyEvent.from_dataframe(event_df)
@@ -116,8 +116,8 @@ class FilterOperatorTest(absltest.TestCase):
             ],
             columns=[
                 "timestamp",
-                "sales_filtered_by_low_sales",
-                "product_filtered_by_low_sales",
+                "sales",
+                "product",
             ],
         )
 
@@ -175,7 +175,7 @@ class FilterOperatorTest(absltest.TestCase):
             columns=[
                 "product",
                 "timestamp",
-                "sales_filtered_by_low_sales",
+                "sales",
             ],
         )
 
@@ -240,7 +240,7 @@ class FilterOperatorTest(absltest.TestCase):
                 "product",
                 "id",
                 "timestamp",
-                "sales_filtered_by_low_sales",
+                "sales",
             ],
         )
 

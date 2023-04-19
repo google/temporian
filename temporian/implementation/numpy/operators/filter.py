@@ -36,7 +36,7 @@ class FilterNumpyImplementation(OperatorImplementation):
             # filter features
             event_filtered_data[index] = [
                 NumpyFeature(
-                    name=self.operator.feature_name(event_feature),
+                    name=event_feature.name,
                     data=event_feature.data[condition_feature],
                 )
                 for event_feature in event.data[index]
