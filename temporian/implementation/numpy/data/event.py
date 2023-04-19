@@ -31,6 +31,7 @@ DTYPE_MAPPING = {
     np.int32: DType.INT32,
     np.str_: DType.STRING,
     np.string_: DType.STRING,
+    np.bool_: DType.BOOLEAN,
 }
 DTYPE_REVERSE_MAPPING = {
     DType.FLOAT64: np.float64,
@@ -38,6 +39,7 @@ DTYPE_REVERSE_MAPPING = {
     DType.INT64: np.float64,
     DType.INT32: np.float32,
     DType.STRING: np.str_,
+    DType.BOOLEAN: np.bool_,
 }
 
 
