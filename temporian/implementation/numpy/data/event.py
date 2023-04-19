@@ -148,7 +148,7 @@ class NumpyEvent:
     def first_index_features(self) -> IndexData:
         if self.first_index_key() is None:
             return []
-        return self.data[self.first_index_key()]
+        return self[self.first_index_key()]
 
     def schema(self) -> Event:
         return Event(
@@ -391,6 +391,12 @@ class NumpyEvent:
             f"\n{data_repr}"
         )
 
+    def __getitem__(self, index: Tuple) -> IndexData:
+        return self.data[index]
+
+    def __setitem__(self, index: Tuple, value: IndexData) -> None:
+        self.data[index] = value
+
     def __eq__(self, __o: object) -> bool:
         if not isinstance(__o, NumpyEvent):
             return False
@@ -416,7 +422,7 @@ class NumpyEvent:
                 return False
 
             # check same features
-            index_data_other = __o.data[index_key]
+            index_data_other = __o[index_key]
             for feature_self, feature_other in zip(
                 index_data_self.features, index_data_other.features
             ):

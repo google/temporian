@@ -24,7 +24,7 @@ class FilterNumpyImplementation(OperatorImplementation):
             index_mask = index_data.features[0]
 
             # filter timestamps
-            filtered_timestamps = event.data[index_key].timestamps[index_mask]
+            filtered_timestamps = event[index_key].timestamps[index_mask]
 
             # if filtered timestamps is empty, skip
             if len(filtered_timestamps) == 0:
@@ -33,9 +33,9 @@ class FilterNumpyImplementation(OperatorImplementation):
             # filter features
             filtered_features = [
                 event_feature[index_mask]
-                for event_feature in event.data[index_key].features
+                for event_feature in event[index_key].features
             ]
-            output_event.data[index_key] = IndexData(
+            output_event[index_key] = IndexData(
                 filtered_features, filtered_timestamps
             )
 

@@ -70,8 +70,8 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
             is_unix_timestamp=event_1.is_unix_timestamp,
         )
         for index_key, index_data in event_1.data.items():
-            output.data[index_key] = IndexData([], index_data.timestamps)
-            event_2_features = event_2.data[index_key].features
+            output[index_key] = IndexData([], index_data.timestamps)
+            event_2_features = event_2[index_key].features
             for i, event_1_feature in enumerate(index_data.features):
                 event_2_feature = event_2_features[i]
 
@@ -85,6 +85,6 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
                     )
 
                 result = self._do_operation(event_1_feature, event_2_feature)
-                output.data[index_key].features.append(result)
+                output[index_key].features.append(result)
 
         return {"event": output}

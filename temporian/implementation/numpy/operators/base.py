@@ -166,7 +166,7 @@ def _check_same_sampling(event_1: NumpyEvent, event_2: NumpyEvent) -> bool:
         if index_key not in event_2.data:
             return False
 
-        index_data_2 = event_2.data[index_key]
+        index_data_2 = event_2[index_key]
         if index_data_1.timestamps is not index_data_2.timestamps:
             return False
 

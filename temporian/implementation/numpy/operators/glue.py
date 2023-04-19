@@ -51,13 +51,11 @@ class GlueNumpyImplementation(OperatorImplementation):
             is_unix_timestamp=events[0].is_unix_timestamp,
         )
         for index_key, index_data in events[0].data.items():
-            dst_event.data[index_key] = IndexData(
+            dst_event[index_key] = IndexData(
                 index_data.features, index_data.timestamps
             )
             for event in events[1:]:
-                dst_event.data[index_key].features.extend(
-                    event.data[index_key].features
-                )
+                dst_event[index_key].features.extend(event[index_key].features)
         # make gluement
         return {"event": dst_event}
 

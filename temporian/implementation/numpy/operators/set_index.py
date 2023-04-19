@@ -93,11 +93,11 @@ def _append_impl(event: NumpyEvent, append_feat_names: List[str]) -> NumpyEvent:
 
             dst_event_data[dst_idx_lvl] = IndexData(
                 [
-                    event.data[src_idx_lvl].features[feat_pos][dst_idx_suff_pos]
+                    event[src_idx_lvl].features[feat_pos][dst_idx_suff_pos]
                     for feat_name, feat_pos in dst_feat_pos.items()
                 ],
                 # fill sampling data
-                event.data[src_idx_lvl].timestamps[dst_idx_suff_pos],
+                event[src_idx_lvl].timestamps[dst_idx_suff_pos],
             )
 
     # finally, sort according to timestamps. TODO: this is merging sorted
@@ -158,7 +158,7 @@ def _set_impl(event: NumpyEvent, set_feat_names: List[str]) -> NumpyEvent:
         ]
         for i, dst_idx_lvl in enumerate(dst_idx_lvls):
             dst_idx_metadata[dst_idx_lvl]["timestamps"].append(
-                event.data[src_idx_lvl].timestamps[i]
+                event[src_idx_lvl].timestamps[i]
             )
             for feat_name, feat_pos in dst_feat_pos.items():
                 dst_idx_metadata[dst_idx_lvl]["features"][feat_name].append(

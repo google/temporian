@@ -70,8 +70,8 @@ class GlueNumpyImplementationTest(absltest.TestCase):
         )
         # set same sampling
         for index_key, index_data in numpy_event_1.data.items():
-            numpy_event_2.data[index_key].timestamps = index_data.timestamps
-            numpy_event_3.data[index_key].timestamps = index_data.timestamps
+            numpy_event_2[index_key].timestamps = index_data.timestamps
+            numpy_event_3[index_key].timestamps = index_data.timestamps
 
         expected_numpy_output_event = NumpyEvent.from_dataframe(
             pd.DataFrame(

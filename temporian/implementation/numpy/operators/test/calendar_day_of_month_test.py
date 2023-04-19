@@ -84,11 +84,11 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
             data={
                 (1,): IndexData(
                     [np.array([1, 14, 14]).astype(np.int32)],
-                    input_event_data.data[(1,)].timestamps,
+                    input_event_data[(1,)].timestamps,
                 ),
                 (2,): IndexData(
                     [np.array([14, 15]).astype(np.int32)],
-                    input_event_data.data[(2,)].timestamps,
+                    input_event_data[(2,)].timestamps,
                 ),
             },
             feature_names="calendar_day_of_month",

@@ -64,9 +64,7 @@ class PrototypeTest(absltest.TestCase):
         )
         # set same sampling
         for index_key, index_data in self.numpy_event_1.data.items():
-            self.numpy_event_2.data[
-                index_key
-            ].timestamps = index_data.timestamps
+            self.numpy_event_2[index_key].timestamps = index_data.timestamps
 
         # TODO: Remove the following line when "from_dataframe" support creating
         # event data with shared sampling. Note that "numpy_event_1" and

@@ -39,9 +39,7 @@ class SampleNumpyImplementation(OperatorImplementation):
         )
         for index_key, index_data in sampling.iterindex():
             dst_mts = []
-            dst_event.data[index_key] = IndexData(
-                dst_mts, index_data.timestamps
-            )
+            dst_event[index_key] = IndexData(dst_mts, index_data.timestamps)
             sampling_timestamps = index_data.timestamps
 
             if index_key not in event.data:
@@ -58,8 +56,8 @@ class SampleNumpyImplementation(OperatorImplementation):
                     dst_mts.append(dst_ts_data)
                 continue
 
-            src_mts = event.data[index_key].features
-            src_timestamps = event.data[index_key].timestamps
+            src_mts = event[index_key].features
+            src_timestamps = event[index_key].timestamps
             (
                 sampling_idxs,
                 first_valid_idx,

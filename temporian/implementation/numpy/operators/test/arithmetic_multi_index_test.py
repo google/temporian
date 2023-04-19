@@ -102,9 +102,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
         )
         # set same sampling
         for index_key, index_data in self.numpy_event_1.data.items():
-            self.numpy_event_2.data[
-                index_key
-            ].timestamps = index_data.timestamps
+            self.numpy_event_2[index_key].timestamps = index_data.timestamps
 
         # Expected result after addition
         self.numpy_expected_add = NumpyEvent.from_dataframe(

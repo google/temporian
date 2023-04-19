@@ -69,9 +69,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         )
         # set same sampling
         for index_key, index_data in self.numpy_event_1.data.items():
-            self.numpy_event_2.data[
-                index_key
-            ].timestamps = index_data.timestamps
+            self.numpy_event_2[index_key].timestamps = index_data.timestamps
         self.event_1 = self.numpy_event_1.schema()
         self.event_2 = self.numpy_event_2.schema()
 

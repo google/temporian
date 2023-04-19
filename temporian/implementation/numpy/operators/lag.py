@@ -26,7 +26,7 @@ class LagNumpyImplementation(OperatorImplementation):
             is_unix_timestamp=event.is_unix_timestamp,
         )
         for index_key, index_data in event.iterindex():
-            output_event.data[index_key] = IndexData(
+            output_event[index_key] = IndexData(
                 index_data.features, index_data.timestamps.copy() + duration
             )
 
