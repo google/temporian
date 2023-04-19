@@ -60,7 +60,7 @@ class FilterOperatorTest(absltest.TestCase):
 
         condition_data = NumpyEvent.from_dataframe(condition_df)
         condition = condition_data.schema()
-        condition.sampling = event.sampling
+        condition._sampling = event._sampling
 
         operator = FilterOperator(event=event, condition=condition)
         impl = FilterNumpyImplementation(operator)
@@ -82,8 +82,7 @@ class FilterOperatorTest(absltest.TestCase):
         self.assertEqual(filtered_event, expected_event)
 
     def test_simple_filter_two_features(self) -> None:
-        """Test correct filter operator for without MultiIndex and two features.
-        """
+        """Test correct filter operator for without MultiIndex and two features."""
 
         event_df = pd.DataFrame(
             [
@@ -114,7 +113,7 @@ class FilterOperatorTest(absltest.TestCase):
 
         condition_data = NumpyEvent.from_dataframe(condition_df)
         condition = condition_data.schema()
-        condition.sampling = event.sampling
+        condition._sampling = event._sampling
 
         operator = FilterOperator(event=event, condition=condition)
         impl = FilterNumpyImplementation(operator)
@@ -176,7 +175,7 @@ class FilterOperatorTest(absltest.TestCase):
             condition_df, index_names=["product"]
         )
         condition = condition_data.schema()
-        condition.sampling = event.sampling
+        condition._sampling = event._sampling
 
         operator = FilterOperator(event=event, condition=condition)
         impl = FilterNumpyImplementation(operator)
