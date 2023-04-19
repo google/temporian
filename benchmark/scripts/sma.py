@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Basic benchmarking script for temporian.
+Basic profiling script for temporian.
 
 The script creates two events, applies some operators, and evaluates the graph.
 """

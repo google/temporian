@@ -37,11 +37,29 @@ class SampleNumpyImplementation(OperatorImplementation):
             for f in output_features
         ]
 
-        for index, src_mts in event.data.items():
+        # for index, src_mts in event.data.items():
+        for index, sampling_timestamps in sampling.sampling.data.items():
             dst_mts = []
             dst_event.data[index] = dst_mts
+
+            if index not in event.sampling.data:
+                # No matchin events to sample from.
+                for output_feature, (
+                    output_missing_value,
+                    output_np_dtype,
+                ) in zip(output_features, output_missing_and_np_dtypes):
+                    dst_ts_data = np.full(
+                        shape=len(sampling_timestamps),
+                        fill_value=output_missing_value,
+                        dtype=output_np_dtype,
+                    )
+                    dst_mts.append(
+                        NumpyFeature(output_feature.name, dst_ts_data)
+                    )
+                continue
+
             src_timestamps = event.sampling.data[index]
-            sampling_timestamps = sampling.sampling.data[index]
+            src_mts = event.data[index]
 
             (
                 sampling_idxs,
