@@ -5,6 +5,7 @@ from typing import Dict
 import numpy as np
 
 from temporian.core.operators.sample import Sample
+from temporian.implementation.numpy.data.event import IndexData
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.feature import dtype_to_np_dtype
 from temporian.implementation.numpy import implementation_lib
@@ -32,23 +33,24 @@ class SampleNumpyImplementation(OperatorImplementation):
             for f in output_features
         ]
         dst_event = NumpyEvent(
-            data=sampling.data,
+            data={},
             feature_names=event.feature_names,
             index_names=event.index_names,
         )
         # for index, src_mts in event.data.items():
         for index_key, index_data in sampling.data.items():
             dst_mts = []
-            dst_event.data[index_key].features = dst_mts
+            dst_event.data[index_key] = IndexData(
+                dst_mts, index_data.timestamps
+            )
             sampling_timestamps = index_data.timestamps
 
-            if index_key not in event.sampling.data:
-                # TODO: Add option to create warning in case of non matching.
+            if index_key not in event.data:
                 # No matchin events to sample from.
-                for output_feature, (
+                for (
                     output_missing_value,
                     output_np_dtype,
-                ) in zip(output_features, output_missing_and_np_dtypes):
+                ) in output_missing_and_np_dtypes:
                     dst_ts_data = np.full(
                         shape=len(sampling_timestamps),
                         fill_value=output_missing_value,
@@ -75,7 +77,7 @@ class SampleNumpyImplementation(OperatorImplementation):
                     fill_value=output_missing_value,
                     dtype=src_ts.data.dtype,
                 )
-                dst_ts_data[first_valid_idx:] = src_ts.data[
+                dst_ts_data[first_valid_idx:] = src_ts[
                     sampling_idxs[first_valid_idx:]
                 ]
                 dst_mts.append(dst_ts_data)

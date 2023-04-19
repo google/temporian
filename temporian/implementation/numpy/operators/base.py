@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
-
 from typing import Dict
+
+from temporian.core.data.event import Event
+from temporian.core.operators.base import Operator
+from temporian.core.operators.base import OperatorExceptionDecorator
 from temporian.implementation.numpy.data.event import DTYPE_MAPPING
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.core.data.event import Event
-from temporian.core.operators.base import Operator, OperatorExceptionDecorator
 
 
 class OperatorImplementation(ABC):
@@ -40,7 +41,6 @@ def _check_features(
 
     # TODO: Check that the index and features have the same number of
     # observations.
-
     for key, item_def in definitions.items():
         item_real = values[key]
 
@@ -67,8 +67,6 @@ def _check_features(
                     f"expected={feature_def.name} vs "
                     f"effective={item_real.feature_names[i]}"
                 )
-
-            print(item_real)
             feat_dtype_real = DTYPE_MAPPING[
                 item_real.first_index_features().features[i].dtype.type
             ]
@@ -127,42 +125,49 @@ def _check_output(
                 )
 
             # TODO: Check copy or referencing of feature data.
-            # TODO: Reactivate Sampling check after discussion w/ the team
-            # Check copy or referencing of sampling data.
-            # matching_samplings = set(operator.list_matching_io_samplings())
-            # for input_key in operator.inputs.keys():
-            #     input_real = inputs[input_key]
-            #     expected_matching_sampling = (
-            #         input_key,
-            #         output_key,
-            #     ) in matching_samplings
-            #     effective_matching_sampling = (
-            #         output_real.sampling is input_real.sampling
-            #     )
-            #     assert effective_matching_sampling == (
-            #         output_real.sampling.data is input_real.sampling.data
-            #     )
-            #     if (
-            #         expected_matching_sampling
-            #         and not effective_matching_sampling
-            #     ):
-            #         raise RuntimeError(
-            #             f"The sampling of input '{input_key}' and output "
-            #             f"'{output_key}' are expected to have THE SAME "
-            #             "sampling. However, a different sampling was generated "
-            #             f"during the op execution ({input_real.sampling} "
-            #             f"vs {output_real.sampling})."
-            #         )
-            #     if (
-            #         not expected_matching_sampling
-            #         and effective_matching_sampling
-            #     ):
-            #         raise RuntimeError(
-            #             f"The sampling of input '{input_key}' and output "
-            #             f"'{output_key}' are expected to have A DIFFERENT "
-            #             "sampling. However, the same sampling was generated "
-            #             "during the op execution."
-            #         )
+            matching_samplings = set(operator.list_matching_io_samplings())
+            for input_key in operator.inputs.keys():
+                input_real = inputs[input_key]
+                expected_matching_sampling = (
+                    input_key,
+                    output_key,
+                ) in matching_samplings
+                effective_matching_sampling = _check_same_sampling(
+                    output_real, input_real
+                )
+                if (
+                    expected_matching_sampling
+                    and not effective_matching_sampling
+                ):
+                    raise RuntimeError(
+                        f"The sampling of input '{input_key}' and output "
+                        f"'{output_key}' are expected to have THE SAME "
+                        "sampling. However, a different sampling was generated "
+                        f"during the op execution ({input_real} "
+                        f"vs {output_real})."
+                    )
+                if (
+                    not expected_matching_sampling
+                    and effective_matching_sampling
+                ):
+                    raise RuntimeError(
+                        f"The sampling of input '{input_key}' and output "
+                        f"'{output_key}' are expected to have A DIFFERENT "
+                        "sampling. However, the same sampling was generated "
+                        "during the op execution."
+                    )
 
         # Check features
         _check_features(outputs, definitions=operator.outputs, label="outputs")
+
+
+def _check_same_sampling(event_1: NumpyEvent, event_2: NumpyEvent) -> bool:
+    for index_key, index_data_1 in event_1.data.items():
+        if index_key not in event_2.data:
+            return False
+
+        index_data_2 = event_2.data[index_key]
+        if index_data_1.timestamps is not index_data_2.timestamps:
+            return False
+
+    return True

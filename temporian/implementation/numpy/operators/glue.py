@@ -40,7 +40,6 @@ class GlueNumpyImplementation(OperatorImplementation):
         #   then, "events" if guarenteed to be [X, Y, Z].
         events = list(list(zip(*sorted(list(dict_events.items()))))[1])
         assert len(events) >= 2
-
         dst_event = NumpyEvent(
             data={},
             feature_names=[
@@ -57,9 +56,8 @@ class GlueNumpyImplementation(OperatorImplementation):
             )
             for event in events[1:]:
                 dst_event.data[index_key].features.extend(
-                    copy.copy(event.data[index_key].features)
+                    event.data[index_key].features
                 )
-
         # make gluement
         return {"event": dst_event}
 
