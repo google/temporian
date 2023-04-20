@@ -12,6 +12,7 @@ py_library(
     deps = [
         ":cast",
         ":drop_index",
+        ":filter",
         ":glue",
         ":lag",
         ":prefix",
@@ -53,6 +54,20 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "filter",
+    srcs = ["filter.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:dtype",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
         "//temporian/proto:core_py_proto",

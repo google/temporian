@@ -29,6 +29,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "CAST",
             "DIVISION",
             "DROP_INDEX",
+            "FILTER",
             "FLOORDIV",
             "GLUE",
             "LAG",

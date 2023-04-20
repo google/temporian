@@ -3,6 +3,9 @@
 # pylint: disable=unused-import
 from temporian.implementation.numpy.operators import cast
 from temporian.implementation.numpy.operators import drop_index
+
+# pylint: disable=redefined-builtin
+from temporian.implementation.numpy.operators import filter
 from temporian.implementation.numpy.operators import glue
 from temporian.implementation.numpy.operators import lag
 from temporian.implementation.numpy.operators import prefix
@@ -29,3 +32,4 @@ from temporian.implementation.numpy.operators.calendar import day_of_month
 from temporian.implementation.numpy.operators.calendar import day_of_week
 
 # pylint: enable=unused-import
+# pylint: enable=redefined-builtin
