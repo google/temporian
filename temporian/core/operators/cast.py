@@ -39,13 +39,13 @@ class CastOperator(Operator):
         # Check that provided arguments are coherent
         self._check_args(event, to_dtype, from_dtypes, from_features)
 
-        # Convert to {feature_name: target_dtype}
-        target_dtypes = self._get_feature_dtype_map(
+        # Convert anything to {feature_name: target_dtype}, include all features
+        from_features_all = self._get_feature_dtype_map(
             event, to_dtype, from_dtypes, from_features
         )
 
         # Attributes
-        self.add_attribute("target_dtypes", target_dtypes)
+        self.add_attribute("from_features", from_features_all)
         self.add_attribute("check_overflow", check_overflow)
 
         # Inputs
@@ -55,7 +55,7 @@ class CastOperator(Operator):
         output_features = []
         reuse_event = True
         for feature in event.features:
-            if target_dtypes[feature.name] is feature.dtype:
+            if from_features_all[feature.name] is feature.dtype:
                 # Reuse feature
                 output_features.append(feature)
             else:
@@ -65,7 +65,7 @@ class CastOperator(Operator):
                     # Note: we're not renaming output features here
                     Feature(
                         feature.name,
-                        target_dtypes[feature.name],
+                        from_features_all[feature.name],
                         feature.sampling,
                         creator=self,
                     )
@@ -84,6 +84,14 @@ class CastOperator(Operator):
         )
 
         self.check()
+
+    @property
+    def check_overflow(self) -> bool:
+        return self.attributes["check_overflow"]
+
+    @property
+    def from_features(self) -> dict[str, DType]:
+        return self.attributes["from_features"]
 
     def _check_args(
         self,
@@ -128,23 +136,19 @@ class CastOperator(Operator):
         to_dtype: Optional[DType] = None,
         from_dtypes: Optional[Mapping[DType, DType]] = None,
         from_features: Optional[Mapping[str, DType]] = None,
-    ) -> dict:
-        target_dtypes = {}
-        for feature in event.features:
-            if to_dtype is not None:
-                # cast all features this dtype
-                target_dtypes[feature.name] = to_dtype
-            elif from_features is not None:
-                # Cast by feature name (use same feature.dtype if not found)
-                target_dtypes[feature.name] = from_features.get(
-                    feature.name, feature.dtype
-                )
-            elif from_dtypes is not None:
-                # Cast by dtype (use same feature.dtype if not found)
-                target_dtypes[feature.name] = from_dtypes.get(
-                    feature.dtype, feature.dtype
-                )
-        return target_dtypes
+    ) -> dict[str, DType]:
+        if to_dtype is not None:
+            return {feature.name: to_dtype for feature in event.features}
+        if from_features is not None:
+            return {
+                feature.name: from_features.get(feature.name, feature.dtype)
+                for feature in event.features
+            }
+        if from_dtypes is not None:
+            return {
+                feature.name: from_dtypes.get(feature.dtype, feature.dtype)
+                for feature in event.features
+            }
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
@@ -152,7 +156,7 @@ class CastOperator(Operator):
             key="CAST",
             attributes=[
                 pb.OperatorDef.Attribute(
-                    key="target_dtypes",
+                    key="from_features",
                     type=pb.OperatorDef.Attribute.Type.MAP_STR_STR,
                     is_optional=False,
                 ),
@@ -178,7 +182,7 @@ def cast(
     check_overflow: bool = True,
 ) -> Event:
     """
-    Changes the dtype of event features to the type specified in `target`.
+    Cast the dtype of event features to the dtype(s) specified in `target`.
     Feature names are preserved, and reused (not copied) if not changed.
 
     Args:
@@ -245,7 +249,9 @@ def cast(
             from_dtypes = target
         else:
             raise ValueError(
-                "Cast: mapping keys should be all DType or feature names"
+                "Cast: mapping keys should be all DType or feature names.\n"
+                f"Keys: {target.keys()}\n"
+                f"Feature names: {event.feature_names}"
             )
     else:
         to_dtype = target

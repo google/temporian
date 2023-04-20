@@ -38,6 +38,19 @@ py_library(
 )
 
 py_library(
+    name = "glue",
+    srcs = ["glue.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
     name = "base",
     srcs = ["base.py"],
     srcs_version = "PY3",
@@ -61,13 +74,13 @@ py_library(
 )
 
 py_library(
-    name = "filter",
-    srcs = ["filter.py"],
+    name = "lag",
+    srcs = ["lag.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data:duration",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
         "//temporian/proto:core_py_proto",
@@ -75,12 +88,13 @@ py_library(
 )
 
 py_library(
-    name = "glue",
-    srcs = ["glue.py"],
+    name = "filter",
+    srcs = ["filter.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
         "//temporian/core:operator_lib",
+        "//temporian/core/data:dtype",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
         "//temporian/proto:core_py_proto",
@@ -102,8 +116,8 @@ py_library(
 )
 
 py_library(
-    name = "lag",
-    srcs = ["lag.py"],
+    name = "select",
+    srcs = ["select.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
@@ -111,6 +125,20 @@ py_library(
         "//temporian/core/data:duration",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "set_index",
+    srcs = ["set_index.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/core/data:sampling",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -156,34 +184,6 @@ py_library(
         "//temporian/core/data:duration",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
-        "//temporian/proto:core_py_proto",
-    ],
-)
-
-py_library(
-    name = "select",
-    srcs = ["select.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":base",
-        "//temporian/core:operator_lib",
-        "//temporian/core/data:duration",
-        "//temporian/core/data:event",
-        "//temporian/core/data:feature",
-        "//temporian/proto:core_py_proto",
-    ],
-)
-
-py_library(
-    name = "set_index",
-    srcs = ["set_index.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":base",
-        "//temporian/core:operator_lib",
-        "//temporian/core/data:event",
-        "//temporian/core/data:feature",
-        "//temporian/core/data:sampling",
         "//temporian/proto:core_py_proto",
     ],
 )

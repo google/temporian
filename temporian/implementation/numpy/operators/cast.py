@@ -55,21 +55,20 @@ class CastNumpyImplementation(OperatorImplementation):
             )
 
     def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
-        target_dtypes = self.operator.attributes["target_dtypes"]
+        from_features = self.operator.attributes["from_features"]
         check = self.operator.attributes["check_overflow"]
 
         # Reuse event if actually no features changed dtype
         if all(
-            orig_dtype is target_dtypes[feature_name]
+            orig_dtype is from_features[feature_name]
             for feature_name, orig_dtype in event.dtypes.items()
         ):
             return {"event": event}
 
         # Create new event, some features may be reused
         output = NumpyEvent(data={}, sampling=event.sampling)
-
         for feat_idx, feature_name in enumerate(event.feature_names()):
-            dst_dtype = target_dtypes[feature_name]
+            dst_dtype = from_features[feature_name]
             orig_dtype = event.dtypes[feature_name]
             check_feature = check and self._can_overflow(orig_dtype, dst_dtype)
             # Numpy dest type
@@ -78,11 +77,14 @@ class CastNumpyImplementation(OperatorImplementation):
                 feature = features[feat_idx]
                 # Initialize row with first feature
                 if feat_idx == 0:
-                    output.data[event_index] = []
+                    idx_features = []
+                    output.data[event_index] = idx_features
+                else:
+                    idx_features = output.data[event_index]
 
                 # Reuse if both features have the same dtype
                 if feature.dtype == dst_dtype:
-                    output.data[event_index].append(feature)
+                    idx_features.append(feature)
                 else:
                     data = feature.data
                     # Check overflow when needed
@@ -90,7 +92,7 @@ class CastNumpyImplementation(OperatorImplementation):
                         self._check_overflow(data, orig_dtype, dst_dtype)
 
                     # Create new feature
-                    output.data[event_index].append(
+                    idx_features.append(
                         NumpyFeature(
                             name=feature_name,
                             data=data.astype(dst_dtype_np),
