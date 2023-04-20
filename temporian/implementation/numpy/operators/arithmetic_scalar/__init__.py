@@ -14,6 +14,9 @@ from temporian.implementation.numpy.operators.arithmetic_scalar.divide import (
 from temporian.implementation.numpy.operators.arithmetic_scalar.floordiv import (
     FloorDivideScalarNumpyImplementation,
 )
+from temporian.implementation.numpy.operators.arithmetic_scalar.negate import (
+    NegateNumpyImplementation,
+)
 from temporian.implementation.numpy.operators.arithmetic_scalar.equal import (
     EqualScalarNumpyImplementation,
 )

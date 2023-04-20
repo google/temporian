@@ -35,6 +35,8 @@ class BaseArithmeticScalarOperator(Operator):
     ):
         super().__init__()
 
+        self.value = value
+
         # inputs
         self.add_input("event", event)
 
@@ -47,17 +49,19 @@ class BaseArithmeticScalarOperator(Operator):
         # TODO: Check if we want to compare kind of dtype or just dtype
         # it makes sense to allow subtypes of the same kind. Value will
         # always be 64 bits. We need a way to allow 32 bits.
-        for feature in event.features:
-            if feature.dtype != value_dtype:
-                raise ValueError(
-                    f"Feature {feature.name} has dtype {feature.dtype} "
-                    f"but value has dtype {value_dtype}. Both must be equal."
-                )
+        if not self.ignore_value_dtype_checking:
+            for feature in event.features:
+                if feature.dtype != value_dtype:
+                    raise ValueError(
+                        f"Feature {feature.name} has dtype {feature.dtype} "
+                        f"but value has dtype {value_dtype}. Both must be"
+                        "equal."
+                    )
 
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=f"{self.prefix}_{feature.name}_{value}",
+                name=self.output_feature_name(feature),
                 dtype=self.output_feature_dtype(feature),
                 sampling=event.sampling,
                 creator=self,
@@ -108,5 +112,13 @@ class BaseArithmeticScalarOperator(Operator):
     def prefix(self) -> str:
         """Get the prefix to use for the output features."""
 
+    def output_feature_name(self, feature: Feature) -> str:
+        return f"{self.prefix}_{feature.name}_{self.value}"
+
     def output_feature_dtype(self, feature: Feature) -> DType:
         return feature.dtype
+
+    @property
+    def ignore_value_dtype_checking(self) -> bool:
+        """Return True if we want to ignore the value dtype checking."""
+        return False

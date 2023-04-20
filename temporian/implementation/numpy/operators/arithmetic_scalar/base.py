@@ -46,17 +46,13 @@ class BaseArithmeticScalarNumpyImplementation(OperatorImplementation, ABC):
         Returns:
             Arithmetic of the event and the valye according to the operator.
         """
-        value = self._operator.attributes["value"]
-
         output = NumpyEvent(data={}, sampling=event.sampling)
-
-        prefix = self._operator.prefix
 
         for index, features in event.data.items():
             output.data[index] = [
                 NumpyFeature(
-                    name=f"{prefix}_{feature.name}_{value}",
-                    data=self._do_operation(feature, value),
+                    name=self._operator.output_feature_name(feature),
+                    data=self._do_operation(feature, self._operator.value),
                 )
                 for feature in features
             ]
