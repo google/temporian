@@ -67,7 +67,7 @@ class BaseArithmeticScalarOperator(Operator):
                 if feature.dtype != value_dtype:
                     raise ValueError(
                         f"Feature {feature.name} has dtype {feature.dtype} "
-                        f"but value has dtype {value_dtype}. Both must be"
+                        f"but value has dtype {value_dtype}. Both must be "
                         "equal."
                     )
 

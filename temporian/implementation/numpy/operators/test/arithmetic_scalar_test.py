@@ -387,6 +387,63 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                 value=value,
             )
 
+    def test_addition_with_string_value(self) -> None:
+        """Test correct addition operator with string value."""
+
+        value = "10"
+
+        with self.assertRaises(ValueError):
+            operator = AddScalarOperator(
+                event=self.event,
+                value=value,
+            )
+
+    def test_addition_with_int(self) -> None:
+        """Test correct addition operator with int value."""
+
+        event_data = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1.0, 10],
+                    [0, 2.0, 0],
+                    [0, 3.0, 12],
+                    [0, 4.0, -10],
+                    [0, 5.0, 30],
+                ],
+                columns=["store_id", "timestamp", "sales"],
+            ),
+            index_names=["store_id"],
+        )
+
+        event = event_data.schema()
+
+        value = 10
+
+        numpy_output_event = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1.0, 20],
+                    [0, 2.0, 10],
+                    [0, 3.0, 22],
+                    [0, 4.0, 0],
+                    [0, 5.0, 40],
+                ],
+                columns=["store_id", "timestamp", "add_sales_10"],
+            ),
+            index_names=["store_id"],
+        )
+
+        operator = AddScalarOperator(
+            event=event,
+            value=value,
+        )
+
+        impl = AddScalarNumpyImplementation(operator)
+
+        operator_output = impl.call(event=event_data)
+
+        self.assertEqual(numpy_output_event, operator_output["event"])
+
     def test_correct_equal(self) -> None:
         """Test correct equal operator."""
 
