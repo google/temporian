@@ -24,6 +24,7 @@ py_library(
         "//temporian/implementation/numpy/operators/arithmetic",
         "//temporian/implementation/numpy/operators/arithmetic:add",
         "//temporian/implementation/numpy/operators/arithmetic:divide",
+        "//temporian/implementation/numpy/operators/arithmetic:equal",
         "//temporian/implementation/numpy/operators/arithmetic:floordiv",
         "//temporian/implementation/numpy/operators/arithmetic:multiply",
         "//temporian/implementation/numpy/operators/arithmetic:subtract",

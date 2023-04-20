@@ -5,6 +5,8 @@ from temporian.core.operators.arithmetic import divide
 from temporian.core.operators.arithmetic import multiply
 from temporian.core.operators.arithmetic import subtract
 from temporian.core.operators.arithmetic import add
+from temporian.core.operators.arithmetic import floordiv
+from temporian.core.operators.arithmetic import equal
 
 from temporian.core.operators.filter import filter
 

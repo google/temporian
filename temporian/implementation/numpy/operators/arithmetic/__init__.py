@@ -11,6 +11,9 @@ from temporian.implementation.numpy.operators.arithmetic.multiply import (
 from temporian.implementation.numpy.operators.arithmetic.divide import (
     DivideNumpyImplementation,
 )
+from temporian.implementation.numpy.operators.arithmetic.equal import (
+    EqualNumpyImplementation,
+)
 from temporian.implementation.numpy.operators.arithmetic.floordiv import (
     FloorDivideNumpyImplementation,
 )

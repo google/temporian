@@ -5,6 +5,7 @@ from temporian.core.operators.arithmetic.divide import (
     divide,
     DivideOperator,
 )
+from temporian.core.operators.arithmetic.equal import equal, EqualOperator
 from temporian.core.operators.arithmetic.floordiv import (
     floordiv,
     FloorDivOperator,
