@@ -13,7 +13,10 @@
 # limitations under the License.
 
 """Arithmetic Negation Scalar Operator"""
+from typing import List
+
 from temporian.core import operator_lib
+from temporian.core.data import dtype as dtype_lib
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.operators.arithmetic_scalar.base import (
@@ -52,6 +55,13 @@ class NegateOperator(BaseArithmeticScalarOperator):
     @property
     def ignore_value_dtype_checking(self) -> bool:
         return True
+
+    @property
+    def supported_value_dtypes(self) -> List[dtype_lib.DType]:
+        return [
+            dtype_lib.INT32,
+            dtype_lib.INT64,
+        ]
 
 
 operator_lib.register_operator(NegateOperator)

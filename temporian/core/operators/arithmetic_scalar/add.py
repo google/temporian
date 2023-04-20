@@ -13,9 +13,10 @@
 # limitations under the License.
 
 """Arithmetic Addition Scalar Operator"""
-from typing import Union
+from typing import Union, List
 
 from temporian.core import operator_lib
+from temporian.core.data import dtype as dtype_lib
 from temporian.core.data.event import Event
 from temporian.core.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarOperator,
@@ -36,13 +37,22 @@ class AddScalarOperator(BaseArithmeticScalarOperator):
     def prefix(self) -> str:
         return "add"
 
+    @property
+    def supported_value_dtypes(self) -> List[dtype_lib.DType]:
+        return [
+            dtype_lib.FLOAT32,
+            dtype_lib.FLOAT64,
+            dtype_lib.INT32,
+            dtype_lib.INT64,
+        ]
+
 
 operator_lib.register_operator(AddScalarOperator)
 
 
 def add_scalar(
     event: Event,
-    value: Union[float, int, str, bool],
+    value: Union[float, int],
 ) -> Event:
     """
     Adds element-wise an event and a scalar value.

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """Base class for arithmetic scalar operators"""
-from typing import Union
+from typing import Union, List
 from abc import abstractmethod
 
 from temporian.core.data.dtype import DType
@@ -44,8 +44,20 @@ class BaseArithmeticScalarOperator(Operator):
         self.add_attribute("value", value)
         self.add_attribute("is_value_first", is_value_first)
 
+        if not isinstance(event, Event):
+            raise TypeError(
+                f"Event must be of type Event but got {type(event)}"
+            )
+
         # check that every dtype of event feature is equal to value dtype
         value_dtype = python_type_to_temporian_dtype(type(value))
+
+        # check that value dtype is in self.dtypes_to_check
+        if value_dtype not in self.supported_value_dtypes:
+            raise ValueError(
+                "Expected value DType to be one of"
+                f" {self.supported_value_dtypes}, but got {value_dtype}"
+            )
 
         # TODO: Check if we want to compare kind of dtype or just dtype
         # it makes sense to allow subtypes of the same kind. Value will
@@ -112,6 +124,11 @@ class BaseArithmeticScalarOperator(Operator):
     @abstractmethod
     def prefix(self) -> str:
         """Get the prefix to use for the output features."""
+
+    @property
+    @abstractmethod
+    def supported_value_dtypes(self) -> List[DType]:
+        """Supported DTypes for value."""
 
     def output_feature_name(self, feature: Feature) -> str:
         return f"{self.prefix}_{feature.name}_{self.value}"

@@ -13,10 +13,10 @@
 # limitations under the License.
 
 """Division Scalar Operator"""
-from typing import Union
+from typing import Union, List
 
 from temporian.core import operator_lib
-from temporian.core.data import dtype
+from temporian.core.data import dtype as dtype_lib
 from temporian.core.data.event import Event
 from temporian.core.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarOperator,
@@ -31,14 +31,13 @@ class DivideScalarOperator(BaseArithmeticScalarOperator):
     def __init__(
         self,
         event: Event,
-        value: Union[float, int, str, bool],
+        value: Union[float, int],
         is_value_first: bool = False,
     ):
         super().__init__(event, value, is_value_first)
 
-        # Assuming previous dtype check of event_1 and event_2 features
         for feat in event.features:
-            if feat.dtype in [dtype.INT32, dtype.INT64]:
+            if feat.dtype in [dtype_lib.INT32, dtype_lib.INT64]:
                 raise ValueError(
                     "Cannot use the divide operator on feature "
                     f"{feat.name} of type {feat.dtype}. Cast to "
@@ -55,10 +54,19 @@ class DivideScalarOperator(BaseArithmeticScalarOperator):
     def prefix(self) -> str:
         return "div"
 
+    @property
+    def supported_value_dtypes(self) -> List[dtype_lib.DType]:
+        return [
+            dtype_lib.FLOAT32,
+            dtype_lib.FLOAT64,
+            dtype_lib.INT32,
+            dtype_lib.INT64,
+        ]
+
 
 operator_lib.register_operator(DivideScalarOperator)
 
-SCALAR = Union[float, int, str, bool]
+SCALAR = Union[float, int]
 
 
 def divide_scalar(
@@ -74,7 +82,7 @@ def divide_scalar(
     Returns:
         Event: Division of numerator and denominator.
     """
-    scalars_types = (float, int, str, bool)
+    scalars_types = (float, int)
 
     if isinstance(numerator, Event) and isinstance(denominator, scalars_types):
         return DivideScalarOperator(

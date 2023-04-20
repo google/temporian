@@ -13,11 +13,10 @@
 # limitations under the License.
 
 """Performs equality between events features and a scalar value"""
-from typing import Union
+from typing import Union, List
 
 from temporian.core import operator_lib
-from temporian.core.data.dtype import BOOLEAN
-from temporian.core.data.dtype import DType
+from temporian.core.data import dtype as dtype_lib
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.operators.arithmetic_scalar.base import (
@@ -39,9 +38,20 @@ class EqualScalarOperator(BaseArithmeticScalarOperator):
     def prefix(self) -> str:
         return "equal"
 
-    def output_feature_dtype(self, feature: Feature) -> DType:
+    def output_feature_dtype(self, feature: Feature) -> dtype_lib.DType:
         # override parent method to always return BOOLEAN features
-        return BOOLEAN
+        return dtype_lib.BOOLEAN
+
+    @property
+    def supported_value_dtypes(self) -> List[dtype_lib.DType]:
+        return [
+            dtype_lib.FLOAT32,
+            dtype_lib.FLOAT64,
+            dtype_lib.INT32,
+            dtype_lib.INT64,
+            dtype_lib.BOOLEAN,
+            dtype_lib.STRING,
+        ]
 
 
 operator_lib.register_operator(EqualScalarOperator)

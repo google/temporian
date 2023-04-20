@@ -13,9 +13,10 @@
 # limitations under the License.
 
 """Floor or integer division scalar Operator"""
-from typing import Union
+from typing import Union, List
 
 from temporian.core import operator_lib
+from temporian.core.data import dtype as dtype_lib
 from temporian.core.data.event import Event
 from temporian.core.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarOperator,
@@ -36,11 +37,20 @@ class FloorDivScalarOperator(BaseArithmeticScalarOperator):
     def prefix(self) -> str:
         return "floordiv"
 
+    @property
+    def supported_value_dtypes(self) -> List[dtype_lib.DType]:
+        return [
+            dtype_lib.FLOAT32,
+            dtype_lib.FLOAT64,
+            dtype_lib.INT32,
+            dtype_lib.INT64,
+        ]
+
 
 operator_lib.register_operator(FloorDivScalarOperator)
 
 
-SCALAR = Union[float, int, str, bool]
+SCALAR = Union[float, int]
 
 
 def floordiv_scalar(
@@ -56,7 +66,7 @@ def floordiv_scalar(
     Returns:
         Event: Integer division of numerator features and denominator value
     """
-    scalars_types = (float, int, str, bool)
+    scalars_types = (float, int)
 
     if isinstance(numerator, Event) and isinstance(denominator, scalars_types):
         return FloorDivScalarOperator(
