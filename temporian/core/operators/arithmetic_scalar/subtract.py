@@ -64,6 +64,7 @@ def subtract_scalar(
         return SubtractScalarOperator(
             event=minuend,
             value=subtrahend,
+            is_value_first=False,
         ).outputs["event"]
 
     if isinstance(minuend, scalars_types) and isinstance(subtrahend, Event):

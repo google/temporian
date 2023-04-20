@@ -58,7 +58,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         self.event = self.event_data.schema()
 
-    def test_correct_sum(self) -> None:
+    def test_correct_add(self) -> None:
         """Test correct sum operator."""
 
         value = 10.0

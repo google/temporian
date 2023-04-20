@@ -36,6 +36,7 @@ class BaseArithmeticScalarOperator(Operator):
         super().__init__()
 
         self.value = value
+        self.is_value_first = is_value_first
 
         # inputs
         self.add_input("event", event)

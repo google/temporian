@@ -80,6 +80,7 @@ def divide_scalar(
         return DivideScalarOperator(
             event=numerator,
             value=denominator,
+            is_value_first=False,
         ).outputs["event"]
 
     if isinstance(numerator, scalars_types) and isinstance(denominator, Event):
