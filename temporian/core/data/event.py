@@ -135,7 +135,8 @@ class Event(object):
         return self.__mul__(other)
 
     def __neg__(self):
-        return self.__mul__(-1)
+        from temporian.core.operators.arithmetic_scalar import negate
+        return negate(self)
 
     def __truediv__(self, other: Any) -> Event:
         if isinstance(other, Event):
