@@ -15,7 +15,9 @@
 """Arithmetic Equal Operator"""
 
 from temporian.core import operator_lib
+from temporian.core.data import dtype as dtype_lib
 from temporian.core.data.event import Event
+from temporian.core.data.feature import Feature
 from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
 
 
@@ -32,6 +34,12 @@ class EqualOperator(BaseArithmeticOperator):
     @property
     def prefix(self) -> str:
         return "equal"
+
+    # override parent dtype method
+    def output_feature_dtype(
+        self, feature_1: Feature, feature_2: Feature
+    ) -> dtype_lib.DType:
+        return dtype_lib.BOOLEAN
 
 
 operator_lib.register_operator(EqualOperator)

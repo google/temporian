@@ -84,7 +84,9 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
+        "//temporian/core/data:dtype",
         "//temporian/core/data:event",
+        "//temporian/core/data:feature",
     ],
 )
 
