@@ -75,7 +75,7 @@ def moving_sum(
         event: The features to sum.
         window_length: The window length for summing.
         sampling: If provided, define when the operator is applied. If not
-          provided, the operator is applied for each timestamp of `event`.
+            provided, the operator is applied for each timestamp of `event`.
 
     Returns:
         An event containing the moving sum of each feature in `event`.

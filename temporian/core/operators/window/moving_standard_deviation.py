@@ -78,7 +78,7 @@ def moving_standard_deviation(
         event: The features to average.
         window_length: The window length for the standard deviation.
         sampling: If provided, define when the operator is applied. If not
-          provided, the operator is applied for each timestamp of `event`.
+            provided, the operator is applied for each timestamp of `event`.
 
     Returns:
         An event containing the moving standard deviation of each feature in

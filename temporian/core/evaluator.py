@@ -43,12 +43,12 @@ def evaluate(
     Args:
         query: Events to compute. Support event, dict and list of events.
         input_data: Dictionary of event and event values to use for the
-          computation.
+            computation.
         verbose: If >0, prints details about the execution on the standard error
-          output. The larger the number, the more information is displayed.
+            output. The larger the number, the more information is displayed.
         check_execution: If true, the input and output of the op implementation
-          are validated to check any bug in the library internal code. If false,
-          checks are skipped.
+            are validated to check any bug in the library internal code. If false,
+            checks are skipped.
 
     TODO: Create an internal configuration object for options such as
     "check_execution".
@@ -146,7 +146,7 @@ def build_schedule(
         inputs: Input events.
         outputs: Output events.
         verbose: If >0, prints details about the execution on the standard error
-          output. The larger the number, the more information is displayed.
+            output. The larger the number, the more information is displayed.
 
     Returns:
         Ordered list of operators, such that the first operator should be

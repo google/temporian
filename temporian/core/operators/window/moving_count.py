@@ -77,7 +77,7 @@ def moving_count(
         event: The features to count.
         window_length: The window length for counting.
         sampling: If provided, define when the operator is applied. If not
-          provided, the operator is applied for each timestamp of `event`.
+            provided, the operator is applied for each timestamp of `event`.
 
     Returns:
         An event containing the non-nan count of each feature in `event`.

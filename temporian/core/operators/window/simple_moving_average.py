@@ -78,7 +78,7 @@ def simple_moving_average(
         event: The features to average.
         window_length: The window length for averaging.
         sampling: If provided, define when the operator is applied. If not
-          provided, the operator is applied for each timestamp of `event`.
+            provided, the operator is applied for each timestamp of `event`.
 
     Returns:
         An event containing the moving average of each feature in `event`.
