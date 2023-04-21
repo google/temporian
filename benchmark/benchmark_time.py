@@ -78,7 +78,7 @@ def benchmark_simple_moving_average(runner):
         output = tp.simple_moving_average(event, window_length=10.0)
 
         runner.benchmark(
-            f"simple_moving_average:{n}",
+            f"simple_moving_average:{n:_}",
             lambda: tp.evaluate(output, input_data={event: ds}),
         )
 
@@ -92,7 +92,7 @@ def benchmark_select_and_glue(runner):
         output = tp.glue(event["data_1"], event["data_2"])
 
         runner.benchmark(
-            f"select_and_glue:{n}",
+            f"select_and_glue:{n:_}",
             lambda: tp.evaluate(output, input_data={event: ds}),
         )
 
@@ -110,7 +110,7 @@ def benchmark_calendar_day_of_month(runner):
         output = tp.calendar_day_of_month(event)
 
         runner.benchmark(
-            f"calendar_day_of_month:{n}",
+            f"calendar_day_of_month:{n:_}",
             lambda: tp.evaluate(output, input_data={event: ds}),
         )
 
@@ -127,7 +127,7 @@ def benchmark_sample(runner):
             output = tp.sample(event_1, event_2)
 
             runner.benchmark(
-                f"sample:e{m}_s{n}",
+                f"sample:e{m:_}_s{n:_}",
                 lambda: tp.evaluate(
                     output, input_data={event_1: ds_1, event_2: ds_2}
                 ),
@@ -142,7 +142,7 @@ def benchmark_propagate(runner):
         output = tp.propagate(event["data_1"], event["data_2"])
 
         runner.benchmark(
-            f"propagate:{n}",
+            f"propagate:{n:_}",
             lambda: tp.evaluate(output, input_data={event: ds}),
         )
 
@@ -213,7 +213,7 @@ def benchmark_from_dataframe(runner):
                     df = pd.DataFrame(dt)
 
                     benchmark_name = (
-                        f"from_dataframe:s:{num_timestamps}_"
+                        f"from_dataframe:s:{num_timestamps:_}_"
                         f"numidx:{num_indexes}_"
                         f"numidxval:{num_index_values}_"
                         f"idx:{'str' if index_is_string else 'int'}"
@@ -227,6 +227,57 @@ def benchmark_from_dataframe(runner):
                     )
 
 
+def benchmark_set_index(runner):
+    runner.add_separator()
+
+    np.random.seed(0)
+    for number_timestamps in [10_000]:
+        feature_values = list(range(int(20)))
+        timestamps = np.sort(
+            np.random.randn(number_timestamps) * number_timestamps
+        )
+
+        # all features are int categorical from 0 to 20
+        feature_1 = np.random.choice(feature_values, number_timestamps)
+        feature_2 = np.random.choice(feature_values, number_timestamps)
+        feature_3 = np.random.choice(feature_values, number_timestamps)
+        feature_4 = np.random.choice(feature_values, number_timestamps)
+        feature_5 = np.random.choice(feature_values, number_timestamps)
+        feature_6 = np.random.choice(feature_values, number_timestamps)
+
+        event_data = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                {
+                    "timestamp": timestamps,
+                    "feature_1": feature_1,
+                    "feature_2": feature_2,
+                    "feature_3": feature_3,
+                    "feature_4": feature_4,
+                    "feature_5": feature_5,
+                    "feature_6": feature_6,
+                }
+            ),
+            is_sorted=True,
+        )
+
+        event = event_data.schema()
+
+        possible_indexes = [
+            ["feature_1"],
+            ["feature_1", "feature_2"],
+            ["feature_1", "feature_2", "feature_3"],
+            ["feature_1", "feature_2", "feature_3", "feature_4"],
+            ["feature_1", "feature_2", "feature_3", "feature_4", "feature_5"],
+        ]
+
+        for index in possible_indexes:
+            output = tp.set_index(event, index)
+            runner.benchmark(
+                f"set_index:s:{number_timestamps:_}:num_idx:{len(index)}",
+                lambda: tp.evaluate(output, input_data={event: event_data}),
+            )
+
+
 def main():
     print("Running benchmark")
     runner = Runner()
@@ -238,6 +289,7 @@ def main():
     benchmark_propagate(runner)
     benchmark_cast(runner)
     benchmark_unique_timestamps(runner)
+    benchmark_set_index(runner)
 
     print("All results (again)")
     runner.print_results()
