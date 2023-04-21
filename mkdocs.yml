@@ -18,12 +18,21 @@ theme:
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
+      primary: black
+      accent: white
 
     # Palette toggle for dark mode
     - scheme: slate
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
+      primary: black
+      accent: white
+
+# Extra CSS
+extra_css:
+  # TODO: continue working on this css customization for temporian
+  - css/custom.css
 
 # Navigation bar
 nav:
