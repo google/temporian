@@ -1,4 +1,4 @@
-![Temporian logo](resources/banner.png)
+![Temporian logo](docs/assets/banner.png)
 
 ![tests](https://github.com/google/temporian/actions/workflows/test.yaml/badge.svg) ![formatting](https://github.com/google/temporian/actions/workflows/formatting.yaml/badge.svg)
 
