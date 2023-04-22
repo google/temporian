@@ -119,7 +119,7 @@ def {lower_op}(event: Event, param: float) -> Event:
         <Text>
     """
 
-    return {capitalized_op}(event=event, param=param).outputs()["event"]
+    return {capitalized_op}(event=event, param=param).outputs["event"]
 
 '''
         )

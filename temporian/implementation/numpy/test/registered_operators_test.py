@@ -26,6 +26,13 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "ADDITION",
             "CALENDAR_DAY_OF_MONTH",
             "CALENDAR_DAY_OF_WEEK",
+            "CALENDAR_ISO_WEEK",
+            "CALENDAR_YEAR",
+            "CALENDAR_DAY_OF_YEAR",
+            "CALENDAR_SECOND",
+            "CALENDAR_MINUTE",
+            "CALENDAR_MONTH",
+            "CALENDAR_HOUR",
             "DIVISION",
             "FILTER",
             "FLOORDIV",
@@ -41,6 +48,9 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "SELECT",
             "SIMPLE_MOVING_AVERAGE",
             "SUBTRACTION",
+            "SET_INDEX",
+            "DROP_INDEX",
+            "UNIQUE_TIMESTAMPS",
         ]
 
         self.assertSetEqual(

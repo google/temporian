@@ -35,6 +35,7 @@ class LagNumpyImplementation(OperatorImplementation):
         new_sampling = NumpySampling(
             data=sampling_data,
             index=event.sampling.index.copy(),
+            is_unix_timestamp=event.sampling.is_unix_timestamp,
         )
         output_event = NumpyEvent(data=output_data, sampling=new_sampling)
 

@@ -359,3 +359,17 @@ py_test(
         "//temporian/implementation/numpy/operators:prefix",
     ],
 )
+
+py_test(
+    name = "unique_timestamps_test",
+    srcs = ["unique_timestamps_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/core/operators:unique_timestamps",
+        "//temporian/implementation/numpy/operators:unique_timestamps",
+    ],
+)
+    

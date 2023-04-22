@@ -2,7 +2,7 @@ bazel*
 .venv
 **/__pycache__/
 my_example
-
+tmp
 # benchmark outputs
 profile.*
 

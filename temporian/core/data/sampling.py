@@ -47,8 +47,9 @@ class IndexLevel(NamedTuple):
 class Index:
     def __init__(
         self,
-        levels: Union[Tuple[str, DType], List[Tuple[str, DType]]],
+        levels: Union[Tuple[str, IndexDType], List[Tuple[str, IndexDType]]],
     ) -> None:
+        # TODO: Check for correct DType.
         if isinstance(levels, Tuple):
             levels = [levels]
 
@@ -76,36 +77,44 @@ class Index:
     def __iter__(self) -> Iterator[IndexLevel]:
         return iter(self._levels)
 
+    # TODO: Remove
     @property
     def levels(self) -> List[IndexLevel]:
         return self._levels
 
+    # TODO: Remove property
     @property
     def names(self) -> List[str]:
         return [index_level.name for index_level in self._levels]
 
+    # TODO: Remove property
     @property
     def dtypes(self) -> List[IndexDType]:
         return [index_level.dtype for index_level in self._levels]
 
-    def __eq__(self, other: Index) -> bool:
-        return self._levels == other._levels
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, Index):
+            return False
+        return self.levels == other.levels
 
 
 class Sampling(object):
     def __init__(
         self,
         index_levels: Union[
-            Tuple[str, IndexDType], List[Tuple[str, IndexDType]], Index
+            Tuple[str, IndexDType],
+            List[Tuple[str, IndexDType]],
+            Tuple[str, DType],
+            List[Tuple[str, DType]],
+            Index,
         ],
         creator: Optional[Operator] = None,
         is_unix_timestamp: bool = False,
     ) -> None:
-        self._index = (
-            Index(index_levels)
-            if not isinstance(index_levels, Index)
-            else index_levels
-        )
+        if isinstance(index_levels, Index):
+            self._index = index_levels
+        else:
+            self._index = Index(index_levels)
         self._creator = creator
         self._is_unix_timestamp = is_unix_timestamp
 
@@ -124,6 +133,7 @@ class Sampling(object):
     def is_unix_timestamp(self) -> bool:
         return self._is_unix_timestamp
 
+    # TODO: Remove setter
     @creator.setter
     def creator(self, creator: Optional[Operator]):
         self._creator = creator

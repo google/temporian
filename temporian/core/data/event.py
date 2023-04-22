@@ -49,14 +49,17 @@ class Event(object):
 
     def __repr__(self) -> str:
         features_print = "\n".join(
-            [string.indent(repr(feature)) for feature in self._features]
+            [
+                string.indent(feature.to_string(include_sampling=False))
+                for feature in self._features
+            ]
         )
         return (
             "features:\n"
             f"{features_print}\n"
             f"sampling: {self._sampling},\n"
-            f"name: {self._name},\n"
-            f"creator: {self._creator},\n"
+            f"name: {self._name}\n"
+            f"creator: {self._creator}\n"
             f"id:{id(self)}\n"
         )
 

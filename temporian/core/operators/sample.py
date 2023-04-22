@@ -14,6 +14,7 @@
 
 """Sample operator."""
 
+from textwrap import indent
 from typing import List, Union, Any, Dict
 
 from temporian.core import operator_lib
@@ -35,6 +36,12 @@ class Sample(Operator):
 
         self.add_input("event", event)
         self.add_input("sampling", sampling)
+
+        if event.sampling.index != sampling.sampling.index:
+            raise ValueError(
+                "Event and sampling do not have the same index."
+                f" {event.sampling.index} != {sampling.sampling.index}"
+            )
 
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(

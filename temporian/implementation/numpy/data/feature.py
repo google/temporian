@@ -32,9 +32,9 @@ class NumpyFeature:
         else:
             if data.dtype.type not in DTYPE_MAPPING:
                 raise ValueError(
-                    f"Unsupported dtype {data.dtype} for NumpyFeature: {name}."
-                    f" Supported dtypes: {DTYPE_MAPPING.keys()}, np.str_ and "
-                    "np.string_"
+                    f'Unsupported dtype "{data.dtype}:{data.dtype.type}" for'
+                    f' NumpyFeature: "{name}". Supported dtypes:'
+                    f" {DTYPE_MAPPING.keys()}, np.str_ and np.string_"
                 )
             self.dtype = DTYPE_MAPPING[data.dtype.type]
 
@@ -54,7 +54,7 @@ class NumpyFeature:
         self._data = new_data
 
     def __repr__(self) -> str:
-        return f"{self.name}: {self.data.__repr__()}"
+        return f"{self.name} ({len(self.data)}): {self.data.__repr__()}"
 
     def __eq__(self, __o: object) -> bool:
         if not isinstance(__o, NumpyFeature):

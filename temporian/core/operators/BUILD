@@ -11,6 +11,7 @@ py_library(
     srcs = ["all_operators.py"],
     srcs_version = "PY3",
     deps = [
+        ":drop_index",
         ":filter",
         ":glue",
         ":lag",
@@ -18,6 +19,8 @@ py_library(
         ":propagate",
         ":sample",
         ":select",
+        ":set_index",
+        ":unique_timestamps",
         "//temporian/core/operators/arithmetic",
         "//temporian/core/operators/calendar:day_of_month",
         "//temporian/core/operators/calendar:day_of_week",
@@ -167,6 +170,19 @@ py_library(
         ":select",
         "//temporian/core:operator_lib",
         "//temporian/core/data:duration",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "unique_timestamps",
+    srcs = ["unique_timestamps.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
         "//temporian/proto:core_py_proto",

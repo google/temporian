@@ -11,6 +11,7 @@ py_library(
     srcs = ["all_operators.py"],
     srcs_version = "PY3",
     deps = [
+        ":drop_index",
         ":filter",
         ":glue",
         ":lag",
@@ -18,6 +19,8 @@ py_library(
         ":propagate",
         ":sample",
         ":select",
+        ":set_index",
+        ":unique_timestamps",
         "//temporian/implementation/numpy/operators/arithmetic",
         "//temporian/implementation/numpy/operators/arithmetic:add",
         "//temporian/implementation/numpy/operators/arithmetic:divide",
@@ -26,6 +29,13 @@ py_library(
         "//temporian/implementation/numpy/operators/arithmetic:subtract",
         "//temporian/implementation/numpy/operators/calendar:day_of_month",
         "//temporian/implementation/numpy/operators/calendar:day_of_week",
+        "//temporian/implementation/numpy/operators/calendar:day_of_year",
+        "//temporian/implementation/numpy/operators/calendar:hour",
+        "//temporian/implementation/numpy/operators/calendar:iso_week",
+        "//temporian/implementation/numpy/operators/calendar:minute",
+        "//temporian/implementation/numpy/operators/calendar:month",
+        "//temporian/implementation/numpy/operators/calendar:second",
+        "//temporian/implementation/numpy/operators/calendar:year",
         "//temporian/implementation/numpy/operators/window:moving_count",
         "//temporian/implementation/numpy/operators/window:moving_standard_deviation",
         "//temporian/implementation/numpy/operators/window:moving_sum",
@@ -93,6 +103,7 @@ py_library(
     deps = [
         ":base",
         "//temporian/core/operators:drop_index",
+        "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
     ],
@@ -118,6 +129,7 @@ py_library(
         ":base",
         ":utils",
         "//temporian/core/operators:set_index",
+        "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
     ],
@@ -175,5 +187,20 @@ py_library(
     srcs_version = "PY3",
     deps = [
         "//temporian/implementation/numpy/data:event",
+    ],
+)
+
+py_library(
+    name = "unique_timestamps",
+    srcs = ["unique_timestamps.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/data:duration",
+        "//temporian/core/operators:unique_timestamps",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy:utils",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
     ],
 )
