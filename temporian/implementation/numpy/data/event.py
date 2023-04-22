@@ -357,4 +357,4 @@ class NumpyEvent:
 
         from temporian.implementation.numpy.data import plotter
 
-        return plotter.plot(event=self, *args, **wargs)
+        return plotter.plot(events=self, *args, **wargs)

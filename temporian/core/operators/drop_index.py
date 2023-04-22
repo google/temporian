@@ -46,7 +46,7 @@ class DropIndexOperator(Operator):
         output_sampling = Sampling(
             index_levels=[
                 index_level
-                for index_level in event.sampling.index.levels
+                for index_level in event.sampling.index
                 if index_level.name not in index_to_drop
             ]
         )
@@ -69,8 +69,6 @@ class DropIndexOperator(Operator):
             # Convert the index to drop into features.
             #
             # Note: The new features are added first.
-
-            new_features = []
             for index_name in index_to_drop:
                 # check no other feature exists with this name
                 if index_name in event.feature_names:
@@ -165,7 +163,7 @@ def _normalize_index_to_drop(
     if missing_index_names:
         raise KeyError(
             f"Dropped indexes {missing_index_names} are missing from the"
-            f" input index. The input index is {event.sampling.index}."
+            f" input index. The input index is {event.sampling.index.names}."
         )
 
     return index_names

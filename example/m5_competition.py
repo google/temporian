@@ -267,7 +267,7 @@ label_sales = tp.glue(*label_sales)
 # Sum of the sales, sampled each day, per departement.
 sales_per_dept = tp.drop_index(sales, "item_id")
 sampling_once_per_day = tp.unique_timestamps(sales_per_dept["item_id"])
-sum_dayly_sales_per_dept = tp.prefix(
+sum_daily_sales_per_dept = tp.prefix(
     "per_dept.sum_28_",
     tp.moving_sum(
         sales_per_dept["sales"],
@@ -278,7 +278,7 @@ sum_dayly_sales_per_dept = tp.prefix(
 
 # For each item, add the sum of departement sales for this specific item.
 sales_aggregated_item_level = tp.sample(
-    tp.propagate(sum_dayly_sales_per_dept, sales), sales
+    tp.propagate(sum_daily_sales_per_dept, sales), sales
 )
 
 # TODO: Last calendar events (need since_last, filter)
@@ -320,3 +320,5 @@ print("==================")
 tabular_dataset_data.to_dataframe().to_csv(
     os.path.join(work_directory, "tabular_dataset.csv"), index=False
 )
+
+print("The artefacts are available in:", work_directory)

@@ -77,6 +77,7 @@ class Index:
     def __iter__(self) -> Iterator[IndexLevel]:
         return iter(self._levels)
 
+    # TODO: Remove
     @property
     def levels(self) -> List[IndexLevel]:
         return self._levels
@@ -91,7 +92,7 @@ class Index:
     def dtypes(self) -> List[IndexDType]:
         return [index_level.dtype for index_level in self._levels]
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if not isinstance(other, Index):
             return False
         return self.levels == other.levels
@@ -113,11 +114,7 @@ class Sampling(object):
         if isinstance(index_levels, Index):
             self._index = index_levels
         else:
-            self._index = (
-                Index(index_levels)
-                if not isinstance(index_levels, Index)
-                else index_levels
-            )
+            self._index = Index(index_levels)
         self._creator = creator
         self._is_unix_timestamp = is_unix_timestamp
 
