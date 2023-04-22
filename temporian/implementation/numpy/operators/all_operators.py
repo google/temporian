@@ -1,6 +1,8 @@
 """Imports all the packages containing operator implementations."""
 
 # pylint: disable=unused-import
+# pylint: disable=redefined-builtin
+from temporian.implementation.numpy.operators import filter
 from temporian.implementation.numpy.operators import glue
 from temporian.implementation.numpy.operators import lag
 from temporian.implementation.numpy.operators import prefix
@@ -35,3 +37,4 @@ from temporian.implementation.numpy.operators.calendar import second
 from temporian.implementation.numpy.operators import unique_timestamps
 
 # pylint: enable=unused-import
+# pylint: enable=redefined-builtin

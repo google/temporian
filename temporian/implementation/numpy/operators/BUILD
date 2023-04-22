@@ -12,6 +12,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":drop_index",
+        ":filter",
         ":glue",
         ":lag",
         ":prefix",
@@ -52,6 +53,19 @@ py_library(
     name = "base",
     srcs = ["base.py"],
     srcs_version = "PY3",
+)
+
+py_library(
+    name = "filter",
+    srcs = ["filter.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators:filter",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+    ],
 )
 
 py_library(

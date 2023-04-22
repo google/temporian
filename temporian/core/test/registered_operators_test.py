@@ -35,6 +35,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "CALENDAR_HOUR",
             "CALENDAR_SECOND",
             "DIVISION",
+            "FILTER",
             "FLOORDIV",
             "GLUE",
             "LAG",

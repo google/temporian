@@ -252,8 +252,7 @@ class NumpyEvent:
             sampling[()] = timestamp
             data[()] = [
                 NumpyFeature(
-                    feature,
-                    df[feature].to_numpy(dtype=df[feature].dtype.type),
+                    feature, df[feature].to_numpy(dtype=df[feature].dtype.type)
                 )
                 for feature in feature_columns
             ]
