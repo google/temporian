@@ -146,6 +146,19 @@ def benchmark_propagate(runner):
         )
 
 
+def benchmark_unique_timestamps(runner):
+    runner.add_separator()
+    for n in [100, 10_000, 1_000_000]:
+        ds = _build_toy_dataset(n, data2_is_categorical_integer=True)
+        event = ds.schema()
+        output = tp.unique_timestamps(event["data_1"])
+
+        runner.benchmark(
+            f"unique_timestamps:{n}",
+            lambda: tp.evaluate(output, input_data={event: ds}),
+        )
+
+
 def benchmark_from_dataframe(runner):
     runner.add_separator()
     # TODO: Add num_timestamps = 100_000 and 1_000_000 when from_dataframe is
@@ -198,6 +211,7 @@ def main():
     benchmark_calendar_day_of_month(runner)
     benchmark_sample(runner)
     benchmark_propagate(runner)
+    benchmark_unique_timestamps(runner)
 
     print("All results (again)")
     runner.print_results()

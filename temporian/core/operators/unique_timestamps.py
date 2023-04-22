@@ -60,7 +60,8 @@ def unique_timestamps(event: Event) -> Event:
     """Removes duplicated timestamps.
 
     unique_timestamps returns a feature-less event where each timestamps from
-    "event" only appears once.
+    "event" only appears once. If the event is indexed, the unique operation is
+    applied independently for each index.
 
     Example:
 

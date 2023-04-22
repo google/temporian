@@ -16,25 +16,32 @@ With Temporian, converting time series data into a tabular format has never been
 easier.
 """
 
+# NOTE: This example can be used to test the API.
+# TODO: Turn into a proper tutorial.
+
 import os
-import temporian as tp
-import pandas as pd
-import numpy as np
 from datetime import datetime, timezone, timedelta
 import urllib.request
-import zipfile
 import tempfile
+
+import zipfile
+import pandas as pd
+import numpy as np
+
+import temporian as tp
 
 # Directory used to download the raw M5 dataset and to export the tabular
 # dataset.
 work_directory = os.path.join(tempfile.gettempdir(), "m5")
 os.makedirs(work_directory, exist_ok=True)
-print("Use work directory:", work_directory)
+print("Work directory (contains the output artefacts):", work_directory)
 
 # Download the M5 dataset
 raw_data_zip = os.path.join(work_directory, "raw.zip")
 if not os.path.exists(raw_data_zip):
     print("Download M5 dataset in", raw_data_zip)
+    # Note: This url is a copy of the M5 dataset we did.
+    # TODO: Find a way to download the M5 dataset from the original location.
     url = "https://docs.google.com/uc?export=download&id=1NYHXmgrcXg50zR4CVWPPntHx9vvU5jbM&confirm=t"
     urllib.request.urlretrieve(url, raw_data_zip)
 
@@ -72,7 +79,11 @@ calendar_raw.info()
 #
 # The different timesteps of sale data ("sales_raw") are stored in different
 # columns. Instead, we want for each timesteps to be a different row.
-
+#
+# For example:
+#   The record "id,item_id,dept_id,d_1,d_2,d_3...d_n" will be converted into
+#   n records "id,item_id,dept_id,day,sales".
+#
 print("Melt dataset")
 print("============")
 

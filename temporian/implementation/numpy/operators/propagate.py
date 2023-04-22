@@ -23,7 +23,7 @@ class PropagateNumpyImplementation(OperatorImplementation):
         dst_sampling_data = {}
         dst_features_data = {}
 
-        for sampling_index in sampling.sampling.data.keys():
+        for sampling_index in sampling.sampling.data:
             # Compute the event index
             src_index = tuple(
                 [sampling_index[i] for i in self.operator.index_mapping]

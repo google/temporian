@@ -23,7 +23,7 @@ class Options(NamedTuple):
 
 
 def plot(
-    event: Union[List[NumpyEvent], NumpyEvent],
+    events: Union[List[NumpyEvent], NumpyEvent],
     indexes: Optional[Union[tuple, List[tuple]]] = None,
     backend: str = DEFAULT_BACKEND,
     width_px: int = 1024,
@@ -36,7 +36,8 @@ def plot(
     """Plots an event.
 
     Args:
-        index: The index of the event to plot. Use 'event.index' for the
+        events: Single event, or list of events, to plot.
+        indexes: The index of the event to plot. Use 'event.index' for the
             list of available indices. If index=None, plots all the indexes.
         backend: Plotting library to use.
         width_px: Width of the figure in pixel.
@@ -49,10 +50,8 @@ def plot(
           warning.
     """
 
-    if isinstance(event, list):
-        events = event
-    else:
-        events = [event]
+    if not isinstance(events, list):
+        events = [events]
 
     if len(events) == 0:
         raise ValueError("Events is empty")

@@ -36,6 +36,7 @@ class UniqueTimestampsNumpyImplementation(OperatorImplementation):
         output_data = {}
 
         for index, timestamps in event.sampling.data.items():
+            # TODO: Optimize using the fact that "timestamps" is sorted.
             sampling_data[index] = np.unique(timestamps)
             output_data[index] = []
 

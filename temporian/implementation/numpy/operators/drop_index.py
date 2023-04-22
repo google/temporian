@@ -65,7 +65,6 @@ class DropIndexNumpyImplementation(OperatorImplementation):
             features = []
             if keep:
                 # Convert the dropped indexes into features
-                features = []
                 for idx in final_nonindex_idxs:
                     index_name = src_index_names[idx]
                     index_value = src_index_lvl[idx]

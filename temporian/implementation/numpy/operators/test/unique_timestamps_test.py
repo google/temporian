@@ -31,9 +31,9 @@ class UniqueTimestampsOperatorTest(absltest.TestCase):
         event_data = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 {
-                    "timestamp": [1, 2, 2, 2, 3, 3, 4],
-                    "a": [1, 2, 3, 4, 5, 6, 7],
-                    "c": [1, 1, 1, 1, 2, 2, 2],
+                    "timestamp": [1, 2, 2, 2, 3, 3, 3, 4],
+                    "a": [1, 2, 3, 4, 5, 6, 7, 8],
+                    "c": [1, 1, 1, 1, 1, 2, 2, 2],
                 }
             ),
             index_names=["c"],
@@ -43,8 +43,8 @@ class UniqueTimestampsOperatorTest(absltest.TestCase):
         expected_output = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 {
-                    "timestamp": [1, 2, 3, 4],
-                    "c": [1, 1, 2, 2],
+                    "timestamp": [1, 2, 3, 3, 4],
+                    "c": [1, 1, 1, 2, 2],
                 }
             ),
             index_names=["c"],
