@@ -3,6 +3,7 @@ bazel*
 **/__pycache__/
 my_example
 tmp
+build_package
 # benchmark outputs
 profile.*
 
