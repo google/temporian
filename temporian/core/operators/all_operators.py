@@ -5,8 +5,19 @@ from temporian.core.operators.arithmetic import divide
 from temporian.core.operators.arithmetic import multiply
 from temporian.core.operators.arithmetic import subtract
 from temporian.core.operators.arithmetic import add
+from temporian.core.operators.arithmetic import floordiv
+from temporian.core.operators.arithmetic import equal
 
 from temporian.core.operators.filter import filter
+
+from temporian.core.operators.arithmetic_scalar import add_scalar
+from temporian.core.operators.arithmetic_scalar import divide_scalar
+from temporian.core.operators.arithmetic_scalar import floordiv_scalar
+from temporian.core.operators.arithmetic_scalar import multiply_scalar
+from temporian.core.operators.arithmetic_scalar import subtract_scalar
+from temporian.core.operators.arithmetic_scalar import negate
+from temporian.core.operators.arithmetic_scalar import equal_scalar
+
 from temporian.core.operators.glue import glue
 from temporian.core.operators.calendar.day_of_month import calendar_day_of_month
 from temporian.core.operators.calendar.day_of_week import calendar_day_of_week

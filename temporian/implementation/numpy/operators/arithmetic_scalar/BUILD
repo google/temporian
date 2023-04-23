@@ -7,7 +7,7 @@ package(
 # =========
 
 py_library(
-    name = "arithmetic",
+    name = "arithmetic_scalar",
     srcs = ["__init__.py"],
     srcs_version = "PY3",
 )
@@ -17,9 +17,10 @@ py_library(
     srcs = ["base.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/core/operators/arithmetic",
-        "//temporian/core/operators/arithmetic:base",
+        "//temporian/core/operators/arithmetic_scalar",
+        "//temporian/core/operators/arithmetic_scalar:base",
         "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:feature",
         "//temporian/implementation/numpy/operators:base",
     ],
 )
@@ -30,45 +31,10 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
-        "//temporian/core/operators/arithmetic:add",
+        "//temporian/core/operators/arithmetic_scalar:add",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
-    ],
-)
-
-py_library(
-    name = "subtract",
-    srcs = ["subtract.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":base",
-        "//temporian/core/operators/arithmetic:subtract",
-        "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
-    ],
-)
-
-py_library(
-    name = "multiply",
-    srcs = ["multiply.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":base",
-        "//temporian/core/operators/arithmetic:multiply",
-        "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
-    ],
-)
-
-py_library(
-    name = "divide",
-    srcs = ["divide.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":base",
-        "//temporian/core/operators/arithmetic:divide",
-        "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:feature",
     ],
 )
 
@@ -78,9 +44,62 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
-        "//temporian/core/operators/arithmetic:equal",
+        "//temporian/core/operators/arithmetic_scalar:equal",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:feature",
+    ],
+)
+
+py_library(
+    name = "subtract",
+    srcs = ["subtract.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators/arithmetic_scalar:subtract",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:feature",
+    ],
+)
+
+py_library(
+    name = "multiply",
+    srcs = ["multiply.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators/arithmetic_scalar:multiply",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:feature",
+    ],
+)
+
+py_library(
+    name = "negate",
+    srcs = ["negate.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators/arithmetic_scalar:negate",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:feature",
+    ],
+)
+
+py_library(
+    name = "divide",
+    srcs = ["divide.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators/arithmetic_scalar:divide",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:feature",
     ],
 )
 
@@ -90,8 +109,9 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
-        "//temporian/core/operators/arithmetic:floordiv",
+        "//temporian/core/operators/arithmetic_scalar:floordiv",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:feature",
     ],
 )

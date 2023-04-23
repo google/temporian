@@ -7,7 +7,7 @@ package(
 # =========
 
 py_library(
-    name = "arithmetic",
+    name = "arithmetic_scalar",
     srcs = ["__init__.py"],
     srcs_version = "PY3",
     deps = [
@@ -17,6 +17,7 @@ py_library(
         ":equal",
         ":floordiv",
         ":multiply",
+        ":negate",
         ":subtract",
     ],
 )
@@ -41,6 +42,19 @@ py_library(
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:event",
+    ],
+)
+
+py_library(
+    name = "equal",
+    srcs = ["equal.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
     ],
 )
 
@@ -78,19 +92,6 @@ py_library(
 )
 
 py_library(
-    name = "equal",
-    srcs = ["equal.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":base",
-        "//temporian/core:operator_lib",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:event",
-        "//temporian/core/data:feature",
-    ],
-)
-
-py_library(
     name = "floordiv",
     srcs = ["floordiv.py"],
     srcs_version = "PY3",
@@ -98,5 +99,17 @@ py_library(
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:event",
+    ],
+)
+
+py_library(
+    name = "negate",
+    srcs = ["negate.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
     ],
 )

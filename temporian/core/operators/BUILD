@@ -22,6 +22,7 @@ py_library(
         ":set_index",
         ":unique_timestamps",
         "//temporian/core/operators/arithmetic",
+        "//temporian/core/operators/arithmetic_scalar",
         "//temporian/core/operators/calendar:day_of_month",
         "//temporian/core/operators/calendar:day_of_week",
         "//temporian/core/operators/calendar:day_of_year",

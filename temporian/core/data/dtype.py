@@ -50,11 +50,39 @@ class DType(Enum):
         if self.is_float:
             return math.nan
 
-        elif self.is_integer:
+        if self.is_integer:
             return 0
 
-        elif self == DType.STRING:
+        if self == DType.STRING:
             return ""
 
-        else:
-            raise ValueError(f"Non-implemented type {self}")
+        raise ValueError(f"Non-implemented type {self}")
+
+    @classmethod
+    def from_python_type(cls, python_type: type) -> "DType":
+        """
+        Returns DType from python type.
+
+        Args:
+            python_type: Python type.
+
+        Returns:
+            The corresponding DType.
+
+        Raises:
+            ValueError: If python_type is not implemented.
+        """
+
+        if python_type is float:
+            return DType.FLOAT64
+
+        if python_type is int:
+            return DType.INT64
+
+        if python_type is str:
+            return DType.STRING
+
+        if python_type is bool:
+            return DType.BOOLEAN
+
+        raise ValueError(f"Non-implemented type {python_type}")
