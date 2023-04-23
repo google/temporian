@@ -4,6 +4,7 @@
 #
 # Usage example:
 #   ./tools/start_notebook.sh
+#   # Then open the url, or set the url in code studio Jupyter server.
 #
 # In a notebook, you now use "import temporian as tp".
 # Make sure to re-run this command each time the source code of temporian is
