@@ -17,7 +17,6 @@ from typing import Union, List
 from abc import abstractmethod
 
 from temporian.core.data.dtype import DType
-from temporian.core.data.dtype import python_type_to_temporian_dtype
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.operators.base import Operator
@@ -50,7 +49,7 @@ class BaseArithmeticScalarOperator(Operator):
             )
 
         # check that every dtype of event feature is equal to value dtype
-        value_dtype = python_type_to_temporian_dtype(type(value))
+        value_dtype = DType.from_python_type(type(value))
 
         # check that value dtype is in self.dtypes_to_check
         if value_dtype not in self.supported_value_dtypes:

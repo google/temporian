@@ -16,7 +16,7 @@
 from typing import Union, List
 
 from temporian.core import operator_lib
-from temporian.core.data import dtype as dtype_lib
+from temporian.core.data.dtype import DType
 from temporian.core.data.event import Event
 from temporian.core.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarOperator,
@@ -38,12 +38,12 @@ class FloorDivScalarOperator(BaseArithmeticScalarOperator):
         return "floordiv"
 
     @property
-    def supported_value_dtypes(self) -> List[dtype_lib.DType]:
+    def supported_value_dtypes(self) -> List[DType]:
         return [
-            dtype_lib.FLOAT32,
-            dtype_lib.FLOAT64,
-            dtype_lib.INT32,
-            dtype_lib.INT64,
+            DType.FLOAT32,
+            DType.FLOAT64,
+            DType.INT32,
+            DType.INT64,
         ]
 
 

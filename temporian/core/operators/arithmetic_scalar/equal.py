@@ -16,7 +16,7 @@
 from typing import Union, List
 
 from temporian.core import operator_lib
-from temporian.core.data import dtype as dtype_lib
+from temporian.core.data.dtype import DType
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.operators.arithmetic_scalar.base import (
@@ -38,19 +38,19 @@ class EqualScalarOperator(BaseArithmeticScalarOperator):
     def prefix(self) -> str:
         return "equal"
 
-    def output_feature_dtype(self, feature: Feature) -> dtype_lib.DType:
+    def output_feature_dtype(self, feature: Feature) -> DType:
         # override parent method to always return BOOLEAN features
-        return dtype_lib.BOOLEAN
+        return DType.BOOLEAN
 
     @property
-    def supported_value_dtypes(self) -> List[dtype_lib.DType]:
+    def supported_value_dtypes(self) -> List[DType]:
         return [
-            dtype_lib.FLOAT32,
-            dtype_lib.FLOAT64,
-            dtype_lib.INT32,
-            dtype_lib.INT64,
-            dtype_lib.BOOLEAN,
-            dtype_lib.STRING,
+            DType.FLOAT32,
+            DType.FLOAT64,
+            DType.INT32,
+            DType.INT64,
+            DType.BOOLEAN,
+            DType.STRING,
         ]
 
 

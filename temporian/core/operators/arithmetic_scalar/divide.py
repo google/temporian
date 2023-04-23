@@ -16,7 +16,7 @@
 from typing import Union, List
 
 from temporian.core import operator_lib
-from temporian.core.data import dtype as dtype_lib
+from temporian.core.data.dtype import DType
 from temporian.core.data.event import Event
 from temporian.core.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarOperator,
@@ -37,7 +37,7 @@ class DivideScalarOperator(BaseArithmeticScalarOperator):
         super().__init__(event, value, is_value_first)
 
         for feat in event.features:
-            if feat.dtype in [dtype_lib.INT32, dtype_lib.INT64]:
+            if feat.dtype in [DType.INT32, DType.INT64]:
                 raise ValueError(
                     "Cannot use the divide operator on feature "
                     f"{feat.name} of type {feat.dtype}. Cast to "
@@ -55,12 +55,12 @@ class DivideScalarOperator(BaseArithmeticScalarOperator):
         return "div"
 
     @property
-    def supported_value_dtypes(self) -> List[dtype_lib.DType]:
+    def supported_value_dtypes(self) -> List[DType]:
         return [
-            dtype_lib.FLOAT32,
-            dtype_lib.FLOAT64,
-            dtype_lib.INT32,
-            dtype_lib.INT64,
+            DType.FLOAT32,
+            DType.FLOAT64,
+            DType.INT32,
+            DType.INT64,
         ]
 
 
