@@ -88,8 +88,8 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         self.assertEqual(numpy_output_event, operator_output["event"])
 
-    def test_correct_substraction(self) -> None:
-        """Test correct substraction operator."""
+    def test_correct_subtraction(self) -> None:
+        """Test correct subtraction operator."""
 
         value = 10.0
 
@@ -118,8 +118,8 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         self.assertEqual(numpy_output_event, operator_output["event"])
 
-    def test_correct_substraction_value_first(self) -> None:
-        """Test correct substraction operator when value is the first.
+    def test_correct_subtraction_value_first(self) -> None:
+        """Test correct subtraction operator when value is the first.
         operand.
         """
         value = 10.0

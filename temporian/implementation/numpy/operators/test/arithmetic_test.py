@@ -113,8 +113,8 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
 
         self.assertTrue(numpy_output_event == operator_output["event"])
 
-    def test_correct_substraction(self) -> None:
-        """Test correct substraction operator."""
+    def test_correct_subtraction(self) -> None:
+        """Test correct subtraction operator."""
 
         numpy_output_event = NumpyEvent.from_dataframe(
             pd.DataFrame(
