@@ -146,6 +146,28 @@ def benchmark_propagate(runner):
         )
 
 
+def benchmark_cast(runner):
+    runner.add_separator()
+    for n in [100, 1_000_000]:
+        for check in [False, True]:
+            ds = _build_toy_dataset(n)
+
+            event = ds.schema()
+            output = tp.cast(
+                event,
+                {
+                    "data_1": tp.dtype.DType.INT32,
+                    "data_2": tp.dtype.DType.FLOAT32,
+                },
+                check_overflow=check,
+            )
+
+            runner.benchmark(
+                f"cast({check=}):{n}",
+                lambda: tp.evaluate(output, input_data={event: ds}),
+            )
+
+
 def benchmark_unique_timestamps(runner):
     runner.add_separator()
     for n in [100, 10_000, 1_000_000]:
@@ -211,6 +233,7 @@ def main():
     benchmark_calendar_day_of_month(runner)
     benchmark_sample(runner)
     benchmark_propagate(runner)
+    benchmark_cast(runner)
     benchmark_unique_timestamps(runner)
 
     print("All results (again)")

@@ -34,6 +34,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "CALENDAR_MINUTE",
             "CALENDAR_MONTH",
             "CALENDAR_HOUR",
+            "CAST",
             "DIVISION",
             "DIVISION_SCALAR",
             "EQUAL",

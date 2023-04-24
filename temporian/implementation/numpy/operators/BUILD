@@ -11,6 +11,7 @@ py_library(
     srcs = ["all_operators.py"],
     srcs_version = "PY3",
     deps = [
+        ":cast",
         ":drop_index",
         ":filter",
         ":glue",
@@ -145,6 +146,21 @@ py_library(
 )
 
 py_library(
+    name = "prefix",
+    srcs = ["prefix.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/data:duration",
+        "//temporian/core/operators:prefix",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy:utils",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+    ],
+)
+
+py_library(
     name = "propagate",
     srcs = ["propagate.py"],
     srcs_version = "PY3",
@@ -176,15 +192,13 @@ py_library(
 )
 
 py_library(
-    name = "prefix",
-    srcs = ["prefix.py"],
+    name = "cast",
+    srcs = ["cast.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
-        "//temporian/core/data:duration",
-        "//temporian/core/operators:prefix",
+        "//temporian/core/operators:cast",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
     ],

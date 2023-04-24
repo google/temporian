@@ -4,6 +4,7 @@ from typing import Dict, List, Union, NamedTuple
 import numpy as np
 
 from temporian.core.operators.drop_index import DropIndexOperator
+from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.data.feature import DTYPE_REVERSE_MAPPING

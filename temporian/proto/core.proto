@@ -170,7 +170,7 @@ message OperatorDef {
   }
 
   message Attribute {
-    // String identifier of the atrribute. Should be unique.
+    // String identifier of the attribute. Should be unique.
     optional string key = 1;
 
     // What type of data is expected.
@@ -187,6 +187,7 @@ message OperatorDef {
       FLOAT_64 = 4;
       BOOL = 5;
       ANY = 6;
+      MAP_STR_STR = 7;
     }
   }
 }
