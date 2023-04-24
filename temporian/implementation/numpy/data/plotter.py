@@ -24,7 +24,7 @@ class Options(NamedTuple):
 
 def plot(
     events: Union[List[NumpyEvent], NumpyEvent],
-    indexes: Optional[Union[tuple, List[tuple]]] = None,
+    indexes: Optional[Union[Any, tuple, List[tuple]]] = None,
     backend: str = DEFAULT_BACKEND,
     width_px: int = 1024,
     height_per_plot_px: int = 150,
@@ -37,8 +37,10 @@ def plot(
 
     Args:
         events: Single event, or list of events, to plot.
-        indexes: The index of the event to plot. Use 'event.index' for the
-            list of available indices. If index=None, plots all the indexes.
+        index: The index or list of indexes to plot. If index=None, plots all
+            the available indexes. Indexes should be provided as single value
+            (e.g. string) or tuple of values. Example: index="a", index=("a",),
+            index=("a", "b",), index=["a", "b"], index=[("a", "b"), ("a", "c")].
         backend: Plotting library to use.
         width_px: Width of the figure in pixel.
         height_per_plot_px: Height of each sub-plot (one per feature) in pixel.
@@ -57,9 +59,20 @@ def plot(
         raise ValueError("Events is empty")
 
     if indexes is None:
+        # All the indexes
         indexes = events[0].index()
+
     elif isinstance(indexes, tuple):
+        # e.g. indexes=("a",)
         indexes = [indexes]
+
+    elif isinstance(indexes, list):
+        # e.g. indexes=["a", ("b",)]
+        indexes = [v if isinstance(v, tuple) else (v,) for v in indexes]
+
+    else:
+        # e.g. indexes="a"
+        indexes = [(indexes,)]
 
     for index in indexes:
         if not isinstance(index, tuple):
@@ -132,17 +145,21 @@ def _plot_matplotlib(
     for index in indexes:
         if plot_idx >= num_plots:
             break
+
+        display_index = index[0] if len(index) == 1 else index
+        title = str(display_index)
+
         for event in events:
             if plot_idx >= num_plots:
                 break
-
-            title = str(index)
 
             feature_names = event.feature_names()
 
             xs = event.sampling.data[index]
             if options.max_points is not None and len(xs) > options.max_points:
                 xs = xs[: options.max_points]
+
+            uniform = is_uniform(xs)
 
             if event.sampling.is_unix_timestamp:
                 xs = [
@@ -163,6 +180,7 @@ def _plot_matplotlib(
                     color=colors[0],
                     name="[sampling]",
                     marker="+",
+                    linestyle="None",
                     is_unix_timestamp=event.sampling.is_unix_timestamp,
                     title=title,
                 )
@@ -193,6 +211,7 @@ def _plot_matplotlib(
                     name=feature_name,
                     is_unix_timestamp=event.sampling.is_unix_timestamp,
                     title=title,
+                    marker="None" if uniform else "+",
                 )
 
                 # Only print the index once
@@ -239,6 +258,15 @@ def _matplotlib_sub_plot(
     ax.grid(lw=0.4, ls="--", axis="x")
     if title:
         ax.set_title(title)
+
+
+def is_uniform(xs) -> bool:
+    """Checks if timestamps are uniformly sampled."""
+
+    diff = np.diff(xs)
+    if len(diff) == 0:
+        return True
+    return np.allclose(diff, diff[0])
 
 
 BACKENDS = {"matplotlib": _plot_matplotlib}
