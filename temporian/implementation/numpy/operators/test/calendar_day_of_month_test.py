@@ -49,11 +49,12 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
             data={
                 (): IndexData(
                     [np.array([1, 14, 14, 15]).astype(np.int32)],
-                    input_event_data.first_index_features().timestamps,
+                    input_event_data.first_index_data().timestamps,
                 ),
             },
             feature_names="calendar_day_of_month",
             index_names=[],
+            is_unix_timestamp=True,
         )
         operator = CalendarDayOfMonthOperator(input_event)
         impl = CalendarDayOfMonthNumpyImplementation(operator)
@@ -61,7 +62,7 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(
-            output["event"].first_index_features().features[0].dtype == np.int32
+            output["event"].first_index_data().features[0].dtype == np.int32
         )
 
     def test_with_index(self) -> None:
@@ -93,6 +94,7 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
             },
             feature_names="calendar_day_of_month",
             index_names=["id"],
+            is_unix_timestamp=True,
         )
         operator = CalendarDayOfMonthOperator(input_event)
         impl = CalendarDayOfMonthNumpyImplementation(operator)
@@ -100,7 +102,7 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(
-            output["event"].first_index_features().features[0].dtype == np.int32
+            output["event"].first_index_data().features[0].dtype == np.int32
         )
 
     # TODO: move this test to core operators' test suite when created

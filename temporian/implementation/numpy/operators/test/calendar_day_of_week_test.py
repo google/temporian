@@ -49,11 +49,12 @@ class CalendarDayOfWeekNumpyImplementationTest(absltest.TestCase):
             data={
                 (): IndexData(
                     [np.array([0, 1, 4, 4, 6]).astype(np.int32)],
-                    input_event_data.first_index_features().timestamps,
+                    input_event_data.first_index_data().timestamps,
                 ),
             },
             feature_names="calendar_day_of_week",
             index_names=[],
+            is_unix_timestamp=True,
         )
         operator = CalendarDayOfWeekOperator(input_event)
         impl = CalendarDayOfWeekNumpyImplementation(operator)
@@ -61,7 +62,7 @@ class CalendarDayOfWeekNumpyImplementationTest(absltest.TestCase):
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(
-            output["event"].first_index_features().features[0].dtype == np.int32
+            output["event"].first_index_data().features[0].dtype == np.int32
         )
 
 

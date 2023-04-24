@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from absl.testing import absltest
 import numpy as np
 import pandas as pd
+from absl.testing import absltest
 
 from temporian.core.data.dtype import DType
 from temporian.core.operators.calendar.month import (
     CalendarMonthOperator,
 )
+from temporian.implementation.numpy.data.event import IndexData
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators.calendar.month import (
     CalendarMonthNumpyImplementation,
@@ -49,23 +50,22 @@ class CalendarMonthNumpyImplementationTest(absltest.TestCase):
 
         output_event_data = NumpyEvent(
             data={
-                (): [
-                    NumpyFeature(
-                        name="calendar_month",
-                        data=np.array([1, 1, 7, 12, 12, 12]),
-                    ),
-                ],
+                (): IndexData(
+                    np.array([1, 1, 7, 12, 12, 12], dtype=np.int32),
+                    input_event_data[()].timestamps,
+                )
             },
-            sampling=input_event_data.sampling,
+            feature_names="calendar_month",
+            index_names=[],
+            is_unix_timestamp=True,
         )
-
         operator = CalendarMonthOperator(input_event)
         impl = CalendarMonthNumpyImplementation(operator)
         output = impl.call(sampling=input_event_data)
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(
-            output["event"].first_index_features()[0].dtype == DType.INT32
+            output["event"].first_index_data().features[0].dtype == np.int32
         )
 
 

@@ -1,5 +1,4 @@
 from __future__ import annotations
-from copy import deepcopy
 from dataclasses import dataclass
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
@@ -51,11 +50,21 @@ class IndexData:
 
     def __init__(
         self,
-        features: Union[np.ndarray, List[np.ndarray]],
+        features: List[np.ndarray],
         timestamps: np.ndarray,
     ) -> None:
         if isinstance(features, np.ndarray):
             features = [features]
+
+        shapes = [feature.shape for feature in features]
+        if not all(len(shape) == 1 for shape in shapes):
+            raise ValueError("Features must be one-dimensional arrays")
+
+        if not all(shape == timestamps.shape for shape in shapes):
+            raise ValueError(
+                "Features must contain the same number of elements as the"
+                " timestamp"
+            )
 
         self.features = features
         self.timestamps = timestamps
@@ -74,7 +83,7 @@ class NumpyEvent:
         data: Dict[Tuple, IndexData],
         feature_names: Union[str, List[str]],
         index_names: Union[str, List[str]],
-        is_unix_timestamp: bool = False,
+        is_unix_timestamp: bool,
     ) -> None:
         self._data = data
         self._feature_names = (
@@ -111,7 +120,7 @@ class NumpyEvent:
         return {
             feature_name: DTYPE_MAPPING[feature.dtype.type]
             for feature_name, feature in zip(
-                self._feature_names, self._first_index_features
+                self._feature_names, self.first_index_data().features
             )
         }
 
@@ -124,12 +133,10 @@ class NumpyEvent:
     def feature_count(self) -> int:
         return len(self._feature_names)
 
-    def copy(self) -> NumpyEvent:
-        return deepcopy(self)
-
     def iterindex(self) -> Iterable[Tuple[Tuple, IndexData]]:
         yield from self.data.items()
 
+    # TODO: improve numpy backend index handling
     def index_dtypes(self) -> Dict[str, DType]:
         return (
             {
@@ -148,7 +155,7 @@ class NumpyEvent:
 
         return next(iter(self._data))
 
-    def first_index_features(self) -> IndexData:
+    def first_index_data(self) -> IndexData:
         if self.first_index_key() is None:
             return []
         return self[self.first_index_key()]
@@ -160,10 +167,8 @@ class NumpyEvent:
             ],
             sampling=Sampling(
                 index_levels=[
-                    (index_name, PYTHON_DTYPE_MAPPING[type(index_key)])
-                    for index_name, index_key in zip(
-                        self._index_names, self.first_index_key()
-                    )
+                    (index_name, index_dtype)
+                    for index_name, index_dtype in self.index_dtypes().items()
                 ],
                 is_unix_timestamp=self._is_unix_timestamp,
             ),
@@ -172,7 +177,7 @@ class NumpyEvent:
     @staticmethod
     def from_dataframe(
         df: pd.DataFrame,
-        index_names: List[str] = [],
+        index_names: Optional[List[str]] = None,
         timestamp_column: str = "timestamp",
         is_sorted: bool = False,
     ) -> NumpyEvent:
@@ -209,6 +214,8 @@ class NumpyEvent:
             >>> event = NumpyEvent.from_dataframe(df, index_names=["product_id"])
         """
         df = df.copy(deep=False)
+        if index_names is None:
+            index_names = []
 
         # check index names and timestamp name are in df columns
         missing_columns = [

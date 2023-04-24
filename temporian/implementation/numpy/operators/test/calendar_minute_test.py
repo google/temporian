@@ -49,11 +49,12 @@ class CalendarMinuteNumpyImplementationTest(absltest.TestCase):
             data={
                 (): IndexData(
                     [np.array([0, 1, 30, 59, 1, 59]).astype(np.int32)],
-                    input_event_data.first_index_features().timestamps,
+                    input_event_data.first_index_data().timestamps,
                 ),
             },
             feature_names="calendar_minute",
             index_names=[],
+            is_unix_timestamp=True,
         )
         operator = CalendarMinuteOperator(input_event)
         impl = CalendarMinuteNumpyImplementation(operator)
@@ -61,7 +62,7 @@ class CalendarMinuteNumpyImplementationTest(absltest.TestCase):
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(
-            output["event"].first_index_features().features[0].dtype == np.int32
+            output["event"].first_index_data().features[0].dtype == np.int32
         )
 
 

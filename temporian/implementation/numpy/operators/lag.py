@@ -15,14 +15,13 @@ class LagNumpyImplementation(OperatorImplementation):
     def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
         # gather operator attributes
         duration = self._operator.duration
-        prefix = self._operator.prefix
         duration_str = self._operator.duration_str
 
         # create output event
         output_event = NumpyEvent(
             {},
             feature_names=[
-                f"{prefix}[{duration_str}]_{feature_name}"
+                f"[{duration_str}]_{feature_name}"
                 for feature_name in event.feature_names
             ],
             index_names=event.index_names,

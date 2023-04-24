@@ -109,9 +109,15 @@ class DropIndexNumpyImplementation(OperatorImplementation):
 
         return {
             "event": NumpyEvent(
+<<<<<<< HEAD
                 data=dst_event_data,
                 feature_names=dst_feature_names,
                 index_names=self.operator.dst_feature_names(),
+=======
+                dst_data,
+                feature_names=dst_feat_names,
+                index_names=dst_index_names,
+>>>>>>> de5a95a (Address initial PR #95 comments)
                 is_unix_timestamp=event.is_unix_timestamp,
             )
         }

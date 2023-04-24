@@ -63,11 +63,12 @@ class CalendarISOWeekNumpyImplementationTest(absltest.TestCase):
             data={
                 (): IndexData(
                     [np.array([1, 1, 2, 52, 1, 2, 12, 52]).astype(np.int32)],
-                    input_event_data.first_index_features().timestamps,
+                    input_event_data.first_index_data().timestamps,
                 ),
             },
             feature_names="calendar_iso_week",
             index_names=[],
+            is_unix_timestamp=True,
         )
         operator = CalendarISOWeekOperator(input_event)
         impl = CalendarISOWeekNumpyImplementation(operator)
@@ -75,7 +76,7 @@ class CalendarISOWeekNumpyImplementationTest(absltest.TestCase):
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(
-            output["event"].first_index_features().features[0].dtype == np.int32
+            output["event"].first_index_data().features[0].dtype == np.int32
         )
 
 

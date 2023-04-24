@@ -68,7 +68,7 @@ def _check_features(
                     f"effective={item_real.feature_names[i]}"
                 )
             feat_dtype_real = DTYPE_MAPPING[
-                item_real.first_index_features().features[i].dtype.type
+                item_real.first_index_data().features[i].dtype.type
             ]
             if feature_def.dtype != feat_dtype_real:
                 raise RuntimeError(

@@ -51,11 +51,12 @@ class CalendarDayOfYearNumpyImplementationTest(absltest.TestCase):
             data={
                 (): IndexData(
                     [np.array([1, 2, 15, 166, 365, 366]).astype(np.int32)],
-                    input_event_data.first_index_features().timestamps,
+                    input_event_data.first_index_data().timestamps,
                 ),
             },
             feature_names="calendar_day_of_year",
             index_names=[],
+            is_unix_timestamp=True,
         )
         operator = CalendarDayOfYearOperator(input_event)
         impl = CalendarDayOfYearNumpyImplementation(operator)
@@ -63,7 +64,7 @@ class CalendarDayOfYearNumpyImplementationTest(absltest.TestCase):
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(
-            output["event"].first_index_features().features[0].dtype == np.int32
+            output["event"].first_index_data().features[0].dtype == np.int32
         )
 
 

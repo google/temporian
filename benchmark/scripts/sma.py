@@ -73,7 +73,7 @@ def main():
     )
 
     # Print output's first row, useful to check reproducibility
-    print(res.first_index_features())
+    print(res.first_index_data())
 
 
 if __name__ == "__main__":

@@ -38,6 +38,7 @@ class BaseCalendarNumpyImplementation(OperatorImplementation):
             data={},
             feature_names=[self.operator.output_feature_name],
             index_names=sampling.index_names,
+            is_unix_timestamp=True,
         )
         for index_key, index_data in sampling.iterindex():
             value = np.array(

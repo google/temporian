@@ -36,10 +36,11 @@ class DataFrameToEventTest(absltest.TestCase):
                 (666964,): IndexData(
                     np.array([740.0, 508.0]), np.array([1.0, 2.0])
                 ),
-                (574016,): IndexData(np.array([573.0]), 3.0),
+                (574016,): IndexData(np.array([573.0]), np.array([3.0])),
             },
             feature_names="costs",
             index_names="product_id",
+            is_unix_timestamp=False,
         )
         numpy_event = NumpyEvent.from_dataframe(
             df, index_names=["product_id"], timestamp_column="timestamp"
@@ -64,6 +65,7 @@ class DataFrameToEventTest(absltest.TestCase):
             },
             feature_names="costs",
             index_names=[],
+            is_unix_timestamp=False,
         )
         numpy_event = NumpyEvent.from_dataframe(df)
 
@@ -88,6 +90,7 @@ class DataFrameToEventTest(absltest.TestCase):
             },
             feature_names="costs",
             index_names="product_id",
+            is_unix_timestamp=False,
         )
         numpy_event = NumpyEvent.from_dataframe(
             df, index_names=["product_id"], timestamp_column="timestamp"
@@ -149,6 +152,7 @@ class DataFrameToEventTest(absltest.TestCase):
             },
             feature_names=["str_0", "str_1", "str_2"],
             index_names=["product_id"],
+            is_unix_timestamp=False,
         )
         numpy_event = NumpyEvent.from_dataframe(
             df, index_names=["product_id"], timestamp_column="timestamp"
@@ -188,6 +192,7 @@ class DataFrameToEventTest(absltest.TestCase):
             },
             feature_names="costs",
             index_names=["index_x", "index_y"],
+            is_unix_timestamp=False,
         )
         # validate
         self.assertTrue(numpy_event == expected_numpy_event)
@@ -210,6 +215,7 @@ class DataFrameToEventTest(absltest.TestCase):
             },
             feature_names="costs",
             index_names="product_id",
+            is_unix_timestamp=False,
         )
         numpy_event = NumpyEvent.from_dataframe(
             df, index_names=["product_id"], timestamp_column="timestamp"
@@ -332,6 +338,7 @@ class DataFrameToEventTest(absltest.TestCase):
             },
             feature_names=["product_id", "costs"],
             index_names=[],
+            is_unix_timestamp=False,
         )
         numpy_event = NumpyEvent.from_dataframe(
             df, index_names=[], timestamp_column="timestamp"
