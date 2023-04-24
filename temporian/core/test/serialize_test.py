@@ -80,6 +80,55 @@ class SerializeTest(absltest.TestCase):
             & serialize.all_identifier(restored.outputs.values())
         )
 
+    def test_serialize_attributes(self):
+        """
+        Test serialization with different types of operator attributes
+        """
+        attributes = {
+            "attr_int": 1,
+            "attr_str": "hello",
+            "attr_list": ["temporian", "rocks"],
+            "attr_float": 5.0,
+            "attr_bool": True,
+            "attr_map": {"good": "bye", "nice": "to", "meet": "you"},
+        }
+        i_event = utils.create_input_event()
+        operator = utils.OpWithAttributes(i_event, **attributes)
+
+        original = processor.infer_processor(
+            inputs={"i_event": i_event},
+            outputs={"output": operator.outputs["output"]},
+        )
+        logging.info("original:\n%s", original)
+
+        proto = serialize.serialize(original)
+        logging.info("proto:\n%s", proto)
+
+        restored = serialize.unserialize(proto)
+        logging.info("restored:\n%s", restored)
+
+        self.assertEqual(len(original.operators), len(restored.operators))
+        self.assertEqual(original.inputs.keys(), restored.inputs.keys())
+        self.assertEqual(original.outputs.keys(), restored.outputs.keys())
+
+        # Check all restored attributes for the only operator
+        restored_attributes = list(restored.operators)[0].attributes
+        for attr_name, attr_value in attributes.items():
+            self.assertEqual(attr_value, restored_attributes[attr_name])
+
+        self.assertFalse(
+            serialize.all_identifier(original.operators)
+            & serialize.all_identifier(restored.operators)
+        )
+        self.assertFalse(
+            serialize.all_identifier(original.inputs.values())
+            & serialize.all_identifier(restored.inputs.values())
+        )
+        self.assertFalse(
+            serialize.all_identifier(original.outputs.values())
+            & serialize.all_identifier(restored.outputs.values())
+        )
+
 
 if __name__ == "__main__":
     absltest.main()

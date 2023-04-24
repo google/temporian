@@ -70,7 +70,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
 
         op = MovingStandardDeviationOperator(
             event=input_data.schema(),
-            window_length=5,
+            window_length=5.0,
             sampling=None,
         )
         self.assertEqual(op.list_matching_io_samplings(), [("event", "event")])
@@ -116,7 +116,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
 
         op = MovingStandardDeviationOperator(
             event=input_data.schema(),
-            window_length=5,
+            window_length=5.0,
             sampling=None,
         )
         self.assertEqual(op.list_matching_io_samplings(), [("event", "event")])

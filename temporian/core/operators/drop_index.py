@@ -123,7 +123,7 @@ class DropIndexOperator(Operator):
             key="DROP_INDEX",
             attributes=[
                 pb.OperatorDef.Attribute(
-                    key="index_names",
+                    key="index_to_drop",
                     type=pb.OperatorDef.Attribute.Type.REPEATED_STRING,
                 ),
                 pb.OperatorDef.Attribute(

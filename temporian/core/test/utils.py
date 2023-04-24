@@ -1,4 +1,5 @@
 """Utilities for unit testing."""
+from typing import List, Mapping
 
 import pandas as pd
 
@@ -63,7 +64,7 @@ class OpI1O1(base.Operator):
                     ),
                     Feature(
                         "f4",
-                        DType.FLOAT64,
+                        DType.INT64,
                         sampling=event.sampling,
                         creator=self,
                     ),
@@ -128,13 +129,13 @@ class OpI2O1(base.Operator):
                 features=[
                     Feature(
                         "f5",
-                        DType.FLOAT64,
+                        DType.BOOLEAN,
                         sampling=event_1.sampling,
                         creator=self,
                     ),
                     Feature(
                         "f6",
-                        DType.FLOAT64,
+                        DType.STRING,
                         sampling=event_1.sampling,
                         creator=self,
                     ),
@@ -172,7 +173,7 @@ class OpI1O2(base.Operator):
                 features=[
                     Feature(
                         "f1",
-                        DType.FLOAT64,
+                        DType.INT32,
                         sampling=event.sampling,
                         creator=self,
                     )
@@ -187,10 +188,10 @@ class OpI1O2(base.Operator):
                 features=[
                     Feature(
                         "f1",
-                        DType.FLOAT64,
+                        DType.FLOAT32,
                         sampling=event.sampling,
                         creator=self,
-                    )
+                    ),
                 ],
                 sampling=event.sampling,
                 creator=self,
@@ -200,3 +201,74 @@ class OpI1O2(base.Operator):
 
 
 operator_lib.register_operator(OpI1O2)
+
+
+class OpWithAttributes(base.Operator):
+    @classmethod
+    def build_op_definition(cls) -> pb.OperatorDef:
+        return pb.OperatorDef(
+            key="OpWithAttributes",
+            inputs=[
+                pb.OperatorDef.Input(key="event"),
+            ],
+            outputs=[
+                pb.OperatorDef.Output(key="output"),
+            ],
+            attributes=[
+                pb.OperatorDef.Attribute(
+                    key="attr_int",
+                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="attr_str",
+                    type=pb.OperatorDef.Attribute.Type.STRING,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="attr_list",
+                    type=pb.OperatorDef.Attribute.Type.REPEATED_STRING,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="attr_float",
+                    type=pb.OperatorDef.Attribute.Type.FLOAT_64,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="attr_bool",
+                    type=pb.OperatorDef.Attribute.Type.BOOL,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="attr_map",
+                    type=pb.OperatorDef.Attribute.Type.MAP_STR_STR,
+                ),
+            ],
+        )
+
+    def __init__(
+        self,
+        event: Event,
+        attr_int: int,
+        attr_str: str,
+        attr_list: List[str],
+        attr_float: float,
+        attr_bool: bool,
+        attr_map: Mapping[str, str],
+    ):
+        super().__init__()
+        self.add_attribute("attr_int", attr_int)
+        self.add_attribute("attr_str", attr_str)
+        self.add_attribute("attr_list", attr_list)
+        self.add_attribute("attr_float", attr_float)
+        self.add_attribute("attr_bool", attr_bool)
+        self.add_attribute("attr_map", attr_map)
+        self.add_input("event", event)
+        self.add_output(
+            "output",
+            Event(
+                features=[],
+                sampling=event.sampling,
+                creator=self,
+            ),
+        )
+        self.check()
+
+
+operator_lib.register_operator(OpWithAttributes)

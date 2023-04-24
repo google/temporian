@@ -79,7 +79,7 @@ def main():
     event_2._sampling = event_1._sampling
 
     a = tp.glue(event_1, event_2)
-    b = tp.simple_moving_average(a, window_length=10)
+    b = tp.simple_moving_average(a, window_length=10.0)
     c = tp.glue(a, tp.sample(b, a))
 
     res: NumpyEvent = tp.evaluate(

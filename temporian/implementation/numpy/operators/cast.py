@@ -68,7 +68,7 @@ class CastNumpyImplementation(OperatorImplementation):
         # but this might need a re-check with future implementations.
         output = NumpyEvent(data={}, sampling=event.sampling)
         for feat_idx, feature_name in enumerate(event.feature_names()):
-            dst_dtype = from_features[feature_name]
+            dst_dtype = DType(from_features[feature_name])
             orig_dtype = event.dtypes[feature_name]
             check_feature = check and self._can_overflow(orig_dtype, dst_dtype)
             # Numpy dest type

@@ -14,7 +14,7 @@
 
 """Serialization / unserialization of a processor."""
 
-from typing import Set, Union, Any, Dict, Tuple, Optional
+from typing import Set, Any, Dict, Tuple, Optional, Mapping
 
 from google.protobuf import text_format
 
@@ -37,7 +37,7 @@ def save(
 
     Usage example:
         a = t.input_event(...)
-        b = t.sma(a, window_length=7)
+        b = t.sma(a, window_length=7.0)
         t.save(inputs={"io_a": a}, outputs={"io_b": b}, path="processor.tem")
 
         inputs, outputs = t.load(path="processor.tem")
@@ -346,34 +346,57 @@ DTYPE_MAPPING = {
     DType.FLOAT32: pb.DType.FLOAT32,
     DType.INT64: pb.DType.INT64,
     DType.INT32: pb.DType.INT32,
+    DType.BOOLEAN: pb.DType.BOOLEAN,
+    DType.STRING: pb.DType.STRING,
 }
 INV_DTYPE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
 
 
 def _attribute_to_proto(
-    key: str, value: Union[str, int]
+    key: str, value: base.AttributeType
 ) -> pb.Operator.Attribute:
     if isinstance(value, str):
         return pb.Operator.Attribute(key=key, str=value)
-    elif isinstance(value, int):
+    if isinstance(value, bool):
+        # NOTE: Check this before int (isinstance(False, int) is also True)
+        return pb.Operator.Attribute(key=key, boolean=value)
+    if isinstance(value, int):
         return pb.Operator.Attribute(key=key, integer_64=value)
-    elif isinstance(value, float):
+    if isinstance(value, float):
         return pb.Operator.Attribute(key=key, float_64=value)
-    else:
-        raise ValueError(
-            f"Non supported type {type(value)} for attribute {key}={value}"
+    # list of strings
+    if isinstance(value, list) and all(isinstance(val, str) for val in value):
+        return pb.Operator.Attribute(
+            key=key, list_str=pb.Operator.Attribute.ListString(value=value)
         )
+    # map<str, str>
+    if (
+        isinstance(value, Mapping)
+        and all(isinstance(key, str) for key in value.keys())
+        and all(isinstance(val, str) for val in value.values())
+    ):
+        return pb.Operator.Attribute(
+            key=key, map_str_str=pb.Operator.Attribute.MapStrStr(value=value)
+        )
+    raise ValueError(
+        f"Non supported type {type(value)} for attribute {key}={value}"
+    )
 
 
-def _attribute_from_proto(src: pb.Operator.Attribute) -> Union[str, int, float]:
+def _attribute_from_proto(src: pb.Operator.Attribute) -> base.AttributeType:
     if src.HasField("integer_64"):
         return src.integer_64
-    elif src.HasField("str"):
+    if src.HasField("str"):
         return src.str
-    elif src.HasField("float_64"):
+    if src.HasField("float_64"):
         return src.float_64
-    else:
-        raise ValueError(f"Non supported proto attribute {src}")
+    if src.HasField("list_str"):
+        return list(src.list_str.value)
+    if src.HasField("boolean"):
+        return bool(src.boolean)
+    if src.HasField("map_str_str"):
+        return dict(src.map_str_str.value)
+    raise ValueError(f"Non supported proto attribute {src}")
 
 
 def _serialize_io_signature(key: str, event: Event):
