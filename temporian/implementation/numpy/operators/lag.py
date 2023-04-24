@@ -19,16 +19,13 @@ class LagNumpyImplementation(OperatorImplementation):
         sampling_data = {}
         output_data = {}
 
-        prefix = "lag" if duration > 0 else "leak"
-        duration_str = duration_abbreviation(duration)
-
         for index, timestamps in event.sampling.data.items():
             sampling_data[index] = timestamps + duration
             output_data[index] = []
             for feature in event.data[index]:
                 new_feature = NumpyFeature(
                     data=feature.data,
-                    name=f"{prefix}[{duration_str}]_{feature.name}",
+                    name=feature.name,
                 )
                 output_data[index].append(new_feature)
 

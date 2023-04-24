@@ -60,7 +60,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
                     [0, 12, 15.0],
                     [0, 22, 16.0],
                 ],
-                columns=["store_id", "timestamp", "lag[2s]_sales"],
+                columns=["store_id", "timestamp", "sales"],
             ),
             index_names=["store_id"],
         )
@@ -112,7 +112,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
                 columns=[
                     "store_id",
                     "timestamp",
-                    "lag[1s]_sales",
+                    "sales",
                 ],
             ),
             index_names=["store_id"],
@@ -132,7 +132,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
                 columns=[
                     "store_id",
                     "timestamp",
-                    "lag[2s]_sales",
+                    "sales",
                 ],
             ),
             index_names=["store_id"],
@@ -202,7 +202,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
                     [0, 8, 15.0],
                     [0, 18, 16.0],
                 ],
-                columns=["store_id", "timestamp", "leak[2s]_sales"],
+                columns=["store_id", "timestamp", "sales"],
             ),
             index_names=["store_id"],
         )
@@ -254,7 +254,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
                 columns=[
                     "store_id",
                     "timestamp",
-                    "leak[1s]_sales",
+                    "sales",
                 ],
             ),
             index_names=["store_id"],
@@ -274,7 +274,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
                 columns=[
                     "store_id",
                     "timestamp",
-                    "leak[2s]_sales",
+                    "sales",
                 ],
             ),
             index_names=["store_id"],
