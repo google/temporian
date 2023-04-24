@@ -44,8 +44,10 @@ def evaluate_schedule(
 
         if verbose == 1:
             print(
-                f"    {operator_idx+1} / {len(schedule)}:"
-                f" {operator.operator_key()}",
+                (
+                    f"    {operator_idx+1} / {len(schedule)}:"
+                    f" {operator.operator_key()}"
+                ),
                 file=sys.stderr,
                 end="",
             )

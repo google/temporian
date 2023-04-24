@@ -61,7 +61,10 @@ class SampleNumpyImplementation(OperatorImplementation):
             src_timestamps = event.sampling.data[index]
             src_mts = event.data[index]
 
-            (sampling_idxs, first_valid_idx,) = sample_cc.build_sampling_idxs(
+            (
+                sampling_idxs,
+                first_valid_idx,
+            ) = sample_cc.build_sampling_idxs(
                 src_timestamps, sampling_timestamps
             )
 
