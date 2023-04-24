@@ -51,9 +51,6 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
             ValueError: If sampling of both events is not equal.
         """
 
-        if event_1.sampling != event_2.sampling:
-            raise ValueError("Sampling of both events must be equal.")
-
         if event_1.feature_count != event_2.feature_count:
             raise ValueError(
                 "Both events must have the same number of features."

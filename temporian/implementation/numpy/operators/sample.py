@@ -76,7 +76,7 @@ class SampleNumpyImplementation(OperatorImplementation):
                 dst_ts_data = np.full(
                     shape=len(index_data),
                     fill_value=output_missing_value,
-                    dtype=src_ts.data.dtype,
+                    dtype=src_ts.dtype,
                 )
                 dst_ts_data[first_valid_idx:] = src_ts[
                     sampling_idxs[first_valid_idx:]

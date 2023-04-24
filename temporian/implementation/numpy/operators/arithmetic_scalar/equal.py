@@ -15,7 +15,6 @@ from typing import Union
 
 import numpy as np
 
-from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarNumpyImplementation,
 )
@@ -30,9 +29,9 @@ class EqualScalarNumpyImplementation(BaseArithmeticScalarNumpyImplementation):
         super().__init__(operator)
 
     def _do_operation(
-        self, feature: NumpyFeature, value: Union[float, int, str, bool]
+        self, feature: np.ndarray, value: Union[float, int, str, bool]
     ) -> np.ndarray:
-        return np.equal(feature.data, value)
+        return np.equal(feature, value)
 
 
 implementation_lib.register_operator_implementation(

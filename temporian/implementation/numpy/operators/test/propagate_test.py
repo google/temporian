@@ -37,7 +37,6 @@ class PropagateOperatorTest(absltest.TestCase):
                 }
             ),
             index_names=["x"],
-            is_unix_timestamp=False,
         )
         event = event_data.schema()
 

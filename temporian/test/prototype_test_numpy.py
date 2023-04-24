@@ -92,7 +92,7 @@ class PrototypeTest(absltest.TestCase):
                     "timestamp",
                     "sales",
                     "costs",
-                    "lag[1s]_sales",
+                    "[1s]_sales",
                     "sub_sales_0",
                 ],
             ),

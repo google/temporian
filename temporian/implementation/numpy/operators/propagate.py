@@ -29,7 +29,7 @@ class PropagateNumpyImplementation(OperatorImplementation):
             )
 
             # Find the source data
-            if src_index not in event.sampling.data:
+            if src_index not in event.data:
                 # TODO: Add option to skip non matched indexes.
                 raise ValueError(f'Cannot find index "{src_index}" in "event".')
 
