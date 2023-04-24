@@ -72,7 +72,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = LagOperator(
-            duration=2,
+            duration=2.0,
             event=event,
         )
 
@@ -214,7 +214,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = LagOperator(
-            duration=-2,
+            duration=-2.0,
             event=event,
         )
 

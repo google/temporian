@@ -31,7 +31,9 @@ class CastOperator(Operator):
         event: Event,
         to_dtype: Optional[DType] = None,
         from_dtypes: Optional[Mapping[DType, DType]] = None,
-        from_features: Optional[Mapping[str, DType]] = None,
+        from_features: Union[
+            Mapping[str, DType], Mapping[str, str], None
+        ] = None,
         check_overflow: bool = True,
     ):
         super().__init__()
@@ -45,8 +47,12 @@ class CastOperator(Operator):
         )
 
         # Attributes
-        self.add_attribute("from_features", from_features_all)
         self.add_attribute("check_overflow", check_overflow)
+        # Convert dtype -> str for serialization
+        self.add_attribute(
+            "from_features",
+            {feat: dtype.value for feat, dtype in from_features_all.items()},
+        )
 
         # Inputs
         self.add_input("event", event)
@@ -119,18 +125,23 @@ class CastOperator(Operator):
         if from_dtypes is not None and (
             not isinstance(from_dtypes, Mapping)
             or any(not isinstance(key, DType) for key in from_dtypes)
+            or any(not isinstance(val, DType) for val in from_dtypes.values())
         ):
             raise ValueError(
-                "Cast: target can be a dict with only DType or feature keys"
+                "Cast: target dict must have valid DTypes or feature names"
             )
 
         # Check: from_features is {feature_name: dtype}
         if from_features is not None and (
             not isinstance(from_features, Mapping)
             or any(key not in event.feature_names for key in from_features)
+            or any(
+                not isinstance(val, (DType, str))
+                for val in from_features.values()
+            )
         ):
             raise ValueError(
-                "Cast: target can be a dict with only DType or feature keys"
+                "Cast: target dict must have valid DTypes or feature names"
             )
 
     def _get_feature_dtype_map(
@@ -143,8 +154,13 @@ class CastOperator(Operator):
         if to_dtype is not None:
             return {feature.name: to_dtype for feature in event.features}
         if from_features is not None:
+            # NOTE: In this special case, it's allowed to provide target DType
+            # as a string instead of DType (for serialization purposes, since
+            # from_features is also an attribute)
             return {
-                feature.name: from_features.get(feature.name, feature.dtype)
+                feature.name: DType(
+                    from_features.get(feature.name, feature.dtype)
+                )
                 for feature in event.features
             }
         if from_dtypes is not None:

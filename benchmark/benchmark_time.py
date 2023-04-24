@@ -74,7 +74,7 @@ def benchmark_simple_moving_average(runner):
         ds = _build_toy_dataset(n)
 
         event = ds.schema()
-        output = tp.simple_moving_average(event, window_length=10)
+        output = tp.simple_moving_average(event, window_length=10.0)
 
         runner.benchmark(
             f"simple_moving_average:{n}",

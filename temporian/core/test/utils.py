@@ -218,32 +218,26 @@ class OpWithAttributes(base.Operator):
                 pb.OperatorDef.Attribute(
                     key="attr_int",
                     type=pb.OperatorDef.Attribute.Type.INTEGER_64,
-                    is_optional=False,
                 ),
                 pb.OperatorDef.Attribute(
                     key="attr_str",
                     type=pb.OperatorDef.Attribute.Type.STRING,
-                    is_optional=False,
                 ),
                 pb.OperatorDef.Attribute(
                     key="attr_list",
                     type=pb.OperatorDef.Attribute.Type.REPEATED_STRING,
-                    is_optional=False,
                 ),
                 pb.OperatorDef.Attribute(
                     key="attr_float",
                     type=pb.OperatorDef.Attribute.Type.FLOAT_64,
-                    is_optional=False,
                 ),
                 pb.OperatorDef.Attribute(
                     key="attr_bool",
                     type=pb.OperatorDef.Attribute.Type.BOOL,
-                    is_optional=False,
                 ),
                 pb.OperatorDef.Attribute(
                     key="attr_map",
                     type=pb.OperatorDef.Attribute.Type.MAP_STR_STR,
-                    is_optional=False,
                 ),
             ],
         )
