@@ -186,7 +186,8 @@ message OperatorDef {
       REPEATED_STRING=3;
       FLOAT_64 = 4;
       BOOL = 5;
-      MAP_STR_STR = 6;
+      ANY = 6;
+      MAP_STR_STR = 7;
     }
   }
 }

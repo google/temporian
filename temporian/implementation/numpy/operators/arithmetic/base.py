@@ -49,7 +49,7 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
             ValueError: If sampling of both events is not equal.
         """
 
-        if event_1.sampling is not event_2.sampling:
+        if event_1.sampling != event_2.sampling:
             raise ValueError("Sampling of both events must be equal.")
 
         if event_1.feature_count() != event_2.feature_count():
@@ -58,8 +58,6 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
             )
 
         output = NumpyEvent(data={}, sampling=event_1.sampling)
-
-        prefix = self._operator.prefix
 
         for event_index, event_1_features in event_1.data.items():
             output.data[event_index] = []
@@ -82,7 +80,9 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
 
                 output.data[event_index].append(
                     NumpyFeature(
-                        name=f"{prefix}_{event_1_feature.name}_{event_2_feature.name}",
+                        name=self._operator.output_feature_name(
+                            event_1_feature, event_2_feature
+                        ),
                         data=result,
                     )
                 )

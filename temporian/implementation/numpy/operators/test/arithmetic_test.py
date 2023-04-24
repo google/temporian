@@ -24,6 +24,7 @@ from temporian.core.operators.arithmetic import (
     SubtractOperator,
     MultiplyOperator,
     DivideOperator,
+    EqualOperator,
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators.arithmetic import (
@@ -31,6 +32,7 @@ from temporian.implementation.numpy.operators.arithmetic import (
     SubtractNumpyImplementation,
     MultiplyNumpyImplementation,
     DivideNumpyImplementation,
+    EqualNumpyImplementation,
 )
 
 
@@ -111,8 +113,8 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
 
         self.assertTrue(numpy_output_event == operator_output["event"])
 
-    def test_correct_substraction(self) -> None:
-        """Test correct substraction operator."""
+    def test_correct_subtraction(self) -> None:
+        """Test correct subtraction operator."""
 
         numpy_output_event = NumpyEvent.from_dataframe(
             pd.DataFrame(
@@ -198,6 +200,68 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         )
 
         self.assertTrue(numpy_output_event == operator_output["event"])
+
+    def test_correct_equal(self) -> None:
+        """Test correct equal operator."""
+        self.numpy_event_1 = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1.0, 10.0],
+                    [0, 2.0, 1.0],
+                    [0, 3.0, 12.0],
+                    [0, 4.0, np.nan],
+                    [0, 5.0, 30.0],
+                ],
+                columns=["store_id", "timestamp", "sales"],
+            ),
+            index_names=["store_id"],
+        )
+
+        self.numpy_event_2 = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1.0, 10.0],
+                    [0, 2.0, -1.0],
+                    [0, 3.0, 12.000000001],
+                    [0, 4.0, np.nan],
+                    [0, 5.0, 30.000001],
+                ],
+                columns=["store_id", "timestamp", "costs"],
+            ),
+            index_names=["store_id"],
+        )
+
+        self.numpy_event_1.sampling = self.numpy_event_2.sampling
+        self.event_1 = self.numpy_event_1.schema()
+        self.event_2 = self.numpy_event_2.schema()
+        self.event_1._sampling = self.event_2._sampling
+
+        numpy_output_event = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1.0, True],
+                    [0, 2.0, False],
+                    [0, 3.0, False],
+                    [0, 4.0, False],  # nan == nan is False
+                    [0, 5.0, False],
+                ],
+                columns=["store_id", "timestamp", "equal_sales_costs"],
+            ),
+            index_names=["store_id"],
+        )
+
+        operator = EqualOperator(
+            event_1=self.event_1,
+            event_2=self.event_2,
+        )
+
+        equal_implementation = EqualNumpyImplementation(operator)
+
+        operator_output = equal_implementation.call(
+            event_1=self.numpy_event_1, event_2=self.numpy_event_2
+        )
+
+        self.assertEqual(numpy_output_event, operator_output["event"])
 
 
 if __name__ == "__main__":

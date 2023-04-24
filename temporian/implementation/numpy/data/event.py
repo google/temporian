@@ -49,12 +49,18 @@ class NumpyEvent:
             return []
         return self.data[self.first_index_value()]
 
+    # TODO: To remove
     @property
     def dtypes(self) -> Dict[str, DType]:
         return {
             feature.name: feature.dtype
             for feature in self._first_index_features
         }
+
+    # TODO: Rename to "dtypes".
+    def dtypes_list(self) -> List[dtype_lib.DType]:
+        # TODO: Handle case where there is no data.
+        return [feature.dtype for feature in self._first_index_features]
 
     @sampling.setter
     def sampling(self, sampling: NumpySampling) -> None:
@@ -135,6 +141,8 @@ class NumpyEvent:
             ... )
             >>> event = NumpyEvent.from_dataframe(df, index_names=["product_id"])
         """
+        df = df.copy(deep=False)
+
         if index_names is None:
             index_names = []
 
@@ -163,6 +171,7 @@ class NumpyEvent:
         )
 
         # convert timestamp column to float
+        # TODO: This is taking a lot of time. Don't use apply.
         df[timestamp_column] = df[timestamp_column].apply(
             convert_date_to_duration
         )
@@ -177,10 +186,15 @@ class NumpyEvent:
         for column in df.columns:
             # if dtype is object, check if it only contains string values
             if df[column].dtype.type is np.object_:
-                if not df[column].apply(lambda x: isinstance(x, str)).all():
+                df[column] = df[column].fillna("")
+                # TODO: Don't use apply.
+                is_string = df[column].apply(lambda x: isinstance(x, str))
+                if not is_string.all():
                     raise ValueError(
-                        "Object columns are only allowed if they contain only"
-                        " string values"
+                        f'Cannot convert column "{column}". Column of type'
+                        ' "Object" can only values. However, the following'
+                        " non-string values were found: "
+                        f" {df[column][~is_string]}"
                     )
                 # convert object column to np.string_
                 df[column] = df[column].astype("string")
@@ -207,9 +221,6 @@ class NumpyEvent:
 
         sampling = {}
         data = {}
-
-        # fill missing values with np.nan
-        df = df.fillna(np.nan)
 
         # The user provided an index
         if index_names:
@@ -293,7 +304,9 @@ class NumpyEvent:
                 if idx > MAX_NUM_PRINTED_FEATURES:
                     feature_repr.append("...")
                     break
-                feature_repr.append(f"{f.name} <{f.dtype}>: {f.data}")
+                feature_repr.append(
+                    f"{f.name} <{f.dtype}> ({len(f.data)}): {f.data}"
+                )
             return "\n".join(feature_repr)
 
         # Representation of the "data" field
@@ -343,4 +356,4 @@ class NumpyEvent:
 
         from temporian.implementation.numpy.data import plotter
 
-        return plotter.plot(event=self, *args, **wargs)
+        return plotter.plot(events=self, *args, **wargs)

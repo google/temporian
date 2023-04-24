@@ -11,6 +11,7 @@ from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.implementation.numpy.operators.utils import _sort_by_timestamp
 from temporian.implementation.numpy.operators.base import OperatorImplementation
+from temporian.implementation.numpy import implementation_lib
 
 
 class SetIndexNumpyImplementation(OperatorImplementation):

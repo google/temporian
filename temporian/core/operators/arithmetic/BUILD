@@ -14,6 +14,7 @@ py_library(
         ":add",
         ":base",
         ":divide",
+        ":equal",
         ":floordiv",
         ":multiply",
         ":subtract",
@@ -73,6 +74,19 @@ py_library(
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:event",
+    ],
+)
+
+py_library(
+    name = "equal",
+    srcs = ["equal.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
     ],
 )
 

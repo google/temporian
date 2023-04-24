@@ -53,14 +53,15 @@ class Feature(object):
         self._dtype = dtype
         self._creator = creator
 
+    def to_string(self, include_sampling: bool = True) -> str:
+        v = f"name: {self.name}\n  dtype: {self.dtype}\n"
+        if include_sampling:
+            v += f"  sampling: {self.sampling}\n"
+        v += f"  creator: {self.creator}\n  id: {id(self)}"
+        return v
+
     def __repr__(self):
-        return (
-            f"name: {self.name}\n"
-            f"  dtype: {self.dtype}\n"
-            f"  sampling: {self.sampling}\n"
-            f"  creator: {self.creator}\n"
-            f"  id: {id(self)}"
-        )
+        return self.to_string()
 
     @property
     def name(self) -> str:

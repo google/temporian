@@ -22,6 +22,7 @@ toml = "^0.10.2"
 pylint = "^2.15.10"
 memory-profiler = "^0.61.0"
 scalene = "^1.5.20"
+# notebook = "^6.5.4"
 
 [tool.black]
 line-length = 80
@@ -33,3 +34,6 @@ max-line-length = 80
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pyright]
+include = ["temporian"]

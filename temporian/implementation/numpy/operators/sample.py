@@ -43,7 +43,7 @@ class SampleNumpyImplementation(OperatorImplementation):
             dst_event.data[index] = dst_mts
 
             if index not in event.sampling.data:
-                # No matchin events to sample from.
+                # TODO: Add option to create warning in case of non matching.
                 for output_feature, (
                     output_missing_value,
                     output_np_dtype,
@@ -76,7 +76,7 @@ class SampleNumpyImplementation(OperatorImplementation):
                 dst_ts_data = np.full(
                     shape=len(sampling_timestamps),
                     fill_value=output_missing_value,
-                    dtype=output_np_dtype,
+                    dtype=src_ts.data.dtype,
                 )
                 dst_ts_data[first_valid_idx:] = src_ts.data[
                     sampling_idxs[first_valid_idx:]

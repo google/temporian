@@ -52,13 +52,21 @@ class NumpySampling:
 
         return False
 
+    # TODO: To remove
     @property
-    def dtypes(self) -> Dict[str, type]:
+    def dtypes(self) -> Dict[str, DType]:
         first_idx_lvl = next(iter(self.data))
         return {
             name: PYTHON_DTYPE_MAPPING[type(value)]
             for name, value in zip(self.index, first_idx_lvl)
         }
+
+    # TODO: Rename to "dtypes".
+    def dtypes_list(self) -> List[DType]:
+        # TODO: Handle case where there is no data.
+        # TODO: Handle non supported type PYTHON_DTYPE_MAPPING.
+        first_idx_lvl = next(iter(self.data))
+        return [PYTHON_DTYPE_MAPPING[type(value)] for value in first_idx_lvl]
 
     def __repr__(self) -> str:
         with np.printoptions(precision=4, threshold=20):
@@ -67,7 +75,7 @@ class NumpySampling:
                 if idx > MAX_NUM_PRINTED_INDEX:
                     data_repr.append("...")
                     break
-                data_repr.append(f"{k}: {v}")
+                data_repr.append(f"{k} ({len(v)}): {v}")
             data_repr = string.indent("\n".join(data_repr))
         return f"index: {self.index}\ndata ({len(self.data)}):\n{data_repr}\n"
 

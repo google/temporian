@@ -15,7 +15,7 @@
 """An event is a collection (possibly empty) of timesampled feature values."""
 
 from __future__ import annotations
-from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
+from typing import Dict, List, Optional, Tuple, TYPE_CHECKING, Any
 
 from temporian.core.data.dtype import DType
 from temporian.core.data.feature import Feature
@@ -49,41 +49,153 @@ class Event(object):
 
     def __repr__(self) -> str:
         features_print = "\n".join(
-            [string.indent(repr(feature)) for feature in self._features]
+            [
+                string.indent(feature.to_string(include_sampling=False))
+                for feature in self._features
+            ]
         )
         return (
             "features:\n"
             f"{features_print}\n"
             f"sampling: {self._sampling},\n"
-            f"name: {self._name},\n"
-            f"creator: {self._creator},\n"
+            f"name: {self._name}\n"
+            f"creator: {self._creator}\n"
             f"id:{id(self)}\n"
         )
 
-    def __add__(self, other):
-        from temporian.core.operators.arithmetic import add
+    def __add__(self, other: Any) -> Event:
+        if isinstance(other, Event):
+            from temporian.core.operators.arithmetic import add
 
-        return add(event_1=self, event_2=other)
+            return add(event_1=self, event_2=other)
 
-    def __sub__(self, other):
-        from temporian.core.operators.arithmetic import subtract
+        if isinstance(other, (int, float)):
+            from temporian.core.operators.arithmetic_scalar import add_scalar
 
-        return subtract(event_1=self, event_2=other)
+            return add_scalar(event=self, value=other)
 
-    def __mul__(self, other):
-        from temporian.core.operators.arithmetic import multiply
+        raise ValueError(
+            f"Cannot add {type(self)} and {type(other)} objects. "
+            "Only Event and scalar values of type int or float are supported."
+        )
 
-        return multiply(event_1=self, event_2=other)
+    def __radd__(self, other: Any) -> Event:
+        return self.__add__(other)
 
-    def __truediv__(self, other):
-        from temporian.core.operators.arithmetic import divide
+    def __sub__(self, other: Any) -> Event:
+        if isinstance(other, Event):
+            from temporian.core.operators.arithmetic import subtract
 
-        return divide(numerator=self, denominator=other)
+            return subtract(event_1=self, event_2=other)
 
-    def __floordiv__(self, other):
-        from temporian.core.operators.arithmetic import floordiv
+        if isinstance(other, (int, float)):
+            from temporian.core.operators.arithmetic_scalar import (
+                subtract_scalar,
+            )
 
-        return floordiv(numerator=self, denominator=other)
+            return subtract_scalar(minuend=self, subtrahend=other)
+
+        raise ValueError(
+            f"Cannot subtract {type(self)} and {type(other)} objects. "
+            "Only Event and scalar values of type int or float are supported."
+        )
+
+    def __rsub__(self, other: Any) -> Event:
+        if isinstance(other, (int, float)):
+            from temporian.core.operators.arithmetic_scalar import (
+                subtract_scalar,
+            )
+
+            return subtract_scalar(minuend=other, subtrahend=self)
+
+        raise ValueError(
+            f"Cannot subtract {type(self)} and {type(other)} objects. "
+            "Only Event and scalar values of type int or float are supported."
+        )
+
+    def __mul__(self, other: Any) -> Event:
+        if isinstance(other, Event):
+            from temporian.core.operators.arithmetic import multiply
+
+            return multiply(event_1=self, event_2=other)
+
+        if isinstance(other, (int, float)):
+            from temporian.core.operators.arithmetic_scalar import (
+                multiply_scalar,
+            )
+
+            return multiply_scalar(event=self, value=other)
+
+        raise ValueError(
+            f"Cannot multiply {type(self)} and {type(other)} objects. "
+            "Only Event and scalar values of type int or float are supported."
+        )
+
+    def __rmul__(self, other: Any) -> Event:
+        return self.__mul__(other)
+
+    def __neg__(self):
+        from temporian.core.operators.arithmetic_scalar import negate
+
+        return negate(self)
+
+    def __truediv__(self, other: Any) -> Event:
+        if isinstance(other, Event):
+            from temporian.core.operators.arithmetic import divide
+
+            return divide(numerator=self, denominator=other)
+
+        if isinstance(other, (int, float)):
+            from temporian.core.operators.arithmetic_scalar import divide_scalar
+
+            return divide_scalar(numerator=self, denominator=other)
+
+        raise ValueError(
+            f"Cannot divide {type(self)} and {type(other)} objects. "
+            "Only Event and scalar values of type int or float are supported."
+        )
+
+    def __rtruediv__(self, other: Any) -> Event:
+        if isinstance(other, (int, float)):
+            from temporian.core.operators.arithmetic_scalar import divide_scalar
+
+            return divide_scalar(numerator=other, denominator=self)
+
+        raise ValueError(
+            f"Cannot divide {type(self)} and {type(other)} objects. "
+            "Only Event and scalar values of type int or float are supported."
+        )
+
+    def __floordiv__(self, other: Any) -> Event:
+        if isinstance(other, Event):
+            from temporian.core.operators.arithmetic import floordiv
+
+            return floordiv(numerator=self, denominator=other)
+
+        if isinstance(other, (int, float)):
+            from temporian.core.operators.arithmetic_scalar import (
+                floordiv_scalar,
+            )
+
+            return floordiv_scalar(numerator=self, denominator=other)
+
+        raise ValueError(
+            f"Cannot floor divide {type(self)} and {type(other)} objects. "
+            "Only Event and scalar values of type int or float are supported."
+        )
+
+    def __rfloordiv__(self, other: Any) -> Event:
+        if isinstance(other, (int, float)):
+            from temporian.core.operators.arithmetic_scalar import (
+                floordiv_scalar,
+            )
+
+            return floordiv_scalar(numerator=other, denominator=self)
+
+        raise ValueError(
+            f"Cannot floor divide {type(self)} and {type(other)} objects. "
+            "Only Event and scalar values of type int or float are supported."
+        )
 
     @property
     def sampling(self) -> Sampling:

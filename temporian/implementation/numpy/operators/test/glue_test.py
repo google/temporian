@@ -114,7 +114,7 @@ class GlueNumpyImplementationTest(absltest.TestCase):
     def test_non_matching_sampling(self):
         with self.assertRaisesRegex(
             ValueError,
-            "All the events do not have the same sampling.",
+            "All glue arguments should have the same sampling.",
         ):
             _ = GlueOperator(
                 event_0=event_lib.input_event(
@@ -130,7 +130,7 @@ class GlueNumpyImplementationTest(absltest.TestCase):
     def test_duplicate_feature(self):
         with self.assertRaisesRegex(
             ValueError,
-            "Feature a is defined in multiple input events",
+            'Feature "a" is defined in multiple input events',
         ):
             sampling = Sampling(index_levels=[("x", DType.INT64)])
             _ = GlueOperator(
