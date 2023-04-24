@@ -59,13 +59,13 @@ class CastNumpyImplementation(OperatorImplementation):
         check = self.operator.attributes["check_overflow"]
 
         # Reuse event if actually no features changed dtype
-        if all(
-            orig_dtype is from_features[feature_name]
-            for feature_name, orig_dtype in event.dtypes.items()
-        ):
+        operator: CastOperator = self.operator
+        if operator.reuse_event:
             return {"event": event}
 
         # Create new event, some features may be reused
+        # NOTE: it's currently faster in the benchmark to run feat/event_idx,
+        # but this might need a re-check with future implementations.
         output = NumpyEvent(data={}, sampling=event.sampling)
         for feat_idx, feature_name in enumerate(event.feature_names()):
             dst_dtype = from_features[feature_name]

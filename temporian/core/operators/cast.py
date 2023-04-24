@@ -83,6 +83,9 @@ class CastOperator(Operator):
             ),
         )
 
+        # Used in implementation
+        self.reuse_event = reuse_event
+
         self.check()
 
     @property
