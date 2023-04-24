@@ -45,13 +45,10 @@ class LagOperator(Operator):
             index_levels=event.sampling.index.levels, creator=self
         )
 
-        prefix = "lag" if duration > 0 else "leak"
-        duration_str = duration_abbreviation(duration)
-
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=f"{prefix}[{duration_str}]_{f.name}",
+                name=f.name,
                 dtype=f.dtype,
                 sampling=output_sampling,
                 creator=self,

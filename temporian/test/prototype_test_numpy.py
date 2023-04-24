@@ -103,7 +103,7 @@ class PrototypeTest(absltest.TestCase):
         # create and glue sum feature
         # TODO: Restore when arithmetic operator is fixed.
         # b = tp.glue(a, self.event_1 + self.event_2)
-        c = tp.lag(self.event_1, duration=1)
+        c = tp.prefix("lag[1s]_", tp.lag(self.event_1, duration=1))
         d = tp.glue(a, tp.sample(c, a))
         sub_sales = 0 - self.event_1["sales"]
         e = tp.glue(d, sub_sales)
