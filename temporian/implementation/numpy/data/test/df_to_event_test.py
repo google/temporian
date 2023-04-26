@@ -405,6 +405,22 @@ class DataFrameToEventTest(absltest.TestCase):
                 df, index_names=["product_id"], timestamp_column="timestamp"
             )
 
+    def test_timestamp_column_with_non_supported_object(self) -> None:
+        df = pd.DataFrame(
+            [
+                [666964, 1.0, 740.0],
+                [666964, 2.0, 508.0],
+                [574016, 3.0, 573.0],
+                [574016, object(), 573.0],
+            ],
+            columns=["product_id", "timestamp", "costs"],
+        )
+
+        with self.assertRaises(TypeError):
+            NumpyEvent.from_dataframe(
+                df, index_names=["product_id"], timestamp_column="timestamp"
+            )
+
     def test_no_index(self) -> None:
         df = pd.DataFrame(
             [
