@@ -251,7 +251,7 @@ class DataFrameToEventTest(absltest.TestCase):
             df, index_names=["product_id"], timestamp_column="timestamp"
         )
         # validate
-        self.assertTrue(numpy_event == expected_numpy_event)
+        self.assertEqual(numpy_event, expected_numpy_event)
         self.assertTrue(numpy_event.is_unix_timestamp)
 
     def test_pdTimestamp_index(self) -> None:
@@ -281,7 +281,40 @@ class DataFrameToEventTest(absltest.TestCase):
             df, index_names=["product_id"], timestamp_column="timestamp"
         )
         # validate
-        self.assertTrue(numpy_event == expected_numpy_event)
+        self.assertEqual(numpy_event, expected_numpy_event)
+        self.assertTrue(numpy_event.is_unix_timestamp)
+
+    def test_string_timestamp(self) -> None:
+        df = pd.DataFrame(
+            [
+                [666964, "2022-01-01", 740.0],
+                [666964, "2022-01-02", 508.0],
+                [574016, "2022-01-03", 573.0],
+            ],
+            columns=["product_id", "timestamp", "costs"],
+        )
+
+        expected_numpy_event = NumpyEvent(
+            data={
+                (666964,): IndexData(
+                    [np.array([740.0, 508.0])],
+                    np.array([1640995200, 1641081600]),
+                ),
+                (574016,): IndexData(
+                    [np.array([573.0])], np.array([1641168000])
+                ),
+            },
+            feature_names=["costs"],
+            index_names=["product_id"],
+            is_unix_timestamp=True,
+        )
+
+        numpy_event = NumpyEvent.from_dataframe(
+            df, index_names=["product_id"], timestamp_column="timestamp"
+        )
+
+        # validate
+        self.assertEqual(numpy_event, expected_numpy_event)
         self.assertTrue(numpy_event.is_unix_timestamp)
 
     def test_datetime_index(self) -> None:
@@ -325,6 +358,52 @@ class DataFrameToEventTest(absltest.TestCase):
         # validate
         self.assertTrue(numpy_event == expected_numpy_event)
         self.assertTrue(numpy_event.is_unix_timestamp)
+
+    def test_invalid_boolean_timestamp_type(self) -> None:
+        df = pd.DataFrame(
+            [
+                [666964, False, 740.0],
+                [666964, True, 508.0],
+                [574016, False, 573.0],
+            ],
+            columns=["product_id", "timestamp", "costs"],
+        )
+
+        with self.assertRaises(TypeError):
+            NumpyEvent.from_dataframe(
+                df, index_names=["product_id"], timestamp_column="timestamp"
+            )
+
+    def test_invalid_string_timestamp_type(self) -> None:
+        df = pd.DataFrame(
+            [
+                [666964, "A", 740.0],
+                [666964, "B", 508.0],
+                [574016, 1.0, 573.0],
+            ],
+            columns=["product_id", "timestamp", "costs"],
+        )
+
+        with self.assertRaises(ValueError):
+            NumpyEvent.from_dataframe(
+                df, index_names=["product_id"], timestamp_column="timestamp"
+            )
+
+    def test_timestamp_column_with_missing_values(self) -> None:
+        df = pd.DataFrame(
+            [
+                [666964, 1.0, 740.0],
+                [666964, 2.0, 508.0],
+                [574016, 3.0, 573.0],
+                [574016, None, 573.0],
+            ],
+            columns=["product_id", "timestamp", "costs"],
+        )
+
+        with self.assertRaises(ValueError):
+            NumpyEvent.from_dataframe(
+                df, index_names=["product_id"], timestamp_column="timestamp"
+            )
 
     def test_no_index(self) -> None:
         df = pd.DataFrame(

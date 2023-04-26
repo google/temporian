@@ -240,15 +240,22 @@ class NumpyEvent:
             Returns:
                 pd.Series: Converted timestamp column to Unix Epoch float.
             """
+            # check if timestamp column contains missing values and raise error
+            if timestamp_column.isna().any():
+                raise ValueError(
+                    f"Cannot convert timestamp column {timestamp_column.name} "
+                    "to Unix Epoch Float because it contains missing values."
+                )
+
             # if timestamp_column is already float64, ignore it
             if timestamp_column.dtype == "float64":
                 return timestamp_column
 
-            # if timestamp_column is int or float != float64, convert to float64
+            # if timestamp_column is int or float != float64 convert to float64
             if timestamp_column.dtype.kind in ("i", "f"):
                 return timestamp_column.astype("float64")
 
-            # string and objects will be converted to datetime and then to float
+            # string and objects will be converted to datetime, then to float
             timestamp_column = pd.to_datetime(timestamp_column, errors="raise")
             timestamp_column = timestamp_column.view("int64") / 1e9
             return timestamp_column
@@ -275,11 +282,8 @@ class NumpyEvent:
                 f"Timestamp column {timestamp_column} cannot be on index_names"
             )
 
-        # check if created sampling's values will be unix timestamps. #TODO:
-        # the user should also be able to specifiy wether it's a unix timestamp
-        is_unix_timestamp = pd.api.types.is_datetime64_any_dtype(
-            df[timestamp_column]
-        )
+        # check if created sampling's values will be unix timestamps
+        is_unix_timestamp = df[timestamp_column].dtype.kind not in ("i", "f")
 
         # convert timestamp column to Unix Epoch Float
         df[timestamp_column] = convert_timestamp_column_to_unix_epoch_float(
