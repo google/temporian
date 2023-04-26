@@ -48,10 +48,10 @@ output_event = tp.evaluate(
 
 Temporian currently supports the following features for pre-processing your temporal data:
 
--   **Simple Moving Average:** calculates the average value of each feature over a specified time window.
--   **Lag:** creates new features by shifting the time series data backwards in time by a specified period.
--   **Arithmetic Operations:** allows you to perform arithmetic operations (such as addition, subtraction, multiplication, and division) on time series data, between different events.
--   More features coming soon!
+- **Simple Moving Average:** calculates the average value of each feature over a specified time window.
+- **Lag:** creates new features by shifting the time series data backwards in time by a specified period.
+- **Arithmetic Operations:** allows you to perform arithmetic operations (such as addition, subtraction, multiplication, and division) on time series data, between different events.
+- More features coming soon!
 
 ## Environment Setup
 
@@ -129,6 +129,10 @@ where `[name]` is the name of one of the python scripts in
 
 `-p` flag displays memory over time plot instead of line-by-line memory
 consumption.
+
+## Run documentation server locally
+
+Live preview your local changes to the documentation with `mkdocs serve`.
 
 ## Credits
 
