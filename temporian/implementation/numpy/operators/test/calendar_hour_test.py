@@ -51,7 +51,7 @@ class CalendarHourNumpyImplementationTest(absltest.TestCase):
                     input_event_data.first_index_data().timestamps,
                 ),
             },
-            feature_names="calendar_hour",
+            feature_names=["calendar_hour"],
             index_names=[],
             is_unix_timestamp=True,
         )

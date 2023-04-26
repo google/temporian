@@ -66,7 +66,7 @@ class CalendarISOWeekNumpyImplementationTest(absltest.TestCase):
                     input_event_data.first_index_data().timestamps,
                 ),
             },
-            feature_names="calendar_iso_week",
+            feature_names=["calendar_iso_week"],
             index_names=[],
             is_unix_timestamp=True,
         )

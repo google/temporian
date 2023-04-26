@@ -52,7 +52,7 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
                     input_event_data.first_index_data().timestamps,
                 ),
             },
-            feature_names="calendar_day_of_month",
+            feature_names=["calendar_day_of_month"],
             index_names=[],
             is_unix_timestamp=True,
         )
@@ -92,7 +92,7 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
                     input_event_data[(2,)].timestamps,
                 ),
             },
-            feature_names="calendar_day_of_month",
+            feature_names=["calendar_day_of_month"],
             index_names=["id"],
             is_unix_timestamp=True,
         )

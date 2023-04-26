@@ -52,7 +52,7 @@ class CalendarDayOfWeekNumpyImplementationTest(absltest.TestCase):
                     input_event_data.first_index_data().timestamps,
                 ),
             },
-            feature_names="calendar_day_of_week",
+            feature_names=["calendar_day_of_week"],
             index_names=[],
             is_unix_timestamp=True,
         )

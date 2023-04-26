@@ -47,15 +47,40 @@ DTYPE_REVERSE_MAPPING = {
 class IndexData:
     features: List[np.ndarray]
     timestamps: np.ndarray
+    """A dataclass representing an index data structure that holds features and
+    timestamps.
+
+    Attributes:
+        features (List[np.ndarray]): A list of one-dimensional NumPy arrays
+            representing the features.
+        timestamps (np.ndarray): A one-dimensional NumPy array representing
+            the timestamps.
+
+    Methods:
+        __init__(features: List[np.ndarray], timestamps: np.ndarray) -> None:
+            Initializes the IndexData object by checking and setting the
+            features and timestamps.
+            Raises:
+                ValueError: If features are not one-dimensional arrays.
+                ValueError: If the number of elements in features and timestamps
+                    do not match.
+
+        __len__() -> int:
+            Returns the number of elements in the timestamps array.
+
+    Example:
+        >>> features = [np.array([1, 2, 3]), np.array([4, 5, 6])]
+        >>> timestamps = np.array([0, 1, 2])
+        >>> index_data = IndexData(features, timestamps)
+        >>> len(index_data)
+        3
+    """
 
     def __init__(
         self,
         features: List[np.ndarray],
         timestamps: np.ndarray,
     ) -> None:
-        if isinstance(features, np.ndarray):
-            features = [features]
-
         shapes = [feature.shape for feature in features]
         if not all(len(shape) == 1 for shape in shapes):
             raise ValueError("Features must be one-dimensional arrays")
@@ -74,24 +99,16 @@ class IndexData:
 
 
 class NumpyEvent:
-    # tolerance levels for comparing float features in __eq__
-    rtol: float = 1e-9
-    atol: float = 1e-9
-
     def __init__(
         self,
         data: Dict[Tuple, IndexData],
-        feature_names: Union[str, List[str]],
-        index_names: Union[str, List[str]],
+        feature_names: Union[List[str]],
+        index_names: Union[List[str]],
         is_unix_timestamp: bool,
     ) -> None:
         self._data = data
-        self._feature_names = (
-            [feature_names] if isinstance(feature_names, str) else feature_names
-        )
-        self._index_names = (
-            [index_names] if isinstance(index_names, str) else index_names
-        )
+        self._feature_names = feature_names
+        self._index_names = index_names
         self._is_unix_timestamp = is_unix_timestamp
 
     @property
@@ -109,10 +126,6 @@ class NumpyEvent:
     @property
     def is_unix_timestamp(self) -> bool:
         return self._is_unix_timestamp
-
-    @property
-    def _first_index_features(self) -> List[np.ndarray]:
-        return list(self._data.values())[0].features
 
     # TODO: To remove
     @property
@@ -159,6 +172,9 @@ class NumpyEvent:
         if self.first_index_key() is None:
             return []
         return self[self.first_index_key()]
+
+    def _first_index_features(self) -> List[np.ndarray]:
+        return list(self._data.values())[0].features
 
     def schema(self) -> Event:
         return Event(
@@ -408,6 +424,10 @@ class NumpyEvent:
         self.data[index] = value
 
     def __eq__(self, __o: object) -> bool:
+        # tolerance levels for float comparison. TODO: move to appropiate place
+        rtol = 1e-9
+        atol = 1e-9
+
         if not isinstance(__o, NumpyEvent):
             return False
 
@@ -445,8 +465,8 @@ class NumpyEvent:
                     equal = np.allclose(
                         feature_self,
                         feature_other,
-                        rtol=self.rtol,
-                        atol=self.atol,
+                        rtol=rtol,
+                        atol=atol,
                         equal_nan=True,
                     )
                 else:
@@ -460,8 +480,8 @@ class NumpyEvent:
             if not np.allclose(
                 index_data_self.timestamps,
                 index_data_other.timestamps,
-                rtol=self.rtol,
-                atol=self.atol,
+                rtol=rtol,
+                atol=atol,
                 equal_nan=True,
             ):
                 return False

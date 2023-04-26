@@ -31,8 +31,8 @@ class EventToDataFrameTest(absltest.TestCase):
                     features=[np.array([573.0])], timestamps=np.array([3.0])
                 ),
             },
-            feature_names="costs",
-            index_names="product_id",
+            feature_names=["costs"],
+            index_names=["product_id"],
             is_unix_timestamp=False,
         )
         expected_df = pd.DataFrame(
@@ -59,8 +59,8 @@ class EventToDataFrameTest(absltest.TestCase):
                     features=[np.array([573.0])], timestamps=np.array([3])
                 ),
             },
-            feature_names="costs",
-            index_names="product_id",
+            feature_names=["costs"],
+            index_names=["product_id"],
             is_unix_timestamp=False,
         )
         expected_df = pd.DataFrame(
@@ -121,7 +121,7 @@ class EventToDataFrameTest(absltest.TestCase):
                     timestamps=np.array([1.2, 2.2, 3.2], dtype=np.float64),
                 ),
             },
-            feature_names="sma_a",
+            feature_names=["sma_a"],
             index_names=["x", "y"],
             is_unix_timestamp=False,
         )
@@ -156,8 +156,8 @@ class EventToDataFrameTest(absltest.TestCase):
                     timestamps=np.array([3.0]),
                 ),
             },
-            feature_names="costs",
-            index_names="product_id",
+            feature_names=["costs"],
+            index_names=["product_id"],
             is_unix_timestamp=False,
         )
         expected_df = pd.DataFrame(

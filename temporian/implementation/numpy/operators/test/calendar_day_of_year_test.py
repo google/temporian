@@ -54,7 +54,7 @@ class CalendarDayOfYearNumpyImplementationTest(absltest.TestCase):
                     input_event_data.first_index_data().timestamps,
                 ),
             },
-            feature_names="calendar_day_of_year",
+            feature_names=["calendar_day_of_year"],
             index_names=[],
             is_unix_timestamp=True,
         )

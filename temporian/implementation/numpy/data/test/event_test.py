@@ -26,7 +26,7 @@ class EventTest(absltest.TestCase):
                 ),
             },
             feature_names=["a", "b"],
-            index_names="x",
+            index_names=["x"],
             is_unix_timestamp=False,
         )
         print(event)

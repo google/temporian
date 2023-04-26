@@ -51,11 +51,11 @@ class CalendarMonthNumpyImplementationTest(absltest.TestCase):
         output_event_data = NumpyEvent(
             data={
                 (): IndexData(
-                    np.array([1, 1, 7, 12, 12, 12], dtype=np.int32),
+                    [np.array([1, 1, 7, 12, 12, 12], dtype=np.int32)],
                     input_event_data[()].timestamps,
                 )
             },
-            feature_names="calendar_month",
+            feature_names=["calendar_month"],
             index_names=[],
             is_unix_timestamp=True,
         )

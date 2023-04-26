@@ -56,7 +56,7 @@ class CalendarYearNumpyImplementationTest(absltest.TestCase):
                     input_event_data.first_index_data().timestamps,
                 ),
             },
-            feature_names="calendar_year",
+            feature_names=["calendar_year"],
             index_names=[],
             is_unix_timestamp=True,
         )

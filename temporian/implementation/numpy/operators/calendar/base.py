@@ -52,7 +52,7 @@ class BaseCalendarNumpyImplementation(OperatorImplementation):
                 np.int32
             )  # TODO: parametrize output dtype
 
-            dst_event[index_key] = IndexData(value, index_data.timestamps)
+            dst_event[index_key] = IndexData([value], index_data.timestamps)
 
         return {"event": dst_event}
 

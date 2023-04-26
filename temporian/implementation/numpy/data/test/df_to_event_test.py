@@ -34,12 +34,12 @@ class DataFrameToEventTest(absltest.TestCase):
         expected_numpy_event = NumpyEvent(
             data={
                 (666964,): IndexData(
-                    np.array([740.0, 508.0]), np.array([1.0, 2.0])
+                    [np.array([740.0, 508.0])], np.array([1.0, 2.0])
                 ),
-                (574016,): IndexData(np.array([573.0]), np.array([3.0])),
+                (574016,): IndexData([np.array([573.0])], np.array([3.0])),
             },
-            feature_names="costs",
-            index_names="product_id",
+            feature_names=["costs"],
+            index_names=["product_id"],
             is_unix_timestamp=False,
         )
         numpy_event = NumpyEvent.from_dataframe(
@@ -60,10 +60,10 @@ class DataFrameToEventTest(absltest.TestCase):
         expected_numpy_event = NumpyEvent(
             data={
                 (): IndexData(
-                    np.array([100.0, 200.0, 300.0]), np.array([1.0, 2.0, 3.0])
+                    [np.array([100.0, 200.0, 300.0])], np.array([1.0, 2.0, 3.0])
                 ),
             },
-            feature_names="costs",
+            feature_names=["costs"],
             index_names=[],
             is_unix_timestamp=False,
         )
@@ -84,12 +84,12 @@ class DataFrameToEventTest(absltest.TestCase):
         expected_numpy_event = NumpyEvent(
             data={
                 (666964,): IndexData(
-                    np.array(["740", "B"]), np.array([1.0, 2.0])
+                    [np.array(["740", "B"])], np.array([1.0, 2.0])
                 ),
-                (574016,): IndexData(np.array([""]), np.array([3.0])),
+                (574016,): IndexData([np.array([""])], np.array([3.0])),
             },
-            feature_names="costs",
-            index_names="product_id",
+            feature_names=["costs"],
+            index_names=["product_id"],
             is_unix_timestamp=False,
         )
         numpy_event = NumpyEvent.from_dataframe(
@@ -181,16 +181,16 @@ class DataFrameToEventTest(absltest.TestCase):
         expected_numpy_event = NumpyEvent(
             data={
                 ("X1", "Y1"): IndexData(
-                    np.array([10.0, 11.0, 12.0]), np.array([1.0, 2.0, 3.0])
+                    [np.array([10.0, 11.0, 12.0])], np.array([1.0, 2.0, 3.0])
                 ),
                 ("X2", "Y1"): IndexData(
-                    np.array([13.0, 14.0, 15.0]), np.array([1.1, 2.1, 3.1])
+                    [np.array([13.0, 14.0, 15.0])], np.array([1.1, 2.1, 3.1])
                 ),
                 ("X2", "Y2"): IndexData(
-                    np.array([16.0, 17.0, 18.0]), np.array([1.2, 2.2, 3.2])
+                    [np.array([16.0, 17.0, 18.0])], np.array([1.2, 2.2, 3.2])
                 ),
             },
-            feature_names="costs",
+            feature_names=["costs"],
             index_names=["index_x", "index_y"],
             is_unix_timestamp=False,
         )
@@ -209,12 +209,12 @@ class DataFrameToEventTest(absltest.TestCase):
         expected_numpy_event = NumpyEvent(
             data={
                 (666964,): IndexData(
-                    np.array([740.0, np.nan]), np.array([1.0, 2.0])
+                    [np.array([740.0, np.nan])], np.array([1.0, 2.0])
                 ),
-                (574016,): IndexData(np.array([573.0]), np.array([3.0])),
+                (574016,): IndexData([np.array([573.0])], np.array([3.0])),
             },
-            feature_names="costs",
-            index_names="product_id",
+            feature_names=["costs"],
+            index_names=["product_id"],
             is_unix_timestamp=False,
         )
         numpy_event = NumpyEvent.from_dataframe(
@@ -236,12 +236,15 @@ class DataFrameToEventTest(absltest.TestCase):
         expected_numpy_event = NumpyEvent(
             data={
                 (666964,): IndexData(
-                    np.array([740.0, 508.0]), np.array([1640995200, 1641081600])
+                    [np.array([740.0, 508.0])],
+                    np.array([1640995200, 1641081600]),
                 ),
-                (574016,): IndexData(np.array([573.0]), np.array([1641168000])),
+                (574016,): IndexData(
+                    [np.array([573.0])], np.array([1641168000])
+                ),
             },
-            feature_names="costs",
-            index_names="product_id",
+            feature_names=["costs"],
+            index_names=["product_id"],
             is_unix_timestamp=True,
         )
         numpy_event = NumpyEvent.from_dataframe(
@@ -263,12 +266,15 @@ class DataFrameToEventTest(absltest.TestCase):
         expected_numpy_event = NumpyEvent(
             data={
                 (666964,): IndexData(
-                    np.array([740.0, 508.0]), np.array([1640995200, 1641081600])
+                    [np.array([740.0, 508.0])],
+                    np.array([1640995200, 1641081600]),
                 ),
-                (574016,): IndexData(np.array([573.0]), np.array([1641168000])),
+                (574016,): IndexData(
+                    [np.array([573.0])], np.array([1641168000])
+                ),
             },
-            feature_names="costs",
-            index_names="product_id",
+            feature_names=["costs"],
+            index_names=["product_id"],
             is_unix_timestamp=True,
         )
         numpy_event = NumpyEvent.from_dataframe(
@@ -302,12 +308,15 @@ class DataFrameToEventTest(absltest.TestCase):
         expected_numpy_event = NumpyEvent(
             data={
                 (666964,): IndexData(
-                    np.array([740.0, 508.0]), np.array([1640995200, 1641081600])
+                    [np.array([740.0, 508.0])],
+                    np.array([1640995200, 1641081600]),
                 ),
-                (574016,): IndexData(np.array([573.0]), np.array([1641168000])),
+                (574016,): IndexData(
+                    [np.array([573.0])], np.array([1641168000])
+                ),
             },
-            feature_names="costs",
-            index_names="product_id",
+            feature_names=["costs"],
+            index_names=["product_id"],
             is_unix_timestamp=True,
         )
         numpy_event = NumpyEvent.from_dataframe(

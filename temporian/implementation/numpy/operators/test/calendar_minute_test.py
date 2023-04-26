@@ -52,7 +52,7 @@ class CalendarMinuteNumpyImplementationTest(absltest.TestCase):
                     input_event_data.first_index_data().timestamps,
                 ),
             },
-            feature_names="calendar_minute",
+            feature_names=["calendar_minute"],
             index_names=[],
             is_unix_timestamp=True,
         )
