@@ -145,7 +145,7 @@ def infer_processor(
     Fails if any inputs are missing.
 
     Args:
-        inputs: Input events. If None, the inputs is inferred. In this case,
+        inputs: Input events. If None, the inputs are inferred. In this case,
             input events have to be named.
         outputs: Output events.
 

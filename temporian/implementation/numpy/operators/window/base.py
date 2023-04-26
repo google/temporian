@@ -77,8 +77,8 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
         """Creates a 2d boolean matrix containing the summing instructions.
 
         Returns:
-            Matrix "m[i,j]" defined as: m[i,j] is true iif. input value "j" is
-            averaged in the output value "i".
+            Matrix `m`, where `m[i,j]` is true iif input value `j` is averaged
+            in the output value `i`.
         """
         # This implementation is simple but expensive. It will create multiple
         # O(n^2) arrays, where n is the number of time samples.
@@ -122,6 +122,6 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
             values: the input array, of shape (n, m).
 
         Returns:
-            A 1D NumPy array of shape (n,) with the result for each row in the
-            input array.
+            A 1D NumPy array of shape (n,) containing the result for each row in
+            the input array.
         """

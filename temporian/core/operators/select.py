@@ -101,7 +101,7 @@ def select(
         feature_names: The names of the features to select from the event.
 
     Returns:
-        Event with only the selected features.
+        Event containing only the selected features.
     """
     if isinstance(feature_names, list):
         pass

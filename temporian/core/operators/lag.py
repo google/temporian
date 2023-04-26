@@ -150,6 +150,9 @@ def leak(
     duration. If `duration` is a list, then the event will be leaked by each
     duration in the list, and a list of events will be returned.
 
+    Note that this operator moves future data into the past, and should be used
+    with caution to prevent unwanted leakage.
+
     Args:
         event: Event to leak the sampling of.
         duration: Duration or list of Durations to leak by.

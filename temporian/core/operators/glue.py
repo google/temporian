@@ -110,7 +110,7 @@ def glue(
         ```
 
     To concatenate events with a different sampling, use the operator
-    'tp.sample(...)' before.
+    'tp.sample(...)' first.
 
     Example:
 

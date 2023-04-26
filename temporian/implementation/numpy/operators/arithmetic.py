@@ -39,7 +39,7 @@ class ArithmeticNumpyImplementation(OperatorImplementation):
             event_2: Second event.
 
         Returns:
-            Result of the arithmetic operation of the two Events according to
+            Result of the arithmetic operation of the two events according to
             resolution and operator.
 
         Raises:

@@ -55,13 +55,11 @@ def moving_count(
     If `sampling` is provided samples the moving window's value at each
     timestamp in `sampling`, else samples it at each timestamp in `event`.
 
-    Missing values (such as NaNs) are not counted.
-
     If the window does not contain any values (e.g., all the values are missing,
     or the window does not contain any sampling), outputs missing values.
 
     Args:
-        event: The features to count the number of values for.
+        event: Event for which to count the number of values in each feature.
         window_length: The sliding window's length.
         sampling: Timestamps to sample the sliding window's value at. If not
             provided, timestamps in `event` are used.

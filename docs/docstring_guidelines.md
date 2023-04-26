@@ -123,6 +123,8 @@ space.
 If the description goes over the max line length, break into a new line with an
 additional indentation of 4 spaces.
 If a function accepts `*args` and/or `**kwargs` they should be listed as such.
+Omit unnecessary prepositions at the start of each arg's description, such as
+`The` or `A`.
 
 **Returns: (or Yields: for generators)**
 

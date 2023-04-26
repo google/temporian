@@ -56,10 +56,10 @@ class BaseCalendarNumpyImplementation(OperatorImplementation):
         """Gets the value of the datetime object that corresponds to each
         specific calendar operator.
 
-        For example, calendar_day_of_month will take the datetime's day, and
-        calendar_hour will take the its hour.
+        For example, calendar_day_of_month will return the datetime's day, and
+        calendar_hour its hour.
 
-        Returned value is be converted to int32 by __call__.
+        Returned value is converted to int32 by __call__.
 
         Args:
             dt: the datetime to get the value from.
