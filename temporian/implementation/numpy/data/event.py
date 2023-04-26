@@ -123,17 +123,19 @@ class NumpyEvent:
         index_names: List[str] = None,
         timestamp_column: str = "timestamp",
     ) -> "NumpyEvent":
-        """Convert a pandas DataFrame to a NumpyEvent.
+        """Creates a NumpyEvent from a pandas DataFrame.
+
         Args:
             df: DataFrame to convert to NumpyEvent.
-            index_names: names of the DataFrame columns to be used as index for
+            index_names: Names of the DataFrame columns to be used as index for
                 the event. Defaults to [].
-            timestamp_column: Column containing timestamps. Supported date types:
-                {np.datetime64, pd.Timestamp, datetime.datetime}. Timestamps of
-                these types are converted implicitly to UTC epoch float.
+            timestamp_column: Name of the column containing the timestamps.
+                Supported date types:
+                `{np.datetime64, pd.Timestamp, datetime.datetime}`.
+                Timestamps of these types are converted to UTC epoch float.
 
         Returns:
-            NumpyEvent: NumpyEvent created from DataFrame.
+            Event created from DataFrame.
 
         Raises:
             ValueError: If index_names or timestamp_column are not in df columns.
@@ -267,7 +269,7 @@ class NumpyEvent:
         """Convert a NumpyEvent to a pandas DataFrame.
 
         Returns:
-            pd.DataFrame: DataFrame created from NumpyEvent.
+            DataFrame created from NumpyEvent.
         """
         # Creating an empty dictionary to store the data
         data = {}

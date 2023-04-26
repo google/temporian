@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import Dict, Optional
 
 import numpy as np
@@ -24,7 +24,7 @@ from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
 class BaseWindowNumpyImplementation(OperatorImplementation):
-    """Abstract base class to implement common logic of numpy implementation of
+    """Interface definition and common logic for numpy implementation of
     window operators."""
 
     def __init__(self, operator: BaseWindowOperator) -> None:
@@ -76,10 +76,10 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
     ) -> np.array:
         """Creates a 2d boolean matrix containing the summing instructions.
 
-        The returned matrix "m[i,j]" is defined as:
-            m[i,j] is true iif. input value "j" is averaged in the output value "i".
+        Returns:
+            Matrix `m`, where `m[i,j]` is true iif input value `j` is averaged
+            in the output value `i`.
         """
-
         # This implementation is simple but expensive. It will create multiple
         # O(n^2) arrays, where n is the number of time samples.
 
@@ -111,23 +111,17 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
 
     @abstractmethod
     def _apply_operation(self, values: np.array) -> np.array:
-        """
-        Applies a window operator to each of the values in each row of the
-        input array.
+        """Reduces each of the rows in an array of values to a single value.
 
-        The input array should have a shape (n, m), where 'n' is the length of
-        the feature and 'm' is the size of the window. Each row represents a
-        window of data points, with 'nan' values used for padding when the
-        window size is smaller than the number of data points in the time
-        series. The function should compute the operation for each row (window).
+        The input array has a shape (n, m), where n is the length of the feature
+        and m is the size of the window. Each row represents a window of data
+        points, with NaN values used for padding when the window size is smaller
+        than the number of data points in the time series.
 
         Args:
-            values: A 2D NumPy array with shape (n, m) where each row represents
-                a  window of data points. 'n' is the length of the feature, and
-                'm' is the size of the window. The array can contain 'nan'
-                values as padding.
+            values: Input array, of shape (n, m).
 
         Returns:
-            np.array: A 1D NumPy array with shape (n,) containing the operation
-                    for each row (window) in the input array.
+            1D NumPy array of shape (n,) containing the result for each row in
+            the input array.
         """

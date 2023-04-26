@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Operator lib module."""
+"""Registering mechanism for operator implementation classes."""
 
 from typing import Any
 
@@ -22,8 +22,7 @@ _OPERATOR_IMPLEMENTATIONS = {}
 def register_operator_implementation(
     operator_class, operator_implementation_class
 ):
-    """Register an operator implementation."""
-
+    """Registers an operator implementation."""
     op_key = operator_class.operator_key()
     if op_key in _OPERATOR_IMPLEMENTATIONS:
         raise ValueError("Operator implementation already registered")
@@ -32,7 +31,6 @@ def register_operator_implementation(
 
 def get_implementation_class(key: str):
     """Gets an operator implementation class from a registered key."""
-
     if key not in _OPERATOR_IMPLEMENTATIONS:
         raise ValueError(
             f"Unknown operator implementation '{key}'. Available operator "
@@ -42,6 +40,5 @@ def get_implementation_class(key: str):
 
 
 def registered_implementations() -> dict[str, Any]:
-    """List the registered operator implementations."""
-
+    """Lists the registered operator implementations."""
     return _OPERATOR_IMPLEMENTATIONS

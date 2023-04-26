@@ -24,24 +24,27 @@ from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
 class ArithmeticNumpyImplementation(OperatorImplementation):
+    """Numpy implementation of the arithmetic operator."""
+
     def __init__(self, operator: ArithmeticOperator) -> None:
         super().__init__(operator)
 
     def __call__(
         self, event_1: NumpyEvent, event_2: NumpyEvent
     ) -> Dict[str, NumpyEvent]:
-        """Sum two Events.
+        """Sums two NumpyEvents.
 
         Args:
-            event_1: First Event.
-            event_2: Second Event.
+            event_1: First event.
+            event_2: Second event.
 
         Returns:
-            Arithmetic of the two Events according to resolution and arithmetic operator.
+            Result of the arithmetic operation of the two events according to
+            resolution and operator.
 
         Raises:
             ValueError: If sampling of both events is not equal.
-            NotImplementedError: If resolution is PER_FEATURE_NAME.
+            NotImplementedError: If resolution is `PER_FEATURE_NAME`.
         """
         resolution = self.operator.attributes()["resolution"]
         operation = self.operator.attributes()["operation"]

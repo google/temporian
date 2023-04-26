@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Base calendar operator."""
+"""Base calendar operator class definition."""
 
 from abc import ABC, abstractmethod
 
@@ -24,9 +24,7 @@ from temporian.proto import core_pb2 as pb
 
 
 class BaseCalendarOperator(Operator, ABC):
-    """
-    Base calendar operator to implement common logic.
-    """
+    """Interface definition and common logic for calendar operators."""
 
     def __init__(self, sampling: Event):
         super().__init__()
@@ -72,10 +70,10 @@ class BaseCalendarOperator(Operator, ABC):
     @property
     @abstractmethod
     def operator_def_key(cls) -> str:
-        """Get the key of the operator definition."""
+        """Gets the key of the operator definition."""
 
     @classmethod
     @property
     @abstractmethod
     def output_feature_name(cls) -> str:
-        """Get the name of the generated feature in the output event."""
+        """Gets the name of the generated feature in the output event."""

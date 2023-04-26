@@ -29,6 +29,17 @@ def evaluate_schedule(
     verbose: int,
     check_execution: bool,
 ) -> Dict[event.Event, numpy_event.NumpyEvent]:
+    """Evaluates a schedule on a dictionary of input event data.
+
+    Args:
+        inputs: Mapping of core Events to materialized NumpyEvents.
+        schedule: Sequence of operators to apply on the data.
+        verbose: If >0, prints details about the execution on the standard error
+            output. The larger the number, the more information is displayed.
+        check_execution: If `True`, data of the intermediate results of the
+            operators is checked against its expected structure and raises if
+            it differs.
+    """
     data = {**inputs}
 
     for operator_idx, operator in enumerate(schedule):

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from datetime import datetime, timezone
 from typing import Dict, Any
 
@@ -24,7 +24,7 @@ from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
 class BaseCalendarNumpyImplementation(OperatorImplementation):
-    """Abstract base class to implement common logic of numpy implementation of
+    """Interface definition and common logic for numpy implementation of
     calendar operators."""
 
     def __init__(self, operator: BaseCalendarOperator) -> None:
@@ -53,16 +53,17 @@ class BaseCalendarNumpyImplementation(OperatorImplementation):
 
     @abstractmethod
     def _get_value_from_datetime(self, dt: datetime) -> Any:
-        """Get the value of the datetime object that corresponds to each
-        specific calendar operator. E.g., calendar_day_of_month will take the
-        datetime's day, and calendar_hour will take the its hour.
+        """Gets the value of the datetime object that corresponds to each
+        specific calendar operator.
 
-        Must be implemented by subclasses.
+        For example, calendar_day_of_month will return the datetime's day, and
+        calendar_hour its hour.
+
+        Returned value is converted to int32 by __call__.
 
         Args:
-            dt: the datetime to get the value from.
+            dt: Datetime to get the value from.
 
         Returns:
-            Any: the numeric value for the datetime. Will be converted to
-                int32 by __call__.
+            Numeric value for the datetime.
         """

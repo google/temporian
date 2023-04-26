@@ -32,15 +32,15 @@ def plot(
     """Plots an event.
 
     Args:
-        index: The index of the event to plot. Use 'event.index()' for the
-            list of available indices. If index=None, select arbitrarily
-            (non deterministically) an index to plot.
+        index: Index of the event to plot. Use `event.index()` for the list of
+            available indices. If index=None, select arbitrarily (non
+            deterministically) an index to plot.
         backend: Plotting library to use.
         width_px: Width of the figure in pixel.
         height_per_plot_px: Height of each sub-plot (one per feature) in pixel.
         max_points: Maximum number of points to plot.
-        min_time: If set, only plot events after min_time.
-        max_time: If set, only plot events before min_time.
+        min_time: If set, only plot events after `min_time`.
+        max_time: If set, only plot events before `max_time`.
     """
 
     if isinstance(event, list):

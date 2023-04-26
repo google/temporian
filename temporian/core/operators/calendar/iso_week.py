@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Calendar ISO week operator."""
+"""Calendar ISO week operator class and public API function definitions."""
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
@@ -20,10 +20,6 @@ from temporian.core.operators.calendar.base import BaseCalendarOperator
 
 
 class CalendarISOWeekOperator(BaseCalendarOperator):
-    """
-    Calendar operator to obtain the ISO week each timestamp belongs to.
-    """
-
     @classmethod
     @property
     def operator_def_key(cls) -> str:
@@ -39,15 +35,16 @@ operator_lib.register_operator(CalendarISOWeekOperator)
 
 
 def calendar_iso_week(sampling: Event) -> Event:
-    """Obtain the ISO week each of the timestamps in an event's sampling belongs
-    to. Features in input event are ignored. Output feature contains numbers
-    between 1 and 53.
+    """Obtains the ISO week the timestamps in an event's sampling are in.
+
+    Features in input event are ignored. Output feature contains numbers between
+    1 and 53.
 
     Args:
-        sampling: the event to get the ISO weeks from.
+        sampling: Event to get the ISO weeks from.
 
     Returns:
-        event with a single feature corresponding to the ISO week each timestamp
-            in `event`'s sampling belongs to, with the same sampling as `event`.
+        Event with a single feature corresponding to the ISO week each timestamp
+        in `event`'s sampling belongs to, with the same sampling as `event`.
     """
     return CalendarISOWeekOperator(sampling).outputs()["event"]

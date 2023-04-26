@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Operator module."""
+"""Base operator class and auxiliary classes definition."""
 
 from abc import ABC
 from typing import Any, Union
@@ -51,7 +51,7 @@ class OperatorExceptionDecorator(object):
 
 
 class Operator(ABC):
-    """Operator interface."""
+    """Interface definition and common logic for operators."""
 
     def __init__(self):
         self._inputs: dict[str, Event] = {}
@@ -75,7 +75,6 @@ class Operator(ABC):
 
     def check(self) -> None:
         """Ensures that the operator is valid."""
-
         definition = self.definition()
 
         with OperatorExceptionDecorator(self):
@@ -146,7 +145,6 @@ class Operator(ABC):
         This function is used to check the correct implementation of ops are
         runtime.
         """
-
         # TODO: Optimize the number of matches: We don't need all the currently
         # computed matches to check the output validity.
         matches: list[tuple[str, str]] = []
