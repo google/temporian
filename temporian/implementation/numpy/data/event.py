@@ -230,6 +230,29 @@ class NumpyEvent:
             ... )
             >>> event = NumpyEvent.from_dataframe(df, index_names=["product_id"])
         """
+
+        def convert_timestamp_column_to_unix_epoch_float(
+            timestamp_column: pd.Series,
+        ) -> pd.DataFrame:
+            """Convert timestamp column to Unix Epoch Float.
+            Args:
+                timestamp_column: Timestamp column to convert.
+            Returns:
+                pd.Series: Converted timestamp column to Unix Epoch float.
+            """
+            # if timestamp_column is already float64, ignore it
+            if timestamp_column.dtype == "float64":
+                return timestamp_column
+
+            # if timestamp_column is int or float != float64, convert to float64
+            if timestamp_column.dtype.kind in ("i", "f"):
+                return timestamp_column.astype("float64")
+
+            # string and objects will be converted to datetime and then to float
+            timestamp_column = pd.to_datetime(timestamp_column, errors="raise")
+            timestamp_column = timestamp_column.view("int64") / 1e9
+            return timestamp_column
+
         df = df.copy(deep=False)
         if index_names is None:
             index_names = []
@@ -257,19 +280,11 @@ class NumpyEvent:
         is_unix_timestamp = pd.api.types.is_datetime64_any_dtype(
             df[timestamp_column]
         )
-        # convert timestamp column to float
-        # TODO: This is taking a lot of time. Don't use apply.
 
-        # if timestamp column is of kind int convert to float
-        if df[timestamp_column].dtype.kind == "i":
-            df[timestamp_column] = df[timestamp_column].astype("float64")
-
-        elif df[timestamp_column].dtype.type not in DTYPE_MAPPING.keys():
-            df[timestamp_column] = pd.to_datetime(
-                df[timestamp_column], errors="raise"
-            )
-            # convert from nanoseconds to seconds and float
-            df[timestamp_column] = df[timestamp_column].astype("int64") / 1e9
+        # convert timestamp column to Unix Epoch Float
+        df[timestamp_column] = convert_timestamp_column_to_unix_epoch_float(
+            df[timestamp_column]
+        )
 
         # sort by timestamp if it's not sorted
         # TODO: we may consider using kind="mergesort" if we know that most of
