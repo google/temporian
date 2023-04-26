@@ -47,7 +47,6 @@ py_library(
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:event",
-        "//temporian/core/data:feature",
         "//temporian/proto:core_py_proto",
     ],
 )

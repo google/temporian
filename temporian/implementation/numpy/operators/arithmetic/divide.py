@@ -14,12 +14,11 @@
 import numpy as np
 
 from temporian.core.data.dtype import DType
-from temporian.implementation.numpy.operators.arithmetic.base import (
-    BaseArithmeticNumpyImplementation,
-    NumpyFeature,
-)
 from temporian.core.operators.arithmetic import DivideOperator
 from temporian.implementation.numpy import implementation_lib
+from temporian.implementation.numpy.operators.arithmetic.base import (
+    BaseArithmeticNumpyImplementation,
+)
 
 
 class DivideNumpyImplementation(BaseArithmeticNumpyImplementation):
@@ -27,18 +26,19 @@ class DivideNumpyImplementation(BaseArithmeticNumpyImplementation):
 
     def __init__(self, operator: DivideOperator) -> None:
         super().__init__(operator)
+        assert isinstance(operator, DivideOperator)
 
     def _do_operation(
-        self, event_1_feature: NumpyFeature, event_2_feature: NumpyFeature
+        self, event_1_feature: np.ndarray, event_2_feature: np.ndarray
     ) -> np.ndarray:
         if event_1_feature.dtype in [DType.INT32, DType.INT64]:
             raise ValueError(
                 "Cannot use the divide operator on feature "
-                f"{event_1_feature.name} of type {event_1_feature.dtype}. "
+                f"{event_1_feature} of type {event_1_feature.dtype.type}. "
                 "Cast to a floating point type or use "
                 "floordiv operator (//) instead, on these integer types."
             )
-        return event_1_feature.data / event_2_feature.data
+        return event_1_feature / event_2_feature
 
 
 implementation_lib.register_operator_implementation(

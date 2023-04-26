@@ -1,11 +1,11 @@
+import datetime
 from typing import NamedTuple, Optional, Union, List, Any
 
-from click import option
-from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.core.data import duration
-import datetime
-
 import numpy as np
+from click import option
+
+from temporian.core.data import duration
+from temporian.implementation.numpy.data.event import NumpyEvent
 
 DEFAULT_BACKEND = "matplotlib"
 
@@ -57,7 +57,7 @@ def plot(
         raise ValueError("Events is empty")
 
     if indexes is None:
-        indexes = events[0].index()
+        indexes = [events[0].first_index_key()]
     elif isinstance(indexes, tuple):
         indexes = [indexes]
 
@@ -105,7 +105,7 @@ def _plot_matplotlib(
                     ' Alternatively, set "index=None" to select a random'
                     f" index value (e.g., {event.first_index_value()}."
                 )
-            num_features = len(event.feature_names())
+            num_features = len(event.feature_names)
             if num_features == 0:
                 # We plot the sampling
                 num_features = 1
@@ -118,7 +118,6 @@ def _plot_matplotlib(
             "plots will be printed."
         )
         num_plots = options.max_num_plots
-
     fig, axs = plt.subplots(
         num_plots,
         figsize=(
@@ -138,13 +137,13 @@ def _plot_matplotlib(
 
             title = str(index)
 
-            feature_names = event.feature_names()
+            feature_names = event.feature_names
 
-            xs = event.sampling.data[index]
+            xs = event.data[index].timestamps
             if options.max_points is not None and len(xs) > options.max_points:
                 xs = xs[: options.max_points]
 
-            if event.sampling.is_unix_timestamp:
+            if event.is_unix_timestamp:
                 xs = [
                     datetime.datetime.fromtimestamp(x, tz=datetime.timezone.utc)
                     for x in xs
@@ -163,7 +162,7 @@ def _plot_matplotlib(
                     color=colors[0],
                     name="[sampling]",
                     marker="+",
-                    is_unix_timestamp=event.sampling.is_unix_timestamp,
+                    is_unix_timestamp=event.is_unix_timestamp,
                     title=title,
                 )
                 # Only print the index once
@@ -177,7 +176,7 @@ def _plot_matplotlib(
 
                 ax = axs[plot_idx, 0]
 
-                ys = event.data[index][feature_idx].data
+                ys = event.data[index].features[feature_idx]
                 if (
                     options.max_points is not None
                     and len(ys) > options.max_points
@@ -191,7 +190,7 @@ def _plot_matplotlib(
                     options=options,
                     color=colors[feature_idx % len(colors)],
                     name=feature_name,
-                    is_unix_timestamp=event.sampling.is_unix_timestamp,
+                    is_unix_timestamp=event.is_unix_timestamp,
                     title=title,
                 )
 
@@ -210,7 +209,6 @@ def _matplotlib_sub_plot(
     import matplotlib.ticker as ticker
 
     ax.plot(xs, ys, lw=0.5, color=color, **wargs)
-
     if options.min_time is not None or options.max_time is not None:
         args = {}
         if options.min_time is not None:

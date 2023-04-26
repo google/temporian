@@ -11,23 +11,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import numpy as np
 from typing import Dict
 from abc import ABC, abstractmethod
 
+import numpy as np
+
 from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
+from temporian.implementation.numpy.data.event import IndexData
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
 class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
     def __init__(self, operator: BaseArithmeticOperator) -> None:
         super().__init__(operator)
+        assert isinstance(operator, BaseArithmeticOperator)
 
     @abstractmethod
     def _do_operation(
-        self, event_1_feature: NumpyFeature, event_2_feature: NumpyFeature
+        self, event_1_feature: np.ndarray, event_2_feature: np.ndarray
     ) -> np.ndarray:
         """
         Perform the actual arithmetic operation corresponding to the subclass
@@ -49,26 +51,39 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
             ValueError: If sampling of both events is not equal.
         """
 
-        if event_1.sampling != event_2.sampling:
-            raise ValueError("Sampling of both events must be equal.")
-
-        if event_1.feature_count() != event_2.feature_count():
+        if event_1.feature_count != event_2.feature_count:
             raise ValueError(
                 "Both events must have the same number of features."
             )
 
-        output = NumpyEvent(data={}, sampling=event_1.sampling)
+        # gather operator outputs
+        prefix = self._operator.prefix
 
-        for event_index, event_1_features in event_1.data.items():
-            output.data[event_index] = []
+        # create destination event
+        dst_feature_names = [
+            f"{prefix}_{feature_name_1}_{feature_name_2}"
+            for feature_name_1, feature_name_2 in zip(
+                event_1.feature_names, event_2.feature_names
+            )
+        ]
+        dst_event = NumpyEvent(
+            data={},
+            feature_names=dst_feature_names,
+            index_names=event_1.index_names,
+            is_unix_timestamp=event_1.is_unix_timestamp,
+        )
+        for index_key, index_data in event_1.iterindex():
+            # initialize destination index data
+            dst_event[index_key] = IndexData([], index_data.timestamps)
 
-            event_2_features = event_2.data[event_index]
-
-            for i, event_1_feature in enumerate(event_1_features):
-                event_2_feature = event_2_features[i]
-
+            # iterate over index key features
+            event_1_features = index_data.features
+            event_2_features = event_2[index_key].features
+            for event_1_feature, event_2_feature in zip(
+                event_1_features, event_2_features
+            ):
                 # check both features have the same dtype
-                if event_1_feature.dtype != event_2_feature.dtype:
+                if event_1_feature.dtype.type != event_2_feature.dtype.type:
                     raise ValueError(
                         "Both features must have the same dtype."
                         f" event_1_feature: {event_1_feature} has dtype "
@@ -77,14 +92,6 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
                     )
 
                 result = self._do_operation(event_1_feature, event_2_feature)
+                dst_event[index_key].features.append(result)
 
-                output.data[event_index].append(
-                    NumpyFeature(
-                        name=self._operator.output_feature_name(
-                            event_1_feature, event_2_feature
-                        ),
-                        data=result,
-                    )
-                )
-
-        return {"event": output}
+        return {"event": dst_event}

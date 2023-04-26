@@ -14,8 +14,6 @@
 
 """Prefix operator."""
 
-from typing import List, Union, Any, Dict
-
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature

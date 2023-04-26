@@ -36,6 +36,9 @@ class LagOperator(Operator):
     ):
         super().__init__()
 
+        self._duration = duration
+        self._duration_str = duration_abbreviation(duration)
+
         # inputs
         self.add_input("event", event)
 
@@ -65,6 +68,14 @@ class LagOperator(Operator):
             ),
         )
         self.check()
+
+    @property
+    def duration(self) -> Duration:
+        return self._duration
+
+    @property
+    def duration_str(self) -> str:
+        return self._duration_str
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:

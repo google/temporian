@@ -137,7 +137,6 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
-        ":utils",
         "//temporian/core/operators:set_index",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
@@ -169,7 +168,6 @@ py_library(
         "//temporian/core/data:duration",
         "//temporian/core/operators:propagate",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
     ],
@@ -184,7 +182,6 @@ py_library(
         "//temporian/core/data:duration",
         "//temporian/core/operators:sample",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
         "//temporian/implementation/numpy_cc/operators:sample",
@@ -201,15 +198,6 @@ py_library(
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
-    ],
-)
-
-py_library(
-    name = "utils",
-    srcs = ["utils.py"],
-    srcs_version = "PY3",
-    deps = [
-        "//temporian/implementation/numpy/data:event",
     ],
 )
 

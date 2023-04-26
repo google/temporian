@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
-
 from typing import Dict
-from temporian.implementation.numpy.data.event import NumpyEvent
+
 from temporian.core.data.event import Event
-from temporian.core.operators.base import Operator, OperatorExceptionDecorator
+from temporian.core.operators.base import Operator
+from temporian.core.operators.base import OperatorExceptionDecorator
+from temporian.implementation.numpy.data.event import DTYPE_MAPPING
+from temporian.implementation.numpy.data.event import NumpyEvent
 
 
 class OperatorImplementation(ABC):
@@ -39,40 +41,40 @@ def _check_features(
 
     # TODO: Check that the index and features have the same number of
     # observations.
-
     for key, item_def in definitions.items():
         item_real = values[key]
 
         # Check sampling
-        if item_real.sampling.index != item_def.sampling.index.names:
+        if item_real.index_names != item_def.sampling.index.names:
             raise RuntimeError(
                 f"Non matching {label} sampling. "
-                f"effective={item_real.sampling.index} vs "
+                f"effective={item_real.index_names} vs "
                 f"expected={item_def.sampling.index.names}"
             )
-        # Check features
-        features = item_real.first_index_features()
 
-        if len(item_def.features) != len(features):
+        # Check features
+        if len(item_def.features) != item_real.feature_count:
             raise RuntimeError(
                 f"Non matching number of {label} features. "
                 f"expected={len(item_def.features)} vs "
-                f"effective={len(features)}"
+                f"effective={item_real.feature_count}"
             )
 
-        for feature_def, feature in zip(item_def.features, features):
-            if feature_def.name != feature.name:
+        for i, feature_def in enumerate(item_def.features):
+            if feature_def.name != item_real.feature_names[i]:
                 raise RuntimeError(
                     f"Non matching {label} feature name. "
                     f"expected={feature_def.name} vs "
-                    f"effective={feature.name}"
+                    f"effective={item_real.feature_names[i]}"
                 )
-
-            if feature_def.dtype != feature.dtype:
+            feat_dtype_real = DTYPE_MAPPING[
+                item_real.first_index_data().features[i].dtype.type
+            ]
+            if feature_def.dtype != feat_dtype_real:
                 raise RuntimeError(
                     f"Non matching {label} feature dtype. "
                     f"expected={feature_def.dtype} vs "
-                    f"effective={feature.dtype}"
+                    f"effective={feat_dtype_real}"
                 )
 
 
@@ -116,15 +118,13 @@ def _check_output(
             output_real = outputs[output_key]
 
             # Check sampling
-            if output_real.sampling.index != output_def.sampling.index.names:
+            if output_real.index_names != output_def.sampling.index.names:
                 raise RuntimeError(
-                    f"Non matching sampling. {output_real.sampling.index} vs"
+                    f"Non matching sampling. {output_real.index_names} vs"
                     f" {output_def.sampling.index.names}"
                 )
 
             # TODO: Check copy or referencing of feature data.
-
-            # Check copy or referencing of sampling data.
             matching_samplings = set(operator.list_matching_io_samplings())
             for input_key in operator.inputs.keys():
                 input_real = inputs[input_key]
@@ -132,11 +132,8 @@ def _check_output(
                     input_key,
                     output_key,
                 ) in matching_samplings
-                effective_matching_sampling = (
-                    output_real.sampling is input_real.sampling
-                )
-                assert effective_matching_sampling == (
-                    output_real.sampling.data is input_real.sampling.data
+                effective_matching_sampling = _check_same_sampling(
+                    output_real, input_real
                 )
                 if (
                     expected_matching_sampling
@@ -146,8 +143,8 @@ def _check_output(
                         f"The sampling of input '{input_key}' and output "
                         f"'{output_key}' are expected to have THE SAME "
                         "sampling. However, a different sampling was generated "
-                        f"during the op execution ({input_real.sampling} "
-                        f"vs {output_real.sampling})."
+                        f"during the op execution ({input_real} "
+                        f"vs {output_real})."
                     )
                 if (
                     not expected_matching_sampling
@@ -162,3 +159,15 @@ def _check_output(
 
         # Check features
         _check_features(outputs, definitions=operator.outputs, label="outputs")
+
+
+def _check_same_sampling(event_1: NumpyEvent, event_2: NumpyEvent) -> bool:
+    for index_key, index_data_1 in event_1.data.items():
+        if index_key not in event_2.data:
+            return False
+
+        index_data_2 = event_2[index_key]
+        if index_data_1.timestamps is not index_data_2.timestamps:
+            return False
+
+    return True

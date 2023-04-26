@@ -54,7 +54,6 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id"],
         )
-
         self.numpy_event_2 = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
@@ -68,8 +67,11 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id"],
         )
-
-        self.numpy_event_2.sampling = self.numpy_event_1.sampling
+        # set same sampling
+        for index_key, index_data in self.numpy_event_1.data.items():
+            self.numpy_event_2[index_key].timestamps = index_data.timestamps
+        self.event_1 = self.numpy_event_1.schema()
+        self.event_2 = self.numpy_event_2.schema()
 
         self.sampling = Sampling([("store_id", DType.INT64)])
         self.event_1 = Event(
@@ -110,7 +112,6 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         operator_output = sum_implementation.call(
             event_1=self.numpy_event_1, event_2=self.numpy_event_2
         )
-
         self.assertTrue(numpy_output_event == operator_output["event"])
 
     def test_correct_subtraction(self) -> None:
@@ -168,7 +169,6 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         operator_output = mult_implementation.call(
             event_1=self.numpy_event_1, event_2=self.numpy_event_2
         )
-
         self.assertTrue(numpy_output_event == operator_output["event"])
 
     def test_correct_division(self) -> None:
@@ -230,8 +230,9 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id"],
         )
+        for index_key, index_data in self.numpy_event_1.iterindex():
+            self.numpy_event_2[index_key].timestamps = index_data.timestamps
 
-        self.numpy_event_1.sampling = self.numpy_event_2.sampling
         self.event_1 = self.numpy_event_1.schema()
         self.event_2 = self.numpy_event_2.schema()
         self.event_1._sampling = self.event_2._sampling

@@ -4,12 +4,11 @@ import numpy as np
 
 from temporian.core.data.dtype import DType
 from temporian.core.operators.cast import CastOperator
-from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.feature import (
-    NumpyFeature,
-    DTYPE_REVERSE_MAPPING,
-)
 from temporian.implementation.numpy import implementation_lib
+from temporian.implementation.numpy.data.event import DTYPE_MAPPING
+from temporian.implementation.numpy.data.event import DTYPE_REVERSE_MAPPING
+from temporian.implementation.numpy.data.event import IndexData
+from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -28,7 +27,7 @@ class CastNumpyImplementation(OperatorImplementation):
     def _can_overflow(self, origin_dtype: DType, dst_dtype: DType) -> bool:
         # Don't check overflow for BOOLEAN or STRING:
         #  - boolean: makes no sense, everybody knows what to expect.
-        #  - string: on orig_dtype, too costly to convert to numeric dtype
+        #  - string: on src_dtype, too costly to convert to numeric dtype
         #            and compare to the limit. On dst_type, there's no limit.
         if (
             origin_dtype in self._nocheck_dtypes
@@ -66,40 +65,43 @@ class CastNumpyImplementation(OperatorImplementation):
         # Create new event, some features may be reused
         # NOTE: it's currently faster in the benchmark to run feat/event_idx,
         # but this might need a re-check with future implementations.
-        output = NumpyEvent(data={}, sampling=event.sampling)
-        for feat_idx, feature_name in enumerate(event.feature_names()):
+        dst_event = NumpyEvent(
+            data={},
+            feature_names=event.feature_names,
+            index_names=event.index_names,
+            is_unix_timestamp=event.is_unix_timestamp,
+        )
+        for feat_idx, feature_name in enumerate(event.feature_names):
+            src_dtype = event.dtypes[feature_name]
             dst_dtype = DType(from_features[feature_name])
-            orig_dtype = event.dtypes[feature_name]
-            check_feature = check and self._can_overflow(orig_dtype, dst_dtype)
-            # Numpy dest type
+            check_feature = check and self._can_overflow(src_dtype, dst_dtype)
+            # Numpy destination type
             dst_dtype_np = DTYPE_REVERSE_MAPPING[dst_dtype]
-            for event_index, features in event.data.items():
-                feature = features[feat_idx]
+            for index_key, index_data in event.iterindex():
+                feature = index_data.features[feat_idx]
                 # Initialize row with first feature
                 if feat_idx == 0:
                     idx_features = []
-                    output.data[event_index] = idx_features
+                    dst_event[index_key] = IndexData(
+                        idx_features, index_data.timestamps
+                    )
                 else:
-                    idx_features = output.data[event_index]
+                    idx_features = dst_event[index_key].features
 
                 # Reuse if both features have the same dtype
-                if feature.dtype == dst_dtype:
+                if DTYPE_MAPPING[feature.dtype.type] == dst_dtype:
                     idx_features.append(feature)
                 else:
-                    data = feature.data
                     # Check overflow when needed
                     if check_feature:
-                        self._check_overflow(data, orig_dtype, dst_dtype)
+                        self._check_overflow(feature, src_dtype, dst_dtype)
 
                     # Create new feature
                     idx_features.append(
-                        NumpyFeature(
-                            name=feature_name,
-                            data=data.astype(dst_dtype_np),
-                        )
+                        feature.astype(dst_dtype_np),
                     )
 
-        return {"event": output}
+        return {"event": dst_event}
 
 
 implementation_lib.register_operator_implementation(

@@ -36,6 +36,8 @@ class SelectOperator(Operator):
                 "Unexpected type for feature_names. Expect str or list of"
                 f" str. Got '{feature_names}' instead."
             )
+
+        self._feature_names = feature_names
         self.add_attribute("feature_names", feature_names)
 
         # verify all selected features exist in the input event
@@ -67,6 +69,10 @@ class SelectOperator(Operator):
         )
 
         self.check()
+
+    @property
+    def feature_names(self) -> List[str]:
+        return self._feature_names
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:

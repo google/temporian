@@ -21,12 +21,11 @@ from temporian.core.data.sampling import Sampling
 from temporian.core.operators.calendar.day_of_month import (
     CalendarDayOfMonthOperator,
 )
+from temporian.implementation.numpy.data.event import IndexData
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.operators.calendar.day_of_month import (
     CalendarDayOfMonthNumpyImplementation,
 )
-from temporian.core.data.dtype import DType
 
 
 class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
@@ -45,28 +44,25 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
                 columns=["timestamp"],
             ),
         )
-
         input_event = input_event_data.schema()
-
         output_event_data = NumpyEvent(
             data={
-                (): [
-                    NumpyFeature(
-                        name="calendar_day_of_month",
-                        data=np.array([1, 14, 14, 15]),
-                    ),
-                ],
+                (): IndexData(
+                    [np.array([1, 14, 14, 15]).astype(np.int32)],
+                    input_event_data.first_index_data().timestamps,
+                ),
             },
-            sampling=input_event_data.sampling,
+            feature_names=["calendar_day_of_month"],
+            index_names=[],
+            is_unix_timestamp=True,
         )
-
         operator = CalendarDayOfMonthOperator(input_event)
         impl = CalendarDayOfMonthNumpyImplementation(operator)
         output = impl.call(sampling=input_event_data)
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(
-            output["event"].first_index_features()[0].dtype == DType.INT32
+            output["event"].first_index_data().features[0].dtype == np.int32
         )
 
     def test_with_index(self) -> None:
@@ -84,34 +80,29 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["id"],
         )
-
         input_event = input_event_data.schema()
-
         output_event_data = NumpyEvent(
             data={
-                (1,): [
-                    NumpyFeature(
-                        name="calendar_day_of_month",
-                        data=np.array([1, 14, 14]),
-                    ),
-                ],
-                (2,): [
-                    NumpyFeature(
-                        name="calendar_day_of_month",
-                        data=np.array([14, 15]),
-                    ),
-                ],
+                (1,): IndexData(
+                    [np.array([1, 14, 14]).astype(np.int32)],
+                    input_event_data[(1,)].timestamps,
+                ),
+                (2,): IndexData(
+                    [np.array([14, 15]).astype(np.int32)],
+                    input_event_data[(2,)].timestamps,
+                ),
             },
-            sampling=input_event_data.sampling,
+            feature_names=["calendar_day_of_month"],
+            index_names=["id"],
+            is_unix_timestamp=True,
         )
-
         operator = CalendarDayOfMonthOperator(input_event)
         impl = CalendarDayOfMonthNumpyImplementation(operator)
         output = impl.call(sampling=input_event_data)
 
         self.assertTrue(output_event_data == output["event"])
         self.assertTrue(
-            output["event"].first_index_features()[0].dtype == DType.INT32
+            output["event"].first_index_data().features[0].dtype == np.int32
         )
 
     # TODO: move this test to core operators' test suite when created

@@ -16,9 +16,10 @@ from abc import abstractmethod
 from typing import Dict, Optional, List, Any
 
 import numpy as np
+
 from temporian.core.operators.window.base import BaseWindowOperator
+from temporian.implementation.numpy.data.event import IndexData
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -35,20 +36,28 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
         event: NumpyEvent,
         sampling: Optional[NumpyEvent] = None,
     ) -> Dict[str, NumpyEvent]:
+        # if no sampling is provided, apply operator to the event's own
+        # timestamps
         if sampling is None:
             sampling = event
 
-        dst_event = NumpyEvent(data={}, sampling=sampling.sampling)
-
+        # create destination event
+        dst_event = NumpyEvent(
+            {},
+            feature_names=event.feature_names,
+            index_names=sampling.index_names,
+            is_unix_timestamp=sampling.is_unix_timestamp,
+        )
         # For each index
-        for index, src_features in event.data.items():
+        for index_key, index_data in event.iterindex():
             dst_features = []
-            dst_event.data[index] = dst_features
-            src_timestamps = event.sampling.data[index]
-            sampling_timestamps = sampling.sampling.data[index]
-
+            dst_timestamps = sampling[index_key].timestamps
+            dst_event[index_key] = IndexData(dst_features, dst_timestamps)
             self._compute(
-                src_timestamps, src_features, sampling_timestamps, dst_features
+                src_timestamps=index_data.timestamps,
+                src_features=index_data.features,
+                sampling_timestamps=dst_timestamps,
+                dst_features=dst_features,
             )
 
         return {"event": dst_event}
@@ -60,18 +69,18 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
     def _compute(
         self,
         src_timestamps: np.ndarray,
-        src_features: List[NumpyFeature],
+        src_features: List[np.ndarray],
         sampling_timestamps: np.ndarray,
-        dst_features: List[NumpyFeature],
-    ):
+        dst_features: List[np.ndarray],
+    ) -> None:
         implementation = self._implementation()
         for src_ts in src_features:
-            args = {
+            kwargs = {
                 "event_timestamps": src_timestamps,
-                "event_values": src_ts.data,
+                "event_values": src_ts,
                 "window_length": self.operator.window_length,
             }
-            if self.operator.has_sampling:
-                args["sampling_timestamps"] = sampling_timestamps
-            dst_feature = implementation(**args)
-            dst_features.append(NumpyFeature(src_ts.name, dst_feature))
+            if self._operator.has_sampling:
+                kwargs["sampling_timestamps"] = sampling_timestamps
+            dst_feature = implementation(**kwargs)
+            dst_features.append(dst_feature)

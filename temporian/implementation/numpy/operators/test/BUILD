@@ -219,6 +219,22 @@ py_test(
 )
 
 py_test(
+    name = "calendar_month_test",
+    srcs = ["calendar_month_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:event",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators/calendar:minute",
+        "//temporian/implementation/numpy:evaluator",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:feature",
+        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/operators/calendar:month",
+    ],
+)
+
+py_test(
     name = "calendar_second_test",
     srcs = ["calendar_second_test.py"],
     srcs_version = "PY3",

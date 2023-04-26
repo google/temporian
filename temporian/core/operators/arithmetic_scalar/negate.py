@@ -48,8 +48,8 @@ class NegateOperator(BaseArithmeticScalarOperator):
         return ""
 
     # overriding feature name to be the same as the input feature
-    def output_feature_name(self, feature: Feature) -> str:
-        return feature.name
+    def output_feature_name(self, feature_name: str) -> str:
+        return feature_name
 
     # overriding checking for feature dtype to be the same as value dtype
     @property
