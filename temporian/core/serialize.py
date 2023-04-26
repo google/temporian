@@ -36,6 +36,7 @@ def save(
     """Saves the processor between `inputs` and `outputs` to a file.
 
     Usage example:
+        ```python
         a = t.input_event(...)
         b = t.sma(a, window_length=7)
         t.save(inputs={"io_a": a}, outputs={"io_b": b}, path="processor.tem")
@@ -45,6 +46,7 @@ def save(
             query=outputs["io_b"],
             input_data{inputs["io_a"]: pandas.DataFrame(...)}
         ))
+        ```
 
     Args:
         inputs: Input events. If None, the inputs is inferred. In this case,

@@ -99,18 +99,39 @@ def glue(
     """Concatenates together events with the same sampling.
 
     Example:
+
+        ```
         event_1 = ... # Feature A & B
         event_2 = ... # Feature C & D
         event_3 = ... # Feature E & F
 
         # Output has features A, B, C, D, E & F
         output = np.glue(event_1, event_2, event_3)
+        ```
 
     To concatenate events with a different sampling, use the operator
     'tp.sample(...)' before.
 
+    Example:
+
+        ```
+        # Assume event_1, event_2 and event_3 dont have the same sampling
+        event_1 = ... # Feature A & B
+        event_2 = ... # Feature C & D
+        event_3 = ... # Feature E & F
+
+        # Output has features A, B, C, D, E & F, and the same sampling as
+        # event_1
+        output = np.glue(event_1,
+            tp.sample(event_2, sampling=event_1),
+            tp.sample(event_3, sampling=event_1))
+        ```
+
     Args:
         *events: list of events to glue.
+
+    Returns:
+        The concatenated events.
     """
     # Note: The event should be called "event_{idx}" with idx in [0, MAX_NUM_ARGUMENTS).
     dict_events = {f"event_{idx}": event for idx, event in enumerate(events)}
