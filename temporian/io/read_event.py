@@ -37,7 +37,7 @@ def read_event(
 
 
     Returns:
-        NumpyEvent: NumpyEvent read from file.
+        NumpyEvent read from file.
 
     """
     if index_names is None:

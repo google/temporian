@@ -60,7 +60,7 @@ def moving_count(
 
     Args:
         event: Event for which to count the number of values in each feature.
-        window_length: The sliding window's length.
+        window_length: Sliding window's length.
         sampling: Timestamps to sample the sliding window's value at. If not
             provided, timestamps in `event` are used.
 

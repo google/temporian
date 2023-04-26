@@ -65,8 +65,8 @@ def simple_moving_average(
     or the window does not contain any sampling), outputs missing values.
 
     Args:
-        event: The features to average.
-        window_length: The sliding window's length.
+        event: Features to average.
+        window_length: Sliding window's length.
         sampling: Timestamps to sample the sliding window's value at. If not
             provided, timestamps in `event` are used.
 

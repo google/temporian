@@ -58,8 +58,8 @@ def moving_sum(
     or the window does not contain any sampling), outputs missing values.
 
     Args:
-        event: The features to sum.
-        window_length: The sliding window's length.
+        event: Features to sum.
+        window_length: Sliding window's length.
         sampling: Timestamps to sample the sliding window's value at. If not
             provided, timestamps in `event` are used.
 

@@ -41,7 +41,7 @@ def calendar_day_of_year(sampling: Event) -> Event:
     1 and 366.
 
     Args:
-        sampling: The event to get the days of year from.
+        sampling: Event to get the days of year from.
 
     Returns:
         Event with a single feature corresponding to the day of the year each

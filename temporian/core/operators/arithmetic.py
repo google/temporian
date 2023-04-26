@@ -156,8 +156,7 @@ def sum(
     event_2: Event,
     resolution: Resolution = Resolution.PER_FEATURE_IDX,
 ) -> Event:
-    """
-    Sums two events.
+    """Sums two events.
 
     If resolution is Resolution.PER_FEATURE_IDX each feature in `event_1` will
     be summed to the feature in `event_2` in its same index.

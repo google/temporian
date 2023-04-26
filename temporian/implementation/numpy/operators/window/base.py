@@ -119,9 +119,9 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
         than the number of data points in the time series.
 
         Args:
-            values: the input array, of shape (n, m).
+            values: Input array, of shape (n, m).
 
         Returns:
-            A 1D NumPy array of shape (n,) containing the result for each row in
+            1D NumPy array of shape (n,) containing the result for each row in
             the input array.
         """

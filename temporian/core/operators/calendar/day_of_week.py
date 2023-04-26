@@ -41,7 +41,7 @@ def calendar_day_of_week(sampling: Event) -> Event:
     (Monday) to 6 (Sunday).
 
     Args:
-        sampling: The event to get the days of week from.
+        sampling: Event to get the days of week from.
 
     Returns:
         Event with a single feature corresponding to the day of the week each

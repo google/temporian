@@ -62,8 +62,8 @@ class BaseCalendarNumpyImplementation(OperatorImplementation):
         Returned value is converted to int32 by __call__.
 
         Args:
-            dt: the datetime to get the value from.
+            dt: Datetime to get the value from.
 
         Returns:
-            The numeric value for the datetime.
+            Numeric value for the datetime.
         """

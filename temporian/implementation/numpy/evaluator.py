@@ -36,7 +36,7 @@ def evaluate_schedule(
         schedule: Sequence of operators to apply on the data.
         verbose: If >0, prints details about the execution on the standard error
             output. The larger the number, the more information is displayed.
-        check_execution: If True, data of the intermediate results of the
+        check_execution: If `True`, data of the intermediate results of the
             operators is checked against its expected structure and raises if
             it differs.
     """

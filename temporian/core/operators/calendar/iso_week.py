@@ -41,7 +41,7 @@ def calendar_iso_week(sampling: Event) -> Event:
     1 and 53.
 
     Args:
-        sampling: The event to get the ISO weeks from.
+        sampling: Event to get the ISO weeks from.
 
     Returns:
         Event with a single feature corresponding to the ISO week each timestamp

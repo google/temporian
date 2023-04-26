@@ -31,11 +31,11 @@ class Feature(object):
     "schema") of data during evaluation.
 
     Attributes:
-        creator: the operator that created this feature. Can be None if it
-            wasn't created by an operator.
-        dtype: the feature's data type.
-        name: The name of the feature.
-        sampling: The feature's sampling.
+        creator: Operator that created this feature. Can be None if it wasn't
+            created by an operator.
+        dtype: Feature's data type.
+        name: Name of the feature.
+        sampling: Feature's sampling.
     """
 
     def __init__(

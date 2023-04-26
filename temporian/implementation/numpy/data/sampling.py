@@ -21,10 +21,10 @@ class NumpySampling:
 
     @property
     def has_repeated_timestamps(self) -> bool:
-        """Check if any index has repeated timestamps
+        """Check if any index has repeated timestamps.
 
         Returns:
-            bool: True if any index has repeated timestamps
+            `True` if any index has repeated timestamps.
         """
         for index in self.data:
             if len(self.data[index]) != len(np.unique(self.data[index])):

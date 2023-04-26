@@ -41,7 +41,7 @@ def calendar_second(sampling: Event) -> Event:
     0 and 59.
 
     Args:
-        sampling: The event to get the seconds from.
+        sampling: Event to get the seconds from.
 
     Returns:
         Event with a single feature corresponding to the second each timestamp

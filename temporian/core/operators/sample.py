@@ -75,10 +75,10 @@ def sample(
 ) -> Event:
     """Samples an event at each timestamp of a sampling.
 
-    If a timestamp in 'sampling' does not have a corresponding timestamp in
-    'event', the last timestamp in 'event' is used instead. If this timestamp
-    is anterior to an value in 'event', the value is replaced by
-    dtype.MissingValue(...).
+    If a timestamp in `sampling` does not have a corresponding timestamp in
+    `event`, the last timestamp in `event` is used instead. If this timestamp
+    is anterior to an value in `event`, the value is replaced by
+    `dtype.MissingValue(...)`.
 
     Example:
 
@@ -94,11 +94,11 @@ def sample(
             feature_1: nan, 1.0, 2.0, 4.0
 
     Args:
-        event: The event to sample.
-        sampling: The event to use the sampling of.
+        event: Event to sample.
+        sampling: Event to use the sampling of.
 
     Returns:
-        A sampled event, with same sampling as `sampling`.
+        Sampled event, with same sampling as `sampling`.
     """
 
     return Sample(event=event, sampling=sampling).outputs()["event"]

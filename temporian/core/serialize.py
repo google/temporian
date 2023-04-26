@@ -52,7 +52,7 @@ def save(
         inputs: Input events. If None, the inputs is inferred. In this case,
             input event have to be named.
         outputs: Output events.
-        path: The file path to save to.
+        path: File path to save to.
     """
 
     # TODO: Add support for compressed / binary serialization.
@@ -79,7 +79,7 @@ def load(
             returns an event (instead of a dictionary of events).
 
     Returns:
-        The input and output events.
+        Input and output events.
     """
 
     with open(path, "r") as f:

@@ -41,7 +41,7 @@ def calendar_hour(sampling: Event) -> Event:
     0 and 23.
 
     Args:
-        sampling: The event to get the hours from.
+        sampling: Event to get the hours from.
 
     Returns:
         Event with a single feature corresponding to the hour each timestamp in

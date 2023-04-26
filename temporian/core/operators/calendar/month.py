@@ -45,7 +45,7 @@ def calendar_month(sampling: Event) -> Event:
     1 and 12.
 
     Args:
-        sampling: The event to get the months from.
+        sampling: Event to get the months from.
 
     Returns:
         Event with a single feature corresponding to the month each timestamp in

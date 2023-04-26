@@ -41,7 +41,7 @@ def calendar_day_of_month(sampling: Event) -> Event:
     1 and 31.
 
     Args:
-        sampling: The event to get the days of month from.
+        sampling: Event to get the days of month from.
 
     Returns:
         Event with a single feature corresponding to the day of the month each

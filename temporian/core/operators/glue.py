@@ -128,7 +128,7 @@ def glue(
         ```
 
     Args:
-        *events: list of events to glue.
+        *events: Events to concatenate.
 
     Returns:
         The concatenated events.

@@ -41,7 +41,7 @@ def calendar_minute(sampling: Event) -> Event:
     0 and 59.
 
     Args:
-        sampling: The event to get the minutes from.
+        sampling: Event to get the minutes from.
 
     Returns:
         Event with a single feature corresponding to the minute each timestamp

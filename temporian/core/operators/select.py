@@ -97,8 +97,8 @@ def select(
     """Selects a subset of features from an event.
 
     Args:
-        event: The event to select features from.
-        feature_names: The names of the features to select from the event.
+        event: Event to select features from.
+        feature_names: Names of the features to select from the event.
 
     Returns:
         Event containing only the selected features.

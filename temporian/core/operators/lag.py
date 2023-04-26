@@ -135,7 +135,7 @@ def lag(
         duration: Duration or list of Durations to lag by.
 
     Returns:
-        The lagged event, or list of lagged events if a Duration list was
+        Lagged event, or list of lagged events if a Duration list was
         provided.
     """
     return _implementation(event=event, duration=duration)
@@ -158,7 +158,7 @@ def leak(
         duration: Duration or list of Durations to leak by.
 
     Returns:
-        The leaked event, or list of leaked events if a Duration list was
+        Leaked event, or list of leaked events if a Duration list was
         provided.
     """
     return _implementation(event=event, duration=duration, should_leak=True)

@@ -44,7 +44,7 @@ class ArithmeticNumpyImplementation(OperatorImplementation):
 
         Raises:
             ValueError: If sampling of both events is not equal.
-            NotImplementedError: If resolution is PER_FEATURE_NAME.
+            NotImplementedError: If resolution is `PER_FEATURE_NAME`.
         """
         resolution = self.operator.attributes()["resolution"]
         operation = self.operator.attributes()["operation"]

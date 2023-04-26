@@ -33,7 +33,7 @@ def save_event(
         path: Path to the file.
         sep: Separator to use.
         na_rep: Representation to use for missing values.
-        columns: Columns to save. If None, saves all columns.
+        columns: Columns to save. If `None`, saves all columns.
     """
     df = event.to_dataframe()
     df.to_csv(path, index=False, sep=sep, na_rep=na_rep, columns=columns)

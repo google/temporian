@@ -50,15 +50,14 @@ def evaluate(
             are validated to check any bug in the library internal code. If
             false, checks are skipped.
 
-    TODO: Create an internal configuration object for options such as
-    "check_execution".
-
     Returns:
         An object with the same structure as `event` containing the results.
         If `event` is a dictionary of events, the returned object will be a
         dictionary of event results. If `event` is a list of events, the
         returned value will be a list of event values with the same order.
     """
+    # TODO: Create an internal configuration object for options such as
+    # `check_execution`.
 
     begin_time = time.perf_counter()
 

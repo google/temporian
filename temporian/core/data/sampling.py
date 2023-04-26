@@ -31,10 +31,10 @@ class Sampling(object):
     passed since an experiment's start time).
 
     Attributes:
-        creator: the operator that created this sampling. Can be None if it
-            wasn't created by an operator.
-        index: the names of the columns that compose this sampling's index.
-        is_unix_timestamp: whether values correspond to Unix timestamps.
+        creator: Operator that created this sampling. Can be None if it wasn't
+            created by an operator.
+        index: Names of the columns that compose this sampling's index.
+        is_unix_timestamp: Whether values correspond to Unix timestamps.
     """
 
     def __init__(

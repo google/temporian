@@ -40,7 +40,7 @@ def calendar_year(sampling: Event) -> Event:
     Features in input event are ignored.
 
     Args:
-        sampling: The event to get the years from.
+        sampling: Event to get the years from.
 
     Returns:
         Event with a single feature corresponding to the year each timestamp in

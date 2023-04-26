@@ -62,8 +62,8 @@ def moving_standard_deviation(
     or the window does not contain any sampling), outputs missing values.
 
     Args:
-        event: The features to compute the standard deviation for.
-        window_length:  The sliding window's length.
+        event: Features to compute the standard deviation for.
+        window_length: Sliding window's length.
         sampling: Timestamps to sample the sliding window's value at. If not
             provided, timestamps in `event` are used.
 
