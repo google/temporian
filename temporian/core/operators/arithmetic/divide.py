@@ -53,7 +53,7 @@ operator_lib.register_operator(DivideOperator)
 
 def divide(
     numerator: Event,
-    : Event,
+    denominator: Event,
 ) -> Event:
     """Divides two events.
 

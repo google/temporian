@@ -20,7 +20,7 @@ from temporian.implementation.numpy import implementation_lib
 
 
 class EqualNumpyImplementation(BaseArithmeticNumpyImplementation):
-    """Numpy implementation of arithmetic equal"""
+    """Numpy implementation of the equal operator."""
 
     def __init__(self, operator: EqualOperator) -> None:
         super().__init__(operator)

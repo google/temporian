@@ -8,7 +8,7 @@ from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
 class FilterNumpyImplementation(OperatorImplementation):
-    """Filter timestamps from an event based on a condition."""
+    """Numpy implementation of the filter operator."""
 
     def __init__(self, operator: FilterOperator) -> None:
         super().__init__(operator)

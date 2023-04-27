@@ -23,7 +23,7 @@ from temporian.implementation.numpy import implementation_lib
 
 
 class EqualScalarNumpyImplementation(BaseArithmeticScalarNumpyImplementation):
-    """Numpy implementation for the Equal Operator"""
+    """Numpy implementation of the equal scalar operator."""
 
     def __init__(self, operator: EqualScalarOperator) -> None:
         super().__init__(operator)

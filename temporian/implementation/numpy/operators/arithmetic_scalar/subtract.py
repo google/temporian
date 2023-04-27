@@ -25,7 +25,7 @@ from temporian.implementation.numpy import implementation_lib
 class SubtractScalarNumpyImplementation(
     BaseArithmeticScalarNumpyImplementation
 ):
-    """Numpy implementation to divide second event from the first one"""
+    """Numpy implementation of the subtract scalar operator."""
 
     def __init__(self, operator: SubtractScalarOperator) -> None:
         super().__init__(operator)

@@ -31,21 +31,19 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
     def _do_operation(
         self, event_1_feature: np.ndarray, event_2_feature: np.ndarray
     ) -> np.ndarray:
-        """
-        Perform the actual arithmetic operation corresponding to the subclass
-        """
+        """Performs the arithmetic operation corresponding to the subclass."""
 
     def __call__(
         self, event_1: NumpyEvent, event_2: NumpyEvent
     ) -> Dict[str, NumpyEvent]:
-        """Apply the corresponding arithmetic operation between two Events.
+        """Applies the corresponding arithmetic operation between two events.
 
         Args:
-            event_1: First Event.
-            event_2: Second Event.
+            event_1: First event.
+            event_2: Second event.
 
         Returns:
-            Arithmetic of the two Events according to the operator.
+            Result of the operation.
 
         Raises:
             ValueError: If sampling of both events is not equal.
