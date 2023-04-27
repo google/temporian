@@ -45,7 +45,9 @@ class LagOperator(Operator):
         self.add_attribute("duration", duration)
 
         output_sampling = Sampling(
-            index_levels=event.sampling.index.levels, creator=self
+            index_levels=event.sampling.index.levels,
+            creator=self,
+            is_unix_timestamp=event.sampling.is_unix_timestamp,
         )
 
         # outputs

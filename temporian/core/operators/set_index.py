@@ -48,7 +48,8 @@ class SetIndexOperator(Operator):
             else [
                 (index_name, event.dtypes[index_name])
                 for index_name in feature_names
-            ]
+            ],
+            is_unix_timestamp=event.sampling.is_unix_timestamp,
         )
         # output event
         self.add_output(

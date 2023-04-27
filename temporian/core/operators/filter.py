@@ -54,7 +54,9 @@ class FilterOperator(Operator):
         self.add_input("condition", condition)
 
         output_sampling = Sampling(
-            index_levels=event.sampling.index, creator=self
+            index_levels=event.sampling.index,
+            creator=self,
+            is_unix_timestamp=event.sampling.is_unix_timestamp,
         )
 
         self.condition_name = condition.features[0].name

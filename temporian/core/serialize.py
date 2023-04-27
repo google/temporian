@@ -316,6 +316,7 @@ def _serialize_sampling(src: Sampling) -> pb.Sampling:
         creator_operator_id=(
             _identifier(src.creator) if src.creator is not None else None
         ),
+        is_unix_timestamp=src.is_unix_timestamp,
     )
 
 
@@ -326,6 +327,7 @@ def _unserialize_sampling(src: pb.Sampling) -> Sampling:
             for index_level in src.index.levels
         ],
         creator=None,
+        is_unix_timestamp=src.is_unix_timestamp,
     )
 
 

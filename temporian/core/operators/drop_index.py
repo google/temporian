@@ -48,7 +48,8 @@ class DropIndexOperator(Operator):
                 index_level
                 for index_level in event.sampling.index
                 if index_level.name not in index_to_drop
-            ]
+            ],
+            is_unix_timestamp=event.sampling.is_unix_timestamp,
         )
 
         self.add_output(
