@@ -19,7 +19,6 @@ py_library(
     deps = [
         "//temporian/core/operators/calendar:base",
         "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:feature",
         "//temporian/implementation/numpy/operators:base",
     ],
 )

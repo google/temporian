@@ -12,8 +12,6 @@ py_test(
     deps = [
         # absl/testing:absltest dep,
         "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:feature",
-        "//temporian/implementation/numpy/data:sampling",
     ],
 )
 
@@ -24,17 +22,6 @@ py_test(
     deps = [
         # absl/testing:absltest dep,
         "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:feature",
-        "//temporian/implementation/numpy/data:sampling",
-    ],
-)
-
-py_test(
-    name = "sampling_test",
-    srcs = ["sampling_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        "//temporian/implementation/numpy/data:sampling",
     ],
 )
 

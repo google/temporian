@@ -24,7 +24,6 @@ from temporian.core.operators.unique_timestamps import UniqueTimestamps
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.data.event import IndexData
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 

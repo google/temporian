@@ -210,7 +210,6 @@ py_library(
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:sampling",
     ],
 )
 

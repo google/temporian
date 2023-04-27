@@ -17,31 +17,10 @@ py_library(
     srcs = ["event.py"],
     srcs_version = "PY3",
     deps = [
-        ":feature",
-        ":sampling",
         "//temporian/core/data:dtype",
         "//temporian/core/data:duration",
         "//temporian/core/data:event",
         "//temporian/core/data:sampling",
-        "//temporian/utils:string",
-    ],
-)
-
-py_library(
-    name = "feature",
-    srcs = ["feature.py"],
-    srcs_version = "PY3",
-    deps = [
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:feature",
-    ],
-)
-
-py_library(
-    name = "sampling",
-    srcs = ["sampling.py"],
-    srcs_version = "PY3",
-    deps = [
         "//temporian/utils:string",
     ],
 )

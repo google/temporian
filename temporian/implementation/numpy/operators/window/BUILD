@@ -20,7 +20,6 @@ py_library(
         "//temporian/core/data:duration",
         "//temporian/core/operators/window:base",
         "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:feature",
         "//temporian/implementation/numpy/operators:base",
     ],
 )

@@ -132,8 +132,6 @@ py_test(
         "//temporian/core/operators/calendar:day_of_month",
         "//temporian/implementation/numpy:evaluator",
         "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:feature",
-        "//temporian/implementation/numpy/data:sampling",
         "//temporian/implementation/numpy/operators/calendar:day_of_month",
     ],
 )
@@ -148,8 +146,6 @@ py_test(
         "//temporian/core/operators/calendar:day_of_week",
         "//temporian/implementation/numpy:evaluator",
         "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:feature",
-        "//temporian/implementation/numpy/data:sampling",
         "//temporian/implementation/numpy/operators/calendar:day_of_week",
     ],
 )
@@ -164,8 +160,6 @@ py_test(
         "//temporian/core/operators/calendar:day_of_year",
         "//temporian/implementation/numpy:evaluator",
         "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:feature",
-        "//temporian/implementation/numpy/data:sampling",
         "//temporian/implementation/numpy/operators/calendar:day_of_year",
     ],
 )
@@ -180,8 +174,6 @@ py_test(
         "//temporian/core/operators/calendar:hour",
         "//temporian/implementation/numpy:evaluator",
         "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:feature",
-        "//temporian/implementation/numpy/data:sampling",
         "//temporian/implementation/numpy/operators/calendar:hour",
     ],
 )
@@ -196,8 +188,6 @@ py_test(
         "//temporian/core/operators/calendar:iso_week",
         "//temporian/implementation/numpy:evaluator",
         "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:feature",
-        "//temporian/implementation/numpy/data:sampling",
         "//temporian/implementation/numpy/operators/calendar:iso_week",
     ],
 )
@@ -212,8 +202,6 @@ py_test(
         "//temporian/core/operators/calendar:minute",
         "//temporian/implementation/numpy:evaluator",
         "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:feature",
-        "//temporian/implementation/numpy/data:sampling",
         "//temporian/implementation/numpy/operators/calendar:minute",
     ],
 )
@@ -228,8 +216,6 @@ py_test(
         "//temporian/core/operators/calendar:minute",
         "//temporian/implementation/numpy:evaluator",
         "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:feature",
-        "//temporian/implementation/numpy/data:sampling",
         "//temporian/implementation/numpy/operators/calendar:month",
     ],
 )
@@ -244,8 +230,6 @@ py_test(
         "//temporian/core/operators/calendar:second",
         "//temporian/implementation/numpy:evaluator",
         "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:feature",
-        "//temporian/implementation/numpy/data:sampling",
         "//temporian/implementation/numpy/operators/calendar:second",
     ],
 )
@@ -260,8 +244,6 @@ py_test(
         "//temporian/core/operators/calendar:year",
         "//temporian/implementation/numpy:evaluator",
         "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:feature",
-        "//temporian/implementation/numpy/data:sampling",
         "//temporian/implementation/numpy/operators/calendar:year",
     ],
 )
@@ -286,7 +268,6 @@ py_test(
         # absl/testing:absltest dep,
         "//temporian/core/operators:drop_index",
         "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:sampling",
         "//temporian/implementation/numpy/operators:drop_index",
     ],
 )
@@ -314,7 +295,6 @@ py_test(
         "//temporian/core/data:sampling",
         "//temporian/core/operators:set_index",
         "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:sampling",
         "//temporian/implementation/numpy/operators:set_index",
     ],
 )
@@ -430,4 +410,3 @@ py_test(
         "//temporian/implementation/numpy/operators:unique_timestamps",
     ],
 )
-    
