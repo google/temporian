@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Subtract a scalar from an event"""
+"""Subtract scalar operator class and public API function definition."""
+
 from typing import Union, List
 
 from temporian.core import operator_lib
@@ -24,11 +25,6 @@ from temporian.core.operators.arithmetic_scalar.base import (
 
 
 class SubtractScalarOperator(BaseArithmeticScalarOperator):
-    """
-    Subtract a scalar from an event, feature to feature according to their
-    position.
-    """
-
     @classmethod
     @property
     def operator_def_key(cls) -> str:
@@ -58,12 +54,16 @@ def subtract_scalar(
     minuend: Union[Event, SCALAR],
     subtrahend: Union[Event, SCALAR],
 ) -> Event:
-    """
-    Subtracts the subtrahend from the minuend and returns the difference.
+    """Subtracts an event and a scalar value.
+
+    Each item in each feature in the event is subtracted with the scalar value.
+
+    Either `minuend` or `subtrahend` should be a scalar value, but not both. If
+    looking to subtract two events, use the `subtract` operator instead.
 
     Args:
-        minuend: The number or event being subtracted from.
-        subtrahend: The number or event being subtracted.
+        minuend: The event or scalar value being subtracted from.
+        subtrahend: The event or scalar number being subtracted.
 
     Returns:
         Event: Event with the difference between the minuend and subtrahend.

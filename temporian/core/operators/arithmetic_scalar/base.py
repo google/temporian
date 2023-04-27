@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Base class for arithmetic scalar operators"""
+"""Base arithmetic scalar operator class definition."""
+
 from typing import Union, List
 from abc import abstractmethod
 
@@ -24,7 +25,7 @@ from temporian.proto import core_pb2 as pb
 
 
 class BaseArithmeticScalarOperator(Operator):
-    """Base Arithmetic scalar operator."""
+    """Interface definition and common logic for arithmetic scalar operators."""
 
     def __init__(
         self,
@@ -117,12 +118,12 @@ class BaseArithmeticScalarOperator(Operator):
     @property
     @abstractmethod
     def operator_def_key(cls) -> str:
-        """Get the key of the operator definition."""
+        """Gets the key of the operator definition."""
 
     @property
     @abstractmethod
     def prefix(self) -> str:
-        """Get the prefix to use for the output features."""
+        """Gets the prefix to use for the output features."""
 
     @property
     @abstractmethod
@@ -137,5 +138,5 @@ class BaseArithmeticScalarOperator(Operator):
 
     @property
     def ignore_value_dtype_checking(self) -> bool:
-        """Return True if we want to ignore the value dtype checking."""
+        """Returns True if we want to ignore the value dtype checking."""
         return False

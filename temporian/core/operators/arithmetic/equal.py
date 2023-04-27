@@ -45,7 +45,7 @@ def equal(
     event_1: Event,
     event_2: Event,
 ) -> Event:
-    """Compares two events.
+    """Checks for equality between two events.
 
     Each feature in `event_1` is compared element-wise to the feature in
     `event_2` in the same position.
