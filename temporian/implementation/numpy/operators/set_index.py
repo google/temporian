@@ -5,9 +5,9 @@ import numpy as np
 
 from temporian.core.operators.set_index import SetIndexOperator
 from temporian.implementation.numpy import implementation_lib
-from temporian.implementation.numpy.data.event_set import DTYPE_REVERSE_MAPPING
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.event_set import IndexData
+from temporian.implementation.numpy.data.event_set import DTYPE_REVERSE_MAPPING
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -52,30 +52,28 @@ def _append_impl(evset: EventSet, append_feat_names: List[str]) -> EventSet:
         for pos, feat_name in enumerate(evset.feature_names)
         if feat_name not in append_feat_names
     }
-    # initialize destination evset & sampling data
+    # initialize destination event & sampling data
     dst_evset = {}
-    for src_idx_lvl, src_idx_lvl_data in evset.iterindex():
-        dst_idx_suffs = [
-            tuple(x)
-            for x in zip(*[src_idx_lvl_data.features[i] for i in dst_idx_pos])
-        ]
-        for target_dst_idx_suff in set(dst_idx_suffs):
-            # find all occurrences of destination suff in source event set
-            dst_idx_suff_pos = [
-                idx
-                for idx, dst_idx_suff in enumerate(dst_idx_suffs)
-                if dst_idx_suff == target_dst_idx_suff
-            ]
+    for src_idx_key, src_idx_data in evset.iterindex():
+        # constructing the dict of unique tuples and their positions
+        dst_idx_suffs = defaultdict(list)
+        for i, tpl in enumerate(
+            zip(*[src_idx_data.features[j] for j in dst_idx_pos])
+        ):
+            tpl = tuple(tpl)
+            dst_idx_suffs[tpl].append(i)
+
+        for target_dst_idx_suff, dst_idx_suff_pos in dst_idx_suffs.items():
             # create destination index
-            dst_idx_lvl = src_idx_lvl + tuple(target_dst_idx_suff)
+            dst_idx_lvl = src_idx_key + tuple(target_dst_idx_suff)
 
             dst_evset[dst_idx_lvl] = IndexData(
                 [
-                    evset[src_idx_lvl].features[feat_pos][dst_idx_suff_pos]
-                    for feat_name, feat_pos in dst_feat_pos.items()
+                    src_idx_data.features[feat_pos][dst_idx_suff_pos]
+                    for feat_pos in dst_feat_pos.values()
                 ],
                 # fill sampling data
-                evset[src_idx_lvl].timestamps[dst_idx_suff_pos],
+                src_idx_data.timestamps[dst_idx_suff_pos],
             )
 
     # finally, sort according to timestamps. TODO: this is merging sorted
@@ -118,26 +116,26 @@ def _set_impl(evset: EventSet, set_feat_names: List[str]) -> EventSet:
         for pos, feat_name in enumerate(evset.feature_names)
         if feat_name not in set_feat_names
     }
-    # intialize empty dict mapping destination index levels to block lengths
+    # intialize empty dict mapping destination index levels to timestamps &
+    # features
     dst_idx_metadata = defaultdict(
         lambda: {
             "timestamps": [],
-            "features": {feat_name: [] for feat_name in dst_feat_pos},
+            "features": [[] for _ in dst_feat_pos],
         }
     )
-    # loop over source index levels gathering destination indexes
-    for src_idx_lvl, src_idx_lvl_data in evset.iterindex():
-        dst_idx_lvls = [
-            tuple(x)
-            for x in zip(*[src_idx_lvl_data.features[i] for i in dst_idx_pos])
-        ]
-        for i, dst_idx_lvl in enumerate(dst_idx_lvls):
+    # loop over source index levels gathering destination index data
+    for src_idx_data in evset.data.values():
+        for i, tpl in enumerate(
+            zip(*[src_idx_data.features[j] for j in dst_idx_pos])
+        ):
+            dst_idx_lvl = tuple(tpl)
             dst_idx_metadata[dst_idx_lvl]["timestamps"].append(
-                evset[src_idx_lvl].timestamps[i]
+                src_idx_data.timestamps[i]
             )
-            for feat_name, feat_pos in dst_feat_pos.items():
-                dst_idx_metadata[dst_idx_lvl]["features"][feat_name].append(
-                    src_idx_lvl_data.features[feat_pos][i]
+            for j, feat_pos in enumerate(dst_feat_pos.values()):
+                dst_idx_metadata[dst_idx_lvl]["features"][j].append(
+                    src_idx_data.features[feat_pos][i]
                 )
 
     # create destination evset
@@ -145,10 +143,10 @@ def _set_impl(evset: EventSet, set_feat_names: List[str]) -> EventSet:
         dst_idx_lvl: IndexData(
             [
                 np.array(
-                    metadata["features"][feat_name],
+                    metadata["features"][i],
                     dtype=DTYPE_REVERSE_MAPPING[evset.dtypes[feat_name]],
                 )
-                for feat_name in dst_feat_pos
+                for i, feat_name in enumerate(dst_feat_pos)
             ],
             np.array(metadata["timestamps"], dtype=float),
         )
