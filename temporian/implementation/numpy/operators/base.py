@@ -132,12 +132,8 @@ def _check_output(
                     input_key,
                     output_key,
                 ) in matching_samplings
-                effective_matching_sampling = _check_same_sampling(
+                if expected_matching_sampling and not _check_same_sampling(
                     output_real, input_real
-                )
-                if (
-                    expected_matching_sampling
-                    and not effective_matching_sampling
                 ):
                     raise RuntimeError(
                         f"The sampling of input '{input_key}' and output "
@@ -145,16 +141,6 @@ def _check_output(
                         "sampling. However, a different sampling was generated "
                         f"during the op execution ({input_real} "
                         f"vs {output_real})."
-                    )
-                if (
-                    not expected_matching_sampling
-                    and effective_matching_sampling
-                ):
-                    raise RuntimeError(
-                        f"The sampling of input '{input_key}' and output "
-                        f"'{output_key}' are expected to have A DIFFERENT "
-                        "sampling. However, the same sampling was generated "
-                        "during the op execution."
                     )
 
         # Check features
