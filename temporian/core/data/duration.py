@@ -35,23 +35,23 @@ def milliseconds(value: float) -> Duration:
 
 
 def seconds(value: float) -> Duration:
-    return value
+    return Duration(value)
 
 
 def minutes(value: float) -> Duration:
-    return value * 60
+    return Duration(value * 60)
 
 
 def hours(value: float) -> Duration:
-    return value * 60 * 60
+    return Duration(value * 60 * 60)
 
 
 def days(value: float) -> Duration:
-    return value * 60 * 60 * 24
+    return Duration(value * 60 * 60 * 24)
 
 
 def weeks(value: float) -> Duration:
-    return value * 60 * 60 * 24 * 7
+    return Duration(value * 60 * 60 * 24 * 7)
 
 
 def convert_date_to_duration(date: Timestamp) -> Duration:
