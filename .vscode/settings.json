@@ -28,4 +28,11 @@
     "files.trimFinalNewlines": true,
     "files.trimTrailingWhitespace": true,
     "prettier.tabWidth": 2,
+    "files.associations": {
+        "system_error": "cpp",
+        "type_traits": "cpp",
+        "xtr1common": "cpp",
+        "xutility": "cpp",
+        "limits": "cpp"
+    }
 }

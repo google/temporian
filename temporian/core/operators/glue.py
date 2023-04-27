@@ -22,7 +22,7 @@ from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 # Maximum number of arguments taken by the glue operator
-MAX_NUM_ARGUMENTS = 10
+MAX_NUM_ARGUMENTS = 30
 
 
 class GlueOperator(Operator):
@@ -49,21 +49,22 @@ class GlueOperator(Operator):
         first_sampling = None
         for key, event in dict_events.items():
             self.add_input(key, event)
-            output_features.extend(event.features())
+            output_features.extend(event.features)
 
-            for f in event.features():
-                if f.name() in feature_names:
+            for f in event.features:
+                if f.name in feature_names:
                     raise ValueError(
-                        f"Feature {f.name()} is defined in multiple "
-                        "input events."
+                        f'Feature "{f.name}" is defined in multiple input'
+                        " events."
                     )
-                feature_names.add(f.name())
+                feature_names.add(f.name)
 
             if first_sampling is None:
-                first_sampling = event.sampling()
-            elif event.sampling() is not first_sampling:
+                first_sampling = event.sampling
+            elif event.sampling is not first_sampling:
                 raise ValueError(
-                    "All the events do not have the same sampling."
+                    "All glue arguments should have the same sampling."
+                    f" {first_sampling} is different from {event.sampling}."
                 )
 
         # outputs
@@ -122,7 +123,7 @@ def glue(
 
         # Output has features A, B, C, D, E & F, and the same sampling as
         # event_1
-        output = np.glue(event_1,
+        output = tp.glue(event_1,
             tp.sample(event_2, sampling=event_1),
             tp.sample(event_3, sampling=event_1))
         ```
@@ -133,6 +134,9 @@ def glue(
     Returns:
         The concatenated events.
     """
+    if len(events) == 1:
+        return events[0]
+
     # Note: The event should be called "event_{idx}" with idx in [0, MAX_NUM_ARGUMENTS).
     dict_events = {f"event_{idx}": event for idx, event in enumerate(events)}
-    return GlueOperator(**dict_events).outputs()["event"]
+    return GlueOperator(**dict_events).outputs["event"]

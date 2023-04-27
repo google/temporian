@@ -47,4 +47,4 @@ def calendar_iso_week(sampling: Event) -> Event:
         Event with a single feature corresponding to the ISO week each timestamp
         in `event`'s sampling belongs to, with the same sampling as `event`.
     """
-    return CalendarISOWeekOperator(sampling).outputs()["event"]
+    return CalendarISOWeekOperator(sampling).outputs["event"]

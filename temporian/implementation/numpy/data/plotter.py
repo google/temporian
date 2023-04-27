@@ -1,9 +1,10 @@
-from typing import NamedTuple, Optional, Union, List, Any
-from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.core.data import duration
 import datetime
+from typing import NamedTuple, Optional, Union, List
 
 import numpy as np
+
+from temporian.core.data import duration
+from temporian.implementation.numpy.data.event import NumpyEvent
 
 DEFAULT_BACKEND = "matplotlib"
 
@@ -17,42 +18,51 @@ class Options(NamedTuple):
     max_points: Optional[int]
     min_time: Optional[duration.Timestamp]
     max_time: Optional[duration.Timestamp]
+    max_num_plots: int
 
 
 def plot(
-    event: Union[List[NumpyEvent], NumpyEvent],
-    index: Optional[Union[tuple, Any]] = (),
+    events: Union[List[NumpyEvent], NumpyEvent],
+    indexes: Optional[Union[tuple, List[tuple]]] = None,
     backend: str = DEFAULT_BACKEND,
     width_px: int = 1024,
     height_per_plot_px: int = 150,
     max_points: Optional[int] = None,
     min_time: Optional[duration.Timestamp] = None,
     max_time: Optional[duration.Timestamp] = None,
+    max_num_plots: int = 20,
 ):
     """Plots an event.
 
     Args:
-        index: Index of the event to plot. Use `event.index()` for the list of
-            available indices. If index=None, select arbitrarily (non
-            deterministically) an index to plot.
+        events: Single event, or list of events, to plot.
+        indexes: Indexes of the event to plot. Use 'event.index' for the
+            list of available indices. If index=None, plots all its indexes.
         backend: Plotting library to use.
         width_px: Width of the figure in pixel.
         height_per_plot_px: Height of each sub-plot (one per feature) in pixel.
         max_points: Maximum number of points to plot.
-        min_time: If set, only plot events after `min_time`.
-        max_time: If set, only plot events before `max_time`.
+        min_time: If set, only plot events after it.
+        max_time: If set, only plot events before it.
+        max_num_plots: Maximum number of plots to display. If more plots are
+          available, only plot the first `max_num_plots` ones and print a
+          warning.
     """
 
-    if isinstance(event, list):
-        events = event
-    else:
-        events = [event]
+    if not isinstance(events, list):
+        events = [events]
 
-    if index is None and len(events) > 0:
-        index = events[0]._first_index_value
+    if len(events) == 0:
+        raise ValueError("Events is empty")
 
-    if not isinstance(index, tuple):
-        index = (index,)
+    if indexes is None:
+        indexes = [events[0].first_index_key()]
+    elif isinstance(indexes, tuple):
+        indexes = [indexes]
+
+    for index in indexes:
+        if not isinstance(index, tuple):
+            raise ValueError("An index should be a tuple or a list of tuples")
 
     options = Options(
         backend=backend,
@@ -61,6 +71,7 @@ def plot(
         max_points=max_points,
         min_time=min_time,
         max_time=max_time,
+        max_num_plots=max_num_plots,
     )
 
     if backend not in BACKENDS:
@@ -69,10 +80,12 @@ def plot(
             f"backends: {BACKENDS}"
         )
 
-    return BACKENDS[backend](events=events, index=index, options=options)
+    return BACKENDS[backend](events=events, indexes=indexes, options=options)
 
 
-def _plot_matplotlib(events: List[NumpyEvent], index: tuple, options: Options):
+def _plot_matplotlib(
+    events: List[NumpyEvent], indexes: List[tuple], options: Options
+):
     import matplotlib.pyplot as plt
     from matplotlib.cm import get_cmap
 
@@ -81,21 +94,29 @@ def _plot_matplotlib(events: List[NumpyEvent], index: tuple, options: Options):
     px = 1 / plt.rcParams["figure.dpi"]
 
     num_plots = 0
-    for event in events:
-        if index not in event.data:
-            raise ValueError(
-                f"Index '{index}' does not exist in event. Check the available"
-                " indexes with 'event.index()' and provide one of those index"
-                " to the 'index' argument of 'plot'. Alternatively, set "
-                '"index=None" to select a random index value (e.g., '
-                f"{event._first_index_value}."
-            )
-        num_features = len(event.feature_names)
-        if num_features == 0:
-            # We plot the sampling
-            num_features = 1
-        num_plots += num_features
+    for index in indexes:
+        for event in events:
+            if index not in event.data:
+                raise ValueError(
+                    f"Index '{index}' does not exist in event. Check the"
+                    " available indexes with 'event.index' and provide one of"
+                    " those index to the 'index' argument of 'plot'."
+                    ' Alternatively, set "index=None" to select a random'
+                    f" index value (e.g., {event.first_index_value()}."
+                )
+            num_features = len(event.feature_names)
+            if num_features == 0:
+                # We plot the sampling
+                num_features = 1
+            num_plots += num_features
 
+    if num_plots > options.max_num_plots:
+        print(
+            f"The number of plots ({num_plots}) is larger than "
+            f'"options.max_num_plots={options.max_num_plots}". Only the first '
+            "plots will be printed."
+        )
+        num_plots = options.max_num_plots
     fig, axs = plt.subplots(
         num_plots,
         figsize=(
@@ -106,67 +127,87 @@ def _plot_matplotlib(events: List[NumpyEvent], index: tuple, options: Options):
     )
 
     plot_idx = 0
-    for event in events:
-        feature_names = event.feature_names
+    for index in indexes:
+        if plot_idx >= num_plots:
+            break
+        for event in events:
+            if plot_idx >= num_plots:
+                break
 
-        xs = event.sampling.data[index]
-        if options.max_points is not None and len(xs) > options.max_points:
-            xs = xs[: options.max_points]
+            title = str(index)
 
-        if event.sampling.is_unix_timestamp:
-            xs = [
-                datetime.datetime.fromtimestamp(x, tz=datetime.timezone.utc)
-                for x in xs
-            ]
+            feature_names = event.feature_names
 
-        if len(feature_names) == 0:
-            # Plot the ticks
+            xs = event.data[index].timestamps
+            if options.max_points is not None and len(xs) > options.max_points:
+                xs = xs[: options.max_points]
 
-            ax = axs[plot_idx, 0]
+            if event.is_unix_timestamp:
+                xs = [
+                    datetime.datetime.fromtimestamp(x, tz=datetime.timezone.utc)
+                    for x in xs
+                ]
 
-            _matplotlib_sub_plot(
-                ax=ax,
-                xs=xs,
-                ys=np.zeros(len(xs)),
-                options=options,
-                color=colors[feature_idx % len(colors)],
-                name="[sampling]",
-                marker="+",
-                is_unix_timestamp=event.sampling.is_unix_timestamp,
-            )
+            if len(feature_names) == 0:
+                # Plot the ticks
 
-            plot_idx += 1
+                ax = axs[plot_idx, 0]
 
-        for feature_idx, feature_name in enumerate(feature_names):
-            ax = axs[plot_idx, 0]
+                _matplotlib_sub_plot(
+                    ax=ax,
+                    xs=xs,
+                    ys=np.zeros(len(xs)),
+                    options=options,
+                    color=colors[0],
+                    name="[sampling]",
+                    marker="+",
+                    is_unix_timestamp=event.is_unix_timestamp,
+                    title=title,
+                )
+                # Only print the index once
+                title = None
 
-            ys = event.data[index][feature_idx].data
-            if options.max_points is not None and len(ys) > options.max_points:
-                ys = ys[: options.max_points]
+                plot_idx += 1
 
-            _matplotlib_sub_plot(
-                ax=ax,
-                xs=xs,
-                ys=ys,
-                options=options,
-                color=colors[feature_idx % len(colors)],
-                name=feature_name,
-                is_unix_timestamp=event.sampling.is_unix_timestamp,
-            )
+            for feature_idx, feature_name in enumerate(feature_names):
+                if plot_idx >= num_plots:
+                    break
 
-            plot_idx += 1
+                ax = axs[plot_idx, 0]
+
+                ys = event.data[index].features[feature_idx]
+                if (
+                    options.max_points is not None
+                    and len(ys) > options.max_points
+                ):
+                    ys = ys[: options.max_points]
+
+                _matplotlib_sub_plot(
+                    ax=ax,
+                    xs=xs,
+                    ys=ys,
+                    options=options,
+                    color=colors[feature_idx % len(colors)],
+                    name=feature_name,
+                    is_unix_timestamp=event.is_unix_timestamp,
+                    title=title,
+                )
+
+                # Only print the index once
+                title = None
+
+                plot_idx += 1
 
     fig.tight_layout()
     return fig
 
 
 def _matplotlib_sub_plot(
-    ax, xs, ys, options, color, name, is_unix_timestamp, **wargs
+    ax, xs, ys, options, color, name, is_unix_timestamp, title, **wargs
 ):
     import matplotlib.ticker as ticker
 
     ax.plot(xs, ys, lw=0.5, color=color, **wargs)
-
     if options.min_time is not None or options.max_time is not None:
         args = {}
         if options.min_time is not None:
@@ -193,6 +234,8 @@ def _matplotlib_sub_plot(
     ax.yaxis.set_minor_locator(ticker.NullLocator())
 
     ax.grid(lw=0.4, ls="--", axis="x")
+    if title:
+        ax.set_title(title)
 
 
 BACKENDS = {"matplotlib": _plot_matplotlib}

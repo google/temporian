@@ -71,8 +71,29 @@ message Operator {
       int64 integer_64 = 2;
       string str = 3;
       double float_64 = 4;
+      ListString list_str = 5;
+      bool boolean = 6;
+      MapStrStr map_str_str = 7;
+    }
+
+    message ListString{
+      repeated string value = 1;
+    }
+    message MapStrStr{
+      map<string, string> value = 1;
     }
   }
+}
+
+// Data types
+enum DType {
+  UNDEFINED = 0;
+  FLOAT64 = 1;
+  INT64 = 2;
+  FLOAT32 = 3;
+  INT32 = 4;
+  BOOLEAN = 5;
+  STRING = 6;
 }
 
 // Schema of an event
@@ -106,14 +127,18 @@ message Feature {
   optional string sampling_id = 4;
 
   optional string creator_operator_id = 5;
+}
 
-  enum DType {
-    UNDEFINED = 0;
-    FLOAT64 = 1;
-    INT64 = 2;
-    FLOAT32 = 3;
-    INT32 = 4;
+message Index {
+  message IndexLevel {
+    // Index level names
+    optional string name = 1;
+
+    // Index level dtypes
+    optional DType dtype = 2;
   }
+
+  repeated IndexLevel levels = 1;
 }
 
 // Schema of a sampling.
@@ -123,7 +148,7 @@ message Sampling {
   optional string id = 1;
 
   // Index of the sampling.
-  repeated string index = 2;
+  optional Index index = 2;
 
   // Index of the event id who's operator creator also created this feature.
   optional string creator_operator_id = 3;
@@ -157,7 +182,7 @@ message OperatorDef {
   }
 
   message Attribute {
-    // String identifier of the atrribute. Should be unique.
+    // String identifier of the attribute. Should be unique.
     optional string key = 1;
 
     // What type of data is expected.
@@ -172,6 +197,9 @@ message OperatorDef {
       STRING = 2;
       REPEATED_STRING=3;
       FLOAT_64 = 4;
+      BOOL = 5;
+      ANY = 6;
+      MAP_STR_STR = 7;
     }
   }
 }

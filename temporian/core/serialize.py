@@ -14,18 +14,18 @@
 
 """Serialization / unserialization of a processor and its components."""
 
-from typing import Set, Union, Any, Dict, Tuple, Optional
+from typing import Set, Any, Dict, Tuple, Optional, Mapping
 
 from google.protobuf import text_format
 
+from temporian.core import operator_lib
+from temporian.core import processor
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators import base
-from temporian.core.data import dtype as dtype_lib
-from temporian.core import operator_lib
+from temporian.core.data.dtype import DType
 from temporian.proto import core_pb2 as pb
-from temporian.core import processor
 
 
 def save(
@@ -38,7 +38,7 @@ def save(
     Usage example:
         ```python
         a = t.input_event(...)
-        b = t.sma(a, window_length=7)
+        b = t.sma(a, window_length=7.0)
         t.save(inputs={"io_a": a}, outputs={"io_b": b}, path="processor.tem")
 
         inputs, outputs = t.load(path="processor.tem")
@@ -86,8 +86,8 @@ def load(
         proto = text_format.Parse(f.read(), pb.Processor())
     p = unserialize(proto)
 
-    inputs = p.inputs()
-    outputs = p.outputs()
+    inputs = p.inputs
+    outputs = p.outputs
 
     if squeeze and len(inputs) == 1:
         inputs = list(inputs.values())[0]
@@ -102,14 +102,12 @@ def serialize(src: processor.Preprocessor) -> pb.Processor:
     """Serializes a processor into a protobuffer."""
 
     return pb.Processor(
-        operators=[_serialize_operator(o) for o in src.operators()],
-        events=[_serialize_event(e) for e in src.events()],
-        features=[_serialize_feature(f) for f in src.features()],
-        samplings=[_serialize_sampling(s) for s in src.samplings()],
-        inputs=[_serialize_io_signature(k, e) for k, e in src.inputs().items()],
-        outputs=[
-            _serialize_io_signature(k, e) for k, e in src.outputs().items()
-        ],
+        operators=[_serialize_operator(o) for o in src.operators],
+        events=[_serialize_event(e) for e in src.events],
+        features=[_serialize_feature(f) for f in src.features],
+        samplings=[_serialize_sampling(s) for s in src.samplings],
+        inputs=[_serialize_io_signature(k, e) for k, e in src.inputs.items()],
+        outputs=[_serialize_io_signature(k, e) for k, e in src.outputs.items()],
     )
 
 
@@ -133,30 +131,30 @@ def unserialize(src: pb.Processor) -> processor.Preprocessor:
 
     for src_event in src.events:
         if src_event.creator_operator_id:
-            events[src_event.id].set_creator(
-                get_creator(src_event.creator_operator_id)
+            events[src_event.id].creator = get_creator(
+                src_event.creator_operator_id
             )
     for src_feature in src.features:
         if src_feature.creator_operator_id:
-            features[src_feature.id].set_creator(
-                get_creator(src_feature.creator_operator_id)
+            features[src_feature.id].creator = get_creator(
+                src_feature.creator_operator_id
             )
     for src_sampling in src.samplings:
         if src_sampling.creator_operator_id:
-            samplings[src_sampling.id].set_creator(
-                get_creator(src_sampling.creator_operator_id)
+            samplings[src_sampling.id].creator = get_creator(
+                src_sampling.creator_operator_id
             )
 
     # Copy extracted items.
     p = processor.Preprocessor()
     for sampling in samplings.values():
-        p.samplings().add(sampling)
+        p.samplings.add(sampling)
     for event in events.values():
-        p.events().add(event)
+        p.events.add(event)
     for feature in features.values():
-        p.features().add(feature)
+        p.features.add(feature)
     for operator in operators.values():
-        p.operators().add(operator)
+        p.operators.add(operator)
 
     # IO Signature
     def get_event(event_id: str) -> Event:
@@ -165,10 +163,10 @@ def unserialize(src: pb.Processor) -> processor.Preprocessor:
         return events[event_id]
 
     for item in src.inputs:
-        p.inputs()[item.key] = get_event(item.event_id)
+        p.inputs[item.key] = get_event(item.event_id)
 
     for item in src.outputs:
-        p.outputs()[item.key] = get_event(item.event_id)
+        p.outputs[item.key] = get_event(item.event_id)
 
     return p
 
@@ -189,14 +187,14 @@ def _serialize_operator(src: base.Operator) -> pb.Operator:
         operator_def_key=src.definition().key,
         inputs=[
             pb.Operator.EventArgument(key=k, event_id=_identifier(v))
-            for k, v in src.inputs().items()
+            for k, v in src.inputs.items()
         ],
         outputs=[
             pb.Operator.EventArgument(key=k, event_id=_identifier(v))
-            for k, v in src.outputs().items()
+            for k, v in src.outputs.items()
         ],
         attributes=[
-            _attribute_to_proto(k, v) for k, v in src.attributes().items()
+            _attribute_to_proto(k, v) for k, v in src.attributes.items()
         ],
     )
 
@@ -216,46 +214,46 @@ def _unserialize_operator(
     attribute_args = {x.key: _attribute_from_proto(x) for x in src.attributes}
 
     # We construct the operator.
-    op = operator_class(**input_args, **attribute_args)
+    op: base.Operator = operator_class(**input_args, **attribute_args)
 
     # Check that the operator signature matches the expected one.
-    if op.inputs().keys() != input_args.keys():
+    if op.inputs.keys() != input_args.keys():
         raise ValueError(
             f"Restoring the operator {src.operator_def_key} lead "
             "to an unexpected input signature. "
-            f"Expected: {input_args.keys()} Effective: {op.inputs().keys()}"
+            f"Expected: {input_args.keys()} Effective: {op.inputs.keys()}"
         )
 
-    if op.outputs().keys() != output_args.keys():
+    if op.outputs.keys() != output_args.keys():
         raise ValueError(
             f"Restoring the operator {src.operator_def_key} lead "
             "to an unexpected output signature. "
-            f"Expected: {output_args.keys()} Effective: {op.outputs().keys()}"
+            f"Expected: {output_args.keys()} Effective: {op.outputs.keys()}"
         )
 
-    if op.attributes().keys() != attribute_args.keys():
+    if op.attributes.keys() != attribute_args.keys():
         raise ValueError(
             f"Restoring the operator {src.operator_def_key} lead to an"
             " unexpected attributes signature. Expected:"
-            f" {attribute_args.keys()} Effective: {op.attributes().keys()}"
+            f" {attribute_args.keys()} Effective: {op.attributes.keys()}"
         )
     # TODO: Deep check of equality of the inputs / outputs / attributes
 
     # Override the inputs / outputs / attributes
-    op.set_inputs(input_args)
-    op.set_outputs(output_args)
-    op.set_attributes(attribute_args)
+    op.inputs = input_args
+    op.outputs = output_args
+    op.attributes = attribute_args
     return op
 
 
 def _serialize_event(src: Event) -> pb.Event:
     return pb.Event(
         id=_identifier(src),
-        sampling_id=_identifier(src.sampling()),
-        feature_ids=[_identifier(f) for f in src.features()],
-        name=src.name(),
+        sampling_id=_identifier(src.sampling),
+        feature_ids=[_identifier(f) for f in src.features],
+        name=src.name,
         creator_operator_id=(
-            _identifier(src.creator()) if src.creator() is not None else None
+            _identifier(src.creator) if src.creator is not None else None
         ),
     )
 
@@ -282,11 +280,11 @@ def _unserialize_event(
 def _serialize_feature(src: Feature) -> pb.Feature:
     return pb.Feature(
         id=_identifier(src),
-        name=src.name(),
-        dtype=_serialize_dtype(src.dtype()),
-        sampling_id=_identifier(src.sampling()),
+        name=src.name,
+        dtype=_serialize_dtype(src.dtype),
+        sampling_id=_identifier(src.sampling),
         creator_operator_id=(
-            _identifier(src.creator()) if src.creator() is not None else None
+            _identifier(src.creator) if src.creator is not None else None
         ),
     )
 
@@ -308,62 +306,96 @@ def _unserialize_feature(
 def _serialize_sampling(src: Sampling) -> pb.Sampling:
     return pb.Sampling(
         id=_identifier(src),
-        index=src.index(),
+        index=pb.Index(
+            levels=[
+                pb.Index.IndexLevel(name, dtype)
+                for name, dtype in zip(src.index.names, src.index.dtypes)
+            ]
+        ),
         creator_operator_id=(
-            _identifier(src.creator()) if src.creator() is not None else None
+            _identifier(src.creator) if src.creator is not None else None
         ),
     )
 
 
 def _unserialize_sampling(src: pb.Sampling) -> Sampling:
-    return Sampling(index=list(src.index), creator=None)
+    return Sampling(
+        index_levels=[
+            (index_level.name, index_level.dtype)
+            for index_level in src.index.levels
+        ],
+        creator=None,
+    )
 
 
-def _serialize_dtype(dtype) -> pb.Feature.DType:
+def _serialize_dtype(dtype) -> pb.DType:
     if dtype not in DTYPE_MAPPING:
         raise ValueError(f"Non supported type {dtype}")
     return DTYPE_MAPPING[dtype]
 
 
-def _unserialize_dtype(dtype: pb.Feature.DType):
+def _unserialize_dtype(dtype: pb.DType):
     if dtype not in INV_DTYPE_MAPPING:
         raise ValueError(f"Non supported type {dtype}")
     return INV_DTYPE_MAPPING[dtype]
 
 
 DTYPE_MAPPING = {
-    dtype_lib.FLOAT64: pb.Feature.DType.FLOAT64,
-    dtype_lib.FLOAT32: pb.Feature.DType.FLOAT32,
-    dtype_lib.INT64: pb.Feature.DType.INT64,
-    dtype_lib.INT32: pb.Feature.DType.INT32,
+    DType.FLOAT64: pb.DType.FLOAT64,
+    DType.FLOAT32: pb.DType.FLOAT32,
+    DType.INT64: pb.DType.INT64,
+    DType.INT32: pb.DType.INT32,
+    DType.BOOLEAN: pb.DType.BOOLEAN,
+    DType.STRING: pb.DType.STRING,
 }
 INV_DTYPE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
 
 
 def _attribute_to_proto(
-    key: str, value: Union[str, int]
+    key: str, value: base.AttributeType
 ) -> pb.Operator.Attribute:
     if isinstance(value, str):
         return pb.Operator.Attribute(key=key, str=value)
-    elif isinstance(value, int):
+    if isinstance(value, bool):
+        # NOTE: Check this before int (isinstance(False, int) is also True)
+        return pb.Operator.Attribute(key=key, boolean=value)
+    if isinstance(value, int):
         return pb.Operator.Attribute(key=key, integer_64=value)
-    elif isinstance(value, float):
+    if isinstance(value, float):
         return pb.Operator.Attribute(key=key, float_64=value)
-    else:
-        raise ValueError(
-            f"Non supported type {type(value)} for attribute {key}={value}"
+    # list of strings
+    if isinstance(value, list) and all(isinstance(val, str) for val in value):
+        return pb.Operator.Attribute(
+            key=key, list_str=pb.Operator.Attribute.ListString(value=value)
         )
+    # map<str, str>
+    if (
+        isinstance(value, Mapping)
+        and all(isinstance(key, str) for key in value.keys())
+        and all(isinstance(val, str) for val in value.values())
+    ):
+        return pb.Operator.Attribute(
+            key=key, map_str_str=pb.Operator.Attribute.MapStrStr(value=value)
+        )
+    raise ValueError(
+        f"Non supported type {type(value)} for attribute {key}={value}"
+    )
 
 
-def _attribute_from_proto(src: pb.Operator.Attribute) -> Union[str, int, float]:
+def _attribute_from_proto(src: pb.Operator.Attribute) -> base.AttributeType:
     if src.HasField("integer_64"):
         return src.integer_64
-    elif src.HasField("str"):
+    if src.HasField("str"):
         return src.str
-    elif src.HasField("float_64"):
+    if src.HasField("float_64"):
         return src.float_64
-    else:
-        raise ValueError(f"Non supported proto attribute {src}")
+    if src.HasField("list_str"):
+        return list(src.list_str.value)
+    if src.HasField("boolean"):
+        return bool(src.boolean)
+    if src.HasField("map_str_str"):
+        return dict(src.map_str_str.value)
+    raise ValueError(f"Non supported proto attribute {src}")
 
 
 def _serialize_io_signature(key: str, event: Event):

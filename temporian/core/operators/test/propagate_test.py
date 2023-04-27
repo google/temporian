@@ -14,11 +14,11 @@
 
 from absl.testing import absltest
 
+from temporian.core.data import event as event_lib
+from temporian.core.data.dtype import DType
+from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.propagate import propagate
-from temporian.core.data import event as event_lib
-from temporian.core.data.feature import Feature
-from temporian.core.data import dtype as dtype_lib
 
 
 class PropagateOperatorTest(absltest.TestCase):
@@ -26,81 +26,60 @@ class PropagateOperatorTest(absltest.TestCase):
         pass
 
     def test_basic(self):
-        sampling = Sampling(index=["x"])
         event = event_lib.input_event(
             [
-                Feature("a", dtype_lib.FLOAT64),
-                Feature("b", dtype_lib.FLOAT64),
+                Feature("a", DType.FLOAT64),
+                Feature("b", DType.FLOAT64),
             ],
-            sampling=sampling,
+            sampling=Sampling(index_levels=[("x", DType.STRING)]),
         )
-        to = event_lib.input_event(
-            [
-                Feature("c", dtype_lib.STRING),
-                Feature("d", dtype_lib.STRING),
-            ],
-            sampling=sampling,
+        sampling = event_lib.input_event(
+            [],
+            sampling=Sampling(
+                index_levels=[("x", DType.STRING), ("y", DType.STRING)]
+            ),
         )
-        _ = propagate(event=event, to=to)
+        _ = propagate(event=event, sampling=sampling)
 
-    def test_str_add_event(self):
-        sampling = Sampling(index=["x"])
+    def test_error_wrong_index(self):
         event = event_lib.input_event(
             [
-                Feature("a", dtype_lib.FLOAT64),
-                Feature("b", dtype_lib.FLOAT64),
-                Feature("c", dtype_lib.STRING),
-                Feature("d", dtype_lib.STRING),
+                Feature("a", DType.FLOAT64),
+                Feature("b", DType.FLOAT64),
             ],
-            sampling=sampling,
+            sampling=Sampling(index_levels=[("z", DType.STRING)]),
         )
-        _ = propagate(event=event, to=["c", "d"])
-
-    def test_error_unknown_to(self):
-        sampling = Sampling(index=["x"])
-        event = event_lib.input_event(
-            [
-                Feature("a", dtype_lib.FLOAT64),
-                Feature("b", dtype_lib.FLOAT64),
-                Feature("c1", dtype_lib.STRING),
-            ],
-            sampling=sampling,
-        )
-        with self.assertRaisesRegex(KeyError, "{'c2'}"):
-            _ = propagate(event=event, to=["c2"])
-
-    def test_error_empty_to(self):
-        sampling = Sampling(index=["x"])
-        event = event_lib.input_event(
-            [
-                Feature("a", dtype_lib.FLOAT64),
-                Feature("b", dtype_lib.FLOAT64),
-                Feature("c1", dtype_lib.STRING),
-            ],
-            sampling=sampling,
-        )
-        with self.assertRaisesRegex(ValueError, "to contains no features"):
-            _ = propagate(event=event, to=[])
-
-    def test_error_non_matching_sampling(self):
-        event = event_lib.input_event(
-            [
-                Feature("a", dtype_lib.FLOAT64),
-                Feature("b", dtype_lib.FLOAT64),
-            ],
-            sampling=Sampling(index=["x"]),
-        )
-        to = event_lib.input_event(
-            [
-                Feature("c", dtype_lib.STRING),
-                Feature("d", dtype_lib.STRING),
-            ],
-            sampling=Sampling(index=["x"]),
+        sampling = event_lib.input_event(
+            [],
+            sampling=Sampling(
+                index_levels=[("x", DType.STRING), ("y", DType.STRING)]
+            ),
         )
         with self.assertRaisesRegex(
-            ValueError, "event and to should have the same sampling"
+            ValueError,
+            "The index of event should be contained in the index of sampling",
         ):
-            _ = propagate(event=event, to=to)
+            _ = propagate(event=event, sampling=sampling)
+
+    def test_error_wrong_index_type(self):
+        event = event_lib.input_event(
+            [
+                Feature("a", DType.FLOAT64),
+                Feature("b", DType.FLOAT64),
+            ],
+            sampling=Sampling(index_levels=[("x", DType.INT32)]),
+        )
+        sampling = event_lib.input_event(
+            [],
+            sampling=Sampling(
+                index_levels=[("x", DType.STRING), ("y", DType.STRING)]
+            ),
+        )
+        with self.assertRaisesRegex(
+            ValueError,
+            "However, the dtype is different",
+        ):
+            _ = propagate(event=event, sampling=sampling)
 
 
 if __name__ == "__main__":

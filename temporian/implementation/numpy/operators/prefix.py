@@ -14,12 +14,9 @@
 
 from typing import Dict
 
-from temporian.implementation.numpy.data.event import (
-    NumpyEvent,
-    NumpyFeature,
-)
 from temporian.core.operators.prefix import Prefix
 from temporian.implementation.numpy import implementation_lib
+from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -27,20 +24,23 @@ class PrefixNumpyImplementation(OperatorImplementation):
     """Numpy implementation of the prefix operator."""
 
     def __init__(self, operator: Prefix) -> None:
-        assert isinstance(operator, Prefix)
         super().__init__(operator)
+        assert isinstance(operator, Prefix)
 
     def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
+        # gather operator attributes
         prefix = self._operator.prefix()
-        dst_event = NumpyEvent(data={}, sampling=event.sampling)
 
-        # For each index value
-        for index, features in event.data.items():
-            dst_event.data[index] = [
-                NumpyFeature(prefix + feature.name, feature.data)
-                for feature in features
-            ]
-
+        # create output event
+        dst_event = NumpyEvent(
+            data=event.data,
+            feature_names=[
+                f"{prefix}{feature_name}"
+                for feature_name in event.feature_names
+            ],
+            index_names=event.index_names,
+            is_unix_timestamp=event.is_unix_timestamp,
+        )
         return {"event": dst_event}
 
 

@@ -48,4 +48,4 @@ def calendar_day_of_week(sampling: Event) -> Event:
         timestamp in `event`'s sampling belongs to, with the same sampling as
         `event`.
     """
-    return CalendarDayOfWeekOperator(sampling).outputs()["event"]
+    return CalendarDayOfWeekOperator(sampling).outputs["event"]

@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict
-import copy
+"""Implementation for the Glue operator."""
 
-from temporian.implementation.numpy.data.event import NumpyEvent
+from typing import Dict
+
 from temporian.core.operators.glue import GlueOperator
 from temporian.implementation.numpy import implementation_lib
+from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -40,16 +41,29 @@ class GlueNumpyImplementation(OperatorImplementation):
             If dict_events is {"event_0": X, "event_3": Z, "event_2": Y}
             output is guarenteed to be [X, Y, Z].
         """
+        # convert input event dict to list of events
         events = list(list(zip(*sorted(list(dict_events.items()))))[1])
-        assert len(events) >= 2
+        if len(events) < 2:
+            raise ValueError(
+                f"Glue operator cannot be called on a {len(events)} events"
+            )
 
-        dst_event = NumpyEvent(data={}, sampling=events[0].sampling)
-
-        for index in events[0].data.keys():
-            dst_features = []
-            for event in events:
-                dst_features.extend(copy.copy(event.data[index]))
-            dst_event.data[index] = dst_features
+        # create output event
+        dst_event = NumpyEvent(
+            data={},
+            feature_names=[
+                feature_name
+                for event in events
+                for feature_name in event.feature_names
+            ],
+            index_names=events[0].index_names,
+            is_unix_timestamp=events[0].is_unix_timestamp,
+        )
+        # fill output event data
+        for index_key, index_data in events[0].iterindex():
+            dst_event[index_key] = index_data
+            for event in events[1:]:
+                dst_event[index_key].features.extend(event[index_key].features)
 
         return {"event": dst_event}
 

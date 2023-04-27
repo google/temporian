@@ -13,13 +13,13 @@
 # limitations under the License.
 
 from abc import abstractmethod
-from typing import Dict, Optional
+from typing import Dict, Optional, List, Any
 
 import numpy as np
-from temporian.core.data.duration import Duration
+
 from temporian.core.operators.window.base import BaseWindowOperator
+from temporian.implementation.numpy.data.event import IndexData
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -36,92 +36,51 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
         event: NumpyEvent,
         sampling: Optional[NumpyEvent] = None,
     ) -> Dict[str, NumpyEvent]:
+        # if no sampling is provided, apply operator to the event's own
+        # timestamps
         if sampling is None:
             sampling = event
 
-        dst_event = NumpyEvent(data={}, sampling=sampling.sampling)
-
-        # Naming convention:
-        #   mts => multi time series
-        #   ts => time series
-        #   dst => destination
-        #   src => source
-
+        # create destination event
+        dst_event = NumpyEvent(
+            {},
+            feature_names=event.feature_names,
+            index_names=sampling.index_names,
+            is_unix_timestamp=sampling.is_unix_timestamp,
+        )
         # For each index
-        for index, src_mts in event.data.items():
-            dst_mts = []
-            dst_event.data[index] = dst_mts
-            src_timestamps = event.sampling.data[index]
-            sampling_timestamps = sampling.sampling.data[index]
-
-            mask = self._build_accumulator_mask(
-                src_timestamps,
-                sampling_timestamps,
-                self.operator.window_length(),
+        for index_key, index_data in event.iterindex():
+            dst_features = []
+            dst_timestamps = sampling[index_key].timestamps
+            dst_event[index_key] = IndexData(dst_features, dst_timestamps)
+            self._compute(
+                src_timestamps=index_data.timestamps,
+                src_features=index_data.features,
+                sampling_timestamps=dst_timestamps,
+                dst_features=dst_features,
             )
-
-            # For each feature
-            for src_ts in src_mts:
-                dst_feature_name = f"{self.operator.prefix}_{src_ts.name}"
-                dst_ts_data = self._apply_accumulator_mask(src_ts.data, mask)
-                dst_mts.append(NumpyFeature(dst_feature_name, dst_ts_data))
 
         return {"event": dst_event}
 
-    def _build_accumulator_mask(
-        self,
-        data_timestamps: np.array,
-        sampling_timestamps: np.array,
-        win: Duration,
-    ) -> np.array:
-        """Creates a 2d boolean matrix containing the summing instructions.
-
-        Returns:
-            Matrix `m`, where `m[i,j]` is true iif input value `j` is averaged
-            in the output value `i`.
-        """
-        # This implementation is simple but expensive. It will create multiple
-        # O(n^2) arrays, where n is the number of time samples.
-
-        right_side = (
-            sampling_timestamps[:, np.newaxis] >= data_timestamps[np.newaxis, :]
-        )
-
-        # TODO: Make left side inclusivity/exclusivity a parameter.
-        left_side = sampling_timestamps[:, np.newaxis] <= (
-            data_timestamps[np.newaxis, :] + win
-        )
-
-        return right_side & left_side
-
-    def _apply_accumulator_mask(
-        self, src: np.array, mask: np.array
-    ) -> np.array:
-        """Sums elements according to an accumulator mask."""
-
-        # Broadcast of feature values to requested timestamps.
-        cross_product = src * mask
-
-        # Replace masked values with NaN
-        cross_product[
-            mask == False
-        ] = np.nan  # pylint: disable=singleton-comparison
-
-        return self._apply_operation(cross_product)
-
     @abstractmethod
-    def _apply_operation(self, values: np.array) -> np.array:
-        """Reduces each of the rows in an array of values to a single value.
+    def _implementation(self) -> Any:
+        pass
 
-        The input array has a shape (n, m), where n is the length of the feature
-        and m is the size of the window. Each row represents a window of data
-        points, with NaN values used for padding when the window size is smaller
-        than the number of data points in the time series.
-
-        Args:
-            values: Input array, of shape (n, m).
-
-        Returns:
-            1D NumPy array of shape (n,) containing the result for each row in
-            the input array.
-        """
+    def _compute(
+        self,
+        src_timestamps: np.ndarray,
+        src_features: List[np.ndarray],
+        sampling_timestamps: np.ndarray,
+        dst_features: List[np.ndarray],
+    ) -> None:
+        implementation = self._implementation()
+        for src_ts in src_features:
+            kwargs = {
+                "event_timestamps": src_timestamps,
+                "event_values": src_ts,
+                "window_length": self.operator.window_length,
+            }
+            if self._operator.has_sampling:
+                kwargs["sampling_timestamps"] = sampling_timestamps
+            dst_feature = implementation(**kwargs)
+            dst_features.append(dst_feature)

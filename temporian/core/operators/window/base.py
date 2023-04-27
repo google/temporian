@@ -15,10 +15,11 @@
 """Base calendar operator class definition."""
 
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Optional, List
 
 
 from temporian.core.data.duration import Duration
+from temporian.core.data import dtype
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.operators.base import Operator
@@ -41,22 +42,24 @@ class BaseWindowOperator(Operator, ABC):
 
         if sampling is not None:
             self.add_input("sampling", sampling)
-            effective_sampling = sampling.sampling()
+            self._has_sampling = True
+            effective_sampling = sampling.sampling
         else:
-            effective_sampling = event.sampling()
+            effective_sampling = event.sampling
+            self._has_sampling = False
 
         self.add_input("event", event)
 
-        # TODO: Remve auto prefix
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=f"{self.prefix}_{f.name()}",
-                dtype=self.get_output_dtype(f),
+                name=f.name,
+                dtype=self.get_feature_dtype(f),
                 sampling=effective_sampling,
                 creator=self,
             )
-            for f in event.features()
+            for f in event.features
         ]
+        self._output_dtypes = [feature.dtype for feature in output_features]
 
         # output
         self.add_output(
@@ -70,8 +73,17 @@ class BaseWindowOperator(Operator, ABC):
 
         self.check()
 
-    def window_length(self):
+    @property
+    def window_length(self) -> Duration:
         return self._window_length
+
+    @property
+    def has_sampling(self) -> bool:
+        return self._has_sampling
+
+    @property
+    def output_dtypes(self) -> List[dtype.DType]:
+        return self._output_dtypes
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
@@ -98,10 +110,5 @@ class BaseWindowOperator(Operator, ABC):
         """Gets the key of the operator definition."""
 
     @abstractmethod
-    def get_output_dtype(self, feature: Feature) -> str:
+    def get_feature_dtype(self, feature: Feature) -> str:
         """Gets the dtype of the output feature."""
-
-    @property
-    @abstractmethod
-    def prefix(self) -> str:
-        """Gets the prefix to use for the output features."""

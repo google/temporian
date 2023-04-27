@@ -14,10 +14,14 @@
 
 """Feature class definition."""
 
-from typing import Any, Optional
+from __future__ import annotations
+from typing import Optional, TYPE_CHECKING
 
-from temporian.core.data import sampling as sampling_lib
-from temporian.core.data import dtype as dtype_lib
+from temporian.core.data.sampling import Sampling
+from temporian.core.data.dtype import DType
+
+if TYPE_CHECKING:
+    from temporian.core.operators.base import Operator
 
 
 class Feature(object):
@@ -41,26 +45,24 @@ class Feature(object):
     def __init__(
         self,
         name: str,
-        dtype: Any = dtype_lib.FLOAT32,
-        sampling: Optional[sampling_lib.Sampling] = None,
-        creator: Optional[Any] = None,
+        dtype: DType = DType.FLOAT32,
+        sampling: Optional[Sampling] = None,
+        creator: Optional[Operator] = None,
     ):
         # TODO: Find a simple, efficient and consistant way to check the type
         # of arguments in the API.
         assert isinstance(
             name, str
         ), f"`name` must be a string. Got name={name} instead."
-        assert sampling is None or isinstance(
-            sampling, sampling_lib.Sampling
-        ), (
+        assert sampling is None or isinstance(sampling, Sampling), (
             "`sampling` must be None or a Sampling. Got"
             f" sampling={sampling} instead."
         )
 
-        if dtype not in dtype_lib.ALL_TYPES:
+        if not isinstance(dtype, DType):
             raise ValueError(
                 f"Invalid dtype feature constructor. Got {dtype}. "
-                f"Expecting one of {dtype_lib.ALL_TYPES} instead."
+                f"Expecting one of {DType} instead."
             )
 
         self._name = name
@@ -68,29 +70,36 @@ class Feature(object):
         self._dtype = dtype
         self._creator = creator
 
-    def __repr__(self):
-        return (
-            f"name: {self._name}\n"
-            f"  dtype: {self._dtype}\n"
-            f"  sampling: {self._sampling}\n"
-            f"  creator: {self.creator()}\n"
-            f"  id: {id(self)}"
-        )
+    def to_string(self, include_sampling: bool = True) -> str:
+        v = f"name: {self.name}\n  dtype: {self.dtype}\n"
+        if include_sampling:
+            v += f"  sampling: {self.sampling}\n"
+        v += f"  creator: {self.creator}\n  id: {id(self)}"
+        return v
 
+    def __repr__(self):
+        return self.to_string()
+
+    @property
     def name(self) -> str:
         return self._name
 
-    def dtype(self):
+    @property
+    def dtype(self) -> DType:
         return self._dtype
 
-    def sampling(self) -> Optional[sampling_lib.Sampling]:
+    @property
+    def sampling(self) -> Optional[Sampling]:
         return self._sampling
 
-    def creator(self):
+    @property
+    def creator(self) -> Optional[Operator]:
         return self._creator
 
-    def set_sampling(self, sampling: sampling_lib.Sampling):
+    @sampling.setter
+    def sampling(self, sampling: Optional[Sampling]):
         self._sampling = sampling
 
-    def set_creator(self, creator):
+    @creator.setter
+    def creator(self, creator: Optional[Operator]):
         self._creator = creator

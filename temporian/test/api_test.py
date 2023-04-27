@@ -40,9 +40,9 @@ class TFPTest(absltest.TestCase):
 
         i1 = i1_data.schema()
         i2 = i2_data.schema()
-        h1 = t.simple_moving_average(event=i1, window_length=7)
+        h1 = t.simple_moving_average(event=i1, window_length=7.0)
         h2 = t.sample(event=h1, sampling=i2)
-        result = t.glue(h2["sma_f2"], i2)
+        result = t.glue(t.prefix("sma_", h2["f2"]), i2)
 
         result_data = t.evaluate(
             query=result,
@@ -65,7 +65,7 @@ class TFPTest(absltest.TestCase):
                 t.Feature(name="f2"),
             ]
         )
-        b = t.simple_moving_average(event=a, window_length=7)
+        b = t.simple_moving_average(event=a, window_length=7.0)
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_processor.tem")
@@ -88,8 +88,8 @@ class TFPTest(absltest.TestCase):
             ],
             name="my_input_event",
         )
-        b = t.simple_moving_average(event=a, window_length=7)
-        b.set_name("my_output_event")
+        b = t.simple_moving_average(event=a, window_length=7.0)
+        b.name = "my_output_event"
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_processor.tem")
@@ -112,8 +112,8 @@ class TFPTest(absltest.TestCase):
             ],
             name="my_input_event",
         )
-        b = t.simple_moving_average(event=a, window_length=7)
-        b.set_name("my_output_event")
+        b = t.simple_moving_average(event=a, window_length=7.0)
+        b.name = "my_output_event"
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_processor.tem")
@@ -125,8 +125,8 @@ class TFPTest(absltest.TestCase):
 
             i, o = t.load(path=path, squeeze=True)
 
-        self.assertEqual(i.name(), "my_input_event")
-        self.assertEqual(o.name(), "my_output_event")
+        self.assertEqual(i.name, "my_input_event")
+        self.assertEqual(o.name, "my_output_event")
 
     def test_serialization_infer_inputs(self):
         a = t.input_event(
@@ -136,8 +136,8 @@ class TFPTest(absltest.TestCase):
             ],
             name="my_input_event",
         )
-        b = t.simple_moving_average(event=a, window_length=7)
-        b.set_name("my_output_event")
+        b = t.simple_moving_average(event=a, window_length=7.0)
+        b.name = "my_output_event"
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_processor.tem")
@@ -145,8 +145,8 @@ class TFPTest(absltest.TestCase):
 
             i, o = t.load(path=path, squeeze=True)
 
-        self.assertEqual(i.name(), "my_input_event")
-        self.assertEqual(o.name(), "my_output_event")
+        self.assertEqual(i.name, "my_input_event")
+        self.assertEqual(o.name, "my_output_event")
 
     def test_list_registered_operators(self):
         logging.info("The operators:")

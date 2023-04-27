@@ -12,31 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy as np
 
-from temporian.implementation.numpy import implementation_lib
 from temporian.core.operators.window.simple_moving_average import (
     SimpleMovingAverageOperator,
 )
+from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.window.base import (
     BaseWindowNumpyImplementation,
 )
+from temporian.implementation.numpy_cc.operators import window as window_cc
 
 
 class SimpleMovingAverageNumpyImplementation(BaseWindowNumpyImplementation):
     """Numpy implementation of the simple moving average operator."""
 
-    def __init__(self, operator: SimpleMovingAverageOperator) -> None:
-        super().__init__(operator)
-
-    def _apply_operation(self, values: np.array) -> np.array:
-        """Calculates the average of the values in each row in the input.
-
-        NaNs are ignored.
-
-        See base class for further info.
-        """
-        return np.nanmean(values, axis=1)
+    def _implementation(self):
+        return window_cc.simple_moving_average
 
 
 implementation_lib.register_operator_implementation(

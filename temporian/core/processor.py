@@ -35,13 +35,13 @@ def normalize_multiple_event_arg(src: MultipleEventArg) -> Dict[str, Event]:
     if isinstance(src, list):
         new_src = {}
         for event in src:
-            if event.name() is None:
+            if event.name is None:
                 raise ValueError(
                     "Input / output event or list events need to be named "
-                    'with "set_name(...)". Alternatively, provide a '
+                    'with "event.name = ...". Alternatively, provide a '
                     "dictionary of events."
                 )
-            new_src[event.name()] = event
+            new_src[event.name] = event
         src = new_src
 
     if not isinstance(src, dict):
@@ -63,17 +63,29 @@ class Preprocessor(object):
         self._inputs: Dict[str, Event] = {}
         self._outputs: Dict[str, Event] = {}
 
+    @property
     def samplings(self) -> Set[Sampling]:
         return self._samplings
 
+    @property
     def features(self) -> Set[Feature]:
         return self._features
 
+    @property
     def operators(self) -> Set[base.Operator]:
         return self._operators
 
+    @property
     def events(self) -> Set[Event]:
         return self._events
+
+    @property
+    def inputs(self) -> Dict[str, Event]:
+        return self._inputs
+
+    @property
+    def outputs(self) -> Dict[str, Event]:
+        return self._outputs
 
     def add_operator(self, operator: base.Operator) -> None:
         self._operators.add(operator)
@@ -87,27 +99,23 @@ class Preprocessor(object):
     def add_event(self, event: Event) -> None:
         self._events.add(event)
 
-    def set_inputs(self, inputs: Dict[str, Event]) -> None:
+    @inputs.setter
+    def inputs(self, inputs: Dict[str, Event]) -> None:
         self._inputs = inputs
 
-    def set_outputs(self, outputs: Dict[str, Event]) -> None:
+    @outputs.setter
+    def outputs(self, outputs: Dict[str, Event]) -> None:
         self._outputs = outputs
-
-    def inputs(self) -> Dict[str, Event]:
-        return self._inputs
-
-    def outputs(self) -> Dict[str, Event]:
-        return self._outputs
 
     def input_features(self) -> Set[Feature]:
         return {
             feature
-            for event in self.inputs().values()
-            for feature in event.features()
+            for event in self.inputs.values()
+            for feature in event.features
         }
 
     def input_samplings(self) -> Set[Sampling]:
-        return {event.sampling() for event in self.inputs().values()}
+        return {event.sampling for event in self.inputs.values()}
 
     def __repr__(self):
         s = "Preprocessor\n============\n"
@@ -119,10 +127,10 @@ class Preprocessor(object):
                 s += f"\t{e}\n"
             s += "\n"
 
-        p("Operators", self.operators())
-        p("Features", self.features())
-        p("Samplings", self.samplings())
-        p("Events", self.events())
+        p("Operators", self.operators)
+        p("Features", self.features)
+        p("Samplings", self.samplings)
+        p("Events", self.events)
 
         def p2(title, dictionary):
             nonlocal s
@@ -131,8 +139,8 @@ class Preprocessor(object):
                 s += f"\t{k}:{v}\n"
             s += "\n"
 
-        p2("Inputs", self.inputs())
-        p2("Output", self.outputs())
+        p2("Inputs", self.inputs)
+        p2("Output", self.outputs)
         return s
 
 
@@ -169,7 +177,7 @@ def infer_processor(
     #   Adds all the input events of event's creator op to the pending list
 
     p = Preprocessor()
-    p.set_outputs(outputs)
+    p.outputs = outputs
 
     # The next event to process. Events are processed from the outputs to
     # the inputs.
@@ -180,7 +188,7 @@ def infer_processor(
     input_events: Set[Event] = {}
 
     if inputs is not None:
-        p.set_inputs(inputs)
+        p.inputs = inputs
         input_events = set(inputs.values())
 
     # Features already processed.
@@ -202,16 +210,16 @@ def infer_processor(
             # The feature is provided by the user.
             continue
 
-        if event.creator() is None:
+        if event.creator is None:
             # The event does not have a source.
             missing_events.add(event)
             continue
 
         # Record the operator.
-        p.add_operator(event.creator())
+        p.add_operator(event.creator)
 
         # Add the parent events to the pending list.
-        for input_event in event.creator().inputs().values():
+        for input_event in event.creator.inputs.values():
             if input_event in done_events:
                 # Already processed.
                 continue
@@ -220,17 +228,17 @@ def infer_processor(
 
         # Record the operator outputs. While the user did not request
         # them, they will be created (and so, we need to track them).
-        for output_event in event.creator().outputs().values():
+        for output_event in event.creator.outputs.values():
             p.add_event(output_event)
 
     if inputs is None:
         # Infer the inputs
         infered_inputs: Dict[str, Event] = {}
         for event in missing_events:
-            if event.name() is None:
+            if event.name is None:
                 raise ValueError(f"Cannot infer input on unnamed event {event}")
-            infered_inputs[event.name()] = event
-        p.set_inputs(infered_inputs)
+            infered_inputs[event.name] = event
+        p.inputs = infered_inputs
 
     else:
         # Fail if not all events are sourced.
@@ -241,9 +249,9 @@ def infer_processor(
             )
 
     # Record all the features and samplings.
-    for e in p.events():
-        p.add_sampling(e.sampling())
-        for f in e.features():
+    for e in p.events:
+        p.add_sampling(e.sampling)
+        for f in e.features:
             p.add_feature(f)
 
     return p

@@ -14,28 +14,74 @@
 
 """Data types declaration."""
 
-from typing import Union, Any
 import math
-
-FLOAT64 = "FLOAT64"
-FLOAT32 = "FLOAT32"
-INT64 = "INT64"
-INT32 = "INT32"
-STRING = "STRING"
-
-DType = Union[FLOAT64, FLOAT32, INT64, INT32, STRING]
-
-ALL_TYPES = [FLOAT64, FLOAT32, INT64, INT32, STRING]
+from enum import Enum
+from typing import Union
 
 
-def MissingValue(dtype: DType) -> Any:
-    """Value used as a replacement of missing values."""
+class DType(Enum):
+    FLOAT64 = "FLOAT64"
+    FLOAT32 = "FLOAT32"
+    INT64 = "INT64"
+    INT32 = "INT32"
+    STRING = "STRING"
+    BOOLEAN = "BOOLEAN"
 
-    if dtype in [FLOAT64, FLOAT32]:
-        return math.nan
-    elif dtype in [INT64, INT32]:
-        return 0
-    elif dtype == STRING:
-        return ""
-    else:
-        raise ValueError(f"Non implemented type {dtype}")
+    def __str__(self) -> str:
+        return self.value
+
+    @property
+    def is_float(self) -> bool:
+        return self in (DType.FLOAT64, DType.FLOAT32)
+
+    @property
+    def is_integer(self) -> bool:
+        return self in (DType.INT64, DType.INT32)
+
+    def missing_value(self) -> Union[float, int, str]:
+        """
+        Returns missing value for specific dtype.
+
+        Returns:
+            The default missing value for the given data type.
+        """
+
+        if self.is_float:
+            return math.nan
+
+        if self.is_integer:
+            return 0
+
+        if self == DType.STRING:
+            return ""
+
+        raise ValueError(f"Non-implemented type {self}")
+
+    @classmethod
+    def from_python_type(cls, python_type: type) -> "DType":
+        """
+        Returns DType from python type.
+
+        Args:
+            python_type: Python type.
+
+        Returns:
+            The corresponding DType.
+
+        Raises:
+            ValueError: If python_type is not implemented.
+        """
+
+        if python_type is float:
+            return DType.FLOAT64
+
+        if python_type is int:
+            return DType.INT64
+
+        if python_type is str:
+            return DType.STRING
+
+        if python_type is bool:
+            return DType.BOOLEAN
+
+        raise ValueError(f"Non-implemented type {python_type}")

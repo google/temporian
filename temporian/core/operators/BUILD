@@ -5,19 +5,24 @@ package(
 
 # Libraries
 # =========
-
 py_library(
     name = "all_operators",
     srcs = ["all_operators.py"],
     srcs_version = "PY3",
     deps = [
-        ":arithmetic",
+        ":cast",
+        ":drop_index",
+        ":filter",
         ":glue",
         ":lag",
-        ":propagate",
-        ":select",
-        ":sample",
         ":prefix",
+        ":propagate",
+        ":sample",
+        ":select",
+        ":set_index",
+        ":unique_timestamps",
+        "//temporian/core/operators/arithmetic",
+        "//temporian/core/operators/arithmetic_scalar",
         "//temporian/core/operators/calendar:day_of_month",
         "//temporian/core/operators/calendar:day_of_week",
         "//temporian/core/operators/calendar:day_of_year",
@@ -35,19 +40,6 @@ py_library(
 )
 
 py_library(
-    name = "arithmetic",
-    srcs = ["arithmetic.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":base",
-        "//temporian/core:operator_lib",
-        "//temporian/core/data:event",
-        "//temporian/core/data:feature",
-        "//temporian/proto:core_py_proto",
-    ],
-)
-
-py_library(
     name = "glue",
     srcs = ["glue.py"],
     srcs_version = "PY3",
@@ -55,7 +47,6 @@ py_library(
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:event",
-        "//temporian/core/data:feature",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -66,6 +57,19 @@ py_library(
     srcs_version = "PY3",
     deps = [
         "//temporian/core/data:event",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "cast",
+    srcs = ["cast.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -85,11 +89,68 @@ py_library(
 )
 
 py_library(
+    name = "filter",
+    srcs = ["filter.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "drop_index",
+    srcs = ["drop_index.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/core/data:sampling",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
     name = "select",
     srcs = ["select.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:duration",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "set_index",
+    srcs = ["set_index.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/core/data:sampling",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "prefix",
+    srcs = ["prefix.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        ":select",
         "//temporian/core:operator_lib",
         "//temporian/core/data:duration",
         "//temporian/core/data:event",
@@ -129,14 +190,12 @@ py_library(
 )
 
 py_library(
-    name = "prefix",
-    srcs = ["prefix.py"],
+    name = "unique_timestamps",
+    srcs = ["unique_timestamps.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
-        ":select",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:duration",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
         "//temporian/proto:core_py_proto",

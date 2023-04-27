@@ -29,11 +29,31 @@ from temporian.core.data import event as event_lib
 from temporian.core.data import feature as feature_lib
 from temporian.core.data import dtype as dtype_lib
 import math
+from temporian.implementation.numpy_cc.operators import window as window_cc
+from numpy.testing import assert_array_equal
+
+
+def _f64(l):
+    return np.array(l, np.float64)
+
+
+def _f32(l):
+    return np.array(l, np.float32)
+
+
+nan = math.nan
 
 
 class MovingSumOperatorTest(absltest.TestCase):
-    def setUp(self):
-        pass
+    def test_cc_wo_sampling(self):
+        assert_array_equal(
+            window_cc.moving_sum(
+                _f64([1, 2, 3, 5, 20]),
+                _f32([10, nan, 12, 13, 14]),
+                5.0,
+            ),
+            _f32([10.0, 10.0, 22.0, 35.0, 14.0]),
+        )
 
     def test_flat(self):
         """A simple time sequence."""
@@ -53,7 +73,7 @@ class MovingSumOperatorTest(absltest.TestCase):
 
         op = MovingSumOperator(
             event=input_data.schema(),
-            window_length=5,
+            window_length=5.0,
             sampling=None,
         )
         self.assertEqual(op.list_matching_io_samplings(), [("event", "event")])
@@ -70,7 +90,7 @@ class MovingSumOperatorTest(absltest.TestCase):
                     [46.0, 86.0, 5],
                     [14.0, 24.0, 20],
                 ],
-                columns=["moving_sum_a", "moving_sum_b", "timestamp"],
+                columns=["a", "b", "timestamp"],
             )
         )
 
@@ -99,7 +119,7 @@ class MovingSumOperatorTest(absltest.TestCase):
 
         op = MovingSumOperator(
             event=input_data.schema(),
-            window_length=5,
+            window_length=5.0,
             sampling=None,
         )
         self.assertEqual(op.list_matching_io_samplings(), [("event", "event")])
@@ -120,7 +140,7 @@ class MovingSumOperatorTest(absltest.TestCase):
                     ["X2", "Y2", 33.0, 2.2],
                     ["X2", "Y2", 51.0, 3.2],
                 ],
-                columns=["x", "y", "moving_sum_a", "timestamp"],
+                columns=["x", "y", "a", "timestamp"],
             ),
             index_names=["x", "y"],
         )
@@ -145,7 +165,7 @@ class MovingSumOperatorTest(absltest.TestCase):
 
         op = MovingSumOperator(
             event=input_data.schema(),
-            window_length=3,
+            window_length=3.1,
             sampling=event_lib.input_event([]),
         )
         self.assertEqual(
@@ -173,15 +193,15 @@ class MovingSumOperatorTest(absltest.TestCase):
         expected_output = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
-                    [np.nan, -1.0],
+                    [0, -1.0],
                     [10.0, 1.0],
                     [10.0, 1.1],
                     [33.0, 3.0],
                     [33.0, 3.5],
                     [39.0, 6.0],
-                    [np.nan, 10.0],
+                    [0, 10.0],
                 ],
-                columns=["moving_sum_a", "timestamp"],
+                columns=["a", "timestamp"],
             )
         )
 
@@ -205,7 +225,7 @@ class MovingSumOperatorTest(absltest.TestCase):
 
         op = MovingSumOperator(
             event=input_data.schema(),
-            window_length=1,
+            window_length=1.1,
             sampling=event_lib.input_event([]),
         )
         instance = MovingSumNumpyImplementation(op)
@@ -231,16 +251,16 @@ class MovingSumOperatorTest(absltest.TestCase):
         expected_output = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
-                    [np.nan, 1],
+                    [0, 1],
                     [11.0, 2],
                     [11.0, 2.5],
                     [11.0, 3],
-                    [np.nan, 3.5],
-                    [np.nan, 4],
+                    [0, 3.5],
+                    [0, 4],
                     [13.0, 5],
                     [27.0, 6],
                 ],
-                columns=["moving_sum_a", "timestamp"],
+                columns=["a", "timestamp"],
             )
         )
 

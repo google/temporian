@@ -26,14 +26,35 @@ from temporian.implementation.numpy.operators.window.moving_count import (
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.core.data import event as event_lib
-from temporian.core.data import feature as feature_lib
-from temporian.core.data import dtype as dtype_lib
-import math
+from temporian.implementation.numpy_cc.operators import window as window_cc
+from numpy.testing import assert_array_equal
+
+
+def _f64(l):
+    return np.array(l, np.float64)
+
+
+def _f32(l):
+    return np.array(l, np.float32)
+
+
+def _i32(l):
+    return np.array(l, np.int32)
+
+
+nan = math.nan
 
 
 class MovingCountOperatorTest(absltest.TestCase):
-    def setUp(self):
-        pass
+    def test_cc_wo_sampling(self):
+        assert_array_equal(
+            window_cc.moving_count(
+                _f64([1, 2, 3, 5, 20]),
+                _f32([10, nan, 12, 13, 14]),
+                5.0,
+            ),
+            _i32([1, 1, 2, 3, 1]),
+        )
 
     def test_flat(self):
         """A simple time sequence."""
@@ -53,7 +74,7 @@ class MovingCountOperatorTest(absltest.TestCase):
 
         op = MovingCountOperator(
             event=input_data.schema(),
-            window_length=5,
+            window_length=5.0,
             sampling=None,
         )
         self.assertEqual(op.list_matching_io_samplings(), [("event", "event")])
@@ -70,8 +91,8 @@ class MovingCountOperatorTest(absltest.TestCase):
                     [4, 4, 5],
                     [1, 1, 20],
                 ],
-                columns=["moving_count_a", "moving_count_b", "timestamp"],
-            )
+                columns=["a", "b", "timestamp"],
+            ).astype({"a": np.int32, "b": np.int32})
         )
 
         self.assertEqual(repr(output), repr({"event": expected_output}))
@@ -99,7 +120,7 @@ class MovingCountOperatorTest(absltest.TestCase):
 
         op = MovingCountOperator(
             event=input_data.schema(),
-            window_length=5,
+            window_length=5.0,
             sampling=None,
         )
         self.assertEqual(op.list_matching_io_samplings(), [("event", "event")])
@@ -120,8 +141,8 @@ class MovingCountOperatorTest(absltest.TestCase):
                     ["X2", "Y2", 2, 2.2],
                     ["X2", "Y2", 3, 3.2],
                 ],
-                columns=["x", "y", "moving_count_a", "timestamp"],
-            ),
+                columns=["x", "y", "a", "timestamp"],
+            ).astype({"a": np.int32}),
             index_names=["x", "y"],
         )
 
@@ -145,7 +166,7 @@ class MovingCountOperatorTest(absltest.TestCase):
 
         op = MovingCountOperator(
             event=input_data.schema(),
-            window_length=3,
+            window_length=3.1,
             sampling=event_lib.input_event([]),
         )
         self.assertEqual(
@@ -181,8 +202,8 @@ class MovingCountOperatorTest(absltest.TestCase):
                     [3, 6.0],
                     [0, 10.0],
                 ],
-                columns=["moving_count_a", "timestamp"],
-            )
+                columns=["a", "timestamp"],
+            ).astype({"a": np.int32})
         )
 
         self.assertEqual(output["event"], expected_output)
@@ -205,7 +226,7 @@ class MovingCountOperatorTest(absltest.TestCase):
 
         op = MovingCountOperator(
             event=input_data.schema(),
-            window_length=1,
+            window_length=1.1,
             sampling=event_lib.input_event([]),
         )
         instance = MovingCountNumpyImplementation(op)
@@ -240,8 +261,8 @@ class MovingCountOperatorTest(absltest.TestCase):
                     [1, 5],
                     [2, 6],
                 ],
-                columns=["moving_count_a", "timestamp"],
-            )
+                columns=["a", "timestamp"],
+            ).astype({"a": np.int32})
         )
 
         self.assertEqual(output["event"], expected_output)

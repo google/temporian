@@ -32,21 +32,27 @@ class Sample(Operator):
         self.add_input("event", event)
         self.add_input("sampling", sampling)
 
+        if event.sampling.index != sampling.sampling.index:
+            raise ValueError(
+                "Event and sampling do not have the same index."
+                f" {event.sampling.index} != {sampling.sampling.index}"
+            )
+
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=f.name(),
-                dtype=f.dtype(),
-                sampling=sampling.sampling(),
+                name=f.name,
+                dtype=f.dtype,
+                sampling=sampling.sampling,
                 creator=self,
             )
-            for f in event.features()
+            for f in event.features
         ]
 
         self.add_output(
             "event",
             Event(
                 features=output_features,
-                sampling=sampling.sampling(),
+                sampling=sampling.sampling,
                 creator=self,
             ),
         )
@@ -101,4 +107,4 @@ def sample(
         Sampled event, with same sampling as `sampling`.
     """
 
-    return Sample(event=event, sampling=sampling).outputs()["event"]
+    return Sample(event=event, sampling=sampling).outputs["event"]

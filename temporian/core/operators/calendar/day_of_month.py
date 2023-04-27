@@ -48,4 +48,4 @@ def calendar_day_of_month(sampling: Event) -> Event:
         timestamp in `event`'s sampling belongs to, with the same sampling as
         `event`.
     """
-    return CalendarDayOfMonthOperator(sampling).outputs()["event"]
+    return CalendarDayOfMonthOperator(sampling).outputs["event"]

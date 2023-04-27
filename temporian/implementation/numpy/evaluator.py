@@ -71,7 +71,7 @@ def evaluate_schedule(
         # Construct operator inputs
         operator_inputs = {
             input_key: data[input_event]
-            for input_key, input_event in operator.inputs().items()
+            for input_key, input_event in operator.inputs.items()
         }
 
         # Compute output
@@ -88,7 +88,7 @@ def evaluate_schedule(
             print(f"Duration: {end_time - begin_time} s", file=sys.stderr)
 
         # materialize data in output events
-        for output_key, output_event in operator.outputs().items():
+        for output_key, output_event in operator.outputs.items():
             data[output_event] = operator_outputs[output_key]
 
     # TODO: Only return the required data.

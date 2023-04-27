@@ -16,12 +16,10 @@
 from typing import Optional, List
 
 from temporian.core import operator_lib
-from temporian.core.data.dtype import FLOAT32
-from temporian.core.data.dtype import FLOAT64
+from temporian.core.data.dtype import DType
 from temporian.core.data.duration import Duration
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
-from temporian.core.data.sampling import Sampling
 from temporian.core.operators.window.base import BaseWindowOperator
 
 
@@ -35,12 +33,10 @@ class SimpleMovingAverageOperator(BaseWindowOperator):
     def operator_def_key(cls) -> str:
         return "SIMPLE_MOVING_AVERAGE"
 
-    @property
-    def prefix(self) -> str:
-        return "sma"
-
-    def get_output_dtype(self, feature: Feature) -> str:
-        return FLOAT32 if feature.dtype() == FLOAT32 else FLOAT64
+    def get_feature_dtype(self, feature: Feature) -> str:
+        return (
+            DType.FLOAT32 if feature.dtype == DType.FLOAT32 else DType.FLOAT64
+        )
 
 
 operator_lib.register_operator(SimpleMovingAverageOperator)
@@ -77,4 +73,4 @@ def simple_moving_average(
         event=event,
         window_length=window_length,
         sampling=sampling,
-    ).outputs()["event"]
+    ).outputs["event"]

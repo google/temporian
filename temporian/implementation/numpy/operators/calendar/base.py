@@ -17,9 +17,10 @@ from datetime import datetime, timezone
 from typing import Dict, Any
 
 import numpy as np
+
 from temporian.core.operators.calendar.base import BaseCalendarOperator
+from temporian.implementation.numpy.data.event import IndexData
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.event import NumpyFeature
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -29,27 +30,31 @@ class BaseCalendarNumpyImplementation(OperatorImplementation):
 
     def __init__(self, operator: BaseCalendarOperator) -> None:
         super().__init__(operator)
+        assert isinstance(operator, BaseCalendarOperator)
 
     def __call__(self, sampling: NumpyEvent) -> Dict[str, NumpyEvent]:
-        data = {}
-        for index, timestamps in sampling.sampling.data.items():
-            days = np.array(
+        # create destination event
+        dst_event = NumpyEvent(
+            data={},
+            feature_names=[self.operator.output_feature_name],
+            index_names=sampling.index_names,
+            is_unix_timestamp=True,
+        )
+        for index_key, index_data in sampling.iterindex():
+            value = np.array(
                 [
                     self._get_value_from_datetime(
                         datetime.fromtimestamp(ts, tz=timezone.utc)
                     )
-                    for ts in timestamps
+                    for ts in index_data.timestamps
                 ]
-            ).astype(np.int32)
+            ).astype(
+                np.int32
+            )  # TODO: parametrize output dtype
 
-            data[index] = [
-                NumpyFeature(
-                    data=days,
-                    name=self.operator.output_feature_name,
-                )
-            ]
+            dst_event[index_key] = IndexData([value], index_data.timestamps)
 
-        return {"event": NumpyEvent(data=data, sampling=sampling.sampling)}
+        return {"event": dst_event}
 
     @abstractmethod
     def _get_value_from_datetime(self, dt: datetime) -> Any:

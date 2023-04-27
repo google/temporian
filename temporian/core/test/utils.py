@@ -1,8 +1,9 @@
 """Utilities for unit testing."""
+from typing import List, Mapping
 
 import pandas as pd
 
-from temporian.core.data import dtype
+from temporian.core.data.dtype import DType
 from temporian.core.data import event as event_lib
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
@@ -20,8 +21,8 @@ Event = event_lib.Event
 def create_input_event():
     return event_lib.input_event(
         features=[
-            Feature("f1", dtype.FLOAT32),
-            Feature("f2", dtype.FLOAT32),
+            Feature("f1", DType.FLOAT32),
+            Feature("f2", DType.FLOAT32),
         ]
     )
 
@@ -57,18 +58,18 @@ class OpI1O1(base.Operator):
                 features=[
                     Feature(
                         "f3",
-                        dtype.FLOAT64,
-                        sampling=event.sampling(),
+                        DType.FLOAT64,
+                        sampling=event.sampling,
                         creator=self,
                     ),
                     Feature(
                         "f4",
-                        dtype.FLOAT64,
-                        sampling=event.sampling(),
+                        DType.INT64,
+                        sampling=event.sampling,
                         creator=self,
                     ),
                 ],
-                sampling=Sampling(index=[], creator=self),
+                sampling=Sampling(index_levels=[], creator=self),
                 creator=self,
             ),
         )
@@ -95,8 +96,8 @@ class OpI1O1NotCreator(base.Operator):
         self.add_output(
             "output",
             Event(
-                features=[f for f in event.features()],
-                sampling=event.sampling(),
+                features=[f for f in event.features],
+                sampling=event.sampling,
                 creator=self,
             ),
         )
@@ -128,18 +129,18 @@ class OpI2O1(base.Operator):
                 features=[
                     Feature(
                         "f5",
-                        dtype.FLOAT64,
-                        sampling=event_1.sampling(),
+                        DType.BOOLEAN,
+                        sampling=event_1.sampling,
                         creator=self,
                     ),
                     Feature(
                         "f6",
-                        dtype.FLOAT64,
-                        sampling=event_1.sampling(),
+                        DType.STRING,
+                        sampling=event_1.sampling,
                         creator=self,
                     ),
                 ],
-                sampling=event_1.sampling(),
+                sampling=event_1.sampling,
                 creator=self,
             ),
         )
@@ -172,12 +173,12 @@ class OpI1O2(base.Operator):
                 features=[
                     Feature(
                         "f1",
-                        dtype.FLOAT64,
-                        sampling=event.sampling(),
+                        DType.INT32,
+                        sampling=event.sampling,
                         creator=self,
                     )
                 ],
-                sampling=event.sampling(),
+                sampling=event.sampling,
                 creator=self,
             ),
         )
@@ -187,12 +188,12 @@ class OpI1O2(base.Operator):
                 features=[
                     Feature(
                         "f1",
-                        dtype.FLOAT64,
-                        sampling=event.sampling(),
+                        DType.FLOAT32,
+                        sampling=event.sampling,
                         creator=self,
-                    )
+                    ),
                 ],
-                sampling=event.sampling(),
+                sampling=event.sampling,
                 creator=self,
             ),
         )
@@ -200,3 +201,74 @@ class OpI1O2(base.Operator):
 
 
 operator_lib.register_operator(OpI1O2)
+
+
+class OpWithAttributes(base.Operator):
+    @classmethod
+    def build_op_definition(cls) -> pb.OperatorDef:
+        return pb.OperatorDef(
+            key="OpWithAttributes",
+            inputs=[
+                pb.OperatorDef.Input(key="event"),
+            ],
+            outputs=[
+                pb.OperatorDef.Output(key="output"),
+            ],
+            attributes=[
+                pb.OperatorDef.Attribute(
+                    key="attr_int",
+                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="attr_str",
+                    type=pb.OperatorDef.Attribute.Type.STRING,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="attr_list",
+                    type=pb.OperatorDef.Attribute.Type.REPEATED_STRING,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="attr_float",
+                    type=pb.OperatorDef.Attribute.Type.FLOAT_64,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="attr_bool",
+                    type=pb.OperatorDef.Attribute.Type.BOOL,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="attr_map",
+                    type=pb.OperatorDef.Attribute.Type.MAP_STR_STR,
+                ),
+            ],
+        )
+
+    def __init__(
+        self,
+        event: Event,
+        attr_int: int,
+        attr_str: str,
+        attr_list: List[str],
+        attr_float: float,
+        attr_bool: bool,
+        attr_map: Mapping[str, str],
+    ):
+        super().__init__()
+        self.add_attribute("attr_int", attr_int)
+        self.add_attribute("attr_str", attr_str)
+        self.add_attribute("attr_list", attr_list)
+        self.add_attribute("attr_float", attr_float)
+        self.add_attribute("attr_bool", attr_bool)
+        self.add_attribute("attr_map", attr_map)
+        self.add_input("event", event)
+        self.add_output(
+            "output",
+            Event(
+                features=[],
+                sampling=event.sampling,
+                creator=self,
+            ),
+        )
+        self.check()
+
+
+operator_lib.register_operator(OpWithAttributes)

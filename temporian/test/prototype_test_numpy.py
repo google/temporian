@@ -30,7 +30,7 @@ class PrototypeTest(absltest.TestCase):
         BOOK_ID = 2
         PIXEL_ID = 3
 
-        self.event_1_data = NumpyEvent.from_dataframe(
+        self.numpy_event_1 = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
                     [TRYOLABS_SHOP, MATE_ID, 0.0, 14],
@@ -46,8 +46,7 @@ class PrototypeTest(absltest.TestCase):
             ),
             index_names=["store_id", "product_id"],
         )
-
-        self.event_2_data = NumpyEvent.from_dataframe(
+        self.numpy_event_2 = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
                     [TRYOLABS_SHOP, MATE_ID, 0.0, -14],
@@ -63,27 +62,29 @@ class PrototypeTest(absltest.TestCase):
             ),
             index_names=["store_id", "product_id"],
         )
+        # set same sampling
+        for index_key, index_data in self.numpy_event_1.data.items():
+            self.numpy_event_2[index_key].timestamps = index_data.timestamps
 
         # TODO: Remove the following line when "from_dataframe" support creating
-        # event data with shared sampling. Note that "event_1_data" and
-        # "event_2_data" should have the same sampling in this tests.
-        self.event_1_data.sampling = self.event_2_data.sampling
+        # event data with shared sampling. Note that "numpy_event_1" and
+        # "numpy_event_2" should have the same sampling in this tests.
 
-        self.event_1 = self.event_1_data.schema()
-        self.event_2 = self.event_2_data.schema()
+        self.event_1 = self.numpy_event_1.schema()
+        self.event_2 = self.numpy_event_2.schema()
         self.event_2._sampling = self.event_1._sampling
 
         self.expected_output_event = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 data=[
-                    [TRYOLABS_SHOP, MATE_ID, 0.0, 14, -14, 0],
-                    [TRYOLABS_SHOP, MATE_ID, 1.0, 15, -15, 14],
-                    [TRYOLABS_SHOP, MATE_ID, 2.0, 16, -16, 15],
-                    [TRYOLABS_SHOP, BOOK_ID, 1.0, 10, -10, 0],
-                    [GOOGLE_SHOP, BOOK_ID, 1.0, 7, -7, 0],
-                    [GOOGLE_SHOP, BOOK_ID, 2.0, 8, -8, 7],
-                    [GOOGLE_SHOP, PIXEL_ID, 0.0, 3, -3, 0],
-                    [GOOGLE_SHOP, PIXEL_ID, 1.0, 4, -4, 3],
+                    [TRYOLABS_SHOP, MATE_ID, 0.0, 14, -14, 0, -14],
+                    [TRYOLABS_SHOP, MATE_ID, 1.0, 15, -15, 14, -15],
+                    [TRYOLABS_SHOP, MATE_ID, 2.0, 16, -16, 15, -16],
+                    [TRYOLABS_SHOP, BOOK_ID, 1.0, 10, -10, 0, -10],
+                    [GOOGLE_SHOP, BOOK_ID, 1.0, 7, -7, 0, -7],
+                    [GOOGLE_SHOP, BOOK_ID, 2.0, 8, -8, 7, -8],
+                    [GOOGLE_SHOP, PIXEL_ID, 0.0, 3, -3, 0, -3],
+                    [GOOGLE_SHOP, PIXEL_ID, 1.0, 4, -4, 3, -4],
                 ],
                 columns=[
                     "store_id",
@@ -92,6 +93,7 @@ class PrototypeTest(absltest.TestCase):
                     "sales",
                     "costs",
                     "lag[1s]_sales",
+                    "sub_sales_0",
                 ],
             ),
             index_names=["store_id", "product_id"],
@@ -102,15 +104,17 @@ class PrototypeTest(absltest.TestCase):
         # create and glue sum feature
         # TODO: Restore when arithmetic operator is fixed.
         # b = tp.glue(a, self.event_1 + self.event_2)
-        c = tp.lag(self.event_1, duration=1)
+        c = tp.prefix("lag[1s]_", tp.lag(self.event_1, duration=1))
         d = tp.glue(a, tp.sample(c, a))
-        output_event = d
+        sub_sales = 0 - self.event_1["sales"]
+        e = tp.glue(d, sub_sales)
+        output_event = e
 
         output_event_numpy = tp.evaluate(
             output_event,
             input_data={
-                self.event_1: self.event_1_data,
-                self.event_2: self.event_2_data,
+                self.event_1: self.numpy_event_1,
+                self.event_2: self.numpy_event_2,
             },
             # TODO: The glue operator has some issues with dtypes. Re-enable
             # checking when solved.

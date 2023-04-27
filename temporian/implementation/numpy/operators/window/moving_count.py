@@ -12,31 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy as np
 
-from temporian.implementation.numpy import implementation_lib
 from temporian.core.operators.window.moving_count import (
     MovingCountOperator,
 )
+from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.window.base import (
     BaseWindowNumpyImplementation,
 )
+from temporian.implementation.numpy_cc.operators import window as window_cc
 
 
 class MovingCountNumpyImplementation(BaseWindowNumpyImplementation):
     """Numpy implementation of the moving count operator."""
 
-    def __init__(self, operator: MovingCountOperator) -> None:
-        super().__init__(operator)
-
-    def _apply_operation(self, values: np.array) -> np.array:
-        """Calculates the count of the values in each row in the input.
-
-        NaNs are not counted.
-
-        See base class for further info.
-        """
-        return np.count_nonzero(~np.isnan(values), axis=1).astype(np.int64)
+    def _implementation(self):
+        return window_cc.moving_count
 
 
 implementation_lib.register_operator_implementation(

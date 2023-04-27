@@ -14,18 +14,13 @@
 
 from absl.testing import absltest
 
-import numpy as np
+import pandas as pd
 
-from temporian.core.data.sampling import Sampling
 from temporian.core.operators.propagate import Propagate
 from temporian.implementation.numpy.operators.propagate import (
     PropagateNumpyImplementation,
 )
-from temporian.implementation.numpy.data.event import NumpyEvent, NumpyFeature
-from temporian.implementation.numpy.data.sampling import NumpySampling
-from temporian.core.data import event as event_lib
-from temporian.core.data import feature as feature_lib
-from temporian.core.data import dtype as dtype_lib
+from temporian.implementation.numpy.data.event import NumpyEvent
 
 
 class PropagateOperatorTest(absltest.TestCase):
@@ -33,116 +28,47 @@ class PropagateOperatorTest(absltest.TestCase):
         pass
 
     def test_base(self):
-        # Define input
-        sampling = Sampling(index=["x"])
-        event = event_lib.input_event(
-            [
-                feature_lib.Feature(name="a", dtype=dtype_lib.FLOAT64),
-                feature_lib.Feature(name="b", dtype=dtype_lib.FLOAT64),
-            ],
-            sampling=sampling,
+        event_data = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                {
+                    "timestamp": [1, 2, 3],
+                    "a": [1, 2, 3],
+                    "x": [1, 1, 2],
+                }
+            ),
+            index_names=["x"],
         )
-        to = event_lib.input_event(
-            [
-                feature_lib.Feature(name="c", dtype=dtype_lib.INT64),
-                feature_lib.Feature(name="d", dtype=dtype_lib.INT64),
-            ],
-            sampling=sampling,
+        event = event_data.schema()
+
+        sampling_data = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                {
+                    "timestamp": [1, 1, 1, 1],
+                    "x": [1, 1, 2, 2],
+                    "y": [1, 2, 1, 2],
+                }
+            ),
+            index_names=["x", "y"],
         )
+        sampling = sampling_data.schema()
 
-        # Create input data
-        # TODO: Use "from_dataframe" when it suppose sampling sharing.
-
-        sampling = NumpySampling(
-            index=["x"],
-            data={
-                ("X1",): np.array([0.1, 0.2, 0.3], dtype=np.float64),
-                ("X2",): np.array([0.4, 0.5], dtype=np.float64),
-            },
+        expected_output = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                {
+                    "timestamp": [1, 2, 1, 2, 3, 3],
+                    "a": [1, 2, 1, 2, 3, 3],
+                    "x": [1, 1, 1, 1, 2, 2],
+                    "y": [1, 1, 2, 2, 1, 2],
+                }
+            ),
+            index_names=["x", "y"],
         )
-
-        input_data = NumpyEvent(
-            data={
-                ("X1",): [
-                    NumpyFeature("a", np.array([1, 2, 3], dtype=np.float64)),
-                    NumpyFeature("b", np.array([4, 5, 6], dtype=np.float64)),
-                ],
-                ("X2",): [
-                    NumpyFeature("a", np.array([7, 8], dtype=np.float64)),
-                    NumpyFeature("b", np.array([9, 10], dtype=np.float64)),
-                ],
-            },
-            sampling=sampling,
-        )
-
-        to_data = NumpyEvent(
-            data={
-                ("X1",): [
-                    NumpyFeature("c", np.array([1, 2, 1], dtype=np.int64)),
-                    NumpyFeature("d", np.array([1, 1, 2], dtype=np.int64)),
-                ],
-                ("X2",): [
-                    NumpyFeature("c", np.array([1, 1], dtype=np.int64)),
-                    NumpyFeature("d", np.array([2, 1], dtype=np.int64)),
-                ],
-            },
-            sampling=sampling,
-        )
-
-        # Expected output
-        expected_sampling = NumpySampling(
-            index=["x", "c", "d"],
-            data={
-                ("X1", 1, 1): np.array([0.1, 0.2, 0.3], dtype=np.float64),
-                ("X1", 1, 2): np.array([0.1, 0.2, 0.3], dtype=np.float64),
-                ("X1", 2, 1): np.array([0.1, 0.2, 0.3], dtype=np.float64),
-                ("X2", 1, 1): np.array([0.4, 0.5], dtype=np.float64),
-                ("X2", 1, 2): np.array([0.4, 0.5], dtype=np.float64),
-            },
-        )
-
-        expected_output = NumpyEvent(
-            data={
-                (
-                    "X1",
-                    1,
-                    1,
-                ): [
-                    NumpyFeature("a", np.array([1, 2, 3], dtype=np.float64)),
-                    NumpyFeature("b", np.array([4, 5, 6], dtype=np.float64)),
-                ],
-                (
-                    "X1",
-                    1,
-                    2,
-                ): [
-                    NumpyFeature("a", np.array([1, 2, 3], dtype=np.float64)),
-                    NumpyFeature("b", np.array([4, 5, 6], dtype=np.float64)),
-                ],
-                (
-                    "X1",
-                    2,
-                    1,
-                ): [
-                    NumpyFeature("a", np.array([1, 2, 3], dtype=np.float64)),
-                    NumpyFeature("b", np.array([4, 5, 6], dtype=np.float64)),
-                ],
-                ("X2", 1, 1): [
-                    NumpyFeature("a", np.array([7, 8], dtype=np.float64)),
-                    NumpyFeature("b", np.array([9, 10], dtype=np.float64)),
-                ],
-                ("X2", 1, 2): [
-                    NumpyFeature("a", np.array([7, 8], dtype=np.float64)),
-                    NumpyFeature("b", np.array([9, 10], dtype=np.float64)),
-                ],
-            },
-            sampling=expected_sampling,
-        )
-
         # Run op
-        op = Propagate(event=event, to=to)
+        op = Propagate(event=event, sampling=sampling)
         instance = PropagateNumpyImplementation(op)
-        output = instance.call(event=input_data, to=to_data)["event"]
+        output = instance.call(event=event_data, sampling=sampling_data)[
+            "event"
+        ]
         self.assertEqual(output, expected_output)
 
 

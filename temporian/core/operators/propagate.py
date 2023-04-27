@@ -14,75 +14,76 @@
 
 """Propagate operator class and public API function definition."""
 
-from typing import List, Union
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
+from temporian.core.data.sampling import Sampling
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
-from temporian.core.operators.select import select
-from temporian.core.data.sampling import Sampling
 
 
 class Propagate(Operator):
     def __init__(
         self,
         event: Event,
-        to: Event,
+        sampling: Event,
     ):
         super().__init__()
 
         self.add_input("event", event)
-        self.add_input("to", to)
+        self.add_input("sampling", sampling)
 
-        # TODO: Constraint the type of features supported in "add_event".
+        self._index_mapping: list[int] = []
+        sampling_index_name = sampling.sampling.index.names
+        sampling_index_dtypes = sampling.sampling.index.dtypes
+        for index in event.sampling.index:
+            try:
+                sampling_idx = sampling_index_name.index(index.name)
+                self._index_mapping.append(sampling_idx)
+            except ValueError:
+                raise ValueError(
+                    "The index of event should be contained in the index of"
+                    f' sampling. Index "{index.name}" from event is not'
+                    " available in sampling. event.index:"
+                    f" {event.sampling.index},"
+                    f" sampling.index={sampling.sampling.index}."
+                )
+            if sampling_index_dtypes[sampling_idx] != index.dtype:
+                raise ValueError(
+                    f'The index "{index.name}" is found both in the event and'
+                    " sampling argument. However, the dtype is different."
+                    f" {index.dtype} != {sampling_index_dtypes[sampling_idx]}"
+                )
 
-        if event.sampling() != to.sampling():
-            raise ValueError("event and to should have the same sampling")
-
-        if len(to.features()) == 0:
-            raise ValueError("to contains no features")
-
-        self._added_index = [k.name() for k in to.features()]
-
-        overlap_features = set(self._added_index).intersection(
-            event.sampling().index()
+        output_sampling = Sampling(
+            index_levels=sampling.sampling.index, creator=self
         )
-        if len(overlap_features) > 0:
-            raise ValueError(
-                "to contains feature names already present in the"
-                f" index: {list(overlap_features)}"
-            )
-
-        new_index = event.sampling().index() + self._added_index
-        sampling = Sampling(index=new_index, creator=self)
 
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=f.name(),
-                dtype=f.dtype(),
-                sampling=sampling,
+                name=f.name,
+                dtype=f.dtype,
+                sampling=output_sampling,
                 creator=self,
             )
-            for f in event.features()
+            for f in event.features
         ]
 
         self.add_output(
             "event",
             Event(
                 features=output_features,
-                sampling=sampling,
+                sampling=output_sampling,
                 creator=self,
             ),
         )
 
         self.check()
 
-    def added_index(self) -> list[str]:
-        """New items in the index."""
-
-        return self._added_index
+    @property
+    def index_mapping(self):
+        return self._index_mapping
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
@@ -91,7 +92,7 @@ class Propagate(Operator):
             attributes=[],
             inputs=[
                 pb.OperatorDef.Input(key="event"),
-                pb.OperatorDef.Input(key="to"),
+                pb.OperatorDef.Input(key="sampling"),
             ],
             outputs=[pb.OperatorDef.Output(key="event")],
         )
@@ -102,53 +103,39 @@ operator_lib.register_operator(Propagate)
 
 def propagate(
     event: Event,
-    to: Union[Event, str, List[str]],
+    sampling: Event,
 ) -> Event:
-    """Extends index and propagates feature values.
+    """Propagates feature values over a larger index.
 
-    Extends the index of `event` over the features of `add_event`. Feature
-    values from `event` are duplicated over the new index. `add_event` can be a
-    string or list of string representing features in `event`, or an event.
-
-    For example, suppose an index-less event containing two features "f_1" and
-    "f_2", and containing 16 timestamps. Suppose "f_1" is a numerical feature
-    and "f_2" is a string feature with 4 unique values across the 16 timestamps.
-    "Propagating" feature "f_1" over "f_2" will create an event containing
-    feature "f_1" and indexed by feature "f_2". This event will contain 4
-    indexed time sequences each containing 16 timestamps.
+    Given `event` and `sampling` where `event` contains a super index of
+    `sampling` (e.g., the index of `event` is `["x"]`, and the index of sampling
+    is `["x","y"]`), duplicates the features of "events" over the index of
+    `sampling`.
 
     Example:
 
-    If `event` is indexed by ["x"] and contain two features "f1" and "f2", and
-    if `add_event` is also indexed by ["x"] and contains two features "y" and
-    "z", the result is an event indexed by ["x", "y", "z"] and containing
-    features "f1" and "f2".
+        Inputs:
+            event:
+                feature_1: ...
+                feature_2: ...
+                index: ["x"]
+            sampling:
+                index: ["x", "y"]
 
-    Constraints:
-
-    - If `to` is an event, `event` and `to` have the same index and sampling.
+        Output:
+            feature_1: ...
+            feature_2: ...
+            index: ["x", "y"]
 
     Args:
         event: Event to propagate.
-        to: Features to index over. If `to` is a list of strings, those strings
-            should refer to existing features of `event`.
+        sampling: Index to propagate over.
 
     Returns:
-        Event propagated over `to`.
+        Event propagated over `sampling`'s index.
     """
-
-    if isinstance(to, str):
-        to = [to]
-
-    if isinstance(to, list):
-        to_set = set(to)
-        to = select(event, to)
-        remaining_features = [
-            f.name() for f in event.features() if f.name not in to_set
-        ]
-        event = select(event, remaining_features)
 
     return Propagate(
         event=event,
-        to=to,
-    ).outputs()["event"]
+        sampling=sampling,
+    ).outputs["event"]

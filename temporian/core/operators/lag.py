@@ -35,25 +35,27 @@ class LagOperator(Operator):
     ):
         super().__init__()
 
+        self._duration = duration
+        self._duration_str = duration_abbreviation(duration)
+
         # inputs
         self.add_input("event", event)
 
         self.add_attribute("duration", duration)
 
-        output_sampling = Sampling(index=event.sampling().index(), creator=self)
-
-        prefix = "lag" if duration > 0 else "leak"
-        duration_str = duration_abbreviation(duration)
+        output_sampling = Sampling(
+            index_levels=event.sampling.index.levels, creator=self
+        )
 
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=f"{prefix}[{duration_str}]_{f.name()}",
-                dtype=f.dtype(),
+                name=f.name,
+                dtype=f.dtype,
                 sampling=output_sampling,
                 creator=self,
             )
-            for f in event.features()
+            for f in event.features
         ]
 
         self.add_output(
@@ -65,6 +67,14 @@ class LagOperator(Operator):
             ),
         )
         self.check()
+
+    @property
+    def duration(self) -> Duration:
+        return self._duration
+
+    @property
+    def duration_str(self) -> str:
+        return self._duration_str
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
@@ -113,10 +123,10 @@ def _implementation(
         return LagOperator(
             event=event,
             duration=used_duration[0],
-        ).outputs()["event"]
+        ).outputs["event"]
 
     return [
-        LagOperator(event=event, duration=d).outputs()["event"]
+        LagOperator(event=event, duration=d).outputs["event"]
         for d in used_duration
     ]
 

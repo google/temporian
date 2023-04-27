@@ -16,7 +16,7 @@
 
 from abc import ABC, abstractmethod
 
-from temporian.core.data import dtype
+from temporian.core.data.dtype import DType
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.operators.base import Operator
@@ -29,7 +29,7 @@ class BaseCalendarOperator(Operator, ABC):
     def __init__(self, sampling: Event):
         super().__init__()
 
-        if not sampling.sampling().is_unix_timestamp():
+        if not sampling.sampling.is_unix_timestamp:
             raise ValueError(
                 "Calendar operators can only be applied on events with unix"
                 " timestamps as sampling. This can be specified with"
@@ -41,8 +41,8 @@ class BaseCalendarOperator(Operator, ABC):
 
         output_feature = Feature(
             name=self.output_feature_name,
-            dtype=dtype.INT32,
-            sampling=sampling.sampling(),
+            dtype=DType.INT32,
+            sampling=sampling.sampling,
             creator=self,
         )
 
@@ -51,7 +51,7 @@ class BaseCalendarOperator(Operator, ABC):
             "event",
             Event(
                 features=[output_feature],
-                sampling=sampling.sampling(),
+                sampling=sampling.sampling,
                 creator=self,
             ),
         )

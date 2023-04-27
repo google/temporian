@@ -14,10 +14,10 @@
 
 from absl.testing import absltest
 
-import numpy as np
 import pandas as pd
 
 from temporian.core import evaluator
+from temporian.core.data.dtype import DType
 from temporian.core.data.event import Event
 from temporian.core.data.event import Feature
 from temporian.core.data.sampling import Sampling
@@ -26,8 +26,6 @@ from temporian.core.operators.lag import leak
 from temporian.core.operators.lag import LagOperator
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators.lag import LagNumpyImplementation
-
-from temporian.core.data import dtype as dtype_lib
 
 
 class LagNumpyImplementationTest(absltest.TestCase):
@@ -50,7 +48,6 @@ class LagNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id"],
         )
-
         numpy_output_event = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
@@ -62,22 +59,19 @@ class LagNumpyImplementationTest(absltest.TestCase):
                     [0, 12, 15.0],
                     [0, 22, 16.0],
                 ],
-                columns=["store_id", "timestamp", "lag[2s]_sales"],
+                columns=["store_id", "timestamp", "sales"],
             ),
             index_names=["store_id"],
         )
-
         event = Event(
-            [Feature("sales", dtype_lib.FLOAT64)],
-            sampling=Sampling(["store_id"]),
+            [Feature("sales", DType.FLOAT64)],
+            sampling=Sampling([("store_id", DType.INT64)]),
             creator=None,
         )
-
         operator = LagOperator(
-            duration=2,
+            duration=2.0,
             event=event,
         )
-
         lag_implementation = LagNumpyImplementation(operator)
         operator_output = lag_implementation.call(event=numpy_input_event)
 
@@ -114,12 +108,11 @@ class LagNumpyImplementationTest(absltest.TestCase):
                 columns=[
                     "store_id",
                     "timestamp",
-                    "lag[1s]_sales",
+                    "sales",
                 ],
             ),
             index_names=["store_id"],
         )
-
         expected_lag_2_numpy_output_event = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
@@ -134,17 +127,15 @@ class LagNumpyImplementationTest(absltest.TestCase):
                 columns=[
                     "store_id",
                     "timestamp",
-                    "lag[2s]_sales",
+                    "sales",
                 ],
             ),
             index_names=["store_id"],
         )
-
         event = numpy_input_event.schema()
 
         # lag multiple durations
         lags = lag(event=event, duration=[1, 2])
-
         lag_1 = lags[0]
 
         # evaluate
@@ -154,12 +145,10 @@ class LagNumpyImplementationTest(absltest.TestCase):
                 event: numpy_input_event,
             },
         )
-
         # validate
         self.assertEqual(
             expected_lag_1_numpy_output_event, output_event_numpy_lag_1
         )
-
         lag_2 = lags[1]
 
         # evaluate
@@ -169,7 +158,6 @@ class LagNumpyImplementationTest(absltest.TestCase):
                 event: numpy_input_event,
             },
         )
-
         # validate
         self.assertEqual(
             expected_lag_2_numpy_output_event, output_event_numpy_lag_2
@@ -192,7 +180,6 @@ class LagNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id"],
         )
-
         numpy_output_event = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
@@ -204,22 +191,19 @@ class LagNumpyImplementationTest(absltest.TestCase):
                     [0, 8, 15.0],
                     [0, 18, 16.0],
                 ],
-                columns=["store_id", "timestamp", "leak[2s]_sales"],
+                columns=["store_id", "timestamp", "sales"],
             ),
             index_names=["store_id"],
         )
-
         event = Event(
-            [Feature("sales", dtype_lib.FLOAT64)],
-            sampling=Sampling(["store_id"]),
+            [Feature("sales", DType.FLOAT64)],
+            sampling=Sampling([("store_id", DType.INT64)]),
             creator=None,
         )
-
         operator = LagOperator(
-            duration=-2,
+            duration=-2.0,
             event=event,
         )
-
         lag_implementation = LagNumpyImplementation(operator)
         operator_output = lag_implementation.call(event=numpy_input_event)
 
@@ -256,12 +240,11 @@ class LagNumpyImplementationTest(absltest.TestCase):
                 columns=[
                     "store_id",
                     "timestamp",
-                    "leak[1s]_sales",
+                    "sales",
                 ],
             ),
             index_names=["store_id"],
         )
-
         expected_leak_2_numpy_output_event = NumpyEvent.from_dataframe(
             pd.DataFrame(
                 [
@@ -276,17 +259,15 @@ class LagNumpyImplementationTest(absltest.TestCase):
                 columns=[
                     "store_id",
                     "timestamp",
-                    "leak[2s]_sales",
+                    "sales",
                 ],
             ),
             index_names=["store_id"],
         )
-
         event = numpy_input_event.schema()
 
         # leak multiple durations
         leaks = leak(event=event, duration=[1, 2])
-
         leak_1 = leaks[0]
 
         # evaluate
@@ -296,12 +277,10 @@ class LagNumpyImplementationTest(absltest.TestCase):
                 event: numpy_input_event,
             },
         )
-
         # validate
         self.assertEqual(
             expected_leak_1_numpy_output_event, output_event_numpy_leak_1
         )
-
         leak_2 = leaks[1]
 
         # evaluate
@@ -311,7 +290,6 @@ class LagNumpyImplementationTest(absltest.TestCase):
                 event: numpy_input_event,
             },
         )
-
         # validate
         self.assertEqual(
             expected_leak_2_numpy_output_event, output_event_numpy_leak_2

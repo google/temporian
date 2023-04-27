@@ -12,32 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy as np
 
-from temporian.implementation.numpy import implementation_lib
 from temporian.core.operators.window.moving_standard_deviation import (
     MovingStandardDeviationOperator,
 )
+from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.window.base import (
     BaseWindowNumpyImplementation,
 )
+from temporian.implementation.numpy_cc.operators import window as window_cc
 
 
 class MovingStandardDeviationNumpyImplementation(BaseWindowNumpyImplementation):
     """Numpy implementation of the moving standard deviation operator."""
 
-    def __init__(self, operator: MovingStandardDeviationOperator) -> None:
-        super().__init__(operator)
-
-    def _apply_operation(self, values: np.array) -> np.array:
-        """Calculates the standard deviation of the values in each row in the
-        input.
-
-        NaNs are ignored.
-
-        See base class for further info.
-        """
-        return np.nanstd(values, axis=1)
+    def _implementation(self):
+        return window_cc.moving_standard_deviation
 
 
 implementation_lib.register_operator_implementation(

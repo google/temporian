@@ -186,9 +186,9 @@ def build_schedule(
 
     # Compute "event_to_op" and "op_to_num_pending_inputs".
     inputs_set = set(inputs)
-    for op in processor.operators():
+    for op in processor.operators:
         num_pending_inputs = 0
-        for input_event in op.inputs().values():
+        for input_event in op.inputs.values():
             if input_event in inputs_set:
                 # This input is already available
                 continue
@@ -211,7 +211,7 @@ def build_schedule(
 
         # Update all the ops that depends on "op". Enlist the ones that are
         # ready to be computed
-        for output in op.outputs().values():
+        for output in op.outputs.values():
             if output not in event_to_op:
                 continue
             for new_op in event_to_op[output]:

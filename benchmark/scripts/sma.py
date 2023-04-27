@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Benchmarking script for the simple moving average operator.
+"""Basic profiling script for temporian.
 
 The script creates an event, applies an sma on it, and evaluates the graph.
 """
@@ -61,7 +61,7 @@ def main():
 
     event = event_data.schema()
 
-    sma = tp.sma(event, window_length=10)
+    sma = tp.simple_moving_average(event, window_length=10.0)
 
     res: NumpyEvent = tp.evaluate(
         sma,
@@ -72,7 +72,7 @@ def main():
     )
 
     # Print output's first row, useful to check reproducibility
-    print(res._first_index_features)
+    print(res.first_index_data())
 
 
 if __name__ == "__main__":

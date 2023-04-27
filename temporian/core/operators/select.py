@@ -35,13 +35,13 @@ class SelectOperator(Operator):
                 "Unexpected type for feature_names. Expect str or list of"
                 f" str. Got '{feature_names}' instead."
             )
+
+        self._feature_names = feature_names
         self.add_attribute("feature_names", feature_names)
 
         # verify all selected features exist in the input event
         selected_features_set = set(feature_names)
-        event_features_set = set(
-            [feature.name() for feature in event.features()]
-        )
+        event_features_set = set([feature.name for feature in event.features])
         if not set(selected_features_set).issubset(event_features_set):
             raise KeyError(selected_features_set.difference(event_features_set))
 
@@ -51,13 +51,13 @@ class SelectOperator(Operator):
         # outputs
         output_features = []
         for feature_name in feature_names:
-            for feature in event.features():
+            for feature in event.features:
                 # TODO: maybe implement features attributes of Event as dict
                 # so we can index by name?
-                if feature.name() == feature_name:
+                if feature.name == feature_name:
                     output_features.append(feature)
 
-        output_sampling = event.sampling()
+        output_sampling = event.sampling
         self.add_output(
             "event",
             Event(
@@ -68,6 +68,10 @@ class SelectOperator(Operator):
         )
 
         self.check()
+
+    @property
+    def feature_names(self) -> List[str]:
+        return self._feature_names
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
@@ -113,4 +117,4 @@ def select(
             f" str. Got '{feature_names}' instead."
         )
 
-    return SelectOperator(event, feature_names).outputs()["event"]
+    return SelectOperator(event, feature_names).outputs["event"]
