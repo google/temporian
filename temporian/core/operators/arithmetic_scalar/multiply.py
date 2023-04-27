@@ -24,9 +24,7 @@ from temporian.core.operators.arithmetic_scalar.base import (
 
 
 class MultiplyScalarOperator(BaseArithmeticScalarOperator):
-    """
-    Applies arithmetic multiplication to an event and a scalar value.
-    """
+    """Applies arithmetic multiplication to an event and a scalar value."""
 
     @classmethod
     @property
@@ -54,15 +52,14 @@ def multiply_scalar(
     event: Event,
     value: Union[float, int],
 ) -> Event:
-    """
-    Multiplies element-wise an event features and a scalar value.
+    """Multiplies element-wise an event features and a scalar value.
 
     Args:
-        event_1: event to perform multiplication to.
-        value: scalar value to multiply to all event features.
+        event: Event to perform multiplication to.
+        value: Scalar value to multiply to all event features.
 
     Returns:
-        Event: event with the multiplication of event features and value.
+        Event with the multiplication of event features and value.
     """
     return MultiplyScalarOperator(
         event=event,

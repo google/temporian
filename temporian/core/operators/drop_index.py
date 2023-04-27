@@ -198,14 +198,11 @@ def drop_index(
         index columns will be included as features in the output `Event`.
 
     Raises:
-        ValueError:
-            If an empty list is provided as the `index_names` argument.
-        KeyError:
-            If any of the specified `index_names` are missing from the input
-            `Event`'s index.
-        ValueError:
-            If a feature name coming from the index already exists in the input
-            `Event`, and the `keep` flag is set to `True`.
+        ValueError: If an empty list is provided as the `index_names` argument.
+        KeyError: If any of the specified `index_names` are missing from
+            `event`'s index.
+        ValueError: If a feature name coming from the index already exists in
+            `event`, and the `keep` flag is set to `True`.
 
     Examples:
         Given an input `Event` with index names ['A', 'B', 'C'] and features

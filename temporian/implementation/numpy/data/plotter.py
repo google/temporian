@@ -45,8 +45,8 @@ def plot(
         min_time: If set, only plot events after it.
         max_time: If set, only plot events before it.
         max_num_plots: Maximum number of plots to display. If more plots are
-          available, only plot the first `max_num_plots` ones and print a
-          warning.
+            available, only plot the first `max_num_plots` ones and print a
+            warning.
     """
 
     if not isinstance(events, list):

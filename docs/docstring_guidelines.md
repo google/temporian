@@ -70,19 +70,24 @@ In temporian we do not (yet) consider module docstrings to be mandatory.
 
 Example:
 
-```
+````
     """A one-line summary of the module, terminated by a period.
 
     Leave one blank line.  The rest of this docstring should contain an
     overall description of the module.  Optionally, it may also contain a brief
     description of exported classes and functions and/or usage examples.
 
-    Typical usage example:
-
-    foo = ClassFoo()
-    bar = foo.FunctionBar()
+    Example:
+        ```
+        foo = ClassFoo()
+        bar = foo.FunctionBar()
+        ```
     """
-```
+````
+
+Note the indentation after the "Example:" clause, which makes mkdocs render it
+as a dropdown component, and the use of "```", which makes it be rendered as a
+code block. The same applies for class docstrings.
 
 #### Test modules
 
@@ -142,36 +147,43 @@ is violated.
 
 Example:
 
-```
+````
     """Fetches rows from a Smalltable.
 
     Retrieves rows pertaining to the given keys from the Table instance
     represented by table_handle.  String keys will be UTF-8 encoded.
 
+    Example:
+        ```
+        rows = fetch_rows(handle, keys)
+        ```
+
     Args:
-        table_handle: An open smalltable.Table instance.
-        keys: A sequence of strings representing the key of each table
-            row to fetch.  String keys will be UTF-8 encoded.
-        require_all_keys: If True only rows with values set for all keys will be
-            returned.
+        table_handle: Open `smalltable.Table` instance.
+        keys: Sequence of strings representing the key of each table row to
+            fetch. String keys will be UTF-8 encoded.
+        require_all_keys: If `True`,  only rows with values set for all keys
+            will be returned.
 
     Returns:
-        A dict mapping keys to the corresponding table row data
-        fetched. Each row is represented as a tuple of strings. For
-        example:
+        Dict mapping keys to the corresponding table row data fetched. Each row
+        is represented as a tuple of strings.
 
-        {b'Serak': ('Rigel VII', 'Preparer'),
-         b'Zim': ('Irk', 'Invader'),
-         b'Lrrr': ('Omicron Persei 8', 'Emperor')}
+        For example:
+            ```
+            {b'Serak': ('Rigel VII', 'Preparer'),
+            b'Zim': ('Irk', 'Invader'),
+            b'Lrrr': ('Omicron Persei 8', 'Emperor')}
+            ```
 
-        Returned keys are always bytes.  If a key from the keys argument is
+        Returned keys are always bytes. If a key from the keys argument is
         missing from the dictionary, then that row was not found in the
-        table (and require_all_keys must have been False).
+        table (and `require_all_keys` must have been False).
 
     Raises:
         IOError: An error occurred accessing the smalltable.
     """
-```
+````
 
 ### Classes
 
@@ -190,8 +202,8 @@ Example:
     Longer class information...
 
     Attributes:
-        likes_spam: A boolean indicating if we like SPAM or not.
-        eggs: An integer count of the eggs we have laid.
+        likes_spam: Boolean indicating if we like SPAM or not.
+        eggs: Integer count of the eggs we have laid.
     """
 ```
 

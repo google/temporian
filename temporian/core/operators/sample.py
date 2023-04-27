@@ -87,7 +87,7 @@ def sample(
     `dtype.MissingValue(...)`.
 
     Example:
-
+        ```
         Inputs:
             event:
                 timestamps: 1, 5, 8, 9
@@ -98,6 +98,7 @@ def sample(
         Output:
             timestamps: -1, 1, 6, 10
             feature_1: nan, 1.0, 2.0, 4.0
+        ```
 
     Args:
         event: Event to sample.
