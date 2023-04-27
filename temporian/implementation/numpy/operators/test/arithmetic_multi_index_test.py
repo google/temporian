@@ -231,7 +231,8 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id", "product_id"],
         )
         self.sampling = Sampling(
-            [("store_id", DType.INT32), ("product_id", DType.INT64)]
+            [("store_id", DType.INT32), ("product_id", DType.INT64)],
+            is_unix_timestamp=False,
         )
         self.event_1 = Event(
             [

@@ -117,11 +117,17 @@ class GlueNumpyImplementationTest(absltest.TestCase):
             _ = GlueOperator(
                 event_0=event_lib.input_event(
                     [Feature(name="a", dtype=DType.FLOAT64)],
-                    sampling=Sampling(index_levels=[("x", DType.INT64)]),
+                    sampling=Sampling(
+                        index_levels=[("x", DType.INT64)],
+                        is_unix_timestamp=False,
+                    ),
                 ),
                 event_1=event_lib.input_event(
                     [Feature(name="b", dtype=DType.FLOAT64)],
-                    sampling=Sampling(index_levels=[("x", DType.INT64)]),
+                    sampling=Sampling(
+                        index_levels=[("x", DType.INT64)],
+                        is_unix_timestamp=False,
+                    ),
                 ),
             )
 
@@ -130,7 +136,9 @@ class GlueNumpyImplementationTest(absltest.TestCase):
             ValueError,
             'Feature "a" is defined in multiple input events',
         ):
-            sampling = Sampling(index_levels=[("x", DType.INT64)])
+            sampling = Sampling(
+                index_levels=[("x", DType.INT64)], is_unix_timestamp=False
+            )
             _ = GlueOperator(
                 event_0=event_lib.input_event(
                     [Feature(name="a", dtype=DType.FLOAT64)],

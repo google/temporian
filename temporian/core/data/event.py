@@ -237,7 +237,9 @@ def input_event(
     sampling: Optional[Sampling] = None,
 ) -> Event:
     if sampling is None:
-        sampling = Sampling(index_levels=index_levels, creator=None)
+        sampling = Sampling(
+            index_levels=index_levels, is_unix_timestamp=False, creator=None
+        )
 
     for feature in features:
         if feature.sampling is not None:

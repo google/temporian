@@ -29,7 +29,9 @@ from temporian.core.operators.arithmetic import (
 
 class ArithmeticOperatorsTest(absltest.TestCase):
     def setUp(self):
-        self.sampling = Sampling(index_levels=[("x", DType.INT32)])
+        self.sampling = Sampling(
+            index_levels=[("x", DType.INT32)], is_unix_timestamp=False
+        )
 
         # Events with floating point types
         self.event_1 = event_lib.input_event(

@@ -69,7 +69,9 @@ class OpI1O1(base.Operator):
                         creator=self,
                     ),
                 ],
-                sampling=Sampling(index_levels=[], creator=self),
+                sampling=Sampling(
+                    index_levels=[], creator=self, is_unix_timestamp=False
+                ),
                 creator=self,
             ),
         )
