@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-"""UniqueTimestamps operator class and public API function definitions."""
+"""Unique timestamps operator class and public API function definitions."""
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
@@ -59,9 +59,9 @@ operator_lib.register_operator(UniqueTimestamps)
 def unique_timestamps(event: Event) -> Event:
     """Removes duplicated timestamps.
 
-    unique_timestamps returns a feature-less event where each timestamps from
-    "event" only appears once. If the event is indexed, the unique operation is
-    applied independently for each index.
+    Returns a feature-less event where each timestamps from `event` only appears
+    once. If the event is indexed, the unique operation is applied independently
+    for each index.
 
     Example:
 
@@ -74,10 +74,10 @@ def unique_timestamps(event: Event) -> Event:
             timestamps: [1, 2, 4]
 
     Args:
-        event: An event, possibly with features, to process.
+        event: Event, possibly with features, to process.
 
     Returns:
-        An event without features with unique timestamps.
+        Event without features with unique timestamps in `event`.
     """
 
     return UniqueTimestamps(event=event).outputs["event"]

@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Type cast operator."""
+"""Cast operator class and public API function definition."""
+
 from typing import Union, Mapping, Optional
 from temporian.core.data.feature import Feature
 
@@ -24,8 +25,6 @@ from temporian.proto import core_pb2 as pb
 
 
 class CastOperator(Operator):
-    """Type cast operator."""
-
     def __init__(
         self,
         event: Event,
@@ -224,13 +223,13 @@ def cast(
             Raises ValueError: don't mix dtype and feature name keys
 
     Args:
-        event:  Input `Event` object to cast the columns from.
+        event: Input `Event` object to cast the columns from.
         target: Single dtype or a map. Providing a single dtype will cast all
             columns to it. The mapping keys can be either feature names or the
             original dtypes (and not both types mixed), and the values are the
             target dtypes for them. All dtypes must be temporian types (see
             `dtype.py`).
-        check_overflow: A flag to check overflow when casting to a dtype with a
+        check_overflow: Flag to check overflow when casting to a dtype with a
             shorter range (e.g: `INT64`->`INT32`). Note that this check adds
             some computation overhead. Defaults to `True`.
 

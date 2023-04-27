@@ -1,4 +1,19 @@
-"""DropIndex operator."""
+# Copyright 2021 Google LLC.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Set index operator class and public API function definition."""
+
 from typing import List, Optional, Union
 
 from temporian.core import operator_lib
@@ -10,8 +25,6 @@ from temporian.proto import core_pb2 as pb
 
 
 class SetIndexOperator(Operator):
-    """SetIndex operator."""
-
     def __init__(
         self,
         event: Event,
@@ -115,10 +128,9 @@ operator_lib.register_operator(SetIndexOperator)
 def set_index(
     event: Event, feature_names: List[str], append: bool = False
 ) -> Event:
-    """Sets one or more index columns for the given `Event` object and returns
-    a new `Event` object with the updated index.
+    """Sets one or more features as index in an event.
 
-    Optionally, it can also append the new index columns to the existing index.
+    Optionally, the new index columns can be appended to the existing index.
 
     The input `event` object remains unchanged. The function returns a new
     event with the specified index changes.
@@ -148,8 +160,8 @@ def set_index(
             existing index (True) or replace it (False). Defaults to `False`.
 
     Returns:
-        New `Event` with the updated index, where the specified feature names have
-        been set or appended as index columns, based on the `append` flag.
+        New `Event` with the updated index, where the specified feature names
+        have been set or appended as index columns, based on the `append` flag.
 
     Raises:
         KeyError: If any of the specified `feature_names` are not found in
