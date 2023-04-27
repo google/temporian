@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Base class for arithmetic operators"""
+"""Base arithmetic operator class definition."""
 
 from abc import abstractmethod
 
@@ -24,7 +24,7 @@ from temporian.proto import core_pb2 as pb
 
 
 class BaseArithmeticOperator(Operator):
-    """Base Arithmetic operator."""
+    """Interface definition and common logic for arithmetic operators."""
 
     def __init__(
         self,
@@ -99,12 +99,12 @@ class BaseArithmeticOperator(Operator):
     @property
     @abstractmethod
     def operator_def_key(cls) -> str:
-        """Get the key of the operator definition."""
+        """Gets the key of the operator definition."""
 
     @property
     @abstractmethod
     def prefix(self) -> str:
-        """Get the prefix to use for the output features."""
+        """Gets the prefix to use for the output features."""
 
     def output_feature_name(
         self, feature_1: Feature, feature_2: Feature

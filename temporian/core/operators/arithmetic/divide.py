@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Division Operator"""
+"""Divide operator class and public API function definition."""
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
@@ -21,10 +21,6 @@ from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
 
 
 class DivideOperator(BaseArithmeticOperator):
-    """
-    Divide first event by second one
-    """
-
     def __init__(
         self,
         event_1: Event,
@@ -57,16 +53,22 @@ operator_lib.register_operator(DivideOperator)
 
 def divide(
     numerator: Event,
-    denominator: Event,
+    : Event,
 ) -> Event:
-    """
-    Divide two events.
+    """Divides two events.
+
+    Each feature in `numerator` is divided by the feature in `denominator` in
+    the same position.
+
+    `numerator` and `denominator` must have the same sampling and the same
+    number of features.
 
     Args:
-        numerator: Numerator event
-        denominator: Denominator event
+        numerator: Numerator event.
+        denominator: Denominator event.
+
     Returns:
-        Event: Division of numerator features and denominator features
+        Division of `numerator`'s features by `denominator`'s features.
     """
     return DivideOperator(
         event_1=numerator,
