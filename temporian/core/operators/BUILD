@@ -17,6 +17,7 @@ py_library(
         ":lag",
         ":prefix",
         ":propagate",
+        ":rename",
         ":sample",
         ":select",
         ":set_index",
@@ -98,6 +99,20 @@ py_library(
         "//temporian/core/data:dtype",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "rename",
+    srcs = ["rename.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/core/data:sampling",
         "//temporian/proto:core_py_proto",
     ],
 )
