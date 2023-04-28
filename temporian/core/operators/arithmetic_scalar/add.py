@@ -31,10 +31,6 @@ class AddScalarOperator(BaseArithmeticScalarOperator):
         return "ADDITION_SCALAR"
 
     @property
-    def prefix(self) -> str:
-        return "add"
-
-    @property
     def supported_value_dtypes(self) -> List[DType]:
         return [
             DType.FLOAT32,

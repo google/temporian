@@ -23,7 +23,6 @@ from temporian.core.operators.arithmetic_scalar import (
     DivideScalarOperator,
     FloorDivScalarOperator,
     EqualScalarOperator,
-    NegateOperator,
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators.arithmetic_scalar import (
@@ -33,7 +32,6 @@ from temporian.implementation.numpy.operators.arithmetic_scalar import (
     DivideScalarNumpyImplementation,
     FloorDivideScalarNumpyImplementation,
     EqualScalarNumpyImplementation,
-    NegateNumpyImplementation,
 )
 
 
@@ -72,7 +70,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                     [0, 4.0, np.nan],
                     [0, 5.0, 40.0],
                 ],
-                columns=["store_id", "timestamp", "add_sales_10.0"],
+                columns=["store_id", "timestamp", "sales"],
             ),
             index_names=["store_id"],
         )
@@ -102,7 +100,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                     [0, 4.0, np.nan],
                     [0, 5.0, 20.0],
                 ],
-                columns=["store_id", "timestamp", "sub_sales_10.0"],
+                columns=["store_id", "timestamp", "sales"],
             ),
             index_names=["store_id"],
         )
@@ -133,7 +131,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                     [0, 4.0, np.nan],
                     [0, 5.0, -20.0],
                 ],
-                columns=["store_id", "timestamp", "sub_sales_10.0"],
+                columns=["store_id", "timestamp", "sales"],
             ),
             index_names=["store_id"],
         )
@@ -164,7 +162,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                     [0, 4.0, np.nan],
                     [0, 5.0, 300.0],
                 ],
-                columns=["store_id", "timestamp", "mult_sales_10.0"],
+                columns=["store_id", "timestamp", "sales"],
             ),
             index_names=["store_id"],
         )
@@ -194,7 +192,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                     [0, 4.0, np.nan],
                     [0, 5.0, 3.0],
                 ],
-                columns=["store_id", "timestamp", "div_sales_10.0"],
+                columns=["store_id", "timestamp", "sales"],
             ),
             index_names=["store_id"],
         )
@@ -223,7 +221,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                     [0, 4.0, np.nan],
                     [0, 5.0, 1.0 / 3.0],
                 ],
-                columns=["store_id", "timestamp", "div_sales_10.0"],
+                columns=["store_id", "timestamp", "sales"],
             ),
             index_names=["store_id"],
         )
@@ -254,7 +252,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                     [0, 4.0, np.nan],
                     [0, 5.0, 3.0],
                 ],
-                columns=["store_id", "timestamp", "floordiv_sales_10.0"],
+                columns=["store_id", "timestamp", "sales"],
             ),
             index_names=["store_id"],
         )
@@ -283,7 +281,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                     [0, 4.0, np.nan],
                     [0, 5.0, 1.0 // 3.0],
                 ],
-                columns=["store_id", "timestamp", "floordiv_sales_10.0"],
+                columns=["store_id", "timestamp", "sales"],
             ),
             index_names=["store_id"],
         )
@@ -295,31 +293,6 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         )
 
         impl = FloorDivideScalarNumpyImplementation(operator)
-
-        operator_output = impl.call(event=self.event_data)
-
-        self.assertEqual(numpy_output_event, operator_output["event"])
-
-    def test_correct_negation(self) -> None:
-        """Test correct negation operator."""
-
-        numpy_output_event = NumpyEvent.from_dataframe(
-            pd.DataFrame(
-                [
-                    [0, 1.0, -10.0],
-                    [0, 2.0, 0.0],
-                    [0, 3.0, -12.0],
-                    [0, 4.0, np.nan],
-                    [0, 5.0, -30.0],
-                ],
-                columns=["store_id", "timestamp", "sales"],
-            ),
-            index_names=["store_id"],
-        )
-
-        operator = NegateOperator(event=self.event)
-
-        impl = NegateNumpyImplementation(operator)
 
         operator_output = impl.call(event=self.event_data)
 
@@ -357,7 +330,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                     "store_id",
                     "product_id",
                     "timestamp",
-                    "add_sales_10.0",
+                    "sales",
                 ],
             ),
             index_names=["store_id", "product_id"],
@@ -428,7 +401,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                     [0, 4.0, 0],
                     [0, 5.0, 40],
                 ],
-                columns=["store_id", "timestamp", "add_sales_10"],
+                columns=["store_id", "timestamp", "sales"],
             ),
             index_names=["store_id"],
         )
@@ -474,7 +447,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                     [0, 4.0, False],
                     [0, 5.0, True],
                 ],
-                columns=["store_id", "timestamp", "equal_sales_0.0"],
+                columns=["store_id", "timestamp", "sales"],
             ),
             index_names=["store_id"],
         )

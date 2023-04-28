@@ -74,7 +74,7 @@ class BaseArithmeticScalarOperator(Operator):
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=self.output_feature_name(feature.name),
+                name=feature.name,
                 dtype=self.output_feature_dtype(feature),
                 sampling=event.sampling,
                 creator=self,
@@ -122,16 +122,8 @@ class BaseArithmeticScalarOperator(Operator):
 
     @property
     @abstractmethod
-    def prefix(self) -> str:
-        """Gets the prefix to use for the output features."""
-
-    @property
-    @abstractmethod
     def supported_value_dtypes(self) -> List[DType]:
         """Supported DTypes for value."""
-
-    def output_feature_name(self, feature_name: str) -> str:
-        return f"{self.prefix}_{feature_name}_{self.value}"
 
     def output_feature_dtype(self, feature: Feature) -> DType:
         return feature.dtype

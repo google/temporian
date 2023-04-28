@@ -46,10 +46,7 @@ class BaseArithmeticScalarNumpyImplementation(OperatorImplementation, ABC):
         """
         dst_event = NumpyEvent(
             data={},
-            feature_names=[
-                self._operator.output_feature_name(feature_name)
-                for feature_name in event.feature_names
-            ],
+            feature_names=event.feature_names,
             index_names=event.index_names,
             is_unix_timestamp=event.is_unix_timestamp,
         )

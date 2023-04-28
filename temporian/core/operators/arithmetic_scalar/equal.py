@@ -31,10 +31,6 @@ class EqualScalarOperator(BaseArithmeticScalarOperator):
     def operator_def_key(cls) -> str:
         return "EQUAL_SCALAR"
 
-    @property
-    def prefix(self) -> str:
-        return "equal"
-
     def output_feature_dtype(self, feature: Feature) -> DType:
         # override parent method to always return BOOLEAN features
         return DType.BOOLEAN

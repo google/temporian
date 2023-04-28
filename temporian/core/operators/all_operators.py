@@ -17,7 +17,6 @@ from temporian.core.operators.arithmetic_scalar import divide_scalar
 from temporian.core.operators.arithmetic_scalar import floordiv_scalar
 from temporian.core.operators.arithmetic_scalar import multiply_scalar
 from temporian.core.operators.arithmetic_scalar import subtract_scalar
-from temporian.core.operators.arithmetic_scalar import negate
 from temporian.core.operators.arithmetic_scalar import equal_scalar
 
 from temporian.core.operators.glue import glue

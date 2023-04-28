@@ -93,7 +93,7 @@ class PrototypeTest(absltest.TestCase):
                     "sales",
                     "costs",
                     "lag[1s]_sales",
-                    "sub_sales_0",
+                    "negated_sales",
                 ],
             ),
             index_names=["store_id", "product_id"],
@@ -106,7 +106,7 @@ class PrototypeTest(absltest.TestCase):
         # b = tp.glue(a, self.event_1 + self.event_2)
         c = tp.prefix("lag[1s]_", tp.lag(self.event_1, duration=1))
         d = tp.glue(a, tp.sample(c, a))
-        sub_sales = 0 - self.event_1["sales"]
+        sub_sales = tp.prefix("negated_", -self.event_1["sales"])
         e = tp.glue(d, sub_sales)
         output_event = e
 

@@ -35,7 +35,6 @@ py_library(
         "//temporian/implementation/numpy/operators/arithmetic_scalar:equal",
         "//temporian/implementation/numpy/operators/arithmetic_scalar:floordiv",
         "//temporian/implementation/numpy/operators/arithmetic_scalar:multiply",
-        "//temporian/implementation/numpy/operators/arithmetic_scalar:negate",
         "//temporian/implementation/numpy/operators/arithmetic_scalar:subtract",
         "//temporian/implementation/numpy/operators/calendar:day_of_month",
         "//temporian/implementation/numpy/operators/calendar:day_of_week",

@@ -31,10 +31,6 @@ class SubtractScalarOperator(BaseArithmeticScalarOperator):
         return "SUBTRACTION_SCALAR"
 
     @property
-    def prefix(self) -> str:
-        return "sub"
-
-    @property
     def supported_value_dtypes(self) -> List[DType]:
         return [
             DType.FLOAT32,
