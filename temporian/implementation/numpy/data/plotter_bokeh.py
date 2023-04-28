@@ -1,7 +1,7 @@
 """Bokeh plotting backend."""
 
 import datetime
-from typing import Optional, List, Any
+from typing import Optional, List, Any, Set
 
 import numpy as np
 
@@ -16,7 +16,12 @@ from temporian.implementation.numpy.data.plotter import (
 )
 
 
-def plot_bokeh(evsets: List[EventSet], indexes: List[tuple], options: Options):
+def plot_bokeh(
+    evsets: List[EventSet],
+    indexes: List[tuple],
+    features: Set[str],
+    options: Options,
+):
     from bokeh.plotting import figure
     from bokeh.io import output_notebook, show
     from bokeh.layouts import gridplot, column
@@ -28,7 +33,7 @@ def plot_bokeh(evsets: List[EventSet], indexes: List[tuple], options: Options):
     from bokeh.models import ColumnDataSource, CustomJS
     from bokeh.palettes import Dark2_5 as colors
 
-    num_plots = get_num_plots(evsets, indexes, options)
+    num_plots = get_num_plots(evsets, indexes, features, options)
 
     figs = []
 
@@ -50,7 +55,7 @@ def plot_bokeh(evsets: List[EventSet], indexes: List[tuple], options: Options):
             if plot_idx >= num_plots:
                 break
 
-            feature_names = evset.feature_names
+            feature_names = [f for f in evset.feature_names if f in features]
 
             xs = evset.data[index].timestamps
             uniform = is_uniform(xs)
@@ -95,7 +100,8 @@ def plot_bokeh(evsets: List[EventSet], indexes: List[tuple], options: Options):
                 color_idx += 1
                 plot_idx += 1
 
-            for feature_idx, feature_name in enumerate(feature_names):
+            for feature_name in feature_names:
+                feature_idx = evset.feature_names.index(feature_name)
                 if plot_idx >= num_plots:
                     # Too much plots are displayed already.
                     break

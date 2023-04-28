@@ -15,7 +15,7 @@
 """Plotting utility."""
 
 import datetime
-from typing import NamedTuple, Optional, Union, List, Any, Tuple
+from typing import NamedTuple, Optional, Union, List, Any, Set, Tuple
 
 import numpy as np
 from enum import Enum
@@ -54,6 +54,7 @@ class Options(NamedTuple):
 def plot(
     evsets: Union[List[EventSet], EventSet],
     indexes: Optional[Union[Any, tuple, List[tuple]]] = None,
+    features: Optional[Union[str, List[str], Set[str]]] = None,
     width_px: int = 1024,
     height_per_plot_px: int = 150,
     max_points: Optional[int] = None,
@@ -73,6 +74,10 @@ def plot(
             the available indexes. Indexes should be provided as single value
             (e.g. string) or tuple of values. Example: index="a", index=("a",),
             index=("a", "b",), index=["a", "b"], index=[("a", "b"), ("a", "c")].
+        features: Feature names of the event(s) to plot. Use
+            'evset.feature_names' for the list of available names.
+            If a feature doesn't exist in an event, it's silently skipped.
+            If None, plots all features of all events.
         width_px: Width of the figure in pixel.
         height_per_plot_px: Height of each sub-plot (one per feature) in pixel.
         max_points: Maximum number of points to plot.
@@ -125,6 +130,20 @@ def plot(
         style = Style[style]
     assert isinstance(style, Style)
 
+    if features is None:
+        # Don't filter anything: use all features from all events
+        features = set().union(*[e.feature_names for e in evsets])
+    elif isinstance(features, str):
+        features = {features}
+    elif isinstance(features, list):
+        features = set(features)
+    elif not isinstance(features, set):
+        raise ValueError("Features argument must be a str, list or set.")
+
+    for feature in features:
+        if not isinstance(feature, str):
+            raise ValueError("All feature names should be strings")
+
     options = Options(
         interactive=interactive,
         backend=backend,
@@ -147,7 +166,9 @@ def plot(
         )
 
     try:
-        fig = BACKENDS[backend](evsets=evsets, indexes=indexes, options=options)
+        fig = BACKENDS[backend](
+            evsets=evsets, indexes=indexes, features=features, options=options
+        )
     except ImportError:
         print(error_message_import_backend(backend))
         raise
@@ -156,7 +177,10 @@ def plot(
 
 
 def get_num_plots(
-    evsets: List[EventSet], indexes: List[tuple], options: Options
+    evsets: List[EventSet],
+    indexes: List[tuple],
+    features: Set[str],
+    options: Options,
 ):
     """Computes the number of sub-plots."""
 
@@ -171,7 +195,7 @@ def get_num_plots(
                     ' Alternatively, set "index=None" to select a random'
                     f" index value (e.g., {evset.first_index_key()}."
                 )
-            num_features = len(evset.feature_names)
+            num_features = len(set(evset.feature_names).intersection(features))
             if num_features == 0:
                 # We plot the sampling
                 num_features = 1

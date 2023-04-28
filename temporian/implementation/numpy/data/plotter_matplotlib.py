@@ -1,7 +1,7 @@
 """Matplotlib plotting backend."""
 
 import datetime
-from typing import Optional, List, Any
+from typing import Optional, List, Set
 
 import numpy as np
 
@@ -18,7 +18,10 @@ from temporian.implementation.numpy.data.plotter import (
 
 
 def plot_matplotlib(
-    evsets: List[EventSet], indexes: List[tuple], options: Options
+    evsets: List[EventSet],
+    indexes: List[tuple],
+    features: Set[str],
+    options: Options,
 ):
     import matplotlib.pyplot as plt
     from matplotlib.cm import get_cmap
@@ -27,7 +30,7 @@ def plot_matplotlib(
 
     px = 1 / plt.rcParams["figure.dpi"]
 
-    num_plots = get_num_plots(evsets, indexes, options)
+    num_plots = get_num_plots(evsets, indexes, features, options)
 
     fig, axs = plt.subplots(
         num_plots,
@@ -56,7 +59,7 @@ def plot_matplotlib(
             if plot_idx >= num_plots:
                 break
 
-            feature_names = evset.feature_names
+            feature_names = [f for f in evset.feature_names if f in features]
 
             xs = evset.data[index].timestamps
             uniform = is_uniform(xs)
@@ -100,7 +103,9 @@ def plot_matplotlib(
                 color_idx += 1
                 plot_idx += 1
 
-            for feature_idx, feature_name in enumerate(feature_names):
+            for feature_name in feature_names:
+                feature_idx = evset.feature_names.index(feature_name)
+
                 if plot_idx >= num_plots:
                     # Too much plots are displayed already.
                     break
