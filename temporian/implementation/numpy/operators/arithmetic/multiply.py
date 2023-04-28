@@ -21,7 +21,7 @@ from temporian.implementation.numpy.operators.arithmetic.base import (
 
 
 class MultiplyNumpyImplementation(BaseArithmeticNumpyImplementation):
-    """Numpy implementation of arithmetic multiplication"""
+    """Numpy implementation of the multiply operator."""
 
     def __init__(self, operator: MultiplyOperator) -> None:
         super().__init__(operator)

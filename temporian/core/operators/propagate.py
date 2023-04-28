@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Propagate operator."""
+"""Propagate operator class and public API function definition."""
 
 
 from temporian.core import operator_lib
@@ -24,8 +24,6 @@ from temporian.proto import core_pb2 as pb
 
 
 class Propagate(Operator):
-    """Propagate operator."""
-
     def __init__(
         self,
         event: Event,
@@ -109,10 +107,10 @@ def propagate(
 ) -> Event:
     """Propagates feature values over a larger index.
 
-    Given "event" and "sampling" where "event" contains a super index of
-    "sampling" (e.g., the index of "event" is ["x"], and the index of sampling
-    is ["x","y"]), duplicates the features of "events" over the index of
-    "sampling".
+    Given `event` and `sampling` where `event` contains a super index of
+    `sampling` (e.g., the index of `event` is `["x"]`, and the index of sampling
+    is `["x","y"]`), duplicates the features of "events" over the index of
+    `sampling`.
 
     Example:
 
@@ -130,11 +128,11 @@ def propagate(
             index: ["x", "y"]
 
     Args:
-        event: The event to propagate.
+        event: Event to propagate.
         sampling: Index to propagate over.
 
     Returns:
-        An event sequence propagated over `to`.
+        Event propagated over `sampling`'s index.
     """
 
     return Propagate(

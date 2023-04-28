@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""An event is a collection (possibly empty) of timesampled feature values."""
+"""Event class definition."""
 
 from __future__ import annotations
 from typing import Dict, List, Optional, Tuple, TYPE_CHECKING, Any
@@ -28,6 +28,24 @@ if TYPE_CHECKING:
 
 
 class Event(object):
+    """Collection of feature values for a certain sampling.
+
+    An event represents the structure, or schema, of a collection of indexed
+    multivariate time series. An event does not contain any actual data, but is
+    instead used as a reference to describe the format of the input,
+    intermediate results, or output of a Processor (i.e., a computation graph).
+
+    Informally, an event defines the name and data types of each time series, as
+    well as the key and data type of the index (if any).
+
+    There are several ways to create an event:
+    - Through the `.schema()` method in a NumpyEvent.
+    - Through applying operators to other events.
+    - Manually using the `tp.input_event(...)` method to specify the name and
+        data types of each time series and the key and data type of the index.
+    - (Not recommended) By instantiating the Event class directly.
+    """
+
     def __init__(
         self,
         features: List[Feature],
@@ -236,6 +254,7 @@ def input_event(
     name: Optional[str] = None,
     sampling: Optional[Sampling] = None,
 ) -> Event:
+    """Creates an event with the specified attributes."""
     if sampling is None:
         sampling = Sampling(index_levels=index_levels, creator=None)
 

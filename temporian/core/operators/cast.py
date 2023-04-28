@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Type cast operator."""
+"""Cast operator class and public API function definition."""
+
 from typing import Union, Mapping, Optional
 from temporian.core.data.feature import Feature
 
@@ -24,8 +25,6 @@ from temporian.proto import core_pb2 as pb
 
 
 class CastOperator(Operator):
-    """Type cast operator."""
-
     def __init__(
         self,
         event: Event,
@@ -200,41 +199,9 @@ def cast(
     target: Union[DType, Union[Mapping[str, DType], Mapping[DType, DType]]],
     check_overflow: bool = True,
 ) -> Event:
-    """
-    Cast the dtype of event features to the dtype(s) specified in `target`.
+    """Casts the dtype of features to the dtype(s) specified in `target`.
+
     Feature names are preserved, and reused (not copied) if not changed.
-
-    Args:
-        event:
-            The input `Event` object to cast the columns from.
-        target:
-            A single dtype or a map. Providing a single dtype will cast all
-            columns to it. The mapping keys can be either feature names or
-            the original dtypes (and not both types mixed),
-            and the values are the target dtypes for them.
-            All dtypes must be temporian types (see `dtype.py`)
-        check_overflow:
-            A flag to check overflow when casting to a dtype with a shorter
-            range (e.g: `INT64`->`INT32`).
-            Note that this check adds some computation overhead.
-            Defaults to `True`.
-
-    Returns:
-        A new `Event` (or the same if no features actually changed dtype), with
-        the same feature names as the input one, but with the new dtypes as
-        specified in `target`.
-
-    Raises:
-        ValueError:
-            If `check_overflow=True` and some value is out of the range of the
-            target dtype.
-        ValueError:
-            If trying to cast a non-numeric string to numeric dtype.
-        ValueError:
-            If the `target` parameter is not a dtype nor a mapping.
-        ValueError:
-            If `target` is a mapping, but some of the keys are not a dtype nor
-            a feature in `event.feature_names`, or if those types are mixed.
 
     Examples:
         Given an input `Event` with features 'A' (`INT64`), 'B'
@@ -254,6 +221,31 @@ def cast(
 
         4. `cast(event, target={'A': dtype.FLOAT32, dtype.FLOAT64: dtype.INT32})`
             Raises ValueError: don't mix dtype and feature name keys
+
+    Args:
+        event: Input `Event` object to cast the columns from.
+        target: Single dtype or a map. Providing a single dtype will cast all
+            columns to it. The mapping keys can be either feature names or the
+            original dtypes (and not both types mixed), and the values are the
+            target dtypes for them. All dtypes must be temporian types (see
+            `dtype.py`).
+        check_overflow: Flag to check overflow when casting to a dtype with a
+            shorter range (e.g: `INT64`->`INT32`). Note that this check adds
+            some computation overhead. Defaults to `True`.
+
+    Returns:
+        New `Event` (or the same if no features actually changed dtype), with
+        the same feature names as the input one, but with the new dtypes as
+        specified in `target`.
+
+    Raises:
+        ValueError: If `check_overflow=True` and some value is out of the range
+            of the `target` dtype.
+        ValueError: If trying to cast a non-numeric string to numeric dtype.
+        ValueError: If `target` is not a dtype nor a mapping.
+        ValueError: If `target` is a mapping, but some of the keys are not a
+            dtype nor a feature in `event.feature_names`, or if those types are
+            mixed.
     """
     # Convert 'target' to one of these:
     to_dtype = None

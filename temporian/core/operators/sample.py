@@ -12,10 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Sample operator."""
-
-from textwrap import indent
-from typing import List, Union, Any, Dict
+"""Sample operator class and public API function definition."""
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
@@ -25,8 +22,6 @@ from temporian.proto import core_pb2 as pb
 
 
 class Sample(Operator):
-    """Sample operator."""
-
     def __init__(
         self,
         event: Event,
@@ -84,15 +79,15 @@ def sample(
     event: Event,
     sampling: Event,
 ) -> Event:
-    """Samples an event according to a sampling.
+    """Samples an event at each timestamp of a sampling.
 
-    If a timestamp in 'sampling' does not have a corresponding timestamp in
-    'event', the last timestamp in 'event' is used instead. If this timestamp
-    is anterior to an value in 'event', the value is replaced by
-    dtype.MissingValue(...).
+    If a timestamp in `sampling` does not have a corresponding timestamp in
+    `event`, the last timestamp in `event` is used instead. If this timestamp
+    is anterior to an value in `event`, the value is replaced by
+    `dtype.MissingValue(...)`.
 
     Example:
-
+        ```
         Inputs:
             event:
                 timestamps: 1, 5, 8, 9
@@ -103,13 +98,14 @@ def sample(
         Output:
             timestamps: -1, 1, 6, 10
             feature_1: nan, 1.0, 2.0, 4.0
+        ```
 
     Args:
-        event: The event to sample.
-        sampling: The timestamp of the sampling.
+        event: Event to sample.
+        sampling: Event to use the sampling of.
 
     Returns:
-        A sampled event.
+        Sampled event, with same sampling as `sampling`.
     """
 
     return Sample(event=event, sampling=sampling).outputs["event"]

@@ -13,30 +13,12 @@ from temporian.implementation.numpy import implementation_lib
 
 
 class SetIndexNumpyImplementation(OperatorImplementation):
-    """
-    A class that represents the implementation of the SetIndexOperator for
-    NumpyEvent objects.
-
-    Attributes:
-        operator (SetIndexOperator): The SetIndexOperator object.
-    """
+    """Numpy implementation of the set index operator."""
 
     def __init__(self, operator: SetIndexOperator) -> None:
         super().__init__(operator)
 
     def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
-        """
-        Execute the SetIndexOperator to the given NumpyEvent and return the
-        updated NumpyEvent.
-
-        Args:
-            event:
-                The input NumpyEvent object.
-
-        Returns:
-            A dictionary containing the resulting NumpyEvent object with the key
-            "event".
-        """
         # get attributes
         feature_names = self.operator.attributes["feature_names"]
         append = self.operator.attributes["append"]
@@ -48,17 +30,14 @@ class SetIndexNumpyImplementation(OperatorImplementation):
 
 
 def _append_impl(event: NumpyEvent, append_feat_names: List[str]) -> NumpyEvent:
-    """
-    Append the specified feature names to the index of the given NumpyEvent.
+    """Appends the specified feature names to the index of the given event.
 
     Args:
-        event:
-            The input NumpyEvent object.
-        append_feat_names:
-            A list of feature names to append to the index.
+        event: Event to append features to the index of.
+        append_feat_names: List of feature names to append to the index.
 
     Returns:
-        The resulting NumpyEvent object with the updated index.
+        NumpyEvent with the updated index.
     """
     # destination index names
     dst_idx_names = event.index_names + append_feat_names
@@ -120,17 +99,14 @@ def _append_impl(event: NumpyEvent, append_feat_names: List[str]) -> NumpyEvent:
 
 
 def _set_impl(event: NumpyEvent, set_feat_names: List[str]) -> NumpyEvent:
-    """
-    Set the specified feature names as the new index of the given NumpyEvent.
+    """Sets the specified feature names as the new index of the given event.
 
     Args:
-        event:
-            The input NumpyEvent object.
-        set_feat_names:
-            A list of feature names to set as the new index.
+        event: Event to set the index of.
+        set_feat_names: List of feature names to set as the new index.
 
     Returns:
-        The resulting NumpyEvent object with the updated index.
+        Event with the updated index.
     """
     # positions of features that are going to be part of the destination index
     dst_idx_pos = [

@@ -11,8 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-Basic profiling script for temporian.
+"""Basic profiling script for temporian.
 
 The script creates two events, applies some operators, and evaluates the graph.
 """
@@ -72,14 +71,12 @@ def main():
         index_names=[STORE, PRODUCT],
     )
 
-    event_1_data.sampling = event_2_data.sampling
-
     event_1 = event_1_data.schema()
     event_2 = event_2_data.schema()
     event_2._sampling = event_1._sampling
 
     a = tp.glue(event_1, event_2)
-    b = tp.simple_moving_average(a, window_length=10.0)
+    b = tp.prefix("sma_", tp.simple_moving_average(a, window_length=10.0))
     c = tp.glue(a, tp.sample(b, a))
 
     res: NumpyEvent = tp.evaluate(

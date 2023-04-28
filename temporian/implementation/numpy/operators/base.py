@@ -29,7 +29,7 @@ class OperatorImplementation(ABC):
     def __call__(
         self, **inputs: Dict[str, NumpyEvent]
     ) -> Dict[str, NumpyEvent]:
-        pass
+        """Applies the operator to its inputs."""
 
 
 def _check_features(

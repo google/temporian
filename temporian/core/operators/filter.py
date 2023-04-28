@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Filter operator."""
+"""Filter operator class and public API function definition."""
+
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
 from temporian.core.data.feature import Feature
@@ -23,8 +24,6 @@ from temporian.proto import core_pb2 as pb
 
 
 class FilterOperator(Operator):
-    """Filter operator."""
-
     def __init__(self, event: Event, condition: Event):
         super().__init__()
 
@@ -102,13 +101,18 @@ def filter(
     event: Event,
     condition: Event,
 ) -> Event:
-    """Filters out events for which the condition is false.
+    """Filters out timestamps in an event for which a condition is false.
+
+    Each timestamp in `event` is only kept if the corresponding value for that
+    timestamp in `condition` is `True`.
+
+    `event` and `condition` must have the same sampling.
 
     Args:
-        event: event to filter
-        condition: event with a single boolean feature condition.
+        event: Event to filter.
+        condition: Event with a single boolean feature condition.
 
     Returns:
-        Event: filtered event.
+        Filtered event.
     """
     return FilterOperator(event, condition).outputs["event"]

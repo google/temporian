@@ -198,23 +198,26 @@ class NumpyEvent:
         timestamp_column: str = "timestamp",
         is_sorted: bool = False,
     ) -> NumpyEvent:
-        """Convert a pandas DataFrame to a NumpyEvent.
+        """Creates a NumpyEvent from a pandas DataFrame.
+
         Args:
             df: DataFrame to convert to NumpyEvent.
-            index_names: names of the DataFrame columns to be used as index for
+            index_names: Names of the DataFrame columns to be used as index for
                 the event. Defaults to [].
-            timestamp_column: Column containing timestamps. Supported date types:
-                {np.datetime64, pd.Timestamp, datetime.datetime}. Timestamps of
-                these types are converted implicitly to UTC epoch float.
+            timestamp_column: Name of the column containing the timestamps.
+                Supported date types:
+                `{np.datetime64, pd.Timestamp, datetime.datetime}`.
+                Timestamps of these types are converted to UTC epoch float.
             is_sorted: If True, the DataFrame is assumed to be sorted by
                 timestamp. If False, the DataFrame will be sorted by timestamp.
 
 
         Returns:
-            NumpyEvent: NumpyEvent created from DataFrame.
+            Event created from DataFrame.
 
         Raises:
-            ValueError: If index_names or timestamp_column are not in df columns.
+            ValueError: If `index_names` or `timestamp_column` are not in `df`'s
+                columns.
             ValueError: If a column has an unsupported dtype.
 
         Example:
@@ -234,11 +237,13 @@ class NumpyEvent:
         def convert_timestamp_column_to_unix_epoch_float(
             timestamp_column: pd.Series,
         ) -> pd.DataFrame:
-            """Convert timestamp column to Unix Epoch Float.
+            """Converts a timestamp column to Unix Epoch Float.
+
             Args:
                 timestamp_column: Timestamp column to convert.
+
             Returns:
-                pd.Series: Converted timestamp column to Unix Epoch float.
+                Timestamp column converted to Unix Epoch float.
             """
             # check if timestamp column contains missing values and raise error
             if timestamp_column.isna().any():
@@ -381,7 +386,7 @@ class NumpyEvent:
         """Convert a NumpyEvent to a pandas DataFrame.
 
         Returns:
-            pd.DataFrame: DataFrame created from NumpyEvent.
+            DataFrame created from NumpyEvent.
         """
         column_names = self._index_names + self._feature_names + ["timestamp"]
         data = {column_name: [] for column_name in column_names}

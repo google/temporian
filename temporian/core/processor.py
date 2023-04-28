@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Processor module."""
+"""Processor class definition and inference logic."""
 
 from typing import List, Set, Dict, Union, Optional
 
@@ -25,7 +25,7 @@ MultipleEventArg = Union[Dict[str, Event], List[Event], Event]
 
 
 def normalize_multiple_event_arg(src: MultipleEventArg) -> Dict[str, Event]:
-    """Normalize an event / collection of events into a dictionary of events."""
+    """Normalizes an event or list of events into a dictionary of events."""
 
     save_src = src
 
@@ -150,15 +150,15 @@ def infer_processor(
 ) -> Preprocessor:
     """Extracts all the objects between the outputs and inputs events.
 
-    Fails if some inputs are missing.
+    Fails if any inputs are missing.
 
     Args:
-        inputs: Input events. If None, the inputs is infered. In this
-            case, input event have to be named.
+        inputs: Input events. If None, the inputs are inferred. In this case,
+            input events have to be named.
         outputs: Output events.
 
     Returns:
-      A preprocessor.
+        A preprocessor.
     """
 
     # The following algorithm lists all the events between the output and

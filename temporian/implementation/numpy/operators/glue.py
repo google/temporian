@@ -18,12 +18,13 @@ from typing import Dict
 
 from temporian.core.operators.glue import GlueOperator
 from temporian.implementation.numpy import implementation_lib
-from temporian.implementation.numpy.data.event import IndexData
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
 class GlueNumpyImplementation(OperatorImplementation):
+    """Numpy implementation of the glue operator."""
+
     def __init__(self, operator: GlueOperator):
         super().__init__(operator)
         assert isinstance(operator, GlueOperator)
@@ -32,12 +33,14 @@ class GlueNumpyImplementation(OperatorImplementation):
         self,
         **dict_events: Dict[str, NumpyEvent],
     ) -> Dict[str, NumpyEvent]:
-        # Features are always ordered by the argument name of the event.
-        #
-        # Example:
-        #   if dict_events = {"event_0": X, "event_3": Z, "event_2": Y}
-        #   then, "events" if guarenteed to be [X, Y, Z].
+        """Glues a dictionary of NumpyEvents.
 
+        The output features are ordered by the argument name of the event.
+
+        Example:
+            If dict_events is {"event_0": X, "event_3": Z, "event_2": Y}
+            output is guarenteed to be [X, Y, Z].
+        """
         # convert input event dict to list of events
         events = list(list(zip(*sorted(list(dict_events.items()))))[1])
         if len(events) < 2:
@@ -62,7 +65,6 @@ class GlueNumpyImplementation(OperatorImplementation):
             for event in events[1:]:
                 dst_event[index_key].features.extend(event[index_key].features)
 
-        # make gluement
         return {"event": dst_event}
 
 

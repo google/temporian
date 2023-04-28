@@ -32,19 +32,17 @@ class BaseArithmeticScalarNumpyImplementation(OperatorImplementation, ABC):
     def _do_operation(
         self, feature: np.ndarray, value: Union[float, int, str, bool]
     ) -> np.ndarray:
-        """
-        Perform the actual arithmetic operation corresponding to the subclass
-        """
+        """Performs the arithmetic operation corresponding to the subclass."""
 
     def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
-        """Apply the corresponding arithmetic operation between an event and a
+        """Applies the corresponding arithmetic operation between an event and a
         scalar.
 
         Args:
-            event: event to perform operation to.
+            event: Event to perform the operation to.
 
         Returns:
-            Arithmetic of the event and the valye according to the operator.
+            Result of the operation.
         """
         dst_event = NumpyEvent(
             data={},

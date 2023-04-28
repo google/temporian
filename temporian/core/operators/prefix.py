@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Prefix operator."""
+"""Prefix operator class and public API function definition."""
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
@@ -22,8 +22,6 @@ from temporian.proto import core_pb2 as pb
 
 
 class Prefix(Operator):
-    """Prefix operator."""
-
     def __init__(
         self,
         prefix: str,
@@ -82,10 +80,9 @@ def prefix(
     prefix: str,
     event: Event,
 ) -> Event:
-    """Add a prefix to the feature names.
+    """Adds a prefix to the names of the features in an event.
 
     Example:
-
         Inputs:
             prefix: "hello_"
             event:
@@ -105,5 +102,4 @@ def prefix(
     Returns:
         Prefixed event.
     """
-
     return Prefix(prefix=prefix, event=event).outputs["event"]

@@ -22,7 +22,7 @@ from temporian.implementation.numpy.operators.arithmetic.base import (
 
 
 class DivideNumpyImplementation(BaseArithmeticNumpyImplementation):
-    """Actual numpy implementation to divide first event by the second one"""
+    """Numpy implementation of the divide operator."""
 
     def __init__(self, operator: DivideOperator) -> None:
         super().__init__(operator)

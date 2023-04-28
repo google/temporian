@@ -24,7 +24,7 @@ from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
 class BaseWindowNumpyImplementation(OperatorImplementation):
-    """Abstract base class to implement common logic of numpy implementation of
+    """Interface definition and common logic for numpy implementation of
     window operators."""
 
     def __init__(self, operator: BaseWindowOperator) -> None:

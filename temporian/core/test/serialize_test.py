@@ -56,28 +56,28 @@ class SerializeTest(absltest.TestCase):
 
         # Ensures that "original" and "restored" don't link to the same objects.
         self.assertFalse(
-            serialize.all_identifier(original.samplings)
-            & serialize.all_identifier(restored.samplings)
+            serialize.all_identifiers(original.samplings)
+            & serialize.all_identifiers(restored.samplings)
         )
         self.assertFalse(
-            serialize.all_identifier(original.features)
-            & serialize.all_identifier(restored.features)
+            serialize.all_identifiers(original.features)
+            & serialize.all_identifiers(restored.features)
         )
         self.assertFalse(
-            serialize.all_identifier(original.operators)
-            & serialize.all_identifier(restored.operators)
+            serialize.all_identifiers(original.operators)
+            & serialize.all_identifiers(restored.operators)
         )
         self.assertFalse(
-            serialize.all_identifier(original.events)
-            & serialize.all_identifier(restored.events)
+            serialize.all_identifiers(original.events)
+            & serialize.all_identifiers(restored.events)
         )
         self.assertFalse(
-            serialize.all_identifier(original.inputs.values())
-            & serialize.all_identifier(restored.inputs.values())
+            serialize.all_identifiers(original.inputs.values())
+            & serialize.all_identifiers(restored.inputs.values())
         )
         self.assertFalse(
-            serialize.all_identifier(original.outputs.values())
-            & serialize.all_identifier(restored.outputs.values())
+            serialize.all_identifiers(original.outputs.values())
+            & serialize.all_identifiers(restored.outputs.values())
         )
 
     def test_serialize_attributes(self):
@@ -117,16 +117,16 @@ class SerializeTest(absltest.TestCase):
             self.assertEqual(attr_value, restored_attributes[attr_name])
 
         self.assertFalse(
-            serialize.all_identifier(original.operators)
-            & serialize.all_identifier(restored.operators)
+            serialize.all_identifiers(original.operators)
+            & serialize.all_identifiers(restored.operators)
         )
         self.assertFalse(
-            serialize.all_identifier(original.inputs.values())
-            & serialize.all_identifier(restored.inputs.values())
+            serialize.all_identifiers(original.inputs.values())
+            & serialize.all_identifiers(restored.inputs.values())
         )
         self.assertFalse(
-            serialize.all_identifier(original.outputs.values())
-            & serialize.all_identifier(restored.outputs.values())
+            serialize.all_identifiers(original.outputs.values())
+            & serialize.all_identifiers(restored.outputs.values())
         )
 
 

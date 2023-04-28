@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Division Scalar Operator"""
+"""Divide scalar operator class and public API function definition."""
+
 from typing import Union, List
 
 from temporian.core import operator_lib
@@ -24,10 +25,6 @@ from temporian.core.operators.arithmetic_scalar.base import (
 
 
 class DivideScalarOperator(BaseArithmeticScalarOperator):
-    """
-    Divides event by a scalar value.
-    """
-
     def __init__(
         self,
         event: Event,
@@ -73,14 +70,19 @@ def divide_scalar(
     numerator: Union[Event, SCALAR],
     denominator: Union[Event, SCALAR],
 ) -> Event:
-    """
-    Divides element-wise an event and a scalar value.
+    """Divides an event and a scalar value.
+
+    Each item in each feature in the event is divided with the scalar value.
+
+    Either `numerator` or `denominator` should be a scalar value, but not both.
+    If looking to divide two events, use the `divide` operator instead.
 
     Args:
         numerator: Numerator event or value.
         denominator: Denominator event or value.
+
     Returns:
-        Event: Division of numerator and denominator.
+        Division of `numerator` and `denominator`.
     """
     scalars_types = (float, int)
 

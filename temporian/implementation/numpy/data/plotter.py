@@ -1,8 +1,7 @@
 import datetime
-from typing import NamedTuple, Optional, Union, List, Any
+from typing import NamedTuple, Optional, Union, List
 
 import numpy as np
-from click import option
 
 from temporian.core.data import duration
 from temporian.implementation.numpy.data.event import NumpyEvent
@@ -37,17 +36,17 @@ def plot(
 
     Args:
         events: Single event, or list of events, to plot.
-        indexes: The index of the event to plot. Use 'event.index' for the
-            list of available indices. If index=None, plots all the indexes.
+        indexes: Indexes of the event to plot. Use 'event.index' for the
+            list of available indices. If index=None, plots all its indexes.
         backend: Plotting library to use.
         width_px: Width of the figure in pixel.
         height_per_plot_px: Height of each sub-plot (one per feature) in pixel.
         max_points: Maximum number of points to plot.
-        min_time: If set, only plot events after min_time.
-        max_time: If set, only plot events before min_time.
+        min_time: If set, only plot events after it.
+        max_time: If set, only plot events before it.
         max_num_plots: Maximum number of plots to display. If more plots are
-          available, only plot the first "max_num_plots" ones and print a
-          warning.
+            available, only plot the first `max_num_plots` ones and print a
+            warning.
     """
 
     if not isinstance(events, list):

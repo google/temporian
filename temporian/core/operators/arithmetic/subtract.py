@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Subtract one event from another"""
+"""Subtract operator class and public API function definition."""
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
@@ -20,11 +20,6 @@ from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
 
 
 class SubtractOperator(BaseArithmeticOperator):
-    """
-    Subtract second event from the first one, feature to feature according
-    to their position.
-    """
-
     @classmethod
     @property
     def operator_def_key(cls) -> str:
@@ -42,15 +37,20 @@ def subtract(
     event_1: Event,
     event_2: Event,
 ) -> Event:
-    """
-    Subtract event_2 from event_1.
+    """Subtracts two events.
+
+    Each feature in `event_2` is subtracted from the feature in `event_1` in the
+    same position.
+
+    `event_1` and `event_2` must have the same sampling and the same number of
+    features.
 
     Args:
-        event_1: First event
-        event_2: Second event
+        event_1: First event.
+        event_2: Second event.
 
     Returns:
-        Event: Subtraction of event_2 features from event_1.
+        Subtraction of `event_2`'s features from `event_1`'s.
     """
     return SubtractOperator(
         event_1=event_1,

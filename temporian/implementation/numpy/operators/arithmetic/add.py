@@ -21,7 +21,7 @@ from temporian.implementation.numpy.operators.arithmetic.base import (
 
 
 class AddNumpyImplementation(BaseArithmeticNumpyImplementation):
-    """Numpy implementation of arithmetic addition"""
+    """Numpy implementation of add operator."""
 
     def __init__(self, operator: AddOperator) -> None:
         super().__init__(operator)

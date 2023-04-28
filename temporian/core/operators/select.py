@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Select operator."""
+"""Select operator class and public API function definition."""
+
 from typing import List, Union
 
 from temporian.core import operator_lib
@@ -22,8 +23,6 @@ from temporian.proto import core_pb2 as pb
 
 
 class SelectOperator(Operator):
-    """Select operator."""
-
     def __init__(self, event: Event, feature_names: Union[str, List[str]]):
         super().__init__()
 
@@ -99,6 +98,15 @@ def select(
     event: Event,
     feature_names: List[str],
 ) -> Event:
+    """Selects a subset of features from an event.
+
+    Args:
+        event: Event to select features from.
+        feature_names: Names of the features to select from the event.
+
+    Returns:
+        Event containing only the selected features.
+    """
     if isinstance(feature_names, list):
         pass
     elif isinstance(feature_names, str):

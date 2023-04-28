@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Glue operator."""
+"""Glue operator class and public API function definition."""
 
-from typing import Dict, Optional, List
+from typing import Dict, List
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
@@ -26,8 +26,6 @@ MAX_NUM_ARGUMENTS = 30
 
 
 class GlueOperator(Operator):
-    """Glue operator."""
-
     def __init__(
         self,
         **dict_events: Dict[str, Event],
@@ -102,18 +100,22 @@ def glue(
     """Concatenates together events with the same sampling.
 
     Example:
+
+        ```
         event_1 = ... # Feature A & B
         event_2 = ... # Feature C & D
         event_3 = ... # Feature E & F
 
         # Output has features A, B, C, D, E & F
         output = np.glue(event_1, event_2, event_3)
+        ```
 
-    All the events should have the same sampling. To concatenate events with a
-    different sampling, use the operator 'tp.sample(...)' before.
+    To concatenate events with a different sampling, use the operator
+    'tp.sample(...)' first.
 
     Example:
 
+        ```
         # Assume event_1, event_2 and event_3 dont have the same sampling
         event_1 = ... # Feature A & B
         event_2 = ... # Feature C & D
@@ -124,8 +126,14 @@ def glue(
         output = tp.glue(event_1,
             tp.sample(event_2, sampling=event_1),
             tp.sample(event_3, sampling=event_1))
-    """
+        ```
 
+    Args:
+        *events: Events to concatenate.
+
+    Returns:
+        The concatenated events.
+    """
     if len(events) == 1:
         return events[0]
 

@@ -1,4 +1,19 @@
-"""DropIndex operator."""
+# Copyright 2021 Google LLC.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Set index operator class and public API function definition."""
+
 from typing import List, Optional, Union
 
 from temporian.core import operator_lib
@@ -10,8 +25,6 @@ from temporian.proto import core_pb2 as pb
 
 
 class SetIndexOperator(Operator):
-    """SetIndex operator."""
-
     def __init__(
         self,
         event: Event,
@@ -115,51 +128,43 @@ operator_lib.register_operator(SetIndexOperator)
 def set_index(
     event: Event, feature_names: List[str], append: bool = False
 ) -> Event:
-    """
-    Sets one or more index columns for the given `Event` object and returns
-    a new `Event` object with the updated index. Optionally, it can also append
-    the new index columns to the existing index.
+    """Sets one or more features as index in an event.
 
-    Args:
-        event:
-            The input `Event` object for which the index is to be set or
-            updated.
-        feature_names:
-            A list of feature names (strings) that should be used as the new
-            index. These feature names should already exist in the input
-            `Event`.
-        append:
-            A flag indicating whether the new index should be appended to the
-            existing index (True) or replace it (False). Defaults to `False`.
+    Optionally, the new index columns can be appended to the existing index.
 
-    Returns:
-        A new `Event` object with the updated index, where the specified feature
-        names have been set or appended as index columns, based on the `append`
-        flag.
-
-    Raises:
-        KeyError:
-            If any of the specified feature_names are not found in the input
-            `Event`.
+    The input `event` object remains unchanged. The function returns a new
+    event with the specified index changes.
 
     Examples:
         Given an input `Event` with index names ['A', 'B', 'C'] and features
         names ['X', 'Y', 'Z']:
 
-        1. set_index(event, feature_names=['X'], append=False)
+        1. `set_index(event, feature_names=['X'], append=False)`
            Output `Event` will have index names ['X'] and features names
            ['Y', 'Z'].
 
-        2. set_index(event, feature_names=['X', 'Y'], append=False)
+        2. `set_index(event, feature_names=['X', 'Y'], append=False)`
            Output `Event` will have index names ['X', 'Y'] and
            features names ['Z'].
 
-        3. set_index(event, feature_names=['X', 'Y'], append=True)
+        3. `set_index(event, feature_names=['X', 'Y'], append=True)`
            Output `Event` will have index names ['A', 'B', 'C', 'X', 'Y'] and
            features names ['Z'].
 
-    Notes:
-        The input `Event` object remains unchanged. The function returns a new
-        `Event` object with the specified index changes.
+    Args:
+        event: Input `Event` object for which the index is to be set or
+            updated.
+        feature_names: List of feature names (strings) that should be used as
+            the new index. These feature names should already exist in `event`.
+        append: Flag indicating whether the new index should be appended to the
+            existing index (True) or replace it (False). Defaults to `False`.
+
+    Returns:
+        New `Event` with the updated index, where the specified feature names
+        have been set or appended as index columns, based on the `append` flag.
+
+    Raises:
+        KeyError: If any of the specified `feature_names` are not found in
+            `event`.
     """
     return SetIndexOperator(event, feature_names, append).outputs["event"]
