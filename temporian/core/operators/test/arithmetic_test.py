@@ -14,7 +14,7 @@
 
 from absl.testing import absltest
 
-from temporian.core.data import event as event_lib
+from temporian.core.data import node as node_lib
 from temporian.core.data.dtype import DType
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
@@ -32,14 +32,14 @@ class ArithmeticOperatorsTest(absltest.TestCase):
         self.sampling = Sampling(index_levels=[("x", DType.INT32)])
 
         # Events with floating point types
-        self.event_1 = event_lib.input_event(
+        self.event_1 = node_lib.input_node(
             features=[
                 Feature("f1", DType.FLOAT32),
                 Feature("f2", DType.FLOAT64),
             ],
             sampling=self.sampling,
         )
-        self.event_2 = event_lib.input_event(
+        self.event_2 = node_lib.input_node(
             features=[
                 Feature("f3", DType.FLOAT32),
                 Feature("f4", DType.FLOAT64),
@@ -48,14 +48,14 @@ class ArithmeticOperatorsTest(absltest.TestCase):
         )
 
         # Events with integer types (only for division operations)
-        self.event_3 = event_lib.input_event(
+        self.event_3 = node_lib.input_node(
             features=[
                 Feature("f5", DType.INT32),
                 Feature("f6", DType.INT64),
             ],
             sampling=self.sampling,
         )
-        self.event_4 = event_lib.input_event(
+        self.event_4 = node_lib.input_node(
             features=[
                 Feature("f7", DType.INT32),
                 Feature("f8", DType.INT64),

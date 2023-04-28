@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 from typing import Dict
 
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators.base import Operator
 from temporian.core.operators.base import OperatorExceptionDecorator
-from temporian.implementation.numpy.data.event import DTYPE_MAPPING
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import DTYPE_MAPPING
+from temporian.implementation.numpy.data.event_set import EventSet
 
 
 class OperatorImplementation(ABC):
@@ -17,7 +17,7 @@ class OperatorImplementation(ABC):
     def operator(self):
         return self._operator
 
-    def call(self, **inputs: Dict[str, NumpyEvent]) -> Dict[str, NumpyEvent]:
+    def call(self, **inputs: Dict[str, EventSet]) -> Dict[str, EventSet]:
         """Like __call__, but with checks."""
 
         _check_input(inputs=inputs, operator=self.operator)
@@ -26,15 +26,13 @@ class OperatorImplementation(ABC):
         return outputs
 
     @abstractmethod
-    def __call__(
-        self, **inputs: Dict[str, NumpyEvent]
-    ) -> Dict[str, NumpyEvent]:
+    def __call__(self, **inputs: Dict[str, EventSet]) -> Dict[str, EventSet]:
         """Applies the operator to its inputs."""
 
 
 def _check_features(
-    values: Dict[str, NumpyEvent],
-    definitions: Dict[str, Event],
+    values: Dict[str, EventSet],
+    definitions: Dict[str, Node],
     label: str,
 ) -> None:
     """Checks if features are matching their definition."""
@@ -79,7 +77,7 @@ def _check_features(
 
 
 def _check_input(
-    inputs: Dict[str, NumpyEvent],
+    inputs: Dict[str, EventSet],
     operator: Operator,
 ) -> None:
     """Checks if the input/output of an operator matches its definition."""
@@ -98,8 +96,8 @@ def _check_input(
 
 
 def _check_output(
-    inputs: Dict[str, NumpyEvent],
-    outputs: Dict[str, NumpyEvent],
+    inputs: Dict[str, EventSet],
+    outputs: Dict[str, EventSet],
     operator: Operator,
 ) -> None:
     """Checks if the input/output of an operator matches its definition."""
@@ -161,12 +159,12 @@ def _check_output(
         _check_features(outputs, definitions=operator.outputs, label="outputs")
 
 
-def _check_same_sampling(event_1: NumpyEvent, event_2: NumpyEvent) -> bool:
-    for index_key, index_data_1 in event_1.data.items():
-        if index_key not in event_2.data:
+def _check_same_sampling(evset_1: EventSet, evset_2: EventSet) -> bool:
+    for index_key, index_data_1 in evset_1.data.items():
+        if index_key not in evset_2.data:
             return False
 
-        index_data_2 = event_2[index_key]
+        index_data_2 = evset_2[index_key]
         if index_data_1.timestamps is not index_data_2.timestamps:
             return False
 

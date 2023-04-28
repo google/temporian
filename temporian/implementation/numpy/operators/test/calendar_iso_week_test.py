@@ -19,8 +19,8 @@ import pandas as pd
 from temporian.core.operators.calendar.iso_week import (
     CalendarISOWeekOperator,
 )
-from temporian.implementation.numpy.data.event import IndexData
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import IndexData
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.calendar.iso_week import (
     CalendarISOWeekNumpyImplementation,
 )
@@ -30,8 +30,8 @@ class CalendarISOWeekNumpyImplementationTest(absltest.TestCase):
     """Test numpy implementation of calendar_iso_week operator."""
 
     def test_basic(self) -> None:
-        "Basic test with flat event."
-        input_event_data = NumpyEvent.from_dataframe(
+        "Basic test with flat node."
+        input_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 data=[
                     [
@@ -58,25 +58,25 @@ class CalendarISOWeekNumpyImplementationTest(absltest.TestCase):
                 columns=["timestamp"],
             ),
         )
-        input_event = input_event_data.schema()
-        output_event_data = NumpyEvent(
+        input_node = input_evset.node()
+        output_evset = EventSet(
             data={
                 (): IndexData(
                     [np.array([1, 1, 2, 52, 1, 2, 12, 52]).astype(np.int32)],
-                    input_event_data.first_index_data().timestamps,
+                    input_evset.first_index_data().timestamps,
                 ),
             },
             feature_names=["calendar_iso_week"],
             index_names=[],
             is_unix_timestamp=True,
         )
-        operator = CalendarISOWeekOperator(input_event)
+        operator = CalendarISOWeekOperator(input_node)
         impl = CalendarISOWeekNumpyImplementation(operator)
-        output = impl.call(sampling=input_event_data)
+        output = impl.call(sampling=input_evset)
 
-        self.assertTrue(output_event_data == output["event"])
+        self.assertTrue(output_evset == output["node"])
         self.assertTrue(
-            output["event"].first_index_data().features[0].dtype == np.int32
+            output["node"].first_index_data().features[0].dtype == np.int32
         )
 
 

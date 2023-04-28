@@ -12,38 +12,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Utility for reading an event from disk."""
+"""Utility for reading an event set from disk."""
 
 from typing import List
 import pandas as pd
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 
 
-def read_event(
+def read_event_set(
     path: str,
     timestamp_column: str,
     index_names: List[str] = None,
     sep: str = ",",
-) -> NumpyEvent:
-    """Reads a NumpyEvent from a file.
+) -> EventSet:
+    """Reads an EventSet from a file.
 
     Args:
         path: Path to the file.
         timestamp_column: Name of the column to be used as timestamps for the
-            event.
-        index_names: Names of the columns to be used as index for the event.
-            If None, a flat event will be created.
+            event set.
+        index_names: Names of the columns to be used as index for the event set.
+            If None, a flat event set will be created.
         sep: Separator to use.
 
 
     Returns:
-        NumpyEvent read from file.
+        EventSet read from file.
 
     """
     if index_names is None:
         index_names = []
 
     df = pd.read_csv(path, sep=sep)
-    return NumpyEvent.from_dataframe(
+    return EventSet.from_dataframe(
         df, index_names=index_names, timestamp_column=timestamp_column
     )

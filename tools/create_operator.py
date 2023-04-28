@@ -167,7 +167,7 @@ py_library(
 
 from typing import Dict
 
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event import EventSet
 from temporian.core.operators.{lower_op} import {capitalized_op}
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.base import OperatorImplementation
@@ -179,7 +179,7 @@ class {capitalized_op}NumpyImplementation(OperatorImplementation):
         super().__init__(operator)
 
     def __call__(
-        self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
+        self, event: EventSet) -> Dict[str, EventSet]:
 
         return {{"event": event}}
 
@@ -237,7 +237,7 @@ from absl.testing import absltest
 
 import pandas as pd
 from temporian.core.operators.{lower_op} import {capitalized_op}
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event import EventSet
 from temporian.implementation.numpy.operators.{lower_op} import (
     {capitalized_op}NumpyImplementation,
 )
@@ -248,7 +248,7 @@ class {capitalized_op}OperatorTest(absltest.TestCase):
         pass
 
     def test_base(self):
-        event_data = NumpyEvent.from_dataframe(
+        event_data = EventSet.from_dataframe(
             pd.DataFrame(
                 {{
                     "timestamp": [1, 2,3,4],
@@ -259,9 +259,9 @@ class {capitalized_op}OperatorTest(absltest.TestCase):
             ),
             index_names=["c"],
         )
-        event = event_data.schema()
+        event = event_data.node()
 
-        expected_output = NumpyEvent.from_dataframe(
+        expected_output = EventSet.from_dataframe(
             pd.DataFrame(
                 {{
                     "timestamp": [1, 2,3,4],

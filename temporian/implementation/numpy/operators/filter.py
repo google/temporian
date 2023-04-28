@@ -2,8 +2,8 @@ from typing import Dict
 
 from temporian.core.operators.filter import FilterOperator
 from temporian.implementation.numpy import implementation_lib
-from temporian.implementation.numpy.data.event import IndexData
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import IndexData
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -14,17 +14,17 @@ class FilterNumpyImplementation(OperatorImplementation):
         super().__init__(operator)
 
     def __call__(
-        self, event: NumpyEvent, condition: NumpyEvent
-    ) -> Dict[str, NumpyEvent]:
-        output_event = NumpyEvent(
-            {}, event.feature_names, event.index_names, event.is_unix_timestamp
+        self, evset: EventSet, condition: EventSet
+    ) -> Dict[str, EventSet]:
+        output_evset = EventSet(
+            {}, evset.feature_names, evset.index_names, evset.is_unix_timestamp
         )
         for index_key, index_data in condition.iterindex():
             # get boolean mask from condition
             index_mask = index_data.features[0]
 
             # filter timestamps
-            filtered_timestamps = event[index_key].timestamps[index_mask]
+            filtered_timestamps = evset[index_key].timestamps[index_mask]
 
             # if filtered timestamps is empty, skip
             if len(filtered_timestamps) == 0:
@@ -32,15 +32,15 @@ class FilterNumpyImplementation(OperatorImplementation):
 
             # filter features
             filtered_features = [
-                event_feature[index_mask]
-                for event_feature in event[index_key].features
+                evset_feature[index_mask]
+                for evset_feature in evset[index_key].features
             ]
             # set filtered data
-            output_event[index_key] = IndexData(
+            output_evset[index_key] = IndexData(
                 filtered_features, filtered_timestamps
             )
 
-        return {"event": output_event}
+        return {"node": output_evset}
 
 
 implementation_lib.register_operator_implementation(

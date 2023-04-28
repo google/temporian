@@ -20,7 +20,7 @@ from typing import Optional, List
 
 from temporian.core.data.duration import Duration
 from temporian.core.data import dtype
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
@@ -31,9 +31,9 @@ class BaseWindowOperator(Operator, ABC):
 
     def __init__(
         self,
-        event: Event,
+        node: Node,
         window_length: Duration,
-        sampling: Optional[Event] = None,
+        sampling: Optional[Node] = None,
     ):
         super().__init__()
 
@@ -45,10 +45,10 @@ class BaseWindowOperator(Operator, ABC):
             self._has_sampling = True
             effective_sampling = sampling.sampling
         else:
-            effective_sampling = event.sampling
+            effective_sampling = node.sampling
             self._has_sampling = False
 
-        self.add_input("event", event)
+        self.add_input("node", node)
 
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
@@ -57,14 +57,14 @@ class BaseWindowOperator(Operator, ABC):
                 sampling=effective_sampling,
                 creator=self,
             )
-            for f in event.features
+            for f in node.features
         ]
         self._output_dtypes = [feature.dtype for feature in output_features]
 
         # output
         self.add_output(
-            "event",
-            Event(
+            "node",
+            Node(
                 features=output_features,
                 sampling=effective_sampling,
                 creator=self,
@@ -97,10 +97,10 @@ class BaseWindowOperator(Operator, ABC):
                 ),
             ],
             inputs=[
-                pb.OperatorDef.Input(key="event"),
+                pb.OperatorDef.Input(key="node"),
                 pb.OperatorDef.Input(key="sampling", is_optional=True),
             ],
-            outputs=[pb.OperatorDef.Output(key="event")],
+            outputs=[pb.OperatorDef.Output(key="node")],
         )
 
     @classmethod

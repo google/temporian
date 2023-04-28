@@ -20,9 +20,8 @@ import numpy as np
 
 from temporian.core.operators.unique_timestamps import UniqueTimestamps
 from temporian.implementation.numpy import implementation_lib
-from temporian.implementation.numpy.data.event import IndexData
-from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.sampling import NumpySampling
+from temporian.implementation.numpy.data.event_set import IndexData
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -31,17 +30,17 @@ class UniqueTimestampsNumpyImplementation(OperatorImplementation):
         super().__init__(operator)
         assert isinstance(operator, UniqueTimestamps)
 
-    def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
-        dst_event = NumpyEvent(
+    def __call__(self, evset: EventSet) -> Dict[str, EventSet]:
+        evset = EventSet(
             data={
                 index_key: IndexData([], np.unique(index_data.timestamps))
-                for index_key, index_data in event.iterindex()
+                for index_key, index_data in evset.iterindex()
             },
             feature_names=[],
-            index_names=event.index_names,
-            is_unix_timestamp=event.is_unix_timestamp,
+            index_names=evset.index_names,
+            is_unix_timestamp=evset.is_unix_timestamp,
         )
-        return {"event": dst_event}
+        return {"node": evset}
 
 
 implementation_lib.register_operator_implementation(

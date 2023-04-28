@@ -18,7 +18,7 @@ from typing import Union, List
 from abc import abstractmethod
 
 from temporian.core.data.dtype import DType
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
@@ -29,7 +29,7 @@ class BaseArithmeticScalarOperator(Operator):
 
     def __init__(
         self,
-        event: Event,
+        node: Node,
         value: Union[float, int, str, bool],
         is_value_first: bool = False,  # useful for non-commutative operators
     ):
@@ -39,17 +39,15 @@ class BaseArithmeticScalarOperator(Operator):
         self.is_value_first = is_value_first
 
         # inputs
-        self.add_input("event", event)
+        self.add_input("node", node)
 
         self.add_attribute("value", value)
         self.add_attribute("is_value_first", is_value_first)
 
-        if not isinstance(event, Event):
-            raise TypeError(
-                f"Event must be of type Event but got {type(event)}"
-            )
+        if not isinstance(node, Node):
+            raise TypeError(f"Node must be of type Node but got {type(node)}")
 
-        # check that every dtype of event feature is equal to value dtype
+        # check that every dtype of node feature is equal to value dtype
         value_dtype = DType.from_python_type(type(value))
 
         # check that value dtype is in self.dtypes_to_check
@@ -63,7 +61,7 @@ class BaseArithmeticScalarOperator(Operator):
         # it makes sense to allow subtypes of the same kind. Value will
         # always be 64 bits. We need a way to allow 32 bits.
         if not self.ignore_value_dtype_checking:
-            for feature in event.features:
+            for feature in node.features:
                 if feature.dtype != value_dtype:
                     raise ValueError(
                         f"Feature {feature.name} has dtype {feature.dtype} "
@@ -76,17 +74,17 @@ class BaseArithmeticScalarOperator(Operator):
             Feature(
                 name=self.output_feature_name(feature.name),
                 dtype=self.output_feature_dtype(feature),
-                sampling=event.sampling,
+                sampling=node.sampling,
                 creator=self,
             )
-            for feature in event.features
+            for feature in node.features
         ]
 
         self.add_output(
-            "event",
-            Event(
+            "node",
+            Node(
                 features=output_features,
-                sampling=event.sampling,
+                sampling=node.sampling,
                 creator=self,
             ),
         )
@@ -109,9 +107,9 @@ class BaseArithmeticScalarOperator(Operator):
                 ),
             ],
             inputs=[
-                pb.OperatorDef.Input(key="event"),
+                pb.OperatorDef.Input(key="node"),
             ],
-            outputs=[pb.OperatorDef.Output(key="event")],
+            outputs=[pb.OperatorDef.Output(key="node")],
         )
 
     @classmethod

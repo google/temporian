@@ -223,9 +223,9 @@ print("Convert time series to tabular dataset")
 print("======================================")
 
 # We define the computation graph
-sales = sales_data.schema()
-calendar = calendar_data.schema()
-sell_prices = sell_prices_data.schema()
+sales = sales_data.node()
+calendar = calendar_data.node()
+sell_prices = sell_prices_data.node()
 
 augmented_sales = tp.glue(
     # Moving average of sales

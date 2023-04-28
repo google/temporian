@@ -16,8 +16,8 @@ from typing import Dict
 
 from temporian.core.operators.lag import LagOperator
 from temporian.implementation.numpy import implementation_lib
-from temporian.implementation.numpy.data.event import IndexData
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import IndexData
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -28,24 +28,24 @@ class LagNumpyImplementation(OperatorImplementation):
         super().__init__(operator)
         assert isinstance(operator, LagOperator)
 
-    def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
+    def __call__(self, evset: EventSet) -> Dict[str, EventSet]:
         # gather operator attributes
         duration = self._operator.duration
 
-        # create output event
-        output_event = NumpyEvent(
+        # create output event set
+        output_evset = EventSet(
             {},
-            feature_names=event.feature_names,
-            index_names=event.index_names,
-            is_unix_timestamp=event.is_unix_timestamp,
+            feature_names=evset.feature_names,
+            index_names=evset.index_names,
+            is_unix_timestamp=evset.is_unix_timestamp,
         )
-        # fill output event data
-        for index_key, index_data in event.iterindex():
-            output_event[index_key] = IndexData(
+        # fill output event set data
+        for index_key, index_data in evset.iterindex():
+            output_evset[index_key] = IndexData(
                 index_data.features, index_data.timestamps + duration
             )
 
-        return {"event": output_event}
+        return {"node": output_evset}
 
 
 implementation_lib.register_operator_implementation(

@@ -15,7 +15,7 @@
 """Calendar second operator class and public API function definitions."""
 
 from temporian.core import operator_lib
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators.calendar.base import BaseCalendarOperator
 
 
@@ -34,17 +34,17 @@ class CalendarSecondOperator(BaseCalendarOperator):
 operator_lib.register_operator(CalendarSecondOperator)
 
 
-def calendar_second(sampling: Event) -> Event:
-    """Obtains the second the timestamps in an event's sampling are in.
+def calendar_second(sampling: Node) -> Node:
+    """Obtains the second the timestamps in a node's sampling are in.
 
-    Features in input event are ignored. Output feature contains numbers between
+    Features in input node are ignored. Output feature contains numbers between
     0 and 59.
 
     Args:
-        sampling: Event to get the seconds from.
+        sampling: Node to get the seconds from.
 
     Returns:
-        Event with a single feature corresponding to the second each timestamp
-        in `event`'s sampling belongs to, with the same sampling as `event`.
+        Node with a single feature corresponding to the second each timestamp
+        in `node`'s sampling belongs to, with the same sampling as `node`.
     """
-    return CalendarSecondOperator(sampling).outputs["event"]
+    return CalendarSecondOperator(sampling).outputs["node"]

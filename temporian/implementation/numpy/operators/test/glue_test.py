@@ -17,13 +17,13 @@ from absl.testing import absltest
 import numpy as np
 import pandas as pd
 
-from temporian.core.data.event import Feature
+from temporian.core.data.node import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.glue import GlueOperator
-from temporian.core.data import event as event_lib
+from temporian.core.data import node as node_lib
 from temporian.core.data.dtype import DType
 
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.node_0 import EventSet
 from temporian.implementation.numpy.operators.glue import (
     GlueNumpyImplementation,
 )
@@ -40,7 +40,7 @@ class GlueNumpyImplementationTest(absltest.TestCase):
             "timestamp": np.array([1, 1, 2, 3, 4]),
             "user_id": ["user_1", "user_1", "user_1", "user_1", "user_2"],
         }
-        numpy_event_1 = NumpyEvent.from_dataframe(
+        evset_1 = EventSet.from_dataframe(
             pd.DataFrame(
                 {
                     **common_data,
@@ -49,7 +49,7 @@ class GlueNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["user_id"],
         )
-        numpy_event_2 = NumpyEvent.from_dataframe(
+        evset_2 = EventSet.from_dataframe(
             pd.DataFrame(
                 {
                     **common_data,
@@ -59,7 +59,7 @@ class GlueNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["user_id"],
         )
-        numpy_event_3 = NumpyEvent.from_dataframe(
+        evset_3 = EventSet.from_dataframe(
             pd.DataFrame(
                 {
                     **common_data,
@@ -69,11 +69,11 @@ class GlueNumpyImplementationTest(absltest.TestCase):
             index_names=["user_id"],
         )
         # set same sampling
-        for index_key, index_data in numpy_event_1.data.items():
-            numpy_event_2[index_key].timestamps = index_data.timestamps
-            numpy_event_3[index_key].timestamps = index_data.timestamps
+        for index_key, index_data in evset_1.data.items():
+            evset_2[index_key].timestamps = index_data.timestamps
+            evset_3[index_key].timestamps = index_data.timestamps
 
-        expected_numpy_output_event = NumpyEvent.from_dataframe(
+        expected_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 {
                     **common_data,
@@ -86,27 +86,27 @@ class GlueNumpyImplementationTest(absltest.TestCase):
             index_names=["user_id"],
         )
 
-        # TODO: Update when "from_dataframe" support the creation of events
+        # TODO: Update when "from_dataframe" support the creation of event sets
         # with shared sampling.
-        event_1 = numpy_event_1.schema()
-        event_2 = numpy_event_2.schema()
-        event_3 = numpy_event_3.schema()
+        node_1 = evset_1.node()
+        node_2 = evset_2.node()
+        node_3 = evset_3.node()
 
-        event_2._sampling = event_1._sampling
-        event_3._sampling = event_1._sampling
+        node_2._sampling = node_1._sampling
+        node_3._sampling = node_1._sampling
 
         operator = GlueOperator(
-            event_0=event_1,
-            event_1=event_2,
-            event_2=event_3,
+            node_0=node_1,
+            node_1=node_2,
+            node_2=node_3,
         )
         implementation = GlueNumpyImplementation(operator=operator)
         output = implementation.call(
-            event_0=numpy_event_1, event_1=numpy_event_2, event_2=numpy_event_3
+            node_0=evset_1, node_1=evset_2, node_2=evset_3
         )
         self.assertEqual(
-            output["event"],
-            expected_numpy_output_event,
+            output["node"],
+            expected_evset,
         )
 
     def test_non_matching_sampling(self):
@@ -115,11 +115,11 @@ class GlueNumpyImplementationTest(absltest.TestCase):
             "All glue arguments should have the same sampling.",
         ):
             _ = GlueOperator(
-                event_0=event_lib.input_event(
+                node_0=node_lib.input_node(
                     [Feature(name="a", dtype=DType.FLOAT64)],
                     sampling=Sampling(index_levels=[("x", DType.INT64)]),
                 ),
-                event_1=event_lib.input_event(
+                node_1=node_lib.input_node(
                     [Feature(name="b", dtype=DType.FLOAT64)],
                     sampling=Sampling(index_levels=[("x", DType.INT64)]),
                 ),
@@ -128,15 +128,15 @@ class GlueNumpyImplementationTest(absltest.TestCase):
     def test_duplicate_feature(self):
         with self.assertRaisesRegex(
             ValueError,
-            'Feature "a" is defined in multiple input events',
+            'Feature "a" is defined in multiple input nodes',
         ):
             sampling = Sampling(index_levels=[("x", DType.INT64)])
             _ = GlueOperator(
-                event_0=event_lib.input_event(
+                node_0=node_lib.input_node(
                     [Feature(name="a", dtype=DType.FLOAT64)],
                     sampling=sampling,
                 ),
-                event_1=event_lib.input_event(
+                node_1=node_lib.input_node(
                     [Feature(name="a", dtype=DType.FLOAT64)],
                     sampling=sampling,
                 ),

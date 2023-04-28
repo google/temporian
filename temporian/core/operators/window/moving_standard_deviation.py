@@ -18,7 +18,7 @@ from typing import Optional
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
 from temporian.core.data.duration import Duration
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
 from temporian.core.operators.window.base import BaseWindowOperator
 
@@ -39,19 +39,19 @@ operator_lib.register_operator(MovingStandardDeviationOperator)
 
 
 def moving_standard_deviation(
-    event: Event,
+    node: Node,
     window_length: Duration,
-    sampling: Optional[Event] = None,
-) -> Event:
+    sampling: Optional[Node] = None,
+) -> Node:
     """Computes the standard deviation of values in a sliding window over the
-    event.
+    node.
 
     For each t in sampling, and for each feature independently, returns at time
     t the standard deviation for the feature in the window
     [t - window_length, t].
 
     If `sampling` is provided samples the moving window's value at each
-    timestamp in `sampling`, else samples it at each timestamp in `event`.
+    timestamp in `sampling`, else samples it at each timestamp in `node`.
 
     Missing values (such as NaNs) are ignored.
 
@@ -59,17 +59,17 @@ def moving_standard_deviation(
     or the window does not contain any sampling), outputs missing values.
 
     Args:
-        event: Features to compute the standard deviation for.
+        node: Features to compute the standard deviation for.
         window_length: Sliding window's length.
         sampling: Timestamps to sample the sliding window's value at. If not
-            provided, timestamps in `event` are used.
+            provided, timestamps in `node` are used.
 
     Returns:
-        Event containing the moving standard deviation of each feature in
-        `event`.
+        Node containing the moving standard deviation of each feature in
+        `node`.
     """
     return MovingStandardDeviationOperator(
-        event=event,
+        node=node,
         window_length=window_length,
         sampling=sampling,
-    ).outputs["event"]
+    ).outputs["node"]

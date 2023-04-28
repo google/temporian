@@ -19,15 +19,15 @@ from temporian.core import operator_lib
 from temporian.core import processor
 from temporian.core import serialize
 from temporian.core.data import dtype
-from temporian.core.data import event
+from temporian.core.data import node
 from temporian.core.data import feature
 from temporian.core.data import sampling
 from temporian.core.data import duration
 from temporian.core.operators import base
-from temporian.io.read_event import read_event
-from temporian.io.save_event import save_event
+from temporian.io.read_event_set import read_event_set
+from temporian.io.save_event_set import save_event_set
 
-from temporian.implementation.numpy.data.event import NumpyEvent as EventData
+from temporian.implementation.numpy.data.event_set import EventSet
 
 from temporian.implementation.numpy.data.plotter import plot
 
@@ -45,5 +45,5 @@ evaluate = evaluator.evaluate
 Feature = feature.Feature
 load = serialize.load
 save = serialize.save
-input_event = event.input_event
-Event = event.Event
+input_node = node.input_node
+Event = node.Node

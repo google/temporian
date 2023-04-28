@@ -16,7 +16,7 @@ from absl.testing import absltest
 
 from temporian.core import evaluator
 from temporian.core.test import utils
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 
 
 class EvaluatorTest(absltest.TestCase):
@@ -83,8 +83,8 @@ class EvaluatorTest(absltest.TestCase):
 
     def test_evaluate_value(self):
         i1 = utils.create_input_event()
-        result = evaluator.evaluate(i1, {i1: utils.create_input_event_data()})
-        self.assertIsInstance(result, NumpyEvent)
+        result = evaluator.evaluate(i1, {i1: utils.create_input_evset()})
+        self.assertIsInstance(result, EventSet)
 
     def test_evaluate_list(self):
         i1 = utils.create_input_event()
@@ -92,8 +92,8 @@ class EvaluatorTest(absltest.TestCase):
         result = evaluator.evaluate(
             [i1, i2],
             {
-                i1: utils.create_input_event_data(),
-                i2: utils.create_input_event_data(),
+                i1: utils.create_input_evset(),
+                i2: utils.create_input_evset(),
             },
         )
         self.assertIsInstance(result, list)
@@ -105,8 +105,8 @@ class EvaluatorTest(absltest.TestCase):
         result = evaluator.evaluate(
             {"i1": i1, "i2": i2},
             {
-                i1: utils.create_input_event_data(),
-                i2: utils.create_input_event_data(),
+                i1: utils.create_input_evset(),
+                i2: utils.create_input_evset(),
             },
         )
         self.assertIsInstance(result, dict)

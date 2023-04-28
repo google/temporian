@@ -19,12 +19,12 @@ import tempfile
 
 import temporian as t
 import pandas as pd
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 
 
 class TFPTest(absltest.TestCase):
     def test_evaluation(self):
-        i1_data = NumpyEvent.from_dataframe(
+        evset_1 = EventSet.from_dataframe(
             pd.DataFrame(
                 {
                     "timestamp": [0.0, 2.0, 4.0, 6.0],
@@ -34,21 +34,21 @@ class TFPTest(absltest.TestCase):
             )
         )
 
-        i2_data = NumpyEvent.from_dataframe(
+        evset_2 = EventSet.from_dataframe(
             pd.DataFrame({"timestamp": [1.0, 2.0, 2.0]})
         )
 
-        i1 = i1_data.schema()
-        i2 = i2_data.schema()
-        h1 = t.simple_moving_average(event=i1, window_length=7.0)
-        h2 = t.sample(event=h1, sampling=i2)
+        i1 = evset_1.node()
+        i2 = evset_2.node()
+        h1 = t.simple_moving_average(node=i1, window_length=7.0)
+        h2 = t.sample(node=h1, sampling=i2)
         result = t.glue(t.prefix("sma_", h2["f2"]), i2)
 
         result_data = t.evaluate(
             query=result,
             input_data={
-                i1: i1_data,
-                i2: i2_data,
+                i1: evset_1,
+                i2: evset_2,
             },
             verbose=2,
         )
@@ -56,16 +56,16 @@ class TFPTest(absltest.TestCase):
 
         with tempfile.TemporaryDirectory() as tempdir:
             result_data.plot().savefig(os.path.join(tempdir, "p1.png"))
-            t.plot([i1_data, i2_data]).savefig(os.path.join(tempdir, "p2.png"))
+            t.plot([evset_1, evset_2]).savefig(os.path.join(tempdir, "p2.png"))
 
     def test_serialization(self):
-        a = t.input_event(
+        a = t.input_node(
             [
                 t.Feature(name="f1"),
                 t.Feature(name="f2"),
             ]
         )
-        b = t.simple_moving_average(event=a, window_length=7.0)
+        b = t.simple_moving_average(node=a, window_length=7.0)
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_processor.tem")

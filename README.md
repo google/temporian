@@ -13,7 +13,7 @@ import temporian as tp
 
 # Load the data
 event_data = tp.read_event("path/to/data.csv")
-event = event_data.schema()
+event = event_data.node()
 
 # Create Simple Moving Average feature
 sma = tp.simple_moving_average(

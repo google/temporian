@@ -16,7 +16,7 @@
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
 from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
 
@@ -42,25 +42,25 @@ operator_lib.register_operator(EqualOperator)
 
 
 def equal(
-    event_1: Event,
-    event_2: Event,
-) -> Event:
-    """Checks for equality between two events.
+    node_1: Node,
+    node_2: Node,
+) -> Node:
+    """Checks for equality between two nodes.
 
-    Each feature in `event_1` is compared element-wise to the feature in
-    `event_2` in the same position.
+    Each feature in `node_1` is compared element-wise to the feature in
+    `node_2` in the same position.
 
-    `event_1` and `event_2` must have the same sampling and the same number of
+    `node_1` and `node_2` must have the same sampling and the same number of
     features.
 
     Args:
-        event_1: First event.
-        event_2: Second event.
+        node_1: First node.
+        node_2: Second node.
 
     Returns:
-        Event containing the result of the comparison.
+        Node containing the result of the comparison.
     """
     return EqualOperator(
-        event_1=event_1,
-        event_2=event_2,
-    ).outputs["event"]
+        node_1=node_1,
+        node_2=node_2,
+    ).outputs["node"]

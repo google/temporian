@@ -19,20 +19,19 @@ import pandas as pd
 from temporian.core.operators.calendar.day_of_week import (
     CalendarDayOfWeekOperator,
 )
-from temporian.implementation.numpy.data.event import IndexData
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import IndexData
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.calendar.day_of_week import (
     CalendarDayOfWeekNumpyImplementation,
 )
-from temporian.core.data.dtype import DType
 
 
 class CalendarDayOfWeekNumpyImplementationTest(absltest.TestCase):
     """Test numpy implementation of calendar_day_of_week operator."""
 
     def test_basic(self) -> None:
-        "Basic test with flat event."
-        input_event_data = NumpyEvent.from_dataframe(
+        "Basic test with flat node."
+        input_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 data=[
                     [pd.to_datetime("Monday Mar 13 12:00:00 2023", utc=True)],
@@ -44,25 +43,25 @@ class CalendarDayOfWeekNumpyImplementationTest(absltest.TestCase):
                 columns=["timestamp"],
             ),
         )
-        input_event = input_event_data.schema()
-        output_event_data = NumpyEvent(
+        input_node = input_evset.node()
+        output_evset = EventSet(
             data={
                 (): IndexData(
                     [np.array([0, 1, 4, 4, 6]).astype(np.int32)],
-                    input_event_data.first_index_data().timestamps,
+                    input_evset.first_index_data().timestamps,
                 ),
             },
             feature_names=["calendar_day_of_week"],
             index_names=[],
             is_unix_timestamp=True,
         )
-        operator = CalendarDayOfWeekOperator(input_event)
+        operator = CalendarDayOfWeekOperator(input_node)
         impl = CalendarDayOfWeekNumpyImplementation(operator)
-        output = impl.call(sampling=input_event_data)
+        output = impl.call(sampling=input_evset)
 
-        self.assertTrue(output_event_data == output["event"])
+        self.assertTrue(output_evset == output["node"])
         self.assertTrue(
-            output["event"].first_index_data().features[0].dtype == np.int32
+            output["node"].first_index_data().features[0].dtype == np.int32
         )
 
 

@@ -16,13 +16,13 @@ from absl.testing import absltest
 import numpy as np
 import pandas as pd
 
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.calendar.day_of_month import (
     CalendarDayOfMonthOperator,
 )
-from temporian.implementation.numpy.data.event import IndexData
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import IndexData
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.calendar.day_of_month import (
     CalendarDayOfMonthNumpyImplementation,
 )
@@ -32,8 +32,8 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
     """Test numpy implementation of calendar_day_of_month operator."""
 
     def test_no_index(self) -> None:
-        """Test calendar day of month operator with flat event."""
-        input_event_data = NumpyEvent.from_dataframe(
+        """Test calendar day of month operator with flat node."""
+        input_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 data=[
                     [pd.to_datetime("1970-01-01 00:00:00", utc=True)],
@@ -44,30 +44,30 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
                 columns=["timestamp"],
             ),
         )
-        input_event = input_event_data.schema()
-        output_event_data = NumpyEvent(
+        input_node = input_evset.node()
+        output_evset = EventSet(
             data={
                 (): IndexData(
                     [np.array([1, 14, 14, 15]).astype(np.int32)],
-                    input_event_data.first_index_data().timestamps,
+                    input_evset.first_index_data().timestamps,
                 ),
             },
             feature_names=["calendar_day_of_month"],
             index_names=[],
             is_unix_timestamp=True,
         )
-        operator = CalendarDayOfMonthOperator(input_event)
+        operator = CalendarDayOfMonthOperator(input_node)
         impl = CalendarDayOfMonthNumpyImplementation(operator)
-        output = impl.call(sampling=input_event_data)
+        output = impl.call(sampling=input_evset)
 
-        self.assertTrue(output_event_data == output["event"])
+        self.assertTrue(output_evset == output["node"])
         self.assertTrue(
-            output["event"].first_index_data().features[0].dtype == np.int32
+            output["node"].first_index_data().features[0].dtype == np.int32
         )
 
     def test_with_index(self) -> None:
-        """Test calendar day of month operator with indexed event."""
-        input_event_data = NumpyEvent.from_dataframe(
+        """Test calendar day of month operator with indexed node."""
+        input_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 data=[
                     [pd.to_datetime("1970-01-01 00:00:00", utc=True), 1],
@@ -80,29 +80,29 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["id"],
         )
-        input_event = input_event_data.schema()
-        output_event_data = NumpyEvent(
+        input_node = input_evset.node()
+        output_evset = EventSet(
             data={
                 (1,): IndexData(
                     [np.array([1, 14, 14]).astype(np.int32)],
-                    input_event_data[(1,)].timestamps,
+                    input_evset[(1,)].timestamps,
                 ),
                 (2,): IndexData(
                     [np.array([14, 15]).astype(np.int32)],
-                    input_event_data[(2,)].timestamps,
+                    input_evset[(2,)].timestamps,
                 ),
             },
             feature_names=["calendar_day_of_month"],
             index_names=["id"],
             is_unix_timestamp=True,
         )
-        operator = CalendarDayOfMonthOperator(input_event)
+        operator = CalendarDayOfMonthOperator(input_node)
         impl = CalendarDayOfMonthNumpyImplementation(operator)
-        output = impl.call(sampling=input_event_data)
+        output = impl.call(sampling=input_evset)
 
-        self.assertTrue(output_event_data == output["event"])
+        self.assertTrue(output_evset == output["node"])
         self.assertTrue(
-            output["event"].first_index_data().features[0].dtype == np.int32
+            output["node"].first_index_data().features[0].dtype == np.int32
         )
 
     # TODO: move this test to core operators' test suite when created
@@ -113,12 +113,12 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
         Test calendar operator with a non-utc timestamp
         sampling.
         """
-        input_event = Event(
+        input_node = Node(
             features=[],
             sampling=Sampling(index_levels=[], is_unix_timestamp=False),
         )
         with self.assertRaises(ValueError):
-            CalendarDayOfMonthOperator(input_event)
+            CalendarDayOfMonthOperator(input_node)
 
 
 if __name__ == "__main__":

@@ -17,8 +17,8 @@ import pandas as pd
 from absl.testing import absltest
 
 from temporian.core.data.dtype import DType
-from temporian.core.data.event import Event
-from temporian.core.data.event import Feature
+from temporian.core.data.node import Node
+from temporian.core.data.node import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.arithmetic import (
     AddOperator,
@@ -27,7 +27,7 @@ from temporian.core.operators.arithmetic import (
     DivideOperator,
     FloorDivOperator,
 )
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.arithmetic import (
     AddNumpyImplementation,
     SubtractNumpyImplementation,
@@ -51,7 +51,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
         PIXEL_ID = 3
 
         # 2 index columns, 2 feature columns (float64 and float32)
-        self.numpy_event_1 = NumpyEvent.from_dataframe(
+        self.evset_1 = EventSet.from_dataframe(
             pd.DataFrame(
                 data=[
                     [TRYOLABS_SHOP, MATE_ID, 0.0, -14.0, 1.0],
@@ -76,7 +76,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id", "product_id"],
         )
 
-        self.numpy_event_2 = NumpyEvent.from_dataframe(
+        self.evset_2 = EventSet.from_dataframe(
             pd.DataFrame(
                 data=[
                     [GOOGLE_SHOP, BOOK_ID, 1.0, 3, -8.0],
@@ -101,11 +101,11 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id", "product_id"],
         )
         # set same sampling
-        for index_key, index_data in self.numpy_event_1.data.items():
-            self.numpy_event_2[index_key].timestamps = index_data.timestamps
+        for index_key, index_data in self.evset_1.data.items():
+            self.evset_2[index_key].timestamps = index_data.timestamps
 
         # Expected result after addition
-        self.numpy_expected_add = NumpyEvent.from_dataframe(
+        self.expected_evset_add = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [TRYOLABS_SHOP, MATE_ID, 0.0, -9.5, 6],
@@ -130,7 +130,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id", "product_id"],
         )
         # Expected result after subtraction
-        self.numpy_expected_subtract = NumpyEvent.from_dataframe(
+        self.expected_evset_subtract = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [TRYOLABS_SHOP, MATE_ID, 0.0, -18.5, -4],
@@ -155,7 +155,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id", "product_id"],
         )
         # Expected result after multiplication
-        self.numpy_expected_multiply = NumpyEvent.from_dataframe(
+        self.expected_evset_multiply = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [TRYOLABS_SHOP, MATE_ID, 0.0, -63, 5],
@@ -180,7 +180,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id", "product_id"],
         )
         # Expected result after division
-        self.numpy_expected_divide = NumpyEvent.from_dataframe(
+        self.expected_evset_divide = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [TRYOLABS_SHOP, MATE_ID, 0.0, -14 / 4.5, 0.2],
@@ -206,7 +206,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
         )
 
         # Expected result after floor division
-        self.numpy_expected_floordiv = NumpyEvent.from_dataframe(
+        self.expected_evset_floordiv = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [TRYOLABS_SHOP, MATE_ID, 0.0, -4.0, 0],
@@ -233,7 +233,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
         self.sampling = Sampling(
             [("store_id", DType.INT32), ("product_id", DType.INT64)]
         )
-        self.event_1 = Event(
+        self.node_1 = Node(
             [
                 Feature("sales", DType.FLOAT64),
                 Feature("revenue", DType.FLOAT32),
@@ -241,7 +241,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             sampling=self.sampling,
             creator=None,
         )
-        self.event_2 = Event(
+        self.node_2 = Node(
             [
                 Feature("costs", DType.FLOAT64),
                 Feature("sales", DType.FLOAT32),
@@ -254,85 +254,79 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
         """Test correct addition operator."""
 
         operator = AddOperator(
-            event_1=self.event_1,
-            event_2=self.event_2,
+            node_1=self.node_1,
+            node_2=self.node_2,
         )
 
         add_implementation = AddNumpyImplementation(operator)
 
         operator_output = add_implementation.call(
-            event_1=self.numpy_event_1, event_2=self.numpy_event_2
+            evset_1=self.evset_1, evset_2=self.evset_2
         )
 
-        self.assertTrue(self.numpy_expected_add == operator_output["event"])
+        self.assertTrue(self.expected_evset_add == operator_output["node"])
 
     def test_correct_subtraction(self) -> None:
         """Test correct subtraction operator."""
 
         operator = SubtractOperator(
-            event_1=self.event_1,
-            event_2=self.event_2,
+            node_1=self.node_1,
+            node_2=self.node_2,
         )
 
         sub_implementation = SubtractNumpyImplementation(operator)
         operator_output = sub_implementation.call(
-            event_1=self.numpy_event_1, event_2=self.numpy_event_2
+            evset_1=self.evset_1, evset_2=self.evset_2
         )
-        self.assertTrue(
-            self.numpy_expected_subtract == operator_output["event"]
-        )
+        self.assertTrue(self.expected_evset_subtract == operator_output["node"])
 
     def test_correct_multiplication(self) -> None:
         """Test correct multiplication operator."""
 
         operator = MultiplyOperator(
-            event_1=self.event_1,
-            event_2=self.event_2,
+            node_1=self.node_1,
+            node_2=self.node_2,
         )
 
         mult_implementation = MultiplyNumpyImplementation(operator)
 
         operator_output = mult_implementation.call(
-            event_1=self.numpy_event_1, event_2=self.numpy_event_2
+            evset_1=self.evset_1, evset_2=self.evset_2
         )
 
-        self.assertTrue(
-            self.numpy_expected_multiply == operator_output["event"]
-        )
+        self.assertTrue(self.expected_evset_multiply == operator_output["node"])
 
     def test_correct_division(self) -> None:
         """Test correct division operator."""
 
         operator = DivideOperator(
-            event_1=self.event_1,
-            event_2=self.event_2,
+            node_1=self.node_1,
+            node_2=self.node_2,
         )
 
         div_implementation = DivideNumpyImplementation(operator)
 
         operator_output = div_implementation.call(
-            event_1=self.numpy_event_1, event_2=self.numpy_event_2
+            evset_1=self.evset_1, evset_2=self.evset_2
         )
 
-        self.assertTrue(self.numpy_expected_divide == operator_output["event"])
+        self.assertTrue(self.expected_evset_divide == operator_output["node"])
 
     def test_correct_floordiv(self) -> None:
         """Test correct floordiv operator."""
 
         operator = FloorDivOperator(
-            event_1=self.event_1,
-            event_2=self.event_2,
+            node_1=self.node_1,
+            node_2=self.node_2,
         )
 
         div_implementation = FloorDivideNumpyImplementation(operator)
 
         operator_output = div_implementation.call(
-            event_1=self.numpy_event_1, event_2=self.numpy_event_2
+            evset_1=self.evset_1, evset_2=self.evset_2
         )
 
-        self.assertTrue(
-            self.numpy_expected_floordiv == operator_output["event"]
-        )
+        self.assertTrue(self.expected_evset_floordiv == operator_output["node"])
 
 
 if __name__ == "__main__":

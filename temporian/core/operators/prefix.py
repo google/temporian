@@ -15,7 +15,7 @@
 """Prefix operator class and public API function definition."""
 
 from temporian.core import operator_lib
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
@@ -25,12 +25,12 @@ class Prefix(Operator):
     def __init__(
         self,
         prefix: str,
-        event: Event,
+        event: Node,
     ):
         super().__init__()
 
         self.add_attribute("prefix", prefix)
-        self.add_input("event", event)
+        self.add_input("node", node)
 
         # TODO: When supported, re-use existing feature instead of creating a
         # new one.
@@ -38,17 +38,17 @@ class Prefix(Operator):
             Feature(
                 name=prefix + f.name,
                 dtype=f.dtype,
-                sampling=event.sampling,
+                sampling=node.sampling,
                 creator=self,
             )
-            for f in event.features
+            for f in node.features
         ]
 
         self.add_output(
-            "event",
-            Event(
+            "node",
+            Node(
                 features=output_features,
-                sampling=event.sampling,
+                sampling=node.sampling,
                 creator=self,
             ),
         )
@@ -68,8 +68,8 @@ class Prefix(Operator):
                     type=pb.OperatorDef.Attribute.Type.STRING,
                 )
             ],
-            inputs=[pb.OperatorDef.Input(key="event")],
-            outputs=[pb.OperatorDef.Output(key="event")],
+            inputs=[pb.OperatorDef.Input(key="node")],
+            outputs=[pb.OperatorDef.Output(key="node")],
         )
 
 
@@ -78,14 +78,14 @@ operator_lib.register_operator(Prefix)
 
 def prefix(
     prefix: str,
-    event: Event,
-) -> Event:
-    """Adds a prefix to the names of the features in an event.
+    node: Node,
+) -> Node:
+    """Adds a prefix to the names of the features in a node.
 
     Example:
         Inputs:
             prefix: "hello_"
-            event:
+            node:
                 feature_1: ...
                 feature_2: ...
                 index: {index_1, index_2, ...}
@@ -97,9 +97,9 @@ def prefix(
 
     Args:
         prefix: Prefix to add in front of the feature names.
-        event: Event to prefix.
+        node: Node to prefix.
 
     Returns:
-        Prefixed event.
+        Prefixed node.
     """
-    return Prefix(prefix=prefix, event=event).outputs["event"]
+    return Prefix(prefix=prefix, node=node).outputs["node"]
