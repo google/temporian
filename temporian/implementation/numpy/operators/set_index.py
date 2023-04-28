@@ -9,7 +9,6 @@ from temporian.implementation.numpy.data.feature import DTYPE_REVERSE_MAPPING
 from temporian.implementation.numpy.data.event import IndexData
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators.base import OperatorImplementation
-from temporian.implementation.numpy import implementation_lib
 
 
 class SetIndexNumpyImplementation(OperatorImplementation):
