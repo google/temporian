@@ -19,13 +19,13 @@ class RenameNumpyImplementation(OperatorImplementation):
 
         # rename features
         new_feature_names = [
-            features[feature_name] if feature_name in features else feature_name
+            features.get(feature_name, feature_name)
             for feature_name in event.feature_names
         ]
 
         # rename index
         new_index_names = [
-            index[index_name] if index_name in index else index_name
+            index.get(index_name, index_name)
             for index_name in event.index_names
         ]
 

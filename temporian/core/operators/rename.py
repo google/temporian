@@ -127,7 +127,7 @@ class RenameOperator(Operator):
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=self.new_feature_name(f),
+                name=self.features.get(f.name, f.name),
                 dtype=f.dtype,
                 sampling=output_sampling,
                 creator=self,
@@ -145,12 +145,6 @@ class RenameOperator(Operator):
         )
 
         self.check()
-
-    def new_feature_name(self, feature: Feature) -> str:
-        if feature.name in self.features:
-            return self.features[feature.name]
-
-        return feature.name
 
     def new_sampling(self, old_sampling: Sampling) -> Sampling:
         new_index_levels = []

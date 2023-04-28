@@ -28,12 +28,10 @@ class RenameOperatorTest(absltest.TestCase):
     """Rename operator test."""
 
     def setUp(self):
-        self.A = 0
-
         self.df = pd.DataFrame(
             [
-                [self.A, 1.0, 10.0, -1.0, 0.0],
-                [self.A, 2.0, np.nan, -2.0, 32.0],
+                ["A", 1.0, 10.0, -1.0, 0.0],
+                ["A", 2.0, np.nan, -2.0, 32.0],
             ],
             columns=["store_id", "timestamp", "sales", "costs", "weather"],
         )
@@ -45,8 +43,8 @@ class RenameOperatorTest(absltest.TestCase):
 
         df = pd.DataFrame(
             [
-                [self.A, 1.0, "X", -1.0, 0.0],
-                [self.A, 2.0, "Y", -2.0, 32.0],
+                ["A", 1.0, "X", -1.0, 0.0],
+                ["A", 2.0, "Y", -2.0, 32.0],
             ],
             columns=["store_id", "timestamp", "sales", "costs", "weather"],
         )
@@ -120,8 +118,8 @@ class RenameOperatorTest(absltest.TestCase):
         """Test renaming multiple features."""
         new_df = pd.DataFrame(
             [
-                [self.A, 1.0, 10.0, -1.0, 0.0],
-                [self.A, 2.0, np.nan, -2.0, 32.0],
+                ["A", 1.0, 10.0, -1.0, 0.0],
+                ["A", 2.0, np.nan, -2.0, 32.0],
             ],
             columns=["store_id", "timestamp", "new_sales", "costs", "profit"],
         )
@@ -143,8 +141,8 @@ class RenameOperatorTest(absltest.TestCase):
         """Test renaming index."""
         new_df = pd.DataFrame(
             [
-                [self.A, 1.0, 10.0, -1.0, 0.0],
-                [self.A, 2.0, np.nan, -2.0, 32.0],
+                ["A", 1.0, 10.0, -1.0, 0.0],
+                ["A", 2.0, np.nan, -2.0, 32.0],
             ],
             columns=["product_id", "timestamp", "sales", "costs", "weather"],
         )
@@ -166,8 +164,8 @@ class RenameOperatorTest(absltest.TestCase):
         """Test renaming index."""
         new_df = pd.DataFrame(
             [
-                [self.A, 1.0, 10.0, -1.0, 0.0],
-                [self.A, 2.0, np.nan, -2.0, 32.0],
+                ["A", 1.0, 10.0, -1.0, 0.0],
+                ["A", 2.0, np.nan, -2.0, 32.0],
             ],
             columns=["product_id", "timestamp", "sales", "costs", "weather"],
         )
@@ -190,8 +188,8 @@ class RenameOperatorTest(absltest.TestCase):
 
         df = pd.DataFrame(
             [
-                [self.A, 1.0, 10.0, -1, 0.0],
-                [self.A, 2.0, np.nan, -2, 32.0],
+                ["A", 1.0, 10.0, -1, 0.0],
+                ["A", 2.0, np.nan, -2, 32.0],
             ],
             columns=["store_id", "timestamp", "sales", "costs", "weather"],
         )
@@ -204,8 +202,8 @@ class RenameOperatorTest(absltest.TestCase):
 
         new_df = pd.DataFrame(
             [
-                [self.A, 1.0, 10.0, -1, 0.0],
-                [self.A, 2.0, np.nan, -2, 32.0],
+                ["A", 1.0, 10.0, -1, 0.0],
+                ["A", 2.0, np.nan, -2, 32.0],
             ],
             columns=["product_id", "timestamp", "sales", "roi", "weather"],
         )
@@ -319,8 +317,8 @@ class RenameOperatorTest(absltest.TestCase):
         """Test renaming feature and index with same name complex case."""
         new_df = pd.DataFrame(
             [
-                [self.A, 1.0, 10.0, -1.0, 0.0],
-                [self.A, 2.0, np.nan, -2.0, 32.0],
+                ["A", 1.0, 10.0, -1.0, 0.0],
+                ["A", 2.0, np.nan, -2.0, 32.0],
             ],
             columns=["sales", "timestamp", "store_id", "costs", "weather"],
         )
