@@ -82,7 +82,7 @@ class RenameOperatorTest(absltest.TestCase):
         operator = RenameOperator(self.input_event, "costs")
 
         impl = RenameNumpyImplementation(operator)
-        renamed_event = impl(event=self.input_event_data)["event"]
+        renamed_event = impl.call(event=self.input_event_data)["event"]
 
         self.assertEqual(renamed_event, expected_event)
 
@@ -112,7 +112,7 @@ class RenameOperatorTest(absltest.TestCase):
         operator = RenameOperator(self.input_event, {"sales": "costs"})
 
         impl = RenameNumpyImplementation(operator)
-        renamed_event = impl(event=self.input_event_data)["event"]
+        renamed_event = impl.call(event=self.input_event_data)["event"]
 
         self.assertEqual(renamed_event, expected_event)
 
@@ -135,7 +135,7 @@ class RenameOperatorTest(absltest.TestCase):
             features={"sales": "new_sales", "weather": "profit"},
         )
         impl = RenameNumpyImplementation(operator)
-        renamed_event = impl(event=self.input_event_data)["event"]
+        renamed_event = impl.call(event=self.input_event_data)["event"]
 
         self.assertEqual(renamed_event, expected_event)
 
@@ -158,7 +158,7 @@ class RenameOperatorTest(absltest.TestCase):
             index="product_id",
         )
         impl = RenameNumpyImplementation(operator)
-        renamed_event = impl(event=self.input_event_data)["event"]
+        renamed_event = impl.call(event=self.input_event_data)["event"]
 
         self.assertEqual(renamed_event, expected_event)
 
@@ -181,7 +181,7 @@ class RenameOperatorTest(absltest.TestCase):
             index={"store_id": "product_id"},
         )
         impl = RenameNumpyImplementation(operator)
-        renamed_event = impl(event=self.input_event_data)["event"]
+        renamed_event = impl.call(event=self.input_event_data)["event"]
 
         self.assertEqual(renamed_event, expected_event)
 
@@ -219,7 +219,7 @@ class RenameOperatorTest(absltest.TestCase):
             index={"store_id": "product_id", "costs": "roi"},
         )
         impl = RenameNumpyImplementation(operator)
-        renamed_event = impl(event=self.input_event_data)["event"]
+        renamed_event = impl.call(event=self.input_event_data)["event"]
 
         self.assertEqual(renamed_event, expected_event)
 
@@ -313,7 +313,7 @@ class RenameOperatorTest(absltest.TestCase):
         impl = RenameNumpyImplementation(operator)
 
         with self.assertRaises(ValueError):
-            impl(event=self.input_event_data)["event"]
+            impl.call(event=self.input_event_data)["event"]
 
     def test_rename_feature_and_index_inverting_name(self) -> None:
         """Test renaming feature and index with same name complex case."""
@@ -335,7 +335,7 @@ class RenameOperatorTest(absltest.TestCase):
             index={"store_id": "sales"},
         )
         impl = RenameNumpyImplementation(operator)
-        renamed_event = impl(event=self.input_event_data)["event"]
+        renamed_event = impl.call(event=self.input_event_data)["event"]
         self.assertEqual(renamed_event, expected_event)
 
 

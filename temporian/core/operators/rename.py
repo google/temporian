@@ -182,7 +182,7 @@ class RenameOperator(Operator):
                 pb.OperatorDef.Attribute(
                     key="index",
                     type=pb.OperatorDef.Attribute.Type.MAP_STR_STR,
-                    is_optional=True,
+                    is_optional=False,
                 ),
             ],
             inputs=[
