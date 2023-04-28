@@ -271,7 +271,7 @@ class MovingSumOperatorTest(absltest.TestCase):
     def test_cumsum(self):
         """Infinite window length (aka: cumsum function)"""
 
-        input_data = NumpyEvent.from_dataframe(
+        input_data = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     ["X1", "Y1", 10.0, 1.0, 1],
@@ -290,16 +290,16 @@ class MovingSumOperatorTest(absltest.TestCase):
         )
 
         op = MovingSumOperator(
-            event=input_data.schema(),
+            node=input_data.node(),
             window_length=np.inf,
             sampling=None,
         )
-        self.assertEqual(op.list_matching_io_samplings(), [("event", "event")])
+        self.assertEqual(op.list_matching_io_samplings(), [("node", "node")])
         instance = MovingSumNumpyImplementation(op)
 
-        output = instance(event=input_data)
+        output = instance(node=input_data)
 
-        expected_output = NumpyEvent.from_dataframe(
+        expected_output = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     ["X1", "Y1", 10.0, 1.0, 1],
@@ -317,11 +317,7 @@ class MovingSumOperatorTest(absltest.TestCase):
             index_names=["x", "y"],
         )
 
-        print("OUTPUT:")
-        print(output["event"])
-        print("EXPECTED:")
-        print(expected_output)
-        self.assertEqual(output["event"], expected_output)
+        self.assertEqual(output["node"], expected_output)
 
 
 if __name__ == "__main__":
