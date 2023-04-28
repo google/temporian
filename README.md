@@ -53,6 +53,10 @@ Temporian currently supports the following features for pre-processing your temp
 - **Arithmetic Operations:** allows you to perform arithmetic operations (such as addition, subtraction, multiplication, and division) on time series data, between different events.
 - More features coming soon!
 
+## Documentation
+
+The official documentation is available at [temporian.readthedocs.io](https://temporian.readthedocs.io/en/latest/).
+
 ## Environment Setup
 
 Dependencies are managed through [Poetry](https://python-poetry.org/). To
