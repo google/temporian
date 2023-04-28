@@ -162,7 +162,11 @@ select_and_glue:1000000              0.00104       0.00104
 
 ## Run documentation server locally
 
-Live preview your local changes to the documentation with `mkdocs serve`.
+Live preview your local changes to the documentation with
+
+```shell
+mkdocs serve -f docs/mkdocs.yml
+```
 
 ## Credits
 

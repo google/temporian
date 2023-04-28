@@ -3,7 +3,7 @@ repo_url: https://github.com/google/temporian
 
 # Theme
 theme:
-  name: "material"
+  name: material
   icon:
     repo: fontawesome/brands/github
   features:
@@ -28,6 +28,9 @@ theme:
       primary: black
       accent: white
 
+# Root dir for docs source
+docs_dir: src
+
 # Extra CSS
 extra_css:
   # TODO: continue working on this css customization for temporian
@@ -47,9 +50,9 @@ plugins:
   - gen-files:
       scripts:
         # Generate the index page from the README.md.
-        - docs/gen_index.py
-        # Generate the reference pages from the docstrings.
-        - docs/gen_ref_pages.py
+        - gen_index.py
+        # Generate the reference pages from ./docstrings.
+        - gen_ref_pages.py
   - literate-nav:
       nav_file: SUMMARY.md
     # Configuration to generate the reference pages from the docstrings.
@@ -96,5 +99,5 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
 
 watch:
-  - README.md
-  - temporian
+  - ../README.md
+  - ../temporian
