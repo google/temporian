@@ -58,16 +58,27 @@ class BaseArithmeticScalarOperator(Operator):
                 f" {self.supported_value_dtypes}, but got {value_dtype}"
             )
 
-        # TODO: Check if we want to compare kind of dtype or just dtype
-        # it makes sense to allow subtypes of the same kind. Value will
-        # always be 64 bits. We need a way to allow 32 bits.
+        # Check that the feature dtype doesn't need an upcast to operate with
+        # this value type
+        self.map_vtype_dtype = {
+            float: [DType.FLOAT32, DType.FLOAT64],
+            int: [DType.INT32, DType.INT64, DType.FLOAT32, DType.FLOAT64],
+            str: [DType.STRING],
+            bool: [
+                DType.BOOLEAN,
+                DType.INT32,
+                DType.INT64,
+                DType.FLOAT32,
+                DType.FLOAT64,
+            ],
+        }
         if not self.ignore_value_dtype_checking:
             for feature in event.features:
-                if feature.dtype != value_dtype:
+                if feature.dtype not in self.map_vtype_dtype[type(value)]:
                     raise ValueError(
-                        f"Feature {feature.name} has dtype {feature.dtype} "
-                        f"but value has dtype {value_dtype}. Both must be "
-                        "equal."
+                        f"Scalar has {type(value)=}, which can only operate"
+                        f" with dtypes: {self.map_vtype_dtype[type(value)]}. "
+                        f"But {feature.name} has dtype {feature.dtype}."
                     )
 
         # outputs
