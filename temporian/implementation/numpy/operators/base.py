@@ -162,6 +162,9 @@ def _check_output(
 
 
 def _check_same_sampling(event_1: NumpyEvent, event_2: NumpyEvent) -> bool:
+    if event_1.index_names != event_2.index_names:
+        return False
+
     for index_key, index_data_1 in event_1.data.items():
         if index_key not in event_2.data:
             return False

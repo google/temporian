@@ -60,6 +60,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "SUBTRACTION",
             "SUBTRACTION_SCALAR",
             "SET_INDEX",
+            "RENAME",
             "DROP_INDEX",
             "UNIQUE_TIMESTAMPS",
         ]

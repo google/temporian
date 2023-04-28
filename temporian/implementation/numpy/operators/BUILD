@@ -18,6 +18,7 @@ py_library(
         ":lag",
         ":prefix",
         ":propagate",
+        ":rename",
         ":sample",
         ":select",
         ":set_index",
@@ -126,6 +127,18 @@ py_library(
     deps = [
         ":base",
         "//temporian/core/operators:select",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event",
+    ],
+)
+
+py_library(
+    name = "rename",
+    srcs = ["rename.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators:rename",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
     ],

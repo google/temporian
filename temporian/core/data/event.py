@@ -228,6 +228,10 @@ class Event(object):
         return [feature.name for feature in self._features]
 
     @property
+    def index_names(self) -> List[str]:
+        return self.sampling.index.names
+
+    @property
     def dtypes(self) -> Dict[str, DType]:
         return {feature.name: feature.dtype for feature in self._features}
 

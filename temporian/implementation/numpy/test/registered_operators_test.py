@@ -52,6 +52,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "NEGATE",
             "PREFIX",
             "PROPAGATE",
+            "RENAME",
             "SAMPLE",
             "SELECT",
             "SIMPLE_MOVING_AVERAGE",
