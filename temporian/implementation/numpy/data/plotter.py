@@ -51,6 +51,8 @@ def plot(
             warning.
     """
 
+    original_indexes = indexes
+
     if not isinstance(events, list):
         events = [events]
 
@@ -59,7 +61,7 @@ def plot(
 
     if indexes is None:
         # All the indexes
-        indexes = events[0].index_names
+        indexes = list(events[0].data.keys())
 
     elif isinstance(indexes, tuple):
         # e.g. indexes=("a",)
@@ -75,7 +77,10 @@ def plot(
 
     for index in indexes:
         if not isinstance(index, tuple):
-            raise ValueError("An index should be a tuple or a list of tuples")
+            raise ValueError(
+                "An index should be a tuple or a list of tuples. Instead"
+                f' receives "indexes={original_indexes}"'
+            )
 
     options = Options(
         backend=backend,
@@ -106,6 +111,7 @@ def _plot_matplotlib(
 
     px = 1 / plt.rcParams["figure.dpi"]
 
+    # Compute the number of sub-plots + extra checks.
     num_plots = 0
     for index in indexes:
         for event in events:
@@ -123,6 +129,9 @@ def _plot_matplotlib(
                 num_features = 1
             num_plots += num_features
 
+    if num_plots == 0:
+        raise ValueError("There is nothing to plot.")
+
     if num_plots > options.max_num_plots:
         print(
             f"The number of plots ({num_plots}) is larger than "
@@ -139,13 +148,16 @@ def _plot_matplotlib(
         squeeze=False,
     )
 
+    # Actual plotting
     plot_idx = 0
     for index in indexes:
         if plot_idx >= num_plots:
+            # Too much plots are displayed already.
             break
 
-        display_index = index[0] if len(index) == 1 else index
-        title = str(display_index)
+        # Note: Don't display the tuple parenthesis is the index contain a
+        # single dimension.
+        title = str(index[0] if len(index) == 1 else index)
 
         for event in events:
             if plot_idx >= num_plots:
@@ -155,23 +167,22 @@ def _plot_matplotlib(
 
             xs = event.data[index].timestamps
             if options.max_points is not None and len(xs) > options.max_points:
+                # Too many timestamps. Only keep the fist ones.
                 xs = xs[: options.max_points]
 
             uniform = is_uniform(xs)
 
             if event.is_unix_timestamp:
+                # Matplotlib understands datetimes.
                 xs = [
                     datetime.datetime.fromtimestamp(x, tz=datetime.timezone.utc)
                     for x in xs
                 ]
 
             if len(feature_names) == 0:
-                # Plot the ticks
-
-                ax = axs[plot_idx, 0]
-
+                # There is not features to plot. Instead, plot the timestamps.
                 _matplotlib_sub_plot(
-                    ax=ax,
+                    ax=axs[plot_idx, 0],
                     xs=xs,
                     ys=np.zeros(len(xs)),
                     options=options,
@@ -182,26 +193,26 @@ def _plot_matplotlib(
                     is_unix_timestamp=event.is_unix_timestamp,
                     title=title,
                 )
-                # Only print the index once
+                # Only print the index / title once
                 title = None
 
                 plot_idx += 1
 
             for feature_idx, feature_name in enumerate(feature_names):
                 if plot_idx >= num_plots:
+                    # Too much plots are displayed already.
                     break
-
-                ax = axs[plot_idx, 0]
 
                 ys = event.data[index].features[feature_idx]
                 if (
                     options.max_points is not None
                     and len(ys) > options.max_points
                 ):
+                    # Too many timestamps. Only keep the fist ones.
                     ys = ys[: options.max_points]
 
                 _matplotlib_sub_plot(
-                    ax=ax,
+                    ax=axs[plot_idx, 0],
                     xs=xs,
                     ys=ys,
                     options=options,
@@ -212,7 +223,7 @@ def _plot_matplotlib(
                     marker="None" if uniform else "+",
                 )
 
-                # Only print the index once
+                # Only print the index / title once
                 title = None
 
                 plot_idx += 1
@@ -222,8 +233,18 @@ def _plot_matplotlib(
 
 
 def _matplotlib_sub_plot(
-    ax, xs, ys, options, color, name, is_unix_timestamp, title, **wargs
+    ax,
+    xs,
+    ys,
+    options: Options,
+    color,
+    name: str,
+    is_unix_timestamp: bool,
+    title: Optional[str],
+    **wargs,
 ):
+    """Plots "(xs, ys)" on the axis "ax"."""
+
     import matplotlib.ticker as ticker
 
     ax.plot(xs, ys, lw=0.5, color=color, **wargs)

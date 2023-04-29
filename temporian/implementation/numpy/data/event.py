@@ -103,8 +103,8 @@ class NumpyEvent:
     def __init__(
         self,
         data: Dict[Tuple, IndexData],
-        feature_names: Union[List[str]],
-        index_names: Union[List[str]],
+        feature_names: List[str],
+        index_names: List[str],
         is_unix_timestamp: bool,
     ) -> None:
         self._data = data
@@ -141,12 +141,14 @@ class NumpyEvent:
     # TODO: Rename to "dtypes".
     def dtypes_list(self) -> List[DType]:
         # TODO: Handle case where there is no data.
-        return [feature.dtype for feature in self._first_index_features]
+        return [feature.dtype for feature in self._first_index_features()]
 
+    # TODO: Remove. Same as "len(self.feature_names)"
     @property
     def feature_count(self) -> int:
         return len(self._feature_names)
 
+    # TODO: Remove. This is the same as "self.data".
     def iterindex(self) -> Iterable[Tuple[Tuple, IndexData]]:
         yield from self.data.items()
 
@@ -169,14 +171,18 @@ class NumpyEvent:
 
         return next(iter(self._data))
 
+    # TODO: Remove.
     def first_index_data(self) -> IndexData:
         if self.first_index_key() is None:
             return []
         return self[self.first_index_key()]
 
+    # TODO: Remove.
     def _first_index_features(self) -> List[np.ndarray]:
         return list(self._data.values())[0].features
 
+    # TODO: Do not recompute the schema on the fly. Instead, keep an internal
+    # Event / Node. This Node is possibly given as constructor argument.
     def schema(self) -> Event:
         return Event(
             features=[
@@ -459,6 +465,9 @@ class NumpyEvent:
 
     def __eq__(self, __o: object) -> bool:
         # tolerance levels for float comparison. TODO: move to appropiate place
+
+        # TODO: Remove. Equality tests should be exact. Create a "Near" function
+        # if necessary.
         rtol = 1e-9
         atol = 1e-9
 
