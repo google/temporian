@@ -1,15 +1,14 @@
 from typing import Dict
 
 from temporian.core.operators.filter import FilterOperator
-from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.feature import NumpyFeature
-from temporian.implementation.numpy.data.sampling import NumpySampling
 from temporian.implementation.numpy import implementation_lib
+from temporian.implementation.numpy.data.event import IndexData
+from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
 class FilterNumpyImplementation(OperatorImplementation):
-    """Filter timestamps from an event based on a condition."""
+    """Numpy implementation of the filter operator."""
 
     def __init__(self, operator: FilterOperator) -> None:
         super().__init__(operator)
@@ -17,41 +16,29 @@ class FilterNumpyImplementation(OperatorImplementation):
     def __call__(
         self, event: NumpyEvent, condition: NumpyEvent
     ) -> Dict[str, NumpyEvent]:
-        # check if sampling is equal
-        if event.sampling != condition.sampling:
-            raise ValueError("Sampling of event and condition must be equal.")
-
-        new_sampling = {}
-        event_filtered_data = {}
-
-        for index, features in condition.data.items():
+        output_event = NumpyEvent(
+            {}, event.feature_names, event.index_names, event.is_unix_timestamp
+        )
+        for index_key, index_data in condition.iterindex():
             # get boolean mask from condition
-            condition_feature = features[0].data
+            index_mask = index_data.features[0]
 
-            # filtered sampling
-            filtered_sampling = event.sampling.data[index][condition_feature]
+            # filter timestamps
+            filtered_timestamps = event[index_key].timestamps[index_mask]
 
-            # if filtered sampling is empty, skip
-            if len(filtered_sampling) == 0:
+            # if filtered timestamps is empty, skip
+            if len(filtered_timestamps) == 0:
                 continue
 
-            new_sampling[index] = filtered_sampling
-
             # filter features
-            event_filtered_data[index] = [
-                NumpyFeature(
-                    name=event_feature.name,
-                    data=event_feature.data[condition_feature],
-                )
-                for event_feature in event.data[index]
+            filtered_features = [
+                event_feature[index_mask]
+                for event_feature in event[index_key].features
             ]
-
-        output_event = NumpyEvent(
-            data=event_filtered_data,
-            sampling=NumpySampling(
-                index=event.sampling.index, data=new_sampling
-            ),
-        )
+            # set filtered data
+            output_event[index_key] = IndexData(
+                filtered_features, filtered_timestamps
+            )
 
         return {"event": output_event}
 

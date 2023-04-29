@@ -26,9 +26,6 @@ from temporian.implementation.numpy.operators.window.moving_count import (
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.core.data import event as event_lib
-from temporian.core.data import feature as feature_lib
-from temporian.core.data import dtype as dtype_lib
-import math
 from temporian.implementation.numpy_cc.operators import window as window_cc
 from numpy.testing import assert_array_equal
 
@@ -77,7 +74,7 @@ class MovingCountOperatorTest(absltest.TestCase):
 
         op = MovingCountOperator(
             event=input_data.schema(),
-            window_length=5,
+            window_length=5.0,
             sampling=None,
         )
         self.assertEqual(op.list_matching_io_samplings(), [("event", "event")])
@@ -123,7 +120,7 @@ class MovingCountOperatorTest(absltest.TestCase):
 
         op = MovingCountOperator(
             event=input_data.schema(),
-            window_length=5,
+            window_length=5.0,
             sampling=None,
         )
         self.assertEqual(op.list_matching_io_samplings(), [("event", "event")])

@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Floor or integer division scalar Operator"""
+"""Floor division scalar operator class and public API function definition."""
+
 from typing import Union, List
 
 from temporian.core import operator_lib
@@ -24,10 +25,6 @@ from temporian.core.operators.arithmetic_scalar.base import (
 
 
 class FloorDivScalarOperator(BaseArithmeticScalarOperator):
-    """
-    Integer division of an event and a scalar (i.e: a//10)
-    """
-
     @classmethod
     @property
     def operator_def_key(cls) -> str:
@@ -57,14 +54,19 @@ def floordiv_scalar(
     numerator: Union[Event, SCALAR],
     denominator: Union[Event, SCALAR],
 ) -> Event:
-    """
-    Divides element-wise an event and a scalar and takes the result floor.
+    """Divides an event and a scalar and takes the result's floor.
+
+    Each item in each feature in the event is divided with the scalar value.
+
+    Either `numerator` or `denominator` should be a scalar value, but not both.
+    If looking to floordiv two events, use the `floordiv` operator instead.
 
     Args:
-        numerator: Numerator.
-        denominator: Denominator.
+        numerator: Numerator event or value.
+        denominator: Denominator event or value.
+
     Returns:
-        Event: Integer division of numerator features and denominator value
+        Integer division of `numerator` and `denominator`.
     """
     scalars_types = (float, int)
 

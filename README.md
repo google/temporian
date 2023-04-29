@@ -1,4 +1,4 @@
-![Temporian logo](resources/banner.png)
+![Temporian logo](docs/src/assets/banner.png)
 
 ![tests](https://github.com/google/temporian/actions/workflows/test.yaml/badge.svg) ![formatting](https://github.com/google/temporian/actions/workflows/formatting.yaml/badge.svg)
 
@@ -52,6 +52,10 @@ Temporian currently supports the following features for pre-processing your temp
 - **Lag:** creates new features by shifting the time series data backwards in time by a specified period.
 - **Arithmetic Operations:** allows you to perform arithmetic operations (such as addition, subtraction, multiplication, and division) on time series data, between different events.
 - More features coming soon!
+
+## Documentation
+
+The official documentation is available at [temporian.readthedocs.io](https://temporian.readthedocs.io/en/latest/).
 
 ## Environment Setup
 
@@ -158,6 +162,14 @@ select_and_glue:1000000              0.00104       0.00104
 ----------------------------------------------------------------
 ...
 ================================================================
+```
+
+## Run documentation server locally
+
+Live preview your local changes to the documentation with
+
+```shell
+mkdocs serve -f docs/mkdocs.yml
 ```
 
 ## Credits

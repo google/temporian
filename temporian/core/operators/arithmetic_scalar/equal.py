@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Performs equality between events features and a scalar value"""
+"""Equal scalar operator class and public API function definition."""
+
 from typing import Union, List
 
 from temporian.core import operator_lib
@@ -25,10 +26,6 @@ from temporian.core.operators.arithmetic_scalar.base import (
 
 
 class EqualScalarOperator(BaseArithmeticScalarOperator):
-    """
-    Performs equality between events features and a scalar value.
-    """
-
     @classmethod
     @property
     def operator_def_key(cls) -> str:
@@ -61,16 +58,16 @@ def equal_scalar(
     event: Event,
     value: Union[float, int, str, bool],
 ) -> Event:
-    """
-    Performs equality element-wise between events features and a scalar value.
+    """Checks for equality between an event and a scalar.
+
+    Each item in each feature in `event` is compared to `value`.
 
     Args:
-        event: Event to compare values to.
-        value: Scalar value to compare to all event features.
+        event: Event to compare the value to.
+        value: Scalar value to compare to the event.
 
     Returns:
-        Event: Event with the equality of event features and value. Features
-            values equal to value are set to True, and False otherwise.
+        Event containing the result of the comparison.
     """
     return EqualScalarOperator(
         event=event,

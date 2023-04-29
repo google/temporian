@@ -12,23 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Arithmetic Negation Scalar Operator"""
+"""Negate operator class and public API function definition."""
+
 from typing import List
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
 from temporian.core.data.event import Event
-from temporian.core.data.feature import Feature
 from temporian.core.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarOperator,
 )
 
 
 class NegateOperator(BaseArithmeticScalarOperator):
-    """
-    Negates the event features.
-    """
-
     def __init__(
         self,
         event: Event,
@@ -48,8 +44,8 @@ class NegateOperator(BaseArithmeticScalarOperator):
         return ""
 
     # overriding feature name to be the same as the input feature
-    def output_feature_name(self, feature: Feature) -> str:
-        return feature.name
+    def output_feature_name(self, feature_name: str) -> str:
+        return feature_name
 
     # overriding checking for feature dtype to be the same as value dtype
     @property
@@ -70,8 +66,9 @@ operator_lib.register_operator(NegateOperator)
 def negate(
     event: Event,
 ) -> Event:
-    """
-    Negates the event features.
+    """Negates an event.
+
+    Multiplies each item in each feature in `event` by -1.
 
     Args:
         event: Event to negate.

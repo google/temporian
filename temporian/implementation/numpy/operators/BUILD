@@ -11,12 +11,14 @@ py_library(
     srcs = ["all_operators.py"],
     srcs_version = "PY3",
     deps = [
+        ":cast",
         ":drop_index",
         ":filter",
         ":glue",
         ":lag",
         ":prefix",
         ":propagate",
+        ":rename",
         ":sample",
         ":select",
         ":set_index",
@@ -131,47 +133,27 @@ py_library(
 )
 
 py_library(
+    name = "rename",
+    srcs = ["rename.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators:rename",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event",
+    ],
+)
+
+py_library(
     name = "set_index",
     srcs = ["set_index.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
-        ":utils",
         "//temporian/core/operators:set_index",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
-    ],
-)
-
-py_library(
-    name = "propagate",
-    srcs = ["propagate.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":base",
-        "//temporian/core/data:duration",
-        "//temporian/core/operators:propagate",
-        "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy:utils",
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:sampling",
-    ],
-)
-
-py_library(
-    name = "sample",
-    srcs = ["sample.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":base",
-        "//temporian/core/data:duration",
-        "//temporian/core/operators:sample",
-        "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy:utils",
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:sampling",
-        "//temporian/implementation/numpy_cc/operators:sample",
     ],
 )
 
@@ -191,11 +173,44 @@ py_library(
 )
 
 py_library(
-    name = "utils",
-    srcs = ["utils.py"],
+    name = "propagate",
+    srcs = ["propagate.py"],
     srcs_version = "PY3",
     deps = [
+        ":base",
+        "//temporian/core/data:duration",
+        "//temporian/core/operators:propagate",
+        "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+    ],
+)
+
+py_library(
+    name = "sample",
+    srcs = ["sample.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/data:duration",
+        "//temporian/core/operators:sample",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy_cc/operators:sample",
+    ],
+)
+
+py_library(
+    name = "cast",
+    srcs = ["cast.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators:cast",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
     ],
 )
 

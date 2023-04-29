@@ -34,14 +34,6 @@ class SimpleMovingAverageOperator(BaseWindowOperator):
         return "SIMPLE_MOVING_AVERAGE"
 
     def get_feature_dtype(self, feature: Feature) -> str:
-        """Returns the dtype of the output feature.
-
-        Args:
-            feature: feature to get the dtype for.
-
-        Returns:
-            str: The dtype of the output feature.
-        """
         return (
             DType.FLOAT32 if feature.dtype == DType.FLOAT32 else DType.FLOAT64
         )
@@ -55,29 +47,27 @@ def simple_moving_average(
     window_length: Duration,
     sampling: Optional[Event] = None,
 ) -> Event:
-    """Simple Moving average
+    """Computes the average of values in a sliding window over the event.
 
     For each t in sampling, and for each feature independently, returns at time
     t the average value of the feature in the window [t - window_length, t].
 
+    If `sampling` is provided samples the moving window's value at each
+    timestamp in `sampling`, else samples it at each timestamp in `event`.
 
-    If `sampling` is provided, applies the operator for each timestamp in
-    `sampling`. If `sampling` is not provided, applies the operator for each
-    timestamp in `event`.
-
-    Missing values are ignored.
+    Missing values (such as NaNs) are ignored.
 
     If the window does not contain any values (e.g., all the values are missing,
     or the window does not contain any sampling), outputs missing values.
 
     Args:
-        event: The features to average.
-        window_length: The window length for averaging.
-        sampling: If provided, define when the operator is applied. If not
-          provided, the operator is applied for each timestamp of `event`.
+        event: Features to average.
+        window_length: Sliding window's length.
+        sampling: Timestamps to sample the sliding window's value at. If not
+            provided, timestamps in `event` are used.
 
     Returns:
-        An event containing the moving average of each feature in `event`.
+        Event containing the moving average of each feature in `event`.
     """
     return SimpleMovingAverageOperator(
         event=event,

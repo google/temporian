@@ -84,6 +84,19 @@ py_test(
 )
 
 py_test(
+    name = "cast_test",
+    srcs = ["cast_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators:cast",
+        "//temporian/implementation/numpy:evaluator",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/operators:cast",
+    ],
+)
+
+py_test(
     name = "filter_test",
     srcs = ["filter_test.py"],
     srcs_version = "PY3",
@@ -206,6 +219,22 @@ py_test(
 )
 
 py_test(
+    name = "calendar_month_test",
+    srcs = ["calendar_month_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:event",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators/calendar:minute",
+        "//temporian/implementation/numpy:evaluator",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:feature",
+        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/operators/calendar:month",
+    ],
+)
+
+py_test(
     name = "calendar_second_test",
     srcs = ["calendar_second_test.py"],
     srcs_version = "PY3",
@@ -272,6 +301,19 @@ py_test(
         "//temporian/implementation/numpy:evaluator",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/operators:select",
+    ],
+)
+
+py_test(
+    name = "rename_test",
+    srcs = ["rename_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core:evaluator",
+        "//temporian/core/operators:rename",
+        "//temporian/implementation/numpy:evaluator",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/operators:rename",
     ],
 )
 
@@ -401,4 +443,3 @@ py_test(
         "//temporian/implementation/numpy/operators:unique_timestamps",
     ],
 )
-    

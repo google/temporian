@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""DropIndex operator."""
+"""Drop index operator class and public API function definition."""
+
 from typing import List, Optional, Union
 
 from temporian.core import operator_lib
@@ -123,7 +124,7 @@ class DropIndexOperator(Operator):
             key="DROP_INDEX",
             attributes=[
                 pb.OperatorDef.Attribute(
-                    key="index_names",
+                    key="index_to_drop",
                     type=pb.OperatorDef.Attribute.Type.REPEATED_STRING,
                 ),
                 pb.OperatorDef.Attribute(
@@ -174,22 +175,31 @@ def drop_index(
     index_to_drop: Optional[Union[str, List[str]]] = None,
     keep: bool = True,
 ) -> Event:
-    """
-    Removes one or more index columns from the given `Event` object and returns
-    a new `Event` object with the updated index. Optionally, it can also keep
-    the removed index columns as features in the output `Event`.
+    """Removes one or more index columns from an event.
+
+    Examples:
+        Given an input `Event` with index names ['A', 'B', 'C'] and features
+        names ['X', 'Y', 'Z']:
+
+        1. `drop_index(event, index_names='A', keep=True)`
+           Output `Event` will have index names ['B', 'C'] and features names
+           ['X', 'Y', 'Z', 'A'].
+
+        2. `drop_index(event, index_names=['A', 'B'], keep=False)`
+           Output `Event` will have index names ['C'] and features names
+           ['X', 'Y', 'Z'].
+
+        3. `drop_index(event, index_names=None, keep=True)`
+           Output `Event` will have index names [] (empty index) and features
+           names ['X', 'Y', 'Z', 'A', 'B', 'C'].
 
     Args:
-        event:
-            The input `Event` object from which the specified index columns
-            should be removed.
-        index_to_drop:
-            The index column(s) to be removed from the input `Event`.
-            This can be a single column name (str) or a list of column names
-            (List[str]). If not specified or set to `None`, all index columns in
-            the input `Event` will be removed. Defaults to `None`.
-        keep:
-            A flag indicating whether the removed index columns should be kept
+        event: Event from which the specified index columns should be removed.
+        index_to_drop: Index column(s) to be removed from `event`. This can be a
+            single column name (`str`) or a list of column names (`List[str]`).
+            If not specified or set to `None`, all index columns in `event` will
+            be removed. Defaults to `None`.
+        keep: Flag indicating whether the removed index columns should be kept
             as features in the output `Event`. Defaults to `True`.
 
     Returns:
@@ -198,30 +208,11 @@ def drop_index(
         index columns will be included as features in the output `Event`.
 
     Raises:
-        ValueError:
-            If an empty list is provided as the `index_names` argument.
-        KeyError:
-            If any of the specified `index_names` are missing from the input
-            `Event`'s index.
-        ValueError:
-            If a feature name coming from the index already exists in the input
-            `Event`, and the `keep` flag is set to `True`.
-
-    Examples:
-        Given an input `Event` with index names ['A', 'B', 'C'] and features
-        names ['X', 'Y', 'Z']:
-
-        1. drop_index(event, index_names='A', keep=True)
-           Output `Event` will have index names ['B', 'C'] and features names
-           ['X', 'Y', 'Z', 'A'].
-
-        2. drop_index(event, index_names=['A', 'B'], keep=False)
-           Output `Event` will have index names ['C'] and features names
-           ['X', 'Y', 'Z'].
-
-        3. drop_index(event, index_names=None, keep=True)
-           Output `Event` will have index names [] (empty index) and features
-           names ['X', 'Y', 'Z', 'A', 'B', 'C'].
+        ValueError: If an empty list is provided as the `index_names` argument.
+        KeyError: If any of the specified `index_names` are missing from
+            `event`'s index.
+        ValueError: If a feature name coming from the index already exists in
+            `event`, and the `keep` flag is set to `True`.
     """
     index_to_drop = _normalize_index_to_drop(event, index_to_drop)
     return DropIndexOperator(event, index_to_drop, keep).outputs["event"]

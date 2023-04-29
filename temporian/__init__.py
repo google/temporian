@@ -47,4 +47,3 @@ load = serialize.load
 save = serialize.save
 input_event = event.input_event
 Event = event.Event
-Feature = feature.Feature

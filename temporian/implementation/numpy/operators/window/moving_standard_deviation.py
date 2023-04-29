@@ -13,14 +13,13 @@
 # limitations under the License.
 
 
-from temporian.implementation.numpy import implementation_lib
 from temporian.core.operators.window.moving_standard_deviation import (
     MovingStandardDeviationOperator,
 )
+from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.window.base import (
     BaseWindowNumpyImplementation,
 )
-
 from temporian.implementation.numpy_cc.operators import window as window_cc
 
 

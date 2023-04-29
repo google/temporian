@@ -8,6 +8,8 @@ from temporian.core.operators.arithmetic import add
 from temporian.core.operators.arithmetic import floordiv
 from temporian.core.operators.arithmetic import equal
 
+from temporian.core.operators.cast import cast
+from temporian.core.operators.drop_index import drop_index
 from temporian.core.operators.filter import filter
 
 from temporian.core.operators.arithmetic_scalar import add_scalar
@@ -36,6 +38,8 @@ from temporian.core.operators.prefix import prefix
 from temporian.core.operators.propagate import propagate
 from temporian.core.operators.sample import sample
 from temporian.core.operators.select import select
+from temporian.core.operators.set_index import set_index
+from temporian.core.operators.rename import rename
 
 from temporian.core.operators.window.simple_moving_average import (
     simple_moving_average,

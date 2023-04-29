@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Arithmetic Addition Scalar Operator"""
+"""Add scalar operator class and public API function definition."""
+
 from typing import Union, List
 
 from temporian.core import operator_lib
@@ -24,10 +25,6 @@ from temporian.core.operators.arithmetic_scalar.base import (
 
 
 class AddScalarOperator(BaseArithmeticScalarOperator):
-    """
-    Applies arithmetic addition between an event and a scalar value.
-    """
-
     @classmethod
     @property
     def operator_def_key(cls) -> str:
@@ -54,15 +51,16 @@ def add_scalar(
     event: Event,
     value: Union[float, int],
 ) -> Event:
-    """
-    Adds element-wise an event and a scalar value.
+    """Adds a scalar value to an event.
+
+    `value` is added to each item in each feature in `event`.
 
     Args:
-        event: Event to perform addition to.
-        value: Scalar value to add to all event features.
+        event: Event to add a scalar to.
+        value: Scalar value to add to the event.
 
     Returns:
-        Event: Event with the addition of event features and value.
+        Addition of `event` and `value`.
     """
     return AddScalarOperator(
         event=event,

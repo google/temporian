@@ -15,15 +15,16 @@
 """Implementation for the Glue operator."""
 
 from typing import Dict
-import copy
 
-from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.core.operators.glue import GlueOperator
 from temporian.implementation.numpy import implementation_lib
+from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
 class GlueNumpyImplementation(OperatorImplementation):
+    """Numpy implementation of the glue operator."""
+
     def __init__(self, operator: GlueOperator):
         super().__init__(operator)
         assert isinstance(operator, GlueOperator)
@@ -32,23 +33,38 @@ class GlueNumpyImplementation(OperatorImplementation):
         self,
         **dict_events: Dict[str, NumpyEvent],
     ) -> Dict[str, NumpyEvent]:
-        # The features are always ordered by the argument name of the event.
-        #
-        # Example:
-        #   if dict_events = {"event_0":X, "event_3":Z, "event_2": Y}
-        #   then, "events" if guarenteed to be [X, Y, Z].
+        """Glues a dictionary of NumpyEvents.
+
+        The output features are ordered by the argument name of the event.
+
+        Example:
+            If dict_events is {"event_0": X, "event_3": Z, "event_2": Y}
+            output is guarenteed to be [X, Y, Z].
+        """
+        # convert input event dict to list of events
         events = list(list(zip(*sorted(list(dict_events.items()))))[1])
-        assert len(events) >= 2
+        if len(events) < 2:
+            raise ValueError(
+                f"Glue operator cannot be called on a {len(events)} events"
+            )
 
-        dst_event = NumpyEvent(data={}, sampling=events[0].sampling)
+        # create output event
+        dst_event = NumpyEvent(
+            data={},
+            feature_names=[
+                feature_name
+                for event in events
+                for feature_name in event.feature_names
+            ],
+            index_names=events[0].index_names,
+            is_unix_timestamp=events[0].is_unix_timestamp,
+        )
+        # fill output event data
+        for index_key, index_data in events[0].iterindex():
+            dst_event[index_key] = index_data
+            for event in events[1:]:
+                dst_event[index_key].features.extend(event[index_key].features)
 
-        for index in events[0].data.keys():
-            dst_features = []
-            for event in events:
-                dst_features.extend(copy.copy(event.data[index]))
-            dst_event.data[index] = dst_features
-
-        # make gluement
         return {"event": dst_event}
 
 

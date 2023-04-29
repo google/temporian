@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Floor or integer division Operator"""
+"""Floor operator class and public API function definition."""
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
@@ -20,10 +20,6 @@ from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
 
 
 class FloorDivOperator(BaseArithmeticOperator):
-    """
-    Integer division of first event by second one (i.e: a//b)
-    """
-
     @classmethod
     @property
     def operator_def_key(cls) -> str:
@@ -41,14 +37,22 @@ def floordiv(
     numerator: Event,
     denominator: Event,
 ) -> Event:
-    """
-    Divide two events and take the result floor.
+    """Divides two events and takes the floor of the result.
+
+    I.e. computes numerator//denominator.
+
+    Each feature in `numerator` is divided by the feature in `denominator` in
+    the same position.
+
+    `numerator` and `denominator` must have the same sampling and the same
+    number of features.
 
     Args:
-        numerator: Numerator event
-        denominator: Denominator event
+        numerator: Numerator event.
+        denominator: Denominator event.
+
     Returns:
-        Event: Integer division of numerator features and denominator features
+        Integer division of `numerator`'s features by `denominator`'s features.
     """
     return FloorDivOperator(
         event_1=numerator,

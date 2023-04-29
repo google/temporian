@@ -14,20 +14,19 @@
 import numpy as np
 from temporian.implementation.numpy.operators.arithmetic.base import (
     BaseArithmeticNumpyImplementation,
-    NumpyFeature,
 )
 from temporian.core.operators.arithmetic import EqualOperator
 from temporian.implementation.numpy import implementation_lib
 
 
 class EqualNumpyImplementation(BaseArithmeticNumpyImplementation):
-    """Numpy implementation of arithmetic equal"""
+    """Numpy implementation of the equal operator."""
 
     def __init__(self, operator: EqualOperator) -> None:
         super().__init__(operator)
 
     def _do_operation(
-        self, event_1_feature: NumpyFeature, event_2_feature: NumpyFeature
+        self, event_1_feature: np.ndarray, event_2_feature: np.ndarray
     ) -> np.ndarray:
         # np.nan == np.nan returns False
         return np.equal(event_1_feature.data, event_2_feature.data)

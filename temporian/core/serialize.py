@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Serialization / unserialization of a processor."""
+"""Serialization / unserialization of a processor and its components."""
 
-from typing import Set, Union, Any, Dict, Tuple, Optional
+from typing import Set, Any, Dict, Tuple, Optional, Mapping
 
 from google.protobuf import text_format
 
@@ -33,11 +33,12 @@ def save(
     outputs: processor.MultipleEventArg,
     path: str,
 ) -> None:
-    """Saves the computation between "inputs" and "outputs" into a file.
+    """Saves the processor between `inputs` and `outputs` to a file.
 
     Usage example:
+        ```python
         a = t.input_event(...)
-        b = t.sma(a, window_length=7)
+        b = t.sma(a, window_length=7.0)
         t.save(inputs={"io_a": a}, outputs={"io_b": b}, path="processor.tem")
 
         inputs, outputs = t.load(path="processor.tem")
@@ -45,13 +46,13 @@ def save(
             query=outputs["io_b"],
             input_data{inputs["io_a"]: pandas.DataFrame(...)}
         ))
-
+        ```
 
     Args:
-        inputs: Input events. If None, the inputs is infered. In this case,
+        inputs: Input events. If None, the inputs is inferred. In this case,
             input event have to be named.
         outputs: Output events.
-        path: The file path.
+        path: File path to save to.
     """
 
     # TODO: Add support for compressed / binary serialization.
@@ -70,15 +71,15 @@ def save(
 def load(
     path: str, squeeze: bool = False
 ) -> Tuple[Dict[str, Event], Dict[str, Event]]:
-    """Load a processor from a file.
+    """Loads a processor from a file.
 
     Args:
-        path: File path.
+        path: File path to load from.
         squeeze: If true, and if the input/output contains a single event,
             returns an event (instead of a dictionary of events).
 
     Returns:
-        The inputs and outputs events.
+        Input and output events.
     """
 
     with open(path, "r") as f:
@@ -98,7 +99,7 @@ def load(
 
 
 def serialize(src: processor.Preprocessor) -> pb.Processor:
-    """Serializes a processor into an equivalent protobuffer."""
+    """Serializes a processor into a protobuffer."""
 
     return pb.Processor(
         operators=[_serialize_operator(o) for o in src.operators],
@@ -171,14 +172,12 @@ def unserialize(src: pb.Processor) -> processor.Preprocessor:
 
 
 def _identifier(item: Any) -> str:
-    """Unique identifier about an object within a processor."""
-
+    """Creates a unique identifier for an object within a processor."""
     return str(id(item))
 
 
-def all_identifier(collection: Any) -> Set[str]:
+def all_identifiers(collection: Any) -> Set[str]:
     """Builds the set of identifiers of a collections of events/features/..."""
-
     return {_identifier(x) for x in collection}
 
 
@@ -346,34 +345,57 @@ DTYPE_MAPPING = {
     DType.FLOAT32: pb.DType.FLOAT32,
     DType.INT64: pb.DType.INT64,
     DType.INT32: pb.DType.INT32,
+    DType.BOOLEAN: pb.DType.BOOLEAN,
+    DType.STRING: pb.DType.STRING,
 }
 INV_DTYPE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
 
 
 def _attribute_to_proto(
-    key: str, value: Union[str, int]
+    key: str, value: base.AttributeType
 ) -> pb.Operator.Attribute:
     if isinstance(value, str):
         return pb.Operator.Attribute(key=key, str=value)
-    elif isinstance(value, int):
+    if isinstance(value, bool):
+        # NOTE: Check this before int (isinstance(False, int) is also True)
+        return pb.Operator.Attribute(key=key, boolean=value)
+    if isinstance(value, int):
         return pb.Operator.Attribute(key=key, integer_64=value)
-    elif isinstance(value, float):
+    if isinstance(value, float):
         return pb.Operator.Attribute(key=key, float_64=value)
-    else:
-        raise ValueError(
-            f"Non supported type {type(value)} for attribute {key}={value}"
+    # list of strings
+    if isinstance(value, list) and all(isinstance(val, str) for val in value):
+        return pb.Operator.Attribute(
+            key=key, list_str=pb.Operator.Attribute.ListString(value=value)
         )
+    # map<str, str>
+    if (
+        isinstance(value, Mapping)
+        and all(isinstance(key, str) for key in value.keys())
+        and all(isinstance(val, str) for val in value.values())
+    ):
+        return pb.Operator.Attribute(
+            key=key, map_str_str=pb.Operator.Attribute.MapStrStr(value=value)
+        )
+    raise ValueError(
+        f"Non supported type {type(value)} for attribute {key}={value}"
+    )
 
 
-def _attribute_from_proto(src: pb.Operator.Attribute) -> Union[str, int, float]:
+def _attribute_from_proto(src: pb.Operator.Attribute) -> base.AttributeType:
     if src.HasField("integer_64"):
         return src.integer_64
-    elif src.HasField("str"):
+    if src.HasField("str"):
         return src.str
-    elif src.HasField("float_64"):
+    if src.HasField("float_64"):
         return src.float_64
-    else:
-        raise ValueError(f"Non supported proto attribute {src}")
+    if src.HasField("list_str"):
+        return list(src.list_str.value)
+    if src.HasField("boolean"):
+        return bool(src.boolean)
+    if src.HasField("map_str_str"):
+        return dict(src.map_str_str.value)
+    raise ValueError(f"Non supported proto attribute {src}")
 
 
 def _serialize_io_signature(key: str, event: Event):

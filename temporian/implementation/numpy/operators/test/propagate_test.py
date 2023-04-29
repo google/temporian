@@ -14,19 +14,13 @@
 
 from absl.testing import absltest
 
-import numpy as np
 import pandas as pd
 
-from temporian.core.data.sampling import Sampling
 from temporian.core.operators.propagate import Propagate
 from temporian.implementation.numpy.operators.propagate import (
     PropagateNumpyImplementation,
 )
-from temporian.implementation.numpy.data.event import NumpyEvent, NumpyFeature
-from temporian.implementation.numpy.data.sampling import NumpySampling
-from temporian.core.data import event as event_lib
-from temporian.core.data import feature as feature_lib
-from temporian.core.data.dtype import DType
+from temporian.implementation.numpy.data.event import NumpyEvent
 
 
 class PropagateOperatorTest(absltest.TestCase):
@@ -69,16 +63,12 @@ class PropagateOperatorTest(absltest.TestCase):
             ),
             index_names=["x", "y"],
         )
-
         # Run op
         op = Propagate(event=event, sampling=sampling)
         instance = PropagateNumpyImplementation(op)
         output = instance.call(event=event_data, sampling=sampling_data)[
             "event"
         ]
-
-        print(output)
-
         self.assertEqual(output, expected_output)
 
 

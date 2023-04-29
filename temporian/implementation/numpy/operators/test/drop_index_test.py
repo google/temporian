@@ -61,7 +61,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "item_id", "timestamp", "sales"],
             ),
-            index_names=None,
+            index_names=[],
         )
         # instance core operator
         operator = DropIndexOperator(
@@ -76,7 +76,6 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         )["event"]
 
         # validate output
-        print(op_numpy_output_evt, expected_numpy_output_evt)
         self.assertEqual(op_numpy_output_evt, expected_numpy_output_evt)
 
     def test_drop_item_id(self) -> None:

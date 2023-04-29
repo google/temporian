@@ -5,18 +5,19 @@ package(
 
 # Libraries
 # =========
-
 py_library(
     name = "all_operators",
     srcs = ["all_operators.py"],
     srcs_version = "PY3",
     deps = [
+        ":cast",
         ":drop_index",
         ":filter",
         ":glue",
         ":lag",
         ":prefix",
         ":propagate",
+        ":rename",
         ":sample",
         ":select",
         ":set_index",
@@ -47,7 +48,6 @@ py_library(
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:event",
-        "//temporian/core/data:feature",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -58,6 +58,33 @@ py_library(
     srcs_version = "PY3",
     deps = [
         "//temporian/core/data:event",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "cast",
+    srcs = ["cast.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "lag",
+    srcs = ["lag.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:duration",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -77,15 +104,15 @@ py_library(
 )
 
 py_library(
-    name = "lag",
-    srcs = ["lag.py"],
+    name = "rename",
+    srcs = ["rename.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:duration",
         "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/core/data:sampling",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -133,6 +160,21 @@ py_library(
 )
 
 py_library(
+    name = "prefix",
+    srcs = ["prefix.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        ":select",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:duration",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
     name = "propagate",
     srcs = ["propagate.py"],
     srcs_version = "PY3",
@@ -150,21 +192,6 @@ py_library(
 py_library(
     name = "sample",
     srcs = ["sample.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":base",
-        ":select",
-        "//temporian/core:operator_lib",
-        "//temporian/core/data:duration",
-        "//temporian/core/data:event",
-        "//temporian/core/data:feature",
-        "//temporian/proto:core_py_proto",
-    ],
-)
-
-py_library(
-    name = "prefix",
-    srcs = ["prefix.py"],
     srcs_version = "PY3",
     deps = [
         ":base",

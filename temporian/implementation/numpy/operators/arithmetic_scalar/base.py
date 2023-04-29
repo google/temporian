@@ -19,8 +19,8 @@ import numpy as np
 from temporian.core.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarOperator,
 )
+from temporian.implementation.numpy.data.event import IndexData
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -30,31 +30,36 @@ class BaseArithmeticScalarNumpyImplementation(OperatorImplementation, ABC):
 
     @abstractmethod
     def _do_operation(
-        self, feature: NumpyFeature, value: Union[float, int, str, bool]
+        self, feature: np.ndarray, value: Union[float, int, str, bool]
     ) -> np.ndarray:
-        """
-        Perform the actual arithmetic operation corresponding to the subclass
-        """
+        """Performs the arithmetic operation corresponding to the subclass."""
 
     def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
-        """Apply the corresponding arithmetic operation between an event and a
+        """Applies the corresponding arithmetic operation between an event and a
         scalar.
 
         Args:
-            event: event to perform operation to.
+            event: Event to perform the operation to.
 
         Returns:
-            Arithmetic of the event and the valye according to the operator.
+            Result of the operation.
         """
-        output = NumpyEvent(data={}, sampling=event.sampling)
+        dst_event = NumpyEvent(
+            data={},
+            feature_names=[
+                self._operator.output_feature_name(feature_name)
+                for feature_name in event.feature_names
+            ],
+            index_names=event.index_names,
+            is_unix_timestamp=event.is_unix_timestamp,
+        )
+        for index_key, index_data in event.iterindex():
+            dst_event[index_key] = IndexData(
+                [
+                    self._do_operation(feature, self._operator.value)
+                    for feature in index_data.features
+                ],
+                index_data.timestamps,
+            )
 
-        for index, features in event.data.items():
-            output.data[index] = [
-                NumpyFeature(
-                    name=self._operator.output_feature_name(feature),
-                    data=self._do_operation(feature, self._operator.value),
-                )
-                for feature in features
-            ]
-
-        return {"event": output}
+        return {"event": dst_event}

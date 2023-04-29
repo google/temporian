@@ -73,7 +73,7 @@ class MovingSumOperatorTest(absltest.TestCase):
 
         op = MovingSumOperator(
             event=input_data.schema(),
-            window_length=5,
+            window_length=5.0,
             sampling=None,
         )
         self.assertEqual(op.list_matching_io_samplings(), [("event", "event")])
@@ -119,7 +119,7 @@ class MovingSumOperatorTest(absltest.TestCase):
 
         op = MovingSumOperator(
             event=input_data.schema(),
-            window_length=5,
+            window_length=5.0,
             sampling=None,
         )
         self.assertEqual(op.list_matching_io_samplings(), [("event", "event")])

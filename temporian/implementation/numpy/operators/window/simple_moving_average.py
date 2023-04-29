@@ -13,10 +13,10 @@
 # limitations under the License.
 
 
-from temporian.implementation.numpy import implementation_lib
 from temporian.core.operators.window.simple_moving_average import (
     SimpleMovingAverageOperator,
 )
+from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.window.base import (
     BaseWindowNumpyImplementation,
 )

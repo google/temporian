@@ -15,7 +15,6 @@ from typing import Union
 
 import numpy as np
 
-from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarNumpyImplementation,
 )
@@ -26,15 +25,15 @@ from temporian.implementation.numpy import implementation_lib
 class MultiplyScalarNumpyImplementation(
     BaseArithmeticScalarNumpyImplementation
 ):
-    """Numpy implementation of arithmetic scalar multiplication"""
+    """Numpy implementation of the multiply scalar operator."""
 
     def __init__(self, operator: MultiplyScalarOperator) -> None:
         super().__init__(operator)
 
     def _do_operation(
-        self, feature: NumpyFeature, value: Union[float, int, str, bool]
+        self, feature: np.ndarray, value: Union[float, int, str, bool]
     ) -> np.ndarray:
-        return feature.data * value
+        return feature * value
 
 
 implementation_lib.register_operator_implementation(

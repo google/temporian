@@ -120,7 +120,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
 
         op = SimpleMovingAverageOperator(
             event=input_data.schema(),
-            window_length=5,
+            window_length=5.0,
             sampling=None,
         )
         self.assertEqual(op.list_matching_io_samplings(), [("event", "event")])
@@ -165,7 +165,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
 
         op = SimpleMovingAverageOperator(
             event=input_data.schema(),
-            window_length=5,
+            window_length=5.0,
             sampling=None,
         )
         self.assertEqual(op.list_matching_io_samplings(), [("event", "event")])
@@ -210,7 +210,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
 
         op = SimpleMovingAverageOperator(
             event=input_data.schema(),
-            window_length=3,
+            window_length=3.0,
             sampling=event_lib.input_event([]),
         )
         self.assertEqual(
@@ -269,7 +269,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
 
         op = SimpleMovingAverageOperator(
             event=input_data.schema(),
-            window_length=1,
+            window_length=1.0,
             sampling=event_lib.input_event([]),
         )
         instance = SimpleMovingAverageNumpyImplementation(op)

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Arithmetic Multiplication Operator"""
+"""Multiply operator class and public API function definition."""
 
 from temporian.core import operator_lib
 from temporian.core.data.event import Event
@@ -20,11 +20,6 @@ from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
 
 
 class MultiplyOperator(BaseArithmeticOperator):
-    """
-    Apply arithmetic multiplication to two events, feature to feature according
-    to their position.
-    """
-
     @classmethod
     @property
     def operator_def_key(cls) -> str:
@@ -42,15 +37,20 @@ def multiply(
     event_1: Event,
     event_2: Event,
 ) -> Event:
-    """
-    Multiply two events, according to feature position.
+    """Multiplies two events.
+
+    Each feature in `event_1` is multiplied by the feature in `event_2` in the
+    same position.
+
+    `event_1` and `event_2` must have the same sampling and the same number of
+    features.
 
     Args:
-        event_1: First event
-        event_2: Second event
+        event_1: First event.
+        event_2: Second event.
 
     Returns:
-        Event: Multiplication of event_1 features and event_2 features.
+        Multiplication of `event_1`'s and `event_2`'s features.
     """
     return MultiplyOperator(
         event_1=event_1,

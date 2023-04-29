@@ -15,7 +15,6 @@ from typing import Union
 
 import numpy as np
 
-from temporian.implementation.numpy.data.feature import NumpyFeature
 from temporian.implementation.numpy.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarNumpyImplementation,
 )
@@ -26,18 +25,18 @@ from temporian.implementation.numpy import implementation_lib
 class FloorDivideScalarNumpyImplementation(
     BaseArithmeticScalarNumpyImplementation
 ):
-    """Numpy implementation of arithmetic scalar floor division"""
+    """Numpy implementation of the floordiv scalar operator."""
 
     def __init__(self, operator: FloorDivScalarOperator) -> None:
         super().__init__(operator)
 
     def _do_operation(
-        self, feature: NumpyFeature, value: Union[float, int, str, bool]
+        self, feature: np.ndarray, value: Union[float, int, str, bool]
     ) -> np.ndarray:
         if self._operator.is_value_first:
-            return value // feature.data
+            return value // feature
 
-        return feature.data // value
+        return feature // value
 
 
 implementation_lib.register_operator_implementation(

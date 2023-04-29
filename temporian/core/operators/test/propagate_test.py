@@ -14,13 +14,11 @@
 
 from absl.testing import absltest
 
-import numpy as np
-
+from temporian.core.data import event as event_lib
+from temporian.core.data.dtype import DType
+from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.propagate import propagate
-from temporian.core.data import event as event_lib
-from temporian.core.data.feature import Feature
-from temporian.core.data.dtype import DType
 
 
 class PropagateOperatorTest(absltest.TestCase):
