@@ -20,6 +20,7 @@ from temporian.core.data.duration import Duration
 from temporian.core.data.event import Event
 from temporian.core.data.feature import Feature
 from temporian.core.operators.window.base import BaseWindowOperator
+from temporian.core.data.dtype import DType
 
 
 class MovingSumOperator(BaseWindowOperator):
@@ -28,7 +29,7 @@ class MovingSumOperator(BaseWindowOperator):
     def operator_def_key(cls) -> str:
         return "MOVING_SUM"
 
-    def get_feature_dtype(self, feature: Feature) -> str:
+    def get_feature_dtype(self, feature: Feature) -> DType:
         return feature.dtype
 
 

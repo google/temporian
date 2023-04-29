@@ -52,6 +52,32 @@ py_library(
 )
 
 py_library(
+    name = "greater",
+    srcs = ["greater.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators/arithmetic_scalar:greater",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:feature",
+    ],
+)
+
+py_library(
+    name = "less",
+    srcs = ["less.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators/arithmetic_scalar:less",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:feature",
+    ],
+)
+
+py_library(
     name = "subtract",
     srcs = ["subtract.py"],
     srcs_version = "PY3",

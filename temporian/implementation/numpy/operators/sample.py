@@ -21,7 +21,7 @@ from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.data.event import DTYPE_REVERSE_MAPPING
 from temporian.implementation.numpy.data.event import IndexData
 from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy_cc.operators import sample as sample_cc
+from temporian.implementation.numpy_cc.operators import operators_cc
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -77,7 +77,7 @@ class SampleNumpyImplementation(OperatorImplementation):
             (
                 sampling_idxs,
                 first_valid_idx,
-            ) = sample_cc.build_sampling_idxs(
+            ) = operators_cc.build_sampling_idxs(
                 src_timestamps, index_data.timestamps
             )
             # For each feature

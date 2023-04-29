@@ -66,9 +66,11 @@ class BaseArithmeticScalarOperator(Operator):
             for feature in event.features:
                 if feature.dtype != value_dtype:
                     raise ValueError(
-                        f"Feature {feature.name} has dtype {feature.dtype} "
-                        f"but value has dtype {value_dtype}. Both must be "
-                        "equal."
+                        f'Feature "{feature.name}" has dtype'
+                        f' {feature.dtype} and value "{value}" has dtype'
+                        f" {value_dtype}. Values shoulds have compatible"
+                        ' dtypes. For instance, change "a * 2" to "a * 2.0" if'
+                        ' "a" is a float32 or float64.'
                     )
 
         # outputs

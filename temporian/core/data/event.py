@@ -215,6 +215,32 @@ class Event(object):
             "Only Event and scalar values of type int or float are supported."
         )
 
+    def __gt__(self, other: Any):
+        if isinstance(other, (int, float)):
+            from temporian.core.operators.arithmetic_scalar import (
+                greater_scalar,
+            )
+
+            return greater_scalar(event=self, value=other)
+
+        raise ValueError(
+            f"Cannot compute {type(self)} > {type(other)}. "
+            "Only Event and scalar values of type int or float are supported."
+        )
+
+    def __lt__(self, other: Any):
+        if isinstance(other, (int, float)):
+            from temporian.core.operators.arithmetic_scalar import (
+                less_scalar,
+            )
+
+            return less_scalar(event=self, value=other)
+
+        raise ValueError(
+            f"Cannot compute {type(self)} < {type(other)}. "
+            "Only Event and scalar values of type int or float are supported."
+        )
+
     @property
     def sampling(self) -> Sampling:
         return self._sampling

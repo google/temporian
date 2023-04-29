@@ -1,12 +1,23 @@
+from bdb import effective
 import datetime
-from typing import NamedTuple, Optional, Union, List, Any
+from typing import NamedTuple, Optional, Union, List, Any, Tuple
 
 import numpy as np
+from enum import Enum
 
 from temporian.core.data import duration
 from temporian.implementation.numpy.data.event import NumpyEvent
 
 DEFAULT_BACKEND = "matplotlib"
+
+
+class Style(Enum):
+    """Plotting style."""
+
+    auto = "auto"
+    line = "line"
+    marker = "marker"
+    vline = "vline"
 
 
 class Options(NamedTuple):
@@ -19,6 +30,7 @@ class Options(NamedTuple):
     min_time: Optional[duration.Timestamp]
     max_time: Optional[duration.Timestamp]
     max_num_plots: int
+    style: Style
 
 
 def plot(
@@ -31,6 +43,8 @@ def plot(
     min_time: Optional[duration.Timestamp] = None,
     max_time: Optional[duration.Timestamp] = None,
     max_num_plots: int = 20,
+    style: Union[Style, str] = Style.auto,
+    return_fig: bool = False,
 ):
     """Plots an event.
 
@@ -49,6 +63,8 @@ def plot(
         max_num_plots: Maximum number of plots to display. If more plots are
             available, only plot the first `max_num_plots` ones and print a
             warning.
+        return_fig: If true, returns the figure object. The figure object
+            depends on the backend.
     """
 
     original_indexes = indexes
@@ -82,6 +98,10 @@ def plot(
                 f' receives "indexes={original_indexes}"'
             )
 
+    if isinstance(style, str):
+        style = Style[style]
+    assert isinstance(style, Style)
+
     options = Options(
         backend=backend,
         width_px=width_px,
@@ -90,6 +110,7 @@ def plot(
         min_time=min_time,
         max_time=max_time,
         max_num_plots=max_num_plots,
+        style=style,
     )
 
     if backend not in BACKENDS:
@@ -98,7 +119,8 @@ def plot(
             f"backends: {BACKENDS}"
         )
 
-    return BACKENDS[backend](events=events, indexes=indexes, options=options)
+    fig = BACKENDS[backend](events=events, indexes=indexes, options=options)
+    return fig if return_fig else None
 
 
 def _plot_matplotlib(
@@ -159,6 +181,9 @@ def _plot_matplotlib(
         # single dimension.
         title = str(index[0] if len(index) == 1 else index)
 
+        # Index of the next color to use in the plot.
+        color_idx = 0
+
         for event in events:
             if plot_idx >= num_plots:
                 break
@@ -166,11 +191,20 @@ def _plot_matplotlib(
             feature_names = event.feature_names
 
             xs = event.data[index].timestamps
+            uniform = is_uniform(xs)
+
+            plot_mask = np.full(len(xs), True)
+            if options.min_time is not None:
+                plot_mask = plot_mask & (xs >= options.min_time)
+            if options.max_time is not None:
+                plot_mask = plot_mask & (xs <= options.max_time)
             if options.max_points is not None and len(xs) > options.max_points:
                 # Too many timestamps. Only keep the fist ones.
-                xs = xs[: options.max_points]
+                plot_mask = plot_mask & (
+                    np.cumsum(plot_mask) <= options.max_points
+                )
 
-            uniform = is_uniform(xs)
+            xs = xs[plot_mask]
 
             if event.is_unix_timestamp:
                 # Matplotlib understands datetimes.
@@ -186,16 +220,16 @@ def _plot_matplotlib(
                     xs=xs,
                     ys=np.zeros(len(xs)),
                     options=options,
-                    color=colors[0],
+                    color=color_idx % len(colors),
                     name="[sampling]",
-                    marker="+",
-                    linestyle="None",
                     is_unix_timestamp=event.is_unix_timestamp,
                     title=title,
+                    style=Style.vline,
                 )
                 # Only print the index / title once
                 title = None
 
+                color_idx += 1
                 plot_idx += 1
 
             for feature_idx, feature_name in enumerate(feature_names):
@@ -203,29 +237,35 @@ def _plot_matplotlib(
                     # Too much plots are displayed already.
                     break
 
-                ys = event.data[index].features[feature_idx]
-                if (
-                    options.max_points is not None
-                    and len(ys) > options.max_points
-                ):
-                    # Too many timestamps. Only keep the fist ones.
-                    ys = ys[: options.max_points]
+                ys = event.data[index].features[feature_idx][plot_mask]
+                if len(ys) == 0:
+                    all_ys_are_equal = True
+                else:
+                    all_ys_are_equal = np.all(ys == ys[0])
+
+                effective_stype = options.style
+                if effective_stype == Style.auto:
+                    if not uniform and (len(xs) <= 1000 or all_ys_are_equal):
+                        effective_stype = Style.marker
+                    else:
+                        effective_stype = Style.line
 
                 _matplotlib_sub_plot(
                     ax=axs[plot_idx, 0],
                     xs=xs,
                     ys=ys,
                     options=options,
-                    color=colors[feature_idx % len(colors)],
+                    color=colors[color_idx % len(colors)],
                     name=feature_name,
                     is_unix_timestamp=event.is_unix_timestamp,
                     title=title,
-                    marker="None" if uniform else "+",
+                    style=effective_stype,
                 )
 
                 # Only print the index / title once
                 title = None
 
+                color_idx += 1
                 plot_idx += 1
 
     fig.tight_layout()
@@ -241,13 +281,23 @@ def _matplotlib_sub_plot(
     name: str,
     is_unix_timestamp: bool,
     title: Optional[str],
+    style: Style,
     **wargs,
 ):
     """Plots "(xs, ys)" on the axis "ax"."""
 
     import matplotlib.ticker as ticker
 
-    ax.plot(xs, ys, lw=0.5, color=color, **wargs)
+    if style == Style.line:
+        mat_style = {}  # Default
+    elif style == Style.marker:
+        mat_style = {"marker": "2", "linestyle": "None"}
+    elif style == Style.vline:
+        mat_style = {"marker": "|", "linestyle": "None"}
+    else:
+        raise ValueError("Non implemented style")
+
+    ax.plot(xs, ys, lw=0.5, color=color, **mat_style, **wargs)
     if options.min_time is not None or options.max_time is not None:
         args = {}
         if options.min_time is not None:

@@ -22,6 +22,7 @@ py_library(
         ":sample",
         ":select",
         ":set_index",
+        ":since_last",
         ":unique_timestamps",
         "//temporian/implementation/numpy/operators/arithmetic",
         "//temporian/implementation/numpy/operators/arithmetic:add",
@@ -35,6 +36,8 @@ py_library(
         "//temporian/implementation/numpy/operators/arithmetic_scalar:divide",
         "//temporian/implementation/numpy/operators/arithmetic_scalar:equal",
         "//temporian/implementation/numpy/operators/arithmetic_scalar:floordiv",
+        "//temporian/implementation/numpy/operators/arithmetic_scalar:greater",
+        "//temporian/implementation/numpy/operators/arithmetic_scalar:less",
         "//temporian/implementation/numpy/operators/arithmetic_scalar:multiply",
         "//temporian/implementation/numpy/operators/arithmetic_scalar:negate",
         "//temporian/implementation/numpy/operators/arithmetic_scalar:subtract",
@@ -48,6 +51,8 @@ py_library(
         "//temporian/implementation/numpy/operators/calendar:second",
         "//temporian/implementation/numpy/operators/calendar:year",
         "//temporian/implementation/numpy/operators/window:moving_count",
+        "//temporian/implementation/numpy/operators/window:moving_max",
+        "//temporian/implementation/numpy/operators/window:moving_min",
         "//temporian/implementation/numpy/operators/window:moving_standard_deviation",
         "//temporian/implementation/numpy/operators/window:moving_sum",
         "//temporian/implementation/numpy/operators/window:simple_moving_average",
@@ -197,7 +202,22 @@ py_library(
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event",
         "//temporian/implementation/numpy/data:sampling",
-        "//temporian/implementation/numpy_cc/operators:sample",
+        "//temporian/implementation/numpy_cc/operators:operators_cc",
+    ],
+)
+
+py_library(
+    name = "since_last",
+    srcs = ["since_last.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/data:duration",
+        "//temporian/core/operators:since_last",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy_cc/operators:operators_cc",
     ],
 )
 

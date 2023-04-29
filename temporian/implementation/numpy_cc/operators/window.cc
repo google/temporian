@@ -1,4 +1,6 @@
+#include <assert.h>
 #include <cstdint>
+#include <deque>
 #include <iostream>
 #include <map>
 #include <pybind11/numpy.h>
@@ -108,16 +110,20 @@ template <typename INPUT, typename OUTPUT>
 struct SimpleMovingAverageAccumulator : Accumulator<INPUT, OUTPUT> {
 
   void Add(INPUT value) override {
-    if (std::isnan(value)) {
-      return;
+    if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
+      if (std::isnan(value)) {
+        return;
+      }
     }
     sum_values += value;
     num_values++;
   }
 
   void Remove(INPUT value) override {
-    if (std::isnan(value)) {
-      return;
+    if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
+      if (std::isnan(value)) {
+        return;
+      }
     }
     sum_values -= value;
     num_values--;
@@ -140,8 +146,10 @@ template <typename INPUT, typename OUTPUT>
 struct MovingStandardDeviationAccumulator : Accumulator<INPUT, OUTPUT> {
 
   void Add(INPUT value) override {
-    if (std::isnan(value)) {
-      return;
+    if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
+      if (std::isnan(value)) {
+        return;
+      }
     }
     sum_values += value;
     sum_square_values += value * value;
@@ -149,8 +157,10 @@ struct MovingStandardDeviationAccumulator : Accumulator<INPUT, OUTPUT> {
   }
 
   void Remove(INPUT value) override {
-    if (std::isnan(value)) {
-      return;
+    if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
+      if (std::isnan(value)) {
+        return;
+      }
     }
     sum_values -= value;
     sum_square_values -= value * value;
@@ -180,17 +190,19 @@ struct MovingCountAccumulator : Accumulator<INPUT, OUTPUT> {
     static_assert(std::is_same<OUTPUT, int32_t>::value,
                   "OUTPUT must be int32_t");
 
-    // TODO: Skip for non floating point types.
-    if (std::isnan(value)) {
-      return;
+    if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
+      if (std::isnan(value)) {
+        return;
+      }
     }
     num_values++;
   }
 
   void Remove(INPUT value) override {
-    // TODO: Skip for non floating point types.
-    if (std::isnan(value)) {
-      return;
+    if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
+      if (std::isnan(value)) {
+        return;
+      }
     }
     num_values--;
   }
@@ -205,17 +217,19 @@ template <typename INPUT, typename OUTPUT>
 struct MovingSumAccumulator : Accumulator<INPUT, OUTPUT> {
 
   void Add(INPUT value) override {
-    // TODO: Skip for non floating point types.
-    if (std::isnan(value)) {
-      return;
+    if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
+      if (std::isnan(value)) {
+        return;
+      }
     }
     sum_values += value;
   }
 
   void Remove(INPUT value) override {
-    // TODO: Skip for non floating point types.
-    if (std::isnan(value)) {
-      return;
+    if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
+      if (std::isnan(value)) {
+        return;
+      }
     }
     sum_values -= value;
   }
@@ -224,6 +238,70 @@ struct MovingSumAccumulator : Accumulator<INPUT, OUTPUT> {
 
   // Sum of the values in the rolling window (RW).
   double sum_values = 0;
+};
+
+template <typename INPUT, typename OUTPUT>
+struct MovingExtremumAccumulator : Accumulator<INPUT, OUTPUT> {
+
+  virtual bool Compare(INPUT a, INPUT b) = 0;
+
+  void Add(INPUT value) override {
+    if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
+      if (std::isnan(value)) {
+        return;
+      }
+    }
+
+    if (values.empty() || Compare(value, current_extremum)) {
+      // The value is the new
+      current_extremum = value;
+    }
+    values.push_back(value);
+  }
+
+  void Remove(INPUT value) override {
+    if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
+      if (std::isnan(value)) {
+        return;
+      }
+    }
+
+    if (values.size() == 1) {
+      values.clear();
+    } else {
+      assert(!values.empty());
+      assert(values.front() == value);
+      values.pop_front();
+      if (value == current_extremum) {
+        // Compute the extremum on the remaining items.
+        current_extremum = values.front();
+        for (const auto value : values) {
+          if (Compare(value, current_extremum)) {
+            current_extremum = value;
+          }
+        }
+      }
+    }
+  }
+
+  OUTPUT Result() override {
+    return values.empty() ? std::numeric_limits<OUTPUT>::quiet_NaN()
+                          : current_extremum;
+  }
+
+  // TODO(gbm): Implement without memory copy.
+  std::deque<INPUT> values;
+  INPUT current_extremum;
+};
+
+template <typename INPUT, typename OUTPUT>
+struct MovingMinAccumulator : MovingExtremumAccumulator<INPUT, OUTPUT> {
+  bool Compare(INPUT a, INPUT b) { return a < b; }
+};
+
+template <typename INPUT, typename OUTPUT>
+struct MovingMaxAccumulator : MovingExtremumAccumulator<INPUT, OUTPUT> {
+  bool Compare(INPUT a, INPUT b) { return a > b; }
 };
 
 // Instantiate the "accumulate" function with an accumulator for both float32
@@ -250,24 +328,39 @@ struct MovingSumAccumulator : Accumulator<INPUT, OUTPUT> {
         event_timestamps, event_values, sampling_timestamps, window_length);   \
   }
 
+// Note: ";" are not needed for the code, but are required for our code
+// formatter.
+
 REGISTER_CC_FUNC(simple_moving_average, float, float,
-                 SimpleMovingAverageAccumulator)
+                 SimpleMovingAverageAccumulator);
 REGISTER_CC_FUNC(simple_moving_average, double, double,
-                 SimpleMovingAverageAccumulator)
+                 SimpleMovingAverageAccumulator);
 
 REGISTER_CC_FUNC(moving_standard_deviation, float, float,
-                 MovingStandardDeviationAccumulator)
+                 MovingStandardDeviationAccumulator);
 REGISTER_CC_FUNC(moving_standard_deviation, double, double,
-                 MovingStandardDeviationAccumulator)
+                 MovingStandardDeviationAccumulator);
 
-REGISTER_CC_FUNC(moving_sum, float, float, MovingSumAccumulator)
-REGISTER_CC_FUNC(moving_sum, double, double, MovingSumAccumulator)
+REGISTER_CC_FUNC(moving_sum, float, float, MovingSumAccumulator);
+REGISTER_CC_FUNC(moving_sum, double, double, MovingSumAccumulator);
+REGISTER_CC_FUNC(moving_sum, int32_t, int32_t, MovingSumAccumulator);
+REGISTER_CC_FUNC(moving_sum, int64_t, int64_t, MovingSumAccumulator);
 
-REGISTER_CC_FUNC(moving_count, float, int32_t, MovingCountAccumulator)
-REGISTER_CC_FUNC(moving_count, double, int32_t, MovingCountAccumulator)
-REGISTER_CC_FUNC(moving_count, int32_t, int32_t, MovingCountAccumulator)
-REGISTER_CC_FUNC(moving_count, int64_t, int32_t, MovingCountAccumulator)
+REGISTER_CC_FUNC(moving_min, float, float, MovingMinAccumulator);
+REGISTER_CC_FUNC(moving_min, double, double, MovingMinAccumulator);
+REGISTER_CC_FUNC(moving_min, int32_t, int32_t, MovingMinAccumulator);
+REGISTER_CC_FUNC(moving_min, int64_t, int64_t, MovingMinAccumulator);
 
+REGISTER_CC_FUNC(moving_max, float, float, MovingMaxAccumulator);
+REGISTER_CC_FUNC(moving_max, double, double, MovingMaxAccumulator);
+REGISTER_CC_FUNC(moving_max, int32_t, int32_t, MovingMaxAccumulator);
+REGISTER_CC_FUNC(moving_max, int64_t, int64_t, MovingMaxAccumulator);
+
+REGISTER_CC_FUNC(moving_count, float, int32_t, MovingCountAccumulator);
+REGISTER_CC_FUNC(moving_count, double, int32_t, MovingCountAccumulator);
+REGISTER_CC_FUNC(moving_count, int32_t, int32_t, MovingCountAccumulator);
+REGISTER_CC_FUNC(moving_count, int64_t, int32_t, MovingCountAccumulator);
+REGISTER_CC_FUNC(moving_count, bool, int32_t, MovingCountAccumulator);
 } // namespace
 
 // Register c++ functions to pybind with and without sampling.
@@ -291,7 +384,7 @@ REGISTER_CC_FUNC(moving_count, int64_t, int32_t, MovingCountAccumulator)
         "", py::arg("event_timestamps").noconvert(),                           \
         py::arg("event_values").noconvert(), py::arg("window_length"));
 
-PYBIND11_MODULE(window, m) {
+void init_window(py::module &m) {
   ADD_PY_DEF(simple_moving_average, float, float)
   ADD_PY_DEF(simple_moving_average, double, double)
 
@@ -300,9 +393,22 @@ PYBIND11_MODULE(window, m) {
 
   ADD_PY_DEF(moving_sum, float, float)
   ADD_PY_DEF(moving_sum, double, double)
+  ADD_PY_DEF(moving_sum, int32_t, int32_t)
+  ADD_PY_DEF(moving_sum, int64_t, int64_t)
+
+  ADD_PY_DEF(moving_min, float, float)
+  ADD_PY_DEF(moving_min, double, double)
+  ADD_PY_DEF(moving_min, int32_t, int32_t)
+  ADD_PY_DEF(moving_min, int64_t, int64_t)
+
+  ADD_PY_DEF(moving_max, float, float)
+  ADD_PY_DEF(moving_max, double, double)
+  ADD_PY_DEF(moving_max, int32_t, int32_t)
+  ADD_PY_DEF(moving_max, int64_t, int64_t)
 
   ADD_PY_DEF(moving_count, float, int32_t)
   ADD_PY_DEF(moving_count, double, int32_t)
   ADD_PY_DEF(moving_count, int32_t, int32_t)
   ADD_PY_DEF(moving_count, int64_t, int32_t)
+  ADD_PY_DEF(moving_count, bool, int32_t)
 }

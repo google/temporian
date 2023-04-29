@@ -44,6 +44,13 @@ class BaseWindowOperator(Operator, ABC):
             self.add_input("sampling", sampling)
             self._has_sampling = True
             effective_sampling = sampling.sampling
+
+            if event.sampling.index != sampling.sampling.index:
+                raise ValueError(
+                    "Event and sampling do not have the same index."
+                    f" {event.sampling.index} != {sampling.sampling.index}"
+                )
+
         else:
             effective_sampling = event.sampling
             self._has_sampling = False
@@ -110,5 +117,5 @@ class BaseWindowOperator(Operator, ABC):
         """Gets the key of the operator definition."""
 
     @abstractmethod
-    def get_feature_dtype(self, feature: Feature) -> str:
+    def get_feature_dtype(self, feature: Feature) -> dtype.DType:
         """Gets the dtype of the output feature."""

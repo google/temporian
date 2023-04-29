@@ -23,13 +23,13 @@ from temporian.core.operators.window.moving_sum import (
 )
 from temporian.implementation.numpy.operators.window.moving_sum import (
     MovingSumNumpyImplementation,
+    operators_cc,
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.core.data import event as event_lib
 from temporian.core.data import feature as feature_lib
 from temporian.core.data import dtype as dtype_lib
 import math
-from temporian.implementation.numpy_cc.operators import window as window_cc
 from numpy.testing import assert_array_equal
 
 
@@ -47,7 +47,7 @@ nan = math.nan
 class MovingSumOperatorTest(absltest.TestCase):
     def test_cc_wo_sampling(self):
         assert_array_equal(
-            window_cc.moving_sum(
+            operators_cc.moving_sum(
                 _f64([1, 2, 3, 5, 20]),
                 _f32([10, nan, 12, 13, 14]),
                 5.0,

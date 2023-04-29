@@ -16,6 +16,8 @@ py_library(
         ":divide",
         ":equal",
         ":floordiv",
+        ":greater",
+        ":less",
         ":multiply",
         ":negate",
         ":subtract",
@@ -48,6 +50,32 @@ py_library(
 py_library(
     name = "equal",
     srcs = ["equal.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+    ],
+)
+
+py_library(
+    name = "greater",
+    srcs = ["greater.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:event",
+        "//temporian/core/data:feature",
+    ],
+)
+
+py_library(
+    name = "less",
+    srcs = ["less.py"],
     srcs_version = "PY3",
     deps = [
         ":base",

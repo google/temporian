@@ -35,7 +35,7 @@ Result = Union[NumpyEvent, List[NumpyEvent], Dict[str, NumpyEvent]]
 def evaluate(
     query: Query,
     input_data: Data,
-    verbose: int = 1,
+    verbose: int = 0,
     check_execution: bool = True,
 ) -> Result:
     """Evaluates events on data.

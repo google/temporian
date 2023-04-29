@@ -11,25 +11,20 @@ namespace py = pybind11;
 
 typedef size_t Idx;
 
-std::tuple<py::array_t<Idx>, Idx>
-build_sampling_idxs(const py::array_t<double> &event_timestamps,
-                    const py::array_t<double> &sampling_timestamps) {
+py::array_t<double> since_last(const py::array_t<double> &event_timestamps,
+                               const py::array_t<double> &sampling_timestamps) {
 
   // Input size
   const Idx n_event = event_timestamps.shape(0);
   const Idx n_sampling = sampling_timestamps.shape(0);
 
   // Allocate output array
-  auto indices = py::array_t<Idx>(n_sampling);
+  auto since_last = py::array_t<double>(n_sampling);
 
   // Access raw input / output data
-  auto v_idxs = indices.mutable_unchecked<1>();
+  auto v_since_last = since_last.mutable_unchecked<1>();
   auto v_event = event_timestamps.unchecked<1>();
   auto v_sampling = sampling_timestamps.unchecked<1>();
-
-  // The index of the first value in "indices" that correspond to a valid
-  // indice.
-  Idx first_valid_idx = 0;
 
   Idx next_event_idx = 0;
   for (Idx sampling_idx = 0; sampling_idx < n_sampling; sampling_idx++) {
@@ -37,19 +32,21 @@ build_sampling_idxs(const py::array_t<double> &event_timestamps,
     while (next_event_idx < n_event && v_event[next_event_idx] <= t) {
       next_event_idx++;
     }
-    v_idxs[sampling_idx] = next_event_idx - 1;
+    double value;
     if (next_event_idx == 0) {
-      first_valid_idx = sampling_idx + 1;
+      value = std::numeric_limits<double>::quiet_NaN();
+    } else {
+      value = t - v_event[next_event_idx - 1];
     }
+    v_since_last[sampling_idx] = value;
   }
 
-  return std::make_tuple(indices, first_valid_idx);
+  return since_last;
 }
 
 } // namespace
 
-void init_sample(py::module &m) {
-  m.def("build_sampling_idxs", &build_sampling_idxs, "",
-        py::arg("event_timestamps").noconvert(),
+void init_since_last(py::module &m) {
+  m.def("since_last", &since_last, "", py::arg("event_timestamps").noconvert(),
         py::arg("sampling_timestamps").noconvert());
 }
