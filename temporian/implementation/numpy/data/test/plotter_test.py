@@ -27,10 +27,20 @@ class PlotterTest(absltest.TestCase):
                 ),
             },
             feature_names=["a", "b"],
-            index_names="x",
+            index_names=["x"],
             is_unix_timestamp=False,
         )
-        _ = plotter.plot(event, indexes=(1,))
+
+        _ = plotter.plot(event, indexes=None)
+        _ = plotter.plot(event, indexes=1)
+        _ = plotter.plot(event, indexes=[1, 2])
+        _ = plotter.plot(event, indexes=[(1,), (2,)])
+
+    def test_is_uniform(self):
+        self.assertTrue(plotter.is_uniform([]))
+        self.assertTrue(plotter.is_uniform([1]))
+        self.assertTrue(plotter.is_uniform([1, 2, 3]))
+        self.assertFalse(plotter.is_uniform([1, 2, 2.5]))
 
 
 if __name__ == "__main__":
