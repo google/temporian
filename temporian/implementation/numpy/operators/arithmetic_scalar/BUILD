@@ -10,6 +10,17 @@ py_library(
     name = "arithmetic_scalar",
     srcs = ["__init__.py"],
     srcs_version = "PY3",
+    deps = [
+        ":add",
+        ":divide",
+        ":equal",
+        ":floordiv",
+        ":greater",
+        ":less",
+        ":multiply",
+        ":negate",
+        ":subtract",
+    ],
 )
 
 py_library(

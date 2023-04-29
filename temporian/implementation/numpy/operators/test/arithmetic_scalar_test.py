@@ -24,6 +24,8 @@ from temporian.core.operators.arithmetic_scalar import (
     FloorDivScalarOperator,
     EqualScalarOperator,
     NegateOperator,
+    GreaterScalarOperator,
+    LessScalarOperator,
 )
 from temporian.implementation.numpy.data.event import NumpyEvent
 from temporian.implementation.numpy.operators.arithmetic_scalar import (
@@ -34,6 +36,8 @@ from temporian.implementation.numpy.operators.arithmetic_scalar import (
     FloorDivideScalarNumpyImplementation,
     EqualScalarNumpyImplementation,
     NegateNumpyImplementation,
+    GreaterScalarNumpyImplementation,
+    LessScalarNumpyImplementation,
 )
 
 
@@ -489,6 +493,44 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         operator_output = impl.call(event=self.event_data)
 
         self.assertEqual(numpy_output_event, operator_output["event"])
+
+    def test_greater_scalar(self) -> None:
+        event_data = NumpyEvent.from_dataframe(
+            pd.DataFrame({"timestamp": [1, 2, 3], "x": [1, 2, 3]})
+        )
+        expected_data = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                {"timestamp": [1, 2, 3], "greater_x_2": [False, False, True]}
+            )
+        )
+
+        event = event_data.schema()
+        operator = GreaterScalarOperator(
+            event=event,
+            value=2,
+        )
+        impl = GreaterScalarNumpyImplementation(operator)
+        operator_output = impl.call(event=event_data)
+        self.assertEqual(expected_data, operator_output["event"])
+
+    def test_less_scalar(self) -> None:
+        event_data = NumpyEvent.from_dataframe(
+            pd.DataFrame({"timestamp": [1, 2, 3], "x": [1, 2, 3]})
+        )
+        expected_data = NumpyEvent.from_dataframe(
+            pd.DataFrame(
+                {"timestamp": [1, 2, 3], "less_x_2": [True, False, False]}
+            )
+        )
+
+        event = event_data.schema()
+        operator = LessScalarOperator(
+            event=event,
+            value=2,
+        )
+        impl = LessScalarNumpyImplementation(operator)
+        operator_output = impl.call(event=event_data)
+        self.assertEqual(expected_data, operator_output["event"])
 
 
 if __name__ == "__main__":

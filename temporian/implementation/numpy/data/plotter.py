@@ -220,7 +220,7 @@ def _plot_matplotlib(
                     xs=xs,
                     ys=np.zeros(len(xs)),
                     options=options,
-                    color=color_idx % len(colors),
+                    color=colors[color_idx % len(colors)],
                     name="[sampling]",
                     is_unix_timestamp=event.is_unix_timestamp,
                     title=title,
