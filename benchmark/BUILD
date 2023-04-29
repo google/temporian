@@ -1,6 +1,6 @@
 package(
-    default_visibility=["//visibility:public"],
-    licenses=["notice"],
+    default_visibility = ["//visibility:public"],
+    licenses = ["notice"],
 )
 
 sh_binary(
@@ -16,8 +16,8 @@ sh_binary(
 )
 
 py_binary(
-    name="benchmark_time",
-    srcs=["benchmark_time.py"],
-    srcs_version="PY3",
-    deps=["//temporian"],
+    name = "benchmark_time",
+    srcs = ["benchmark_time.py"],
+    srcs_version = "PY3",
+    deps = ["//temporian"],
 )
