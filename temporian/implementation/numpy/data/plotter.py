@@ -175,6 +175,20 @@ def get_num_plots(
     return num_plots
 
 
+def auto_style(uniform: bool, xs, ys) -> Style:
+    """Finds the best plotting style."""
+
+    if len(ys) == 0:
+        all_ys_are_equal = True
+    else:
+        all_ys_are_equal = np.all(ys == ys[0])
+
+    if not uniform and (len(xs) <= 1000 or all_ys_are_equal):
+        return Style.marker
+    else:
+        return Style.line
+
+
 def is_uniform(xs) -> bool:
     """Checks if timestamps are uniformly sampled."""
 

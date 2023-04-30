@@ -14,6 +14,8 @@
 
 """Filter operator class and public API function definition."""
 
+from typing import Optional
+
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
 from temporian.core.data.feature import Feature
@@ -41,7 +43,7 @@ class FilterOperator(Operator):
                 f" {condition.features[0].dtype} instead."
             )
 
-        # check both events have same sampling
+        # check both events have same index
         if event.sampling.index != condition.sampling.index:
             raise ValueError(
                 "Event and condition must have the same sampling. Got"
@@ -99,7 +101,7 @@ operator_lib.register_operator(FilterOperator)
 # pylint: disable=redefined-builtin
 def filter(
     event: Event,
-    condition: Event,
+    condition: Optional[Event] = None,
 ) -> Event:
     """Filters out timestamps in an event for which a condition is false.
 
@@ -108,6 +110,15 @@ def filter(
 
     `event` and `condition` must have the same sampling.
 
+    filter(x) is equivalent to filter(x,x). filter(x) can be used to convert
+    a boolean mask into a timestamps. For example:
+        Input:
+            timestamps: 1 2 3
+            value: True False True
+        Output:
+            timestamps: 1 3
+            value: True True
+
     Args:
         event: Event to filter.
         condition: Event with a single boolean feature condition.
@@ -115,4 +126,8 @@ def filter(
     Returns:
         Filtered event.
     """
+
+    if condition is None:
+        condition = event
+
     return FilterOperator(event, condition).outputs["event"]

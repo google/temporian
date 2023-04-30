@@ -13,6 +13,7 @@ from temporian.implementation.numpy.data.plotter import (
     Style,
     is_uniform,
     get_num_plots,
+    auto_style,
 )
 
 
@@ -105,17 +106,10 @@ def plot_matplotlib(
                     break
 
                 ys = event.data[index].features[feature_idx][plot_mask]
-                if len(ys) == 0:
-                    all_ys_are_equal = True
+                if options.style == Style.auto:
+                    effective_stype = auto_style(uniform, xs, ys)
                 else:
-                    all_ys_are_equal = np.all(ys == ys[0])
-
-                effective_stype = options.style
-                if effective_stype == Style.auto:
-                    if not uniform and (len(xs) <= 1000 or all_ys_are_equal):
-                        effective_stype = Style.marker
-                    else:
-                        effective_stype = Style.line
+                    effective_stype = options.style
 
                 _matplotlib_sub_plot(
                     ax=axs[plot_idx, 0],

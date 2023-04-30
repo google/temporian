@@ -116,10 +116,43 @@ class NumpyEvent:
     def data(self) -> Dict[Tuple, IndexData]:
         return self._data
 
+    def features(self) -> List[Tuple[str, DType]]:
+        """List of feature names and dtypes."""
+
+        # TODO: Use the schema/node data directly.
+        return [
+            (feature_name, DTYPE_MAPPING[feature.dtype.type])
+            for feature_name, feature in zip(
+                self._feature_names, self.first_index_data().features
+            )
+        ]
+
+    def indexes(self) -> List[Tuple[str, DType]]:
+        """List of index names and dtypes.
+
+        WARNING: This function currently does not work if the EventSet is empty.
+        """
+
+        # TODO: Use the schema/node data directly.
+        index_example = self.first_index_key()
+        if index_example is None:
+            # TODO: Fix.
+            print(
+                "WARNING: This function currently does not work if the EventSet"
+                " is empty."
+            )
+            return []
+        return [
+            (index_name, PYTHON_DTYPE_MAPPING[type(index_key)])
+            for index_name, index_key in zip(self._index_names, index_example)
+        ]
+
+    # TODO: Remove
     @property
     def feature_names(self) -> List[str]:
         return self._feature_names
 
+    # TODO: Remove
     @property
     def index_names(self) -> List[str]:
         return self._index_names
@@ -165,6 +198,7 @@ class NumpyEvent:
             else {}
         )
 
+    # TODO: Remove
     def first_index_key(self) -> Optional[Tuple]:
         if self._data is None or len(self._data) == 0:
             return None
@@ -435,29 +469,34 @@ class NumpyEvent:
                     feature_repr.append("...")
                     break
 
-                feature_repr.append(
-                    f"{feature_name}<{feature.dtype}>: {feature})"
-                )
+                feature_repr.append(f"'{feature_name}': {feature}")
             return "\n".join(feature_repr)
 
         # Representation of the "data" field
         with np.printoptions(precision=4, threshold=20):
             data_repr = []
-            for i, (index_key, index_data) in enumerate(self._data.items()):
+            for i, (index_key, index_data) in enumerate(self.data.items()):
                 if i > MAX_NUM_PRINTED_INDEX:
-                    data_repr.append("...")
+                    data_repr.append(f"... ({len(self.data) - i} remaining)")
                     break
+                index_key_repr = []
+                for index_value, (index_name, _) in zip(
+                    index_key, self.indexes()
+                ):
+                    index_key_repr.append(f"{index_name}={index_value}")
+                index_key_repr = " ".join(index_key_repr)
                 data_repr.append(
-                    f"{index_key}:"
-                    f" {index_data.timestamps}\n{string.indent(repr_features(index_data.features))}"
+                    f"{index_key_repr} ({len(index_data.timestamps)} events):\n"
+                    f"    timestamps: {index_data.timestamps}\n"
+                    f"{string.indent(repr_features(index_data.features))}"
                 )
             data_repr = string.indent("\n".join(data_repr))
 
         return (
-            "data:"
-            f"\n\t\tindex_names={self.index_names}"
-            f"\n\t\tfeature_names={self.feature_names}"
-            f"\n{data_repr}"
+            f"indexes: {self.indexes()}\n"
+            f"features: {self.features()}\n"
+            "events:\n"
+            f"{data_repr}\n"
         )
 
     def __getitem__(self, index: Tuple) -> IndexData:

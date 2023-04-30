@@ -20,14 +20,17 @@ from typing import Union
 
 
 class DType(Enum):
-    FLOAT64 = "FLOAT64"
-    FLOAT32 = "FLOAT32"
-    INT64 = "INT64"
-    INT32 = "INT32"
-    STRING = "STRING"
-    BOOLEAN = "BOOLEAN"
+    FLOAT64 = "float64"
+    FLOAT32 = "float32"
+    INT64 = "int64"
+    INT32 = "int32"
+    STRING = "str_"
+    BOOLEAN = "bool_"
 
     def __str__(self) -> str:
+        return self.value
+
+    def __repr__(self) -> str:
         return self.value
 
     @property
