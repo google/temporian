@@ -151,7 +151,7 @@ class Sampling(object):
     def is_unix_timestamp(self) -> bool:
         return self._is_unix_timestamp
 
-    # TODO: Remove setter
+    # TODO: Remove. A sampling is constant after its creation.
     @creator.setter
     def creator(self, creator: Optional[Operator]):
         self._creator = creator

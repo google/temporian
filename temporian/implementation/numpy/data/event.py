@@ -184,17 +184,20 @@ class NumpyEvent:
     # TODO: Do not recompute the schema on the fly. Instead, keep an internal
     # Event / Node. This Node is possibly given as constructor argument.
     def schema(self) -> Event:
+        sampling = Sampling(
+            index_levels=[
+                (index_name, index_dtype)
+                for index_name, index_dtype in self.index_dtypes().items()
+            ],
+            is_unix_timestamp=self._is_unix_timestamp,
+        )
+
         return Event(
             features=[
-                Feature(name, dtype) for name, dtype in self.dtypes.items()
+                Feature(name=name, dtype=dtype, sampling=sampling)
+                for name, dtype in self.dtypes.items()
             ],
-            sampling=Sampling(
-                index_levels=[
-                    (index_name, index_dtype)
-                    for index_name, index_dtype in self.index_dtypes().items()
-                ],
-                is_unix_timestamp=self._is_unix_timestamp,
-            ),
+            sampling=sampling,
         )
 
     @staticmethod
