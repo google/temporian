@@ -10,6 +10,12 @@ from temporian.implementation.numpy.data.event import NumpyEvent
 class PlotterTest(parameterized.TestCase):
     @parameterized.parameters((True,), (False,))
     def test_plot(self, interactive):
+        try:
+            import IPython.display
+        except ImportError:
+            # IPython is not installed / supported
+            return
+
         event = NumpyEvent(
             data={
                 (1,): IndexData(
