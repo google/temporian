@@ -21,18 +21,10 @@ bazel build -c opt //temporian
 PKDIR="$(pwd)/build_package"
 rm -fr ${PKDIR}
 mkdir -p ${PKDIR}
-find temporian -name "*.py" -type f -exec sh -c '
-    dir="$(dirname "$1")"
-    mkdir -p "${2}/${dir}"
-    cp "$1" "${2}/${dir}/$(basename "$1")"
-  ' _ {} ${PKDIR} \;
+find temporian -name "*.py" -type f -exec rsync -R {} ${PKDIR}/ \;
 
 ( cd bazel-bin && \
-  find temporian \( -name "*.so" -o -name "*.py" \) -type f -exec sh -c '
-    dir="$(dirname "$1")"
-    mkdir -p "${2}/${dir}"
-    cp "$1" "${2}/${dir}/$(basename $1)"
-  ' _ {} ${PKDIR} \;
+  find temporian \( -name "*.so" -o -name "*.py" \) -type f -exec rsync -R {} ${PKDIR}/ \;
 )
 
 # Start notebook
