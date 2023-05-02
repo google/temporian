@@ -14,17 +14,17 @@ class FilterNumpyImplementation(OperatorImplementation):
         super().__init__(operator)
 
     def __call__(
-        self, evset: EventSet, condition: EventSet
+        self, node: EventSet, condition: EventSet
     ) -> Dict[str, EventSet]:
         output_evset = EventSet(
-            {}, evset.feature_names, evset.index_names, evset.is_unix_timestamp
+            {}, node.feature_names, node.index_names, node.is_unix_timestamp
         )
         for index_key, index_data in condition.iterindex():
             # get boolean mask from condition
             index_mask = index_data.features[0]
 
             # filter timestamps
-            filtered_timestamps = evset[index_key].timestamps[index_mask]
+            filtered_timestamps = node[index_key].timestamps[index_mask]
 
             # if filtered timestamps is empty, skip
             if len(filtered_timestamps) == 0:
@@ -33,7 +33,7 @@ class FilterNumpyImplementation(OperatorImplementation):
             # filter features
             filtered_features = [
                 evset_feature[index_mask]
-                for evset_feature in evset[index_key].features
+                for evset_feature in node[index_key].features
             ]
             # set filtered data
             output_evset[index_key] = IndexData(

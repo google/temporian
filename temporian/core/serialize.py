@@ -98,7 +98,7 @@ def load(
     return inputs, outputs
 
 
-def serialize(src: processor.Preprocessor) -> pb.Processor:
+def serialize(src: processor.Processor) -> pb.Processor:
     """Serializes a processor into a protobuffer."""
 
     return pb.Processor(
@@ -111,7 +111,7 @@ def serialize(src: processor.Preprocessor) -> pb.Processor:
     )
 
 
-def unserialize(src: pb.Processor) -> processor.Preprocessor:
+def unserialize(src: pb.Processor) -> processor.Processor:
     """Unserializes a protobuffer into a processor."""
 
     # Decode the components.
@@ -144,7 +144,7 @@ def unserialize(src: pb.Processor) -> processor.Preprocessor:
             )
 
     # Copy extracted items.
-    p = processor.Preprocessor()
+    p = processor.Processor()
     for sampling in samplings.values():
         p.samplings.add(sampling)
     for node in nodes.values():

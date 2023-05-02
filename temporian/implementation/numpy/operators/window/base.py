@@ -33,23 +33,23 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
 
     def __call__(
         self,
-        evset: EventSet,
+        node: EventSet,
         sampling: Optional[EventSet] = None,
     ) -> Dict[str, EventSet]:
         # if no sampling is provided, apply operator to the evset's own
         # timestamps
         if sampling is None:
-            sampling = evset
+            sampling = node
 
         # create destination evset
         dst_evset = EventSet(
             {},
-            feature_names=evset.feature_names,
+            feature_names=node.feature_names,
             index_names=sampling.index_names,
             is_unix_timestamp=sampling.is_unix_timestamp,
         )
         # For each index
-        for index_key, index_data in evset.iterindex():
+        for index_key, index_data in node.iterindex():
             dst_features = []
             dst_timestamps = sampling[index_key].timestamps
             dst_evset[index_key] = IndexData(dst_features, dst_timestamps)

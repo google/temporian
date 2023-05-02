@@ -261,7 +261,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
         add_implementation = AddNumpyImplementation(operator)
 
         operator_output = add_implementation.call(
-            evset_1=self.evset_1, evset_2=self.evset_2
+            node_1=self.evset_1, node_2=self.evset_2
         )
 
         self.assertTrue(self.expected_evset_add == operator_output["node"])
@@ -276,7 +276,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
 
         sub_implementation = SubtractNumpyImplementation(operator)
         operator_output = sub_implementation.call(
-            evset_1=self.evset_1, evset_2=self.evset_2
+            node_1=self.evset_1, node_2=self.evset_2
         )
         self.assertTrue(self.expected_evset_subtract == operator_output["node"])
 
@@ -291,7 +291,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
         mult_implementation = MultiplyNumpyImplementation(operator)
 
         operator_output = mult_implementation.call(
-            evset_1=self.evset_1, evset_2=self.evset_2
+            node_1=self.evset_1, node_2=self.evset_2
         )
 
         self.assertTrue(self.expected_evset_multiply == operator_output["node"])
@@ -307,7 +307,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
         div_implementation = DivideNumpyImplementation(operator)
 
         operator_output = div_implementation.call(
-            evset_1=self.evset_1, evset_2=self.evset_2
+            node_1=self.evset_1, node_2=self.evset_2
         )
 
         self.assertTrue(self.expected_evset_divide == operator_output["node"])
@@ -323,7 +323,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
         div_implementation = FloorDivideNumpyImplementation(operator)
 
         operator_output = div_implementation.call(
-            evset_1=self.evset_1, evset_2=self.evset_2
+            node_1=self.evset_1, node_2=self.evset_2
         )
 
         self.assertTrue(self.expected_evset_floordiv == operator_output["node"])

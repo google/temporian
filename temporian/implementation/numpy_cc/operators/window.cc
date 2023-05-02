@@ -16,19 +16,19 @@ typedef py::array_t<float> ArrayF;
 // Apply TAccumulator over the data sequentially and return the aggregated
 // results.
 template <typename INPUT, typename OUTPUT, typename TAccumulator>
-py::array_t<OUTPUT> accumulate(const ArrayD &event_timestamps,
-                               const py::array_t<INPUT> &event_values,
+py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
+                               const py::array_t<INPUT> &evset_values,
                                const double window_length) {
 
   // Input size
-  const size_t n_event = event_timestamps.shape(0);
+  const size_t n_event = evset_timestamps.shape(0);
 
   // Allocate output array
   auto output = py::array_t<OUTPUT>(n_event);
 
   auto v_output = output.template mutable_unchecked<1>();
-  auto v_timestamps = event_timestamps.unchecked<1>();
-  auto v_values = event_values.template unchecked<1>();
+  auto v_timestamps = evset_timestamps.unchecked<1>();
+  auto v_values = evset_values.template unchecked<1>();
 
   TAccumulator accumulator;
 
@@ -56,20 +56,20 @@ py::array_t<OUTPUT> accumulate(const ArrayD &event_timestamps,
 // Apply TAccumulator over the data sequentially and return the aggregated
 // results.
 template <typename INPUT, typename OUTPUT, typename TAccumulator>
-py::array_t<OUTPUT> accumulate(const ArrayD &event_timestamps,
-                               const py::array_t<INPUT> &event_values,
+py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
+                               const py::array_t<INPUT> &evset_values,
                                const ArrayD &sampling_timestamps,
                                const double window_length) {
   // Input size
-  const size_t n_event = event_timestamps.shape(0);
+  const size_t n_event = evset_timestamps.shape(0);
   const size_t n_sampling = sampling_timestamps.shape(0);
 
   // Allocate output array
   auto output = py::array_t<OUTPUT>(n_sampling);
 
   auto v_output = output.template mutable_unchecked<1>();
-  auto v_timestamps = event_timestamps.unchecked<1>();
-  auto v_values = event_values.template unchecked<1>();
+  auto v_timestamps = evset_timestamps.unchecked<1>();
+  auto v_values = evset_values.template unchecked<1>();
   auto v_sampling = sampling_timestamps.unchecked<1>();
 
   TAccumulator accumulator;
@@ -236,18 +236,18 @@ struct MovingSumAccumulator : Accumulator<INPUT, OUTPUT> {
 //   ACCUMULATOR: Accumulator class.
 #define REGISTER_CC_FUNC(NAME, INPUT, OUTPUT, ACCUMULATOR)                     \
                                                                                \
-  py::array_t<OUTPUT> NAME(const ArrayD &event_timestamps,                     \
-                           const py::array_t<INPUT> &event_values,             \
+  py::array_t<OUTPUT> NAME(const ArrayD &evset_timestamps,                     \
+                           const py::array_t<INPUT> &evset_values,             \
                            const double window_length) {                       \
     return accumulate<INPUT, OUTPUT, ACCUMULATOR<INPUT, OUTPUT>>(              \
-        event_timestamps, event_values, window_length);                        \
+        evset_timestamps, evset_values, window_length);                        \
   }                                                                            \
                                                                                \
   py::array_t<OUTPUT> NAME(                                                    \
-      const ArrayD &event_timestamps, const py::array_t<INPUT> &event_values,  \
+      const ArrayD &evset_timestamps, const py::array_t<INPUT> &evset_values,  \
       const ArrayD &sampling_timestamps, const double window_length) {         \
     return accumulate<INPUT, OUTPUT, ACCUMULATOR<INPUT, OUTPUT>>(              \
-        event_timestamps, event_values, sampling_timestamps, window_length);   \
+        evset_timestamps, evset_values, sampling_timestamps, window_length);   \
   }
 
 REGISTER_CC_FUNC(simple_moving_average, float, float,
@@ -281,15 +281,15 @@ REGISTER_CC_FUNC(moving_count, int64_t, int32_t, MovingCountAccumulator)
   m.def(#NAME,                                                                 \
         py::overload_cast<const ArrayD &, const py::array_t<INPUT> &,          \
                           const ArrayD &, double>(&NAME),                      \
-        "", py::arg("event_timestamps").noconvert(),                           \
-        py::arg("event_values").noconvert(),                                   \
+        "", py::arg("evset_timestamps").noconvert(),                           \
+        py::arg("evset_values").noconvert(),                                   \
         py::arg("sampling_timestamps").noconvert(), py::arg("window_length")); \
                                                                                \
   m.def(#NAME,                                                                 \
         py::overload_cast<const ArrayD &, const py::array_t<INPUT> &, double>( \
             &NAME),                                                            \
-        "", py::arg("event_timestamps").noconvert(),                           \
-        py::arg("event_values").noconvert(), py::arg("window_length"));
+        "", py::arg("evset_timestamps").noconvert(),                           \
+        py::arg("evset_values").noconvert(), py::arg("window_length"));
 
 PYBIND11_MODULE(window, m) {
   ADD_PY_DEF(simple_moving_average, float, float)

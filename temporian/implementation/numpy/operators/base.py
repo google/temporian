@@ -88,8 +88,9 @@ def _check_input(
         expected_input_keys = set(operator.inputs.keys())
         if effective_input_keys != expected_input_keys:
             raise RuntimeError(
-                "Non matching number of inputs. "
-                f"{effective_input_keys} vs {expected_input_keys}"
+                "Input keys do not match the expected ones. "
+                f"Received: {effective_input_keys}. "
+                f"Expected: {expected_input_keys}."
             )
 
         _check_features(inputs, definitions=operator.inputs, label="input")
@@ -108,8 +109,9 @@ def _check_output(
         expected_output_keys = set(operator.outputs.keys())
         if effective_output_keys != expected_output_keys:
             raise RuntimeError(
-                "Non matching number of outputs. "
-                f"{effective_output_keys} vs {expected_output_keys}"
+                "Output keys do not match the expected ones. "
+                f"Received: {effective_output_keys}. "
+                f"Expected: {expected_output_keys}."
             )
 
         for output_key, output_def in operator.outputs.items():

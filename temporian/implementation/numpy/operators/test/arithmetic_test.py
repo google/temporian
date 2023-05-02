@@ -110,7 +110,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         sum_implementation = AddNumpyImplementation(operator)
 
         operator_output = sum_implementation.call(
-            evset_1=self.evset_1, evset_2=self.evset_2
+            node_1=self.evset_1, node_2=self.evset_2
         )
         self.assertTrue(output_evset == operator_output["node"])
 
@@ -138,7 +138,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
 
         sub_implementation = SubtractNumpyImplementation(operator)
         operator_output = sub_implementation.call(
-            evset_1=self.evset_1, evset_2=self.evset_2
+            node_1=self.evset_1, node_2=self.evset_2
         )
         self.assertTrue(output_evset == operator_output["node"])
 
@@ -167,7 +167,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         mult_implementation = MultiplyNumpyImplementation(operator)
 
         operator_output = mult_implementation.call(
-            evset_1=self.evset_1, evset_2=self.evset_2
+            node_1=self.evset_1, node_2=self.evset_2
         )
         self.assertTrue(output_evset == operator_output["node"])
 
@@ -196,7 +196,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         div_implementation = DivideNumpyImplementation(operator)
 
         operator_output = div_implementation.call(
-            evset_1=self.evset_1, evset_2=self.evset_2
+            node_1=self.evset_1, node_2=self.evset_2
         )
 
         self.assertTrue(output_evset == operator_output["node"])
@@ -259,7 +259,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         equal_implementation = EqualNumpyImplementation(operator)
 
         operator_output = equal_implementation.call(
-            evset_1=self.evset_1, evset_2=self.evset_2
+            node_1=self.evset_1, node_2=self.evset_2
         )
 
         self.assertEqual(output_evset, operator_output["node"])

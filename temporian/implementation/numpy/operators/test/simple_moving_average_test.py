@@ -100,7 +100,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
         )
 
     def test_flat(self):
-        """A simple time sequence."""
+        """A simple event set."""
 
         evset = EventSet.from_dataframe(
             pd.DataFrame(
@@ -140,7 +140,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
         self.assertEqual(repr(output), repr({"node": expected_output}))
 
     def test_with_index(self):
-        """Indexed time sequences."""
+        """Indexed Event sets."""
 
         evset = EventSet.from_dataframe(
             pd.DataFrame(
@@ -190,7 +190,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
         self.assertEqual(output["node"], expected_output)
 
     def test_with_sampling(self):
-        """Time sequenes with user provided sampling."""
+        """Event sets with user provided sampling."""
 
         evset = EventSet.from_dataframe(
             pd.DataFrame(

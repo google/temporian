@@ -38,7 +38,7 @@ class PropagateOperatorTest(absltest.TestCase):
             ),
             index_names=["x"],
         )
-        event = evset.node()
+        node = evset.node()
 
         sampling_evset = EventSet.from_dataframe(
             pd.DataFrame(

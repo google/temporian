@@ -25,7 +25,7 @@ class Prefix(Operator):
     def __init__(
         self,
         prefix: str,
-        event: Node,
+        node: Node,
     ):
         super().__init__()
 

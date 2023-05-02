@@ -24,12 +24,12 @@ class DropIndexNumpyImplementation(OperatorImplementation):
     def __init__(self, operator: DropIndexOperator) -> None:
         super().__init__(operator)
 
-    def __call__(self, evset: EventSet) -> Dict[str, EventSet]:
+    def __call__(self, node: EventSet) -> Dict[str, EventSet]:
         index_to_drop = self.operator.index_to_drop
         keep = self.operator.keep
         dst_feature_names = self.operator.dst_feature_names()
-        src_index_dtypes = evset.index_dtypes()
-        src_index_names = evset.index_names
+        src_index_dtypes = node.index_dtypes()
+        src_index_names = node.index_names
 
         # Idx in src_index_names of the indexes to keep in the output.
         final_index_idxs = [
@@ -49,7 +49,7 @@ class DropIndexNumpyImplementation(OperatorImplementation):
             DstIndexGroup
         )
         # Compute "dst_index_groups".
-        for src_index_key, src_index_data in evset.iterindex():
+        for src_index_key, src_index_data in node.iterindex():
             dst_index_key = tuple((src_index_key[i] for i in final_index_idxs))
             dst_index_group = dst_index_groups[dst_index_key]
 
@@ -102,7 +102,7 @@ class DropIndexNumpyImplementation(OperatorImplementation):
                 data=dst_evset,
                 feature_names=dst_feature_names,
                 index_names=self.operator.dst_index_names(),
-                is_unix_timestamp=evset.is_unix_timestamp,
+                is_unix_timestamp=node.is_unix_timestamp,
             )
         }
 

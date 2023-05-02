@@ -68,7 +68,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         operator_impl = DropIndexNumpyImplementation(operator)
 
         # call operator
-        op_numpy_output_evt = operator_impl.__call__(evset=self.input_evset)[
+        op_numpy_output_evt = operator_impl.__call__(node=self.input_evset)[
             "node"
         ]
 

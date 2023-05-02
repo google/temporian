@@ -28,19 +28,19 @@ class LagNumpyImplementation(OperatorImplementation):
         super().__init__(operator)
         assert isinstance(operator, LagOperator)
 
-    def __call__(self, evset: EventSet) -> Dict[str, EventSet]:
+    def __call__(self, node: EventSet) -> Dict[str, EventSet]:
         # gather operator attributes
         duration = self._operator.duration
 
         # create output event set
         output_evset = EventSet(
             {},
-            feature_names=evset.feature_names,
-            index_names=evset.index_names,
-            is_unix_timestamp=evset.is_unix_timestamp,
+            feature_names=node.feature_names,
+            index_names=node.index_names,
+            is_unix_timestamp=node.is_unix_timestamp,
         )
         # fill output event set data
-        for index_key, index_data in evset.iterindex():
+        for index_key, index_data in node.iterindex():
             output_evset[index_key] = IndexData(
                 index_data.features, index_data.timestamps + duration
             )

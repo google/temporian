@@ -52,7 +52,7 @@ def normalize_multiple_node_arg(src: MultipleNodeArg) -> Dict[str, Node]:
     return src
 
 
-class Preprocessor(object):
+class Processor(object):
     """A set of operators, nodes, features and samplings."""
 
     def __init__(self):
@@ -118,7 +118,7 @@ class Preprocessor(object):
         return {node.sampling for node in self.inputs.values()}
 
     def __repr__(self):
-        s = "Preprocessor\n============\n"
+        s = "Processor\n============\n"
 
         def p(title, elements):
             nonlocal s
@@ -147,7 +147,7 @@ class Preprocessor(object):
 def infer_processor(
     inputs: Optional[Dict[str, Node]],
     outputs: Dict[str, Node],
-) -> Preprocessor:
+) -> Processor:
     """Extracts all the objects between the output and input nodes.
 
     Fails if any inputs are missing.
@@ -158,7 +158,7 @@ def infer_processor(
         outputs: Output nodes.
 
     Returns:
-        A preprocessor.
+        A processor.
     """
 
     # The following algorithm lists all the nodes between the output and
@@ -176,7 +176,7 @@ def infer_processor(
     #       continue
     #   Adds all the input nodes of node's creator op to the pending list
 
-    p = Preprocessor()
+    p = Processor()
     p.outputs = outputs
 
     # The next node to process. Nodes are processed from the outputs to

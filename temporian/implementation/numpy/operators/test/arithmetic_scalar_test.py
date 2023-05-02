@@ -84,7 +84,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         impl = AddScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(evset=self.evset)
+        operator_output = impl.call(node=self.evset)
 
         self.assertEqual(output_evset, operator_output["node"])
 
@@ -114,7 +114,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         impl = SubtractScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(evset=self.evset)
+        operator_output = impl.call(node=self.evset)
 
         self.assertEqual(output_evset, operator_output["node"])
 
@@ -146,7 +146,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         impl = SubtractScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(evset=self.evset)
+        operator_output = impl.call(node=self.evset)
 
         self.assertEqual(output_evset, operator_output["node"])
 
@@ -176,7 +176,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         impl = MultiplyScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(evset=self.evset)
+        operator_output = impl.call(node=self.evset)
 
         self.assertEqual(output_evset, operator_output["node"])
 
@@ -206,7 +206,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         impl = DivideScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(evset=self.evset)
+        operator_output = impl.call(node=self.evset)
 
         self.assertEqual(output_evset, operator_output["node"])
 
@@ -236,7 +236,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         impl = DivideScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(evset=self.evset)
+        operator_output = impl.call(node=self.evset)
 
         self.assertEqual(output_evset, operator_output["node"])
 
@@ -266,7 +266,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         impl = FloorDivideScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(evset=self.evset)
+        operator_output = impl.call(node=self.evset)
 
         self.assertEqual(output_evset, operator_output["node"])
 
@@ -296,7 +296,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         impl = FloorDivideScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(evset=self.evset)
+        operator_output = impl.call(node=self.evset)
 
         self.assertEqual(output_evset, operator_output["node"])
 
@@ -321,7 +321,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         impl = NegateNumpyImplementation(operator)
 
-        operator_output = impl.call(evset=self.evset)
+        operator_output = impl.call(node=self.evset)
 
         self.assertEqual(output_evset, operator_output["node"])
 
@@ -486,7 +486,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         impl = EqualScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(evset=self.evset)
+        operator_output = impl.call(node=self.evset)
 
         self.assertEqual(output_evset, operator_output["node"])
 

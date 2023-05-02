@@ -80,16 +80,16 @@ class TFPTest(absltest.TestCase):
         self.assertSetEqual(set(inputs.keys()), {"a"})
         self.assertSetEqual(set(outputs.keys()), {"b"})
 
-    def test_serialization_single_event(self):
-        a = t.input_event(
+    def test_serialization_single_node(self):
+        a = t.input_node(
             [
                 t.Feature(name="f1"),
                 t.Feature(name="f2"),
             ],
-            name="my_input_event",
+            name="my_input_node",
         )
-        b = t.simple_moving_average(event=a, window_length=7.0)
-        b.name = "my_output_event"
+        b = t.simple_moving_average(node=a, window_length=7.0)
+        b.name = "my_output_node"
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_processor.tem")
@@ -101,19 +101,19 @@ class TFPTest(absltest.TestCase):
 
             inputs, outputs = t.load(path=path)
 
-        self.assertSetEqual(set(inputs.keys()), {"my_input_event"})
-        self.assertSetEqual(set(outputs.keys()), {"my_output_event"})
+        self.assertSetEqual(set(inputs.keys()), {"my_input_node"})
+        self.assertSetEqual(set(outputs.keys()), {"my_output_node"})
 
     def test_serialization_squeeze_loading_results(self):
-        a = t.input_event(
+        a = t.input_node(
             [
                 t.Feature(name="f1"),
                 t.Feature(name="f2"),
             ],
-            name="my_input_event",
+            name="my_input_node",
         )
-        b = t.simple_moving_average(event=a, window_length=7.0)
-        b.name = "my_output_event"
+        b = t.simple_moving_average(node=a, window_length=7.0)
+        b.name = "my_output_node"
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_processor.tem")
@@ -125,19 +125,19 @@ class TFPTest(absltest.TestCase):
 
             i, o = t.load(path=path, squeeze=True)
 
-        self.assertEqual(i.name, "my_input_event")
-        self.assertEqual(o.name, "my_output_event")
+        self.assertEqual(i.name, "my_input_node")
+        self.assertEqual(o.name, "my_output_node")
 
     def test_serialization_infer_inputs(self):
-        a = t.input_event(
+        a = t.input_node(
             [
                 t.Feature(name="f1"),
                 t.Feature(name="f2"),
             ],
-            name="my_input_event",
+            name="my_input_node",
         )
-        b = t.simple_moving_average(event=a, window_length=7.0)
-        b.name = "my_output_event"
+        b = t.simple_moving_average(node=a, window_length=7.0)
+        b.name = "my_output_node"
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_processor.tem")
@@ -145,8 +145,8 @@ class TFPTest(absltest.TestCase):
 
             i, o = t.load(path=path, squeeze=True)
 
-        self.assertEqual(i.name, "my_input_event")
-        self.assertEqual(o.name, "my_output_event")
+        self.assertEqual(i.name, "my_input_node")
+        self.assertEqual(o.name, "my_output_node")
 
     def test_list_registered_operators(self):
         logging.info("The operators:")

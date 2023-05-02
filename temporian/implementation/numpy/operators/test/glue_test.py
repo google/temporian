@@ -23,7 +23,7 @@ from temporian.core.operators.glue import GlueOperator
 from temporian.core.data import node as node_lib
 from temporian.core.data.dtype import DType
 
-from temporian.implementation.numpy.data.node_0 import EventSet
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.glue import (
     GlueNumpyImplementation,
 )

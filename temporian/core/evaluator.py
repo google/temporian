@@ -184,15 +184,15 @@ def build_schedule(
     # scheduled.
     op_to_num_pending_inputs: Dict[base.Operator, int] = defaultdict(lambda: 0)
 
-    # Compute "event_to_op" and "op_to_num_pending_inputs".
+    # Compute "node_to_op" and "op_to_num_pending_inputs".
     inputs_set = set(inputs)
     for op in processor.operators:
         num_pending_inputs = 0
-        for input_event in op.inputs.values():
-            if input_event in inputs_set:
+        for input_node in op.inputs.values():
+            if input_node in inputs_set:
                 # This input is already available
                 continue
-            node_to_op[input_event].append(op)
+            node_to_op[input_node].append(op)
             num_pending_inputs += 1
         if num_pending_inputs == 0:
             # Ready to be scheduled

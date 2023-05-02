@@ -28,24 +28,24 @@ class SelectNumpyImplementation(OperatorImplementation):
         super().__init__(operator)
         assert isinstance(operator, SelectOperator)
 
-    def __call__(self, evset: EventSet) -> Dict[str, EventSet]:
+    def __call__(self, node: EventSet) -> Dict[str, EventSet]:
         # gather operator attributes
         feature_names = self._operator.feature_names
 
         # get feature indexes to be selected
         feature_idxs = [
-            evset.feature_names.index(feature_name)
+            node.feature_names.index(feature_name)
             for feature_name in feature_names
         ]
         # create output event set
         output_evset = EventSet(
             data={},
             feature_names=feature_names,
-            index_names=evset.index_names,
-            is_unix_timestamp=evset.is_unix_timestamp,
+            index_names=node.index_names,
+            is_unix_timestamp=node.is_unix_timestamp,
         )
         # select feature index key-wise
-        for index_key, index_data in evset.iterindex():
+        for index_key, index_data in node.iterindex():
             output_evset[index_key] = IndexData(
                 [index_data.features[idx] for idx in feature_idxs],
                 index_data.timestamps,
