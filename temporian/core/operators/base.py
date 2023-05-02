@@ -61,6 +61,10 @@ class Operator(ABC):
         self._inputs: dict[str, Event] = {}
         self._outputs: dict[str, Event] = {}
         self._attributes: dict[str, AttributeType] = {}
+        self._definition: pb.OperatorDef = self.build_op_definition()
+        self._attr_types: dict[str:type] = {
+            attr.key: attr.type for attr in self._definition.attributes
+        }
 
     def __str__(self):
         return (
@@ -108,7 +112,9 @@ class Operator(ABC):
         with OperatorExceptionDecorator(self):
             if key in self.attributes:
                 raise ValueError(f'Already existing attribute "{key}".')
-            self.attributes[key] = value
+            self.attributes[key] = self.cast_attribute_type(
+                value, self._attr_types[key]
+            )
 
     def check(self) -> None:
         """Ensures that the operator is valid."""
@@ -162,7 +168,7 @@ class Operator(ABC):
         raise NotImplementedError()
 
     def definition(self) -> pb.OperatorDef:
-        return self.build_op_definition()
+        return self._definition
 
     @classmethod
     def operator_key(cls) -> str:
@@ -256,3 +262,24 @@ class Operator(ABC):
                 "Attribute of type ANY has an invalid value type:"
                 f" {type(value)}"
             )
+
+    @classmethod
+    def cast_attribute_type(
+        cls, value: Any, attr_type: pb.OperatorDef.Attribute.Type
+    ) -> Any:
+        """
+        Cast some attribute types that can be converted without risk:
+        int -> float
+        int [0,1] -> bool
+        """
+        if attr_type == pb.OperatorDef.Attribute.Type.FLOAT_64 and isinstance(
+            value, int
+        ):
+            return float(value)
+        if (
+            attr_type == pb.OperatorDef.Attribute.Type.BOOL
+            and isinstance(value, int)
+            and value in [0, 1]
+        ):
+            return bool(value)
+        return value

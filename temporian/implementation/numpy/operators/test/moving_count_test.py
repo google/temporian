@@ -74,7 +74,7 @@ class MovingCountOperatorTest(absltest.TestCase):
 
         op = MovingCountOperator(
             event=input_data.schema(),
-            window_length=5.0,
+            window_length=5,
             sampling=None,
         )
         self.assertEqual(op.list_matching_io_samplings(), [("event", "event")])
@@ -120,7 +120,7 @@ class MovingCountOperatorTest(absltest.TestCase):
 
         op = MovingCountOperator(
             event=input_data.schema(),
-            window_length=5.0,
+            window_length=5,
             sampling=None,
         )
         self.assertEqual(op.list_matching_io_samplings(), [("event", "event")])

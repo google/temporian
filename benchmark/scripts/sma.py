@@ -62,7 +62,7 @@ def main():
 
     event = event_data.schema()
 
-    sma = tp.simple_moving_average(event, window_length=10.0)
+    sma = tp.simple_moving_average(event, window_length=10)
 
     res: NumpyEvent = tp.evaluate(
         sma,
