@@ -15,6 +15,7 @@ from temporian.implementation.numpy.operators import set_index
 from temporian.implementation.numpy.operators import sample
 from temporian.implementation.numpy.operators import set_index
 from temporian.implementation.numpy.operators import drop_index
+from temporian.implementation.numpy.operators import rename
 from temporian.implementation.numpy.operators.arithmetic import add
 from temporian.implementation.numpy.operators.arithmetic import subtract
 from temporian.implementation.numpy.operators.arithmetic import multiply

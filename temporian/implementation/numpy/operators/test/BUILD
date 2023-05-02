@@ -286,6 +286,19 @@ py_test(
 )
 
 py_test(
+    name = "rename_test",
+    srcs = ["rename_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core:evaluator",
+        "//temporian/core/operators:rename",
+        "//temporian/implementation/numpy:evaluator",
+        "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy/operators:rename",
+    ],
+)
+
+py_test(
     name = "set_index_test",
     srcs = ["set_index_test.py"],
     srcs_version = "PY3",

@@ -162,6 +162,9 @@ def _check_output(
 
 
 def _check_same_sampling(evset_1: EventSet, evset_2: EventSet) -> bool:
+    if evset_1.index_names != evset_2.index_names:
+        return False
+
     for index_key, index_data_1 in evset_1.data.items():
         if index_key not in evset_2.data:
             return False
