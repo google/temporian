@@ -46,7 +46,7 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:event",
+        "//temporian/core/data:node",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -56,7 +56,7 @@ py_library(
     srcs = ["base.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/core/data:event",
+        "//temporian/core/data:node",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -68,8 +68,8 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/core/data:node",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -82,8 +82,8 @@ py_library(
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:duration",
-        "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/core/data:node",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -96,8 +96,8 @@ py_library(
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:dtype",
-        "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/core/data:node",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -109,8 +109,8 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/core/data:node",
         "//temporian/core/data:sampling",
         "//temporian/proto:core_py_proto",
     ],
@@ -124,8 +124,8 @@ py_library(
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:duration",
-        "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/core/data:node",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -137,8 +137,8 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/core/data:node",
         "//temporian/core/data:sampling",
         "//temporian/proto:core_py_proto",
     ],
@@ -153,8 +153,8 @@ py_library(
         ":select",
         "//temporian/core:operator_lib",
         "//temporian/core/data:duration",
-        "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/core/data:node",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -168,8 +168,8 @@ py_library(
         ":select",
         "//temporian/core:operator_lib",
         "//temporian/core/data:duration",
-        "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/core/data:node",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -183,8 +183,8 @@ py_library(
         ":select",
         "//temporian/core:operator_lib",
         "//temporian/core/data:duration",
-        "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/core/data:node",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -196,8 +196,8 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/core/data:node",
         "//temporian/proto:core_py_proto",
     ],
 )

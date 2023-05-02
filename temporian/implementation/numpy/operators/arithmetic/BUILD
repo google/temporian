@@ -19,7 +19,7 @@ py_library(
     deps = [
         "//temporian/core/operators/arithmetic",
         "//temporian/core/operators/arithmetic:base",
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/operators:base",
     ],
 )
@@ -32,7 +32,7 @@ py_library(
         ":base",
         "//temporian/core/operators/arithmetic:add",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -44,7 +44,7 @@ py_library(
         ":base",
         "//temporian/core/operators/arithmetic:subtract",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -56,7 +56,7 @@ py_library(
         ":base",
         "//temporian/core/operators/arithmetic:multiply",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -68,7 +68,7 @@ py_library(
         ":base",
         "//temporian/core/operators/arithmetic:divide",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -80,7 +80,7 @@ py_library(
         ":base",
         "//temporian/core/operators/arithmetic:equal",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -92,6 +92,6 @@ py_library(
         ":base",
         "//temporian/core/operators/arithmetic:floordiv",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )

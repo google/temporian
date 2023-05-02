@@ -18,8 +18,8 @@ A minimal end-to-end run looks as follows:
 import temporian as tp
 
 # Load the data
-event_data = tp.read_event("path/to/data.csv")
-event = event_data.node()
+evset = tp.read_event_set("path/to/data.csv")
+node = evset.node()
 
 # Compute features
 # TODO: complete with a simple example...

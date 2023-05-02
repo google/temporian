@@ -139,7 +139,7 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:event",
+        "//temporian/core/data:node",
         "//temporian/core/data:feature",
         "//temporian/proto:core_py_proto",
     ],
@@ -209,8 +209,7 @@ py_library(
         "//temporian/core/operators:{lower_op}",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy:utils",
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -303,7 +302,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         "//temporian/core/data:dtype",
-        "//temporian/core/data:event",
+        "//temporian/core/data:node",
         "//temporian/core/data:feature",
         "//temporian/core/operators:{lower_op}",
         "//temporian/implementation/numpy/operators:{lower_op}",
