@@ -1,4 +1,4 @@
-<img src="https://github.com/google/temporian/blob/main/docs/src/assets/banner.png?raw=true" width="100%" >
+<img src="https://github.com/google/temporian/blob/main/docs/src/assets/banner.png?raw=true" width="100%" alt="Temporian logo">
 
 ![tests](https://github.com/google/temporian/actions/workflows/test.yaml/badge.svg) ![formatting](https://github.com/google/temporian/actions/workflows/formatting.yaml/badge.svg)
 
