@@ -25,7 +25,7 @@ from temporian.implementation.numpy import implementation_lib
 class MultiplyScalarNumpyImplementation(
     BaseArithmeticScalarNumpyImplementation
 ):
-    """Numpy implementation of arithmetic scalar multiplication"""
+    """Numpy implementation of the multiply scalar operator."""
 
     def __init__(self, operator: MultiplyScalarOperator) -> None:
         super().__init__(operator)

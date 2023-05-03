@@ -25,7 +25,7 @@ from temporian.implementation.numpy import implementation_lib
 class FloorDivideScalarNumpyImplementation(
     BaseArithmeticScalarNumpyImplementation
 ):
-    """Numpy implementation of arithmetic scalar floor division"""
+    """Numpy implementation of the floordiv scalar operator."""
 
     def __init__(self, operator: FloorDivScalarOperator) -> None:
         super().__init__(operator)

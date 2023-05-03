@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Calendar month operator."""
+"""Calendar month operator class and public API function definitions."""
 
 from temporian.core import operator_lib
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators.calendar.base import BaseCalendarOperator
 
 
@@ -38,16 +38,17 @@ class CalendarMonthOperator(BaseCalendarOperator):
 operator_lib.register_operator(CalendarMonthOperator)
 
 
-def calendar_month(sampling: Event) -> Event:
-    """Obtain the month each of the timestamps in an event's sampling belongs
-    to. Features in input event are ignored. Output feature contains numbers
-    between 1 and 12.
+def calendar_month(sampling: Node) -> Node:
+    """Obtains the month the timestamps in a node's sampling are in.
+
+    Features in input node are ignored. Output feature contains numbers between
+    1 and 12.
 
     Args:
-        sampling: the event to get the months from.
+        sampling: Node to get the months from.
 
     Returns:
-        event with a single feature corresponding to the month each timestamp in
-            `event`'s sampling belongs to, with the same sampling as `event`.
+        Node with a single feature corresponding to the month each timestamp in
+        `node`'s sampling belongs to, with the same sampling as `node`.
     """
-    return CalendarMonthOperator(sampling).outputs["event"]
+    return CalendarMonthOperator(sampling).outputs["node"]

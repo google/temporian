@@ -12,19 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Select operator."""
+"""Select operator class and public API function definition."""
+
 from typing import List, Union
 
 from temporian.core import operator_lib
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
 class SelectOperator(Operator):
-    """Select operator."""
-
-    def __init__(self, event: Event, feature_names: Union[str, List[str]]):
+    def __init__(self, node: Node, feature_names: Union[str, List[str]]):
         super().__init__()
 
         # store selected feature names
@@ -40,28 +39,28 @@ class SelectOperator(Operator):
         self._feature_names = feature_names
         self.add_attribute("feature_names", feature_names)
 
-        # verify all selected features exist in the input event
+        # verify all selected features exist in the input node
         selected_features_set = set(feature_names)
-        event_features_set = set([feature.name for feature in event.features])
-        if not set(selected_features_set).issubset(event_features_set):
-            raise KeyError(selected_features_set.difference(event_features_set))
+        node_features_set = set([feature.name for feature in node.features])
+        if not set(selected_features_set).issubset(node_features_set):
+            raise KeyError(selected_features_set.difference(node_features_set))
 
         # inputs
-        self.add_input("event", event)
+        self.add_input("node", node)
 
         # outputs
         output_features = []
         for feature_name in feature_names:
-            for feature in event.features:
-                # TODO: maybe implement features attributes of Event as dict
+            for feature in node.features:
+                # TODO: maybe implement features attributes of Node as dict
                 # so we can index by name?
                 if feature.name == feature_name:
                     output_features.append(feature)
 
-        output_sampling = event.sampling
+        output_sampling = node.sampling
         self.add_output(
-            "event",
-            Event(
+            "node",
+            Node(
                 features=output_features,
                 sampling=output_sampling,
                 creator=self,
@@ -86,9 +85,9 @@ class SelectOperator(Operator):
                 ),
             ],
             inputs=[
-                pb.OperatorDef.Input(key="event"),
+                pb.OperatorDef.Input(key="node"),
             ],
-            outputs=[pb.OperatorDef.Output(key="event")],
+            outputs=[pb.OperatorDef.Output(key="node")],
         )
 
 
@@ -96,9 +95,18 @@ operator_lib.register_operator(SelectOperator)
 
 
 def select(
-    event: Event,
+    node: Node,
     feature_names: List[str],
-) -> Event:
+) -> Node:
+    """Selects a subset of features from a node.
+
+    Args:
+        node: Node to select features from.
+        feature_names: Names of the features to select from the node.
+
+    Returns:
+        Node containing only the selected features.
+    """
     if isinstance(feature_names, list):
         pass
     elif isinstance(feature_names, str):
@@ -109,4 +117,4 @@ def select(
             f" str. Got '{feature_names}' instead."
         )
 
-    return SelectOperator(event, feature_names).outputs["event"]
+    return SelectOperator(node, feature_names).outputs["node"]

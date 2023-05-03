@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""A feature."""
+"""Feature class definition."""
 
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
@@ -25,6 +25,23 @@ if TYPE_CHECKING:
 
 
 class Feature(object):
+    """Feature values for a certain sampling.
+
+    A feature can be thought of as a list of univariate series, where each item
+    in the list corresponds to an index value in the feature's sampling and each
+    value in that item corresponds to a timestamp in it.
+
+    A feature holds no actual data, but rather describes the structure (or
+    "schema") of data during evaluation.
+
+    Attributes:
+        creator: Operator that created this feature. Can be None if it wasn't
+            created by an operator.
+        dtype: Feature's data type.
+        name: Name of the feature.
+        sampling: Feature's sampling.
+    """
+
     def __init__(
         self,
         name: str,

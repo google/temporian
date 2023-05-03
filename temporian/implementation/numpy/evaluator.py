@@ -17,18 +17,29 @@ import time
 
 from typing import Dict, List
 
-from temporian.core.data import event
+from temporian.core.data.node import Node
 from temporian.core.operators import base
-from temporian.implementation.numpy.data import event as numpy_event
 from temporian.implementation.numpy import implementation_lib
+from temporian.implementation.numpy.data.event_set import EventSet
 
 
 def evaluate_schedule(
-    inputs: Dict[event.Event, numpy_event.NumpyEvent],
+    inputs: Dict[Node, EventSet],
     schedule: List[base.Operator],
     verbose: int,
     check_execution: bool,
-) -> Dict[event.Event, numpy_event.NumpyEvent]:
+) -> Dict[Node, EventSet]:
+    """Evaluates a schedule on a dictionary of input event sets.
+
+    Args:
+        inputs: Mapping of core Nodes to materialized EventSets.
+        schedule: Sequence of operators to apply on the data.
+        verbose: If >0, prints details about the execution on the standard error
+            output. The larger the number, the more information is displayed.
+        check_execution: If `True`, data of the intermediate results of the
+            operators is checked against its expected structure and raises if
+            it differs.
+    """
     data = {**inputs}
 
     for operator_idx, operator in enumerate(schedule):
@@ -59,8 +70,8 @@ def evaluate_schedule(
 
         # Construct operator inputs
         operator_inputs = {
-            input_key: data[input_event]
-            for input_key, input_event in operator.inputs.items()
+            input_key: data[input_node]
+            for input_key, input_node in operator.inputs.items()
         }
 
         # Compute output
@@ -76,9 +87,9 @@ def evaluate_schedule(
         elif verbose >= 2:
             print(f"Duration: {end_time - begin_time} s", file=sys.stderr)
 
-        # materialize data in output events
-        for output_key, output_event in operator.outputs.items():
-            data[output_event] = operator_outputs[output_key]
+        # materialize data in output nodes
+        for output_key, output_node in operator.outputs.items():
+            data[output_node] = operator_outputs[output_key]
 
     # TODO: Only return the required data.
     # TODO: Un-allocate not used anymore object.

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Operator lib module."""
+"""Registering mechanism for operator classes."""
 
 from typing import Any
 
@@ -40,6 +40,6 @@ def get_operator_class(key: str):
 
 
 def registered_operators() -> dict[str, Any]:
-    """List the registered operators."""
+    """Lists the registered operators."""
 
     return _OPERATORS

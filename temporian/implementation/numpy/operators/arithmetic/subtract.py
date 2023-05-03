@@ -21,16 +21,16 @@ from temporian.implementation.numpy.operators.arithmetic.base import (
 
 
 class SubtractNumpyImplementation(BaseArithmeticNumpyImplementation):
-    """Numpy implementation to divide second event from the first one"""
+    """Numpy implementation of the subtract operator."""
 
     def __init__(self, operator: SubtractOperator) -> None:
         super().__init__(operator)
         assert isinstance(operator, SubtractOperator)
 
     def _do_operation(
-        self, event_1_feature: np.ndarray, event_2_feature: np.ndarray
+        self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
     ) -> np.ndarray:
-        return event_1_feature - event_2_feature
+        return evset_1_feature - evset_2_feature
 
 
 implementation_lib.register_operator_implementation(

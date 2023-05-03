@@ -28,4 +28,5 @@ find temporian -name "*.py" -type f -exec rsync -R {} ${PKDIR}/ \;
 )
 
 # Start notebook
-PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python PYTHONPATH="${PKDIR}/:$PYTHONPATH" jupyter notebook
+# Note: Use "notebook" or "lab" ("jupyterlab").
+PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python PYTHONPATH="${PKDIR}/:$PYTHONPATH" jupyter lab

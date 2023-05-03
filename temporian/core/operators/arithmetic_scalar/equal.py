@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Performs equality between events features and a scalar value"""
+"""Equal scalar operator class and public API function definition."""
+
 from typing import Union, List
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
 from temporian.core.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarOperator,
@@ -25,10 +26,6 @@ from temporian.core.operators.arithmetic_scalar.base import (
 
 
 class EqualScalarOperator(BaseArithmeticScalarOperator):
-    """
-    Performs equality between events features and a scalar value.
-    """
-
     @classmethod
     @property
     def operator_def_key(cls) -> str:
@@ -58,21 +55,21 @@ operator_lib.register_operator(EqualScalarOperator)
 
 
 def equal_scalar(
-    event: Event,
+    node: Node,
     value: Union[float, int, str, bool],
-) -> Event:
-    """
-    Performs equality element-wise between events features and a scalar value.
+) -> Node:
+    """Checks for equality between a node and a scalar.
+
+    Each item in each feature in `node` is compared to `value`.
 
     Args:
-        event: Event to compare values to.
-        value: Scalar value to compare to all event features.
+        node: Node to compare the value to.
+        value: Scalar value to compare to the node.
 
     Returns:
-        Event: Event with the equality of event features and value. Features
-            values equal to value are set to True, and False otherwise.
+        Node containing the result of the comparison.
     """
     return EqualScalarOperator(
-        event=event,
+        node=node,
         value=value,
-    ).outputs["event"]
+    ).outputs["node"]

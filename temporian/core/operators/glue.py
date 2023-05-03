@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Glue operator."""
+"""Glue operator class and public API function definition."""
 
-from typing import Dict, Optional, List
+from typing import Dict, List
 
 from temporian.core import operator_lib
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -26,53 +26,51 @@ MAX_NUM_ARGUMENTS = 30
 
 
 class GlueOperator(Operator):
-    """Glue operator."""
-
     def __init__(
         self,
-        **dict_events: Dict[str, Event],
+        **nodes_dict: Dict[str, Node],
     ):
         super().__init__()
 
-        # Note: Support for dictionaries of events is required for
+        # Note: Support for dictionaries of nodes is required for
         # serialization.
 
-        if len(dict_events) < 2:
+        if len(nodes_dict) < 2:
             raise ValueError("At least two arguments should be provided")
 
-        if len(dict_events) >= MAX_NUM_ARGUMENTS:
+        if len(nodes_dict) >= MAX_NUM_ARGUMENTS:
             raise ValueError(
-                f"Too much (>{MAX_NUM_ARGUMENTS}) arguments provided"
+                f"Too many (>{MAX_NUM_ARGUMENTS}) arguments provided"
             )
 
         # inputs
         output_features = []
         feature_names = set()
         first_sampling = None
-        for key, event in dict_events.items():
-            self.add_input(key, event)
-            output_features.extend(event.features)
+        for key, node in nodes_dict.items():
+            self.add_input(key, node)
+            output_features.extend(node.features)
 
-            for f in event.features:
+            for f in node.features:
                 if f.name in feature_names:
                     raise ValueError(
                         f'Feature "{f.name}" is defined in multiple input'
-                        " events."
+                        " nodes."
                     )
                 feature_names.add(f.name)
 
             if first_sampling is None:
-                first_sampling = event.sampling
-            elif event.sampling is not first_sampling:
+                first_sampling = node.sampling
+            elif node.sampling is not first_sampling:
                 raise ValueError(
                     "All glue arguments should have the same sampling."
-                    f" {first_sampling} is different from {event.sampling}."
+                    f" {first_sampling} is different from {node.sampling}."
                 )
 
         # outputs
         self.add_output(
-            "event",
-            Event(
+            "node",
+            Node(
                 features=output_features,
                 sampling=first_sampling,
                 creator=self,
@@ -84,12 +82,12 @@ class GlueOperator(Operator):
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
             key="GLUE",
-            # TODO: Add support to array of events arguments.
+            # TODO: Add support to array of nodes arguments.
             inputs=[
-                pb.OperatorDef.Input(key=f"event_{idx}", is_optional=idx >= 2)
+                pb.OperatorDef.Input(key=f"node_{idx}", is_optional=idx >= 2)
                 for idx in range(MAX_NUM_ARGUMENTS)
             ],
-            outputs=[pb.OperatorDef.Output(key="event")],
+            outputs=[pb.OperatorDef.Output(key="node")],
         )
 
 
@@ -97,38 +95,48 @@ operator_lib.register_operator(GlueOperator)
 
 
 def glue(
-    *events: List[Event],
-) -> Event:
-    """Concatenates together events with the same sampling.
+    *nodes: List[Node],
+) -> Node:
+    """Concatenates together nodes with the same sampling.
 
     Example:
-        event_1 = ... # Feature A & B
-        event_2 = ... # Feature C & D
-        event_3 = ... # Feature E & F
+
+        ```
+        node_1 = ... # Feature A & B
+        node_2 = ... # Feature C & D
+        node_3 = ... # Feature E & F
 
         # Output has features A, B, C, D, E & F
-        output = np.glue(event_1, event_2, event_3)
+        output = np.glue(node_1, node_2, node_3)
+        ```
 
-    All the events should have the same sampling. To concatenate events with a
-    different sampling, use the operator 'tp.sample(...)' before.
+    To concatenate nodes with a different sampling, use the operator
+    'tp.sample(...)' first.
 
     Example:
 
-        # Assume event_1, event_2 and event_3 dont have the same sampling
-        event_1 = ... # Feature A & B
-        event_2 = ... # Feature C & D
-        event_3 = ... # Feature E & F
+        ```
+        # Assume node_1, node_2 and node_3 dont have the same sampling
+        node_1 = ... # Feature A & B
+        node_2 = ... # Feature C & D
+        node_3 = ... # Feature E & F
 
         # Output has features A, B, C, D, E & F, and the same sampling as
-        # event_1
-        output = tp.glue(event_1,
-            tp.sample(event_2, sampling=event_1),
-            tp.sample(event_3, sampling=event_1))
+        # node_1
+        output = tp.glue(node_1,
+            tp.sample(node_2, sampling=node_1),
+            tp.sample(node_3, sampling=node_1))
+        ```
+
+    Args:
+        *nodes: Nodes to concatenate.
+
+    Returns:
+        The concatenated nodes.
     """
+    if len(nodes) == 1:
+        return nodes[0]
 
-    if len(events) == 1:
-        return events[0]
-
-    # Note: The event should be called "event_{idx}" with idx in [0, MAX_NUM_ARGUMENTS).
-    dict_events = {f"event_{idx}": event for idx, event in enumerate(events)}
-    return GlueOperator(**dict_events).outputs["event"]
+    # Note: The node should be called "node_{idx}" with idx in [0, MAX_NUM_ARGUMENTS).
+    nodes_dict = {f"node_{idx}": node for idx, node in enumerate(nodes)}
+    return GlueOperator(**nodes_dict).outputs["node"]

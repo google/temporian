@@ -12,18 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Arithmetic Addition Operator"""
+"""Add operator class and public API function definition."""
 
 from temporian.core import operator_lib
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
 
 
 class AddOperator(BaseArithmeticOperator):
-    """
-    Apply arithmetic addition to two events
-    """
-
     @classmethod
     @property
     def operator_def_key(cls) -> str:
@@ -38,20 +34,25 @@ operator_lib.register_operator(AddOperator)
 
 
 def add(
-    event_1: Event,
-    event_2: Event,
-) -> Event:
-    """
-    Add two events
+    node_1: Node,
+    node_2: Node,
+) -> Node:
+    """Adds two nodes.
+
+    Each feature in `node_1` is added to the feature in `node_2` in the same
+    position.
+
+    `node_1` and `node_2` must have the same sampling and the same number of
+    features.
 
     Args:
-        event_1: First event
-        event_2: Second event
+        node_1: First node.
+        node_2: Second node.
 
     Returns:
-        Event: Sum of event_1 and event_2 features
+        Sum of `node_1`'s and `node_2`'s features.
     """
     return AddOperator(
-        event_1=event_1,
-        event_2=event_2,
-    ).outputs["event"]
+        node_1=node_1,
+        node_2=node_2,
+    ).outputs["node"]

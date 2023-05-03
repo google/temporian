@@ -12,22 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Arithmetic Multiplication Scalar Operator"""
+"""Multiply scalar operator class and public API function definition."""
+
 from typing import Union, List
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarOperator,
 )
 
 
 class MultiplyScalarOperator(BaseArithmeticScalarOperator):
-    """
-    Applies arithmetic multiplication to an event and a scalar value.
-    """
-
     @classmethod
     @property
     def operator_def_key(cls) -> str:
@@ -51,20 +48,21 @@ operator_lib.register_operator(MultiplyScalarOperator)
 
 
 def multiply_scalar(
-    event: Event,
+    node: Node,
     value: Union[float, int],
-) -> Event:
-    """
-    Multiplies element-wise an event features and a scalar value.
+) -> Node:
+    """Multiplies a node by a scalar value.
+
+    Each item in each feature in `node` is multiplied by `value`.
 
     Args:
-        event_1: event to perform multiplication to.
-        value: scalar value to multiply to all event features.
+        node: Node to multiply.
+        value: Scalar value to multiply the node by.
 
     Returns:
-        Event: event with the multiplication of event features and value.
+        Integer division of `node` and `value`.
     """
     return MultiplyScalarOperator(
-        event=event,
+        node=node,
         value=value,
-    ).outputs["event"]
+    ).outputs["node"]

@@ -19,22 +19,22 @@ from typing import Dict, Any
 import numpy as np
 
 from temporian.core.operators.calendar.base import BaseCalendarOperator
-from temporian.implementation.numpy.data.event import IndexData
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import IndexData
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
 class BaseCalendarNumpyImplementation(OperatorImplementation):
-    """Abstract base class to implement common logic of numpy implementation of
+    """Interface definition and common logic for numpy implementation of
     calendar operators."""
 
     def __init__(self, operator: BaseCalendarOperator) -> None:
         super().__init__(operator)
         assert isinstance(operator, BaseCalendarOperator)
 
-    def __call__(self, sampling: NumpyEvent) -> Dict[str, NumpyEvent]:
-        # create destination event
-        dst_event = NumpyEvent(
+    def __call__(self, sampling: EventSet) -> Dict[str, EventSet]:
+        # create destination event set
+        dst_evset = EventSet(
             data={},
             feature_names=[self.operator.output_feature_name],
             index_names=sampling.index_names,
@@ -52,22 +52,23 @@ class BaseCalendarNumpyImplementation(OperatorImplementation):
                 np.int32
             )  # TODO: parametrize output dtype
 
-            dst_event[index_key] = IndexData([value], index_data.timestamps)
+            dst_evset[index_key] = IndexData([value], index_data.timestamps)
 
-        return {"event": dst_event}
+        return {"node": dst_evset}
 
     @abstractmethod
     def _get_value_from_datetime(self, dt: datetime) -> Any:
-        """Get the value of the datetime object that corresponds to each
-        specific calendar operator. E.g., calendar_day_of_month will take the
-        datetime's day, and calendar_hour will take the its hour.
+        """Gets the value of the datetime object that corresponds to each
+        specific calendar operator.
 
-        Must be implemented by subclasses.
+        For example, calendar_day_of_month will return the datetime's day, and
+        calendar_hour its hour.
+
+        Returned value is converted to int32 by __call__.
 
         Args:
-            dt: the datetime to get the value from.
+            dt: Datetime to get the value from.
 
         Returns:
-            Any: the numeric value for the datetime. Will be converted to
-                int32 by __call__.
+            Numeric value for the datetime.
         """

@@ -13,13 +13,13 @@ py_library(
 )
 
 py_library(
-    name = "event",
-    srcs = ["event.py"],
+    name = "event_set",
+    srcs = ["event_set.py"],
     srcs_version = "PY3",
     deps = [
         "//temporian/core/data:dtype",
         "//temporian/core/data:duration",
-        "//temporian/core/data:event",
+        "//temporian/core/data:node",
         "//temporian/core/data:sampling",
         "//temporian/utils:string",
     ],
@@ -29,5 +29,5 @@ py_library(
     name = "plotter",
     srcs = ["plotter.py"],
     srcs_version = "PY3",
-    deps = [":event"],
+    deps = [":event_set"],
 )

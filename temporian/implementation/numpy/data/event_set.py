@@ -1,21 +1,34 @@
+# Copyright 2021 Google LLC.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 
 from temporian.core.data.dtype import DType
-from temporian.core.data.duration import convert_date_to_duration
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.utils import string
 
-# Maximum of printed index when calling repr(event)
+# Maximum of printed index when calling repr(evset)
 MAX_NUM_PRINTED_INDEX = 5
 
-# Maximum of printed features when calling repr(event)
+# Maximum of printed features when calling repr(evset)
 MAX_NUM_PRINTED_FEATURES = 10
 
 PYTHON_DTYPE_MAPPING = {
@@ -46,42 +59,39 @@ DTYPE_REVERSE_MAPPING = {
 
 @dataclass
 class IndexData:
-    features: List[np.ndarray]
-    timestamps: np.ndarray
-    """A dataclass representing an index data structure that holds features and
-    timestamps.
+    """Index data structure that holds features and timestamps.
 
     Attributes:
-        features (List[np.ndarray]): A list of one-dimensional NumPy arrays
-            representing the features.
-        timestamps (np.ndarray): A one-dimensional NumPy array representing
-            the timestamps.
+        features: List of one-dimensional NumPy arrays representing the
+            features.
+        timestamps: One-dimensional NumPy array representing the timestamps.
 
-    Methods:
-        __init__(features: List[np.ndarray], timestamps: np.ndarray) -> None:
-            Initializes the IndexData object by checking and setting the
-            features and timestamps.
-            Raises:
-                ValueError: If features are not one-dimensional arrays.
-                ValueError: If the number of elements in features and timestamps
-                    do not match.
-
-        __len__() -> int:
-            Returns the number of elements in the timestamps array.
-
-    Example:
+    Example usage:
+        ```
         >>> features = [np.array([1, 2, 3]), np.array([4, 5, 6])]
         >>> timestamps = np.array([0, 1, 2])
         >>> index_data = IndexData(features, timestamps)
         >>> len(index_data)
         3
+        ```
     """
+
+    features: List[np.ndarray]
+    timestamps: np.ndarray
 
     def __init__(
         self,
         features: List[np.ndarray],
         timestamps: np.ndarray,
     ) -> None:
+        """Initializes the IndexData object by checking and setting the features
+        and timestamps.
+
+        Raises:
+            ValueError: If features are not one-dimensional arrays.
+            ValueError: If the number of elements in features and timestamps
+                do not match.
+        """
         shapes = [feature.shape for feature in features]
         if not all(len(shape) == 1 for shape in shapes):
             raise ValueError("Features must be one-dimensional arrays")
@@ -96,15 +106,16 @@ class IndexData:
         self.timestamps = timestamps
 
     def __len__(self) -> int:
+        """Returns the number of elements in the timestamps array."""
         return len(self.timestamps)
 
 
-class NumpyEvent:
+class EventSet:
     def __init__(
         self,
         data: Dict[Tuple, IndexData],
-        feature_names: Union[List[str]],
-        index_names: Union[List[str]],
+        feature_names: List[str],
+        index_names: List[str],
         is_unix_timestamp: bool,
     ) -> None:
         self._data = data
@@ -141,12 +152,14 @@ class NumpyEvent:
     # TODO: Rename to "dtypes".
     def dtypes_list(self) -> List[DType]:
         # TODO: Handle case where there is no data.
-        return [feature.dtype for feature in self._first_index_features]
+        return [feature.dtype for feature in self._first_index_features()]
 
+    # TODO: Remove. Same as "len(self.feature_names)"
     @property
     def feature_count(self) -> int:
         return len(self._feature_names)
 
+    # TODO: Remove. This is the same as "self.data".
     def iterindex(self) -> Iterable[Tuple[Tuple, IndexData]]:
         yield from self.data.items()
 
@@ -169,16 +182,20 @@ class NumpyEvent:
 
         return next(iter(self._data))
 
+    # TODO: Remove.
     def first_index_data(self) -> IndexData:
         if self.first_index_key() is None:
             return []
         return self[self.first_index_key()]
 
+    # TODO: Remove.
     def _first_index_features(self) -> List[np.ndarray]:
         return list(self._data.values())[0].features
 
-    def schema(self) -> Event:
-        return Event(
+    # TODO: Do not recompute the schema on the fly. Instead, keep an internal
+    # Event / Node. This Node is possibly given as constructor argument.
+    def node(self) -> Node:
+        return Node(
             features=[
                 Feature(name, dtype) for name, dtype in self.dtypes.items()
             ],
@@ -197,29 +214,32 @@ class NumpyEvent:
         index_names: Optional[List[str]] = None,
         timestamp_column: str = "timestamp",
         is_sorted: bool = False,
-    ) -> NumpyEvent:
-        """Convert a pandas DataFrame to a NumpyEvent.
+    ) -> EventSet:
+        """Creates an EventSet from a pandas DataFrame.
+
         Args:
-            df: DataFrame to convert to NumpyEvent.
-            index_names: names of the DataFrame columns to be used as index for
-                the event. Defaults to [].
-            timestamp_column: Column containing timestamps. Supported date types:
-                {np.datetime64, pd.Timestamp, datetime.datetime}. Timestamps of
-                these types are converted implicitly to UTC epoch float.
+            df: DataFrame to convert to an EventSet.
+            index_names: Names of the DataFrame columns to be used as index for
+                the event set. Defaults to [].
+            timestamp_column: Name of the column containing the timestamps.
+                Supported date types:
+                `{np.datetime64, pd.Timestamp, datetime.datetime}`.
+                Timestamps of these types are converted to UTC epoch float.
             is_sorted: If True, the DataFrame is assumed to be sorted by
                 timestamp. If False, the DataFrame will be sorted by timestamp.
 
 
         Returns:
-            NumpyEvent: NumpyEvent created from DataFrame.
+            EventSet created from DataFrame.
 
         Raises:
-            ValueError: If index_names or timestamp_column are not in df columns.
+            ValueError: If `index_names` or `timestamp_column` are not in `df`'s
+                columns.
             ValueError: If a column has an unsupported dtype.
 
         Example:
             >>> import pandas as pd
-            >>> from temporian.implementation.numpy.data.event import NumpyEvent
+            >>> from temporian.implementation.numpy.data.event_set import EventSet
             >>> df = pd.DataFrame(
             ...     data=[
             ...         [666964, 1.0, 740.0],
@@ -228,17 +248,19 @@ class NumpyEvent:
             ...     ],
             ...     columns=["product_id", "timestamp", "costs"],
             ... )
-            >>> event = NumpyEvent.from_dataframe(df, index_names=["product_id"])
+            >>> evset = EventSet.from_dataframe(df, index_names=["product_id"])
         """
 
         def convert_timestamp_column_to_unix_epoch_float(
             timestamp_column: pd.Series,
         ) -> pd.DataFrame:
-            """Convert timestamp column to Unix Epoch Float.
+            """Converts a timestamp column to Unix Epoch Float.
+
             Args:
                 timestamp_column: Timestamp column to convert.
+
             Returns:
-                pd.Series: Converted timestamp column to Unix Epoch float.
+                Timestamp column converted to Unix Epoch float.
             """
             # check if timestamp column contains missing values and raise error
             if timestamp_column.isna().any():
@@ -370,7 +392,7 @@ class NumpyEvent:
                 timestamps=timestamps,
             )
 
-        return NumpyEvent(
+        return EventSet(
             data=data,
             feature_names=feature_names,
             index_names=index_names,
@@ -378,10 +400,10 @@ class NumpyEvent:
         )
 
     def to_dataframe(self) -> pd.DataFrame:
-        """Convert a NumpyEvent to a pandas DataFrame.
+        """Convert a EventSet to a pandas DataFrame.
 
         Returns:
-            pd.DataFrame: DataFrame created from NumpyEvent.
+            DataFrame created from EventSet.
         """
         column_names = self._index_names + self._feature_names + ["timestamp"]
         data = {column_name: [] for column_name in column_names}
@@ -454,10 +476,13 @@ class NumpyEvent:
 
     def __eq__(self, __o: object) -> bool:
         # tolerance levels for float comparison. TODO: move to appropiate place
+
+        # TODO: Remove. Equality tests should be exact. Create a "Near" function
+        # if necessary.
         rtol = 1e-9
         atol = 1e-9
 
-        if not isinstance(__o, NumpyEvent):
+        if not isinstance(__o, EventSet):
             return False
 
         # check same features
@@ -518,8 +543,8 @@ class NumpyEvent:
         return True
 
     def plot(self, *args, **wargs) -> Any:
-        """Plots an event. See tp.plot for details."""
+        """Plots the event set. See tp.plot for details."""
 
         from temporian.implementation.numpy.data import plotter
 
-        return plotter.plot(events=self, *args, **wargs)
+        return plotter.plot(evsets=self, *args, **wargs)

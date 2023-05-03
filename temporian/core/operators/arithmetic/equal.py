@@ -12,20 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Arithmetic Equal Operator"""
+"""Equal operator class and public API function definition."""
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
 from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
 
 
 class EqualOperator(BaseArithmeticOperator):
-    """
-    Compares two Events element wise
-    """
-
     @classmethod
     @property
     def operator_def_key(cls) -> str:
@@ -46,21 +42,25 @@ operator_lib.register_operator(EqualOperator)
 
 
 def equal(
-    event_1: Event,
-    event_2: Event,
-) -> Event:
-    """
-    Compares two event features element wise
+    node_1: Node,
+    node_2: Node,
+) -> Node:
+    """Checks for equality between two nodes.
+
+    Each feature in `node_1` is compared element-wise to the feature in
+    `node_2` in the same position.
+
+    `node_1` and `node_2` must have the same sampling and the same number of
+    features.
 
     Args:
-        event_1: First event
-        event_2: Second event
+        node_1: First node.
+        node_2: Second node.
 
     Returns:
-        Event: Event with features equal to the result of the comparison. True
-            if the features are equal, False otherwise.
+        Node containing the result of the comparison.
     """
     return EqualOperator(
-        event_1=event_1,
-        event_2=event_2,
-    ).outputs["event"]
+        node_1=node_1,
+        node_2=node_2,
+    ).outputs["node"]

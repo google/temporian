@@ -21,16 +21,16 @@ from temporian.implementation.numpy.operators.arithmetic.base import (
 
 
 class AddNumpyImplementation(BaseArithmeticNumpyImplementation):
-    """Numpy implementation of arithmetic addition"""
+    """Numpy implementation of add operator."""
 
     def __init__(self, operator: AddOperator) -> None:
         super().__init__(operator)
         assert isinstance(operator, AddOperator)
 
     def _do_operation(
-        self, event_1_feature: np.ndarray, event_2_feature: np.ndarray
+        self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
     ) -> np.ndarray:
-        return event_1_feature + event_2_feature
+        return evset_1_feature + evset_2_feature
 
 
 implementation_lib.register_operator_implementation(

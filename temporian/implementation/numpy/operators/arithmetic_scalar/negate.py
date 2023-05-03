@@ -22,7 +22,7 @@ from temporian.implementation.numpy import implementation_lib
 
 
 class NegateNumpyImplementation(BaseArithmeticScalarNumpyImplementation):
-    """Numpy implementation of negation operator"""
+    """Numpy implementation of the negate operator."""
 
     def __init__(self, operator: NegateOperator) -> None:
         super().__init__(operator)

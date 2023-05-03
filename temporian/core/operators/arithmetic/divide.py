@@ -12,28 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Division Operator"""
+"""Divide operator class and public API function definition."""
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
 
 
 class DivideOperator(BaseArithmeticOperator):
-    """
-    Divide first event by second one
-    """
-
     def __init__(
         self,
-        event_1: Event,
-        event_2: Event,
+        node_1: Node,
+        node_2: Node,
     ):
-        super().__init__(event_1, event_2)
+        super().__init__(node_1, node_2)
 
-        # Assuming previous dtype check of event_1 and event_2 features
-        for feat in event_1.features:
+        # Assuming previous dtype check of node_1 and node_2 features
+        for feat in node_1.features:
             if feat.dtype in [DType.INT32, DType.INT64]:
                 raise ValueError(
                     "Cannot use the divide operator on feature "
@@ -56,19 +52,25 @@ operator_lib.register_operator(DivideOperator)
 
 
 def divide(
-    numerator: Event,
-    denominator: Event,
-) -> Event:
-    """
-    Divide two events.
+    numerator: Node,
+    denominator: Node,
+) -> Node:
+    """Divides two nodes.
+
+    Each feature in `numerator` is divided by the feature in `denominator` in
+    the same position.
+
+    `numerator` and `denominator` must have the same sampling and the same
+    number of features.
 
     Args:
-        numerator: Numerator event
-        denominator: Denominator event
+        numerator: Numerator node.
+        denominator: Denominator node.
+
     Returns:
-        Event: Division of numerator features and denominator features
+        Division of `numerator`'s features by `denominator`'s features.
     """
     return DivideOperator(
-        event_1=numerator,
-        event_2=denominator,
-    ).outputs["event"]
+        node_1=numerator,
+        node_2=denominator,
+    ).outputs["node"]

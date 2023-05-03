@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""A sampling."""
+"""Sampling class definition."""
 
 from __future__ import annotations
 from enum import Enum
@@ -98,6 +98,25 @@ class Index:
 
 
 class Sampling(object):
+    """Lists of timestamps corresponding to unique values in an Index.
+
+    A sampling consists of a (possibly multi-level) index, and a list of
+    timestamps for each of the unique pairs of values present in it.
+
+    A sampling holds no actual data, but rather describes the structure (or
+    "schema") of data during evaluation.
+
+    A sampling's values can correspond to actual Unix timestamps, but also to
+    any arbitrary number that represents a time (e.g. the number of seconds that
+    passed since an experiment's start time).
+
+    Attributes:
+        creator: Operator that created this sampling. Can be None if it wasn't
+            created by an operator.
+        index: Names of the columns that compose this sampling's index.
+        is_unix_timestamp: Whether values correspond to Unix timestamps.
+    """
+
     def __init__(
         self,
         index_levels: Union[

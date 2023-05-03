@@ -12,23 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Subtract a scalar from an event"""
+"""Subtract scalar operator class and public API function definition."""
+
 from typing import Union, List
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarOperator,
 )
 
 
 class SubtractScalarOperator(BaseArithmeticScalarOperator):
-    """
-    Subtract a scalar from an event, feature to feature according to their
-    position.
-    """
-
     @classmethod
     @property
     def operator_def_key(cls) -> str:
@@ -55,37 +51,41 @@ SCALAR = Union[float, int]
 
 
 def subtract_scalar(
-    minuend: Union[Event, SCALAR],
-    subtrahend: Union[Event, SCALAR],
-) -> Event:
-    """
-    Subtracts the subtrahend from the minuend and returns the difference.
+    minuend: Union[Node, SCALAR],
+    subtrahend: Union[Node, SCALAR],
+) -> Node:
+    """Subtracts a node and a scalar value.
+
+    Each item in each feature in the node is subtracted with the scalar value.
+
+    Either `minuend` or `subtrahend` should be a scalar value, but not both. If
+    looking to subtract two nodes, use the `subtract` operator instead.
 
     Args:
-        minuend: The number or event being subtracted from.
-        subtrahend: The number or event being subtracted.
+        minuend: Node or scalar value being subtracted from.
+        subtrahend: Node or scalar number being subtracted.
 
     Returns:
-        Event: Event with the difference between the minuend and subtrahend.
+        Node with the difference between the minuend and subtrahend.
     """
     scalars_types = (float, int)
 
-    if isinstance(minuend, Event) and isinstance(subtrahend, scalars_types):
+    if isinstance(minuend, Node) and isinstance(subtrahend, scalars_types):
         return SubtractScalarOperator(
-            event=minuend,
+            node=minuend,
             value=subtrahend,
             is_value_first=False,
-        ).outputs["event"]
+        ).outputs["node"]
 
-    if isinstance(minuend, scalars_types) and isinstance(subtrahend, Event):
+    if isinstance(minuend, scalars_types) and isinstance(subtrahend, Node):
         return SubtractScalarOperator(
-            event=subtrahend,
+            node=subtrahend,
             value=minuend,
             is_value_first=True,
-        ).outputs["event"]
+        ).outputs["node"]
 
     raise ValueError(
         "Invalid input types for subtract_scalar. "
-        "Expected (Event, SCALAR) or (SCALAR, Event), "
+        "Expected (Node, SCALAR) or (SCALAR, Node), "
         f"got ({type(minuend)}, {type(subtrahend)})."
     )

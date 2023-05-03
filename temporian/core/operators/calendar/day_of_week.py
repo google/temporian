@@ -12,18 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Calendar day of week operator."""
+"""Calendar day of week operator class and public API function definitions."""
 
 from temporian.core import operator_lib
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators.calendar.base import BaseCalendarOperator
 
 
 class CalendarDayOfWeekOperator(BaseCalendarOperator):
-    """
-    Calendar operator to obtain the day of the week each timestamp belongs to.
-    """
-
     @classmethod
     @property
     def operator_def_key(cls) -> str:
@@ -38,17 +34,18 @@ class CalendarDayOfWeekOperator(BaseCalendarOperator):
 operator_lib.register_operator(CalendarDayOfWeekOperator)
 
 
-def calendar_day_of_week(sampling: Event) -> Event:
-    """Obtain the day of the week each of the timestamps in an event's sampling
-    belongs to. Features in input event are ignored. Output feature contains
-    numbers from 0 (Monday) to 6 (Sunday).
+def calendar_day_of_week(sampling: Node) -> Node:
+    """Obtains the day of the week the timestamps in a node's sampling are in.
+
+    Features in input node are ignored. Output feature contains numbers from 0
+    (Monday) to 6 (Sunday).
 
     Args:
-        sampling: the event to get the days of week from.
+        sampling: Node to get the days of week from.
 
     Returns:
-        event with a single feature corresponding to the day of the week
-            each timestamp in `event`'s sampling belongs to, with the same
-            sampling as `event`.
+        Node with a single feature corresponding to the day of the week each
+        timestamp in `node`'s sampling belongs to, with the same sampling as
+        `node`.
     """
-    return CalendarDayOfWeekOperator(sampling).outputs["event"]
+    return CalendarDayOfWeekOperator(sampling).outputs["node"]

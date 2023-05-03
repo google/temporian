@@ -12,47 +12,44 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Base class for arithmetic operators"""
+"""Base arithmetic operator class definition."""
 
 from abc import abstractmethod
 
 from temporian.core.data.dtype import DType
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
 class BaseArithmeticOperator(Operator):
-    """Base Arithmetic operator."""
+    """Interface definition and common logic for arithmetic operators."""
 
     def __init__(
         self,
-        event_1: Event,
-        event_2: Event,
+        node_1: Node,
+        node_2: Node,
     ):
         super().__init__()
 
         # inputs
-        self.add_input("event_1", event_1)
-        self.add_input("event_2", event_2)
+        self.add_input("node_1", node_1)
+        self.add_input("node_2", node_2)
 
-        if event_1.sampling is not event_2.sampling:
-            raise ValueError("event_1 and event_2 must have same sampling.")
+        if node_1.sampling is not node_2.sampling:
+            raise ValueError("node_1 and node_2 must have same sampling.")
 
-        if len(event_1.features) != len(event_2.features):
+        if len(node_1.features) != len(node_2.features):
             raise ValueError(
-                "event_1 and event_2 must have same number of features."
+                "node_1 and node_2 must have same number of features."
             )
 
         # check that features have same dtype
-        for feature_1, feature_2 in zip(event_1.features, event_2.features):
+        for feature_1, feature_2 in zip(node_1.features, node_2.features):
             if feature_1.dtype != feature_2.dtype:
                 raise ValueError(
-                    (
-                        "event_1 and event_2 must have same dtype for each"
-                        " feature."
-                    ),
+                    "node_1 and node_2 must have same dtype for each feature.",
                     (
                         f"feature_1: {feature_1}, feature_2: {feature_2} have"
                         " dtypes:"
@@ -60,7 +57,7 @@ class BaseArithmeticOperator(Operator):
                     f"{feature_1.dtype}, {feature_2.dtype}.",
                 )
 
-        sampling = event_1.sampling
+        sampling = node_1.sampling
 
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
@@ -70,12 +67,12 @@ class BaseArithmeticOperator(Operator):
                 sampling=sampling,
                 creator=self,
             )
-            for feature_1, feature_2 in zip(event_1.features, event_2.features)
+            for feature_1, feature_2 in zip(node_1.features, node_2.features)
         ]
 
         self.add_output(
-            "event",
-            Event(
+            "node",
+            Node(
                 features=output_features,
                 sampling=sampling,
                 creator=self,
@@ -89,22 +86,22 @@ class BaseArithmeticOperator(Operator):
             key=cls.operator_def_key,
             attributes=[],
             inputs=[
-                pb.OperatorDef.Input(key="event_1"),
-                pb.OperatorDef.Input(key="event_2"),
+                pb.OperatorDef.Input(key="node_1"),
+                pb.OperatorDef.Input(key="node_2"),
             ],
-            outputs=[pb.OperatorDef.Output(key="event")],
+            outputs=[pb.OperatorDef.Output(key="node")],
         )
 
     @classmethod
     @property
     @abstractmethod
     def operator_def_key(cls) -> str:
-        """Get the key of the operator definition."""
+        """Gets the key of the operator definition."""
 
     @property
     @abstractmethod
     def prefix(self) -> str:
-        """Get the prefix to use for the output features."""
+        """Gets the prefix to use for the output features."""
 
     def output_feature_name(
         self, feature_1: Feature, feature_2: Feature

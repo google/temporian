@@ -12,18 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Calendar day of month operator."""
+"""Calendar day of month operator class and public API function definitions."""
 
 from temporian.core import operator_lib
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators.calendar.base import BaseCalendarOperator
 
 
 class CalendarDayOfMonthOperator(BaseCalendarOperator):
-    """
-    Calendar operator to obtain the day of the month each timestamp belongs to.
-    """
-
     @classmethod
     @property
     def operator_def_key(cls) -> str:
@@ -38,17 +34,18 @@ class CalendarDayOfMonthOperator(BaseCalendarOperator):
 operator_lib.register_operator(CalendarDayOfMonthOperator)
 
 
-def calendar_day_of_month(sampling: Event) -> Event:
-    """Obtain the day of month each of the timestamps in an event's sampling
-    belongs to. Features in input event are ignored. Output feature contains
-    numbers between 1 and 31.
+def calendar_day_of_month(sampling: Node) -> Node:
+    """Obtains the day of month the timestamps in a node's sampling are in.
+
+    Features in input node are ignored. Output feature contains numbers between
+    1 and 31.
 
     Args:
-        sampling: the event to get the days of month from.
+        sampling: Node to get the days of month from.
 
     Returns:
-        event with a single feature corresponding to the day of the month
-            each timestamp in `event`'s sampling belongs to, with the same
-            sampling as `event`.
+        Node with a single feature corresponding to the day of the month each
+        timestamp in `node`'s sampling belongs to, with the same sampling as
+        `node`.
     """
-    return CalendarDayOfMonthOperator(sampling).outputs["event"]
+    return CalendarDayOfMonthOperator(sampling).outputs["node"]

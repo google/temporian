@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Operator module."""
+"""Base operator class and auxiliary classes definition."""
 
 from abc import ABC
-from typing import Any, Union
+from typing import Union
 
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.proto import core_pb2 as pb
 
 
@@ -55,11 +55,11 @@ class OperatorExceptionDecorator(object):
 
 
 class Operator(ABC):
-    """Operator interface."""
+    """Interface definition and common logic for operators."""
 
     def __init__(self):
-        self._inputs: dict[str, Event] = {}
-        self._outputs: dict[str, Event] = {}
+        self._inputs: dict[str, Node] = {}
+        self._outputs: dict[str, Node] = {}
         self._attributes: dict[str, AttributeType] = {}
         self._definition: pb.OperatorDef = self.build_op_definition()
         self._attr_types: dict[str:type] = {
@@ -77,11 +77,11 @@ class Operator(ABC):
         return self._attributes
 
     @property
-    def inputs(self) -> dict[str, Event]:
+    def inputs(self) -> dict[str, Node]:
         return self._inputs
 
     @property
-    def outputs(self) -> dict[str, Event]:
+    def outputs(self) -> dict[str, Node]:
         return self._outputs
 
     @attributes.setter
@@ -89,24 +89,24 @@ class Operator(ABC):
         self._attributes = attributes
 
     @inputs.setter
-    def inputs(self, inputs: dict[str, Event]):
+    def inputs(self, inputs: dict[str, Node]):
         self._inputs = inputs
 
     @outputs.setter
-    def outputs(self, outputs: dict[str, Event]):
+    def outputs(self, outputs: dict[str, Node]):
         self._outputs = outputs
 
-    def add_input(self, key: str, event: Event) -> None:
+    def add_input(self, key: str, node: Node) -> None:
         with OperatorExceptionDecorator(self):
             if key in self.inputs:
                 raise ValueError(f'Already existing input "{key}".')
-            self.inputs[key] = event
+            self.inputs[key] = node
 
-    def add_output(self, key: str, event: Event) -> None:
+    def add_output(self, key: str, node: Node) -> None:
         with OperatorExceptionDecorator(self):
             if key in self.outputs:
                 raise ValueError(f'Already existing output "{key}".')
-            self.outputs[key] = event
+            self.outputs[key] = node
 
     def add_attribute(self, key: str, value: AttributeType) -> None:
         with OperatorExceptionDecorator(self):
@@ -118,7 +118,6 @@ class Operator(ABC):
 
     def check(self) -> None:
         """Ensures that the operator is valid."""
-
         definition = self.definition()
 
         with OperatorExceptionDecorator(self):
@@ -180,7 +179,6 @@ class Operator(ABC):
         This function is used to check the correct implementation of ops are
         runtime.
         """
-
         # TODO: Optimize the number of matches: We don't need all the currently
         # computed matches to check the output validity.
         matches: list[tuple[str, str]] = []

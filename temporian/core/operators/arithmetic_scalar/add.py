@@ -12,22 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Arithmetic Addition Scalar Operator"""
+"""Add scalar operator class and public API function definition."""
+
 from typing import Union, List
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarOperator,
 )
 
 
 class AddScalarOperator(BaseArithmeticScalarOperator):
-    """
-    Applies arithmetic addition between an event and a scalar value.
-    """
-
     @classmethod
     @property
     def operator_def_key(cls) -> str:
@@ -51,20 +48,21 @@ operator_lib.register_operator(AddScalarOperator)
 
 
 def add_scalar(
-    event: Event,
+    node: Node,
     value: Union[float, int],
-) -> Event:
-    """
-    Adds element-wise an event and a scalar value.
+) -> Node:
+    """Adds a scalar value to a node.
+
+    `value` is added to each item in each feature in `node`.
 
     Args:
-        event: Event to perform addition to.
-        value: Scalar value to add to all event features.
+        node: Node to add a scalar to.
+        value: Scalar value to add to the node.
 
     Returns:
-        Event: Event with the addition of event features and value.
+        Addition of `node` and `value`.
     """
     return AddScalarOperator(
-        event=event,
+        node=node,
         value=value,
-    ).outputs["event"]
+    ).outputs["node"]

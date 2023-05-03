@@ -14,7 +14,7 @@
 
 from absl.testing import absltest
 
-from temporian.core.data import event as event_lib
+from temporian.core.data import node as node_lib
 from temporian.core.data.dtype import DType
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
@@ -26,7 +26,7 @@ class PropagateOperatorTest(absltest.TestCase):
         pass
 
     def test_basic(self):
-        event = event_lib.input_event(
+        node = node_lib.input_node(
             [
                 Feature("a", DType.FLOAT64),
                 Feature("b", DType.FLOAT64),
@@ -35,17 +35,17 @@ class PropagateOperatorTest(absltest.TestCase):
                 index_levels=[("x", DType.STRING)], is_unix_timestamp=False
             ),
         )
-        sampling = event_lib.input_event(
+        sampling = node_lib.input_node(
             [],
             sampling=Sampling(
                 index_levels=[("x", DType.STRING), ("y", DType.STRING)],
                 is_unix_timestamp=False,
             ),
         )
-        _ = propagate(event=event, sampling=sampling)
+        _ = propagate(node=node, sampling=sampling)
 
     def test_error_wrong_index(self):
-        event = event_lib.input_event(
+        node = node_lib.input_node(
             [
                 Feature("a", DType.FLOAT64),
                 Feature("b", DType.FLOAT64),
@@ -54,7 +54,7 @@ class PropagateOperatorTest(absltest.TestCase):
                 index_levels=[("z", DType.STRING)], is_unix_timestamp=False
             ),
         )
-        sampling = event_lib.input_event(
+        sampling = node_lib.input_node(
             [],
             sampling=Sampling(
                 index_levels=[("x", DType.STRING), ("y", DType.STRING)],
@@ -63,12 +63,12 @@ class PropagateOperatorTest(absltest.TestCase):
         )
         with self.assertRaisesRegex(
             ValueError,
-            "The index of event should be contained in the index of sampling",
+            "The index of node should be contained in the index of sampling",
         ):
-            _ = propagate(event=event, sampling=sampling)
+            _ = propagate(node=node, sampling=sampling)
 
     def test_error_wrong_index_type(self):
-        event = event_lib.input_event(
+        node = node_lib.input_node(
             [
                 Feature("a", DType.FLOAT64),
                 Feature("b", DType.FLOAT64),
@@ -77,7 +77,7 @@ class PropagateOperatorTest(absltest.TestCase):
                 index_levels=[("x", DType.INT32)], is_unix_timestamp=False
             ),
         )
-        sampling = event_lib.input_event(
+        sampling = node_lib.input_node(
             [],
             sampling=Sampling(
                 index_levels=[("x", DType.STRING), ("y", DType.STRING)],
@@ -88,7 +88,7 @@ class PropagateOperatorTest(absltest.TestCase):
             ValueError,
             "However, the dtype is different",
         ):
-            _ = propagate(event=event, sampling=sampling)
+            _ = propagate(node=node, sampling=sampling)
 
 
 if __name__ == "__main__":

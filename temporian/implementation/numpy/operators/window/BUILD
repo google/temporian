@@ -19,7 +19,7 @@ py_library(
     deps = [
         "//temporian/core/data:duration",
         "//temporian/core/operators/window:base",
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/operators:base",
     ],
 )
@@ -32,7 +32,7 @@ py_library(
         ":base",
         "//temporian/core/operators/window:simple_moving_average",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy_cc/operators:window",
     ],
 )
@@ -45,7 +45,7 @@ py_library(
         ":base",
         "//temporian/core/operators/window:moving_standard_deviation",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy_cc/operators:window",
     ],
 )
@@ -58,7 +58,7 @@ py_library(
         ":base",
         "//temporian/core/operators/window:moving_sum",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy_cc/operators:window",
     ],
 )
@@ -71,7 +71,7 @@ py_library(
         ":base",
         "//temporian/core/operators/window:moving_count",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy_cc/operators:window",
     ],
 )

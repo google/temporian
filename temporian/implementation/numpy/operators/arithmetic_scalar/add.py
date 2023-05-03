@@ -23,7 +23,7 @@ from temporian.implementation.numpy import implementation_lib
 
 
 class AddScalarNumpyImplementation(BaseArithmeticScalarNumpyImplementation):
-    """Numpy implementation of arithmetic scalar addition"""
+    """Numpy implementation of the add scalar operator."""
 
     def __init__(self, operator: AddScalarOperator) -> None:
         super().__init__(operator)

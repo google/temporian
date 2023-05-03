@@ -19,7 +19,7 @@ py_library(
     deps = [
         "//temporian/core/operators/arithmetic_scalar",
         "//temporian/core/operators/arithmetic_scalar:base",
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/operators:base",
     ],
 )
@@ -32,7 +32,7 @@ py_library(
         ":base",
         "//temporian/core/operators/arithmetic_scalar:add",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -44,7 +44,7 @@ py_library(
         ":base",
         "//temporian/core/operators/arithmetic_scalar:equal",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -56,7 +56,7 @@ py_library(
         ":base",
         "//temporian/core/operators/arithmetic_scalar:subtract",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -68,7 +68,7 @@ py_library(
         ":base",
         "//temporian/core/operators/arithmetic_scalar:multiply",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -80,7 +80,7 @@ py_library(
         ":base",
         "//temporian/core/operators/arithmetic_scalar:negate",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -92,7 +92,7 @@ py_library(
         ":base",
         "//temporian/core/operators/arithmetic_scalar:divide",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -104,6 +104,6 @@ py_library(
         ":base",
         "//temporian/core/operators/arithmetic_scalar:floordiv",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )

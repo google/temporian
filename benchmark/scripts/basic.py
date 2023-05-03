@@ -11,8 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-Basic profiling script for temporian.
+"""Basic profiling script for temporian.
 
 The script creates two events, applies some operators, and evaluates the graph.
 """
@@ -20,7 +19,7 @@ The script creates two events, applies some operators, and evaluates the graph.
 import numpy as np
 import pandas as pd
 import temporian as tp
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 
 # Make results reproducible
 np.random.seed(0)
@@ -48,7 +47,7 @@ def main():
     product_ids = np.random.choice(ids, N)
     store_ids = np.random.choice(ids, N)
 
-    event_1_data = NumpyEvent.from_dataframe(
+    evset_1 = EventSet.from_dataframe(
         pd.DataFrame(
             {
                 STORE: store_ids,
@@ -60,7 +59,7 @@ def main():
         index_names=[STORE, PRODUCT],
     )
 
-    event_2_data = NumpyEvent.from_dataframe(
+    evset_2 = EventSet.from_dataframe(
         pd.DataFrame(
             {
                 STORE: store_ids,
@@ -72,21 +71,19 @@ def main():
         index_names=[STORE, PRODUCT],
     )
 
-    event_1_data.sampling = event_2_data.sampling
+    node_1 = evset_1.node()
+    node_2 = evset_2.node()
+    node_2._sampling = node_1._sampling
 
-    event_1 = event_1_data.schema()
-    event_2 = event_2_data.schema()
-    event_2._sampling = event_1._sampling
-
-    a = tp.glue(event_1, event_2)
-    b = tp.simple_moving_average(a, window_length=10.0)
+    a = tp.glue(node_1, node_2)
+    b = tp.prefix("sma_", tp.simple_moving_average(a, window_length=10.0))
     c = tp.glue(a, tp.sample(b, a))
 
-    res: NumpyEvent = tp.evaluate(
+    res: EventSet = tp.evaluate(
         c,
         input_data={
-            event_1: event_1_data,
-            event_2: event_2_data,
+            node_1: evset_1,
+            node_2: evset_2,
         },
         check_execution=False,
     )

@@ -62,7 +62,7 @@ def convert_date_to_duration(date: Timestamp) -> Duration:
     epoch).
 
     Args:
-        date: the date to convert.
+        date: date to convert.
 
     Returns:
         int: unix timestamp (seconds elapsed from unix epoch).

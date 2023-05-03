@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Evaluator module."""
+"""Construction and evaluation of an operator schedule for a set of inputs."""
 
 import time
 import sys
@@ -20,16 +20,16 @@ import pathlib
 from typing import Any, Dict, List, Set, Union
 from collections import defaultdict
 
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators import base
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core import processor as processor_lib
 from temporian.implementation.numpy import evaluator as numpy_evaluator
 
 AvailableBackends = Any
-Data = Dict[Event, Union[str, pathlib.Path, NumpyEvent]]
-Query = Union[Event, List[Event], Dict[str, Event]]
-Result = Union[NumpyEvent, List[NumpyEvent], Dict[str, NumpyEvent]]
+Data = Dict[Node, Union[str, pathlib.Path, EventSet]]
+Query = Union[Node, List[Node], Dict[str, Node]]
+Result = Union[EventSet, List[EventSet], Dict[str, EventSet]]
 
 
 def evaluate(
@@ -38,34 +38,33 @@ def evaluate(
     verbose: int = 1,
     check_execution: bool = True,
 ) -> Result:
-    """Evaluates a query on data.
+    """Evaluates nodes on event sets.
 
     Args:
-        query: Events to compute. Support event, dict and list of events.
-        input_data: Dictionary of event and event values to use for the
-          computation.
+        query: Nodes to compute. Supports node, dict and list of nodes.
+        input_data: Dictionary of node to event sets to use for the
+            computation.
         verbose: If >0, prints details about the execution on the standard error
-          output. The larger the number, the more information is displayed.
+            output. The larger the number, the more information is displayed.
         check_execution: If true, the input and output of the op implementation
-          are validated to check any bug in the library internal code. If false,
-          checks are skipped.
-
-    TODO: Create an internal configuration object for options such as
-    "check_execution".
+            are validated to check any bug in the library internal code. If
+            false, checks are skipped.
 
     Returns:
-        An object with the same structure as "event" containing the results. For
-        instance, if "event" is a dictionary of events, the returned object
-        will be a dictionary of event results. If "event" is a list of events,
-        the returned value will be a list of event values with the same order.
+        An object with the same structure as `query` containing the results.
+        If `query` is a dictionary of nodes, the returned object will be a
+        dictionary of event sets. If `query` is a list of nodes, the
+        returned value will be a list of event sets with the same order.
     """
+    # TODO: Create an internal configuration object for options such as
+    # `check_execution`.
 
     begin_time = time.perf_counter()
 
-    # Normalize the user query into a list query events.
-    normalized_query: List[Event] = {}
+    # Normalize the user query into a list of query nodes.
+    normalized_query: List[Node] = {}
 
-    if isinstance(query, Event):
+    if isinstance(query, Node):
         # The query is a single value
         normalized_query = [query]
 
@@ -88,9 +87,9 @@ def evaluate(
         print("Build schedule", file=sys.stderr)
 
     # Schedule execution
-    input_events = list(input_data.keys())
+    input_nodes = list(input_data.keys())
     schedule = build_schedule(
-        inputs=input_events, outputs=normalized_query, verbose=verbose
+        inputs=input_nodes, outputs=normalized_query, verbose=verbose
     )
 
     if verbose == 1:
@@ -116,7 +115,7 @@ def evaluate(
         print(f"Execution in {end_time - begin_time:.5f} s", file=sys.stderr)
 
     # Convert the result "outputs" into the same format as the query.
-    if isinstance(query, Event):
+    if isinstance(query, Node):
         return outputs[query]
 
     elif isinstance(query, list):
@@ -133,20 +132,20 @@ def evaluate(
 
 
 def build_schedule(
-    inputs: List[Event],
-    outputs: List[Event],
+    inputs: List[Node],
+    outputs: List[Node],
     verbose: int = 0,
 ) -> List[base.Operator]:
     """Calculates which operators need to be executed in which order to
-    compute a set of output events given a set of input events.
+    compute a set of output nodes given a set of input nodes.
 
     This implementation is based on Kahn's algorithm.
 
     Args:
-        inputs: Input events.
-        outputs: Output events.
+        inputs: Input nodes.
+        outputs: Output nodes.
         verbose: If >0, prints details about the execution on the standard error
-          output. The larger the number, the more information is displayed.
+            output. The larger the number, the more information is displayed.
 
     Returns:
         Ordered list of operators, such that the first operator should be
@@ -157,7 +156,7 @@ def build_schedule(
         """Converts a list into a dict with a text index key."""
         return {str(i): x for i, x in enumerate(l)}
 
-    # List all events and operators in between inputs and outputs.
+    # List all nodes and operators in between inputs and outputs.
     #
     # Fails if the outputs cannot be computed from the inputs e.g. some inputs
     # are missing.
@@ -177,23 +176,23 @@ def build_schedule(
     # "inputs".
     ready_ops: Set[base.Operator] = set()
 
-    # "event_to_op[e]" is the list of operators with event "e" as input.
-    event_to_op: Dict[Event, List[base.Operator]] = defaultdict(lambda: [])
+    # "node_to_op[e]" is the list of operators with node "e" as input.
+    node_to_op: Dict[Node, List[base.Operator]] = defaultdict(lambda: [])
 
     # "op_to_num_pending_inputs[op]" is the number of "not yet scheduled" inputs
     # of operator "op". Operators in "op_to_num_pending_inputs" have not yet
     # scheduled.
     op_to_num_pending_inputs: Dict[base.Operator, int] = defaultdict(lambda: 0)
 
-    # Compute "event_to_op" and "op_to_num_pending_inputs".
+    # Compute "node_to_op" and "op_to_num_pending_inputs".
     inputs_set = set(inputs)
     for op in processor.operators:
         num_pending_inputs = 0
-        for input_event in op.inputs.values():
-            if input_event in inputs_set:
+        for input_node in op.inputs.values():
+            if input_node in inputs_set:
                 # This input is already available
                 continue
-            event_to_op[input_event].append(op)
+            node_to_op[input_node].append(op)
             num_pending_inputs += 1
         if num_pending_inputs == 0:
             # Ready to be scheduled
@@ -213,9 +212,9 @@ def build_schedule(
         # Update all the ops that depends on "op". Enlist the ones that are
         # ready to be computed
         for output in op.outputs.values():
-            if output not in event_to_op:
+            if output not in node_to_op:
                 continue
-            for new_op in event_to_op[output]:
+            for new_op in node_to_op[output]:
                 # "new_op" depends on the result of "op".
                 assert new_op in op_to_num_pending_inputs
                 num_missing_inputs = op_to_num_pending_inputs[new_op] - 1

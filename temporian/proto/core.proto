@@ -17,12 +17,12 @@ syntax = "proto2";
 
 package temporian.proto;
 
-// A processor defines a set of processing operations and holds all Event,
+// A processor defines a set of processing operations and holds all Node,
 // Feature and Sampling instances.
 message Processor {
   repeated Operator operators = 1;
 
-  repeated Event events = 2;
+  repeated Node nodes = 2;
 
   repeated Feature features = 3;
 
@@ -36,7 +36,7 @@ message Processor {
 // The input or output of a processor.
 message IOSignature {
     optional string key = 1;
-    optional string event_id = 2;
+    optional string node_id = 2;
 }
 
 // Instantiation of an operator in a processor.
@@ -47,20 +47,20 @@ message Operator {
   // Key of the operator definition.
   optional string operator_def_key = 2;
 
-  // Input event ids by key.
-  repeated EventArgument inputs = 3;
+  // Input node ids by key.
+  repeated NodeArgument inputs = 3;
 
-  // Output event ids by key.
-  repeated EventArgument outputs = 4;
+  // Output node ids by key.
+  repeated NodeArgument outputs = 4;
 
   // Constructor attributes.
   repeated Attribute attributes = 5;
 
-  message EventArgument {
+  message NodeArgument {
     // Name of the argument.
     optional string key = 1;
 
-    optional string event_id = 2;
+    optional string node_id = 2;
   }
 
   message Attribute {
@@ -96,16 +96,16 @@ enum DType {
   STRING = 6;
 }
 
-// Schema of an event
-message Event {
-  // Identifier of the event. Should be unique across all the events of the
+// Schema of an event set
+message Node {
+  // Identifier of the node. Should be unique across all the nodes of the
   // processor.
   optional string id = 1;
 
-  // Identifier of the sampling of the event.
+  // Identifier of the sampling of the node.
   optional string sampling_id = 2;
 
-  // Features in the event.
+  // Features in the node.
   repeated string feature_ids = 3;
 
   optional string name = 4;
@@ -150,7 +150,7 @@ message Sampling {
   // Index of the sampling.
   optional Index index = 2;
 
-  // Index of the event id who's operator creator also created this feature.
+  // Index of the node id who's operator creator also created this feature.
   optional string creator_operator_id = 3;
 
   // True if the event timestamps can be converted to dates

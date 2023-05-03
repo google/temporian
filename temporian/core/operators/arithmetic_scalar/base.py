@@ -12,23 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Base class for arithmetic scalar operators"""
+"""Base arithmetic scalar operator class definition."""
+
 from typing import Union, List
 from abc import abstractmethod
 
 from temporian.core.data.dtype import DType
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
 class BaseArithmeticScalarOperator(Operator):
-    """Base Arithmetic scalar operator."""
+    """Interface definition and common logic for arithmetic scalar operators."""
 
     def __init__(
         self,
-        event: Event,
+        node: Node,
         value: Union[float, int, str, bool],
         is_value_first: bool = False,  # useful for non-commutative operators
     ):
@@ -38,17 +39,15 @@ class BaseArithmeticScalarOperator(Operator):
         self.is_value_first = is_value_first
 
         # inputs
-        self.add_input("event", event)
+        self.add_input("node", node)
 
         self.add_attribute("value", value)
         self.add_attribute("is_value_first", is_value_first)
 
-        if not isinstance(event, Event):
-            raise TypeError(
-                f"Event must be of type Event but got {type(event)}"
-            )
+        if not isinstance(node, Node):
+            raise TypeError(f"Node must be of type Node but got {type(node)}")
 
-        # check that every dtype of event feature is equal to value dtype
+        # check that every dtype of node feature is equal to value dtype
         value_dtype = DType.from_python_type(type(value))
 
         # check that value dtype is in self.dtypes_to_check
@@ -73,7 +72,7 @@ class BaseArithmeticScalarOperator(Operator):
             ],
         }
         if not self.ignore_value_dtype_checking:
-            for feature in event.features:
+            for feature in node.features:
                 if feature.dtype not in self.map_vtype_dtype[type(value)]:
                     raise ValueError(
                         f"Scalar has {type(value)=}, which can only operate"
@@ -86,17 +85,17 @@ class BaseArithmeticScalarOperator(Operator):
             Feature(
                 name=self.output_feature_name(feature.name),
                 dtype=self.output_feature_dtype(feature),
-                sampling=event.sampling,
+                sampling=node.sampling,
                 creator=self,
             )
-            for feature in event.features
+            for feature in node.features
         ]
 
         self.add_output(
-            "event",
-            Event(
+            "node",
+            Node(
                 features=output_features,
-                sampling=event.sampling,
+                sampling=node.sampling,
                 creator=self,
             ),
         )
@@ -119,21 +118,21 @@ class BaseArithmeticScalarOperator(Operator):
                 ),
             ],
             inputs=[
-                pb.OperatorDef.Input(key="event"),
+                pb.OperatorDef.Input(key="node"),
             ],
-            outputs=[pb.OperatorDef.Output(key="event")],
+            outputs=[pb.OperatorDef.Output(key="node")],
         )
 
     @classmethod
     @property
     @abstractmethod
     def operator_def_key(cls) -> str:
-        """Get the key of the operator definition."""
+        """Gets the key of the operator definition."""
 
     @property
     @abstractmethod
     def prefix(self) -> str:
-        """Get the prefix to use for the output features."""
+        """Gets the prefix to use for the output features."""
 
     @property
     @abstractmethod
@@ -148,5 +147,5 @@ class BaseArithmeticScalarOperator(Operator):
 
     @property
     def ignore_value_dtype_checking(self) -> bool:
-        """Return True if we want to ignore the value dtype checking."""
+        """Returns True if we want to ignore the value dtype checking."""
         return False

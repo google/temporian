@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Lag operator."""
+"""Lag operator class and public API function definitions."""
+
 from typing import List
 from typing import Union
 
 from temporian.core import operator_lib
 from temporian.core.data.duration import Duration
 from temporian.core.data.duration import duration_abbreviation
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.base import Operator
@@ -27,11 +28,9 @@ from temporian.proto import core_pb2 as pb
 
 
 class LagOperator(Operator):
-    """Lag operator."""
-
     def __init__(
         self,
-        event: Event,
+        node: Node,
         duration: Duration,
     ):
         super().__init__()
@@ -40,14 +39,14 @@ class LagOperator(Operator):
         self._duration_str = duration_abbreviation(duration)
 
         # inputs
-        self.add_input("event", event)
+        self.add_input("node", node)
 
         self.add_attribute("duration", duration)
 
         output_sampling = Sampling(
-            index_levels=event.sampling.index.levels,
+            index_levels=node.sampling.index.levels,
             creator=self,
-            is_unix_timestamp=event.sampling.is_unix_timestamp,
+            is_unix_timestamp=node.sampling.is_unix_timestamp,
         )
 
         # outputs
@@ -58,12 +57,12 @@ class LagOperator(Operator):
                 sampling=output_sampling,
                 creator=self,
             )
-            for f in event.features
+            for f in node.features
         ]
 
         self.add_output(
-            "event",
-            Event(
+            "node",
+            Node(
                 features=output_features,
                 sampling=output_sampling,
                 creator=self,
@@ -90,8 +89,8 @@ class LagOperator(Operator):
                     is_optional=False,
                 ),
             ],
-            inputs=[pb.OperatorDef.Input(key="event")],
-            outputs=[pb.OperatorDef.Output(key="event")],
+            inputs=[pb.OperatorDef.Input(key="node")],
+            outputs=[pb.OperatorDef.Output(key="node")],
         )
 
 
@@ -99,11 +98,11 @@ operator_lib.register_operator(LagOperator)
 
 
 def _implementation(
-    event: Event,
+    node: Node,
     duration: Union[Duration, List[Duration]],
     should_leak: bool = False,
-) -> Event:
-    """Lag & Leak Implementation."""
+) -> Node:
+    """Lags or leaks `node` depending on `should_leak`."""
 
     if not isinstance(duration, list):
         duration = [duration]
@@ -124,45 +123,54 @@ def _implementation(
 
     if len(used_duration) == 1:
         return LagOperator(
-            event=event,
+            node=node,
             duration=used_duration[0],
-        ).outputs["event"]
+        ).outputs["node"]
 
     return [
-        LagOperator(event=event, duration=d).outputs["event"]
+        LagOperator(node=node, duration=d).outputs["node"]
         for d in used_duration
     ]
 
 
 def lag(
-    event: Event, duration: Union[Duration, List[Duration]]
-) -> Union[Event, List[Event]]:
-    """Lag operator. Shifts the event sampling backwards in time by a specified
-    duration.
+    node: Node, duration: Union[Duration, List[Duration]]
+) -> Union[Node, List[Node]]:
+    """Shifts the node's sampling forwards in time by a specified duration.
+
+    Each timestamp in `node`'s sampling is shifted forwards by the specified
+    duration. If `duration` is a list, then the node will be lagged by each
+    duration in the list, and a list of nodes will be returned.
 
     Args:
-        event: Event to lag.
-        duration: Duration to lag by. Can be a list of Durations.
+        node: Node to lag the sampling of.
+        duration: Duration or list of Durations to lag by.
 
     Returns:
-        Lagged event. If a list of Durations is provided, a list of lagged
-        events is returned.
+        Lagged node, or list of lagged nodes if a Duration list was
+        provided.
     """
-    return _implementation(event=event, duration=duration)
+    return _implementation(node=node, duration=duration)
 
 
 def leak(
-    event: Event, duration: Union[Duration, List[Duration]]
-) -> Union[Event, List[Event]]:
-    """Leak operator. Shifts the event sampling forward in time by a specified
-    duration.
+    node: Node, duration: Union[Duration, List[Duration]]
+) -> Union[Node, List[Node]]:
+    """Shifts the node's sampling backwards in time by a specified duration.
+
+    Each timestamp in `node`'s sampling is shifted backwards by the specified
+    duration. If `duration` is a list, then the node will be leaked by each
+    duration in the list, and a list of nodes will be returned.
+
+    Note that this operator moves future data into the past, and should be used
+    with caution to prevent unwanted leakage.
 
     Args:
-        event: Event to leak.
-        duration: Duration to shift the sampling. Can be a list of Durations.
+        node: Node to leak the sampling of.
+        duration: Duration or list of Durations to leak by.
 
     Returns:
-        Leaked event. If a list of Durations is provided, a list of leaked
-        events is returned.
+        Leaked node, or list of leaked nodes if a Duration list was
+        provided.
     """
-    return _implementation(event=event, duration=duration, should_leak=True)
+    return _implementation(node=node, duration=duration, should_leak=True)

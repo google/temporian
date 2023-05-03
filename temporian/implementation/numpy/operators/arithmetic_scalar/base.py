@@ -19,8 +19,8 @@ import numpy as np
 from temporian.core.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarOperator,
 )
-from temporian.implementation.numpy.data.event import IndexData
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.event_set import IndexData
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -32,31 +32,29 @@ class BaseArithmeticScalarNumpyImplementation(OperatorImplementation, ABC):
     def _do_operation(
         self, feature: np.ndarray, value: Union[float, int, str, bool]
     ) -> np.ndarray:
-        """
-        Perform the actual arithmetic operation corresponding to the subclass
-        """
+        """Performs the arithmetic operation corresponding to the subclass."""
 
-    def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
-        """Apply the corresponding arithmetic operation between an event and a
-        scalar.
+    def __call__(self, node: EventSet) -> Dict[str, EventSet]:
+        """Applies the corresponding arithmetic operation between an event set
+        and a scalar.
 
         Args:
-            event: event to perform operation to.
+            node: Event set to perform the operation to.
 
         Returns:
-            Arithmetic of the event and the valye according to the operator.
+            Result of the operation.
         """
-        dst_event = NumpyEvent(
+        dst_evset = EventSet(
             data={},
             feature_names=[
                 self._operator.output_feature_name(feature_name)
-                for feature_name in event.feature_names
+                for feature_name in node.feature_names
             ],
-            index_names=event.index_names,
-            is_unix_timestamp=event.is_unix_timestamp,
+            index_names=node.index_names,
+            is_unix_timestamp=node.is_unix_timestamp,
         )
-        for index_key, index_data in event.iterindex():
-            dst_event[index_key] = IndexData(
+        for index_key, index_data in node.iterindex():
+            dst_evset[index_key] = IndexData(
                 [
                     self._do_operation(feature, self._operator.value)
                     for feature in index_data.features
@@ -64,4 +62,4 @@ class BaseArithmeticScalarNumpyImplementation(OperatorImplementation, ABC):
                 index_data.timestamps,
             )
 
-        return {"event": dst_event}
+        return {"node": dst_evset}

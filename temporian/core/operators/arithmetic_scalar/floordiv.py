@@ -12,22 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Floor or integer division scalar Operator"""
+"""Floor division scalar operator class and public API function definition."""
+
 from typing import Union, List
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarOperator,
 )
 
 
 class FloorDivScalarOperator(BaseArithmeticScalarOperator):
-    """
-    Integer division of an event and a scalar (i.e: a//10)
-    """
-
     @classmethod
     @property
     def operator_def_key(cls) -> str:
@@ -54,36 +51,41 @@ SCALAR = Union[float, int]
 
 
 def floordiv_scalar(
-    numerator: Union[Event, SCALAR],
-    denominator: Union[Event, SCALAR],
-) -> Event:
-    """
-    Divides element-wise an event and a scalar and takes the result floor.
+    numerator: Union[Node, SCALAR],
+    denominator: Union[Node, SCALAR],
+) -> Node:
+    """Divides a node and a scalar and takes the result's floor.
+
+    Each item in each feature in the node is divided with the scalar value.
+
+    Either `numerator` or `denominator` should be a scalar value, but not both.
+    If looking to floordiv two nodes, use the `floordiv` operator instead.
 
     Args:
-        numerator: Numerator.
-        denominator: Denominator.
+        numerator: Numerator node or value.
+        denominator: Denominator node or value.
+
     Returns:
-        Event: Integer division of numerator features and denominator value
+        Integer division of `numerator` and `denominator`.
     """
     scalars_types = (float, int)
 
-    if isinstance(numerator, Event) and isinstance(denominator, scalars_types):
+    if isinstance(numerator, Node) and isinstance(denominator, scalars_types):
         return FloorDivScalarOperator(
-            event=numerator,
+            node=numerator,
             value=denominator,
             is_value_first=False,
-        ).outputs["event"]
+        ).outputs["node"]
 
-    if isinstance(numerator, scalars_types) and isinstance(denominator, Event):
+    if isinstance(numerator, scalars_types) and isinstance(denominator, Node):
         return FloorDivScalarOperator(
-            event=denominator,
+            node=denominator,
             value=numerator,
             is_value_first=True,
-        ).outputs["event"]
+        ).outputs["node"]
 
     raise ValueError(
         "Invalid input types for floordiv_scalar. "
-        "Expected (Event, SCALAR) or (SCALAR, Event), "
+        "Expected (Node, SCALAR) or (SCALAR, Node), "
         f"got ({type(numerator)}, {type(denominator)})."
     )

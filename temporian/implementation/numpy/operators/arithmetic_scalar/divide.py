@@ -23,7 +23,7 @@ from temporian.implementation.numpy import implementation_lib
 
 
 class DivideScalarNumpyImplementation(BaseArithmeticScalarNumpyImplementation):
-    """Divides event by a scalar value."""
+    """Numpy implementation of the divide scalar operator."""
 
     def __init__(self, operator: DivideScalarOperator) -> None:
         super().__init__(operator)

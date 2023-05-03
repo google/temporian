@@ -20,16 +20,16 @@ from temporian.implementation.numpy import implementation_lib
 
 
 class EqualNumpyImplementation(BaseArithmeticNumpyImplementation):
-    """Numpy implementation of arithmetic equal"""
+    """Numpy implementation of the equal operator."""
 
     def __init__(self, operator: EqualOperator) -> None:
         super().__init__(operator)
 
     def _do_operation(
-        self, event_1_feature: np.ndarray, event_2_feature: np.ndarray
+        self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
     ) -> np.ndarray:
         # np.nan == np.nan returns False
-        return np.equal(event_1_feature.data, event_2_feature.data)
+        return np.equal(evset_1_feature.data, evset_2_feature.data)
 
 
 implementation_lib.register_operator_implementation(
