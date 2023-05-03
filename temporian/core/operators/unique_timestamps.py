@@ -80,4 +80,4 @@ def unique_timestamps(node: Node) -> Node:
         Node without features with unique timestamps in `node`.
     """
 
-    return UniqueTimestamps(node=node).outputs["event"]
+    return UniqueTimestamps(node=node).outputs["node"]

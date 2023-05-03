@@ -61,7 +61,7 @@ class SetIndexOperator(Operator):
                 (index_name, node.dtypes[index_name])
                 for index_name in feature_names
             ],
-            is_unix_timestamp=event.sampling.is_unix_timestamp,
+            is_unix_timestamp=node.sampling.is_unix_timestamp,
         )
         # output node
         self.add_output(

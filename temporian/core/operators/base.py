@@ -15,7 +15,7 @@
 """Base operator class and auxiliary classes definition."""
 
 from abc import ABC
-from typing import Union
+from typing import Union, Any
 
 from temporian.core.data.node import Node
 from temporian.proto import core_pb2 as pb
