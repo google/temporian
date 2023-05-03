@@ -31,7 +31,7 @@ class BaseWindowOperator(Operator, ABC):
 
     def __init__(
         self,
-        node: Node,
+        input: Node,
         window_length: Duration,
         sampling: Optional[Node] = None,
     ):
@@ -45,10 +45,10 @@ class BaseWindowOperator(Operator, ABC):
             self._has_sampling = True
             effective_sampling = sampling.sampling
         else:
-            effective_sampling = node.sampling
+            effective_sampling = input.sampling
             self._has_sampling = False
 
-        self.add_input("node", node)
+        self.add_input("input", input)
 
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
@@ -57,13 +57,13 @@ class BaseWindowOperator(Operator, ABC):
                 sampling=effective_sampling,
                 creator=self,
             )
-            for f in node.features
+            for f in input.features
         ]
         self._output_dtypes = [feature.dtype for feature in output_features]
 
         # output
         self.add_output(
-            "node",
+            "output",
             Node(
                 features=output_features,
                 sampling=effective_sampling,
@@ -97,10 +97,10 @@ class BaseWindowOperator(Operator, ABC):
                 ),
             ],
             inputs=[
-                pb.OperatorDef.Input(key="node"),
+                pb.OperatorDef.Input(key="input"),
                 pb.OperatorDef.Input(key="sampling", is_optional=True),
             ],
-            outputs=[pb.OperatorDef.Output(key="node")],
+            outputs=[pb.OperatorDef.Output(key="output")],
         )
 
     @classmethod
