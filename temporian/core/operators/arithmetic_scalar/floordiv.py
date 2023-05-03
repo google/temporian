@@ -31,10 +31,6 @@ class FloorDivScalarOperator(BaseArithmeticScalarOperator):
         return "FLOORDIV_SCALAR"
 
     @property
-    def prefix(self) -> str:
-        return "floordiv"
-
-    @property
     def supported_value_dtypes(self) -> List[DType]:
         return [
             DType.FLOAT32,

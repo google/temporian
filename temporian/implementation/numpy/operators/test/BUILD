@@ -42,7 +42,6 @@ py_test(
         "//temporian/core/operators/arithmetic_scalar:equal",
         "//temporian/core/operators/arithmetic_scalar:floordiv",
         "//temporian/core/operators/arithmetic_scalar:multiply",
-        "//temporian/core/operators/arithmetic_scalar:negate",
         "//temporian/core/operators/arithmetic_scalar:subtract",
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/operators/arithmetic_scalar",
@@ -51,7 +50,6 @@ py_test(
         "//temporian/implementation/numpy/operators/arithmetic_scalar:equal",
         "//temporian/implementation/numpy/operators/arithmetic_scalar:floordiv",
         "//temporian/implementation/numpy/operators/arithmetic_scalar:multiply",
-        "//temporian/implementation/numpy/operators/arithmetic_scalar:negate",
         "//temporian/implementation/numpy/operators/arithmetic_scalar:subtract",
     ],
 )
