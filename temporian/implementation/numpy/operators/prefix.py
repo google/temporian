@@ -29,7 +29,7 @@ class PrefixNumpyImplementation(OperatorImplementation):
 
     def __call__(self, input: EventSet) -> Dict[str, EventSet]:
         # gather operator attributes
-        prefix = self._operator.prefix()
+        prefix = self._operator.prefix
 
         # create output evset
         dst_evset = EventSet(

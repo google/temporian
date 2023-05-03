@@ -55,6 +55,7 @@ class Prefix(Operator):
 
         self.check()
 
+    @property
     def prefix(self):
         return self.attributes["prefix"]
 
