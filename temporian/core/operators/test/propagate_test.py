@@ -31,12 +31,15 @@ class PropagateOperatorTest(absltest.TestCase):
                 Feature("a", DType.FLOAT64),
                 Feature("b", DType.FLOAT64),
             ],
-            sampling=Sampling(index_levels=[("x", DType.STRING)]),
+            sampling=Sampling(
+                index_levels=[("x", DType.STRING)], is_unix_timestamp=False
+            ),
         )
         sampling = node_lib.input_node(
             [],
             sampling=Sampling(
-                index_levels=[("x", DType.STRING), ("y", DType.STRING)]
+                index_levels=[("x", DType.STRING), ("y", DType.STRING)],
+                is_unix_timestamp=False,
             ),
         )
         _ = propagate(node=node, sampling=sampling)
@@ -47,12 +50,15 @@ class PropagateOperatorTest(absltest.TestCase):
                 Feature("a", DType.FLOAT64),
                 Feature("b", DType.FLOAT64),
             ],
-            sampling=Sampling(index_levels=[("z", DType.STRING)]),
+            sampling=Sampling(
+                index_levels=[("z", DType.STRING)], is_unix_timestamp=False
+            ),
         )
         sampling = node_lib.input_node(
             [],
             sampling=Sampling(
-                index_levels=[("x", DType.STRING), ("y", DType.STRING)]
+                index_levels=[("x", DType.STRING), ("y", DType.STRING)],
+                is_unix_timestamp=False,
             ),
         )
         with self.assertRaisesRegex(
@@ -67,12 +73,15 @@ class PropagateOperatorTest(absltest.TestCase):
                 Feature("a", DType.FLOAT64),
                 Feature("b", DType.FLOAT64),
             ],
-            sampling=Sampling(index_levels=[("x", DType.INT32)]),
+            sampling=Sampling(
+                index_levels=[("x", DType.INT32)], is_unix_timestamp=False
+            ),
         )
         sampling = node_lib.input_node(
             [],
             sampling=Sampling(
-                index_levels=[("x", DType.STRING), ("y", DType.STRING)]
+                index_levels=[("x", DType.STRING), ("y", DType.STRING)],
+                is_unix_timestamp=False,
             ),
         )
         with self.assertRaisesRegex(

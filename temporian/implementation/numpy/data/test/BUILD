@@ -24,13 +24,6 @@ py_test(
 )
 
 py_test(
-    name = "sampling_test",
-    srcs = ["sampling_test.py"],
-    srcs_version = "PY3",
-    deps = [],
-)
-
-py_test(
     name = "event_test",
     srcs = ["event_test.py"],
     srcs_version = "PY3",

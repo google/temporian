@@ -133,7 +133,8 @@ class CastNumpyImplementationTest(absltest.TestCase):
         )
 
         self.sampling = Sampling(
-            [("store_id", DType.INT32), ("product_id", DType.INT64)]
+            [("store_id", DType.INT32), ("product_id", DType.INT64)],
+            is_unix_timestamp=False,
         )
         self.input_node = Node(
             [

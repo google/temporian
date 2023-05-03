@@ -260,7 +260,9 @@ def input_node(
 ) -> Node:
     """Creates a node with the specified attributes."""
     if sampling is None:
-        sampling = Sampling(index_levels=index_levels, creator=None)
+        sampling = Sampling(
+            index_levels=index_levels, is_unix_timestamp=False, creator=None
+        )
 
     for feature in features:
         if feature.sampling is not None:

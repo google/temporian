@@ -117,11 +117,17 @@ class GlueNumpyImplementationTest(absltest.TestCase):
             _ = GlueOperator(
                 node_0=node_lib.input_node(
                     [Feature(name="a", dtype=DType.FLOAT64)],
-                    sampling=Sampling(index_levels=[("x", DType.INT64)]),
+                    sampling=Sampling(
+                        index_levels=[("x", DType.INT64)],
+                        is_unix_timestamp=False,
+                    ),
                 ),
                 node_1=node_lib.input_node(
                     [Feature(name="b", dtype=DType.FLOAT64)],
-                    sampling=Sampling(index_levels=[("x", DType.INT64)]),
+                    sampling=Sampling(
+                        index_levels=[("x", DType.INT64)],
+                        is_unix_timestamp=False,
+                    ),
                 ),
             )
 
@@ -130,7 +136,9 @@ class GlueNumpyImplementationTest(absltest.TestCase):
             ValueError,
             'Feature "a" is defined in multiple input nodes',
         ):
-            sampling = Sampling(index_levels=[("x", DType.INT64)])
+            sampling = Sampling(
+                index_levels=[("x", DType.INT64)], is_unix_timestamp=False
+            )
             _ = GlueOperator(
                 node_0=node_lib.input_node(
                     [Feature(name="a", dtype=DType.FLOAT64)],

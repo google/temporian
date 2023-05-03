@@ -376,14 +376,32 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         self.assertEqual(output_evset, operator_output["node"])
 
-    def test_addition_different_dtypes(self) -> None:
-        """Test correct addition operator with different dtypes."""
+    def test_addition_upcast(self) -> None:
+        """Test correct addition operator with a value that would require
+        an upcast in the feature dtype."""
 
-        value = 10
+        # Value: float, feature: int -> output should not be upcasted to float
+        value = 10.0
+
+        event_data = EventSet.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1.0, 10],
+                    [0, 2.0, 0],
+                    [0, 3.0, 12],
+                    [0, 4.0, -10],
+                    [0, 5.0, 30],
+                ],
+                columns=["store_id", "timestamp", "sales"],
+            ),
+            index_names=["store_id"],
+        )
+
+        node = event_data.node()
 
         with self.assertRaises(ValueError):
             operator = AddScalarOperator(
-                node=self.node,
+                node=node,
                 value=value,
             )
 
@@ -404,13 +422,13 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
-                    [0, 1.0, 10],
-                    [0, 2.0, 0],
-                    [0, 3.0, 12],
-                    [0, 4.0, -10],
-                    [0, 5.0, 30],
+                    [0, 1.0, 10, 5.5],
+                    [0, 2.0, 0, 3.0],
+                    [0, 3.0, 12, 2.1],
+                    [0, 4.0, -10, 3.3],
+                    [0, 5.0, 30, 9],
                 ],
-                columns=["store_id", "timestamp", "sales"],
+                columns=["store_id", "timestamp", "sales", "revenue"],
             ),
             index_names=["store_id"],
         )
@@ -422,13 +440,18 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         output_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
-                    [0, 1.0, 20],
-                    [0, 2.0, 10],
-                    [0, 3.0, 22],
-                    [0, 4.0, 0],
-                    [0, 5.0, 40],
+                    [0, 1.0, 20, 15.5],
+                    [0, 2.0, 10, 13.0],
+                    [0, 3.0, 22, 12.1],
+                    [0, 4.0, 0, 13.3],
+                    [0, 5.0, 40, 19.0],
                 ],
-                columns=["store_id", "timestamp", "add_sales_10"],
+                columns=[
+                    "store_id",
+                    "timestamp",
+                    "add_sales_10",
+                    "add_revenue_10",
+                ],
             ),
             index_names=["store_id"],
         )
