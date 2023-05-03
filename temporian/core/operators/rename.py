@@ -29,7 +29,7 @@ class RenameOperator(Operator):
 
     def __init__(
         self,
-        node: Node,
+        input: Node,
         features: Union[str, Dict[str, str]] = None,
         index: Union[str, Dict[str, str]] = None,
     ):
@@ -74,23 +74,23 @@ class RenameOperator(Operator):
 
         if isinstance(features, str):
             # check that node only has one feature
-            if len(node.features) != 1:
+            if len(input.features) != 1:
                 raise ValueError(
-                    "Expected node to have only one feature when passed a"
-                    f" single string. Got {len(node.features)} features"
+                    "Expected input to have only one feature when passed a"
+                    f" single string. Got {len(input.features)} features"
                     " instead."
                 )
             if not features:
                 raise ValueError("Expected feature to be a non-empty string.")
-            only_feature_name = node.features[0].name
+            only_feature_name = input.features[0].name
             self.features = {only_feature_name: features}
 
         elif isinstance(features, dict):
             # check that every key is a feature name in node
-            feature_names = [feature.name for feature in node.features]
+            feature_names = [feature.name for feature in input.features]
             self.features = check_rename_dict(features, feature_names)
 
-        node_index_names = node.index_names
+        node_index_names = input.index_names
 
         self.index = {}
 
@@ -117,12 +117,12 @@ class RenameOperator(Operator):
         self.add_attribute("index", self.index)
 
         # inputs
-        self.add_input("node", node)
+        self.add_input("input", input)
 
-        output_sampling = node.sampling
+        output_sampling = input.sampling
 
         if index:
-            output_sampling = self.new_sampling(node.sampling)
+            output_sampling = self.new_sampling(input.sampling)
 
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
@@ -132,11 +132,11 @@ class RenameOperator(Operator):
                 sampling=output_sampling,
                 creator=self,
             )
-            for f in node.features
+            for f in input.features
         ]
 
         self.add_output(
-            "node",
+            "output",
             Node(
                 features=output_features,
                 sampling=output_sampling,
@@ -180,9 +180,9 @@ class RenameOperator(Operator):
                 ),
             ],
             inputs=[
-                pb.OperatorDef.Input(key="node"),
+                pb.OperatorDef.Input(key="input"),
             ],
-            outputs=[pb.OperatorDef.Output(key="node")],
+            outputs=[pb.OperatorDef.Output(key="output")],
         )
 
 
@@ -190,14 +190,14 @@ operator_lib.register_operator(RenameOperator)
 
 
 def rename(
-    node: Node,
+    input: Node,
     features: Union[str, Dict[str, str]] = None,
     index: Union[str, Dict[str, str]] = None,
 ) -> Node:
     """Renames a node's features and index.
 
     Args:
-        node: Node to rename.
+        input: Node to rename.
         features: List of new feature names or mapping from old feature names to
             new feature names.
         index: List of new index names or mapping from old index names to new
@@ -206,4 +206,4 @@ def rename(
     Returns:
         Event with renamed features and index.
     """
-    return RenameOperator(node, features, index).outputs["node"]
+    return RenameOperator(input, features, index).outputs["output"]

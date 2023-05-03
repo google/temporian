@@ -28,17 +28,17 @@ MAX_NUM_ARGUMENTS = 30
 class GlueOperator(Operator):
     def __init__(
         self,
-        **nodes_dict: Dict[str, Node],
+        **inputs: Dict[str, Node],
     ):
         super().__init__()
 
         # Note: Support for dictionaries of nodes is required for
         # serialization.
 
-        if len(nodes_dict) < 2:
+        if len(inputs) < 2:
             raise ValueError("At least two arguments should be provided")
 
-        if len(nodes_dict) >= MAX_NUM_ARGUMENTS:
+        if len(inputs) >= MAX_NUM_ARGUMENTS:
             raise ValueError(
                 f"Too many (>{MAX_NUM_ARGUMENTS}) arguments provided"
             )
@@ -47,11 +47,11 @@ class GlueOperator(Operator):
         output_features = []
         feature_names = set()
         first_sampling = None
-        for key, node in nodes_dict.items():
-            self.add_input(key, node)
-            output_features.extend(node.features)
+        for key, input in inputs.items():
+            self.add_input(key, input)
+            output_features.extend(input.features)
 
-            for f in node.features:
+            for f in input.features:
                 if f.name in feature_names:
                     raise ValueError(
                         f'Feature "{f.name}" is defined in multiple input'
@@ -60,16 +60,16 @@ class GlueOperator(Operator):
                 feature_names.add(f.name)
 
             if first_sampling is None:
-                first_sampling = node.sampling
-            elif node.sampling is not first_sampling:
+                first_sampling = input.sampling
+            elif input.sampling is not first_sampling:
                 raise ValueError(
                     "All glue arguments should have the same sampling."
-                    f" {first_sampling} is different from {node.sampling}."
+                    f" {first_sampling} is different from {input.sampling}."
                 )
 
         # outputs
         self.add_output(
-            "node",
+            "output",
             Node(
                 features=output_features,
                 sampling=first_sampling,
@@ -84,10 +84,10 @@ class GlueOperator(Operator):
             key="GLUE",
             # TODO: Add support to array of nodes arguments.
             inputs=[
-                pb.OperatorDef.Input(key=f"node_{idx}", is_optional=idx >= 2)
+                pb.OperatorDef.Input(key=f"input_{idx}", is_optional=idx >= 2)
                 for idx in range(MAX_NUM_ARGUMENTS)
             ],
-            outputs=[pb.OperatorDef.Output(key="node")],
+            outputs=[pb.OperatorDef.Output(key="output")],
         )
 
 
@@ -95,19 +95,19 @@ operator_lib.register_operator(GlueOperator)
 
 
 def glue(
-    *nodes: List[Node],
+    *inputs: List[Node],
 ) -> Node:
     """Concatenates together nodes with the same sampling.
 
     Example:
 
         ```
-        node_1 = ... # Feature A & B
-        node_2 = ... # Feature C & D
-        node_3 = ... # Feature E & F
+        input_1 = ... # Feature A & B
+        input_2 = ... # Feature C & D
+        input_3 = ... # Feature E & F
 
         # Output has features A, B, C, D, E & F
-        output = np.glue(node_1, node_2, node_3)
+        output = np.glue(input_1, input_2, input_3)
         ```
 
     To concatenate nodes with a different sampling, use the operator
@@ -116,27 +116,27 @@ def glue(
     Example:
 
         ```
-        # Assume node_1, node_2 and node_3 dont have the same sampling
-        node_1 = ... # Feature A & B
-        node_2 = ... # Feature C & D
-        node_3 = ... # Feature E & F
+        # Assume input_1, input_2 and input_3 dont have the same sampling
+        input_1 = ... # Feature A & B
+        input_2 = ... # Feature C & D
+        input_3 = ... # Feature E & F
 
         # Output has features A, B, C, D, E & F, and the same sampling as
-        # node_1
-        output = tp.glue(node_1,
-            tp.sample(node_2, sampling=node_1),
-            tp.sample(node_3, sampling=node_1))
+        # input_1
+        output = tp.glue(input_1,
+            tp.sample(input_2, sampling=input_1),
+            tp.sample(input_3, sampling=input_1))
         ```
 
     Args:
-        *nodes: Nodes to concatenate.
+        *inputs: Nodes to concatenate.
 
     Returns:
-        The concatenated nodes.
+        Concatenated nodes.
     """
-    if len(nodes) == 1:
-        return nodes[0]
+    if len(inputs) == 1:
+        return inputs[0]
 
-    # Note: The node should be called "node_{idx}" with idx in [0, MAX_NUM_ARGUMENTS).
-    nodes_dict = {f"node_{idx}": node for idx, node in enumerate(nodes)}
-    return GlueOperator(**nodes_dict).outputs["node"]
+    # Note: The node should be called "input_{idx}" with idx in [0, MAX_NUM_ARGUMENTS).
+    inputs_dict = {f"input_{idx}": input for idx, input in enumerate(inputs)}
+    return GlueOperator(**inputs_dict).outputs["output"]

@@ -27,33 +27,33 @@ from temporian.proto import core_pb2 as pb
 class DropIndexOperator(Operator):
     def __init__(
         self,
-        node: Node,
+        input: Node,
         index_to_drop: List[str],
         keep: bool,
     ) -> None:
         super().__init__()
 
-        # "index_to_drop" is the list of indexes in "node" to drop. If "keep"
+        # "index_to_drop" is the list of indexes in `input`` to drop. If `keep`
         # is true, those indexes will be converted into features.
         self._index_to_drop = index_to_drop
         self._keep = keep
 
-        self.add_input("node", node)
+        self.add_input("input", input)
         self.add_attribute("index_to_drop", index_to_drop)
         self.add_attribute("keep", keep)
 
-        output_features = self._output_features(node, index_to_drop, keep)
+        output_features = self._output_features(input, index_to_drop, keep)
 
         output_sampling = Sampling(
             index_levels=[
                 index_level
-                for index_level in node.sampling.index
+                for index_level in input.sampling.index
                 if index_level.name not in index_to_drop
             ]
         )
 
         self.add_output(
-            "node",
+            "output",
             Node(
                 features=output_features,
                 sampling=output_sampling,
@@ -63,7 +63,7 @@ class DropIndexOperator(Operator):
         self.check()
 
     def _output_features(
-        self, node: Node, index_to_drop: List[str], keep: bool
+        self, input: Node, index_to_drop: List[str], keep: bool
     ) -> List[Feature]:
         new_features = []
         if keep:
@@ -72,10 +72,10 @@ class DropIndexOperator(Operator):
             # Note: The new features are added first.
             for index_name in index_to_drop:
                 # check no other feature exists with this name
-                if index_name in node.feature_names:
+                if index_name in input.feature_names:
                     raise ValueError(
                         f"Feature name {index_name} coming from index already"
-                        " exists in node."
+                        " exists in input."
                     )
 
                 # TODO: Don't recompute the "dtypes/names" at each iteration.
@@ -83,20 +83,20 @@ class DropIndexOperator(Operator):
                 new_features.append(
                     Feature(
                         name=index_name,
-                        dtype=node.sampling.index.dtypes[
-                            node.sampling.index.names.index(index_name)
+                        dtype=input.sampling.index.dtypes[
+                            input.sampling.index.names.index(index_name)
                         ],
                     )
                 )
 
         existing_features = [
             Feature(name=feature.name, dtype=feature.dtype)
-            for feature in node.features
+            for feature in input.features
         ]
         return new_features + existing_features
 
     def dst_feature_names(self) -> List[str]:
-        feature_names = self.inputs["node"].feature_names
+        feature_names = self.inputs["input"].feature_names
         if self._keep:
             return self._index_to_drop + feature_names
         else:
@@ -106,7 +106,7 @@ class DropIndexOperator(Operator):
         # TODO: Avoid instentiating the "names" array.
         return [
             index_lvl_name
-            for index_lvl_name in self.inputs["node"].sampling.index.names
+            for index_lvl_name in self.inputs["input"].sampling.index.names
             if index_lvl_name not in self._index_to_drop
         ]
 
@@ -133,9 +133,9 @@ class DropIndexOperator(Operator):
                 ),
             ],
             inputs=[
-                pb.OperatorDef.Input(key="node"),
+                pb.OperatorDef.Input(key="input"),
             ],
-            outputs=[pb.OperatorDef.Output(key="node")],
+            outputs=[pb.OperatorDef.Output(key="output")],
         )
 
 
@@ -143,10 +143,10 @@ operator_lib.register_operator(DropIndexOperator)
 
 
 def _normalize_index_to_drop(
-    node: Node, index_names: Optional[Union[List[str], str]]
+    input: Node, index_names: Optional[Union[List[str], str]]
 ) -> List[str]:
     if index_names is None:
-        return node.sampling.index.names
+        return input.sampling.index.names
 
     if isinstance(index_names, str):
         index_names = [index_names]
@@ -159,19 +159,19 @@ def _normalize_index_to_drop(
     missing_index_names = [
         index_name
         for index_name in index_names
-        if index_name not in node.sampling.index.names
+        if index_name not in input.sampling.index.names
     ]
     if missing_index_names:
         raise KeyError(
             f"Dropped indexes {missing_index_names} are missing from the"
-            f" input index. The input index is {node.sampling.index.names}."
+            f" input index. The input index is {input.sampling.index.names}."
         )
 
     return index_names
 
 
 def drop_index(
-    node: Node,
+    input: Node,
     index_to_drop: Optional[Union[str, List[str]]] = None,
     keep: bool = True,
 ) -> Node:
@@ -181,23 +181,23 @@ def drop_index(
         Given an input `Node` with index names ['A', 'B', 'C'] and features
         names ['X', 'Y', 'Z']:
 
-        1. `drop_index(node, index_names='A', keep=True)`
+        1. `drop_index(input, index_names='A', keep=True)`
            Output `Node` will have index names ['B', 'C'] and features names
            ['X', 'Y', 'Z', 'A'].
 
-        2. `drop_index(node, index_names=['A', 'B'], keep=False)`
+        2. `drop_index(input, index_names=['A', 'B'], keep=False)`
            Output `Node` will have index names ['C'] and features names
            ['X', 'Y', 'Z'].
 
-        3. `drop_index(node, index_names=None, keep=True)`
+        3. `drop_index(input, index_names=None, keep=True)`
            Output `Node` will have index names [] (empty index) and features
            names ['X', 'Y', 'Z', 'A', 'B', 'C'].
 
     Args:
-        node: Node from which the specified index columns should be removed.
-        index_to_drop: Index column(s) to be removed from `node`. This can be a
+        input: Node from which the specified index columns should be removed.
+        index_to_drop: Index column(s) to be removed from `input`. This can be a
             single column name (`str`) or a list of column names (`List[str]`).
-            If not specified or set to `None`, all index columns in `node` will
+            If not specified or set to `None`, all index columns in `input` will
             be removed. Defaults to `None`.
         keep: Flag indicating whether the removed index columns should be kept
             as features in the output `Node`. Defaults to `True`.
@@ -210,9 +210,9 @@ def drop_index(
     Raises:
         ValueError: If an empty list is provided as the `index_names` argument.
         KeyError: If any of the specified `index_names` are missing from
-            `node`'s index.
+            `input`'s index.
         ValueError: If a feature name coming from the index already exists in
-            `node`, and the `keep` flag is set to `True`.
+            `input`, and the `keep` flag is set to `True`.
     """
-    index_to_drop = _normalize_index_to_drop(node, index_to_drop)
-    return DropIndexOperator(node, index_to_drop, keep).outputs["node"]
+    index_to_drop = _normalize_index_to_drop(input, index_to_drop)
+    return DropIndexOperator(input, index_to_drop, keep).outputs["output"]

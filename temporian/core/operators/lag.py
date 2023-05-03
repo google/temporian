@@ -30,7 +30,7 @@ from temporian.proto import core_pb2 as pb
 class LagOperator(Operator):
     def __init__(
         self,
-        node: Node,
+        input: Node,
         duration: Duration,
     ):
         super().__init__()
@@ -39,12 +39,12 @@ class LagOperator(Operator):
         self._duration_str = duration_abbreviation(duration)
 
         # inputs
-        self.add_input("node", node)
+        self.add_input("input", input)
 
         self.add_attribute("duration", duration)
 
         output_sampling = Sampling(
-            index_levels=node.sampling.index.levels, creator=self
+            index_levels=input.sampling.index.levels, creator=self
         )
 
         # outputs
@@ -55,11 +55,11 @@ class LagOperator(Operator):
                 sampling=output_sampling,
                 creator=self,
             )
-            for f in node.features
+            for f in input.features
         ]
 
         self.add_output(
-            "node",
+            "output",
             Node(
                 features=output_features,
                 sampling=output_sampling,
@@ -87,8 +87,8 @@ class LagOperator(Operator):
                     is_optional=False,
                 ),
             ],
-            inputs=[pb.OperatorDef.Input(key="node")],
-            outputs=[pb.OperatorDef.Output(key="node")],
+            inputs=[pb.OperatorDef.Input(key="input")],
+            outputs=[pb.OperatorDef.Output(key="output")],
         )
 
 
@@ -96,11 +96,11 @@ operator_lib.register_operator(LagOperator)
 
 
 def _implementation(
-    node: Node,
+    input: Node,
     duration: Union[Duration, List[Duration]],
     should_leak: bool = False,
 ) -> Node:
-    """Lags or leaks `node` depending on `should_leak`."""
+    """Lags or leaks `input` depending on `should_leak`."""
 
     if not isinstance(duration, list):
         duration = [duration]
@@ -121,54 +121,54 @@ def _implementation(
 
     if len(used_duration) == 1:
         return LagOperator(
-            node=node,
+            input=input,
             duration=used_duration[0],
-        ).outputs["node"]
+        ).outputs["output"]
 
     return [
-        LagOperator(node=node, duration=d).outputs["node"]
+        LagOperator(input=input, duration=d).outputs["output"]
         for d in used_duration
     ]
 
 
 def lag(
-    node: Node, duration: Union[Duration, List[Duration]]
+    input: Node, duration: Union[Duration, List[Duration]]
 ) -> Union[Node, List[Node]]:
     """Shifts the node's sampling forwards in time by a specified duration.
 
-    Each timestamp in `node`'s sampling is shifted forwards by the specified
-    duration. If `duration` is a list, then the node will be lagged by each
+    Each timestamp in `input`'s sampling is shifted forwards by the specified
+    duration. If `duration` is a list, then the input will be lagged by each
     duration in the list, and a list of nodes will be returned.
 
     Args:
-        node: Node to lag the sampling of.
+        input: Node to lag the sampling of.
         duration: Duration or list of Durations to lag by.
 
     Returns:
         Lagged node, or list of lagged nodes if a Duration list was
         provided.
     """
-    return _implementation(node=node, duration=duration)
+    return _implementation(input=input, duration=duration)
 
 
 def leak(
-    node: Node, duration: Union[Duration, List[Duration]]
+    input: Node, duration: Union[Duration, List[Duration]]
 ) -> Union[Node, List[Node]]:
     """Shifts the node's sampling backwards in time by a specified duration.
 
-    Each timestamp in `node`'s sampling is shifted backwards by the specified
-    duration. If `duration` is a list, then the node will be leaked by each
+    Each timestamp in `input`'s sampling is shifted backwards by the specified
+    duration. If `duration` is a list, then the input will be leaked by each
     duration in the list, and a list of nodes will be returned.
 
     Note that this operator moves future data into the past, and should be used
     with caution to prevent unwanted leakage.
 
     Args:
-        node: Node to leak the sampling of.
+        input: Node to leak the sampling of.
         duration: Duration or list of Durations to leak by.
 
     Returns:
         Leaked node, or list of leaked nodes if a Duration list was
         provided.
     """
-    return _implementation(node=node, duration=duration, should_leak=True)
+    return _implementation(input=input, duration=duration, should_leak=True)
