@@ -36,6 +36,9 @@ preview = true
 
 [tool.pylint]
 max-line-length = 80
+disable = [
+    "redefined-builtin",
+]
 
 [tool.pyright]
 include = ["temporian"]
