@@ -65,7 +65,9 @@ class LagNumpyImplementationTest(absltest.TestCase):
         )
         node = Node(
             [Feature("sales", DType.FLOAT64)],
-            sampling=Sampling([("store_id", DType.INT64)]),
+            sampling=Sampling(
+                [("store_id", DType.INT64)], is_unix_timestamp=False
+            ),
             creator=None,
         )
         operator = LagOperator(
@@ -193,7 +195,9 @@ class LagNumpyImplementationTest(absltest.TestCase):
         )
         node = Node(
             [Feature("sales", DType.FLOAT64)],
-            sampling=Sampling([("store_id", DType.INT64)]),
+            sampling=Sampling(
+                [("store_id", DType.INT64)], is_unix_timestamp=False
+            ),
             creator=None,
         )
         operator = LagOperator(

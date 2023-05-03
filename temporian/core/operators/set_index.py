@@ -60,7 +60,8 @@ class SetIndexOperator(Operator):
             else [
                 (index_name, input.dtypes[index_name])
                 for index_name in feature_names
-            ]
+            ],
+            is_unix_timestamp=node.sampling.is_unix_timestamp,
         )
         # output node
         self.add_output(

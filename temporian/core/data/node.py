@@ -153,9 +153,9 @@ class Node(object):
         return self.__mul__(other)
 
     def __neg__(self):
-        from temporian.core.operators.arithmetic_scalar import negate
+        from temporian.core.operators.arithmetic_scalar import multiply_scalar
 
-        return negate(self)
+        return multiply_scalar(node=self, value=-1)
 
     def __truediv__(self, other: Any) -> Node:
         if isinstance(other, Node):
@@ -260,7 +260,9 @@ def input_node(
 ) -> Node:
     """Creates a node with the specified attributes."""
     if sampling is None:
-        sampling = Sampling(index_levels=index_levels, creator=None)
+        sampling = Sampling(
+            index_levels=index_levels, is_unix_timestamp=False, creator=None
+        )
 
     for feature in features:
         if feature.sampling is not None:

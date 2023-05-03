@@ -74,7 +74,7 @@ class MovingCountOperatorTest(absltest.TestCase):
 
         op = MovingCountOperator(
             input=evset.node(),
-            window_length=5.0,
+            window_length=5,
             sampling=None,
         )
         self.assertEqual(op.list_matching_io_samplings(), [("input", "output")])
@@ -120,7 +120,7 @@ class MovingCountOperatorTest(absltest.TestCase):
 
         op = MovingCountOperator(
             input=evset.node(),
-            window_length=5.0,
+            window_length=5,
             sampling=None,
         )
         self.assertEqual(op.list_matching_io_samplings(), [("input", "output")])

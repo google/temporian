@@ -47,10 +47,6 @@ class DivideScalarOperator(BaseArithmeticScalarOperator):
         return "DIVISION_SCALAR"
 
     @property
-    def prefix(self) -> str:
-        return "div"
-
-    @property
     def supported_value_dtypes(self) -> List[DType]:
         return [
             DType.FLOAT32,

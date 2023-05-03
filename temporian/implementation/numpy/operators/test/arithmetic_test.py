@@ -73,7 +73,9 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         self.node_1 = self.evset_1.node()
         self.node_2 = self.evset_2.node()
 
-        self.sampling = Sampling([("store_id", DType.INT64)])
+        self.sampling = Sampling(
+            [("store_id", DType.INT64)], is_unix_timestamp=False
+        )
         self.node_1 = Node(
             [Feature("sales", DType.FLOAT64)],
             sampling=self.sampling,

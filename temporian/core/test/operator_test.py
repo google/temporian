@@ -41,7 +41,9 @@ class OperatorTest(absltest.TestCase):
 
         def build_fake_node():
             return Node(
-                features=[], sampling=Sampling(index_levels=[]), creator=None
+                features=[],
+                sampling=Sampling(index_levels=[], is_unix_timestamp=False),
+                creator=None,
             )
 
         t = ToyOperator()

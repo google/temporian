@@ -50,7 +50,6 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "MOVING_SUM",
             "MULTIPLICATION",
             "MULTIPLICATION_SCALAR",
-            "NEGATE",
             "PREFIX",
             "PROPAGATE",
             "SAMPLE",

@@ -40,7 +40,7 @@ class TFPTest(absltest.TestCase):
 
         i1 = evset_1.node()
         i2 = evset_2.node()
-        h1 = t.simple_moving_average(input=i1, window_length=7.0)
+        h1 = t.simple_moving_average(input=i1, window_length=7)
         h2 = t.sample(input=h1, sampling=i2)
         result = t.glue(t.prefix("sma_", h2["f2"]), i2)
 
@@ -65,7 +65,7 @@ class TFPTest(absltest.TestCase):
                 t.Feature(name="f2"),
             ]
         )
-        b = t.simple_moving_average(input=a, window_length=7.0)
+        b = t.simple_moving_average(input=a, window_length=7)
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_processor.tem")
@@ -88,7 +88,7 @@ class TFPTest(absltest.TestCase):
             ],
             name="my_input_node",
         )
-        b = t.simple_moving_average(input=a, window_length=7.0)
+        b = t.simple_moving_average(input=a, window_length=7)
         b.name = "my_output_node"
 
         with tempfile.TemporaryDirectory() as tempdir:
@@ -112,7 +112,7 @@ class TFPTest(absltest.TestCase):
             ],
             name="my_input_node",
         )
-        b = t.simple_moving_average(input=a, window_length=7.0)
+        b = t.simple_moving_average(input=a, window_length=7)
         b.name = "my_output_node"
 
         with tempfile.TemporaryDirectory() as tempdir:
@@ -136,7 +136,7 @@ class TFPTest(absltest.TestCase):
             ],
             name="my_input_node",
         )
-        b = t.simple_moving_average(input=a, window_length=7.0)
+        b = t.simple_moving_average(input=a, window_length=7)
         b.name = "my_output_node"
 
         with tempfile.TemporaryDirectory() as tempdir:

@@ -17,7 +17,6 @@ py_library(
         ":equal",
         ":floordiv",
         ":multiply",
-        ":negate",
         ":subtract",
     ],
 )
@@ -98,18 +97,6 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:node",
-    ],
-)
-
-py_library(
-    name = "negate",
-    srcs = ["negate.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":base",
-        "//temporian/core:operator_lib",
-        "//temporian/core/data:feature",
         "//temporian/core/data:node",
     ],
 )

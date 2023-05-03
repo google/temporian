@@ -57,7 +57,9 @@ class Propagate(Operator):
                 )
 
         output_sampling = Sampling(
-            index_levels=sampling.sampling.index, creator=self
+            index_levels=sampling.sampling.index,
+            creator=self,
+            is_unix_timestamp=sampling.sampling.is_unix_timestamp,
         )
 
         output_features = [  # pylint: disable=g-complex-comprehension

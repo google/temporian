@@ -23,7 +23,6 @@ from temporian.core.operators.arithmetic_scalar import (
     DivideScalarOperator,
     FloorDivScalarOperator,
     EqualScalarOperator,
-    NegateOperator,
 )
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.arithmetic_scalar import (
@@ -33,7 +32,6 @@ from temporian.implementation.numpy.operators.arithmetic_scalar import (
     DivideScalarNumpyImplementation,
     FloorDivideScalarNumpyImplementation,
     EqualScalarNumpyImplementation,
-    NegateNumpyImplementation,
 )
 
 
@@ -72,7 +70,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                     [0, 4.0, np.nan],
                     [0, 5.0, 40.0],
                 ],
-                columns=["store_id", "timestamp", "add_sales_10.0"],
+                columns=["store_id", "timestamp", "sales"],
             ),
             index_names=["store_id"],
         )
@@ -102,7 +100,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                     [0, 4.0, np.nan],
                     [0, 5.0, 20.0],
                 ],
-                columns=["store_id", "timestamp", "sub_sales_10.0"],
+                columns=["store_id", "timestamp", "sales"],
             ),
             index_names=["store_id"],
         )
@@ -133,7 +131,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                     [0, 4.0, np.nan],
                     [0, 5.0, -20.0],
                 ],
-                columns=["store_id", "timestamp", "sub_sales_10.0"],
+                columns=["store_id", "timestamp", "sales"],
             ),
             index_names=["store_id"],
         )
@@ -164,7 +162,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                     [0, 4.0, np.nan],
                     [0, 5.0, 300.0],
                 ],
-                columns=["store_id", "timestamp", "mult_sales_10.0"],
+                columns=["store_id", "timestamp", "sales"],
             ),
             index_names=["store_id"],
         )
@@ -194,7 +192,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                     [0, 4.0, np.nan],
                     [0, 5.0, 3.0],
                 ],
-                columns=["store_id", "timestamp", "div_sales_10.0"],
+                columns=["store_id", "timestamp", "sales"],
             ),
             index_names=["store_id"],
         )
@@ -223,7 +221,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                     [0, 4.0, np.nan],
                     [0, 5.0, 1.0 / 3.0],
                 ],
-                columns=["store_id", "timestamp", "div_sales_10.0"],
+                columns=["store_id", "timestamp", "sales"],
             ),
             index_names=["store_id"],
         )
@@ -254,7 +252,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                     [0, 4.0, np.nan],
                     [0, 5.0, 3.0],
                 ],
-                columns=["store_id", "timestamp", "floordiv_sales_10.0"],
+                columns=["store_id", "timestamp", "sales"],
             ),
             index_names=["store_id"],
         )
@@ -283,7 +281,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                     [0, 4.0, np.nan],
                     [0, 5.0, 1.0 // 3.0],
                 ],
-                columns=["store_id", "timestamp", "floordiv_sales_10.0"],
+                columns=["store_id", "timestamp", "sales"],
             ),
             index_names=["store_id"],
         )
@@ -295,31 +293,6 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         )
 
         impl = FloorDivideScalarNumpyImplementation(operator)
-
-        operator_output = impl.call(input=self.evset)
-
-        self.assertEqual(output_evset, operator_output["output"])
-
-    def test_correct_negation(self) -> None:
-        """Test correct negation operator."""
-
-        output_evset = EventSet.from_dataframe(
-            pd.DataFrame(
-                [
-                    [0, 1.0, -10.0],
-                    [0, 2.0, 0.0],
-                    [0, 3.0, -12.0],
-                    [0, 4.0, np.nan],
-                    [0, 5.0, -30.0],
-                ],
-                columns=["store_id", "timestamp", "sales"],
-            ),
-            index_names=["store_id"],
-        )
-
-        operator = NegateOperator(input=self.node)
-
-        impl = NegateNumpyImplementation(operator)
 
         operator_output = impl.call(input=self.evset)
 
@@ -357,7 +330,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                     "store_id",
                     "product_id",
                     "timestamp",
-                    "add_sales_10.0",
+                    "sales",
                 ],
             ),
             index_names=["store_id", "product_id"],
@@ -376,14 +349,32 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         self.assertEqual(output_evset, operator_output["output"])
 
-    def test_addition_different_dtypes(self) -> None:
-        """Test correct addition operator with different dtypes."""
+    def test_addition_upcast(self) -> None:
+        """Test correct addition operator with a value that would require
+        an upcast in the feature dtype."""
 
-        value = 10
+        # Value: float, feature: int -> output should not be upcasted to float
+        value = 10.0
+
+        event_data = EventSet.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1.0, 10],
+                    [0, 2.0, 0],
+                    [0, 3.0, 12],
+                    [0, 4.0, -10],
+                    [0, 5.0, 30],
+                ],
+                columns=["store_id", "timestamp", "sales"],
+            ),
+            index_names=["store_id"],
+        )
+
+        node = event_data.node()
 
         with self.assertRaises(ValueError):
             operator = AddScalarOperator(
-                input=self.node,
+                input=node,
                 value=value,
             )
 
@@ -404,13 +395,13 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
-                    [0, 1.0, 10],
-                    [0, 2.0, 0],
-                    [0, 3.0, 12],
-                    [0, 4.0, -10],
-                    [0, 5.0, 30],
+                    [0, 1.0, 10, 5.5],
+                    [0, 2.0, 0, 3.0],
+                    [0, 3.0, 12, 2.1],
+                    [0, 4.0, -10, 3.3],
+                    [0, 5.0, 30, 9],
                 ],
-                columns=["store_id", "timestamp", "sales"],
+                columns=["store_id", "timestamp", "sales", "revenue"],
             ),
             index_names=["store_id"],
         )
@@ -422,13 +413,18 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         output_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
-                    [0, 1.0, 20],
-                    [0, 2.0, 10],
-                    [0, 3.0, 22],
-                    [0, 4.0, 0],
-                    [0, 5.0, 40],
+                    [0, 1.0, 20, 15.5],
+                    [0, 2.0, 10, 13.0],
+                    [0, 3.0, 22, 12.1],
+                    [0, 4.0, 0, 13.3],
+                    [0, 5.0, 40, 19.0],
                 ],
-                columns=["store_id", "timestamp", "add_sales_10"],
+                columns=[
+                    "store_id",
+                    "timestamp",
+                    "sales",
+                    "revenue",
+                ],
             ),
             index_names=["store_id"],
         )
@@ -474,7 +470,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                     [0, 4.0, False],
                     [0, 5.0, True],
                 ],
-                columns=["store_id", "timestamp", "equal_sales_0.0"],
+                columns=["store_id", "timestamp", "sales"],
             ),
             index_names=["store_id"],
         )

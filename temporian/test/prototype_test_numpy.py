@@ -93,7 +93,7 @@ class PrototypeTest(absltest.TestCase):
                     "sales",
                     "costs",
                     "lag[1s]_sales",
-                    "sub_sales_0",
+                    "negated_sales",
                 ],
             ),
             index_names=["store_id", "product_id"],
@@ -106,8 +106,9 @@ class PrototypeTest(absltest.TestCase):
         # b = tp.glue(a, self.node_1 + self.node_2)
         c = tp.prefix("lag[1s]_", tp.lag(self.node_1, duration=1))
         d = tp.glue(a, tp.sample(c, a))
-        sub_sales = 0 - self.node_1["sales"]
-        output_node = tp.glue(d, sub_sales)
+        sub_sales = tp.prefix("negated_", -self.node_1["sales"])
+        e = tp.glue(d, sub_sales)
+        output_node = e
 
         output_evset = tp.evaluate(
             output_node,

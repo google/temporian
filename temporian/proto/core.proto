@@ -152,6 +152,9 @@ message Sampling {
 
   // Index of the node id who's operator creator also created this feature.
   optional string creator_operator_id = 3;
+
+  // True if the event timestamps can be converted to dates
+  optional bool is_unix_timestamp = 4;
 }
 
 // Definition of an operator. No two operators definition can have the same key.
