@@ -155,7 +155,7 @@ class Node(object):
     def __neg__(self):
         from temporian.core.operators.arithmetic_scalar import multiply_scalar
 
-        return multiply_scalar(event=self, value=-1)
+        return multiply_scalar(node=self, value=-1)
 
     def __truediv__(self, other: Any) -> Node:
         if isinstance(other, Node):

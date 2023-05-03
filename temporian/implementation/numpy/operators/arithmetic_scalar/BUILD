@@ -68,8 +68,7 @@ py_library(
         ":base",
         "//temporian/core/operators/arithmetic_scalar:multiply",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:feature",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 

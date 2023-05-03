@@ -296,7 +296,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         operator_output = impl.call(node=self.evset)
 
-        self.assertEqual(numpy_output_event, operator_output["event"])
+        self.assertEqual(output_evset, operator_output["node"])
 
     def test_correct_sum_multi_index(self) -> None:
         """Test correct sum operator with multiple indexes."""
@@ -425,7 +425,6 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                     "sales",
                     "revenue",
                 ],
-                columns=["store_id", "timestamp", "add_sales_10"],
             ),
             index_names=["store_id"],
         )
