@@ -16,12 +16,12 @@ from absl.testing import absltest
 
 from temporian.core import evaluator
 from temporian.core.test import utils
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 
 
 class EvaluatorTest(absltest.TestCase):
     def test_schedule_trivial(self):
-        a = utils.create_input_event()
+        a = utils.create_input_node()
         b = utils.OpI1O1(a)
 
         schedule = evaluator.build_schedule(
@@ -31,7 +31,7 @@ class EvaluatorTest(absltest.TestCase):
         self.assertEqual(schedule, [b])
 
     def test_schedule_empty(self):
-        a = utils.create_input_event()
+        a = utils.create_input_node()
 
         schedule = evaluator.build_schedule(
             inputs=[a],
@@ -40,8 +40,8 @@ class EvaluatorTest(absltest.TestCase):
         self.assertEqual(schedule, [])
 
     def test_schedule_two_delayed_inputs(self):
-        i1 = utils.create_input_event()
-        i2 = utils.create_input_event()
+        i1 = utils.create_input_node()
+        i2 = utils.create_input_node()
         o1 = utils.OpI1O1(i1)
         o2 = utils.OpI1O1(i2)
         o3 = utils.OpI2O1(o1.outputs["output"], o2.outputs["output"])
@@ -54,9 +54,9 @@ class EvaluatorTest(absltest.TestCase):
         )
 
     def test_schedule_basic(self):
-        i1 = utils.create_input_event()
+        i1 = utils.create_input_node()
         o2 = utils.OpI1O1(i1)
-        i3 = utils.create_input_event()
+        i3 = utils.create_input_node()
         o4 = utils.OpI2O1(o2.outputs["output"], i3)
         o5 = utils.OpI1O2(o4.outputs["output"])
 
@@ -69,7 +69,7 @@ class EvaluatorTest(absltest.TestCase):
         )
 
     def test_schedule_mid_chain(self):
-        i1 = utils.create_input_event()
+        i1 = utils.create_input_node()
         o2 = utils.OpI1O1(i1)
         o3 = utils.OpI1O1(o2.outputs["output"])
         o4 = utils.OpI1O1(o3.outputs["output"])
@@ -82,31 +82,31 @@ class EvaluatorTest(absltest.TestCase):
         self.assertEqual(schedule, [o4, o5])
 
     def test_evaluate_value(self):
-        i1 = utils.create_input_event()
-        result = evaluator.evaluate(i1, {i1: utils.create_input_event_data()})
-        self.assertIsInstance(result, NumpyEvent)
+        i1 = utils.create_input_node()
+        result = evaluator.evaluate(i1, {i1: utils.create_input_event_set()})
+        self.assertIsInstance(result, EventSet)
 
     def test_evaluate_list(self):
-        i1 = utils.create_input_event()
-        i2 = utils.create_input_event()
+        i1 = utils.create_input_node()
+        i2 = utils.create_input_node()
         result = evaluator.evaluate(
             [i1, i2],
             {
-                i1: utils.create_input_event_data(),
-                i2: utils.create_input_event_data(),
+                i1: utils.create_input_event_set(),
+                i2: utils.create_input_event_set(),
             },
         )
         self.assertIsInstance(result, list)
         self.assertLen(result, 2)
 
     def test_evaluate_dict(self):
-        i1 = utils.create_input_event()
-        i2 = utils.create_input_event()
+        i1 = utils.create_input_node()
+        i2 = utils.create_input_node()
         result = evaluator.evaluate(
             {"i1": i1, "i2": i2},
             {
-                i1: utils.create_input_event_data(),
-                i2: utils.create_input_event_data(),
+                i1: utils.create_input_event_set(),
+                i2: utils.create_input_event_set(),
             },
         )
         self.assertIsInstance(result, dict)

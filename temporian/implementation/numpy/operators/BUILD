@@ -18,6 +18,7 @@ py_library(
         ":lag",
         ":prefix",
         ":propagate",
+        ":rename",
         ":sample",
         ":select",
         ":set_index",
@@ -72,8 +73,7 @@ py_library(
         ":base",
         "//temporian/core/operators:filter",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -85,8 +85,7 @@ py_library(
         ":base",
         "//temporian/core/operators:glue",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -99,9 +98,7 @@ py_library(
         "//temporian/core/data:duration",
         "//temporian/core/operators:lag",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:feature",
-        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -113,8 +110,7 @@ py_library(
         ":base",
         "//temporian/core/operators:drop_index",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -126,7 +122,19 @@ py_library(
         ":base",
         "//temporian/core/operators:select",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:event_set",
+    ],
+)
+
+py_library(
+    name = "rename",
+    srcs = ["rename.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators:rename",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -138,8 +146,7 @@ py_library(
         ":base",
         "//temporian/core/operators:set_index",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -153,8 +160,7 @@ py_library(
         "//temporian/core/operators:prefix",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy:utils",
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -167,8 +173,7 @@ py_library(
         "//temporian/core/data:duration",
         "//temporian/core/operators:propagate",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -181,8 +186,7 @@ py_library(
         "//temporian/core/data:duration",
         "//temporian/core/operators:sample",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy_cc/operators:sample",
     ],
 )
@@ -195,8 +199,7 @@ py_library(
         ":base",
         "//temporian/core/operators:cast",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -210,7 +213,6 @@ py_library(
         "//temporian/core/operators:unique_timestamps",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy:utils",
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )

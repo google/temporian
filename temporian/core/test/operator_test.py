@@ -14,7 +14,7 @@
 
 from absl.testing import absltest
 
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators import base
 from temporian.proto import core_pb2 as pb
@@ -39,33 +39,35 @@ class OperatorTest(absltest.TestCase):
             def _get_pandas_implementation(self):
                 raise NotImplementedError()
 
-        def build_fake_event():
-            return Event(
-                features=[], sampling=Sampling(index_levels=[]), creator=None
+        def build_fake_node():
+            return Node(
+                features=[],
+                sampling=Sampling(index_levels=[], is_unix_timestamp=False),
+                creator=None,
             )
 
         t = ToyOperator()
         with self.assertRaisesRegex(ValueError, 'Missing input "input"'):
             t.check()
 
-        t.add_input("input", build_fake_event())
+        t.add_input("input", build_fake_node())
         with self.assertRaisesRegex(ValueError, 'Missing output "output"'):
             t.check()
 
         with self.assertRaisesRegex(
             ValueError, 'Already existing input "input"'
         ):
-            t.add_input("input", build_fake_event())
+            t.add_input("input", build_fake_node())
 
-        t.add_output("output", build_fake_event())
+        t.add_output("output", build_fake_node())
         t.check()
 
         with self.assertRaisesRegex(
             ValueError, 'Already existing output "output"'
         ):
-            t.add_output("output", build_fake_event())
+            t.add_output("output", build_fake_node())
 
-        t.add_output("unexpected_output", build_fake_event())
+        t.add_output("unexpected_output", build_fake_node())
         with self.assertRaisesRegex(
             ValueError, 'Unexpected output "unexpected_output"'
         ):

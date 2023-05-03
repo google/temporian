@@ -3,13 +3,13 @@ from absl.testing import absltest
 import numpy as np
 
 from temporian.implementation.numpy.data import plotter
-from temporian.implementation.numpy.data.event import IndexData
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import IndexData
+from temporian.implementation.numpy.data.event_set import EventSet
 
 
 class PlotterTest(absltest.TestCase):
     def test_plot(self):
-        event = NumpyEvent(
+        evset = EventSet(
             data={
                 (1,): IndexData(
                     features=[
@@ -27,10 +27,20 @@ class PlotterTest(absltest.TestCase):
                 ),
             },
             feature_names=["a", "b"],
-            index_names="x",
+            index_names=["x"],
             is_unix_timestamp=False,
         )
-        _ = plotter.plot(event, indexes=(1,))
+
+        _ = plotter.plot(evset, indexes=None)
+        _ = plotter.plot(evset, indexes=1)
+        _ = plotter.plot(evset, indexes=[1, 2])
+        _ = plotter.plot(evset, indexes=[(1,), (2,)])
+
+    def test_is_uniform(self):
+        self.assertTrue(plotter.is_uniform([]))
+        self.assertTrue(plotter.is_uniform([1]))
+        self.assertTrue(plotter.is_uniform([1, 2, 3]))
+        self.assertFalse(plotter.is_uniform([1, 2, 2.5]))
 
 
 if __name__ == "__main__":

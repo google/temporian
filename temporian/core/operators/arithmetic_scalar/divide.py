@@ -18,7 +18,7 @@ from typing import Union, List
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarOperator,
 )
@@ -27,13 +27,13 @@ from temporian.core.operators.arithmetic_scalar.base import (
 class DivideScalarOperator(BaseArithmeticScalarOperator):
     def __init__(
         self,
-        event: Event,
+        node: Node,
         value: Union[float, int],
         is_value_first: bool = False,
     ):
-        super().__init__(event, value, is_value_first)
+        super().__init__(node, value, is_value_first)
 
-        for feat in event.features:
+        for feat in node.features:
             if feat.dtype in [DType.INT32, DType.INT64]:
                 raise ValueError(
                     "Cannot use the divide operator on feature "
@@ -63,41 +63,41 @@ SCALAR = Union[float, int]
 
 
 def divide_scalar(
-    numerator: Union[Event, SCALAR],
-    denominator: Union[Event, SCALAR],
-) -> Event:
-    """Divides an event and a scalar value.
+    numerator: Union[Node, SCALAR],
+    denominator: Union[Node, SCALAR],
+) -> Node:
+    """Divides a node and a scalar value.
 
-    Each item in each feature in the event is divided with the scalar value.
+    Each item in each feature in the node is divided with the scalar value.
 
     Either `numerator` or `denominator` should be a scalar value, but not both.
-    If looking to divide two events, use the `divide` operator instead.
+    If looking to divide two nodes, use the `divide` operator instead.
 
     Args:
-        numerator: Numerator event or value.
-        denominator: Denominator event or value.
+        numerator: Numerator node or value.
+        denominator: Denominator node or value.
 
     Returns:
         Division of `numerator` and `denominator`.
     """
     scalars_types = (float, int)
 
-    if isinstance(numerator, Event) and isinstance(denominator, scalars_types):
+    if isinstance(numerator, Node) and isinstance(denominator, scalars_types):
         return DivideScalarOperator(
-            event=numerator,
+            node=numerator,
             value=denominator,
             is_value_first=False,
-        ).outputs["event"]
+        ).outputs["node"]
 
-    if isinstance(numerator, scalars_types) and isinstance(denominator, Event):
+    if isinstance(numerator, scalars_types) and isinstance(denominator, Node):
         return DivideScalarOperator(
-            event=denominator,
+            node=denominator,
             value=numerator,
             is_value_first=True,
-        ).outputs["event"]
+        ).outputs["node"]
 
     raise ValueError(
         "Invalid input types for divide_scalar. "
-        "Expected (Event, SCALAR) or (SCALAR, Event), "
+        "Expected (Node, SCALAR) or (SCALAR, Node), "
         f"got ({type(numerator)}, {type(denominator)})."
     )

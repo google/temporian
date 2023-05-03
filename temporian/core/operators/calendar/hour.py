@@ -15,7 +15,7 @@
 """Calendar hour operator class and public API function definitions."""
 
 from temporian.core import operator_lib
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators.calendar.base import BaseCalendarOperator
 
 
@@ -34,17 +34,17 @@ class CalendarHourOperator(BaseCalendarOperator):
 operator_lib.register_operator(CalendarHourOperator)
 
 
-def calendar_hour(sampling: Event) -> Event:
-    """Obtains the hour the timestamps in an event's sampling are in.
+def calendar_hour(sampling: Node) -> Node:
+    """Obtains the hour the timestamps in a node's sampling are in.
 
-    Features in input event are ignored. Output feature contains numbers between
+    Features in input node are ignored. Output feature contains numbers between
     0 and 23.
 
     Args:
-        sampling: Event to get the hours from.
+        sampling: Node to get the hours from.
 
     Returns:
-        Event with a single feature corresponding to the hour each timestamp in
-        `event`'s sampling belongs to, with the same sampling as `event`.
+        Node with a single feature corresponding to the hour each timestamp in
+        `node`'s sampling belongs to, with the same sampling as `node`.
     """
-    return CalendarHourOperator(sampling).outputs["event"]
+    return CalendarHourOperator(sampling).outputs["node"]

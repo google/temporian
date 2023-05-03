@@ -18,7 +18,7 @@ from typing import Union, List
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarOperator,
 )
@@ -44,21 +44,21 @@ operator_lib.register_operator(MultiplyScalarOperator)
 
 
 def multiply_scalar(
-    event: Event,
+    node: Node,
     value: Union[float, int],
-) -> Event:
-    """Multiplies an event by a scalar value.
+) -> Node:
+    """Multiplies a node by a scalar value.
 
-    Each item in each feature in `event` is multiplied by `value`.
+    Each item in each feature in `node` is multiplied by `value`.
 
     Args:
-        event: Event to multiply.
-        value: Scalar value to multiply the event by.
+        node: Node to multiply.
+        value: Scalar value to multiply the node by.
 
     Returns:
-        Event with the multiplication of event features and value.
+        Integer division of `node` and `value`.
     """
     return MultiplyScalarOperator(
-        event=event,
+        node=node,
         value=value,
-    ).outputs["event"]
+    ).outputs["node"]

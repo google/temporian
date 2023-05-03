@@ -38,6 +38,7 @@ from temporian.core.operators.propagate import propagate
 from temporian.core.operators.sample import sample
 from temporian.core.operators.select import select
 from temporian.core.operators.set_index import set_index
+from temporian.core.operators.rename import rename
 
 from temporian.core.operators.window.simple_moving_average import (
     simple_moving_average,

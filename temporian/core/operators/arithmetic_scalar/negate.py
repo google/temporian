@@ -12,60 +12,71 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Equal scalar operator class and public API function definition."""
+"""Negate operator class and public API function definition."""
 
-from typing import Union, List
+from typing import List
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
-from temporian.core.data.feature import Feature
 from temporian.core.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarOperator,
 )
 
 
-class EqualScalarOperator(BaseArithmeticScalarOperator):
+class NegateOperator(BaseArithmeticScalarOperator):
+    def __init__(
+        self,
+        node: Node,
+        value: int = -1,
+        is_value_first: bool = False,
+    ):
+        super().__init__(node, value, is_value_first)
+
     @classmethod
     @property
     def operator_def_key(cls) -> str:
-        return "EQUAL_SCALAR"
+        return "NEGATE"
 
-    def output_feature_dtype(self, feature: Feature) -> DType:
-        # override parent method to always return BOOLEAN features
-        return DType.BOOLEAN
+    # this will be ignored because we will override output feature name
+    @property
+    def prefix(self) -> str:
+        return ""
+
+    # overriding feature name to be the same as the input feature
+    def output_feature_name(self, feature_name: str) -> str:
+        return feature_name
+
+    # overriding checking for feature dtype to be the same as value dtype
+    @property
+    def ignore_value_dtype_checking(self) -> bool:
+        return True
 
     @property
     def supported_value_dtypes(self) -> List[DType]:
         return [
-            DType.FLOAT32,
-            DType.FLOAT64,
             DType.INT32,
             DType.INT64,
-            DType.BOOLEAN,
-            DType.STRING,
         ]
 
 
-operator_lib.register_operator(EqualScalarOperator)
+operator_lib.register_operator(NegateOperator)
 
 
-def equal_scalar(
+def negate(
     node: Node,
-    value: Union[float, int, str, bool],
 ) -> Node:
-    """Checks for equality between a node and a scalar.
+    """Negates a node.
 
-    Each item in each feature in `node` is compared to `value`.
+    Multiplies each item in each feature in `node` by -1.
 
     Args:
-        node: Node to compare the value to.
-        value: Scalar value to compare to the node.
+        node: Node to negate.
 
     Returns:
-        Node containing the result of the comparison.
+        Negated node.
     """
-    return EqualScalarOperator(
+    return NegateOperator(
         node=node,
-        value=value,
-    ).outputs["node"]
+        value=-1,
+    ).outputs["event"]

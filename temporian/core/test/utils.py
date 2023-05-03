@@ -3,23 +3,22 @@ from typing import List, Mapping
 
 import pandas as pd
 
+from temporian.core.data import node as node_lib
 from temporian.core.data.dtype import DType
-from temporian.core.data import event as event_lib
 from temporian.core.data.feature import Feature
+from temporian.core.data.node import Node
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators import base
 from temporian.proto import core_pb2 as pb
 from temporian.core import operator_lib
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 
 # The name of the operator is defined by the number of inputs and outputs.
 # For example "OpI1O2" has 1 input and 2 outputs.
 
-Event = event_lib.Event
 
-
-def create_input_event():
-    return event_lib.input_event(
+def create_input_node():
+    return node_lib.input_node(
         features=[
             Feature("f1", DType.FLOAT32),
             Feature("f2", DType.FLOAT32),
@@ -27,8 +26,8 @@ def create_input_event():
     )
 
 
-def create_input_event_data():
-    return NumpyEvent.from_dataframe(
+def create_input_event_set():
+    return EventSet.from_dataframe(
         pd.DataFrame(
             {
                 "timestamp": [0, 2, 4, 6],
@@ -44,32 +43,34 @@ class OpI1O1(base.Operator):
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
             key="OpI1O1",
-            inputs=[pb.OperatorDef.Input(key="event")],
+            inputs=[pb.OperatorDef.Input(key="node")],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
 
-    def __init__(self, event: Event):
+    def __init__(self, node: Node):
         super().__init__()
 
-        self.add_input("event", event)
+        self.add_input("node", node)
         self.add_output(
             "output",
-            Event(
+            Node(
                 features=[
                     Feature(
                         "f3",
                         DType.FLOAT64,
-                        sampling=event.sampling,
+                        sampling=node.sampling,
                         creator=self,
                     ),
                     Feature(
                         "f4",
                         DType.INT64,
-                        sampling=event.sampling,
+                        sampling=node.sampling,
                         creator=self,
                     ),
                 ],
-                sampling=Sampling(index_levels=[], creator=self),
+                sampling=Sampling(
+                    index_levels=[], creator=self, is_unix_timestamp=False
+                ),
                 creator=self,
             ),
         )
@@ -86,18 +87,18 @@ class OpI1O1NotCreator(base.Operator):
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
             key="OpI1O1NotCreator",
-            inputs=[pb.OperatorDef.Input(key="event")],
+            inputs=[pb.OperatorDef.Input(key="node")],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
 
-    def __init__(self, event: Event):
+    def __init__(self, node: Node):
         super().__init__()
-        self.add_input("event", event)
+        self.add_input("node", node)
         self.add_output(
             "output",
-            Event(
-                features=[f for f in event.features],
-                sampling=event.sampling,
+            Node(
+                features=[f for f in node.features],
+                sampling=node.sampling,
                 creator=self,
             ),
         )
@@ -113,34 +114,34 @@ class OpI2O1(base.Operator):
         return pb.OperatorDef(
             key="OpI2O1",
             inputs=[
-                pb.OperatorDef.Input(key="event_1"),
-                pb.OperatorDef.Input(key="event_2"),
+                pb.OperatorDef.Input(key="node_1"),
+                pb.OperatorDef.Input(key="node_2"),
             ],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
 
-    def __init__(self, event_1: Event, event_2: Event):
+    def __init__(self, node_1: Node, node_2: Node):
         super().__init__()
-        self.add_input("event_1", event_1)
-        self.add_input("event_2", event_2)
+        self.add_input("node_1", node_1)
+        self.add_input("node_2", node_2)
         self.add_output(
             "output",
-            Event(
+            Node(
                 features=[
                     Feature(
                         "f5",
                         DType.BOOLEAN,
-                        sampling=event_1.sampling,
+                        sampling=node_1.sampling,
                         creator=self,
                     ),
                     Feature(
                         "f6",
                         DType.STRING,
-                        sampling=event_1.sampling,
+                        sampling=node_1.sampling,
                         creator=self,
                     ),
                 ],
-                sampling=event_1.sampling,
+                sampling=node_1.sampling,
                 creator=self,
             ),
         )
@@ -156,7 +157,7 @@ class OpI1O2(base.Operator):
         return pb.OperatorDef(
             key="OpI1O2",
             inputs=[
-                pb.OperatorDef.Input(key="event"),
+                pb.OperatorDef.Input(key="node"),
             ],
             outputs=[
                 pb.OperatorDef.Output(key="output_1"),
@@ -164,36 +165,36 @@ class OpI1O2(base.Operator):
             ],
         )
 
-    def __init__(self, event: Event):
+    def __init__(self, node: Node):
         super().__init__()
-        self.add_input("event", event)
+        self.add_input("node", node)
         self.add_output(
             "output_1",
-            Event(
+            Node(
                 features=[
                     Feature(
                         "f1",
                         DType.INT32,
-                        sampling=event.sampling,
+                        sampling=node.sampling,
                         creator=self,
                     )
                 ],
-                sampling=event.sampling,
+                sampling=node.sampling,
                 creator=self,
             ),
         )
         self.add_output(
             "output_2",
-            Event(
+            Node(
                 features=[
                     Feature(
                         "f1",
                         DType.FLOAT32,
-                        sampling=event.sampling,
+                        sampling=node.sampling,
                         creator=self,
                     ),
                 ],
-                sampling=event.sampling,
+                sampling=node.sampling,
                 creator=self,
             ),
         )
@@ -209,7 +210,7 @@ class OpWithAttributes(base.Operator):
         return pb.OperatorDef(
             key="OpWithAttributes",
             inputs=[
-                pb.OperatorDef.Input(key="event"),
+                pb.OperatorDef.Input(key="node"),
             ],
             outputs=[
                 pb.OperatorDef.Output(key="output"),
@@ -244,7 +245,7 @@ class OpWithAttributes(base.Operator):
 
     def __init__(
         self,
-        event: Event,
+        node: Node,
         attr_int: int,
         attr_str: str,
         attr_list: List[str],
@@ -259,12 +260,12 @@ class OpWithAttributes(base.Operator):
         self.add_attribute("attr_float", attr_float)
         self.add_attribute("attr_bool", attr_bool)
         self.add_attribute("attr_map", attr_map)
-        self.add_input("event", event)
+        self.add_input("node", node)
         self.add_output(
             "output",
-            Event(
+            Node(
                 features=[],
-                sampling=event.sampling,
+                sampling=node.sampling,
                 creator=self,
             ),
         )

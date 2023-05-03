@@ -17,7 +17,7 @@ from absl.testing import absltest
 import pandas as pd
 
 from temporian.core.operators.drop_index import DropIndexOperator
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.drop_index import (
     DropIndexNumpyImplementation,
 )
@@ -25,8 +25,7 @@ from temporian.implementation.numpy.operators.drop_index import (
 
 class DropIndexNumpyImplementationTest(absltest.TestCase):
     def setUp(self) -> None:
-        # input NumPy event
-        self.numpy_input_evt = NumpyEvent.from_dataframe(
+        self.input_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1, 0.4, 10.0],
@@ -42,12 +41,10 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id", "item_id"],
         )
-        # input event
-        self.input_evt = self.numpy_input_evt.schema()
+        self.input_node = self.input_evset.node()
 
     def test_drop_all(self) -> None:
-        # output NumPy event
-        expected_numpy_output_evt = NumpyEvent.from_dataframe(
+        expected_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 2, 0.1, 13.0],
@@ -65,23 +62,22 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         )
         # instance core operator
         operator = DropIndexOperator(
-            self.input_evt, index_to_drop=["store_id", "item_id"], keep=True
+            self.input_node, index_to_drop=["store_id", "item_id"], keep=True
         )
         # instance operator implementation
         operator_impl = DropIndexNumpyImplementation(operator)
 
         # call operator
-        op_numpy_output_evt = operator_impl.__call__(
-            event=self.numpy_input_evt
-        )["event"]
+        op_numpy_output_evt = operator_impl.__call__(node=self.input_evset)[
+            "node"
+        ]
 
         # validate output
-        self.assertEqual(op_numpy_output_evt, expected_numpy_output_evt)
+        self.assertEqual(op_numpy_output_evt, expected_evset)
 
     def test_drop_item_id(self) -> None:
-        # output NumPy event. Need to do some re-ordering due to timestamp
-        # collisions in sort
-        expected_numpy_output_evt = NumpyEvent.from_dataframe(
+        # Need to do some re-ordering due to timestamp collisions in sort
+        expected_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 2, 0.1, 13.0],
@@ -99,22 +95,19 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         )
         # instance core operator
         operator = DropIndexOperator(
-            self.input_evt, index_to_drop=["item_id"], keep=True
+            self.input_node, index_to_drop=["item_id"], keep=True
         )
         # instance operator implementation
         operator_impl = DropIndexNumpyImplementation(operator)
 
         # call operator
-        op_numpy_output_evt = operator_impl.call(event=self.numpy_input_evt)[
-            "event"
-        ]
+        op_numpy_output_evt = operator_impl.call(node=self.input_evset)["node"]
 
         # validate output
-        self.assertEqual(op_numpy_output_evt, expected_numpy_output_evt)
+        self.assertEqual(op_numpy_output_evt, expected_evset)
 
     def test_drop_store_id(self) -> None:
-        # output NumPy event
-        expected_numpy_output_evt = NumpyEvent.from_dataframe(
+        expected_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 2, 0.1, 13.0],
@@ -132,23 +125,20 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         )
         # instance core operator
         operator = DropIndexOperator(
-            self.input_evt, index_to_drop=["store_id"], keep=True
+            self.input_node, index_to_drop=["store_id"], keep=True
         )
         # instance operator implementation
         operator_impl = DropIndexNumpyImplementation(operator)
 
         # call operator
-        op_numpy_output_evt = operator_impl.call(event=self.numpy_input_evt)[
-            "event"
-        ]
+        op_numpy_output_evt = operator_impl.call(node=self.input_evset)["node"]
 
         # validate output
-        self.assertEqual(op_numpy_output_evt, expected_numpy_output_evt)
+        self.assertEqual(op_numpy_output_evt, expected_evset)
 
     def test_drop_item_id_keep_false(self) -> None:
-        # output NumPy event. Need to do some re-ordering due to timestamp
-        # collisions in sort
-        expected_numpy_output_evt = NumpyEvent.from_dataframe(
+        # Need to do some re-ordering due to timestamp collisions in sort
+        expected_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 0.1, 13.0],
@@ -166,23 +156,20 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         )
         # instance core operator
         operator = DropIndexOperator(
-            self.input_evt, index_to_drop=["item_id"], keep=False
+            self.input_node, index_to_drop=["item_id"], keep=False
         )
         # instance operator implementation
         operator_impl = DropIndexNumpyImplementation(operator)
 
         # call operator
-        op_numpy_output_evt = operator_impl.call(event=self.numpy_input_evt)[
-            "event"
-        ]
+        op_numpy_output_evt = operator_impl.call(node=self.input_evset)["node"]
 
         # validate output
-        self.assertEqual(op_numpy_output_evt, expected_numpy_output_evt)
+        self.assertEqual(op_numpy_output_evt, expected_evset)
 
     def test_drop_store_id_keep_false(self) -> None:
-        # output NumPy event. Need to do some re-ordering due to timestamp
-        # collisions in sort
-        expected_numpy_output_evt = NumpyEvent.from_dataframe(
+        # Need to do some re-ordering due to timestamp collisions in sort
+        expected_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [2, 0.1, 13.0],
@@ -200,21 +187,19 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         )
         # instance core operator
         operator = DropIndexOperator(
-            self.input_evt, index_to_drop=["store_id"], keep=False
+            self.input_node, index_to_drop=["store_id"], keep=False
         )
         # instance operator implementation
         operator_impl = DropIndexNumpyImplementation(operator)
 
         # call operator
-        op_numpy_output_evt = operator_impl.call(event=self.numpy_input_evt)[
-            "event"
-        ]
+        op_numpy_output_evt = operator_impl.call(node=self.input_evset)["node"]
 
         # validate output
-        self.assertEqual(op_numpy_output_evt, expected_numpy_output_evt)
+        self.assertEqual(op_numpy_output_evt, expected_evset)
 
     def test_str_index(self):
-        event_data = NumpyEvent.from_dataframe(
+        evset = EventSet.from_dataframe(
             pd.DataFrame(
                 {
                     "timestamp": [1, 2, 2, 3],
@@ -226,9 +211,9 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["b", "c"],
         )
-        event = event_data.schema()
+        node = evset.node()
 
-        expected_output = NumpyEvent.from_dataframe(
+        expected_output = EventSet.from_dataframe(
             pd.DataFrame(
                 {
                     "timestamp": [1, 2, 2, 3],
@@ -242,9 +227,9 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         )
 
         # Run op
-        op = DropIndexOperator(event=event, index_to_drop=["b"], keep=True)
+        op = DropIndexOperator(node=node, index_to_drop=["b"], keep=True)
         instance = DropIndexNumpyImplementation(op)
-        output = instance.call(event=event_data)["event"]
+        output = instance.call(node=evset)["node"]
         self.assertEqual(output, expected_output)
 
 

@@ -15,9 +15,9 @@
 """Base operator class and auxiliary classes definition."""
 
 from abc import ABC
-from typing import Any, Union
+from typing import Union, Any
 
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.proto import core_pb2 as pb
 
 
@@ -58,9 +58,13 @@ class Operator(ABC):
     """Interface definition and common logic for operators."""
 
     def __init__(self):
-        self._inputs: dict[str, Event] = {}
-        self._outputs: dict[str, Event] = {}
+        self._inputs: dict[str, Node] = {}
+        self._outputs: dict[str, Node] = {}
         self._attributes: dict[str, AttributeType] = {}
+        self._definition: pb.OperatorDef = self.build_op_definition()
+        self._attr_types: dict[str:type] = {
+            attr.key: attr.type for attr in self._definition.attributes
+        }
 
     def __str__(self):
         return (
@@ -73,11 +77,11 @@ class Operator(ABC):
         return self._attributes
 
     @property
-    def inputs(self) -> dict[str, Event]:
+    def inputs(self) -> dict[str, Node]:
         return self._inputs
 
     @property
-    def outputs(self) -> dict[str, Event]:
+    def outputs(self) -> dict[str, Node]:
         return self._outputs
 
     @attributes.setter
@@ -85,30 +89,32 @@ class Operator(ABC):
         self._attributes = attributes
 
     @inputs.setter
-    def inputs(self, inputs: dict[str, Event]):
+    def inputs(self, inputs: dict[str, Node]):
         self._inputs = inputs
 
     @outputs.setter
-    def outputs(self, outputs: dict[str, Event]):
+    def outputs(self, outputs: dict[str, Node]):
         self._outputs = outputs
 
-    def add_input(self, key: str, event: Event) -> None:
+    def add_input(self, key: str, node: Node) -> None:
         with OperatorExceptionDecorator(self):
             if key in self.inputs:
                 raise ValueError(f'Already existing input "{key}".')
-            self.inputs[key] = event
+            self.inputs[key] = node
 
-    def add_output(self, key: str, event: Event) -> None:
+    def add_output(self, key: str, node: Node) -> None:
         with OperatorExceptionDecorator(self):
             if key in self.outputs:
                 raise ValueError(f'Already existing output "{key}".')
-            self.outputs[key] = event
+            self.outputs[key] = node
 
     def add_attribute(self, key: str, value: AttributeType) -> None:
         with OperatorExceptionDecorator(self):
             if key in self.attributes:
                 raise ValueError(f'Already existing attribute "{key}".')
-            self.attributes[key] = value
+            self.attributes[key] = self.cast_attribute_type(
+                value, self._attr_types[key]
+            )
 
     def check(self) -> None:
         """Ensures that the operator is valid."""
@@ -161,7 +167,7 @@ class Operator(ABC):
         raise NotImplementedError()
 
     def definition(self) -> pb.OperatorDef:
-        return self.build_op_definition()
+        return self._definition
 
     @classmethod
     def operator_key(cls) -> str:
@@ -254,3 +260,24 @@ class Operator(ABC):
                 "Attribute of type ANY has an invalid value type:"
                 f" {type(value)}"
             )
+
+    @classmethod
+    def cast_attribute_type(
+        cls, value: Any, attr_type: pb.OperatorDef.Attribute.Type
+    ) -> Any:
+        """
+        Cast some attribute types that can be converted without risk:
+        int -> float
+        int [0,1] -> bool
+        """
+        if attr_type == pb.OperatorDef.Attribute.Type.FLOAT_64 and isinstance(
+            value, int
+        ):
+            return float(value)
+        if (
+            attr_type == pb.OperatorDef.Attribute.Type.BOOL
+            and isinstance(value, int)
+            and value in [0, 1]
+        ):
+            return bool(value)
+        return value

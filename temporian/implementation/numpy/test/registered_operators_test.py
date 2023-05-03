@@ -51,6 +51,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "MULTIPLICATION_SCALAR",
             "PREFIX",
             "PROPAGATE",
+            "RENAME",
             "SAMPLE",
             "SELECT",
             "SIMPLE_MOVING_AVERAGE",
