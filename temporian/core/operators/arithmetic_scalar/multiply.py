@@ -48,21 +48,21 @@ operator_lib.register_operator(MultiplyScalarOperator)
 
 
 def multiply_scalar(
-    node: Node,
+    input: Node,
     value: Union[float, int],
 ) -> Node:
     """Multiplies a node by a scalar value.
 
-    Each item in each feature in `node` is multiplied by `value`.
+    Each item in each feature in `input` is multiplied by `value`.
 
     Args:
-        node: Node to multiply.
-        value: Scalar value to multiply the node by.
+        input: Node to multiply.
+        value: Scalar value to multiply the input by.
 
     Returns:
-        Integer division of `node` and `value`.
+        Integer division of `input` and `value`.
     """
     return MultiplyScalarOperator(
-        node=node,
+        input=input,
         value=value,
-    ).outputs["node"]
+    ).outputs["output"]

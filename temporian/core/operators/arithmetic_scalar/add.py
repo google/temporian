@@ -48,21 +48,21 @@ operator_lib.register_operator(AddScalarOperator)
 
 
 def add_scalar(
-    node: Node,
+    input: Node,
     value: Union[float, int],
 ) -> Node:
     """Adds a scalar value to a node.
 
-    `value` is added to each item in each feature in `node`.
+    `value` is added to each item in each feature in `input`.
 
     Args:
-        node: Node to add a scalar to.
-        value: Scalar value to add to the node.
+        input: Node to add a scalar to.
+        value: Scalar value to add to the input.
 
     Returns:
-        Addition of `node` and `value`.
+        Addition of `input` and `value`.
     """
     return AddScalarOperator(
-        node=node,
+        input=input,
         value=value,
-    ).outputs["node"]
+    ).outputs["output"]

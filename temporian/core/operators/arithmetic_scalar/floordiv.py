@@ -72,17 +72,17 @@ def floordiv_scalar(
 
     if isinstance(numerator, Node) and isinstance(denominator, scalars_types):
         return FloorDivScalarOperator(
-            node=numerator,
+            input=numerator,
             value=denominator,
             is_value_first=False,
-        ).outputs["node"]
+        ).outputs["output"]
 
     if isinstance(numerator, scalars_types) and isinstance(denominator, Node):
         return FloorDivScalarOperator(
-            node=denominator,
+            input=denominator,
             value=numerator,
             is_value_first=True,
-        ).outputs["node"]
+        ).outputs["output"]
 
     raise ValueError(
         "Invalid input types for floordiv_scalar. "

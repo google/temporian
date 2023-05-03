@@ -27,19 +27,18 @@ from temporian.core.operators.arithmetic_scalar.base import (
 class DivideScalarOperator(BaseArithmeticScalarOperator):
     def __init__(
         self,
-        node: Node,
+        input: Node,
         value: Union[float, int],
         is_value_first: bool = False,
     ):
-        super().__init__(node, value, is_value_first)
+        super().__init__(input, value, is_value_first)
 
-        for feat in node.features:
+        for feat in input.features:
             if feat.dtype in [DType.INT32, DType.INT64]:
                 raise ValueError(
                     "Cannot use the divide operator on feature "
-                    f"{feat.name} of type {feat.dtype}. Cast to "
-                    "a floating point type or use "
-                    "floordiv operator (//)."
+                    f"{feat.name} of type {feat.dtype}. Cast to a "
+                    "floating point type or use floordiv operator (//)."
                 )
 
     @classmethod
@@ -88,17 +87,17 @@ def divide_scalar(
 
     if isinstance(numerator, Node) and isinstance(denominator, scalars_types):
         return DivideScalarOperator(
-            node=numerator,
+            input=numerator,
             value=denominator,
             is_value_first=False,
-        ).outputs["node"]
+        ).outputs["output"]
 
     if isinstance(numerator, scalars_types) and isinstance(denominator, Node):
         return DivideScalarOperator(
-            node=denominator,
+            input=denominator,
             value=numerator,
             is_value_first=True,
-        ).outputs["node"]
+        ).outputs["output"]
 
     raise ValueError(
         "Invalid input types for divide_scalar. "

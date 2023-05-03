@@ -92,7 +92,7 @@ class BaseArithmeticOperator(Operator):
                 pb.OperatorDef.Input(key="input_1"),
                 pb.OperatorDef.Input(key="input_2"),
             ],
-            outputs=[pb.OperatorDef.Output(key="node")],
+            outputs=[pb.OperatorDef.Output(key="output")],
         )
 
     @classmethod

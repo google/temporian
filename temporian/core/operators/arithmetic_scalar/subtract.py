@@ -72,17 +72,17 @@ def subtract_scalar(
 
     if isinstance(minuend, Node) and isinstance(subtrahend, scalars_types):
         return SubtractScalarOperator(
-            node=minuend,
+            input=minuend,
             value=subtrahend,
             is_value_first=False,
-        ).outputs["node"]
+        ).outputs["output"]
 
     if isinstance(minuend, scalars_types) and isinstance(subtrahend, Node):
         return SubtractScalarOperator(
-            node=subtrahend,
+            input=subtrahend,
             value=minuend,
             is_value_first=True,
-        ).outputs["node"]
+        ).outputs["output"]
 
     raise ValueError(
         "Invalid input types for subtract_scalar. "

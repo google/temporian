@@ -37,9 +37,9 @@ preview = true
 [tool.pylint]
 max-line-length = 80
 
+[tool.pyright]
+include = ["temporian"]
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.pyright]
-include = ["temporian"]

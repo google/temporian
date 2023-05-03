@@ -55,21 +55,21 @@ operator_lib.register_operator(EqualScalarOperator)
 
 
 def equal_scalar(
-    node: Node,
+    input: Node,
     value: Union[float, int, str, bool],
 ) -> Node:
     """Checks for equality between a node and a scalar.
 
-    Each item in each feature in `node` is compared to `value`.
+    Each item in each feature in `input` is compared to `value`.
 
     Args:
-        node: Node to compare the value to.
-        value: Scalar value to compare to the node.
+        input: Node to compare the value to.
+        value: Scalar value to compare to the input.
 
     Returns:
         Node containing the result of the comparison.
     """
     return EqualScalarOperator(
-        node=node,
+        input=input,
         value=value,
-    ).outputs["node"]
+    ).outputs["output"]
