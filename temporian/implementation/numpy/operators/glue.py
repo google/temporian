@@ -31,7 +31,7 @@ class GlueNumpyImplementation(OperatorImplementation):
 
     def __call__(
         self,
-        **evset_dict: Dict[str, EventSet],
+        **inputs: Dict[str, EventSet],
     ) -> Dict[str, EventSet]:
         """Glues a dictionary of EventSets.
 
@@ -42,7 +42,7 @@ class GlueNumpyImplementation(OperatorImplementation):
             output is guarenteed to be [X, Y, Z].
         """
         # convert input evest dict to list of evsets
-        evsets = list(list(zip(*sorted(list(evset_dict.items()))))[1])
+        evsets = list(list(zip(*sorted(list(inputs.items()))))[1])
         if len(evsets) < 2:
             raise ValueError(
                 f"Glue operator cannot be called on a {len(evsets)} event sets."
@@ -65,7 +65,7 @@ class GlueNumpyImplementation(OperatorImplementation):
             for evset in evsets[1:]:
                 dst_evset[index_key].features.extend(evset[index_key].features)
 
-        return {"node": dst_evset}
+        return {"output": dst_evset}
 
 
 implementation_lib.register_operator_implementation(
