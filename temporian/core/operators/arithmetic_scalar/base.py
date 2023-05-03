@@ -45,7 +45,7 @@ class BaseArithmeticScalarOperator(Operator):
         self.add_attribute("is_value_first", is_value_first)
 
         if not isinstance(input, Node):
-            raise TypeError(f"Node must be of type Node but got {type(input)}")
+            raise TypeError(f"Input must be of type Node but got {type(input)}")
 
         # check that every dtype of input feature is equal to value dtype
         value_dtype = DType.from_python_type(type(value))
