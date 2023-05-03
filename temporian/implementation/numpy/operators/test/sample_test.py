@@ -21,7 +21,7 @@ from temporian.core.operators.sample import Sample
 from temporian.implementation.numpy.operators.sample import (
     SampleNumpyImplementation,
 )
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 
 
 class SampleOperatorTest(absltest.TestCase):
@@ -29,7 +29,7 @@ class SampleOperatorTest(absltest.TestCase):
         pass
 
     def test_base(self):
-        event_data = NumpyEvent.from_dataframe(
+        evset = EventSet.from_dataframe(
             pd.DataFrame(
                 {
                     "timestamp": [1, 5, 8, 9, 1, 1],
@@ -41,9 +41,9 @@ class SampleOperatorTest(absltest.TestCase):
             ),
             index_names=["x"],
         )
-        event = event_data.schema()
+        node = evset.node()
 
-        sampling_data = NumpyEvent.from_dataframe(
+        sampling_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 {
                     "timestamp": [-1, 1, 6, 10, 2, 2, 1],
@@ -52,9 +52,9 @@ class SampleOperatorTest(absltest.TestCase):
             ),
             index_names=["x"],
         )
-        sampling = sampling_data.schema()
+        sampling_node = sampling_evset.node()
 
-        expected_output = NumpyEvent.from_dataframe(
+        expected_output = EventSet.from_dataframe(
             pd.DataFrame(
                 {
                     "timestamp": [-1, 1, 6, 10, 2, 2, 1],
@@ -68,11 +68,9 @@ class SampleOperatorTest(absltest.TestCase):
         )
 
         # Run op
-        op = Sample(event=event, sampling=sampling)
+        op = Sample(node=node, sampling=sampling_node)
         instance = SampleNumpyImplementation(op)
-        output = instance.call(event=event_data, sampling=sampling_data)[
-            "event"
-        ]
+        output = instance.call(node=evset, sampling=sampling_evset)["node"]
 
         self.assertEqual(output, expected_output)
 

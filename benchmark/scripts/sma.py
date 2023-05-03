@@ -13,13 +13,13 @@
 # limitations under the License.
 """Basic profiling script for temporian.
 
-The script creates an event, applies an sma on it, and evaluates the graph.
+The script creates a node, applies an sma to it, and evaluates the graph.
 """
 
 import numpy as np
 import pandas as pd
 import temporian as tp
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 
 # Make results reproducible
 np.random.seed(0)
@@ -47,7 +47,7 @@ def main():
     product_ids = np.random.choice(ids, N)
     store_ids = np.random.choice(ids, N)
 
-    event_data = NumpyEvent.from_dataframe(
+    evset = EventSet.from_dataframe(
         pd.DataFrame(
             {
                 STORE: store_ids,
@@ -59,14 +59,14 @@ def main():
         index_names=[STORE, PRODUCT],
     )
 
-    event = event_data.schema()
+    node = evset.node()
 
-    sma = tp.simple_moving_average(event, window_length=10.0)
+    sma = tp.simple_moving_average(node, window_length=10.0)
 
-    res: NumpyEvent = tp.evaluate(
+    res: EventSet = tp.evaluate(
         sma,
         input_data={
-            event: event_data,
+            node: evset,
         },
         check_execution=False,
     )

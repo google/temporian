@@ -18,8 +18,8 @@ from typing import Dict, Optional, List, Any
 import numpy as np
 
 from temporian.core.operators.window.base import BaseWindowOperator
-from temporian.implementation.numpy.data.event import IndexData
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import IndexData
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -33,26 +33,26 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
 
     def __call__(
         self,
-        event: NumpyEvent,
-        sampling: Optional[NumpyEvent] = None,
-    ) -> Dict[str, NumpyEvent]:
-        # if no sampling is provided, apply operator to the event's own
+        node: EventSet,
+        sampling: Optional[EventSet] = None,
+    ) -> Dict[str, EventSet]:
+        # if no sampling is provided, apply operator to the evset's own
         # timestamps
         if sampling is None:
-            sampling = event
+            sampling = node
 
-        # create destination event
-        dst_event = NumpyEvent(
+        # create destination evset
+        dst_evset = EventSet(
             {},
-            feature_names=event.feature_names,
+            feature_names=node.feature_names,
             index_names=sampling.index_names,
             is_unix_timestamp=sampling.is_unix_timestamp,
         )
         # For each index
-        for index_key, index_data in event.iterindex():
+        for index_key, index_data in node.iterindex():
             dst_features = []
             dst_timestamps = sampling[index_key].timestamps
-            dst_event[index_key] = IndexData(dst_features, dst_timestamps)
+            dst_evset[index_key] = IndexData(dst_features, dst_timestamps)
             self._compute(
                 src_timestamps=index_data.timestamps,
                 src_features=index_data.features,
@@ -60,7 +60,7 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
                 dst_features=dst_features,
             )
 
-        return {"event": dst_event}
+        return {"node": dst_evset}
 
     @abstractmethod
     def _implementation(self) -> Any:
@@ -76,8 +76,8 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
         implementation = self._implementation()
         for src_ts in src_features:
             kwargs = {
-                "event_timestamps": src_timestamps,
-                "event_values": src_ts,
+                "evset_timestamps": src_timestamps,
+                "evset_values": src_ts,
                 "window_length": self.operator.window_length,
             }
             if self._operator.has_sampling:

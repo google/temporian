@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from absl.testing import absltest
+import math
 
-import pandas as pd
+from absl.testing import absltest
 import numpy as np
+from numpy.testing import assert_almost_equal
+import pandas as pd
 
 from temporian.core.operators.window.moving_standard_deviation import (
     MovingStandardDeviationOperator,
@@ -23,11 +25,9 @@ from temporian.core.operators.window.moving_standard_deviation import (
 from temporian.implementation.numpy.operators.window.moving_standard_deviation import (
     MovingStandardDeviationNumpyImplementation,
 )
-from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.core.data import event as event_lib
-import math
+from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.core.data import node as node_lib
 from temporian.implementation.numpy_cc.operators import window as window_cc
-from numpy.testing import assert_almost_equal
 
 
 def _f64(l):
@@ -53,9 +53,9 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
         )
 
     def test_flat(self):
-        """A simple time sequence."""
+        """A simple event set."""
 
-        input_data = NumpyEvent.from_dataframe(
+        input_data = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [10.0, 20.0, 1],
@@ -69,16 +69,16 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
         )
 
         op = MovingStandardDeviationOperator(
-            event=input_data.schema(),
+            node=input_data.node(),
             window_length=5.0,
             sampling=None,
         )
-        self.assertEqual(op.list_matching_io_samplings(), [("event", "event")])
+        self.assertEqual(op.list_matching_io_samplings(), [("node", "node")])
         instance = MovingStandardDeviationNumpyImplementation(op)
 
-        output = instance(event=input_data)
+        output = instance(node=input_data)
 
-        expected_output = NumpyEvent.from_dataframe(
+        expected_output = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 0, 1],
@@ -91,12 +91,12 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
             )
         )
 
-        self.assertEqual(repr(output), repr({"event": expected_output}))
+        self.assertEqual(repr(output), repr({"node": expected_output}))
 
     def test_with_index(self):
-        """Indexed time sequences."""
+        """Indexed event sets."""
 
-        input_data = NumpyEvent.from_dataframe(
+        input_data = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     ["X1", "Y1", 10.0, 1],
@@ -115,16 +115,16 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
         )
 
         op = MovingStandardDeviationOperator(
-            event=input_data.schema(),
+            node=input_data.node(),
             window_length=5.0,
             sampling=None,
         )
-        self.assertEqual(op.list_matching_io_samplings(), [("event", "event")])
+        self.assertEqual(op.list_matching_io_samplings(), [("node", "node")])
         instance = MovingStandardDeviationNumpyImplementation(op)
 
-        output = instance(event=input_data)
+        output = instance(node=input_data)
 
-        expected_output = NumpyEvent.from_dataframe(
+        expected_output = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     ["X1", "Y1", 0, 1],
@@ -142,12 +142,12 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
             index_names=["x", "y"],
         )
 
-        self.assertEqual(repr(output), repr({"event": expected_output}))
+        self.assertEqual(repr(output), repr({"node": expected_output}))
 
     def test_with_sampling(self):
-        """Time sequenes with user provided sampling."""
+        """Event sets with user provided sampling."""
 
-        input_data = NumpyEvent.from_dataframe(
+        input_data = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [10.0, 1],
@@ -161,16 +161,16 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
         )
 
         op = MovingStandardDeviationOperator(
-            event=input_data.schema(),
+            node=input_data.node(),
             window_length=3.1,
-            sampling=event_lib.input_event([]),
+            sampling=node_lib.input_node([]),
         )
         self.assertEqual(
-            op.list_matching_io_samplings(), [("sampling", "event")]
+            op.list_matching_io_samplings(), [("sampling", "node")]
         )
         instance = MovingStandardDeviationNumpyImplementation(op)
 
-        sampling_data = NumpyEvent.from_dataframe(
+        sampling_data = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [-1.0],
@@ -185,9 +185,9 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
             )
         )
 
-        output = instance(event=input_data, sampling=sampling_data)
+        output = instance(node=input_data, sampling=sampling_data)
 
-        expected_output = NumpyEvent.from_dataframe(
+        expected_output = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [math.nan, -1.0],
@@ -202,12 +202,12 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
             )
         )
 
-        self.assertEqual(repr(output), repr({"event": expected_output}))
+        self.assertEqual(repr(output), repr({"node": expected_output}))
 
     def test_with_nan(self):
         """The input features contains nan values."""
 
-        input_data = NumpyEvent.from_dataframe(
+        input_data = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [math.nan, 1],
@@ -221,13 +221,13 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
         )
 
         op = MovingStandardDeviationOperator(
-            event=input_data.schema(),
+            node=input_data.node(),
             window_length=1.1,
-            sampling=event_lib.input_event([]),
+            sampling=node_lib.input_node([]),
         )
         instance = MovingStandardDeviationNumpyImplementation(op)
 
-        sampling_data = NumpyEvent.from_dataframe(
+        sampling_data = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [1],
@@ -243,9 +243,9 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
             )
         )
 
-        output = instance(event=input_data, sampling=sampling_data)
+        output = instance(node=input_data, sampling=sampling_data)
 
-        expected_output = NumpyEvent.from_dataframe(
+        expected_output = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [math.nan, 1],
@@ -261,7 +261,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
             )
         )
 
-        self.assertEqual(repr(output), repr({"event": expected_output}))
+        self.assertEqual(repr(output), repr({"node": expected_output}))
 
 
 if __name__ == "__main__":

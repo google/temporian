@@ -25,7 +25,7 @@ from temporian.core.operators.arithmetic_scalar import (
     EqualScalarOperator,
     NegateOperator,
 )
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.arithmetic_scalar import (
     AddScalarNumpyImplementation,
     SubtractScalarNumpyImplementation,
@@ -42,7 +42,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
     addition, subtraction, division and multiplication"""
 
     def setUp(self):
-        self.event_data = NumpyEvent.from_dataframe(
+        self.evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1.0, 10.0],
@@ -56,14 +56,14 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id"],
         )
 
-        self.event = self.event_data.schema()
+        self.node = self.evset.node()
 
     def test_correct_add(self) -> None:
         """Test correct sum operator."""
 
         value = 10.0
 
-        numpy_output_event = NumpyEvent.from_dataframe(
+        output_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1.0, 20.0],
@@ -78,22 +78,22 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = AddScalarOperator(
-            event=self.event,
+            node=self.node,
             value=value,
         )
 
         impl = AddScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(event=self.event_data)
+        operator_output = impl.call(node=self.evset)
 
-        self.assertEqual(numpy_output_event, operator_output["event"])
+        self.assertEqual(output_evset, operator_output["node"])
 
     def test_correct_subtraction(self) -> None:
         """Test correct subtraction operator."""
 
         value = 10.0
 
-        numpy_output_event = NumpyEvent.from_dataframe(
+        output_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1.0, 0.0],
@@ -108,15 +108,15 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = SubtractScalarOperator(
-            event=self.event,
+            node=self.node,
             value=value,
         )
 
         impl = SubtractScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(event=self.event_data)
+        operator_output = impl.call(node=self.evset)
 
-        self.assertEqual(numpy_output_event, operator_output["event"])
+        self.assertEqual(output_evset, operator_output["node"])
 
     def test_correct_subtraction_value_first(self) -> None:
         """Test correct subtraction operator when value is the first.
@@ -124,7 +124,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         """
         value = 10.0
 
-        numpy_output_event = NumpyEvent.from_dataframe(
+        output_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1.0, 0.0],
@@ -139,23 +139,23 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = SubtractScalarOperator(
-            event=self.event,
+            node=self.node,
             value=value,
             is_value_first=True,
         )
 
         impl = SubtractScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(event=self.event_data)
+        operator_output = impl.call(node=self.evset)
 
-        self.assertEqual(numpy_output_event, operator_output["event"])
+        self.assertEqual(output_evset, operator_output["node"])
 
     def test_correct_multiplication(self) -> None:
         """Test correct multiplication operator."""
 
         value = 10.0
 
-        numpy_output_event = NumpyEvent.from_dataframe(
+        output_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1.0, 100.0],
@@ -170,22 +170,22 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = MultiplyScalarOperator(
-            event=self.event,
+            node=self.node,
             value=value,
         )
 
         impl = MultiplyScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(event=self.event_data)
+        operator_output = impl.call(node=self.evset)
 
-        self.assertEqual(numpy_output_event, operator_output["event"])
+        self.assertEqual(output_evset, operator_output["node"])
 
     def test_correct_division(self) -> None:
         """Test correct division operator."""
 
         value = 10.0
 
-        numpy_output_event = NumpyEvent.from_dataframe(
+        output_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1.0, 1.0],
@@ -200,21 +200,21 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = DivideScalarOperator(
-            event=self.event,
+            node=self.node,
             value=value,
         )
 
         impl = DivideScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(event=self.event_data)
+        operator_output = impl.call(node=self.evset)
 
-        self.assertEqual(numpy_output_event, operator_output["event"])
+        self.assertEqual(output_evset, operator_output["node"])
 
     def test_correct_division_with_value_as_numerator(self) -> None:
         """Test correct division operator with value as numerator."""
         value = 10.0
 
-        numpy_output_event = NumpyEvent.from_dataframe(
+        output_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1.0, 1.0],
@@ -229,23 +229,23 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = DivideScalarOperator(
-            event=self.event,
+            node=self.node,
             value=value,
             is_value_first=True,
         )
 
         impl = DivideScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(event=self.event_data)
+        operator_output = impl.call(node=self.evset)
 
-        self.assertEqual(numpy_output_event, operator_output["event"])
+        self.assertEqual(output_evset, operator_output["node"])
 
     def test_correct_floor_division(self) -> None:
         """Test correct floor division operator."""
 
         value = 10.0
 
-        numpy_output_event = NumpyEvent.from_dataframe(
+        output_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1.0, 1.0],
@@ -260,21 +260,21 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = FloorDivScalarOperator(
-            event=self.event,
+            node=self.node,
             value=value,
         )
 
         impl = FloorDivideScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(event=self.event_data)
+        operator_output = impl.call(node=self.evset)
 
-        self.assertEqual(numpy_output_event, operator_output["event"])
+        self.assertEqual(output_evset, operator_output["node"])
 
     def test_correct_floor_division_with_value_as_numerator(self) -> None:
         """Test correct floor division operator with value as numerator."""
         value = 10.0
 
-        numpy_output_event = NumpyEvent.from_dataframe(
+        output_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1.0, 1.0],
@@ -289,21 +289,21 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = FloorDivScalarOperator(
-            event=self.event,
+            node=self.node,
             value=value,
             is_value_first=True,
         )
 
         impl = FloorDivideScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(event=self.event_data)
+        operator_output = impl.call(node=self.evset)
 
-        self.assertEqual(numpy_output_event, operator_output["event"])
+        self.assertEqual(output_evset, operator_output["node"])
 
     def test_correct_negation(self) -> None:
         """Test correct negation operator."""
 
-        numpy_output_event = NumpyEvent.from_dataframe(
+        output_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1.0, -10.0],
@@ -317,18 +317,18 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id"],
         )
 
-        operator = NegateOperator(event=self.event)
+        operator = NegateOperator(node=self.node)
 
         impl = NegateNumpyImplementation(operator)
 
-        operator_output = impl.call(event=self.event_data)
+        operator_output = impl.call(node=self.evset)
 
-        self.assertEqual(numpy_output_event, operator_output["event"])
+        self.assertEqual(output_evset, operator_output["node"])
 
     def test_correct_sum_multi_index(self) -> None:
         """Test correct sum operator with multiple indexes."""
 
-        event_data = NumpyEvent.from_dataframe(
+        evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 101, 1.0, 10.0],
@@ -344,7 +344,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         value = 10.0
 
-        numpy_output_event = NumpyEvent.from_dataframe(
+        output_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 101, 1.0, 20.0],
@@ -363,18 +363,18 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id", "product_id"],
         )
 
-        event = event_data.schema()
+        node = evset.node()
 
         operator = AddScalarOperator(
-            event=event,
+            node=node,
             value=value,
         )
 
         impl = AddScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(event=event_data)
+        operator_output = impl.call(node=evset)
 
-        self.assertEqual(numpy_output_event, operator_output["event"])
+        self.assertEqual(output_evset, operator_output["node"])
 
     def test_addition_different_dtypes(self) -> None:
         """Test correct addition operator with different dtypes."""
@@ -383,7 +383,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         with self.assertRaises(ValueError):
             operator = AddScalarOperator(
-                event=self.event,
+                node=self.node,
                 value=value,
             )
 
@@ -394,14 +394,14 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         with self.assertRaises(ValueError):
             operator = AddScalarOperator(
-                event=self.event,
+                node=self.node,
                 value=value,
             )
 
     def test_addition_with_int(self) -> None:
         """Test correct addition operator with int value."""
 
-        event_data = NumpyEvent.from_dataframe(
+        evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1.0, 10],
@@ -415,11 +415,11 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id"],
         )
 
-        event = event_data.schema()
+        node = evset.node()
 
         value = 10
 
-        numpy_output_event = NumpyEvent.from_dataframe(
+        output_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1.0, 20],
@@ -434,20 +434,20 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = AddScalarOperator(
-            event=event,
+            node=node,
             value=value,
         )
 
         impl = AddScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(event=event_data)
+        operator_output = impl.call(node=evset)
 
-        self.assertEqual(numpy_output_event, operator_output["event"])
+        self.assertEqual(output_evset, operator_output["node"])
 
     def test_correct_equal(self) -> None:
         """Test correct equal operator."""
 
-        self.event_data = NumpyEvent.from_dataframe(
+        self.evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1.0, 10.0],
@@ -461,11 +461,11 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id"],
         )
 
-        self.event = self.event_data.schema()
+        self.node = self.evset.node()
 
         value = 0.0
 
-        numpy_output_event = NumpyEvent.from_dataframe(
+        output_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1.0, False],
@@ -480,15 +480,15 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = EqualScalarOperator(
-            event=self.event,
+            node=self.node,
             value=value,
         )
 
         impl = EqualScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(event=self.event_data)
+        operator_output = impl.call(node=self.evset)
 
-        self.assertEqual(numpy_output_event, operator_output["event"])
+        self.assertEqual(output_evset, operator_output["node"])
 
 
 if __name__ == "__main__":

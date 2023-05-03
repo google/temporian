@@ -18,7 +18,7 @@ from typing import Union, List
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarOperator,
 )
@@ -48,21 +48,21 @@ operator_lib.register_operator(AddScalarOperator)
 
 
 def add_scalar(
-    event: Event,
+    node: Node,
     value: Union[float, int],
-) -> Event:
-    """Adds a scalar value to an event.
+) -> Node:
+    """Adds a scalar value to a node.
 
-    `value` is added to each item in each feature in `event`.
+    `value` is added to each item in each feature in `node`.
 
     Args:
-        event: Event to add a scalar to.
-        value: Scalar value to add to the event.
+        node: Node to add a scalar to.
+        value: Scalar value to add to the node.
 
     Returns:
-        Addition of `event` and `value`.
+        Addition of `node` and `value`.
     """
     return AddScalarOperator(
-        event=event,
+        node=node,
         value=value,
-    ).outputs["event"]
+    ).outputs["node"]

@@ -18,7 +18,7 @@ from typing import List
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarOperator,
 )
@@ -27,11 +27,11 @@ from temporian.core.operators.arithmetic_scalar.base import (
 class NegateOperator(BaseArithmeticScalarOperator):
     def __init__(
         self,
-        event: Event,
+        node: Node,
         value: int = -1,
         is_value_first: bool = False,
     ):
-        super().__init__(event, value, is_value_first)
+        super().__init__(node, value, is_value_first)
 
     @classmethod
     @property
@@ -64,19 +64,19 @@ operator_lib.register_operator(NegateOperator)
 
 
 def negate(
-    event: Event,
-) -> Event:
-    """Negates an event.
+    node: Node,
+) -> Node:
+    """Negates a node.
 
-    Multiplies each item in each feature in `event` by -1.
+    Multiplies each item in each feature in `node` by -1.
 
     Args:
-        event: Event to negate.
+        node: Node to negate.
 
     Returns:
-        Negated event.
+        Negated node.
     """
     return NegateOperator(
-        event=event,
+        node=node,
         value=-1,
     ).outputs["event"]

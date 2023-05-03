@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Simple Moving Average operator."""
-from typing import Optional, List
+"""Simple moving average operator class and public API function definition.."""
+
+from typing import Optional
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
 from temporian.core.data.duration import Duration
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
 from temporian.core.operators.window.base import BaseWindowOperator
 
@@ -43,17 +44,17 @@ operator_lib.register_operator(SimpleMovingAverageOperator)
 
 
 def simple_moving_average(
-    event: Event,
+    node: Node,
     window_length: Duration,
-    sampling: Optional[Event] = None,
-) -> Event:
-    """Computes the average of values in a sliding window over the event.
+    sampling: Optional[Node] = None,
+) -> Node:
+    """Computes the average of values in a sliding window over the node.
 
     For each t in sampling, and for each feature independently, returns at time
     t the average value of the feature in the window [t - window_length, t].
 
     If `sampling` is provided samples the moving window's value at each
-    timestamp in `sampling`, else samples it at each timestamp in `event`.
+    timestamp in `sampling`, else samples it at each timestamp in `node`.
 
     Missing values (such as NaNs) are ignored.
 
@@ -61,16 +62,16 @@ def simple_moving_average(
     or the window does not contain any sampling), outputs missing values.
 
     Args:
-        event: Features to average.
+        node: Features to average.
         window_length: Sliding window's length.
         sampling: Timestamps to sample the sliding window's value at. If not
-            provided, timestamps in `event` are used.
+            provided, timestamps in `node` are used.
 
     Returns:
-        Event containing the moving average of each feature in `event`.
+        Node containing the moving average of each feature in `node`.
     """
     return SimpleMovingAverageOperator(
-        event=event,
+        node=node,
         window_length=window_length,
         sampling=sampling,
-    ).outputs["event"]
+    ).outputs["node"]

@@ -18,13 +18,13 @@ import pandas as pd
 
 from temporian.core import evaluator
 from temporian.core.data.dtype import DType
-from temporian.core.data.event import Event
-from temporian.core.data.event import Feature
+from temporian.core.data.node import Node
+from temporian.core.data.node import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.lag import lag
 from temporian.core.operators.lag import leak
 from temporian.core.operators.lag import LagOperator
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.lag import LagNumpyImplementation
 
 
@@ -33,7 +33,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
 
     def test_correct_lag(self) -> None:
         """Test correct lag operator."""
-        numpy_input_event = NumpyEvent.from_dataframe(
+        input_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1, 10.0],
@@ -48,7 +48,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id"],
         )
-        numpy_output_event = NumpyEvent.from_dataframe(
+        output_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 3, 10.0],
@@ -63,23 +63,23 @@ class LagNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id"],
         )
-        event = Event(
+        node = Node(
             [Feature("sales", DType.FLOAT64)],
             sampling=Sampling([("store_id", DType.INT64)]),
             creator=None,
         )
         operator = LagOperator(
             duration=2.0,
-            event=event,
+            node=node,
         )
         lag_implementation = LagNumpyImplementation(operator)
-        operator_output = lag_implementation.call(event=numpy_input_event)
+        operator_output = lag_implementation.call(node=input_evset)
 
-        self.assertTrue(numpy_output_event == operator_output["event"])
+        self.assertTrue(output_evset == operator_output["node"])
 
     def test_correct_multiple_lags(self) -> None:
         """Test correct lag operator with duration list."""
-        numpy_input_event = NumpyEvent.from_dataframe(
+        input_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1.0, 10.0],
@@ -94,7 +94,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id"],
         )
-        expected_lag_1_numpy_output_event = NumpyEvent.from_dataframe(
+        expected_lag_1_output_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 2.0, 10.0],
@@ -113,7 +113,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id"],
         )
-        expected_lag_2_numpy_output_event = NumpyEvent.from_dataframe(
+        expected_lag_2_output_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 3.0, 10.0],
@@ -132,40 +132,36 @@ class LagNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id"],
         )
-        event = numpy_input_event.schema()
+        node = input_evset.node()
 
         # lag multiple durations
-        lags = lag(event=event, duration=[1, 2])
+        lags = lag(node=node, duration=[1, 2])
         lag_1 = lags[0]
 
         # evaluate
-        output_event_numpy_lag_1 = evaluator.evaluate(
+        output_evset_lag_1 = evaluator.evaluate(
             lag_1,
             input_data={
-                event: numpy_input_event,
+                node: input_evset,
             },
         )
         # validate
-        self.assertEqual(
-            expected_lag_1_numpy_output_event, output_event_numpy_lag_1
-        )
+        self.assertEqual(expected_lag_1_output_evset, output_evset_lag_1)
         lag_2 = lags[1]
 
         # evaluate
-        output_event_numpy_lag_2 = evaluator.evaluate(
+        output_evset_lag_2 = evaluator.evaluate(
             lag_2,
             input_data={
-                event: numpy_input_event,
+                node: input_evset,
             },
         )
         # validate
-        self.assertEqual(
-            expected_lag_2_numpy_output_event, output_event_numpy_lag_2
-        )
+        self.assertEqual(expected_lag_2_output_evset, output_evset_lag_2)
 
     def test_correct_leak(self) -> None:
         """Test correct leak operator."""
-        numpy_input_event = NumpyEvent.from_dataframe(
+        input_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1, 10.0],
@@ -180,7 +176,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id"],
         )
-        numpy_output_event = NumpyEvent.from_dataframe(
+        output_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, -1, 10.0],
@@ -195,23 +191,23 @@ class LagNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id"],
         )
-        event = Event(
+        node = Node(
             [Feature("sales", DType.FLOAT64)],
             sampling=Sampling([("store_id", DType.INT64)]),
             creator=None,
         )
         operator = LagOperator(
             duration=-2.0,
-            event=event,
+            node=node,
         )
         lag_implementation = LagNumpyImplementation(operator)
-        operator_output = lag_implementation.call(event=numpy_input_event)
+        operator_output = lag_implementation.call(node=input_evset)
 
-        self.assertTrue(numpy_output_event == operator_output["event"])
+        self.assertTrue(output_evset == operator_output["node"])
 
     def test_correct_multiple_leaks(self) -> None:
         """Test correct leak operator with duration list."""
-        numpy_input_event = NumpyEvent.from_dataframe(
+        input_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1.0, 10.0],
@@ -226,7 +222,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id"],
         )
-        expected_leak_1_numpy_output_event = NumpyEvent.from_dataframe(
+        expected_leak_1_output_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 0.0, 10.0],
@@ -245,7 +241,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id"],
         )
-        expected_leak_2_numpy_output_event = NumpyEvent.from_dataframe(
+        expected_leak_2_output_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, -1.0, 10.0],
@@ -264,36 +260,32 @@ class LagNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id"],
         )
-        event = numpy_input_event.schema()
+        node = input_evset.node()
 
         # leak multiple durations
-        leaks = leak(event=event, duration=[1, 2])
+        leaks = leak(node=node, duration=[1, 2])
         leak_1 = leaks[0]
 
         # evaluate
-        output_event_numpy_leak_1 = evaluator.evaluate(
+        output_evset_leak_1 = evaluator.evaluate(
             leak_1,
             input_data={
-                event: numpy_input_event,
+                node: input_evset,
             },
         )
         # validate
-        self.assertEqual(
-            expected_leak_1_numpy_output_event, output_event_numpy_leak_1
-        )
+        self.assertEqual(expected_leak_1_output_evset, output_evset_leak_1)
         leak_2 = leaks[1]
 
         # evaluate
-        output_event_numpy_leak_2 = evaluator.evaluate(
+        output_evset_leak_2 = evaluator.evaluate(
             leak_2,
             input_data={
-                event: numpy_input_event,
+                node: input_evset,
             },
         )
         # validate
-        self.assertEqual(
-            expected_leak_2_numpy_output_event, output_event_numpy_leak_2
-        )
+        self.assertEqual(expected_leak_2_output_evset, output_evset_leak_2)
 
 
 if __name__ == "__main__":

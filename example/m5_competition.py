@@ -20,7 +20,7 @@ easier.
 # TODO: Turn into a proper tutorial.
 
 import os
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta
 import urllib.request
 import tempfile
 
@@ -165,21 +165,21 @@ calendar_raw["snap_WI"] = calendar_raw["snap_WI"].astype(np.int32)
 # TODO: Make the case in Temporian. Float32 is required for the SMA operator.
 sales_raw["sales"] = sales_raw["sales"].astype(np.float32)
 
-# Convert to Temporian Events
+# Convert to Temporian EventSets
 #
 # We can finally convert the dataset to Temporian format.
 
-print("Convert to Temporian Events")
+print("Convert to Temporian EventSets")
 print("===========================")
 
-sales_data = tp.EventData.from_dataframe(
+sales_data = tp.EventSet.from_dataframe(
     sales_raw,
     index_names=["item_id", "dept_id", "cat_id", "store_id", "state_id"],
 )
 
-calendar_data = tp.EventData.from_dataframe(calendar_raw)
+calendar_data = tp.EventSet.from_dataframe(calendar_raw)
 
-sell_prices_data = tp.EventData.from_dataframe(
+sell_prices_data = tp.EventSet.from_dataframe(
     sell_prices_raw,
     index_names=["store_id", "item_id"],
 )
@@ -223,9 +223,9 @@ print("Convert time series to tabular dataset")
 print("======================================")
 
 # We define the computation graph
-sales = sales_data.schema()
-calendar = calendar_data.schema()
-sell_prices = sell_prices_data.schema()
+sales = sales_data.node()
+calendar = calendar_data.node()
+sell_prices = sell_prices_data.node()
 
 augmented_sales = tp.glue(
     # Moving average of sales

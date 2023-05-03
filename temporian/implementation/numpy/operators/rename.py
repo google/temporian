@@ -2,7 +2,7 @@ from typing import Dict
 
 from temporian.core.operators.rename import RenameOperator
 from temporian.implementation.numpy import implementation_lib
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -13,20 +13,19 @@ class RenameNumpyImplementation(OperatorImplementation):
         super().__init__(operator)
         assert isinstance(operator, RenameOperator)
 
-    def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
+    def __call__(self, node: EventSet) -> Dict[str, EventSet]:
         features = self._operator.features
         index = self._operator.index
 
         # rename features
         new_feature_names = [
             features.get(feature_name, feature_name)
-            for feature_name in event.feature_names
+            for feature_name in node.feature_names
         ]
 
         # rename index
         new_index_names = [
-            index.get(index_name, index_name)
-            for index_name in event.index_names
+            index.get(index_name, index_name) for index_name in node.index_names
         ]
 
         # check that after renaming everything there are no common values
@@ -37,15 +36,15 @@ class RenameNumpyImplementation(OperatorImplementation):
                 f" {new_feature_names} and {new_index_names}."
             )
 
-        # create output event
-        output_event = NumpyEvent(
-            data=event.data,
+        # create output evset
+        output_evset = EventSet(
+            data=node.data,
             feature_names=new_feature_names,
             index_names=new_index_names,
-            is_unix_timestamp=event.is_unix_timestamp,
+            is_unix_timestamp=node.is_unix_timestamp,
         )
 
-        return {"event": output_event}
+        return {"node": output_evset}
 
 
 implementation_lib.register_operator_implementation(

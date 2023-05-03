@@ -15,7 +15,7 @@
 """Multiply operator class and public API function definition."""
 
 from temporian.core import operator_lib
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
 
 
@@ -34,25 +34,25 @@ operator_lib.register_operator(MultiplyOperator)
 
 
 def multiply(
-    event_1: Event,
-    event_2: Event,
-) -> Event:
-    """Multiplies two events.
+    node_1: Node,
+    node_2: Node,
+) -> Node:
+    """Multiplies two nodes.
 
-    Each feature in `event_1` is multiplied by the feature in `event_2` in the
+    Each feature in `node_1` is multiplied by the feature in `node_2` in the
     same position.
 
-    `event_1` and `event_2` must have the same sampling and the same number of
+    `node_1` and `node_2` must have the same sampling and the same number of
     features.
 
     Args:
-        event_1: First event.
-        event_2: Second event.
+        node_1: First node.
+        node_2: Second node.
 
     Returns:
-        Multiplication of `event_1`'s and `event_2`'s features.
+        Multiplication of `node_1`'s and `node_2`'s features.
     """
     return MultiplyOperator(
-        event_1=event_1,
-        event_2=event_2,
-    ).outputs["event"]
+        node_1=node_1,
+        node_2=node_2,
+    ).outputs["node"]

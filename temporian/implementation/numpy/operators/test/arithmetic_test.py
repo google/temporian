@@ -17,7 +17,7 @@ import pandas as pd
 from absl.testing import absltest
 
 from temporian.core.data.dtype import DType
-from temporian.core.data.event import Event, Feature
+from temporian.core.data.node import Node, Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.arithmetic import (
     AddOperator,
@@ -26,7 +26,7 @@ from temporian.core.operators.arithmetic import (
     DivideOperator,
     EqualOperator,
 )
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.arithmetic import (
     AddNumpyImplementation,
     SubtractNumpyImplementation,
@@ -41,7 +41,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
     addition, subtraction, division and multiplication"""
 
     def setUp(self):
-        self.numpy_event_1 = NumpyEvent.from_dataframe(
+        self.evset_1 = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1.0, 10.0],
@@ -54,7 +54,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id"],
         )
-        self.numpy_event_2 = NumpyEvent.from_dataframe(
+        self.evset_2 = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1.0, 0.0],
@@ -68,18 +68,18 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id"],
         )
         # set same sampling
-        for index_key, index_data in self.numpy_event_1.data.items():
-            self.numpy_event_2[index_key].timestamps = index_data.timestamps
-        self.event_1 = self.numpy_event_1.schema()
-        self.event_2 = self.numpy_event_2.schema()
+        for index_key, index_data in self.evset_1.data.items():
+            self.evset_2[index_key].timestamps = index_data.timestamps
+        self.node_1 = self.evset_1.node()
+        self.node_2 = self.evset_2.node()
 
         self.sampling = Sampling([("store_id", DType.INT64)])
-        self.event_1 = Event(
+        self.node_1 = Node(
             [Feature("sales", DType.FLOAT64)],
             sampling=self.sampling,
             creator=None,
         )
-        self.event_2 = Event(
+        self.node_2 = Node(
             [Feature("costs", DType.FLOAT64)],
             sampling=self.sampling,
             creator=None,
@@ -88,7 +88,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
     def test_correct_sum(self) -> None:
         """Test correct sum operator."""
 
-        numpy_output_event = NumpyEvent.from_dataframe(
+        output_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1.0, 10.0],
@@ -103,21 +103,21 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = AddOperator(
-            event_1=self.event_1,
-            event_2=self.event_2,
+            node_1=self.node_1,
+            node_2=self.node_2,
         )
 
         sum_implementation = AddNumpyImplementation(operator)
 
         operator_output = sum_implementation.call(
-            event_1=self.numpy_event_1, event_2=self.numpy_event_2
+            node_1=self.evset_1, node_2=self.evset_2
         )
-        self.assertTrue(numpy_output_event == operator_output["event"])
+        self.assertTrue(output_evset == operator_output["node"])
 
     def test_correct_subtraction(self) -> None:
         """Test correct subtraction operator."""
 
-        numpy_output_event = NumpyEvent.from_dataframe(
+        output_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1.0, 10.0],
@@ -132,20 +132,20 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = SubtractOperator(
-            event_1=self.event_1,
-            event_2=self.event_2,
+            node_1=self.node_1,
+            node_2=self.node_2,
         )
 
         sub_implementation = SubtractNumpyImplementation(operator)
         operator_output = sub_implementation.call(
-            event_1=self.numpy_event_1, event_2=self.numpy_event_2
+            node_1=self.evset_1, node_2=self.evset_2
         )
-        self.assertTrue(numpy_output_event == operator_output["event"])
+        self.assertTrue(output_evset == operator_output["node"])
 
     def test_correct_multiplication(self) -> None:
         """Test correct multiplication operator."""
 
-        numpy_output_event = NumpyEvent.from_dataframe(
+        output_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1.0, 0.0],
@@ -160,21 +160,21 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = MultiplyOperator(
-            event_1=self.event_1,
-            event_2=self.event_2,
+            node_1=self.node_1,
+            node_2=self.node_2,
         )
 
         mult_implementation = MultiplyNumpyImplementation(operator)
 
         operator_output = mult_implementation.call(
-            event_1=self.numpy_event_1, event_2=self.numpy_event_2
+            node_1=self.evset_1, node_2=self.evset_2
         )
-        self.assertTrue(numpy_output_event == operator_output["event"])
+        self.assertTrue(output_evset == operator_output["node"])
 
     def test_correct_division(self) -> None:
         """Test correct division operator."""
 
-        numpy_output_event = NumpyEvent.from_dataframe(
+        output_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1.0, np.inf],
@@ -189,21 +189,21 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = DivideOperator(
-            event_1=self.event_1,
-            event_2=self.event_2,
+            node_1=self.node_1,
+            node_2=self.node_2,
         )
 
         div_implementation = DivideNumpyImplementation(operator)
 
         operator_output = div_implementation.call(
-            event_1=self.numpy_event_1, event_2=self.numpy_event_2
+            node_1=self.evset_1, node_2=self.evset_2
         )
 
-        self.assertTrue(numpy_output_event == operator_output["event"])
+        self.assertTrue(output_evset == operator_output["node"])
 
     def test_correct_equal(self) -> None:
         """Test correct equal operator."""
-        self.numpy_event_1 = NumpyEvent.from_dataframe(
+        self.evset_1 = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1.0, 10.0],
@@ -217,7 +217,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id"],
         )
 
-        self.numpy_event_2 = NumpyEvent.from_dataframe(
+        self.evset_2 = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1.0, 10.0],
@@ -230,14 +230,14 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id"],
         )
-        for index_key, index_data in self.numpy_event_1.iterindex():
-            self.numpy_event_2[index_key].timestamps = index_data.timestamps
+        for index_key, index_data in self.evset_1.iterindex():
+            self.evset_2[index_key].timestamps = index_data.timestamps
 
-        self.event_1 = self.numpy_event_1.schema()
-        self.event_2 = self.numpy_event_2.schema()
-        self.event_1._sampling = self.event_2._sampling
+        self.node_1 = self.evset_1.node()
+        self.node_2 = self.evset_2.node()
+        self.node_1._sampling = self.node_2._sampling
 
-        numpy_output_event = NumpyEvent.from_dataframe(
+        output_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 1.0, True],
@@ -252,17 +252,17 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = EqualOperator(
-            event_1=self.event_1,
-            event_2=self.event_2,
+            node_1=self.node_1,
+            node_2=self.node_2,
         )
 
         equal_implementation = EqualNumpyImplementation(operator)
 
         operator_output = equal_implementation.call(
-            event_1=self.numpy_event_1, event_2=self.numpy_event_2
+            node_1=self.evset_1, node_2=self.evset_2
         )
 
-        self.assertEqual(numpy_output_event, operator_output["event"])
+        self.assertEqual(output_evset, operator_output["node"])
 
 
 if __name__ == "__main__":

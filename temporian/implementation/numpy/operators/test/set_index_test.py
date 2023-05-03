@@ -3,7 +3,7 @@ from absl.testing import absltest
 import pandas as pd
 
 from temporian.core.operators.set_index import SetIndexOperator
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.set_index import (
     SetIndexNumpyImplementation,
 )
@@ -11,8 +11,8 @@ from temporian.implementation.numpy.operators.set_index import (
 
 class SetIndexNumpyImplementationTest(absltest.TestCase):
     def setUp(self) -> None:
-        # input NumPy event
-        self.numpy_input_evt = NumpyEvent.from_dataframe(
+        # input event set
+        self.input_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     ["A", 0, 1, 0.4, 10.0],
@@ -34,12 +34,11 @@ class SetIndexNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["state_id"],
         )
-        # input event
-        self.input_evt = self.numpy_input_evt.schema()
+        # input node
+        self.input_node = self.input_evset.node()
 
     def test_append_single(self) -> None:
-        # output NumPy event
-        expected_numpy_output_evt = NumpyEvent.from_dataframe(
+        expected_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     ["A", 0, 1, 0.4, 10.0],
@@ -62,22 +61,19 @@ class SetIndexNumpyImplementationTest(absltest.TestCase):
             index_names=["state_id", "store_id"],
         )
         operator = SetIndexOperator(
-            self.input_evt, feature_names="store_id", append=True
+            self.input_node, feature_names="store_id", append=True
         )
         # instance operator implementation
         operator_impl = SetIndexNumpyImplementation(operator)
 
         # call operator
-        op_numpy_output_evt = operator_impl.call(event=self.numpy_input_evt)[
-            "event"
-        ]
+        output_evset = operator_impl.call(node=self.input_evset)["node"]
 
         # validate output
-        self.assertEqual(op_numpy_output_evt, expected_numpy_output_evt)
+        self.assertEqual(output_evset, expected_evset)
 
     def test_append_multiple(self) -> None:
-        # output NumPy event
-        expected_numpy_output_evt = NumpyEvent.from_dataframe(
+        expected_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     ["A", 0, 1, 0.4, 10.0],
@@ -100,7 +96,7 @@ class SetIndexNumpyImplementationTest(absltest.TestCase):
             index_names=["state_id", "store_id", "item_id"],
         )
         operator = SetIndexOperator(
-            self.input_evt,
+            self.input_node,
             feature_names=["store_id", "item_id"],
             append=True,
         )
@@ -108,16 +104,13 @@ class SetIndexNumpyImplementationTest(absltest.TestCase):
         operator_impl = SetIndexNumpyImplementation(operator)
 
         # call operator
-        op_numpy_output_evt = operator_impl.call(event=self.numpy_input_evt)[
-            "event"
-        ]
+        output_evset = operator_impl.call(node=self.input_evset)["node"]
 
         # validate output
-        self.assertEqual(op_numpy_output_evt, expected_numpy_output_evt)
+        self.assertEqual(output_evset, expected_evset)
 
     def test_set_single(self) -> None:
-        # output NumPy event
-        expected_numpy_output_evt = NumpyEvent.from_dataframe(
+        expected_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 2, 0.1, 13.0],
@@ -139,22 +132,19 @@ class SetIndexNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id"],
         )
         operator = SetIndexOperator(
-            self.input_evt, feature_names=["store_id"], append=False
+            self.input_node, feature_names=["store_id"], append=False
         )
         # instance operator implementation
         operator_impl = SetIndexNumpyImplementation(operator)
 
         # call operator
-        op_numpy_output_evt = operator_impl.call(event=self.numpy_input_evt)[
-            "event"
-        ]
+        output_evset = operator_impl.call(node=self.input_evset)["node"]
 
         # validate output
-        self.assertEqual(op_numpy_output_evt, expected_numpy_output_evt)
+        self.assertEqual(output_evset, expected_evset)
 
     def test_set_multiple(self) -> None:
-        # output NumPy event
-        expected_numpy_output_evt = NumpyEvent.from_dataframe(
+        expected_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [0, 2, 0.1, 13.0],
@@ -176,7 +166,7 @@ class SetIndexNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id", "item_id"],
         )
         operator = SetIndexOperator(
-            self.input_evt,
+            self.input_node,
             feature_names=["store_id", "item_id"],
             append=False,
         )
@@ -184,12 +174,10 @@ class SetIndexNumpyImplementationTest(absltest.TestCase):
         operator_impl = SetIndexNumpyImplementation(operator)
 
         # call operator
-        op_numpy_output_evt = operator_impl.call(event=self.numpy_input_evt)[
-            "event"
-        ]
+        output_evset = operator_impl.call(node=self.input_evset)["node"]
 
         # validate output
-        self.assertEqual(op_numpy_output_evt, expected_numpy_output_evt)
+        self.assertEqual(output_evset, expected_evset)
 
 
 if __name__ == "__main__":

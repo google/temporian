@@ -22,9 +22,9 @@ from temporian.core.test import utils
 
 class SerializeTest(absltest.TestCase):
     def test_serialize(self):
-        i1 = utils.create_input_event()
+        i1 = utils.create_input_node()
         o2 = utils.OpI1O1(i1)
-        i3 = utils.create_input_event()
+        i3 = utils.create_input_node()
         o4 = utils.OpI2O1(o2.outputs["output"], i3)
         o5 = utils.OpI1O2(o4.outputs["output"])
 
@@ -49,7 +49,7 @@ class SerializeTest(absltest.TestCase):
         self.assertEqual(len(original.samplings), len(restored.samplings))
         self.assertEqual(len(original.features), len(restored.features))
         self.assertEqual(len(original.operators), len(restored.operators))
-        self.assertEqual(len(original.events), len(restored.events))
+        self.assertEqual(len(original.nodes), len(restored.nodes))
         self.assertEqual(original.inputs.keys(), restored.inputs.keys())
         self.assertEqual(original.outputs.keys(), restored.outputs.keys())
         # TODO: Deep equality tests.
@@ -68,8 +68,8 @@ class SerializeTest(absltest.TestCase):
             & serialize.all_identifiers(restored.operators)
         )
         self.assertFalse(
-            serialize.all_identifiers(original.events)
-            & serialize.all_identifiers(restored.events)
+            serialize.all_identifiers(original.nodes)
+            & serialize.all_identifiers(restored.nodes)
         )
         self.assertFalse(
             serialize.all_identifiers(original.inputs.values())
@@ -92,7 +92,7 @@ class SerializeTest(absltest.TestCase):
             "attr_bool": True,
             "attr_map": {"good": "bye", "nice": "to", "meet": "you"},
         }
-        i_event = utils.create_input_event()
+        i_event = utils.create_input_node()
         operator = utils.OpWithAttributes(i_event, **attributes)
 
         original = processor.infer_processor(

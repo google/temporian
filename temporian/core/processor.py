@@ -16,52 +16,52 @@
 
 from typing import List, Set, Dict, Union, Optional
 
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators import base
 
-MultipleEventArg = Union[Dict[str, Event], List[Event], Event]
+MultipleNodeArg = Union[Dict[str, Node], List[Node], Node]
 
 
-def normalize_multiple_event_arg(src: MultipleEventArg) -> Dict[str, Event]:
-    """Normalizes an event or list of events into a dictionary of events."""
+def normalize_multiple_node_arg(src: MultipleNodeArg) -> Dict[str, Node]:
+    """Normalizes a node or list of nodes into a dictionary of nodes."""
 
     save_src = src
 
-    if isinstance(src, Event):
+    if isinstance(src, Node):
         src = [src]
 
     if isinstance(src, list):
         new_src = {}
-        for event in src:
-            if event.name is None:
+        for node in src:
+            if node.name is None:
                 raise ValueError(
-                    "Input / output event or list events need to be named "
-                    'with "event.name = ...". Alternatively, provide a '
-                    "dictionary of events."
+                    "Input / output node or list nodes need to be named "
+                    'with "node.name = ...". Alternatively, provide a '
+                    "dictionary of nodes."
                 )
-            new_src[event.name] = event
+            new_src[node.name] = node
         src = new_src
 
     if not isinstance(src, dict):
         raise ValueError(
-            f'Unexpected event(s) "{save_src}". Expecting dict of events, '
-            "list of events, or a single event."
+            f'Unexpected node(s) "{save_src}". Expecting dict of nodes, '
+            "list of nodes, or a single node."
         )
     return src
 
 
-class Preprocessor(object):
-    """A set of operators, events, features and samplings."""
+class Processor(object):
+    """A set of operators, nodes, features and samplings."""
 
     def __init__(self):
         self._operators: Set[base.Operator] = set()
         self._features: Set[Feature] = set()
-        self._events: Set[Event] = set()
+        self._nodes: Set[Node] = set()
         self._samplings: Set[Sampling] = set()
-        self._inputs: Dict[str, Event] = {}
-        self._outputs: Dict[str, Event] = {}
+        self._inputs: Dict[str, Node] = {}
+        self._outputs: Dict[str, Node] = {}
 
     @property
     def samplings(self) -> Set[Sampling]:
@@ -76,15 +76,15 @@ class Preprocessor(object):
         return self._operators
 
     @property
-    def events(self) -> Set[Event]:
-        return self._events
+    def nodes(self) -> Set[Node]:
+        return self._nodes
 
     @property
-    def inputs(self) -> Dict[str, Event]:
+    def inputs(self) -> Dict[str, Node]:
         return self._inputs
 
     @property
-    def outputs(self) -> Dict[str, Event]:
+    def outputs(self) -> Dict[str, Node]:
         return self._outputs
 
     def add_operator(self, operator: base.Operator) -> None:
@@ -96,29 +96,29 @@ class Preprocessor(object):
     def add_feature(self, feature: Feature) -> None:
         self._features.add(feature)
 
-    def add_event(self, event: Event) -> None:
-        self._events.add(event)
+    def add_node(self, node: Node) -> None:
+        self._nodes.add(node)
 
     @inputs.setter
-    def inputs(self, inputs: Dict[str, Event]) -> None:
+    def inputs(self, inputs: Dict[str, Node]) -> None:
         self._inputs = inputs
 
     @outputs.setter
-    def outputs(self, outputs: Dict[str, Event]) -> None:
+    def outputs(self, outputs: Dict[str, Node]) -> None:
         self._outputs = outputs
 
     def input_features(self) -> Set[Feature]:
         return {
             feature
-            for event in self.inputs.values()
-            for feature in event.features
+            for node in self.inputs.values()
+            for feature in node.features
         }
 
     def input_samplings(self) -> Set[Sampling]:
-        return {event.sampling for event in self.inputs.values()}
+        return {node.sampling for node in self.inputs.values()}
 
     def __repr__(self):
-        s = "Preprocessor\n============\n"
+        s = "Processor\n============\n"
 
         def p(title, elements):
             nonlocal s
@@ -130,7 +130,7 @@ class Preprocessor(object):
         p("Operators", self.operators)
         p("Features", self.features)
         p("Samplings", self.samplings)
-        p("Events", self.events)
+        p("Nodes", self.nodes)
 
         def p2(title, dictionary):
             nonlocal s
@@ -145,111 +145,111 @@ class Preprocessor(object):
 
 
 def infer_processor(
-    inputs: Optional[Dict[str, Event]],
-    outputs: Dict[str, Event],
-) -> Preprocessor:
-    """Extracts all the objects between the outputs and inputs events.
+    inputs: Optional[Dict[str, Node]],
+    outputs: Dict[str, Node],
+) -> Processor:
+    """Extracts all the objects between the output and input nodes.
 
     Fails if any inputs are missing.
 
     Args:
-        inputs: Input events. If None, the inputs are inferred. In this case,
-            input events have to be named.
-        outputs: Output events.
+        inputs: Input nodes. If None, the inputs are inferred. In this case,
+            input nodes have to be named.
+        outputs: Output nodes.
 
     Returns:
-        A preprocessor.
+        A processor.
     """
 
-    # The following algorithm lists all the events between the output and
-    # input events. Informally, the algorithm works as follow:
+    # The following algorithm lists all the nodes between the output and
+    # input nodes. Informally, the algorithm works as follow:
     #
-    # pending_event <= use outputs
-    # done_event <= empty
+    # pending_node <= use outputs
+    # done_node <= empty
     #
-    # While pending event not empty:
-    #   Extract an event from pending_event
-    #   if event is a provided input event
+    # While pending node not empty:
+    #   Extract a node from pending_node
+    #   if node is a provided input node
     #       continue
-    #   if event has not creator
-    #       record this event for future error / input inference
+    #   if node has no creator
+    #       record this node for future error / input inference
     #       continue
-    #   Adds all the input events of event's creator op to the pending list
+    #   Adds all the input nodes of node's creator op to the pending list
 
-    p = Preprocessor()
+    p = Processor()
     p.outputs = outputs
 
-    # The next event to process. Events are processed from the outputs to
+    # The next node to process. Nodes are processed from the outputs to
     # the inputs.
-    pending_events: Set[Event] = set()
-    pending_events.update(outputs.values())
+    pending_nodes: Set[Node] = set()
+    pending_nodes.update(outputs.values())
 
-    # Index the input event for fast retrieval
-    input_events: Set[Event] = {}
+    # Index the input node for fast retrieval
+    input_nodes: Set[Node] = {}
 
     if inputs is not None:
         p.inputs = inputs
-        input_events = set(inputs.values())
+        input_nodes = set(inputs.values())
 
     # Features already processed.
-    done_events: Set[Event] = set()
+    done_nodes: Set[Node] = set()
 
-    # List of the missing events. They will be used to infer the input features
+    # List of the missing nodes. They will be used to infer the input features
     # (if infer_inputs=True), or to raise an error (if infer_inputs=False).
-    missing_events: Set[Event] = set()
+    missing_nodes: Set[Node] = set()
 
-    while pending_events:
-        # Select an event to process.
-        event = next(iter(pending_events))
-        pending_events.remove(event)
-        assert event not in done_events
+    while pending_nodes:
+        # Select a node to process.
+        node = next(iter(pending_nodes))
+        pending_nodes.remove(node)
+        assert node not in done_nodes
 
-        p.add_event(event)
+        p.add_node(node)
 
-        if event in input_events:
+        if node in input_nodes:
             # The feature is provided by the user.
             continue
 
-        if event.creator is None:
-            # The event does not have a source.
-            missing_events.add(event)
+        if node.creator is None:
+            # The node does not have a source.
+            missing_nodes.add(node)
             continue
 
         # Record the operator.
-        p.add_operator(event.creator)
+        p.add_operator(node.creator)
 
-        # Add the parent events to the pending list.
-        for input_event in event.creator.inputs.values():
-            if input_event in done_events:
+        # Add the parent nodes to the pending list.
+        for input_node in node.creator.inputs.values():
+            if input_node in done_nodes:
                 # Already processed.
                 continue
 
-            pending_events.add(input_event)
+            pending_nodes.add(input_node)
 
         # Record the operator outputs. While the user did not request
         # them, they will be created (and so, we need to track them).
-        for output_event in event.creator.outputs.values():
-            p.add_event(output_event)
+        for output_node in node.creator.outputs.values():
+            p.add_node(output_node)
 
     if inputs is None:
         # Infer the inputs
-        infered_inputs: Dict[str, Event] = {}
-        for event in missing_events:
-            if event.name is None:
-                raise ValueError(f"Cannot infer input on unnamed event {event}")
-            infered_inputs[event.name] = event
+        infered_inputs: Dict[str, Node] = {}
+        for node in missing_nodes:
+            if node.name is None:
+                raise ValueError(f"Cannot infer input on unnamed node {node}")
+            infered_inputs[node.name] = node
         p.inputs = infered_inputs
 
     else:
-        # Fail if not all events are sourced.
-        if missing_events:
+        # Fail if not all nodes are sourced.
+        if missing_nodes:
             raise ValueError(
-                "One of multiple events are required but "
-                f"not provided as input:\n {missing_events}"
+                "One of multiple nodes are required but "
+                f"not provided as input:\n {missing_nodes}"
             )
 
     # Record all the features and samplings.
-    for e in p.events:
+    for e in p.nodes:
         p.add_sampling(e.sampling)
         for f in e.features:
             p.add_feature(f)

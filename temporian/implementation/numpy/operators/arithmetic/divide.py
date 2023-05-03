@@ -29,16 +29,16 @@ class DivideNumpyImplementation(BaseArithmeticNumpyImplementation):
         assert isinstance(operator, DivideOperator)
 
     def _do_operation(
-        self, event_1_feature: np.ndarray, event_2_feature: np.ndarray
+        self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
     ) -> np.ndarray:
-        if event_1_feature.dtype in [DType.INT32, DType.INT64]:
+        if evset_1_feature.dtype in [DType.INT32, DType.INT64]:
             raise ValueError(
                 "Cannot use the divide operator on feature "
-                f"{event_1_feature} of type {event_1_feature.dtype.type}. "
+                f"{evset_1_feature} of type {evset_1_feature.dtype.type}. "
                 "Cast to a floating point type or use "
                 "floordiv operator (//) instead, on these integer types."
             )
-        return event_1_feature / event_2_feature
+        return evset_1_feature / evset_2_feature
 
 
 implementation_lib.register_operator_implementation(

@@ -17,7 +17,7 @@
 from abc import ABC, abstractmethod
 
 from temporian.core.data.dtype import DType
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
@@ -26,14 +26,14 @@ from temporian.proto import core_pb2 as pb
 class BaseCalendarOperator(Operator, ABC):
     """Interface definition and common logic for calendar operators."""
 
-    def __init__(self, sampling: Event):
+    def __init__(self, sampling: Node):
         super().__init__()
 
         if not sampling.sampling.is_unix_timestamp:
             raise ValueError(
-                "Calendar operators can only be applied on events with unix"
+                "Calendar operators can only be applied on nodes with unix"
                 " timestamps as sampling. This can be specified with"
-                " is_unix_timestamp=True when manually creating a sampling."
+                " `is_unix_timestamp=True` when manually creating a sampling."
             )
 
         # input
@@ -48,8 +48,8 @@ class BaseCalendarOperator(Operator, ABC):
 
         # output
         self.add_output(
-            "event",
-            Event(
+            "node",
+            Node(
                 features=[output_feature],
                 sampling=sampling.sampling,
                 creator=self,
@@ -63,7 +63,7 @@ class BaseCalendarOperator(Operator, ABC):
         return pb.OperatorDef(
             key=cls.operator_def_key,
             inputs=[pb.OperatorDef.Input(key="sampling")],
-            outputs=[pb.OperatorDef.Output(key="event")],
+            outputs=[pb.OperatorDef.Output(key="node")],
         )
 
     @classmethod
@@ -76,4 +76,4 @@ class BaseCalendarOperator(Operator, ABC):
     @property
     @abstractmethod
     def output_feature_name(cls) -> str:
-        """Gets the name of the generated feature in the output event."""
+        """Gets the name of the generated feature in the output node."""

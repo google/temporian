@@ -10,10 +10,7 @@ py_test(
     srcs = ["df_to_event_test.py"],
     srcs_version = "PY3",
     deps = [
-        # absl/testing:absltest dep,
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:feature",
-        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -22,10 +19,7 @@ py_test(
     srcs = ["event_to_df_test.py"],
     srcs_version = "PY3",
     deps = [
-        # absl/testing:absltest dep,
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:feature",
-        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -33,16 +27,14 @@ py_test(
     name = "sampling_test",
     srcs = ["sampling_test.py"],
     srcs_version = "PY3",
-    deps = [
-        "//temporian/implementation/numpy/data:sampling",
-    ],
+    deps = [],
 )
 
 py_test(
     name = "event_test",
     srcs = ["event_test.py"],
     srcs_version = "PY3",
-    deps = ["//temporian/implementation/numpy/data:event"],
+    deps = ["//temporian/implementation/numpy/data:event_set"],
 )
 
 py_test(
@@ -50,7 +42,7 @@ py_test(
     srcs = ["plotter_test.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:plotter",
     ],
 )

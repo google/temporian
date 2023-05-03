@@ -19,8 +19,8 @@ py_library(
 )
 
 py_library(
-    name = "event",
-    srcs = ["event.py"],
+    name = "node",
+    srcs = ["node.py"],
     srcs_version = "PY3",
     deps = [
         ":feature",

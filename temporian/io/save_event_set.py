@@ -12,28 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Utility for saving an event to disk."""
+"""Utility for saving an event set to disk."""
 
 from typing import List, Optional
 
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 
 
-def save_event(
-    event: NumpyEvent,
+def save_event_set(
+    evset: EventSet,
     path: str,
     sep: str = ",",
     na_rep: Optional[str] = None,
     columns: Optional[List[str]] = None,
 ):
-    """Saves a NumpyEvent to a file.
+    """Saves an EventSet to a file.
 
     Args:
-        event: NumpyEvent to save.
+        evset: EventSet to save.
         path: Path to the file.
         sep: Separator to use.
         na_rep: Representation to use for missing values.
         columns: Columns to save. If `None`, saves all columns.
     """
-    df = event.to_dataframe()
+    df = evset.to_dataframe()
     df.to_csv(path, index=False, sep=sep, na_rep=na_rep, columns=columns)

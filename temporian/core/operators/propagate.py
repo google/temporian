@@ -16,7 +16,7 @@
 
 
 from temporian.core import operator_lib
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.base import Operator
@@ -26,32 +26,32 @@ from temporian.proto import core_pb2 as pb
 class Propagate(Operator):
     def __init__(
         self,
-        event: Event,
-        sampling: Event,
+        node: Node,
+        sampling: Node,
     ):
         super().__init__()
 
-        self.add_input("event", event)
+        self.add_input("node", node)
         self.add_input("sampling", sampling)
 
         self._index_mapping: list[int] = []
         sampling_index_name = sampling.sampling.index.names
         sampling_index_dtypes = sampling.sampling.index.dtypes
-        for index in event.sampling.index:
+        for index in node.sampling.index:
             try:
                 sampling_idx = sampling_index_name.index(index.name)
                 self._index_mapping.append(sampling_idx)
-            except ValueError:
+            except ValueError as exc:
                 raise ValueError(
-                    "The index of event should be contained in the index of"
-                    f' sampling. Index "{index.name}" from event is not'
-                    " available in sampling. event.index:"
-                    f" {event.sampling.index},"
+                    "The index of node should be contained in the index of"
+                    f' sampling. Index "{index.name}" from node is not'
+                    " available in sampling. node.index:"
+                    f" {node.sampling.index},"
                     f" sampling.index={sampling.sampling.index}."
-                )
+                ) from exc
             if sampling_index_dtypes[sampling_idx] != index.dtype:
                 raise ValueError(
-                    f'The index "{index.name}" is found both in the event and'
+                    f'The index "{index.name}" is found both in the node and'
                     " sampling argument. However, the dtype is different."
                     f" {index.dtype} != {sampling_index_dtypes[sampling_idx]}"
                 )
@@ -67,12 +67,12 @@ class Propagate(Operator):
                 sampling=output_sampling,
                 creator=self,
             )
-            for f in event.features
+            for f in node.features
         ]
 
         self.add_output(
-            "event",
-            Event(
+            "node",
+            Node(
                 features=output_features,
                 sampling=output_sampling,
                 creator=self,
@@ -91,10 +91,10 @@ class Propagate(Operator):
             key="PROPAGATE",
             attributes=[],
             inputs=[
-                pb.OperatorDef.Input(key="event"),
+                pb.OperatorDef.Input(key="node"),
                 pb.OperatorDef.Input(key="sampling"),
             ],
-            outputs=[pb.OperatorDef.Output(key="event")],
+            outputs=[pb.OperatorDef.Output(key="node")],
         )
 
 
@@ -102,20 +102,20 @@ operator_lib.register_operator(Propagate)
 
 
 def propagate(
-    event: Event,
-    sampling: Event,
-) -> Event:
+    node: Node,
+    sampling: Node,
+) -> Node:
     """Propagates feature values over a larger index.
 
-    Given `event` and `sampling` where `event` contains a super index of
-    `sampling` (e.g., the index of `event` is `["x"]`, and the index of sampling
-    is `["x","y"]`), duplicates the features of "events" over the index of
+    Given `node` and `sampling` where `node` contains a super index of
+    `sampling` (e.g., the index of `node` is `["x"]`, and the index of sampling
+    is `["x","y"]`), duplicates the features of "nodes" over the index of
     `sampling`.
 
     Example:
 
         Inputs:
-            event:
+            node:
                 feature_1: ...
                 feature_2: ...
                 index: ["x"]
@@ -128,14 +128,14 @@ def propagate(
             index: ["x", "y"]
 
     Args:
-        event: Event to propagate.
+        node: Node to propagate.
         sampling: Index to propagate over.
 
     Returns:
-        Event propagated over `sampling`'s index.
+        Node propagated over `sampling`'s index.
     """
 
     return Propagate(
-        event=event,
+        node=node,
         sampling=sampling,
-    ).outputs["event"]
+    ).outputs["node"]
