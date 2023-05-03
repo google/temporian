@@ -15,6 +15,7 @@ py_library(
         ":drop_index",
         ":filter",
         ":glue",
+        ":invert",
         ":lag",
         ":prefix",
         ":propagate",
@@ -217,6 +218,18 @@ py_library(
     deps = [
         ":base",
         "//temporian/core/operators:cast",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event_set",
+    ],
+)
+
+py_library(
+    name = "invert",
+    srcs = ["invert.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators:invert",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
     ],

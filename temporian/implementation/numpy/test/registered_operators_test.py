@@ -45,6 +45,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "FLOORDIV",
             "FLOORDIV_SCALAR",
             "GLUE",
+            "INVERT",
             "LAG",
             "MOVING_COUNT",
             "MOVING_MIN",
