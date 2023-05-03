@@ -72,12 +72,12 @@ class LagNumpyImplementationTest(absltest.TestCase):
         )
         operator = LagOperator(
             duration=2.0,
-            node=node,
+            input=node,
         )
         lag_implementation = LagNumpyImplementation(operator)
-        operator_output = lag_implementation.call(node=input_evset)
+        operator_output = lag_implementation.call(input=input_evset)
 
-        self.assertTrue(output_evset == operator_output["node"])
+        self.assertTrue(output_evset == operator_output["output"])
 
     def test_correct_multiple_lags(self) -> None:
         """Test correct lag operator with duration list."""
@@ -137,7 +137,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
         node = input_evset.node()
 
         # lag multiple durations
-        lags = lag(node=node, duration=[1, 2])
+        lags = lag(input=node, duration=[1, 2])
         lag_1 = lags[0]
 
         # evaluate
@@ -202,12 +202,12 @@ class LagNumpyImplementationTest(absltest.TestCase):
         )
         operator = LagOperator(
             duration=-2.0,
-            node=node,
+            input=node,
         )
         lag_implementation = LagNumpyImplementation(operator)
-        operator_output = lag_implementation.call(node=input_evset)
+        operator_output = lag_implementation.call(input=input_evset)
 
-        self.assertTrue(output_evset == operator_output["node"])
+        self.assertTrue(output_evset == operator_output["output"])
 
     def test_correct_multiple_leaks(self) -> None:
         """Test correct leak operator with duration list."""
@@ -267,7 +267,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
         node = input_evset.node()
 
         # leak multiple durations
-        leaks = leak(node=node, duration=[1, 2])
+        leaks = leak(input=node, duration=[1, 2])
         leak_1 = leaks[0]
 
         # evaluate

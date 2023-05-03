@@ -60,9 +60,9 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
         impl = CalendarDayOfMonthNumpyImplementation(operator)
         output = impl.call(sampling=input_evset)
 
-        self.assertTrue(output_evset == output["node"])
+        self.assertTrue(output_evset == output["output"])
         self.assertTrue(
-            output["node"].first_index_data().features[0].dtype == np.int32
+            output["output"].first_index_data().features[0].dtype == np.int32
         )
 
     def test_with_index(self) -> None:
@@ -100,9 +100,9 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
         impl = CalendarDayOfMonthNumpyImplementation(operator)
         output = impl.call(sampling=input_evset)
 
-        self.assertTrue(output_evset == output["node"])
+        self.assertTrue(output_evset == output["output"])
         self.assertTrue(
-            output["node"].first_index_data().features[0].dtype == np.int32
+            output["output"].first_index_data().features[0].dtype == np.int32
         )
 
     # TODO: move this test to core operators' test suite when created

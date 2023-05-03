@@ -34,14 +34,14 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
         """Performs the arithmetic operation corresponding to the subclass."""
 
     def __call__(
-        self, node_1: EventSet, node_2: EventSet
+        self, input_1: EventSet, input_2: EventSet
     ) -> Dict[str, EventSet]:
         """Applies the corresponding arithmetic operation between two event
         sets.
 
         Args:
-            node_1: First event set.
-            node_2: Second event set.
+            input_1: First event set.
+            input_2: Second event set.
 
         Returns:
             Result of the operation.
@@ -50,7 +50,7 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
             ValueError: If sampling of both event sets is not equal.
         """
 
-        if node_1.feature_count != node_2.feature_count:
+        if input_1.feature_count != input_2.feature_count:
             raise ValueError(
                 "Both event sets must have the same number of features."
             )
@@ -62,35 +62,35 @@ class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
         dst_feature_names = [
             f"{prefix}_{feature_name_1}_{feature_name_2}"
             for feature_name_1, feature_name_2 in zip(
-                node_1.feature_names, node_2.feature_names
+                input_1.feature_names, input_2.feature_names
             )
         ]
         dst_evset = EventSet(
             data={},
             feature_names=dst_feature_names,
-            index_names=node_1.index_names,
-            is_unix_timestamp=node_1.is_unix_timestamp,
+            index_names=input_1.index_names,
+            is_unix_timestamp=input_1.is_unix_timestamp,
         )
-        for index_key, index_data in node_1.iterindex():
+        for index_key, index_data in input_1.iterindex():
             # initialize destination index data
             dst_evset[index_key] = IndexData([], index_data.timestamps)
 
             # iterate over index key features
-            node_1_features = index_data.features
-            node_2_features = node_2[index_key].features
-            for node_1_feature, node_2_feature in zip(
-                node_1_features, node_2_features
+            input_1_features = index_data.features
+            input_2_features = input_2[index_key].features
+            for input_1_feature, input_2_feature in zip(
+                input_1_features, input_2_features
             ):
                 # check both features have the same dtype
-                if node_1_feature.dtype.type != node_2_feature.dtype.type:
+                if input_1_feature.dtype.type != input_2_feature.dtype.type:
                     raise ValueError(
                         "Both features must have the same dtype."
-                        f" node_1_feature: {node_1_feature} has dtype "
-                        f"{node_1_feature.dtype}, node_2_feature: "
-                        f"{node_2_feature} has dtype {node_2_feature.dtype}."
+                        f" input_1_feature: {input_1_feature} has dtype "
+                        f"{input_1_feature.dtype}, input_2_feature: "
+                        f"{input_2_feature} has dtype {input_2_feature.dtype}."
                     )
 
-                result = self._do_operation(node_1_feature, node_2_feature)
+                result = self._do_operation(input_1_feature, input_2_feature)
                 dst_evset[index_key].features.append(result)
 
-        return {"node": dst_evset}
+        return {"output": dst_evset}

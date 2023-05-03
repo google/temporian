@@ -67,7 +67,7 @@ class SetIndexNumpyImplementationTest(absltest.TestCase):
         operator_impl = SetIndexNumpyImplementation(operator)
 
         # call operator
-        output_evset = operator_impl.call(node=self.input_evset)["node"]
+        output_evset = operator_impl.call(input=self.input_evset)["output"]
 
         # validate output
         self.assertEqual(output_evset, expected_evset)
@@ -104,7 +104,7 @@ class SetIndexNumpyImplementationTest(absltest.TestCase):
         operator_impl = SetIndexNumpyImplementation(operator)
 
         # call operator
-        output_evset = operator_impl.call(node=self.input_evset)["node"]
+        output_evset = operator_impl.call(input=self.input_evset)["output"]
 
         # validate output
         self.assertEqual(output_evset, expected_evset)
@@ -138,7 +138,7 @@ class SetIndexNumpyImplementationTest(absltest.TestCase):
         operator_impl = SetIndexNumpyImplementation(operator)
 
         # call operator
-        output_evset = operator_impl.call(node=self.input_evset)["node"]
+        output_evset = operator_impl.call(input=self.input_evset)["output"]
 
         # validate output
         self.assertEqual(output_evset, expected_evset)
@@ -174,7 +174,7 @@ class SetIndexNumpyImplementationTest(absltest.TestCase):
         operator_impl = SetIndexNumpyImplementation(operator)
 
         # call operator
-        output_evset = operator_impl.call(node=self.input_evset)["node"]
+        output_evset = operator_impl.call(input=self.input_evset)["output"]
 
         # validate output
         self.assertEqual(output_evset, expected_evset)

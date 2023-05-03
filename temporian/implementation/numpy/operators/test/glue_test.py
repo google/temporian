@@ -96,16 +96,16 @@ class GlueNumpyImplementationTest(absltest.TestCase):
         node_3._sampling = node_1._sampling
 
         operator = GlueOperator(
-            node_0=node_1,
-            node_1=node_2,
-            node_2=node_3,
+            input_0=node_1,
+            input_1=node_2,
+            input_2=node_3,
         )
         implementation = GlueNumpyImplementation(operator=operator)
         output = implementation.call(
-            node_0=evset_1, node_1=evset_2, node_2=evset_3
+            input_0=evset_1, input_1=evset_2, input_2=evset_3
         )
         self.assertEqual(
-            output["node"],
+            output["output"],
             expected_evset,
         )
 
@@ -115,14 +115,14 @@ class GlueNumpyImplementationTest(absltest.TestCase):
             "All glue arguments should have the same sampling.",
         ):
             _ = GlueOperator(
-                node_0=node_lib.input_node(
+                input_0=node_lib.input_node(
                     [Feature(name="a", dtype=DType.FLOAT64)],
                     sampling=Sampling(
                         index_levels=[("x", DType.INT64)],
                         is_unix_timestamp=False,
                     ),
                 ),
-                node_1=node_lib.input_node(
+                input_1=node_lib.input_node(
                     [Feature(name="b", dtype=DType.FLOAT64)],
                     sampling=Sampling(
                         index_levels=[("x", DType.INT64)],
@@ -140,11 +140,11 @@ class GlueNumpyImplementationTest(absltest.TestCase):
                 index_levels=[("x", DType.INT64)], is_unix_timestamp=False
             )
             _ = GlueOperator(
-                node_0=node_lib.input_node(
+                input_0=node_lib.input_node(
                     [Feature(name="a", dtype=DType.FLOAT64)],
                     sampling=sampling,
                 ),
-                node_1=node_lib.input_node(
+                input_1=node_lib.input_node(
                     [Feature(name="a", dtype=DType.FLOAT64)],
                     sampling=sampling,
                 ),

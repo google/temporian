@@ -45,7 +45,7 @@ def calendar_day_of_week(sampling: Node) -> Node:
 
     Returns:
         Node with a single feature corresponding to the day of the week each
-        timestamp in `node`'s sampling belongs to, with the same sampling as
-        `node`.
+        timestamp in `sampling`'s sampling belongs to, with the same sampling as
+        `sampling`.
     """
-    return CalendarDayOfWeekOperator(sampling).outputs["node"]
+    return CalendarDayOfWeekOperator(sampling).outputs["output"]

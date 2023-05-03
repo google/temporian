@@ -51,9 +51,9 @@ class UniqueTimestampsOperatorTest(absltest.TestCase):
         )
 
         # Run op
-        op = UniqueTimestamps(node=node)
+        op = UniqueTimestamps(input=node)
         instance = UniqueTimestampsNumpyImplementation(op)
-        output = instance.call(node=evset)["node"]
+        output = instance.call(input=evset)["output"]
 
         self.assertEqual(output, expected_output)
 

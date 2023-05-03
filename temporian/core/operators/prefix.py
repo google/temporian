@@ -25,12 +25,12 @@ class Prefix(Operator):
     def __init__(
         self,
         prefix: str,
-        node: Node,
+        input: Node,
     ):
         super().__init__()
 
         self.add_attribute("prefix", prefix)
-        self.add_input("node", node)
+        self.add_input("input", input)
 
         # TODO: When supported, re-use existing feature instead of creating a
         # new one.
@@ -38,23 +38,24 @@ class Prefix(Operator):
             Feature(
                 name=prefix + f.name,
                 dtype=f.dtype,
-                sampling=node.sampling,
+                sampling=input.sampling,
                 creator=self,
             )
-            for f in node.features
+            for f in input.features
         ]
 
         self.add_output(
-            "node",
+            "output",
             Node(
                 features=output_features,
-                sampling=node.sampling,
+                sampling=input.sampling,
                 creator=self,
             ),
         )
 
         self.check()
 
+    @property
     def prefix(self):
         return self.attributes["prefix"]
 
@@ -68,8 +69,8 @@ class Prefix(Operator):
                     type=pb.OperatorDef.Attribute.Type.STRING,
                 )
             ],
-            inputs=[pb.OperatorDef.Input(key="node")],
-            outputs=[pb.OperatorDef.Output(key="node")],
+            inputs=[pb.OperatorDef.Input(key="input")],
+            outputs=[pb.OperatorDef.Output(key="output")],
         )
 
 
@@ -78,14 +79,14 @@ operator_lib.register_operator(Prefix)
 
 def prefix(
     prefix: str,
-    node: Node,
+    input: Node,
 ) -> Node:
     """Adds a prefix to the names of the features in a node.
 
     Example:
         Inputs:
             prefix: "hello_"
-            node:
+            input:
                 feature_1: ...
                 feature_2: ...
                 index: {index_1, index_2, ...}
@@ -97,9 +98,9 @@ def prefix(
 
     Args:
         prefix: Prefix to add in front of the feature names.
-        node: Node to prefix.
+        input: Node to prefix.
 
     Returns:
         Prefixed node.
     """
-    return Prefix(prefix=prefix, node=node).outputs["node"]
+    return Prefix(prefix=prefix, input=input).outputs["output"]

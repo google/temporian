@@ -53,31 +53,31 @@ class CastNumpyImplementation(OperatorImplementation):
                 f"Overflow casting {origin_dtype}->{dst_dtype} {data=}"
             )
 
-    def __call__(self, node: EventSet) -> Dict[str, EventSet]:
+    def __call__(self, input: EventSet) -> Dict[str, EventSet]:
         from_features = self.operator.attributes["from_features"]
         check = self.operator.attributes["check_overflow"]
 
         # Reuse evset if actually no features changed dtype
         operator: CastOperator = self.operator
         if operator.reuse_node:
-            return {"node": node}
+            return {"output": input}
 
         # Create new evset, some features may be reused
         # NOTE: it's currently faster in the benchmark to run feat/event_idx,
         # but this might need a re-check with future implementations.
         dst_evset = EventSet(
             data={},
-            feature_names=node.feature_names,
-            index_names=node.index_names,
-            is_unix_timestamp=node.is_unix_timestamp,
+            feature_names=input.feature_names,
+            index_names=input.index_names,
+            is_unix_timestamp=input.is_unix_timestamp,
         )
-        for feat_idx, feature_name in enumerate(node.feature_names):
-            src_dtype = node.dtypes[feature_name]
+        for feat_idx, feature_name in enumerate(input.feature_names):
+            src_dtype = input.dtypes[feature_name]
             dst_dtype = DType(from_features[feature_name])
             check_feature = check and self._can_overflow(src_dtype, dst_dtype)
             # Numpy destination type
             dst_dtype_np = DTYPE_REVERSE_MAPPING[dst_dtype]
-            for index_key, index_data in node.iterindex():
+            for index_key, index_data in input.iterindex():
                 feature = index_data.features[feat_idx]
                 # Initialize row with first feature
                 if feat_idx == 0:
@@ -101,7 +101,7 @@ class CastNumpyImplementation(OperatorImplementation):
                         feature.astype(dst_dtype_np),
                     )
 
-        return {"node": dst_evset}
+        return {"output": dst_evset}
 
 
 implementation_lib.register_operator_implementation(

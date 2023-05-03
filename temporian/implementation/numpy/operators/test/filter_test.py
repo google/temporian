@@ -70,10 +70,10 @@ class FilterOperatorTest(absltest.TestCase):
         condition_evset = EventSet.from_dataframe(condition_df)
         condition = condition_evset.node()
 
-        operator = FilterOperator(node=node, condition=condition)
+        operator = FilterOperator(input=node, condition=condition)
         impl = FilterNumpyImplementation(operator)
-        filtered_evset = impl.call(node=evset, condition=condition_evset)[
-            "node"
+        filtered_evset = impl.call(input=evset, condition=condition_evset)[
+            "output"
         ]
 
         expected_evset = EventSet.from_dataframe(expected_df)
@@ -127,10 +127,10 @@ class FilterOperatorTest(absltest.TestCase):
         condition_evset = EventSet.from_dataframe(condition_df)
         condition = condition_evset.node()
 
-        operator = FilterOperator(node=node, condition=condition)
+        operator = FilterOperator(input=node, condition=condition)
         impl = FilterNumpyImplementation(operator)
-        filtered_evset = impl.call(node=evset, condition=condition_evset)[
-            "node"
+        filtered_evset = impl.call(input=evset, condition=condition_evset)[
+            "output"
         ]
 
         expected_evset = EventSet.from_dataframe(expected_df)
@@ -186,10 +186,10 @@ class FilterOperatorTest(absltest.TestCase):
         )
         condition = condition_evset.node()
 
-        operator = FilterOperator(node=node, condition=condition)
+        operator = FilterOperator(input=node, condition=condition)
         impl = FilterNumpyImplementation(operator)
-        filtered_evset = impl.call(node=evset, condition=condition_evset)[
-            "node"
+        filtered_evset = impl.call(input=evset, condition=condition_evset)[
+            "output"
         ]
 
         expected_evset = EventSet.from_dataframe(
@@ -248,10 +248,10 @@ class FilterOperatorTest(absltest.TestCase):
         )
         condition = condition_evset.node()
 
-        operator = FilterOperator(node=node, condition=condition)
+        operator = FilterOperator(input=node, condition=condition)
         impl = FilterNumpyImplementation(operator)
-        filtered_evset = impl.call(node=evset, condition=condition_evset)[
-            "node"
+        filtered_evset = impl.call(input=evset, condition=condition_evset)[
+            "output"
         ]
 
         expected_evset = EventSet.from_dataframe(

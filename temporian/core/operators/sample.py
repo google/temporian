@@ -24,18 +24,18 @@ from temporian.proto import core_pb2 as pb
 class Sample(Operator):
     def __init__(
         self,
-        node: Node,
+        input: Node,
         sampling: Node,
     ):
         super().__init__()
 
-        self.add_input("node", node)
+        self.add_input("input", input)
         self.add_input("sampling", sampling)
 
-        if node.sampling.index != sampling.sampling.index:
+        if input.sampling.index != sampling.sampling.index:
             raise ValueError(
                 "Node and sampling do not have the same index."
-                f" {node.sampling.index} != {sampling.sampling.index}"
+                f" {input.sampling.index} != {sampling.sampling.index}"
             )
 
         output_features = [  # pylint: disable=g-complex-comprehension
@@ -45,11 +45,11 @@ class Sample(Operator):
                 sampling=sampling.sampling,
                 creator=self,
             )
-            for f in node.features
+            for f in input.features
         ]
 
         self.add_output(
-            "node",
+            "output",
             Node(
                 features=output_features,
                 sampling=sampling.sampling,
@@ -65,10 +65,10 @@ class Sample(Operator):
             key="SAMPLE",
             attributes=[],
             inputs=[
-                pb.OperatorDef.Input(key="node"),
+                pb.OperatorDef.Input(key="input"),
                 pb.OperatorDef.Input(key="sampling"),
             ],
-            outputs=[pb.OperatorDef.Output(key="node")],
+            outputs=[pb.OperatorDef.Output(key="output")],
         )
 
 
@@ -76,20 +76,20 @@ operator_lib.register_operator(Sample)
 
 
 def sample(
-    node: Node,
+    input: Node,
     sampling: Node,
 ) -> Node:
     """Samples a node at each timestamp of a sampling.
 
     If a timestamp in `sampling` does not have a corresponding timestamp in
-    `node`, the last timestamp in `node` is used instead. If this timestamp
-    is anterior to an value in `node`, the value is replaced by
+    `input`, the last timestamp in `input` is used instead. If this timestamp
+    is anterior to an value in `input`, the value is replaced by
     `dtype.MissingValue(...)`.
 
     Example:
         ```
         Inputs:
-            node:
+            input:
                 timestamps: 1, 5, 8, 9
                 feature_1:  1.0, 2.0, 3.0, 4.0
             sampling:
@@ -101,11 +101,11 @@ def sample(
         ```
 
     Args:
-        node: Node to sample.
+        input: Node to sample.
         sampling: Node to use the sampling of.
 
     Returns:
         Sampled node, with same sampling as `sampling`.
     """
 
-    return Sample(node=node, sampling=sampling).outputs["node"]
+    return Sample(input=input, sampling=sampling).outputs["output"]

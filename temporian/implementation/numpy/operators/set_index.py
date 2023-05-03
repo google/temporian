@@ -17,15 +17,15 @@ class SetIndexNumpyImplementation(OperatorImplementation):
     def __init__(self, operator: SetIndexOperator) -> None:
         super().__init__(operator)
 
-    def __call__(self, node: EventSet) -> Dict[str, EventSet]:
+    def __call__(self, input: EventSet) -> Dict[str, EventSet]:
         # get attributes
         feature_names = self.operator.attributes["feature_names"]
         append = self.operator.attributes["append"]
 
         if append:
-            return {"node": _append_impl(node, feature_names)}
+            return {"output": _append_impl(input, feature_names)}
 
-        return {"node": _set_impl(node, feature_names)}
+        return {"output": _set_impl(input, feature_names)}
 
 
 def _append_impl(evset: EventSet, append_feat_names: List[str]) -> EventSet:

@@ -69,14 +69,14 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
         )
 
         op = MovingStandardDeviationOperator(
-            node=input_data.node(),
+            input=input_data.node(),
             window_length=5.0,
             sampling=None,
         )
-        self.assertEqual(op.list_matching_io_samplings(), [("node", "node")])
+        self.assertEqual(op.list_matching_io_samplings(), [("input", "output")])
         instance = MovingStandardDeviationNumpyImplementation(op)
 
-        output = instance(node=input_data)
+        output = instance(input=input_data)
 
         expected_output = EventSet.from_dataframe(
             pd.DataFrame(
@@ -91,7 +91,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
             )
         )
 
-        self.assertEqual(repr(output), repr({"node": expected_output}))
+        self.assertEqual(repr(output), repr({"output": expected_output}))
 
     def test_with_index(self):
         """Indexed event sets."""
@@ -115,14 +115,14 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
         )
 
         op = MovingStandardDeviationOperator(
-            node=input_data.node(),
+            input=input_data.node(),
             window_length=5.0,
             sampling=None,
         )
-        self.assertEqual(op.list_matching_io_samplings(), [("node", "node")])
+        self.assertEqual(op.list_matching_io_samplings(), [("input", "output")])
         instance = MovingStandardDeviationNumpyImplementation(op)
 
-        output = instance(node=input_data)
+        output = instance(input=input_data)
 
         expected_output = EventSet.from_dataframe(
             pd.DataFrame(
@@ -142,7 +142,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
             index_names=["x", "y"],
         )
 
-        self.assertEqual(repr(output), repr({"node": expected_output}))
+        self.assertEqual(repr(output), repr({"output": expected_output}))
 
     def test_with_sampling(self):
         """Event sets with user provided sampling."""
@@ -161,12 +161,12 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
         )
 
         op = MovingStandardDeviationOperator(
-            node=input_data.node(),
+            input=input_data.node(),
             window_length=3.1,
             sampling=node_lib.input_node([]),
         )
         self.assertEqual(
-            op.list_matching_io_samplings(), [("sampling", "node")]
+            op.list_matching_io_samplings(), [("sampling", "output")]
         )
         instance = MovingStandardDeviationNumpyImplementation(op)
 
@@ -185,7 +185,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
             )
         )
 
-        output = instance(node=input_data, sampling=sampling_data)
+        output = instance(input=input_data, sampling=sampling_data)
 
         expected_output = EventSet.from_dataframe(
             pd.DataFrame(
@@ -202,7 +202,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
             )
         )
 
-        self.assertEqual(repr(output), repr({"node": expected_output}))
+        self.assertEqual(repr(output), repr({"output": expected_output}))
 
     def test_with_nan(self):
         """The input features contains nan values."""
@@ -221,7 +221,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
         )
 
         op = MovingStandardDeviationOperator(
-            node=input_data.node(),
+            input=input_data.node(),
             window_length=1.1,
             sampling=node_lib.input_node([]),
         )
@@ -243,7 +243,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
             )
         )
 
-        output = instance(node=input_data, sampling=sampling_data)
+        output = instance(input=input_data, sampling=sampling_data)
 
         expected_output = EventSet.from_dataframe(
             pd.DataFrame(
@@ -261,7 +261,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
             )
         )
 
-        self.assertEqual(repr(output), repr({"node": expected_output}))
+        self.assertEqual(repr(output), repr({"output": expected_output}))
 
 
 if __name__ == "__main__":

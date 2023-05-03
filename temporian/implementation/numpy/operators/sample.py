@@ -33,10 +33,10 @@ class SampleNumpyImplementation(OperatorImplementation):
         assert isinstance(operator, Sample)
 
     def __call__(
-        self, node: EventSet, sampling: EventSet
+        self, input: EventSet, sampling: EventSet
     ) -> Dict[str, EventSet]:
         # Type and replacement values
-        output_features = self._operator.outputs["node"].features
+        output_features = self._operator.outputs["output"].features
         output_missing_and_np_dtypes = [
             (
                 f.dtype.missing_value(),
@@ -47,9 +47,9 @@ class SampleNumpyImplementation(OperatorImplementation):
         # create output event set
         dst_evset = EventSet(
             data={},
-            feature_names=node.feature_names,
-            index_names=node.index_names,
-            is_unix_timestamp=node.is_unix_timestamp,
+            feature_names=input.feature_names,
+            index_names=input.index_names,
+            is_unix_timestamp=input.is_unix_timestamp,
         )
         # iterate over destination sampling
         for index_key, index_data in sampling.iterindex():
@@ -57,7 +57,7 @@ class SampleNumpyImplementation(OperatorImplementation):
             dst_mts = []
             dst_evset[index_key] = IndexData(dst_mts, index_data.timestamps)
 
-            if index_key not in node.data:
+            if index_key not in input.data:
                 # No matching events to sample from
                 for (
                     output_missing_value,
@@ -72,8 +72,8 @@ class SampleNumpyImplementation(OperatorImplementation):
                     )
                 continue
 
-            src_mts = node[index_key].features
-            src_timestamps = node[index_key].timestamps
+            src_mts = input[index_key].features
+            src_timestamps = input[index_key].timestamps
             (
                 sampling_idxs,
                 first_valid_idx,
@@ -95,7 +95,7 @@ class SampleNumpyImplementation(OperatorImplementation):
                 ]
                 dst_mts.append(dst_ts_data)
 
-        return {"node": dst_evset}
+        return {"output": dst_evset}
 
 
 implementation_lib.register_operator_implementation(

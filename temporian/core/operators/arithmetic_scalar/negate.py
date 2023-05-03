@@ -27,11 +27,11 @@ from temporian.core.operators.arithmetic_scalar.base import (
 class NegateOperator(BaseArithmeticScalarOperator):
     def __init__(
         self,
-        node: Node,
+        input: Node,
         value: int = -1,
         is_value_first: bool = False,
     ):
-        super().__init__(node, value, is_value_first)
+        super().__init__(input, value, is_value_first)
 
     @classmethod
     @property
@@ -64,19 +64,19 @@ operator_lib.register_operator(NegateOperator)
 
 
 def negate(
-    node: Node,
+    input: Node,
 ) -> Node:
     """Negates a node.
 
-    Multiplies each item in each feature in `node` by -1.
+    Multiplies each item in each feature in `input` by -1.
 
     Args:
-        node: Node to negate.
+        input: Node to negate.
 
     Returns:
         Negated node.
     """
     return NegateOperator(
-        node=node,
+        input=input,
         value=-1,
-    ).outputs["event"]
+    ).outputs["output"]

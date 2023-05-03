@@ -23,7 +23,7 @@ from temporian.proto import core_pb2 as pb
 
 
 class SelectOperator(Operator):
-    def __init__(self, node: Node, feature_names: Union[str, List[str]]):
+    def __init__(self, input: Node, feature_names: Union[str, List[str]]):
         super().__init__()
 
         # store selected feature names
@@ -41,25 +41,25 @@ class SelectOperator(Operator):
 
         # verify all selected features exist in the input node
         selected_features_set = set(feature_names)
-        node_features_set = set([feature.name for feature in node.features])
+        node_features_set = set([feature.name for feature in input.features])
         if not set(selected_features_set).issubset(node_features_set):
             raise KeyError(selected_features_set.difference(node_features_set))
 
         # inputs
-        self.add_input("node", node)
+        self.add_input("input", input)
 
         # outputs
         output_features = []
         for feature_name in feature_names:
-            for feature in node.features:
+            for feature in input.features:
                 # TODO: maybe implement features attributes of Node as dict
                 # so we can index by name?
                 if feature.name == feature_name:
                     output_features.append(feature)
 
-        output_sampling = node.sampling
+        output_sampling = input.sampling
         self.add_output(
-            "node",
+            "output",
             Node(
                 features=output_features,
                 sampling=output_sampling,
@@ -85,9 +85,9 @@ class SelectOperator(Operator):
                 ),
             ],
             inputs=[
-                pb.OperatorDef.Input(key="node"),
+                pb.OperatorDef.Input(key="input"),
             ],
-            outputs=[pb.OperatorDef.Output(key="node")],
+            outputs=[pb.OperatorDef.Output(key="output")],
         )
 
 
@@ -95,14 +95,14 @@ operator_lib.register_operator(SelectOperator)
 
 
 def select(
-    node: Node,
+    input: Node,
     feature_names: List[str],
 ) -> Node:
     """Selects a subset of features from a node.
 
     Args:
-        node: Node to select features from.
-        feature_names: Names of the features to select from the node.
+        input: Node to select features from.
+        feature_names: Names of the features to select from the input.
 
     Returns:
         Node containing only the selected features.
@@ -117,4 +117,4 @@ def select(
             f" str. Got '{feature_names}' instead."
         )
 
-    return SelectOperator(node, feature_names).outputs["node"]
+    return SelectOperator(input, feature_names).outputs["output"]

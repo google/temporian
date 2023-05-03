@@ -45,7 +45,7 @@ def calendar_day_of_year(sampling: Node) -> Node:
 
     Returns:
         Node with a single feature corresponding to the day of the year each
-        timestamp in `node`'s sampling belongs to, with the same sampling as
-        `node`.
+        timestamp in `sampling`'s sampling belongs to, with the same sampling as
+        `sampling`.
     """
-    return CalendarDayOfYearOperator(sampling).outputs["node"]
+    return CalendarDayOfYearOperator(sampling).outputs["output"]

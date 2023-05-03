@@ -55,6 +55,6 @@ def floordiv(
         Integer division of `numerator`'s features by `denominator`'s features.
     """
     return FloorDivOperator(
-        node_1=numerator,
-        node_2=denominator,
-    ).outputs["node"]
+        input_1=numerator,
+        input_2=denominator,
+    ).outputs["output"]

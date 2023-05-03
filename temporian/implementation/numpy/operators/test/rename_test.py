@@ -80,7 +80,7 @@ class RenameOperatorTest(absltest.TestCase):
         operator = RenameOperator(self.input_node, "costs")
 
         impl = RenameNumpyImplementation(operator)
-        renamed_evset = impl.call(node=self.input_evset)["node"]
+        renamed_evset = impl.call(input=self.input_evset)["output"]
 
         self.assertEqual(renamed_evset, expected_evset)
 
@@ -110,7 +110,7 @@ class RenameOperatorTest(absltest.TestCase):
         operator = RenameOperator(self.input_node, {"sales": "costs"})
 
         impl = RenameNumpyImplementation(operator)
-        renamed_evset = impl.call(node=self.input_evset)["node"]
+        renamed_evset = impl.call(input=self.input_evset)["output"]
 
         self.assertEqual(renamed_evset, expected_evset)
 
@@ -129,11 +129,11 @@ class RenameOperatorTest(absltest.TestCase):
         )
 
         operator = RenameOperator(
-            node=self.input_node,
+            input=self.input_node,
             features={"sales": "new_sales", "weather": "profit"},
         )
         impl = RenameNumpyImplementation(operator)
-        renamed_evset = impl.call(node=self.input_evset)["node"]
+        renamed_evset = impl.call(input=self.input_evset)["output"]
 
         self.assertEqual(renamed_evset, expected_evset)
 
@@ -152,11 +152,11 @@ class RenameOperatorTest(absltest.TestCase):
         )
 
         operator = RenameOperator(
-            node=self.input_node,
+            input=self.input_node,
             index="product_id",
         )
         impl = RenameNumpyImplementation(operator)
-        renamed_evset = impl.call(node=self.input_evset)["node"]
+        renamed_evset = impl.call(input=self.input_evset)["output"]
 
         self.assertEqual(renamed_evset, expected_evset)
 
@@ -175,11 +175,11 @@ class RenameOperatorTest(absltest.TestCase):
         )
 
         operator = RenameOperator(
-            node=self.input_node,
+            input=self.input_node,
             index={"store_id": "product_id"},
         )
         impl = RenameNumpyImplementation(operator)
-        renamed_evset = impl.call(node=self.input_evset)["node"]
+        renamed_evset = impl.call(input=self.input_evset)["output"]
 
         self.assertEqual(renamed_evset, expected_evset)
 
@@ -213,18 +213,18 @@ class RenameOperatorTest(absltest.TestCase):
         )
 
         operator = RenameOperator(
-            node=self.input_node,
+            input=self.input_node,
             index={"store_id": "product_id", "costs": "roi"},
         )
         impl = RenameNumpyImplementation(operator)
-        renamed_evset = impl.call(node=self.input_evset)["node"]
+        renamed_evset = impl.call(input=self.input_evset)["output"]
 
         self.assertEqual(renamed_evset, expected_evset)
 
     def test_rename_feature_with_empty_str(self) -> None:
         """Test renaming feature with empty string."""
         with self.assertRaises(ValueError):
-            RenameOperator(node=self.input_node, features={"sales": ""})
+            RenameOperator(input=self.input_node, features={"sales": ""})
 
     def test_rename_feature_with_empty_str_without_dict(self) -> None:
         """Test renaming feature with empty string."""
@@ -244,25 +244,25 @@ class RenameOperatorTest(absltest.TestCase):
     def test_rename_feature_with_non_str_object(self) -> None:
         """Test renaming feature with non string object."""
         with self.assertRaises(ValueError):
-            RenameOperator(node=self.input_node, features={"sales": 1})
+            RenameOperator(input=self.input_node, features={"sales": 1})
 
     def test_rename_feature_with_non_existent_feature(self) -> None:
         """Test renaming feature with non existent feature."""
         with self.assertRaises(KeyError):
-            RenameOperator(node=self.input_node, features={"sales_1": "costs"})
+            RenameOperator(input=self.input_node, features={"sales_1": "costs"})
 
     def test_rename_feature_with_duplicated_new_feature_names(self) -> None:
         """Test renaming feature with duplicated new names."""
         with self.assertRaises(ValueError):
             RenameOperator(
-                node=self.input_node,
+                input=self.input_node,
                 features={"sales": "new_sales", "costs": "new_sales"},
             )
 
     def test_rename_index_with_empty_str(self) -> None:
         """Test renaming index with empty string."""
         with self.assertRaises(ValueError):
-            RenameOperator(node=self.input_node, index={"sales": ""})
+            RenameOperator(input=self.input_node, index={"sales": ""})
 
     def test_rename_index_with_empty_str_without_dict(self) -> None:
         """Test renaming index with empty string."""
@@ -284,18 +284,18 @@ class RenameOperatorTest(absltest.TestCase):
     def test_rename_index_with_non_str_object(self) -> None:
         """Test renaming index with non string object."""
         with self.assertRaises(ValueError):
-            RenameOperator(node=self.input_node, index={"sales": 1})
+            RenameOperator(input=self.input_node, index={"sales": 1})
 
     def test_rename_index_with_non_existent_index(self) -> None:
         """Test renaming index with non existent index."""
         with self.assertRaises(KeyError):
-            RenameOperator(node=self.input_node, index={"sales_1": "costs"})
+            RenameOperator(input=self.input_node, index={"sales_1": "costs"})
 
     def test_rename_index_with_duplicated_new_index_names(self) -> None:
         """Test renaming index with duplicated new names."""
         with self.assertRaises(ValueError):
             RenameOperator(
-                node=self.input_node,
+                input=self.input_node,
                 index={"store_id": "new_sales", "sales": "new_sales"},
             )
 
@@ -303,13 +303,13 @@ class RenameOperatorTest(absltest.TestCase):
         """Test renaming feature and index with same name."""
 
         operator = RenameOperator(
-            node=self.input_node,
+            input=self.input_node,
             index={"store_id": "sales"},
         )
         impl = RenameNumpyImplementation(operator)
 
         with self.assertRaises(ValueError):
-            impl.call(node=self.input_evset)["node"]
+            impl.call(input=self.input_evset)["output"]
 
     def test_rename_feature_and_index_inverting_name(self) -> None:
         """Test renaming feature and index with same name complex case."""
@@ -324,12 +324,12 @@ class RenameOperatorTest(absltest.TestCase):
         expected_evset = EventSet.from_dataframe(new_df, index_names=["sales"])
 
         operator = RenameOperator(
-            node=self.input_node,
+            input=self.input_node,
             features={"sales": "store_id"},
             index={"store_id": "sales"},
         )
         impl = RenameNumpyImplementation(operator)
-        renamed_evset = impl.call(node=self.input_evset)["node"]
+        renamed_evset = impl.call(input=self.input_evset)["output"]
         self.assertEqual(renamed_evset, expected_evset)
 
 

@@ -24,7 +24,7 @@ from temporian.proto import core_pb2 as pb
 
 
 class FilterOperator(Operator):
-    def __init__(self, node: Node, condition: Node):
+    def __init__(self, input: Node, condition: Node):
         super().__init__()
 
         # check that condition is a single feature
@@ -42,20 +42,20 @@ class FilterOperator(Operator):
             )
 
         # check both nodes have same sampling
-        if node.sampling.index != condition.sampling.index:
+        if input.sampling.index != condition.sampling.index:
             raise ValueError(
                 "Node and condition must have the same sampling. Got"
-                f" {node.sampling} and {condition.sampling} instead."
+                f" {input.sampling} and {condition.sampling} instead."
             )
 
         # inputs
-        self.add_input("node", node)
+        self.add_input("input", input)
         self.add_input("condition", condition)
 
         output_sampling = Sampling(
-            index_levels=node.sampling.index,
+            index_levels=input.sampling.index,
             creator=self,
-            is_unix_timestamp=node.sampling.is_unix_timestamp,
+            is_unix_timestamp=input.sampling.is_unix_timestamp,
         )
 
         self.condition_name = condition.features[0].name
@@ -68,11 +68,11 @@ class FilterOperator(Operator):
                 sampling=output_sampling,
                 creator=self,
             )
-            for f in node.features
+            for f in input.features
         ]
 
         self.add_output(
-            "node",
+            "output",
             Node(
                 features=output_features,
                 sampling=output_sampling,
@@ -88,10 +88,10 @@ class FilterOperator(Operator):
             key="FILTER",
             attributes=[],
             inputs=[
-                pb.OperatorDef.Input(key="node"),
+                pb.OperatorDef.Input(key="input"),
                 pb.OperatorDef.Input(key="condition"),
             ],
-            outputs=[pb.OperatorDef.Output(key="node")],
+            outputs=[pb.OperatorDef.Output(key="output")],
         )
 
 
@@ -100,21 +100,21 @@ operator_lib.register_operator(FilterOperator)
 
 # pylint: disable=redefined-builtin
 def filter(
-    node: Node,
+    input: Node,
     condition: Node,
 ) -> Node:
     """Filters out timestamps in a node for which a condition is false.
 
-    Each timestamp in `node` is only kept if the corresponding value for that
+    Each timestamp in `input` is only kept if the corresponding value for that
     timestamp in `condition` is `True`.
 
-    `node` and `condition` must have the same sampling.
+    `input` and `condition` must have the same sampling.
 
     Args:
-        node: Node to filter.
+        input: Node to filter.
         condition: Node with a single boolean feature condition.
 
     Returns:
-        Filtered node.
+        Filtered input.
     """
-    return FilterOperator(node, condition).outputs["node"]
+    return FilterOperator(input, condition).outputs["output"]

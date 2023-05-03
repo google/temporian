@@ -85,12 +85,12 @@ from temporian.proto import core_pb2 as pb
 
 
 class {capitalized_op}(Operator):
-    def __init__(self, node: Node, param: float):
+    def __init__(self, input: Node, param: float):
         super().__init__()
 
-        self.add_input("node", node)
+        self.add_input("input", input)
         self.add_attribute("param", param)
-        self.add_output("node", node)
+        self.add_output("output", input)
         self.check()
 
     @classmethod
@@ -104,22 +104,29 @@ class {capitalized_op}(Operator):
                     is_optional=False,
                 ),
             ],
-            inputs=[pb.OperatorDef.Input(key="node")],
-            outputs=[pb.OperatorDef.Output(key="node")],
+            inputs=[pb.OperatorDef.Input(key="input")],
+            outputs=[pb.OperatorDef.Output(key="output")],
         )
 
 
 operator_lib.register_operator({capitalized_op})
 
 
-def {lower_op}(node: Node, param: float) -> Node:
+def {lower_op}(input: Node, param: float) -> Node:
     """<Text>
+
+    Args:
+        input: <Text>
+        param: <Text>
 
     Example:
         <Text>
+
+    Returns:
+        <Text>
     """
 
-    return {capitalized_op}(node=node, param=param).outputs["node"]
+    return {capitalized_op}(input=input, param=param).outputs["output"]
 
 '''
         )
@@ -179,9 +186,9 @@ class {capitalized_op}NumpyImplementation(OperatorImplementation):
         super().__init__(operator)
 
     def __call__(
-        self, node: EventSet) -> Dict[str, EventSet]:
+        self, input: EventSet) -> Dict[str, EventSet]:
 
-        return {{"node": node}}
+        return {{"output": input}}
 
 
 implementation_lib.register_operator_implementation(
@@ -273,9 +280,9 @@ class {capitalized_op}OperatorTest(absltest.TestCase):
         )
 
         # Run op
-        op = {capitalized_op}(node=node, param=1.0)
+        op = {capitalized_op}(input=node, param=1.0)
         instance = {capitalized_op}NumpyImplementation(op)
-        output = instance.call(node=evset)["node"]
+        output = instance.call(input=evset)["output"]
 
         self.assertEqual(output, expected_output)
 

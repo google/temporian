@@ -34,25 +34,25 @@ operator_lib.register_operator(SubtractOperator)
 
 
 def subtract(
-    node_1: Node,
-    node_2: Node,
+    input_1: Node,
+    input_2: Node,
 ) -> Node:
     """Subtracts two nodes.
 
-    Each feature in `node_2` is subtracted from the feature in `node_1` in the
+    Each feature in `input_2` is subtracted from the feature in `input_1` in the
     same position.
 
-    `node_1` and `node_2` must have the same sampling and the same number of
+    `input_1` and `input_2` must have the same sampling and the same number of
     features.
 
     Args:
-        node_1: First node.
-        node_2: Second node.
+        input_1: First node.
+        input_2: Second node.
 
     Returns:
-        Subtraction of `node_2`'s features from `node_1`'s.
+        Subtraction of `input_2`'s features from `input_1`'s.
     """
     return SubtractOperator(
-        node_1=node_1,
-        node_2=node_2,
-    ).outputs["node"]
+        input_1=input_1,
+        input_2=input_2,
+    ).outputs["output"]

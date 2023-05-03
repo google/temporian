@@ -29,7 +29,7 @@ class BaseArithmeticScalarOperator(Operator):
 
     def __init__(
         self,
-        node: Node,
+        input: Node,
         value: Union[float, int, str, bool],
         is_value_first: bool = False,  # useful for non-commutative operators
     ):
@@ -39,15 +39,15 @@ class BaseArithmeticScalarOperator(Operator):
         self.is_value_first = is_value_first
 
         # inputs
-        self.add_input("node", node)
+        self.add_input("input", input)
 
         self.add_attribute("value", value)
         self.add_attribute("is_value_first", is_value_first)
 
-        if not isinstance(node, Node):
-            raise TypeError(f"Node must be of type Node but got {type(node)}")
+        if not isinstance(input, Node):
+            raise TypeError(f"Input must be of type Node but got {type(input)}")
 
-        # check that every dtype of node feature is equal to value dtype
+        # check that every dtype of input feature is equal to value dtype
         value_dtype = DType.from_python_type(type(value))
 
         # check that value dtype is in self.dtypes_to_check
@@ -72,7 +72,7 @@ class BaseArithmeticScalarOperator(Operator):
             ],
         }
         if not self.ignore_value_dtype_checking:
-            for feature in node.features:
+            for feature in input.features:
                 if feature.dtype not in self.map_vtype_dtype[type(value)]:
                     raise ValueError(
                         f"Scalar has {type(value)=}, which can only operate"
@@ -85,17 +85,17 @@ class BaseArithmeticScalarOperator(Operator):
             Feature(
                 name=feature.name,
                 dtype=self.output_feature_dtype(feature),
-                sampling=node.sampling,
+                sampling=input.sampling,
                 creator=self,
             )
-            for feature in node.features
+            for feature in input.features
         ]
 
         self.add_output(
-            "node",
+            "output",
             Node(
                 features=output_features,
-                sampling=node.sampling,
+                sampling=input.sampling,
                 creator=self,
             ),
         )
@@ -118,9 +118,9 @@ class BaseArithmeticScalarOperator(Operator):
                 ),
             ],
             inputs=[
-                pb.OperatorDef.Input(key="node"),
+                pb.OperatorDef.Input(key="input"),
             ],
-            outputs=[pb.OperatorDef.Output(key="node")],
+            outputs=[pb.OperatorDef.Output(key="output")],
         )
 
     @classmethod

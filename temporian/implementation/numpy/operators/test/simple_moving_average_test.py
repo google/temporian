@@ -116,13 +116,13 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
         )
 
         op = SimpleMovingAverageOperator(
-            node=evset.node(),
+            input=evset.node(),
             window_length=5.0,
             sampling=None,
         )
-        self.assertEqual(op.list_matching_io_samplings(), [("node", "node")])
+        self.assertEqual(op.list_matching_io_samplings(), [("input", "output")])
         instance = SimpleMovingAverageNumpyImplementation(op)
-        output = instance.call(node=evset)
+        output = instance.call(input=evset)
 
         expected_output = EventSet.from_dataframe(
             pd.DataFrame(
@@ -137,7 +137,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             )
         )
 
-        self.assertEqual(repr(output), repr({"node": expected_output}))
+        self.assertEqual(repr(output), repr({"output": expected_output}))
 
     def test_with_index(self):
         """Indexed Event sets."""
@@ -161,14 +161,14 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
         )
 
         op = SimpleMovingAverageOperator(
-            node=evset.node(),
+            input=evset.node(),
             window_length=5.0,
             sampling=None,
         )
-        self.assertEqual(op.list_matching_io_samplings(), [("node", "node")])
+        self.assertEqual(op.list_matching_io_samplings(), [("input", "output")])
         instance = SimpleMovingAverageNumpyImplementation(op)
 
-        output = instance.call(node=evset)
+        output = instance.call(input=evset)
         expected_output = EventSet.from_dataframe(
             pd.DataFrame(
                 [
@@ -187,7 +187,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             index_names=["x", "y"],
         )
 
-        self.assertEqual(output["node"], expected_output)
+        self.assertEqual(output["output"], expected_output)
 
     def test_with_sampling(self):
         """Event sets with user provided sampling."""
@@ -206,12 +206,12 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
         )
 
         op = SimpleMovingAverageOperator(
-            node=evset.node(),
+            input=evset.node(),
             window_length=3.0,
             sampling=node_lib.input_node([]),
         )
         self.assertEqual(
-            op.list_matching_io_samplings(), [("sampling", "node")]
+            op.list_matching_io_samplings(), [("sampling", "output")]
         )
         instance = SimpleMovingAverageNumpyImplementation(op)
 
@@ -230,7 +230,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             )
         )
 
-        output = instance.call(node=evset, sampling=sampling_data)
+        output = instance.call(input=evset, sampling=sampling_data)
         expected_output = EventSet.from_dataframe(
             pd.DataFrame(
                 [
@@ -246,7 +246,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             )
         )
 
-        self.assertEqual(output["node"], expected_output)
+        self.assertEqual(output["output"], expected_output)
 
     def test_with_nan(self):
         """The input features contains nan values."""
@@ -265,7 +265,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
         )
 
         op = SimpleMovingAverageOperator(
-            node=evset.node(),
+            input=evset.node(),
             window_length=1.0,
             sampling=node_lib.input_node([]),
         )
@@ -287,7 +287,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             )
         )
 
-        output = instance.call(node=evset, sampling=sampling_data)
+        output = instance.call(input=evset, sampling=sampling_data)
         expected_output = EventSet.from_dataframe(
             pd.DataFrame(
                 [
@@ -304,7 +304,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             )
         )
 
-        self.assertEqual(output["node"], expected_output)
+        self.assertEqual(output["output"], expected_output)
 
 
 if __name__ == "__main__":

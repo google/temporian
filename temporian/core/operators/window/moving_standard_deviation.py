@@ -39,7 +39,7 @@ operator_lib.register_operator(MovingStandardDeviationOperator)
 
 
 def moving_standard_deviation(
-    node: Node,
+    input: Node,
     window_length: Duration,
     sampling: Optional[Node] = None,
 ) -> Node:
@@ -51,7 +51,7 @@ def moving_standard_deviation(
     [t - window_length, t].
 
     If `sampling` is provided samples the moving window's value at each
-    timestamp in `sampling`, else samples it at each timestamp in `node`.
+    timestamp in `sampling`, else samples it at each timestamp in `input`.
 
     Missing values (such as NaNs) are ignored.
 
@@ -59,17 +59,17 @@ def moving_standard_deviation(
     or the window does not contain any sampling), outputs missing values.
 
     Args:
-        node: Features to compute the standard deviation for.
+        input: Features to compute the standard deviation for.
         window_length: Sliding window's length.
         sampling: Timestamps to sample the sliding window's value at. If not
-            provided, timestamps in `node` are used.
+            provided, timestamps in `input` are used.
 
     Returns:
         Node containing the moving standard deviation of each feature in
-        `node`.
+        `input`.
     """
     return MovingStandardDeviationOperator(
-        node=node,
+        input=input,
         window_length=window_length,
         sampling=sampling,
-    ).outputs["node"]
+    ).outputs["output"]

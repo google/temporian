@@ -28,7 +28,7 @@ class PropagateNumpyImplementation(OperatorImplementation):
         assert isinstance(operator, Propagate)
 
     def __call__(
-        self, node: EventSet, sampling: EventSet
+        self, input: EventSet, sampling: EventSet
     ) -> Dict[str, EventSet]:
         dst_data = {}
 
@@ -39,19 +39,19 @@ class PropagateNumpyImplementation(OperatorImplementation):
             )
 
             # Find the source data
-            if src_index not in node.data:
+            if src_index not in input.data:
                 # TODO: Add option to skip non matched indexes.
                 raise ValueError(f'Cannot find index "{src_index}" in "evset".')
 
-            dst_data[sampling_index] = node.data[src_index]
+            dst_data[sampling_index] = input.data[src_index]
 
         output_evset = EventSet(
             data=dst_data,
-            feature_names=node.feature_names,
+            feature_names=input.feature_names,
             index_names=sampling.index_names,
             is_unix_timestamp=sampling.is_unix_timestamp,
         )
-        return {"node": output_evset}
+        return {"output": output_evset}
 
 
 implementation_lib.register_operator_implementation(

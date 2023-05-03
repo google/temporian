@@ -23,19 +23,19 @@ from temporian.core.data.sampling import Sampling
 
 
 class UniqueTimestamps(Operator):
-    def __init__(self, node: Node):
+    def __init__(self, input: Node):
         super().__init__()
 
-        self.add_input("node", node)
+        self.add_input("input", input)
 
         self.add_output(
-            "node",
+            "output",
             Node(
                 features=[],
                 sampling=Sampling(
-                    index_levels=node.sampling.index,
+                    index_levels=input.sampling.index,
                     creator=self,
-                    is_unix_timestamp=node.sampling.is_unix_timestamp,
+                    is_unix_timestamp=input.sampling.is_unix_timestamp,
                 ),
                 creator=self,
             ),
@@ -48,25 +48,25 @@ class UniqueTimestamps(Operator):
         return pb.OperatorDef(
             key="UNIQUE_TIMESTAMPS",
             attributes=[],
-            inputs=[pb.OperatorDef.Input(key="node")],
-            outputs=[pb.OperatorDef.Output(key="node")],
+            inputs=[pb.OperatorDef.Input(key="input")],
+            outputs=[pb.OperatorDef.Output(key="output")],
         )
 
 
 operator_lib.register_operator(UniqueTimestamps)
 
 
-def unique_timestamps(node: Node) -> Node:
+def unique_timestamps(input: Node) -> Node:
     """Removes duplicated timestamps.
 
-    Returns a feature-less node where each timestamps from `node` only appears
-    once. If the node is indexed, the unique operation is applied independently
+    Returns a feature-less node where each timestamps from `input` only appears
+    once. If the input is indexed, the unique operation is applied independently
     for each index.
 
     Example:
 
         Inputs:
-            node:
+            input:
                 feature_1: ['a', 'b', 'c', 'd']
                 timestamps: [1, 2, 2, 4]
 
@@ -74,10 +74,10 @@ def unique_timestamps(node: Node) -> Node:
             timestamps: [1, 2, 4]
 
     Args:
-        node: Node, possibly with features, to process.
+        input: Node, possibly with features, to process.
 
     Returns:
-        Node without features with unique timestamps in `node`.
+        Node without features with unique timestamps in `input`.
     """
 
-    return UniqueTimestamps(node=node).outputs["node"]
+    return UniqueTimestamps(input=input).outputs["output"]

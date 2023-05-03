@@ -44,7 +44,7 @@ operator_lib.register_operator(SimpleMovingAverageOperator)
 
 
 def simple_moving_average(
-    node: Node,
+    input: Node,
     window_length: Duration,
     sampling: Optional[Node] = None,
 ) -> Node:
@@ -54,7 +54,7 @@ def simple_moving_average(
     t the average value of the feature in the window [t - window_length, t].
 
     If `sampling` is provided samples the moving window's value at each
-    timestamp in `sampling`, else samples it at each timestamp in `node`.
+    timestamp in `sampling`, else samples it at each timestamp in `input`.
 
     Missing values (such as NaNs) are ignored.
 
@@ -62,16 +62,16 @@ def simple_moving_average(
     or the window does not contain any sampling), outputs missing values.
 
     Args:
-        node: Features to average.
+        input: Features to average.
         window_length: Sliding window's length.
         sampling: Timestamps to sample the sliding window's value at. If not
-            provided, timestamps in `node` are used.
+            provided, timestamps in `input` are used.
 
     Returns:
-        Node containing the moving average of each feature in `node`.
+        Node containing the moving average of each feature in `input`.
     """
     return SimpleMovingAverageOperator(
-        node=node,
+        input=input,
         window_length=window_length,
         sampling=sampling,
-    ).outputs["node"]
+    ).outputs["output"]

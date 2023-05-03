@@ -44,6 +44,6 @@ def calendar_year(sampling: Node) -> Node:
 
     Returns:
         Node with a single feature corresponding to the year each timestamp in
-        `node`'s sampling belongs to, with the same sampling as `node`.
+        `sampling`'s sampling belongs to, with the same sampling as `sampling`.
     """
-    return CalendarYearOperator(sampling).outputs["node"]
+    return CalendarYearOperator(sampling).outputs["output"]

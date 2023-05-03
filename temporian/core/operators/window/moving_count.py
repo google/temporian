@@ -38,7 +38,7 @@ operator_lib.register_operator(MovingCountOperator)
 
 
 def moving_count(
-    node: Node,
+    input: Node,
     window_length: Duration,
     sampling: Optional[Node] = None,
 ) -> Node:
@@ -49,22 +49,22 @@ def moving_count(
     [t - window_length, t].
 
     If `sampling` is provided samples the moving window's value at each
-    timestamp in `sampling`, else samples it at each timestamp in `node`.
+    timestamp in `sampling`, else samples it at each timestamp in `input`.
 
     If the window does not contain any values (e.g., all the values are missing,
     or the window does not contain any sampling), outputs missing values.
 
     Args:
-        node: Node for which to count the number of values in each feature.
+        input: Node for which to count the number of values in each feature.
         window_length: Sliding window's length.
         sampling: Timestamps to sample the sliding window's value at. If not
-            provided, timestamps in `node` are used.
+            provided, timestamps in `input` are used.
 
     Returns:
-        Node containing the non-nan count of each feature in `node`.
+        Node containing the non-nan count of each feature in `input`.
     """
     return MovingCountOperator(
-        node=node,
+        input=input,
         window_length=window_length,
         sampling=sampling,
-    ).outputs["node"]
+    ).outputs["output"]

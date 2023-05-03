@@ -30,17 +30,17 @@ class UniqueTimestampsNumpyImplementation(OperatorImplementation):
         super().__init__(operator)
         assert isinstance(operator, UniqueTimestamps)
 
-    def __call__(self, node: EventSet) -> Dict[str, EventSet]:
+    def __call__(self, input: EventSet) -> Dict[str, EventSet]:
         evset = EventSet(
             data={
                 index_key: IndexData([], np.unique(index_data.timestamps))
-                for index_key, index_data in node.iterindex()
+                for index_key, index_data in input.iterindex()
             },
             feature_names=[],
-            index_names=node.index_names,
-            is_unix_timestamp=node.is_unix_timestamp,
+            index_names=input.index_names,
+            is_unix_timestamp=input.is_unix_timestamp,
         )
-        return {"node": evset}
+        return {"output": evset}
 
 
 implementation_lib.register_operator_implementation(

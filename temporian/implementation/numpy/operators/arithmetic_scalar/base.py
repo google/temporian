@@ -34,23 +34,23 @@ class BaseArithmeticScalarNumpyImplementation(OperatorImplementation, ABC):
     ) -> np.ndarray:
         """Performs the arithmetic operation corresponding to the subclass."""
 
-    def __call__(self, node: EventSet) -> Dict[str, EventSet]:
+    def __call__(self, input: EventSet) -> Dict[str, EventSet]:
         """Applies the corresponding arithmetic operation between an event set
         and a scalar.
 
         Args:
-            node: Event set to perform the operation to.
+            input: Event set to perform the operation to.
 
         Returns:
             Result of the operation.
         """
         dst_evset = EventSet(
             data={},
-            feature_names=node.feature_names,
-            index_names=node.index_names,
-            is_unix_timestamp=node.is_unix_timestamp,
+            feature_names=input.feature_names,
+            index_names=input.index_names,
+            is_unix_timestamp=input.is_unix_timestamp,
         )
-        for index_key, index_data in node.iterindex():
+        for index_key, index_data in input.iterindex():
             dst_evset[index_key] = IndexData(
                 [
                     self._do_operation(feature, self._operator.value)
@@ -59,4 +59,4 @@ class BaseArithmeticScalarNumpyImplementation(OperatorImplementation, ABC):
                 index_data.timestamps,
             )
 
-        return {"node": dst_evset}
+        return {"output": dst_evset}

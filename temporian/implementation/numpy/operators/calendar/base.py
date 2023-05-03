@@ -54,7 +54,7 @@ class BaseCalendarNumpyImplementation(OperatorImplementation):
 
             dst_evset[index_key] = IndexData([value], index_data.timestamps)
 
-        return {"node": dst_evset}
+        return {"output": dst_evset}
 
     @abstractmethod
     def _get_value_from_datetime(self, dt: datetime) -> Any:
