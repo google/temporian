@@ -68,8 +68,8 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         operator_impl = DropIndexNumpyImplementation(operator)
 
         # call operator
-        op_numpy_output_evt = operator_impl.__call__(node=self.input_evset)[
-            "node"
+        op_numpy_output_evt = operator_impl.__call__(input=self.input_evset)[
+            "output"
         ]
 
         # validate output
@@ -101,7 +101,9 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         operator_impl = DropIndexNumpyImplementation(operator)
 
         # call operator
-        op_numpy_output_evt = operator_impl.call(node=self.input_evset)["node"]
+        op_numpy_output_evt = operator_impl.call(input=self.input_evset)[
+            "output"
+        ]
 
         # validate output
         self.assertEqual(op_numpy_output_evt, expected_evset)
@@ -131,7 +133,9 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         operator_impl = DropIndexNumpyImplementation(operator)
 
         # call operator
-        op_numpy_output_evt = operator_impl.call(node=self.input_evset)["node"]
+        op_numpy_output_evt = operator_impl.call(input=self.input_evset)[
+            "output"
+        ]
 
         # validate output
         self.assertEqual(op_numpy_output_evt, expected_evset)
@@ -162,7 +166,9 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         operator_impl = DropIndexNumpyImplementation(operator)
 
         # call operator
-        op_numpy_output_evt = operator_impl.call(node=self.input_evset)["node"]
+        op_numpy_output_evt = operator_impl.call(input=self.input_evset)[
+            "output"
+        ]
 
         # validate output
         self.assertEqual(op_numpy_output_evt, expected_evset)
@@ -193,7 +199,9 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         operator_impl = DropIndexNumpyImplementation(operator)
 
         # call operator
-        op_numpy_output_evt = operator_impl.call(node=self.input_evset)["node"]
+        op_numpy_output_evt = operator_impl.call(input=self.input_evset)[
+            "output"
+        ]
 
         # validate output
         self.assertEqual(op_numpy_output_evt, expected_evset)
@@ -227,9 +235,9 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         )
 
         # Run op
-        op = DropIndexOperator(node=node, index_to_drop=["b"], keep=True)
+        op = DropIndexOperator(input=node, index_to_drop=["b"], keep=True)
         instance = DropIndexNumpyImplementation(op)
-        output = instance.call(node=evset)["node"]
+        output = instance.call(input=evset)["output"]
         self.assertEqual(output, expected_output)
 
 

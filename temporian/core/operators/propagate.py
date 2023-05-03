@@ -91,10 +91,10 @@ class Propagate(Operator):
             key="PROPAGATE",
             attributes=[],
             inputs=[
-                pb.OperatorDef.Input(key="node"),
+                pb.OperatorDef.Input(key="input"),
                 pb.OperatorDef.Input(key="sampling"),
             ],
-            outputs=[pb.OperatorDef.Output(key="node")],
+            outputs=[pb.OperatorDef.Output(key="output")],
         )
 
 

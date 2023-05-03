@@ -73,14 +73,14 @@ class MovingCountOperatorTest(absltest.TestCase):
         )
 
         op = MovingCountOperator(
-            node=evset.node(),
+            input=evset.node(),
             window_length=5.0,
             sampling=None,
         )
-        self.assertEqual(op.list_matching_io_samplings(), [("node", "node")])
+        self.assertEqual(op.list_matching_io_samplings(), [("input", "output")])
         instance = MovingCountNumpyImplementation(op)
 
-        output = instance(node=evset)
+        output = instance(input=evset)
 
         expected_output = EventSet.from_dataframe(
             pd.DataFrame(
@@ -95,7 +95,7 @@ class MovingCountOperatorTest(absltest.TestCase):
             ).astype({"a": np.int32, "b": np.int32})
         )
 
-        self.assertEqual(repr(output), repr({"node": expected_output}))
+        self.assertEqual(repr(output), repr({"output": expected_output}))
 
     def test_with_index(self):
         """Indexed Event sets."""
@@ -119,14 +119,14 @@ class MovingCountOperatorTest(absltest.TestCase):
         )
 
         op = MovingCountOperator(
-            node=evset.node(),
+            input=evset.node(),
             window_length=5.0,
             sampling=None,
         )
-        self.assertEqual(op.list_matching_io_samplings(), [("node", "node")])
+        self.assertEqual(op.list_matching_io_samplings(), [("input", "output")])
         instance = MovingCountNumpyImplementation(op)
 
-        output = instance(node=evset)
+        output = instance(input=evset)
 
         expected_output = EventSet.from_dataframe(
             pd.DataFrame(
@@ -146,7 +146,7 @@ class MovingCountOperatorTest(absltest.TestCase):
             index_names=["x", "y"],
         )
 
-        self.assertEqual(output["node"], expected_output)
+        self.assertEqual(output["output"], expected_output)
 
     def test_with_sampling(self):
         """Event sets with user provided sampling."""
@@ -165,12 +165,12 @@ class MovingCountOperatorTest(absltest.TestCase):
         )
 
         op = MovingCountOperator(
-            node=evset.node(),
+            input=evset.node(),
             window_length=3.1,
             sampling=node_lib.input_node([]),
         )
         self.assertEqual(
-            op.list_matching_io_samplings(), [("sampling", "node")]
+            op.list_matching_io_samplings(), [("sampling", "output")]
         )
         instance = MovingCountNumpyImplementation(op)
 
@@ -189,7 +189,7 @@ class MovingCountOperatorTest(absltest.TestCase):
             )
         )
 
-        output = instance(node=evset, sampling=sampling_data)
+        output = instance(input=evset, sampling=sampling_data)
 
         expected_output = EventSet.from_dataframe(
             pd.DataFrame(
@@ -206,7 +206,7 @@ class MovingCountOperatorTest(absltest.TestCase):
             ).astype({"a": np.int32})
         )
 
-        self.assertEqual(output["node"], expected_output)
+        self.assertEqual(output["output"], expected_output)
 
     def test_with_nan(self):
         """The input features contains nan values."""
@@ -225,7 +225,7 @@ class MovingCountOperatorTest(absltest.TestCase):
         )
 
         op = MovingCountOperator(
-            node=evset.node(),
+            input=evset.node(),
             window_length=1.1,
             sampling=node_lib.input_node([]),
         )
@@ -247,7 +247,7 @@ class MovingCountOperatorTest(absltest.TestCase):
             )
         )
 
-        output = instance(node=evset, sampling=sampling_data)
+        output = instance(input=evset, sampling=sampling_data)
 
         expected_output = EventSet.from_dataframe(
             pd.DataFrame(
@@ -265,7 +265,7 @@ class MovingCountOperatorTest(absltest.TestCase):
             ).astype({"a": np.int32})
         )
 
-        self.assertEqual(output["node"], expected_output)
+        self.assertEqual(output["output"], expected_output)
 
 
 if __name__ == "__main__":

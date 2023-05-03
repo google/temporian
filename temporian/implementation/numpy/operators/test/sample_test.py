@@ -68,9 +68,9 @@ class SampleOperatorTest(absltest.TestCase):
         )
 
         # Run op
-        op = Sample(node=node, sampling=sampling_node)
+        op = Sample(input=node, sampling=sampling_node)
         instance = SampleNumpyImplementation(op)
-        output = instance.call(node=evset, sampling=sampling_evset)["node"]
+        output = instance.call(input=evset, sampling=sampling_evset)["output"]
 
         self.assertEqual(output, expected_output)
 

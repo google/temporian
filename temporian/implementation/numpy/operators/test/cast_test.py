@@ -150,7 +150,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
         """Test correct casting by feat. names, without overflow check."""
 
         operator = CastOperator(
-            node=self.input_node,
+            input=self.input_node,
             from_features={
                 "float_64": DType.FLOAT32,
                 "int_64": DType.INT32,
@@ -162,15 +162,15 @@ class CastNumpyImplementationTest(absltest.TestCase):
 
         cast_implementation = CastNumpyImplementation(operator)
 
-        operator_output = cast_implementation.call(node=self.input_evset)
+        operator_output = cast_implementation.call(input=self.input_evset)
 
-        self.assertTrue(self.expected_evset_1 == operator_output["node"])
+        self.assertTrue(self.expected_evset_1 == operator_output["output"])
 
     def test_cast_op_by_dtype(self) -> None:
         """Test correct casting by origin DType, without overflow check."""
 
         operator = CastOperator(
-            node=self.input_node,
+            input=self.input_node,
             from_dtypes={
                 DType.FLOAT64: DType.FLOAT32,
                 DType.INT64: DType.INT32,
@@ -183,30 +183,30 @@ class CastNumpyImplementationTest(absltest.TestCase):
 
         cast_implementation = CastNumpyImplementation(operator)
 
-        operator_output = cast_implementation.call(node=self.input_evset)
+        operator_output = cast_implementation.call(input=self.input_evset)
 
-        self.assertTrue(self.expected_evset_1 == operator_output["node"])
+        self.assertTrue(self.expected_evset_1 == operator_output["output"])
 
     def test_cast_to_dtype(self) -> None:
         """Test correct casting everything to float32, no overflow check."""
 
         operator = CastOperator(
-            node=self.input_node,
+            input=self.input_node,
             to_dtype=DType.FLOAT32,
             check_overflow=False,
         )
 
         cast_implementation = CastNumpyImplementation(operator)
 
-        operator_output = cast_implementation.call(node=self.input_evset)
+        operator_output = cast_implementation.call(input=self.input_evset)
 
-        self.assertTrue(self.expected_evset_2 == operator_output["node"])
+        self.assertTrue(self.expected_evset_2 == operator_output["output"])
 
     def test_cast_no_effect(self) -> None:
         """Test the case in which there's nothing to do actually."""
 
         operator = CastOperator(
-            node=self.input_node,
+            input=self.input_node,
             from_dtypes={
                 DType.FLOAT64: DType.FLOAT64,
                 DType.INT64: DType.INT64,
@@ -218,16 +218,16 @@ class CastNumpyImplementationTest(absltest.TestCase):
 
         cast_implementation = CastNumpyImplementation(operator)
 
-        operator_output = cast_implementation.call(node=self.input_evset)
+        operator_output = cast_implementation.call(input=self.input_evset)
 
         # Check against input event set
-        self.assertTrue(self.input_evset == operator_output["node"])
+        self.assertTrue(self.input_evset == operator_output["output"])
 
     def test_overflow_int64_int32(self) -> None:
         """Test overflow check for int32, coming from int64."""
 
         operator = CastOperator(
-            node=self.input_node,
+            input=self.input_node,
             from_features={
                 "int_64": DType.INT32,
             },
@@ -237,13 +237,13 @@ class CastNumpyImplementationTest(absltest.TestCase):
         cast_implementation = CastNumpyImplementation(operator)
 
         with self.assertRaisesRegex(ValueError, "Overflow"):
-            _ = cast_implementation.call(node=self.input_evset)
+            _ = cast_implementation.call(input=self.input_evset)
 
     def test_overflow_float64_float32(self) -> None:
         """Test overflow check for float32, coming from float64."""
 
         operator = CastOperator(
-            node=self.input_node,
+            input=self.input_node,
             from_dtypes={
                 DType.FLOAT64: DType.FLOAT32,
             },
@@ -253,13 +253,13 @@ class CastNumpyImplementationTest(absltest.TestCase):
         cast_implementation = CastNumpyImplementation(operator)
 
         with self.assertRaisesRegex(ValueError, "Overflow"):
-            _ = cast_implementation.call(node=self.input_evset)
+            _ = cast_implementation.call(input=self.input_evset)
 
     def test_overflow_float64_int64(self) -> None:
         """Test overflow check for int64, coming from max float64"""
 
         operator = CastOperator(
-            node=self.input_node,
+            input=self.input_node,
             from_features={
                 "float_64": DType.INT64,
             },
@@ -269,14 +269,14 @@ class CastNumpyImplementationTest(absltest.TestCase):
         cast_implementation = CastNumpyImplementation(operator)
 
         with self.assertRaisesRegex(ValueError, "Overflow"):
-            _ = cast_implementation.call(node=self.input_evset)
+            _ = cast_implementation.call(input=self.input_evset)
 
     def test_no_overflow_boolean(self) -> None:
         """Test that no overflow error is raised when
         converting to boolean type"""
 
         operator = CastOperator(
-            node=self.input_node,
+            input=self.input_node,
             from_features={
                 "int_64": DType.BOOLEAN,
                 "float_64": DType.BOOLEAN,
@@ -287,7 +287,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
         cast_implementation = CastNumpyImplementation(operator)
 
         # This shouldn't raise error
-        _ = cast_implementation.call(node=self.input_evset)
+        _ = cast_implementation.call(input=self.input_evset)
 
 
 if __name__ == "__main__":

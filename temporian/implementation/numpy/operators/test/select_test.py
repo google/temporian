@@ -62,9 +62,9 @@ class SelectOperatorTest(absltest.TestCase):
             columns=["store_id", "timestamp", "sales"],
         )
 
-        operator = SelectOperator(node=self.input_node, feature_names="sales")
+        operator = SelectOperator(input=self.input_node, feature_names="sales")
         impl = select.SelectNumpyImplementation(operator)
-        output_evset = impl.call(node=self.input_evset)["node"]
+        output_evset = impl.call(input=self.input_evset)["output"]
 
         expected_evset = EventSet.from_dataframe(
             new_df, index_names=["store_id"]
@@ -87,10 +87,10 @@ class SelectOperatorTest(absltest.TestCase):
         )
 
         operator = SelectOperator(
-            node=self.input_node, feature_names=["sales", "costs"]
+            input=self.input_node, feature_names=["sales", "costs"]
         )
         impl = select.SelectNumpyImplementation(operator)
-        output_evset = impl.call(node=self.input_evset)["node"]
+        output_evset = impl.call(input=self.input_evset)["output"]
 
         expected_evset = EventSet.from_dataframe(
             new_df, index_names=["store_id"]

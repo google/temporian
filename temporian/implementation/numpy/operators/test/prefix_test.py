@@ -51,9 +51,9 @@ class PrefixOperatorTest(absltest.TestCase):
         )
 
         # Run op
-        op = Prefix("hello_", node=node)
+        op = Prefix("hello_", input=node)
         instance = PrefixNumpyImplementation(op)
-        output = instance.call(node=evset)["node"]
+        output = instance.call(input=evset)["output"]
 
         self.assertEqual(output, expected_output)
 

@@ -64,9 +64,9 @@ class PropagateOperatorTest(absltest.TestCase):
             index_names=["x", "y"],
         )
         # Run op
-        op = Propagate(node=node, sampling=sampling_node)
+        op = Propagate(input=node, sampling=sampling_node)
         instance = PropagateNumpyImplementation(op)
-        output = instance.call(node=evset, sampling=sampling_evset)["node"]
+        output = instance.call(input=evset, sampling=sampling_evset)["output"]
         self.assertEqual(output, expected_output)
 
 

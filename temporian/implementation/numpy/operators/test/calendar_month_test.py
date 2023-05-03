@@ -62,9 +62,9 @@ class CalendarMonthNumpyImplementationTest(absltest.TestCase):
         impl = CalendarMonthNumpyImplementation(operator)
         output = impl.call(sampling=input_evset)
 
-        self.assertTrue(output_evset == output["node"])
+        self.assertTrue(output_evset == output["output"])
         self.assertTrue(
-            output["node"].first_index_data().features[0].dtype == np.int32
+            output["output"].first_index_data().features[0].dtype == np.int32
         )
 
 

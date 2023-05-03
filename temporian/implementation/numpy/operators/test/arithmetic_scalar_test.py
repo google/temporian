@@ -78,15 +78,15 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = AddScalarOperator(
-            node=self.node,
+            input=self.node,
             value=value,
         )
 
         impl = AddScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(node=self.evset)
+        operator_output = impl.call(input=self.evset)
 
-        self.assertEqual(output_evset, operator_output["node"])
+        self.assertEqual(output_evset, operator_output["output"])
 
     def test_correct_subtraction(self) -> None:
         """Test correct subtraction operator."""
@@ -108,15 +108,15 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = SubtractScalarOperator(
-            node=self.node,
+            input=self.node,
             value=value,
         )
 
         impl = SubtractScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(node=self.evset)
+        operator_output = impl.call(input=self.evset)
 
-        self.assertEqual(output_evset, operator_output["node"])
+        self.assertEqual(output_evset, operator_output["output"])
 
     def test_correct_subtraction_value_first(self) -> None:
         """Test correct subtraction operator when value is the first.
@@ -139,16 +139,16 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = SubtractScalarOperator(
-            node=self.node,
+            input=self.node,
             value=value,
             is_value_first=True,
         )
 
         impl = SubtractScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(node=self.evset)
+        operator_output = impl.call(input=self.evset)
 
-        self.assertEqual(output_evset, operator_output["node"])
+        self.assertEqual(output_evset, operator_output["output"])
 
     def test_correct_multiplication(self) -> None:
         """Test correct multiplication operator."""
@@ -170,15 +170,15 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = MultiplyScalarOperator(
-            node=self.node,
+            input=self.node,
             value=value,
         )
 
         impl = MultiplyScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(node=self.evset)
+        operator_output = impl.call(input=self.evset)
 
-        self.assertEqual(output_evset, operator_output["node"])
+        self.assertEqual(output_evset, operator_output["output"])
 
     def test_correct_division(self) -> None:
         """Test correct division operator."""
@@ -200,15 +200,15 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = DivideScalarOperator(
-            node=self.node,
+            input=self.node,
             value=value,
         )
 
         impl = DivideScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(node=self.evset)
+        operator_output = impl.call(input=self.evset)
 
-        self.assertEqual(output_evset, operator_output["node"])
+        self.assertEqual(output_evset, operator_output["output"])
 
     def test_correct_division_with_value_as_numerator(self) -> None:
         """Test correct division operator with value as numerator."""
@@ -229,16 +229,16 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = DivideScalarOperator(
-            node=self.node,
+            input=self.node,
             value=value,
             is_value_first=True,
         )
 
         impl = DivideScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(node=self.evset)
+        operator_output = impl.call(input=self.evset)
 
-        self.assertEqual(output_evset, operator_output["node"])
+        self.assertEqual(output_evset, operator_output["output"])
 
     def test_correct_floor_division(self) -> None:
         """Test correct floor division operator."""
@@ -260,15 +260,15 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = FloorDivScalarOperator(
-            node=self.node,
+            input=self.node,
             value=value,
         )
 
         impl = FloorDivideScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(node=self.evset)
+        operator_output = impl.call(input=self.evset)
 
-        self.assertEqual(output_evset, operator_output["node"])
+        self.assertEqual(output_evset, operator_output["output"])
 
     def test_correct_floor_division_with_value_as_numerator(self) -> None:
         """Test correct floor division operator with value as numerator."""
@@ -289,16 +289,16 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = FloorDivScalarOperator(
-            node=self.node,
+            input=self.node,
             value=value,
             is_value_first=True,
         )
 
         impl = FloorDivideScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(node=self.evset)
+        operator_output = impl.call(input=self.evset)
 
-        self.assertEqual(output_evset, operator_output["node"])
+        self.assertEqual(output_evset, operator_output["output"])
 
     def test_correct_negation(self) -> None:
         """Test correct negation operator."""
@@ -317,13 +317,13 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id"],
         )
 
-        operator = NegateOperator(node=self.node)
+        operator = NegateOperator(input=self.node)
 
         impl = NegateNumpyImplementation(operator)
 
-        operator_output = impl.call(node=self.evset)
+        operator_output = impl.call(input=self.evset)
 
-        self.assertEqual(output_evset, operator_output["node"])
+        self.assertEqual(output_evset, operator_output["output"])
 
     def test_correct_sum_multi_index(self) -> None:
         """Test correct sum operator with multiple indexes."""
@@ -366,15 +366,15 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         node = evset.node()
 
         operator = AddScalarOperator(
-            node=node,
+            input=node,
             value=value,
         )
 
         impl = AddScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(node=evset)
+        operator_output = impl.call(input=evset)
 
-        self.assertEqual(output_evset, operator_output["node"])
+        self.assertEqual(output_evset, operator_output["output"])
 
     def test_addition_different_dtypes(self) -> None:
         """Test correct addition operator with different dtypes."""
@@ -383,7 +383,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         with self.assertRaises(ValueError):
             operator = AddScalarOperator(
-                node=self.node,
+                input=self.node,
                 value=value,
             )
 
@@ -394,7 +394,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         with self.assertRaises(ValueError):
             operator = AddScalarOperator(
-                node=self.node,
+                input=self.node,
                 value=value,
             )
 
@@ -434,15 +434,15 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = AddScalarOperator(
-            node=node,
+            input=node,
             value=value,
         )
 
         impl = AddScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(node=evset)
+        operator_output = impl.call(input=evset)
 
-        self.assertEqual(output_evset, operator_output["node"])
+        self.assertEqual(output_evset, operator_output["output"])
 
     def test_correct_equal(self) -> None:
         """Test correct equal operator."""
@@ -480,15 +480,15 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = EqualScalarOperator(
-            node=self.node,
+            input=self.node,
             value=value,
         )
 
         impl = EqualScalarNumpyImplementation(operator)
 
-        operator_output = impl.call(node=self.evset)
+        operator_output = impl.call(input=self.evset)
 
-        self.assertEqual(output_evset, operator_output["node"])
+        self.assertEqual(output_evset, operator_output["output"])
 
 
 if __name__ == "__main__":

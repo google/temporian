@@ -85,12 +85,12 @@ class Node(object):
         if isinstance(other, Node):
             from temporian.core.operators.arithmetic import add
 
-            return add(node_1=self, node_2=other)
+            return add(input_1=self, input_2=other)
 
         if isinstance(other, (int, float)):
             from temporian.core.operators.arithmetic_scalar import add_scalar
 
-            return add_scalar(node=self, value=other)
+            return add_scalar(input=self, value=other)
 
         raise ValueError(
             f"Cannot add {type(self)} and {type(other)} objects. "
@@ -104,7 +104,7 @@ class Node(object):
         if isinstance(other, Node):
             from temporian.core.operators.arithmetic import subtract
 
-            return subtract(node_1=self, node_2=other)
+            return subtract(input_1=self, input_2=other)
 
         if isinstance(other, (int, float)):
             from temporian.core.operators.arithmetic_scalar import (
@@ -135,14 +135,14 @@ class Node(object):
         if isinstance(other, Node):
             from temporian.core.operators.arithmetic import multiply
 
-            return multiply(node_1=self, node_2=other)
+            return multiply(input_1=self, input_2=other)
 
         if isinstance(other, (int, float)):
             from temporian.core.operators.arithmetic_scalar import (
                 multiply_scalar,
             )
 
-            return multiply_scalar(node=self, value=other)
+            return multiply_scalar(input=self, value=other)
 
         raise ValueError(
             f"Cannot multiply {type(self)} and {type(other)} objects. "

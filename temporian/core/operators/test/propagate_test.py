@@ -39,7 +39,7 @@ class PropagateOperatorTest(absltest.TestCase):
                 index_levels=[("x", DType.STRING), ("y", DType.STRING)]
             ),
         )
-        _ = propagate(node=node, sampling=sampling)
+        _ = propagate(input=node, sampling=sampling)
 
     def test_error_wrong_index(self):
         node = node_lib.input_node(
@@ -57,9 +57,9 @@ class PropagateOperatorTest(absltest.TestCase):
         )
         with self.assertRaisesRegex(
             ValueError,
-            "The index of node should be contained in the index of sampling",
+            "The index of input should be contained in the index of sampling",
         ):
-            _ = propagate(node=node, sampling=sampling)
+            _ = propagate(input=node, sampling=sampling)
 
     def test_error_wrong_index_type(self):
         node = node_lib.input_node(
@@ -79,7 +79,7 @@ class PropagateOperatorTest(absltest.TestCase):
             ValueError,
             "However, the dtype is different",
         ):
-            _ = propagate(node=node, sampling=sampling)
+            _ = propagate(input=node, sampling=sampling)
 
 
 if __name__ == "__main__":

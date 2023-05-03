@@ -43,14 +43,14 @@ class OpI1O1(base.Operator):
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
             key="OpI1O1",
-            inputs=[pb.OperatorDef.Input(key="node")],
+            inputs=[pb.OperatorDef.Input(key="input")],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
 
-    def __init__(self, node: Node):
+    def __init__(self, input: Node):
         super().__init__()
 
-        self.add_input("node", node)
+        self.add_input("input", input)
         self.add_output(
             "output",
             Node(
@@ -58,13 +58,13 @@ class OpI1O1(base.Operator):
                     Feature(
                         "f3",
                         DType.FLOAT64,
-                        sampling=node.sampling,
+                        sampling=input.sampling,
                         creator=self,
                     ),
                     Feature(
                         "f4",
                         DType.INT64,
-                        sampling=node.sampling,
+                        sampling=input.sampling,
                         creator=self,
                     ),
                 ],
@@ -85,18 +85,18 @@ class OpI1O1NotCreator(base.Operator):
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
             key="OpI1O1NotCreator",
-            inputs=[pb.OperatorDef.Input(key="node")],
+            inputs=[pb.OperatorDef.Input(key="input")],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
 
-    def __init__(self, node: Node):
+    def __init__(self, input: Node):
         super().__init__()
-        self.add_input("node", node)
+        self.add_input("input", input)
         self.add_output(
             "output",
             Node(
-                features=[f for f in node.features],
-                sampling=node.sampling,
+                features=[f for f in input.features],
+                sampling=input.sampling,
                 creator=self,
             ),
         )
@@ -112,16 +112,16 @@ class OpI2O1(base.Operator):
         return pb.OperatorDef(
             key="OpI2O1",
             inputs=[
-                pb.OperatorDef.Input(key="node_1"),
-                pb.OperatorDef.Input(key="node_2"),
+                pb.OperatorDef.Input(key="input_1"),
+                pb.OperatorDef.Input(key="input_2"),
             ],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
 
-    def __init__(self, node_1: Node, node_2: Node):
+    def __init__(self, input_1: Node, input_2: Node):
         super().__init__()
-        self.add_input("node_1", node_1)
-        self.add_input("node_2", node_2)
+        self.add_input("input_1", input_1)
+        self.add_input("input_2", input_2)
         self.add_output(
             "output",
             Node(
@@ -129,17 +129,17 @@ class OpI2O1(base.Operator):
                     Feature(
                         "f5",
                         DType.BOOLEAN,
-                        sampling=node_1.sampling,
+                        sampling=input_1.sampling,
                         creator=self,
                     ),
                     Feature(
                         "f6",
                         DType.STRING,
-                        sampling=node_1.sampling,
+                        sampling=input_1.sampling,
                         creator=self,
                     ),
                 ],
-                sampling=node_1.sampling,
+                sampling=input_1.sampling,
                 creator=self,
             ),
         )
@@ -155,7 +155,7 @@ class OpI1O2(base.Operator):
         return pb.OperatorDef(
             key="OpI1O2",
             inputs=[
-                pb.OperatorDef.Input(key="node"),
+                pb.OperatorDef.Input(key="input"),
             ],
             outputs=[
                 pb.OperatorDef.Output(key="output_1"),
@@ -163,9 +163,9 @@ class OpI1O2(base.Operator):
             ],
         )
 
-    def __init__(self, node: Node):
+    def __init__(self, input: Node):
         super().__init__()
-        self.add_input("node", node)
+        self.add_input("input", input)
         self.add_output(
             "output_1",
             Node(
@@ -173,11 +173,11 @@ class OpI1O2(base.Operator):
                     Feature(
                         "f1",
                         DType.INT32,
-                        sampling=node.sampling,
+                        sampling=input.sampling,
                         creator=self,
                     )
                 ],
-                sampling=node.sampling,
+                sampling=input.sampling,
                 creator=self,
             ),
         )
@@ -188,11 +188,11 @@ class OpI1O2(base.Operator):
                     Feature(
                         "f1",
                         DType.FLOAT32,
-                        sampling=node.sampling,
+                        sampling=input.sampling,
                         creator=self,
                     ),
                 ],
-                sampling=node.sampling,
+                sampling=input.sampling,
                 creator=self,
             ),
         )
@@ -208,7 +208,7 @@ class OpWithAttributes(base.Operator):
         return pb.OperatorDef(
             key="OpWithAttributes",
             inputs=[
-                pb.OperatorDef.Input(key="node"),
+                pb.OperatorDef.Input(key="input"),
             ],
             outputs=[
                 pb.OperatorDef.Output(key="output"),
@@ -243,7 +243,7 @@ class OpWithAttributes(base.Operator):
 
     def __init__(
         self,
-        node: Node,
+        input: Node,
         attr_int: int,
         attr_str: str,
         attr_list: List[str],
@@ -258,12 +258,12 @@ class OpWithAttributes(base.Operator):
         self.add_attribute("attr_float", attr_float)
         self.add_attribute("attr_bool", attr_bool)
         self.add_attribute("attr_map", attr_map)
-        self.add_input("node", node)
+        self.add_input("input", input)
         self.add_output(
             "output",
             Node(
                 features=[],
-                sampling=node.sampling,
+                sampling=input.sampling,
                 creator=self,
             ),
         )

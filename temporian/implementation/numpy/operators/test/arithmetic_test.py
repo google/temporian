@@ -103,16 +103,16 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = AddOperator(
-            node_1=self.node_1,
-            node_2=self.node_2,
+            input_1=self.node_1,
+            input_2=self.node_2,
         )
 
         sum_implementation = AddNumpyImplementation(operator)
 
         operator_output = sum_implementation.call(
-            node_1=self.evset_1, node_2=self.evset_2
+            input_1=self.evset_1, input_2=self.evset_2
         )
-        self.assertTrue(output_evset == operator_output["node"])
+        self.assertTrue(output_evset == operator_output["output"])
 
     def test_correct_subtraction(self) -> None:
         """Test correct subtraction operator."""
@@ -132,15 +132,15 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = SubtractOperator(
-            node_1=self.node_1,
-            node_2=self.node_2,
+            input_1=self.node_1,
+            input_2=self.node_2,
         )
 
         sub_implementation = SubtractNumpyImplementation(operator)
         operator_output = sub_implementation.call(
-            node_1=self.evset_1, node_2=self.evset_2
+            input_1=self.evset_1, input_2=self.evset_2
         )
-        self.assertTrue(output_evset == operator_output["node"])
+        self.assertTrue(output_evset == operator_output["output"])
 
     def test_correct_multiplication(self) -> None:
         """Test correct multiplication operator."""
@@ -160,16 +160,16 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = MultiplyOperator(
-            node_1=self.node_1,
-            node_2=self.node_2,
+            input_1=self.node_1,
+            input_2=self.node_2,
         )
 
         mult_implementation = MultiplyNumpyImplementation(operator)
 
         operator_output = mult_implementation.call(
-            node_1=self.evset_1, node_2=self.evset_2
+            input_1=self.evset_1, input_2=self.evset_2
         )
-        self.assertTrue(output_evset == operator_output["node"])
+        self.assertTrue(output_evset == operator_output["output"])
 
     def test_correct_division(self) -> None:
         """Test correct division operator."""
@@ -189,17 +189,17 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = DivideOperator(
-            node_1=self.node_1,
-            node_2=self.node_2,
+            input_1=self.node_1,
+            input_2=self.node_2,
         )
 
         div_implementation = DivideNumpyImplementation(operator)
 
         operator_output = div_implementation.call(
-            node_1=self.evset_1, node_2=self.evset_2
+            input_1=self.evset_1, input_2=self.evset_2
         )
 
-        self.assertTrue(output_evset == operator_output["node"])
+        self.assertTrue(output_evset == operator_output["output"])
 
     def test_correct_equal(self) -> None:
         """Test correct equal operator."""
@@ -252,17 +252,17 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = EqualOperator(
-            node_1=self.node_1,
-            node_2=self.node_2,
+            input_1=self.node_1,
+            input_2=self.node_2,
         )
 
         equal_implementation = EqualNumpyImplementation(operator)
 
         operator_output = equal_implementation.call(
-            node_1=self.evset_1, node_2=self.evset_2
+            input_1=self.evset_1, input_2=self.evset_2
         )
 
-        self.assertEqual(output_evset, operator_output["node"])
+        self.assertEqual(output_evset, operator_output["output"])
 
 
 if __name__ == "__main__":
