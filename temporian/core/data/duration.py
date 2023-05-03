@@ -25,7 +25,7 @@ from typing import Union
 import numpy as np
 
 # Unit for durations
-Duration = Union[int, float]
+Duration = float
 
 Timestamp = Union[np.datetime64, datetime.datetime, int, float]
 
@@ -35,23 +35,23 @@ def milliseconds(value: Union[int, float]) -> Duration:
 
 
 def seconds(value: Union[int, float]) -> Duration:
-    return value
+    return Duration(value)
 
 
 def minutes(value: Union[int, float]) -> Duration:
-    return value * 60
+    return Duration(value * 60)
 
 
 def hours(value: Union[int, float]) -> Duration:
-    return value * 60 * 60
+    return Duration(value * 60 * 60)
 
 
 def days(value: Union[int, float]) -> Duration:
-    return value * 60 * 60 * 24
+    return Duration(value * 60 * 60 * 24)
 
 
 def weeks(value: Union[int, float]) -> Duration:
-    return value * 60 * 60 * 24 * 7
+    return Duration(value * 60 * 60 * 24 * 7)
 
 
 def convert_date_to_duration(date: Timestamp) -> Duration:
