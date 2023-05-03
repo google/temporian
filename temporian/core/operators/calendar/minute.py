@@ -45,6 +45,7 @@ def calendar_minute(sampling: Node) -> Node:
 
     Returns:
         Node with a single feature corresponding to the minute each timestamp
-        in `node`'s sampling belongs to, with the same sampling as `node`.
+        in `sampling`'s sampling belongs to, with the same sampling as
+        `sampling`.
     """
-    return CalendarMinuteOperator(sampling).outputs["node"]
+    return CalendarMinuteOperator(sampling).outputs["output"]

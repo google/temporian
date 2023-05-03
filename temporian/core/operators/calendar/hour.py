@@ -45,6 +45,6 @@ def calendar_hour(sampling: Node) -> Node:
 
     Returns:
         Node with a single feature corresponding to the hour each timestamp in
-        `node`'s sampling belongs to, with the same sampling as `node`.
+        `sampling`'s sampling belongs to, with the same sampling as `sampling`.
     """
-    return CalendarHourOperator(sampling).outputs["node"]
+    return CalendarHourOperator(sampling).outputs["output"]

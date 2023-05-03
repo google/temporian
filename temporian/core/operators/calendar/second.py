@@ -45,6 +45,7 @@ def calendar_second(sampling: Node) -> Node:
 
     Returns:
         Node with a single feature corresponding to the second each timestamp
-        in `node`'s sampling belongs to, with the same sampling as `node`.
+        in `sampling`'s sampling belongs to, with the same sampling as
+        `sampling`.
     """
-    return CalendarSecondOperator(sampling).outputs["node"]
+    return CalendarSecondOperator(sampling).outputs["output"]

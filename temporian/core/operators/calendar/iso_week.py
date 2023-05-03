@@ -45,6 +45,7 @@ def calendar_iso_week(sampling: Node) -> Node:
 
     Returns:
         Node with a single feature corresponding to the ISO week each timestamp
-        in `node`'s sampling belongs to, with the same sampling as `node`.
+        in `sampling`'s sampling belongs to, with the same sampling as
+        `sampling`.
     """
-    return CalendarISOWeekOperator(sampling).outputs["node"]
+    return CalendarISOWeekOperator(sampling).outputs["output"]

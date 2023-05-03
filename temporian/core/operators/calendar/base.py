@@ -48,7 +48,7 @@ class BaseCalendarOperator(Operator, ABC):
 
         # output
         self.add_output(
-            "node",
+            "output",
             Node(
                 features=[output_feature],
                 sampling=sampling.sampling,
@@ -63,7 +63,7 @@ class BaseCalendarOperator(Operator, ABC):
         return pb.OperatorDef(
             key=cls.operator_def_key,
             inputs=[pb.OperatorDef.Input(key="sampling")],
-            outputs=[pb.OperatorDef.Output(key="node")],
+            outputs=[pb.OperatorDef.Output(key="output")],
         )
 
     @classmethod

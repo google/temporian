@@ -49,6 +49,6 @@ def calendar_month(sampling: Node) -> Node:
 
     Returns:
         Node with a single feature corresponding to the month each timestamp in
-        `node`'s sampling belongs to, with the same sampling as `node`.
+        `sampling`'s sampling belongs to, with the same sampling as `sampling`.
     """
-    return CalendarMonthOperator(sampling).outputs["node"]
+    return CalendarMonthOperator(sampling).outputs["output"]
