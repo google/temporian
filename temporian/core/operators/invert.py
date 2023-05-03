@@ -48,7 +48,7 @@ class InvertOperator(Operator):
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
-                name=f"not_{feature.name}",
+                name=feature.name,
                 dtype=DType.BOOLEAN,
                 sampling=input.sampling,
                 creator=self,

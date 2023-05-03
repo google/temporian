@@ -121,6 +121,19 @@ py_test(
 )
 
 py_test(
+    name = "invert_test",
+    srcs = ["invert_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators:invert",
+        "//temporian/implementation/numpy:evaluator",
+        "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy/operators:invert",
+    ],
+)
+
+py_test(
     name = "calendar_day_of_month_test",
     srcs = ["calendar_day_of_month_test.py"],
     srcs_version = "PY3",

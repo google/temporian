@@ -22,7 +22,7 @@ class InvertNumpyImplementation(OperatorImplementation):
         """
         dst_evset = EventSet(
             data={},
-            feature_names=[f"not_{name}" for name in input.feature_names],
+            feature_names=input.feature_names,
             index_names=input.index_names,
             is_unix_timestamp=input.is_unix_timestamp,
         )

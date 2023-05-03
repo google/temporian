@@ -14,6 +14,7 @@ py_library(
         ":drop_index",
         ":filter",
         ":glue",
+        ":invert",
         ":lag",
         ":prefix",
         ":propagate",
@@ -68,6 +69,19 @@ py_library(
 py_library(
     name = "cast",
     srcs = ["cast.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:feature",
+        "//temporian/core/data:node",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "invert",
+    srcs = ["invert.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
