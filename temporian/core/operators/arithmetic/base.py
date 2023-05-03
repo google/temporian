@@ -28,28 +28,31 @@ class BaseArithmeticOperator(Operator):
 
     def __init__(
         self,
-        node_1: Node,
-        node_2: Node,
+        input_1: Node,
+        input_2: Node,
     ):
         super().__init__()
 
         # inputs
-        self.add_input("node_1", node_1)
-        self.add_input("node_2", node_2)
+        self.add_input("input_1", input_1)
+        self.add_input("input_2", input_2)
 
-        if node_1.sampling is not node_2.sampling:
-            raise ValueError("node_1 and node_2 must have same sampling.")
+        if input_1.sampling is not input_2.sampling:
+            raise ValueError("input_1 and input_2 must have same sampling.")
 
-        if len(node_1.features) != len(node_2.features):
+        if len(input_1.features) != len(input_2.features):
             raise ValueError(
-                "node_1 and node_2 must have same number of features."
+                "input_1 and input_2 must have same number of features."
             )
 
         # check that features have same dtype
-        for feature_1, feature_2 in zip(node_1.features, node_2.features):
+        for feature_1, feature_2 in zip(input_1.features, input_2.features):
             if feature_1.dtype != feature_2.dtype:
                 raise ValueError(
-                    "node_1 and node_2 must have same dtype for each feature.",
+                    (
+                        "input_1 and input_2 must have same dtype for each"
+                        " feature."
+                    ),
                     (
                         f"feature_1: {feature_1}, feature_2: {feature_2} have"
                         " dtypes:"
@@ -57,7 +60,7 @@ class BaseArithmeticOperator(Operator):
                     f"{feature_1.dtype}, {feature_2.dtype}.",
                 )
 
-        sampling = node_1.sampling
+        sampling = input_1.sampling
 
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
@@ -67,11 +70,11 @@ class BaseArithmeticOperator(Operator):
                 sampling=sampling,
                 creator=self,
             )
-            for feature_1, feature_2 in zip(node_1.features, node_2.features)
+            for feature_1, feature_2 in zip(input_1.features, input_2.features)
         ]
 
         self.add_output(
-            "node",
+            "output",
             Node(
                 features=output_features,
                 sampling=sampling,
@@ -86,8 +89,8 @@ class BaseArithmeticOperator(Operator):
             key=cls.operator_def_key,
             attributes=[],
             inputs=[
-                pb.OperatorDef.Input(key="node_1"),
-                pb.OperatorDef.Input(key="node_2"),
+                pb.OperatorDef.Input(key="input_1"),
+                pb.OperatorDef.Input(key="input_2"),
             ],
             outputs=[pb.OperatorDef.Output(key="node")],
         )

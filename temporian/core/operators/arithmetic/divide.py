@@ -23,13 +23,13 @@ from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
 class DivideOperator(BaseArithmeticOperator):
     def __init__(
         self,
-        node_1: Node,
-        node_2: Node,
+        input_1: Node,
+        input_2: Node,
     ):
-        super().__init__(node_1, node_2)
+        super().__init__(input_1, input_2)
 
-        # Assuming previous dtype check of node_1 and node_2 features
-        for feat in node_1.features:
+        # Assuming previous dtype check of input_1 and input_2 features
+        for feat in input_1.features:
             if feat.dtype in [DType.INT32, DType.INT64]:
                 raise ValueError(
                     "Cannot use the divide operator on feature "
@@ -71,6 +71,6 @@ def divide(
         Division of `numerator`'s features by `denominator`'s features.
     """
     return DivideOperator(
-        node_1=numerator,
-        node_2=denominator,
-    ).outputs["node"]
+        input_1=numerator,
+        input_2=denominator,
+    ).outputs["output"]

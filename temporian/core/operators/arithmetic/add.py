@@ -34,25 +34,25 @@ operator_lib.register_operator(AddOperator)
 
 
 def add(
-    node_1: Node,
-    node_2: Node,
+    input_1: Node,
+    input_2: Node,
 ) -> Node:
     """Adds two nodes.
 
-    Each feature in `node_1` is added to the feature in `node_2` in the same
+    Each feature in `input_1` is added to the feature in `input_2` in the same
     position.
 
-    `node_1` and `node_2` must have the same sampling and the same number of
+    `input_1` and `input_2` must have the same sampling and the same number of
     features.
 
     Args:
-        node_1: First node.
-        node_2: Second node.
+        input_1: First node.
+        input_2: Second node.
 
     Returns:
-        Sum of `node_1`'s and `node_2`'s features.
+        Sum of `input_1`'s and `input_2`'s features.
     """
     return AddOperator(
-        node_1=node_1,
-        node_2=node_2,
-    ).outputs["node"]
+        input_1=input_1,
+        input_2=input_2,
+    ).outputs["output"]
