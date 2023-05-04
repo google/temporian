@@ -62,7 +62,7 @@ class Operator(ABC):
         self._outputs: dict[str, Node] = {}
         self._attributes: dict[str, AttributeType] = {}
         self._definition: pb.OperatorDef = self.build_op_definition()
-        self._attr_types: dict[str:type] = {
+        self._attr_types: dict[str, type] = {
             attr.key: attr.type for attr in self._definition.attributes
         }
 
