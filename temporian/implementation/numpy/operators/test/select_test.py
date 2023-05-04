@@ -124,6 +124,32 @@ class SelectOperatorTest(absltest.TestCase):
 
         self.assertEqual(expected_evset, output_evset)
 
+    def test_select_with_core_several_features(self) -> None:
+        """Test correct select operator with core and multiple features."""
+        new_df = pd.DataFrame(
+            [
+                [self.A, 1.0, 10.0, -1.0],
+                [self.A, 2.0, np.nan, -2.0],
+                [self.B, 3.0, 12.0, -3.0],
+                [self.B, 4.0, 13.0, -4.0],
+                [self.C, 5.0, 14.0, np.nan],
+                [self.C, 6.0, 15.0, -6.0],
+            ],
+            columns=["store_id", "timestamp", "sales", "costs"],
+        )
+        expected_evset = EventSet.from_dataframe(
+            new_df, index_names=["store_id"]
+        )
+
+        output_evset = evaluator.evaluate(
+            self.input_node[["sales", "costs"]],
+            input_data={
+                self.input_node: self.input_evset,
+            },
+        )
+
+        self.assertEqual(expected_evset, output_evset)
+
 
 if __name__ == "__main__":
     absltest.main()
