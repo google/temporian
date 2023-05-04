@@ -15,7 +15,7 @@
 """Node class definition."""
 
 from __future__ import annotations
-from typing import Dict, List, Optional, Tuple, TYPE_CHECKING, Any
+from typing import Dict, List, Optional, Tuple, TYPE_CHECKING, Any, Union
 
 from temporian.core.data.dtype import DType
 from temporian.core.data.feature import Feature
@@ -58,7 +58,7 @@ class Node(object):
         self._creator = creator
         self._name = name
 
-    def __getitem__(self, feature_names: List[str]) -> Node:
+    def __getitem__(self, feature_names: Union[str, List[str]]) -> Node:
         # import select operator
         from temporian.core.operators.select import select
 
