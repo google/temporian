@@ -9,7 +9,6 @@ from temporian.core.operators.arithmetic import floordiv
 from temporian.core.operators.arithmetic import equal
 
 from temporian.core.operators.cast import cast
-from temporian.core.operators.drop_index import drop_index
 from temporian.core.operators.filter import filter
 
 from temporian.core.operators.arithmetic_scalar import add_scalar
@@ -29,7 +28,6 @@ from temporian.core.operators.calendar.hour import calendar_hour
 from temporian.core.operators.calendar.minute import calendar_minute
 from temporian.core.operators.calendar.second import calendar_second
 from temporian.core.operators.calendar.year import calendar_year
-from temporian.core.operators.set_index import set_index
 from temporian.core.operators.drop_index import drop_index
 from temporian.core.operators.lag import lag
 from temporian.core.operators.lag import leak

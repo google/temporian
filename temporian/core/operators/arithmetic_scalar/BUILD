@@ -11,13 +11,13 @@ py_library(
     srcs = ["__init__.py"],
     srcs_version = "PY3",
     deps = [
-        ":add",
+        ":add_scalar",
         ":base",
-        ":divide",
-        ":equal",
-        ":floordiv",
-        ":multiply",
-        ":subtract",
+        ":divide_scalar",
+        ":equal_scalar",
+        ":floordiv_scalar",
+        ":multiply_scalar",
+        ":subtract_scalar",
     ],
 )
 
@@ -34,8 +34,8 @@ py_library(
 )
 
 py_library(
-    name = "add",
-    srcs = ["add.py"],
+    name = "add_scalar",
+    srcs = ["add_scalar.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
@@ -45,8 +45,8 @@ py_library(
 )
 
 py_library(
-    name = "equal",
-    srcs = ["equal.py"],
+    name = "equal_scalar",
+    srcs = ["equal_scalar.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
@@ -58,8 +58,8 @@ py_library(
 )
 
 py_library(
-    name = "subtract",
-    srcs = ["subtract.py"],
+    name = "subtract_scalar",
+    srcs = ["subtract_scalar.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
@@ -69,8 +69,8 @@ py_library(
 )
 
 py_library(
-    name = "multiply",
-    srcs = ["multiply.py"],
+    name = "multiply_scalar",
+    srcs = ["multiply_scalar.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
@@ -80,8 +80,8 @@ py_library(
 )
 
 py_library(
-    name = "divide",
-    srcs = ["divide.py"],
+    name = "divide_scalar",
+    srcs = ["divide_scalar.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
@@ -91,8 +91,8 @@ py_library(
 )
 
 py_library(
-    name = "floordiv",
-    srcs = ["floordiv.py"],
+    name = "floordiv_scalar",
+    srcs = ["floordiv_scalar.py"],
     srcs_version = "PY3",
     deps = [
         ":base",

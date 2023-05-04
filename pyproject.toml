@@ -38,6 +38,7 @@ preview = true
 max-line-length = 80
 disable = [
     "redefined-builtin",
+    "missing-class-docstring",
 ]
 
 [tool.pyright]

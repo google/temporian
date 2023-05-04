@@ -13,7 +13,7 @@
         "**/.venv/**": true,
         "**/bazel-*/**": true,
     },
-    "python.formatting.provider": "black",
+    "python.formatting.provider": "none",
     "editor.tabSize": 4,
     "editor.formatOnSave": true,
     "python.linting.flake8Enabled": false,
@@ -34,5 +34,8 @@
         "xtr1common": "cpp",
         "xutility": "cpp",
         "limits": "cpp"
+    },
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
     }
 }
