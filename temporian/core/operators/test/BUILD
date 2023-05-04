@@ -13,7 +13,7 @@ py_test(
         "//temporian/core/data:dtype",
         "//temporian/core/data:feature",
         "//temporian/core/data:node",
-        "//temporian/core/operators/arithmetic",
+        "//temporian/core/operators/binary",
     ],
 )
 

@@ -1,12 +1,12 @@
 """Imports all the packages containing operator definitions."""
 
 # pylint: disable=unused-import
-from temporian.core.operators.arithmetic import divide
-from temporian.core.operators.arithmetic import multiply
-from temporian.core.operators.arithmetic import subtract
-from temporian.core.operators.arithmetic import add
-from temporian.core.operators.arithmetic import floordiv
-from temporian.core.operators.arithmetic import equal
+from temporian.core.operators.binary import divide
+from temporian.core.operators.binary import multiply
+from temporian.core.operators.binary import subtract
+from temporian.core.operators.binary import add
+from temporian.core.operators.binary import floordiv
+from temporian.core.operators.binary import equal
 
 from temporian.core.operators.arithmetic_scalar import add_scalar
 from temporian.core.operators.arithmetic_scalar import divide_scalar

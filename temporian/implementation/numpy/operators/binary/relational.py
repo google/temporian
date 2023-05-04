@@ -12,27 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import numpy as np
-
-from temporian.core.operators.arithmetic import FloorDivOperator
-from temporian.implementation.numpy import implementation_lib
-from temporian.implementation.numpy.operators.arithmetic.base import (
-    BaseArithmeticNumpyImplementation,
+from temporian.implementation.numpy.operators.binary.base import (
+    BaseBinaryNumpyImplementation,
 )
+from temporian.core.operators.binary import EqualOperator
+from temporian.implementation.numpy import implementation_lib
 
 
-class FloorDivideNumpyImplementation(BaseArithmeticNumpyImplementation):
-    """Numpy implementation of the floordiv operator."""
+class EqualNumpyImplementation(BaseBinaryNumpyImplementation):
+    """Numpy implementation of the equal operator."""
 
-    def __init__(self, operator: FloorDivOperator) -> None:
+    def __init__(self, operator: EqualOperator) -> None:
         super().__init__(operator)
-        assert isinstance(operator, FloorDivOperator)
 
     def _do_operation(
         self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
     ) -> np.ndarray:
-        return evset_1_feature // evset_2_feature
+        # np.nan == np.nan returns False
+        return np.equal(evset_1_feature.data, evset_2_feature.data)
 
 
 implementation_lib.register_operator_implementation(
-    FloorDivOperator, FloorDivideNumpyImplementation
+    EqualOperator, EqualNumpyImplementation
 )

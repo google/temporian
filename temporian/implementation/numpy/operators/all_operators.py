@@ -17,12 +17,8 @@ from temporian.implementation.numpy.operators import sample
 from temporian.implementation.numpy.operators import set_index
 from temporian.implementation.numpy.operators import drop_index
 from temporian.implementation.numpy.operators import rename
-from temporian.implementation.numpy.operators.arithmetic import add
-from temporian.implementation.numpy.operators.arithmetic import subtract
-from temporian.implementation.numpy.operators.arithmetic import multiply
-from temporian.implementation.numpy.operators.arithmetic import divide
-from temporian.implementation.numpy.operators.arithmetic import floordiv
-from temporian.implementation.numpy.operators.arithmetic import equal
+from temporian.implementation.numpy.operators.binary import arithmetic
+from temporian.implementation.numpy.operators.binary import relational
 
 from temporian.implementation.numpy.operators.arithmetic_scalar import add
 from temporian.implementation.numpy.operators.arithmetic_scalar import subtract

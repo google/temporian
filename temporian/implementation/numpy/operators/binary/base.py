@@ -16,16 +16,16 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
+from temporian.core.operators.binary.base import BaseBinaryOperator
 from temporian.implementation.numpy.data.event_set import IndexData
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
-class BaseArithmeticNumpyImplementation(OperatorImplementation, ABC):
-    def __init__(self, operator: BaseArithmeticOperator) -> None:
+class BaseBinaryNumpyImplementation(OperatorImplementation, ABC):
+    def __init__(self, operator: BaseBinaryOperator) -> None:
         super().__init__(operator)
-        assert isinstance(operator, BaseArithmeticOperator)
+        assert isinstance(operator, BaseBinaryOperator)
 
     @abstractmethod
     def _do_operation(

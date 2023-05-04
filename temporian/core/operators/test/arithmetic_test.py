@@ -18,7 +18,7 @@ from temporian.core.data import node as node_lib
 from temporian.core.data.dtype import DType
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
-from temporian.core.operators.arithmetic import (
+from temporian.core.operators.binary import (
     AddOperator,
     DivideOperator,
     FloorDivOperator,

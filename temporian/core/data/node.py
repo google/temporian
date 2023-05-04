@@ -86,7 +86,7 @@ class Node(object):
         # swapping operators (e.g. a+1, a+b, 1+a).
 
         if isinstance(other, Node):
-            from temporian.core.operators.arithmetic import add
+            from temporian.core.operators.binary import add
 
             return add(input_1=self, input_2=other)
 
@@ -105,7 +105,7 @@ class Node(object):
 
     def __sub__(self, other: Any) -> Node:
         if isinstance(other, Node):
-            from temporian.core.operators.arithmetic import subtract
+            from temporian.core.operators.binary import subtract
 
             return subtract(input_1=self, input_2=other)
 
@@ -136,7 +136,7 @@ class Node(object):
 
     def __mul__(self, other: Any) -> Node:
         if isinstance(other, Node):
-            from temporian.core.operators.arithmetic import multiply
+            from temporian.core.operators.binary import multiply
 
             return multiply(input_1=self, input_2=other)
 
@@ -162,7 +162,7 @@ class Node(object):
 
     def __truediv__(self, other: Any) -> Node:
         if isinstance(other, Node):
-            from temporian.core.operators.arithmetic import divide
+            from temporian.core.operators.binary import divide
 
             return divide(numerator=self, denominator=other)
 
@@ -189,7 +189,7 @@ class Node(object):
 
     def __floordiv__(self, other: Any) -> Node:
         if isinstance(other, Node):
-            from temporian.core.operators.arithmetic import floordiv
+            from temporian.core.operators.binary import floordiv
 
             return floordiv(numerator=self, denominator=other)
 

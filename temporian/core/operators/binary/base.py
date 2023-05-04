@@ -23,8 +23,8 @@ from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
-class BaseArithmeticOperator(Operator):
-    """Interface definition and common logic for arithmetic operators."""
+class BaseBinaryOperator(Operator):
+    """Base for common code of binary operators (between two events)."""
 
     def __init__(
         self,
