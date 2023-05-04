@@ -33,7 +33,7 @@ class Node(object):
     A node represents the structure, or schema, of a collection of indexed
     multivariate time series, or EventSets. A node does not contain any actual
     data, but is instead used as a reference to describe the format of the
-    input, intermediate results, or output of a Processor.
+    input, intermediate results, or output of a Graph.
 
     Informally, a node defines the name and data types of each time series, as
     well as the key and data type of the index (if any).

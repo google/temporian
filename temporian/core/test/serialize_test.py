@@ -16,7 +16,7 @@ from absl import logging
 from absl.testing import absltest
 
 from temporian.core import serialize
-from temporian.core import processor
+from temporian.core import graph
 from temporian.core.test import utils
 
 
@@ -28,7 +28,7 @@ class SerializeTest(absltest.TestCase):
         o4 = utils.OpI2O1(o2.outputs["output"], i3)
         o5 = utils.OpI1O2(o4.outputs["output"])
 
-        original = processor.infer_processor(
+        original = graph.infer_graph(
             {
                 "io_input_1": i1,
                 "io_input_2": i3,
@@ -95,7 +95,7 @@ class SerializeTest(absltest.TestCase):
         i_event = utils.create_input_node()
         operator = utils.OpWithAttributes(i_event, **attributes)
 
-        original = processor.infer_processor(
+        original = graph.infer_graph(
             inputs={"i_event": i_event},
             outputs={"output": operator.outputs["output"]},
         )
