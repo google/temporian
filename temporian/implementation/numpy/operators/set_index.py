@@ -65,7 +65,7 @@ def _append_impl(evset: EventSet, append_feat_names: List[str]) -> EventSet:
 
         for dst_suff, dst_suff_idxs in dst_suffs.items():
             # create destination index
-            dst_key = src_key + tuple(dst_suff)
+            dst_key = src_key + dst_suff
 
             dst_evset[dst_key] = IndexData(
                 [
