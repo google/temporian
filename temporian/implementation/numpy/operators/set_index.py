@@ -54,26 +54,26 @@ def _append_impl(evset: EventSet, append_feat_names: List[str]) -> EventSet:
     }
     # initialize destination event & sampling data
     dst_evset = {}
-    for src_idx_key, src_idx_data in evset.iterindex():
+    for src_key, src_idx_data in evset.iterindex():
         # constructing the dict of unique tuples and their positions
-        dst_idx_suffs = defaultdict(list)
-        for i, tpl in enumerate(
+        dst_suffs = defaultdict(list)
+        for dst_suff_idx, dst_suff in enumerate(
             zip(*[src_idx_data.features[j] for j in dst_idx_pos])
         ):
-            tpl = tuple(tpl)
-            dst_idx_suffs[tpl].append(i)
+            dst_suff = tuple(dst_suff)
+            dst_suffs[dst_suff].append(dst_suff_idx)
 
-        for target_dst_idx_suff, dst_idx_suff_pos in dst_idx_suffs.items():
+        for dst_suff, dst_suff_idxs in dst_suffs.items():
             # create destination index
-            dst_idx_lvl = src_idx_key + tuple(target_dst_idx_suff)
+            dst_key = src_key + tuple(dst_suff)
 
-            dst_evset[dst_idx_lvl] = IndexData(
+            dst_evset[dst_key] = IndexData(
                 [
-                    src_idx_data.features[feat_pos][dst_idx_suff_pos]
+                    src_idx_data.features[feat_pos][dst_suff_idxs]
                     for feat_pos in dst_feat_pos.values()
                 ],
                 # fill sampling data
-                src_idx_data.timestamps[dst_idx_suff_pos],
+                src_idx_data.timestamps[dst_suff_idxs],
             )
 
     # finally, sort according to timestamps. TODO: this is merging sorted
@@ -126,21 +126,21 @@ def _set_impl(evset: EventSet, set_feat_names: List[str]) -> EventSet:
     )
     # loop over source index levels gathering destination index data
     for src_idx_data in evset.data.values():
-        for i, tpl in enumerate(
+        for dst_key_idx, dst_key in enumerate(
             zip(*[src_idx_data.features[j] for j in dst_idx_pos])
         ):
-            dst_idx_lvl = tuple(tpl)
-            dst_idx_metadata[dst_idx_lvl]["timestamps"].append(
-                src_idx_data.timestamps[i]
+            dst_key = tuple(dst_key)
+            dst_idx_metadata[dst_key]["timestamps"].append(
+                src_idx_data.timestamps[dst_key_idx]
             )
             for j, feat_pos in enumerate(dst_feat_pos.values()):
-                dst_idx_metadata[dst_idx_lvl]["features"][j].append(
-                    src_idx_data.features[feat_pos][i]
+                dst_idx_metadata[dst_key]["features"][j].append(
+                    src_idx_data.features[feat_pos][dst_key_idx]
                 )
 
     # create destination evset
     dst_evset = {
-        dst_idx_lvl: IndexData(
+        dst_key: IndexData(
             [
                 np.array(
                     metadata["features"][i],
@@ -150,7 +150,7 @@ def _set_impl(evset: EventSet, set_feat_names: List[str]) -> EventSet:
             ],
             np.array(metadata["timestamps"], dtype=float),
         )
-        for dst_idx_lvl, metadata in dst_idx_metadata.items()
+        for dst_key, metadata in dst_idx_metadata.items()
     }
     # finally, sort according to timestamps. TODO: this is merging sorted
     # arrays, we should later improve this code by avoiding the full sort
