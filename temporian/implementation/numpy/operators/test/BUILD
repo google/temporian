@@ -90,10 +90,10 @@ py_test(
     srcs_version = "PY3",
     deps = [
         "//temporian/core/data:sampling",
-        "//temporian/core/operators:invert",
+        "//temporian/core/operators:unary",
         "//temporian/implementation/numpy:evaluator",
         "//temporian/implementation/numpy/data:event_set",
-        "//temporian/implementation/numpy/operators:invert",
+        "//temporian/implementation/numpy/operators:unary",
     ],
 )
 

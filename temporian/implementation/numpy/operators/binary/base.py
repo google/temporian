@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import Dict
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 import numpy as np
 
@@ -22,7 +22,7 @@ from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
-class BaseBinaryNumpyImplementation(OperatorImplementation, ABC):
+class BaseBinaryNumpyImplementation(OperatorImplementation):
     def __init__(self, operator: BaseBinaryOperator) -> None:
         super().__init__(operator)
         assert isinstance(operator, BaseBinaryOperator)

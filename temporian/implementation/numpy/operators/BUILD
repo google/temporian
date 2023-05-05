@@ -15,7 +15,6 @@ py_library(
         ":drop_index",
         ":filter",
         ":glue",
-        ":invert",
         ":lag",
         ":prefix",
         ":propagate",
@@ -24,6 +23,7 @@ py_library(
         ":select",
         ":set_index",
         ":since_last",
+        ":unary",
         ":unique_timestamps",
         "//temporian/implementation/numpy/operators/binary",
         "//temporian/implementation/numpy/operators/calendar:day_of_month",
@@ -210,12 +210,12 @@ py_library(
 )
 
 py_library(
-    name = "invert",
-    srcs = ["invert.py"],
+    name = "unary",
+    srcs = ["unary.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
-        "//temporian/core/operators:invert",
+        "//temporian/core/operators:unary",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
     ],

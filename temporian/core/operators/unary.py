@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Invert boolean (~) operator class and public API function definition."""
+"""Unary operators (~, isnan, abs) and public API definitions"""
 
-from typing import List
+from abc import abstractmethod
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
@@ -24,7 +24,7 @@ from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
-class InvertOperator(Operator):
+class BaseUnaryOperator(Operator):
     def __init__(
         self,
         input: Node,
@@ -36,9 +36,9 @@ class InvertOperator(Operator):
             raise TypeError(f"Input must be of type Node but got {type(input)}")
 
         for feature in input.features:
-            if feature.dtype is not DType.BOOLEAN:
+            if feature.dtype not in self.allowed_dtypes:
                 raise ValueError(
-                    "Only BOOLEAN features can be inverted, use cast()."
+                    f"DTypes supported by the operator: {self.allowed_dtypes}."
                     f" Got feature {feature.name} with dtype {feature.dtype}."
                 )
 
@@ -49,7 +49,7 @@ class InvertOperator(Operator):
         output_features = [  # pylint: disable=g-complex-comprehension
             Feature(
                 name=feature.name,
-                dtype=DType.BOOLEAN,
+                dtype=self.get_output_dtype(feature.dtype),
                 sampling=input.sampling,
                 creator=self,
             )
@@ -69,6 +69,42 @@ class InvertOperator(Operator):
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
+            key=cls.op_key_definition,
+            attributes=[],
+            inputs=[
+                pb.OperatorDef.Input(key="input"),
+            ],
+            outputs=[pb.OperatorDef.Output(key="output")],
+        )
+
+    @classmethod
+    @property
+    @abstractmethod
+    def op_key_definition(cls) -> str:
+        """
+        Get the operator key used for serialization (build_op_definition)
+        """
+
+    @classmethod
+    @property
+    @abstractmethod
+    def allowed_dtypes(cls) -> list[DType]:
+        """
+        Get the dtypes that should work with this operator
+        """
+
+    @classmethod
+    @abstractmethod
+    def get_output_dtype(cls, feature_dtype: DType) -> DType:
+        """
+        Get the output DType from the corresponding feature DType
+        """
+
+
+class InvertOperator(BaseUnaryOperator):
+    @classmethod
+    def build_op_definition(cls) -> pb.OperatorDef:
+        return pb.OperatorDef(
             key="INVERT",
             attributes=[],
             inputs=[
@@ -76,6 +112,20 @@ class InvertOperator(Operator):
             ],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
+
+    @classmethod
+    @property
+    def op_key_definition(cls) -> str:
+        return "INVERT"
+
+    @classmethod
+    @property
+    def allowed_dtypes(cls) -> list[DType]:
+        return [DType.BOOLEAN]
+
+    @classmethod
+    def get_output_dtype(cls, feature_dtype: DType) -> DType:
+        return DType.BOOLEAN
 
 
 operator_lib.register_operator(InvertOperator)

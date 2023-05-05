@@ -14,7 +14,6 @@ py_library(
         ":drop_index",
         ":filter",
         ":glue",
-        ":invert",
         ":lag",
         ":prefix",
         ":propagate",
@@ -23,6 +22,7 @@ py_library(
         ":select",
         ":set_index",
         ":since_last",
+        ":unary",
         ":unique_timestamps",
         "//temporian/core/operators/binary",
         "//temporian/core/operators/calendar:day_of_month",
@@ -80,8 +80,8 @@ py_library(
 )
 
 py_library(
-    name = "invert",
-    srcs = ["invert.py"],
+    name = "unary",
+    srcs = ["unary.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
