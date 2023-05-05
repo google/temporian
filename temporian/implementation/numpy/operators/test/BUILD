@@ -24,21 +24,9 @@ py_test(
     srcs = ["arithmetic_scalar_test.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/core/operators/arithmetic_scalar",
-        "//temporian/core/operators/arithmetic_scalar:add",
-        "//temporian/core/operators/arithmetic_scalar:divide",
-        "//temporian/core/operators/arithmetic_scalar:equal",
-        "//temporian/core/operators/arithmetic_scalar:floordiv",
-        "//temporian/core/operators/arithmetic_scalar:multiply",
-        "//temporian/core/operators/arithmetic_scalar:subtract",
+        "//temporian/core/operators/scalar",
         "//temporian/implementation/numpy/data:event_set",
-        "//temporian/implementation/numpy/operators/arithmetic_scalar",
-        "//temporian/implementation/numpy/operators/arithmetic_scalar:add",
-        "//temporian/implementation/numpy/operators/arithmetic_scalar:divide",
-        "//temporian/implementation/numpy/operators/arithmetic_scalar:equal",
-        "//temporian/implementation/numpy/operators/arithmetic_scalar:floordiv",
-        "//temporian/implementation/numpy/operators/arithmetic_scalar:multiply",
-        "//temporian/implementation/numpy/operators/arithmetic_scalar:subtract",
+        "//temporian/implementation/numpy/operators/scalar",
     ],
 )
 

@@ -20,14 +20,8 @@ from temporian.implementation.numpy.operators import rename
 from temporian.implementation.numpy.operators.binary import arithmetic
 from temporian.implementation.numpy.operators.binary import relational
 
-from temporian.implementation.numpy.operators.arithmetic_scalar import add
-from temporian.implementation.numpy.operators.arithmetic_scalar import subtract
-from temporian.implementation.numpy.operators.arithmetic_scalar import multiply
-from temporian.implementation.numpy.operators.arithmetic_scalar import divide
-from temporian.implementation.numpy.operators.arithmetic_scalar import floordiv
-from temporian.implementation.numpy.operators.arithmetic_scalar import equal
-from temporian.implementation.numpy.operators.arithmetic_scalar import greater
-from temporian.implementation.numpy.operators.arithmetic_scalar import less
+from temporian.implementation.numpy.operators.scalar import arithmetic
+from temporian.implementation.numpy.operators.scalar import relational
 
 from temporian.implementation.numpy.operators.window import (
     simple_moving_average,

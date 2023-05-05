@@ -16,7 +16,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from temporian.core.operators.arithmetic_scalar.base import (
+from temporian.core.operators.scalar.base import (
     BaseArithmeticScalarOperator,
 )
 from temporian.implementation.numpy.data.event_set import EventSet

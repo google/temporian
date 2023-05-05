@@ -8,14 +8,12 @@ from temporian.core.operators.binary import add
 from temporian.core.operators.binary import floordiv
 from temporian.core.operators.binary import equal
 
-from temporian.core.operators.arithmetic_scalar import add_scalar
-from temporian.core.operators.arithmetic_scalar import divide_scalar
-from temporian.core.operators.arithmetic_scalar import floordiv_scalar
-from temporian.core.operators.arithmetic_scalar import multiply_scalar
-from temporian.core.operators.arithmetic_scalar import subtract_scalar
-from temporian.core.operators.arithmetic_scalar import equal_scalar
-from temporian.core.operators.arithmetic_scalar import greater_scalar
-from temporian.core.operators.arithmetic_scalar import less_scalar
+from temporian.core.operators.scalar import add_scalar
+from temporian.core.operators.scalar import divide_scalar
+from temporian.core.operators.scalar import floordiv_scalar
+from temporian.core.operators.scalar import multiply_scalar
+from temporian.core.operators.scalar import subtract_scalar
+from temporian.core.operators.scalar import equal_scalar
 
 from temporian.core.operators.cast import cast
 from temporian.core.operators.drop_index import drop_index

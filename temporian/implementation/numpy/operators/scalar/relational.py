@@ -15,27 +15,25 @@ from typing import Union
 
 import numpy as np
 
-from temporian.implementation.numpy.operators.arithmetic_scalar.base import (
+from temporian.implementation.numpy.operators.scalar.base import (
     BaseArithmeticScalarNumpyImplementation,
 )
-from temporian.core.operators.arithmetic_scalar import MultiplyScalarOperator
+from temporian.core.operators.scalar import EqualScalarOperator
 from temporian.implementation.numpy import implementation_lib
 
 
-class MultiplyScalarNumpyImplementation(
-    BaseArithmeticScalarNumpyImplementation
-):
-    """Numpy implementation of the multiply scalar operator."""
+class EqualScalarNumpyImplementation(BaseArithmeticScalarNumpyImplementation):
+    """Numpy implementation of the equal scalar operator."""
 
-    def __init__(self, operator: MultiplyScalarOperator) -> None:
+    def __init__(self, operator: EqualScalarOperator) -> None:
         super().__init__(operator)
 
     def _do_operation(
         self, feature: np.ndarray, value: Union[float, int, str, bool]
     ) -> np.ndarray:
-        return feature * value
+        return np.equal(feature, value)
 
 
 implementation_lib.register_operator_implementation(
-    MultiplyScalarOperator, MultiplyScalarNumpyImplementation
+    EqualScalarOperator, EqualScalarNumpyImplementation
 )

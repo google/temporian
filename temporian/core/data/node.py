@@ -91,7 +91,7 @@ class Node(object):
             return add(input_1=self, input_2=other)
 
         if isinstance(other, (int, float)):
-            from temporian.core.operators.arithmetic_scalar import add_scalar
+            from temporian.core.operators.scalar import add_scalar
 
             return add_scalar(input=self, value=other)
 
@@ -110,7 +110,7 @@ class Node(object):
             return subtract(input_1=self, input_2=other)
 
         if isinstance(other, (int, float)):
-            from temporian.core.operators.arithmetic_scalar import (
+            from temporian.core.operators.scalar import (
                 subtract_scalar,
             )
 
@@ -123,7 +123,7 @@ class Node(object):
 
     def __rsub__(self, other: Any) -> Node:
         if isinstance(other, (int, float)):
-            from temporian.core.operators.arithmetic_scalar import (
+            from temporian.core.operators.scalar import (
                 subtract_scalar,
             )
 
@@ -141,7 +141,7 @@ class Node(object):
             return multiply(input_1=self, input_2=other)
 
         if isinstance(other, (int, float)):
-            from temporian.core.operators.arithmetic_scalar import (
+            from temporian.core.operators.scalar import (
                 multiply_scalar,
             )
 
@@ -156,7 +156,7 @@ class Node(object):
         return self.__mul__(other)
 
     def __neg__(self):
-        from temporian.core.operators.arithmetic_scalar import multiply_scalar
+        from temporian.core.operators.scalar import multiply_scalar
 
         return multiply_scalar(input=self, value=-1)
 
@@ -167,7 +167,7 @@ class Node(object):
             return divide(numerator=self, denominator=other)
 
         if isinstance(other, (int, float)):
-            from temporian.core.operators.arithmetic_scalar import divide_scalar
+            from temporian.core.operators.scalar import divide_scalar
 
             return divide_scalar(numerator=self, denominator=other)
 
@@ -178,7 +178,7 @@ class Node(object):
 
     def __rtruediv__(self, other: Any) -> Node:
         if isinstance(other, (int, float)):
-            from temporian.core.operators.arithmetic_scalar import divide_scalar
+            from temporian.core.operators.scalar import divide_scalar
 
             return divide_scalar(numerator=other, denominator=self)
 
@@ -194,7 +194,7 @@ class Node(object):
             return floordiv(numerator=self, denominator=other)
 
         if isinstance(other, (int, float)):
-            from temporian.core.operators.arithmetic_scalar import (
+            from temporian.core.operators.scalar import (
                 floordiv_scalar,
             )
 
@@ -207,7 +207,7 @@ class Node(object):
 
     def __rfloordiv__(self, other: Any) -> Node:
         if isinstance(other, (int, float)):
-            from temporian.core.operators.arithmetic_scalar import (
+            from temporian.core.operators.scalar import (
                 floordiv_scalar,
             )
 

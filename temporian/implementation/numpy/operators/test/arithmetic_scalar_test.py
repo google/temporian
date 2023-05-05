@@ -16,7 +16,7 @@ import numpy as np
 import pandas as pd
 from absl.testing import absltest
 
-from temporian.core.operators.arithmetic_scalar import (
+from temporian.core.operators.scalar import (
     AddScalarOperator,
     SubtractScalarOperator,
     MultiplyScalarOperator,
@@ -27,7 +27,7 @@ from temporian.core.operators.arithmetic_scalar import (
     LessScalarOperator,
 )
 from temporian.implementation.numpy.data.event_set import EventSet
-from temporian.implementation.numpy.operators.arithmetic_scalar import (
+from temporian.implementation.numpy.operators.scalar import (
     AddScalarNumpyImplementation,
     SubtractScalarNumpyImplementation,
     MultiplyScalarNumpyImplementation,

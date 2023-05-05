@@ -12,23 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Add scalar operator class and public API function definition."""
+"""Equal scalar operator class and public API function definition."""
 
 from typing import Union, List
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
-from temporian.core.operators.arithmetic_scalar.base import (
+from temporian.core.data.feature import Feature
+from temporian.core.operators.scalar.base import (
     BaseArithmeticScalarOperator,
 )
 
 
-class AddScalarOperator(BaseArithmeticScalarOperator):
+class EqualScalarOperator(BaseArithmeticScalarOperator):
     @classmethod
     @property
     def operator_def_key(cls) -> str:
-        return "ADDITION_SCALAR"
+        return "EQUAL_SCALAR"
+
+    def output_feature_dtype(self, feature: Feature) -> DType:
+        # override parent method to always return BOOLEAN features
+        return DType.BOOLEAN
 
     @property
     def supported_value_dtypes(self) -> List[DType]:
@@ -37,28 +42,30 @@ class AddScalarOperator(BaseArithmeticScalarOperator):
             DType.FLOAT64,
             DType.INT32,
             DType.INT64,
+            DType.BOOLEAN,
+            DType.STRING,
         ]
 
 
-operator_lib.register_operator(AddScalarOperator)
+operator_lib.register_operator(EqualScalarOperator)
 
 
-def add_scalar(
+def equal_scalar(
     input: Node,
-    value: Union[float, int],
+    value: Union[float, int, str, bool],
 ) -> Node:
-    """Adds a scalar value to a node.
+    """Checks for equality between a node and a scalar.
 
-    `value` is added to each item in each feature in `input`.
+    Each item in each feature in `input` is compared to `value`.
 
     Args:
-        input: Node to add a scalar to.
-        value: Scalar value to add to the input.
+        input: Node to compare the value to.
+        value: Scalar value to compare to the input.
 
     Returns:
-        Addition of `input` and `value`.
+        Node containing the result of the comparison.
     """
-    return AddScalarOperator(
+    return EqualScalarOperator(
         input=input,
         value=value,
     ).outputs["output"]
