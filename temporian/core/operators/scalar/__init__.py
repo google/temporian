@@ -1,6 +1,6 @@
 # pylint: disable=unused-import
 
-from temporian.core.operators.scalar.arithmetic import (
+from temporian.core.operators.scalar.arithmetic_scalar import (
     add_scalar,
     subtract_scalar,
     multiply_scalar,
@@ -13,7 +13,7 @@ from temporian.core.operators.scalar.arithmetic import (
     FloorDivScalarOperator,
 )
 
-from temporian.core.operators.scalar.relational import (
+from temporian.core.operators.scalar.relational_scalar import (
     equal_scalar,
     EqualScalarOperator,
 )

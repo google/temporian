@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Equal scalar operator class and public API function definition."""
+"""Event/scalar relational operators classes and public API definitions."""
 
 from typing import Union, List
 

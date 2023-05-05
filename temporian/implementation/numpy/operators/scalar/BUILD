@@ -11,9 +11,9 @@ py_library(
     srcs = ["__init__.py"],
     srcs_version = "PY3",
     deps = [
-        ":arithmetic",
+        ":arithmetic_scalar",
         ":base",
-        ":relational",
+        ":relational_scalar",
     ],
 )
 
@@ -29,8 +29,8 @@ py_library(
 )
 
 py_library(
-    name = "arithmetic",
-    srcs = ["arithmetic.py"],
+    name = "arithmetic_scalar",
+    srcs = ["arithmetic_scalar.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
@@ -41,8 +41,8 @@ py_library(
 )
 
 py_library(
-    name = "relational",
-    srcs = ["relational.py"],
+    name = "relational_scalar",
+    srcs = ["relational_scalar.py"],
     srcs_version = "PY3",
     deps = [
         ":base",

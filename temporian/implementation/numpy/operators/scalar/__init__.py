@@ -1,5 +1,5 @@
 # pylint: disable=unused-import
-from temporian.implementation.numpy.operators.scalar.arithmetic import (
+from temporian.implementation.numpy.operators.scalar.arithmetic_scalar import (
     AddScalarNumpyImplementation,
     SubtractScalarNumpyImplementation,
     MultiplyScalarNumpyImplementation,
@@ -7,7 +7,7 @@ from temporian.implementation.numpy.operators.scalar.arithmetic import (
     FloorDivideScalarNumpyImplementation,
 )
 
-from temporian.implementation.numpy.operators.scalar.relational import (
+from temporian.implementation.numpy.operators.scalar.relational_scalar import (
     EqualScalarNumpyImplementation,
 )
 

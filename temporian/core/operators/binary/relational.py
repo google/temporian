@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Equal operator class and public API function definition."""
+"""Binary relational operators classes and public API function definitions."""
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
