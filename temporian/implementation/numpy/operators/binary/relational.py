@@ -35,7 +35,7 @@ class EqualNumpyImplementation(BaseBinaryNumpyImplementation):
     def _do_operation(
         self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
     ) -> np.ndarray:
-        # np.nan == np.nan returns False
+        # returns False on both NaNs
         return np.equal(evset_1_feature.data, evset_2_feature.data)
 
 

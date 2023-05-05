@@ -91,6 +91,7 @@ def equal_scalar(
     """Checks for equality between a node and a scalar element-wise.
 
     Each item in each feature in `input` is compared to `value`.
+    Note that if both elements are NaNs, returns False.
 
     Args:
         input: Node to compare the value to.
@@ -112,6 +113,7 @@ def not_equal_scalar(
     """Checks for differences between a node and a scalar element-wise.
 
     Each item in each feature in `input` is compared to `value`.
+    Note that if both elements are NaNs, returns True.
 
     Args:
         input: Node to compare the value to.
@@ -133,6 +135,7 @@ def greater_equal_scalar(
     """Check if the input node is greater or equal than a scalar element-wise.
 
     Each item in each feature in `input` is compared to `value`.
+    Note that it will always return False on NaN elements.
 
     Args:
         input: Node to compare the value to.
@@ -154,6 +157,7 @@ def less_equal_scalar(
     """Check if the input node is less or equal than a scalar element-wise.
 
     Each item in each feature in `input` is compared to `value`.
+    Note that it will always return False on NaN elements.
 
     Args:
         input: Node to compare the value to.
@@ -175,6 +179,7 @@ def greater_scalar(
     """Check if the input node is greater than a scalar element-wise.
 
     Each item in each feature in `input` is compared to `value`.
+    Note that it will always return False on NaN elements.
 
     Args:
         input: Node to compare the value to.
@@ -196,6 +201,7 @@ def less_scalar(
     """Check if the input node is less than a scalar element-wise.
 
     Each item in each feature in `input` is compared to `value`.
+    Note that it will always return False on NaN elements.
 
     Args:
         input: Node to compare the value to.

@@ -33,6 +33,7 @@ class EqualScalarNumpyImplementation(BaseScalarNumpyImplementation):
     def _do_operation(
         self, feature: np.ndarray, value: Union[float, int, str, bool]
     ) -> np.ndarray:
+        # Returns False if both NaNs
         return np.equal(feature, value)
 
 

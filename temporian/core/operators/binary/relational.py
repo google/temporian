@@ -131,6 +131,7 @@ def equal(
 
     Each feature in `input_1` is compared element-wise to the feature in
     `input_2` in the same position.
+    Note that it will always return False on NaN elements.
 
     `input_1` and `input_2` must have the same sampling and the same number of
     features.
@@ -156,6 +157,7 @@ def not_equal(
 
     Each feature in `input_1` is compared element-wise to the feature in
     `input_2` in the same position.
+    Note that it will always return True on NaNs (even if both are).
 
     `input_1` and `input_2` must have the same sampling and the same number of
     features.
@@ -181,6 +183,7 @@ def greater(
 
     Each feature in `input_left` is compared element-wise to the feature in
     `input_right` in the same position.
+    Note that it will always return False on NaN elements.
 
     `input_left` and `input_right` must have the same sampling and the same number of
     features.
@@ -206,6 +209,7 @@ def greater_equal(
 
     Each feature in `input_left` is compared element-wise to the feature in
     `input_right` in the same position.
+    Note that it will always return False on NaN elements.
 
     `input_left` and `input_right` must have the same sampling and the same number of
     features.
@@ -231,6 +235,7 @@ def less(
 
     Each feature in `input_left` is compared element-wise to the feature in
     `input_right` in the same position.
+    Note that it will always return False on NaN elements.
 
     `input_left` and `input_right` must have the same sampling and the same number of
     features.
@@ -256,6 +261,7 @@ def less_equal(
 
     Each feature in `input_left` is compared element-wise to the feature in
     `input_right` in the same position.
+    Note that it will always return False on NaN elements.
 
     `input_left` and `input_right` must have the same sampling and the same number of
     features.
