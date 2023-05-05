@@ -47,11 +47,14 @@ def _append_impl(evset: EventSet, append_feat_names: List[str]) -> EventSet:
         for append_feat_name in append_feat_names
     ]
     # positions of features that are being kept
-    dst_feat_pos = {
-        feat_name: pos
+    dst_feat_pos = [
+        pos
         for pos, feat_name in enumerate(evset.feature_names)
         if feat_name not in append_feat_names
-    }
+    ]
+    # names of features that are being kept
+    dst_feat_names = [evset.feature_names[pos] for pos in dst_feat_pos]
+
     # initialize destination event & sampling data
     dst_evset = {}
     for src_key, src_idx_data in evset.iterindex():
@@ -70,7 +73,7 @@ def _append_impl(evset: EventSet, append_feat_names: List[str]) -> EventSet:
             dst_evset[dst_key] = IndexData(
                 [
                     src_idx_data.features[feat_pos][dst_suff_idxs]
-                    for feat_pos in dst_feat_pos.values()
+                    for feat_pos in dst_feat_pos
                 ],
                 # fill sampling data
                 src_idx_data.timestamps[dst_suff_idxs],
@@ -89,7 +92,7 @@ def _append_impl(evset: EventSet, append_feat_names: List[str]) -> EventSet:
 
     return EventSet(
         dst_evset,
-        feature_names=list(dst_feat_pos),
+        feature_names=dst_feat_names,
         index_names=dst_idx_names,
         is_unix_timestamp=evset.is_unix_timestamp,
     )
@@ -111,11 +114,13 @@ def _set_impl(evset: EventSet, set_feat_names: List[str]) -> EventSet:
         for set_feat_name in set_feat_names
     ]
     # positions of features that are being kept
-    dst_feat_pos = {
-        feat_name: pos
+    dst_feat_pos = [
+        pos
         for pos, feat_name in enumerate(evset.feature_names)
         if feat_name not in set_feat_names
-    }
+    ]
+    # names of features that are being kept
+    dst_feat_names = [evset.feature_names[pos] for pos in dst_feat_pos]
     # intialize empty dict mapping destination index levels to timestamps &
     # features
     dst_idx_metadata = defaultdict(
@@ -133,7 +138,7 @@ def _set_impl(evset: EventSet, set_feat_names: List[str]) -> EventSet:
             dst_idx_metadata[dst_key]["timestamps"].append(
                 src_idx_data.timestamps[dst_key_idx]
             )
-            for j, feat_pos in enumerate(dst_feat_pos.values()):
+            for j, feat_pos in enumerate(dst_feat_pos):
                 dst_idx_metadata[dst_key]["features"][j].append(
                     src_idx_data.features[feat_pos][dst_key_idx]
                 )
@@ -144,9 +149,11 @@ def _set_impl(evset: EventSet, set_feat_names: List[str]) -> EventSet:
             [
                 np.array(
                     metadata["features"][i],
-                    dtype=DTYPE_REVERSE_MAPPING[evset.dtypes[feat_name]],
+                    dtype=DTYPE_REVERSE_MAPPING[
+                        evset.dtypes[evset.feature_names[feat_pos]]
+                    ],
                 )
-                for i, feat_name in enumerate(dst_feat_pos)
+                for i, feat_pos in enumerate(dst_feat_pos)
             ],
             np.array(metadata["timestamps"], dtype=float),
         )
@@ -165,7 +172,7 @@ def _set_impl(evset: EventSet, set_feat_names: List[str]) -> EventSet:
 
     return EventSet(
         dst_evset,
-        feature_names=list(dst_feat_pos),
+        feature_names=dst_feat_names,
         index_names=set_feat_names,
         is_unix_timestamp=evset.is_unix_timestamp,
     )
