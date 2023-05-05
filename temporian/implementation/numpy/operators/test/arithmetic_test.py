@@ -248,7 +248,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                     [0, 4.0, False],  # nan == nan is False
                     [0, 5.0, False],
                 ],
-                columns=["store_id", "timestamp", "equal_sales_costs"],
+                columns=["store_id", "timestamp", "eq_sales_costs"],
             ),
             index_names=["store_id"],
         )

@@ -7,6 +7,11 @@ from temporian.core.operators.binary import subtract
 from temporian.core.operators.binary import add
 from temporian.core.operators.binary import floordiv
 from temporian.core.operators.binary import equal
+from temporian.core.operators.binary import not_equal
+from temporian.core.operators.binary import greater
+from temporian.core.operators.binary import greater_equal
+from temporian.core.operators.binary import less
+from temporian.core.operators.binary import less_equal
 
 from temporian.core.operators.scalar import add_scalar
 from temporian.core.operators.scalar import divide_scalar
