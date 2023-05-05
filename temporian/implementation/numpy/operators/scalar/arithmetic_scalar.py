@@ -16,7 +16,7 @@ from typing import Union
 import numpy as np
 
 from temporian.implementation.numpy.operators.scalar.base import (
-    BaseArithmeticScalarNumpyImplementation,
+    BaseScalarNumpyImplementation,
 )
 from temporian.core.operators.scalar import (
     AddScalarOperator,
@@ -28,7 +28,7 @@ from temporian.core.operators.scalar import (
 from temporian.implementation.numpy import implementation_lib
 
 
-class AddScalarNumpyImplementation(BaseArithmeticScalarNumpyImplementation):
+class AddScalarNumpyImplementation(BaseScalarNumpyImplementation):
     """Numpy implementation of the add scalar operator."""
 
     def __init__(self, operator: AddScalarOperator) -> None:
@@ -40,9 +40,7 @@ class AddScalarNumpyImplementation(BaseArithmeticScalarNumpyImplementation):
         return feature + value
 
 
-class SubtractScalarNumpyImplementation(
-    BaseArithmeticScalarNumpyImplementation
-):
+class SubtractScalarNumpyImplementation(BaseScalarNumpyImplementation):
     """Numpy implementation of the subtract scalar operator."""
 
     def __init__(self, operator: SubtractScalarOperator) -> None:
@@ -57,9 +55,7 @@ class SubtractScalarNumpyImplementation(
         return feature - value
 
 
-class MultiplyScalarNumpyImplementation(
-    BaseArithmeticScalarNumpyImplementation
-):
+class MultiplyScalarNumpyImplementation(BaseScalarNumpyImplementation):
     """Numpy implementation of the multiply scalar operator."""
 
     def __init__(self, operator: MultiplyScalarOperator) -> None:
@@ -71,7 +67,7 @@ class MultiplyScalarNumpyImplementation(
         return feature * value
 
 
-class DivideScalarNumpyImplementation(BaseArithmeticScalarNumpyImplementation):
+class DivideScalarNumpyImplementation(BaseScalarNumpyImplementation):
     """Numpy implementation of the divide scalar operator."""
 
     def __init__(self, operator: DivideScalarOperator) -> None:
@@ -86,9 +82,7 @@ class DivideScalarNumpyImplementation(BaseArithmeticScalarNumpyImplementation):
         return feature / value
 
 
-class FloorDivideScalarNumpyImplementation(
-    BaseArithmeticScalarNumpyImplementation
-):
+class FloorDivideScalarNumpyImplementation(BaseScalarNumpyImplementation):
     """Numpy implementation of the floordiv scalar operator."""
 
     def __init__(self, operator: FloorDivScalarOperator) -> None:

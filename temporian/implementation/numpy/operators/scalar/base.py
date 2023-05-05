@@ -17,15 +17,15 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 from temporian.core.operators.scalar.base import (
-    BaseArithmeticScalarOperator,
+    BaseScalarOperator,
 )
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.event_set import IndexData
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
-class BaseArithmeticScalarNumpyImplementation(OperatorImplementation, ABC):
-    def __init__(self, operator: BaseArithmeticScalarOperator) -> None:
+class BaseScalarNumpyImplementation(OperatorImplementation, ABC):
+    def __init__(self, operator: BaseScalarOperator) -> None:
         super().__init__(operator)
 
     @abstractmethod

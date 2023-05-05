@@ -21,11 +21,11 @@ from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
 from temporian.core.operators.scalar.base import (
-    BaseArithmeticScalarOperator,
+    BaseScalarOperator,
 )
 
 
-class EqualScalarOperator(BaseArithmeticScalarOperator):
+class EqualScalarOperator(BaseScalarOperator):
     @classmethod
     @property
     def operator_def_key(cls) -> str:

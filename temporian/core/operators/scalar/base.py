@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Base arithmetic scalar operator class definition."""
+"""Event/scalar operators classes and public API definitions."""
 
 from typing import Union, List
 from abc import abstractmethod
@@ -24,8 +24,8 @@ from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
-class BaseArithmeticScalarOperator(Operator):
-    """Interface definition and common logic for arithmetic scalar operators."""
+class BaseScalarOperator(Operator):
+    """Interface definition and common logic for operators."""
 
     def __init__(
         self,

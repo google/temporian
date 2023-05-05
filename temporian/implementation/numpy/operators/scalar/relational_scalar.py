@@ -16,13 +16,13 @@ from typing import Union
 import numpy as np
 
 from temporian.implementation.numpy.operators.scalar.base import (
-    BaseArithmeticScalarNumpyImplementation,
+    BaseScalarNumpyImplementation,
 )
 from temporian.core.operators.scalar import EqualScalarOperator
 from temporian.implementation.numpy import implementation_lib
 
 
-class EqualScalarNumpyImplementation(BaseArithmeticScalarNumpyImplementation):
+class EqualScalarNumpyImplementation(BaseScalarNumpyImplementation):
     """Numpy implementation of the equal scalar operator."""
 
     def __init__(self, operator: EqualScalarOperator) -> None:

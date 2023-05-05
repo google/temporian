@@ -20,13 +20,13 @@ from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
 from temporian.core.operators.scalar.base import (
-    BaseArithmeticScalarOperator,
+    BaseScalarOperator,
 )
 
 SCALAR = Union[float, int]
 
 
-class AddScalarOperator(BaseArithmeticScalarOperator):
+class AddScalarOperator(BaseScalarOperator):
     @classmethod
     @property
     def operator_def_key(cls) -> str:
@@ -42,7 +42,7 @@ class AddScalarOperator(BaseArithmeticScalarOperator):
         ]
 
 
-class SubtractScalarOperator(BaseArithmeticScalarOperator):
+class SubtractScalarOperator(BaseScalarOperator):
     @classmethod
     @property
     def operator_def_key(cls) -> str:
@@ -58,7 +58,7 @@ class SubtractScalarOperator(BaseArithmeticScalarOperator):
         ]
 
 
-class MultiplyScalarOperator(BaseArithmeticScalarOperator):
+class MultiplyScalarOperator(BaseScalarOperator):
     @classmethod
     @property
     def operator_def_key(cls) -> str:
@@ -74,7 +74,7 @@ class MultiplyScalarOperator(BaseArithmeticScalarOperator):
         ]
 
 
-class DivideScalarOperator(BaseArithmeticScalarOperator):
+class DivideScalarOperator(BaseScalarOperator):
     def __init__(
         self,
         input: Node,
@@ -106,7 +106,7 @@ class DivideScalarOperator(BaseArithmeticScalarOperator):
         ]
 
 
-class FloorDivScalarOperator(BaseArithmeticScalarOperator):
+class FloorDivScalarOperator(BaseScalarOperator):
     @classmethod
     @property
     def operator_def_key(cls) -> str:
