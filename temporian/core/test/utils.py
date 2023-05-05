@@ -23,7 +23,7 @@ def create_input_node(name: Optional[str] = None):
             Feature("f1", DType.FLOAT32),
             Feature("f2", DType.FLOAT32),
         ],
-        name=name
+        name=name,
     )
 
 
