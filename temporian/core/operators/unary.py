@@ -103,17 +103,6 @@ class BaseUnaryOperator(Operator):
 
 class InvertOperator(BaseUnaryOperator):
     @classmethod
-    def build_op_definition(cls) -> pb.OperatorDef:
-        return pb.OperatorDef(
-            key="INVERT",
-            attributes=[],
-            inputs=[
-                pb.OperatorDef.Input(key="input"),
-            ],
-            outputs=[pb.OperatorDef.Output(key="output")],
-        )
-
-    @classmethod
     @property
     def op_key_definition(cls) -> str:
         return "INVERT"
@@ -128,7 +117,75 @@ class InvertOperator(BaseUnaryOperator):
         return DType.BOOLEAN
 
 
+class IsNanOperator(BaseUnaryOperator):
+    @classmethod
+    @property
+    def op_key_definition(cls) -> str:
+        return "IS_NAN"
+
+    @classmethod
+    @property
+    def allowed_dtypes(cls) -> list[DType]:
+        return [
+            DType.BOOLEAN,
+            DType.FLOAT32,
+            DType.FLOAT64,
+            DType.INT32,
+            DType.INT64,
+        ]
+
+    @classmethod
+    def get_output_dtype(cls, feature_dtype: DType) -> DType:
+        return DType.BOOLEAN
+
+
+class NotNanOperator(BaseUnaryOperator):
+    @classmethod
+    @property
+    def op_key_definition(cls) -> str:
+        return "NOT_NAN"
+
+    @classmethod
+    @property
+    def allowed_dtypes(cls) -> list[DType]:
+        return [
+            DType.BOOLEAN,
+            DType.FLOAT32,
+            DType.FLOAT64,
+            DType.INT32,
+            DType.INT64,
+        ]
+
+    @classmethod
+    def get_output_dtype(cls, feature_dtype: DType) -> DType:
+        return DType.BOOLEAN
+
+
+class AbsOperator(BaseUnaryOperator):
+    @classmethod
+    @property
+    def op_key_definition(cls) -> str:
+        return "ABS"
+
+    @classmethod
+    @property
+    def allowed_dtypes(cls) -> list[DType]:
+        return [
+            DType.FLOAT32,
+            DType.FLOAT64,
+            DType.INT32,
+            DType.INT64,
+        ]
+
+    @classmethod
+    def get_output_dtype(cls, feature_dtype: DType) -> DType:
+        return feature_dtype
+
+
 operator_lib.register_operator(InvertOperator)
+operator_lib.register_operator(IsNanOperator)
+operator_lib.register_operator(NotNanOperator)
+operator_lib.register_operator(AbsOperator)
 
 
 def invert(
@@ -145,5 +202,60 @@ def invert(
         Negated node.
     """
     return InvertOperator(
+        input=input,
+    ).outputs["output"]
+
+
+def isnan(
+    input: Node,
+) -> Node:
+    """Get boolean features, True in the positions where
+    there's a NaN.
+    Note that for INT and BOOLEAN this will
+    always be False since those types don't support NaNs.
+    It only makes actual sense to use on FLOAT features.
+
+    Args:
+        input: Node to check for NaNs.
+
+    Returns:
+        Node with BOOLEAN features.
+    """
+    return IsNanOperator(
+        input=input,
+    ).outputs["output"]
+
+
+def notnan(
+    input: Node,
+) -> Node:
+    """Get boolean features, True in the positions that are not NaN.
+    Equivalent to invert(isnan()). Note that for INT and BOOLEAN this will
+    always be True since those types don't support NaNs.
+    It only makes actual sense to use on FLOAT features.
+
+    Args:
+        input: Node to check for NaNs.
+
+    Returns:
+        Node with BOOLEAN features.
+    """
+    return NotNanOperator(
+        input=input,
+    ).outputs["output"]
+
+
+def abs(
+    input: Node,
+) -> Node:
+    """Get the absolute value of the features.
+
+    Args:
+        input: Node to apply abs().
+
+    Returns:
+        Node with positive valued features.
+    """
+    return AbsOperator(
         input=input,
     ).outputs["output"]

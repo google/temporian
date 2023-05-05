@@ -3,7 +3,13 @@ from typing import Dict
 
 import numpy as np
 
-from temporian.core.operators.unary import InvertOperator
+from temporian.core.operators.unary import (
+    BaseUnaryOperator,
+    AbsOperator,
+    InvertOperator,
+    NotNanOperator,
+    IsNanOperator,
+)
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.data.event_set import IndexData
 from temporian.implementation.numpy.data.event_set import EventSet
@@ -11,7 +17,7 @@ from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
 class BaseUnaryNumpyImplementation(OperatorImplementation):
-    def __init__(self, operator: InvertOperator) -> None:
+    def __init__(self, operator: BaseUnaryOperator) -> None:
         super().__init__(operator)
 
     def __call__(self, input: EventSet) -> Dict[str, EventSet]:
@@ -44,6 +50,30 @@ class InvertNumpyImplementation(BaseUnaryNumpyImplementation):
         return ~feature
 
 
+class IsNanNumpyImplementation(BaseUnaryNumpyImplementation):
+    def _do_operation(self, feature: np.ndarray) -> np.ndarray:
+        return np.isnan(feature)
+
+
+class NotNanNumpyImplementation(BaseUnaryNumpyImplementation):
+    def _do_operation(self, feature: np.ndarray) -> np.ndarray:
+        return ~np.isnan(feature)
+
+
+class AbsNumpyImplementation(BaseUnaryNumpyImplementation):
+    def _do_operation(self, feature: np.ndarray) -> np.ndarray:
+        return abs(feature)
+
+
+implementation_lib.register_operator_implementation(
+    AbsOperator, AbsNumpyImplementation
+)
 implementation_lib.register_operator_implementation(
     InvertOperator, InvertNumpyImplementation
+)
+implementation_lib.register_operator_implementation(
+    IsNanOperator, IsNanNumpyImplementation
+)
+implementation_lib.register_operator_implementation(
+    NotNanOperator, NotNanNumpyImplementation
 )

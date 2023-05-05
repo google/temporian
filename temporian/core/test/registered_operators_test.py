@@ -24,6 +24,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
     def test_base(self):
         # Note: The operators are stored alphabetically.
         expected_operators = [
+            "ABS",
             "ADDITION",
             "ADDITION_SCALAR",
             "CALENDAR_DAY_OF_MONTH",
@@ -47,12 +48,14 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "FLOORDIV_SCALAR",
             "GLUE",
             "INVERT",
+            "IS_NAN",
             "LAG",
             "MOVING_COUNT",
             "MOVING_STANDARD_DEVIATION",
             "MOVING_SUM",
             "MULTIPLICATION",
             "MULTIPLICATION_SCALAR",
+            "NOT_NAN",
             "PREFIX",
             "PROPAGATE",
             "SAMPLE",

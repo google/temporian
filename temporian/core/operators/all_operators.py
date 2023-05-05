@@ -19,7 +19,7 @@ from temporian.core.operators.cast import cast
 from temporian.core.operators.drop_index import drop_index
 from temporian.core.operators.filter import filter
 from temporian.core.operators.glue import glue
-from temporian.core.operators.unary import invert
+from temporian.core.operators.unary import abs, invert, isnan, notnan
 from temporian.core.operators.calendar.day_of_month import calendar_day_of_month
 from temporian.core.operators.calendar.day_of_week import calendar_day_of_week
 from temporian.core.operators.calendar.day_of_year import calendar_day_of_year
