@@ -20,10 +20,7 @@ from temporian.core.operators.arithmetic_scalar.multiply import (
     multiply_scalar,
     MultiplyScalarOperator,
 )
-
 from temporian.core.operators.arithmetic_scalar.equal import (
     equal_scalar,
     EqualScalarOperator,
 )
-
-# pylint: enable=unused-import

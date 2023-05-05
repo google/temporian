@@ -28,7 +28,7 @@ class SerializeTest(absltest.TestCase):
         o4 = utils.OpI2O1(o2.outputs["output"], i3)
         o5 = utils.OpI1O2(o4.outputs["output"])
 
-        original = processor.infer_processor(
+        original, _ = processor.infer_processor(
             {
                 "io_input_1": i1,
                 "io_input_2": i3,
@@ -95,7 +95,7 @@ class SerializeTest(absltest.TestCase):
         i_event = utils.create_input_node()
         operator = utils.OpWithAttributes(i_event, **attributes)
 
-        original = processor.infer_processor(
+        original, _ = processor.infer_processor(
             inputs={"i_event": i_event},
             outputs={"output": operator.outputs["output"]},
         )

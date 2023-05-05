@@ -62,7 +62,7 @@ def save(
 
     outputs = processor.normalize_multiple_node_arg(outputs)
 
-    p = processor.infer_processor(inputs=inputs, outputs=outputs)
+    p, _ = processor.infer_processor(inputs=inputs, outputs=outputs)
     proto = serialize(p)
     with open(path, "w") as f:
         f.write(text_format.MessageToString(proto))

@@ -1,5 +1,5 @@
 """Utilities for unit testing."""
-from typing import List, Mapping
+from typing import List, Mapping, Optional
 
 import pandas as pd
 
@@ -17,12 +17,13 @@ from temporian.implementation.numpy.data.event_set import EventSet
 # For example "OpI1O2" has 1 input and 2 outputs.
 
 
-def create_input_node():
+def create_input_node(name: Optional[str] = None):
     return node_lib.input_node(
         features=[
             Feature("f1", DType.FLOAT32),
             Feature("f2", DType.FLOAT32),
-        ]
+        ],
+        name=name
     )
 
 

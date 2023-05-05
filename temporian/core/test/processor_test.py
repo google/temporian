@@ -29,7 +29,7 @@ class ProcessorTest(absltest.TestCase):
         o4 = utils.OpI2O1(o2.outputs["output"], i3)
         o5 = utils.OpI1O2(o4.outputs["output"])
 
-        p = processor.infer_processor(
+        p, _ = processor.infer_processor(
             {
                 "io_input_1": i1,
                 "io_input_2": i3,
@@ -51,7 +51,7 @@ class ProcessorTest(absltest.TestCase):
         b = utils.OpI1O1NotCreator(a)
         c = utils.OpI1O1(b.outputs["output"])
 
-        p = processor.infer_processor(
+        p, _ = processor.infer_processor(
             {"my_input": a},
             {"my_output": c.outputs["output"]},
         )
@@ -68,7 +68,7 @@ class ProcessorTest(absltest.TestCase):
         b = utils.OpI1O1NotCreator(a)
         c = utils.OpI1O1(b.outputs["output"])
 
-        p = processor.infer_processor(
+        p, _ = processor.infer_processor(
             {"my_input": b.outputs["output"]},
             {"my_output": c.outputs["output"]},
         )
@@ -101,7 +101,7 @@ class ProcessorTest(absltest.TestCase):
         o4 = utils.OpI2O1(o2.outputs["output"], i3)
         o5 = utils.OpI1O2(o4.outputs["output"])
 
-        p = processor.infer_processor(
+        p, _ = processor.infer_processor(
             None,
             {
                 "io_output_1": o5.outputs["output_1"],
@@ -133,7 +133,7 @@ class ProcessorTest(absltest.TestCase):
         i1 = utils.create_input_node()
         i1.name = "io_1"
 
-        p = processor.infer_processor(None, {"io_2": i1})
+        p, _ = processor.infer_processor(None, {"io_2": i1})
 
         self.assertLen(p.operators, 0)
         self.assertLen(p.nodes, 1)

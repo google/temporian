@@ -14,7 +14,7 @@
 
 """Processor class definition and inference logic."""
 
-from typing import List, Set, Dict, Union, Optional
+from typing import List, Set, Dict, Tuple, Union, Optional
 
 from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
@@ -22,34 +22,7 @@ from temporian.core.data.sampling import Sampling
 from temporian.core.operators import base
 
 MultipleNodeArg = Union[Dict[str, Node], List[Node], Node]
-
-
-def normalize_multiple_node_arg(src: MultipleNodeArg) -> Dict[str, Node]:
-    """Normalizes a node or list of nodes into a dictionary of nodes."""
-
-    save_src = src
-
-    if isinstance(src, Node):
-        src = [src]
-
-    if isinstance(src, list):
-        new_src = {}
-        for node in src:
-            if node.name is None:
-                raise ValueError(
-                    "Input / output node or list nodes need to be named "
-                    'with "node.name = ...". Alternatively, provide a '
-                    "dictionary of nodes."
-                )
-            new_src[node.name] = node
-        src = new_src
-
-    if not isinstance(src, dict):
-        raise ValueError(
-            f'Unexpected node(s) "{save_src}". Expecting dict of nodes, '
-            "list of nodes, or a single node."
-        )
-    return src
+NodeInputArg = Union[Node, str]
 
 
 class Processor(object):
@@ -145,22 +118,26 @@ class Processor(object):
 
 
 def infer_processor(
-    inputs: Optional[Dict[str, Node]],
+    inputs: Optional[Dict[str, NodeInputArg]],
     outputs: Dict[str, Node],
-) -> Processor:
+) -> Tuple[Processor, Dict[NodeInputArg, Node]]:
     """Extracts all the objects between the output and input nodes.
 
     Fails if any inputs are missing.
 
     Args:
-        inputs: Input nodes. If None, the inputs are inferred. In this case,
-            input nodes have to be named.
+        inputs: Mapping of strings to input nodes or node names. If None, the
+            inputs are inferred. In this case, input nodes have to be named.
         outputs: Output nodes.
 
     Returns:
-        A processor.
+        Tuple of:
+            - Inferred processor.
+            - Mapping of node or node name inputs to nodes. The keys are the
+            values in the `inputs` argument, and the values are the nodes
+            corresponding to each one. If an input was already a node, it will
+            be mapped to itself.
     """
-
     # The following algorithm lists all the nodes between the output and
     # input nodes. Informally, the algorithm works as follow:
     #
@@ -184,12 +161,36 @@ def infer_processor(
     pending_nodes: Set[Node] = set()
     pending_nodes.update(outputs.values())
 
-    # Index the input node for fast retrieval
-    input_nodes: Set[Node] = {}
+    # Index the input nodes for fast retrieval.
+    input_nodes: Set[Node] = set()
+
+    # Index the input node names for fast retrieval.
+    # Use dict instead of set since we will need their key.
+    input_node_names_to_idx: Dict[str, str] = {}
+
+    # Create map of node/node name inputs to corresponding node.
+    normalized_inputs: Dict[NodeInputArg, Node] = {}
 
     if inputs is not None:
-        p.inputs = inputs
-        input_nodes = set(inputs.values())
+        p.inputs: Dict[str, Node] = {}
+
+        for idx_str, node_or_name in inputs.items():
+            if isinstance(node_or_name, Node):
+                input_nodes.add(node_or_name)
+                # Only add node_or_name to p.inputs if its a node
+                # If a name, it will be added to p.inputs and normalized_inputs
+                # when we find it
+                p.inputs[idx_str] = node_or_name
+                normalized_inputs[node_or_name] = node_or_name
+
+            elif isinstance(node_or_name, str):
+                input_node_names_to_idx[node_or_name] = idx_str
+
+            else:
+                raise ValueError(
+                    f"Unexpected input {node_or_name}. "
+                    "Expecting a node or node name."
+                )
 
     # Features already processed.
     done_nodes: Set[Node] = set()
@@ -208,6 +209,14 @@ def infer_processor(
 
         if node in input_nodes:
             # The feature is provided by the user.
+            continue
+
+        elif node.name and node.name in input_node_names_to_idx:
+            # The feature is provided by the user.
+            # Add node to p.inputs and normalized_inputs now that we have it.
+            idx_str = input_node_names_to_idx[node.name]
+            p.inputs[idx_str] = node
+            normalized_inputs[node.name] = node
             continue
 
         if node.creator is None:
@@ -244,7 +253,7 @@ def infer_processor(
         # Fail if not all nodes are sourced.
         if missing_nodes:
             raise ValueError(
-                "One of multiple nodes are required but "
+                "Some nodes are required but "
                 f"not provided as input:\n {missing_nodes}"
             )
 
@@ -254,4 +263,32 @@ def infer_processor(
         for f in e.features:
             p.add_feature(f)
 
-    return p
+    return p, normalized_inputs
+
+
+def normalize_multiple_node_arg(src: MultipleNodeArg) -> Dict[str, Node]:
+    """Normalizes a node or list of nodes into a dictionary of nodes."""
+
+    save_src = src
+
+    if isinstance(src, Node):
+        src = [src]
+
+    if isinstance(src, list):
+        new_src = {}
+        for node in src:
+            if node.name is None:
+                raise ValueError(
+                    "Input / output node or list nodes need to be named "
+                    'with "node.name = ...". Alternatively, provide a '
+                    "dictionary of nodes."
+                )
+            new_src[node.name] = node
+        src = new_src
+
+    if not isinstance(src, dict):
+        raise ValueError(
+            f'Unexpected node(s) "{save_src}". Expecting dict of nodes, '
+            "list of nodes, or a single node."
+        )
+    return src

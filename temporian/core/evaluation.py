@@ -17,7 +17,7 @@
 import time
 import sys
 import pathlib
-from typing import Any, Dict, List, Set, Union
+from typing import Any, Dict, List, Set, Tuple, Union
 from collections import defaultdict
 
 from temporian.core.data.node import Node
@@ -27,7 +27,7 @@ from temporian.core import processor as processor_lib
 from temporian.implementation.numpy import evaluation as np_eval
 
 AvailableBackends = Any
-Data = Dict[Node, Union[str, pathlib.Path, EventSet]]
+Data = Dict[Union[Node, str], Union[str, pathlib.Path, EventSet]]
 Query = Union[Node, List[Node], Dict[str, Node]]
 Result = Union[EventSet, List[EventSet], Dict[str, EventSet]]
 
@@ -43,7 +43,9 @@ def evaluate(
     Args:
         query: Nodes to compute. Supports node, dict and list of nodes.
         input_data: Dictionary of node to event sets to use for the
-            computation.
+            computation. Keys can be nodes or strings. If a key is a string,
+            the EventSet it maps to will be used as input for the node with that
+            name.
         verbose: If >0, prints details about the execution on the standard error
             output. The larger the number, the more information is displayed.
         check_execution: If true, the input and output of the op implementation
@@ -79,7 +81,7 @@ def evaluate(
     else:
         # TODO: improve error message
         raise TypeError(
-            f"schedule_graph query argument must be one of {Query}. Received"
+            f"Evaluate query argument must be one of {Query}. Received"
             f" {type(query)}."
         )
 
@@ -88,9 +90,14 @@ def evaluate(
 
     # Schedule execution
     input_nodes = list(input_data.keys())
-    schedule = build_schedule(
+    schedule, normalized_inputs = build_schedule(
         inputs=input_nodes, outputs=normalized_query, verbose=verbose
     )
+
+    # Replace node names for actual nodes in input_data
+    normalized_input_data = {
+        normalized_inputs[input]: data for input, data in input_data.items()
+    }
 
     if verbose == 1:
         print(
@@ -106,7 +113,10 @@ def evaluate(
     # Note: "outputs" is a dictionary of event (including the query events) to
     # event data.
     outputs = np_eval.evaluate_schedule(
-        input_data, schedule, verbose=verbose, check_execution=check_execution
+        normalized_input_data,
+        schedule,
+        verbose=verbose,
+        check_execution=check_execution,
     )
 
     end_time = time.perf_counter()
@@ -132,36 +142,36 @@ def evaluate(
 
 
 def build_schedule(
-    inputs: List[Node],
+    inputs: List[Union[Node, str]],
     outputs: List[Node],
     verbose: int = 0,
-) -> List[base.Operator]:
+) -> Tuple[List[base.Operator], Dict[processor_lib.NodeInputArg, Node]]:
     """Calculates which operators need to be executed in which order to
     compute a set of output nodes given a set of input nodes.
 
     This implementation is based on Kahn's algorithm.
 
     Args:
-        inputs: Input nodes.
+        inputs: Input nodes or names of input nodes.
         outputs: Output nodes.
         verbose: If >0, prints details about the execution on the standard error
             output. The larger the number, the more information is displayed.
 
     Returns:
-        Ordered list of operators, such that the first operator should be
-        computed before the second, second before the third, etc.
+        Tuple of:
+            - Ordered list of operators, such that the first operator should be
+            computed before the second, second before the third, etc.
+            - Mapping of node or node name inputs to nodes. The keys are the
+            values in the `inputs` argument, and the values are the nodes
+            corresponding to each one. If an input was already a node, it will
+            be mapped to itself.
     """
-
-    def list_to_dict(l: List[Any]) -> Dict[str, Any]:
-        """Converts a list into a dict with a text index key."""
-        return {str(i): x for i, x in enumerate(l)}
-
     # List all nodes and operators in between inputs and outputs.
     #
     # Fails if the outputs cannot be computed from the inputs e.g. some inputs
     # are missing.
-    processor = processor_lib.infer_processor(
-        list_to_dict(inputs), list_to_dict(outputs)
+    processor, normalized_inputs = processor_lib.infer_processor(
+        _list_to_dict(inputs), _list_to_dict(outputs)
     )
 
     if verbose >= 2:
@@ -189,7 +199,9 @@ def build_schedule(
     for op in processor.operators:
         num_pending_inputs = 0
         for input_node in op.inputs.values():
-            if input_node in inputs_set:
+            if input_node in inputs_set or (
+                input_node.name and input_node.name in inputs_set
+            ):
                 # This input is already available
                 continue
             node_to_op[input_node].append(op)
@@ -228,4 +240,9 @@ def build_schedule(
 
     assert not op_to_num_pending_inputs
 
-    return planned_ops
+    return planned_ops, normalized_inputs
+
+
+def _list_to_dict(l: List[Any]) -> Dict[str, Any]:
+    """Converts a list into a dict with a text index key."""
+    return {str(i): x for i, x in enumerate(l)}
