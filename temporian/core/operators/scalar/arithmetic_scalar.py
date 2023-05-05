@@ -25,6 +25,13 @@ from temporian.core.operators.scalar.base import (
 
 SCALAR = Union[float, int]
 
+arithmetic_dypes = [
+    DType.FLOAT32,
+    DType.FLOAT64,
+    DType.INT32,
+    DType.INT64,
+]
+
 
 class AddScalarOperator(BaseScalarOperator):
     @classmethod
@@ -34,12 +41,7 @@ class AddScalarOperator(BaseScalarOperator):
 
     @property
     def supported_value_dtypes(self) -> List[DType]:
-        return [
-            DType.FLOAT32,
-            DType.FLOAT64,
-            DType.INT32,
-            DType.INT64,
-        ]
+        return arithmetic_dypes
 
 
 class SubtractScalarOperator(BaseScalarOperator):
@@ -50,12 +52,7 @@ class SubtractScalarOperator(BaseScalarOperator):
 
     @property
     def supported_value_dtypes(self) -> List[DType]:
-        return [
-            DType.FLOAT32,
-            DType.FLOAT64,
-            DType.INT32,
-            DType.INT64,
-        ]
+        return arithmetic_dypes
 
 
 class MultiplyScalarOperator(BaseScalarOperator):
@@ -66,12 +63,7 @@ class MultiplyScalarOperator(BaseScalarOperator):
 
     @property
     def supported_value_dtypes(self) -> List[DType]:
-        return [
-            DType.FLOAT32,
-            DType.FLOAT64,
-            DType.INT32,
-            DType.INT64,
-        ]
+        return arithmetic_dypes
 
 
 class DivideScalarOperator(BaseScalarOperator):
@@ -98,12 +90,7 @@ class DivideScalarOperator(BaseScalarOperator):
 
     @property
     def supported_value_dtypes(self) -> List[DType]:
-        return [
-            DType.FLOAT32,
-            DType.FLOAT64,
-            DType.INT32,
-            DType.INT64,
-        ]
+        return arithmetic_dypes
 
 
 class FloorDivScalarOperator(BaseScalarOperator):
@@ -114,19 +101,7 @@ class FloorDivScalarOperator(BaseScalarOperator):
 
     @property
     def supported_value_dtypes(self) -> List[DType]:
-        return [
-            DType.FLOAT32,
-            DType.FLOAT64,
-            DType.INT32,
-            DType.INT64,
-        ]
-
-
-operator_lib.register_operator(SubtractScalarOperator)
-operator_lib.register_operator(AddScalarOperator)
-operator_lib.register_operator(MultiplyScalarOperator)
-operator_lib.register_operator(DivideScalarOperator)
-operator_lib.register_operator(FloorDivScalarOperator)
+        return arithmetic_dypes
 
 
 def add_scalar(
@@ -292,3 +267,10 @@ def floordiv_scalar(
         "Expected (Node, SCALAR) or (SCALAR, Node), "
         f"got ({type(numerator)}, {type(denominator)})."
     )
+
+
+operator_lib.register_operator(SubtractScalarOperator)
+operator_lib.register_operator(AddScalarOperator)
+operator_lib.register_operator(MultiplyScalarOperator)
+operator_lib.register_operator(DivideScalarOperator)
+operator_lib.register_operator(FloorDivScalarOperator)

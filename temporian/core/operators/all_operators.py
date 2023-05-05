@@ -19,12 +19,21 @@ from temporian.core.operators.scalar import floordiv_scalar
 from temporian.core.operators.scalar import multiply_scalar
 from temporian.core.operators.scalar import subtract_scalar
 from temporian.core.operators.scalar import equal_scalar
+from temporian.core.operators.scalar import not_equal_scalar
+from temporian.core.operators.scalar import greater_equal_scalar
+from temporian.core.operators.scalar import less_equal_scalar
+from temporian.core.operators.scalar import greater_scalar
+from temporian.core.operators.scalar import less_scalar
+
+from temporian.core.operators.unary import abs
+from temporian.core.operators.unary import invert
+from temporian.core.operators.unary import isnan
+from temporian.core.operators.unary import notnan
 
 from temporian.core.operators.cast import cast
 from temporian.core.operators.drop_index import drop_index
 from temporian.core.operators.filter import filter
 from temporian.core.operators.glue import glue
-from temporian.core.operators.unary import abs, invert, isnan, notnan
 from temporian.core.operators.calendar.day_of_month import calendar_day_of_month
 from temporian.core.operators.calendar.day_of_week import calendar_day_of_week
 from temporian.core.operators.calendar.day_of_year import calendar_day_of_year
