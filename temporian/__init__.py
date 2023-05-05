@@ -14,7 +14,7 @@
 
 """Temporian."""
 
-from temporian.core import evaluator
+from temporian.core import evaluation
 from temporian.core import operator_lib
 from temporian.core import processor
 from temporian.core import serialize
@@ -41,7 +41,7 @@ from temporian.implementation.numpy.operators import all_operators as _impls
 
 __version__ = "0.0.1"
 
-evaluate = evaluator.evaluate
+evaluate = evaluation.evaluate
 Feature = feature.Feature
 load = serialize.load
 save = serialize.save

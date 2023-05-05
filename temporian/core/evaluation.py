@@ -24,7 +24,7 @@ from temporian.core.data.node import Node
 from temporian.core.operators import base
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core import processor as processor_lib
-from temporian.implementation.numpy import evaluator as numpy_evaluator
+from temporian.implementation.numpy import evaluation as np_eval
 
 AvailableBackends = Any
 Data = Dict[Node, Union[str, pathlib.Path, EventSet]]
@@ -105,7 +105,7 @@ def evaluate(
     #
     # Note: "outputs" is a dictionary of event (including the query events) to
     # event data.
-    outputs = numpy_evaluator.evaluate_schedule(
+    outputs = np_eval.evaluate_schedule(
         input_data, schedule, verbose=verbose, check_execution=check_execution
     )
 

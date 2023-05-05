@@ -14,17 +14,17 @@
 
 from absl.testing import absltest
 
-from temporian.core import evaluator
+from temporian.core import evaluation
 from temporian.core.test import utils
 from temporian.implementation.numpy.data.event_set import EventSet
 
 
-class EvaluatorTest(absltest.TestCase):
+class EvaluationTest(absltest.TestCase):
     def test_schedule_trivial(self):
         a = utils.create_input_node()
         b = utils.OpI1O1(a)
 
-        schedule = evaluator.build_schedule(
+        schedule = evaluation.build_schedule(
             inputs=[a],
             outputs=[b.outputs["output"]],
         )
@@ -33,7 +33,7 @@ class EvaluatorTest(absltest.TestCase):
     def test_schedule_empty(self):
         a = utils.create_input_node()
 
-        schedule = evaluator.build_schedule(
+        schedule = evaluation.build_schedule(
             inputs=[a],
             outputs=[a],
         )
@@ -45,7 +45,7 @@ class EvaluatorTest(absltest.TestCase):
         o1 = utils.OpI1O1(i1)
         o2 = utils.OpI1O1(i2)
         o3 = utils.OpI2O1(o1.outputs["output"], o2.outputs["output"])
-        schedule = evaluator.build_schedule(
+        schedule = evaluation.build_schedule(
             inputs=[i1, i2],
             outputs=[o3.outputs["output"]],
         )
@@ -60,7 +60,7 @@ class EvaluatorTest(absltest.TestCase):
         o4 = utils.OpI2O1(o2.outputs["output"], i3)
         o5 = utils.OpI1O2(o4.outputs["output"])
 
-        schedule = evaluator.build_schedule(
+        schedule = evaluation.build_schedule(
             inputs=[i1, i3],
             outputs=[o5.outputs["output_1"], o4.outputs["output"]],
         )
@@ -75,7 +75,7 @@ class EvaluatorTest(absltest.TestCase):
         o4 = utils.OpI1O1(o3.outputs["output"])
         o5 = utils.OpI1O1(o4.outputs["output"])
 
-        schedule = evaluator.build_schedule(
+        schedule = evaluation.build_schedule(
             inputs=[o3.outputs["output"]],
             outputs=[o5.outputs["output"]],
         )
@@ -83,13 +83,13 @@ class EvaluatorTest(absltest.TestCase):
 
     def test_evaluate_value(self):
         i1 = utils.create_input_node()
-        result = evaluator.evaluate(i1, {i1: utils.create_input_event_set()})
+        result = evaluation.evaluate(i1, {i1: utils.create_input_event_set()})
         self.assertIsInstance(result, EventSet)
 
     def test_evaluate_list(self):
         i1 = utils.create_input_node()
         i2 = utils.create_input_node()
-        result = evaluator.evaluate(
+        result = evaluation.evaluate(
             [i1, i2],
             {
                 i1: utils.create_input_event_set(),
@@ -102,7 +102,7 @@ class EvaluatorTest(absltest.TestCase):
     def test_evaluate_dict(self):
         i1 = utils.create_input_node()
         i2 = utils.create_input_node()
-        result = evaluator.evaluate(
+        result = evaluation.evaluate(
             {"i1": i1, "i2": i2},
             {
                 i1: utils.create_input_event_set(),

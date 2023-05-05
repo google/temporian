@@ -16,7 +16,7 @@ from absl.testing import absltest
 
 import pandas as pd
 
-from temporian.core import evaluator
+from temporian.core import evaluation
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
 from temporian.core.data.node import Feature
@@ -141,7 +141,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
         lag_1 = lags[0]
 
         # evaluate
-        output_evset_lag_1 = evaluator.evaluate(
+        output_evset_lag_1 = evaluation.evaluate(
             lag_1,
             input_data={
                 node: input_evset,
@@ -152,7 +152,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
         lag_2 = lags[1]
 
         # evaluate
-        output_evset_lag_2 = evaluator.evaluate(
+        output_evset_lag_2 = evaluation.evaluate(
             lag_2,
             input_data={
                 node: input_evset,
@@ -271,7 +271,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
         leak_1 = leaks[0]
 
         # evaluate
-        output_evset_leak_1 = evaluator.evaluate(
+        output_evset_leak_1 = evaluation.evaluate(
             leak_1,
             input_data={
                 node: input_evset,
@@ -282,7 +282,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
         leak_2 = leaks[1]
 
         # evaluate
-        output_evset_leak_2 = evaluator.evaluate(
+        output_evset_leak_2 = evaluation.evaluate(
             leak_2,
             input_data={
                 node: input_evset,

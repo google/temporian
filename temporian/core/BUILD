@@ -7,15 +7,15 @@ package(
 # =========
 
 py_library(
-    name = "evaluator",
-    srcs = ["evaluator.py"],
+    name = "evaluation",
+    srcs = ["evaluation.py"],
     srcs_version = "PY3",
     deps = [
         ":processor",
         "//temporian/core/data:feature",
         "//temporian/core/data:node",
         "//temporian/core/operators:base",
-        "//temporian/implementation/numpy:evaluator",
+        "//temporian/implementation/numpy:evaluation",
         "//temporian/implementation/numpy/data:event_set",
     ],
 )
