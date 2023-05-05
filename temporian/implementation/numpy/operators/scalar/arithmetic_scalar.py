@@ -24,15 +24,14 @@ from temporian.core.operators.scalar import (
     MultiplyScalarOperator,
     DivideScalarOperator,
     FloorDivScalarOperator,
+    ModuloScalarOperator,
+    PowerScalarOperator,
 )
 from temporian.implementation.numpy import implementation_lib
 
 
 class AddScalarNumpyImplementation(BaseScalarNumpyImplementation):
     """Numpy implementation of the add scalar operator."""
-
-    def __init__(self, operator: AddScalarOperator) -> None:
-        super().__init__(operator)
 
     def _do_operation(
         self, feature: np.ndarray, value: Union[float, int, str, bool]
@@ -42,9 +41,6 @@ class AddScalarNumpyImplementation(BaseScalarNumpyImplementation):
 
 class SubtractScalarNumpyImplementation(BaseScalarNumpyImplementation):
     """Numpy implementation of the subtract scalar operator."""
-
-    def __init__(self, operator: SubtractScalarOperator) -> None:
-        super().__init__(operator)
 
     def _do_operation(
         self, feature: np.ndarray, value: Union[float, int, str, bool]
@@ -58,9 +54,6 @@ class SubtractScalarNumpyImplementation(BaseScalarNumpyImplementation):
 class MultiplyScalarNumpyImplementation(BaseScalarNumpyImplementation):
     """Numpy implementation of the multiply scalar operator."""
 
-    def __init__(self, operator: MultiplyScalarOperator) -> None:
-        super().__init__(operator)
-
     def _do_operation(
         self, feature: np.ndarray, value: Union[float, int, str, bool]
     ) -> np.ndarray:
@@ -69,9 +62,6 @@ class MultiplyScalarNumpyImplementation(BaseScalarNumpyImplementation):
 
 class DivideScalarNumpyImplementation(BaseScalarNumpyImplementation):
     """Numpy implementation of the divide scalar operator."""
-
-    def __init__(self, operator: DivideScalarOperator) -> None:
-        super().__init__(operator)
 
     def _do_operation(
         self, feature: np.ndarray, value: Union[float, int, str, bool]
@@ -85,9 +75,6 @@ class DivideScalarNumpyImplementation(BaseScalarNumpyImplementation):
 class FloorDivideScalarNumpyImplementation(BaseScalarNumpyImplementation):
     """Numpy implementation of the floordiv scalar operator."""
 
-    def __init__(self, operator: FloorDivScalarOperator) -> None:
-        super().__init__(operator)
-
     def _do_operation(
         self, feature: np.ndarray, value: Union[float, int, str, bool]
     ) -> np.ndarray:
@@ -95,6 +82,28 @@ class FloorDivideScalarNumpyImplementation(BaseScalarNumpyImplementation):
             return value // feature
 
         return feature // value
+
+
+class ModuloScalarNumpyImplementation(BaseScalarNumpyImplementation):
+    """Numpy implementation of the modulo scalar operator."""
+
+    def _do_operation(
+        self, feature: np.ndarray, value: Union[float, int, str, bool]
+    ) -> np.ndarray:
+        if self._operator.is_value_first:
+            return value % feature
+        return feature % value
+
+
+class PowerScalarNumpyImplementation(BaseScalarNumpyImplementation):
+    """Numpy implementation of the power scalar operator."""
+
+    def _do_operation(
+        self, feature: np.ndarray, value: Union[float, int, str, bool]
+    ) -> np.ndarray:
+        if self._operator.is_value_first:
+            return value**feature
+        return feature**value
 
 
 implementation_lib.register_operator_implementation(
@@ -111,4 +120,10 @@ implementation_lib.register_operator_implementation(
 )
 implementation_lib.register_operator_implementation(
     FloorDivScalarOperator, FloorDivideScalarNumpyImplementation
+)
+implementation_lib.register_operator_implementation(
+    ModuloScalarOperator, ModuloScalarNumpyImplementation
+)
+implementation_lib.register_operator_implementation(
+    PowerScalarOperator, PowerScalarNumpyImplementation
 )

@@ -6,11 +6,15 @@ from temporian.core.operators.scalar.arithmetic_scalar import (
     multiply_scalar,
     divide_scalar,
     floordiv_scalar,
+    modulo_scalar,
+    power_scalar,
     AddScalarOperator,
     SubtractScalarOperator,
     MultiplyScalarOperator,
     DivideScalarOperator,
     FloorDivScalarOperator,
+    ModuloScalarOperator,
+    PowerScalarOperator,
 )
 
 from temporian.core.operators.scalar.relational_scalar import (

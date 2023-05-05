@@ -92,11 +92,26 @@ class FloorDivOperator(BaseBinaryOperator):
         return "floordiv"
 
 
-operator_lib.register_operator(AddOperator)
-operator_lib.register_operator(SubtractOperator)
-operator_lib.register_operator(DivideOperator)
-operator_lib.register_operator(MultiplyOperator)
-operator_lib.register_operator(FloorDivOperator)
+class ModuloOperator(BaseBinaryOperator):
+    @classmethod
+    @property
+    def operator_def_key(cls) -> str:
+        return "MODULO"
+
+    @property
+    def prefix(self) -> str:
+        return "mod"
+
+
+class PowerOperator(BaseBinaryOperator):
+    @classmethod
+    @property
+    def operator_def_key(cls) -> str:
+        return "POWER"
+
+    @property
+    def prefix(self) -> str:
+        return "pow"
 
 
 def add(
@@ -224,3 +239,57 @@ def floordiv(
         input_1=numerator,
         input_2=denominator,
     ).outputs["output"]
+
+
+def modulo(
+    numerator: Node,
+    denominator: Node,
+) -> Node:
+    """Computes modulo or remainder of division between two
+    nodes.
+
+    `numerator` and `denominator` must have the same sampling and the same number of
+    features.
+
+    Args:
+        numerator: First node.
+        denominator: Second node.
+
+    Returns:
+        New node with the remainder of the integer division
+    """
+    return SubtractOperator(
+        input_1=numerator,
+        input_2=denominator,
+    ).outputs["output"]
+
+
+def power(
+    base: Node,
+    exponent: Node,
+) -> Node:
+    """Computes elements of the base raised to the elements of the exponent.
+
+    `numerator` and `denominator` must have the same sampling and the same
+    number of features.
+
+    Args:
+        numerator: First node.
+        denominator: Second node.
+
+    Returns:
+        New node with the remainder of the integer division
+    """
+    return SubtractOperator(
+        input_1=base,
+        input_2=exponent,
+    ).outputs["output"]
+
+
+operator_lib.register_operator(AddOperator)
+operator_lib.register_operator(SubtractOperator)
+operator_lib.register_operator(DivideOperator)
+operator_lib.register_operator(MultiplyOperator)
+operator_lib.register_operator(FloorDivOperator)
+operator_lib.register_operator(ModuloOperator)
+operator_lib.register_operator(PowerOperator)

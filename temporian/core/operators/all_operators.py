@@ -6,6 +6,8 @@ from temporian.core.operators.binary import multiply
 from temporian.core.operators.binary import subtract
 from temporian.core.operators.binary import add
 from temporian.core.operators.binary import floordiv
+from temporian.core.operators.binary import modulo
+from temporian.core.operators.binary import power
 from temporian.core.operators.binary import equal
 from temporian.core.operators.binary import not_equal
 from temporian.core.operators.binary import greater
@@ -18,6 +20,8 @@ from temporian.core.operators.scalar import divide_scalar
 from temporian.core.operators.scalar import floordiv_scalar
 from temporian.core.operators.scalar import multiply_scalar
 from temporian.core.operators.scalar import subtract_scalar
+from temporian.core.operators.scalar import modulo_scalar
+from temporian.core.operators.scalar import power_scalar
 from temporian.core.operators.scalar import equal_scalar
 from temporian.core.operators.scalar import not_equal_scalar
 from temporian.core.operators.scalar import greater_equal_scalar
@@ -29,6 +33,7 @@ from temporian.core.operators.unary import abs
 from temporian.core.operators.unary import invert
 from temporian.core.operators.unary import isnan
 from temporian.core.operators.unary import notnan
+from temporian.core.operators.unary import log
 
 from temporian.core.operators.cast import cast
 from temporian.core.operators.drop_index import drop_index

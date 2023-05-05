@@ -19,6 +19,8 @@ from temporian.core.operators.binary import (
     MultiplyOperator,
     DivideOperator,
     FloorDivOperator,
+    ModuloOperator,
+    PowerOperator,
 )
 from temporian.core.data.dtype import DType
 from temporian.implementation.numpy import implementation_lib
@@ -99,6 +101,32 @@ class FloorDivideNumpyImplementation(BaseBinaryNumpyImplementation):
         return evset_1_feature // evset_2_feature
 
 
+class ModuloNumpyImplementation(BaseBinaryNumpyImplementation):
+    """Numpy implementation of the modulo operator."""
+
+    def __init__(self, operator: ModuloOperator) -> None:
+        super().__init__(operator)
+        assert isinstance(operator, ModuloOperator)
+
+    def _do_operation(
+        self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
+    ) -> np.ndarray:
+        return evset_1_feature % evset_2_feature
+
+
+class PowerNumpyImplementation(BaseBinaryNumpyImplementation):
+    """Numpy implementation of the power operator."""
+
+    def __init__(self, operator: PowerOperator) -> None:
+        super().__init__(operator)
+        assert isinstance(operator, PowerOperator)
+
+    def _do_operation(
+        self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
+    ) -> np.ndarray:
+        return evset_1_feature**evset_2_feature
+
+
 implementation_lib.register_operator_implementation(
     AddOperator, AddNumpyImplementation
 )
@@ -113,4 +141,10 @@ implementation_lib.register_operator_implementation(
 )
 implementation_lib.register_operator_implementation(
     FloorDivOperator, FloorDivideNumpyImplementation
+)
+implementation_lib.register_operator_implementation(
+    ModuloOperator, ModuloNumpyImplementation
+)
+implementation_lib.register_operator_implementation(
+    PowerOperator, PowerNumpyImplementation
 )

@@ -6,11 +6,15 @@ from temporian.core.operators.binary.arithmetic import (
     MultiplyOperator,
     DivideOperator,
     FloorDivOperator,
+    ModuloOperator,
+    PowerOperator,
     add,
     subtract,
     multiply,
     divide,
     floordiv,
+    modulo,
+    power,
 )
 
 from temporian.core.operators.binary.relational import (

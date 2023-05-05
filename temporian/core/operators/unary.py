@@ -182,10 +182,30 @@ class AbsOperator(BaseUnaryOperator):
         return feature_dtype
 
 
+class LogOperator(BaseUnaryOperator):
+    @classmethod
+    @property
+    def op_key_definition(cls) -> str:
+        return "LOG"
+
+    @classmethod
+    @property
+    def allowed_dtypes(cls) -> list[DType]:
+        return [
+            DType.FLOAT32,
+            DType.FLOAT64,
+        ]
+
+    @classmethod
+    def get_output_dtype(cls, feature_dtype: DType) -> DType:
+        return feature_dtype
+
+
 operator_lib.register_operator(InvertOperator)
 operator_lib.register_operator(IsNanOperator)
 operator_lib.register_operator(NotNanOperator)
 operator_lib.register_operator(AbsOperator)
+operator_lib.register_operator(LogOperator)
 
 
 def invert(
@@ -257,5 +277,22 @@ def abs(
         Node with positive valued features.
     """
     return AbsOperator(
+        input=input,
+    ).outputs["output"]
+
+
+def log(
+    input: Node,
+) -> Node:
+    """Get natural logarithm of the features. Can only be used
+    on floating point types.
+
+    Args:
+        input: Node to apply logarithm.
+
+    Returns:
+        Node with logarithm of input features.
+    """
+    return LogOperator(
         input=input,
     ).outputs["output"]

@@ -104,6 +104,28 @@ class FloorDivScalarOperator(BaseScalarOperator):
         return arithmetic_dypes
 
 
+class ModuloScalarOperator(BaseScalarOperator):
+    @classmethod
+    @property
+    def operator_def_key(cls) -> str:
+        return "MODULO_SCALAR"
+
+    @property
+    def supported_value_dtypes(self) -> List[DType]:
+        return arithmetic_dypes
+
+
+class PowerScalarOperator(BaseScalarOperator):
+    @classmethod
+    @property
+    def operator_def_key(cls) -> str:
+        return "POWER_SCALAR"
+
+    @property
+    def supported_value_dtypes(self) -> List[DType]:
+        return arithmetic_dypes
+
+
 def add_scalar(
     input: Node,
     value: Union[float, int],
@@ -269,8 +291,88 @@ def floordiv_scalar(
     )
 
 
+def modulo_scalar(
+    numerator: Union[Node, SCALAR],
+    denominator: Union[Node, SCALAR],
+) -> Node:
+    """Remainder of the division of numerator by denominator.
+
+    Either `numerator` or `denominator` should be a scalar value, but not both.
+    For the operation between two nodes, use the `modulo` operator instead.
+
+    Args:
+        numerator: Node or scalar to divide.
+        denominator: Node or scalar to divide by.
+
+    Returns:
+        Remainder of the integer division.
+    """
+    scalar_types = (float, int)
+
+    if isinstance(numerator, Node) and isinstance(denominator, scalar_types):
+        return ModuloScalarOperator(
+            input=numerator,
+            value=denominator,
+            is_value_first=False,
+        ).outputs["output"]
+
+    if isinstance(numerator, scalar_types) and isinstance(denominator, Node):
+        return ModuloScalarOperator(
+            input=denominator,
+            value=numerator,
+            is_value_first=True,
+        ).outputs["output"]
+
+    raise ValueError(
+        "Invalid input types for modulo_scalar. "
+        "Expected (Node, SCALAR) or (SCALAR, Node), "
+        f"got ({type(numerator)}, {type(denominator)})."
+    )
+
+
+def power_scalar(
+    base: Union[Node, SCALAR],
+    exponent: Union[Node, SCALAR],
+) -> Node:
+    """Raise the base to the exponent (`base ** exponent`)
+
+    Either `base` or `exponent` should be a scalar value, but not both.
+    For the operation between two nodes, use the `power` operator instead.
+
+    Args:
+        base: Node or scalar to raise to the exponent
+        exponent: Node or scalar for the exponent
+
+    Returns:
+        base values raised to the exponent
+    """
+    scalar_types = (float, int)
+
+    if isinstance(base, Node) and isinstance(exponent, scalar_types):
+        return ModuloScalarOperator(
+            input=base,
+            value=exponent,
+            is_value_first=False,
+        ).outputs["output"]
+
+    if isinstance(base, scalar_types) and isinstance(exponent, Node):
+        return ModuloScalarOperator(
+            input=exponent,
+            value=base,
+            is_value_first=True,
+        ).outputs["output"]
+
+    raise ValueError(
+        "Invalid input types for power_scalar. "
+        "Expected (Node, SCALAR) or (SCALAR, Node), "
+        f"got ({type(base)}, {type(exponent)})."
+    )
+
+
 operator_lib.register_operator(SubtractScalarOperator)
 operator_lib.register_operator(AddScalarOperator)
 operator_lib.register_operator(MultiplyScalarOperator)
 operator_lib.register_operator(DivideScalarOperator)
 operator_lib.register_operator(FloorDivScalarOperator)
+operator_lib.register_operator(ModuloScalarOperator)
+operator_lib.register_operator(PowerScalarOperator)
