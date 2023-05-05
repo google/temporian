@@ -81,14 +81,14 @@ def _append_impl(evset: EventSet, append_feat_names: List[str]) -> EventSet:
 
     # finally, sort according to timestamps. TODO: this is merging sorted
     # arrays, we should later improve this code by avoiding the full sort
-    for dst_index_data in dst_evset.values():
-        sorted_idxs = np.argsort(dst_index_data.timestamps, kind="mergesort")
+    for dst_idx_data in dst_evset.values():
+        sorted_idxs = np.argsort(dst_idx_data.timestamps, kind="mergesort")
         # features
-        for i, feature in enumerate(dst_index_data.features):
-            dst_index_data.features[i] = feature[sorted_idxs]
+        for i, feature in enumerate(dst_idx_data.features):
+            dst_idx_data.features[i] = feature[sorted_idxs]
 
         # timestamp
-        dst_index_data.timestamps = dst_index_data.timestamps[sorted_idxs]
+        dst_idx_data.timestamps = dst_idx_data.timestamps[sorted_idxs]
 
     return EventSet(
         dst_evset,
@@ -161,14 +161,14 @@ def _set_impl(evset: EventSet, set_feat_names: List[str]) -> EventSet:
     }
     # finally, sort according to timestamps. TODO: this is merging sorted
     # arrays, we should later improve this code by avoiding the full sort
-    for dst_index_data in dst_evset.values():
-        sorted_idxs = np.argsort(dst_index_data.timestamps, kind="mergesort")
+    for dst_idx_data in dst_evset.values():
+        sorted_idxs = np.argsort(dst_idx_data.timestamps, kind="mergesort")
         # features
-        for i, feature in enumerate(dst_index_data.features):
-            dst_index_data.features[i] = feature[sorted_idxs]
+        for i, feature in enumerate(dst_idx_data.features):
+            dst_idx_data.features[i] = feature[sorted_idxs]
 
         # timestamp
-        dst_index_data.timestamps = dst_index_data.timestamps[sorted_idxs]
+        dst_idx_data.timestamps = dst_idx_data.timestamps[sorted_idxs]
 
     return EventSet(
         dst_evset,
