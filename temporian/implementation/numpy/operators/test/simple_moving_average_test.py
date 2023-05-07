@@ -24,10 +24,14 @@ from temporian.core.operators.window.simple_moving_average import (
 )
 from temporian.implementation.numpy.operators.window.simple_moving_average import (
     SimpleMovingAverageNumpyImplementation,
+    operators_cc,
 )
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core.data import node as node_lib
-from temporian.implementation.numpy_cc.operators import window as window_cc
+from temporian.core.data import feature as feature_lib
+from temporian.core.data import dtype as dtype_lib
+import math
+from numpy.testing import assert_array_equal
 
 
 def _f64(l):
@@ -39,7 +43,7 @@ def _f32(l):
 
 
 nan = math.nan
-cc_sma = window_cc.simple_moving_average
+cc_sma = operators_cc.simple_moving_average
 
 
 class SimpleMovingAverageOperatorTest(absltest.TestCase):

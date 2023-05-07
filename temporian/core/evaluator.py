@@ -35,7 +35,7 @@ Result = Union[EventSet, List[EventSet], Dict[str, EventSet]]
 def evaluate(
     query: Query,
     input_data: Data,
-    verbose: int = 1,
+    verbose: int = 0,
     check_execution: bool = True,
 ) -> Result:
     """Evaluates nodes on event sets.

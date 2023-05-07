@@ -23,6 +23,8 @@ from temporian.core.operators.arithmetic_scalar import (
     DivideScalarOperator,
     FloorDivScalarOperator,
     EqualScalarOperator,
+    GreaterScalarOperator,
+    LessScalarOperator,
 )
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.arithmetic_scalar import (
@@ -32,6 +34,8 @@ from temporian.implementation.numpy.operators.arithmetic_scalar import (
     DivideScalarNumpyImplementation,
     FloorDivideScalarNumpyImplementation,
     EqualScalarNumpyImplementation,
+    GreaterScalarNumpyImplementation,
+    LessScalarNumpyImplementation,
 )
 
 
@@ -485,6 +489,41 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         operator_output = impl.call(input=self.evset)
 
         self.assertEqual(output_evset, operator_output["output"])
+
+    def test_greater_scalar(self) -> None:
+        event_data = EventSet.from_dataframe(
+            pd.DataFrame({"timestamp": [1, 2, 3], "x": [1, 2, 3]})
+        )
+        expected_data = EventSet.from_dataframe(
+            pd.DataFrame({"timestamp": [1, 2, 3], "x": [False, False, True]})
+        )
+
+        event = event_data.node()
+        operator = GreaterScalarOperator(
+            input=event,
+            value=2,
+        )
+        impl = GreaterScalarNumpyImplementation(operator)
+        operator_output = impl.call(input=event_data)
+        self.assertEqual(expected_data, operator_output["output"])
+
+    def test_less_scalar(self) -> None:
+        event_data = EventSet.from_dataframe(
+            pd.DataFrame({"timestamp": [1, 2, 3], "x": [1, 2, 3]})
+        )
+        expected_data = EventSet.from_dataframe(
+            pd.DataFrame({"timestamp": [1, 2, 3], "x": [True, False, False]})
+        )
+
+        event = event_data.node()
+        operator = LessScalarOperator(
+            input=event,
+            value=2,
+        )
+        impl = LessScalarNumpyImplementation(operator)
+        operator_output = impl.call(input=event_data)
+
+        self.assertEqual(expected_data, operator_output["output"])
 
 
 if __name__ == "__main__":

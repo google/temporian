@@ -29,7 +29,7 @@ class MovingStandardDeviationOperator(BaseWindowOperator):
     def operator_def_key(cls) -> str:
         return "MOVING_STANDARD_DEVIATION"
 
-    def get_feature_dtype(self, feature: Feature) -> str:
+    def get_feature_dtype(self, feature: Feature) -> DType:
         return (
             DType.FLOAT32 if feature.dtype == DType.FLOAT32 else DType.FLOAT64
         )

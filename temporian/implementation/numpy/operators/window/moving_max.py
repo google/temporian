@@ -13,8 +13,8 @@
 # limitations under the License.
 
 
-from temporian.core.operators.window.moving_sum import (
-    MovingSumOperator,
+from temporian.core.operators.window.moving_max import (
+    MovingMaxOperator,
 )
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.window.base import (
@@ -23,13 +23,13 @@ from temporian.implementation.numpy.operators.window.base import (
 from temporian.implementation.numpy_cc.operators import operators_cc
 
 
-class MovingSumNumpyImplementation(BaseWindowNumpyImplementation):
-    """Numpy implementation of the moving sum operator."""
+class MovingMaxNumpyImplementation(BaseWindowNumpyImplementation):
+    """Numpy implementation of the moving max operator."""
 
     def _implementation(self):
-        return operators_cc.moving_sum
+        return operators_cc.moving_max
 
 
 implementation_lib.register_operator_implementation(
-    MovingSumOperator, MovingSumNumpyImplementation
+    MovingMaxOperator, MovingMaxNumpyImplementation
 )

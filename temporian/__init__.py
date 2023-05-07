@@ -39,6 +39,14 @@ from temporian.core.operator_lib import registered_operators as get_operators
 # Load all the implementations
 from temporian.implementation.numpy.operators import all_operators as _impls
 
+# dtypes
+float32 = dtype.DType.FLOAT32
+float64 = dtype.DType.FLOAT64
+int32 = dtype.DType.INT32
+int6432 = dtype.DType.INT64
+bool_ = dtype.DType.BOOLEAN
+str_ = dtype.DType.STRING
+
 __version__ = "0.0.1"
 
 evaluate = evaluator.evaluate

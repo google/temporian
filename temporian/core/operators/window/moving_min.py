@@ -24,46 +24,46 @@ from temporian.core.data.feature import Feature
 from temporian.core.operators.window.base import BaseWindowOperator
 
 
-class MovingCountOperator(BaseWindowOperator):
+class MovingMinOperator(BaseWindowOperator):
     @classmethod
     @property
     def operator_def_key(cls) -> str:
-        return "MOVING_COUNT"
+        return "MOVING_MIN"
 
     def get_feature_dtype(self, feature: Feature) -> DType:
-        return DType.INT32
+        return feature.dtype
 
 
-operator_lib.register_operator(MovingCountOperator)
+operator_lib.register_operator(MovingMinOperator)
 
 
-def moving_count(
+def moving_min(
     input: Node,
     window_length: Duration,
     sampling: Optional[Node] = None,
 ) -> Node:
-    """Computes the number of values in a sliding window over the node.
+    """Computes the minimum of values in a sliding window over the event.
 
     For each t in sampling, and for each feature independently, returns at time
-    t the number of non-nan values for the feature in the window
+    t the minimum of non-nan values for the feature in the window
     [t - window_length, t].
 
     If `sampling` is provided samples the moving window's value at each
-    timestamp in `sampling`, else samples it at each timestamp in `input`.
+    timestamp in `sampling`, else samples it at each timestamp in `event`.
 
     If the window does not contain any values (e.g., all the values are missing,
     or the window does not contain any sampling), outputs missing values.
 
     Args:
-        input: Node for which to count the number of values in each feature.
+        event: Event for which to count the number of values in each feature.
         window_length: Sliding window's length.
         sampling: Timestamps to sample the sliding window's value at. If not
-            provided, timestamps in `input` are used.
+            provided, timestamps in `event` are used.
 
     Returns:
-        Node containing the non-nan count of each feature in `input`.
+        Event containing the minimum of each feature in `event`.
     """
-    return MovingCountOperator(
+    return MovingMinOperator(
         input=input,
         window_length=window_length,
         sampling=sampling,
