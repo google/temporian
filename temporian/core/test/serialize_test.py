@@ -20,7 +20,7 @@ import temporian as tp
 from temporian.core import serialize
 from temporian.core import processor
 from temporian.core.test import utils
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 
 
 class SerializeTest(absltest.TestCase):
@@ -84,7 +84,7 @@ class SerializeTest(absltest.TestCase):
         )
 
     def test_serialize_autonode(self):
-        input_data = NumpyEvent.from_dataframe(
+        input_data = EventSet.from_dataframe(
             pd.DataFrame(
                 {
                     "timestamp": [0.0, 2.0, 4.0, 6.0],
@@ -95,7 +95,7 @@ class SerializeTest(absltest.TestCase):
             index_names=["x"],
         )
 
-        input_node = input_data.schema()
+        input_node = input_data.node()
         output_node = tp.simple_moving_average(input_node, 2.0)
 
         original = processor.infer_processor(

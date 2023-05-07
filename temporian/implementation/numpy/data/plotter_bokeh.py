@@ -6,7 +6,7 @@ from typing import Optional, List, Any
 import numpy as np
 
 from temporian.core.data import duration
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.plotter import (
     Options,
     Style,
@@ -16,9 +16,7 @@ from temporian.implementation.numpy.data.plotter import (
 )
 
 
-def plot_bokeh(
-    events: List[NumpyEvent], indexes: List[tuple], options: Options
-):
+def plot_bokeh(evsets: List[EventSet], indexes: List[tuple], options: Options):
     from bokeh.plotting import figure
     from bokeh.io import output_notebook, show
     from bokeh.layouts import gridplot, column
@@ -30,7 +28,7 @@ def plot_bokeh(
     from bokeh.models import ColumnDataSource, CustomJS
     from bokeh.palettes import Dark2_5 as colors
 
-    num_plots = get_num_plots(events, indexes, options)
+    num_plots = get_num_plots(evsets, indexes, options)
 
     figs = []
 
@@ -48,13 +46,13 @@ def plot_bokeh(
         # Index of the next color to use in the plot.
         color_idx = 0
 
-        for event in events:
+        for evset in evsets:
             if plot_idx >= num_plots:
                 break
 
-            feature_names = event.feature_names
+            feature_names = evset.feature_names
 
-            xs = event.data[index].timestamps
+            xs = evset.data[index].timestamps
             uniform = is_uniform(xs)
 
             plot_mask = np.full(len(xs), True)
@@ -70,7 +68,7 @@ def plot_bokeh(
 
             xs = xs[plot_mask]
 
-            if event.is_unix_timestamp:
+            if evset.is_unix_timestamp:
                 # Matplotlib understands datetimes.
                 xs = [
                     datetime.datetime.fromtimestamp(x, tz=datetime.timezone.utc)
@@ -86,7 +84,7 @@ def plot_bokeh(
                         options=options,
                         color=colors[color_idx % len(colors)],
                         name="[sampling]",
-                        is_unix_timestamp=event.is_unix_timestamp,
+                        is_unix_timestamp=evset.is_unix_timestamp,
                         title=title,
                         style=Style.vline,
                     )
@@ -102,7 +100,7 @@ def plot_bokeh(
                     # Too much plots are displayed already.
                     break
 
-                ys = event.data[index].features[feature_idx][plot_mask]
+                ys = evset.data[index].features[feature_idx][plot_mask]
                 if options.style == Style.auto:
                     effective_stype = auto_style(uniform, xs, ys)
                 else:
@@ -115,7 +113,7 @@ def plot_bokeh(
                         options=options,
                         color=colors[color_idx % len(colors)],
                         name=feature_name,
-                        is_unix_timestamp=event.is_unix_timestamp,
+                        is_unix_timestamp=evset.is_unix_timestamp,
                         title=title,
                         style=effective_stype,
                     )

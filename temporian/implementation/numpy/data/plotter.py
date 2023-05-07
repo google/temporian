@@ -83,10 +83,11 @@ def plot(
             warning.
         return_fig: If true, returns the figure object. The figure object
             depends on the backend.
-        interactive: If true, creates an interractive plotting. interactive=True
-            effectively selects a backend that support interractive plotting.
+        interactive: If true, creates an interactive plotting. interactive=True
+            effectively selects a backend that support interactive plotting.
+            Ignored if "backend" is set.
         backend: Plotting library to use. Possible values are: matplotlib,
-            bokeh.
+            bokeh. If set, overrides the "interactive" argument.
     """
 
     original_indexes = indexes

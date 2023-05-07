@@ -103,7 +103,7 @@ operator_lib.register_operator(FilterOperator)
 # pylint: disable=redefined-builtin
 def filter(
     input: Node,
-    condition: Optional[Node],
+    condition: Optional[Node] = None,
 ) -> Node:
     """Filters out timestamps in a node for which a condition is false.
 
