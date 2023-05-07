@@ -14,7 +14,7 @@
 import pandas as pd
 from absl.testing import absltest
 
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 
 # Even if not used, ensure that all the necessary code is loaded.
 import temporian as tp
@@ -30,7 +30,7 @@ class PrototypeTest(absltest.TestCase):
         BOOK_ID = 2
         PIXEL_ID = 3
 
-        self.numpy_event_1 = NumpyEvent.from_dataframe(
+        self.evset_1 = EventSet.from_dataframe(
             pd.DataFrame(
                 data=[
                     [TRYOLABS_SHOP, MATE_ID, 0.0, 14],
@@ -46,7 +46,7 @@ class PrototypeTest(absltest.TestCase):
             ),
             index_names=["store_id", "product_id"],
         )
-        self.numpy_event_2 = NumpyEvent.from_dataframe(
+        self.evset_2 = EventSet.from_dataframe(
             pd.DataFrame(
                 data=[
                     [TRYOLABS_SHOP, MATE_ID, 0.0, -14],
@@ -63,18 +63,18 @@ class PrototypeTest(absltest.TestCase):
             index_names=["store_id", "product_id"],
         )
         # set same sampling
-        for index_key, index_data in self.numpy_event_1.data.items():
-            self.numpy_event_2[index_key].timestamps = index_data.timestamps
+        for index_key, index_data in self.evset_1.data.items():
+            self.evset_2[index_key].timestamps = index_data.timestamps
 
         # TODO: Remove the following line when "from_dataframe" support creating
-        # event data with shared sampling. Note that "numpy_event_1" and
-        # "numpy_event_2" should have the same sampling in this tests.
+        # event set with shared sampling. Note that "evset_1" and
+        # "evset_2" should have the same sampling in this tests.
 
-        self.event_1 = self.numpy_event_1.schema()
-        self.event_2 = self.numpy_event_2.schema()
-        self.event_2._sampling = self.event_1._sampling
+        self.node_1 = self.evset_1.node()
+        self.node_2 = self.evset_2.node()
+        self.node_2._sampling = self.node_1._sampling
 
-        self.expected_output_event = NumpyEvent.from_dataframe(
+        self.expected_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 data=[
                     [TRYOLABS_SHOP, MATE_ID, 0.0, 14, -14, 0, -14],
@@ -93,34 +93,34 @@ class PrototypeTest(absltest.TestCase):
                     "sales",
                     "costs",
                     "lag[1s]_sales",
-                    "sub_sales_0",
+                    "negated_sales",
                 ],
             ),
             index_names=["store_id", "product_id"],
         )
 
     def test_prototype(self) -> None:
-        a = tp.glue(self.event_1, self.event_2)
+        a = tp.glue(self.node_1, self.node_2)
         # create and glue sum feature
         # TODO: Restore when arithmetic operator is fixed.
-        # b = tp.glue(a, self.event_1 + self.event_2)
-        c = tp.prefix("lag[1s]_", tp.lag(self.event_1, duration=1))
+        # b = tp.glue(a, self.node_1 + self.node_2)
+        c = tp.prefix("lag[1s]_", tp.lag(self.node_1, duration=1))
         d = tp.glue(a, tp.sample(c, a))
-        sub_sales = 0 - self.event_1["sales"]
+        sub_sales = tp.prefix("negated_", -self.node_1["sales"])
         e = tp.glue(d, sub_sales)
-        output_event = e
+        output_node = e
 
-        output_event_numpy = tp.evaluate(
-            output_event,
+        output_evset = tp.evaluate(
+            output_node,
             input_data={
-                self.event_1: self.numpy_event_1,
-                self.event_2: self.numpy_event_2,
+                self.node_1: self.evset_1,
+                self.node_2: self.evset_2,
             },
             # TODO: The glue operator has some issues with dtypes. Re-enable
             # checking when solved.
             check_execution=True,
         )
-        self.assertEqual(self.expected_output_event, output_event_numpy)
+        self.assertEqual(self.expected_evset, output_evset)
 
 
 if __name__ == "__main__":

@@ -18,9 +18,9 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":implementation_lib",
-        "//temporian/core/data:event",
+        "//temporian/core/data:node",
         "//temporian/core/operators:base",
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -29,8 +29,7 @@ py_library(
     srcs = ["utils.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 

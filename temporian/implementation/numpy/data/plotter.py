@@ -1,12 +1,27 @@
+# Copyright 2021 Google LLC.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """Plotting utility."""
 
-from typing import NamedTuple, Optional, Union, List, Any
+import datetime
+from typing import NamedTuple, Optional, Union, List, Any, Tuple
 
 import numpy as np
 from enum import Enum
 
 from temporian.core.data import duration
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 
 
 class Style(Enum):
@@ -37,7 +52,7 @@ class Options(NamedTuple):
 
 
 def plot(
-    events: Union[List[NumpyEvent], NumpyEvent],
+    evsets: Union[List[EventSet], EventSet],
     indexes: Optional[Union[Any, tuple, List[tuple]]] = None,
     width_px: int = 1024,
     height_per_plot_px: int = 150,
@@ -50,10 +65,10 @@ def plot(
     interactive: bool = False,
     backend: Optional[str] = None,
 ):
-    """Plots an event.
+    """Plots event sets.
 
     Args:
-        events: Single event, or list of events, to plot.
+        evsets: Single or list of event sets to plot.
         indexes: The index or list of indexes to plot. If index=None, plots all
             the available indexes. Indexes should be provided as single value
             (e.g. string) or tuple of values. Example: index="a", index=("a",),
@@ -76,15 +91,15 @@ def plot(
 
     original_indexes = indexes
 
-    if not isinstance(events, list):
-        events = [events]
+    if not isinstance(evsets, list):
+        evsets = [evsets]
 
-    if len(events) == 0:
+    if len(evsets) == 0:
         raise ValueError("Events is empty")
 
     if indexes is None:
         # All the indexes
-        indexes = list(events[0].data.keys())
+        indexes = list(evsets[0].data.keys())
 
     elif isinstance(indexes, tuple):
         # e.g. indexes=("a",)
@@ -131,7 +146,7 @@ def plot(
         )
 
     try:
-        fig = BACKENDS[backend](events=events, indexes=indexes, options=options)
+        fig = BACKENDS[backend](evsets=evsets, indexes=indexes, options=options)
     except ImportError:
         print(error_message_import_backend(backend))
         raise
@@ -140,22 +155,22 @@ def plot(
 
 
 def get_num_plots(
-    events: List[NumpyEvent], indexes: List[tuple], options: Options
+    evsets: List[EventSet], indexes: List[tuple], options: Options
 ):
     """Computes the number of sub-plots."""
 
     num_plots = 0
     for index in indexes:
-        for event in events:
-            if index not in event.data:
+        for evset in evsets:
+            if index not in evset.data:
                 raise ValueError(
-                    f"Index '{index}' does not exist in event. Check the"
-                    " available indexes with 'event.index' and provide one of"
+                    f"Index '{index}' does not exist in event set. Check the"
+                    " available indexes with 'evset.index' and provide one of"
                     " those index to the 'index' argument of 'plot'."
                     ' Alternatively, set "index=None" to select a random'
-                    f" index value (e.g., {event.first_index_key()}."
+                    f" index value (e.g., {evset.first_index_key()}."
                 )
-            num_features = len(event.feature_names)
+            num_features = len(evset.feature_names)
             if num_features == 0:
                 # We plot the sampling
                 num_features = 1

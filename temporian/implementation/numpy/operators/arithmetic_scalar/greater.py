@@ -25,7 +25,7 @@ from temporian.implementation.numpy import implementation_lib
 
 
 class GreaterScalarNumpyImplementation(BaseArithmeticScalarNumpyImplementation):
-    """Numpy implementation of the equal greater operator."""
+    """Numpy implementation of the greater scalar operator."""
 
     def __init__(self, operator: GreaterScalarOperator) -> None:
         super().__init__(operator)

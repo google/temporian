@@ -12,11 +12,11 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":processor",
-        "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/core/data:node",
         "//temporian/core/operators:base",
         "//temporian/implementation/numpy:evaluator",
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -31,8 +31,8 @@ py_library(
     srcs = ["processor.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/core/data:node",
         "//temporian/core/data:sampling",
         "//temporian/core/operators:base",
     ],
@@ -44,8 +44,8 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":operator_lib",
-        "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/core/data:node",
         "//temporian/core/data:sampling",
         "//temporian/core/operators:base",
     ],

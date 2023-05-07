@@ -15,7 +15,7 @@
 """Calendar year operator class and public API function definitions."""
 
 from temporian.core import operator_lib
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators.calendar.base import BaseCalendarOperator
 
 
@@ -34,16 +34,16 @@ class CalendarYearOperator(BaseCalendarOperator):
 operator_lib.register_operator(CalendarYearOperator)
 
 
-def calendar_year(sampling: Event) -> Event:
-    """Obtains the year the timestamps in an event's sampling are in.
+def calendar_year(sampling: Node) -> Node:
+    """Obtains the year the timestamps in a node's sampling are in.
 
-    Features in input event are ignored.
+    Features in input node are ignored.
 
     Args:
-        sampling: Event to get the years from.
+        sampling: Node to get the years from.
 
     Returns:
-        Event with a single feature corresponding to the year each timestamp in
-        `event`'s sampling belongs to, with the same sampling as `event`.
+        Node with a single feature corresponding to the year each timestamp in
+        `sampling`'s sampling belongs to, with the same sampling as `sampling`.
     """
-    return CalendarYearOperator(sampling).outputs["event"]
+    return CalendarYearOperator(sampling).outputs["output"]

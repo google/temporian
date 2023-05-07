@@ -17,7 +17,7 @@
 from typing import Optional
 
 from temporian.core import operator_lib
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
@@ -27,26 +27,26 @@ from temporian.core.data.dtype import DType
 class SinceLast(Operator):
     def __init__(
         self,
-        event: Event,
-        sampling: Optional[Event] = None,
+        input: Node,
+        sampling: Optional[Node] = None,
     ):
         super().__init__()
 
-        self.add_input("event", event)
+        self.add_input("input", input)
 
         if sampling is not None:
             self.add_input("sampling", sampling)
             self._has_sampling = True
             effective_sampling = sampling.sampling
 
-            if event.sampling.index != sampling.sampling.index:
+            if input.sampling.index != sampling.sampling.index:
                 raise ValueError(
                     "Event and sampling do not have the same index."
-                    f" {event.sampling.index} != {sampling.sampling.index}"
+                    f" {input.sampling.index} != {sampling.sampling.index}"
                 )
 
         else:
-            effective_sampling = event.sampling
+            effective_sampling = input.sampling
             self._has_sampling = False
 
         output_features = [
@@ -59,8 +59,8 @@ class SinceLast(Operator):
         ]
 
         self.add_output(
-            "event",
-            Event(
+            "output",
+            Node(
                 features=output_features,
                 sampling=effective_sampling,
                 creator=self,
@@ -75,10 +75,10 @@ class SinceLast(Operator):
             key="SINCE_LAST",
             attributes=[],
             inputs=[
-                pb.OperatorDef.Input(key="event"),
+                pb.OperatorDef.Input(key="input"),
                 pb.OperatorDef.Input(key="sampling", is_optional=True),
             ],
-            outputs=[pb.OperatorDef.Output(key="event")],
+            outputs=[pb.OperatorDef.Output(key="output")],
         )
 
     @property
@@ -90,15 +90,15 @@ operator_lib.register_operator(SinceLast)
 
 
 def since_last(
-    event: Event,
-    sampling: Optional[Event] = None,
-) -> Event:
+    input: Node,
+    sampling: Optional[Node] = None,
+) -> Node:
     """Amount of time since the last distinct timestamp.
 
     Example 1:
         ```
         Inputs:
-            event:
+            input:
                 timestamps: 1, 5, 8, 8, 9
 
         Output:
@@ -109,7 +109,7 @@ def since_last(
     Example 2:
         ```
         Inputs:
-            event:
+            input:
                 timestamps: 1, 5, 8, 9
             sampling:
                 timestamps: -1, 1, 6, 10
@@ -120,11 +120,11 @@ def since_last(
         ```
 
     Args:
-        event: Event to sample.
+        input: Event to sample.
         sampling: Event to use the sampling of.
 
     Returns:
         Sampled event, with same sampling as `sampling`.
     """
 
-    return SinceLast(event=event, sampling=sampling).outputs["event"]
+    return SinceLast(input=input, sampling=sampling).outputs["output"]

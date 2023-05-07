@@ -18,9 +18,9 @@ import numpy as np
 
 from temporian.core.operators.since_last import SinceLast
 from temporian.implementation.numpy import implementation_lib
-from temporian.implementation.numpy.data.event import DTYPE_REVERSE_MAPPING
-from temporian.implementation.numpy.data.event import IndexData
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import DTYPE_REVERSE_MAPPING
+from temporian.implementation.numpy.data.event_set import IndexData
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 from temporian.implementation.numpy_cc.operators import operators_cc
 
@@ -33,19 +33,19 @@ class SinceLastNumpyImplementation(OperatorImplementation):
         assert isinstance(operator, SinceLast)
 
     def __call__(
-        self, event: NumpyEvent, sampling: Optional[NumpyEvent] = None
-    ) -> Dict[str, NumpyEvent]:
+        self, input: EventSet, sampling: Optional[EventSet] = None
+    ) -> Dict[str, EventSet]:
         assert isinstance(self.operator, SinceLast)
         assert self.operator.has_sampling == (sampling is not None)
 
-        output_event = NumpyEvent(
+        output_event = EventSet(
             {},
             feature_names=["since_last"],
-            index_names=event.index_names,
-            is_unix_timestamp=event.is_unix_timestamp,
+            index_names=input.index_names,
+            is_unix_timestamp=input.is_unix_timestamp,
         )
 
-        for index_key, index_data in event.iterindex():
+        for index_key, index_data in input.iterindex():
             if sampling is not None:
                 sampling_timestamps = sampling.data[index_key].timestamps
                 feature_values = operators_cc.since_last(
@@ -63,7 +63,7 @@ class SinceLastNumpyImplementation(OperatorImplementation):
                     [feature_values], index_data.timestamps
                 )
 
-        return {"event": output_event}
+        return {"output": output_event}
 
 
 implementation_lib.register_operator_implementation(

@@ -2,13 +2,13 @@ from absl.testing import absltest
 
 import numpy as np
 
-from temporian.implementation.numpy.data.event import IndexData
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import IndexData
+from temporian.implementation.numpy.data.event_set import EventSet
 
 
 class EventTest(absltest.TestCase):
     def setUp(self):
-        self._event = NumpyEvent(
+        self._evset = EventSet(
             data={
                 (1, "hello"): IndexData(
                     features=[
@@ -32,16 +32,16 @@ class EventTest(absltest.TestCase):
 
     def test_data_access(self):
         self.assertEqual(
-            repr(self._event.features()), "[('a', int64), ('b', int64)]"
+            repr(self._evset.features()), "[('a', int64), ('b', int64)]"
         )
         self.assertEqual(
-            repr(self._event.indexes()), "[('x', int64), ('y', str_)]"
+            repr(self._evset.indexes()), "[('x', int64), ('y', str_)]"
         )
 
     def test_repr(self):
-        print(self._event)
+        print(self._evset)
         self.assertEqual(
-            repr(self._event),
+            repr(self._evset),
             """indexes: [('x', int64), ('y', str_)]
 features: [('a', int64), ('b', int64)]
 events:

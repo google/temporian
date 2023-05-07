@@ -23,9 +23,9 @@ class ProcessorTest(absltest.TestCase):
     def test_infer_processor_basic(self):
         """Lists all the objects in a graph."""
 
-        i1 = utils.create_input_event()
+        i1 = utils.create_input_node()
         o2 = utils.OpI1O1(i1)
-        i3 = utils.create_input_event()
+        i3 = utils.create_input_node()
         o4 = utils.OpI2O1(o2.outputs["output"], i3)
         o5 = utils.OpI1O2(o4.outputs["output"])
 
@@ -41,13 +41,13 @@ class ProcessorTest(absltest.TestCase):
         )
         self.assertLen(p.operators, 3)
         self.assertLen(p.samplings, 3)
-        self.assertLen(p.events, 6)
+        self.assertLen(p.nodes, 6)
         self.assertLen(p.features, 10)
 
     def test_infer_processor_passing_op(self):
         """With an opt that just passes features."""
 
-        a = utils.create_input_event()
+        a = utils.create_input_node()
         b = utils.OpI1O1NotCreator(a)
         c = utils.OpI1O1(b.outputs["output"])
 
@@ -58,13 +58,13 @@ class ProcessorTest(absltest.TestCase):
 
         self.assertLen(p.operators, 2)
         self.assertLen(p.samplings, 2)
-        self.assertLen(p.events, 3)
+        self.assertLen(p.nodes, 3)
         self.assertLen(p.features, 4)
 
     def test_infer_processor_input_is_not_feature_creator(self):
         """When the user input is not the feature creator."""
 
-        a = utils.create_input_event()
+        a = utils.create_input_node()
         b = utils.OpI1O1NotCreator(a)
         c = utils.OpI1O1(b.outputs["output"])
 
@@ -75,13 +75,13 @@ class ProcessorTest(absltest.TestCase):
 
         self.assertLen(p.operators, 1)
         self.assertLen(p.samplings, 2)
-        self.assertLen(p.events, 2)
+        self.assertLen(p.nodes, 2)
         self.assertLen(p.features, 4)
 
     def test_infer_processor_missing_input(self):
         """The input is missing."""
 
-        i = utils.create_input_event()
+        i = utils.create_input_node()
         o2 = utils.OpI1O1(i)
 
         with self.assertRaisesRegex(
@@ -93,10 +93,10 @@ class ProcessorTest(absltest.TestCase):
     def test_infer_processor_automatic_input(self):
         """Infer automatically the input."""
 
-        i1 = utils.create_input_event()
+        i1 = utils.create_input_node()
         i1.name = "io_input_1"
         o2 = utils.OpI1O1(i1)
-        i3 = utils.create_input_event()
+        i3 = utils.create_input_node()
         i3.name = "io_input_2"
         o4 = utils.OpI2O1(o2.outputs["output"], i3)
         o5 = utils.OpI1O2(o4.outputs["output"])
@@ -111,17 +111,17 @@ class ProcessorTest(absltest.TestCase):
 
         self.assertLen(p.operators, 3)
         self.assertLen(p.samplings, 3)
-        self.assertLen(p.events, 6)
+        self.assertLen(p.nodes, 6)
         self.assertLen(p.features, 10)
 
     def test_automatic_input_missing_name(self):
-        """Automated input is not allowed if the input event is not named."""
+        """Automated input is not allowed if the input node is not named."""
 
-        i1 = utils.create_input_event()
+        i1 = utils.create_input_node()
         o2 = utils.OpI1O1(i1)
 
         with self.assertRaisesRegex(
-            ValueError, "Cannot infer input on unnamed event"
+            ValueError, "Cannot infer input on unnamed node"
         ):
             processor.infer_processor(
                 None, {"io_output_1": o2.outputs["output"]}
@@ -130,13 +130,13 @@ class ProcessorTest(absltest.TestCase):
     def test_automatic_input_equality_graph(self):
         """Automated inference when the input is the same as the output."""
 
-        i1 = utils.create_input_event()
+        i1 = utils.create_input_node()
         i1.name = "io_1"
 
         p = processor.infer_processor(None, {"io_2": i1})
 
         self.assertLen(p.operators, 0)
-        self.assertLen(p.events, 1)
+        self.assertLen(p.nodes, 1)
         self.assertLen(p.samplings, 1)
         self.assertLen(p.inputs, 1)
         self.assertLen(p.outputs, 1)

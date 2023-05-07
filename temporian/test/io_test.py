@@ -1,11 +1,11 @@
 import os
-import pandas as pd
-
-from absl.testing import absltest
 from pathlib import Path
 
+from absl.testing import absltest
+import pandas as pd
+
 import temporian as tp
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 
 
 class IOTest(absltest.TestCase):
@@ -20,14 +20,14 @@ class IOTest(absltest.TestCase):
         if Path(self.save_path).exists():
             os.remove(self.save_path)
 
-    def test_read_event(self) -> None:
-        event_data = tp.read_event(
+    def test_read_event_set(self) -> None:
+        evset = tp.read_event_set(
             path=self.read_path,
             timestamp_column="timestamp",
             index_names=["product_id"],
         )
 
-        expected_event = NumpyEvent.from_dataframe(
+        expected_evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [666964, 1.0, 740.0],
@@ -40,9 +40,9 @@ class IOTest(absltest.TestCase):
             timestamp_column="timestamp",
         )
 
-        self.assertEqual(event_data, expected_event)
+        self.assertEqual(evset, expected_evset)
 
-    def test_save_event(self) -> None:
+    def test_save_event_set(self) -> None:
         df = pd.DataFrame(
             [
                 [666964, 1.0, 740.0],
@@ -52,20 +52,20 @@ class IOTest(absltest.TestCase):
             columns=["product_id", "timestamp", "costs"],
         )
 
-        event = NumpyEvent.from_dataframe(df=df, index_names=["product_id"])
+        evset = EventSet.from_dataframe(df=df, index_names=["product_id"])
 
-        tp.save_event(event=event, path=self.save_path)
+        tp.save_event_set(evset=evset, path=self.save_path)
 
         # check if file exists
         self.assertTrue(Path(self.save_path).exists())
 
-        saved_event = tp.read_event(
+        saved_evset = tp.read_event_set(
             path=self.save_path,
             timestamp_column="timestamp",
             index_names=["product_id"],
         )
 
-        self.assertEqual(event, saved_event)
+        self.assertEqual(evset, saved_evset)
 
 
 if __name__ == "__main__":

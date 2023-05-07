@@ -19,7 +19,7 @@ from typing import Optional
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
 from temporian.core.data.duration import Duration
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
 from temporian.core.operators.window.base import BaseWindowOperator
 
@@ -38,10 +38,10 @@ operator_lib.register_operator(MovingMaxOperator)
 
 
 def moving_max(
-    event: Event,
+    input: Node,
     window_length: Duration,
-    sampling: Optional[Event] = None,
-) -> Event:
+    sampling: Optional[Node] = None,
+) -> Node:
     """Computes the maximum in a sliding window over the event.
 
     For each t in sampling, and for each feature independently, returns at time
@@ -64,7 +64,7 @@ def moving_max(
         Event containing the max of each feature in `event`.
     """
     return MovingMaxOperator(
-        event=event,
+        input=input,
         window_length=window_length,
         sampling=sampling,
-    ).outputs["event"]
+    ).outputs["output"]

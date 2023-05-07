@@ -17,7 +17,7 @@
 from typing import List, Optional, Union
 
 from temporian.core import operator_lib
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.base import Operator
@@ -27,34 +27,35 @@ from temporian.proto import core_pb2 as pb
 class DropIndexOperator(Operator):
     def __init__(
         self,
-        event: Event,
+        input: Node,
         index_to_drop: List[str],
         keep: bool,
     ) -> None:
         super().__init__()
 
-        # "index_to_drop" is the list of indexes in "event" to drop. If "keep"
+        # "index_to_drop" is the list of indexes in `input`` to drop. If `keep`
         # is true, those indexes will be converted into features.
         self._index_to_drop = index_to_drop
         self._keep = keep
 
-        self.add_input("event", event)
+        self.add_input("input", input)
         self.add_attribute("index_to_drop", index_to_drop)
         self.add_attribute("keep", keep)
 
-        output_features = self._output_features(event, index_to_drop, keep)
+        output_features = self._output_features(input, index_to_drop, keep)
 
         output_sampling = Sampling(
             index_levels=[
                 index_level
-                for index_level in event.sampling.index
+                for index_level in input.sampling.index
                 if index_level.name not in index_to_drop
-            ]
+            ],
+            is_unix_timestamp=input.sampling.is_unix_timestamp,
         )
 
         self.add_output(
-            "event",
-            Event(
+            "output",
+            Node(
                 features=output_features,
                 sampling=output_sampling,
                 creator=self,
@@ -63,7 +64,7 @@ class DropIndexOperator(Operator):
         self.check()
 
     def _output_features(
-        self, event: Event, index_to_drop: List[str], keep: bool
+        self, input: Node, index_to_drop: List[str], keep: bool
     ) -> List[Feature]:
         new_features = []
         if keep:
@@ -72,10 +73,10 @@ class DropIndexOperator(Operator):
             # Note: The new features are added first.
             for index_name in index_to_drop:
                 # check no other feature exists with this name
-                if index_name in event.feature_names:
+                if index_name in input.feature_names:
                     raise ValueError(
                         f"Feature name {index_name} coming from index already"
-                        " exists in event."
+                        " exists in input."
                     )
 
                 # TODO: Don't recompute the "dtypes/names" at each iteration.
@@ -83,20 +84,20 @@ class DropIndexOperator(Operator):
                 new_features.append(
                     Feature(
                         name=index_name,
-                        dtype=event.sampling.index.dtypes[
-                            event.sampling.index.names.index(index_name)
+                        dtype=input.sampling.index.dtypes[
+                            input.sampling.index.names.index(index_name)
                         ],
                     )
                 )
 
         existing_features = [
             Feature(name=feature.name, dtype=feature.dtype)
-            for feature in event.features
+            for feature in input.features
         ]
         return new_features + existing_features
 
     def dst_feature_names(self) -> List[str]:
-        feature_names = self.inputs["event"].feature_names
+        feature_names = self.inputs["input"].feature_names
         if self._keep:
             return self._index_to_drop + feature_names
         else:
@@ -106,7 +107,7 @@ class DropIndexOperator(Operator):
         # TODO: Avoid instentiating the "names" array.
         return [
             index_lvl_name
-            for index_lvl_name in self.inputs["event"].sampling.index.names
+            for index_lvl_name in self.inputs["input"].sampling.index.names
             if index_lvl_name not in self._index_to_drop
         ]
 
@@ -133,9 +134,9 @@ class DropIndexOperator(Operator):
                 ),
             ],
             inputs=[
-                pb.OperatorDef.Input(key="event"),
+                pb.OperatorDef.Input(key="input"),
             ],
-            outputs=[pb.OperatorDef.Output(key="event")],
+            outputs=[pb.OperatorDef.Output(key="output")],
         )
 
 
@@ -143,10 +144,10 @@ operator_lib.register_operator(DropIndexOperator)
 
 
 def _normalize_index_to_drop(
-    event: Event, index_names: Optional[Union[List[str], str]]
+    input: Node, index_names: Optional[Union[List[str], str]]
 ) -> List[str]:
     if index_names is None:
-        return event.sampling.index.names
+        return input.sampling.index.names
 
     if isinstance(index_names, str):
         index_names = [index_names]
@@ -159,60 +160,60 @@ def _normalize_index_to_drop(
     missing_index_names = [
         index_name
         for index_name in index_names
-        if index_name not in event.sampling.index.names
+        if index_name not in input.sampling.index.names
     ]
     if missing_index_names:
         raise KeyError(
             f"Dropped indexes {missing_index_names} are missing from the"
-            f" input index. The input index is {event.sampling.index.names}."
+            f" input index. The input index is {input.sampling.index.names}."
         )
 
     return index_names
 
 
 def drop_index(
-    event: Event,
+    input: Node,
     index_to_drop: Optional[Union[str, List[str]]] = None,
     keep: bool = True,
-) -> Event:
-    """Removes one or more index columns from an event.
+) -> Node:
+    """Removes one or more index columns from a node.
 
     Examples:
-        Given an input `Event` with index names ['A', 'B', 'C'] and features
+        Given an input `Node` with index names ['A', 'B', 'C'] and features
         names ['X', 'Y', 'Z']:
 
-        1. `drop_index(event, index_names='A', keep=True)`
-           Output `Event` will have index names ['B', 'C'] and features names
+        1. `drop_index(input, index_names='A', keep=True)`
+           Output `Node` will have index names ['B', 'C'] and features names
            ['X', 'Y', 'Z', 'A'].
 
-        2. `drop_index(event, index_names=['A', 'B'], keep=False)`
-           Output `Event` will have index names ['C'] and features names
+        2. `drop_index(input, index_names=['A', 'B'], keep=False)`
+           Output `Node` will have index names ['C'] and features names
            ['X', 'Y', 'Z'].
 
-        3. `drop_index(event, index_names=None, keep=True)`
-           Output `Event` will have index names [] (empty index) and features
+        3. `drop_index(input, index_names=None, keep=True)`
+           Output `Node` will have index names [] (empty index) and features
            names ['X', 'Y', 'Z', 'A', 'B', 'C'].
 
     Args:
-        event: Event from which the specified index columns should be removed.
-        index_to_drop: Index column(s) to be removed from `event`. This can be a
+        input: Node from which the specified index columns should be removed.
+        index_to_drop: Index column(s) to be removed from `input`. This can be a
             single column name (`str`) or a list of column names (`List[str]`).
-            If not specified or set to `None`, all index columns in `event` will
+            If not specified or set to `None`, all index columns in `input` will
             be removed. Defaults to `None`.
         keep: Flag indicating whether the removed index columns should be kept
-            as features in the output `Event`. Defaults to `True`.
+            as features in the output `Node`. Defaults to `True`.
 
     Returns:
-        A new `Event` object with the updated index, where the specified index
+        A new `Node` object with the updated index, where the specified index
         column(s) have been removed. If `keep` is set to `True`, the removed
-        index columns will be included as features in the output `Event`.
+        index columns will be included as features in the output `Node`.
 
     Raises:
         ValueError: If an empty list is provided as the `index_names` argument.
         KeyError: If any of the specified `index_names` are missing from
-            `event`'s index.
+            `input`'s index.
         ValueError: If a feature name coming from the index already exists in
-            `event`, and the `keep` flag is set to `True`.
+            `input`, and the `keep` flag is set to `True`.
     """
-    index_to_drop = _normalize_index_to_drop(event, index_to_drop)
-    return DropIndexOperator(event, index_to_drop, keep).outputs["event"]
+    index_to_drop = _normalize_index_to_drop(input, index_to_drop)
+    return DropIndexOperator(input, index_to_drop, keep).outputs["output"]

@@ -16,7 +16,7 @@
 from typing import List, Union, Dict
 
 from temporian.core import operator_lib
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.data.sampling import IndexLevel
@@ -29,13 +29,13 @@ class RenameOperator(Operator):
 
     def __init__(
         self,
-        event: Event,
+        input: Node,
         features: Union[str, Dict[str, str]] = None,
         index: Union[str, Dict[str, str]] = None,
     ):
         def check_rename_dict(
             rename_dict: Dict[str, str],
-            event_names: List[str],
+            node_names: List[str],
             dict_name: str = "features",
         ) -> Dict[str, str]:
             # check that there are no duplicate values in rename_dict values
@@ -60,10 +60,10 @@ class RenameOperator(Operator):
 
             # check that every key is in event_names
             for key in rename_dict.keys():
-                if key not in event_names:
+                if key not in node_names:
                     raise KeyError(
-                        f"Key '{key}' not found in event. Possible names:"
-                        f" {event_names}."
+                        f"Key '{key}' not found in node. Possible names:"
+                        f" {node_names}."
                     )
 
             return rename_dict
@@ -73,56 +73,56 @@ class RenameOperator(Operator):
         self.features = {}
 
         if isinstance(features, str):
-            # check that event only has one feature
-            if len(event.features) != 1:
+            # check that node only has one feature
+            if len(input.features) != 1:
                 raise ValueError(
-                    "Expected event to have only one feature when passed a"
-                    f" single string. Got {len(event.features)} features"
+                    "Expected input to have only one feature when passed a"
+                    f" single string. Got {len(input.features)} features"
                     " instead."
                 )
             if not features:
                 raise ValueError("Expected feature to be a non-empty string.")
-            only_feature_name = event.features[0].name
+            only_feature_name = input.features[0].name
             self.features = {only_feature_name: features}
 
         elif isinstance(features, dict):
-            # check that every key is a feature name in event
-            feature_names = [feature.name for feature in event.features]
+            # check that every key is a feature name in node
+            feature_names = [feature.name for feature in input.features]
             self.features = check_rename_dict(features, feature_names)
 
-        event_index_names = event.index_names
+        node_index_names = input.index_names
 
         self.index = {}
 
         if isinstance(index, str):
-            # check that event only has one index
-            if len(event_index_names) != 1:
+            # check that node only has one index
+            if len(node_index_names) != 1:
                 raise ValueError(
-                    "Expected event to have only one index when passed a"
+                    "Expected node to have only one index when passed a"
                     " single string in index. Got"
-                    f" {len(event_index_names)} indexes instead."
+                    f" {len(node_index_names)} indexes instead."
                 )
             # check index is non empty
             if not index:
                 raise ValueError("Expected index to be a non-empty string.")
-            only_index_name = event_index_names[0]
+            only_index_name = node_index_names[0]
             self.index = {only_index_name: index}
 
         elif isinstance(index, dict):
-            # check that every key is an index name in event
-            self.index = check_rename_dict(index, event_index_names, "index")
+            # check that every key is an index name in node
+            self.index = check_rename_dict(index, node_index_names, "index")
 
         self.add_attribute("features", self.features)
 
         self.add_attribute("index", self.index)
 
         # inputs
-        self.add_input("event", event)
+        self.add_input("input", input)
 
-        output_sampling = event.sampling
+        output_sampling = input.sampling
 
         if index:
-            output_sampling = self.new_sampling(event.sampling)
+            output_sampling = self.new_sampling(input.sampling)
 
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
@@ -132,12 +132,12 @@ class RenameOperator(Operator):
                 sampling=output_sampling,
                 creator=self,
             )
-            for f in event.features
+            for f in input.features
         ]
 
         self.add_output(
-            "event",
-            Event(
+            "output",
+            Node(
                 features=output_features,
                 sampling=output_sampling,
                 creator=self,
@@ -180,9 +180,9 @@ class RenameOperator(Operator):
                 ),
             ],
             inputs=[
-                pb.OperatorDef.Input(key="event"),
+                pb.OperatorDef.Input(key="input"),
             ],
-            outputs=[pb.OperatorDef.Output(key="event")],
+            outputs=[pb.OperatorDef.Output(key="output")],
         )
 
 
@@ -190,19 +190,20 @@ operator_lib.register_operator(RenameOperator)
 
 
 def rename(
-    event: Event,
+    input: Node,
     features: Union[str, Dict[str, str]] = None,
     index: Union[str, Dict[str, str]] = None,
-) -> Event:
-    """Renames event features and index.
+) -> Node:
+    """Renames a node's features and index.
 
     Args:
-        event: Event to rename.
-        features: New feature name or mapping from old feature name to new
-            feature name.
-        index: New index name or mapping from old index name to new index name.
+        input: Node to rename.
+        features: List of new feature names or mapping from old feature names to
+            new feature names.
+        index: List of new index names or mapping from old index names to new
+            index names.
 
     Returns:
         Event with renamed features and index.
     """
-    return RenameOperator(event, features, index).outputs["event"]
+    return RenameOperator(input, features, index).outputs["output"]

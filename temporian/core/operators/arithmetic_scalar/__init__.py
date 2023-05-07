@@ -23,11 +23,6 @@ from temporian.core.operators.arithmetic_scalar.multiply import (
     MultiplyScalarOperator,
 )
 
-from temporian.core.operators.arithmetic_scalar.negate import (
-    negate,
-    NegateOperator,
-)
-
 from temporian.core.operators.arithmetic_scalar.equal import (
     equal_scalar,
     EqualScalarOperator,

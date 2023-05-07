@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Serialization / unserialization of a processor and its components."""
+"""Serialization/unserialization of a processor and its components."""
 
 from typing import Set, Any, Dict, Tuple, Optional, Mapping
 
@@ -20,7 +20,7 @@ from google.protobuf import text_format
 
 from temporian.core import operator_lib
 from temporian.core import processor
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators import base
@@ -29,15 +29,15 @@ from temporian.proto import core_pb2 as pb
 
 
 def save(
-    inputs: Optional[processor.MultipleEventArg],
-    outputs: processor.MultipleEventArg,
+    inputs: Optional[processor.MultipleNodeArg],
+    outputs: processor.MultipleNodeArg,
     path: str,
 ) -> None:
     """Saves the processor between `inputs` and `outputs` to a file.
 
     Usage example:
         ```python
-        a = t.input_event(...)
+        a = t.input_node(...)
         b = t.sma(a, window_length=7.0)
         t.save(inputs={"io_a": a}, outputs={"io_b": b}, path="processor.tem")
 
@@ -49,18 +49,18 @@ def save(
         ```
 
     Args:
-        inputs: Input events. If None, the inputs is inferred. In this case,
-            input event have to be named.
-        outputs: Output events.
+        inputs: Input nodes. If None, the inputs is inferred. In this case,
+            input nodes have to be named.
+        outputs: Output nodes.
         path: File path to save to.
     """
 
     # TODO: Add support for compressed / binary serialization.
 
     if inputs is not None:
-        inputs = processor.normalize_multiple_event_arg(inputs)
+        inputs = processor.normalize_multiple_node_arg(inputs)
 
-    outputs = processor.normalize_multiple_event_arg(outputs)
+    outputs = processor.normalize_multiple_node_arg(outputs)
 
     p = processor.infer_processor(inputs=inputs, outputs=outputs)
     proto = serialize(p)
@@ -70,16 +70,16 @@ def save(
 
 def load(
     path: str, squeeze: bool = False
-) -> Tuple[Dict[str, Event], Dict[str, Event]]:
+) -> Tuple[Dict[str, Node], Dict[str, Node]]:
     """Loads a processor from a file.
 
     Args:
         path: File path to load from.
-        squeeze: If true, and if the input/output contains a single event,
-            returns an event (instead of a dictionary of events).
+        squeeze: If true, and if the input/output contains a single node,
+            returns a node (instead of a dictionary of nodes).
 
     Returns:
-        Input and output events.
+        Input and output nodes.
     """
 
     with open(path, "r") as f:
@@ -98,12 +98,12 @@ def load(
     return inputs, outputs
 
 
-def serialize(src: processor.Preprocessor) -> pb.Processor:
+def serialize(src: processor.Processor) -> pb.Processor:
     """Serializes a processor into a protobuffer."""
 
     return pb.Processor(
         operators=[_serialize_operator(o) for o in src.operators],
-        events=[_serialize_event(e) for e in src.events],
+        nodes=[_serialize_node(e) for e in src.nodes],
         features=[_serialize_feature(f) for f in src.features],
         samplings=[_serialize_sampling(s) for s in src.samplings],
         inputs=[_serialize_io_signature(k, e) for k, e in src.inputs.items()],
@@ -111,17 +111,15 @@ def serialize(src: processor.Preprocessor) -> pb.Processor:
     )
 
 
-def unserialize(src: pb.Processor) -> processor.Preprocessor:
+def unserialize(src: pb.Processor) -> processor.Processor:
     """Unserializes a protobuffer into a processor."""
 
     # Decode the components.
     # All the fields except for the "creator" ones are set.
     samplings = {s.id: _unserialize_sampling(s) for s in src.samplings}
     features = {f.id: _unserialize_feature(f, samplings) for f in src.features}
-    events = {
-        e.id: _unserialize_event(e, samplings, features) for e in src.events
-    }
-    operators = {o.id: _unserialize_operator(o, events) for o in src.operators}
+    nodes = {e.id: _unserialize_node(e, samplings, features) for e in src.nodes}
+    operators = {o.id: _unserialize_operator(o, nodes) for o in src.operators}
 
     # Set the creator fields.
     def get_creator(op_id: str) -> base.Operator:
@@ -129,10 +127,10 @@ def unserialize(src: pb.Processor) -> processor.Preprocessor:
             raise ValueError(f"Non existing creator operator {op_id}")
         return operators[op_id]
 
-    for src_event in src.events:
-        if src_event.creator_operator_id:
-            events[src_event.id].creator = get_creator(
-                src_event.creator_operator_id
+    for src_node in src.nodes:
+        if src_node.creator_operator_id:
+            nodes[src_node.id].creator = get_creator(
+                src_node.creator_operator_id
             )
     for src_feature in src.features:
         if src_feature.creator_operator_id:
@@ -146,27 +144,27 @@ def unserialize(src: pb.Processor) -> processor.Preprocessor:
             )
 
     # Copy extracted items.
-    p = processor.Preprocessor()
+    p = processor.Processor()
     for sampling in samplings.values():
         p.samplings.add(sampling)
-    for event in events.values():
-        p.events.add(event)
+    for node in nodes.values():
+        p.nodes.add(node)
     for feature in features.values():
         p.features.add(feature)
     for operator in operators.values():
         p.operators.add(operator)
 
     # IO Signature
-    def get_event(event_id: str) -> Event:
-        if event_id not in events:
-            raise ValueError(f"Non existing event {event_id}")
-        return events[event_id]
+    def get_node(node_id: str) -> Node:
+        if node_id not in nodes:
+            raise ValueError(f"Non existing node {node_id}")
+        return nodes[node_id]
 
     for item in src.inputs:
-        p.inputs[item.key] = get_event(item.event_id)
+        p.inputs[item.key] = get_node(item.node_id)
 
     for item in src.outputs:
-        p.outputs[item.key] = get_event(item.event_id)
+        p.outputs[item.key] = get_node(item.node_id)
 
     return p
 
@@ -179,7 +177,7 @@ def _identifier(item: Any) -> str:
 
 
 def all_identifiers(collection: Any) -> Set[str]:
-    """Builds the set of identifiers of a collections of events/features/..."""
+    """Builds the set of identifiers of a collections of nodes/features/..."""
     return {_identifier(x) for x in collection}
 
 
@@ -188,11 +186,11 @@ def _serialize_operator(src: base.Operator) -> pb.Operator:
         id=_identifier(src),
         operator_def_key=src.definition().key,
         inputs=[
-            pb.Operator.EventArgument(key=k, event_id=_identifier(v))
+            pb.Operator.NodeArgument(key=k, node_id=_identifier(v))
             for k, v in src.inputs.items()
         ],
         outputs=[
-            pb.Operator.EventArgument(key=k, event_id=_identifier(v))
+            pb.Operator.NodeArgument(key=k, node_id=_identifier(v))
             for k, v in src.outputs.items()
         ],
         attributes=[
@@ -202,17 +200,17 @@ def _serialize_operator(src: base.Operator) -> pb.Operator:
 
 
 def _unserialize_operator(
-    src: pb.Operator, events: Dict[str, Event]
+    src: pb.Operator, nodes: Dict[str, Node]
 ) -> base.Operator:
     operator_class = operator_lib.get_operator_class(src.operator_def_key)
 
-    def get_event(key):
-        if key not in events:
-            raise ValueError(f"Non existing event {key}")
-        return events[key]
+    def get_node(key):
+        if key not in nodes:
+            raise ValueError(f"Non existing node {key}")
+        return nodes[key]
 
-    input_args = {x.key: get_event(x.event_id) for x in src.inputs}
-    output_args = {x.key: get_event(x.event_id) for x in src.outputs}
+    input_args = {x.key: get_node(x.node_id) for x in src.inputs}
+    output_args = {x.key: get_node(x.node_id) for x in src.outputs}
     attribute_args = {x.key: _attribute_from_proto(x) for x in src.attributes}
 
     # We construct the operator.
@@ -248,8 +246,8 @@ def _unserialize_operator(
     return op
 
 
-def _serialize_event(src: Event) -> pb.Event:
-    return pb.Event(
+def _serialize_node(src: Node) -> pb.Node:
+    return pb.Node(
         id=_identifier(src),
         sampling_id=_identifier(src.sampling),
         feature_ids=[_identifier(f) for f in src.features],
@@ -260,9 +258,9 @@ def _serialize_event(src: Event) -> pb.Event:
     )
 
 
-def _unserialize_event(
-    src: pb.Event, samplings: Dict[str, Sampling], features: Dict[str, Feature]
-) -> Event:
+def _unserialize_node(
+    src: pb.Node, samplings: Dict[str, Sampling], features: Dict[str, Feature]
+) -> Node:
     if src.sampling_id not in samplings:
         raise ValueError(f"Non existing sampling {src.sampling_id} in {src}")
 
@@ -271,7 +269,7 @@ def _unserialize_event(
             raise ValueError(f"Non existing feature {key}")
         return features[key]
 
-    return Event(
+    return Node(
         sampling=samplings[src.sampling_id],
         features=[get_feature(f) for f in src.feature_ids],
         name=src.name,
@@ -317,6 +315,7 @@ def _serialize_sampling(src: Sampling) -> pb.Sampling:
         creator_operator_id=(
             _identifier(src.creator) if src.creator is not None else None
         ),
+        is_unix_timestamp=src.is_unix_timestamp,
     )
 
 
@@ -327,6 +326,7 @@ def _unserialize_sampling(src: pb.Sampling) -> Sampling:
             for index_level in src.index.levels
         ],
         creator=None,
+        is_unix_timestamp=src.is_unix_timestamp,
     )
 
 
@@ -400,8 +400,8 @@ def _attribute_from_proto(src: pb.Operator.Attribute) -> base.AttributeType:
     raise ValueError(f"Non supported proto attribute {src}")
 
 
-def _serialize_io_signature(key: str, event: Event):
+def _serialize_io_signature(key: str, node: Node):
     return pb.IOSignature(
         key=key,
-        event_id=_identifier(event),
+        node_id=_identifier(node),
     )

@@ -19,7 +19,7 @@ from typing import Optional
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
 from temporian.core.data.duration import Duration
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
 from temporian.core.operators.window.base import BaseWindowOperator
 
@@ -38,33 +38,33 @@ operator_lib.register_operator(MovingCountOperator)
 
 
 def moving_count(
-    event: Event,
+    input: Node,
     window_length: Duration,
-    sampling: Optional[Event] = None,
-) -> Event:
-    """Computes the number of values in a sliding window over the event.
+    sampling: Optional[Node] = None,
+) -> Node:
+    """Computes the number of values in a sliding window over the node.
 
     For each t in sampling, and for each feature independently, returns at time
     t the number of non-nan values for the feature in the window
     [t - window_length, t].
 
     If `sampling` is provided samples the moving window's value at each
-    timestamp in `sampling`, else samples it at each timestamp in `event`.
+    timestamp in `sampling`, else samples it at each timestamp in `input`.
 
     If the window does not contain any values (e.g., all the values are missing,
     or the window does not contain any sampling), outputs missing values.
 
     Args:
-        event: Event for which to count the number of values in each feature.
+        input: Node for which to count the number of values in each feature.
         window_length: Sliding window's length.
         sampling: Timestamps to sample the sliding window's value at. If not
-            provided, timestamps in `event` are used.
+            provided, timestamps in `input` are used.
 
     Returns:
-        Event containing the non-nan count of each feature in `event`.
+        Node containing the non-nan count of each feature in `input`.
     """
     return MovingCountOperator(
-        event=event,
+        input=input,
         window_length=window_length,
         sampling=sampling,
-    ).outputs["event"]
+    ).outputs["output"]

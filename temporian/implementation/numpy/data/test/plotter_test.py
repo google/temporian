@@ -3,8 +3,8 @@ from absl.testing import parameterized, absltest
 import numpy as np
 
 from temporian.implementation.numpy.data import plotter
-from temporian.implementation.numpy.data.event import IndexData
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import IndexData
+from temporian.implementation.numpy.data.event_set import EventSet
 
 
 class PlotterTest(parameterized.TestCase):
@@ -16,7 +16,7 @@ class PlotterTest(parameterized.TestCase):
             # IPython is not installed / supported
             return
 
-        event = NumpyEvent(
+        evset = EventSet(
             data={
                 (1,): IndexData(
                     features=[
@@ -41,16 +41,16 @@ class PlotterTest(parameterized.TestCase):
         )
 
         _ = plotter.plot(
-            event, indexes=None, interactive=interactive, return_fig=True
+            evset, indexes=None, interactive=interactive, return_fig=True
         )
         _ = plotter.plot(
-            event, indexes=1, interactive=interactive, return_fig=True
+            evset, indexes=1, interactive=interactive, return_fig=True
         )
         _ = plotter.plot(
-            event, indexes=[1, 2], interactive=interactive, return_fig=True
+            evset, indexes=[1, 2], interactive=interactive, return_fig=True
         )
         _ = plotter.plot(
-            event,
+            evset,
             indexes=[(1,), (2,)],
             interactive=interactive,
             return_fig=True,

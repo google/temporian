@@ -5,9 +5,9 @@ import numpy as np
 
 from temporian.core.operators.drop_index import DropIndexOperator
 from temporian.implementation.numpy import implementation_lib
-from temporian.implementation.numpy.data.event import IndexData
-from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.implementation.numpy.data.feature import DTYPE_REVERSE_MAPPING
+from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.event_set import DTYPE_REVERSE_MAPPING
+from temporian.implementation.numpy.data.event_set import IndexData
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -24,12 +24,12 @@ class DropIndexNumpyImplementation(OperatorImplementation):
     def __init__(self, operator: DropIndexOperator) -> None:
         super().__init__(operator)
 
-    def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
+    def __call__(self, input: EventSet) -> Dict[str, EventSet]:
         index_to_drop = self.operator.index_to_drop
         keep = self.operator.keep
         dst_feature_names = self.operator.dst_feature_names()
-        src_index_dtypes = event.index_dtypes()
-        src_index_names = event.index_names
+        src_index_dtypes = input.index_dtypes()
+        src_index_names = input.index_names
 
         # Idx in src_index_names of the indexes to keep in the output.
         final_index_idxs = [
@@ -49,7 +49,7 @@ class DropIndexNumpyImplementation(OperatorImplementation):
             DstIndexGroup
         )
         # Compute "dst_index_groups".
-        for src_index_key, src_index_data in event.iterindex():
+        for src_index_key, src_index_data in input.iterindex():
             dst_index_key = tuple((src_index_key[i] for i in final_index_idxs))
             dst_index_group = dst_index_groups[dst_index_key]
 
@@ -78,7 +78,7 @@ class DropIndexNumpyImplementation(OperatorImplementation):
         #
         # TODO: this is merging sorted arrays, we should later improve this code
         # by avoiding the full sort
-        dst_event_data = {}
+        dst_evset = {}
         for dst_index_key, group in dst_index_groups.items():
             # Append together all the timestamps.
             local_dst_sampling_data = np.concatenate(group.timestamps)
@@ -87,22 +87,22 @@ class DropIndexNumpyImplementation(OperatorImplementation):
             sorted_idxs = np.argsort(local_dst_sampling_data, kind="mergesort")
 
             # Append together and sort (according to the timestamps) all the feature values.
-            local_dst_event_data = [
+            local_dst_evset = [
                 np.concatenate(
                     [features[dst_feature_idx] for features in group.features]
                 )[sorted_idxs]
                 for dst_feature_idx in range(len(dst_feature_names))
             ]
-            dst_event_data[dst_index_key] = IndexData(
-                local_dst_event_data, local_dst_sampling_data[sorted_idxs]
+            dst_evset[dst_index_key] = IndexData(
+                local_dst_evset, local_dst_sampling_data[sorted_idxs]
             )
 
         return {
-            "event": NumpyEvent(
-                data=dst_event_data,
+            "output": EventSet(
+                data=dst_evset,
                 feature_names=dst_feature_names,
                 index_names=self.operator.dst_index_names(),
-                is_unix_timestamp=event.is_unix_timestamp,
+                is_unix_timestamp=input.is_unix_timestamp,
             )
         }
 

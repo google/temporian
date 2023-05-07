@@ -5,10 +5,10 @@ import numpy as np
 from temporian.core.data.dtype import DType
 from temporian.core.operators.cast import CastOperator
 from temporian.implementation.numpy import implementation_lib
-from temporian.implementation.numpy.data.event import DTYPE_MAPPING
-from temporian.implementation.numpy.data.event import DTYPE_REVERSE_MAPPING
-from temporian.implementation.numpy.data.event import IndexData
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import DTYPE_MAPPING
+from temporian.implementation.numpy.data.event_set import DTYPE_REVERSE_MAPPING
+from temporian.implementation.numpy.data.event_set import IndexData
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -53,40 +53,40 @@ class CastNumpyImplementation(OperatorImplementation):
                 f"Overflow casting {origin_dtype}->{dst_dtype} {data=}"
             )
 
-    def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
+    def __call__(self, input: EventSet) -> Dict[str, EventSet]:
         from_features = self.operator.attributes["from_features"]
         check = self.operator.attributes["check_overflow"]
 
-        # Reuse event if actually no features changed dtype
+        # Reuse evset if actually no features changed dtype
         operator: CastOperator = self.operator
-        if operator.reuse_event:
-            return {"event": event}
+        if operator.reuse_node:
+            return {"output": input}
 
-        # Create new event, some features may be reused
+        # Create new evset, some features may be reused
         # NOTE: it's currently faster in the benchmark to run feat/event_idx,
         # but this might need a re-check with future implementations.
-        dst_event = NumpyEvent(
+        dst_evset = EventSet(
             data={},
-            feature_names=event.feature_names,
-            index_names=event.index_names,
-            is_unix_timestamp=event.is_unix_timestamp,
+            feature_names=input.feature_names,
+            index_names=input.index_names,
+            is_unix_timestamp=input.is_unix_timestamp,
         )
-        for feat_idx, feature_name in enumerate(event.feature_names):
-            src_dtype = event.dtypes[feature_name]
+        for feat_idx, feature_name in enumerate(input.feature_names):
+            src_dtype = input.dtypes[feature_name]
             dst_dtype = DType(from_features[feature_name])
             check_feature = check and self._can_overflow(src_dtype, dst_dtype)
             # Numpy destination type
             dst_dtype_np = DTYPE_REVERSE_MAPPING[dst_dtype]
-            for index_key, index_data in event.iterindex():
+            for index_key, index_data in input.iterindex():
                 feature = index_data.features[feat_idx]
                 # Initialize row with first feature
                 if feat_idx == 0:
                     idx_features = []
-                    dst_event[index_key] = IndexData(
+                    dst_evset[index_key] = IndexData(
                         idx_features, index_data.timestamps
                     )
                 else:
-                    idx_features = dst_event[index_key].features
+                    idx_features = dst_evset[index_key].features
 
                 # Reuse if both features have the same dtype
                 if DTYPE_MAPPING[feature.dtype.type] == dst_dtype:
@@ -101,7 +101,7 @@ class CastNumpyImplementation(OperatorImplementation):
                         feature.astype(dst_dtype_np),
                     )
 
-        return {"event": dst_event}
+        return {"output": dst_evset}
 
 
 implementation_lib.register_operator_implementation(

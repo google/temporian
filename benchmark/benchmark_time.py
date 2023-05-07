@@ -20,17 +20,17 @@ import time
 from typing import List, NamedTuple, Union
 
 import numpy as np
-import temporian as tp
 import pandas as pd
+import temporian as tp
 
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 
 # TODO(gbm): Add flag to control which benchmark to run.
 
 
 def _build_toy_dataset(
     n: int, data_prefix="", data2_is_categorical_integer=False
-) -> NumpyEvent:
+) -> EventSet:
     """Builds a toy dataset with two features.
 
     Args:
@@ -40,7 +40,7 @@ def _build_toy_dataset(
             categorical. If false (default), the second feature is numerical.
 
     Returns:
-        A NumpyEvent containing the toy dataset.
+        An EventSet containing the toy dataset.
     """
 
     np.random.seed(0)
@@ -54,7 +54,7 @@ def _build_toy_dataset(
     else:
         data_2 = np.random.randn(n)
 
-    return NumpyEvent.from_dataframe(
+    return EventSet.from_dataframe(
         pd.DataFrame(
             {
                 "timestamp": timestamps,
@@ -74,12 +74,12 @@ def benchmark_simple_moving_average(runner):
     for n in [100, 10_000, 1_000_000]:
         ds = _build_toy_dataset(n)
 
-        event = ds.schema()
-        output = tp.simple_moving_average(event, window_length=10.0)
+        node = ds.node()
+        output = tp.simple_moving_average(node, window_length=10.0)
 
         runner.benchmark(
             f"simple_moving_average:{n:_}",
-            lambda: tp.evaluate(output, input_data={event: ds}),
+            lambda: tp.evaluate(output, input_data={node: ds}),
         )
 
 
@@ -88,12 +88,12 @@ def benchmark_select_and_glue(runner):
     for n in [100, 10_000, 1_000_000]:
         ds = _build_toy_dataset(n)
 
-        event = ds.schema()
-        output = tp.glue(event["data_1"], event["data_2"])
+        node = ds.node()
+        output = tp.glue(node["data_1"], node["data_2"])
 
         runner.benchmark(
             f"select_and_glue:{n:_}",
-            lambda: tp.evaluate(output, input_data={event: ds}),
+            lambda: tp.evaluate(output, input_data={node: ds}),
         )
 
 
@@ -104,14 +104,14 @@ def benchmark_calendar_day_of_month(runner):
         timestamps = np.sort(np.random.randn(n) * 1_700_000_000).astype(
             "datetime64[s]"
         )
-        ds = NumpyEvent.from_dataframe(pd.DataFrame({"timestamp": timestamps}))
+        ds = EventSet.from_dataframe(pd.DataFrame({"timestamp": timestamps}))
 
-        event = ds.schema()
-        output = tp.calendar_day_of_month(event)
+        node = ds.node()
+        output = tp.calendar_day_of_month(node)
 
         runner.benchmark(
             f"calendar_day_of_month:{n:_}",
-            lambda: tp.evaluate(output, input_data={event: ds}),
+            lambda: tp.evaluate(output, input_data={node: ds}),
         )
 
 
@@ -122,14 +122,14 @@ def benchmark_sample(runner):
             ds_1 = _build_toy_dataset(m, "ds_1")
             ds_2 = _build_toy_dataset(n, "ds_2")
 
-            event_1 = ds_1.schema()
-            event_2 = ds_2.schema()
-            output = tp.sample(event_1, event_2)
+            node_1 = ds_1.node()
+            node_2 = ds_2.node()
+            output = tp.sample(node_1, node_2)
 
             runner.benchmark(
                 f"sample:e{m:_}_s{n:_}",
                 lambda: tp.evaluate(
-                    output, input_data={event_1: ds_1, event_2: ds_2}
+                    output, input_data={node_1: ds_1, node_2: ds_2}
                 ),
             )
 
@@ -138,12 +138,12 @@ def benchmark_propagate(runner):
     runner.add_separator()
     for n in [100, 10_000, 1_000_000]:
         ds = _build_toy_dataset(n, data2_is_categorical_integer=True)
-        event = ds.schema()
-        output = tp.propagate(event["data_1"], event["data_2"])
+        node = ds.node()
+        output = tp.propagate(node["data_1"], node["data_2"])
 
         runner.benchmark(
             f"propagate:{n:_}",
-            lambda: tp.evaluate(output, input_data={event: ds}),
+            lambda: tp.evaluate(output, input_data={node: ds}),
         )
 
 
@@ -153,9 +153,9 @@ def benchmark_cast(runner):
         for check in [False, True]:
             ds = _build_toy_dataset(n)
 
-            event = ds.schema()
+            node = ds.node()
             output = tp.cast(
-                event,
+                node,
                 {
                     "data_1": tp.dtype.DType.INT32,
                     "data_2": tp.dtype.DType.FLOAT32,
@@ -165,7 +165,7 @@ def benchmark_cast(runner):
 
             runner.benchmark(
                 f"cast({check=}):{n}",
-                lambda: tp.evaluate(output, input_data={event: ds}),
+                lambda: tp.evaluate(output, input_data={node: ds}),
             )
 
 
@@ -173,12 +173,12 @@ def benchmark_unique_timestamps(runner):
     runner.add_separator()
     for n in [100, 10_000, 1_000_000]:
         ds = _build_toy_dataset(n, data2_is_categorical_integer=True)
-        event = ds.schema()
-        output = tp.unique_timestamps(event["data_1"])
+        node = ds.node()
+        output = tp.unique_timestamps(node["data_1"])
 
         runner.benchmark(
             f"unique_timestamps:{n}",
-            lambda: tp.evaluate(output, input_data={event: ds}),
+            lambda: tp.evaluate(output, input_data={node: ds}),
         )
 
 
@@ -221,7 +221,7 @@ def benchmark_from_dataframe(runner):
 
                     runner.benchmark(
                         benchmark_name,
-                        lambda: NumpyEvent.from_dataframe(
+                        lambda: EventSet.from_dataframe(
                             df, index_names, is_sorted=True
                         ),
                     )
@@ -245,7 +245,7 @@ def benchmark_set_index(runner):
         feature_5 = np.random.choice(feature_values, number_timestamps)
         feature_6 = np.random.choice(feature_values, number_timestamps)
 
-        event_data = NumpyEvent.from_dataframe(
+        evset = EventSet.from_dataframe(
             pd.DataFrame(
                 {
                     "timestamp": timestamps,
@@ -260,7 +260,7 @@ def benchmark_set_index(runner):
             is_sorted=True,
         )
 
-        event = event_data.schema()
+        node = evset.node()
 
         possible_indexes = [
             ["feature_1"],
@@ -271,10 +271,10 @@ def benchmark_set_index(runner):
         ]
 
         for index in possible_indexes:
-            output = tp.set_index(event, index)
+            output = tp.set_index(node, index)
             runner.benchmark(
                 f"set_index:s:{number_timestamps:_}:num_idx:{len(index)}",
-                lambda: tp.evaluate(output, input_data={event: event_data}),
+                lambda: tp.evaluate(output, input_data={node: evset}),
             )
 
 

@@ -38,6 +38,6 @@ py_test(
         # absl/testing:absltest dep,
         # pandas dep,
         "//temporian",
-        "//temporian/implementation/numpy/data:event",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )

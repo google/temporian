@@ -18,7 +18,7 @@ from typing import Union, List
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
 from temporian.core.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarOperator,
@@ -30,10 +30,6 @@ class EqualScalarOperator(BaseArithmeticScalarOperator):
     @property
     def operator_def_key(cls) -> str:
         return "EQUAL_SCALAR"
-
-    @property
-    def prefix(self) -> str:
-        return "equal"
 
     def output_feature_dtype(self, feature: Feature) -> DType:
         # override parent method to always return BOOLEAN features
@@ -55,21 +51,21 @@ operator_lib.register_operator(EqualScalarOperator)
 
 
 def equal_scalar(
-    event: Event,
+    input: Node,
     value: Union[float, int, str, bool],
-) -> Event:
-    """Checks for equality between an event and a scalar.
+) -> Node:
+    """Checks for equality between a node and a scalar.
 
-    Each item in each feature in `event` is compared to `value`.
+    Each item in each feature in `input` is compared to `value`.
 
     Args:
-        event: Event to compare the value to.
-        value: Scalar value to compare to the event.
+        input: Node to compare the value to.
+        value: Scalar value to compare to the input.
 
     Returns:
-        Event containing the result of the comparison.
+        Node containing the result of the comparison.
     """
     return EqualScalarOperator(
-        event=event,
+        input=input,
         value=value,
-    ).outputs["event"]
+    ).outputs["output"]

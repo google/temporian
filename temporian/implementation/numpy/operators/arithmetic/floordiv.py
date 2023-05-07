@@ -28,9 +28,9 @@ class FloorDivideNumpyImplementation(BaseArithmeticNumpyImplementation):
         assert isinstance(operator, FloorDivOperator)
 
     def _do_operation(
-        self, event_1_feature: np.ndarray, event_2_feature: np.ndarray
+        self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
     ) -> np.ndarray:
-        return event_1_feature // event_2_feature
+        return evset_1_feature // evset_2_feature
 
 
 implementation_lib.register_operator_implementation(
