@@ -18,7 +18,7 @@ from typing import Union, List
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
 from temporian.core.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarOperator,
@@ -33,10 +33,6 @@ class LessScalarOperator(BaseArithmeticScalarOperator):
     @property
     def operator_def_key(cls) -> str:
         return "LESS_SCALAR"
-
-    @property
-    def prefix(self) -> str:
-        return "less"
 
     def output_feature_dtype(self, feature: Feature) -> DType:
         # override parent method to always return BOOLEAN features
@@ -56,9 +52,9 @@ operator_lib.register_operator(LessScalarOperator)
 
 
 def less_scalar(
-    event: Event,
+    input: Node,
     value: Union[float, int, str, bool],
-) -> Event:
+) -> Node:
     """Computes event < value.
 
     Args:
@@ -69,6 +65,6 @@ def less_scalar(
         Event containing the result of the computation.
     """
     return LessScalarOperator(
-        event=event,
+        input=input,
         value=value,
-    ).outputs["event"]
+    ).outputs["output"]

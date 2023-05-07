@@ -100,8 +100,8 @@ py_library(
         "//temporian/core:operator_lib",
         "//temporian/core/data:dtype",
         "//temporian/core/data:duration",
-        "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/core/data:node",
         "//temporian/core/data:sampling",
     ],
 )
@@ -115,8 +115,8 @@ py_library(
         "//temporian/core:operator_lib",
         "//temporian/core/data:dtype",
         "//temporian/core/data:duration",
-        "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/core/data:node",
         "//temporian/core/data:sampling",
     ],
 )

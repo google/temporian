@@ -23,8 +23,8 @@ from temporian.implementation.numpy.operators.window.moving_min import (
     MovingMinNumpyImplementation,
     operators_cc,
 )
-from temporian.implementation.numpy.data.event import NumpyEvent
-from temporian.core.data import event as event_lib
+from temporian.implementation.numpy.data.event_set import IndexData
+from temporian.implementation.numpy.data.event_set import EventSet
 from numpy.testing import assert_array_equal
 
 
@@ -68,7 +68,7 @@ class MovingMinOperatorTest(absltest.TestCase):
     def test_flat(self):
         """A simple time sequence."""
 
-        input_data = NumpyEvent.from_dataframe(
+        input_data = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [10.0, 20.0, 1],
@@ -82,16 +82,16 @@ class MovingMinOperatorTest(absltest.TestCase):
         )
 
         op = MovingMinOperator(
-            event=input_data.schema(),
+            input=input_data.node(),
             window_length=5.0,
             sampling=None,
         )
-        self.assertEqual(op.list_matching_io_samplings(), [("event", "event")])
+        self.assertEqual(op.list_matching_io_samplings(), [("input", "output")])
         instance = MovingMinNumpyImplementation(op)
 
-        output = instance.call(event=input_data)
+        output = instance.call(input=input_data)
 
-        expected_output = NumpyEvent.from_dataframe(
+        expected_output = EventSet.from_dataframe(
             pd.DataFrame(
                 [
                     [10.0, 20.0, 1],
@@ -104,7 +104,7 @@ class MovingMinOperatorTest(absltest.TestCase):
             )
         )
 
-        self.assertEqual(repr(output), repr({"event": expected_output}))
+        self.assertEqual(repr(output), repr({"output": expected_output}))
 
 
 if __name__ == "__main__":

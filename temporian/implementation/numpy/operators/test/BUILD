@@ -369,8 +369,8 @@ py_test(
     srcs_version = "PY3",
     deps = [
         "//temporian/core/data:dtype",
-        "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/core/data:node",
         "//temporian/core/operators/window:moving_min",
         "//temporian/implementation/numpy/operators/window:moving_min",
     ],
@@ -382,8 +382,8 @@ py_test(
     srcs_version = "PY3",
     deps = [
         "//temporian/core/data:dtype",
-        "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/core/data:node",
         "//temporian/core/operators/window:moving_max",
         "//temporian/implementation/numpy/operators/window:moving_max",
     ],
@@ -450,8 +450,8 @@ py_test(
     srcs_version = "PY3",
     deps = [
         "//temporian/core/data:dtype",
-        "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/core/data:node",
         "//temporian/core/operators:since_last",
         "//temporian/implementation/numpy/operators:since_last",
     ],

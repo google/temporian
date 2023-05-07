@@ -67,8 +67,8 @@ py_library(
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:dtype",
-        "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/core/data:node",
     ],
 )
 
@@ -80,8 +80,8 @@ py_library(
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:dtype",
-        "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/core/data:node",
     ],
 )
 

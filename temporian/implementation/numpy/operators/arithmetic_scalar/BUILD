@@ -18,7 +18,6 @@ py_library(
         ":greater",
         ":less",
         ":multiply",
-        ":negate",
         ":subtract",
     ],
 )
@@ -67,8 +66,7 @@ py_library(
         ":base",
         "//temporian/core/operators/arithmetic_scalar:greater",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:feature",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -80,8 +78,7 @@ py_library(
         ":base",
         "//temporian/core/operators/arithmetic_scalar:less",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:feature",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 

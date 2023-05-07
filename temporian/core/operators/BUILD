@@ -216,8 +216,8 @@ py_library(
         ":select",
         "//temporian/core:operator_lib",
         "//temporian/core/data:duration",
-        "//temporian/core/data:event",
         "//temporian/core/data:feature",
+        "//temporian/core/data:node",
         "//temporian/proto:core_py_proto",
     ],
 )

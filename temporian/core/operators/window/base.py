@@ -45,10 +45,10 @@ class BaseWindowOperator(Operator, ABC):
             self._has_sampling = True
             effective_sampling = sampling.sampling
 
-            if event.sampling.index != sampling.sampling.index:
+            if input.sampling.index != sampling.sampling.index:
                 raise ValueError(
                     "Event and sampling do not have the same index."
-                    f" {event.sampling.index} != {sampling.sampling.index}"
+                    f" {input.sampling.index} != {sampling.sampling.index}"
                 )
 
         else:

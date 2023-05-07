@@ -22,7 +22,7 @@ from temporian.implementation.numpy.operators.since_last import (
     SinceLastNumpyImplementation,
     operators_cc,
 )
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 
 nan = math.nan
 
@@ -32,7 +32,7 @@ class SinceLastOperatorTest(absltest.TestCase):
         pass
 
     def test_no_sampling(self):
-        event_data = NumpyEvent.from_dataframe(
+        event_data = EventSet.from_dataframe(
             pd.DataFrame(
                 {
                     "timestamp": [1, 5, 8, 9, 1, 1, 2],
@@ -41,9 +41,9 @@ class SinceLastOperatorTest(absltest.TestCase):
             ),
             index_names=["x"],
         )
-        event = event_data.schema()
+        event = event_data.node()
 
-        expected_output = NumpyEvent.from_dataframe(
+        expected_output = EventSet.from_dataframe(
             pd.DataFrame(
                 {
                     "timestamp": [1, 5, 8, 9, 1, 1, 2],
@@ -55,24 +55,24 @@ class SinceLastOperatorTest(absltest.TestCase):
         )
 
         # Run op
-        op = SinceLast(event=event)
+        op = SinceLast(input=event)
         instance = SinceLastNumpyImplementation(op)
-        output = instance.call(event=event_data)["event"]
+        output = instance.call(input=event_data)["output"]
 
         self.assertEqual(output, expected_output)
 
     def test_with_sampling(self):
-        event_data = NumpyEvent.from_dataframe(
+        event_data = EventSet.from_dataframe(
             pd.DataFrame({"timestamp": [1, 2, 2, 4]}),
         )
-        event = event_data.schema()
+        event = event_data.node()
 
-        sampling_data = NumpyEvent.from_dataframe(
+        sampling_data = EventSet.from_dataframe(
             pd.DataFrame({"timestamp": [-1, 1, 1.5, 2, 2.1, 4, 5]})
         )
-        sampling = sampling_data.schema()
+        sampling = sampling_data.node()
 
-        expected_output = NumpyEvent.from_dataframe(
+        expected_output = EventSet.from_dataframe(
             pd.DataFrame(
                 {
                     "timestamp": [-1, 1, 1.5, 2, 2.1, 4, 5],
@@ -82,14 +82,11 @@ class SinceLastOperatorTest(absltest.TestCase):
         )
 
         # Run op
-        op = SinceLast(event=event, sampling=sampling)
+        op = SinceLast(input=event, sampling=sampling)
         instance = SinceLastNumpyImplementation(op)
-        output = instance.call(event=event_data, sampling=sampling_data)[
-            "event"
+        output = instance.call(input=event_data, sampling=sampling_data)[
+            "output"
         ]
-
-        print("@output:\n", output)
-        print("@expected_output:\n", expected_output)
 
         self.assertEqual(output, expected_output)
 
