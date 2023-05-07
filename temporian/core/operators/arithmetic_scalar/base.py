@@ -68,7 +68,7 @@ class BaseArithmeticScalarOperator(Operator):
                     raise ValueError(
                         f'Feature "{feature.name}" has dtype'
                         f' {feature.dtype} and value "{value}" has dtype'
-                        f" {value_dtype}. Values shoulds have compatible"
+                        f" {value_dtype}. Both should have compatible"
                         ' dtypes. For instance, change "a * 2" to "a * 2.0" if'
                         ' "a" is a float32 or float64.'
                     )

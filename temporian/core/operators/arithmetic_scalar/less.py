@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Equal scalar operator class and public API function definition."""
+"""Less scalar operator class and public API function definition."""
 
 from typing import Union, List
 
@@ -23,6 +23,9 @@ from temporian.core.data.feature import Feature
 from temporian.core.operators.arithmetic_scalar.base import (
     BaseArithmeticScalarOperator,
 )
+
+# TODO: Rename operator to "lesser" or remove this todo. Note: Numpy uses
+# greater / less for comparison operators.
 
 
 class LessScalarOperator(BaseArithmeticScalarOperator):

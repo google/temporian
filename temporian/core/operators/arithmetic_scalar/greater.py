@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Equal scalar operator class and public API function definition."""
+"""Greater scalar operator class and public API function definition."""
 
 from typing import Union, List
 
@@ -31,6 +31,7 @@ class GreaterScalarOperator(BaseArithmeticScalarOperator):
     def operator_def_key(cls) -> str:
         return "GREATER_SCALAR"
 
+    # DO NOT SUBMIT: Make sure this is gone.
     @property
     def prefix(self) -> str:
         return "greater"
