@@ -28,6 +28,7 @@ mkdocs-material = "^9.1.5"
 mkdocs-gen-files = "^0.4.0"
 mkdocs-literate-nav = "^0.6.0"
 mkdocs-section-index = "^0.3.5"
+ipykernel = "^6.22.0"
 
 [tool.black]
 line-length = 80
@@ -35,10 +36,13 @@ preview = true
 
 [tool.pylint]
 max-line-length = 80
+disable = [
+    "redefined-builtin",
+]
+
+[tool.pyright]
+include = ["temporian"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.pyright]
-include = ["temporian"]

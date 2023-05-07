@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 from typing import Dict
 
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators.base import Operator
 from temporian.core.operators.base import OperatorExceptionDecorator
-from temporian.implementation.numpy.data.event import DTYPE_MAPPING
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import DTYPE_MAPPING
+from temporian.implementation.numpy.data.event_set import EventSet
 
 
 class OperatorImplementation(ABC):
@@ -17,7 +17,7 @@ class OperatorImplementation(ABC):
     def operator(self):
         return self._operator
 
-    def call(self, **inputs: Dict[str, NumpyEvent]) -> Dict[str, NumpyEvent]:
+    def call(self, **inputs: Dict[str, EventSet]) -> Dict[str, EventSet]:
         """Like __call__, but with checks."""
 
         _check_input(inputs=inputs, operator=self.operator)
@@ -26,15 +26,13 @@ class OperatorImplementation(ABC):
         return outputs
 
     @abstractmethod
-    def __call__(
-        self, **inputs: Dict[str, NumpyEvent]
-    ) -> Dict[str, NumpyEvent]:
+    def __call__(self, **inputs: Dict[str, EventSet]) -> Dict[str, EventSet]:
         """Applies the operator to its inputs."""
 
 
 def _check_features(
-    values: Dict[str, NumpyEvent],
-    definitions: Dict[str, Event],
+    values: Dict[str, EventSet],
+    definitions: Dict[str, Node],
     label: str,
 ) -> None:
     """Checks if features are matching their definition."""
@@ -79,7 +77,7 @@ def _check_features(
 
 
 def _check_input(
-    inputs: Dict[str, NumpyEvent],
+    inputs: Dict[str, EventSet],
     operator: Operator,
 ) -> None:
     """Checks if the input/output of an operator matches its definition."""
@@ -90,16 +88,17 @@ def _check_input(
         expected_input_keys = set(operator.inputs.keys())
         if effective_input_keys != expected_input_keys:
             raise RuntimeError(
-                "Non matching number of inputs. "
-                f"{effective_input_keys} vs {expected_input_keys}"
+                "Input keys do not match the expected ones. "
+                f"Received: {effective_input_keys}. "
+                f"Expected: {expected_input_keys}."
             )
 
         _check_features(inputs, definitions=operator.inputs, label="input")
 
 
 def _check_output(
-    inputs: Dict[str, NumpyEvent],
-    outputs: Dict[str, NumpyEvent],
+    inputs: Dict[str, EventSet],
+    outputs: Dict[str, EventSet],
     operator: Operator,
 ) -> None:
     """Checks if the input/output of an operator matches its definition."""
@@ -110,8 +109,9 @@ def _check_output(
         expected_output_keys = set(operator.outputs.keys())
         if effective_output_keys != expected_output_keys:
             raise RuntimeError(
-                "Non matching number of outputs. "
-                f"{effective_output_keys} vs {expected_output_keys}"
+                "Output keys do not match the expected ones. "
+                f"Received: {effective_output_keys}. "
+                f"Expected: {expected_output_keys}."
             )
 
         for output_key, output_def in operator.outputs.items():
@@ -132,12 +132,8 @@ def _check_output(
                     input_key,
                     output_key,
                 ) in matching_samplings
-                effective_matching_sampling = _check_same_sampling(
+                if expected_matching_sampling and not _check_same_sampling(
                     output_real, input_real
-                )
-                if (
-                    expected_matching_sampling
-                    and not effective_matching_sampling
                 ):
                     raise RuntimeError(
                         f"The sampling of input '{input_key}' and output "
@@ -146,30 +142,20 @@ def _check_output(
                         f"during the op execution ({input_real} "
                         f"vs {output_real})."
                     )
-                if (
-                    not expected_matching_sampling
-                    and effective_matching_sampling
-                ):
-                    raise RuntimeError(
-                        f"The sampling of input '{input_key}' and output "
-                        f"'{output_key}' are expected to have A DIFFERENT "
-                        "sampling. However, the same sampling was generated "
-                        "during the op execution."
-                    )
 
         # Check features
         _check_features(outputs, definitions=operator.outputs, label="outputs")
 
 
-def _check_same_sampling(event_1: NumpyEvent, event_2: NumpyEvent) -> bool:
-    if event_1.index_names != event_2.index_names:
+def _check_same_sampling(evset_1: EventSet, evset_2: EventSet) -> bool:
+    if evset_1.index_names != evset_2.index_names:
         return False
 
-    for index_key, index_data_1 in event_1.data.items():
-        if index_key not in event_2.data:
+    for index_key, index_data_1 in evset_1.data.items():
+        if index_key not in evset_2.data:
             return False
 
-        index_data_2 = event_2[index_key]
+        index_data_2 = evset_2[index_key]
         if index_data_1.timestamps is not index_data_2.timestamps:
             return False
 

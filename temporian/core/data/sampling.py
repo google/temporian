@@ -126,8 +126,8 @@ class Sampling(object):
             List[Tuple[str, DType]],
             Index,
         ],
+        is_unix_timestamp: bool,
         creator: Optional[Operator] = None,
-        is_unix_timestamp: bool = False,
     ) -> None:
         if isinstance(index_levels, Index):
             self._index = index_levels

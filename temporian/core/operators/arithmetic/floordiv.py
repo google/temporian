@@ -15,7 +15,7 @@
 """Floor operator class and public API function definition."""
 
 from temporian.core import operator_lib
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators.arithmetic.base import BaseArithmeticOperator
 
 
@@ -34,10 +34,10 @@ operator_lib.register_operator(FloorDivOperator)
 
 
 def floordiv(
-    numerator: Event,
-    denominator: Event,
-) -> Event:
-    """Divides two events and takes the floor of the result.
+    numerator: Node,
+    denominator: Node,
+) -> Node:
+    """Divides two nodes and takes the floor of the result.
 
     I.e. computes numerator//denominator.
 
@@ -48,13 +48,13 @@ def floordiv(
     number of features.
 
     Args:
-        numerator: Numerator event.
-        denominator: Denominator event.
+        numerator: Numerator node.
+        denominator: Denominator node.
 
     Returns:
         Integer division of `numerator`'s features by `denominator`'s features.
     """
     return FloorDivOperator(
-        event_1=numerator,
-        event_2=denominator,
-    ).outputs["event"]
+        input_1=numerator,
+        input_2=denominator,
+    ).outputs["output"]

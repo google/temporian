@@ -18,9 +18,9 @@ import numpy as np
 
 from temporian.core.operators.sample import Sample
 from temporian.implementation.numpy import implementation_lib
-from temporian.implementation.numpy.data.event import DTYPE_REVERSE_MAPPING
-from temporian.implementation.numpy.data.event import IndexData
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import DTYPE_REVERSE_MAPPING
+from temporian.implementation.numpy.data.event_set import IndexData
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy_cc.operators import operators_cc
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
@@ -33,10 +33,10 @@ class SampleNumpyImplementation(OperatorImplementation):
         assert isinstance(operator, Sample)
 
     def __call__(
-        self, event: NumpyEvent, sampling: NumpyEvent
-    ) -> Dict[str, NumpyEvent]:
+        self, input: EventSet, sampling: EventSet
+    ) -> Dict[str, EventSet]:
         # Type and replacement values
-        output_features = self._operator.outputs["event"].features
+        output_features = self._operator.outputs["output"].features
         output_missing_and_np_dtypes = [
             (
                 f.dtype.missing_value(),
@@ -44,20 +44,20 @@ class SampleNumpyImplementation(OperatorImplementation):
             )
             for f in output_features
         ]
-        # create output event
-        dst_event = NumpyEvent(
+        # create output event set
+        dst_evset = EventSet(
             data={},
-            feature_names=event.feature_names,
-            index_names=event.index_names,
-            is_unix_timestamp=event.is_unix_timestamp,
+            feature_names=input.feature_names,
+            index_names=input.index_names,
+            is_unix_timestamp=input.is_unix_timestamp,
         )
         # iterate over destination sampling
         for index_key, index_data in sampling.iterindex():
             # intialize destination index data
             dst_mts = []
-            dst_event[index_key] = IndexData(dst_mts, index_data.timestamps)
+            dst_evset[index_key] = IndexData(dst_mts, index_data.timestamps)
 
-            if index_key not in event.data:
+            if index_key not in input.data:
                 # No matching events to sample from
                 for (
                     output_missing_value,
@@ -72,8 +72,8 @@ class SampleNumpyImplementation(OperatorImplementation):
                     )
                 continue
 
-            src_mts = event[index_key].features
-            src_timestamps = event[index_key].timestamps
+            src_mts = input[index_key].features
+            src_timestamps = input[index_key].timestamps
             (
                 sampling_idxs,
                 first_valid_idx,
@@ -95,7 +95,7 @@ class SampleNumpyImplementation(OperatorImplementation):
                 ]
                 dst_mts.append(dst_ts_data)
 
-        return {"event": dst_event}
+        return {"output": dst_evset}
 
 
 implementation_lib.register_operator_implementation(

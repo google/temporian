@@ -19,7 +19,7 @@ from temporian.core.data.feature import Feature
 
 from temporian.core.data.dtype import DType
 from temporian.core import operator_lib
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -27,7 +27,7 @@ from temporian.proto import core_pb2 as pb
 class CastOperator(Operator):
     def __init__(
         self,
-        event: Event,
+        input: Node,
         to_dtype: Optional[DType] = None,
         from_dtypes: Optional[Mapping[DType, DType]] = None,
         from_features: Union[
@@ -38,11 +38,11 @@ class CastOperator(Operator):
         super().__init__()
 
         # Check that provided arguments are coherent
-        self._check_args(event, to_dtype, from_dtypes, from_features)
+        self._check_args(input, to_dtype, from_dtypes, from_features)
 
         # Convert anything to {feature_name: target_dtype}, include all features
         from_features_all = self._get_feature_dtype_map(
-            event, to_dtype, from_dtypes, from_features
+            input, to_dtype, from_dtypes, from_features
         )
 
         # Attributes
@@ -54,18 +54,18 @@ class CastOperator(Operator):
         )
 
         # Inputs
-        self.add_input("event", event)
+        self.add_input("input", input)
 
-        # Output event features
+        # Output node features
         output_features = []
-        reuse_event = True
-        for feature in event.features:
+        reuse_node = True
+        for feature in input.features:
             if from_features_all[feature.name] is feature.dtype:
                 # Reuse feature
                 output_features.append(feature)
             else:
                 # Create new feature
-                reuse_event = False
+                reuse_node = False
                 output_features.append(
                     # Note: we're not renaming output features here
                     Feature(
@@ -76,20 +76,20 @@ class CastOperator(Operator):
                     )
                 )
 
-        # Output event: don't create new if all features are reused
+        # Output node: don't create new if all features are reused
         self.add_output(
-            "event",
-            event
-            if reuse_event
-            else Event(
+            "output",
+            input
+            if reuse_node
+            else Node(
                 features=output_features,
-                sampling=event.sampling,
+                sampling=input.sampling,
                 creator=self,
             ),
         )
 
         # Used in implementation
-        self.reuse_event = reuse_event
+        self.reuse_node = reuse_node
 
         self.check()
 
@@ -103,7 +103,7 @@ class CastOperator(Operator):
 
     def _check_args(
         self,
-        event: Event,
+        input: Node,
         to_dtype: Optional[DType] = None,
         from_dtypes: Optional[Mapping[DType, DType]] = None,
         from_features: Optional[Mapping[str, DType]] = None,
@@ -133,7 +133,7 @@ class CastOperator(Operator):
         # Check: from_features is {feature_name: dtype}
         if from_features is not None and (
             not isinstance(from_features, Mapping)
-            or any(key not in event.feature_names for key in from_features)
+            or any(key not in input.feature_names for key in from_features)
             or any(
                 not isinstance(val, (DType, str))
                 for val in from_features.values()
@@ -145,13 +145,13 @@ class CastOperator(Operator):
 
     def _get_feature_dtype_map(
         self,
-        event: Event,
+        input: Node,
         to_dtype: Optional[DType] = None,
         from_dtypes: Optional[Mapping[DType, DType]] = None,
         from_features: Optional[Mapping[str, DType]] = None,
     ) -> dict[str, DType]:
         if to_dtype is not None:
-            return {feature.name: to_dtype for feature in event.features}
+            return {feature.name: to_dtype for feature in input.features}
         if from_features is not None:
             # NOTE: In this special case, it's allowed to provide target DType
             # as a string instead of DType (for serialization purposes, since
@@ -160,12 +160,12 @@ class CastOperator(Operator):
                 feature.name: DType(
                     from_features.get(feature.name, feature.dtype)
                 )
-                for feature in event.features
+                for feature in input.features
             }
         if from_dtypes is not None:
             return {
                 feature.name: from_dtypes.get(feature.dtype, feature.dtype)
-                for feature in event.features
+                for feature in input.features
             }
 
     @classmethod
@@ -185,9 +185,9 @@ class CastOperator(Operator):
                 ),
             ],
             inputs=[
-                pb.OperatorDef.Input(key="event"),
+                pb.OperatorDef.Input(key="input"),
             ],
-            outputs=[pb.OperatorDef.Output(key="event")],
+            outputs=[pb.OperatorDef.Output(key="output")],
         )
 
 
@@ -195,35 +195,35 @@ operator_lib.register_operator(CastOperator)
 
 
 def cast(
-    event: Event,
+    input: Node,
     target: Union[DType, Union[Mapping[str, DType], Mapping[DType, DType]]],
     check_overflow: bool = True,
-) -> Event:
+) -> Node:
     """Casts the dtype of features to the dtype(s) specified in `target`.
 
     Feature names are preserved, and reused (not copied) if not changed.
 
     Examples:
-        Given an input `Event` with features 'A' (`INT64`), 'B'
+        Given an input `Node` with features 'A' (`INT64`), 'B'
         (`INT64`), 'C' (`FLOAT64`) and 'D' (`STRING`):
 
-        1. `cast(event, target=dtype.INT32)`
+        1. `cast(input, target=dtype.INT32)`
            Try to convert all features to `INT32`, or raise `ValueError` if some
            string value in 'D' is invalid, or any column value is out of range
            for `INT32`.
 
-        2. `cast(event, target={dtype.INT64: dtype.INT32, dtype.STRING: dtype.FLOAT32})`
+        2. `cast(input, target={dtype.INT64: dtype.INT32, dtype.STRING: dtype.FLOAT32})`
             Convert features 'A' and 'B' to `INT32`, 'D' to `FLOAT32`, leave 'C'
             unchanged.
 
-        3. `cast(event, target={'A': dtype.FLOAT32, 'B': dtype.INT32})`
+        3. `cast(input, target={'A': dtype.FLOAT32, 'B': dtype.INT32})`
             Convert 'A' to `FLOAT32` and 'B' to `INT32`.
 
-        4. `cast(event, target={'A': dtype.FLOAT32, dtype.FLOAT64: dtype.INT32})`
+        4. `cast(input, target={'A': dtype.FLOAT32, dtype.FLOAT64: dtype.INT32})`
             Raises ValueError: don't mix dtype and feature name keys
 
     Args:
-        event: Input `Event` object to cast the columns from.
+        input: Input `Node` object to cast the columns from.
         target: Single dtype or a map. Providing a single dtype will cast all
             columns to it. The mapping keys can be either feature names or the
             original dtypes (and not both types mixed), and the values are the
@@ -234,7 +234,7 @@ def cast(
             some computation overhead. Defaults to `True`.
 
     Returns:
-        New `Event` (or the same if no features actually changed dtype), with
+        New `Node` (or the same if no features actually changed dtype), with
         the same feature names as the input one, but with the new dtypes as
         specified in `target`.
 
@@ -244,7 +244,7 @@ def cast(
         ValueError: If trying to cast a non-numeric string to numeric dtype.
         ValueError: If `target` is not a dtype nor a mapping.
         ValueError: If `target` is a mapping, but some of the keys are not a
-            dtype nor a feature in `event.feature_names`, or if those types are
+            dtype nor a feature in `input.feature_names`, or if those types are
             mixed.
     """
     # Convert 'target' to one of these:
@@ -254,7 +254,7 @@ def cast(
 
     # Further type verifications are done in the operator
     if isinstance(target, Mapping):
-        if all(key in event.feature_names for key in target):
+        if all(key in input.feature_names for key in target):
             from_features = target
         elif all(isinstance(key, DType) for key in target):
             from_dtypes = target
@@ -262,15 +262,15 @@ def cast(
             raise ValueError(
                 "Cast: mapping keys should be all DType or feature names.\n"
                 f"Keys: {target.keys()}\n"
-                f"Feature names: {event.feature_names}"
+                f"Feature names: {input.feature_names}"
             )
     else:
         to_dtype = target
 
     return CastOperator(
-        event,
+        input,
         to_dtype=to_dtype,
         from_features=from_features,
         from_dtypes=from_dtypes,
         check_overflow=check_overflow,
-    ).outputs["event"]
+    ).outputs["output"]

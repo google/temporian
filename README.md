@@ -1,4 +1,4 @@
-![Temporian logo](docs/src/assets/banner.png)
+<img src="https://github.com/google/temporian/blob/main/docs/src/assets/banner.png?raw=true" width="100%" alt="Temporian logo">
 
 ![tests](https://github.com/google/temporian/actions/workflows/test.yaml/badge.svg) ![formatting](https://github.com/google/temporian/actions/workflows/formatting.yaml/badge.svg)
 
@@ -12,31 +12,31 @@ A minimal end-to-end run looks as follows:
 import temporian as tp
 
 # Load the data
-event_data = tp.read_event("path/to/data.csv")
-event = event_data.schema()
+evset = tp.read_event_set("path/to/data.csv")
+node = evset.node()
 
 # Create Simple Moving Average feature
-sma = tp.simple_moving_average(
-    input=event,
+sma_node = tp.simple_moving_average(
+    node,
     window_length=tp.day(5),
 )
 
 # Create Lag feature
-lag = tp.lag(
-    input=event,
+lag_node = tp.lag(
+    node,
     lag=tp.week(1),
 )
 
 # Glue features
-output_event = tp.glue(event, sma)
-output_event = tp.glue(output_event, lag)
+output_node = tp.glue(node, sma_node)
+output_node = tp.glue(output_node, lag_node)
 
 
 # Execute pipeline and get results
-output_event = tp.evaluate(
-    output_event,
+output_evset = tp.evaluate(
+    output_node,
     input_data={
-        event: event_data,
+        node: evset,
     },
 )
 

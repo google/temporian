@@ -12,11 +12,11 @@ namespace py = pybind11;
 typedef size_t Idx;
 
 std::tuple<py::array_t<Idx>, Idx>
-build_sampling_idxs(const py::array_t<double> &event_timestamps,
+build_sampling_idxs(const py::array_t<double> &evset_timestamps,
                     const py::array_t<double> &sampling_timestamps) {
 
   // Input size
-  const Idx n_event = event_timestamps.shape(0);
+  const Idx n_event = evset_timestamps.shape(0);
   const Idx n_sampling = sampling_timestamps.shape(0);
 
   // Allocate output array
@@ -24,7 +24,7 @@ build_sampling_idxs(const py::array_t<double> &event_timestamps,
 
   // Access raw input / output data
   auto v_idxs = indices.mutable_unchecked<1>();
-  auto v_event = event_timestamps.unchecked<1>();
+  auto v_event = evset_timestamps.unchecked<1>();
   auto v_sampling = sampling_timestamps.unchecked<1>();
 
   // The index of the first value in "indices" that correspond to a valid
@@ -50,6 +50,6 @@ build_sampling_idxs(const py::array_t<double> &event_timestamps,
 
 void init_sample(py::module &m) {
   m.def("build_sampling_idxs", &build_sampling_idxs, "",
-        py::arg("event_timestamps").noconvert(),
+        py::arg("evset_timestamps").noconvert(),
         py::arg("sampling_timestamps").noconvert());
 }

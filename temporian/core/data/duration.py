@@ -30,28 +30,28 @@ Duration = float
 Timestamp = Union[np.datetime64, datetime.datetime, int, float]
 
 
-def milliseconds(value: float) -> Duration:
+def milliseconds(value: Union[int, float]) -> Duration:
     return value / 1000
 
 
-def seconds(value: float) -> Duration:
-    return value
+def seconds(value: Union[int, float]) -> Duration:
+    return Duration(value)
 
 
-def minutes(value: float) -> Duration:
-    return value * 60
+def minutes(value: Union[int, float]) -> Duration:
+    return Duration(value * 60)
 
 
-def hours(value: float) -> Duration:
-    return value * 60 * 60
+def hours(value: Union[int, float]) -> Duration:
+    return Duration(value * 60 * 60)
 
 
-def days(value: float) -> Duration:
-    return value * 60 * 60 * 24
+def days(value: Union[int, float]) -> Duration:
+    return Duration(value * 60 * 60 * 24)
 
 
-def weeks(value: float) -> Duration:
-    return value * 60 * 60 * 24 * 7
+def weeks(value: Union[int, float]) -> Duration:
+    return Duration(value * 60 * 60 * 24 * 7)
 
 
 def convert_date_to_duration(date: Timestamp) -> Duration:

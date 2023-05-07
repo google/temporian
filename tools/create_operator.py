@@ -79,18 +79,18 @@ def main(argv):
 """{capitalized_op} operator class and public API function definitions."""
 
 from temporian.core import operator_lib
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
 class {capitalized_op}(Operator):
-    def __init__(self, event: Event, param: float):
+    def __init__(self, input: Node, param: float):
         super().__init__()
 
-        self.add_input("event", event)
+        self.add_input("input", input)
         self.add_attribute("param", param)
-        self.add_output("event", event)
+        self.add_output("output", input)
         self.check()
 
     @classmethod
@@ -104,22 +104,29 @@ class {capitalized_op}(Operator):
                     is_optional=False,
                 ),
             ],
-            inputs=[pb.OperatorDef.Input(key="event")],
-            outputs=[pb.OperatorDef.Output(key="event")],
+            inputs=[pb.OperatorDef.Input(key="input")],
+            outputs=[pb.OperatorDef.Output(key="output")],
         )
 
 
 operator_lib.register_operator({capitalized_op})
 
 
-def {lower_op}(event: Event, param: float) -> Event:
+def {lower_op}(input: Node, param: float) -> Node:
     """<Text>
+
+    Args:
+        input: <Text>
+        param: <Text>
 
     Example:
         <Text>
+
+    Returns:
+        <Text>
     """
 
-    return {capitalized_op}(event=event, param=param).outputs["event"]
+    return {capitalized_op}(input=input, param=param).outputs["output"]
 
 '''
         )
@@ -139,7 +146,7 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:event",
+        "//temporian/core/data:node",
         "//temporian/core/data:feature",
         "//temporian/proto:core_py_proto",
     ],
@@ -167,7 +174,7 @@ py_library(
 
 from typing import Dict
 
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event import EventSet
 from temporian.core.operators.{lower_op} import {capitalized_op}
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.base import OperatorImplementation
@@ -179,9 +186,9 @@ class {capitalized_op}NumpyImplementation(OperatorImplementation):
         super().__init__(operator)
 
     def __call__(
-        self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
+        self, input: EventSet) -> Dict[str, EventSet]:
 
-        return {{"event": event}}
+        return {{"output": input}}
 
 
 implementation_lib.register_operator_implementation(
@@ -209,8 +216,7 @@ py_library(
         "//temporian/core/operators:{lower_op}",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy:utils",
-        "//temporian/implementation/numpy/data:event",
-        "//temporian/implementation/numpy/data:sampling",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -237,7 +243,7 @@ from absl.testing import absltest
 
 import pandas as pd
 from temporian.core.operators.{lower_op} import {capitalized_op}
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event import EventSet
 from temporian.implementation.numpy.operators.{lower_op} import (
     {capitalized_op}NumpyImplementation,
 )
@@ -248,7 +254,7 @@ class {capitalized_op}OperatorTest(absltest.TestCase):
         pass
 
     def test_base(self):
-        event_data = NumpyEvent.from_dataframe(
+        evset = EventSet.from_dataframe(
             pd.DataFrame(
                 {{
                     "timestamp": [1, 2,3,4],
@@ -259,9 +265,9 @@ class {capitalized_op}OperatorTest(absltest.TestCase):
             ),
             index_names=["c"],
         )
-        event = event_data.schema()
+        node = evset.node()
 
-        expected_output = NumpyEvent.from_dataframe(
+        expected_output = EventSet.from_dataframe(
             pd.DataFrame(
                 {{
                     "timestamp": [1, 2,3,4],
@@ -274,9 +280,9 @@ class {capitalized_op}OperatorTest(absltest.TestCase):
         )
 
         # Run op
-        op = {capitalized_op}(event=event, param=1.0)
+        op = {capitalized_op}(input=node, param=1.0)
         instance = {capitalized_op}NumpyImplementation(op)
-        output = instance.call(event=event_data)["event"]
+        output = instance.call(input=evset)["output"]
 
         self.assertEqual(output, expected_output)
 
@@ -303,7 +309,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         "//temporian/core/data:dtype",
-        "//temporian/core/data:event",
+        "//temporian/core/data:node",
         "//temporian/core/data:feature",
         "//temporian/core/operators:{lower_op}",
         "//temporian/implementation/numpy/operators:{lower_op}",

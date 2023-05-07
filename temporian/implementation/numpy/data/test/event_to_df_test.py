@@ -15,13 +15,13 @@
 import pandas as pd
 import numpy as np
 from absl.testing import absltest
-from temporian.implementation.numpy.data.event import IndexData
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import IndexData
+from temporian.implementation.numpy.data.event_set import EventSet
 
 
 class EventToDataFrameTest(absltest.TestCase):
-    def test_numpy_event_to_df(self) -> None:
-        numpy_event = NumpyEvent(
+    def test_evset_to_df(self) -> None:
+        evset = EventSet(
             data={
                 (666964,): IndexData(
                     features=[np.array([740.0, 508.0])],
@@ -43,13 +43,13 @@ class EventToDataFrameTest(absltest.TestCase):
             ],
             columns=["product_id", "costs", "timestamp"],
         )
-        df = numpy_event.to_dataframe()
+        df = evset.to_dataframe()
 
         # validate
         self.assertTrue(df.equals(expected_df))
 
-    def test_numpy_event_to_df_with_datetimes(self) -> None:
-        numpy_event = NumpyEvent(
+    def test_evset_to_df_with_datetimes(self) -> None:
+        evset = EventSet(
             data={
                 (666964,): IndexData(
                     features=[np.array([740.0, 508.0])],
@@ -72,13 +72,13 @@ class EventToDataFrameTest(absltest.TestCase):
             ],
             columns=["product_id", "costs", "timestamp"],
         )
-        df = numpy_event.to_dataframe()
+        df = evset.to_dataframe()
 
         # validate
         self.assertTrue(df.equals(expected_df))
 
-    def test_numpy_event_to_df_no_index(self) -> None:
-        numpy_event = NumpyEvent(
+    def test_evset_to_df_no_index(self) -> None:
+        evset = EventSet(
             data={
                 (): IndexData(
                     features=[
@@ -100,13 +100,13 @@ class EventToDataFrameTest(absltest.TestCase):
             ],
             columns=["product_id", "costs", "timestamp"],
         )
-        df = numpy_event.to_dataframe()
+        df = evset.to_dataframe()
 
         # validate
         self.assertTrue(df.equals(expected_df))
 
-    def test_numpy_event_to_df_multiple_index(self) -> None:
-        numpy_event = NumpyEvent(
+    def test_evset_to_df_multiple_index(self) -> None:
+        evset = EventSet(
             data={
                 ("X1", "Y1"): IndexData(
                     features=[np.array([10.0, 10.5, 11.0])],
@@ -139,13 +139,13 @@ class EventToDataFrameTest(absltest.TestCase):
             ],
             columns=["x", "y", "sma_a", "timestamp"],
         )
-        df = numpy_event.to_dataframe()
+        df = evset.to_dataframe()
 
         # validate
         self.assertTrue(df.equals(expected_df))
 
-    def test_numpy_event_to_df_string_feature(self) -> None:
-        numpy_event = NumpyEvent(
+    def test_evset_to_df_string_feature(self) -> None:
+        evset = EventSet(
             data={
                 (666964,): IndexData(
                     features=[np.array(["740.0", "508.0"]).astype(np.str_)],
@@ -168,7 +168,7 @@ class EventToDataFrameTest(absltest.TestCase):
             ],
             columns=["product_id", "costs", "timestamp"],
         )
-        df = numpy_event.to_dataframe()
+        df = evset.to_dataframe()
 
         # validate
         self.assertTrue(df.equals(expected_df))

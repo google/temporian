@@ -19,7 +19,7 @@ import pandas as pd
 
 from temporian.core import evaluator
 from temporian.core.operators.select import SelectOperator
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators import select
 
 
@@ -45,10 +45,8 @@ class SelectOperatorTest(absltest.TestCase):
 
         self.features = ["sales", "costs", "weather"]
 
-        self.input_event_data = NumpyEvent.from_dataframe(
-            df, index_names=["store_id"]
-        )
-        self.input_event = self.input_event_data.schema()
+        self.input_evset = EventSet.from_dataframe(df, index_names=["store_id"])
+        self.input_node = self.input_evset.node()
 
     def test_select_one_feature(self) -> None:
         """Test correct select operator for one feature selection."""
@@ -64,15 +62,15 @@ class SelectOperatorTest(absltest.TestCase):
             columns=["store_id", "timestamp", "sales"],
         )
 
-        operator = SelectOperator(event=self.input_event, feature_names="sales")
+        operator = SelectOperator(input=self.input_node, feature_names="sales")
         impl = select.SelectNumpyImplementation(operator)
-        selected_event = impl.call(event=self.input_event_data)["event"]
+        output_evset = impl.call(input=self.input_evset)["output"]
 
-        expected_event = NumpyEvent.from_dataframe(
+        expected_evset = EventSet.from_dataframe(
             new_df, index_names=["store_id"]
         )
 
-        self.assertTrue(selected_event == expected_event)
+        self.assertTrue(output_evset == expected_evset)
 
     def test_select_multiple_features(self) -> None:
         """Test correct select operator for multiple features selection."""
@@ -89,16 +87,16 @@ class SelectOperatorTest(absltest.TestCase):
         )
 
         operator = SelectOperator(
-            event=self.input_event, feature_names=["sales", "costs"]
+            input=self.input_node, feature_names=["sales", "costs"]
         )
         impl = select.SelectNumpyImplementation(operator)
-        selected_event = impl.call(event=self.input_event_data)["event"]
+        output_evset = impl.call(input=self.input_evset)["output"]
 
-        expected_event = NumpyEvent.from_dataframe(
+        expected_evset = EventSet.from_dataframe(
             new_df, index_names=["store_id"]
         )
 
-        self.assertTrue(selected_event == expected_event)
+        self.assertTrue(output_evset == expected_evset)
 
     def test_select_with_core(self) -> None:
         """Test correct select operator with core."""
@@ -113,19 +111,18 @@ class SelectOperatorTest(absltest.TestCase):
             ],
             columns=["store_id", "timestamp", "sales"],
         )
-        expected_event = NumpyEvent.from_dataframe(
+        expected_evset = EventSet.from_dataframe(
             new_df, index_names=["store_id"]
         )
 
-        output_event_data = evaluator.evaluate(
-            self.input_event["sales"],
+        output_evset = evaluator.evaluate(
+            self.input_node["sales"],
             input_data={
-                # left event specified from disk
-                self.input_event: self.input_event_data,
+                self.input_node: self.input_evset,
             },
         )
 
-        self.assertEqual(expected_event, output_event_data)
+        self.assertEqual(expected_evset, output_evset)
 
 
 if __name__ == "__main__":

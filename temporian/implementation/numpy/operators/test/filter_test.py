@@ -18,7 +18,7 @@ import numpy as np
 import pandas as pd
 
 from temporian.core.operators.filter import FilterOperator
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.filter import (
     FilterNumpyImplementation,
 )
@@ -31,7 +31,7 @@ class FilterOperatorTest(absltest.TestCase):
         """Test correct filter operator for without MultiIndex and only one
         feature."""
 
-        event_df = pd.DataFrame(
+        df = pd.DataFrame(
             [
                 [1.0, 10.0],
                 [2.0, np.nan],
@@ -64,27 +64,27 @@ class FilterOperatorTest(absltest.TestCase):
             columns=["timestamp", "sales"],
         )
 
-        event_data = NumpyEvent.from_dataframe(event_df)
-        event = event_data.schema()
+        evset = EventSet.from_dataframe(df)
+        node = evset.node()
 
-        condition_data = NumpyEvent.from_dataframe(condition_df)
-        condition = condition_data.schema()
+        condition_evset = EventSet.from_dataframe(condition_df)
+        condition = condition_evset.node()
 
-        operator = FilterOperator(event=event, condition=condition)
+        operator = FilterOperator(input=node, condition=condition)
         impl = FilterNumpyImplementation(operator)
-        filtered_event = impl.call(event=event_data, condition=condition_data)[
-            "event"
+        filtered_evset = impl.call(input=evset, condition=condition_evset)[
+            "output"
         ]
 
-        expected_event = NumpyEvent.from_dataframe(expected_df)
+        expected_evset = EventSet.from_dataframe(expected_df)
 
-        self.assertEqual(filtered_event, expected_event)
+        self.assertEqual(filtered_evset, expected_evset)
 
     def test_simple_filter_two_features(self) -> None:
         """Test correct filter operator for without MultiIndex and two features.
         """
 
-        event_df = pd.DataFrame(
+        df = pd.DataFrame(
             [
                 [1.0, 10.0, "A"],
                 [2.0, np.nan, "B"],
@@ -121,26 +121,26 @@ class FilterOperatorTest(absltest.TestCase):
             ],
         )
 
-        event_data = NumpyEvent.from_dataframe(event_df)
-        event = event_data.schema()
+        evset = EventSet.from_dataframe(df)
+        node = evset.node()
 
-        condition_data = NumpyEvent.from_dataframe(condition_df)
-        condition = condition_data.schema()
+        condition_evset = EventSet.from_dataframe(condition_df)
+        condition = condition_evset.node()
 
-        operator = FilterOperator(event=event, condition=condition)
+        operator = FilterOperator(input=node, condition=condition)
         impl = FilterNumpyImplementation(operator)
-        filtered_event = impl.call(event=event_data, condition=condition_data)[
-            "event"
+        filtered_evset = impl.call(input=evset, condition=condition_evset)[
+            "output"
         ]
 
-        expected_event = NumpyEvent.from_dataframe(expected_df)
+        expected_evset = EventSet.from_dataframe(expected_df)
 
-        self.assertEqual(filtered_event, expected_event)
+        self.assertEqual(filtered_evset, expected_evset)
 
     def test_filter_with_one_index(self) -> None:
         """Test correct filter operator with one index apart from timestamps."""
 
-        event_df = pd.DataFrame(
+        df = pd.DataFrame(
             [
                 [1.0, 10.0, "A"],
                 [2.0, np.nan, "A"],
@@ -178,32 +178,30 @@ class FilterOperatorTest(absltest.TestCase):
             ],
         )
 
-        event_data = NumpyEvent.from_dataframe(
-            event_df, index_names=["product"]
-        )
-        event = event_data.schema()
+        evset = EventSet.from_dataframe(df, index_names=["product"])
+        node = evset.node()
 
-        condition_data = NumpyEvent.from_dataframe(
+        condition_evset = EventSet.from_dataframe(
             condition_df, index_names=["product"]
         )
-        condition = condition_data.schema()
+        condition = condition_evset.node()
 
-        operator = FilterOperator(event=event, condition=condition)
+        operator = FilterOperator(input=node, condition=condition)
         impl = FilterNumpyImplementation(operator)
-        filtered_event = impl.call(event=event_data, condition=condition_data)[
-            "event"
+        filtered_evset = impl.call(input=evset, condition=condition_evset)[
+            "output"
         ]
 
-        expected_event = NumpyEvent.from_dataframe(
+        expected_evset = EventSet.from_dataframe(
             expected_df, index_names=["product"]
         )
 
-        self.assertEqual(filtered_event, expected_event)
+        self.assertEqual(filtered_evset, expected_evset)
 
     def test_filter_with_one_index(self) -> None:
         """Test correct filter operator with multiple index."""
 
-        event_df = pd.DataFrame(
+        df = pd.DataFrame(
             [
                 [1.0, 10.0, "A", 101],
                 [2.0, np.nan, "A", 102],
@@ -242,27 +240,25 @@ class FilterOperatorTest(absltest.TestCase):
             ],
         )
 
-        event_data = NumpyEvent.from_dataframe(
-            event_df, index_names=["product", "id"]
-        )
-        event = event_data.schema()
+        evset = EventSet.from_dataframe(df, index_names=["product", "id"])
+        node = evset.node()
 
-        condition_data = NumpyEvent.from_dataframe(
+        condition_evset = EventSet.from_dataframe(
             condition_df, index_names=["product", "id"]
         )
-        condition = condition_data.schema()
+        condition = condition_evset.node()
 
-        operator = FilterOperator(event=event, condition=condition)
+        operator = FilterOperator(input=node, condition=condition)
         impl = FilterNumpyImplementation(operator)
-        filtered_event = impl.call(event=event_data, condition=condition_data)[
-            "event"
+        filtered_evset = impl.call(input=evset, condition=condition_evset)[
+            "output"
         ]
 
-        expected_event = NumpyEvent.from_dataframe(
+        expected_evset = EventSet.from_dataframe(
             expected_df, index_names=["product", "id"]
         )
 
-        self.assertEqual(filtered_event, expected_event)
+        self.assertEqual(filtered_evset, expected_evset)
 
 
 if __name__ == "__main__":

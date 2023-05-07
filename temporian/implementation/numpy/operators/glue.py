@@ -18,7 +18,7 @@ from typing import Dict
 
 from temporian.core.operators.glue import GlueOperator
 from temporian.implementation.numpy import implementation_lib
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -31,41 +31,41 @@ class GlueNumpyImplementation(OperatorImplementation):
 
     def __call__(
         self,
-        **dict_events: Dict[str, NumpyEvent],
-    ) -> Dict[str, NumpyEvent]:
-        """Glues a dictionary of NumpyEvents.
+        **inputs: Dict[str, EventSet],
+    ) -> Dict[str, EventSet]:
+        """Glues a dictionary of EventSets.
 
         The output features are ordered by the argument name of the event.
 
         Example:
-            If dict_events is {"event_0": X, "event_3": Z, "event_2": Y}
+            If evset_dict is {"evset_0": X, "evset_3": Z, "evset_2": Y}
             output is guarenteed to be [X, Y, Z].
         """
-        # convert input event dict to list of events
-        events = list(list(zip(*sorted(list(dict_events.items()))))[1])
-        if len(events) < 2:
+        # convert input evest dict to list of evsets
+        evsets = list(list(zip(*sorted(list(inputs.items()))))[1])
+        if len(evsets) < 2:
             raise ValueError(
-                f"Glue operator cannot be called on a {len(events)} events"
+                f"Glue operator cannot be called on a {len(evsets)} event sets."
             )
 
-        # create output event
-        dst_event = NumpyEvent(
+        # create output event set
+        dst_evset = EventSet(
             data={},
             feature_names=[
                 feature_name
-                for event in events
-                for feature_name in event.feature_names
+                for evset in evsets
+                for feature_name in evset.feature_names
             ],
-            index_names=events[0].index_names,
-            is_unix_timestamp=events[0].is_unix_timestamp,
+            index_names=evsets[0].index_names,
+            is_unix_timestamp=evsets[0].is_unix_timestamp,
         )
-        # fill output event data
-        for index_key, index_data in events[0].iterindex():
-            dst_event[index_key] = index_data
-            for event in events[1:]:
-                dst_event[index_key].features.extend(event[index_key].features)
+        # fill output event set data
+        for index_key, index_data in evsets[0].iterindex():
+            dst_evset[index_key] = index_data
+            for evset in evsets[1:]:
+                dst_evset[index_key].features.extend(evset[index_key].features)
 
-        return {"event": dst_event}
+        return {"output": dst_evset}
 
 
 implementation_lib.register_operator_implementation(

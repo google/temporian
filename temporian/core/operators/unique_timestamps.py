@@ -16,26 +16,26 @@
 """Unique timestamps operator class and public API function definitions."""
 
 from temporian.core import operator_lib
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 from temporian.core.data.sampling import Sampling
 
 
 class UniqueTimestamps(Operator):
-    def __init__(self, event: Event):
+    def __init__(self, input: Node):
         super().__init__()
 
-        self.add_input("event", event)
+        self.add_input("input", input)
 
         self.add_output(
-            "event",
-            Event(
+            "output",
+            Node(
                 features=[],
                 sampling=Sampling(
-                    index_levels=event.sampling.index,
+                    index_levels=input.sampling.index,
                     creator=self,
-                    is_unix_timestamp=event.sampling.is_unix_timestamp,
+                    is_unix_timestamp=input.sampling.is_unix_timestamp,
                 ),
                 creator=self,
             ),
@@ -48,25 +48,25 @@ class UniqueTimestamps(Operator):
         return pb.OperatorDef(
             key="UNIQUE_TIMESTAMPS",
             attributes=[],
-            inputs=[pb.OperatorDef.Input(key="event")],
-            outputs=[pb.OperatorDef.Output(key="event")],
+            inputs=[pb.OperatorDef.Input(key="input")],
+            outputs=[pb.OperatorDef.Output(key="output")],
         )
 
 
 operator_lib.register_operator(UniqueTimestamps)
 
 
-def unique_timestamps(event: Event) -> Event:
+def unique_timestamps(input: Node) -> Node:
     """Removes duplicated timestamps.
 
-    Returns a feature-less event where each timestamps from `event` only appears
-    once. If the event is indexed, the unique operation is applied independently
+    Returns a feature-less node where each timestamps from `input` only appears
+    once. If the input is indexed, the unique operation is applied independently
     for each index.
 
     Example:
 
         Inputs:
-            event:
+            input:
                 feature_1: ['a', 'b', 'c', 'd']
                 timestamps: [1, 2, 2, 4]
 
@@ -74,10 +74,10 @@ def unique_timestamps(event: Event) -> Event:
             timestamps: [1, 2, 4]
 
     Args:
-        event: Event, possibly with features, to process.
+        input: Node, possibly with features, to process.
 
     Returns:
-        Event without features with unique timestamps in `event`.
+        Node without features with unique timestamps in `input`.
     """
 
-    return UniqueTimestamps(event=event).outputs["event"]
+    return UniqueTimestamps(input=input).outputs["output"]

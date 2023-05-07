@@ -16,7 +16,7 @@ from typing import Dict
 
 from temporian.core.operators.prefix import Prefix
 from temporian.implementation.numpy import implementation_lib
-from temporian.implementation.numpy.data.event import NumpyEvent
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -27,21 +27,21 @@ class PrefixNumpyImplementation(OperatorImplementation):
         super().__init__(operator)
         assert isinstance(operator, Prefix)
 
-    def __call__(self, event: NumpyEvent) -> Dict[str, NumpyEvent]:
+    def __call__(self, input: EventSet) -> Dict[str, EventSet]:
         # gather operator attributes
-        prefix = self._operator.prefix()
+        prefix = self._operator.prefix
 
-        # create output event
-        dst_event = NumpyEvent(
-            data=event.data,
+        # create output evset
+        dst_evset = EventSet(
+            data=input.data,
             feature_names=[
                 f"{prefix}{feature_name}"
-                for feature_name in event.feature_names
+                for feature_name in input.feature_names
             ],
-            index_names=event.index_names,
-            is_unix_timestamp=event.is_unix_timestamp,
+            index_names=input.index_names,
+            is_unix_timestamp=input.is_unix_timestamp,
         )
-        return {"event": dst_event}
+        return {"output": dst_evset}
 
 
 implementation_lib.register_operator_implementation(

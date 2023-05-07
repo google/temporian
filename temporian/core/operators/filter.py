@@ -17,14 +17,14 @@
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
 from temporian.core.data.feature import Feature
-from temporian.core.data.event import Event
+from temporian.core.data.node import Node
 from temporian.core.data.sampling import Sampling
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
 class FilterOperator(Operator):
-    def __init__(self, event: Event, condition: Event):
+    def __init__(self, input: Node, condition: Node):
         super().__init__()
 
         # check that condition is a single feature
@@ -41,19 +41,21 @@ class FilterOperator(Operator):
                 f" {condition.features[0].dtype} instead."
             )
 
-        # check both events have same sampling
-        if event.sampling.index != condition.sampling.index:
+        # check both nodes have same sampling
+        if input.sampling.index != condition.sampling.index:
             raise ValueError(
-                "Event and condition must have the same sampling. Got"
-                f" {event.sampling} and {condition.sampling} instead."
+                "Node and condition must have the same sampling. Got"
+                f" {input.sampling} and {condition.sampling} instead."
             )
 
         # inputs
-        self.add_input("event", event)
+        self.add_input("input", input)
         self.add_input("condition", condition)
 
         output_sampling = Sampling(
-            index_levels=event.sampling.index, creator=self
+            index_levels=input.sampling.index,
+            creator=self,
+            is_unix_timestamp=input.sampling.is_unix_timestamp,
         )
 
         self.condition_name = condition.features[0].name
@@ -66,12 +68,12 @@ class FilterOperator(Operator):
                 sampling=output_sampling,
                 creator=self,
             )
-            for f in event.features
+            for f in input.features
         ]
 
         self.add_output(
-            "event",
-            Event(
+            "output",
+            Node(
                 features=output_features,
                 sampling=output_sampling,
                 creator=self,
@@ -86,10 +88,10 @@ class FilterOperator(Operator):
             key="FILTER",
             attributes=[],
             inputs=[
-                pb.OperatorDef.Input(key="event"),
+                pb.OperatorDef.Input(key="input"),
                 pb.OperatorDef.Input(key="condition"),
             ],
-            outputs=[pb.OperatorDef.Output(key="event")],
+            outputs=[pb.OperatorDef.Output(key="output")],
         )
 
 
@@ -98,21 +100,21 @@ operator_lib.register_operator(FilterOperator)
 
 # pylint: disable=redefined-builtin
 def filter(
-    event: Event,
-    condition: Event,
-) -> Event:
-    """Filters out timestamps in an event for which a condition is false.
+    input: Node,
+    condition: Node,
+) -> Node:
+    """Filters out timestamps in a node for which a condition is false.
 
-    Each timestamp in `event` is only kept if the corresponding value for that
+    Each timestamp in `input` is only kept if the corresponding value for that
     timestamp in `condition` is `True`.
 
-    `event` and `condition` must have the same sampling.
+    `input` and `condition` must have the same sampling.
 
     Args:
-        event: Event to filter.
-        condition: Event with a single boolean feature condition.
+        input: Node to filter.
+        condition: Node with a single boolean feature condition.
 
     Returns:
-        Filtered event.
+        Filtered input.
     """
-    return FilterOperator(event, condition).outputs["event"]
+    return FilterOperator(input, condition).outputs["output"]
