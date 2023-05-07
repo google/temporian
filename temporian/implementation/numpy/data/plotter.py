@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Plotting utility."""
+
 import datetime
 from typing import NamedTuple, Optional, Union, List, Any, Tuple
 
@@ -21,22 +23,24 @@ from enum import Enum
 from temporian.core.data import duration
 from temporian.implementation.numpy.data.event_set import EventSet
 
-DEFAULT_BACKEND = "matplotlib"
-
 
 class Style(Enum):
     """Plotting style."""
 
+    # Determine the style according to the data.
     auto = "auto"
+    # Connect numerical values with a line.
     line = "line"
+    # A discreet marker showing a feature value.
     marker = "marker"
+    # A discreet marker not showing a feature value.
     vline = "vline"
 
 
 class Options(NamedTuple):
     """Options for plotting."""
 
-    backend: str
+    backend: Optional[str]
     height_per_plot_px: int
     width_px: int
     max_points: Optional[int]
@@ -44,12 +48,12 @@ class Options(NamedTuple):
     max_time: Optional[duration.Timestamp]
     max_num_plots: int
     style: Style
+    interactive: bool
 
 
 def plot(
     evsets: Union[List[EventSet], EventSet],
     indexes: Optional[Union[Any, tuple, List[tuple]]] = None,
-    backend: str = DEFAULT_BACKEND,
     width_px: int = 1024,
     height_per_plot_px: int = 150,
     max_points: Optional[int] = None,
@@ -58,6 +62,8 @@ def plot(
     max_num_plots: int = 20,
     style: Union[Style, str] = Style.auto,
     return_fig: bool = False,
+    interactive: bool = False,
+    backend: Optional[str] = None,
 ):
     """Plots event sets.
 
@@ -67,7 +73,6 @@ def plot(
             the available indexes. Indexes should be provided as single value
             (e.g. string) or tuple of values. Example: index="a", index=("a",),
             index=("a", "b",), index=["a", "b"], index=[("a", "b"), ("a", "c")].
-        backend: Plotting library to use.
         width_px: Width of the figure in pixel.
         height_per_plot_px: Height of each sub-plot (one per feature) in pixel.
         max_points: Maximum number of points to plot.
@@ -78,6 +83,11 @@ def plot(
             warning.
         return_fig: If true, returns the figure object. The figure object
             depends on the backend.
+        interactive: If true, creates an interactive plotting. interactive=True
+            effectively selects a backend that support interactive plotting.
+            Ignored if "backend" is set.
+        backend: Plotting library to use. Possible values are: matplotlib,
+            bokeh. If set, overrides the "interactive" argument.
     """
 
     original_indexes = indexes
@@ -116,6 +126,7 @@ def plot(
     assert isinstance(style, Style)
 
     options = Options(
+        interactive=interactive,
         backend=backend,
         width_px=width_px,
         height_per_plot_px=height_per_plot_px,
@@ -126,27 +137,29 @@ def plot(
         style=style,
     )
 
+    if backend is None:
+        backend = "bokeh" if interactive else "matplotlib"
+
     if backend not in BACKENDS:
         raise ValueError(
             f"Unknown plotting backend {backend}. Available "
             f"backends: {BACKENDS}"
         )
 
-    fig = BACKENDS[backend](evsets=evsets, indexes=indexes, options=options)
+    try:
+        fig = BACKENDS[backend](evsets=evsets, indexes=indexes, options=options)
+    except ImportError:
+        print(error_message_import_backend(backend))
+        raise
+
     return fig if return_fig else None
 
 
-def _plot_matplotlib(
+def get_num_plots(
     evsets: List[EventSet], indexes: List[tuple], options: Options
 ):
-    import matplotlib.pyplot as plt
-    from matplotlib.cm import get_cmap
+    """Computes the number of sub-plots."""
 
-    colors = get_cmap("tab10").colors
-
-    px = 1 / plt.rcParams["figure.dpi"]
-
-    # Compute the number of sub-plots + extra checks.
     num_plots = 0
     for index in indexes:
         for evset in evsets:
@@ -175,171 +188,21 @@ def _plot_matplotlib(
         )
         num_plots = options.max_num_plots
 
-    fig, axs = plt.subplots(
-        num_plots,
-        figsize=(
-            options.width_px * px,
-            options.height_per_plot_px * num_plots * px,
-        ),
-        squeeze=False,
-    )
-
-    # Actual plotting
-    plot_idx = 0
-    for index in indexes:
-        if plot_idx >= num_plots:
-            # Too much plots are displayed already.
-            break
-
-        # Note: Don't display the tuple parenthesis is the index contain a
-        # single dimension.
-        title = str(index[0] if len(index) == 1 else index)
-
-        # Index of the next color to use in the plot.
-        color_idx = 0
-
-        for evset in evsets:
-            if plot_idx >= num_plots:
-                break
-
-            feature_names = evset.feature_names
-
-            xs = evset.data[index].timestamps
-            uniform = is_uniform(xs)
-
-            plot_mask = np.full(len(xs), True)
-            if options.min_time is not None:
-                plot_mask = plot_mask & (xs >= options.min_time)
-            if options.max_time is not None:
-                plot_mask = plot_mask & (xs <= options.max_time)
-            if options.max_points is not None and len(xs) > options.max_points:
-                # Too many timestamps. Only keep the fist ones.
-                plot_mask = plot_mask & (
-                    np.cumsum(plot_mask) <= options.max_points
-                )
-
-            xs = xs[plot_mask]
-
-            if evset.is_unix_timestamp:
-                # Matplotlib understands datetimes.
-                xs = [
-                    datetime.datetime.fromtimestamp(x, tz=datetime.timezone.utc)
-                    for x in xs
-                ]
-
-            if len(feature_names) == 0:
-                # There is not features to plot. Instead, plot the timestamps.
-                _matplotlib_sub_plot(
-                    ax=axs[plot_idx, 0],
-                    xs=xs,
-                    ys=np.zeros(len(xs)),
-                    options=options,
-                    color=colors[color_idx % len(colors)],
-                    name="[sampling]",
-                    is_unix_timestamp=evset.is_unix_timestamp,
-                    title=title,
-                    style=Style.vline,
-                )
-                # Only print the index / title once
-                title = None
-
-                color_idx += 1
-                plot_idx += 1
-
-            for feature_idx, feature_name in enumerate(feature_names):
-                if plot_idx >= num_plots:
-                    # Too much plots are displayed already.
-                    break
-
-                ys = evset.data[index].features[feature_idx][plot_mask]
-                if len(ys) == 0:
-                    all_ys_are_equal = True
-                else:
-                    all_ys_are_equal = np.all(ys == ys[0])
-
-                effective_stype = options.style
-                if effective_stype == Style.auto:
-                    if not uniform and (len(xs) <= 1000 or all_ys_are_equal):
-                        effective_stype = Style.marker
-                    else:
-                        effective_stype = Style.line
-
-                _matplotlib_sub_plot(
-                    ax=axs[plot_idx, 0],
-                    xs=xs,
-                    ys=ys,
-                    options=options,
-                    color=colors[color_idx % len(colors)],
-                    name=feature_name,
-                    is_unix_timestamp=evset.is_unix_timestamp,
-                    title=title,
-                    style=effective_stype,
-                )
-
-                # Only print the index / title once
-                title = None
-
-                color_idx += 1
-                plot_idx += 1
-
-    fig.tight_layout()
-    return fig
+    return num_plots
 
 
-def _matplotlib_sub_plot(
-    ax,
-    xs,
-    ys,
-    options: Options,
-    color,
-    name: str,
-    is_unix_timestamp: bool,
-    title: Optional[str],
-    style: Style,
-    **wargs,
-):
-    """Plots "(xs, ys)" on the axis "ax"."""
+def auto_style(uniform: bool, xs, ys) -> Style:
+    """Finds the best plotting style."""
 
-    import matplotlib.ticker as ticker
-
-    if style == Style.line:
-        mat_style = {}  # Default
-    elif style == Style.marker:
-        mat_style = {"marker": "2", "linestyle": "None"}
-    elif style == Style.vline:
-        mat_style = {"marker": "|", "linestyle": "None"}
+    if len(ys) == 0:
+        all_ys_are_equal = True
     else:
-        raise ValueError("Non implemented style")
+        all_ys_are_equal = np.all(ys == ys[0])
 
-    ax.plot(xs, ys, lw=0.5, color=color, **mat_style, **wargs)
-    if options.min_time is not None or options.max_time is not None:
-        args = {}
-        if options.min_time is not None:
-            args["left"] = (
-                duration.convert_date_to_duration(options.min_time)
-                if not is_unix_timestamp
-                else options.min_time
-            )
-        if options.max_time is not None:
-            args["right"] = (
-                duration.convert_date_to_duration(options.max_time)
-                if not is_unix_timestamp
-                else options.max_time
-            )
-        ax.set_xlim(**args)
-
-    ax.xaxis.set_tick_params(labelsize=8)
-    ax.xaxis.set_major_locator(ticker.MaxNLocator(10))
-    ax.xaxis.set_minor_locator(ticker.NullLocator())
-
-    ax.set_ylabel(name, size=8)
-    ax.yaxis.set_tick_params(labelsize=8)
-    ax.yaxis.set_major_locator(ticker.MaxNLocator(5))
-    ax.yaxis.set_minor_locator(ticker.NullLocator())
-
-    ax.grid(lw=0.4, ls="--", axis="x")
-    if title:
-        ax.set_title(title)
+    if not uniform and (len(xs) <= 1000 or all_ys_are_equal):
+        return Style.marker
+    else:
+        return Style.line
 
 
 def is_uniform(xs) -> bool:
@@ -351,4 +214,18 @@ def is_uniform(xs) -> bool:
     return np.allclose(diff, diff[0])
 
 
-BACKENDS = {"matplotlib": _plot_matplotlib}
+from temporian.implementation.numpy.data.plotter_bokeh import plot_bokeh
+from temporian.implementation.numpy.data.plotter_matplotlib import (
+    plot_matplotlib,
+)
+
+BACKENDS = {"matplotlib": plot_matplotlib, "bokeh": plot_bokeh}
+
+
+def error_message_import_backend(backend: str) -> str:
+    return (
+        f"Cannot plot with selected backend={backend}. Solutions: (1) Install"
+        f" {backend} e.g. 'pip install {backend}', or (2) use a different"
+        " plotting backen, for example with 'plot(..., backend=\"<other"
+        f' backend>"). The supported backends are: {list(BACKENDS.keys())}.'
+    )
