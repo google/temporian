@@ -290,14 +290,14 @@ class MovingSumOperatorTest(absltest.TestCase):
         )
 
         op = MovingSumOperator(
-            node=input_data.node(),
+            input=input_data.node(),
             window_length=np.inf,
             sampling=None,
         )
-        self.assertEqual(op.list_matching_io_samplings(), [("node", "node")])
+        self.assertEqual(op.list_matching_io_samplings(), [("input", "output")])
         instance = MovingSumNumpyImplementation(op)
 
-        output = instance(node=input_data)
+        output = instance(input=input_data)
 
         expected_output = EventSet.from_dataframe(
             pd.DataFrame(
@@ -317,7 +317,7 @@ class MovingSumOperatorTest(absltest.TestCase):
             index_names=["x", "y"],
         )
 
-        self.assertEqual(output["node"], expected_output)
+        self.assertEqual(output["output"], expected_output)
 
 
 if __name__ == "__main__":
