@@ -16,6 +16,8 @@
 
 from typing import Optional
 
+import numpy as np
+
 from temporian.core import operator_lib
 from temporian.core.data.duration import Duration
 from temporian.core.data.node import Node
@@ -68,4 +70,29 @@ def moving_sum(
         input=input,
         window_length=window_length,
         sampling=sampling,
+    ).outputs["output"]
+
+
+def cumsum(
+    input: Node,
+) -> Node:
+    """Cumulative Sum.
+
+    Foreach timestamp, calculate the sum of the feature from the beginning.
+    It's a shorthand for `moving_sum(event, window_length=np.inf)`.
+
+    Missing values are ignored.
+
+    While the feature does not have any values (e.g., missing initial values),
+    outputs missing values.
+
+    Args:
+        input: The node with features to accumulate.
+
+    Returns:
+        A node containing the cumulative sum of each feature in `node`.
+    """
+    return MovingSumOperator(
+        input=input,
+        window_length=np.inf,
     ).outputs["output"]

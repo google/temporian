@@ -1,5 +1,6 @@
 from absl.testing import parameterized, absltest
 
+import matplotlib
 import numpy as np
 
 from temporian.implementation.numpy.data import plotter
@@ -8,6 +9,11 @@ from temporian.implementation.numpy.data.event_set import EventSet
 
 
 class PlotterTest(parameterized.TestCase):
+    def setUp(self):
+        # Make sure that the plot functions don't fail on command line
+        print("Setting matplotlib backend to: agg")
+        matplotlib.use("agg")
+
     @parameterized.parameters((True,), (False,))
     def test_plot(self, interactive):
         try:
