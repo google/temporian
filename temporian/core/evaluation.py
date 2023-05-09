@@ -79,7 +79,7 @@ def evaluate(
 
     normalized_query = _normalize_query(query)
 
-    # input = _handle_single_input_node(input)
+    input = _normalize_input(input)
 
     if verbose >= 1:
         print("Build schedule", file=sys.stderr)
@@ -225,8 +225,35 @@ def build_schedule(
     return planned_ops, names_to_nodes
 
 
-# def _handle_single_input_node(input: EvaluationInput) -> EvaluationInput:
-#     if isinstance(input, Node):
+def _normalize_input(
+    input: EvaluationInput,
+) -> Dict[processor_lib.NodeInputArg, EventSet]:
+    """Normalizes an input into a dictionary of node or node names to evsets."""
+
+    if isinstance(input, dict):
+        return input
+
+    if isinstance(input, EventSet):
+        if not input.name:
+            raise ValueError(
+                f"{input} must have a name to be used as an unnamed input."
+                " Either set its name or pass inputs as a dict."
+            )
+        return {input.name: input}
+
+    if isinstance(input, list):
+        if not all((evset.name for evset in input)):
+            raise ValueError(
+                f"All event sets in {input} must have a name to be used as"
+                " unnamed inputs. Either set their names or pass inputs as a"
+                " dict."
+            )
+        return {evset.name: evset for evset in input}
+
+    raise TypeError(
+        f"Evaluate input argument must be one of {EvaluationInput}."
+        f" Received {type(input)} instead."
+    )
 
 
 def _normalize_query(query: EvaluationQuery) -> List[Node]:
@@ -249,7 +276,7 @@ def _normalize_query(query: EvaluationQuery) -> List[Node]:
         # TODO: improve error message
         raise TypeError(
             f"Evaluate query argument must be one of {EvaluationQuery}."
-            f" Received {type(query)}."
+            f" Received {type(query)} instead."
         )
 
     return normalized_query
@@ -259,6 +286,7 @@ def _denormalize_outputs(
     outputs: Dict[Node, EventSet], query: EvaluationQuery
 ) -> EvaluationResult:
     """Converts outputs into the same format as the query."""
+
     if isinstance(query, Node):
         return outputs[query]
 
