@@ -16,7 +16,6 @@
 
 import time
 import sys
-import pathlib
 from typing import Any, Dict, List, Set, Tuple, Union
 from collections import defaultdict
 
@@ -28,7 +27,14 @@ from temporian.implementation.numpy.data.event_set import EventSet
 
 
 EvaluationQuery = Union[Node, List[Node], Dict[str, Node]]
-EvaluationInput = Dict[Union[Node, str], Union[str, pathlib.Path, EventSet]]
+EvaluationInput = Union[
+    # dict of node/node name to corresponding event set
+    Dict[Union[Node, str], EventSet],
+    # list of event sets, and nodes are associated by name
+    List[EventSet],
+    # single event set, and node is associated by name
+    EventSet,
+]
 EvaluationResult = Union[EventSet, List[EventSet], Dict[str, EventSet]]
 
 
@@ -41,11 +47,14 @@ def evaluate(
     """Evaluates nodes on event sets.
 
     Args:
-        query: Nodes to compute. Supports node, dict and list of nodes.
-        input: Dictionary of node to event sets to use for the
-            computation. Keys can be nodes or strings. If a key is a string,
-            the EventSet it maps to will be used as input for the node with that
-            name.
+        query: Nodes to compute. Supports Node, dict of Nodes and list of Nodes.
+        input: Event sets to be used for the computation. Supports EventSet,
+            list of EventSets, dict of Nodes to EventSets, and dict of node
+            names to event sets. If a single event set or list of event sets,
+            they must be named and will be used as input for the nodes with the
+            same name. If a dict of node names to event sets, they will be used
+            as input for the nodes with those names. If a dict of nodes to event
+            sets, they will be used as input for those nodes.
         verbose: If >0, prints details about the execution on the standard error
             output. The larger the number, the more information is displayed.
         check_execution: If true, the input and output of the op implementation

@@ -66,6 +66,10 @@ class Node(object):
         verbose: int = 1,
         check_execution: bool = True,
     ) -> EventSet:
+        """Evaluates the node on the specified input.
+
+        See `tp.evaluate` for details.
+        """
         from temporian.core.evaluation import evaluate
 
         return evaluate(
