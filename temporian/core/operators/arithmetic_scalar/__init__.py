@@ -1,5 +1,7 @@
 # pylint: disable=unused-import
 
+# TODO: Is this file needed?
+
 from temporian.core.operators.arithmetic_scalar.add import (
     add_scalar,
     AddScalarOperator,
@@ -23,4 +25,12 @@ from temporian.core.operators.arithmetic_scalar.multiply import (
 from temporian.core.operators.arithmetic_scalar.equal import (
     equal_scalar,
     EqualScalarOperator,
+)
+from temporian.core.operators.arithmetic_scalar.greater import (
+    greater_scalar,
+    GreaterScalarOperator,
+)
+from temporian.core.operators.arithmetic_scalar.less import (
+    less_scalar,
+    LessScalarOperator,
 )

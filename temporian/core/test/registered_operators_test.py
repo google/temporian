@@ -40,6 +40,8 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "DIVISION_SCALAR",
             "EQUAL",
             "EQUAL_SCALAR",
+            "GREATER_SCALAR",
+            "LESS_SCALAR",
             "FILTER",
             "FLOORDIV",
             "FLOORDIV_SCALAR",
@@ -62,6 +64,9 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "RENAME",
             "DROP_INDEX",
             "UNIQUE_TIMESTAMPS",
+            "MOVING_MAX",
+            "MOVING_MIN",
+            "SINCE_LAST",
         ]
 
         self.assertSetEqual(

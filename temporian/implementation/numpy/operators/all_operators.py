@@ -29,6 +29,8 @@ from temporian.implementation.numpy.operators.arithmetic_scalar import multiply
 from temporian.implementation.numpy.operators.arithmetic_scalar import divide
 from temporian.implementation.numpy.operators.arithmetic_scalar import floordiv
 from temporian.implementation.numpy.operators.arithmetic_scalar import equal
+from temporian.implementation.numpy.operators.arithmetic_scalar import greater
+from temporian.implementation.numpy.operators.arithmetic_scalar import less
 
 from temporian.implementation.numpy.operators.window import (
     simple_moving_average,
@@ -38,6 +40,8 @@ from temporian.implementation.numpy.operators.window import (
 )
 from temporian.implementation.numpy.operators.window import moving_sum
 from temporian.implementation.numpy.operators.window import moving_count
+from temporian.implementation.numpy.operators.window import moving_min
+from temporian.implementation.numpy.operators.window import moving_max
 from temporian.implementation.numpy.operators.calendar import day_of_month
 from temporian.implementation.numpy.operators.calendar import day_of_week
 from temporian.implementation.numpy.operators.calendar import day_of_year
@@ -47,6 +51,7 @@ from temporian.implementation.numpy.operators.calendar import iso_week
 from temporian.implementation.numpy.operators.calendar import hour
 from temporian.implementation.numpy.operators.calendar import minute
 from temporian.implementation.numpy.operators.calendar import second
+from temporian.implementation.numpy.operators import since_last
 from temporian.implementation.numpy.operators import unique_timestamps
 
 # pylint: enable=unused-import

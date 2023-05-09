@@ -15,7 +15,7 @@
 """
 Benchmark Python API.
 """
-
+import argparse
 import time
 from typing import List, NamedTuple, Union
 
@@ -229,13 +229,16 @@ def benchmark_set_index(runner):
     runner.add_separator()
 
     np.random.seed(0)
-    for number_timestamps in [10_000]:
-        feature_values = list(range(int(20)))
+    for number_timestamps in [10_000, 100_000, 1_000_000]:
+        feature_values = list(range(int(10)))
+        index_values = list(range(int(5)))
         timestamps = np.sort(
             np.random.randn(number_timestamps) * number_timestamps
         )
 
-        # all features are int categorical from 0 to 20
+        # all features are int categorical from 0 to 10
+        index_1 = np.random.choice(index_values, number_timestamps)
+        index_2 = np.random.choice(index_values, number_timestamps)
         feature_1 = np.random.choice(feature_values, number_timestamps)
         feature_2 = np.random.choice(feature_values, number_timestamps)
         feature_3 = np.random.choice(feature_values, number_timestamps)
@@ -247,6 +250,8 @@ def benchmark_set_index(runner):
             pd.DataFrame(
                 {
                     "timestamp": timestamps,
+                    "index_1": index_1,
+                    "index_2": index_2,
                     "feature_1": feature_1,
                     "feature_2": feature_2,
                     "feature_3": feature_3,
@@ -256,6 +261,7 @@ def benchmark_set_index(runner):
                 }
             ),
             is_sorted=True,
+            index_names=["index_1", "index_2"],
         )
 
         node = evset.node()
@@ -269,28 +275,12 @@ def benchmark_set_index(runner):
         ]
 
         for index in possible_indexes:
-            output = tp.set_index(node, index)
-            runner.benchmark(
-                f"set_index:s:{number_timestamps:_}:num_idx:{len(index)}",
-                lambda: tp.evaluate(output, input={node: evset}),
-            )
-
-
-def main():
-    print("Running benchmark")
-    runner = Runner()
-    benchmark_from_dataframe(runner)
-    benchmark_simple_moving_average(runner)
-    benchmark_select_and_glue(runner)
-    benchmark_calendar_day_of_month(runner)
-    benchmark_sample(runner)
-    benchmark_propagate(runner)
-    benchmark_cast(runner)
-    benchmark_unique_timestamps(runner)
-    benchmark_set_index(runner)
-
-    print("All results (again)")
-    runner.print_results()
+            for append in [False]:
+                output = tp.set_index(node, index, append=append)
+                runner.benchmark(
+                    f"set_index:s:{number_timestamps:_}:num_idx:{len(index)}:append:{append}",
+                    lambda: tp.evaluate(output, input={node: evset}),
+                )
 
 
 class BenchmarkResult(NamedTuple):
@@ -348,6 +338,47 @@ class Runner:
             else:
                 print(result)
         print("=" * sep_length, flush=True)
+
+
+def main():
+    # parse benchmarks to run from command line
+    parser = argparse.ArgumentParser(description="Execute a list of functions.")
+    parser.add_argument(
+        "-f",
+        "--functions",
+        nargs="*",
+        help=(
+            "List of function names to execute. If not provided, all functions"
+            " will be executed."
+        ),
+    )
+    args = parser.parse_args()
+
+    print("Running benchmark")
+    runner = Runner()
+
+    benchmarks_to_run = [
+        "from_dataframe",
+        "simple_moving_average",
+        "select_and_glue",
+        "calendar_day_of_month",
+        "sample",
+        "propagate",
+        "cast",
+        "unique_timestamps",
+        "set_index",
+    ]
+    if args.functions is not None:
+        benchmarks_to_run = args.functions
+
+    for func_name in benchmarks_to_run:
+        try:
+            eval(f"benchmark_{func_name}")(runner)
+        except NameError:
+            print(f"Function '{func_name}' not found.")
+
+    print("All results (again)")
+    runner.print_results()
 
 
 if __name__ == "__main__":

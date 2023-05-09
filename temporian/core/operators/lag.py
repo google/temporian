@@ -14,8 +14,7 @@
 
 """Lag operator class and public API function definitions."""
 
-from typing import List
-from typing import Union
+from typing import List, Union
 
 from temporian.core import operator_lib
 from temporian.core.data.duration import Duration

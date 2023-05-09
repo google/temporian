@@ -33,7 +33,7 @@ py_library(
         "//temporian/core/operators/window:simple_moving_average",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
-        "//temporian/implementation/numpy_cc/operators:window",
+        "//temporian/implementation/numpy_cc/operators:operators_cc",
     ],
 )
 
@@ -46,7 +46,7 @@ py_library(
         "//temporian/core/operators/window:moving_standard_deviation",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
-        "//temporian/implementation/numpy_cc/operators:window",
+        "//temporian/implementation/numpy_cc/operators:operators_cc",
     ],
 )
 
@@ -59,7 +59,7 @@ py_library(
         "//temporian/core/operators/window:moving_sum",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
-        "//temporian/implementation/numpy_cc/operators:window",
+        "//temporian/implementation/numpy_cc/operators:operators_cc",
     ],
 )
 
@@ -72,6 +72,32 @@ py_library(
         "//temporian/core/operators/window:moving_count",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
-        "//temporian/implementation/numpy_cc/operators:window",
+        "//temporian/implementation/numpy_cc/operators:operators_cc",
+    ],
+)
+
+py_library(
+    name = "moving_max",
+    srcs = ["moving_max.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators/window:moving_max",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy_cc/operators:operators_cc",
+    ],
+)
+
+py_library(
+    name = "moving_min",
+    srcs = ["moving_min.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators/window:moving_min",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy_cc/operators:operators_cc",
     ],
 )

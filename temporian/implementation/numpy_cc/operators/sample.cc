@@ -48,7 +48,7 @@ build_sampling_idxs(const py::array_t<double> &evset_timestamps,
 
 } // namespace
 
-PYBIND11_MODULE(sample, m) {
+void init_sample(py::module &m) {
   m.def("build_sampling_idxs", &build_sampling_idxs, "",
         py::arg("evset_timestamps").noconvert(),
         py::arg("sampling_timestamps").noconvert());

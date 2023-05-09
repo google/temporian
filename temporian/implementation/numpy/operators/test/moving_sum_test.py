@@ -19,15 +19,20 @@ import numpy as np
 from numpy.testing import assert_array_equal
 import pandas as pd
 
+from absl.testing import absltest
 from temporian.core.operators.window.moving_sum import (
     MovingSumOperator,
 )
 from temporian.implementation.numpy.operators.window.moving_sum import (
     MovingSumNumpyImplementation,
+    operators_cc,
 )
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core.data import node as node_lib
-from temporian.implementation.numpy_cc.operators import window as window_cc
+from temporian.core.data import feature as feature_lib
+from temporian.core.data import dtype as dtype_lib
+import math
+from numpy.testing import assert_array_equal
 
 
 def _f64(l):
@@ -44,7 +49,7 @@ nan = math.nan
 class MovingSumOperatorTest(absltest.TestCase):
     def test_cc_wo_sampling(self):
         assert_array_equal(
-            window_cc.moving_sum(
+            operators_cc.moving_sum(
                 _f64([1, 2, 3, 5, 20]),
                 _f32([10, nan, 12, 13, 14]),
                 5.0,
@@ -259,6 +264,57 @@ class MovingSumOperatorTest(absltest.TestCase):
                 ],
                 columns=["a", "timestamp"],
             )
+        )
+
+        self.assertEqual(output["output"], expected_output)
+
+    def test_cumsum(self):
+        """Infinite window length (aka: cumsum function)"""
+
+        input_data = EventSet.from_dataframe(
+            pd.DataFrame(
+                [
+                    ["X1", "Y1", 10.0, 1.0, 1],
+                    ["X1", "Y1", 11.0, -1, 2],
+                    ["X1", "Y1", 12.0, 2, 3],
+                    ["X2", "Y1", 13.0, -3, 1.1],
+                    ["X2", "Y1", 14.0, -8, 2.1],
+                    ["X2", "Y1", 15.0, 0, 3.1],
+                    ["X2", "Y2", 16.0, 5, 1.2],
+                    ["X2", "Y2", 17.0, 3, 2.2],
+                    ["X2", "Y2", 18.0, -1, 3.2],
+                ],
+                columns=["x", "y", "a", "b", "timestamp"],
+            ),
+            index_names=["x", "y"],
+        )
+
+        op = MovingSumOperator(
+            input=input_data.node(),
+            window_length=np.inf,
+            sampling=None,
+        )
+        self.assertEqual(op.list_matching_io_samplings(), [("input", "output")])
+        instance = MovingSumNumpyImplementation(op)
+
+        output = instance(input=input_data)
+
+        expected_output = EventSet.from_dataframe(
+            pd.DataFrame(
+                [
+                    ["X1", "Y1", 10.0, 1.0, 1],
+                    ["X1", "Y1", 21.0, 0, 2],
+                    ["X1", "Y1", 33.0, 2, 3],
+                    ["X2", "Y1", 13.0, -3, 1.1],
+                    ["X2", "Y1", 27.0, -11, 2.1],
+                    ["X2", "Y1", 42.0, -11, 3.1],
+                    ["X2", "Y2", 16.0, 5, 1.2],
+                    ["X2", "Y2", 33.0, 8, 2.2],
+                    ["X2", "Y2", 51.0, 7, 3.2],
+                ],
+                columns=["x", "y", "a", "b", "timestamp"],
+            ),
+            index_names=["x", "y"],
         )
 
         self.assertEqual(output["output"], expected_output)

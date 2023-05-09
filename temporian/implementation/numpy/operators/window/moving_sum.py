@@ -20,14 +20,14 @@ from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.window.base import (
     BaseWindowNumpyImplementation,
 )
-from temporian.implementation.numpy_cc.operators import window as window_cc
+from temporian.implementation.numpy_cc.operators import operators_cc
 
 
 class MovingSumNumpyImplementation(BaseWindowNumpyImplementation):
     """Numpy implementation of the moving sum operator."""
 
     def _implementation(self):
-        return window_cc.moving_sum
+        return operators_cc.moving_sum
 
 
 implementation_lib.register_operator_implementation(

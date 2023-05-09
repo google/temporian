@@ -9,7 +9,6 @@ from temporian.core.operators.arithmetic import floordiv
 from temporian.core.operators.arithmetic import equal
 
 from temporian.core.operators.cast import cast
-from temporian.core.operators.drop_index import drop_index
 from temporian.core.operators.filter import filter
 
 from temporian.core.operators.arithmetic_scalar import add_scalar
@@ -18,6 +17,8 @@ from temporian.core.operators.arithmetic_scalar import floordiv_scalar
 from temporian.core.operators.arithmetic_scalar import multiply_scalar
 from temporian.core.operators.arithmetic_scalar import subtract_scalar
 from temporian.core.operators.arithmetic_scalar import equal_scalar
+from temporian.core.operators.arithmetic_scalar import greater_scalar
+from temporian.core.operators.arithmetic_scalar import less_scalar
 
 from temporian.core.operators.glue import glue
 from temporian.core.operators.calendar.day_of_month import calendar_day_of_month
@@ -37,7 +38,6 @@ from temporian.core.operators.prefix import prefix
 from temporian.core.operators.propagate import propagate
 from temporian.core.operators.sample import sample
 from temporian.core.operators.select import select
-from temporian.core.operators.set_index import set_index
 from temporian.core.operators.rename import rename
 
 from temporian.core.operators.window.simple_moving_average import (
@@ -46,8 +46,11 @@ from temporian.core.operators.window.simple_moving_average import (
 from temporian.core.operators.window.moving_standard_deviation import (
     moving_standard_deviation,
 )
-from temporian.core.operators.window.moving_sum import moving_sum
+from temporian.core.operators.window.moving_sum import moving_sum, cumsum
 from temporian.core.operators.window.moving_count import moving_count
+from temporian.core.operators.window.moving_min import moving_min
+from temporian.core.operators.window.moving_max import moving_max
 from temporian.core.operators.unique_timestamps import unique_timestamps
+from temporian.core.operators.since_last import since_last
 
 # pylint: enable=unused-import

@@ -19,15 +19,14 @@ import numpy as np
 from numpy.testing import assert_array_equal
 import pandas as pd
 
-from temporian.core.operators.window.moving_count import (
-    MovingCountOperator,
-)
+from temporian.core.operators.window.moving_count import MovingCountOperator
 from temporian.implementation.numpy.operators.window.moving_count import (
     MovingCountNumpyImplementation,
+    operators_cc,
 )
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core.data import node as node_lib
-from temporian.implementation.numpy_cc.operators import window as window_cc
+from numpy.testing import assert_array_equal
 
 
 def _f64(l):
@@ -48,7 +47,7 @@ nan = math.nan
 class MovingCountOperatorTest(absltest.TestCase):
     def test_cc_wo_sampling(self):
         assert_array_equal(
-            window_cc.moving_count(
+            operators_cc.moving_count(
                 _f64([1, 2, 3, 5, 20]),
                 _f32([10, nan, 12, 13, 14]),
                 5.0,

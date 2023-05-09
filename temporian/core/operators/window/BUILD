@@ -90,3 +90,33 @@ py_library(
         "//temporian/core/data:sampling",
     ],
 )
+
+py_library(
+    name = "moving_min",
+    srcs = ["moving_min.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:duration",
+        "//temporian/core/data:feature",
+        "//temporian/core/data:node",
+        "//temporian/core/data:sampling",
+    ],
+)
+
+py_library(
+    name = "moving_max",
+    srcs = ["moving_max.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:duration",
+        "//temporian/core/data:feature",
+        "//temporian/core/data:node",
+        "//temporian/core/data:sampling",
+    ],
+)
