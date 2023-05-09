@@ -26,7 +26,6 @@ from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core import processor as processor_lib
 from temporian.implementation.numpy import evaluation as np_eval
 
-AvailableBackends = Any
 Data = Dict[Union[Node, str], Union[str, pathlib.Path, EventSet]]
 Query = Union[Node, List[Node], Dict[str, Node]]
 Result = Union[EventSet, List[EventSet], Dict[str, EventSet]]
@@ -146,8 +145,8 @@ def build_schedule(
     outputs: List[Node],
     verbose: int = 0,
 ) -> Tuple[List[base.Operator], Dict[processor_lib.NodeInputArg, Node]]:
-    """Calculates which operators need to be executed in which order to
-    compute a set of output nodes given a set of input nodes.
+    """Calculates which operators need to be executed in which order to compute
+    a set of output nodes given a set of input nodes.
 
     This implementation is based on Kahn's algorithm.
 

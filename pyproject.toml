@@ -6,7 +6,7 @@ authors = [
     "Guillermo Etchebarne <getchebarne@tryolabs.com>",
     "Ian Spektor <ispektor@tryolabs.com>",
     "Mathieu Guillame-Bert <gbm@google.com>",
-    "Richard Stotz <richardstotz@google.com>"
+    "Richard Stotz <richardstotz@google.com>",
 ]
 
 [tool.poetry.dependencies]
@@ -23,7 +23,7 @@ pylint = "^2.15.10"
 memory-profiler = "^0.61.0"
 scalene = "^1.5.20"
 mkdocs = "^1.4.2"
-mkdocstrings = {extras = ["python"], version = "^0.20.0"}
+mkdocstrings = { extras = ["python"], version = "^0.20.0" }
 mkdocs-material = "^9.1.5"
 mkdocs-gen-files = "^0.4.0"
 mkdocs-literate-nav = "^0.6.0"
@@ -38,6 +38,9 @@ preview = true
 max-line-length = 80
 disable = [
     "redefined-builtin",
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "fixme",
 ]
 
 [tool.pyright]
