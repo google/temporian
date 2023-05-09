@@ -21,6 +21,20 @@ py_library(
 # =====
 
 py_test(
+    name = "node_test",
+    srcs = ["node_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/testing:absltest dep,
+        ":utils",
+        "//temporian/core/data:node",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators:base",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_test(
     name = "operator_test",
     srcs = ["operator_test.py"],
     srcs_version = "PY3",

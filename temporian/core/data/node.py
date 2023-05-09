@@ -89,26 +89,6 @@ class Node(object):
             " element-wise or use cast() operator to convert to boolean."
         )
 
-    def __hash__(self):
-        # The return value must be immutable
-        return id(self)
-
-    def __eq__(self, other: Any) -> Node:
-        if isinstance(other, Node):
-            from temporian.core.operators.binary import equal
-
-            return equal(input_1=self, input_2=other)
-
-        if isinstance(other, (int, float, bool, str)):
-            from temporian.core.operators.scalar import equal_scalar
-
-            return equal_scalar(input=self, value=other)
-
-        raise ValueError(
-            f"Cannot check {type(self)} == {type(other)} objects. "
-            "Only Node or values of type int,float,bool,str are supported."
-        )
-
     def __neq__(self, other: Any) -> Node:
         if isinstance(other, Node):
             from temporian.core.operators.binary import not_equal
