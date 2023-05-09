@@ -42,6 +42,7 @@ disable = [
     "missing-class-docstring",
     "missing-function-docstring",
     "fixme",
+    "invalid-name",
 ]
 
 [tool.pyright]

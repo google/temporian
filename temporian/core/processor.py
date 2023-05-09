@@ -120,7 +120,7 @@ class Processor(object):
 def infer_processor(
     inputs: Optional[Dict[str, NodeInputArg]],
     outputs: Dict[str, Node],
-) -> Tuple[Processor, Dict[NodeInputArg, Node]]:
+) -> Tuple[Processor, Dict[str, Node]]:
     """Extracts all the objects between the output and input nodes.
 
     Fails if any inputs are missing.
@@ -133,10 +133,10 @@ def infer_processor(
     Returns:
         Tuple of:
             - Inferred processor.
-            - Mapping of node or node name inputs to nodes. The keys are the
+            - Mapping of node name inputs to nodes. The keys are the string
             values in the `inputs` argument, and the values are the nodes
-            corresponding to each one. If an input was already a node, it will
-            be mapped to itself.
+            corresponding to each one. If a value was already a node, it won't
+            be present in the returned dictionary.
     """
     # The following algorithm lists all the nodes between the output and
     # input nodes. Informally, the algorithm works as follow:
@@ -169,7 +169,7 @@ def infer_processor(
     input_node_names_to_idx: Dict[str, str] = {}
 
     # Create map of node/node name inputs to corresponding node.
-    normalized_inputs: Dict[NodeInputArg, Node] = {}
+    names_to_nodes: Dict[str, Node] = {}
 
     if inputs is not None:
         p.inputs: Dict[str, Node] = {}
@@ -178,10 +178,9 @@ def infer_processor(
             if isinstance(node_or_name, Node):
                 input_nodes.add(node_or_name)
                 # Only add node_or_name to p.inputs if its a node
-                # If a name, it will be added to p.inputs and normalized_inputs
+                # If a name, it will be added to p.inputs and names_to_nodes
                 # when we find it
                 p.inputs[idx_str] = node_or_name
-                normalized_inputs[node_or_name] = node_or_name
 
             elif isinstance(node_or_name, str):
                 input_node_names_to_idx[node_or_name] = idx_str
@@ -216,7 +215,7 @@ def infer_processor(
             # Add node to p.inputs and normalized_inputs now that we have it.
             idx_str = input_node_names_to_idx[node.name]
             p.inputs[idx_str] = node
-            normalized_inputs[node.name] = node
+            names_to_nodes[node.name] = node
             continue
 
         if node.creator is None:
@@ -263,7 +262,7 @@ def infer_processor(
         for f in e.features:
             p.add_feature(f)
 
-    return p, normalized_inputs
+    return p, names_to_nodes
 
 
 def normalize_multiple_node_arg(src: MultipleNodeArg) -> Dict[str, Node]:
