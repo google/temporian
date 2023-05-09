@@ -81,6 +81,50 @@ class Node(object):
             f"id:{id(self)}\n"
         )
 
+    def __bool__(self) -> bool:
+        # Called on "if node" conditions
+        # TODO: modify to similar numpy msg if we implement .any() or .all()
+        raise ValueError(
+            "The truth value of a node is ambiguous. Check condition"
+            " element-wise or use cast() operator to convert to boolean."
+        )
+
+    def __hash__(self):
+        # The return value must be immutable
+        return id(self)
+
+    def __eq__(self, other: Any) -> Node:
+        if isinstance(other, Node):
+            from temporian.core.operators.binary import equal
+
+            return equal(input_1=self, input_2=other)
+
+        if isinstance(other, (int, float, bool, str)):
+            from temporian.core.operators.scalar import equal_scalar
+
+            return equal_scalar(input=self, value=other)
+
+        raise ValueError(
+            f"Cannot check {type(self)} == {type(other)} objects. "
+            "Only Node or values of type int,float,bool,str are supported."
+        )
+
+    def __neq__(self, other: Any) -> Node:
+        if isinstance(other, Node):
+            from temporian.core.operators.binary import not_equal
+
+            return not_equal(input_1=self, input_2=other)
+
+        if isinstance(other, (int, float, bool, str)):
+            from temporian.core.operators.scalar import not_equal_scalar
+
+            return not_equal_scalar(input=self, value=other)
+
+        raise ValueError(
+            f"Cannot check {type(self)} != {type(other)} objects. "
+            "Only Node or values of type int,float,bool,str are supported."
+        )
+
     def __add__(self, other: Any) -> Node:
         # TODO: In this and other operants, factor code and add support for
         # swapping operators (e.g. a+1, a+b, 1+a).
@@ -97,7 +141,7 @@ class Node(object):
 
         raise ValueError(
             f"Cannot add {type(self)} and {type(other)} objects. "
-            "Only Event and scalar values of type int or float are supported."
+            "Only Node and scalar values of type int or float are supported."
         )
 
     def __radd__(self, other: Any) -> Node:
@@ -118,7 +162,7 @@ class Node(object):
 
         raise ValueError(
             f"Cannot subtract {type(self)} and {type(other)} objects. "
-            "Only Event and scalar values of type int or float are supported."
+            "Only Node and scalar values of type int or float are supported."
         )
 
     def __rsub__(self, other: Any) -> Node:
@@ -131,7 +175,7 @@ class Node(object):
 
         raise ValueError(
             f"Cannot subtract {type(self)} and {type(other)} objects. "
-            "Only Event and scalar values of type int or float are supported."
+            "Only Node and scalar values of type int or float are supported."
         )
 
     def __mul__(self, other: Any) -> Node:
@@ -149,7 +193,7 @@ class Node(object):
 
         raise ValueError(
             f"Cannot multiply {type(self)} and {type(other)} objects. "
-            "Only Event and scalar values of type int or float are supported."
+            "Only Node and scalar values of type int or float are supported."
         )
 
     def __rmul__(self, other: Any) -> Node:
@@ -159,6 +203,27 @@ class Node(object):
         from temporian.core.operators.scalar import multiply_scalar
 
         return multiply_scalar(input=self, value=-1)
+
+    def __invert__(self):
+        from temporian.core.operators.unary import invert
+
+        return invert(input=self)
+
+    def __abs__(self):
+        from temporian.core.operators.unary import abs
+
+        return abs(input=self)
+
+    def __int__(self):
+        from temporian.core.operators.cast import cast
+
+        # Overflow going to int64 is very rare (only from float64)
+        return cast(self, DType.INT64, check_overflow=False)
+
+    def __float__(self):
+        from temporian.core.operators.cast import cast
+
+        return cast(self, DType.FLOAT64, check_overflow=False)
 
     def __truediv__(self, other: Any) -> Node:
         if isinstance(other, Node):
@@ -173,7 +238,7 @@ class Node(object):
 
         raise ValueError(
             f"Cannot divide {type(self)} and {type(other)} objects. "
-            "Only Event and scalar values of type int or float are supported."
+            "Only Node and scalar values of type int or float are supported."
         )
 
     def __rtruediv__(self, other: Any) -> Node:
@@ -184,7 +249,7 @@ class Node(object):
 
         raise ValueError(
             f"Cannot divide {type(self)} and {type(other)} objects. "
-            "Only Event and scalar values of type int or float are supported."
+            "Only Node and scalar values of type int or float are supported."
         )
 
     def __floordiv__(self, other: Any) -> Node:
@@ -202,7 +267,7 @@ class Node(object):
 
         raise ValueError(
             f"Cannot floor divide {type(self)} and {type(other)} objects. "
-            "Only Event and scalar values of type int or float are supported."
+            "Only Node and scalar values of type int or float are supported."
         )
 
     def __rfloordiv__(self, other: Any) -> Node:
@@ -215,10 +280,69 @@ class Node(object):
 
         raise ValueError(
             f"Cannot floor divide {type(self)} and {type(other)} objects. "
-            "Only Event and scalar values of type int or float are supported."
+            "Only Node and scalar values of type int or float are supported."
+        )
+
+    def __pow__(self, other: Any) -> Node:
+        if isinstance(other, Node):
+            from temporian.core.operators.binary import power
+
+            return power(base=self, exponent=other)
+
+        if isinstance(other, (int, float)):
+            from temporian.core.operators.scalar import power_scalar
+
+            return power_scalar(base=self, exponent=other)
+
+        raise ValueError(
+            f"Cannot raise {type(self)} ** {type(other)} objects. "
+            "Only Node and scalar values of type int or float are supported."
+        )
+
+    def __rpow__(self, other: Any) -> Node:
+        if isinstance(other, (int, float)):
+            from temporian.core.operators.scalar import power_scalar
+
+            return power_scalar(base=other, exponent=self)
+
+        raise ValueError(
+            f"Cannot raise {type(other)} ** {type(self)} objects. "
+            "Only Node and scalar values of type int or float are supported."
+        )
+
+    def __mod__(self, other: Any) -> Node:
+        if isinstance(other, Node):
+            from temporian.core.operators.binary import modulo
+
+            return modulo(numerator=self, denominator=other)
+
+        if isinstance(other, (int, float)):
+            from temporian.core.operators.scalar import modulo_scalar
+
+            return modulo_scalar(numerator=self, denominator=other)
+
+        raise ValueError(
+            f"Cannot compute {type(self)} % {type(other)} objects. "
+            "Only Node and scalar values of type int or float are supported."
+        )
+
+    def __rmod__(self, other: Any) -> Node:
+        if isinstance(other, (int, float)):
+            from temporian.core.operators.scalar import modulo_scalar
+
+            return modulo_scalar(numerator=other, denominator=self)
+
+        raise ValueError(
+            f"Cannot compute {type(other)} % {type(self)} objects. "
+            "Only Node and scalar values of type int or float are supported."
         )
 
     def __gt__(self, other: Any):
+        if isinstance(other, Node):
+            from temporian.core.operators.binary import greater
+
+            return greater(input_left=self, input_right=other)
+
         if isinstance(other, (int, float)):
             from temporian.core.operators.scalar import (
                 greater_scalar,
@@ -228,10 +352,33 @@ class Node(object):
 
         raise ValueError(
             f"Cannot compute {type(self)} > {type(other)}. "
-            "Only Event and scalar values of type int or float are supported."
+            "Only Node and scalar values of type int or float are supported."
+        )
+
+    def __ge__(self, other: Any):
+        if isinstance(other, Node):
+            from temporian.core.operators.binary import greater_equal
+
+            return greater_equal(input_left=self, input_right=other)
+
+        if isinstance(other, (int, float)):
+            from temporian.core.operators.scalar import (
+                greater_equal_scalar,
+            )
+
+            return greater_equal_scalar(input=self, value=other)
+
+        raise ValueError(
+            f"Cannot compute {type(self)} >= {type(other)}. "
+            "Only Node and scalar values of type int or float are supported."
         )
 
     def __lt__(self, other: Any):
+        if isinstance(other, Node):
+            from temporian.core.operators.binary import less
+
+            return less(input_left=self, input_right=other)
+
         if isinstance(other, (int, float)):
             from temporian.core.operators.scalar import (
                 less_scalar,
@@ -241,7 +388,55 @@ class Node(object):
 
         raise ValueError(
             f"Cannot compute {type(self)} < {type(other)}. "
-            "Only Event and scalar values of type int or float are supported."
+            "Only Node and scalar values of type int or float are supported."
+        )
+
+    def __le__(self, other: Any):
+        if isinstance(other, Node):
+            from temporian.core.operators.binary import less_equal
+
+            return less_equal(input_left=self, input_right=other)
+
+        if isinstance(other, (int, float)):
+            from temporian.core.operators.scalar import (
+                less_equal_scalar,
+            )
+
+            return less_equal_scalar(input=self, value=other)
+
+        raise ValueError(
+            f"Cannot compute {type(self)} <= {type(other)}. "
+            "Only Node and scalar values of type int or float are supported."
+        )
+
+    def __and__(self, other: Any) -> Node:
+        if isinstance(other, Node):
+            from temporian.core.operators.binary import logical_and
+
+            return logical_and(input_1=self, input_2=other)
+        raise ValueError(
+            f"Cannot compare {type(self)} & {type(other)} objects. "
+            "Only Nodes with boolean features are supported."
+        )
+
+    def __or__(self, other: Any) -> Node:
+        if isinstance(other, Node):
+            from temporian.core.operators.binary import logical_or
+
+            return logical_or(input_1=self, input_2=other)
+        raise ValueError(
+            f"Cannot compare {type(self)} | {type(other)} objects. "
+            "Only Nodes with boolean features are supported."
+        )
+
+    def __xor__(self, other: Any) -> Node:
+        if isinstance(other, Node):
+            from temporian.core.operators.binary import logical_xor
+
+            return logical_xor(input_1=self, input_2=other)
+        raise ValueError(
+            f"Cannot compare {type(self)} ^ {type(other)} objects. "
+            "Only Nodes with boolean features are supported."
         )
 
     @property

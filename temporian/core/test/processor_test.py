@@ -140,7 +140,7 @@ class ProcessorTest(absltest.TestCase):
         self.assertLen(p.samplings, 1)
         self.assertLen(p.inputs, 1)
         self.assertLen(p.outputs, 1)
-        self.assertEqual(p.inputs["io_1"], p.outputs["io_2"])
+        self.assertTrue(p.inputs["io_1"] is p.outputs["io_2"])
 
 
 if __name__ == "__main__":
