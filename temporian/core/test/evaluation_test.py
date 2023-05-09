@@ -143,6 +143,46 @@ class EvaluationTest(absltest.TestCase):
         self.assertIsInstance(result, list)
         self.assertLen(result, 2)
 
+    def test_evaluate_single_unnamed_input_no_name(self):
+        e1 = utils.create_input_event_set()
+        i1 = e1.node()
+
+        with self.assertRaises(ValueError):
+            evaluation.evaluate(i1, e1)
+
+    def test_evaluate_single_unnamed_input_named(self):
+        e1 = utils.create_input_event_set("i1")
+        i1 = e1.node()
+
+        result = evaluation.evaluate(i1, e1)
+
+        self.assertIsInstance(result, EventSet)
+        self.assertTrue(result is e1)
+
+    def test_evaluate_list_unnamed_inputs_no_name(self):
+        e1 = utils.create_input_event_set("i1")
+        i1 = e1.node()
+        e2 = utils.create_input_event_set()
+        i2 = e2.node()
+
+        with self.assertRaises(ValueError):
+            evaluation.evaluate([i1, i2], [e1, e2])
+
+    def test_evaluate_list_unnamed_inputs_named(self):
+        e1 = utils.create_input_event_set("i1")
+        i1 = e1.node()
+        e2 = utils.create_input_event_set("i2")
+        i2 = e2.node()
+        e3 = utils.create_input_event_set("i3")
+        i3 = e3.node()
+
+        result = evaluation.evaluate([i3, i1, i2], [e1, e2, e3])
+
+        self.assertIsInstance(result, list)
+        self.assertTrue(result[0] is e3)
+        self.assertTrue(result[1] is e1)
+        self.assertTrue(result[2] is e2)
+
 
 if __name__ == "__main__":
     absltest.main()

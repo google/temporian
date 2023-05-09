@@ -27,7 +27,7 @@ def create_input_node(name: Optional[str] = None):
     )
 
 
-def create_input_event_set():
+def create_input_event_set(name: Optional[str] = None) -> EventSet:
     return EventSet.from_dataframe(
         pd.DataFrame(
             {
@@ -35,7 +35,8 @@ def create_input_event_set():
                 "f1": [1.0, 2.0, 3.0, 4.0],
                 "f2": [5.0, 6.0, 7.0, 8.0],
             }
-        )
+        ),
+        name=name,
     )
 
 
