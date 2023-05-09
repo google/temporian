@@ -220,7 +220,7 @@ class Node(object):
 
     def __gt__(self, other: Any):
         if isinstance(other, (int, float)):
-            from temporian.core.operators.arithmetic_scalar import (
+            from temporian.core.operators.scalar import (
                 greater_scalar,
             )
 
@@ -233,7 +233,7 @@ class Node(object):
 
     def __lt__(self, other: Any):
         if isinstance(other, (int, float)):
-            from temporian.core.operators.arithmetic_scalar import (
+            from temporian.core.operators.scalar import (
                 less_scalar,
             )
 

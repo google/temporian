@@ -131,7 +131,7 @@ class InvertNumpyImplementationTest(absltest.TestCase):
             sampling=self.sampling,
             creator=None,
         )
-        with self.assertRaisesRegex(ValueError, "BOOLEAN"):
+        with self.assertRaisesRegex(ValueError, "bool"):
             _ = InvertOperator(input=invalid_node)
 
 
