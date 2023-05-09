@@ -98,7 +98,7 @@ class SerializeTest(absltest.TestCase):
         input_node = input_data.node()
         output_node = tp.simple_moving_average(input_node, 2.0)
 
-        original = processor.infer_processor(
+        original, _ = processor.infer_processor(
             {"i": input_node},
             {"o": output_node},
         )
