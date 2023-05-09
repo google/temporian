@@ -20,8 +20,8 @@ from temporian.implementation.numpy.data.event_set import EventSet
 def create_input_node(name: Optional[str] = None):
     return node_lib.input_node(
         features=[
-            Feature("f1", DType.FLOAT32),
-            Feature("f2", DType.FLOAT32),
+            Feature("f1", DType.FLOAT64),
+            Feature("f2", DType.FLOAT64),
         ],
         name=name,
     )
