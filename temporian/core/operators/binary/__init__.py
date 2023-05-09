@@ -32,4 +32,13 @@ from temporian.core.operators.binary.relational import (
     less_equal,
 )
 
+from temporian.core.operators.binary.logical import (
+    LogicalAndOperator,
+    LogicalOrOperator,
+    LogicalXorOperator,
+    logical_and,
+    logical_or,
+    logical_xor,
+)
+
 # pylint: enable=unused-import

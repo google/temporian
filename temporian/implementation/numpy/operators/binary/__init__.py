@@ -8,6 +8,15 @@ from temporian.implementation.numpy.operators.binary.arithmetic import (
 )
 from temporian.implementation.numpy.operators.binary.relational import (
     EqualNumpyImplementation,
+    GreaterEqualNumpyImplementation,
+    GreaterNumpyImplementation,
+    LessEqualNumpyImplementation,
+    LessNumpyImplementation,
+    NotEqualNumpyImplementation,
+)
+from temporian.implementation.numpy.operators.binary.logical import (
+    LogicalAndNumpyImplementation,
+    LogicalOrNumpyImplementation,
 )
 
 # pylint: enable=unused-import

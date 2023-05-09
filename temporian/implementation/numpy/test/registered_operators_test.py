@@ -25,6 +25,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
         expected_implementations = [
             "ABS",
             "ADDITION",
+            "AND",
             "ADDITION_SCALAR",
             "CALENDAR_DAY_OF_MONTH",
             "CALENDAR_DAY_OF_WEEK",
@@ -70,6 +71,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "NOT_NAN",
             "NOT_EQUAL",
             "NOT_EQUAL_SCALAR",
+            "OR",
             "POWER",
             "POWER_SCALAR",
             "PREFIX",
@@ -84,6 +86,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "DROP_INDEX",
             "UNIQUE_TIMESTAMPS",
             "SINCE_LAST",
+            "XOR",
         ]
 
         self.assertSetEqual(

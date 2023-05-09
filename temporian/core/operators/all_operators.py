@@ -14,6 +14,9 @@ from temporian.core.operators.binary import greater
 from temporian.core.operators.binary import greater_equal
 from temporian.core.operators.binary import less
 from temporian.core.operators.binary import less_equal
+from temporian.core.operators.binary import logical_and
+from temporian.core.operators.binary import logical_or
+from temporian.core.operators.binary import logical_xor
 
 from temporian.core.operators.scalar import add_scalar
 from temporian.core.operators.scalar import divide_scalar

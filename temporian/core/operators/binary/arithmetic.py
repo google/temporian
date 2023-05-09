@@ -258,7 +258,7 @@ def modulo(
     Returns:
         New node with the remainder of the integer division
     """
-    return SubtractOperator(
+    return ModuloOperator(
         input_1=numerator,
         input_2=denominator,
     ).outputs["output"]
@@ -280,7 +280,7 @@ def power(
     Returns:
         New node with the remainder of the integer division
     """
-    return SubtractOperator(
+    return PowerOperator(
         input_1=base,
         input_2=exponent,
     ).outputs["output"]

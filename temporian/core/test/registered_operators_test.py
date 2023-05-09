@@ -27,6 +27,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "ABS",
             "ADDITION",
             "ADDITION_SCALAR",
+            "AND",
             "CALENDAR_DAY_OF_MONTH",
             "CALENDAR_DAY_OF_WEEK",
             "CALENDAR_ISO_WEEK",
@@ -69,6 +70,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "NOT_NAN",
             "NOT_EQUAL",
             "NOT_EQUAL_SCALAR",
+            "OR",
             "POWER",
             "POWER_SCALAR",
             "PREFIX",
@@ -86,6 +88,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "MOVING_MAX",
             "MOVING_MIN",
             "SINCE_LAST",
+            "XOR",
         ]
 
         self.assertSetEqual(

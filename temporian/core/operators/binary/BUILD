@@ -13,6 +13,7 @@ py_library(
     deps = [
         ":arithmetic",
         ":base",
+        ":logical",
         ":relational",
     ],
 )
@@ -43,6 +44,17 @@ py_library(
 py_library(
     name = "relational",
     srcs = ["relational.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:node",
+    ],
+)
+
+py_library(
+    name = "logical",
+    srcs = ["logical.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
