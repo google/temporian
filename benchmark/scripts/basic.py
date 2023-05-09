@@ -81,7 +81,7 @@ def main():
 
     res: EventSet = tp.evaluate(
         c,
-        input_data={
+        input={
             node_1: evset_1,
             node_2: evset_2,
         },

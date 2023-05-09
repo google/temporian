@@ -117,7 +117,7 @@ class SelectOperatorTest(absltest.TestCase):
 
         output_evset = evaluation.evaluate(
             self.input_node["sales"],
-            input_data={
+            input={
                 self.input_node: self.input_evset,
             },
         )

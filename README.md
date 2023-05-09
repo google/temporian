@@ -35,7 +35,7 @@ output_node = tp.glue(output_node, lag_node)
 # Execute pipeline and get results
 output_evset = tp.evaluate(
     output_node,
-    input_data={
+    {
         node: evset,
     },
 )

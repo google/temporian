@@ -112,7 +112,7 @@ class PrototypeTest(absltest.TestCase):
 
         output_evset = tp.evaluate(
             output_node,
-            input_data={
+            input={
                 self.node_1: self.evset_1,
                 self.node_2: self.evset_2,
             },

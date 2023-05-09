@@ -22,26 +22,27 @@ from collections import defaultdict
 
 from temporian.core.data.node import Node
 from temporian.core.operators import base
-from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core import processor as processor_lib
 from temporian.implementation.numpy import evaluation as np_eval
+from temporian.implementation.numpy.data.event_set import EventSet
 
-Data = Dict[Union[Node, str], Union[str, pathlib.Path, EventSet]]
-Query = Union[Node, List[Node], Dict[str, Node]]
-Result = Union[EventSet, List[EventSet], Dict[str, EventSet]]
+
+EvaluationQuery = Union[Node, List[Node], Dict[str, Node]]
+EvaluationInput = Dict[Union[Node, str], Union[str, pathlib.Path, EventSet]]
+EvaluationResult = Union[EventSet, List[EventSet], Dict[str, EventSet]]
 
 
 def evaluate(
-    query: Query,
-    input_data: Data,
+    query: EvaluationQuery,
+    input: EvaluationInput,
     verbose: int = 1,
     check_execution: bool = True,
-) -> Result:
+) -> EvaluationResult:
     """Evaluates nodes on event sets.
 
     Args:
         query: Nodes to compute. Supports node, dict and list of nodes.
-        input_data: Dictionary of node to event sets to use for the
+        input: Dictionary of node to event sets to use for the
             computation. Keys can be nodes or strings. If a key is a string,
             the EventSet it maps to will be used as input for the node with that
             name.
@@ -80,22 +81,22 @@ def evaluate(
     else:
         # TODO: improve error message
         raise TypeError(
-            f"Evaluate query argument must be one of {Query}. Received"
-            f" {type(query)}."
+            f"Evaluate query argument must be one of {EvaluationQuery}."
+            f" Received {type(query)}."
         )
 
     if verbose >= 1:
         print("Build schedule", file=sys.stderr)
 
     # Schedule execution
-    input_nodes = list(input_data.keys())
+    input_nodes = list(input.keys())
     schedule, normalized_inputs = build_schedule(
         inputs=input_nodes, outputs=normalized_query, verbose=verbose
     )
 
-    # Replace node names for actual nodes in input_data
-    normalized_input_data = {
-        normalized_inputs[input]: data for input, data in input_data.items()
+    # Replace node names for actual nodes in input
+    normalized_input = {
+        normalized_inputs[input]: data for input, data in input.items()
     }
 
     if verbose == 1:
@@ -112,7 +113,7 @@ def evaluate(
     # Note: "outputs" is a dictionary of event (including the query events) to
     # event data.
     outputs = np_eval.evaluate_schedule(
-        normalized_input_data,
+        normalized_input,
         schedule,
         verbose=verbose,
         check_execution=check_execution,

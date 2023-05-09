@@ -143,7 +143,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
         # evaluate
         output_evset_lag_1 = evaluation.evaluate(
             lag_1,
-            input_data={
+            input={
                 node: input_evset,
             },
         )
@@ -154,7 +154,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
         # evaluate
         output_evset_lag_2 = evaluation.evaluate(
             lag_2,
-            input_data={
+            input={
                 node: input_evset,
             },
         )
@@ -273,7 +273,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
         # evaluate
         output_evset_leak_1 = evaluation.evaluate(
             leak_1,
-            input_data={
+            input={
                 node: input_evset,
             },
         )
@@ -284,7 +284,7 @@ class LagNumpyImplementationTest(absltest.TestCase):
         # evaluate
         output_evset_leak_2 = evaluation.evaluate(
             leak_2,
-            input_data={
+            input={
                 node: input_evset,
             },
         )
