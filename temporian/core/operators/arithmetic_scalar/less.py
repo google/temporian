@@ -58,11 +58,11 @@ def less_scalar(
     """Computes event < value.
 
     Args:
-        event: Event to compare the value to.
-        value: Scalar value to compare to the event.
+        input: Node to compare the value to.
+        value: Scalar value to compare to the input.
 
     Returns:
-        Event containing the result of the computation.
+        Node containing the result of the computation.
     """
     return LessScalarOperator(
         input=input,
