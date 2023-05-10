@@ -321,7 +321,6 @@ py_test(
         "//temporian/core/operators/window:simple_moving_average",
         "//temporian/implementation/numpy:evaluator",
         "//temporian/implementation/numpy/operators/window:simple_moving_average",
-        "//temporian/implementation/numpy_cc/operators:window",
     ],
 )
 
@@ -335,7 +334,6 @@ py_test(
         "//temporian/core/data:node",
         "//temporian/core/operators/window:moving_standard_deviation",
         "//temporian/implementation/numpy/operators/window:moving_standard_deviation",
-        "//temporian/implementation/numpy_cc/operators:window",
     ],
 )
 
@@ -349,7 +347,6 @@ py_test(
         "//temporian/core/data:node",
         "//temporian/core/operators/window:moving_sum",
         "//temporian/implementation/numpy/operators/window:moving_sum",
-        "//temporian/implementation/numpy_cc/operators:window",
     ],
 )
 
@@ -363,7 +360,32 @@ py_test(
         "//temporian/core/data:node",
         "//temporian/core/operators/window:moving_count",
         "//temporian/implementation/numpy/operators/window:moving_count",
-        "//temporian/implementation/numpy_cc/operators:window",
+    ],
+)
+
+py_test(
+    name = "moving_min_test",
+    srcs = ["moving_min_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:feature",
+        "//temporian/core/data:node",
+        "//temporian/core/operators/window:moving_min",
+        "//temporian/implementation/numpy/operators/window:moving_min",
+    ],
+)
+
+py_test(
+    name = "moving_max_test",
+    srcs = ["moving_max_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:feature",
+        "//temporian/core/data:node",
+        "//temporian/core/operators/window:moving_max",
+        "//temporian/implementation/numpy/operators/window:moving_max",
     ],
 )
 
@@ -419,5 +441,18 @@ py_test(
         "//temporian/core/data:node",
         "//temporian/core/operators:unique_timestamps",
         "//temporian/implementation/numpy/operators:unique_timestamps",
+    ],
+)
+
+py_test(
+    name = "since_last_test",
+    srcs = ["since_last_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:feature",
+        "//temporian/core/data:node",
+        "//temporian/core/operators:since_last",
+        "//temporian/implementation/numpy/operators:since_last",
     ],
 )

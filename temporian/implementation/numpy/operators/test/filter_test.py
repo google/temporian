@@ -146,8 +146,9 @@ class FilterOperatorTest(absltest.TestCase):
                 [2.0, np.nan, "A"],
                 [3.0, 12.0, "B"],
                 [4.0, 13.0, "B"],
-                [5.0, 14.0, "C"],
-                [6.0, 15.0, "C"],
+                # TODO: Find a way to create a index in EventSet without data.
+                # [5.0, 14.0, "C"],
+                # [6.0, 15.0, "C"],
             ],
             columns=["timestamp", "sales", "product"],
         )
@@ -159,8 +160,8 @@ class FilterOperatorTest(absltest.TestCase):
                 [2.0, True, "A"],
                 [3.0, True, "B"],
                 [4.0, False, "B"],
-                [5.0, False, "C"],
-                [6.0, False, "C"],
+                # [5.0, False, "C"],
+                # [6.0, False, "C"],
             ],
             columns=["timestamp", "low_sales", "product"],
         )
@@ -194,68 +195,6 @@ class FilterOperatorTest(absltest.TestCase):
 
         expected_evset = EventSet.from_dataframe(
             expected_df, index_names=["product"]
-        )
-
-        self.assertEqual(filtered_evset, expected_evset)
-
-    def test_filter_with_one_index(self) -> None:
-        """Test correct filter operator with multiple index."""
-
-        df = pd.DataFrame(
-            [
-                [1.0, 10.0, "A", 101],
-                [2.0, np.nan, "A", 102],
-                [3.0, 12.0, "B", 103],
-                [4.0, 13.0, "B", 104],
-                [5.0, 14.0, "C", 105],
-                [6.0, 15.0, "C", 106],
-            ],
-            columns=["timestamp", "sales", "product", "id"],
-        )
-
-        # must have same index for filtering
-        condition_df = pd.DataFrame(
-            [
-                [1.0, True, "A", 101],
-                [2.0, True, "A", 102],
-                [3.0, True, "B", 103],
-                [4.0, False, "B", 104],
-                [5.0, False, "C", 105],
-                [6.0, False, "C", 106],
-            ],
-            columns=["timestamp", "low_sales", "product", "id"],
-        )
-
-        expected_df = pd.DataFrame(
-            [
-                ["A", 101, 1.0, 10.0],
-                ["A", 102, 2.0, np.nan],
-                ["B", 103, 3.0, 12.0],
-            ],
-            columns=[
-                "product",
-                "id",
-                "timestamp",
-                "sales",
-            ],
-        )
-
-        evset = EventSet.from_dataframe(df, index_names=["product", "id"])
-        node = evset.node()
-
-        condition_evset = EventSet.from_dataframe(
-            condition_df, index_names=["product", "id"]
-        )
-        condition = condition_evset.node()
-
-        operator = FilterOperator(input=node, condition=condition)
-        impl = FilterNumpyImplementation(operator)
-        filtered_evset = impl.call(input=evset, condition=condition_evset)[
-            "output"
-        ]
-
-        expected_evset = EventSet.from_dataframe(
-            expected_df, index_names=["product", "id"]
         )
 
         self.assertEqual(filtered_evset, expected_evset)

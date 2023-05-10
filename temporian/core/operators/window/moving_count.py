@@ -30,7 +30,7 @@ class MovingCountOperator(BaseWindowOperator):
     def operator_def_key(cls) -> str:
         return "MOVING_COUNT"
 
-    def get_feature_dtype(self, feature: Feature) -> str:
+    def get_feature_dtype(self, feature: Feature) -> DType:
         return DType.INT32
 
 

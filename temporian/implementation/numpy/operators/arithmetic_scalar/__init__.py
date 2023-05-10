@@ -18,5 +18,11 @@ from temporian.implementation.numpy.operators.arithmetic_scalar.floordiv import 
 from temporian.implementation.numpy.operators.arithmetic_scalar.equal import (
     EqualScalarNumpyImplementation,
 )
+from temporian.implementation.numpy.operators.arithmetic_scalar.greater import (
+    GreaterScalarNumpyImplementation,
+)
+from temporian.implementation.numpy.operators.arithmetic_scalar.less import (
+    LessScalarNumpyImplementation,
+)
 
 # pylint: enable=unused-import

@@ -19,24 +19,19 @@ class FilterNumpyImplementation(OperatorImplementation):
         output_evset = EventSet(
             {}, input.feature_names, input.index_names, input.is_unix_timestamp
         )
-        for index_key, index_data in condition.iterindex():
+        for condition_index, condition_data in condition.iterindex():
             # get boolean mask from condition
-            index_mask = index_data.features[0]
+            mask = condition_data.features[0]
 
-            # filter timestamps
-            filtered_timestamps = input[index_key].timestamps[index_mask]
+            src_event = input[condition_index]
 
-            # if filtered timestamps is empty, skip
-            if len(filtered_timestamps) == 0:
-                continue
+            filtered_timestamps = src_event.timestamps[mask]
 
-            # filter features
             filtered_features = [
-                evset_feature[index_mask]
-                for evset_feature in input[index_key].features
+                feature_data[mask] for feature_data in src_event.features
             ]
-            # set filtered data
-            output_evset[index_key] = IndexData(
+
+            output_evset[condition_index] = IndexData(
                 filtered_features, filtered_timestamps
             )
 

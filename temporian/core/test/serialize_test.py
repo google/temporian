@@ -14,10 +14,13 @@
 
 from absl import logging
 from absl.testing import absltest
+import pandas as pd
 
+import temporian as tp
 from temporian.core import serialize
 from temporian.core import graph
 from temporian.core.test import utils
+from temporian.implementation.numpy.data.event_set import EventSet
 
 
 class SerializeTest(absltest.TestCase):
@@ -79,6 +82,33 @@ class SerializeTest(absltest.TestCase):
             serialize.all_identifiers(original.outputs.values())
             & serialize.all_identifiers(restored.outputs.values())
         )
+
+    def test_serialize_autonode(self):
+        input_data = EventSet.from_dataframe(
+            pd.DataFrame(
+                {
+                    "timestamp": [0.0, 2.0, 4.0, 6.0],
+                    "f1": [1.0, 2.0, 3.0, 4.0],
+                    "x": [1, 1, 2, 2],
+                },
+            ),
+            index_names=["x"],
+        )
+
+        input_node = input_data.node()
+        output_node = tp.simple_moving_average(input_node, 2.0)
+
+        original = graph.infer_graph(
+            {"i": input_node},
+            {"o": output_node},
+        )
+        logging.info("original:\n%s", original)
+
+        proto = serialize.serialize(original)
+        logging.info("proto:\n%s", proto)
+
+        restored = serialize.unserialize(proto)
+        logging.info("restored:\n%s", restored)
 
     def test_serialize_attributes(self):
         """

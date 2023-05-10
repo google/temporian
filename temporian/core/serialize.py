@@ -171,6 +171,8 @@ def unserialize(src: pb.Graph) -> graph.Graph:
 
 def _identifier(item: Any) -> str:
     """Creates a unique identifier for an object within a graph."""
+    if item is None:
+        raise ValueError("Cannot get id of None")
     return str(id(item))
 
 
@@ -260,7 +262,7 @@ def _unserialize_node(
     src: pb.Node, samplings: Dict[str, Sampling], features: Dict[str, Feature]
 ) -> Node:
     if src.sampling_id not in samplings:
-        raise ValueError(f"Non existing sampling {src.sampling_id}")
+        raise ValueError(f"Non existing sampling {src.sampling_id} in {src}")
 
     def get_feature(key):
         if key not in features:
@@ -291,7 +293,7 @@ def _unserialize_feature(
     src: pb.Feature, samplings: Dict[str, Sampling]
 ) -> Feature:
     if src.sampling_id not in samplings:
-        raise ValueError(f"Non existing sampling {src.sampling_id}")
+        raise ValueError(f"Non existing sampling {src.sampling_id} in {src}")
 
     return Feature(
         name=src.name,
@@ -306,7 +308,7 @@ def _serialize_sampling(src: Sampling) -> pb.Sampling:
         id=_identifier(src),
         index=pb.Index(
             levels=[
-                pb.Index.IndexLevel(name, dtype)
+                pb.Index.IndexLevel(name=name, dtype=_serialize_dtype(dtype))
                 for name, dtype in zip(src.index.names, src.index.dtypes)
             ]
         ),
@@ -320,7 +322,7 @@ def _serialize_sampling(src: Sampling) -> pb.Sampling:
 def _unserialize_sampling(src: pb.Sampling) -> Sampling:
     return Sampling(
         index_levels=[
-            (index_level.name, index_level.dtype)
+            (index_level.name, _unserialize_dtype(index_level.dtype))
             for index_level in src.index.levels
         ],
         creator=None,

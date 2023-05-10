@@ -96,10 +96,12 @@ class Feature(object):
     def creator(self) -> Optional[Operator]:
         return self._creator
 
+    # TODO: Remove. A feature is constant after its creation.
     @sampling.setter
     def sampling(self, sampling: Optional[Sampling]):
         self._sampling = sampling
 
+    # TODO: Remove. A feature is constant after its creation.
     @creator.setter
     def creator(self, creator: Optional[Operator]):
         self._creator = creator

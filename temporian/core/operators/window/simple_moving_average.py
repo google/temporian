@@ -34,7 +34,7 @@ class SimpleMovingAverageOperator(BaseWindowOperator):
     def operator_def_key(cls) -> str:
         return "SIMPLE_MOVING_AVERAGE"
 
-    def get_feature_dtype(self, feature: Feature) -> str:
+    def get_feature_dtype(self, feature: Feature) -> DType:
         return (
             DType.FLOAT32 if feature.dtype == DType.FLOAT32 else DType.FLOAT64
         )

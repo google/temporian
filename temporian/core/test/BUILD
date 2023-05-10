@@ -59,6 +59,7 @@ py_test(
         # absl/logging dep,
         # absl/testing:absltest dep,
         ":utils",
+        "//temporian",
         "//temporian/core:graph",
         "//temporian/core:serialize",
         "//temporian/core/data:dtype",

@@ -42,10 +42,17 @@ class TFPTest(absltest.TestCase):
         i2 = evset_2.node()
         h1 = t.simple_moving_average(input=i1, window_length=7)
         h2 = t.sample(input=h1, sampling=i2)
+
+        h3 = i1 * 2.0 + 3.0 > 10.0
+
         result = t.glue(t.prefix("sma_", h2["f2"]), i2)
 
-        result_data = t.evaluate(
-            query=result,
+        result2 = t.glue(
+            t.prefix("toto.", h3),
+        )
+
+        result_data, result2_data = t.evaluate(
+            query=[result, result2],
             input_data={
                 i1: evset_1,
                 i2: evset_2,
@@ -53,10 +60,15 @@ class TFPTest(absltest.TestCase):
             verbose=2,
         )
         logging.info("results: %s", result_data)
+        logging.info("result2: %s", result2_data)
 
         with tempfile.TemporaryDirectory() as tempdir:
-            result_data.plot().savefig(os.path.join(tempdir, "p1.png"))
-            t.plot([evset_1, evset_2]).savefig(os.path.join(tempdir, "p2.png"))
+            result_data.plot(return_fig=True).savefig(
+                os.path.join(tempdir, "p1.png")
+            )
+            t.plot([evset_1, evset_2], return_fig=True).savefig(
+                os.path.join(tempdir, "p2.png")
+            )
 
     def test_serialization(self):
         a = t.input_node(
