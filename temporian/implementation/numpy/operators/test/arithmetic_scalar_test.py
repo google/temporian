@@ -22,9 +22,8 @@ from temporian.core.operators.scalar import (
     MultiplyScalarOperator,
     DivideScalarOperator,
     FloorDivScalarOperator,
-    EqualScalarOperator,
-    GreaterScalarOperator,
-    LessScalarOperator,
+    PowerScalarOperator,
+    ModuloScalarOperator,
 )
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.scalar import (
@@ -33,9 +32,8 @@ from temporian.implementation.numpy.operators.scalar import (
     MultiplyScalarNumpyImplementation,
     DivideScalarNumpyImplementation,
     FloorDivideScalarNumpyImplementation,
-    EqualScalarNumpyImplementation,
-    GreaterScalarNumpyImplementation,
-    LessScalarNumpyImplementation,
+    PowerScalarNumpyImplementation,
+    ModuloScalarNumpyImplementation,
 )
 
 
@@ -302,6 +300,120 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         self.assertEqual(output_evset, operator_output["output"])
 
+    def test_correct_modulo(self) -> None:
+        """Test correct modulo operator."""
+
+        value = 7.0
+        output_evset = EventSet.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1.0, 3.0],
+                    [0, 2.0, 0.0],
+                    [0, 3.0, 5.0],
+                    [0, 4.0, np.nan],
+                    [0, 5.0, 2.0],
+                ],
+                columns=["store_id", "timestamp", "sales"],
+            ),
+            index_names=["store_id"],
+        )
+
+        operator = ModuloScalarOperator(
+            input=self.node,
+            value=value,
+        )
+
+        impl = ModuloScalarNumpyImplementation(operator)
+
+        operator_output = impl.call(input=self.evset)
+
+        self.assertEqual(output_evset, operator_output["output"])
+
+    def test_correct_modulo_value_first(self) -> None:
+        """Test correct modulo operator with value to the left."""
+
+        value = 25.0
+        output_evset = EventSet.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1.0, 5.0],
+                    [0, 2.0, np.nan],
+                    [0, 3.0, 1.0],
+                    [0, 4.0, np.nan],
+                    [0, 5.0, 25.0],
+                ],
+                columns=["store_id", "timestamp", "sales"],
+            ),
+            index_names=["store_id"],
+        )
+
+        operator = ModuloScalarOperator(
+            input=self.node, value=value, is_value_first=True
+        )
+
+        impl = ModuloScalarNumpyImplementation(operator)
+
+        operator_output = impl.call(input=self.evset)
+
+        self.assertEqual(output_evset, operator_output["output"])
+
+    def test_correct_power(self) -> None:
+        """Test correct power operator."""
+
+        value = 2.0
+        output_evset = EventSet.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1.0, 100.0],
+                    [0, 2.0, 0.0],
+                    [0, 3.0, 144.0],
+                    [0, 4.0, np.nan],
+                    [0, 5.0, 900.0],
+                ],
+                columns=["store_id", "timestamp", "sales"],
+            ),
+            index_names=["store_id"],
+        )
+
+        operator = PowerScalarOperator(
+            input=self.node,
+            value=value,
+        )
+
+        impl = PowerScalarNumpyImplementation(operator)
+
+        operator_output = impl.call(input=self.evset)
+
+        self.assertEqual(output_evset, operator_output["output"])
+
+    def test_correct_power_value_first(self) -> None:
+        """Test correct power operator with value as base."""
+
+        value = 2.0
+        output_evset = EventSet.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1.0, 1024.0],
+                    [0, 2.0, 1.0],
+                    [0, 3.0, 4096.0],
+                    [0, 4.0, np.nan],
+                    [0, 5.0, 2**30],
+                ],
+                columns=["store_id", "timestamp", "sales"],
+            ),
+            index_names=["store_id"],
+        )
+
+        operator = PowerScalarOperator(
+            input=self.node, value=value, is_value_first=True
+        )
+
+        impl = PowerScalarNumpyImplementation(operator)
+
+        operator_output = impl.call(input=self.evset)
+
+        self.assertEqual(output_evset, operator_output["output"])
+
     def test_correct_sum_multi_index(self) -> None:
         """Test correct sum operator with multiple indexes."""
 
@@ -443,87 +555,6 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         operator_output = impl.call(input=evset)
 
         self.assertEqual(output_evset, operator_output["output"])
-
-    def test_correct_equal(self) -> None:
-        """Test correct equal operator."""
-
-        self.evset = EventSet.from_dataframe(
-            pd.DataFrame(
-                [
-                    [0, 1.0, 10.0],
-                    [0, 2.0, 0.0],
-                    [0, 3.0, 0.1],
-                    [0, 4.0, np.nan],
-                    [0, 5.0, 0.0],
-                ],
-                columns=["store_id", "timestamp", "sales"],
-            ),
-            index_names=["store_id"],
-        )
-
-        self.node = self.evset.node()
-
-        value = 0.0
-
-        output_evset = EventSet.from_dataframe(
-            pd.DataFrame(
-                [
-                    [0, 1.0, False],
-                    [0, 2.0, True],
-                    [0, 3.0, False],
-                    [0, 4.0, False],
-                    [0, 5.0, True],
-                ],
-                columns=["store_id", "timestamp", "sales"],
-            ),
-            index_names=["store_id"],
-        )
-
-        operator = EqualScalarOperator(
-            input=self.node,
-            value=value,
-        )
-
-        impl = EqualScalarNumpyImplementation(operator)
-
-        operator_output = impl.call(input=self.evset)
-
-        self.assertEqual(output_evset, operator_output["output"])
-
-    def test_greater_scalar(self) -> None:
-        event_data = EventSet.from_dataframe(
-            pd.DataFrame({"timestamp": [1, 2, 3], "x": [1, 2, 3]})
-        )
-        expected_data = EventSet.from_dataframe(
-            pd.DataFrame({"timestamp": [1, 2, 3], "x": [False, False, True]})
-        )
-
-        event = event_data.node()
-        operator = GreaterScalarOperator(
-            input=event,
-            value=2,
-        )
-        impl = GreaterScalarNumpyImplementation(operator)
-        operator_output = impl.call(input=event_data)
-        self.assertEqual(expected_data, operator_output["output"])
-
-    def test_less_scalar(self) -> None:
-        event_data = EventSet.from_dataframe(
-            pd.DataFrame({"timestamp": [1, 2, 3], "x": [1, 2, 3]})
-        )
-        expected_data = EventSet.from_dataframe(
-            pd.DataFrame({"timestamp": [1, 2, 3], "x": [True, False, False]})
-        )
-
-        event = event_data.node()
-        operator = LessScalarOperator(
-            input=event,
-            value=2,
-        )
-        impl = LessScalarNumpyImplementation(operator)
-        operator_output = impl.call(input=event_data)
-
-        self.assertEqual(expected_data, operator_output["output"])
 
 
 if __name__ == "__main__":

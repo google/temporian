@@ -31,6 +31,17 @@ py_test(
 )
 
 py_test(
+    name = "relational_scalar_test",
+    srcs = ["relational_scalar_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/operators/scalar",
+        "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy/operators/scalar",
+    ],
+)
+
+py_test(
     name = "arithmetic_multi_index_test",
     srcs = ["arithmetic_multi_index_test.py"],
     srcs_version = "PY3",
