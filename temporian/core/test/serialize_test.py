@@ -14,10 +14,13 @@
 
 from absl import logging
 from absl.testing import absltest
+import pandas as pd
 
+import temporian as tp
 from temporian.core import serialize
-from temporian.core import processor
+from temporian.core import graph
 from temporian.core.test import utils
+from temporian.implementation.numpy.data.event_set import EventSet
 
 
 class SerializeTest(absltest.TestCase):
@@ -28,7 +31,7 @@ class SerializeTest(absltest.TestCase):
         o4 = utils.OpI2O1(o2.outputs["output"], i3)
         o5 = utils.OpI1O2(o4.outputs["output"])
 
-        original = processor.infer_processor(
+        original = graph.infer_graph(
             {
                 "io_input_1": i1,
                 "io_input_2": i3,
@@ -80,6 +83,33 @@ class SerializeTest(absltest.TestCase):
             & serialize.all_identifiers(restored.outputs.values())
         )
 
+    def test_serialize_autonode(self):
+        input_data = EventSet.from_dataframe(
+            pd.DataFrame(
+                {
+                    "timestamp": [0.0, 2.0, 4.0, 6.0],
+                    "f1": [1.0, 2.0, 3.0, 4.0],
+                    "x": [1, 1, 2, 2],
+                },
+            ),
+            index_names=["x"],
+        )
+
+        input_node = input_data.node()
+        output_node = tp.simple_moving_average(input_node, 2.0)
+
+        original = graph.infer_graph(
+            {"i": input_node},
+            {"o": output_node},
+        )
+        logging.info("original:\n%s", original)
+
+        proto = serialize.serialize(original)
+        logging.info("proto:\n%s", proto)
+
+        restored = serialize.unserialize(proto)
+        logging.info("restored:\n%s", restored)
+
     def test_serialize_attributes(self):
         """
         Test serialization with different types of operator attributes
@@ -95,7 +125,7 @@ class SerializeTest(absltest.TestCase):
         i_event = utils.create_input_node()
         operator = utils.OpWithAttributes(i_event, **attributes)
 
-        original = processor.infer_processor(
+        original = graph.infer_graph(
             inputs={"i_event": i_event},
             outputs={"output": operator.outputs["output"]},
         )

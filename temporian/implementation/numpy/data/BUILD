@@ -27,7 +27,11 @@ py_library(
 
 py_library(
     name = "plotter",
-    srcs = ["plotter.py"],
+    srcs = [
+        "plotter.py",
+        "plotter_bokeh.py",
+        "plotter_matplotlib.py",
+    ],
     srcs_version = "PY3",
     deps = [":event_set"],
 )

@@ -1,5 +1,6 @@
+import os
 from abc import ABC, abstractmethod
-from typing import Dict
+from typing import Dict, Tuple
 
 from temporian.core.data.node import Node
 from temporian.core.operators.base import Operator
@@ -119,6 +120,7 @@ def _check_output(
 
             # Check sampling
             if output_real.index_names != output_def.sampling.index.names:
+                # TODO: also check is_unix_timestamp
                 raise RuntimeError(
                     f"Non matching sampling. {output_real.index_names} vs"
                     f" {output_def.sampling.index.names}"
@@ -132,31 +134,57 @@ def _check_output(
                     input_key,
                     output_key,
                 ) in matching_samplings
-                if expected_matching_sampling and not _check_same_sampling(
-                    output_real, input_real
-                ):
+                is_same, reason = _check_same_sampling(output_real, input_real)
+                if expected_matching_sampling and not is_same:
                     raise RuntimeError(
                         f"The sampling of input '{input_key}' and output "
                         f"'{output_key}' are expected to have THE SAME "
                         "sampling. However, a different sampling was generated "
                         f"during the op execution ({input_real} "
-                        f"vs {output_real})."
+                        f"vs {output_real}). Reason: {reason}"
                     )
 
         # Check features
         _check_features(outputs, definitions=operator.outputs, label="outputs")
 
 
-def _check_same_sampling(evset_1: EventSet, evset_2: EventSet) -> bool:
+def _check_same_sampling(
+    evset_1: EventSet, evset_2: EventSet
+) -> Tuple[bool, str]:
+    # number of index keys to check in default mode
+    num_check = (
+        1000
+        if os.environ.get("TEMPORIAN_DEBUG_MODE", False) is True
+        else len(evset_1.data)
+    )
+    # compare index names
     if evset_1.index_names != evset_2.index_names:
-        return False
+        return (False, "Different index names")
 
-    for index_key, index_data_1 in evset_1.data.items():
-        if index_key not in evset_2.data:
-            return False
+    # compare timestamps for `num_check` index keys
+    for i, (index_key, index_data_1) in enumerate(evset_1.data.items()):
+        if i >= num_check:
+            # checked all index keys' timestamps
+            break
 
         index_data_2 = evset_2[index_key]
         if index_data_1.timestamps is not index_data_2.timestamps:
-            return False
+            return (
+                False,
+                (
+                    f"Timestamps at index key {index_key} are not the same"
+                    " np.ndarray"
+                ),
+            )
 
-    return True
+    # compare index keys
+    # TODO: is there a way to avoid checking all keys here (keys might come in
+    # different orders, can't compare top num_check keys in each evset)
+    diff_keys = set(evset_1.data.keys()).difference(evset_2.data.keys())
+    if diff_keys:
+        return (
+            False,
+            f"Found {len(diff_keys)} different index keys",
+        )
+
+    return (True, "")

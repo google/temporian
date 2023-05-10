@@ -14,6 +14,8 @@
 
 """Filter operator class and public API function definition."""
 
+from typing import Optional
+
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
 from temporian.core.data.feature import Feature
@@ -101,7 +103,7 @@ operator_lib.register_operator(FilterOperator)
 # pylint: disable=redefined-builtin
 def filter(
     input: Node,
-    condition: Node,
+    condition: Optional[Node] = None,
 ) -> Node:
     """Filters out timestamps in a node for which a condition is false.
 
@@ -110,6 +112,15 @@ def filter(
 
     `input` and `condition` must have the same sampling.
 
+    filter(x) is equivalent to filter(x,x). filter(x) can be used to convert
+    a boolean mask into a timestamps. For example:
+        Input:
+            timestamps: 1 2 3
+            value: True False True
+        Output:
+            timestamps: 1 3
+            value: True True
+
     Args:
         input: Node to filter.
         condition: Node with a single boolean feature condition.
@@ -117,4 +128,8 @@ def filter(
     Returns:
         Filtered input.
     """
+
+    if condition is None:
+        condition = input
+
     return FilterOperator(input, condition).outputs["output"]

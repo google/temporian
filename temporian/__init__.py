@@ -16,7 +16,7 @@
 
 from temporian.core import evaluator
 from temporian.core import operator_lib
-from temporian.core import processor
+from temporian.core import graph
 from temporian.core import serialize
 from temporian.core.data import dtype
 from temporian.core.data import node
@@ -38,6 +38,14 @@ from temporian.core.operator_lib import registered_operators as get_operators
 
 # Load all the implementations
 from temporian.implementation.numpy.operators import all_operators as _impls
+
+# dtypes
+float32 = dtype.DType.FLOAT32
+float64 = dtype.DType.FLOAT64
+int32 = dtype.DType.INT32
+int64 = dtype.DType.INT64
+bool_ = dtype.DType.BOOLEAN
+str_ = dtype.DType.STRING
 
 __version__ = "0.0.1"
 

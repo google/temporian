@@ -21,6 +21,7 @@ py_library(
         ":sample",
         ":select",
         ":set_index",
+        ":since_last",
         ":unique_timestamps",
         "//temporian/core/operators/arithmetic",
         "//temporian/core/operators/arithmetic_scalar",
@@ -34,6 +35,8 @@ py_library(
         "//temporian/core/operators/calendar:second",
         "//temporian/core/operators/calendar:year",
         "//temporian/core/operators/window:moving_count",
+        "//temporian/core/operators/window:moving_max",
+        "//temporian/core/operators/window:moving_min",
         "//temporian/core/operators/window:moving_standard_deviation",
         "//temporian/core/operators/window:moving_sum",
         "//temporian/core/operators/window:simple_moving_average",
@@ -192,6 +195,21 @@ py_library(
 py_library(
     name = "sample",
     srcs = ["sample.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        ":select",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:duration",
+        "//temporian/core/data:feature",
+        "//temporian/core/data:node",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "since_last",
+    srcs = ["since_last.py"],
     srcs_version = "PY3",
     deps = [
         ":base",

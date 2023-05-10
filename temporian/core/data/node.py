@@ -33,7 +33,7 @@ class Node(object):
     A node represents the structure, or schema, of a collection of indexed
     multivariate time series, or EventSets. A node does not contain any actual
     data, but is instead used as a reference to describe the format of the
-    input, intermediate results, or output of a Processor.
+    input, intermediate results, or output of a Graph.
 
     Informally, a node defines the name and data types of each time series, as
     well as the key and data type of the index (if any).
@@ -82,6 +82,9 @@ class Node(object):
         )
 
     def __add__(self, other: Any) -> Node:
+        # TODO: In this and other operants, factor code and add support for
+        # swapping operators (e.g. a+1, a+b, 1+a).
+
         if isinstance(other, Node):
             from temporian.core.operators.arithmetic import add
 
@@ -212,6 +215,32 @@ class Node(object):
 
         raise ValueError(
             f"Cannot floor divide {type(self)} and {type(other)} objects. "
+            "Only Event and scalar values of type int or float are supported."
+        )
+
+    def __gt__(self, other: Any):
+        if isinstance(other, (int, float)):
+            from temporian.core.operators.arithmetic_scalar import (
+                greater_scalar,
+            )
+
+            return greater_scalar(input=self, value=other)
+
+        raise ValueError(
+            f"Cannot compute {type(self)} > {type(other)}. "
+            "Only Event and scalar values of type int or float are supported."
+        )
+
+    def __lt__(self, other: Any):
+        if isinstance(other, (int, float)):
+            from temporian.core.operators.arithmetic_scalar import (
+                less_scalar,
+            )
+
+            return less_scalar(input=self, value=other)
+
+        raise ValueError(
+            f"Cannot compute {type(self)} < {type(other)}. "
             "Only Event and scalar values of type int or float are supported."
         )
 

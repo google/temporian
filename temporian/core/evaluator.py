@@ -23,7 +23,7 @@ from collections import defaultdict
 from temporian.core.data.node import Node
 from temporian.core.operators import base
 from temporian.implementation.numpy.data.event_set import EventSet
-from temporian.core import processor as processor_lib
+from temporian.core import graph as graph_lib
 from temporian.implementation.numpy import evaluator as numpy_evaluator
 
 AvailableBackends = Any
@@ -35,7 +35,7 @@ Result = Union[EventSet, List[EventSet], Dict[str, EventSet]]
 def evaluate(
     query: Query,
     input_data: Data,
-    verbose: int = 1,
+    verbose: int = 0,
     check_execution: bool = True,
 ) -> Result:
     """Evaluates nodes on event sets.
@@ -160,12 +160,10 @@ def build_schedule(
     #
     # Fails if the outputs cannot be computed from the inputs e.g. some inputs
     # are missing.
-    processor = processor_lib.infer_processor(
-        list_to_dict(inputs), list_to_dict(outputs)
-    )
+    graph = graph_lib.infer_graph(list_to_dict(inputs), list_to_dict(outputs))
 
     if verbose >= 2:
-        print("Processor:\n", processor, file=sys.stderr)
+        print("Graph:\n", graph, file=sys.stderr)
 
     # Sequence of operators to execute. This is the result of the
     # "build_schedule" function.
@@ -186,7 +184,7 @@ def build_schedule(
 
     # Compute "node_to_op" and "op_to_num_pending_inputs".
     inputs_set = set(inputs)
-    for op in processor.operators:
+    for op in graph.operators:
         num_pending_inputs = 0
         for input_node in op.inputs.values():
             if input_node in inputs_set:

@@ -24,10 +24,12 @@ from temporian.core.operators.window.moving_standard_deviation import (
 )
 from temporian.implementation.numpy.operators.window.moving_standard_deviation import (
     MovingStandardDeviationNumpyImplementation,
+    operators_cc,
 )
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core.data import node as node_lib
-from temporian.implementation.numpy_cc.operators import window as window_cc
+import math
+from numpy.testing import assert_almost_equal
 
 
 def _f64(l):
@@ -44,7 +46,7 @@ nan = math.nan
 class MovingStandardDeviationOperatorTest(absltest.TestCase):
     def test_cc_wo_sampling(self):
         assert_almost_equal(
-            window_cc.moving_standard_deviation(
+            operators_cc.moving_standard_deviation(
                 _f64([1, 2, 3, 5, 20]),
                 _f32([10, nan, 12, 13, 14]),
                 5.0,

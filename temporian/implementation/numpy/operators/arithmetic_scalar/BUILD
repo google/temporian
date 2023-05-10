@@ -10,6 +10,16 @@ py_library(
     name = "arithmetic_scalar",
     srcs = ["__init__.py"],
     srcs_version = "PY3",
+    deps = [
+        ":add",
+        ":divide",
+        ":equal",
+        ":floordiv",
+        ":greater",
+        ":less",
+        ":multiply",
+        ":subtract",
+    ],
 )
 
 py_library(
@@ -43,6 +53,30 @@ py_library(
     deps = [
         ":base",
         "//temporian/core/operators/arithmetic_scalar:equal",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event_set",
+    ],
+)
+
+py_library(
+    name = "greater",
+    srcs = ["greater.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators/arithmetic_scalar:greater",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event_set",
+    ],
+)
+
+py_library(
+    name = "less",
+    srcs = ["less.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators/arithmetic_scalar:less",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
     ],

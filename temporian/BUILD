@@ -12,8 +12,8 @@ py_library(
     srcs_version = "PY3",
     deps = [
         "//temporian/core:evaluator",
+        "//temporian/core:graph",
         "//temporian/core:operator_lib",
-        "//temporian/core:processor",
         "//temporian/core:serialize",
         "//temporian/core/data:dtype",
         "//temporian/core/data:duration",
