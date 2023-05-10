@@ -16,9 +16,6 @@ import numpy as np
 import pandas as pd
 from absl.testing import absltest
 
-from temporian.core.data.dtype import DType
-from temporian.core.data.node import Node, Feature
-from temporian.core.data.sampling import Sampling
 from temporian.core.operators.binary import (
     EqualOperator,
     NotEqualOperator,

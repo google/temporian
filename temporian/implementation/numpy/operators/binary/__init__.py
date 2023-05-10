@@ -19,6 +19,7 @@ from temporian.implementation.numpy.operators.binary.relational import (
 from temporian.implementation.numpy.operators.binary.logical import (
     LogicalAndNumpyImplementation,
     LogicalOrNumpyImplementation,
+    LogicalXorNumpyImplementation,
 )
 
 # pylint: enable=unused-import

@@ -34,6 +34,20 @@ py_test(
 )
 
 py_test(
+    name = "logical_test",
+    srcs = ["logical_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:node",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators/binary",
+        "//temporian/implementation/numpy:evaluator",
+        "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy/operators/binary",
+    ],
+)
+
+py_test(
     name = "arithmetic_scalar_test",
     srcs = ["arithmetic_scalar_test.py"],
     srcs_version = "PY3",
