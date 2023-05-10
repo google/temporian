@@ -46,7 +46,7 @@ class NotEqualOperator(BaseBinaryOperator):
 
     @property
     def prefix(self) -> str:
-        return "neq"
+        return "ne"
 
     # override parent dtype method
     def output_feature_dtype(

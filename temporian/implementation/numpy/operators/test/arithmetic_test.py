@@ -16,9 +16,6 @@ import numpy as np
 import pandas as pd
 from absl.testing import absltest
 
-from temporian.core.data.dtype import DType
-from temporian.core.data.node import Node, Feature
-from temporian.core.data.sampling import Sampling
 from temporian.core.operators.binary import (
     AddOperator,
     SubtractOperator,
@@ -27,7 +24,6 @@ from temporian.core.operators.binary import (
     FloorDivOperator,
     ModuloOperator,
     PowerOperator,
-    EqualOperator,
 )
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.binary import (
@@ -38,7 +34,6 @@ from temporian.implementation.numpy.operators.binary import (
     FloorDivNumpyImplementation,
     ModuloNumpyImplementation,
     PowerNumpyImplementation,
-    EqualNumpyImplementation,
 )
 
 
@@ -305,69 +300,6 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         )
 
         self.assertTrue(output_evset == operator_output["output"])
-
-    def test_correct_equal(self) -> None:
-        """Test correct equal operator."""
-        self.evset_1 = EventSet.from_dataframe(
-            pd.DataFrame(
-                [
-                    [0, 1.0, 10.0],
-                    [0, 2.0, 1.0],
-                    [0, 3.0, 12.0],
-                    [0, 4.0, np.nan],
-                    [0, 5.0, 30.0],
-                ],
-                columns=["store_id", "timestamp", "sales"],
-            ),
-            index_names=["store_id"],
-        )
-
-        self.evset_2 = EventSet.from_dataframe(
-            pd.DataFrame(
-                [
-                    [0, 1.0, 10.0],
-                    [0, 2.0, -1.0],
-                    [0, 3.0, 12.000000001],
-                    [0, 4.0, np.nan],
-                    [0, 5.0, 30.000001],
-                ],
-                columns=["store_id", "timestamp", "costs"],
-            ),
-            index_names=["store_id"],
-        )
-        for index_key, index_data in self.evset_1.iterindex():
-            self.evset_2[index_key].timestamps = index_data.timestamps
-
-        self.node_1 = self.evset_1.node()
-        self.node_2 = self.evset_2.node()
-        self.node_1._sampling = self.node_2._sampling
-
-        output_evset = EventSet.from_dataframe(
-            pd.DataFrame(
-                [
-                    [0, 1.0, True],
-                    [0, 2.0, False],
-                    [0, 3.0, False],
-                    [0, 4.0, False],  # nan == nan is False
-                    [0, 5.0, False],
-                ],
-                columns=["store_id", "timestamp", "eq_sales_costs"],
-            ),
-            index_names=["store_id"],
-        )
-
-        operator = EqualOperator(
-            input_1=self.node_1,
-            input_2=self.node_2,
-        )
-
-        equal_implementation = EqualNumpyImplementation(operator)
-
-        operator_output = equal_implementation.call(
-            input_1=self.evset_1, input_2=self.evset_2
-        )
-
-        self.assertEqual(output_evset, operator_output["output"])
 
 
 if __name__ == "__main__":

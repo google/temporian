@@ -131,8 +131,8 @@ class MagicMethodsTest(absltest.TestCase):
     def test_not_equal(self):
         node_out = self.node_1 != self.node_2
         assert isinstance(node_out.creator, NotEqualOperator)
-        assert node_out.features[0].name == "neq_f1_f3"
-        assert node_out.features[1].name == "neq_f2_f4"
+        assert node_out.features[0].name == "ne_f1_f3"
+        assert node_out.features[1].name == "ne_f2_f4"
         self._check_node_boolean(node_out)
 
     def test_greater(self):
