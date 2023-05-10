@@ -80,7 +80,7 @@ class GreaterEqualOperator(BaseBinaryOperator):
 
     @property
     def prefix(self) -> str:
-        return "gt_eq"
+        return "ge"
 
     # override parent dtype method
     def output_feature_dtype(
@@ -114,7 +114,7 @@ class LessEqualOperator(BaseBinaryOperator):
 
     @property
     def prefix(self) -> str:
-        return "lt_eq"
+        return "le"
 
     # override parent dtype method
     def output_feature_dtype(
@@ -169,7 +169,7 @@ def not_equal(
     Returns:
         Node containing the result of the comparison.
     """
-    return EqualOperator(
+    return NotEqualOperator(
         input_1=input_1,
         input_2=input_2,
     ).outputs["output"]

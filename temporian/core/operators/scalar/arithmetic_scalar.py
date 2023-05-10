@@ -349,14 +349,14 @@ def power_scalar(
     scalar_types = (float, int)
 
     if isinstance(base, Node) and isinstance(exponent, scalar_types):
-        return ModuloScalarOperator(
+        return PowerScalarOperator(
             input=base,
             value=exponent,
             is_value_first=False,
         ).outputs["output"]
 
     if isinstance(base, scalar_types) and isinstance(exponent, Node):
-        return ModuloScalarOperator(
+        return PowerScalarOperator(
             input=exponent,
             value=base,
             is_value_first=True,

@@ -21,8 +21,8 @@ py_library(
 # =====
 
 py_test(
-    name = "node_test",
-    srcs = ["node_test.py"],
+    name = "magic_methods_test",
+    srcs = ["magic_methods_test.py"],
     srcs_version = "PY3",
     deps = [
         # absl/testing:absltest dep,
@@ -30,6 +30,9 @@ py_test(
         "//temporian/core/data:node",
         "//temporian/core/data:sampling",
         "//temporian/core/operators:base",
+        "//temporian/core/operators:unary",
+        "//temporian/core/operators/binary",
+        "//temporian/core/operators/scalar",
         "//temporian/proto:core_py_proto",
     ],
 )

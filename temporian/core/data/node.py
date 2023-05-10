@@ -89,7 +89,7 @@ class Node(object):
             " element-wise or use cast() operator to convert to boolean."
         )
 
-    def __neq__(self, other: Any) -> Node:
+    def __ne__(self, other: Any) -> Node:
         if isinstance(other, Node):
             from temporian.core.operators.binary import not_equal
 
@@ -193,17 +193,6 @@ class Node(object):
         from temporian.core.operators.unary import abs
 
         return abs(input=self)
-
-    def __int__(self):
-        from temporian.core.operators.cast import cast
-
-        # Overflow going to int64 is very rare (only from float64)
-        return cast(self, DType.INT64, check_overflow=False)
-
-    def __float__(self):
-        from temporian.core.operators.cast import cast
-
-        return cast(self, DType.FLOAT64, check_overflow=False)
 
     def __truediv__(self, other: Any) -> Node:
         if isinstance(other, Node):
