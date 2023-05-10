@@ -33,7 +33,7 @@ from temporian.implementation.numpy.operators.binary import (
     SubtractNumpyImplementation,
     MultiplyNumpyImplementation,
     DivideNumpyImplementation,
-    FloorDivideNumpyImplementation,
+    FloorDivNumpyImplementation,
 )
 
 
@@ -325,7 +325,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             input_2=self.node_2,
         )
 
-        div_implementation = FloorDivideNumpyImplementation(operator)
+        div_implementation = FloorDivNumpyImplementation(operator)
 
         operator_output = div_implementation.call(
             input_1=self.evset_1, input_2=self.evset_2

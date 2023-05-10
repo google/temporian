@@ -88,7 +88,7 @@ class DivideNumpyImplementation(BaseBinaryNumpyImplementation):
         return evset_1_feature / evset_2_feature
 
 
-class FloorDivideNumpyImplementation(BaseBinaryNumpyImplementation):
+class FloorDivNumpyImplementation(BaseBinaryNumpyImplementation):
     """Numpy implementation of the floordiv operator."""
 
     def __init__(self, operator: FloorDivOperator) -> None:
@@ -140,7 +140,7 @@ implementation_lib.register_operator_implementation(
     DivideOperator, DivideNumpyImplementation
 )
 implementation_lib.register_operator_implementation(
-    FloorDivOperator, FloorDivideNumpyImplementation
+    FloorDivOperator, FloorDivNumpyImplementation
 )
 implementation_lib.register_operator_implementation(
     ModuloOperator, ModuloNumpyImplementation

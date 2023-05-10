@@ -24,6 +24,9 @@ from temporian.core.operators.binary import (
     SubtractOperator,
     MultiplyOperator,
     DivideOperator,
+    FloorDivOperator,
+    ModuloOperator,
+    PowerOperator,
     EqualOperator,
 )
 from temporian.implementation.numpy.data.event_set import EventSet
@@ -32,6 +35,9 @@ from temporian.implementation.numpy.operators.binary import (
     SubtractNumpyImplementation,
     MultiplyNumpyImplementation,
     DivideNumpyImplementation,
+    FloorDivNumpyImplementation,
+    ModuloNumpyImplementation,
+    PowerNumpyImplementation,
     EqualNumpyImplementation,
 )
 
@@ -67,25 +73,29 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id"],
         )
-        # set same sampling
-        for index_key, index_data in self.evset_1.data.items():
-            self.evset_2[index_key].timestamps = index_data.timestamps
+        self.evset_3 = EventSet.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1.0, 0.0],
+                    [0, 2.0, 20.0],
+                    [0, 3.0, np.nan],
+                    [0, 4.0, 0.0],
+                    [0, 5.0, 7.0],
+                ],
+                columns=["store_id", "timestamp", "costs"],
+            ),
+            index_names=["store_id"],
+        )
         self.node_1 = self.evset_1.node()
         self.node_2 = self.evset_2.node()
+        self.node_3 = self.evset_3.node()
 
-        self.sampling = Sampling(
-            [("store_id", DType.INT64)], is_unix_timestamp=False
-        )
-        self.node_1 = Node(
-            [Feature("sales", DType.FLOAT64)],
-            sampling=self.sampling,
-            creator=None,
-        )
-        self.node_2 = Node(
-            [Feature("costs", DType.FLOAT64)],
-            sampling=self.sampling,
-            creator=None,
-        )
+        # FIXME: This should not be necessary
+        self.node_2._sampling = self.node_1._sampling
+        self.node_3._sampling = self.node_1._sampling
+        for index, data in self.evset_1.data.items():
+            self.evset_2[index].timestamps = data.timestamps
+            self.evset_3[index].timestamps = data.timestamps
 
     def test_correct_sum(self) -> None:
         """Test correct sum operator."""
@@ -199,6 +209,99 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
 
         operator_output = div_implementation.call(
             input_1=self.evset_1, input_2=self.evset_2
+        )
+
+        self.assertTrue(output_evset == operator_output["output"])
+
+    def test_correct_floordiv(self) -> None:
+        """Test correct floor division operator."""
+
+        # Using evset_1 and evset_3
+        output_evset = EventSet.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1.0, np.inf],
+                    [0, 2.0, 0.0],
+                    [0, 3.0, np.nan],
+                    [0, 4.0, np.nan],
+                    [0, 5.0, 4.0],
+                ],
+                columns=["store_id", "timestamp", "floordiv_sales_costs"],
+            ),
+            index_names=["store_id"],
+        )
+
+        operator = FloorDivOperator(
+            input_1=self.node_1,
+            input_2=self.node_3,
+        )
+
+        div_implementation = FloorDivNumpyImplementation(operator)
+
+        operator_output = div_implementation.call(
+            input_1=self.evset_1, input_2=self.evset_3
+        )
+
+        self.assertTrue(output_evset == operator_output["output"])
+
+    def test_correct_modulo(self) -> None:
+        """Test correct modulo operator."""
+
+        # Using evset_1 and evset_3
+        output_evset = EventSet.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1.0, np.nan],
+                    [0, 2.0, 0.0],
+                    [0, 3.0, np.nan],
+                    [0, 4.0, np.nan],
+                    [0, 5.0, 2.0],
+                ],
+                columns=["store_id", "timestamp", "mod_sales_costs"],
+            ),
+            index_names=["store_id"],
+        )
+
+        operator = ModuloOperator(
+            input_1=self.node_1,
+            input_2=self.node_3,
+        )
+
+        op_implementation = ModuloNumpyImplementation(operator)
+
+        operator_output = op_implementation.call(
+            input_1=self.evset_1, input_2=self.evset_3
+        )
+
+        self.assertTrue(output_evset == operator_output["output"])
+
+    def test_correct_power(self) -> None:
+        """Test correct power operator."""
+
+        # Using evset_1 and evset_3
+        output_evset = EventSet.from_dataframe(
+            pd.DataFrame(
+                [
+                    [0, 1.0, 1.0],
+                    [0, 2.0, 0.0],
+                    [0, 3.0, np.nan],
+                    [0, 4.0, 1.0],
+                    [0, 5.0, 30**7],
+                ],
+                columns=["store_id", "timestamp", "pow_sales_costs"],
+            ),
+            index_names=["store_id"],
+        )
+
+        operator = PowerOperator(
+            input_1=self.node_1,
+            input_2=self.node_3,
+        )
+
+        op_implementation = PowerNumpyImplementation(operator)
+
+        operator_output = op_implementation.call(
+            input_1=self.evset_1, input_2=self.evset_3
         )
 
         self.assertTrue(output_evset == operator_output["output"])

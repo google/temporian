@@ -4,7 +4,9 @@ from temporian.implementation.numpy.operators.binary.arithmetic import (
     SubtractNumpyImplementation,
     MultiplyNumpyImplementation,
     DivideNumpyImplementation,
-    FloorDivideNumpyImplementation,
+    FloorDivNumpyImplementation,
+    ModuloNumpyImplementation,
+    PowerNumpyImplementation,
 )
 from temporian.implementation.numpy.operators.binary.relational import (
     EqualNumpyImplementation,
