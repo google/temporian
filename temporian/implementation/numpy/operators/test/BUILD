@@ -96,8 +96,8 @@ py_test(
 )
 
 py_test(
-    name = "invert_test",
-    srcs = ["invert_test.py"],
+    name = "unary_test",
+    srcs = ["unary_test.py"],
     srcs_version = "PY3",
     deps = [
         "//temporian/core/data:sampling",

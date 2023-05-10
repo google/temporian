@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import math
 import numpy as np
 import pandas as pd
 from absl.testing import absltest
@@ -21,14 +21,21 @@ from temporian.core.data.sampling import Sampling
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.unary import (
     InvertNumpyImplementation,
+    AbsNumpyImplementation,
+    LogNumpyImplementation,
+    IsNanNumpyImplementation,
+    NotNanNumpyImplementation,
     InvertOperator,
+    AbsOperator,
+    LogOperator,
+    IsNanOperator,
+    NotNanOperator,
 )
 from temporian.core.data.dtype import DType
 
 
-class InvertNumpyImplementationTest(absltest.TestCase):
-    """Test numpy implementation of all arithmetic operators,
-    but using a two-level index and disordered rows."""
+class UnaryNumpyImplementationTest(absltest.TestCase):
+    """Test numpy implementation of all unary operators"""
 
     def setUp(self):
         # store ids
@@ -133,6 +140,92 @@ class InvertNumpyImplementationTest(absltest.TestCase):
         )
         with self.assertRaisesRegex(ValueError, "bool"):
             _ = InvertOperator(input=invalid_node)
+
+    def test_correct_abs(self) -> None:
+        event_data = EventSet.from_dataframe(
+            pd.DataFrame({"timestamp": [1, 2, 3], "x": [1, -2, -3]})
+        )
+        expected_data = EventSet.from_dataframe(
+            pd.DataFrame({"timestamp": [1, 2, 3], "x": [1, 2, 3]})
+        )
+        operator = AbsOperator(
+            input=event_data.node(),
+        )
+        operator_output = AbsNumpyImplementation(operator).call(
+            input=event_data
+        )
+
+        self.assertEqual(expected_data, operator_output["output"])
+
+    def test_correct_log(self) -> None:
+        event_data = EventSet.from_dataframe(
+            pd.DataFrame({"timestamp": [1, 2, 3, 4], "x": [1, np.e, 0, 10]})
+        )
+        expected_data = EventSet.from_dataframe(
+            pd.DataFrame(
+                {"timestamp": [1, 2, 3, 4], "x": [0, 1, -np.inf, np.log(10)]}
+            )
+        )
+        operator = LogOperator(
+            input=event_data.node(),
+        )
+        operator_output = LogNumpyImplementation(operator).call(
+            input=event_data
+        )
+
+        self.assertEqual(expected_data, operator_output["output"])
+
+    def test_correct_isnan(self) -> None:
+        event_data = EventSet.from_dataframe(
+            pd.DataFrame(
+                {
+                    "timestamp": [1, 2, 3, 4, 5],
+                    "x": [1, -1, np.nan, math.nan, None],
+                }
+            )
+        )
+        expected_data = EventSet.from_dataframe(
+            pd.DataFrame(
+                {
+                    "timestamp": [1, 2, 3, 4, 5],
+                    "x": [False, False, True, True, True],
+                }
+            )
+        )
+        operator = IsNanOperator(
+            input=event_data.node(),
+        )
+        operator_output = IsNanNumpyImplementation(operator).call(
+            input=event_data
+        )
+
+        self.assertEqual(expected_data, operator_output["output"])
+
+    def test_correct_notnan(self) -> None:
+        event_data = EventSet.from_dataframe(
+            pd.DataFrame(
+                {
+                    "timestamp": [1, 2, 3, 4, 5],
+                    "x": [1, -1, np.nan, math.nan, None],
+                }
+            )
+        )
+        expected_data = EventSet.from_dataframe(
+            pd.DataFrame(
+                {
+                    "timestamp": [1, 2, 3, 4, 5],
+                    "x": [True, True, False, False, False],
+                }
+            )
+        )
+        operator = NotNanOperator(
+            input=event_data.node(),
+        )
+        operator_output = NotNanNumpyImplementation(operator).call(
+            input=event_data
+        )
+
+        self.assertEqual(expected_data, operator_output["output"])
 
 
 if __name__ == "__main__":
