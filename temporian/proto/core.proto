@@ -17,9 +17,9 @@ syntax = "proto2";
 
 package temporian.proto;
 
-// A processor defines a set of processing operations and holds all Node,
+// A graph defines a set of processing operations and holds all Node,
 // Feature and Sampling instances.
-message Processor {
+message Graph {
   repeated Operator operators = 1;
 
   repeated Node nodes = 2;
@@ -33,13 +33,13 @@ message Processor {
   repeated IOSignature outputs = 6;
 }
 
-// The input or output of a processor.
+// The input or output of a graph.
 message IOSignature {
     optional string key = 1;
     optional string node_id = 2;
 }
 
-// Instantiation of an operator in a processor.
+// Instantiation of an operator in a graph.
 message Operator {
   // Unique identifier of the operator instance.
   optional string id = 1;
@@ -99,7 +99,7 @@ enum DType {
 // Schema of an event set
 message Node {
   // Identifier of the node. Should be unique across all the nodes of the
-  // processor.
+  // graph.
   optional string id = 1;
 
   // Identifier of the sampling of the node.
@@ -116,7 +116,7 @@ message Node {
 // Schema of a feature
 message Feature {
   // Identifier of the feature. Should be unique in all the features in the
-  // processor.
+  // graph.
   optional string id = 1;
 
   optional string name = 2;
@@ -144,7 +144,7 @@ message Index {
 // Schema of a sampling.
 message Sampling {
   // Identifier of the sampling. Should be unique across all the samplings of
-  // the processor.
+  // the graph.
   optional string id = 1;
 
   // Index of the sampling.

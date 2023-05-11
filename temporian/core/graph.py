@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Processor class definition and inference logic."""
+"""Graph class definition and inference logic."""
 
 from typing import List, Set, Dict, Union, Optional
 
@@ -24,35 +24,7 @@ from temporian.core.operators import base
 MultipleNodeArg = Union[Dict[str, Node], List[Node], Node]
 
 
-def normalize_multiple_node_arg(src: MultipleNodeArg) -> Dict[str, Node]:
-    """Normalizes a node or list of nodes into a dictionary of nodes."""
-
-    save_src = src
-
-    if isinstance(src, Node):
-        src = [src]
-
-    if isinstance(src, list):
-        new_src = {}
-        for node in src:
-            if node.name is None:
-                raise ValueError(
-                    "Input / output node or list nodes need to be named "
-                    'with "node.name = ...". Alternatively, provide a '
-                    "dictionary of nodes."
-                )
-            new_src[node.name] = node
-        src = new_src
-
-    if not isinstance(src, dict):
-        raise ValueError(
-            f'Unexpected node(s) "{save_src}". Expecting dict of nodes, '
-            "list of nodes, or a single node."
-        )
-    return src
-
-
-class Processor(object):
+class Graph:
     """A set of operators, nodes, features and samplings."""
 
     def __init__(self):
@@ -118,7 +90,7 @@ class Processor(object):
         return {node.sampling for node in self.inputs.values()}
 
     def __repr__(self):
-        s = "Processor\n============\n"
+        s = "Graph\n============\n"
 
         def p(title, elements):
             nonlocal s
@@ -144,10 +116,10 @@ class Processor(object):
         return s
 
 
-def infer_processor(
+def infer_graph(
     inputs: Optional[Dict[str, Node]],
     outputs: Dict[str, Node],
-) -> Processor:
+) -> Graph:
     """Extracts all the objects between the output and input nodes.
 
     Fails if any inputs are missing.
@@ -158,7 +130,7 @@ def infer_processor(
         outputs: Output nodes.
 
     Returns:
-        A processor.
+        Inferred graph.
     """
 
     # The following algorithm lists all the nodes between the output and
@@ -176,8 +148,8 @@ def infer_processor(
     #       continue
     #   Adds all the input nodes of node's creator op to the pending list
 
-    p = Processor()
-    p.outputs = outputs
+    g = Graph()
+    g.outputs = outputs
 
     # The next node to process. Nodes are processed from the outputs to
     # the inputs.
@@ -188,7 +160,7 @@ def infer_processor(
     input_nodes: Set[Node] = {}
 
     if inputs is not None:
-        p.inputs = inputs
+        g.inputs = inputs
         input_nodes = set(inputs.values())
 
     # Features already processed.
@@ -204,7 +176,7 @@ def infer_processor(
         pending_nodes.remove(node)
         assert node not in done_nodes
 
-        p.add_node(node)
+        g.add_node(node)
 
         if node in input_nodes:
             # The feature is provided by the user.
@@ -216,7 +188,7 @@ def infer_processor(
             continue
 
         # Record the operator.
-        p.add_operator(node.creator)
+        g.add_operator(node.creator)
 
         # Add the parent nodes to the pending list.
         for input_node in node.creator.inputs.values():
@@ -229,7 +201,7 @@ def infer_processor(
         # Record the operator outputs. While the user did not request
         # them, they will be created (and so, we need to track them).
         for output_node in node.creator.outputs.values():
-            p.add_node(output_node)
+            g.add_node(output_node)
 
     if inputs is None:
         # Infer the inputs
@@ -238,7 +210,7 @@ def infer_processor(
             if node.name is None:
                 raise ValueError(f"Cannot infer input on unnamed node {node}")
             infered_inputs[node.name] = node
-        p.inputs = infered_inputs
+        g.inputs = infered_inputs
 
     else:
         # Fail if not all nodes are sourced.
@@ -249,9 +221,37 @@ def infer_processor(
             )
 
     # Record all the features and samplings.
-    for e in p.nodes:
-        p.add_sampling(e.sampling)
+    for e in g.nodes:
+        g.add_sampling(e.sampling)
         for f in e.features:
-            p.add_feature(f)
+            g.add_feature(f)
 
-    return p
+    return g
+
+
+def normalize_multiple_node_arg(src: MultipleNodeArg) -> Dict[str, Node]:
+    """Normalizes a node or list of nodes into a dictionary of nodes."""
+
+    save_src = src
+
+    if isinstance(src, Node):
+        src = [src]
+
+    if isinstance(src, list):
+        new_src = {}
+        for node in src:
+            if node.name is None:
+                raise ValueError(
+                    "Input / output node or list nodes need to be named "
+                    'with "node.name = ...". Alternatively, provide a '
+                    "dictionary of nodes."
+                )
+            new_src[node.name] = node
+        src = new_src
+
+    if not isinstance(src, dict):
+        raise ValueError(
+            f'Unexpected node(s) "{save_src}". Expecting dict of nodes, '
+            "list of nodes, or a single node."
+        )
+    return src

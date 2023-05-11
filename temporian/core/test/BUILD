@@ -51,14 +51,14 @@ py_test(
 )
 
 py_test(
-    name = "processor_test",
-    srcs = ["processor_test.py"],
+    name = "graph_test",
+    srcs = ["graph_test.py"],
     srcs_version = "PY3",
     deps = [
         # absl/logging dep,
         # absl/testing:absltest dep,
         ":utils",
-        "//temporian/core:processor",
+        "//temporian/core:graph",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:feature",
@@ -77,7 +77,7 @@ py_test(
         # absl/testing:absltest dep,
         ":utils",
         "//temporian",
-        "//temporian/core:processor",
+        "//temporian/core:graph",
         "//temporian/core:serialize",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",

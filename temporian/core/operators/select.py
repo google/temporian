@@ -96,13 +96,14 @@ operator_lib.register_operator(SelectOperator)
 
 def select(
     input: Node,
-    feature_names: List[str],
+    feature_names: Union[str, List[str]],
 ) -> Node:
     """Selects a subset of features from a node.
 
     Args:
         input: Node to select features from.
-        feature_names: Names of the features to select from the input.
+        feature_names: Name or list of names of the features to select from the
+            input.
 
     Returns:
         Node containing only the selected features.
