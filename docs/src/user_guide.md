@@ -230,7 +230,7 @@ EventSet(
 )
 ```
 
-Temporian accepts time inputs in various formats, including integer, float, Python date or datetime, NumPy datetime, and Pandas datetime. Date and datetime objects are internally converted to floats as Unix time in seconds, compatible with the calendar operators.
+Temporian accepts time inputs in various formats, including integer, float, Python date or datetime, NumPy datetime, and pandas datetime. Date and datetime objects are internally converted to floats as Unix time in seconds, compatible with the calendar operators.
 
 TODO: examples
 
@@ -530,165 +530,158 @@ EventSet(
 
 ## Sampling
 
-Arithmetic operators, such as the addition operator require for input arguments to have the same timestamps and an index (see next section). The unique combination of timestamps and index is called a _sampling_.
+Arithmetic operators, such as `tp.add`, require their input arguments to have the same timestamps and [index](TODO: link). The unique combination of timestamps and index is called a _sampling_.
 
-<example>
+TODO: example
 
-For example, if nodes `a` and `b` have different samplings, `a["feature_1"] + b["feature_2"]` will fail with the error message:
+For example, if nodes `a` and `b` have different samplings, `a["feature_1"] + b["feature_2"]` will fail.
 
-> > The two operands have different sampling. [details about the samplings]
+To use arithmetic operators on EventSets with different samplings, one of the EventSets needs to be resampled to the sampling of the other EventSet. Resampling is done with the `tp.resample` operator.
 
-To use arithmetic operators on EventSets with different sampling, one of the EventSets needs to be resampled to the sampling of the other EventSet. Resampling is done with the `tp.resample` operator.
+The `tp.resample` operator takes two EventSets called `input` and `sampling`, and returns the resampling of the features of `input` according to the timestamps of `sampling` according to the following rules:
 
-The `tp.resample` operator takes two EventSets input called `events` and `sampling`, and returns the resampling of the features of `events` according to the timestamps of `sampling` according to the following rules:
+If a timestamp is present in `input` but not in `sampling`, the timestamp is dropped.
+If a timestamp is present in both `input` and `sampling`, the timestamp is kept.
+If a timestamp is present in `sampling` but not in `input`, a new timestamp is created using the feature values from the _closest anterior_ (not the closest, as that could induce future leakage) timestamp of `input`. This rule is especially useful for events that represent measurements (see [Events and EventSets](TODO: link)).
 
-If a timestamp is present in `events` but not in `sampling`, the timestamp is dropped.
-If a timestamp is present in both `events` and `sampling`, the timestamp is kept.
-If a timestamp is present in `sampling` but not in `events`, a new timestamp is created using the feature values from the _closest anterior_ (not the closest, as that could induce future leakage) timestamp of `events`. This rule is especially useful for events that represent measurements (see "Events and EventSets" section).
+**Note:** Features in `sampling` are ignored. This also happens in some other operators that take a `sampling` argument of type `Node` - it indicates that only the sampling (a.k.a. the index and timestamps) of that node are being used by that operator.
 
-**Note:** Features in `sampling` are ignored.
-
-Here is an example:
+Given this example:
 
 ```python
-a = tp.EventSet(timestamps=[10, 20, 30], features={"x": ["1.0,2.0,3.0,4.0 ]})
-b = tp.EventSet(timestamps=[0, 9, 10, 11, 19, 20, 21])
-c = tp.resample(events=a.node(), sampling=b.node())
+evset = tp.EventSet(
+    timestamps=[10, 20, 30],
+    features={
+        "x": [1.0, 2.0, 3.0],
+    },
+)
+sampling = tp.EventSet(
+    timestamps=[0, 9, 10, 11, 19, 20, 21],
+)
 
-c.evaluate([a, b])
+resampled = tp.resample(input=evset.node(), sampling=sampling.node())
+
+resampled.evaluate([evset, sampling])
 ```
 
-Following the matching between the timestamps of `sampling=b.node()` and `events=a.node()`:
+The following would be the matching between the timestamps of `sampling` and `input`:
 
-sampling
-0
-9
-10
-11
-19
-20
-21
-matching event sampling
-None
-None
-10
-10
-10
-20
-20
-matching event x feature
-NaN
-(missing)
-NaN
-(missing)
-1
-1
-1
-2
-2
+| `sampling` timestamp         | 0   | 9   | 10  | 11  | 19  | 20  | 21  |
+| ---------------------------- | --- | --- | --- | --- | --- | --- | --- |
+| matching `input` timestamp   | -   | -   | 10  | 10  | 10  | 20  | 20  |
+| matching `"x"` feature value | NaN | NaN | 1   | 1   | 1   | 2   | 2   |
 
-If `sampling` contains a timestamp anterior to any `events` timestamp (like 0 and 9 in the example above), the feature of the sampled event will be missing. The representation of a missing value depends on its dtype:
+If `sampling` contains a timestamp anterior to any timestamp in the `input` (like 0 and 9 in the example above), the feature of the sampled event will be missing. The representation of a missing value depends on its dtype:
 
-float: NaN
-integer: 0
-string: "" (empty string)
+float: `NaN`
+integer: `0`
+string: `""`
 
 Back to the example of the `tp.add` operator, `a` and `b` with different sampling can be added in one of the following ways:
 
 ```python
-a["feature_1"] + tp.resample(b, a) ["feature_2"]
+a["feature_1"] + tp.resample(b, a)["feature_2"]
 a["feature_1"] + tp.resample(b["feature_2"], a)
-# Assuming that "c" is another EventSet.
+
+# Assuming that `c` is another EventSet.
 tp.resample(a["feature_1"], c) + tp.resample(b["feature_2"], c)
 ```
 
-`tp.resample` is critical to combine events from different, asynchronized sources. For example, consider a system with two sensors, a thermometer for temperature and a manometer for pressure. The temperature sensor produces measurements every 1 to 10 minutes, while the pressure sensor returns measurements every second. Additionally assume that both sensors are not synchronized. Finally, assume that you need to combine the temperature and pressure measurements with the equation "temperature / pressure".
+`tp.resample` is critical to combine events from different, non-synchronized sources. For example, consider a system with two sensors, a thermometer for temperature and a manometer for pressure. The temperature sensor produces measurements every 1 to 10 minutes, while the pressure sensor returns measurements every second. Additionally assume that both sensors are not synchronized. Finally, assume that you need to combine the temperature and pressure measurements with the equation `temperature / pressure`.
 
-<Example>
+TODO: image
 
-Since the temperature and pressure EventSet have different sampling, you will need to combine them in one of the following ways.
+Since the temperature and pressure EventSets have different sampling, you will need to resample one of them. The pressure sensor has higher resolution. Therefore, resampling the temperature to the pressure yields higher resolution than resampling the pressure to the temperature.
 
 ```python
 r = tp.resample(termometer["temperature"], manometer) / manometer["pressure"]
 ```
 
-The pressure sensor has higher resolution. Therefore, resampling the temperature to the pressure yields higher resolution than resampling the pressure to the temperature.
-
-When handling non uniform sampling it is also common to have a common resampling source.
+When handling non-uniform timestamps it is also common to have a common resampling source.
 
 ```python
-sampling_source = ... # Uniform timestamps every 10 seconds
+sampling_source = ... # Uniform timestamps every 10 seconds.
 r = tp.resample(termometer["temperature"], sampling_source) / tp.resample(manometer["pressure"], sampling_source)
 ```
 
-Window operators, such as the simple moving average or moving count operators, have an optional `sampling` argument. For example, the signature of the simple moving average operator is `tp.simple_moving_average(events: Node, window_length: Duration, sampling:Optional[Node]=None)`. If `sampling` is not set, the result is sampled the same as the `events` argument. If `sampling` is set, the operator is applied at the timestamps of `sampling`.
+Moving window operators, such as the `tp.simple_moving_average` or `tp.moving_count` operators, have an optional `sampling` argument. For example, the signature of the simple moving average operator is `tp.simple_moving_average(input: Node, window_length: Duration, sampling: Optional[Node] = None)`. If `sampling` is not set, the result will maintain the sampling of the `input` argument. If `sampling` is set, the moving window will be sampled at each timestamp of `sampling` instead, and the result will have those new ones.
 
 ```python
-b = tp.simple_moving_average(events=a, window_length=10)
-c= tp.simple_moving_average(events=a, window_length=10, sampling=d)
+b = tp.simple_moving_average(input=a, window_length=10)
+c = tp.simple_moving_average(input=a, window_length=10, sampling=d)
 ```
 
-```python
-# The two lines return the same results, but the second line is significantly faster.
-c = tp.simple_moving_average(events=a, window_length=10, sampling=b)
-c = tp.sample(tp.simple_moving_average(events=a, window_length=10), b)
-```
+Note that if planning to resample the result of a moving window operator, passing the `sampling` argument is both more efficient and more accurate than calling `tp.resample` on the result.
 
 ## Index, horizontal and vertical operators
 
-All operators presented so far work on a sequence of related events. For instance, the simple moving average operator computes the average of events within a specific time window. These types of operators are call **horizontal operators**.
+All operators presented so far work on a sequence of related events. For instance, the simple moving average operator computes the average of events within a specific time window. These types of operators are called _horizontal operators_.
 
-It is sometimes desirable for events in an EventSet not to interact with each other. For example, assume a dataset containing the sum of daily sales of a set of products. The objective is to compute the sum of weekly sales of each product independently. In this scenario, the weekly moving sum should be applied individually to each product. If not, you would compute the weekly sales of all the products together. To compute the weekly sales of individual products, you can define an _index_ on the `product` feature. The moving sum operator will be applied separately to each product.
+It is sometimes desirable for events in an EventSet not to interact with each other. For example, assume a dataset containing the sum of daily sales of a set of products. The objective is to compute the sum of weekly sales of each product independently. In this scenario, the weekly moving sum should be applied individually to each product. If not, you would compute the weekly sales of all the products together.
 
-```python
-daily_sales= tp.EventSet(
-	timestamps=[...],
-	features={
-	"product": [...],
-	"sale": [...],
-     }
-)
-
-a = daily_sales.node()
-
-# Create an index on the "product" feature
-b = tp.set_index(a, "product")
-
-# Compute the moving sum of each product individually
-c = tp.moving_sum(b, window_length=tp.duration.weeks(1))
-
-b.evaluate({a: daily_sales})
-```
-
-Operators that, like the moving sum, are applied independently on each index are called horizontal operators. Operators that modify indexes are called vertical operators. The most important vertical operators are:
-
-`tp.set_index`: Overwrite or add a feature to the existing index.
-`tp.drop_index`: Remove an index; optionally convert it into a feature.
-`tp.propagate`: Expand an index based on another EventSet’s index.
-
-Note: By default, when creating EventSets with `EventSet`, all the events are in a single global index group. Keep in mind only string and integer features can be used as indexes.
-
-We can also have multiple indexes. In the next example, assume our daily sale aggregates are also annotated with `store` data.
+To compute the weekly sales of individual products, you can define the `product` feature as the EventSet's _index_. The moving sum operator will then be applied independently to the events corresponding to each product.
 
 ```python
 daily_sales = tp.EventSet(
 	timestamps=[...],
 	features={
-	"product": [...],
-	"store": [...],
-	"price": [...],
-	"quantity": [...],
-	}
+        "product": [...],
+        "sale": [...],
+    },
+)
+
+a = daily_sales.node()
+
+# Set the "product" feature as the index.
+b = tp.set_index(a, "product")
+
+# Compute the moving sum of each product individually.
+c = tp.moving_sum(b, window_length=tp.duration.weeks(1))
+
+c.evaluate({a: daily_sales})
 ```
 
-Sales records correspond to individual purchases. Instead, let's compute the daily sum of sales for each (product, store) pair.
+Horizontal operators can be understood as operators that are applied independently on each index.
+
+Operators that modify an EventSet's index are called _vertical operators_. The most important vertical operators are:
+
+- `tp.set_index`: Set features as index or add them to the existing one.
+- `tp.drop_index`: Remove features from the index, optionally keeping them as features.
+- `tp.propagate`: Expand an index based on another EventSet’s index.
+
+By default EventSets are _flat_, which means they have no index, and therefore all events are in a single global index group.
+
+Also, keep in mind that only string and integer features can be used as indexes.
+
+EventSets can have multiple features as index. In the next example, assume our daily sale aggregates are also annotated with `store` data.
+
+```python
+daily_sales = tp.EventSet(
+	timestamps=[...],
+	features={
+        "product": [...],
+        "store": [...],
+        "price": [...],
+        "quantity": [...],
+	}
+)
+```
+
+Let's compute the daily sum of sales for each `(product, store)` pair.
 
 ```python
 a = daily_sales.node()
-b = tp.glue(a, tp.rename(a["price"] * a["quantity"], "sales"))
-b = tp.set_index(a, ["product", "store"] )
+b = tp.glue(
+    a,
+    tp.rename(
+        a["price"] * a["quantity"],
+        "sales"
+    ),
+)
+b = tp.set_index(b, ["product", "store"] )
+
 # Moving sum computed individually for each (product, store).
-c = tp.moving_sum(b["sales"], window_length=tp.duration.weeks(1)) # indexed by ["product", "store"]
+c = tp.moving_sum(b["sales"], window_length=tp.duration.weeks(1))
 ```
 
 Now, let's compute the daily sum of sales for each store.
@@ -702,34 +695,42 @@ d = tp.drop_index(b, "product")
 e = tp.moving_sum(d["sales"], window_length=tp.duration.weeks(1))
 ```
 
-Finally, let's compute the ratio of sales of each pair (product, store) compared to the corresponding (store). Since `c` (daily sales for each product and store) and `e` (daily sales for each store) have different indexes, we cannot use tp.divide (or /) directly - we must first `propagate` `e` to the `["product", "store"]` level.
+Finally, let's compute the ratio of sales of each `(product, store)` pair compared to the corresponding `store`.
+
+Since `c` (daily sales for each product and store) and `e` (daily sales for each store) have different indexes, we cannot use `tp.divide` (or `/`) directly - we must first `propagate` `e` to the `["product", "store"]` index.
 
 ```python
-# Copy the content of "e" (indexed by "store") into each (store, product).
+# Copy the content of e (indexed by (store)) into each (store, product).
 f = c / tp.propagate(e, sampling=c, resample=True)
 
-# Or equivalently
-f = c / tp.resample(tp.propagate(e, sampling=c), sampling=c)
+# Equivalent.
+f = c / tp.resample(
+    tp.propagate(e, sampling=c),
+    sampling=c,
+)
 ```
+
+The `tp.propagate` operator expands the index of its `input` (`e` in this case) to match the index of its `sampling` by copying the content of `input` into each corresponding index group of `sampling`. Note that the features in `sampling`'s index must be a superset of the ones in `input`'s index.
 
 ## Future leakage
 
 In supervised learning, [leakage](<https://en.wikipedia.org/wiki/Leakage_(machine_learning)>) is the use of data not available at serving time by a machine learning model. A common example of leakage is _label leakage_, which involves the invalid use of labels in the model input features. Leakage tends to bias model evaluation by making it appear much better than it is in reality. Unfortunately, leakage is often subtle, easy to inject, and challenging to detect.
 
-Another type of leakage is future leakage, where a model uses data before it is available. Future leakage is particularly easy to create and hard to detect, as all feature data is ultimately available to the model; the question is when it is accessed.
+Another type of leakage is future leakage, where a model uses data before it is available. Future leakage is particularly easy to create, as all feature data is ultimately available to the model, the problem being it being accessed at the wrong time.
 
-To avoid future leakage, Temporian operators are guaranteed to not cause future leakage except for the `tp.leak` operator. This means that it is impossible to inadvertently add future leakage to a Temporian program.
+To avoid future leakage, Temporian operators are guaranteed to not cause future leakage, except for the `tp.leak` operator. This means that it is impossible to inadvertently add future leakage to a Temporian program.
 
-The tp.leak operator can be useful for precomputing labels or evaluating machine learning models. However, its outputs shouldn’t be used as input features. To check programmatically if a node depends on a tp.leak operator, we can use the tp.has_leak function.
+`tp.leak` can be useful for precomputing labels or evaluating machine learning models. However, its outputs shouldn’t be used as input features. To check programmatically if a node depends on `tp.leak`, we can use the `tp.has_leak` function.
 
 ```python
 >>> a = tp.input_node(features=[("feature_1", tp.float32)])
 >>> b = tp.moving_count(a, 1)
 >>> c = tp.moving_count(tp.leak(b, 1), 2)
 
->>> print(""b" has a future leak:", tp.has_leak(b))
+>>> print(tp.has_leak(b))
 False
->>> print(""c" has a future leak:", tp.has_leak(b))
+
+>>> print(tp.has_leak(c))
 True
 ```
 
@@ -739,127 +740,83 @@ In this example, `b` does not have a future leak, but `c` does because it depend
 
 EventSet data can be accessed using the `index()` and `feature()` functions. Temporian internally relies on NumPy, which means that the data access functions always return NumPy arrays.
 
-```
-# Create an EventSet
-events = tp.EventSet(
+```python
+evset = tp.EventSet(
 	timestamps=[1, 2, 3, 5, 6],
 	features={
-	"f1": [0.1, 0.2, 0.3, 1.1, 1.2],
-	"f2": ["red", "red", "red", "blue", "blue"],
+        "f1": [0.1, 0.2, 0.3, 1.1, 1.2],
+        "f2": ["red", "red", "red", "blue", "blue"],
 	},
-	indexes=["f2"],
+	index=["f2"],
 )
-events
+
+# Access the data for the index `f2=red`.
+evset.index("red")
+
+# Equivalent.
+evset.index(("red", ))
+
+# Access the data for the index `f2=red` and feature `f1`.
+evset.index("red").feature("f1")
 ```
 
-```python
-# Access the data for the index "f2=red".
-events.index("red")
-
-# Or, equivalently
-events.index(("red", ))
-```
+If an EventSet does not have an index, `feature` can be called directly:
 
 ```python
-events.index("red").feature("f1")
-```
-
-If an EventSet does not have an index, `features` can be called directly:
-
-```python
-events = tp.EventSet(
+evset = tp.EventSet(
 	timestamps=[1, 2, 3, 5, 6],
 	features={
-	"f1": [0.1, 0.2, 0.3, 1.1, 1.2],
-	"f2": ["red", "red", "red", "blue", "blue"],
+        "f1": [0.1, 0.2, 0.3, 1.1, 1.2],
+        "f2": ["red", "red", "red", "blue", "blue"],
 	},
 )
-events.feature("f1")
-
-# Or, equivalently
-# events.index((,)).feature("f1")
+evset.feature("f1")
 ```
 
 ## Import and export data
 
-Converting EventSet data to and from Pandas DataFrames is a straightforward process.
+Converting EventSet data to and from pandas DataFrames is easily done via `EventSet.to_dataframe` and `EventSet.from_dataframe`.
 
 ```python
 import pandas a pd
 
 df = pd.DataFrame({
-"timestamp": [1, 2, 3, 5, 6],
-"f1": [0.1, 0.2, 0.3, 1.1, 1.2],
-"f2": ["red", "red", "red", "blue", "blue"],
+    "timestamp": [1, 2, 3, 5, 6],
+    "f1": [0.1, 0.2, 0.3, 1.1, 1.2],
+    "f2": ["red", "red", "red", "blue", "blue"],
 })
 
-df
+# Create EventSet from DataFrame.
+evset = EventSet.from_dataframe(df)
+
+# Convert EventSet to DataFrame.
+df = evset.to_dataframe()
 ```
+
+## Serialization and deserialization of a graph
+
+Temporian graphs can be exported and imported to a safe-to-share file with `tp.save` and `tp.load`. In both functions input and output nodes need to be named, or be assigned a name by passing them as a dictionary.
 
 ```python
-events = tp.from_dataframe(df)
-```
-
-```
-tp.to_dataframe(events)
-```
-
-## Serializing and deserializing of graph
-
-Temporian graphs can be exported and imported to a safe-to-share file with `tp.save` and `tp.load`. In both functions, the input and output nodes are always named.
-
-```python
-
-# Define a Temporian graph
-events = tp.EventSet(
+# Define a graph.
+evset = tp.EventSet(
 	timestamps=[1, 2, 3],
 	features={"f1": [0.1, 0.2, 0.3]},
 )
-a = events.node()
+a = evset.node()
 b = tp.moving_count(a, 1)
 
-# Run the graph
-tp.evaluate(b, {a: events})
-
-# Save the graph to file
+# Save the graph.
 tp.save(inputs={"input_a": a}, outputs={"output_b": b}, path="/tmp/my_graph.tem")
 
-a.set_name("input_a")
-b.set_name("output_b")
-...
+# Equivalent.
+a.name = "input_a"
+b.name = "output_b"
 tp.save(inputs=a, outputs=[b], path="/tmp/my_graph.tem")
 
-
-# Restore the graph from file
+# Load the graph.
 loaded_inputs, loaded_outputs = tp.load(path="/tmp/my_graph.tem")
 
-# Run data on the restored graph
-tp.evaluate(loaded_outputs["output_b"], {loaded_inputs["input_a"]: events})
+# Run data on the restored graph.
+tp.evaluate(loaded_outputs["output_b"], {loaded_inputs["input_a"]: evset})
 ```
-
-## Memory management
-
-tell which operator is copping data, and which one is not
-track data usage (different ways)
-explain that this is a graphical language. give examples
-Measuring memory usage( in eval and in EventSet)
-normalize eventset print
-
-node = evset.node()
-
-node = tp.select(node, …)
-node += 3
-node = node + 3
-node["aze"] = ...
-
-node = tp.source_onde()
-node += 1
-node += 1
-node += 1
-a = something(node)
-
-e.evaluate(node:{})
-
-x = ...
-x = x....
-x = x....
