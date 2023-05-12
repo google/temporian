@@ -12,10 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Event/scalar operators classes and public API definitions."""
+"""Base scalar operator class definition."""
 
 from typing import Union, List
-from abc import abstractmethod
 
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
@@ -25,7 +24,7 @@ from temporian.proto import core_pb2 as pb
 
 
 class BaseScalarOperator(Operator):
-    """Interface definition and common logic for operators."""
+    """Interface definition and common code for scalar operators."""
 
     DEF_KEY = ""
 

@@ -127,14 +127,14 @@ def greater(
     input_left: Node,
     input_right: Node,
 ) -> Node:
-    """Checks (element-wise) if input_left > input_right
+    """Checks (element-wise) if input_left > input_right.
 
     Each feature in `input_left` is compared element-wise to the feature in
     `input_right` in the same position.
     Note that it will always return False on NaN elements.
 
-    `input_left` and `input_right` must have the same sampling and the same number of
-    features.
+    `input_left` and `input_right` must have the same sampling and the same
+    number of features.
 
     Args:
         input_left: node to the left of the operator
@@ -153,14 +153,14 @@ def greater_equal(
     input_left: Node,
     input_right: Node,
 ) -> Node:
-    """Checks (element-wise) if input_left >= input_right
+    """Checks (element-wise) if input_left >= input_right.
 
     Each feature in `input_left` is compared element-wise to the feature in
     `input_right` in the same position.
     Note that it will always return False on NaN elements.
 
-    `input_left` and `input_right` must have the same sampling and the same number of
-    features.
+    `input_left` and `input_right` must have the same sampling and the same
+    number of features.
 
     Args:
         input_left: node to the left of the operator
@@ -179,14 +179,14 @@ def less(
     input_left: Node,
     input_right: Node,
 ) -> Node:
-    """Checks (element-wise) if input_left < input_right
+    """Checks (element-wise) if input_left < input_right.
 
     Each feature in `input_left` is compared element-wise to the feature in
     `input_right` in the same position.
     Note that it will always return False on NaN elements.
 
-    `input_left` and `input_right` must have the same sampling and the same number of
-    features.
+    `input_left` and `input_right` must have the same sampling and the same
+    number of features.
 
     Args:
         input_left: node to the left of the operator
@@ -205,14 +205,14 @@ def less_equal(
     input_left: Node,
     input_right: Node,
 ) -> Node:
-    """Checks (element-wise) if input_left <= input_right
+    """Checks (element-wise) if input_left <= input_right.
 
     Each feature in `input_left` is compared element-wise to the feature in
     `input_right` in the same position.
     Note that it will always return False on NaN elements.
 
-    `input_left` and `input_right` must have the same sampling and the same number of
-    features.
+    `input_left` and `input_right` must have the same sampling and the same
+    number of features.
 
     Args:
         input_left: node to the left of the operator

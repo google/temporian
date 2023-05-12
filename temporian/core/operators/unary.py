@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unary operators (~, isnan, abs) and public API definitions"""
+"""Unary operators (e.g: ~, isnan, abs) and public API definitions."""
 
 from abc import abstractmethod
 
@@ -81,24 +81,18 @@ class BaseUnaryOperator(Operator):
     @property
     @abstractmethod
     def op_key_definition(cls) -> str:
-        """
-        Get the operator key used for serialization (build_op_definition)
-        """
+        """Gets the op. key used for serialization in build_op_definition."""
 
     @classmethod
     @property
     @abstractmethod
     def allowed_dtypes(cls) -> list[DType]:
-        """
-        Get the dtypes that should work with this operator
-        """
+        """Gets the dtypes that should work with this operator."""
 
     @classmethod
     @abstractmethod
     def get_output_dtype(cls, feature_dtype: DType) -> DType:
-        """
-        Get the output DType from the corresponding feature DType
-        """
+        """Gets the output DType from the input feature DType."""
 
 
 class InvertOperator(BaseUnaryOperator):
@@ -211,9 +205,10 @@ operator_lib.register_operator(LogOperator)
 def invert(
     input: Node,
 ) -> Node:
-    """Invert a boolean node (~node).
+    """Inverts a boolean node (~node).
+
+    Swaps False<->True element-wise.
     Does not work on integers, they should be cast to BOOLEAN beforehand.
-    Swaps False<->True
 
     Args:
         input: Node to invert.
@@ -229,17 +224,17 @@ def invert(
 def isnan(
     input: Node,
 ) -> Node:
-    """Get boolean features, True in the positions where
-    there's a NaN.
-    Note that for INT and BOOLEAN this will
-    always be False since those types don't support NaNs.
-    It only makes actual sense to use on FLOAT features.
+    """Returns boolean features, `True` in the NaN elements of the input.
+
+    Note that for `int` and `bool` this will
+    always be `False` since those types don't support NaNs.
+    It only makes actual sense to use on `float` (or `tp.float32`) features.
 
     Args:
         input: Node to check for NaNs.
 
     Returns:
-        Node with BOOLEAN features.
+        Node with `bool` features.
     """
     return IsNanOperator(
         input=input,
@@ -249,16 +244,17 @@ def isnan(
 def notnan(
     input: Node,
 ) -> Node:
-    """Get boolean features, True in the positions that are not NaN.
-    Equivalent to invert(isnan()). Note that for INT and BOOLEAN this will
-    always be True since those types don't support NaNs.
-    It only makes actual sense to use on FLOAT features.
+    """Opposite of `isnan()`, being `True` in the elements that are not NaN.
+
+    Equivalent to `invert(isnan())`. Note that for `int` and `bool` this will
+    always be `True` since those types don't support NaNs.
+    It only makes actual sense to use on `float` (or `tp.float32`) features.
 
     Args:
         input: Node to check for NaNs.
 
     Returns:
-        Node with BOOLEAN features.
+        Node with `bool` features.
     """
     return NotNanOperator(
         input=input,
@@ -268,10 +264,10 @@ def notnan(
 def abs(
     input: Node,
 ) -> Node:
-    """Get the absolute value of the features.
+    """Gets the absolute value of the input features.
 
     Args:
-        input: Node to apply abs().
+        input: Node calculate absolute value.
 
     Returns:
         Node with positive valued features.
@@ -284,11 +280,11 @@ def abs(
 def log(
     input: Node,
 ) -> Node:
-    """Get natural logarithm of the features. Can only be used
-    on floating point types.
+    """Calculates the natural logarithm of the features. Can only be used
+    on floating point feature types.
 
     Args:
-        input: Node to apply logarithm.
+        input: Node to calculate natural logarithm.
 
     Returns:
         Node with logarithm of input features.

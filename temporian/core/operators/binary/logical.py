@@ -67,20 +67,20 @@ def logical_and(
     input_1: Node,
     input_2: Node,
 ) -> Node:
-    """Element-wise boolean AND operator.
+    """Gets the logical AND (`&`) between boolean features, element-wise.
 
     Each feature in `input_1` is compared element-wise to the feature in
     `input_2` in the same position.
 
-    `input_1` and `input_2` must have the same sampling and the same number of
-    features.
+    `input_1` and `input_2` must have the same sampling, the same number of
+    features, and all feature types must be `bool`.
 
     Args:
-        input_1: First node.
-        input_2: Second node.
+        input_1: First node, with only boolean features.
+        input_2: Second node, with only boolean features.
 
     Returns:
-        Node containing the result of the operator.
+        Node with boolean features.
     """
     return LogicalAndOperator(
         input_1=input_1,
@@ -92,20 +92,20 @@ def logical_or(
     input_1: Node,
     input_2: Node,
 ) -> Node:
-    """Element-wise boolean OR operator.
+    """Gets the logical OR (`|`) between boolean features, element-wise.
 
     Each feature in `input_1` is compared element-wise to the feature in
     `input_2` in the same position.
 
-    `input_1` and `input_2` must have the same sampling and the same number of
-    features.
+    `input_1` and `input_2` must have the same sampling, the same number of
+    features, and all feature types must be `bool`.
 
     Args:
-        input_1: First node.
-        input_2: Second node.
+        input_1: First node, with only boolean features.
+        input_2: Second node, with only boolean features.
 
     Returns:
-        Node containing the result of the operator.
+        Node with boolean features.
     """
     return LogicalOrOperator(
         input_1=input_1,
@@ -117,20 +117,20 @@ def logical_xor(
     input_1: Node,
     input_2: Node,
 ) -> Node:
-    """Element-wise boolean XOR operator.
+    """Gets the logical XOR (`^`) between boolean features, element-wise.
 
     Each feature in `input_1` is compared element-wise to the feature in
     `input_2` in the same position.
 
-    `input_1` and `input_2` must have the same sampling and the same number of
-    features.
+    `input_1` and `input_2` must have the same sampling, the same number of
+    features, and all feature types must be `bool`.
 
     Args:
-        input_1: First node.
-        input_2: Second node.
+        input_1: First node, with only boolean features.
+        input_2: Second node, with only boolean features.
 
     Returns:
-        Node containing the result of the operator.
+        Node with boolean features.
     """
     return LogicalXorOperator(
         input_1=input_1,

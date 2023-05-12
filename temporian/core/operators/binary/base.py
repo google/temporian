@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Base arithmetic operator class definition."""
+"""Base binary operators class definition."""
 
 from abc import abstractmethod
 
