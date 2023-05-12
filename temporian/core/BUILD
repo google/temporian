@@ -11,7 +11,7 @@ py_library(
     srcs = ["evaluation.py"],
     srcs_version = "PY3",
     deps = [
-        ":processor",
+        ":graph",
         "//temporian/core/data:feature",
         "//temporian/core/data:node",
         "//temporian/core/operators:base",
@@ -27,8 +27,8 @@ py_library(
 )
 
 py_library(
-    name = "processor",
-    srcs = ["processor.py"],
+    name = "graph",
+    srcs = ["graph.py"],
     srcs_version = "PY3",
     deps = [
         "//temporian/core/data:feature",

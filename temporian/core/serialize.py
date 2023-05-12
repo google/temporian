@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Serialization/unserialization of a processor and its components."""
+"""Serialization/unserialization of a graph and its components."""
 
 from typing import Set, Any, Dict, Tuple, Optional, Mapping
 
 from google.protobuf import text_format
 
 from temporian.core import operator_lib
-from temporian.core import processor
+from temporian.core import graph
 from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
 from temporian.core.data.sampling import Sampling
@@ -29,19 +29,19 @@ from temporian.proto import core_pb2 as pb
 
 
 def save(
-    inputs: Optional[processor.MultipleNodeArg],
-    outputs: processor.MultipleNodeArg,
+    inputs: Optional[graph.MultipleNodeArg],
+    outputs: graph.MultipleNodeArg,
     path: str,
 ) -> None:
-    """Saves the processor between `inputs` and `outputs` to a file.
+    """Saves the graph between `inputs` and `outputs` to a file.
 
     Usage example:
         ```python
         a = t.input_node(...)
         b = t.sma(a, window_length=7.0)
-        t.save(inputs={"io_a": a}, outputs={"io_b": b}, path="processor.tem")
+        t.save(inputs={"io_a": a}, outputs={"io_b": b}, path="graph.tem")
 
-        inputs, outputs = t.load(path="processor.tem")
+        inputs, outputs = t.load(path="graph.tem")
         print(t.evaluate(
             query=outputs["io_b"],
             input_data{inputs["io_a"]: pandas.DataFrame(...)}
@@ -58,12 +58,12 @@ def save(
     # TODO: Add support for compressed / binary serialization.
 
     if inputs is not None:
-        inputs = processor.normalize_multiple_node_arg(inputs)
+        inputs = graph.normalize_multiple_node_arg(inputs)
 
-    outputs = processor.normalize_multiple_node_arg(outputs)
+    outputs = graph.normalize_multiple_node_arg(outputs)
 
-    p, _ = processor.infer_processor(inputs=inputs, outputs=outputs)
-    proto = serialize(p)
+    g, _ = graph.infer_graph(inputs=inputs, outputs=outputs)
+    proto = serialize(g)
     with open(path, "w") as f:
         f.write(text_format.MessageToString(proto))
 
@@ -71,7 +71,7 @@ def save(
 def load(
     path: str, squeeze: bool = False
 ) -> Tuple[Dict[str, Node], Dict[str, Node]]:
-    """Loads a processor from a file.
+    """Loads a graph from a file.
 
     Args:
         path: File path to load from.
@@ -83,11 +83,11 @@ def load(
     """
 
     with open(path, "r") as f:
-        proto = text_format.Parse(f.read(), pb.Processor())
-    p = unserialize(proto)
+        proto = text_format.Parse(f.read(), pb.Graph())
+    g = unserialize(proto)
 
-    inputs = p.inputs
-    outputs = p.outputs
+    inputs = g.inputs
+    outputs = g.outputs
 
     if squeeze and len(inputs) == 1:
         inputs = list(inputs.values())[0]
@@ -98,10 +98,10 @@ def load(
     return inputs, outputs
 
 
-def serialize(src: processor.Processor) -> pb.Processor:
-    """Serializes a processor into a protobuffer."""
+def serialize(src: graph.Graph) -> pb.Graph:
+    """Serializes a graph into a protobuffer."""
 
-    return pb.Processor(
+    return pb.Graph(
         operators=[_serialize_operator(o) for o in src.operators],
         nodes=[_serialize_node(e) for e in src.nodes],
         features=[_serialize_feature(f) for f in src.features],
@@ -111,8 +111,8 @@ def serialize(src: processor.Processor) -> pb.Processor:
     )
 
 
-def unserialize(src: pb.Processor) -> processor.Processor:
-    """Unserializes a protobuffer into a processor."""
+def unserialize(src: pb.Graph) -> graph.Graph:
+    """Unserializes a protobuffer into a graph."""
 
     # Decode the components.
     # All the fields except for the "creator" ones are set.
@@ -144,15 +144,15 @@ def unserialize(src: pb.Processor) -> processor.Processor:
             )
 
     # Copy extracted items.
-    p = processor.Processor()
+    g = graph.Graph()
     for sampling in samplings.values():
-        p.samplings.add(sampling)
+        g.samplings.add(sampling)
     for node in nodes.values():
-        p.nodes.add(node)
+        g.nodes.add(node)
     for feature in features.values():
-        p.features.add(feature)
+        g.features.add(feature)
     for operator in operators.values():
-        p.operators.add(operator)
+        g.operators.add(operator)
 
     # IO Signature
     def get_node(node_id: str) -> Node:
@@ -161,16 +161,16 @@ def unserialize(src: pb.Processor) -> processor.Processor:
         return nodes[node_id]
 
     for item in src.inputs:
-        p.inputs[item.key] = get_node(item.node_id)
+        g.inputs[item.key] = get_node(item.node_id)
 
     for item in src.outputs:
-        p.outputs[item.key] = get_node(item.node_id)
+        g.outputs[item.key] = get_node(item.node_id)
 
-    return p
+    return g
 
 
 def _identifier(item: Any) -> str:
-    """Creates a unique identifier for an object within a processor."""
+    """Creates a unique identifier for an object within a graph."""
     if item is None:
         raise ValueError("Cannot get id of None")
     return str(id(item))

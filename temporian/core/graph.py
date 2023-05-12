@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Processor class definition and inference logic."""
+"""Graph class definition and inference logic."""
 
 from typing import List, Set, Dict, Tuple, Union, Optional
 
@@ -25,7 +25,7 @@ MultipleNodeArg = Union[Dict[str, Node], List[Node], Node]
 NodeInputArg = Union[Node, str]
 
 
-class Processor(object):
+class Graph:
     """A set of operators, nodes, features and samplings."""
 
     def __init__(self):
@@ -91,7 +91,7 @@ class Processor(object):
         return {node.sampling for node in self.inputs.values()}
 
     def __repr__(self):
-        s = "Processor\n============\n"
+        s = "Graph\n============\n"
 
         def p(title, elements):
             nonlocal s
@@ -117,10 +117,10 @@ class Processor(object):
         return s
 
 
-def infer_processor(
+def infer_graph(
     inputs: Optional[Dict[str, NodeInputArg]],
     outputs: Dict[str, Node],
-) -> Tuple[Processor, Dict[str, Node]]:
+) -> Tuple[Graph, Dict[str, Node]]:
     """Extracts all the objects between the output and input nodes.
 
     Fails if any inputs are missing.
@@ -132,7 +132,7 @@ def infer_processor(
 
     Returns:
         Tuple of:
-            - Inferred processor.
+            - Inferred graph.
             - Mapping of node name inputs to nodes. The keys are the string
             values in the `inputs` argument, and the values are the nodes
             corresponding to each one. If a value was already a node, it won't
@@ -158,8 +158,8 @@ def infer_processor(
     #       continue
     #   Adds all the input nodes of node's creator op to the pending list
 
-    p = Processor()
-    p.outputs = outputs
+    g = Graph()
+    g.outputs = outputs
 
     # The next node to process. Nodes are processed from the outputs to
     # the inputs.
@@ -177,7 +177,7 @@ def infer_processor(
     names_to_nodes: Dict[str, Node] = {}
 
     if inputs is not None:
-        p.inputs: Dict[str, Node] = {}
+        g.inputs: Dict[str, Node] = {}
 
         for idx_str, node_or_name in inputs.items():
             if isinstance(node_or_name, Node):
@@ -189,10 +189,10 @@ def infer_processor(
                     )
                 input_nodes.add(node_or_name)
 
-                # Only add node_or_name to p.inputs if its a node
-                # If a name, it will be added to p.inputs and names_to_nodes
+                # Only add node_or_name to g.inputs if its a node
+                # If a name, it will be added to g.inputs and names_to_nodes
                 # when we find it while traversing the graph.
-                p.inputs[idx_str] = node_or_name
+                g.inputs[idx_str] = node_or_name
 
             elif isinstance(node_or_name, str):
                 # Fail if same node is passed as input twice.
@@ -228,7 +228,7 @@ def infer_processor(
         pending_nodes.remove(node)
         assert node not in done_nodes
 
-        p.add_node(node)
+        g.add_node(node)
 
         if node in input_nodes:
             # The feature is provided by the user.
@@ -236,9 +236,9 @@ def infer_processor(
 
         elif node.name and node.name in input_node_names_to_idx_str:
             # The feature is provided by the user.
-            # Add node to p.inputs and names_to_nodes now that we have it.
+            # Add node to g.inputs and names_to_nodes now that we have it.
             idx_str = input_node_names_to_idx_str[node.name]
-            p.inputs[idx_str] = node
+            g.inputs[idx_str] = node
             names_to_nodes[node.name] = node
             continue
 
@@ -248,7 +248,7 @@ def infer_processor(
             continue
 
         # Record the operator.
-        p.add_operator(node.creator)
+        g.add_operator(node.creator)
 
         # Add the parent nodes to the pending list.
         for input_node in node.creator.inputs.values():
@@ -261,7 +261,7 @@ def infer_processor(
         # Record the operator outputs. While the user did not request
         # them, they will be created (and so, we need to track them).
         for output_node in node.creator.outputs.values():
-            p.add_node(output_node)
+            g.add_node(output_node)
 
     if inputs is None:
         # Infer the inputs
@@ -270,7 +270,7 @@ def infer_processor(
             if node.name is None:
                 raise ValueError(f"Cannot infer input on unnamed node {node}")
             infered_inputs[node.name] = node
-        p.inputs = infered_inputs
+        g.inputs = infered_inputs
 
     else:
         # Fail if not all nodes are sourced.
@@ -281,12 +281,12 @@ def infer_processor(
             )
 
     # Record all the features and samplings.
-    for e in p.nodes:
-        p.add_sampling(e.sampling)
+    for e in g.nodes:
+        g.add_sampling(e.sampling)
         for f in e.features:
-            p.add_feature(f)
+            g.add_feature(f)
 
-    return p, names_to_nodes
+    return g, names_to_nodes
 
 
 def normalize_multiple_node_arg(src: MultipleNodeArg) -> Dict[str, Node]:

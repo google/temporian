@@ -80,7 +80,7 @@ class TFPTest(absltest.TestCase):
         b = t.simple_moving_average(input=a, window_length=7)
 
         with tempfile.TemporaryDirectory() as tempdir:
-            path = os.path.join(tempdir, "my_processor.tem")
+            path = os.path.join(tempdir, "my_graph.tem")
             t.save(
                 inputs={"a": a},
                 outputs={"b": b},
@@ -104,7 +104,7 @@ class TFPTest(absltest.TestCase):
         b.name = "my_output_node"
 
         with tempfile.TemporaryDirectory() as tempdir:
-            path = os.path.join(tempdir, "my_processor.tem")
+            path = os.path.join(tempdir, "my_graph.tem")
             t.save(
                 inputs=a,
                 outputs=b,
@@ -128,7 +128,7 @@ class TFPTest(absltest.TestCase):
         b.name = "my_output_node"
 
         with tempfile.TemporaryDirectory() as tempdir:
-            path = os.path.join(tempdir, "my_processor.tem")
+            path = os.path.join(tempdir, "my_graph.tem")
             t.save(
                 inputs=a,
                 outputs=b,
@@ -152,7 +152,7 @@ class TFPTest(absltest.TestCase):
         b.name = "my_output_node"
 
         with tempfile.TemporaryDirectory() as tempdir:
-            path = os.path.join(tempdir, "my_processor.tem")
+            path = os.path.join(tempdir, "my_graph.tem")
             t.save(inputs=None, outputs=b, path=path)
 
             i, o = t.load(path=path, squeeze=True)

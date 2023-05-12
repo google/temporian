@@ -16,7 +16,7 @@
 
 from temporian.core import evaluation
 from temporian.core import operator_lib
-from temporian.core import processor
+from temporian.core import graph
 from temporian.core import serialize
 from temporian.core.data import dtype
 from temporian.core.data import node

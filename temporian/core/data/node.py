@@ -15,7 +15,7 @@
 """Node class definition."""
 
 from __future__ import annotations
-from typing import Dict, List, Optional, Tuple, TYPE_CHECKING, Any
+from typing import Dict, List, Optional, Tuple, TYPE_CHECKING, Any, Union
 
 from temporian.core.data.dtype import DType
 from temporian.core.data.feature import Feature
@@ -35,7 +35,7 @@ class Node(object):
     A node represents the structure, or schema, of a collection of indexed
     multivariate time series, or EventSets. A node does not contain any actual
     data, but is instead used as a reference to describe the format of the
-    input, intermediate results, or output of a Processor.
+    input, intermediate results, or output of a Graph.
 
     Informally, a node defines the name and data types of each time series, as
     well as the key and data type of the index (if any).
@@ -79,7 +79,7 @@ class Node(object):
             check_execution=check_execution,
         )
 
-    def __getitem__(self, feature_names: List[str]) -> Node:
+    def __getitem__(self, feature_names: Union[str, List[str]]) -> Node:
         # import select operator
         from temporian.core.operators.select import select
 

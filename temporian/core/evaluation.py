@@ -21,15 +21,15 @@ from collections import defaultdict
 
 from temporian.core.data.node import Node
 from temporian.core.operators import base
-from temporian.core import processor as processor_lib
 from temporian.implementation.numpy import evaluation as np_eval
 from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.core import graph
 
 
 EvaluationQuery = Union[Node, List[Node], Dict[str, Node]]
 EvaluationInput = Union[
     # dict of node/node name to corresponding event set
-    Dict[processor_lib.NodeInputArg, EventSet],
+    Dict[graph.NodeInputArg, EventSet],
     # list of event sets, and nodes are associated by name
     List[EventSet],
     # single event set, and node is associated by name
@@ -124,7 +124,7 @@ def evaluate(
 
 
 def build_schedule(
-    inputs: List[processor_lib.NodeInputArg],
+    inputs: List[graph.NodeInputArg],
     outputs: List[Node],
     verbose: int = 0,
 ) -> Tuple[List[base.Operator], Dict[str, Node]]:
@@ -152,12 +152,12 @@ def build_schedule(
     #
     # Fails if the outputs cannot be computed from the inputs e.g. some inputs
     # are missing.
-    processor, names_to_nodes = processor_lib.infer_processor(
+    g, names_to_nodes = graph.infer_graph(
         _list_to_dict(inputs), _list_to_dict(outputs)
     )
 
     if verbose >= 2:
-        print("Processor:\n", processor, file=sys.stderr)
+        print("Graph:\n", graph, file=sys.stderr)
 
     # Sequence of operators to execute. This is the result of the
     # "build_schedule" function.
@@ -178,7 +178,7 @@ def build_schedule(
 
     # Compute "node_to_op" and "op_to_num_pending_inputs".
     inputs_set = set(inputs)
-    for op in processor.operators:
+    for op in g.operators:
         num_pending_inputs = 0
         for input_node in op.inputs.values():
             if input_node in inputs_set or (
@@ -227,7 +227,7 @@ def build_schedule(
 
 def _normalize_input(
     input: EvaluationInput,
-) -> Dict[processor_lib.NodeInputArg, EventSet]:
+) -> Dict[graph.NodeInputArg, EventSet]:
     """Normalizes an input into a dictionary of node or node names to evsets."""
 
     if isinstance(input, dict):

@@ -17,7 +17,7 @@ from absl.testing import absltest
 import numpy as np
 import pandas as pd
 
-from temporian.core import evaluation
+from temporian.core.evaluation import evaluate
 from temporian.core.operators.select import SelectOperator
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators import select
@@ -115,8 +115,34 @@ class SelectOperatorTest(absltest.TestCase):
             new_df, index_names=["store_id"]
         )
 
-        output_evset = evaluation.evaluate(
+        output_evset = evaluate(
             self.input_node["sales"],
+            input={
+                self.input_node: self.input_evset,
+            },
+        )
+
+        self.assertEqual(expected_evset, output_evset)
+
+    def test_select_with_core_several_features(self) -> None:
+        """Test correct select operator with core and multiple features."""
+        new_df = pd.DataFrame(
+            [
+                [self.A, 1.0, 10.0, -1.0],
+                [self.A, 2.0, np.nan, -2.0],
+                [self.B, 3.0, 12.0, -3.0],
+                [self.B, 4.0, 13.0, -4.0],
+                [self.C, 5.0, 14.0, np.nan],
+                [self.C, 6.0, 15.0, -6.0],
+            ],
+            columns=["store_id", "timestamp", "sales", "costs"],
+        )
+        expected_evset = EventSet.from_dataframe(
+            new_df, index_names=["store_id"]
+        )
+
+        output_evset = evaluate(
+            self.input_node[["sales", "costs"]],
             input={
                 self.input_node: self.input_evset,
             },
