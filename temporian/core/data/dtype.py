@@ -16,7 +16,7 @@
 
 import math
 from enum import Enum
-from typing import Union
+from typing import Union, Any, Mapping, List
 
 
 class DType(Enum):
@@ -88,3 +88,32 @@ class DType(Enum):
             return DType.BOOLEAN
 
         raise ValueError(f"Non-implemented type {python_type}")
+
+
+def py_types_to_dtypes(target: Any) -> Any:
+    """
+    Convert any python types found to temporian types,
+    works recursively on List or Mapping.
+
+    Any other kind of data is left unchanged.
+
+    Args:
+        target: Any object.
+
+        Returns:
+            The same input object, with `type` elements changed by `DType`.
+
+        Raises:
+            ValueError: If there's a python `type` found that cannot be
+            converted to any temporian type (e.g: `object`)
+    """
+    if isinstance(target, type):
+        target = DType.from_python_type(target)
+    elif isinstance(target, Mapping):
+        target = {
+            py_types_to_dtypes(key): py_types_to_dtypes(val)
+            for key, val in target.items()
+        }
+    elif isinstance(target, List):
+        target = [py_types_to_dtypes(val) for val in target]
+    return target

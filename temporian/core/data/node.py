@@ -18,7 +18,7 @@ from __future__ import annotations
 from typing import Dict, List, Optional, Tuple, TYPE_CHECKING, Any, Union
 
 from temporian.core.data.dtype import DType
-from temporian.core.data.feature import Feature
+from temporian.core.data.feature import Feature, FeatureTuple
 from temporian.core.data.sampling import Sampling
 from temporian.core.data.sampling import IndexDType
 from temporian.utils import string
@@ -52,11 +52,19 @@ class Node(object):
 
     def __init__(
         self,
-        features: List[Feature],
+        features: List[Feature, FeatureTuple],
         sampling: Sampling,
         name: Optional[str] = None,
         creator: Optional[Operator] = None,
     ):
+        for idx, feature in enumerate(features):
+            # Convert tuples to feature
+            if isinstance(feature, tuple):
+                features[idx] = Feature.from_tuple(feature)
+                features[idx].sampling = sampling
+            elif not isinstance(feature, Feature):
+                raise ValueError(f"Unrecognized feature format: {feature}")
+
         self._features = features
         self._sampling = sampling
         self._creator = creator
@@ -423,7 +431,7 @@ class Node(object):
 
 
 def input_node(
-    features: List[Feature],
+    features: List[Union[Feature, FeatureTuple]],
     index_levels: Optional[List[Tuple[str, IndexDType]]] = None,
     name: Optional[str] = None,
     sampling: Optional[Sampling] = None,
@@ -438,11 +446,16 @@ def input_node(
         )
 
     for feature in features:
-        if feature.sampling is not None:
+        if not isinstance(feature, Feature):
+            # These cases are handled in Node
+            continue
+        if feature.sampling is None:
+            feature.sampling = sampling
+        elif feature.sampling is not sampling:
             raise ValueError(
-                "Cannot call input_node on already linked features."
+                f"Cannot add feature {feature.name} to node since it has a"
+                " different sampling."
             )
-        feature.sampling = sampling
 
     return Node(
         features=features,
