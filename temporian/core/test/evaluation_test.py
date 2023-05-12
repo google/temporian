@@ -183,6 +183,31 @@ class EvaluationTest(absltest.TestCase):
         self.assertTrue(result[1] is e1)
         self.assertTrue(result[2] is e2)
 
+    def test_evaluate_repeated_unnamed_inputs(self):
+        i1 = utils.create_input_node(name="i1")
+        evset_1 = utils.create_input_event_set(name="i1")
+        evset_2 = utils.create_input_event_set(name="i1")
+
+        with self.assertRaises(ValueError):
+            evaluation.evaluate(
+                i1,
+                [evset_1, evset_2],
+            )
+
+    def test_evaluate_repeated_input_node_and_name(self):
+        i1 = utils.create_input_node(name="i1")
+        evset_1 = utils.create_input_event_set()
+        evset_2 = utils.create_input_event_set()
+
+        with self.assertRaises(ValueError):
+            evaluation.evaluate(
+                i1,
+                {
+                    i1: evset_1,
+                    "i1": evset_2,
+                },
+            )
+
 
 if __name__ == "__main__":
     absltest.main()

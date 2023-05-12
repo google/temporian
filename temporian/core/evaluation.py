@@ -29,7 +29,7 @@ from temporian.implementation.numpy.data.event_set import EventSet
 EvaluationQuery = Union[Node, List[Node], Dict[str, Node]]
 EvaluationInput = Union[
     # dict of node/node name to corresponding event set
-    Dict[Union[Node, str], EventSet],
+    Dict[processor_lib.NodeInputArg, EventSet],
     # list of event sets, and nodes are associated by name
     List[EventSet],
     # single event set, and node is associated by name
@@ -124,7 +124,7 @@ def evaluate(
 
 
 def build_schedule(
-    inputs: List[Union[Node, str]],
+    inputs: List[processor_lib.NodeInputArg],
     outputs: List[Node],
     verbose: int = 0,
 ) -> Tuple[List[base.Operator], Dict[str, Node]]:
@@ -248,7 +248,12 @@ def _normalize_input(
                 " unnamed inputs. Either set their names or pass inputs as a"
                 " dict."
             )
-        return {evset.name: evset for evset in input}
+        result = {evset.name: evset for evset in input}
+        if len(result) < len(input):
+            raise ValueError(
+                f"Duplicate names in {input}. Input node names must be unique."
+            )
+        return result
 
     raise TypeError(
         f"Evaluate input argument must be one of {EvaluationInput}."

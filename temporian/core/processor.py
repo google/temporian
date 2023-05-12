@@ -137,6 +137,11 @@ def infer_processor(
             values in the `inputs` argument, and the values are the nodes
             corresponding to each one. If a value was already a node, it won't
             be present in the returned dictionary.
+
+    Raises:
+        ValueError: If there are repeated nodes in the `inputs`; an
+            unexpected type of input is provided; an unnamed node is inferred
+            as input; or some nodes are required but not provided.
     """
     # The following algorithm lists all the nodes between the output and
     # input nodes. Informally, the algorithm works as follow:
@@ -166,7 +171,7 @@ def infer_processor(
 
     # Index the input node names for fast retrieval.
     # Use dict instead of set since we will need their key.
-    input_node_names_to_idx: Dict[str, str] = {}
+    input_node_names_to_idx_str: Dict[str, str] = {}
 
     # Create map of node/node name inputs to corresponding node.
     names_to_nodes: Dict[str, Node] = {}
@@ -176,14 +181,33 @@ def infer_processor(
 
         for idx_str, node_or_name in inputs.items():
             if isinstance(node_or_name, Node):
+                # Fail if same node is passed as input twice.
+                if node_or_name in input_nodes:
+                    raise ValueError(
+                        f"Duplicate nodes in {inputs}. Input nodes must be"
+                        " unique."
+                    )
                 input_nodes.add(node_or_name)
+
                 # Only add node_or_name to p.inputs if its a node
                 # If a name, it will be added to p.inputs and names_to_nodes
-                # when we find it
+                # when we find it while traversing the graph.
                 p.inputs[idx_str] = node_or_name
 
             elif isinstance(node_or_name, str):
-                input_node_names_to_idx[node_or_name] = idx_str
+                # Fail if same node is passed as input twice.
+                # Need to check name against other input names and against names
+                # of input nodes.
+                if (
+                    node_or_name
+                    in {node.name for node in input_nodes if node.name}
+                    or node_or_name in input_node_names_to_idx_str
+                ):
+                    raise ValueError(
+                        f"Duplicate nodes or names in {inputs}. Input nodes and"
+                        " names must be unique."
+                    )
+                input_node_names_to_idx_str[node_or_name] = idx_str
 
             else:
                 raise ValueError(
@@ -210,10 +234,10 @@ def infer_processor(
             # The feature is provided by the user.
             continue
 
-        elif node.name and node.name in input_node_names_to_idx:
+        elif node.name and node.name in input_node_names_to_idx_str:
             # The feature is provided by the user.
-            # Add node to p.inputs and normalized_inputs now that we have it.
-            idx_str = input_node_names_to_idx[node.name]
+            # Add node to p.inputs and names_to_nodes now that we have it.
+            idx_str = input_node_names_to_idx_str[node.name]
             p.inputs[idx_str] = node
             names_to_nodes[node.name] = node
             continue
