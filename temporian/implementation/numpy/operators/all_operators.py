@@ -41,6 +41,3 @@ from temporian.implementation.numpy.operators.calendar import minute
 from temporian.implementation.numpy.operators.calendar import second
 from temporian.implementation.numpy.operators import since_last
 from temporian.implementation.numpy.operators import unique_timestamps
-
-# pylint: enable=unused-import
-# pylint: enable=redefined-builtin

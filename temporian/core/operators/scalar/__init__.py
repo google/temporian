@@ -31,5 +31,3 @@ from temporian.core.operators.scalar.relational_scalar import (
     LessEqualScalarOperator,
     LessScalarOperator,
 )
-
-# pylint: enable=unused-import

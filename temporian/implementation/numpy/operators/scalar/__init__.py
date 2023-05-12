@@ -17,5 +17,3 @@ from temporian.implementation.numpy.operators.scalar.relational_scalar import (
     LessEqualScalarNumpyImplementation,
     LessScalarNumpyImplementation,
 )
-
-# pylint: enable=unused-import

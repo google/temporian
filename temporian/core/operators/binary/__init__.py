@@ -40,5 +40,3 @@ from temporian.core.operators.binary.logical import (
     logical_or,
     logical_xor,
 )
-
-# pylint: enable=unused-import

@@ -21,5 +21,3 @@ from temporian.implementation.numpy.operators.binary.logical import (
     LogicalOrNumpyImplementation,
     LogicalXorNumpyImplementation,
 )
-
-# pylint: enable=unused-import
