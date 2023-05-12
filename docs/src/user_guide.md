@@ -1,8 +1,8 @@
 # User Guide
 
-This is a complete guide to Temporian.
+This is a complete tour of Temporian's capabilities.
 
-If you are are in hurry, we recommend you read the first sections (e.g. until the [Index, horizontal and vertical operators](#index-horizontal-and-vertical-operators) section) and then look at some of the task-specific [tutorials](https://temporian.readthedocs.io/en/latest/tutorials/).
+Feel free to read the first sections (e.g. up until [Index, horizontal and vertical operators](#index-horizontal-and-vertical-operators)) and then look at some of the task-specific [tutorials](https://temporian.readthedocs.io/en/latest/tutorials/).
 
 ## ¿What is temporal data?
 
