@@ -12,22 +12,38 @@ py_test(
     deps = [
         "//temporian/core/data:node",
         "//temporian/core/data:sampling",
-        "//temporian/core/operators/arithmetic",
-        "//temporian/core/operators/arithmetic:add",
-        "//temporian/core/operators/arithmetic:divide",
-        "//temporian/core/operators/arithmetic:equal",
-        "//temporian/core/operators/arithmetic:floordiv",
-        "//temporian/core/operators/arithmetic:multiply",
-        "//temporian/core/operators/arithmetic:subtract",
+        "//temporian/core/operators/binary",
         "//temporian/implementation/numpy:evaluation",
         "//temporian/implementation/numpy/data:event_set",
-        "//temporian/implementation/numpy/operators/arithmetic",
-        "//temporian/implementation/numpy/operators/arithmetic:add",
-        "//temporian/implementation/numpy/operators/arithmetic:divide",
-        "//temporian/implementation/numpy/operators/arithmetic:equal",
-        "//temporian/implementation/numpy/operators/arithmetic:floordiv",
-        "//temporian/implementation/numpy/operators/arithmetic:multiply",
-        "//temporian/implementation/numpy/operators/arithmetic:subtract",
+        "//temporian/implementation/numpy/operators/binary",
+    ],
+)
+
+py_test(
+    name = "relational_test",
+    srcs = ["relational_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:node",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators/binary",
+        "//temporian/implementation/numpy:evaluation",
+        "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy/operators/binary",
+    ],
+)
+
+py_test(
+    name = "logical_test",
+    srcs = ["logical_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:node",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators/binary",
+        "//temporian/implementation/numpy:evaluation",
+        "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy/operators/binary",
     ],
 )
 
@@ -36,21 +52,20 @@ py_test(
     srcs = ["arithmetic_scalar_test.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/core/operators/arithmetic_scalar",
-        "//temporian/core/operators/arithmetic_scalar:add",
-        "//temporian/core/operators/arithmetic_scalar:divide",
-        "//temporian/core/operators/arithmetic_scalar:equal",
-        "//temporian/core/operators/arithmetic_scalar:floordiv",
-        "//temporian/core/operators/arithmetic_scalar:multiply",
-        "//temporian/core/operators/arithmetic_scalar:subtract",
+        "//temporian/core/operators/scalar",
         "//temporian/implementation/numpy/data:event_set",
-        "//temporian/implementation/numpy/operators/arithmetic_scalar",
-        "//temporian/implementation/numpy/operators/arithmetic_scalar:add",
-        "//temporian/implementation/numpy/operators/arithmetic_scalar:divide",
-        "//temporian/implementation/numpy/operators/arithmetic_scalar:equal",
-        "//temporian/implementation/numpy/operators/arithmetic_scalar:floordiv",
-        "//temporian/implementation/numpy/operators/arithmetic_scalar:multiply",
-        "//temporian/implementation/numpy/operators/arithmetic_scalar:subtract",
+        "//temporian/implementation/numpy/operators/scalar",
+    ],
+)
+
+py_test(
+    name = "relational_scalar_test",
+    srcs = ["relational_scalar_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/operators/scalar",
+        "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy/operators/scalar",
     ],
 )
 
@@ -62,21 +77,9 @@ py_test(
         # absl/testing:absltest dep,
         "//temporian/core/data:node",
         "//temporian/core/data:sampling",
-        "//temporian/core/operators/arithmetic",
-        "//temporian/core/operators/arithmetic:add",
-        "//temporian/core/operators/arithmetic:subtract",
-        "//temporian/core/operators/arithmetic:multiply",
-        "//temporian/core/operators/arithmetic:divide",
-        "//temporian/core/operators/arithmetic:equal",
-        "//temporian/core/operators/arithmetic:floordiv",
+        "//temporian/core/operators/binary",
         "//temporian/implementation/numpy/data:event_set",
-        "//temporian/implementation/numpy/operators/arithmetic",
-        "//temporian/implementation/numpy/operators/arithmetic:add",
-        "//temporian/implementation/numpy/operators/arithmetic:subtract",
-        "//temporian/implementation/numpy/operators/arithmetic:multiply",
-        "//temporian/implementation/numpy/operators/arithmetic:divide",
-        "//temporian/implementation/numpy/operators/arithmetic:equal",
-        "//temporian/implementation/numpy/operators/arithmetic:floordiv",
+        "//temporian/implementation/numpy/operators/binary",
         "//temporian/implementation/numpy:evaluation",
     ],
 )
@@ -117,6 +120,19 @@ py_test(
         "//temporian/implementation/numpy:evaluation",
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/operators:glue",
+    ],
+)
+
+py_test(
+    name = "unary_test",
+    srcs = ["unary_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators:unary",
+        "//temporian/implementation/numpy:evaluation",
+        "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy/operators:unary",
     ],
 )
 

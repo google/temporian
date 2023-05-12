@@ -22,9 +22,9 @@ py_library(
         ":select",
         ":set_index",
         ":since_last",
+        ":unary",
         ":unique_timestamps",
-        "//temporian/core/operators/arithmetic",
-        "//temporian/core/operators/arithmetic_scalar",
+        "//temporian/core/operators/binary",
         "//temporian/core/operators/calendar:day_of_month",
         "//temporian/core/operators/calendar:day_of_week",
         "//temporian/core/operators/calendar:day_of_year",
@@ -34,6 +34,7 @@ py_library(
         "//temporian/core/operators/calendar:month",
         "//temporian/core/operators/calendar:second",
         "//temporian/core/operators/calendar:year",
+        "//temporian/core/operators/scalar",
         "//temporian/core/operators/window:moving_count",
         "//temporian/core/operators/window:moving_max",
         "//temporian/core/operators/window:moving_min",
@@ -68,6 +69,19 @@ py_library(
 py_library(
     name = "cast",
     srcs = ["cast.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:feature",
+        "//temporian/core/data:node",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "unary",
+    srcs = ["unary.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
