@@ -8,23 +8,11 @@ If you are are in hurry, we recommend you read the first sections (e.g. util the
 
 # User Guide
 
-## ¿What is Temporian?
-
-Temporian is a Python library to feature-engineer temporal data for machine learning models.
+## ¿What is temporal data?
 
 For Temporian, temporal data is an **MMTS**. A Multivariate and Multi-index Time Sequence is an extension of multivariate time-series to non-uniform and hierarchically-structured data. A MMTS allows you to represent a time series, as well as other common time data such as transactions, logs, sparse events, asynchronous measurements, or hierarchical records. Temporian unifies all those representations into a powerful and concise framework.
 
 TODO: add plot
-
-## ¿Why Temporian?
-
-With a concise and powerful API, Temporian helps you focus on high level modeling.
-
-To see the benefit of Temporian over general data processing libraries, compare our [original Khipu 2023 Tutorial](TODO: link), which uses pandas to perform feature engineering for the M5 dataset, to the [updated version using Temporian](TODO: link).
-
-Temporian focuses on iterative development in notebooks. You can develop a pre-processing program in a notebook while visualizing results on every step of the way, and then save the program to a `".tem"` file to be consumed in an ML production pipeline with ease.
-
-Finally, Temporian's API is designed to reduce the risk of modeling errors. For instance, Temporian prevents you from inadvertently creating future leakage, that is, using future information to compute signals in the past. This means that you can develop your pipelines with confidence, knowing that your results are accurate and reliable.
 
 ## Events and EventSets
 
@@ -775,10 +763,24 @@ evset.feature("f1")
 
 ## Import and export data
 
-Converting EventSet data to and from pandas DataFrames is easily done via `EventSet.to_dataframe` and `EventSet.from_dataframe`.
+EventSets can be read from and saved to disk via the `tp.read_event_set` and `tp.save_event_set` functions.
 
 ```python
-import pandas a pd
+# Read EventSet from .csv file.
+evset = tp.read_event_set(
+    path="path/to/file.csv",
+    timestamp_column="timestamp",
+    index_names=["product_id"],
+)
+
+# Save EventSet to .csv file.
+tp.save_event_set(evset, path="path/to/file.csv")
+```
+
+Converting EventSet data to and from pandas DataFrames is also easily done via `EventSet.to_dataframe` and `EventSet.from_dataframe`.
+
+```python
+import pandas as pd
 
 df = pd.DataFrame({
     "timestamp": [1, 2, 3, 5, 6],

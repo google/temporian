@@ -2,62 +2,53 @@
 
 ![tests](https://github.com/google/temporian/actions/workflows/test.yaml/badge.svg) ![formatting](https://github.com/google/temporian/actions/workflows/formatting.yaml/badge.svg)
 
-**Temporian** is a library to pre-process temporal signals before their use as input features with off-the-shelf tabular machine learning libraries (e.g., TensorFlow Decision Forests, scikit-learn).
+## ¿What is Temporian?
 
-## Usage Example
+Temporian is a Python package for **feature engineering of temporal data**.
 
-A minimal end-to-end run looks as follows:
+Temporian focuses on providing a **simple and powerful API**, a first-class **iterative development** experience, **efficient and well-tested implementations** of common temporal data preprocessing functions, and **preventing common modeling errors**.
+
+## ¿Why Temporian?
+
+Temporian helps you **focus on high-level modeling**.
+
+Temporal data processing is commonly done with generic data processing tools. However, this approach is often tedious, error-prone, and requires engineers to learn and re-implement existing methods. Additionally, the complexity of these tools can lead engineers to create less effective pipelines in order to reduce complexity. This can increase the cost of developing and maintaining performant ML pipelines.
+
+To see the benefit of Temporian over general data processing libraries, compare our [original Khipu 2023 Tutorial](TODO: link), which uses pandas to perform feature engineering for the M5 dataset, to the [updated version using Temporian](TODO: link).
+
+## Minimal end-to-end example
 
 ```python
 import temporian as tp
 
-# Load the data
-evset = tp.read_event_set("path/to/data.csv")
+# Load data.
+evset = tp.read_event_set("path/to/temporal_data.csv", timestamp_column="time")
 node = evset.node()
 
-# Create Simple Moving Average feature
-sma_node = tp.simple_moving_average(
-    node,
-    window_length=tp.day(5),
-)
+# Apply operators to create a processing graph.
+sma = tp.simple_moving_average(node, window_length=tp.days(7))
 
-# Create Lag feature
-lag_node = tp.lag(
-    node,
-    lag=tp.week(1),
-)
-
-# Glue features
-output_node = tp.glue(node, sma_node)
-output_node = tp.glue(output_node, lag_node)
-
-
-# Execute pipeline and get results
-output_evset = tp.evaluate(
-    output_node,
-    input_data={
-        node: evset,
-    },
-)
-
+# Run the graph on the input data.
+result = sma.evaluate(evset)
 ```
 
-> **Warning**: The library is still under construction. This example usage is what we are aiming to build in the short term.
+## Key features
 
-## Supported Features
+These are what set Temporian apart.
 
-Temporian currently supports the following features for pre-processing your temporal data:
-
-- **Simple Moving Average:** calculates the average value of each feature over a specified time window.
-- **Lag:** creates new features by shifting the time series data backwards in time by a specified period.
-- **Arithmetic Operations:** allows you to perform arithmetic operations (such as addition, subtraction, multiplication, and division) on time series data, between different events.
-- More features coming soon!
+- **Simple and powerful API**: Temporian exports high level operations making processing complex programs short and ready to read.
+- **Prevents modeling errors**: Temporian programs are guaranteed not to have future leakage unless the user calls the `leak` function, ensuring that models are not trained on future data.
+- **Iterative development**: Temporian can be used to develop preprocessing pipelines in Colab or local notebooks, allowing users to visualize results each step of the way to identify and correct errors early on.
+- **Efficient and well-tested implementations**: Temporian contains efficient and well-tested implementations of a variety of temporal data processing functions. For instance, our implementation of window operators is **x2000** faster than the same function implemented with NumPy.
+- **Wide range of preprocessing functions**: Temporian contains a wide range of preprocessing functions, including moving window operations, lagging, calendar features, arithmetic operations, index manipulation and propagation, resampling, and more. For a full list of the available operators, see the [operators documentation](https://temporian.readthedocs.io/en/latest/reference/temporian/core/operators/).
 
 ## Documentation
 
 The official documentation is available at [temporian.readthedocs.io](https://temporian.readthedocs.io/en/latest/).
 
-## Environment Setup
+## For developers
+
+### Environment Setup
 
 Dependencies are managed through [Poetry](https://python-poetry.org/). To
 install Poetry, execute the following command:
@@ -103,7 +94,7 @@ Finally, activate the virtual environment by executing:
 poetry shell
 ```
 
-## Testing
+### Testing
 
 Install bazel and buildifier (in Mac we recommend installing bazelisk with brew):
 
@@ -117,13 +108,13 @@ Run all tests with bazel:
 bazel test //...:all
 ```
 
-> **Note**: You can use the Bazel test flag `--test_output=streamed` to see the test logs in realtime.
+You can use the Bazel test flag `--test_output=streamed` to see the test logs in realtime.
 
-## Benchmarking and profiling
+### Benchmarking and profiling
 
 Benchmarking and profiling of pre-configured scripts is available as follow:
 
-**Time and memory profiling**
+#### Time and memory profiling
 
 ```shell
 bazel run -c opt benchmark:profile_time -- [name]
@@ -136,35 +127,13 @@ where `[name]` is the name of one of the python scripts in
 `-p` flag displays memory over time plot instead of line-by-line memory
 consumption.
 
-**Time benchmarking**
+#### Time benchmarking
 
 ```shell
 bazel run -c opt benchmark:benchmark_time
 ```
 
-Example of results:
-
-```
-================================================================
-Name                              Wall time (s)    CPU time (s)
-================================================================
-from_dataframe:100                   0.01601       0.01600
-from_dataframe:10000                 0.03091       0.03091
-from_dataframe:1000000               1.05764       1.05122
-----------------------------------------------------------------
-simple_moving_average:100            0.00108       0.00108
-simple_moving_average:10000          0.00150       0.00150
-simple_moving_average:1000000        0.00839       0.00839
-----------------------------------------------------------------
-select_and_glue:100                  0.00076       0.00076
-select_and_glue:10000                0.00074       0.00074
-select_and_glue:1000000              0.00104       0.00104
-----------------------------------------------------------------
-...
-================================================================
-```
-
-## Run documentation server locally
+### Running docs server
 
 Live preview your local changes to the documentation with
 

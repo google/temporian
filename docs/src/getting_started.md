@@ -26,10 +26,40 @@ node = evset.node()
 
 ```
 
-## Main concepts
+## Usage Example
 
-- [Node](../reference/temporian/core/data/node/) is the main concept in Temporian. It represents a collection of time series data. Each time series is identified by a unique feature name. Each time series is a sequence of values, each value is associated with a timestamp. The timestamps are assumed to be in ascending order.
+A minimal end-to-end run looks as follows:
 
-- [Feature](../reference/temporian/core/data/feature/) is a single time series in a node. It is identified by a unique name within the event. Each feature has a specific type.
+```python
+import temporian as tp
 
-- TODO: add more concepts here...
+# Load the data
+evset = tp.read_event_set("path/to/data.csv")
+node = evset.node()
+
+# Create Simple Moving Average feature
+sma_node = tp.simple_moving_average(
+    node,
+    window_length=tp.day(5),
+)
+
+# Create Lag feature
+lag_node = tp.lag(
+    node,
+    lag=tp.week(1),
+)
+
+# Glue features
+output_node = tp.glue(node, sma_node)
+output_node = tp.glue(output_node, lag_node)
+
+
+# Execute pipeline and get results
+output_evset = tp.evaluate(
+    output_node,
+    input_data={
+        node: evset,
+    },
+)
+
+```
