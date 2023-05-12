@@ -32,7 +32,7 @@ def evaluate_schedule(
     """Evaluates a schedule on a dictionary of input event sets.
 
     Args:
-        inputs: Mapping of core Nodes to materialized EventSets.
+        inputs: Mapping of nodes to materialized EventSets.
         schedule: Sequence of operators to apply on the data.
         verbose: If >0, prints details about the execution on the standard error
             output. The larger the number, the more information is displayed.

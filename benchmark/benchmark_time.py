@@ -79,7 +79,7 @@ def benchmark_simple_moving_average(runner):
 
         runner.benchmark(
             f"simple_moving_average:{n:_}",
-            lambda: tp.evaluate(output, input_data={node: ds}),
+            lambda: tp.evaluate(output, input={node: ds}),
         )
 
 
@@ -93,7 +93,7 @@ def benchmark_select_and_glue(runner):
 
         runner.benchmark(
             f"select_and_glue:{n:_}",
-            lambda: tp.evaluate(output, input_data={node: ds}),
+            lambda: tp.evaluate(output, input={node: ds}),
         )
 
 
@@ -111,7 +111,7 @@ def benchmark_calendar_day_of_month(runner):
 
         runner.benchmark(
             f"calendar_day_of_month:{n:_}",
-            lambda: tp.evaluate(output, input_data={node: ds}),
+            lambda: tp.evaluate(output, input={node: ds}),
         )
 
 
@@ -128,9 +128,7 @@ def benchmark_sample(runner):
 
             runner.benchmark(
                 f"sample:e{m:_}_s{n:_}",
-                lambda: tp.evaluate(
-                    output, input_data={node_1: ds_1, node_2: ds_2}
-                ),
+                lambda: tp.evaluate(output, input={node_1: ds_1, node_2: ds_2}),
             )
 
 
@@ -143,7 +141,7 @@ def benchmark_propagate(runner):
 
         runner.benchmark(
             f"propagate:{n:_}",
-            lambda: tp.evaluate(output, input_data={node: ds}),
+            lambda: tp.evaluate(output, input={node: ds}),
         )
 
 
@@ -165,7 +163,7 @@ def benchmark_cast(runner):
 
             runner.benchmark(
                 f"cast({check=}):{n}",
-                lambda: tp.evaluate(output, input_data={node: ds}),
+                lambda: tp.evaluate(output, input={node: ds}),
             )
 
 
@@ -178,7 +176,7 @@ def benchmark_unique_timestamps(runner):
 
         runner.benchmark(
             f"unique_timestamps:{n}",
-            lambda: tp.evaluate(output, input_data={node: ds}),
+            lambda: tp.evaluate(output, input={node: ds}),
         )
 
 
@@ -281,7 +279,7 @@ def benchmark_set_index(runner):
                 output = tp.set_index(node, index, append=append)
                 runner.benchmark(
                     f"set_index:s:{number_timestamps:_}:num_idx:{len(index)}:append:{append}",
-                    lambda: tp.evaluate(output, input_data={node: evset}),
+                    lambda: tp.evaluate(output, input={node: evset}),
                 )
 
 

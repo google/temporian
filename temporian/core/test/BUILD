@@ -89,14 +89,14 @@ py_test(
 )
 
 py_test(
-    name = "evaluator_test",
-    srcs = ["evaluator_test.py"],
+    name = "evaluation_test",
+    srcs = ["evaluation_test.py"],
     srcs_version = "PY3",
     deps = [
         # absl/logging dep,
         # absl/testing:absltest dep,
         ":utils",
-        "//temporian/core:evaluator",
+        "//temporian/core:evaluation",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:feature",

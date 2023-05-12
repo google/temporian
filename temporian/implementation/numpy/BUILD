@@ -13,8 +13,8 @@ py_library(
 )
 
 py_library(
-    name = "evaluator",
-    srcs = ["evaluator.py"],
+    name = "evaluation",
+    srcs = ["evaluation.py"],
     srcs_version = "PY3",
     deps = [
         ":implementation_lib",

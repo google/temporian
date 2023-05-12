@@ -14,7 +14,7 @@
 
 """Temporian."""
 
-from temporian.core import evaluator
+from temporian.core import evaluation
 from temporian.core import operator_lib
 from temporian.core import graph
 from temporian.core import serialize
@@ -49,7 +49,7 @@ str_ = dtype.DType.STRING
 
 __version__ = "0.0.1"
 
-evaluate = evaluator.evaluate
+evaluate = evaluation.evaluate
 Feature = feature.Feature
 load = serialize.load
 save = serialize.save
