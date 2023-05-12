@@ -24,7 +24,9 @@ from temporian.core.data.sampling import IndexDType
 from temporian.utils import string
 
 if TYPE_CHECKING:
+    from temporian.core.evaluation import EvaluationInput
     from temporian.core.operators.base import Operator
+    from temporian.implementation.numpy.data.event_set import EventSet
 
 
 class Node(object):
@@ -57,6 +59,25 @@ class Node(object):
         self._sampling = sampling
         self._creator = creator
         self._name = name
+
+    def evaluate(
+        self,
+        input: EvaluationInput,
+        verbose: int = 1,
+        check_execution: bool = True,
+    ) -> EventSet:
+        """Evaluates the node on the specified input.
+
+        See `tp.evaluate` for details.
+        """
+        from temporian.core.evaluation import evaluate
+
+        return evaluate(
+            query=self,
+            input=input,
+            verbose=verbose,
+            check_execution=check_execution,
+        )
 
     def __getitem__(self, feature_names: Union[str, List[str]]) -> Node:
         # import select operator
@@ -283,11 +304,14 @@ class Node(object):
 
 def input_node(
     features: List[Feature],
-    index_levels: List[Tuple[str, IndexDType]] = [],
+    index_levels: Optional[List[Tuple[str, IndexDType]]] = None,
     name: Optional[str] = None,
     sampling: Optional[Sampling] = None,
 ) -> Node:
     """Creates a node with the specified attributes."""
+    if index_levels is None:
+        index_levels = []
+
     if sampling is None:
         sampling = Sampling(
             index_levels=index_levels, is_unix_timestamp=False, creator=None

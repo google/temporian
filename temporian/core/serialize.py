@@ -62,7 +62,7 @@ def save(
 
     outputs = graph.normalize_multiple_node_arg(outputs)
 
-    g = graph.infer_graph(inputs=inputs, outputs=outputs)
+    g, _ = graph.infer_graph(inputs=inputs, outputs=outputs)
     proto = serialize(g)
     with open(path, "w") as f:
         f.write(text_format.MessageToString(proto))

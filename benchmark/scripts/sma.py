@@ -65,7 +65,7 @@ def main():
 
     res: EventSet = tp.evaluate(
         sma,
-        input_data={
+        input={
             node: evset,
         },
         check_execution=False,

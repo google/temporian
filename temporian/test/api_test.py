@@ -53,7 +53,7 @@ class TFPTest(absltest.TestCase):
 
         result_data, result2_data = t.evaluate(
             query=[result, result2],
-            input_data={
+            input={
                 i1: evset_1,
                 i2: evset_2,
             },
