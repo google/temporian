@@ -2,11 +2,7 @@
 
 ![tests](https://github.com/google/temporian/actions/workflows/test.yaml/badge.svg) ![formatting](https://github.com/google/temporian/actions/workflows/formatting.yaml/badge.svg)
 
-## ¿What is Temporian?
-
-Temporian is a Python package for **feature engineering of temporal data**.
-
-Temporian focuses on providing a **simple and powerful API**, a first-class **iterative development** experience, **efficient and well-tested implementations** of common temporal data preprocessing functions, and **preventing common modeling errors**.
+**Temporian** is a Python package for **feature engineering of temporal data**, focusing on providing a **simple and powerful API**, a first-class **iterative development** experience, **efficient and well-tested implementations** of common and not-so-common temporal data preprocessing functions, and **preventing common modeling errors**.
 
 ## ¿Why Temporian?
 
@@ -15,6 +11,14 @@ Temporian helps you **focus on high-level modeling**.
 Temporal data processing is commonly done with generic data processing tools. However, this approach is often tedious, error-prone, and requires engineers to learn and re-implement existing methods. Additionally, the complexity of these tools can lead engineers to create less effective pipelines in order to reduce complexity. This can increase the cost of developing and maintaining performant ML pipelines.
 
 To see the benefit of Temporian over general data processing libraries, compare our [original Khipu 2023 Tutorial](TODO: link), which uses pandas to perform feature engineering for the M5 dataset, to the [updated version using Temporian](TODO: link).
+
+## Installation
+
+Temporian is available on PyPI. To install it, run:
+
+```shell
+pip install temporian
+```
 
 ## Minimal end-to-end example
 

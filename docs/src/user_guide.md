@@ -1,4 +1,3 @@
-TODO: rename node to Node?
 TODO: add `` to Node and EventSet?
 TODO: add links to operator reference when we mention them
 
@@ -88,7 +87,7 @@ You will see that Temporian is agnostic to the semantics of events, and that oft
 
 Processing operations are performed by **Operators**. For instance, the [tp.simple_moving_average()](TODO: link) operator computes the [simple moving average](https://en.wikipedia.org/wiki/Moving_average) of each feature in an EventSet.
 
-Operators are not executed individually, but rather combined to form an operator **Graph**. A graph takes one or multiple EventSets as input and produces one or multiple EventSets as output. Graphs can contain an arbitrary number of operators, which can consume the ouput of other operators as input. You can see a graph as a computation graph where nodes are operators.
+Operators are not executed individually, but rather combined to form an operator **Graph**. A graph takes one or multiple EventSets as input and produces one or multiple EventSets as output. Graphs can contain an arbitrary number of operators, which can consume the ouput of other operators as input. You can see a graph as a computation graph where Nodes are operators.
 
 TODO: Graph plot
 
@@ -129,18 +128,18 @@ print(d_evset)
 
 The `tp.evaluate` function's signature is `tp.evaluate(<outputs>, <inputs>)`.
 
-The `<outputs>` can be specified as a node, a list of nodes, or a dictionary of names to nodes, and the result of `tp.evaluate` will be of the same type. For example, if `<outputs>` is a list of three nodes, the result will be a list of the three corresponding EventSets.
+The `<outputs>` can be specified as a Node, a list of Nodes, or a dictionary of names to Nodes, and the result of `tp.evaluate` will be of the same type. For example, if `<outputs>` is a list of three Nodes, the result will be a list of the three corresponding EventSets.
 
-The `<inputs>` can be specified as a dictionary of nodes to EventSets, a dictionary of names to EventSets, a list of EventSets or a single EventSet, which lets Temporian know the nodes of the graph that each input EventSet corresponds to. In the case of a dictionary of names to EventSets, the names must match the names of nodes in the graph, and in the case of a list or single EventSet, the names of those EventSets must do the same. If specifying the inputs as a dictionary, we could skip passing a name to `a_evset`.
+The `<inputs>` can be specified as a dictionary of Nodes to EventSets, a dictionary of names to EventSets, a list of EventSets or a single EventSet, which lets Temporian know the Nodes of the graph that each input EventSet corresponds to. In the case of a dictionary of names to EventSets, the names must match the names of Nodes in the graph, and in the case of a list or single EventSet, the names of those EventSets must do the same. If specifying the inputs as a dictionary, we could skip passing a name to `a_evset`.
 
 **Remarks:**
 
-- It's important to distinguish between _EventSets_, such as `a_evset`, that contain data, and _nodes_, like `a_node` and `b_node`, that connect operators together and compose the computation graph, but do not contain data.
+- It's important to distinguish between _EventSets_, such as `a_evset`, that contain data, and _Nodes_, like `a_node` and `b_node`, that connect operators together and compose the computation graph, but do not contain data.
 - No computation is performed during the definition of the graph (i.e., when calling the operator functions). All computation is done during `tp.evaluate`.
-- In `tp.evaluate`, the second argument defines a mapping between input nodes and EventSets. If all necessary input nodes are not fed, an error will be raised.
-- In most cases you will only pass EventSets that correspond to the graph's input nodes, but Temporian also supports passing EventSets to intermediate nodes in the graph. In the example provided, `a_node` is fed, but we could also feed `b_node` and `c_node`. In that case we would not need to feed `a_node`, since no nodes need to be computed from it anymore.
+- In `tp.evaluate`, the second argument defines a mapping between input Nodes and EventSets. If all necessary input Nodes are not fed, an error will be raised.
+- In most cases you will only pass EventSets that correspond to the graph's input Nodes, but Temporian also supports passing EventSets to intermediate Nodes in the graph. In the example provided, `a_node` is fed, but we could also feed `b_node` and `c_node`. In that case we would not need to feed `a_node`, since no Nodes need to be computed from it anymore.
 
-To simplify its usage when the graph contains a single output node, `node.evaluate` is equivalent to `tp.evaluate(node, <inputs>)`.
+To simplify its usage when the graph contains a single output Node, `node.evaluate` is equivalent to `tp.evaluate(node, <inputs>)`.
 
 ```python
 # All these statements are equivalent.
@@ -154,13 +153,13 @@ d_node.evaluate([a_evset])
 d_node.evaluate(a_evset)
 ```
 
-**Warning:** It is more efficient to evaluate multiple output nodes together with `tp.evaluate` than to evaluate them separately with `node_1.evaluate(...)`, `node_2.evaluate(...)`, etc. Only use `node.evaluate` for debugging purposes or when you only have a single output node.
+**Warning:** It is more efficient to evaluate multiple output Nodes together with `tp.evaluate` than to evaluate them separately with `node_1.evaluate(...)`, `node_2.evaluate(...)`, etc. Only use `node.evaluate` for debugging purposes or when you only have a single output Node.
 
-## Creating a node from an EventSet
+## Creating a Node from an EventSet
 
 Previously, we defined the input of the graph `a_node` with `tp.input_node`. This way of listing features manually and their respective data type is cumbersome.
 
-If an EventSet is available (i.e., data is available) this step can be changed to use `evset.node()` instead, which will return a node that is compatible with it. This is especially useful when creating EventSets from existing data, such as pandas DataFrames or CSV files.
+If an EventSet is available (i.e., data is available) this step can be changed to use `evset.node()` instead, which will return a Node that is compatible with it. This is especially useful when creating EventSets from existing data, such as pandas DataFrames or CSV files.
 
 ```python
 # Define an EventSet.
@@ -301,7 +300,7 @@ Most operators do not change the input feature's names.
 ["feature_1", "feature_2"]
 ```
 
-You can modify feature names using the `tp.rename` and `tp.prefix` operators. `tp.rename` changes the name of features, while `tp.prefix` adds a prefix in front of existing feature names. Note that they do not modify the content of the input node, but return a new node with the modified feature names.
+You can modify feature names using the `tp.rename` and `tp.prefix` operators. `tp.rename` changes the name of features, while `tp.prefix` adds a prefix in front of existing feature names. Note that they do not modify the content of the input Node, but return a new Node with the modified feature names.
 
 ```python
 # Rename a single feature.
@@ -326,7 +325,7 @@ sma_7_node = tp.prefix("sma_7.", tp.simple_moving_average(node, tp.duration.days
 sma_14_node = tp.prefix("sma_14.", tp.simple_moving_average(node, tp.duration.days(14)))
 ```
 
-The `tp.glue` operator can be used to concatenate different features into a single node. The following pattern is commonly used in Temporian programs.
+The `tp.glue` operator can be used to concatenate different features into a single Node. The following pattern is commonly used in Temporian programs.
 
 ```python
 result = tp.glue(
@@ -522,7 +521,7 @@ Arithmetic operators, such as `tp.add`, require their input arguments to have th
 
 TODO: example
 
-For example, if nodes `a` and `b` have different samplings, `a["feature_1"] + b["feature_2"]` will fail.
+For example, if Nodes `a` and `b` have different samplings, `a["feature_1"] + b["feature_2"]` will fail.
 
 To use arithmetic operators on EventSets with different samplings, one of the EventSets needs to be resampled to the sampling of the other EventSet. Resampling is done with the `tp.resample` operator.
 
@@ -532,7 +531,7 @@ If a timestamp is present in `input` but not in `sampling`, the timestamp is dro
 If a timestamp is present in both `input` and `sampling`, the timestamp is kept.
 If a timestamp is present in `sampling` but not in `input`, a new timestamp is created using the feature values from the _closest anterior_ (not the closest, as that could induce future leakage) timestamp of `input`. This rule is especially useful for events that represent measurements (see [Events and EventSets](TODO: link)).
 
-**Note:** Features in `sampling` are ignored. This also happens in some other operators that take a `sampling` argument of type `Node` - it indicates that only the sampling (a.k.a. the index and timestamps) of that node are being used by that operator.
+**Note:** Features in `sampling` are ignored. This also happens in some other operators that take a `sampling` argument of type `Node` - it indicates that only the sampling (a.k.a. the index and timestamps) of that Node are being used by that operator.
 
 Given this example:
 
@@ -708,7 +707,7 @@ Another type of leakage is future leakage, where a model uses data before it is 
 
 To avoid future leakage, Temporian operators are guaranteed to not cause future leakage, except for the `tp.leak` operator. This means that it is impossible to inadvertently add future leakage to a Temporian program.
 
-`tp.leak` can be useful for precomputing labels or evaluating machine learning models. However, its outputs shouldn’t be used as input features. To check programmatically if a node depends on `tp.leak`, we can use the `tp.has_leak` function.
+`tp.leak` can be useful for precomputing labels or evaluating machine learning models. However, its outputs shouldn’t be used as input features. To check programmatically if a Node depends on `tp.leak`, we can use the `tp.has_leak` function.
 
 ```python
 >>> a = tp.input_node(features=[("feature_1", tp.float32)])
@@ -797,7 +796,7 @@ df = evset.to_dataframe()
 
 ## Serialization and deserialization of a graph
 
-Temporian graphs can be exported and imported to a safe-to-share file with `tp.save` and `tp.load`. In both functions input and output nodes need to be named, or be assigned a name by passing them as a dictionary.
+Temporian graphs can be exported and imported to a safe-to-share file with `tp.save` and `tp.load`. In both functions input and output Nodes need to be named, or be assigned a name by passing them as a dictionary.
 
 ```python
 # Define a graph.
