@@ -22,6 +22,8 @@ from temporian.core.operators.binary.base import BaseBinaryOperator
 
 
 class BaseLogicalOperator(BaseBinaryOperator):
+    OP_NAME = ""
+
     def __init__(self, input_1: Node, input_2: Node):
         super().__init__(input_1, input_2)
 
@@ -34,56 +36,31 @@ class BaseLogicalOperator(BaseBinaryOperator):
                     f" {feature.name} has dtype {feature.dtype}"
                 )
 
-
-class LogicalAndOperator(BaseLogicalOperator):
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "AND"
-
-    @property
-    def prefix(self) -> str:
-        return "and"
-
-    # override parent dtype method
     def output_feature_dtype(
         self, feature_1: Feature, feature_2: Feature
     ) -> DType:
         return DType.BOOLEAN
+
+    @classmethod
+    @property
+    def operator_def_key(cls) -> str:
+        return cls.OP_NAME.upper()
+
+    @property
+    def prefix(self) -> str:
+        return self.OP_NAME.lower()
+
+
+class LogicalAndOperator(BaseLogicalOperator):
+    OP_NAME = "and"
 
 
 class LogicalOrOperator(BaseLogicalOperator):
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "OR"
-
-    @property
-    def prefix(self) -> str:
-        return "or"
-
-    # override parent dtype method
-    def output_feature_dtype(
-        self, feature_1: Feature, feature_2: Feature
-    ) -> DType:
-        return DType.BOOLEAN
+    OP_NAME = "or"
 
 
 class LogicalXorOperator(BaseLogicalOperator):
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "XOR"
-
-    @property
-    def prefix(self) -> str:
-        return "xor"
-
-    # override parent dtype method
-    def output_feature_dtype(
-        self, feature_1: Feature, feature_2: Feature
-    ) -> DType:
-        return DType.BOOLEAN
+    OP_NAME = "xor"
 
 
 def logical_and(

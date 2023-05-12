@@ -26,6 +26,8 @@ from temporian.core.operators.scalar.base import (
 
 
 class RelationalScalarOperator(BaseScalarOperator):
+    DEF_KEY = ""
+
     def output_feature_dtype(self, feature: Feature) -> DType:
         # override parent method to always return BOOLEAN features
         return DType.BOOLEAN
@@ -41,47 +43,34 @@ class RelationalScalarOperator(BaseScalarOperator):
             DType.STRING,
         ]
 
-
-class EqualScalarOperator(RelationalScalarOperator):
     @classmethod
     @property
     def operator_def_key(cls) -> str:
-        return "EQUAL_SCALAR"
+        return cls.DEF_KEY
+
+
+class EqualScalarOperator(RelationalScalarOperator):
+    DEF_KEY = "EQUAL_SCALAR"
 
 
 class NotEqualScalarOperator(RelationalScalarOperator):
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "NOT_EQUAL_SCALAR"
+    DEF_KEY = "NOT_EQUAL_SCALAR"
 
 
 class GreaterEqualScalarOperator(RelationalScalarOperator):
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "GREATER_EQUAL_SCALAR"
+    DEF_KEY = "GREATER_EQUAL_SCALAR"
 
 
 class LessEqualScalarOperator(RelationalScalarOperator):
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "LESS_EQUAL_SCALAR"
+    DEF_KEY = "LESS_EQUAL_SCALAR"
 
 
 class GreaterScalarOperator(RelationalScalarOperator):
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "GREATER_SCALAR"
+    DEF_KEY = "GREATER_SCALAR"
 
 
 class LessScalarOperator(RelationalScalarOperator):
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "LESS_SCALAR"
+    DEF_KEY = "LESS_SCALAR"
 
 
 def equal_scalar(

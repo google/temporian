@@ -20,40 +20,54 @@ from temporian.core.data.dtype import DType
 from temporian.core.operators.binary.base import BaseBinaryOperator
 
 
-class AddOperator(BaseBinaryOperator):
+class BaseArithmeticOperator(BaseBinaryOperator):
+    DEF_KEY = ""
+    PREFIX = ""
+
     @classmethod
     @property
     def operator_def_key(cls) -> str:
-        return "ADDITION"
+        return cls.DEF_KEY
 
     @property
     def prefix(self) -> str:
-        return "add"
+        return self.PREFIX
 
 
-class SubtractOperator(BaseBinaryOperator):
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "SUBTRACTION"
-
-    @property
-    def prefix(self) -> str:
-        return "sub"
+class AddOperator(BaseArithmeticOperator):
+    DEF_KEY = "ADDITION"
+    PREFIX = "add"
 
 
-class MultiplyOperator(BaseBinaryOperator):
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "MULTIPLICATION"
-
-    @property
-    def prefix(self) -> str:
-        return "mult"
+class SubtractOperator(BaseArithmeticOperator):
+    DEF_KEY = "SUBTRACTION"
+    PREFIX = "sub"
 
 
-class DivideOperator(BaseBinaryOperator):
+class MultiplyOperator(BaseArithmeticOperator):
+    DEF_KEY = "MULTIPLICATION"
+    PREFIX = "mult"
+
+
+class FloorDivOperator(BaseArithmeticOperator):
+    DEF_KEY = "FLOORDIV"
+    PREFIX = "floordiv"
+
+
+class ModuloOperator(BaseArithmeticOperator):
+    DEF_KEY = "MODULO"
+    PREFIX = "mod"
+
+
+class PowerOperator(BaseArithmeticOperator):
+    DEF_KEY = "POWER"
+    PREFIX = "pow"
+
+
+class DivideOperator(BaseArithmeticOperator):
+    DEF_KEY = "DIVISION"
+    PREFIX = "div"
+
     def __init__(
         self,
         input_1: Node,
@@ -70,48 +84,6 @@ class DivideOperator(BaseBinaryOperator):
                     "a floating point type or use "
                     "floordiv operator (//) instead, on these integer types."
                 )
-
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "DIVISION"
-
-    @property
-    def prefix(self) -> str:
-        return "div"
-
-
-class FloorDivOperator(BaseBinaryOperator):
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "FLOORDIV"
-
-    @property
-    def prefix(self) -> str:
-        return "floordiv"
-
-
-class ModuloOperator(BaseBinaryOperator):
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "MODULO"
-
-    @property
-    def prefix(self) -> str:
-        return "mod"
-
-
-class PowerOperator(BaseBinaryOperator):
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "POWER"
-
-    @property
-    def prefix(self) -> str:
-        return "pow"
 
 
 def add(

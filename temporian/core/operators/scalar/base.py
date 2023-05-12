@@ -27,6 +27,8 @@ from temporian.proto import core_pb2 as pb
 class BaseScalarOperator(Operator):
     """Interface definition and common logic for operators."""
 
+    DEF_KEY = ""
+
     def __init__(
         self,
         input: Node,
@@ -125,14 +127,19 @@ class BaseScalarOperator(Operator):
 
     @classmethod
     @property
-    @abstractmethod
     def operator_def_key(cls) -> str:
         """Gets the key of the operator definition."""
+        return cls.DEF_KEY
 
     @property
-    @abstractmethod
     def supported_value_dtypes(self) -> List[DType]:
         """Supported DTypes for value."""
+        return [
+            DType.FLOAT32,
+            DType.FLOAT64,
+            DType.INT32,
+            DType.INT64,
+        ]
 
     def output_feature_dtype(self, feature: Feature) -> DType:
         return feature.dtype

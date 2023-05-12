@@ -21,15 +21,18 @@ from temporian.core.data.feature import Feature
 from temporian.core.operators.binary.base import BaseBinaryOperator
 
 
-class EqualOperator(BaseBinaryOperator):
+class BaseRelationalOperator(BaseBinaryOperator):
+    DEF_KEY = ""
+    PREFIX = ""
+
     @classmethod
     @property
     def operator_def_key(cls) -> str:
-        return "EQUAL"
+        return cls.DEF_KEY
 
     @property
     def prefix(self) -> str:
-        return "eq"
+        return self.PREFIX
 
     # override parent dtype method
     def output_feature_dtype(
@@ -38,89 +41,34 @@ class EqualOperator(BaseBinaryOperator):
         return DType.BOOLEAN
 
 
-class NotEqualOperator(BaseBinaryOperator):
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "NOT_EQUAL"
-
-    @property
-    def prefix(self) -> str:
-        return "ne"
-
-    # override parent dtype method
-    def output_feature_dtype(
-        self, feature_1: Feature, feature_2: Feature
-    ) -> DType:
-        return DType.BOOLEAN
+class EqualOperator(BaseRelationalOperator):
+    DEF_KEY = "EQUAL"
+    PREFIX = "eq"
 
 
-class GreaterOperator(BaseBinaryOperator):
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "GREATER"
-
-    @property
-    def prefix(self) -> str:
-        return "gt"
-
-    # override parent dtype method
-    def output_feature_dtype(
-        self, feature_1: Feature, feature_2: Feature
-    ) -> DType:
-        return DType.BOOLEAN
+class NotEqualOperator(BaseRelationalOperator):
+    DEF_KEY = "NOT_EQUAL"
+    PREFIX = "ne"
 
 
-class GreaterEqualOperator(BaseBinaryOperator):
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "GREATER_EQUAL"
-
-    @property
-    def prefix(self) -> str:
-        return "ge"
-
-    # override parent dtype method
-    def output_feature_dtype(
-        self, feature_1: Feature, feature_2: Feature
-    ) -> DType:
-        return DType.BOOLEAN
+class GreaterOperator(BaseRelationalOperator):
+    DEF_KEY = "GREATER"
+    PREFIX = "gt"
 
 
-class LessOperator(BaseBinaryOperator):
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "LESS"
-
-    @property
-    def prefix(self) -> str:
-        return "lt"
-
-    # override parent dtype method
-    def output_feature_dtype(
-        self, feature_1: Feature, feature_2: Feature
-    ) -> DType:
-        return DType.BOOLEAN
+class GreaterEqualOperator(BaseRelationalOperator):
+    DEF_KEY = "GREATER_EQUAL"
+    PREFIX = "ge"
 
 
-class LessEqualOperator(BaseBinaryOperator):
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "LESS_EQUAL"
+class LessOperator(BaseRelationalOperator):
+    DEF_KEY = "LESS"
+    PREFIX = "lt"
 
-    @property
-    def prefix(self) -> str:
-        return "le"
 
-    # override parent dtype method
-    def output_feature_dtype(
-        self, feature_1: Feature, feature_2: Feature
-    ) -> DType:
-        return DType.BOOLEAN
+class LessEqualOperator(BaseRelationalOperator):
+    DEF_KEY = "LESS_EQUAL"
+    PREFIX = "le"
 
 
 def equal(

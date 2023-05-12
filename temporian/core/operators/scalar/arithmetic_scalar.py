@@ -25,48 +25,34 @@ from temporian.core.operators.scalar.base import (
 
 SCALAR = Union[float, int]
 
-arithmetic_dypes = [
-    DType.FLOAT32,
-    DType.FLOAT64,
-    DType.INT32,
-    DType.INT64,
-]
-
 
 class AddScalarOperator(BaseScalarOperator):
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "ADDITION_SCALAR"
-
-    @property
-    def supported_value_dtypes(self) -> List[DType]:
-        return arithmetic_dypes
+    DEF_KEY = "ADDITION_SCALAR"
 
 
 class SubtractScalarOperator(BaseScalarOperator):
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "SUBTRACTION_SCALAR"
-
-    @property
-    def supported_value_dtypes(self) -> List[DType]:
-        return arithmetic_dypes
+    DEF_KEY = "SUBTRACTION_SCALAR"
 
 
 class MultiplyScalarOperator(BaseScalarOperator):
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "MULTIPLICATION_SCALAR"
+    DEF_KEY = "MULTIPLICATION_SCALAR"
 
-    @property
-    def supported_value_dtypes(self) -> List[DType]:
-        return arithmetic_dypes
+
+class FloorDivScalarOperator(BaseScalarOperator):
+    DEF_KEY = "FLOORDIV_SCALAR"
+
+
+class ModuloScalarOperator(BaseScalarOperator):
+    DEF_KEY = "MODULO_SCALAR"
+
+
+class PowerScalarOperator(BaseScalarOperator):
+    DEF_KEY = "POWER_SCALAR"
 
 
 class DivideScalarOperator(BaseScalarOperator):
+    DEF_KEY = "DIVISION_SCALAR"
+
     def __init__(
         self,
         input: Node,
@@ -82,48 +68,6 @@ class DivideScalarOperator(BaseScalarOperator):
                     f"{feat.name} of type {feat.dtype}. Cast to a "
                     "floating point type or use floordiv operator (//)."
                 )
-
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "DIVISION_SCALAR"
-
-    @property
-    def supported_value_dtypes(self) -> List[DType]:
-        return arithmetic_dypes
-
-
-class FloorDivScalarOperator(BaseScalarOperator):
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "FLOORDIV_SCALAR"
-
-    @property
-    def supported_value_dtypes(self) -> List[DType]:
-        return arithmetic_dypes
-
-
-class ModuloScalarOperator(BaseScalarOperator):
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "MODULO_SCALAR"
-
-    @property
-    def supported_value_dtypes(self) -> List[DType]:
-        return arithmetic_dypes
-
-
-class PowerScalarOperator(BaseScalarOperator):
-    @classmethod
-    @property
-    def operator_def_key(cls) -> str:
-        return "POWER_SCALAR"
-
-    @property
-    def supported_value_dtypes(self) -> List[DType]:
-        return arithmetic_dypes
 
 
 def add_scalar(
