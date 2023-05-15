@@ -242,12 +242,12 @@ def power(
 ) -> Node:
     """Computes elements of the base raised to the elements of the exponent.
 
-    `numerator` and `denominator` must have the same sampling and the same
-    number of features.
+    `base` and `exponent` must have the same sampling and the same number of
+    features.
 
     Args:
-        numerator: First node.
-        denominator: Second node.
+        base: First node.
+        exponent: Second node.
 
     Returns:
         New node with the remainder of the integer division

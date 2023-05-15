@@ -47,6 +47,7 @@ nav:
 plugins:
   - search
   - autorefs
+  - mkdocs-jupyter
   - gen-files:
       scripts:
         # Generate the index page from the README.md.
@@ -55,7 +56,7 @@ plugins:
         - gen_ref_pages.py
   - literate-nav:
       nav_file: SUMMARY.md
-    # Configuration to generate the reference pages from the docstrings.
+  # Configuration to generate the reference pages from the docstrings.
   - mkdocstrings:
       default_handler: python
       handlers:
