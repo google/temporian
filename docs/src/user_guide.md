@@ -8,7 +8,7 @@ Feel free to read the first sections (e.g. up until [Index, horizontal and verti
 
 For Temporian, temporal data is an **MMTS**. A Multivariate and Multi-index Time Sequence is an extension of multivariate time-series to non-uniform and hierarchically-structured data. A MMTS allows you to represent a time series, as well as other common time data such as transactions, logs, sparse events, asynchronous measurements, or hierarchical records. Temporian unifies all those representations into a powerful and concise framework.
 
-TODO: add plot
+<!-- TODO: add plot -->
 
 ## Events and `EventSets`
 
@@ -72,11 +72,11 @@ evset.plot()
 
 Events can carry various meanings. For instance, events can represent **regular measurements**. Suppose an electronic thermometer that generates temperature measurements every minute. This could be an `EventSet` with one feature called `temperature`. In this scenario, the temperature can change in between two measurements. However, for most practical uses, the most recent measurement will be considered to be the current temperature.
 
-TODO: Temperature plot
+<!-- TODO: Temperature plot -->
 
 Events can also represent the _occurrence_ of sporadic phenomena. Suppose a sales recording system that records client purchases. Each time a client makes a purchase (i.e., each transaction), a new event is created.
 
-TODO: Sales plot
+<!-- TODO: Sales plot -->
 
 You will see that Temporian is agnostic to the semantics of events, and that often, you will mix together measurements and occurrences. For instance, given the _occurrence_ of sales from the previous example, you can compute daily sales (which is a _measurement_).
 
@@ -86,7 +86,7 @@ Processing operations are performed by **Operators**. For instance, the [`tp.sim
 
 Operators are not executed individually, but rather combined to form an operator **Graph**. A graph takes one or multiple `EventSets` as input and produces one or multiple `EventSets` as output. Graphs can contain an arbitrary number of operators, which can consume the ouput of other operators as input. You can see a graph as a computation graph where `Nodes` are operators.
 
-TODO: Graph plot
+<!-- TODO: Graph plot -->
 
 Let's see how to compute the simple moving average of two features `feature_1` and `feature_2` using two different window lengths, and then sum the results:
 
@@ -514,7 +514,7 @@ EventSet(
 
 Arithmetic operators, such as `tp.add`, require their input arguments to have the same timestamps and [Index](#index-horizontal-and-vertical-operators). The unique combination of timestamps and index is called a _sampling_.
 
-TODO: example
+<!-- TODO: example -->
 
 For example, if `Nodes` `a` and `b` have different samplings, `a["feature_1"] + b["feature_2"]` will fail.
 
@@ -571,7 +571,7 @@ tp.resample(a["feature_1"], c) + tp.resample(b["feature_2"], c)
 
 `tp.resample` is critical to combine events from different, non-synchronized sources. For example, consider a system with two sensors, a thermometer for temperature and a manometer for pressure. The temperature sensor produces measurements every 1 to 10 minutes, while the pressure sensor returns measurements every second. Additionally assume that both sensors are not synchronized. Finally, assume that you need to combine the temperature and pressure measurements with the equation `temperature / pressure`.
 
-TODO: image
+<!-- TODO: image -->
 
 Since the temperature and pressure `EventSets` have different sampling, you will need to resample one of them. The pressure sensor has higher resolution. Therefore, resampling the temperature to the pressure yields higher resolution than resampling the pressure to the temperature.
 

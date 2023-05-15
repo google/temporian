@@ -10,7 +10,7 @@ Temporian helps you **focus on high-level modeling**.
 
 Temporal data processing is commonly done with generic data processing tools. However, this approach is often tedious, error-prone, and requires engineers to learn and re-implement existing methods. Additionally, the complexity of these tools can lead engineers to create less effective pipelines in order to reduce complexity. This can increase the cost of developing and maintaining performant ML pipelines.
 
-To see the benefit of Temporian over general data processing libraries, compare our [original Khipu 2023 Tutorial](TODO: link), which uses pandas to perform feature engineering for the M5 dataset, to the [updated version using Temporian](TODO: link).
+To see the benefit of Temporian over general data processing libraries, compare the original **Feature engineering** section of our [Khipu 2023 Forecasting Tutorial](https://github.com/tryolabs/khipu-2023), which uses pandas to preprocess the M5 sales dataset, to the [updated version using Temporian](example/m5_competition.py).
 
 ## Installation
 
