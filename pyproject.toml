@@ -46,12 +46,13 @@ matplotlib = "^3.7.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.12.0"
+isort = "^5.12.0"
 toml = "^0.10.2"
 pylint = "^2.15.10"
 memory-profiler = "^0.61.0"
 scalene = "^1.5.20"
 mkdocs = "^1.4.2"
-mkdocstrings = {extras = ["python"], version = "^0.20.0"}
+mkdocstrings = { extras = ["python"], version = "^0.20.0" }
 mkdocs-material = "^9.1.5"
 mkdocs-gen-files = "^0.4.0"
 mkdocs-literate-nav = "^0.6.0"
@@ -67,6 +68,10 @@ preview = true
 max-line-length = 80
 disable = [
     "redefined-builtin",
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "fixme",
+    "invalid-name",
 ]
 
 [tool.pyright]

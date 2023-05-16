@@ -14,12 +14,17 @@
     "**/bazel-*/**": true
   },
   "python.formatting.provider": "black",
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
   "editor.tabSize": 4,
   "editor.formatOnSave": true,
   "python.linting.flake8Enabled": false,
   "python.linting.pylintEnabled": true,
   "python.linting.enabled": true,
-  "editor.rulers": [80],
+  "editor.rulers": [
+    80
+  ],
   "editor.codeActionsOnSave": {
     "source.organizeImports": false
   },

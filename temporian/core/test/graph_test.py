@@ -15,7 +15,6 @@
 from absl.testing import absltest
 
 from temporian.core import graph
-from temporian.proto import core_pb2 as pb
 from temporian.core.test import utils
 
 
@@ -29,7 +28,7 @@ class GraphTest(absltest.TestCase):
         o4 = utils.OpI2O1(o2.outputs["output"], i3)
         o5 = utils.OpI1O2(o4.outputs["output"])
 
-        g = graph.infer_graph(
+        g, _ = graph.infer_graph(
             {
                 "io_input_1": i1,
                 "io_input_2": i3,
@@ -51,7 +50,7 @@ class GraphTest(absltest.TestCase):
         b = utils.OpI1O1NotCreator(a)
         c = utils.OpI1O1(b.outputs["output"])
 
-        g = graph.infer_graph(
+        g, _ = graph.infer_graph(
             {"my_input": a},
             {"my_output": c.outputs["output"]},
         )
@@ -68,7 +67,7 @@ class GraphTest(absltest.TestCase):
         b = utils.OpI1O1NotCreator(a)
         c = utils.OpI1O1(b.outputs["output"])
 
-        g = graph.infer_graph(
+        g, _ = graph.infer_graph(
             {"my_input": b.outputs["output"]},
             {"my_output": c.outputs["output"]},
         )
@@ -101,7 +100,7 @@ class GraphTest(absltest.TestCase):
         o4 = utils.OpI2O1(o2.outputs["output"], i3)
         o5 = utils.OpI1O2(o4.outputs["output"])
 
-        g = graph.infer_graph(
+        g, _ = graph.infer_graph(
             None,
             {
                 "io_output_1": o5.outputs["output_1"],
@@ -131,7 +130,7 @@ class GraphTest(absltest.TestCase):
         i1 = utils.create_input_node()
         i1.name = "io_1"
 
-        g = graph.infer_graph(None, {"io_2": i1})
+        g, _ = graph.infer_graph(None, {"io_2": i1})
 
         self.assertLen(g.operators, 0)
         self.assertLen(g.nodes, 1)

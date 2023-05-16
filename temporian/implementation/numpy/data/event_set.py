@@ -117,11 +117,13 @@ class EventSet:
         feature_names: List[str],
         index_names: List[str],
         is_unix_timestamp: bool,
+        name: Optional[str] = None,
     ) -> None:
         self._data = data
         self._feature_names = feature_names
         self._index_names = index_names
         self._is_unix_timestamp = is_unix_timestamp
+        self._name = name
 
     @property
     def data(self) -> Dict[Tuple, IndexData]:
@@ -171,6 +173,14 @@ class EventSet:
     @property
     def is_unix_timestamp(self) -> bool:
         return self._is_unix_timestamp
+
+    @property
+    def name(self) -> bool:
+        return self._name
+
+    @name.setter
+    def name(self, name: str) -> None:
+        self._name = name
 
     # TODO: To remove
     @property
@@ -243,6 +253,7 @@ class EventSet:
                 for name, dtype in self.dtypes.items()
             ],
             sampling=sampling,
+            name=self.name,
         )
 
     @staticmethod
@@ -251,6 +262,7 @@ class EventSet:
         index_names: Optional[List[str]] = None,
         timestamp_column: str = "timestamp",
         is_sorted: bool = False,
+        name: Optional[str] = None,
     ) -> EventSet:
         """Creates an EventSet from a pandas DataFrame.
 
@@ -264,6 +276,7 @@ class EventSet:
                 Timestamps of these types are converted to UTC epoch float.
             is_sorted: If True, the DataFrame is assumed to be sorted by
                 timestamp. If False, the DataFrame will be sorted by timestamp.
+            name: Optional name for the EventSet.
 
 
         Returns:
@@ -287,38 +300,6 @@ class EventSet:
             ... )
             >>> evset = EventSet.from_dataframe(df, index_names=["product_id"])
         """
-
-        def convert_timestamp_column_to_unix_epoch_float(
-            timestamp_column: pd.Series,
-        ) -> pd.DataFrame:
-            """Converts a timestamp column to Unix Epoch Float.
-
-            Args:
-                timestamp_column: Timestamp column to convert.
-
-            Returns:
-                Timestamp column converted to Unix Epoch float.
-            """
-            # check if timestamp column contains missing values and raise error
-            if timestamp_column.isna().any():
-                raise ValueError(
-                    f"Cannot convert timestamp column {timestamp_column.name} "
-                    "to Unix Epoch Float because it contains missing values."
-                )
-
-            # if timestamp_column is already float64, ignore it
-            if timestamp_column.dtype == "float64":
-                return timestamp_column
-
-            # if timestamp_column is int or float != float64 convert to float64
-            if timestamp_column.dtype.kind in ("i", "f"):
-                return timestamp_column.astype("float64")
-
-            # string and objects will be converted to datetime, then to float
-            timestamp_column = pd.to_datetime(timestamp_column, errors="raise")
-            timestamp_column = timestamp_column.view("int64") / 1e9
-            return timestamp_column
-
         df = df.copy(deep=False)
         if index_names is None:
             index_names = []
@@ -345,7 +326,7 @@ class EventSet:
         is_unix_timestamp = df[timestamp_column].dtype.kind not in ("i", "f")
 
         # convert timestamp column to Unix Epoch Float
-        df[timestamp_column] = convert_timestamp_column_to_unix_epoch_float(
+        df[timestamp_column] = _convert_timestamp_column_to_unix_epoch_float(
             df[timestamp_column]
         )
 
@@ -434,6 +415,7 @@ class EventSet:
             feature_names=feature_names,
             index_names=index_names,
             is_unix_timestamp=is_unix_timestamp,
+            name=name,
         )
 
     def to_dataframe(self) -> pd.DataFrame:
@@ -590,3 +572,35 @@ class EventSet:
         from temporian.implementation.numpy.data import plotter
 
         return plotter.plot(evsets=self, *args, **wargs)
+
+
+def _convert_timestamp_column_to_unix_epoch_float(
+    timestamp_column: pd.Series,
+) -> pd.DataFrame:
+    """Converts a timestamp column to Unix Epoch Float.
+
+    Args:
+        timestamp_column: Timestamp column to convert.
+
+    Returns:
+        Timestamp column converted to Unix Epoch float.
+    """
+    # check if timestamp column contains missing values and raise error
+    if timestamp_column.isna().any():
+        raise ValueError(
+            f"Cannot convert timestamp column {timestamp_column.name} "
+            "to Unix Epoch Float because it contains missing values."
+        )
+
+    # if timestamp_column is already float64, ignore it
+    if timestamp_column.dtype == "float64":
+        return timestamp_column
+
+    # if timestamp_column is int or float != float64 convert to float64
+    if timestamp_column.dtype.kind in ("i", "f"):
+        return timestamp_column.astype("float64")
+
+    # string and objects will be converted to datetime, then to float
+    timestamp_column = pd.to_datetime(timestamp_column, errors="raise")
+    timestamp_column = timestamp_column.view("int64") / 1e9
+    return timestamp_column

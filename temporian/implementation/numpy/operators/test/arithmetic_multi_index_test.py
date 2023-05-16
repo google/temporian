@@ -20,7 +20,7 @@ from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
 from temporian.core.data.node import Feature
 from temporian.core.data.sampling import Sampling
-from temporian.core.operators.arithmetic import (
+from temporian.core.operators.binary import (
     AddOperator,
     SubtractOperator,
     MultiplyOperator,
@@ -28,12 +28,12 @@ from temporian.core.operators.arithmetic import (
     FloorDivOperator,
 )
 from temporian.implementation.numpy.data.event_set import EventSet
-from temporian.implementation.numpy.operators.arithmetic import (
+from temporian.implementation.numpy.operators.binary import (
     AddNumpyImplementation,
     SubtractNumpyImplementation,
     MultiplyNumpyImplementation,
     DivideNumpyImplementation,
-    FloorDivideNumpyImplementation,
+    FloorDivNumpyImplementation,
 )
 
 
@@ -325,7 +325,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             input_2=self.node_2,
         )
 
-        div_implementation = FloorDivideNumpyImplementation(operator)
+        div_implementation = FloorDivNumpyImplementation(operator)
 
         operator_output = div_implementation.call(
             input_1=self.evset_1, input_2=self.evset_2
