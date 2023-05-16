@@ -31,26 +31,78 @@ Timestamp = Union[np.datetime64, datetime.datetime, int, float]
 
 
 def milliseconds(value: Union[int, float]) -> Duration:
+    """Converts input value from milliseconds to a `Duration` in seconds.
+
+    Args:
+        value: number of milliseconds (`float` or `integer` type).
+
+    Returns:
+        value: equivalent number of seconds (`float`)
+    """
     return value / 1000
 
 
 def seconds(value: Union[int, float]) -> Duration:
+    """Returns a `Duration` in seconds, actually only converts value to `float`.
+
+    Since the `Duration` object is equivalent to a `float` value in seconds,
+    this method does nothing else than casting the input to `float`. It may be
+    used in order to make the code more explicit.
+
+    Args:
+        value: number of seconds (`float` or `integer` type).
+
+    Returns:
+        value: same number of seconds (`float` type)
+    """
     return Duration(value)
 
 
 def minutes(value: Union[int, float]) -> Duration:
+    """Converts input value from minutes to a `Duration` in seconds.
+
+    Args:
+        value: number of minutes (`float` or `integer` type).
+
+    Returns:
+        value: equivalent number of seconds (`float` type)
+    """
     return Duration(value * 60)
 
 
 def hours(value: Union[int, float]) -> Duration:
+    """Converts input value from hours to a `Duration` in seconds.
+
+    Args:
+        value: number of hours (`float` or `integer` type).
+
+    Returns:
+        value: equivalent number of seconds (`float` type)
+    """
     return Duration(value * 60 * 60)
 
 
 def days(value: Union[int, float]) -> Duration:
+    """Converts input value from number of days to a `Duration` in seconds.
+
+    Args:
+        value: number of days (`float` or `integer` type).
+
+    Returns:
+        value: equivalent number of seconds (`float` type)
+    """
     return Duration(value * 60 * 60 * 24)
 
 
 def weeks(value: Union[int, float]) -> Duration:
+    """Converts input value from number of weeks to a `Duration` in seconds.
+
+    Args:
+        value: number of weeks (`float` or `integer` type).
+
+    Returns:
+        value: equivalent number of seconds (`float` type)
+    """
     return Duration(value * 60 * 60 * 24 * 7)
 
 
