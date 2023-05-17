@@ -31,27 +31,29 @@ jobs:
           name: dist-${{ matrix.python-version }}
           path: dist
 
-  # test-install:
-  #   needs: [build]
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       python-version: ["3.8", "3.9", "3.10", "3.11"]
-  #   steps:
-  #     - name: Set up Python ${{ matrix.python-version }}
-  #       uses: actions/setup-python@v4
-  #       with:
-  #         python-version: ${{ matrix.python-version }}
-  #         cache: "poetry"
+  test-install:
+    needs: [build]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
-  #     - name: Download build
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         name: dist-${{ matrix.python-version }}
-  #         path: ./dist
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
 
-  #     - name: Install
-  #       run: pip install ./dist/*.whl
+      - name: Download build
+        uses: actions/download-artifact@v3
+        with:
+          name: dist-${{ matrix.python-version }}
+          path: ./dist
 
-  #     - name: Test import
-  #       run: python -c "import temporian"
+      - name: Install from wheel
+        run: pip install ./dist/*.whl
+
+      - name: Test import
+        run: python -c "import temporian"
