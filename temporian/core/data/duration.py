@@ -34,26 +34,26 @@ def milliseconds(value: Union[int, float]) -> Duration:
     """Converts input value from milliseconds to a `Duration` in seconds.
 
     Args:
-        value: number of milliseconds (`float` or `integer` type).
+        value: Number of milliseconds.
 
     Returns:
-        value: equivalent number of seconds (`float`)
+        Equivalent number of seconds.
     """
     return value / 1000
 
 
 def seconds(value: Union[int, float]) -> Duration:
-    """Returns a `Duration` in seconds, actually only converts value to `float`.
+    """Converts input value from seconds to a `Duration` in seconds.
 
     Since the `Duration` object is equivalent to a `float` value in seconds,
     this method does nothing else than casting the input to `float`. It may be
     used in order to make the code more explicit.
 
     Args:
-        value: number of seconds (`float` or `integer` type).
+        value: Number of seconds.
 
     Returns:
-        value: same number of seconds (`float` type)
+        Same number of seconds.
     """
     return Duration(value)
 
@@ -62,10 +62,10 @@ def minutes(value: Union[int, float]) -> Duration:
     """Converts input value from minutes to a `Duration` in seconds.
 
     Args:
-        value: number of minutes (`float` or `integer` type).
+        value: Number of minutes.
 
     Returns:
-        value: equivalent number of seconds (`float` type)
+        Equivalent number of seconds.
     """
     return Duration(value * 60)
 
@@ -74,10 +74,10 @@ def hours(value: Union[int, float]) -> Duration:
     """Converts input value from hours to a `Duration` in seconds.
 
     Args:
-        value: number of hours (`float` or `integer` type).
+        value: Number of hours.
 
     Returns:
-        value: equivalent number of seconds (`float` type)
+        Equivalent number of seconds.
     """
     return Duration(value * 60 * 60)
 
@@ -86,10 +86,10 @@ def days(value: Union[int, float]) -> Duration:
     """Converts input value from number of days to a `Duration` in seconds.
 
     Args:
-        value: number of days (`float` or `integer` type).
+        value: number of days.
 
     Returns:
-        value: equivalent number of seconds (`float` type)
+        Equivalent number of seconds.
     """
     return Duration(value * 60 * 60 * 24)
 
@@ -98,26 +98,26 @@ def weeks(value: Union[int, float]) -> Duration:
     """Converts input value from number of weeks to a `Duration` in seconds.
 
     Args:
-        value: number of weeks (`float` or `integer` type).
+        value: Number of weeks.
 
     Returns:
-        value: equivalent number of seconds (`float` type)
+        Equivalent number of seconds.
     """
     return Duration(value * 60 * 60 * 24 * 7)
 
 
 def convert_date_to_duration(date: Timestamp) -> Duration:
-    """Convert date value to float.
+    """Converts date value to a number representing the Unix timestamp.
 
     If a float or int, it is returned as float.
     If a date, it is converted to a Unix timestamp (number of seconds from Unix
     epoch).
 
     Args:
-        date: date to convert.
+        date: Date to convert.
 
     Returns:
-        int: unix timestamp (seconds elapsed from unix epoch).
+        Unix timestamp (seconds elapsed from unix epoch).
 
     Raises:
         TypeError: unsupported type. Supported types are:
