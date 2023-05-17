@@ -24,9 +24,9 @@ mkdir -p ${PKDIR}
 find temporian -name "*.py" -type f -exec rsync -R {} ${PKDIR}/ \;
 
 ( cd bazel-bin && \
-  find temporian \( -name "*.so" -o -name "*.py" \) -type f -exec rsync -R {} ${PKDIR}/ \;
+    find temporian \( -name "*.so" -o -name "*.py" \) -type f -exec rsync -R {} ${PKDIR}/ \;
 )
 
 # Start notebook
 # Note: Use "notebook" or "lab" ("jupyterlab").
-PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python PYTHONPATH="${PKDIR}/:$PYTHONPATH" jupyter lab
+PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python PYTHONPATH="${PKDIR}/:$PYTHONPATH" jupyter-lab

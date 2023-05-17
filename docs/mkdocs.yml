@@ -55,7 +55,12 @@ plugins:
         - gen_ref_pages.py
   - literate-nav:
       nav_file: SUMMARY.md
-    # Configuration to generate the reference pages from the docstrings.
+  - mkdocs-jupyter:
+      execute: false # execute notebooks when building docs (set to true when temporian runs in a notebook w/o the start_notebook script)
+      include: ["*.ipynb"] # use ["*.py", "*.ipynb"] to render jupytext too
+      allow_errors: false # cancel build if cell execution fails
+      theme: dark
+  # Configuration to generate the reference pages from the docstrings.
   - mkdocstrings:
       default_handler: python
       handlers:
