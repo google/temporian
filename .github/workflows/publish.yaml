@@ -1,7 +1,10 @@
 name: publish
 
 # TODO: change to either only run on release branch or on tags/releases
-on: push
+on:
+  push:
+    branches:
+      - publish-action
 
 jobs:
   build:
@@ -13,14 +16,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install poetry
-        run: pipx install poetry
-
-      - name: Setup up ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+      - name: Setup up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4.2.0
         with:
           python-version: ${{ matrix.python-version }}
-          cache: "poetry"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
 
       - name: Build package
         run: poetry build
