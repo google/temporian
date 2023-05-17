@@ -1,16 +1,44 @@
 [tool.poetry]
 name = "temporian"
 version = "0.1.0"
-description = ""
+description = "Temporian is a library to pre-process temporal signals before their use as input features with off-the-shelf tabular machine learning libraries (e.g., TensorFlow Decision Forests)."
 authors = [
+    "Google Inc."
+]
+maintainers = [
+    "Mathieu Guillame-Bert <gbm@google.com>",
     "Guillermo Etchebarne <getchebarne@tryolabs.com>",
     "Ian Spektor <ispektor@tryolabs.com>",
-    "Mathieu Guillame-Bert <gbm@google.com>",
-    "Richard Stotz <richardstotz@google.com>",
+    "Richard Stotz <richardstotz@google.com>"
 ]
+repository = "https://github.com/google/temporian"
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+license = "Apache 2.0"
+readme = "README.md"
+
+[tool.poetry.build]
+script = "config/build.py"
+generate-setup-file = true
 
 [tool.poetry.dependencies]
-python = "^3.9,<3.11"
+python = "^3.8,<3.12"
 absl-py = "^1.3.0"
 protobuf = "^4.21.12"
 pandas = "^1.5.2"
@@ -53,5 +81,5 @@ disable = [
 include = ["temporian"]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core>=1.0.0", "setuptools>=67.6.0"]
 build-backend = "poetry.core.masonry.api"
