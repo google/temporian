@@ -17,7 +17,7 @@ from absl.testing import absltest
 import numpy as np
 import pandas as pd
 
-from temporian.core import evaluator
+from temporian.core.evaluation import evaluate
 from temporian.core.operators.select import SelectOperator
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators import select
@@ -115,9 +115,9 @@ class SelectOperatorTest(absltest.TestCase):
             new_df, index_names=["store_id"]
         )
 
-        output_evset = evaluator.evaluate(
+        output_evset = evaluate(
             self.input_node["sales"],
-            input_data={
+            input={
                 self.input_node: self.input_evset,
             },
         )
@@ -141,9 +141,9 @@ class SelectOperatorTest(absltest.TestCase):
             new_df, index_names=["store_id"]
         )
 
-        output_evset = evaluator.evaluate(
+        output_evset = evaluate(
             self.input_node[["sales", "costs"]],
-            input_data={
+            input={
                 self.input_node: self.input_evset,
             },
         )

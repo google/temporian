@@ -39,7 +39,5 @@ for path in sorted(SRC_PATH.rglob("*.py")):
     else:
         skipped_paths.append(str(path))
 
-print("Skipped paths:", skipped_paths)
-
 with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
     nav_file.writelines(nav.build_literate_nav())

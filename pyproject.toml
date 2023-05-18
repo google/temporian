@@ -1,16 +1,44 @@
 [tool.poetry]
 name = "temporian"
 version = "0.1.0"
-description = ""
+description = "Temporian is a library to pre-process temporal signals before their use as input features with off-the-shelf tabular machine learning libraries (e.g., TensorFlow Decision Forests)."
 authors = [
+    "Google Inc."
+]
+maintainers = [
+    "Mathieu Guillame-Bert <gbm@google.com>",
     "Guillermo Etchebarne <getchebarne@tryolabs.com>",
     "Ian Spektor <ispektor@tryolabs.com>",
-    "Mathieu Guillame-Bert <gbm@google.com>",
     "Richard Stotz <richardstotz@google.com>"
 ]
+repository = "https://github.com/google/temporian"
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+license = "Apache 2.0"
+readme = "README.md"
+
+[tool.poetry.build]
+script = "config/build.py"
+generate-setup-file = true
 
 [tool.poetry.dependencies]
-python = "^3.9,<3.11"
+python = "^3.8,<3.12"
 absl-py = "^1.3.0"
 protobuf = "^4.21.12"
 pandas = "^1.5.2"
@@ -18,18 +46,22 @@ matplotlib = "^3.7.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.12.0"
+isort = "^5.12.0"
 toml = "^0.10.2"
 pylint = "^2.15.10"
 memory-profiler = "^0.61.0"
 scalene = "^1.5.20"
 mkdocs = "^1.4.2"
-mkdocstrings = {extras = ["python"], version = "^0.20.0"}
+mkdocstrings = { extras = ["python"], version = "^0.20.0" }
 mkdocs-material = "^9.1.5"
 mkdocs-gen-files = "^0.4.0"
 mkdocs-literate-nav = "^0.6.0"
 mkdocs-section-index = "^0.3.5"
+mkdocs-jupyter = "^0.24.1"
 bokeh = "^3.1.0"
 ipykernel = "^6.22.0"
+griffe = "0.26.0"
+jupyterlab = "^4.0.0"
 
 [tool.black]
 line-length = 80
@@ -39,11 +71,15 @@ preview = true
 max-line-length = 80
 disable = [
     "redefined-builtin",
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "fixme",
+    "invalid-name",
 ]
 
 [tool.pyright]
 include = ["temporian"]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core>=1.0.0", "setuptools>=67.6.0"]
 build-backend = "poetry.core.masonry.api"

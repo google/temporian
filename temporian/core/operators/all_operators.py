@@ -1,25 +1,46 @@
 """Imports all the packages containing operator definitions."""
 
 # pylint: disable=unused-import
-from temporian.core.operators.arithmetic import divide
-from temporian.core.operators.arithmetic import multiply
-from temporian.core.operators.arithmetic import subtract
-from temporian.core.operators.arithmetic import add
-from temporian.core.operators.arithmetic import floordiv
-from temporian.core.operators.arithmetic import equal
+from temporian.core.operators.binary import divide
+from temporian.core.operators.binary import multiply
+from temporian.core.operators.binary import subtract
+from temporian.core.operators.binary import add
+from temporian.core.operators.binary import floordiv
+from temporian.core.operators.binary import modulo
+from temporian.core.operators.binary import power
+from temporian.core.operators.binary import equal
+from temporian.core.operators.binary import not_equal
+from temporian.core.operators.binary import greater
+from temporian.core.operators.binary import greater_equal
+from temporian.core.operators.binary import less
+from temporian.core.operators.binary import less_equal
+from temporian.core.operators.binary import logical_and
+from temporian.core.operators.binary import logical_or
+from temporian.core.operators.binary import logical_xor
+
+from temporian.core.operators.scalar import add_scalar
+from temporian.core.operators.scalar import divide_scalar
+from temporian.core.operators.scalar import floordiv_scalar
+from temporian.core.operators.scalar import multiply_scalar
+from temporian.core.operators.scalar import subtract_scalar
+from temporian.core.operators.scalar import modulo_scalar
+from temporian.core.operators.scalar import power_scalar
+from temporian.core.operators.scalar import equal_scalar
+from temporian.core.operators.scalar import not_equal_scalar
+from temporian.core.operators.scalar import greater_equal_scalar
+from temporian.core.operators.scalar import less_equal_scalar
+from temporian.core.operators.scalar import greater_scalar
+from temporian.core.operators.scalar import less_scalar
+
+from temporian.core.operators.unary import abs
+from temporian.core.operators.unary import invert
+from temporian.core.operators.unary import isnan
+from temporian.core.operators.unary import notnan
+from temporian.core.operators.unary import log
 
 from temporian.core.operators.cast import cast
+from temporian.core.operators.drop_index import drop_index
 from temporian.core.operators.filter import filter
-
-from temporian.core.operators.arithmetic_scalar import add_scalar
-from temporian.core.operators.arithmetic_scalar import divide_scalar
-from temporian.core.operators.arithmetic_scalar import floordiv_scalar
-from temporian.core.operators.arithmetic_scalar import multiply_scalar
-from temporian.core.operators.arithmetic_scalar import subtract_scalar
-from temporian.core.operators.arithmetic_scalar import equal_scalar
-from temporian.core.operators.arithmetic_scalar import greater_scalar
-from temporian.core.operators.arithmetic_scalar import less_scalar
-
 from temporian.core.operators.glue import glue
 from temporian.core.operators.calendar.day_of_month import calendar_day_of_month
 from temporian.core.operators.calendar.day_of_week import calendar_day_of_week
@@ -31,7 +52,6 @@ from temporian.core.operators.calendar.minute import calendar_minute
 from temporian.core.operators.calendar.second import calendar_second
 from temporian.core.operators.calendar.year import calendar_year
 from temporian.core.operators.set_index import set_index
-from temporian.core.operators.drop_index import drop_index
 from temporian.core.operators.lag import lag
 from temporian.core.operators.lag import leak
 from temporian.core.operators.prefix import prefix
@@ -52,5 +72,3 @@ from temporian.core.operators.window.moving_min import moving_min
 from temporian.core.operators.window.moving_max import moving_max
 from temporian.core.operators.unique_timestamps import unique_timestamps
 from temporian.core.operators.since_last import since_last
-
-# pylint: enable=unused-import

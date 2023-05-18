@@ -14,8 +14,7 @@
 
 """Plotting utility."""
 
-import datetime
-from typing import NamedTuple, Optional, Union, List, Any, Set, Tuple
+from typing import NamedTuple, Optional, Union, List, Any, Set
 
 import numpy as np
 from enum import Enum

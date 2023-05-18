@@ -21,6 +21,23 @@ py_library(
 # =====
 
 py_test(
+    name = "magic_methods_test",
+    srcs = ["magic_methods_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/testing:absltest dep,
+        ":utils",
+        "//temporian/core/data:node",
+        "//temporian/core/data:sampling",
+        "//temporian/core/operators:base",
+        "//temporian/core/operators:unary",
+        "//temporian/core/operators/binary",
+        "//temporian/core/operators/scalar",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_test(
     name = "operator_test",
     srcs = ["operator_test.py"],
     srcs_version = "PY3",
@@ -72,14 +89,14 @@ py_test(
 )
 
 py_test(
-    name = "evaluator_test",
-    srcs = ["evaluator_test.py"],
+    name = "evaluation_test",
+    srcs = ["evaluation_test.py"],
     srcs_version = "PY3",
     deps = [
         # absl/logging dep,
         # absl/testing:absltest dep,
         ":utils",
-        "//temporian/core:evaluator",
+        "//temporian/core:evaluation",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:feature",

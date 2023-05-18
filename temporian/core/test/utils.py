@@ -1,5 +1,5 @@
 """Utilities for unit testing."""
-from typing import List, Mapping
+from typing import List, Mapping, Optional
 
 import pandas as pd
 
@@ -17,25 +17,30 @@ from temporian.implementation.numpy.data.event_set import EventSet
 # For example "OpI1O2" has 1 input and 2 outputs.
 
 
-def create_input_node():
+def create_input_node(name: Optional[str] = None):
     return node_lib.input_node(
         features=[
-            Feature("f1", DType.FLOAT32),
-            Feature("f2", DType.FLOAT32),
+            Feature("f1", DType.FLOAT64),
+            Feature("f2", DType.FLOAT64),
         ],
         index_levels=[("x", DType.INT32), ("y", DType.STRING)],
+        name=name,
     )
 
 
-def create_input_event_set():
+def create_input_event_set(name: Optional[str] = None) -> EventSet:
     return EventSet.from_dataframe(
         pd.DataFrame(
             {
                 "timestamp": [0, 2, 4, 6],
+                "x": [10, 20, 30, 40],
+                "y": ["a", "b", "c", "d"],
                 "f1": [1.0, 2.0, 3.0, 4.0],
                 "f2": [5.0, 6.0, 7.0, 8.0],
             }
-        )
+        ),
+        index_names=["x", "y"],
+        name=name,
     )
 
 
