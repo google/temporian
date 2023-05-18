@@ -6,7 +6,7 @@ Feel free to read the first sections (e.g. up until [Index, horizontal and verti
 
 ## ¿What is temporal data?
 
-For Temporian, temporal data is an **MMTS**. A Multivariate and Multi-index Time Sequence is an extension of multivariate time-series to non-uniform and hierarchically-structured data. A MMTS allows you to represent a time series, as well as other common time data such as transactions, logs, sparse events, asynchronous measurements, or hierarchical records. Temporian unifies all those representations into a powerful and concise framework.
+For Temporian, temporal data is a **multivariate and multi-index time sequence**: an extension of multivariate time-series to non-uniform and hierarchically-structured data. This allows for representing time series, but also other common time data such as transactions, logs, sparse events, asynchronous measurements, or hierarchical records. Temporian unifies all of those into a powerful and concise framework.
 
 <!-- TODO: add plot -->
 
