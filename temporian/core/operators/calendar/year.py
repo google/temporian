@@ -37,13 +37,14 @@ operator_lib.register_operator(CalendarYearOperator)
 def calendar_year(sampling: Node) -> Node:
     """Obtains the year the timestamps in a node's sampling are in.
 
-    Features in input node are ignored.
+    Features in the input node are ignored, only the timestamps in
+    `Node.sampling` are used and they must be unix timestamps
+    (check  `Node.sampling.is_unix_timestamp`).
 
     Args:
         sampling: Node to get the years from.
 
     Returns:
-        Node with a single feature corresponding to the year each timestamp in
-        `sampling`'s sampling belongs to, with the same sampling as `sampling`.
+        Single feature with the year each timestamp in `sampling` belongs to.
     """
     return CalendarYearOperator(sampling).outputs["output"]

@@ -37,14 +37,16 @@ operator_lib.register_operator(CalendarHourOperator)
 def calendar_hour(sampling: Node) -> Node:
     """Obtains the hour the timestamps in a node's sampling are in.
 
-    Features in input node are ignored. Output feature contains numbers between
-    0 and 23.
+    Features in the input node are ignored, only the timestamps in
+    `Node.sampling` are used and they must be unix timestamps
+    (check  `Node.sampling.is_unix_timestamp`).
+
+    Output feature contains numbers between 0 and 23.
 
     Args:
         sampling: Node to get the hours from.
 
     Returns:
-        Node with a single feature corresponding to the hour each timestamp in
-        `sampling`'s sampling belongs to, with the same sampling as `sampling`.
+        Single feature with the hour each timestamp in `sampling` belongs to.
     """
     return CalendarHourOperator(sampling).outputs["output"]

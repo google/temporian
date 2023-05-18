@@ -41,14 +41,17 @@ operator_lib.register_operator(CalendarMonthOperator)
 def calendar_month(sampling: Node) -> Node:
     """Obtains the month the timestamps in a node's sampling are in.
 
-    Features in input node are ignored. Output feature contains numbers between
+    Features in the input node are ignored, only the timestamps in
+    `Node.sampling` are used and they must be unix timestamps
+    (check  `Node.sampling.is_unix_timestamp`).
+
+    Output feature contains numbers between
     1 and 12.
 
     Args:
-        sampling: Node to get the months from.
+        sampling: Node with unix timestamp sampling.
 
     Returns:
-        Node with a single feature corresponding to the month each timestamp in
-        `sampling`'s sampling belongs to, with the same sampling as `sampling`.
+        Single feature with the month each timestamp in `sampling` belongs to.
     """
     return CalendarMonthOperator(sampling).outputs["output"]
