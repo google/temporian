@@ -1,0 +1,80 @@
+name: publish
+
+# TODO: change to either only run on release branch or on tags/releases
+on:
+  push:
+    branches:
+      - publish-action
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: gcr.io/tfx-oss-public/manylinux2014-bazel:bazel-5.3.0
+    # strategy:
+    #   matrix:
+    #     python-version: ["3.8", "3.9", "3.10", "3.11"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build packages for all Python versions
+        run: ./tools/build_manylinux.sh
+
+      - name: Save packages for following jobs
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist
+
+  # build:
+  #   strategy:
+  #     matrix:
+  #       python-version: ["3.8", "3.9", "3.10", "3.11"]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+
+  #     - name: Setup up Python ${{ matrix.python-version }}
+  #       uses: actions/setup-python@v4.2.0
+  #       with:
+  #         python-version: ${{ matrix.python-version }}
+
+  #     - name: Install Poetry
+  #       uses: snok/install-poetry@v1
+
+  #     - name: Build package
+  #       run: poetry build
+
+  #     - name: Save package for following jobs
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: dist-${{ matrix.python-version }}
+  #         path: dist
+
+  # test-install:
+  #   needs: [build]
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix:
+  #       python-version: ["3.8", "3.9", "3.10", "3.11"]
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+
+  #     - name: Set up Python ${{ matrix.python-version }}
+  #       uses: actions/setup-python@v4
+  #       with:
+  #         python-version: ${{ matrix.python-version }}
+
+  #     - name: Download build
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: dist-${{ matrix.python-version }}
+  #         path: ./dist
+
+  #     - name: Install from wheel
+  #       run: pip install ./dist/*.whl
+
+  #     - name: Test import
+  #       run: python -c "import temporian"
