@@ -26,55 +26,31 @@ jobs:
           name: dist
           path: dist
 
-  # build:
-  #   strategy:
-  #     matrix:
-  #       python-version: ["3.8", "3.9", "3.10", "3.11"]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
+  test-install:
+    needs: [build]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
-  #     - name: Setup up Python ${{ matrix.python-version }}
-  #       uses: actions/setup-python@v4.2.0
-  #       with:
-  #         python-version: ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
 
-  #     - name: Install Poetry
-  #       uses: snok/install-poetry@v1
+      - name: Download build
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: ./dist
 
-  #     - name: Build package
-  #       run: poetry build
+      - name: Install from wheel
+        run: |
+          name=${${{ matrix.python-version }}//./}
+          pip install ./dist/temporian-0.1.0-cp$name-cp$name-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
 
-  #     - name: Save package for following jobs
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: dist-${{ matrix.python-version }}
-  #         path: dist
-
-  # test-install:
-  #   needs: [build]
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       python-version: ["3.8", "3.9", "3.10", "3.11"]
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-
-  #     - name: Set up Python ${{ matrix.python-version }}
-  #       uses: actions/setup-python@v4
-  #       with:
-  #         python-version: ${{ matrix.python-version }}
-
-  #     - name: Download build
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         name: dist-${{ matrix.python-version }}
-  #         path: ./dist
-
-  #     - name: Install from wheel
-  #       run: pip install ./dist/*.whl
-
-  #     - name: Test import
-  #       run: python -c "import temporian"
+      - name: Test import
+        run: python -c "import temporian"
