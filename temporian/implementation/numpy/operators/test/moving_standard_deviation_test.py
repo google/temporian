@@ -28,8 +28,6 @@ from temporian.implementation.numpy.operators.window.moving_standard_deviation i
 )
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core.data import node as node_lib
-import math
-from numpy.testing import assert_almost_equal
 
 
 def _f64(l):

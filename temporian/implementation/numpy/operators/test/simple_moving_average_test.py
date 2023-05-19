@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from absl.testing import absltest
 import math
 
+from absl.testing import absltest
 import numpy as np
 from numpy.testing import assert_array_equal
 import pandas as pd
@@ -28,10 +28,6 @@ from temporian.implementation.numpy.operators.window.simple_moving_average impor
 )
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core.data import node as node_lib
-from temporian.core.data import feature as feature_lib
-from temporian.core.data import dtype as dtype_lib
-import math
-from numpy.testing import assert_array_equal
 
 
 def _f64(l):
@@ -64,22 +60,22 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
     def test_cc_wo_sampling(self):
         assert_array_equal(
             cc_sma(
-                _f64([1, 2, 3, 5, 20]),
-                _f32([10, 11, 12, 13, 14]),
+                _f64([1, 2, 3, 5, 5, 20]),
+                _f32([10, 11, 12, 13, 14, 15]),
                 5.0,
             ),
-            _f32([10.0, 10.5, 11.0, 11.5, 14.0]),
+            _f32([10.0, 10.5, 11.0, 12.0, 12.0, 15.0]),
         )
 
     def test_cc_w_sampling(self):
         assert_array_equal(
             cc_sma(
-                _f64([1, 2, 3, 5, 6]),
-                _f32([10, 11, 12, 13, 14]),
+                _f64([1, 2, 3, 3, 5, 6]),
+                _f32([10, 11, 12, 13, 14, 15]),
                 _f64([-1.0, 1.0, 1.1, 3.0, 3.5, 6.0, 10.0]),
                 3.0,
             ),
-            _f32([nan, 10.0, 10.0, 11.0, 11.0, 13.5, nan]),
+            _f32([nan, 10.0, 10.0, 11.5, 11.5, 14.5, nan]),
         )
 
     def test_cc_w_nan_wo_sampling(self):

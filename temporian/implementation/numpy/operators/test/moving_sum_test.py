@@ -19,7 +19,6 @@ import numpy as np
 from numpy.testing import assert_array_equal
 import pandas as pd
 
-from absl.testing import absltest
 from temporian.core.operators.window.moving_sum import (
     MovingSumOperator,
 )
@@ -29,10 +28,6 @@ from temporian.implementation.numpy.operators.window.moving_sum import (
 )
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core.data import node as node_lib
-from temporian.core.data import feature as feature_lib
-from temporian.core.data import dtype as dtype_lib
-import math
-from numpy.testing import assert_array_equal
 
 
 def _f64(l):
@@ -50,11 +45,11 @@ class MovingSumOperatorTest(absltest.TestCase):
     def test_cc_wo_sampling(self):
         assert_array_equal(
             operators_cc.moving_sum(
-                _f64([1, 2, 3, 5, 20]),
-                _f32([10, nan, 12, 13, 14]),
+                _f64([1, 2, 3, 5, 20, 20]),
+                _f32([10, nan, 12, 13, 14, 2]),
                 5.0,
             ),
-            _f32([10.0, 10.0, 22.0, 35.0, 14.0]),
+            _f32([10.0, 10.0, 22.0, 35.0, 16.0, 16.0]),
         )
 
     def test_flat(self):
