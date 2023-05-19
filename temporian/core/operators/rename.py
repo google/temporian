@@ -196,12 +196,20 @@ def rename(
 ) -> Node:
     """Renames a node's features and index.
 
+    If the input has a single feature, then the `features` can be a
+    single string with the new name.
+
+    If the input has multiple features, then `features` must be a mapping
+    with the old names as keys and the new names as values.
+
+    The index renaming follows the same criteria, accepting a single string or
+    a mapping for multiple index levels.
+
     Args:
         input: Node to rename.
-        features: List of new feature names or mapping from old feature names to
-            new feature names.
-        index: List of new index names or mapping from old index names to new
-            index names.
+
+        features: New feature name or mapping from old names to new names.
+        index: New index name or mapping from old names to new names.
 
     Returns:
         Event with renamed features and index.
