@@ -38,18 +38,36 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
   size_t begin_idx = 0;
 
   for (size_t sampling_idx = 0; sampling_idx < n_event; sampling_idx++) {
-
-    accumulator.Add(v_values[sampling_idx]);
-
     // Note: We accumulate values in (t-window_length, t] with t=
-    // v_timestamps[sampling_idx].
+    // v_timestamps[sampling_idx], and there may be several contiguous equal
+    // values in v_timestamps.
+
+    // Add all values with same timestamp as the current one.
+    accumulator.Add(v_values[sampling_idx]);
+    size_t same_ts_idx = sampling_idx;
+    while (
+      same_ts_idx + 1 < n_event &&
+      v_timestamps[same_ts_idx] == v_timestamps[same_ts_idx + 1]
+    ) {
+      same_ts_idx++;
+      accumulator.Add(v_values[same_ts_idx]);
+    }
+
+    // Remove all values that no longer belong to the window.
     const auto left_limit = v_timestamps[sampling_idx] - window_length;
     while (begin_idx < n_event && v_timestamps[begin_idx] <= left_limit) {
       accumulator.Remove(v_values[begin_idx]);
       begin_idx++;
     }
 
-    v_output[sampling_idx] = accumulator.Result();
+    // Set current value of window to all values with the same timestamp.
+    const auto result = accumulator.Result();
+    for (size_t i = sampling_idx; i <= same_ts_idx; i++) {
+      v_output[i] = result;
+    }
+
+    // Move pointer to the index of the last value with the same timestamp.
+    sampling_idx = same_ts_idx;
   }
 
   return output;
