@@ -26,7 +26,6 @@ from temporian.implementation.numpy.operators.window.moving_count import (
 )
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core.data import node as node_lib
-from numpy.testing import assert_array_equal
 
 
 def _f64(l):
@@ -48,11 +47,11 @@ class MovingCountOperatorTest(absltest.TestCase):
     def test_cc_wo_sampling(self):
         assert_array_equal(
             operators_cc.moving_count(
-                _f64([1, 2, 3, 5, 20]),
-                _f32([10, nan, 12, 13, 14]),
+                _f64([1, 2, 3, 5, 5, 5, 20]),
+                _f32([10, nan, 12, 13, 14, 15, 16]),
                 5.0,
             ),
-            _i32([1, 1, 2, 3, 1]),
+            _i32([1, 1, 2, 5, 5, 5, 1]),
         )
 
     def test_flat(self):
@@ -61,11 +60,13 @@ class MovingCountOperatorTest(absltest.TestCase):
         evset = EventSet.from_dataframe(
             pd.DataFrame(
                 [
+                    [9.0, 19.0, 1],
                     [10.0, 20.0, 1],
-                    [00.0, 21.0, 2],
+                    [11.0, 21.0, 2],
                     [12.0, 00.0, 3],
                     [13.0, 23.0, 5],
                     [14.0, 24.0, 20],
+                    [15.0, 25.0, 20],
                 ],
                 columns=["a", "b", "timestamp"],
             )
@@ -84,11 +85,13 @@ class MovingCountOperatorTest(absltest.TestCase):
         expected_output = EventSet.from_dataframe(
             pd.DataFrame(
                 [
-                    [1, 1, 1],
-                    [2, 2, 2],
-                    [3, 3, 3],
-                    [4, 4, 5],
-                    [1, 1, 20],
+                    [2, 2, 1],
+                    [2, 2, 1],
+                    [3, 3, 2],
+                    [4, 4, 3],
+                    [5, 5, 5],
+                    [2, 2, 20],
+                    [2, 2, 20],
                 ],
                 columns=["a", "b", "timestamp"],
             ).astype({"a": np.int32, "b": np.int32})
@@ -237,6 +240,7 @@ class MovingCountOperatorTest(absltest.TestCase):
                     [2],
                     [2.5],
                     [3],
+                    [3],
                     [3.5],
                     [4],
                     [5],
@@ -254,6 +258,7 @@ class MovingCountOperatorTest(absltest.TestCase):
                     [0, 1],
                     [1, 2],
                     [1, 2.5],
+                    [1, 3],
                     [1, 3],
                     [0, 3.5],
                     [0, 4],
