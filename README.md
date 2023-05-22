@@ -4,7 +4,7 @@
 
 **Temporian** is a Python package for **feature engineering of temporal data**, focusing on providing a **simple and powerful API**, a first-class **iterative development** experience, **efficient and well-tested implementations** of common and not-so-common temporal data preprocessing functions, and **preventing common modeling errors**.
 
-## ¿Why Temporian?
+## Why Temporian?
 
 Temporian helps you **focus on high-level modeling**.
 
