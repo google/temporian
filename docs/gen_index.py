@@ -23,6 +23,10 @@ content = re.sub(
     r"temporian\/([\w\/-]+)\.py", r"reference/temporian/\1", content
 )
 
+# Remove entire "## Documentation" and "## Contributing" sections
+content = re.sub(r"## Documentation.*## ", "## ", content, flags=re.DOTALL)
+content = re.sub(r"## Contributing.*## ", "## ", content, flags=re.DOTALL)
+
 # write the index
 with mkdocs_gen_files.open("index.md", "w") as fd:  #
     print(content, file=fd)
