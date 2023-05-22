@@ -47,7 +47,7 @@ set -x
 #     temporian::setup_environment
 #     temporian::build_wheel
 # done
-PYTHON_VERSION="38"
+PYTHON_VERSION="310"
 temporian::setup_environment
 temporian::build_wheel
 temporian::stamp_wheels
