@@ -56,4 +56,7 @@ jobs:
           pip install ./dist/temporian-0.1.0-cp$name-cp$name-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
 
       - name: Test import
-        run: python -c "import temporian"
+        # We have to move to a subfolder to avoid importing the local module.
+        run: |
+          cd ..
+          python -c "import temporian"
