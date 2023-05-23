@@ -40,4 +40,10 @@ for path in sorted(SRC_PATH.rglob("*.py")):
         skipped_paths.append(str(path))
 
 with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
+    # Remove SUMMARY file from search
+    nav_file.writelines("""---
+search:
+  exclude: true
+---
+""")
     nav_file.writelines(nav.build_literate_nav())
