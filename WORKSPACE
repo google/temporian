@@ -24,7 +24,6 @@ bazel_skylib_workspace()
 
 http_archive(
     name = "pybind11_bazel",
-    sha256 = "37aca5f00771645b840fa84c71f450c3f9b7f78e65a7cc88bf7bf883449ff802",
     strip_prefix = "pybind11_bazel-master",
     urls = ["https://github.com/pybind/pybind11_bazel/archive/refs/heads/master.zip"],
 )
@@ -32,7 +31,6 @@ http_archive(
 http_archive(
     name = "pybind11",
     build_file = "@pybind11_bazel//:pybind11.BUILD",
-    sha256 = "2db4dc881c89680da512c7f3e76ea4306b97e16d29058c1513709c6b80f6b57e",
     strip_prefix = "pybind11-master",
     urls = ["https://github.com/pybind/pybind11/archive/refs/heads/master.zip"],
 )
