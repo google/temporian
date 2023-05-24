@@ -1,9 +1,9 @@
-load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
-
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],
 )
+
+load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
 
 pybind_library(
     name = "since_last",
