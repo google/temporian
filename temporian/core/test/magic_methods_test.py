@@ -69,14 +69,14 @@ class MagicMethodsTest(absltest.TestCase):
         self.node_float_1 = node_lib.input_node(
             features=[
                 Feature("f1", DType.FLOAT32),
-                Feature("f2", DType.FLOAT64),
+                Feature("f2", float),
             ],
             sampling=self.sampling,
         )
         self.node_float_2 = node_lib.input_node(
             features=[
                 Feature("f3", DType.FLOAT32),
-                Feature("f4", DType.FLOAT64),
+                Feature("f4", float),
             ],
             sampling=self.sampling,
         )
@@ -85,14 +85,14 @@ class MagicMethodsTest(absltest.TestCase):
         self.node_int_1 = node_lib.input_node(
             features=[
                 Feature("f5", DType.INT32),
-                Feature("f6", DType.INT64),
+                Feature("f6", int),
             ],
             sampling=self.sampling,
         )
         self.node_int_2 = node_lib.input_node(
             features=[
                 Feature("f7", DType.INT32),
-                Feature("f8", DType.INT64),
+                Feature("f8", int),
             ],
             sampling=self.sampling,
         )
