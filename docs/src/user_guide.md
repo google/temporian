@@ -4,7 +4,7 @@ This is a complete tour of Temporian's capabilities.
 
 Feel free to read the first sections (e.g. up until [Index, horizontal and vertical operators](#index-horizontal-and-vertical-operators)) and then look at some of the task-specific [tutorials](https://temporian.readthedocs.io/en/latest/tutorials/).
 
-## ¿What is temporal data?
+## What is temporal data?
 
 For Temporian, temporal data is a **multivariate and multi-index time sequence**: an extension of multivariate time-series to non-uniform and hierarchically-structured data. This allows for representing time series, but also other common time data such as transactions, logs, sparse events, asynchronous measurements, or hierarchical records. Temporian unifies all of those into a powerful and concise framework.
 
