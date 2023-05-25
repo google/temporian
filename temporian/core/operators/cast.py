@@ -14,7 +14,7 @@
 
 """Cast operator class and public API function definition."""
 
-from typing import Union, Mapping, Optional, Any
+from typing import Union, Mapping, Optional
 from temporian.core.data.feature import Feature
 
 from temporian.core.data.dtype import DType, py_types_to_dtypes

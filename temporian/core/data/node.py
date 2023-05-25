@@ -52,7 +52,7 @@ class Node(object):
 
     def __init__(
         self,
-        features: List[Feature, FeatureTuple],
+        features: List[Union[Feature, FeatureTuple]],
         sampling: Sampling,
         name: Optional[str] = None,
         creator: Optional[Operator] = None,

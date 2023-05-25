@@ -43,13 +43,13 @@ class IndexDType(Enum):
     STRING = DType.STRING.value
 
 
-AnyDType = Union[DType, IndexDType, type]
+IndexType = Union[IndexDType, int, str]
 
 
 class Index:
     def __init__(
         self,
-        levels: Union[Tuple[str, AnyDType], List[Tuple[str, AnyDType]]],
+        levels: Union[Tuple[str, IndexType], List[Tuple[str, IndexType]]],
     ) -> None:
         # TODO: Check for correct DType.
         if isinstance(levels, Tuple):
