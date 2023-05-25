@@ -37,9 +37,4 @@ for path in sorted(SRC_PATH.rglob("*.py")):
         mkdocs_gen_files.set_edit_path(full_doc_path, path)
 
 with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
-    # Remove SUMMARY file from search
-    nav_file.writelines("---")
-    nav_file.writelines("search:")
-    nav_file.writelines("  exclude: true")
-    nav_file.writelines("---")
     nav_file.writelines(nav.build_literate_nav())

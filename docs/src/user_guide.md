@@ -1,8 +1,6 @@
 # User Guide
 
-This is a complete tour of Temporian's capabilities.
-
-Feel free to read the first sections (e.g. up until [Index, horizontal and vertical operators](#index-horizontal-and-vertical-operators)) and then look at some of the task-specific [tutorials](https://temporian.readthedocs.io/en/latest/tutorials/).
+This is a complete tour of Temporian's capabilities. For a brief introduction to how the library works, please refer to the [Quick Start](./quick_start).
 
 ## What is temporal data?
 
@@ -16,22 +14,22 @@ The most basic unit of data in Temporian is referred to as an _event_. An event 
 
 Here is an example of an event:
 
-```python
-"timestamp": 05-02-2023
-"feature_1": 0.5
-"feature_2": "red"
-"feature_3": 10
+```
+timestamp: 05-02-2023
+feature_1: 0.5
+feature_2: "red"
+feature_3: 10
 ```
 
 Events are not handled individually. Instead, events are grouped together into **`EventSets`**. When representing an `EventSet`, it is convenient to group similar features together and to sort them according to the timestamps in increasing order.
 
-Here is an example of an `EventSet` containing four events:
+Here is an example of an `EventSet` containing four events, each with three features:
 
-```python
-"timestamp": [04-02-2023, 06-02-2023, 07-02-2023, 07-02-2023]
-"feature_1": [0.5, 0.6, NaN, 0.9]
-"feature_2": ["red", "blue", "red", "blue"]
-"feature_3":  [10, -1, 5, 5]
+```
+timestamp: [04-02-2023, 06-02-2023, 07-02-2023, 07-02-2023]
+feature_1: [0.5, 0.6, NaN, 0.9]
+feature_2: ["red", "blue", "red", "blue"]
+feature_3:  [10, -1, 5, 5]
 ```
 
 **Remarks:**
