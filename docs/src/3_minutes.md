@@ -8,7 +8,7 @@ The most basic unit of data in Temporian is an **event**. An event consists of a
 
 Events are not handled individually. Instead, events are grouped together into an **[EventSet](/reference/temporian/implementation/numpy/data/event_set)**.
 
-`EventSet`s are the main data structure in Temporian, and represent **(multivariate time sequences)[/user_guide/#what-is-temporal-data]**. Note that "multivariate" indicates that each event in the time sequence holds several feature values, and "sequence" indicates that the events are not necessarily sampled at a uniform rate (in which case we would call it a time "series").
+`EventSet`s are the main data structure in Temporian, and represent **[multivariate time sequences](/user_guide/#what-is-temporal-data)**. Note that "multivariate" indicates that each event in the time sequence holds several feature values, and "sequence" indicates that the events are not necessarily sampled at a uniform rate (in which case we would call it a time "series").
 
 You can create an `EventSet` from a pandas DataFrame, NumPy arrays, CSV files, and more. Here is an example of an `EventSet` containing four events and three features:
 
@@ -24,7 +24,7 @@ evset = tp.EventSet(
 )
 ```
 
-An `EventSet` can hold one or several time sequences, depending on what its **(index)[/user_guide/#index-horizontal-and-vertical-operators]** is.
+An `EventSet` can hold one or several time sequences, depending on what its **[index](/user_guide/#index-horizontal-and-vertical-operators)** is.
 
 If the `EventSet` has no index, it will hold a single time sequence, which means that all events will be considered part of the same group and will interact with each other when operators are applied to the `EventSet`.
 
