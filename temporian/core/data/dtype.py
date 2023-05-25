@@ -16,7 +16,7 @@
 
 import math
 from enum import Enum
-from typing import Union
+from typing import Union, Any, Mapping, List
 
 
 class DType(Enum):
@@ -42,8 +42,7 @@ class DType(Enum):
         return self in (DType.INT64, DType.INT32)
 
     def missing_value(self) -> Union[float, int, str]:
-        """
-        Returns missing value for specific dtype.
+        """Returns missing value for specific dtype.
 
         Returns:
             The default missing value for the given data type.
@@ -62,8 +61,7 @@ class DType(Enum):
 
     @classmethod
     def from_python_type(cls, python_type: type) -> "DType":
-        """
-        Returns DType from python type.
+        """Returns DType from python type.
 
         Args:
             python_type: Python type.
@@ -88,3 +86,30 @@ class DType(Enum):
             return DType.BOOLEAN
 
         raise ValueError(f"Non-implemented type {python_type}")
+
+
+def py_types_to_dtypes(target: Any) -> Any:
+    """Converts any python types found to temporian types.
+
+    This function works recursively on List or Mapping.
+    Any other kind of data is left unchanged.
+
+    Args:
+        target: Any object.
+
+    Returns:
+        The same input object, with `type` elements changed by `DType`.
+
+    Raises:
+        ValueError: If there's a `type` that cannot be converted to temporian.
+    """
+    if isinstance(target, type):
+        target = DType.from_python_type(target)
+    elif isinstance(target, Mapping):
+        target = {
+            py_types_to_dtypes(key): py_types_to_dtypes(val)
+            for key, val in target.items()
+        }
+    elif isinstance(target, List):
+        target = [py_types_to_dtypes(val) for val in target]
+    return target

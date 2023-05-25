@@ -15,13 +15,16 @@
 """Feature class definition."""
 
 from __future__ import annotations
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, Union, TYPE_CHECKING, Tuple
 
 from temporian.core.data.sampling import Sampling
 from temporian.core.data.dtype import DType
 
 if TYPE_CHECKING:
     from temporian.core.operators.base import Operator
+
+# Alternative to create Feature.from_tuple(("f1", int))
+FeatureTuple = Tuple[str, Union[DType, type]]
 
 
 class Feature(object):
@@ -45,7 +48,7 @@ class Feature(object):
     def __init__(
         self,
         name: str,
-        dtype: DType = DType.FLOAT32,
+        dtype: Union[DType, type] = DType.FLOAT32,
         sampling: Optional[Sampling] = None,
         creator: Optional[Operator] = None,
     ):
@@ -59,7 +62,9 @@ class Feature(object):
             f" sampling={sampling} instead."
         )
 
-        if not isinstance(dtype, DType):
+        if isinstance(dtype, type):
+            dtype = DType.from_python_type(dtype)
+        elif not isinstance(dtype, DType):
             raise ValueError(
                 f"Invalid dtype feature constructor. Got {dtype}. "
                 f"Expecting one of {DType} instead."
@@ -105,3 +110,16 @@ class Feature(object):
     @creator.setter
     def creator(self, creator: Optional[Operator]):
         self._creator = creator
+
+    @staticmethod
+    def from_tuple(feature: FeatureTuple) -> Feature:
+        if (
+            not isinstance(feature, tuple)
+            or len(feature) != 2
+            or not isinstance(feature[0], str)
+            or not isinstance(feature[1], (DType, type))
+        ):
+            raise ValueError(
+                "Provided feature tuple should be (feature_name, type)"
+            )
+        return Feature(name=feature[0], dtype=feature[1])
