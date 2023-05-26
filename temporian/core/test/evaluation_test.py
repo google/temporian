@@ -24,7 +24,7 @@ class EvaluationTest(absltest.TestCase):
         a = utils.create_input_node()
         b = utils.OpI1O1(a)
 
-        schedule, _ = evaluation.build_schedule(
+        schedule, _ = evaluation._build_schedule(
             inputs=[a],
             outputs=[b.outputs["output"]],
         )
@@ -33,7 +33,7 @@ class EvaluationTest(absltest.TestCase):
     def test_schedule_empty(self):
         a = utils.create_input_node()
 
-        schedule, _ = evaluation.build_schedule(
+        schedule, _ = evaluation._build_schedule(
             inputs=[a],
             outputs=[a],
         )
@@ -45,7 +45,7 @@ class EvaluationTest(absltest.TestCase):
         o1 = utils.OpI1O1(i1)
         o2 = utils.OpI1O1(i2)
         o3 = utils.OpI2O1(o1.outputs["output"], o2.outputs["output"])
-        schedule, _ = evaluation.build_schedule(
+        schedule, _ = evaluation._build_schedule(
             inputs=[i1, i2],
             outputs=[o3.outputs["output"]],
         )
@@ -60,7 +60,7 @@ class EvaluationTest(absltest.TestCase):
         o4 = utils.OpI2O1(o2.outputs["output"], i3)
         o5 = utils.OpI1O2(o4.outputs["output"])
 
-        schedule, _ = evaluation.build_schedule(
+        schedule, _ = evaluation._build_schedule(
             inputs=[i1, i3],
             outputs=[o5.outputs["output_1"], o4.outputs["output"]],
         )
@@ -75,7 +75,7 @@ class EvaluationTest(absltest.TestCase):
         o4 = utils.OpI1O1(o3.outputs["output"])
         o5 = utils.OpI1O1(o4.outputs["output"])
 
-        schedule, _ = evaluation.build_schedule(
+        schedule, _ = evaluation._build_schedule(
             inputs=[o3.outputs["output"]],
             outputs=[o5.outputs["output"]],
         )

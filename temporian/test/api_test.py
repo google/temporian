@@ -162,7 +162,7 @@ class TFPTest(absltest.TestCase):
 
     def test_list_registered_operators(self):
         logging.info("The operators:")
-        for k, v in t.get_operators().items():
+        for k, v in t.registered_operators().items():
             logging.info("  %s: %s", k, v)
 
 

@@ -86,7 +86,7 @@ def evaluate(
 
     # Schedule execution
     input_nodes = list(input.keys())
-    schedule, names_to_nodes = build_schedule(
+    schedule, names_to_nodes = _build_schedule(
         inputs=input_nodes, outputs=normalized_query, verbose=verbose
     )
 
@@ -123,7 +123,7 @@ def evaluate(
     return _denormalize_outputs(outputs, query)
 
 
-def build_schedule(
+def _build_schedule(
     inputs: List[graph.NodeInputArg],
     outputs: List[Node],
     verbose: int = 0,
@@ -160,7 +160,7 @@ def build_schedule(
         print("Graph:\n", graph, file=sys.stderr)
 
     # Sequence of operators to execute. This is the result of the
-    # "build_schedule" function.
+    # "_build_schedule" function.
     planned_ops: List[base.Operator] = []
 
     # Operators ready to be computed (i.e. ready to be added to "planned_ops")
