@@ -14,6 +14,10 @@
 
 """Temporian."""
 
+# WARNING: The API reference documentation reads this file and expects a single
+# import per line. Do not import several symbols from the same module in a
+# single line.
+
 from temporian.core import evaluation
 from temporian.core import operator_lib
 from temporian.core import graph
