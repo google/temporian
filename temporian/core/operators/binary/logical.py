@@ -17,7 +17,7 @@
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
-from temporian.core.data.feature import Feature
+from temporian.core.data.schema import Schema, FeatureSchema
 from temporian.core.operators.binary.base import BaseBinaryOperator
 
 
@@ -29,7 +29,7 @@ class BaseLogicalOperator(BaseBinaryOperator):
 
         # Check that all features are boolean
         # Note: Assuming that input_1 and input_2 features have the same dtype
-        for feature in input_1.features:
+        for feature in input_1.schema.features:
             if feature.dtype != DType.BOOLEAN:
                 raise ValueError(
                     "Logic operators only support BOOLEAN types, but feature"
@@ -37,7 +37,7 @@ class BaseLogicalOperator(BaseBinaryOperator):
                 )
 
     def output_feature_dtype(
-        self, feature_1: Feature, feature_2: Feature
+        self, feature_1: FeatureSchema, feature_2: FeatureSchema
     ) -> DType:
         return DType.BOOLEAN
 

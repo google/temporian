@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Dict, List
+from typing import Dict, List, Any
 
 import numpy as np
 
@@ -7,7 +7,10 @@ from temporian.core.operators.set_index import SetIndexOperator
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.event_set import IndexData
-from temporian.implementation.numpy.data.event_set import DTYPE_REVERSE_MAPPING
+from temporian.implementation.numpy.data.event_set import (
+    DTYPE_REVERSE_MAPPING,
+    DTYPE_MAPPING,
+)
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -98,6 +101,18 @@ def _append_impl(evset: EventSet, append_feat_names: List[str]) -> EventSet:
     )
 
 
+def _convert_to_index_type(value: Any) -> Any:
+    """Converts a numpy value into an index compatible value type."""
+
+    if value.dtype.type is np.str_:
+        return str(value)
+
+    if value not in DTYPE_MAPPING:
+        raise ValueError(f"Non supported index type {type(value)}")
+
+    return value
+
+
 def _set_impl(evset: EventSet, set_feat_names: List[str]) -> EventSet:
     """Sets the specified feature names as the new index of the given event set.
 
@@ -134,7 +149,8 @@ def _set_impl(evset: EventSet, set_feat_names: List[str]) -> EventSet:
         for dst_key_idx, dst_key in enumerate(
             zip(*[src_idx_data.features[j] for j in dst_idx_pos])
         ):
-            dst_key = tuple(dst_key)
+            dst_key = tuple([_convert_to_index_type(x) for x in dst_key])
+
             dst_idx_metadata[dst_key]["timestamps"].append(
                 src_idx_data.timestamps[dst_key_idx]
             )

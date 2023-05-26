@@ -12,15 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Node class definition."""
+"""Node and related classes"""
 
 from __future__ import annotations
-from typing import Dict, List, Optional, Tuple, TYPE_CHECKING, Any, Union
+from dataclasses import dataclass
+from typing import List, Optional, Tuple, TYPE_CHECKING, Any, Union
 
-from temporian.core.data.dtype import DType
-from temporian.core.data.feature import Feature
-from temporian.core.data.sampling import Sampling
-from temporian.core.data.sampling import IndexDType
+from temporian.core.data.dtype import DType, IndexDType
+from temporian.core.data.schema import Schema
 from temporian.utils import string
 
 if TYPE_CHECKING:
@@ -31,36 +30,100 @@ if TYPE_CHECKING:
 T_SCALAR = (int, float)
 
 
+@dataclass
+class Sampling:
+    """A sampling is a reference to the way data is sampled."""
+
+    creator: Optional[Operator] = None
+
+
+@dataclass
+class Feature:
+    """A feature is a reference to sampled data."""
+
+    creator: Optional[Operator] = None
+
+
 class Node(object):
-    """Schema definition of an event set in the preprocessing graph.
+    """A node is a reference to the input/output of ops in a compute graph.
 
-    A node represents the structure, or schema, of a collection of indexed
-    multivariate time series, or EventSets. A node does not contain any actual
-    data, but is instead used as a reference to describe the format of the
-    input, intermediate results, or output of a Graph.
+    A node does not contain any data. Use "node.evaluate(...)" to get the values
+    transiting in a node.
 
-    Informally, a node defines the name and data types of each time series, as
-    well as the key and data type of the index (if any).
-
-    There are several ways to create a node:
-    - Through the `.node()` method in an EventSet.
-    - Through applying operators to other nodes.
-    - Manually using the `tp.input_node(...)` method to specify the name and
-        data types of each time series and the key and data type of the index.
-    - (Not recommended) By instantiating the Node class directly.
+    Use "tp.input_node" to create a node manually, or use "event_set.node()" to
+    create a node compatible with a given event set.
     """
 
     def __init__(
         self,
+        schema: Schema,
         features: List[Feature],
         sampling: Sampling,
         name: Optional[str] = None,
         creator: Optional[Operator] = None,
     ):
+        self._schema = schema
         self._features = features
         self._sampling = sampling
         self._creator = creator
         self._name = name
+
+    @staticmethod
+    def create_with_new_reference(
+        schema: Schema,
+        name: Optional[str] = None,
+        creator: Optional[Operator] = None,
+        sampling: Optional[Sampling] = None,
+        features: Optional[List[Feature]] = None,
+    ) -> Node:
+        """Creates a node with new features and sampling.
+
+        If sampling is not specified, a new sampling is created.
+        Similarly, if features is not specifies, new features are created.
+        """
+
+        if sampling is None:
+            sampling = Sampling(creator=creator)
+
+        if features is None:
+            features = [Feature(creator=creator) for _ in schema.features]
+        assert len(features) == len(schema.features)
+
+        return Node(
+            schema=schema,
+            sampling=sampling,
+            features=features,
+            name=name,
+            creator=creator,
+        )
+
+    @property
+    def schema(self) -> Schema:
+        return self._schema
+
+    @property
+    def sampling(self) -> Sampling:
+        return self._sampling
+
+    @property
+    def features(self) -> List[Feature]:
+        return self._features
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @name.setter
+    def name(self, name: str):
+        self._name = name
+
+    @property
+    def creator(self) -> Optional[Operator]:
+        return self._creator
+
+    @creator.setter
+    def creator(self, creator: Optional[Operator]):
+        self._creator = creator
 
     def evaluate(
         self,
@@ -82,13 +145,15 @@ class Node(object):
         )
 
     def __getitem__(self, feature_names: Union[str, List[str]]) -> Node:
-        # import select operator
+        """Creates a node with a subset of the features."""
+
         from temporian.core.operators.select import select
 
-        # return select output
         return select(self, feature_names)
 
     def __repr__(self) -> str:
+        """Human readable representation of a node."""
+
         features_print = "\n".join(
             [
                 string.indent(feature.to_string(include_sampling=False))
@@ -105,6 +170,8 @@ class Node(object):
         )
 
     def __bool__(self) -> bool:
+        """Catches bool evaluation with an error message."""
+
         # Called on "if node" conditions
         # TODO: modify to similar numpy msg if we implement .any() or .all()
         raise ValueError(
@@ -115,6 +182,12 @@ class Node(object):
     def _nope(
         self, op_name: str, other: Any, allowed_types: Tuple[type]
     ) -> None:
+        """Raises an error message.
+
+        This method is a utilities used in operators implementations,
+        e.g., +, -, *.
+        """
+
         raise ValueError(
             f"Cannot {op_name} Node and {type(other)} objects. "
             f"Only Node or values of type ({allowed_types}) are supported."
@@ -385,68 +458,23 @@ class Node(object):
             return logical_xor(input_1=self, input_2=other)
         self._nope_only_boolean("^", other)
 
-    @property
-    def sampling(self) -> Sampling:
-        return self._sampling
-
-    @property
-    def features(self) -> List[Feature]:
-        return self._features
-
-    @property
-    def feature_names(self) -> List[str]:
-        return [feature.name for feature in self._features]
-
-    @property
-    def index_names(self) -> List[str]:
-        return self.sampling.index.names
-
-    @property
-    def dtypes(self) -> Dict[str, DType]:
-        return {feature.name: feature.dtype for feature in self._features}
-
-    @property
-    def name(self) -> str:
-        return self._name
-
-    @property
-    def creator(self) -> Optional[Operator]:
-        return self._creator
-
-    @name.setter
-    def name(self, name: str):
-        self._name = name
-
-    @creator.setter
-    def creator(self, creator: Optional[Operator]):
-        self._creator = creator
-
 
 def input_node(
-    features: List[Feature],
-    index_levels: Optional[List[Tuple[str, IndexDType]]] = None,
+    features: List[Tuple[str, DType]],
+    indexes: Optional[List[Tuple[str, IndexDType]]] = None,
+    is_unix_timestamp: bool = False,
     name: Optional[str] = None,
-    sampling: Optional[Sampling] = None,
 ) -> Node:
-    """Creates a node with the specified attributes."""
-    if index_levels is None:
-        index_levels = []
+    """Creates a node manually."""
 
-    if sampling is None:
-        sampling = Sampling(
-            index_levels=index_levels, is_unix_timestamp=False, creator=None
-        )
+    if indexes is None:
+        indexes = []
 
-    for feature in features:
-        if feature.sampling is not None:
-            raise ValueError(
-                "Cannot call input_node on already linked features."
-            )
-        feature.sampling = sampling
-
-    return Node(
-        features=features,
-        sampling=sampling,
+    return Node.create_with_new_reference(
+        schema=Schema(
+            features=features,
+            indexes=indexes,
+            is_unix_timestamp=is_unix_timestamp,
+        ),
         name=name,
-        creator=None,
     )

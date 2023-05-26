@@ -14,10 +14,9 @@
 
 from absl.testing import absltest
 
-from temporian.core.data import node as node_lib
+from temporian.core.data.node import input_node
 from temporian.core.data.dtype import DType
-from temporian.core.data.feature import Feature
-from temporian.core.data.sampling import Sampling
+from temporian.core.data.schema import Schema
 from temporian.core.operators.propagate import propagate
 
 
@@ -26,40 +25,34 @@ class PropagateOperatorTest(absltest.TestCase):
         pass
 
     def test_basic(self):
-        node = node_lib.input_node(
+        node = input_node(
             [
-                Feature("a", DType.FLOAT64),
-                Feature("b", DType.FLOAT64),
+                ("a", DType.FLOAT64),
+                ("b", DType.FLOAT64),
             ],
-            sampling=Sampling(
-                index_levels=[("x", DType.STRING)], is_unix_timestamp=False
-            ),
+            indexes=[("x", DType.STRING)],
+            is_unix_timestamp=False,
         )
-        sampling = node_lib.input_node(
+        sampling = input_node(
             [],
-            sampling=Sampling(
-                index_levels=[("x", DType.STRING), ("y", DType.STRING)],
-                is_unix_timestamp=False,
-            ),
+            indexes=[("x", DType.STRING), ("y", DType.STRING)],
+            is_unix_timestamp=False,
         )
         _ = propagate(input=node, sampling=sampling)
 
     def test_error_wrong_index(self):
-        node = node_lib.input_node(
+        node = input_node(
             [
-                Feature("a", DType.FLOAT64),
-                Feature("b", DType.FLOAT64),
+                ("a", DType.FLOAT64),
+                ("b", DType.FLOAT64),
             ],
-            sampling=Sampling(
-                index_levels=[("z", DType.STRING)], is_unix_timestamp=False
-            ),
+            indexes=[("z", DType.STRING)],
+            is_unix_timestamp=False,
         )
-        sampling = node_lib.input_node(
+        sampling = input_node(
             [],
-            sampling=Sampling(
-                index_levels=[("x", DType.STRING), ("y", DType.STRING)],
-                is_unix_timestamp=False,
-            ),
+            indexes=[("x", DType.STRING), ("y", DType.STRING)],
+            is_unix_timestamp=False,
         )
         with self.assertRaisesRegex(
             ValueError,
@@ -68,21 +61,18 @@ class PropagateOperatorTest(absltest.TestCase):
             _ = propagate(input=node, sampling=sampling)
 
     def test_error_wrong_index_type(self):
-        node = node_lib.input_node(
+        node = input_node(
             [
-                Feature("a", DType.FLOAT64),
-                Feature("b", DType.FLOAT64),
+                ("a", DType.FLOAT64),
+                ("b", DType.FLOAT64),
             ],
-            sampling=Sampling(
-                index_levels=[("x", DType.INT32)], is_unix_timestamp=False
-            ),
+            indexes=[("x", DType.INT32)],
+            is_unix_timestamp=False,
         )
-        sampling = node_lib.input_node(
+        sampling = input_node(
             [],
-            sampling=Sampling(
-                index_levels=[("x", DType.STRING), ("y", DType.STRING)],
-                is_unix_timestamp=False,
-            ),
+            indexes=[("x", DType.STRING), ("y", DType.STRING)],
+            is_unix_timestamp=False,
         )
         with self.assertRaisesRegex(
             ValueError,

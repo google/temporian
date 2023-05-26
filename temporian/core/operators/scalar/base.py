@@ -18,7 +18,7 @@ from typing import Union, List
 
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
-from temporian.core.data.feature import Feature
+from temporian.core.data.schema import Schema, FeatureSchema
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -83,19 +83,21 @@ class BaseScalarOperator(Operator):
 
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
-            Feature(
+            FeatureSchema(
                 name=feature.name,
                 dtype=self.output_feature_dtype(feature),
-                sampling=input.sampling,
-                creator=self,
             )
-            for feature in input.features
+            for feature in input.schema.features
         ]
 
         self.add_output(
             "output",
-            Node(
-                features=output_features,
+            Node.create_with_new_reference(
+                schema=Schema(
+                    features=output_features,
+                    indexes=input.schema.indexes,
+                    is_unix_timestamp=input.schema.is_unix_timestamp,
+                ),
                 sampling=input.sampling,
                 creator=self,
             ),
@@ -140,7 +142,7 @@ class BaseScalarOperator(Operator):
             DType.INT64,
         ]
 
-    def output_feature_dtype(self, feature: Feature) -> DType:
+    def output_feature_dtype(self, feature: FeatureSchema) -> DType:
         return feature.dtype
 
     @property

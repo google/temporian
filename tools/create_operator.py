@@ -147,7 +147,7 @@ py_library(
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
-        "//temporian/core/data:feature",
+        "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -310,7 +310,7 @@ py_test(
     deps = [
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
-        "//temporian/core/data:feature",
+        "//temporian/core/data:schema",
         "//temporian/core/operators:{lower_op}",
         "//temporian/implementation/numpy/operators:{lower_op}",
     ],

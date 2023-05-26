@@ -39,3 +39,12 @@ py_test(
         "//temporian/implementation/numpy/data:plotter",
     ],
 )
+
+py_test(
+    name = "io_test",
+    srcs = ["io_test.py"],
+    srcs_version = "PY3",
+    deps = ["//temporian/implementation/numpy/data:io",
+            "//temporian/implementation/numpy/operators:all_operators",
+            ],
+)

@@ -17,7 +17,6 @@ import pandas as pd
 from absl.testing import absltest
 
 from temporian.core.data.node import Node, Feature
-from temporian.core.data.sampling import Sampling
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.unary import (
     InvertNumpyImplementation,

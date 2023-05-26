@@ -19,7 +19,7 @@ from typing import Union, List
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
-from temporian.core.data.feature import Feature
+from temporian.core.data.schema import Schema, FeatureSchema
 from temporian.core.operators.scalar.base import (
     BaseScalarOperator,
 )
@@ -28,7 +28,7 @@ from temporian.core.operators.scalar.base import (
 class RelationalScalarOperator(BaseScalarOperator):
     DEF_KEY = ""
 
-    def output_feature_dtype(self, feature: Feature) -> DType:
+    def output_feature_dtype(self, feature: FeatureSchema) -> DType:
         # override parent method to always return BOOLEAN features
         return DType.BOOLEAN
 

@@ -18,7 +18,7 @@ from typing import Optional
 
 from temporian.core import operator_lib
 from temporian.core.data.node import Node
-from temporian.core.data.feature import Feature
+from temporian.core.data.schema import Schema
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 from temporian.core.data.dtype import DType

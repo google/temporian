@@ -21,7 +21,7 @@ import numpy as np
 from temporian.core import operator_lib
 from temporian.core.data.duration import Duration
 from temporian.core.data.node import Node
-from temporian.core.data.feature import Feature
+from temporian.core.data.schema import Schema
 from temporian.core.operators.window.base import BaseWindowOperator
 from temporian.core.data.dtype import DType
 

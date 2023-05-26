@@ -16,9 +16,8 @@
 
 from typing import List, Set, Dict, Tuple, Union, Optional
 
-from temporian.core.data.node import Node
-from temporian.core.data.feature import Feature
-from temporian.core.data.sampling import Sampling
+from temporian.core.data.node import Node, Feature, Sampling
+from temporian.core.data.schema import Schema
 from temporian.core.operators import base
 
 MultipleNodeArg = Union[Dict[str, Node], List[Node], Node]

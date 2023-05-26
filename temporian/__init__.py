@@ -28,6 +28,7 @@ from temporian.io.read_event_set import read_event_set
 from temporian.io.save_event_set import save_event_set
 
 from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.io import event_set
 
 from temporian.implementation.numpy.data.plotter import plot
 

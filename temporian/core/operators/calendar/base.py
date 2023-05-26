@@ -18,7 +18,7 @@ from abc import ABC, abstractmethod
 
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
-from temporian.core.data.feature import Feature
+from temporian.core.data.schema import Schema
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 

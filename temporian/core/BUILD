@@ -12,7 +12,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":graph",
-        "//temporian/core/data:feature",
+        "//temporian/core/data:schema",
         "//temporian/core/data:node",
         "//temporian/core/operators:base",
         "//temporian/implementation/numpy:evaluation",
@@ -31,9 +31,8 @@ py_library(
     srcs = ["graph.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/core/data:feature",
+        "//temporian/core/data:schema",
         "//temporian/core/data:node",
-        "//temporian/core/data:sampling",
         "//temporian/core/operators:base",
     ],
 )
@@ -44,9 +43,8 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":operator_lib",
-        "//temporian/core/data:feature",
+        "//temporian/core/data:schema",
         "//temporian/core/data:node",
-        "//temporian/core/data:sampling",
         "//temporian/core/operators:base",
     ],
 )

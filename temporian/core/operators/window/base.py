@@ -21,7 +21,7 @@ from typing import Optional, List
 from temporian.core.data.duration import Duration
 from temporian.core.data import dtype
 from temporian.core.data.node import Node
-from temporian.core.data.feature import Feature
+from temporian.core.data.schema import Schema
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 

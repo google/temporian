@@ -18,7 +18,6 @@ import numpy as np
 import pandas as pd
 
 from temporian.core.data.node import Feature
-from temporian.core.data.sampling import Sampling
 from temporian.core.operators.glue import GlueOperator
 from temporian.core.data import node as node_lib
 from temporian.core.data.dtype import DType

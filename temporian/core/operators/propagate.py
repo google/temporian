@@ -17,8 +17,7 @@
 
 from temporian.core import operator_lib
 from temporian.core.data.node import Node
-from temporian.core.data.feature import Feature
-from temporian.core.data.sampling import Sampling
+from temporian.core.data.schema import Schema
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -35,48 +34,39 @@ class Propagate(Operator):
         self.add_input("sampling", sampling)
 
         self._index_mapping: list[int] = []
-        sampling_index_name = sampling.sampling.index.names
-        sampling_index_dtypes = sampling.sampling.index.dtypes
-        for index in input.sampling.index:
+
+        sampling_index_name = sampling.schema.index_names
+        sampling_index_dtypes = sampling.schema.index_dtypes
+
+        for index_name, index_type in input.schema.indexes:
             try:
-                sampling_idx = sampling_index_name.index(index.name)
+                sampling_idx = sampling_index_name.index(index_name)
                 self._index_mapping.append(sampling_idx)
             except ValueError as exc:
                 raise ValueError(
                     "The index of input should be contained in the index of"
-                    f' sampling. Index "{index.name}" from input is not'
-                    " available in sampling. input.index:"
-                    f" {input.sampling.index},"
-                    f" sampling.index={sampling.sampling.index}."
+                    f' sampling. Index "{index_name}" from input is not'
+                    " available in sampling. input.index="
+                    f" {input.schema.indexes},"
+                    f" sampling.index={sampling.schema.indexes}."
                 ) from exc
-            if sampling_index_dtypes[sampling_idx] != index.dtype:
+            if sampling_index_dtypes[sampling_idx] != index_type:
                 raise ValueError(
-                    f'The index "{index.name}" is found both in the input and'
+                    f'The index "{index_name}" is found both in the input and'
                     " sampling argument. However, the dtype is different."
-                    f" {index.dtype} != {sampling_index_dtypes[sampling_idx]}"
+                    f" {index_type} != {sampling_index_dtypes[sampling_idx]}"
                 )
 
-        output_sampling = Sampling(
-            index_levels=sampling.sampling.index,
-            creator=self,
-            is_unix_timestamp=sampling.sampling.is_unix_timestamp,
+        output_schema = Schema(
+            features=input.features,
+            indexes=sampling.schema.indexes,
+            is_unix_timestamp=sampling.schema.is_unix_timestamp,
         )
-
-        output_features = [  # pylint: disable=g-complex-comprehension
-            Feature(
-                name=f.name,
-                dtype=f.dtype,
-                sampling=output_sampling,
-                creator=self,
-            )
-            for f in input.features
-        ]
 
         self.add_output(
             "output",
-            Node(
-                features=output_features,
-                sampling=output_sampling,
+            Node.create_with_new_reference(
+                schema=output_schema,
                 creator=self,
             ),
         )

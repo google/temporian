@@ -18,7 +18,7 @@ from abc import abstractmethod
 
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
-from temporian.core.data.feature import Feature
+from temporian.core.data.schema import Schema, FeatureSchema
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -40,13 +40,15 @@ class BaseBinaryOperator(Operator):
         if input_1.sampling is not input_2.sampling:
             raise ValueError("input_1 and input_2 must have same sampling.")
 
-        if len(input_1.features) != len(input_2.features):
+        if len(input_1.schema.features) != len(input_2.schema.features):
             raise ValueError(
                 "input_1 and input_2 must have same number of features."
             )
 
         # check that features have same dtype
-        for feature_1, feature_2 in zip(input_1.features, input_2.features):
+        for feature_1, feature_2 in zip(
+            input_1.schema.features, input_2.schema.features
+        ):
             if feature_1.dtype != feature_2.dtype:
                 raise ValueError(
                     (
@@ -64,19 +66,21 @@ class BaseBinaryOperator(Operator):
 
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
-            Feature(
+            FeatureSchema(
                 name=self.output_feature_name(feature_1, feature_2),
                 dtype=self.output_feature_dtype(feature_1, feature_2),
-                sampling=sampling,
-                creator=self,
             )
             for feature_1, feature_2 in zip(input_1.features, input_2.features)
         ]
 
         self.add_output(
             "output",
-            Node(
-                features=output_features,
+            Node.create_with_new_reference(
+                schema=Schema(
+                    features=output_features,
+                    indexes=input_1.schema.indexes,
+                    is_unix_timestamp=input_1.schema.is_unix_timestamp,
+                ),
                 sampling=sampling,
                 creator=self,
             ),
@@ -107,11 +111,11 @@ class BaseBinaryOperator(Operator):
         """Gets the prefix to use for the output features."""
 
     def output_feature_name(
-        self, feature_1: Feature, feature_2: Feature
+        self, feature_1: FeatureSchema, feature_2: FeatureSchema
     ) -> str:
         return f"{self.prefix}_{feature_1.name}_{feature_2.name}"
 
     def output_feature_dtype(
-        self, feature_1: Feature, feature_2: Feature
+        self, feature_1: FeatureSchema, feature_2: FeatureSchema
     ) -> DType:
         return feature_1.dtype

@@ -23,26 +23,15 @@ py_library(
     srcs = ["node.py"],
     srcs_version = "PY3",
     deps = [
-        ":feature",
-        ":sampling",
         "//temporian/utils:string",
     ],
 )
 
 py_library(
-    name = "sampling",
-    srcs = ["sampling.py"],
+    name = "schema",
+    srcs = ["schema.py"],
     srcs_version = "PY3",
-)
-
-py_library(
-    name = "feature",
-    srcs = ["feature.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":dtype",
-        ":sampling",
-    ],
+    deps = [    ],
 )
 
 py_library(

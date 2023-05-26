@@ -20,7 +20,6 @@ from temporian.core import evaluation
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
 from temporian.core.data.node import Feature
-from temporian.core.data.sampling import Sampling
 from temporian.core.operators.lag import lag
 from temporian.core.operators.lag import leak
 from temporian.core.operators.lag import LagOperator

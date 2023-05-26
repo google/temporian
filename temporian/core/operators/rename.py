@@ -17,8 +17,7 @@ from typing import List, Union, Dict
 
 from temporian.core import operator_lib
 from temporian.core.data.node import Node
-from temporian.core.data.feature import Feature
-from temporian.core.data.sampling import Sampling
+from temporian.core.data.schema import Schema
 from temporian.core.data.sampling import IndexLevel
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb

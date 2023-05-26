@@ -23,7 +23,7 @@ py_library(
     srcs = ["base.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/core/data:feature",
+        "//temporian/core/data:schema",
         "//temporian/core/data:node",
         "//temporian/core/operators:base",
         "//temporian/proto:core_py_proto",

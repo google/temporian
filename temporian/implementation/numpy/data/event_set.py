@@ -14,15 +14,14 @@
 
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
-from temporian.core.data.feature import Feature
-from temporian.core.data.sampling import Sampling
+from temporian.core.data.schema import Schema
 from temporian.utils import string
 
 # Maximum of printed index when calling repr(evset)
@@ -31,14 +30,15 @@ MAX_NUM_PRINTED_INDEX = 5
 # Maximum of printed features when calling repr(evset)
 MAX_NUM_PRINTED_FEATURES = 10
 
-PYTHON_DTYPE_MAPPING = {
+_PYTHON_DTYPE_MAPPING = {
     str: DType.STRING,
     # TODO: fix this, int doesn't have to be INT64 necessarily
     int: DType.INT64,
     np.int64: DType.INT64,
 }
 
-DTYPE_MAPPING = {
+# Mapping of temporian types to / from numpy types.
+_DTYPE_MAPPING = {
     np.float64: DType.FLOAT64,
     np.float32: DType.FLOAT32,
     np.int64: DType.INT64,
@@ -47,7 +47,7 @@ DTYPE_MAPPING = {
     np.string_: DType.STRING,
     np.bool_: DType.BOOLEAN,
 }
-DTYPE_REVERSE_MAPPING = {
+_DTYPE_REVERSE_MAPPING = {
     DType.FLOAT64: np.float64,
     DType.FLOAT32: np.float32,
     DType.INT64: np.int64,
@@ -57,9 +57,21 @@ DTYPE_REVERSE_MAPPING = {
 }
 
 
+def numpy_dtype_to_tp_dtype(numpy_dtype) -> DType:
+    """Converts a numpy dtype into a temporian dtype."""
+
+    return _DTYPE_MAPPING[numpy_dtype]
+
+
+def numpy_array_to_tp_dtype(numpy_array: np.array) -> DType:
+    """Gets the matching temporian dtype of a numpy array."""
+
+    return numpy_dtype_to_tp_dtype(numpy_array.dtype.type)
+
+
 @dataclass
 class IndexData:
-    """Index data structure that holds features and timestamps.
+    """Features and timestamps data for a single index item.
 
     Attributes:
         features: List of one-dimensional NumPy arrays representing the
@@ -83,6 +95,7 @@ class IndexData:
         self,
         features: List[np.ndarray],
         timestamps: np.ndarray,
+        schema: Schema,
     ) -> None:
         """Initializes the IndexData object by checking and setting the features
         and timestamps.
@@ -92,87 +105,76 @@ class IndexData:
             ValueError: If the number of elements in features and timestamps
                 do not match.
         """
-        shapes = [feature.shape for feature in features]
-        if not all(len(shape) == 1 for shape in shapes):
-            raise ValueError("Features must be one-dimensional arrays")
 
-        if not all(shape == timestamps.shape for shape in shapes):
-            raise ValueError(
-                "Features must contain the same number of elements as the"
-                " timestamp"
-            )
+        # Check that the data (features & timestamps) matches the schema.
+
+        if timestamps.ndim != 1:
+            raise ValueError("timestamps must be one-dimensional arrays")
+
+        if timestamps.dtype.type != np.float64:
+            raise ValueError("Timestamps should be float64")
+
+        if len(features) != len(schema.features):
+            raise ValueError("Wrong number of features")
+
+        for feature_data, feature_schema in zip(features, schema.features):
+            if feature_data.ndim != 1:
+                raise ValueError("Features must be one-dimensional arrays")
+
+            expected_numpy_type = DTYPE_REVERSE_MAPPING[feature_schema[1]]
+            if feature_data.dtype.type != expected_numpy_type:
+                raise ValueError(
+                    f"Feature {feature_schema[0]} has numpy type"
+                    f" {feature_data.dtype} and temporian type"
+                    f" {feature_schema[1]}. The numpy type is expected to be"
+                    f" {expected_numpy_type}."
+                )
+
+            if timestamps.shape != feature_data.shape:
+                raise ValueError(
+                    "The number of feature values does not match the number of"
+                    " timestamps."
+                )
 
         self.features = features
         self.timestamps = timestamps
 
     def __len__(self) -> int:
-        """Returns the number of elements in the timestamps array."""
+        """Number of events / timesteps."""
+
         return len(self.timestamps)
 
 
 class EventSet:
+    """Actual temporal data.
+
+    Use `tp.event_set` to create an event set manually.
+    Use `tp.EventSet.from_dataframe` to create an event set from a pandas
+    dataframe.
+
+    TODO: tp.EventSet.from_dataframe -> tp.pd_dataframe_to_event_set
+    """
+
     def __init__(
         self,
         data: Dict[Tuple, IndexData],
-        feature_names: List[str],
-        index_names: List[str],
-        is_unix_timestamp: bool,
+        schema: Schema,
         name: Optional[str] = None,
     ) -> None:
         self._data = data
-        self._feature_names = feature_names
-        self._index_names = index_names
-        self._is_unix_timestamp = is_unix_timestamp
+        self._schema = schema
         self._name = name
+
+        # Node created when "self.node()" is called.
+        self._internal_node: Optional[Node] = None
 
     @property
     def data(self) -> Dict[Tuple, IndexData]:
         return self._data
 
-    def features(self) -> List[Tuple[str, DType]]:
-        """List of feature names and dtypes."""
-
-        # TODO: Use the schema/node data directly.
-        return [
-            (feature_name, DTYPE_MAPPING[feature.dtype.type])
-            for feature_name, feature in zip(
-                self._feature_names, self.first_index_data().features
-            )
-        ]
-
-    def indexes(self) -> List[Tuple[str, DType]]:
-        """List of index names and dtypes.
-
-        WARNING: This function currently does not work if the EventSet is empty.
-        """
-
-        # TODO: Use the schema/node data directly.
-        index_example = self.first_index_key()
-        if index_example is None:
-            # TODO: Fix.
-            print(
-                "WARNING: This function currently does not work if the EventSet"
-                " is empty."
-            )
-            return []
-        return [
-            (index_name, PYTHON_DTYPE_MAPPING[type(index_key)])
-            for index_name, index_key in zip(self._index_names, index_example)
-        ]
-
-    # TODO: Remove
     @property
-    def feature_names(self) -> List[str]:
-        return self._feature_names
-
-    # TODO: Remove
-    @property
-    def index_names(self) -> List[str]:
-        return self._index_names
-
-    @property
-    def is_unix_timestamp(self) -> bool:
-        return self._is_unix_timestamp
+    def schema(self) -> Schema:
+        return self._schema
 
     @property
     def name(self) -> bool:
@@ -182,79 +184,133 @@ class EventSet:
     def name(self, name: str) -> None:
         self._name = name
 
-    # TODO: To remove
-    @property
-    def dtypes(self) -> Dict[str, DType]:
-        return {
-            feature_name: DTYPE_MAPPING[feature.dtype.type]
-            for feature_name, feature in zip(
-                self._feature_names, self.first_index_data().features
-            )
-        }
+    # def features(self) -> List[Tuple[str, DType]]:
+    #     """List of feature names and dtypes."""
 
-    # TODO: Rename to "dtypes".
-    def dtypes_list(self) -> List[DType]:
-        # TODO: Handle case where there is no data.
-        return [feature.dtype for feature in self._first_index_features()]
+    #     # TODO: Use the schema/node data directly.
+    #     return [
+    #         (feature_name, DTYPE_MAPPING[feature.dtype.type])
+    #         for feature_name, feature in zip(
+    #             self._feature_names, self.first_index_data().features
+    #         )
+    #     ]
 
-    # TODO: Remove. Same as "len(self.feature_names)"
-    @property
-    def feature_count(self) -> int:
-        return len(self._feature_names)
+    # def indexes(self) -> List[Tuple[str, DType]]:
+    #     """List of index names and dtypes.
 
-    # TODO: Remove. This is the same as "self.data".
-    def iterindex(self) -> Iterable[Tuple[Tuple, IndexData]]:
-        yield from self.data.items()
+    #     WARNING: This function currently does not work if the EventSet is empty.
+    #     """
 
-    # TODO: improve numpy backend index handling
-    def index_dtypes(self) -> Dict[str, DType]:
-        return (
-            {
-                index_name: PYTHON_DTYPE_MAPPING[type(index_key)]
-                for index_name, index_key in zip(
-                    self._index_names, self.first_index_key()
-                )
-            }
-            if self._data
-            else {}
-        )
+    #     # TODO: Use the schema/node data directly.
+    #     index_example = self.first_index_key()
+    #     if index_example is None:
+    #         # TODO: Fix.
+    #         print(
+    #             "WARNING: This function currently does not work if the EventSet"
+    #             " is empty."
+    #         )
+    #         return []
 
-    # TODO: Remove
-    def first_index_key(self) -> Optional[Tuple]:
-        if self._data is None or len(self._data) == 0:
-            return None
+    #     # TODO: set_index can return numpy.str_. Once solved, remove "my_type".
+    #     def my_type(x):
+    #         if x in PYTHON_DTYPE_MAPPING:
+    #             return PYTHON_DTYPE_MAPPING[x]
+    #         return x
 
-        return next(iter(self._data))
+    #     return [
+    #         (index_name, my_type(type(index_key)))
+    #         for index_name, index_key in zip(self._index_names, index_example)
+    #     ]
 
-    # TODO: Remove.
-    def first_index_data(self) -> IndexData:
-        if self.first_index_key() is None:
-            return []
-        return self[self.first_index_key()]
+    # # TODO: Remove
+    # @property
+    # def feature_names(self) -> List[str]:
+    #     return self._feature_names
 
-    # TODO: Remove.
-    def _first_index_features(self) -> List[np.ndarray]:
-        return list(self._data.values())[0].features
+    # # TODO: Remove
+    # @property
+    # def index_names(self) -> List[str]:
+    #     return self._index_names
+
+    # @property
+    # def is_unix_timestamp(self) -> bool:
+    #     return self._is_unix_timestamp
+
+    # # TODO: To remove
+    # @property
+    # def dtypes(self) -> Dict[str, DType]:
+    #     return {
+    #         feature_name: DTYPE_MAPPING[feature.dtype.type]
+    #         for feature_name, feature in zip(
+    #             self._feature_names, self.first_index_data().features
+    #         )
+    #     }
+
+    # # TODO: Rename to "dtypes".
+    # def dtypes_list(self) -> List[DType]:
+    #     # TODO: Handle case where there is no data.
+    #     return [feature.dtype for feature in self._first_index_features()]
+
+    # # TODO: Remove. Same as "len(self.feature_names)"
+    # @property
+    # def feature_count(self) -> int:
+    #     return len(self._feature_names)
+
+    # # TODO: Remove. This is the same as "self.data".
+    # def iterindex(self) -> Iterable[Tuple[Tuple, IndexData]]:
+    #     yield from self.data.items()
+
+    # # TODO: improve numpy backend index handling
+    # def index_dtypes(self) -> Dict[str, DType]:
+    #     return (
+    #         {
+    #             index_name: PYTHON_DTYPE_MAPPING[type(index_key)]
+    #             for index_name, index_key in zip(
+    #                 self._index_names, self.first_index_key()
+    #             )
+    #         }
+    #         if self._data
+    #         else {}
+    #     )
+
+    # # TODO: Remove
+    # def first_index_key(self) -> Optional[Tuple]:
+    #     if self._data is None or len(self._data) == 0:
+    #         return None
+
+    #     return next(iter(self._data))
+
+    # # TODO: Remove.
+    # def first_index_data(self) -> IndexData:
+    #     if self.first_index_key() is None:
+    #         return []
+    #     return self[self.first_index_key()]
+
+    # # TODO: Remove.
+    # def _first_index_features(self) -> List[np.ndarray]:
+    #     return list(self._data.values())[0].features
 
     # TODO: Do not recompute the schema on the fly. Instead, keep an internal
     # Event / Node. This Node is possibly given as constructor argument.
-    def node(self) -> Node:
-        sampling = Sampling(
-            index_levels=[
-                (index_name, index_dtype)
-                for index_name, index_dtype in self.index_dtypes().items()
-            ],
-            is_unix_timestamp=self._is_unix_timestamp,
-        )
 
-        return Node(
-            features=[
-                Feature(name=name, dtype=dtype, sampling=sampling)
-                for name, dtype in self.dtypes.items()
-            ],
-            sampling=sampling,
-            name=self.name,
+    def node(self, force_new_node=False) -> Node:
+        """Creates a node able to consume the the event set.
+
+        If called multiple times, always return the same node.
+        Args:
+            force_new_node: If false (default), return the same node if "node"
+              is called multiple times. If true, return a new node each time.
+        """
+
+        if self._internal_node is not None and not force_new_node:
+            # "node" was already called. Return the cached node.
+            return self._internal_node
+
+        self._internal_node = Node.create_with_new_reference(
+            schema=self._schema,
+            name=self._name,
         )
+        return self._internal_node
 
     @staticmethod
     def from_dataframe(
@@ -300,6 +356,9 @@ class EventSet:
             ... )
             >>> evset = EventSet.from_dataframe(df, index_names=["product_id"])
         """
+
+        # TODO: Detect "is_sorted" automatically.
+
         df = df.copy(deep=False)
         if index_names is None:
             index_names = []
@@ -424,30 +483,34 @@ class EventSet:
         Returns:
             DataFrame created from EventSet.
         """
-        column_names = self._index_names + self._feature_names + ["timestamp"]
+
+        timestamp_key = "timestamp"
+
+        # Collect data into a dictionary.
+        column_names = (
+            self.schema.index_names
+            + self.schema.feature_names
+            + [timestamp_key]
+        )
         data = {column_name: [] for column_name in column_names}
-
         for index_key, index_data in self._data.items():
-            # parse timestamps. TODO: add output dtypes argument
-            data["timestamp"].extend(index_data.timestamps.astype(np.float64))
+            assert isinstance(index_key, tuple)
 
-            # parse feature data
+            # Timestamps
+            data[timestamp_key].extend(index_data.timestamps)
+
+            # Features
             for feature_name, feature in zip(
-                self._feature_names, index_data.features
+                self.schema.feature_names, index_data.features
             ):
                 data[feature_name].extend(feature)
 
-            # TODO: do we need this?
-            if not isinstance(index_key, tuple):
-                index_key = (index_key,)
-
-            # parse index values as columns
-            for i, index_name in enumerate(self._index_names):
+            # Indexes
+            for i, index_name in enumerate(self.schema.index_names):
                 data[index_name].extend(
                     [index_key[i]] * len(index_data.timestamps)
                 )
 
-        # convert dictionary to pandas DataFrame
         return pd.DataFrame(data)
 
     def __repr__(self) -> str:
@@ -455,14 +518,14 @@ class EventSet:
             """Repr for a list of features."""
 
             feature_repr = []
-            for idx, (feature_name, feature) in enumerate(
-                zip(self.feature_names, features)
+            for idx, (feature_schema, feature_data) in enumerate(
+                zip(self.schema.features, features)
             ):
                 if idx > MAX_NUM_PRINTED_FEATURES:
                     feature_repr.append("...")
                     break
 
-                feature_repr.append(f"'{feature_name}': {feature}")
+                feature_repr.append(f"'{feature_schema[0]}': {feature_data}")
             return "\n".join(feature_repr)
 
         # Representation of the "data" field
@@ -474,7 +537,7 @@ class EventSet:
                     break
                 index_key_repr = []
                 for index_value, (index_name, _) in zip(
-                    index_key, self.indexes()
+                    index_key, self.schema.index_names
                 ):
                     index_key_repr.append(f"{index_name}={index_value}")
                 index_key_repr = " ".join(index_key_repr)
@@ -486,8 +549,8 @@ class EventSet:
             data_repr = string.indent("\n".join(data_repr))
 
         return (
-            f"indexes: {self.indexes()}\n"
-            f"features: {self.features()}\n"
+            f"indexes: {self.schema.indexes}\n"
+            f"features: {self.schema.features}\n"
             "events:\n"
             f"{data_repr}\n"
         )
@@ -574,33 +637,67 @@ class EventSet:
         return plotter.plot(evsets=self, *args, **wargs)
 
 
-def _convert_timestamp_column_to_unix_epoch_float(
-    timestamp_column: pd.Series,
-) -> pd.DataFrame:
-    """Converts a timestamp column to Unix Epoch Float.
-
-    Args:
-        timestamp_column: Timestamp column to convert.
+def normalize_timestamps(
+    raw_timestamps: Any,
+) -> Tuple[np.ndarray, bool]:
+    """Normalizes timestamps to temporian format.
 
     Returns:
-        Timestamp column converted to Unix Epoch float.
+        Normalized timestamps (numpy float64 of unix epoch in seconds) and if
+        the raw timestamps look like a unix epoch.
     """
-    # check if timestamp column contains missing values and raise error
-    if timestamp_column.isna().any():
-        raise ValueError(
-            f"Cannot convert timestamp column {timestamp_column.name} "
-            "to Unix Epoch Float because it contains missing values."
-        )
 
-    # if timestamp_column is already float64, ignore it
-    if timestamp_column.dtype == "float64":
-        return timestamp_column
+    # Convert to numpy array
+    if not isinstance(raw_timestamps, np.ndarray):
+        raw_timestamps = np.array(raw_timestamps)
 
-    # if timestamp_column is int or float != float64 convert to float64
-    if timestamp_column.dtype.kind in ("i", "f"):
-        return timestamp_column.astype("float64")
+    # Check NaN
+    if np.isnan(raw_timestamps).any():
+        raise ValueError("Timestamps contains NaN values.")
 
-    # string and objects will be converted to datetime, then to float
-    timestamp_column = pd.to_datetime(timestamp_column, errors="raise")
-    timestamp_column = timestamp_column.view("int64") / 1e9
-    return timestamp_column
+    # raw_timestamps is already in float64 format
+    if raw_timestamps.dtype.type == np.float64:
+        return raw_timestamps
+
+    # raw_timestamps is represented as a number. Cast to float64.
+    if raw_timestamps.dtype.type in [np.float32, np.int64, np.int32]:
+        return raw_timestamps.astype(np.float64)
+
+    # raw_timestamps is a date. Cast to unix epoch in float64 seconds.
+    raw_timestamps = (
+        raw_timestamps.astype("datetime64[ns]").astype(np.float64) / 1e9
+    )
+
+    return raw_timestamps
+
+
+# def _convert_timestamp_column_to_unix_epoch_float(
+#     timestamp_column: pd.Series,
+# ) -> pd.DataFrame:
+#     """Converts a timestamp column to Unix Epoch Float.
+
+#     Args:
+#         timestamp_column: Timestamp column to convert.
+
+#     Returns:
+#         Timestamp column converted to Unix Epoch float.
+#     """
+#     # check if timestamp column contains missing values and raise error
+#     if timestamp_column.isna().any():
+#         raise ValueError(
+#             f"Cannot convert timestamp column {timestamp_column.name} "
+#             "to Unix Epoch Float because it contains missing values."
+#         )
+
+#     # if timestamp_column is already float64, ignore it
+#     if timestamp_column.dtype == "float64":
+#         return timestamp_column
+
+#     # if timestamp_column is int or float != float64 convert to float64
+#     if timestamp_column.dtype.kind in ("i", "f"):
+#         return timestamp_column.astype("float64")
+
+#     # string and objects will be converted to datetime, then to float
+#     timestamp_column = pd.to_datetime(timestamp_column, errors="raise")
+#     timestamp_column = timestamp_column.view("int64") / 1e9
+#     return timestamp_column

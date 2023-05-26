@@ -20,6 +20,8 @@ from typing import Union
 
 
 class DType(Enum):
+    """The type of a feature."""
+
     FLOAT64 = "float64"
     FLOAT32 = "float32"
     INT64 = "int64"
@@ -88,3 +90,11 @@ class DType(Enum):
             return DType.BOOLEAN
 
         raise ValueError(f"Non-implemented type {python_type}")
+
+
+class IndexDType(Enum):
+    """The type of an index."""
+
+    INT32 = DType.INT32.value
+    INT64 = DType.INT64.value
+    STRING = DType.STRING.value

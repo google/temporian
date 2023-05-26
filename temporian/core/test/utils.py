@@ -5,41 +5,39 @@ import pandas as pd
 
 from temporian.core.data import node as node_lib
 from temporian.core.data.dtype import DType
-from temporian.core.data.feature import Feature
-from temporian.core.data.node import Node
-from temporian.core.data.sampling import Sampling
+from temporian.core.data.schema import Schema
+from temporian.core.data.node import Node, input_node
 from temporian.core.operators import base
 from temporian.proto import core_pb2 as pb
 from temporian.core import operator_lib
 from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.io import event_set
 
 # The name of the operator is defined by the number of inputs and outputs.
 # For example "OpI1O2" has 1 input and 2 outputs.
 
 
 def create_input_node(name: Optional[str] = None):
-    return node_lib.input_node(
+    return input_node(
         features=[
-            Feature("f1", DType.FLOAT64),
-            Feature("f2", DType.FLOAT64),
+            ("f1", DType.FLOAT64),
+            ("f2", DType.FLOAT64),
         ],
-        index_levels=[("x", DType.INT32), ("y", DType.STRING)],
+        indexes=[("x", DType.INT32), ("y", DType.STRING)],
         name=name,
     )
 
 
 def create_input_event_set(name: Optional[str] = None) -> EventSet:
-    return EventSet.from_dataframe(
-        pd.DataFrame(
-            {
-                "timestamp": [0, 2, 4, 6],
-                "x": [10, 20, 30, 40],
-                "y": ["a", "b", "c", "d"],
-                "f1": [1.0, 2.0, 3.0, 4.0],
-                "f2": [5.0, 6.0, 7.0, 8.0],
-            }
-        ),
-        index_names=["x", "y"],
+    return event_set(
+        timestamps=[0, 2, 4, 6],
+        features={
+            "x": [10, 20, 30, 40],
+            "y": ["a", "b", "c", "d"],
+            "f1": [1.0, 2.0, 3.0, 4.0],
+            "f2": [5.0, 6.0, 7.0, 8.0],
+        },
+        index_features=["x", "y"],
         name=name,
     )
 
@@ -59,23 +57,14 @@ class OpI1O1(base.Operator):
         self.add_input("input", input)
         self.add_output(
             "output",
-            Node(
-                features=[
-                    Feature(
-                        "f3",
-                        DType.FLOAT64,
-                        sampling=input.sampling,
-                        creator=self,
-                    ),
-                    Feature(
-                        "f4",
-                        DType.INT64,
-                        sampling=input.sampling,
-                        creator=self,
-                    ),
-                ],
-                sampling=Sampling(
-                    index_levels=[], creator=self, is_unix_timestamp=False
+            Node.create_with_new_reference(
+                schema=Schema(
+                    features=[
+                        ("f3", DType.FLOAT64),
+                        ("f4", DType.INT64),
+                    ],
+                    indexes=[],
+                    is_unix_timestamp=False,
                 ),
                 creator=self,
             ),
@@ -103,7 +92,8 @@ class OpI1O1NotCreator(base.Operator):
         self.add_output(
             "output",
             Node(
-                features=[f for f in input.features],
+                schema=input.schema,
+                features=input.features,
                 sampling=input.sampling,
                 creator=self,
             ),
@@ -132,21 +122,15 @@ class OpI2O1(base.Operator):
         self.add_input("input_2", input_2)
         self.add_output(
             "output",
-            Node(
-                features=[
-                    Feature(
-                        "f5",
-                        DType.BOOLEAN,
-                        sampling=input_1.sampling,
-                        creator=self,
-                    ),
-                    Feature(
-                        "f6",
-                        DType.STRING,
-                        sampling=input_1.sampling,
-                        creator=self,
-                    ),
-                ],
+            Node.create_with_new_reference(
+                schema=Schema(
+                    features=[
+                        ("f5", DType.BOOLEAN),
+                        ("f6", DType.STRING),
+                    ],
+                    indexes=input_1.schema.indexes,
+                    is_unix_timestamp=input_1.schema.is_unix_timestamp,
+                ),
                 sampling=input_1.sampling,
                 creator=self,
             ),
@@ -176,30 +160,24 @@ class OpI1O2(base.Operator):
         self.add_input("input", input)
         self.add_output(
             "output_1",
-            Node(
-                features=[
-                    Feature(
-                        "f1",
-                        DType.INT32,
-                        sampling=input.sampling,
-                        creator=self,
-                    )
-                ],
+            Node.create_with_new_reference(
+                schema=Schema(
+                    features=[("f1", DType.INT32)],
+                    indexes=input.schema.indexes,
+                    is_unix_timestamp=input.schema.is_unix_timestamp,
+                ),
                 sampling=input.sampling,
                 creator=self,
             ),
         )
         self.add_output(
             "output_2",
-            Node(
-                features=[
-                    Feature(
-                        "f1",
-                        DType.FLOAT32,
-                        sampling=input.sampling,
-                        creator=self,
-                    ),
-                ],
+            Node.create_with_new_reference(
+                schema=Schema(
+                    features=[("f1", DType.FLOAT32)],
+                    indexes=input.schema.indexes,
+                    is_unix_timestamp=input.schema.is_unix_timestamp,
+                ),
                 sampling=input.sampling,
                 creator=self,
             ),
@@ -269,8 +247,12 @@ class OpWithAttributes(base.Operator):
         self.add_input("input", input)
         self.add_output(
             "output",
-            Node(
-                features=[],
+            Node.create_with_new_reference(
+                schema=Schema(
+                    features=[],
+                    indexes=input.schema.is_unix_timestamp,
+                    is_unix_timestamp=input.schema.is_unix_timestamp,
+                ),
                 sampling=input.sampling,
                 creator=self,
             ),

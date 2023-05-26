@@ -17,7 +17,6 @@ import numpy as np
 import pandas as pd
 
 from temporian.core.data.node import Node
-from temporian.core.data.sampling import Sampling
 from temporian.core.operators.calendar.day_of_month import (
     CalendarDayOfMonthOperator,
 )

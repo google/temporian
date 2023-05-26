@@ -19,7 +19,6 @@ from absl.testing import absltest
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
 from temporian.core.data.node import Feature
-from temporian.core.data.sampling import Sampling
 from temporian.core.operators.binary import (
     AddOperator,
     SubtractOperator,
