@@ -20,11 +20,26 @@ from google.protobuf import text_format
 
 from temporian.core import operator_lib
 from temporian.core import graph
-from temporian.core.data.node import Node
-from temporian.core.data.schema import Schema
+from temporian.core.data.node import Node, Sampling, Feature
+from temporian.core.data.schema import Schema, FeatureSchema, IndexSchema
 from temporian.core.operators import base
 from temporian.core.data.dtype import DType
 from temporian.proto import core_pb2 as pb
+from temporian.implementation.numpy.data.event_set import (
+    EventSet,
+    is_supported_numpy_dtype,
+)
+
+
+DTYPE_MAPPING = {
+    DType.FLOAT64: pb.DType.FLOAT64,
+    DType.FLOAT32: pb.DType.FLOAT32,
+    DType.INT64: pb.DType.INT64,
+    DType.INT32: pb.DType.INT32,
+    DType.BOOLEAN: pb.DType.BOOLEAN,
+    DType.STRING: pb.DType.STRING,
+}
+INV_DTYPE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
 
 
 def save(
@@ -63,13 +78,13 @@ def save(
 
     g, _ = graph.infer_graph(inputs=inputs, outputs=outputs)
     proto = serialize(g)
-    with open(path, "w") as f:
+    with open(path, "wb") as f:
         f.write(text_format.MessageToString(proto))
 
 
 def load(
     path: str, squeeze: bool = False
-) -> Tuple[Dict[str, Node], Dict[str, Node]]:
+) -> Tuple[Node | Dict[str, Node], Node | Dict[str, Node]]:
     """Loads a graph from a file.
 
     Args:
@@ -81,7 +96,7 @@ def load(
         Input and output nodes.
     """
 
-    with open(path, "r") as f:
+    with open(path, "rb") as f:
         proto = text_format.Parse(f.read(), pb.Graph())
     g = unserialize(proto)
 
@@ -116,7 +131,7 @@ def unserialize(src: pb.Graph) -> graph.Graph:
     # Decode the components.
     # All the fields except for the "creator" ones are set.
     samplings = {s.id: _unserialize_sampling(s) for s in src.samplings}
-    features = {f.id: _unserialize_feature(f, samplings) for f in src.features}
+    features = {f.id: _unserialize_feature(f) for f in src.features}
     nodes = {e.id: _unserialize_node(e, samplings, features) for e in src.nodes}
     operators = {o.id: _unserialize_operator(o, nodes) for o in src.operators}
 
@@ -172,6 +187,13 @@ def _identifier(item: Any) -> str:
     """Creates a unique identifier for an object within a graph."""
     if item is None:
         raise ValueError("Cannot get id of None")
+    return str(id(item))
+
+
+def _identifier_or_none(item: Any) -> Optional[str]:
+    """Creates a unique identifier for an object within a graph."""
+    if item is None:
+        return None
     return str(id(item))
 
 
@@ -248,12 +270,11 @@ def _unserialize_operator(
 def _serialize_node(src: Node) -> pb.Node:
     return pb.Node(
         id=_identifier(src),
-        sampling_id=_identifier(src.sampling),
-        feature_ids=[_identifier(f) for f in src.features],
+        sampling_id=_identifier(src.sampling_node),
+        feature_ids=[_identifier(f) for f in src.feature_nodes],
         name=src.name,
-        creator_operator_id=(
-            _identifier(src.creator) if src.creator is not None else None
-        ),
+        creator_operator_id=_identifier_or_none(src.creator),
+        schema=_serialize_schema(src.schema),
     )
 
 
@@ -269,62 +290,56 @@ def _unserialize_node(
         return features[key]
 
     return Node(
-        sampling=samplings[src.sampling_id],
+        schema=_unserialize_schema(src.schema),
         features=[get_feature(f) for f in src.feature_ids],
-        name=src.name,
-        creator=None,
-    )
-
-
-def _serialize_feature(src: Feature) -> pb.Feature:
-    return pb.Feature(
-        id=_identifier(src),
-        name=src.name,
-        dtype=_serialize_dtype(src.dtype),
-        sampling_id=_identifier(src.sampling),
-        creator_operator_id=(
-            _identifier(src.creator) if src.creator is not None else None
-        ),
-    )
-
-
-def _unserialize_feature(
-    src: pb.Feature, samplings: Dict[str, Sampling]
-) -> Feature:
-    if src.sampling_id not in samplings:
-        raise ValueError(f"Non existing sampling {src.sampling_id} in {src}")
-
-    return Feature(
-        name=src.name,
-        dtype=_unserialize_dtype(src.dtype),
         sampling=samplings[src.sampling_id],
+        name=src.name,
         creator=None,
     )
 
 
-def _serialize_sampling(src: Sampling) -> pb.Sampling:
-    return pb.Sampling(
+def _serialize_feature(src: Feature) -> pb.Node.Feature:
+    return pb.Node.Feature(
         id=_identifier(src),
-        index=pb.Index(
-            levels=[
-                pb.Index.IndexLevel(name=name, dtype=_serialize_dtype(dtype))
-                for name, dtype in zip(src.index.names, src.index.dtypes)
-            ]
-        ),
-        creator_operator_id=(
-            _identifier(src.creator) if src.creator is not None else None
-        ),
+        creator_operator_id=_identifier_or_none(src.creator),
+    )
+
+
+def _unserialize_feature(src: pb.Node.Feature) -> Feature:
+    return Feature(creator=None)
+
+
+def _serialize_sampling(src: Sampling) -> pb.Node.Sampling:
+    return pb.Node.Sampling(
+        id=_identifier(src),
+        creator_operator_id=_identifier_or_none(src.creator),
+    )
+
+
+def _unserialize_sampling(src: pb.Node.Sampling) -> Sampling:
+    return Sampling(creator=None)
+
+
+def _serialize_schema(src: Schema) -> pb.Schema:
+    return pb.Schema(
+        features=[],
+        indexes=[
+            pb.Schema.Index(
+                name=index.name, dtype=_serialize_dtype(index.dtype)
+            )
+            for index in src.indexes
+        ],
         is_unix_timestamp=src.is_unix_timestamp,
     )
 
 
-def _unserialize_sampling(src: pb.Sampling) -> Sampling:
-    return Sampling(
-        index_levels=[
-            (index_level.name, _unserialize_dtype(index_level.dtype))
-            for index_level in src.index.levels
+def _unserialize_schema(src: pb.Schema) -> Schema:
+    return Schema(
+        features=[],
+        indexes=[
+            (index.name, _unserialize_dtype(index.dtype))
+            for index in src.indexes
         ],
-        creator=None,
         is_unix_timestamp=src.is_unix_timestamp,
     )
 
@@ -339,17 +354,6 @@ def _unserialize_dtype(dtype: pb.DType):
     if dtype not in INV_DTYPE_MAPPING:
         raise ValueError(f"Non supported type {dtype}")
     return INV_DTYPE_MAPPING[dtype]
-
-
-DTYPE_MAPPING = {
-    DType.FLOAT64: pb.DType.FLOAT64,
-    DType.FLOAT32: pb.DType.FLOAT32,
-    DType.INT64: pb.DType.INT64,
-    DType.INT32: pb.DType.INT32,
-    DType.BOOLEAN: pb.DType.BOOLEAN,
-    DType.STRING: pb.DType.STRING,
-}
-INV_DTYPE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
 
 
 def _attribute_to_proto(

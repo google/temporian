@@ -19,54 +19,41 @@ from typing import List, Union
 from temporian.core import operator_lib
 from temporian.core.data.node import Node
 from temporian.core.operators.base import Operator
+from temporian.core.data.schema import Schema
 from temporian.proto import core_pb2 as pb
 
 
 class SelectOperator(Operator):
-    def __init__(self, input: Node, feature_names: Union[str, List[str]]):
+    def __init__(self, input: Node, feature_names: List[str]):
         super().__init__()
-
-        # store selected feature names
-        if isinstance(feature_names, str):
-            feature_names = [feature_names]
-
-        if not isinstance(feature_names, list):
-            raise ValueError(
-                "Unexpected type for feature_names. Expect str or list of"
-                f" str. Got '{feature_names}' instead."
-            )
 
         self._feature_names = feature_names
         self.add_attribute("feature_names", feature_names)
-
-        # verify all selected features exist in the input node
-        selected_features_set = set(feature_names)
-        node_features_set = set([feature.name for feature in input.features])
-        if not set(selected_features_set).issubset(node_features_set):
-            raise KeyError(selected_features_set.difference(node_features_set))
-
-        # inputs
         self.add_input("input", input)
 
         # outputs
         output_features = []
-        for feature_name in feature_names:
-            for feature in input.features:
-                # TODO: maybe implement features attributes of Node as dict
-                # so we can index by name?
-                if feature.name == feature_name:
-                    output_features.append(feature)
+        output_feature_schemas = []
+        input_feature_names = input.schema.feature_names()
 
-        output_sampling = input.sampling
+        for feature_name in feature_names:
+            feature_idx = input_feature_names.index(feature_name)
+            output_features.append(input.feature_nodes[feature_idx])
+            output_feature_schemas.append(input.schema.features[feature_idx])
+
         self.add_output(
             "output",
-            Node(
+            Node.create_with_new_reference(
+                schema=Schema(
+                    features=output_feature_schemas,
+                    indexes=input.schema.indexes,
+                    is_unix_timestamp=input.schema.is_unix_timestamp,
+                ),
+                sampling=input.sampling_node,
                 features=output_features,
-                sampling=output_sampling,
                 creator=self,
             ),
         )
-
         self.check()
 
     @property
@@ -84,9 +71,7 @@ class SelectOperator(Operator):
                     is_optional=False,
                 ),
             ],
-            inputs=[
-                pb.OperatorDef.Input(key="input"),
-            ],
+            inputs=[pb.OperatorDef.Input(key="input")],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
 

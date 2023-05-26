@@ -29,7 +29,7 @@ class BaseCalendarOperator(Operator, ABC):
     def __init__(self, sampling: Node):
         super().__init__()
 
-        if not sampling.sampling.is_unix_timestamp:
+        if not sampling.schema.is_unix_timestamp:
             raise ValueError(
                 "Calendar operators can only be applied on nodes with unix"
                 " timestamps as sampling. This can be specified with"
@@ -39,23 +39,14 @@ class BaseCalendarOperator(Operator, ABC):
         # input
         self.add_input("sampling", sampling)
 
-        output_feature = Feature(
-            name=self.output_feature_name,
-            dtype=DType.INT32,
-            sampling=sampling.sampling,
-            creator=self,
-        )
-
-        # output
         self.add_output(
             "output",
-            Node(
-                features=[output_feature],
-                sampling=sampling.sampling,
+            Node.create_new_features_existing_sampling(
+                features=[(self.output_feature_name, DType.INT32)],
+                sampling_node=sampling,
                 creator=self,
             ),
         )
-
         self.check()
 
     @classmethod

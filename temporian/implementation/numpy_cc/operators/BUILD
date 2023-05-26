@@ -18,16 +18,16 @@ pybind_library(
 )
 
 pybind_library(
-    name = "sample",
-    srcs = ["sample.cc"],
-    hdrs = ["sample.h"],
+    name = "resample",
+    srcs = ["resample.cc"],
+    hdrs = ["resample.h"],
 )
 
 pybind_extension(
     name = "operators_cc",
     srcs = ["pyinit.cc"],
     deps = [
-        ":sample",
+        ":resample",
         ":since_last",
         ":window",
     ],

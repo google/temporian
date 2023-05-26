@@ -124,7 +124,7 @@ def benchmark_sample(runner):
 
             node_1 = ds_1.node()
             node_2 = ds_2.node()
-            output = tp.sample(node_1, node_2)
+            output = tp.resample(node_1, node_2)
 
             runner.benchmark(
                 f"sample:e{m:_}_s{n:_}",
@@ -225,7 +225,7 @@ def benchmark_from_dataframe(runner):
                     )
 
 
-def benchmark_set_index(runner):
+def benchmark_add_index(runner):
     runner.add_separator()
 
     np.random.seed(0)
@@ -276,9 +276,9 @@ def benchmark_set_index(runner):
 
         for index in possible_indexes:
             for append in [False]:
-                output = tp.set_index(node, index, append=append)
+                output = tp.add_index(node, index, append=append)
                 runner.benchmark(
-                    f"set_index:s:{number_timestamps:_}:num_idx:{len(index)}:append:{append}",
+                    f"add_index:s:{number_timestamps:_}:num_idx:{len(index)}:append:{append}",
                     lambda: tp.evaluate(output, input={node: evset}),
                 )
 
@@ -366,7 +366,7 @@ def main():
         "propagate",
         "cast",
         "unique_timestamps",
-        "set_index",
+        "add_index",
     ]
     if args.functions is not None:
         benchmarks_to_run = args.functions

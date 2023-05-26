@@ -10,8 +10,8 @@ from temporian.implementation.numpy.operators import lag
 from temporian.implementation.numpy.operators import prefix
 from temporian.implementation.numpy.operators import propagate
 from temporian.implementation.numpy.operators import select
-from temporian.implementation.numpy.operators import set_index
-from temporian.implementation.numpy.operators import sample
+from temporian.implementation.numpy.operators import add_index
+from temporian.implementation.numpy.operators import resample
 from temporian.implementation.numpy.operators import rename
 from temporian.implementation.numpy.operators.binary import arithmetic
 from temporian.implementation.numpy.operators.binary import relational

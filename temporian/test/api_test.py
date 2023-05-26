@@ -42,7 +42,7 @@ class TFPTest(absltest.TestCase):
         i1 = evset_1.node()
         i2 = evset_2.node()
         h1 = tp.simple_moving_average(input=i1, window_length=7)
-        h2 = tp.sample(input=h1, sampling=i2)
+        h2 = tp.resample(input=h1, sampling=i2)
 
         h3 = i1 * 2.0 + 3.0 > 10.0
 

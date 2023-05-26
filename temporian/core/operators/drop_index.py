@@ -18,7 +18,7 @@ from typing import List, Optional, Union
 
 from temporian.core import operator_lib
 from temporian.core.data.node import Node
-from temporian.core.data.schema import Schema, FeatureSchema
+from temporian.core.data.schema import Schema, FeatureSchema, IndexSchema
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -41,74 +41,63 @@ class DropIndexOperator(Operator):
         self.add_attribute("index_to_drop", index_to_drop)
         self.add_attribute("keep", keep)
 
-        output_features = self._output_features(input, index_to_drop, keep)
-
-        output_sampling = Sampling(
-            index_levels=[
-                index_level
-                for index_level in input.sampling.index
-                if index_level.name not in index_to_drop
-            ],
-            is_unix_timestamp=input.sampling.is_unix_timestamp,
+        self._output_feature_schemas = self._get_output_feature_schemas(
+            input, index_to_drop, keep
         )
+
+        self._output_indexes = [
+            index_level
+            for index_level in input.schema.indexes
+            if index_level.name not in index_to_drop
+        ]
 
         self.add_output(
             "output",
-            Node(
-                features=output_features,
-                sampling=output_sampling,
+            Node.create_new_features_new_sampling(
+                features=self._output_feature_schemas,
+                indexes=self._output_indexes,
+                is_unix_timestamp=input.schema.is_unix_timestamp,
                 creator=self,
             ),
         )
         self.check()
 
-    def _output_features(
+    def _get_output_feature_schemas(
         self, input: Node, index_to_drop: List[str], keep: bool
-    ) -> List[Feature]:
-        new_features = []
-        if keep:
-            # Convert the index to drop into features.
-            #
-            # Note: The new features are added first.
-            for index_name in index_to_drop:
-                # check no other feature exists with this name
-                if index_name in input.feature_names:
-                    raise ValueError(
-                        f"Feature name {index_name} coming from index already"
-                        " exists in input."
-                    )
+    ) -> List[FeatureSchema]:
+        if not keep:
+            return input.schema.features
 
-                # TODO: Don't recompute the "dtypes/names" at each iteration.
-                # TODO: Replace linear search with hasmap search.
-                new_features.append(
-                    Feature(
-                        name=index_name,
-                        dtype=input.sampling.index.dtypes[
-                            input.sampling.index.names.index(index_name)
-                        ],
-                    )
+        index_dict = input.schema.index_name_to_dtype()
+        feature_dict = input.schema.feature_name_to_dtype()
+
+        new_features: List[FeatureSchema] = []
+        for index_name in index_to_drop:
+            if index_name not in index_dict:
+                raise ValueError(
+                    f"Drop index {index_name} is not part of the index."
                 )
 
-        existing_features = [
-            Feature(name=feature.name, dtype=feature.dtype)
-            for feature in input.features
-        ]
-        return new_features + existing_features
+            if index_name in feature_dict:
+                raise ValueError(
+                    f"Feature name {index_name} coming from index already"
+                    " exists in input."
+                )
 
-    def dst_feature_names(self) -> List[str]:
-        feature_names = self.inputs["input"].feature_names
-        if self._keep:
-            return self._index_to_drop + feature_names
-        else:
-            return feature_names
+            new_features.append(
+                FeatureSchema(name=index_name, dtype=index_dict[index_name])
+            )
 
-    def dst_index_names(self) -> List[str]:
-        # TODO: Avoid instentiating the "names" array.
-        return [
-            index_lvl_name
-            for index_lvl_name in self.inputs["input"].sampling.index.names
-            if index_lvl_name not in self._index_to_drop
-        ]
+        # Note: The new features are added first.
+        return new_features + input.schema.features
+
+    @property
+    def output_feature_schemas(self) -> List[FeatureSchema]:
+        return self._output_feature_schemas
+
+    @property
+    def output_indexes(self) -> List[IndexSchema]:
+        return self._output_indexes
 
     @property
     def index_to_drop(self) -> List[str]:
@@ -132,9 +121,7 @@ class DropIndexOperator(Operator):
                     type=pb.OperatorDef.Attribute.Type.BOOL,
                 ),
             ],
-            inputs=[
-                pb.OperatorDef.Input(key="input"),
-            ],
+            inputs=[pb.OperatorDef.Input(key="input")],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
 
@@ -143,10 +130,12 @@ operator_lib.register_operator(DropIndexOperator)
 
 
 def _normalize_index_to_drop(
-    input: Node, index_names: Optional[Union[List[str], str]]
+    input: Node,
+    index_names: Optional[List[str] | str],
 ) -> List[str]:
     if index_names is None:
-        return input.sampling.index.names
+        # Drop all the indexes
+        return input.schema.index_names()
 
     if isinstance(index_names, str):
         index_names = [index_names]
@@ -154,25 +143,21 @@ def _normalize_index_to_drop(
     if len(index_names) == 0:
         raise ValueError("Cannot specify empty list as `index_names` argument.")
 
-    # TODO: Don't recompute name each time.
-    # check if any index names are missing from the index
-    missing_index_names = [
-        index_name
-        for index_name in index_names
-        if index_name not in input.sampling.index.names
-    ]
-    if missing_index_names:
-        raise KeyError(
-            f"Dropped indexes {missing_index_names} are missing from the"
-            f" input index. The input index is {input.sampling.index.names}."
-        )
+    # Check that requested indexes exist
+    index_dict = input.schema.index_name_to_dtype()
+    for index_item in index_names:
+        if index_item not in index_dict:
+            raise KeyError(
+                f"Dropped index {index_item} is not part of the index"
+                f" {input.schema.indexes}."
+            )
 
     return index_names
 
 
 def drop_index(
     input: Node,
-    index_to_drop: Optional[Union[str, List[str]]] = None,
+    index_to_drop: Optional[str | List[str]] = None,
     keep: bool = True,
 ) -> Node:
     """Removes one or more index columns from a node.

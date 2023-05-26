@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from typing import List, Tuple, TYPE_CHECKING, Union
+from typing import List, Tuple, TYPE_CHECKING, Dict
 
 from dataclasses import dataclass
 from temporian.core.data.dtype import DType, IndexDType
@@ -30,11 +30,17 @@ class FeatureSchema:
     name: str
     dtype: DType
 
+    def __repr__(self) -> str:
+        return f"({self.name},{self.dtype})"
+
 
 @dataclass
 class IndexSchema:
     name: str
     dtype: IndexDType
+
+    def __repr__(self) -> str:
+        return f"({self.name},{self.dtype})"
 
 
 class Schema:
@@ -51,8 +57,8 @@ class Schema:
 
     def __init__(
         self,
-        features: List[Union[FeatureSchema, Tuple[str, DType]]],
-        indexes: List[Union[IndexSchema, Tuple[str, IndexDType]]],
+        features: List[FeatureSchema] | List[Tuple[str, DType]],
+        indexes: List[IndexSchema] | List[Tuple[str, IndexDType]],
         is_unix_timestamp: bool,
     ):
         def normalize_feature(x):
@@ -65,10 +71,10 @@ class Schema:
             if isinstance(x, IndexSchema):
                 return x
             assert len(x) == 2
-            return FeatureSchema(x[0], x[1])
+            return IndexSchema(x[0], x[1])
 
-        self._features = map(normalize_feature, features)
-        self._indexes = map(normalize_index, indexes)
+        self._features = list(map(normalize_feature, features))
+        self._indexes = list(map(normalize_index, indexes))
         self._is_unix_timestamp = is_unix_timestamp
 
     @property
@@ -83,18 +89,37 @@ class Schema:
     def is_unix_timestamp(self) -> bool:
         return self._is_unix_timestamp
 
-    @property
     def feature_names(self) -> List[str]:
         return [feature.name for feature in self._features]
 
-    @property
     def index_names(self) -> List[str]:
         return [index.name for index in self._indexes]
 
-    @property
     def feature_dtypes(self) -> List[DType]:
         return [feature.dtype for feature in self._features]
 
-    @property
-    def index_dtypes(self) -> List[DType]:
+    def index_dtypes(self) -> List[IndexDType]:
         return [index.dtype for index in self._indexes]
+
+    def feature_name_to_dtype(self) -> Dict[str, DType]:
+        return {feature.name: feature.dtype for feature in self._features}
+
+    def index_name_to_dtype(self) -> Dict[str, IndexDType]:
+        return {index.name: index.dtype for index in self._indexes}
+
+    def __repr__(self) -> str:
+        r = (
+            f"features: {self._features}\n"
+            f"indexes: {self._indexes}\n"
+            f"is_unix_timestamp: {self._is_unix_timestamp}\n"
+        )
+        return r
+
+    def check_compatible_index(
+        self, other: Schema, label: str = "input and sampling"
+    ):
+        if self.indexes != other.indexes:
+            raise ValueError(
+                f"Non matching index between {label}."
+                f" {self.indexes} != {other.indexes}"
+            )

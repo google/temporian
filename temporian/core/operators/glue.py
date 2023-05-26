@@ -18,6 +18,7 @@ from typing import Dict, List
 
 from temporian.core import operator_lib
 from temporian.core.data.node import Node
+from temporian.core.data.schema import Schema
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -28,7 +29,7 @@ MAX_NUM_ARGUMENTS = 30
 class GlueOperator(Operator):
     def __init__(
         self,
-        **inputs: Dict[str, Node],
+        **inputs: Node,
     ):
         super().__init__()
 
@@ -45,13 +46,17 @@ class GlueOperator(Operator):
 
         # inputs
         output_features = []
+        output_feature_schemas = []
         feature_names = set()
-        first_sampling = None
+        first_sampling_node = None
+
         for key, input in inputs.items():
             self.add_input(key, input)
-            output_features.extend(input.features)
 
-            for f in input.features:
+            output_features.extend(input.feature_nodes)
+            output_feature_schemas.extend(input.schema.features)
+
+            for f in input.schema.features:
                 if f.name in feature_names:
                     raise ValueError(
                         f'Feature "{f.name}" is defined in multiple input'
@@ -59,20 +64,27 @@ class GlueOperator(Operator):
                     )
                 feature_names.add(f.name)
 
-            if first_sampling is None:
-                first_sampling = input.sampling
-            elif input.sampling is not first_sampling:
+            if first_sampling_node is None:
+                first_sampling_node = input
+
+            elif input.sampling_node is not first_sampling_node.sampling_node:
                 raise ValueError(
                     "All glue arguments should have the same sampling."
-                    f" {first_sampling} is different from {input.sampling}."
+                    f" {first_sampling_node.sampling_node} is different from"
+                    f" {input.sampling_node}."
                 )
+        assert first_sampling_node is not None
 
-        # outputs
         self.add_output(
             "output",
-            Node(
+            Node.create_with_new_reference(
+                schema=Schema(
+                    features=output_feature_schemas,
+                    indexes=first_sampling_node.schema.indexes,
+                    is_unix_timestamp=first_sampling_node.schema.is_unix_timestamp,
+                ),
+                sampling=first_sampling_node.sampling_node,
                 features=output_features,
-                sampling=first_sampling,
                 creator=self,
             ),
         )
@@ -95,7 +107,7 @@ operator_lib.register_operator(GlueOperator)
 
 
 def glue(
-    *inputs: List[Node],
+    *inputs: Node,
 ) -> Node:
     """Concatenates together nodes with the same sampling.
 
@@ -111,7 +123,7 @@ def glue(
         ```
 
     To concatenate nodes with a different sampling, use the operator
-    'tp.sample(...)' first.
+    'tp.resample(...)' first.
 
     Example:
 
@@ -124,8 +136,8 @@ def glue(
         # Output has features A, B, C, D, E & F, and the same sampling as
         # input_1
         output = tp.glue(input_1,
-            tp.sample(input_2, sampling=input_1),
-            tp.sample(input_3, sampling=input_1))
+            tp.resample(input_2, sampling=input_1),
+            tp.resample(input_3, sampling=input_1))
         ```
 
     Args:

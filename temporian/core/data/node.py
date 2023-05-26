@@ -18,12 +18,14 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional, Tuple, TYPE_CHECKING, Any, Union
 
+from numpy import isin
+
 from temporian.core.data.dtype import DType, IndexDType
-from temporian.core.data.schema import Schema
+from temporian.core.data.schema import Schema, FeatureSchema, IndexSchema
 from temporian.utils import string
 
 if TYPE_CHECKING:
-    from temporian.core.evaluation import EvaluationInput
+    from temporian.core.evaluation import EvaluationInput, EvaluationResult
     from temporian.core.operators.base import Operator
     from temporian.implementation.numpy.data.event_set import EventSet
 
@@ -36,12 +38,18 @@ class Sampling:
 
     creator: Optional[Operator] = None
 
+    def __hash__(self):
+        return id(self)
+
 
 @dataclass
 class Feature:
     """A feature is a reference to sampled data."""
 
     creator: Optional[Operator] = None
+
+    def __hash__(self):
+        return id(self)
 
 
 class Node(object):
@@ -62,6 +70,11 @@ class Node(object):
         name: Optional[str] = None,
         creator: Optional[Operator] = None,
     ):
+        """Creates a new node manualy.
+
+        When possible, use one of the helper functions below.
+        """
+
         self._schema = schema
         self._features = features
         self._sampling = sampling
@@ -69,14 +82,85 @@ class Node(object):
         self._name = name
 
     @staticmethod
-    def create_with_new_reference(
-        schema: Schema,
+    def create_new_features_existing_sampling(
+        features: List[FeatureSchema] | List[Tuple[str, DType]],
+        sampling_node: Node,
         name: Optional[str] = None,
         creator: Optional[Operator] = None,
+    ) -> Node:
+        """Creates a node with an existing sampling and new features.
+
+        When possible, this is the Node creation function to use.
+        """
+
+        # TODO: Use better way
+        assert sampling_node is not None
+        assert features is not None
+        assert creator is not None
+        assert isinstance(sampling_node, Node)
+        assert isinstance(features, List)
+        assert (
+            len(features) == 0
+            or isinstance(features[0], FeatureSchema)
+            or isinstance(features[0], tuple)
+        )
+
+        return Node(
+            schema=Schema(
+                features=features,
+                # The index and is_unix_timestamp is defined by the sampling.
+                indexes=sampling_node.schema.indexes,
+                is_unix_timestamp=sampling_node.schema.is_unix_timestamp,
+            ),
+            # Making use to use the same sampling reference.
+            sampling=sampling_node.sampling_node,
+            # New features.
+            features=[Feature(creator=creator) for _ in features],
+            name=name,
+            creator=creator,
+        )
+
+    @staticmethod
+    def create_new_features_new_sampling(
+        features: List[FeatureSchema] | List[Tuple[str, DType]],
+        indexes: List[IndexSchema] | List[Tuple[str, IndexDType]],
+        is_unix_timestamp: bool,
+        name: Optional[str] = None,
+        creator: Optional[Operator] = None,
+    ) -> Node:
+        """Creates a node with a new sampling and new features."""
+
+        # TODO: Use better way
+        assert isinstance(features, List)
+        assert (
+            len(features) == 0
+            or isinstance(features[0], FeatureSchema)
+            or isinstance(features[0], tuple)
+        )
+
+        return Node(
+            schema=Schema(
+                features=features,
+                indexes=indexes,
+                is_unix_timestamp=is_unix_timestamp,
+            ),
+            # New sampling
+            sampling=Sampling(creator=creator),
+            # New features.
+            features=[Feature(creator=creator) for _ in features],
+            name=name,
+            creator=creator,
+        )
+
+    @staticmethod
+    def create_with_new_reference(
+        schema: Schema,
         sampling: Optional[Sampling] = None,
         features: Optional[List[Feature]] = None,
+        name: Optional[str] = None,
+        creator: Optional[Operator] = None,
     ) -> Node:
-        """Creates a node with new features and sampling.
+        """Creates a node with NEW features and NEW sampling.
 
         If sampling is not specified, a new sampling is created.
         Similarly, if features is not specifies, new features are created.
@@ -102,15 +186,15 @@ class Node(object):
         return self._schema
 
     @property
-    def sampling(self) -> Sampling:
+    def sampling_node(self) -> Sampling:
         return self._sampling
 
     @property
-    def features(self) -> List[Feature]:
+    def feature_nodes(self) -> List[Feature]:
         return self._features
 
     @property
-    def name(self) -> str:
+    def name(self) -> Optional[str]:
         return self._name
 
     @name.setter
@@ -130,7 +214,7 @@ class Node(object):
         input: EvaluationInput,
         verbose: int = 1,
         check_execution: bool = True,
-    ) -> EventSet:
+    ) -> EvaluationResult:
         """Evaluates the node on the specified input.
 
         See `tp.evaluate` for details.
@@ -154,15 +238,10 @@ class Node(object):
     def __repr__(self) -> str:
         """Human readable representation of a node."""
 
-        features_print = "\n".join(
-            [
-                string.indent(feature.to_string(include_sampling=False))
-                for feature in self._features
-            ]
-        )
+        schema_print = string.indent(repr(self._schema))
         return (
-            "features:\n"
-            f"{features_print}\n"
+            f"schema:\n{schema_print}\n"
+            "features: {self._features}\n"
             f"sampling: {self._sampling},\n"
             f"name: {self._name}\n"
             f"creator: {self._creator}\n"
@@ -179,9 +258,7 @@ class Node(object):
             " element-wise or use cast() operator to convert to boolean."
         )
 
-    def _nope(
-        self, op_name: str, other: Any, allowed_types: Tuple[type]
-    ) -> None:
+    def _error(self, op_name: str, other: Any, allowed_types: str) -> None:
         """Raises an error message.
 
         This method is a utilities used in operators implementations,
@@ -204,7 +281,7 @@ class Node(object):
 
             return not_equal_scalar(input=self, value=other)
 
-        self._nope("compare", other, "(int,float,bool,str)")
+        self._error("ne", other, "int,float,bool,str")
 
     def __add__(self, other: Any) -> Node:
         # TODO: In this and other operants, factor code and add support for
@@ -220,7 +297,7 @@ class Node(object):
 
             return add_scalar(input=self, value=other)
 
-        self._nope("add", other, "(int,float)")
+        self._error("add", other, "int,float")
 
     def __radd__(self, other: Any) -> Node:
         return self.__add__(other)
@@ -238,7 +315,7 @@ class Node(object):
 
             return subtract_scalar(minuend=self, subtrahend=other)
 
-        self._nope("subtract", other, "(int,float)")
+        self._error("subtract", other, "int,float")
 
     def __rsub__(self, other: Any) -> Node:
         if isinstance(other, T_SCALAR):
@@ -248,7 +325,7 @@ class Node(object):
 
             return subtract_scalar(minuend=other, subtrahend=self)
 
-        self._nope("subtract", other, "(int,float)")
+        self._error("subtract", other, "int,float")
 
     def __mul__(self, other: Any) -> Node:
         if isinstance(other, Node):
@@ -263,7 +340,7 @@ class Node(object):
 
             return multiply_scalar(input=self, value=other)
 
-        self._nope("multiply", other, "(int,float)")
+        self._error("multiply", other, "int,float")
 
     def __rmul__(self, other: Any) -> Node:
         return self.__mul__(other)
@@ -294,7 +371,7 @@ class Node(object):
 
             return divide_scalar(numerator=self, denominator=other)
 
-        self._nope("divide", other, "(int,float)")
+        self._error("divide", other, "(int,float)")
 
     def __rtruediv__(self, other: Any) -> Node:
         if isinstance(other, T_SCALAR):
@@ -302,7 +379,7 @@ class Node(object):
 
             return divide_scalar(numerator=other, denominator=self)
 
-        self._nope("divide", other, "(int,float)")
+        self._error("divide", other, "(int,float)")
 
     def __floordiv__(self, other: Any) -> Node:
         if isinstance(other, Node):
@@ -317,7 +394,7 @@ class Node(object):
 
             return floordiv_scalar(numerator=self, denominator=other)
 
-        self._nope("floor_divide", other, "(int,float)")
+        self._error("floor_divide", other, "(int,float)")
 
     def __rfloordiv__(self, other: Any) -> Node:
         if isinstance(other, T_SCALAR):
@@ -327,7 +404,7 @@ class Node(object):
 
             return floordiv_scalar(numerator=other, denominator=self)
 
-        self._nope("floor_divide", other, "(int,float)")
+        self._error("floor_divide", other, "(int,float)")
 
     def __pow__(self, other: Any) -> Node:
         if isinstance(other, Node):
@@ -340,7 +417,7 @@ class Node(object):
 
             return power_scalar(base=self, exponent=other)
 
-        self._nope("exponentiate", other, "(int,float)")
+        self._error("exponentiate", other, "(int,float)")
 
     def __rpow__(self, other: Any) -> Node:
         if isinstance(other, T_SCALAR):
@@ -348,7 +425,7 @@ class Node(object):
 
             return power_scalar(base=other, exponent=self)
 
-        self._nope("exponentiate", other, "(int,float)")
+        self._error("exponentiate", other, "(int,float)")
 
     def __mod__(self, other: Any) -> Node:
         if isinstance(other, Node):
@@ -361,7 +438,7 @@ class Node(object):
 
             return modulo_scalar(numerator=self, denominator=other)
 
-        self._nope("compute modulo (%)", other, "(int,float)")
+        self._error("compute modulo (%)", other, "(int,float)")
 
     def __rmod__(self, other: Any) -> Node:
         if isinstance(other, T_SCALAR):
@@ -369,7 +446,7 @@ class Node(object):
 
             return modulo_scalar(numerator=other, denominator=self)
 
-        self._nope("compute modulo (%)", other, "(int,float)")
+        self._error("compute modulo (%)", other, "(int,float)")
 
     def __gt__(self, other: Any):
         if isinstance(other, Node):
@@ -384,7 +461,7 @@ class Node(object):
 
             return greater_scalar(input=self, value=other)
 
-        self._nope("compare", other, "(int,float)")
+        self._error("compare", other, "(int,float)")
 
     def __ge__(self, other: Any):
         if isinstance(other, Node):
@@ -399,7 +476,7 @@ class Node(object):
 
             return greater_equal_scalar(input=self, value=other)
 
-        self._nope("compare", other, "(int,float)")
+        self._error("compare", other, "(int,float)")
 
     def __lt__(self, other: Any):
         if isinstance(other, Node):
@@ -414,7 +491,7 @@ class Node(object):
 
             return less_scalar(input=self, value=other)
 
-        self._nope("compare", other, "(int,float)")
+        self._error("compare", other, "(int,float)")
 
     def __le__(self, other: Any):
         if isinstance(other, Node):
@@ -429,9 +506,9 @@ class Node(object):
 
             return less_equal_scalar(input=self, value=other)
 
-        self._nope("compare", other, "(int,float)")
+        self._error("compare", other, "(int,float)")
 
-    def _nope_only_boolean(self, boolean_op: str, other: Any) -> None:
+    def _error_only_boolean(self, boolean_op: str, other: Any) -> None:
         raise ValueError(
             f"Cannot compute 'Node {boolean_op} {type(other)}'. "
             "Only Nodes with boolean features are supported."
@@ -442,21 +519,21 @@ class Node(object):
             from temporian.core.operators.binary import logical_and
 
             return logical_and(input_1=self, input_2=other)
-        self._nope_only_boolean("&", other)
+        self._error_only_boolean("&", other)
 
     def __or__(self, other: Any) -> Node:
         if isinstance(other, Node):
             from temporian.core.operators.binary import logical_or
 
             return logical_or(input_1=self, input_2=other)
-        self._nope_only_boolean("|", other)
+        self._error_only_boolean("|", other)
 
     def __xor__(self, other: Any) -> Node:
         if isinstance(other, Node):
             from temporian.core.operators.binary import logical_xor
 
             return logical_xor(input_1=self, input_2=other)
-        self._nope_only_boolean("^", other)
+        self._error_only_boolean("^", other)
 
 
 def input_node(
@@ -470,11 +547,9 @@ def input_node(
     if indexes is None:
         indexes = []
 
-    return Node.create_with_new_reference(
-        schema=Schema(
-            features=features,
-            indexes=indexes,
-            is_unix_timestamp=is_unix_timestamp,
-        ),
+    return Node.create_new_features_new_sampling(
+        features=features,
+        indexes=indexes,
+        is_unix_timestamp=is_unix_timestamp,
         name=name,
     )

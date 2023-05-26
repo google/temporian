@@ -17,14 +17,14 @@ from absl.testing import absltest
 
 import pandas as pd
 
-from temporian.core.operators.sample import Sample
-from temporian.implementation.numpy.operators.sample import (
-    SampleNumpyImplementation,
+from temporian.core.operators.resample import Resample
+from temporian.implementation.numpy.operators.resample import (
+    ResampleNumpyImplementation,
 )
 from temporian.implementation.numpy.data.event_set import EventSet
 
 
-class SampleOperatorTest(absltest.TestCase):
+class ResampleOperatorTest(absltest.TestCase):
     def setUp(self):
         pass
 
@@ -68,8 +68,8 @@ class SampleOperatorTest(absltest.TestCase):
         )
 
         # Run op
-        op = Sample(input=node, sampling=sampling_node)
-        instance = SampleNumpyImplementation(op)
+        op = Resample(input=node, sampling=sampling_node)
+        instance = ResampleNumpyImplementation(op)
         output = instance.call(input=evset, sampling=sampling_evset)["output"]
 
         self.assertEqual(output, expected_output)

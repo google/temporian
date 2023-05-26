@@ -34,25 +34,15 @@ class Prefix(Operator):
 
         # TODO: When supported, re-use existing feature instead of creating a
         # new one.
-        output_features = [  # pylint: disable=g-complex-comprehension
-            Feature(
-                name=prefix + f.name,
-                dtype=f.dtype,
-                sampling=input.sampling,
-                creator=self,
-            )
-            for f in input.features
-        ]
 
         self.add_output(
             "output",
-            Node(
-                features=output_features,
-                sampling=input.sampling,
+            Node.create_new_features_existing_sampling(
+                features=input.schema.features,
+                sampling_node=input,
                 creator=self,
             ),
         )
-
         self.check()
 
     @property

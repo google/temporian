@@ -14,12 +14,12 @@
 
 """Cast operator class and public API function definition."""
 
-from typing import Union, Mapping, Optional
-from temporian.core.data.schema import Schema
+from typing import Union, Dict, Optional
+from temporian.core.data.schema import Schema, FeatureSchema
 
 from temporian.core.data.dtype import DType
 from temporian.core import operator_lib
-from temporian.core.data.node import Node
+from temporian.core.data.node import Node, Feature
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -29,10 +29,8 @@ class CastOperator(Operator):
         self,
         input: Node,
         to_dtype: Optional[DType] = None,
-        from_dtypes: Optional[Mapping[DType, DType]] = None,
-        from_features: Union[
-            Mapping[str, DType], Mapping[str, str], None
-        ] = None,
+        from_dtypes: Optional[Dict[DType, DType]] = None,
+        from_features: Optional[Dict[str, DType] | Dict[str, str]] = None,
         check_overflow: bool = True,
     ):
         super().__init__()
@@ -58,35 +56,41 @@ class CastOperator(Operator):
 
         # Output node features
         output_features = []
+        output_schema = Schema(
+            features=[],
+            indexes=input.schema.indexes,
+            is_unix_timestamp=input.schema.is_unix_timestamp,
+        )
         reuse_node = True
-        for feature in input.features:
-            if from_features_all[feature.name] is feature.dtype:
+        for feature_node, feature_schema in zip(
+            input.feature_nodes, input.schema.features
+        ):
+            new_dtype = from_features_all[feature_schema.name]
+            output_schema.features.append(
+                FeatureSchema(feature_schema.name, new_dtype)
+            )
+            if new_dtype is feature_schema.dtype:
                 # Reuse feature
-                output_features.append(feature)
+                output_features.append(feature_node)
             else:
                 # Create new feature
                 reuse_node = False
-                output_features.append(
-                    # Note: we're not renaming output features here
-                    Feature(
-                        feature.name,
-                        from_features_all[feature.name],
-                        feature.sampling,
-                        creator=self,
-                    )
-                )
+                output_features.append(Feature(creator=self))
 
-        # Output node: don't create new if all features are reused
-        self.add_output(
-            "output",
-            input
-            if reuse_node
-            else Node(
-                features=output_features,
-                sampling=input.sampling,
-                creator=self,
-            ),
-        )
+        if reuse_node:
+            # Nothing to cast
+            self.add_output("output", input)
+        else:
+            # Some of the features are new, some of the features are re-used.
+            self.add_output(
+                "output",
+                Node.create_with_new_reference(
+                    schema=output_schema,
+                    features=output_features,
+                    sampling=input.sampling_node,
+                    creator=self,
+                ),
+            )
 
         # Used in implementation
         self.reuse_node = reuse_node
@@ -95,6 +99,7 @@ class CastOperator(Operator):
 
     @property
     def check_overflow(self) -> bool:
+        assert isinstance(self.attributes["check_overflow"], bool)
         return self.attributes["check_overflow"]
 
     @property
@@ -105,8 +110,8 @@ class CastOperator(Operator):
         self,
         input: Node,
         to_dtype: Optional[DType] = None,
-        from_dtypes: Optional[Mapping[DType, DType]] = None,
-        from_features: Optional[Mapping[str, DType]] = None,
+        from_dtypes: Optional[Dict[DType, DType]] = None,
+        from_features: Optional[Dict[str, DType]] = None,
     ) -> None:
         # Check that only one of these args was provided
         oneof_args = [to_dtype, from_dtypes, from_features]
@@ -122,7 +127,7 @@ class CastOperator(Operator):
 
         # Check: from_dtypes is a dict {dtype: dtype}
         if from_dtypes is not None and (
-            not isinstance(from_dtypes, Mapping)
+            not isinstance(from_dtypes, dict)
             or any(not isinstance(key, DType) for key in from_dtypes)
             or any(not isinstance(val, DType) for val in from_dtypes.values())
         ):
@@ -132,7 +137,7 @@ class CastOperator(Operator):
 
         # Check: from_features is {feature_name: dtype}
         if from_features is not None and (
-            not isinstance(from_features, Mapping)
+            not isinstance(from_features, dict)
             or any(key not in input.feature_names for key in from_features)
             or any(
                 not isinstance(val, (DType, str))
@@ -147,11 +152,11 @@ class CastOperator(Operator):
         self,
         input: Node,
         to_dtype: Optional[DType] = None,
-        from_dtypes: Optional[Mapping[DType, DType]] = None,
-        from_features: Optional[Mapping[str, DType]] = None,
-    ) -> dict[str, DType]:
+        from_dtypes: Optional[Dict[DType, DType]] = None,
+        from_features: Optional[Dict[str, DType]] = None,
+    ) -> Dict[str, DType]:
         if to_dtype is not None:
-            return {feature.name: to_dtype for feature in input.features}
+            return {feature.name: to_dtype for feature in input.schema.features}
         if from_features is not None:
             # NOTE: In this special case, it's allowed to provide target DType
             # as a string instead of DType (for serialization purposes, since
@@ -160,12 +165,12 @@ class CastOperator(Operator):
                 feature.name: DType(
                     from_features.get(feature.name, feature.dtype)
                 )
-                for feature in input.features
+                for feature in input.schema.features
             }
         if from_dtypes is not None:
             return {
                 feature.name: from_dtypes.get(feature.dtype, feature.dtype)
-                for feature in input.features
+                for feature in input.schema.features
             }
 
     @classmethod
@@ -196,7 +201,7 @@ operator_lib.register_operator(CastOperator)
 
 def cast(
     input: Node,
-    target: Union[DType, Union[Mapping[str, DType], Mapping[DType, DType]]],
+    target: Union[DType, Union[Dict[str, DType], Dict[DType, DType]]],
     check_overflow: bool = True,
 ) -> Node:
     """Casts the dtype of features to the dtype(s) specified in `target`.
@@ -253,8 +258,9 @@ def cast(
     from_dtypes = None
 
     # Further type verifications are done in the operator
-    if isinstance(target, Mapping):
-        if all(key in input.feature_names for key in target):
+    if isinstance(target, map):
+        feature_dict = input.schema.feature_name_to_dtype()
+        if all(key in feature_dict for key in target):
             from_features = target
         elif all(isinstance(key, DType) for key in target):
             from_dtypes = target
@@ -262,10 +268,12 @@ def cast(
             raise ValueError(
                 "Cast: mapping keys should be all DType or feature names.\n"
                 f"Keys: {target.keys()}\n"
-                f"Feature names: {input.feature_names}"
+                f"Feature names: {feature_dict.keys()}"
             )
-    else:
+    elif isinstance(target, DType):
         to_dtype = target
+    else:
+        raise ValueError(f"Not supported target type {target}")
 
     return CastOperator(
         input,

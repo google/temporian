@@ -20,7 +20,7 @@ from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
 from temporian.core.data.duration import Duration
 from temporian.core.data.node import Node
-from temporian.core.data.schema import Schema
+from temporian.core.data.schema import Schema, FeatureSchema
 from temporian.core.operators.window.base import BaseWindowOperator
 
 
@@ -34,7 +34,7 @@ class SimpleMovingAverageOperator(BaseWindowOperator):
     def operator_def_key(cls) -> str:
         return "SIMPLE_MOVING_AVERAGE"
 
-    def get_feature_dtype(self, feature: Feature) -> DType:
+    def get_feature_dtype(self, feature: FeatureSchema) -> DType:
         return (
             DType.FLOAT32 if feature.dtype == DType.FLOAT32 else DType.FLOAT64
         )

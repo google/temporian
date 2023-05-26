@@ -21,7 +21,7 @@ from typing import Optional, List
 from temporian.core.data.duration import Duration
 from temporian.core.data import dtype
 from temporian.core.data.node import Node
-from temporian.core.data.schema import Schema
+from temporian.core.data.schema import Schema, FeatureSchema
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -40,40 +40,33 @@ class BaseWindowOperator(Operator, ABC):
         self._window_length = window_length
         self.add_attribute("window_length", window_length)
 
-        if sampling is not None:
-            self.add_input("sampling", sampling)
-            self._has_sampling = True
-            effective_sampling = sampling.sampling
+        self._has_sampling = sampling is not None
+        if self._has_sampling:
+            assert sampling is not None
 
-            if input.sampling.index != sampling.sampling.index:
-                raise ValueError(
-                    "Event and sampling do not have the same index."
-                    f" {input.sampling.index} != {sampling.sampling.index}"
-                )
+            self.add_input("sampling", sampling)
+            effective_sampling_node = sampling
+
+            input.schema.check_compatible_index(sampling.schema)
 
         else:
-            effective_sampling = input.sampling
-            self._has_sampling = False
+            effective_sampling_node = input
 
         self.add_input("input", input)
 
-        output_features = [  # pylint: disable=g-complex-comprehension
-            Feature(
+        feature_schemas = [  # pylint: disable=g-complex-comprehension
+            FeatureSchema(
                 name=f.name,
                 dtype=self.get_feature_dtype(f),
-                sampling=effective_sampling,
-                creator=self,
             )
-            for f in input.features
+            for f in input.schema.features
         ]
-        self._output_dtypes = [feature.dtype for feature in output_features]
 
-        # output
         self.add_output(
             "output",
-            Node(
-                features=output_features,
-                sampling=effective_sampling,
+            Node.create_new_features_existing_sampling(
+                features=feature_schemas,
+                sampling_node=effective_sampling_node,
                 creator=self,
             ),
         )
@@ -88,10 +81,6 @@ class BaseWindowOperator(Operator, ABC):
     def has_sampling(self) -> bool:
         return self._has_sampling
 
-    @property
-    def output_dtypes(self) -> List[dtype.DType]:
-        return self._output_dtypes
-
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
@@ -100,7 +89,6 @@ class BaseWindowOperator(Operator, ABC):
                 pb.OperatorDef.Attribute(
                     key="window_length",
                     type=pb.OperatorDef.Attribute.Type.FLOAT_64,
-                    is_optional=False,
                 ),
             ],
             inputs=[
@@ -117,5 +105,5 @@ class BaseWindowOperator(Operator, ABC):
         """Gets the key of the operator definition."""
 
     @abstractmethod
-    def get_feature_dtype(self, feature: Feature) -> dtype.DType:
+    def get_feature_dtype(self, feature: FeatureSchema) -> dtype.DType:
         """Gets the dtype of the output feature."""

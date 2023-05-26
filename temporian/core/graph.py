@@ -83,11 +83,11 @@ class Graph:
         return {
             feature
             for node in self.inputs.values()
-            for feature in node.features
+            for feature in node.feature_nodes
         }
 
     def input_samplings(self) -> Set[Sampling]:
-        return {node.sampling for node in self.inputs.values()}
+        return {node.sampling_node for node in self.inputs.values()}
 
     def __repr__(self):
         s = "Graph\n============\n"
@@ -281,8 +281,8 @@ def infer_graph(
 
     # Record all the features and samplings.
     for e in g.nodes:
-        g.add_sampling(e.sampling)
-        for f in e.features:
+        g.add_sampling(e.sampling_node)
+        for f in e.feature_nodes:
             g.add_feature(f)
 
     return g, names_to_nodes

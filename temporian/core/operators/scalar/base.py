@@ -73,7 +73,7 @@ class BaseScalarOperator(Operator):
             ],
         }
         if not self.ignore_value_dtype_checking:
-            for feature in input.features:
+            for feature in input.schema.features:
                 if feature.dtype not in self.map_vtype_dtype[type(value)]:
                     raise ValueError(
                         f"Scalar has {type(value)=}, which can only operate"
@@ -92,13 +92,9 @@ class BaseScalarOperator(Operator):
 
         self.add_output(
             "output",
-            Node.create_with_new_reference(
-                schema=Schema(
-                    features=output_features,
-                    indexes=input.schema.indexes,
-                    is_unix_timestamp=input.schema.is_unix_timestamp,
-                ),
-                sampling=input.sampling,
+            Node.create_new_features_existing_sampling(
+                features=output_features,
+                sampling_node=input,
                 creator=self,
             ),
         )

@@ -37,7 +37,7 @@ class BaseBinaryOperator(Operator):
         self.add_input("input_1", input_1)
         self.add_input("input_2", input_2)
 
-        if input_1.sampling is not input_2.sampling:
+        if input_1.sampling_node is not input_2.sampling_node:
             raise ValueError("input_1 and input_2 must have same sampling.")
 
         if len(input_1.schema.features) != len(input_2.schema.features):
@@ -62,26 +62,22 @@ class BaseBinaryOperator(Operator):
                     f"{feature_1.dtype}, {feature_2.dtype}.",
                 )
 
-        sampling = input_1.sampling
-
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
             FeatureSchema(
                 name=self.output_feature_name(feature_1, feature_2),
                 dtype=self.output_feature_dtype(feature_1, feature_2),
             )
-            for feature_1, feature_2 in zip(input_1.features, input_2.features)
+            for feature_1, feature_2 in zip(
+                input_1.schema.features, input_2.schema.features
+            )
         ]
 
         self.add_output(
             "output",
-            Node.create_with_new_reference(
-                schema=Schema(
-                    features=output_features,
-                    indexes=input_1.schema.indexes,
-                    is_unix_timestamp=input_1.schema.is_unix_timestamp,
-                ),
-                sampling=sampling,
+            Node.create_new_features_existing_sampling(
+                features=output_features,
+                sampling_node=input_1,
                 creator=self,
             ),
         )

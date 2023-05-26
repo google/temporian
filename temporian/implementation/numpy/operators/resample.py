@@ -16,21 +16,19 @@ from typing import Dict
 
 import numpy as np
 
-from temporian.core.operators.sample import Sample
+from temporian.core.operators.resample import Resample
 from temporian.implementation.numpy import implementation_lib
-from temporian.implementation.numpy.data.event_set import DTYPE_REVERSE_MAPPING
-from temporian.implementation.numpy.data.event_set import IndexData
-from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.implementation.numpy_cc.operators import operators_cc
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
-class SampleNumpyImplementation(OperatorImplementation):
+class ResampleNumpyImplementation(OperatorImplementation):
     """Numpy implementation of the sample operator."""
 
-    def __init__(self, operator: Sample) -> None:
+    def __init__(self, operator: Resample) -> None:
         super().__init__(operator)
-        assert isinstance(operator, Sample)
+        assert isinstance(operator, Resample)
 
     def __call__(
         self, input: EventSet, sampling: EventSet
@@ -99,5 +97,5 @@ class SampleNumpyImplementation(OperatorImplementation):
 
 
 implementation_lib.register_operator_implementation(
-    Sample, SampleNumpyImplementation
+    Resample, ResampleNumpyImplementation
 )

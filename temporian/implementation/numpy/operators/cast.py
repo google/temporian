@@ -5,10 +5,7 @@ import numpy as np
 from temporian.core.data.dtype import DType
 from temporian.core.operators.cast import CastOperator
 from temporian.implementation.numpy import implementation_lib
-from temporian.implementation.numpy.data.event_set import DTYPE_MAPPING
-from temporian.implementation.numpy.data.event_set import DTYPE_REVERSE_MAPPING
-from temporian.implementation.numpy.data.event_set import IndexData
-from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 

@@ -2,14 +2,14 @@ from absl.testing import absltest
 
 import pandas as pd
 
-from temporian.core.operators.set_index import SetIndexOperator
+from temporian.core.operators.add_index import AddIndexOperator
 from temporian.implementation.numpy.data.event_set import EventSet
-from temporian.implementation.numpy.operators.set_index import (
-    SetIndexNumpyImplementation,
+from temporian.implementation.numpy.operators.add_index import (
+    AddIndexNumpyImplementation,
 )
 
 
-class SetIndexNumpyImplementationTest(absltest.TestCase):
+class AddIndexNumpyImplementationTest(absltest.TestCase):
     def setUp(self) -> None:
         # input event set
         self.input_evset = EventSet.from_dataframe(
@@ -60,11 +60,11 @@ class SetIndexNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["state_id", "store_id"],
         )
-        operator = SetIndexOperator(
+        operator = AddIndexOperator(
             self.input_node, feature_names="store_id", append=True
         )
         # instance operator implementation
-        operator_impl = SetIndexNumpyImplementation(operator)
+        operator_impl = AddIndexNumpyImplementation(operator)
 
         # call operator
         output_evset = operator_impl.call(input=self.input_evset)["output"]
@@ -95,13 +95,13 @@ class SetIndexNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["state_id", "store_id", "item_id"],
         )
-        operator = SetIndexOperator(
+        operator = AddIndexOperator(
             self.input_node,
             feature_names=["store_id", "item_id"],
             append=True,
         )
         # instance operator implementation
-        operator_impl = SetIndexNumpyImplementation(operator)
+        operator_impl = AddIndexNumpyImplementation(operator)
 
         # call operator
         output_evset = operator_impl.call(input=self.input_evset)["output"]
@@ -131,11 +131,11 @@ class SetIndexNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id"],
         )
-        operator = SetIndexOperator(
+        operator = AddIndexOperator(
             self.input_node, feature_names=["store_id"], append=False
         )
         # instance operator implementation
-        operator_impl = SetIndexNumpyImplementation(operator)
+        operator_impl = AddIndexNumpyImplementation(operator)
 
         # call operator
         output_evset = operator_impl.call(input=self.input_evset)["output"]
@@ -165,13 +165,13 @@ class SetIndexNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id", "item_id"],
         )
-        operator = SetIndexOperator(
+        operator = AddIndexOperator(
             self.input_node,
             feature_names=["store_id", "item_id"],
             append=False,
         )
         # instance operator implementation
-        operator_impl = SetIndexNumpyImplementation(operator)
+        operator_impl = AddIndexNumpyImplementation(operator)
 
         # call operator
         output_evset = operator_impl.call(input=self.input_evset)["output"]

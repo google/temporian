@@ -92,9 +92,13 @@ class DType(Enum):
         raise ValueError(f"Non-implemented type {python_type}")
 
 
-class IndexDType(Enum):
-    """The type of an index."""
+# The dtype of indexes.
+IndexDType = DType
 
-    INT32 = DType.INT32.value
-    INT64 = DType.INT64.value
-    STRING = DType.STRING.value
+
+def check_is_valid_index_dtype(dtype: DType):
+    if dtype not in [DType.INT32, DType.INT64, DType.STRING]:
+        raise ValueError(
+            f"Trying to create an index with dtype={dtype}. The dtype of an"
+            " index can only be int32, int64 or string."
+        )

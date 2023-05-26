@@ -615,7 +615,7 @@ daily_sales = tp.EventSet(
 a = daily_sales.node()
 
 # Set the "product" feature as the index.
-b = tp.set_index(a, "product")
+b = tp.add_index(a, "product")
 
 # Compute the moving sum of each product individually.
 c = tp.moving_sum(b, window_length=tp.duration.weeks(1))
@@ -627,7 +627,7 @@ Horizontal operators can be understood as operators that are applied independent
 
 Operators that modify an `EventSet`'s index are called _vertical operators_. The most important vertical operators are:
 
-- `tp.set_index`: Set features as index or add them to the existing one.
+- `tp.add_index`: Set features as index or add them to the existing one.
 - `tp.drop_index`: Remove features from the index, optionally keeping them as features.
 - `tp.propagate`: Expand an index based on another `EventSet`’s index.
 
@@ -660,7 +660,7 @@ b = tp.glue(
         "sales"
     ),
 )
-b = tp.set_index(b, ["product", "store"] )
+b = tp.add_index(b, ["product", "store"] )
 
 # Moving sum computed individually for each (product, store).
 c = tp.moving_sum(b["sales"], window_length=tp.duration.weeks(1))
@@ -669,7 +669,7 @@ c = tp.moving_sum(b["sales"], window_length=tp.duration.weeks(1))
 Now, let's compute the daily sum of sales for each store.
 
 ```python
-d = tp.set_index(a, "store")
+d = tp.add_index(a, "store")
 e = tp.moving_sum(d["sales"], window_length=tp.duration.weeks(1))
 
 # Which is equivalent to

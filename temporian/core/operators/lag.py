@@ -36,33 +36,16 @@ class LagOperator(Operator):
         self._duration = duration
         self._duration_str = duration_abbreviation(duration)
 
-        # inputs
         self.add_input("input", input)
 
         self.add_attribute("duration", duration)
 
-        output_sampling = Sampling(
-            index_levels=input.sampling.index.levels,
-            creator=self,
-            is_unix_timestamp=input.sampling.is_unix_timestamp,
-        )
-
-        # outputs
-        output_features = [  # pylint: disable=g-complex-comprehension
-            Feature(
-                name=f.name,
-                dtype=f.dtype,
-                sampling=output_sampling,
-                creator=self,
-            )
-            for f in input.features
-        ]
-
         self.add_output(
             "output",
-            Node(
-                features=output_features,
-                sampling=output_sampling,
+            Node.create_new_features_new_sampling(
+                features=input.schema.features,
+                indexes=input.schema.indexes,
+                is_unix_timestamp=input.schema.is_unix_timestamp,
                 creator=self,
             ),
         )
@@ -99,7 +82,7 @@ def _implementation(
     input: Node,
     duration: Union[Duration, List[Duration]],
     should_leak: bool = False,
-) -> Node:
+) -> Union[Node, List[Node]]:
     """Lags or leaks `input` depending on `should_leak`."""
 
     if not isinstance(duration, list):

@@ -19,6 +19,7 @@ from temporian.core import operator_lib
 from temporian.core.data.node import Node
 from temporian.core.data.schema import Schema
 from temporian.core.operators.base import Operator
+from temporian.core.operators.resample import Resample
 from temporian.proto import core_pb2 as pb
 
 
@@ -35,38 +36,35 @@ class Propagate(Operator):
 
         self._index_mapping: list[int] = []
 
-        sampling_index_name = sampling.schema.index_names
-        sampling_index_dtypes = sampling.schema.index_dtypes
+        sampling_index_name = sampling.schema.index_names()
+        sampling_index_dtypes = sampling.schema.index_dtypes()
 
-        for index_name, index_type in input.schema.indexes:
+        for index in input.schema.indexes:
             try:
-                sampling_idx = sampling_index_name.index(index_name)
+                sampling_idx = sampling_index_name.index(index.name)
                 self._index_mapping.append(sampling_idx)
             except ValueError as exc:
                 raise ValueError(
                     "The index of input should be contained in the index of"
-                    f' sampling. Index "{index_name}" from input is not'
+                    f' sampling. Index "{index.name}" from input is not'
                     " available in sampling. input.index="
                     f" {input.schema.indexes},"
                     f" sampling.index={sampling.schema.indexes}."
                 ) from exc
-            if sampling_index_dtypes[sampling_idx] != index_type:
+            if sampling_index_dtypes[sampling_idx] != index.dtype:
                 raise ValueError(
-                    f'The index "{index_name}" is found both in the input and'
+                    f'The index "{index.name}" is found both in the input and'
                     " sampling argument. However, the dtype is different."
-                    f" {index_type} != {sampling_index_dtypes[sampling_idx]}"
+                    f" {index.dtype} != {sampling_index_dtypes[sampling_idx]}"
                 )
 
-        output_schema = Schema(
-            features=input.features,
-            indexes=sampling.schema.indexes,
-            is_unix_timestamp=sampling.schema.is_unix_timestamp,
-        )
-
+        # Note: The propagate operator creates a new sampling.
         self.add_output(
             "output",
-            Node.create_with_new_reference(
-                schema=output_schema,
+            Node.create_new_features_new_sampling(
+                features=input.schema.features,
+                indexes=sampling.schema.indexes,
+                is_unix_timestamp=sampling.schema.is_unix_timestamp,
                 creator=self,
             ),
         )
@@ -93,10 +91,7 @@ class Propagate(Operator):
 operator_lib.register_operator(Propagate)
 
 
-def propagate(
-    input: Node,
-    sampling: Node,
-) -> Node:
+def propagate(input: Node, sampling: Node, resample: bool = False) -> Node:
     """Propagates feature values over a larger index.
 
     Given `input` and `sampling` where `input` contains a super index of
@@ -122,12 +117,19 @@ def propagate(
     Args:
         input: Node to propagate.
         sampling: Index to propagate over.
+        resample: If true, apply a tp.resample operator. In this case, the
+          output of "propagate" has the same sampling as "sampling".
 
     Returns:
         Node propagated over `sampling`'s index.
     """
 
-    return Propagate(
+    result = Propagate(
         input=input,
         sampling=sampling,
     ).outputs["output"]
+
+    if resample:
+        result = Resample(input=result, sampling=sampling).outputs["output"]
+
+    return result

@@ -240,7 +240,7 @@ augmented_sales = tp.glue(
 lagged_sales = []
 for lag in [1, 2]:
     lagged_sales.append(
-        tp.sample(
+        tp.resample(
             tp.prefix(f"lag_{lag}.", tp.lag(sales, tp.duration.days(lag))),
             sales,
         )
@@ -257,7 +257,7 @@ calendar_events = tp.glue(
 label_sales = []
 for lag in [1, 2, 3]:
     label_sales.append(
-        tp.sample(
+        tp.resample(
             tp.prefix(f"leak_{lag}.", tp.leak(sales, tp.duration.days(lag))),
             sales,
         )
@@ -277,7 +277,7 @@ sum_daily_sales_per_dept = tp.prefix(
 )
 
 # For each item, add the sum of departement sales for this specific item.
-sales_aggregated_item_level = tp.sample(
+sales_aggregated_item_level = tp.resample(
     tp.propagate(sum_daily_sales_per_dept, sales), sales
 )
 
