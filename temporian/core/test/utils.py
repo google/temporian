@@ -23,7 +23,7 @@ def create_input_node(name: Optional[str] = None):
             ("f1", DType.FLOAT64),
             ("f2", DType.FLOAT64),
         ],
-        indexes=[("x", DType.INT32), ("y", DType.STRING)],
+        indexes=[("x", DType.INT64), ("y", DType.STRING)],
         name=name,
     )
 

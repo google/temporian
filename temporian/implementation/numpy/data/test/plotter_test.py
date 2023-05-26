@@ -7,6 +7,9 @@ from temporian.implementation.numpy.data import plotter
 from temporian.implementation.numpy.data.event_set import IndexData
 from temporian.implementation.numpy.data.event_set import EventSet
 
+# Load all the implementations
+from temporian.implementation.numpy.operators import all_operators as _impls
+
 
 class PlotterTest(parameterized.TestCase):
     def setUp(self):

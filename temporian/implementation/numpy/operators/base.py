@@ -64,7 +64,9 @@ def _check_value_to_schema(
             for feature_value, feature_schema in zip(
                 index_data.features, value.schema.features
             ):
-                expecterd_tdtype = numpy_array_to_tp_dtype(feature_value)
+                expecterd_tdtype = numpy_array_to_tp_dtype(
+                    feature_schema.name, feature_value
+                )
                 if feature_schema.dtype != expecterd_tdtype:
                     raise RuntimeError(
                         f"Non matching {label} feature dtype. "

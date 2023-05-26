@@ -14,7 +14,7 @@
 
 from absl.testing import absltest
 
-from temporian.core.data.node import Node
+from temporian.core.data.node import Node, input_node
 from temporian.core.operators import base
 from temporian.proto import core_pb2 as pb
 
@@ -39,11 +39,7 @@ class OperatorTest(absltest.TestCase):
                 raise NotImplementedError()
 
         def build_fake_node():
-            return Node(
-                features=[],
-                sampling=Sampling(index_levels=[], is_unix_timestamp=False),
-                creator=None,
-            )
+            return input_node(features=[])
 
         t = ToyOperator()
         with self.assertRaisesRegex(ValueError, 'Missing input "input"'):

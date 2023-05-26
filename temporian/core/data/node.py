@@ -85,8 +85,8 @@ class Node(object):
     def create_new_features_existing_sampling(
         features: List[FeatureSchema] | List[Tuple[str, DType]],
         sampling_node: Node,
+        creator: Optional[Operator],
         name: Optional[str] = None,
-        creator: Optional[Operator] = None,
     ) -> Node:
         """Creates a node with an existing sampling and new features.
 
@@ -96,7 +96,6 @@ class Node(object):
         # TODO: Use better way
         assert sampling_node is not None
         assert features is not None
-        assert creator is not None
         assert isinstance(sampling_node, Node)
         assert isinstance(features, List)
         assert (
@@ -125,8 +124,8 @@ class Node(object):
         features: List[FeatureSchema] | List[Tuple[str, DType]],
         indexes: List[IndexSchema] | List[Tuple[str, IndexDType]],
         is_unix_timestamp: bool,
+        creator: Optional[Operator],
         name: Optional[str] = None,
-        creator: Optional[Operator] = None,
     ) -> Node:
         """Creates a node with a new sampling and new features."""
 
@@ -540,16 +539,43 @@ def input_node(
     features: List[Tuple[str, DType]],
     indexes: Optional[List[Tuple[str, IndexDType]]] = None,
     is_unix_timestamp: bool = False,
+    same_sampling_as: Optional[Node] = None,
     name: Optional[str] = None,
 ) -> Node:
-    """Creates a node manually."""
+    """Creates a node manually.
 
-    if indexes is None:
-        indexes = []
+    Args:
+        features: List of names and dtypes of the features.
+        indexes: List of names and dtypes of the index. If empty, the data is
+          assumed not indexed.
+        is_unix_timestamp: If true, the timestamps are interpreted as unix
+          timestamps in seconds.
+        same_sampling_as: If set, the created node is guarentied to have the
+          same sampling as "same_sampling_as". In this case, "indexes" and
+          "is_unix_timestamp" should not be provided. Some operators require for
+          input nodes to have the same sampling.
+    """
 
-    return Node.create_new_features_new_sampling(
-        features=features,
-        indexes=indexes,
-        is_unix_timestamp=is_unix_timestamp,
-        name=name,
-    )
+    if same_sampling_as is not None:
+        if indexes is not None:
+            raise ValueError(
+                "indexes cannot be provided with same_sampling_as=True"
+            )
+        return Node.create_new_features_existing_sampling(
+            features=features,
+            sampling_node=same_sampling_as,
+            name=name,
+            creator=None,
+        )
+
+    else:
+        if indexes is None:
+            indexes = []
+
+        return Node.create_new_features_new_sampling(
+            features=features,
+            indexes=indexes,
+            is_unix_timestamp=is_unix_timestamp,
+            name=name,
+            creator=None,
+        )

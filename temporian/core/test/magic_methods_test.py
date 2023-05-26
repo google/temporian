@@ -14,10 +14,10 @@
 
 from absl.testing import absltest
 
-from temporian.core.data import node as node_lib
+from temporian.core.data.node import input_node
 from temporian.core.test import utils
 from temporian.core.data.dtype import DType
-from temporian.core.data.schema import Schema
+from temporian.core.data.schema import Schema, FeatureSchema
 from temporian.core.operators.binary import (
     AddOperator,
     DivideOperator,
@@ -60,40 +60,42 @@ from temporian.core.operators.unary import AbsOperator, InvertOperator
 
 class MagicMethodsTest(absltest.TestCase):
     def setUp(self):
-        self.sampling = Sampling(
-            index_levels=[("x", DType.INT32)], is_unix_timestamp=False
+        self.sampling_node = input_node(
+            features=[],
+            indexes=[("x", DType.INT32)],
+            is_unix_timestamp=False,
         )
 
         # Nodes with floating point types
-        self.node_float_1 = node_lib.input_node(
+        self.node_float_1 = input_node(
             features=[
-                Feature("f1", DType.FLOAT32),
-                Feature("f2", DType.FLOAT64),
+                ("f1", DType.FLOAT32),
+                ("f2", DType.FLOAT64),
             ],
-            sampling=self.sampling,
+            same_sampling_as=self.sampling_node,
         )
-        self.node_float_2 = node_lib.input_node(
+        self.node_float_2 = input_node(
             features=[
-                Feature("f3", DType.FLOAT32),
-                Feature("f4", DType.FLOAT64),
+                ("f3", DType.FLOAT32),
+                ("f4", DType.FLOAT64),
             ],
-            sampling=self.sampling,
+            same_sampling_as=self.sampling_node,
         )
 
         # Nodes with integer types (only for division operations)
-        self.node_int_1 = node_lib.input_node(
+        self.node_int_1 = input_node(
             features=[
-                Feature("f5", DType.INT32),
-                Feature("f6", DType.INT64),
+                ("f5", DType.INT32),
+                ("f6", DType.INT64),
             ],
-            sampling=self.sampling,
+            same_sampling_as=self.sampling_node,
         )
-        self.node_int_2 = node_lib.input_node(
+        self.node_int_2 = input_node(
             features=[
-                Feature("f7", DType.INT32),
-                Feature("f8", DType.INT64),
+                ("f7", DType.INT32),
+                ("f8", DType.INT64),
             ],
-            sampling=self.sampling,
+            same_sampling_as=self.sampling_node,
         )
 
         # Nodes with boolean types for logic operators
@@ -126,45 +128,43 @@ class MagicMethodsTest(absltest.TestCase):
 
     def _check_node_boolean(self, node_out):
         # Auxiliar function to check arithmetic outputs
-        assert node_out.sampling is self.sampling
-        assert node_out.features[0].creator is node_out.creator
-        assert node_out.features[1].creator is node_out.creator
-        assert node_out.features[0].dtype == DType.BOOLEAN
-        assert node_out.features[1].dtype == DType.BOOLEAN
+        assert node_out.sampling_node is self.sampling_node.sampling_node
+        assert node_out.schema.features[0].dtype == DType.BOOLEAN
+        assert node_out.schema.features[1].dtype == DType.BOOLEAN
 
     def test_not_equal(self):
         node_out = self.node_float_1 != self.node_float_2
         assert isinstance(node_out.creator, NotEqualOperator)
-        assert node_out.features[0].name == "ne_f1_f3"
-        assert node_out.features[1].name == "ne_f2_f4"
+        assert node_out.schema.features[0].name == "ne_f1_f3"
+        assert node_out.schema.features[1].name == "ne_f2_f4"
         self._check_node_boolean(node_out)
 
     def test_greater(self):
         node_out = self.node_float_1 > self.node_float_2
         assert isinstance(node_out.creator, GreaterOperator)
-        assert node_out.features[0].name == "gt_f1_f3"
-        assert node_out.features[1].name == "gt_f2_f4"
+        assert node_out.schema.features[0].name == "gt_f1_f3"
+        assert node_out.schema.features[1].name == "gt_f2_f4"
         self._check_node_boolean(node_out)
 
     def test_less(self):
         node_out = self.node_float_1 < self.node_float_2
         assert isinstance(node_out.creator, LessOperator)
-        assert node_out.features[0].name == "lt_f1_f3"
-        assert node_out.features[1].name == "lt_f2_f4"
+        assert node_out.schema.features[0].name == "lt_f1_f3"
+        assert node_out.schema.features[1].name == "lt_f2_f4"
         self._check_node_boolean(node_out)
 
     def test_greater_equal(self):
         node_out = self.node_float_1 >= self.node_float_2
         assert isinstance(node_out.creator, GreaterEqualOperator)
-        assert node_out.features[0].name == "ge_f1_f3"
-        assert node_out.features[1].name == "ge_f2_f4"
+        assert node_out.schema.features[0].name == "ge_f1_f3"
+        assert node_out.schema.features[1].name == "ge_f2_f4"
         self._check_node_boolean(node_out)
 
     def test_less_equal(self):
         node_out = self.node_float_1 <= self.node_float_2
         assert isinstance(node_out.creator, LessEqualOperator)
-        assert node_out.features[0].name == "le_f1_f3"
-        assert node_out.features[1].name == "le_f2_f4"
+        assert node_out.schema.features[0].name == "le_f1_f3"
+        assert node_out.schema.features[1].name == "le_f2_f4"
         self._check_node_boolean(node_out)
 
     ###################################
@@ -174,36 +174,36 @@ class MagicMethodsTest(absltest.TestCase):
     def test_not_equal_scalar(self):
         node_out = self.node_float_1 != 3
         assert isinstance(node_out.creator, NotEqualScalarOperator)
-        assert node_out.features[0].name == "f1"
-        assert node_out.features[1].name == "f2"
+        assert node_out.schema.features[0].name == "f1"
+        assert node_out.schema.features[1].name == "f2"
         self._check_node_boolean(node_out)
 
     def test_greater_scalar(self):
         node_out = self.node_float_1 > 3.0
         assert isinstance(node_out.creator, GreaterScalarOperator)
-        assert node_out.features[0].name == "f1"
-        assert node_out.features[1].name == "f2"
+        assert node_out.schema.features[0].name == "f1"
+        assert node_out.schema.features[1].name == "f2"
         self._check_node_boolean(node_out)
 
     def test_less_scalar(self):
         node_out = self.node_float_1 < 3
         assert isinstance(node_out.creator, LessScalarOperator)
-        assert node_out.features[0].name == "f1"
-        assert node_out.features[1].name == "f2"
+        assert node_out.schema.features[0].name == "f1"
+        assert node_out.schema.features[1].name == "f2"
         self._check_node_boolean(node_out)
 
     def test_greater_equal_scalar(self):
         node_out = self.node_float_1 >= 3.0
         assert isinstance(node_out.creator, GreaterEqualScalarOperator)
-        assert node_out.features[0].name == "f1"
-        assert node_out.features[1].name == "f2"
+        assert node_out.schema.features[0].name == "f1"
+        assert node_out.schema.features[1].name == "f2"
         self._check_node_boolean(node_out)
 
     def test_less_equal_scalar(self):
         node_out = self.node_float_1 <= 0.5
         assert isinstance(node_out.creator, LessEqualScalarOperator)
-        assert node_out.features[0].name == "f1"
-        assert node_out.features[1].name == "f2"
+        assert node_out.schema.features[0].name == "f1"
+        assert node_out.schema.features[1].name == "f2"
         self._check_node_boolean(node_out)
 
     ########################
@@ -235,38 +235,42 @@ class MagicMethodsTest(absltest.TestCase):
 
     def _check_node_same_dtype(self, node_in, node_out):
         # Auxiliar function to check arithmetic outputs
-        assert node_out.sampling is self.sampling
-        assert node_out.features[0].creator is node_out.creator
-        assert node_out.features[1].creator is node_out.creator
-        assert node_out.features[0].dtype == node_in.features[0].dtype
-        assert node_out.features[1].dtype == node_in.features[1].dtype
+        assert node_out.sampling_node is self.sampling_node.sampling_node
+        assert (
+            node_out.schema.features[0].dtype
+            == node_in.schema.features[0].dtype
+        )
+        assert (
+            node_out.schema.features[1].dtype
+            == node_in.schema.features[1].dtype
+        )
 
     def test_addition(self):
         node_out = self.node_float_1 + self.node_float_2
         assert isinstance(node_out.creator, AddOperator)
-        assert node_out.features[0].name == "add_f1_f3"
-        assert node_out.features[1].name == "add_f2_f4"
+        assert node_out.schema.features[0].name == "add_f1_f3"
+        assert node_out.schema.features[1].name == "add_f2_f4"
         self._check_node_same_dtype(self.node_float_1, node_out)
 
     def test_subtraction(self):
         node_out = self.node_float_1 - self.node_float_2
         assert isinstance(node_out.creator, SubtractOperator)
-        assert node_out.features[0].name == "sub_f1_f3"
-        assert node_out.features[1].name == "sub_f2_f4"
+        assert node_out.schema.features[0].name == "sub_f1_f3"
+        assert node_out.schema.features[1].name == "sub_f2_f4"
         self._check_node_same_dtype(self.node_float_1, node_out)
 
     def test_multiplication(self):
         node_out = self.node_float_1 * self.node_float_2
         assert isinstance(node_out.creator, MultiplyOperator)
-        assert node_out.features[0].name == "mult_f1_f3"
-        assert node_out.features[1].name == "mult_f2_f4"
+        assert node_out.schema.features[0].name == "mult_f1_f3"
+        assert node_out.schema.features[1].name == "mult_f2_f4"
         self._check_node_same_dtype(self.node_float_1, node_out)
 
     def test_division(self):
         node_out = self.node_float_1 / self.node_float_2
         assert isinstance(node_out.creator, DivideOperator)
-        assert node_out.features[0].name == "div_f1_f3"
-        assert node_out.features[1].name == "div_f2_f4"
+        assert node_out.schema.features[0].name == "div_f1_f3"
+        assert node_out.schema.features[1].name == "div_f2_f4"
         self._check_node_same_dtype(self.node_float_1, node_out)
 
     def test_floordiv(self):
@@ -277,22 +281,22 @@ class MagicMethodsTest(absltest.TestCase):
         # Check floordiv operator instead
         node_out = self.node_int_1 // self.node_int_2
         assert isinstance(node_out.creator, FloorDivOperator)
-        assert node_out.features[0].name == "floordiv_f5_f7"
-        assert node_out.features[1].name == "floordiv_f6_f8"
+        assert node_out.schema.features[0].name == "floordiv_f5_f7"
+        assert node_out.schema.features[1].name == "floordiv_f6_f8"
         self._check_node_same_dtype(self.node_int_1, node_out)
 
     def test_modulo(self):
         node_out = self.node_float_1 % self.node_float_2
         assert isinstance(node_out.creator, ModuloOperator)
-        assert node_out.features[0].name == "mod_f1_f3"
-        assert node_out.features[1].name == "mod_f2_f4"
+        assert node_out.schema.features[0].name == "mod_f1_f3"
+        assert node_out.schema.features[1].name == "mod_f2_f4"
         self._check_node_same_dtype(self.node_float_1, node_out)
 
     def test_power(self):
         node_out = self.node_float_1**self.node_float_2
         assert isinstance(node_out.creator, PowerOperator)
-        assert node_out.features[0].name == "pow_f1_f3"
-        assert node_out.features[1].name == "pow_f2_f4"
+        assert node_out.schema.features[0].name == "pow_f1_f3"
+        assert node_out.schema.features[1].name == "pow_f2_f4"
         self._check_node_same_dtype(self.node_float_1, node_out)
 
     ###################################
@@ -307,8 +311,8 @@ class MagicMethodsTest(absltest.TestCase):
         # Should work: float node and int scalar
         node_out = self.node_float_1 + 3
         assert isinstance(node_out.creator, AddScalarOperator)
-        assert node_out.features[0].name == "f1"
-        assert node_out.features[1].name == "f2"
+        assert node_out.schema.features[0].name == "f1"
+        assert node_out.schema.features[1].name == "f2"
         self._check_node_same_dtype(self.node_float_1, node_out)
 
     def test_right_addition_scalar(self):
@@ -319,8 +323,8 @@ class MagicMethodsTest(absltest.TestCase):
         # Should work: float node and int scalar
         node_out = 3 + self.node_float_1
         assert isinstance(node_out.creator, AddScalarOperator)
-        assert node_out.features[0].name == "f1"
-        assert node_out.features[1].name == "f2"
+        assert node_out.schema.features[0].name == "f1"
+        assert node_out.schema.features[1].name == "f2"
         self._check_node_same_dtype(self.node_float_1, node_out)
 
     def test_division_scalar(self):
@@ -331,8 +335,8 @@ class MagicMethodsTest(absltest.TestCase):
         # Should work: float node and int scalar
         node_out = self.node_float_1 / 3
         assert isinstance(node_out.creator, DivideScalarOperator)
-        assert node_out.features[0].name == "f1"
-        assert node_out.features[1].name == "f2"
+        assert node_out.schema.features[0].name == "f1"
+        assert node_out.schema.features[1].name == "f2"
         self._check_node_same_dtype(self.node_float_1, node_out)
 
     def test_right_division_scalar(self):
@@ -343,26 +347,26 @@ class MagicMethodsTest(absltest.TestCase):
         # Should work: divide by float node
         node_out = 3 / self.node_float_1
         assert isinstance(node_out.creator, DivideScalarOperator)
-        assert node_out.features[0].name == "f1"
-        assert node_out.features[1].name == "f2"
+        assert node_out.schema.features[0].name == "f1"
+        assert node_out.schema.features[1].name == "f2"
         self._check_node_same_dtype(self.node_float_1, node_out)
 
     def test_floordiv_scalar(self):
         # int node
         node_out = self.node_int_1 // 3
-        assert node_out.features[0].name == "f5"
-        assert node_out.features[1].name == "f6"
+        assert node_out.schema.features[0].name == "f5"
+        assert node_out.schema.features[1].name == "f6"
 
         # int node (right)
         node_out = 3 // self.node_int_1
-        assert node_out.features[0].name == "f5"
-        assert node_out.features[1].name == "f6"
+        assert node_out.schema.features[0].name == "f5"
+        assert node_out.schema.features[1].name == "f6"
 
         # float node
         node_out = self.node_float_1 // 3
         assert isinstance(node_out.creator, FloorDivScalarOperator)
-        assert node_out.features[0].name == "f1"
-        assert node_out.features[1].name == "f2"
+        assert node_out.schema.features[0].name == "f1"
+        assert node_out.schema.features[1].name == "f2"
         self._check_node_same_dtype(self.node_float_1, node_out)
 
     def test_multiply_scalar(self):
@@ -370,8 +374,8 @@ class MagicMethodsTest(absltest.TestCase):
         assert isinstance(node_out.creator, MultiplyScalarOperator)
         node_out = self.node_float_1 * 3
         assert isinstance(node_out.creator, MultiplyScalarOperator)
-        assert node_out.features[0].name == "f1"
-        assert node_out.features[1].name == "f2"
+        assert node_out.schema.features[0].name == "f1"
+        assert node_out.schema.features[1].name == "f2"
         self._check_node_same_dtype(self.node_float_1, node_out)
 
     def test_subtract_scalar(self):
@@ -379,8 +383,8 @@ class MagicMethodsTest(absltest.TestCase):
         assert isinstance(node_out.creator, SubtractScalarOperator)
         node_out = self.node_float_1 - 3
         assert isinstance(node_out.creator, SubtractScalarOperator)
-        assert node_out.features[0].name == "f1"
-        assert node_out.features[1].name == "f2"
+        assert node_out.schema.features[0].name == "f1"
+        assert node_out.schema.features[1].name == "f2"
         self._check_node_same_dtype(self.node_float_1, node_out)
 
     def test_modulo_scalar(self):
@@ -388,8 +392,8 @@ class MagicMethodsTest(absltest.TestCase):
         assert isinstance(node_out.creator, ModuloScalarOperator)
         node_out = self.node_float_1 % 3
         assert isinstance(node_out.creator, ModuloScalarOperator)
-        assert node_out.features[0].name == "f1"
-        assert node_out.features[1].name == "f2"
+        assert node_out.schema.features[0].name == "f1"
+        assert node_out.schema.features[1].name == "f2"
         self._check_node_same_dtype(self.node_float_1, node_out)
 
     def test_power_scalar(self):
@@ -397,8 +401,8 @@ class MagicMethodsTest(absltest.TestCase):
         assert isinstance(node_out.creator, PowerScalarOperator)
         node_out = self.node_float_1**3
         assert isinstance(node_out.creator, PowerScalarOperator)
-        assert node_out.features[0].name == "f1"
-        assert node_out.features[1].name == "f2"
+        assert node_out.schema.features[0].name == "f1"
+        assert node_out.schema.features[1].name == "f2"
         self._check_node_same_dtype(self.node_float_1, node_out)
 
     ########################

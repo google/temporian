@@ -38,6 +38,8 @@ _PYTHON_DTYPE_MAPPING = {
 }
 
 # Mapping of temporian types to / from numpy types.
+#
+# np.object_ is not automatically converted into DType.STRING
 _DTYPE_MAPPING = {
     np.float64: DType.FLOAT64,
     np.float32: DType.FLOAT32,
@@ -46,13 +48,14 @@ _DTYPE_MAPPING = {
     np.str_: DType.STRING,
     np.string_: DType.STRING,
     np.bool_: DType.BOOLEAN,
+    np.datetime64: DType.INT64,
 }
 _DTYPE_REVERSE_MAPPING = {
     DType.FLOAT64: np.float64,
     DType.FLOAT32: np.float32,
     DType.INT64: np.int64,
     DType.INT32: np.int32,
-    DType.STRING: np.str_,
+    DType.STRING: np.string_,
     DType.BOOLEAN: np.bool_,
 }
 
@@ -61,21 +64,115 @@ def is_supported_numpy_dtype(numpy_dtype) -> bool:
     return numpy_dtype in _DTYPE_MAPPING
 
 
-def numpy_dtype_to_tp_dtype(numpy_dtype) -> DType:
+def numpy_dtype_to_tp_dtype(feature_name: str, numpy_dtype) -> DType:
     """Converts a numpy dtype into a temporian dtype."""
+
+    if numpy_dtype not in _DTYPE_MAPPING:
+        raise ValueError(
+            f"Features {feature_name!r} with dtype {numpy_dtype} cannot be"
+            " imported in Temporian. Supported"
+            f" dtypes={list(_DTYPE_MAPPING.keys())}."
+        )
 
     return _DTYPE_MAPPING[numpy_dtype]
 
 
-def numpy_array_to_tp_dtype(numpy_array: np.ndarray) -> DType:
+def numpy_array_to_tp_dtype(
+    feature_name: str, numpy_array: np.ndarray
+) -> DType:
     """Gets the matching temporian dtype of a numpy array."""
 
-    return numpy_dtype_to_tp_dtype(numpy_array.dtype.type)
+    return numpy_dtype_to_tp_dtype(feature_name, numpy_array.dtype.type)
+
+
+def normalize_features(
+    raw_feature_values: Any,
+) -> np.ndarray:
+    """Normalies a list of feature values to temporian format.
+
+    "normalize_features" should match "_DTYPE_MAPPING".
+    """
+
+    if not isinstance(raw_feature_values, np.ndarray):
+        # The data is not a np.array
+
+        if isinstance(raw_feature_values, list) and all(
+            [isinstance(x, (str, bytes)) for x in raw_feature_values]
+        ):
+            # All the values are python strings.
+            raw_feature_values = np.array(raw_feature_values, dtype=np.string_)
+        else:
+            raw_feature_values = np.array(raw_feature_values)
+
+    else:
+        if raw_feature_values.dtype.type == np.str_:
+            raw_feature_values = raw_feature_values.astype(np.string_)
+
+        if raw_feature_values.dtype.type == np.object_ and all(
+            isinstance(x, str) for x in raw_feature_values
+        ):
+            # This is a np.array of python string.
+            raw_feature_values = raw_feature_values.astype(np.string_)
+
+        if raw_feature_values.dtype.type == np.datetime64:
+            raw_feature_values = raw_feature_values.astype(
+                "datetime64[s]"
+            ).astype(np.int64)
+
+    return raw_feature_values
+
+
+def normalize_timestamps(
+    raw_timestamps: Any,
+) -> Tuple[np.ndarray, bool]:
+    """Normalizes timestamps to temporian format.
+
+    Returns:
+        Normalized timestamps (numpy float64 of unix epoch in seconds) and if
+        the raw timestamps look like a unix epoch.
+    """
+
+    # Convert to numpy array
+    if not isinstance(raw_timestamps, np.ndarray):
+        raw_timestamps = np.array(raw_timestamps)
+
+    # raw_timestamps is represented as a number. Cast to float64.
+    if raw_timestamps.dtype.type in [np.float32, np.int64, np.int32]:
+        raw_timestamps = raw_timestamps.astype(np.float64)
+
+    if raw_timestamps.dtype.type == np.float64:
+        # Check NaN
+        if np.isnan(raw_timestamps).any():
+            raise ValueError("Timestamps contains NaN values.")
+
+        return raw_timestamps, False
+
+    if raw_timestamps.dtype.type == np.datetime64:
+        # raw_timestamps is a date. Cast to unix epoch in float64 seconds.
+        raw_timestamps = (
+            raw_timestamps.astype("datetime64[ns]").astype(np.float64) / 1e9
+        )
+        return raw_timestamps, True
+
+    if raw_timestamps.dtype.type == np.object_ and all(
+        isinstance(x, str) for x in raw_timestamps
+    ):
+        # raw_timestamps is a date. Cast to unix epoch in float64 seconds.
+        raw_timestamps = (
+            raw_timestamps.astype("datetime64[ns]").astype(np.float64) / 1e9
+        )
+        return raw_timestamps, True
+
+    raise ValueError(f"No support values for timestamps: {raw_timestamps}")
 
 
 @dataclass
 class IndexData:
     """Features and timestamps data for a single index item.
+
+    Note: The "schema" constructor argument is only used for checking. If
+    schema=None, no checking is done. Checking can be done manually with
+    "index_data.check_schema(...)".
 
     Attributes:
         features: List of one-dimensional NumPy arrays representing the
@@ -99,7 +196,7 @@ class IndexData:
         self,
         features: List[np.ndarray],
         timestamps: np.ndarray,
-        schema: Schema,
+        schema: Optional[Schema],
     ) -> None:
         """Initializes the IndexData object by checking and setting the features
         and timestamps.
@@ -110,38 +207,67 @@ class IndexData:
                 do not match.
         """
 
+        self.features = features
+        self.timestamps = timestamps
+
+        if schema is not None:
+            self.check_schema(schema)
+
+    def check_schema(self, schema: Schema):
         # Check that the data (features & timestamps) matches the schema.
 
-        if timestamps.ndim != 1:
+        if self.timestamps.ndim != 1:
             raise ValueError("timestamps must be one-dimensional arrays")
 
-        if timestamps.dtype.type != np.float64:
+        if self.timestamps.dtype.type != np.float64:
             raise ValueError("Timestamps should be float64")
 
-        if len(features) != len(schema.features):
-            raise ValueError("Wrong number of features")
+        if len(self.features) != len(schema.features):
+            raise ValueError(
+                "Wrong number of features. Event has"
+                f" {len(self.features)} features while schema indicates"
+                f" {len(schema.features)} features."
+            )
 
-        for feature_data, feature_schema in zip(features, schema.features):
+        for feature_data, feature_schema in zip(self.features, schema.features):
             if feature_data.ndim != 1:
                 raise ValueError("Features must be one-dimensional arrays")
 
             expected_numpy_type = _DTYPE_REVERSE_MAPPING[feature_schema.dtype]
             if feature_data.dtype.type != expected_numpy_type:
                 raise ValueError(
-                    f"Feature {feature_schema.name} has numpy type"
-                    f" {feature_data.dtype} and temporian type"
-                    f" {feature_schema.dtype}. The numpy type is expected to be"
-                    f" {expected_numpy_type}."
+                    "The schema does not match the feature dtype. Feature "
+                    f"{feature_schema.name!r} has numpy dtype = "
+                    f"{feature_data.dtype} but schema has temporian dtype = "
+                    f"{feature_schema.dtype!r}. From the schema, the numpy"
+                    f"type is expected to be {expected_numpy_type!r}."
                 )
 
-            if timestamps.shape != feature_data.shape:
+            if self.timestamps.shape != feature_data.shape:
                 raise ValueError(
                     "The number of feature values does not match the number of"
                     " timestamps."
                 )
 
-        self.features = features
-        self.timestamps = timestamps
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, IndexData):
+            return False
+
+        if not np.array_equal(self.timestamps, other.timestamps):
+            return False
+
+        for f1, f2 in zip(self.features, other.features):
+            if f1.dtype != f2.dtype:
+                return False
+
+            if f1.dtype.kind == "f":
+                if not np.allclose(f1, f2, equal_nan=True):
+                    return False
+            else:
+                if not np.array_equal(f1, f2):
+                    return False
+
+        return True
 
     def __len__(self) -> int:
         """Number of events / timesteps."""
@@ -421,7 +547,7 @@ class EventSet:
                     data_repr.append(f"... ({len(self.data) - i} remaining)")
                     break
                 index_key_repr = []
-                for index_value, (index_name, _) in zip(
+                for index_value, index_name in zip(
                     index_key, self.schema.index_names()
                 ):
                     index_key_repr.append(f"{index_name}={index_value}")
@@ -446,73 +572,64 @@ class EventSet:
     def __setitem__(self, index: Tuple, value: IndexData) -> None:
         self.data[index] = value
 
-    def __eq__(self, __o: object) -> bool:
-        # tolerance levels for float comparison. TODO: move to appropiate place
-
-        # TODO: Remove. Equality tests should be exact. Create a "Near" function
-        # if necessary.
-        rtol = 1e-9
-        atol = 1e-9
-
-        if not isinstance(__o, EventSet):
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, EventSet):
             return False
 
-        # check same features
-        if self.schema.feature_names() != __o.schema.feature_names():
+        if self._name != other._name:
             return False
 
-        # check same index
-        if self.schema.index_names() != __o.schema.index_names():
+        if self._schema != other._schema:
             return False
 
-        # check unix timestamp
-        if self.schema.is_unix_timestamp != __o.schema.is_unix_timestamp:
+        if self._data != other._data:
             return False
-
-        # check same data
-        if len(self._data) != len(__o.data):
-            return False
-
-        for index_key, index_data_self in self._data.items():
-            if index_key not in __o.data:
-                return False
-
-            # check same features
-            index_data_other = __o[index_key]
-            for feature_self, feature_other in zip(
-                index_data_self.features, index_data_other.features
-            ):
-                if feature_self.dtype.type != feature_other.dtype.type:
-                    return False
-
-                # check if the array has a float dtype. If so, compare with
-                # `allclose`
-                if feature_self.dtype.kind == "f":
-                    equal = np.allclose(
-                        feature_self,
-                        feature_other,
-                        rtol=rtol,
-                        atol=atol,
-                        equal_nan=True,
-                    )
-                else:
-                    # compare non-float arrays
-                    equal = np.array_equal(feature_self, feature_other)
-
-                if not equal:
-                    return False
-
-            # check same timestamps
-            if not np.allclose(
-                index_data_self.timestamps,
-                index_data_other.timestamps,
-                rtol=rtol,
-                atol=atol,
-                equal_nan=True,
-            ):
-                return False
 
         return True
+
+        # if len(self._data) != len(other.data):
+        #     return False
+
+        # for index_key, index_data_self in self._data.items():
+        #     if index_key not in other.data:
+        #         return False
+
+        #     # check same features
+        #     index_data_other = other[index_key]
+        #     for feature_self, feature_other in zip(
+        #         index_data_self.features, index_data_other.features
+        #     ):
+        #         if feature_self.dtype.type != feature_other.dtype.type:
+        #             return False
+
+        #         # check if the array has a float dtype. If so, compare with
+        #         # `allclose`
+        #         if feature_self.dtype.kind == "f":
+        #             equal = np.allclose(
+        #                 feature_self,
+        #                 feature_other,
+        #                 rtol=rtol,
+        #                 atol=atol,
+        #                 equal_nan=True,
+        #             )
+        #         else:
+        #             # compare non-float arrays
+        #             equal = np.array_equal(feature_self, feature_other)
+
+        #         if not equal:
+        #             return False
+
+        #     # check same timestamps
+        #     if not np.allclose(
+        #         index_data_self.timestamps,
+        #         index_data_other.timestamps,
+        #         rtol=rtol,
+        #         atol=atol,
+        #         equal_nan=True,
+        #     ):
+        #         return False
+
+        # return True
 
     def plot(self, *args, **wargs) -> Any:
         """Plots the event set. See tp.plot for details."""
@@ -520,48 +637,6 @@ class EventSet:
         from temporian.implementation.numpy.data import plotter
 
         return plotter.plot(evsets=self, *args, **wargs)
-
-
-def normalize_features(
-    raw_feature_values: Any,
-) -> np.ndarray:
-    if not isinstance(raw_feature_values, np.ndarray):
-        return np.array(raw_feature_values)
-    return raw_feature_values
-
-
-def normalize_timestamps(
-    raw_timestamps: Any,
-) -> Tuple[np.ndarray, bool]:
-    """Normalizes timestamps to temporian format.
-
-    Returns:
-        Normalized timestamps (numpy float64 of unix epoch in seconds) and if
-        the raw timestamps look like a unix epoch.
-    """
-
-    # Convert to numpy array
-    if not isinstance(raw_timestamps, np.ndarray):
-        raw_timestamps = np.array(raw_timestamps)
-
-    # Check NaN
-    if np.isnan(raw_timestamps).any():
-        raise ValueError("Timestamps contains NaN values.")
-
-    # raw_timestamps is already in float64 format
-    if raw_timestamps.dtype.type == np.float64:
-        return raw_timestamps, False
-
-    # raw_timestamps is represented as a number. Cast to float64.
-    if raw_timestamps.dtype.type in [np.float32, np.int64, np.int32]:
-        return raw_timestamps.astype(np.float64), False
-
-    # raw_timestamps is a date. Cast to unix epoch in float64 seconds.
-    raw_timestamps = (
-        raw_timestamps.astype("datetime64[ns]").astype(np.float64) / 1e9
-    )
-
-    return raw_timestamps, True
 
 
 # def _convert_timestamp_column_to_unix_epoch_float(

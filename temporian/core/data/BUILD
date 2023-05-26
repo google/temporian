@@ -23,6 +23,8 @@ py_library(
     srcs = ["node.py"],
     srcs_version = "PY3",
     deps = [
+        ":dtype",
+        ":schema",
         "//temporian/utils:string",
     ],
 )
@@ -31,7 +33,7 @@ py_library(
     name = "schema",
     srcs = ["schema.py"],
     srcs_version = "PY3",
-    deps = [    ],
+    deps = [],
 )
 
 py_library(

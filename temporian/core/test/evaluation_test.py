@@ -17,6 +17,7 @@ from absl.testing import absltest
 from temporian.core import evaluation
 from temporian.core.test import utils
 from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.operators import all_operators as _impls
 
 
 class EvaluationTest(absltest.TestCase):

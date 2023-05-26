@@ -24,6 +24,7 @@ def event_set(
     features: dict[str, DataArray],
     index_features: Optional[List[str]] = None,
     name: Optional[str] = None,
+    is_unix_timestamp: Union[bool, str] = "auto",
 ) -> EventSet:
     """Creates an event set from raw data (e.g. python lists,  numpy arrays).
 
@@ -47,27 +48,32 @@ def event_set(
         index_features: Names of the features in "features" to be used as index.
           If empty (default), the data is not indexed.
         name: Name of the node.
+        is_unix_timestamp: If "auto" (default), the fact that the timestamp is interpretable as unix timestamps is true if the timestamps are date or date-like object. If "is_unix_timestamp" is boolean, "is_unix_timestamp" defines if the timestamps are unix timestamps.
 
     Returns:
         An event set.
     """
 
-    print("@@@features:\n", features)
-    print("@@@index_features:\n", index_features)
-
     features = {
         name: normalize_features(value) for name, value in features.items()
     }
 
-    print("@@@normalized features:\n", features)
-
     # Convert timestamps to expected type.
-    timestamps, is_unix_timestamp = normalize_timestamps(timestamps)
+    timestamps, auto_is_unix_timestamp = normalize_timestamps(timestamps)
+
+    if not np.all(timestamps[:-1] <= timestamps[1:]):
+        order = np.argsort(timestamps, kind="mergesort")
+        timestamps = timestamps[order]
+        features = {name: value[order] for name, value in features.items()}
+
+    if is_unix_timestamp == "auto":
+        is_unix_timestamp = auto_is_unix_timestamp
+    assert isinstance(is_unix_timestamp, bool)
 
     # Infer the schema
     schema = Schema(
         features=[
-            (feature_key, numpy_array_to_tp_dtype(feature_data))
+            (feature_key, numpy_array_to_tp_dtype(feature_key, feature_data))
             for feature_key, feature_data in features.items()
         ],
         indexes=[],
@@ -142,9 +148,11 @@ def pd_dataframe_to_event_set(
         >>> evset = EventSet.from_dataframe(df, index_names=["product_id"])
     """
 
+    feature_dict = df.drop(columns=timestamp_column).to_dict("series")
+
     return event_set(
         timestamps=df[timestamp_column].to_numpy(copy=True),
-        features=df.drop(columns=timestamp_column).to_dict("series"),
+        features={k: v.to_numpy(copy=True) for k, v in feature_dict.items()},
         index_features=index_names,
         name=name,
     )

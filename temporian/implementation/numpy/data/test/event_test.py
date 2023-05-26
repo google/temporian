@@ -1,41 +1,30 @@
 from absl.testing import absltest
 
-import numpy as np
+from temporian.implementation.numpy.data.io import event_set
 
-from temporian.implementation.numpy.data.event_set import IndexData
-from temporian.implementation.numpy.data.event_set import EventSet
+# Load all the implementations
+from temporian.implementation.numpy.operators import all_operators as _impls
 
 
 class EventTest(absltest.TestCase):
     def setUp(self):
-        self._evset = EventSet(
-            data={
-                (1, "hello"): IndexData(
-                    features=[
-                        np.array([1, 2, 3]),
-                        np.array([4, 5, 6]),
-                    ],
-                    timestamps=np.array([0.1, 0.2, 0.3]),
-                ),
-                (2, "world"): IndexData(
-                    features=[
-                        np.array([7, 8]),
-                        np.array([9, 10]),
-                    ],
-                    timestamps=np.array([0.4, 0.5]),
-                ),
+        self._evset = event_set(
+            timestamps=[0.1, 0.2, 0.3, 0.4, 0.5],
+            features={
+                "a": [1, 2, 3, 7, 8],
+                "b": [4, 5, 6, 9, 10],
+                "x": [1, 1, 1, 2, 2],
+                "y": ["hello", "hello", "hello", "world", "world"],
             },
-            feature_names=["a", "b"],
-            index_names=["x", "y"],
-            is_unix_timestamp=False,
+            index_features=["x", "y"],
         )
 
     def test_data_access(self):
         self.assertEqual(
-            repr(self._evset.features()), "[('a', int64), ('b', int64)]"
+            repr(self._evset.schema.features), "[('a', int64), ('b', int64)]"
         )
         self.assertEqual(
-            repr(self._evset.indexes()), "[('x', int64), ('y', str_)]"
+            repr(self._evset.schema.indexes), "[('x', int64), ('y', str_)]"
         )
 
     def test_repr(self):

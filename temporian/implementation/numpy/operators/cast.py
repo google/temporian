@@ -55,6 +55,7 @@ class CastNumpyImplementation(OperatorImplementation):
         check = self.operator.attributes["check_overflow"]
 
         # Reuse evset if actually no features changed dtype
+        assert isinstance(self.operator, CastOperator)
         operator: CastOperator = self.operator
         if operator.reuse_node:
             return {"output": input}

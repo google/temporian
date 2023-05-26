@@ -31,7 +31,7 @@ class FeatureSchema:
     dtype: DType
 
     def __repr__(self) -> str:
-        return f"({self.name},{self.dtype})"
+        return f"({self.name!r}, {self.dtype})"
 
 
 @dataclass
@@ -40,7 +40,7 @@ class IndexSchema:
     dtype: IndexDType
 
     def __repr__(self) -> str:
-        return f"({self.name},{self.dtype})"
+        return f"({self.name!r}, {self.dtype})"
 
 
 class Schema:
@@ -76,6 +76,15 @@ class Schema:
         self._features = list(map(normalize_feature, features))
         self._indexes = list(map(normalize_index, indexes))
         self._is_unix_timestamp = is_unix_timestamp
+
+    def __eq__(self, other):
+        if not isinstance(other, Schema):
+            return False
+        return (
+            self._features == other._features
+            and self._indexes == other._indexes
+            and self._is_unix_timestamp == other._is_unix_timestamp
+        )
 
     @property
     def features(self) -> List[FeatureSchema]:

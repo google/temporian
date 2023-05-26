@@ -194,6 +194,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        ":resample",
         ":select",
         "//temporian/core:operator_lib",
         "//temporian/core/data:duration",
