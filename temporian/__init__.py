@@ -25,7 +25,7 @@
 # from temporian.my_module import _private_name
 
 # Core
-from temporian.core import serialize
+from temporian.core import serialization
 from temporian.core.data import dtype
 from temporian.core.data import node
 from temporian.core.data import feature
@@ -57,8 +57,8 @@ str_ = dtype.DType.STRING
 
 # Aliases
 Feature = feature.Feature
-load = serialize.load
-save = serialize.save
+load = serialization.load
+save = serialization.save
 input_node = node.input_node
 
 __version__ = "0.0.1"
