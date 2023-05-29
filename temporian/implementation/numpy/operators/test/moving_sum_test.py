@@ -32,6 +32,7 @@ import math
 from numpy.testing import assert_array_equal
 from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
 
+
 def _f64(l):
     return np.array(l, np.float64)
 

@@ -25,18 +25,14 @@ class EvaluationTest(absltest.TestCase):
         b = utils.OpI1O1(a)
 
         schedule = evaluation.build_schedule(
-            inputs=set([a]),
-            outputs=set([b.outputs["output"]]),
+            inputs={a}, outputs={b.outputs["output"]}
         )
         self.assertEqual(schedule.ordered_operators, [b])
 
     def test_schedule_empty(self):
         a = utils.create_input_node()
 
-        schedule = evaluation.build_schedule(
-            inputs=set([a]),
-            outputs=set([a]),
-        )
+        schedule = evaluation.build_schedule(inputs={a}, outputs={a})
         self.assertEqual(schedule.ordered_operators, [])
 
     def test_schedule_two_delayed_inputs(self):
@@ -46,8 +42,7 @@ class EvaluationTest(absltest.TestCase):
         o2 = utils.OpI1O1(i2)
         o3 = utils.OpI2O1(o1.outputs["output"], o2.outputs["output"])
         schedule = evaluation.build_schedule(
-            inputs=set([i1, i2]),
-            outputs=set([o3.outputs["output"]]),
+            inputs={i1, i2}, outputs={o3.outputs["output"]}
         )
         self.assertTrue(
             (schedule.ordered_operators == [o2, o1, o3])
@@ -62,8 +57,8 @@ class EvaluationTest(absltest.TestCase):
         o5 = utils.OpI1O2(o4.outputs["output"])
 
         schedule = evaluation.build_schedule(
-            inputs=set([i1, i3]),
-            outputs=set([o5.outputs["output_1"], o4.outputs["output"]]),
+            inputs={i1, i3},
+            outputs={o5.outputs["output_1"], o4.outputs["output"]},
         )
         self.assertTrue(
             (schedule.ordered_operators == [o2, o4, o5])
@@ -78,8 +73,7 @@ class EvaluationTest(absltest.TestCase):
         o5 = utils.OpI1O1(o4.outputs["output"])
 
         schedule = evaluation.build_schedule(
-            inputs=set([o3.outputs["output"]]),
-            outputs=set([o5.outputs["output"]]),
+            inputs={o3.outputs["output"]}, outputs={o5.outputs["output"]}
         )
         self.assertEqual(schedule.ordered_operators, [o4, o5])
 
