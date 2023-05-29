@@ -157,7 +157,7 @@ def _normalize_index_to_drop(
 
 def drop_index(
     input: Node,
-    index_to_drop: Optional[str | List[str]] = None,
+    index_to_drop: Optional[Union[str, List[str]]] = None,
     keep: bool = True,
 ) -> Node:
     """Removes one or more index columns from a node.

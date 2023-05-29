@@ -117,7 +117,7 @@ operator_lib.register_operator(AddIndexOperator)
 
 
 def _normalize_index_to_add(
-    index_names: str | List[str],
+    index_names: Union[str, List[str]],
 ) -> List[str]:
     if isinstance(index_names, str):
         return [index_names]
@@ -129,7 +129,7 @@ def _normalize_index_to_add(
 
 
 def _normalize_index_to_set(
-    index_names: str | List[str],
+    index_names: Union[str, List[str]],
 ) -> List[str]:
     if isinstance(index_names, str):
         return [index_names]
@@ -140,7 +140,7 @@ def _normalize_index_to_set(
     return index_names
 
 
-def add_index(input: Node, index_to_add: str | List[str]) -> Node:
+def add_index(input: Node, index_to_add: Union[str, List[str]]) -> Node:
     """Adds one or more features as index in a node.
 
     Examples:
@@ -169,7 +169,7 @@ def add_index(input: Node, index_to_add: str | List[str]) -> Node:
     return AddIndexOperator(input, index_to_add).outputs["output"]
 
 
-def set_index(input: Node, index: str | List[str]) -> Node:
+def set_index(input: Node, index: Union[str, List[str]]) -> Node:
     """Replaces the index in a node.
 
     "set_index" is implemented as drop_index + add_index.

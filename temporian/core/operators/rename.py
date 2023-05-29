@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """Rename operator."""
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 
 from temporian.core import operator_lib
 from temporian.core.data.node import Node
@@ -103,7 +103,7 @@ operator_lib.register_operator(RenameOperator)
 
 def _normalize_rename_features(
     schema: Schema,
-    features: Optional[str | Dict[str, str]],
+    features: Optional[Union[str, Dict[str, str]]],
 ) -> Dict[str, str]:
     if features is None:
         return {}
@@ -132,7 +132,7 @@ def _normalize_rename_features(
 
 def _normalize_rename_indexes(
     schema: Schema,
-    indexes: Optional[str | Dict[str, str]],
+    indexes: Optional[Union[str, Dict[str, str]]],
 ) -> Dict[str, str]:
     if indexes is None:
         return {}
@@ -161,8 +161,8 @@ def _normalize_rename_indexes(
 
 def rename(
     input: Node,
-    features: Optional[str | Dict[str, str]] = None,
-    index: Optional[str | Dict[str, str]] = None,
+    features: Optional[Union[str, Dict[str, str]]] = None,
+    index: Optional[Union[str, Dict[str, str]]] = None,
 ) -> Node:
     """Renames a node's features and index.
 
