@@ -20,9 +20,8 @@
 
 # TIP: If you need to import something here that isn't part of the public API,
 # and therefore shouldn't show up in the documentation, import it with a private
-# name, like this:
-#
-# from temporian.my_module import _private_name
+# name:
+# from temporian.module import submodule as _submodule
 
 # Core
 from temporian.core import serialization
