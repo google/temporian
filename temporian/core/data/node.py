@@ -87,7 +87,7 @@ class Node(object):
 
     @staticmethod
     def create_new_features_existing_sampling(
-        features: List[FeatureSchema] | List[Tuple[str, DType]],
+        features: Union[List[FeatureSchema], List[Tuple[str, DType]]],
         sampling_node: Node,
         creator: Optional[Operator],
         name: Optional[str] = None,
@@ -125,8 +125,8 @@ class Node(object):
 
     @staticmethod
     def create_new_features_new_sampling(
-        features: List[FeatureSchema] | List[Tuple[str, DType]],
-        indexes: List[IndexSchema] | List[Tuple[str, IndexDType]],
+        features: Union[List[FeatureSchema], List[Tuple[str, DType]]],
+        indexes: Union[List[IndexSchema], List[Tuple[str, IndexDType]]],
         is_unix_timestamp: bool,
         creator: Optional[Operator],
         name: Optional[str] = None,

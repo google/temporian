@@ -14,7 +14,7 @@
 
 """Serialization/unserialization of a graph and its components."""
 
-from typing import Set, Any, Dict, Tuple, Optional, Mapping
+from typing import Set, Any, Dict, Tuple, Optional, Mapping, Union
 
 from google.protobuf import text_format
 
@@ -80,7 +80,7 @@ def save(
 
 def load(
     path: str, squeeze: bool = False
-) -> Tuple[Node | Dict[str, Node], Node | Dict[str, Node]]:
+) -> Tuple[Union[Node, Dict[str, Node]], Union[Node, Dict[str, Node]]]:
     """Loads a graph from a file.
 
     Args:

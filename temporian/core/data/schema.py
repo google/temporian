@@ -57,8 +57,8 @@ class Schema:
 
     def __init__(
         self,
-        features: List[FeatureSchema] | List[Tuple[str, DType]],
-        indexes: List[IndexSchema] | List[Tuple[str, IndexDType]],
+        features: Union[List[FeatureSchema], List[Tuple[str, DType]]],
+        indexes: Union[List[IndexSchema], List[Tuple[str, IndexDType]]],
         is_unix_timestamp: bool,
     ):
         def normalize_feature(x):
