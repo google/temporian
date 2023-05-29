@@ -19,45 +19,34 @@ import tempfile
 import math
 
 import temporian as tp
-import pandas as pd
-from temporian.implementation.numpy.data.event_set import EventSet
 
 
 class TFPTest(absltest.TestCase):
     def test_evaluation(self):
-        evset_1 = EventSet.from_dataframe(
-            pd.DataFrame(
-                {
-                    "timestamp": [0.0, 2.0, 4.0, 6.0],
-                    "f1": [1.0, 2.0, 3.0, 4.0],
-                    "f2": [5.0, 6.0, 7.0, 8.0],
-                }
-            )
+        evset_1 = tp.event_set(
+            timestamps=[0.0, 2.0, 4.0, 6.0],
+            features={
+                "f1": [1.0, 2.0, 3.0, 4.0],
+                "f2": [5.0, 6.0, 7.0, 8.0],
+            },
         )
 
-        evset_2 = EventSet.from_dataframe(
-            pd.DataFrame({"timestamp": [1.0, 2.0, 2.0]})
-        )
+        evset_2 = tp.event_set(timestamps=[1.0, 2.0, 2.0])
 
-        i1 = evset_1.node()
-        i2 = evset_2.node()
+        i1 = evset_1.source_node()
+        i2 = evset_2.source_node()
+
         h1 = tp.simple_moving_average(input=i1, window_length=7)
         h2 = tp.resample(input=h1, sampling=i2)
-
         h3 = i1 * 2.0 + 3.0 > 10.0
 
         result = tp.glue(tp.prefix("sma_", h2["f2"]), i2)
 
-        result2 = tp.glue(
-            tp.prefix("toto.", h3),
-        )
+        result2 = tp.glue(tp.prefix("toto.", h3))
 
         result_data, result2_data = tp.evaluate(
             query=[result, result2],
-            input={
-                i1: evset_1,
-                i2: evset_2,
-            },
+            input={i1: evset_1, i2: evset_2},
             verbose=2,
         )
         logging.info("results: %s", result_data)
@@ -72,21 +61,12 @@ class TFPTest(absltest.TestCase):
             )
 
     def test_serialization(self):
-        a = tp.input_node(
-            [
-                tp.Feature(name="f1"),
-                tp.Feature(name="f2"),
-            ]
-        )
+        a = tp.source_node([("f1", tp.float32), ("f2", tp.float32)])
         b = tp.simple_moving_average(input=a, window_length=7)
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_graph.tem")
-            tp.save(
-                inputs={"a": a},
-                outputs={"b": b},
-                path=path,
-            )
+            tp.save(inputs={"a": a}, outputs={"b": b}, path=path)
 
             inputs, outputs = tp.load(path=path)
 
@@ -94,12 +74,8 @@ class TFPTest(absltest.TestCase):
         self.assertSetEqual(set(outputs.keys()), {"b"})
 
     def test_serialization_single_node(self):
-        a = tp.input_node(
-            [
-                tp.Feature(name="f1"),
-                tp.Feature(name="f2"),
-            ],
-            name="my_input_node",
+        a = tp.source_node(
+            [("f1", tp.float32), ("f2", tp.float32)], name="my_source_node"
         )
         b = tp.simple_moving_average(input=a, window_length=7)
         b.name = "my_output_node"
@@ -114,16 +90,13 @@ class TFPTest(absltest.TestCase):
 
             inputs, outputs = tp.load(path=path)
 
-        self.assertSetEqual(set(inputs.keys()), {"my_input_node"})
+        self.assertSetEqual(set(inputs.keys()), {"my_source_node"})
         self.assertSetEqual(set(outputs.keys()), {"my_output_node"})
 
     def test_serialization_squeeze_loading_results(self):
-        a = tp.input_node(
-            [
-                tp.Feature(name="f1"),
-                tp.Feature(name="f2"),
-            ],
-            name="my_input_node",
+        a = tp.source_node(
+            [("f1", tp.float32), ("f2", tp.float32)],
+            name="my_source_node",
         )
         b = tp.simple_moving_average(input=a, window_length=7)
         b.name = "my_output_node"
@@ -138,16 +111,13 @@ class TFPTest(absltest.TestCase):
 
             i, o = tp.load(path=path, squeeze=True)
 
-        self.assertEqual(i.name, "my_input_node")
+        self.assertEqual(i.name, "my_source_node")
         self.assertEqual(o.name, "my_output_node")
 
     def test_serialization_infer_inputs(self):
-        a = tp.input_node(
-            [
-                tp.Feature(name="f1"),
-                tp.Feature(name="f2"),
-            ],
-            name="my_input_node",
+        a = tp.source_node(
+            [("f1", tp.float32), ("f2", tp.float32)],
+            name="my_source_node",
         )
         b = tp.simple_moving_average(input=a, window_length=7)
         b.name = "my_output_node"
@@ -158,7 +128,7 @@ class TFPTest(absltest.TestCase):
 
             i, o = tp.load(path=path, squeeze=True)
 
-        self.assertEqual(i.name, "my_input_node")
+        self.assertEqual(i.name, "my_source_node")
         self.assertEqual(o.name, "my_output_node")
 
     def test_list_registered_operators(self):
@@ -167,7 +137,7 @@ class TFPTest(absltest.TestCase):
             logging.info("  %s: %s", k, v)
 
     def test_event_set(self):
-        evset = tp.evset = tp.event_set(
+        evset = tp.event_set(
             timestamps=[1, 2, 3, 4],
             features={
                 "feature_1": [0.5, 0.6, math.nan, 0.9],

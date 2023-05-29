@@ -22,7 +22,7 @@ from temporian.implementation.numpy.operators.since_last import (
     SinceLastNumpyImplementation,
     operators_cc,
 )
-from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
 
 nan = math.nan
 
@@ -32,7 +32,7 @@ class SinceLastOperatorTest(absltest.TestCase):
         pass
 
     def test_no_sampling(self):
-        event_data = EventSet.from_dataframe(
+        event_data = pd_dataframe_to_event_set(
             pd.DataFrame(
                 {
                     "timestamp": [1, 5, 8, 9, 1, 1, 2],
@@ -43,7 +43,7 @@ class SinceLastOperatorTest(absltest.TestCase):
         )
         event = event_data.node()
 
-        expected_output = EventSet.from_dataframe(
+        expected_output = pd_dataframe_to_event_set(
             pd.DataFrame(
                 {
                     "timestamp": [1, 5, 8, 9, 1, 1, 2],
@@ -56,23 +56,25 @@ class SinceLastOperatorTest(absltest.TestCase):
 
         # Run op
         op = SinceLast(input=event)
+        op.outputs["output"].check_same_sampling(event)
+
         instance = SinceLastNumpyImplementation(op)
         output = instance.call(input=event_data)["output"]
 
         self.assertEqual(output, expected_output)
 
     def test_with_sampling(self):
-        event_data = EventSet.from_dataframe(
+        event_data = pd_dataframe_to_event_set(
             pd.DataFrame({"timestamp": [1, 2, 2, 4]}),
         )
         event = event_data.node()
 
-        sampling_data = EventSet.from_dataframe(
+        sampling_data = pd_dataframe_to_event_set(
             pd.DataFrame({"timestamp": [-1, 1, 1.5, 2, 2.1, 4, 5]})
         )
         sampling = sampling_data.node()
 
-        expected_output = EventSet.from_dataframe(
+        expected_output = pd_dataframe_to_event_set(
             pd.DataFrame(
                 {
                     "timestamp": [-1, 1, 1.5, 2, 2.1, 4, 5],
@@ -83,6 +85,8 @@ class SinceLastOperatorTest(absltest.TestCase):
 
         # Run op
         op = SinceLast(input=event, sampling=sampling)
+        op.outputs["output"].check_same_sampling(sampling)
+
         instance = SinceLastNumpyImplementation(op)
         output = instance.call(input=event_data, sampling=sampling_data)[
             "output"

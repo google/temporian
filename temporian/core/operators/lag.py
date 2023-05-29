@@ -17,8 +17,12 @@
 from typing import List, Union
 
 from temporian.core import operator_lib
-from temporian.core.data.duration import Duration
-from temporian.core.data.duration import duration_abbreviation
+from temporian.core.data.duration import (
+    Duration,
+    NormalizedDuration,
+    normalize_duration,
+    duration_abbreviation,
+)
 from temporian.core.data.node import Node
 from temporian.core.data.schema import Schema
 from temporian.core.operators.base import Operator
@@ -29,15 +33,13 @@ class LagOperator(Operator):
     def __init__(
         self,
         input: Node,
-        duration: Duration,
+        duration: NormalizedDuration,
     ):
         super().__init__()
 
         self._duration = duration
-        self._duration_str = duration_abbreviation(duration)
 
         self.add_input("input", input)
-
         self.add_attribute("duration", duration)
 
         self.add_output(
@@ -54,10 +56,6 @@ class LagOperator(Operator):
     @property
     def duration(self) -> Duration:
         return self._duration
-
-    @property
-    def duration_str(self) -> str:
-        return self._duration_str
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
@@ -78,80 +76,29 @@ class LagOperator(Operator):
 operator_lib.register_operator(LagOperator)
 
 
-def _implementation(
-    input: Node,
-    duration: Union[Duration, List[Duration]],
-    should_leak: bool = False,
-) -> Union[Node, List[Node]]:
-    """Lags or leaks `input` depending on `should_leak`."""
+def lag(input: Node, duration: Duration) -> Node:
+    """Adds a delay to the timestamps.
 
-    if not isinstance(duration, list):
-        duration = [duration]
+    In other words, shifts the timestamp values forwards in time.
 
-    if not all(isinstance(d, (int, float)) and d > 0 for d in duration):
-        raise ValueError(
-            "duration must be a list of positive numbers. Got"
-            f" {duration}, type {type(duration)}"
-        )
-
-    # Ensure that all durations are of type Duration. This converts ints to
-    # float64 for consistent behavior.
-    duration = [
-        Duration(d) if not isinstance(d, Duration) else d for d in duration
-    ]
-
-    used_duration = duration if not should_leak else [-d for d in duration]
-
-    if len(used_duration) == 1:
-        return LagOperator(
-            input=input,
-            duration=used_duration[0],
-        ).outputs["output"]
-
-    return [
-        LagOperator(input=input, duration=d).outputs["output"]
-        for d in used_duration
-    ]
-
-
-def lag(
-    input: Node, duration: Union[Duration, List[Duration]]
-) -> Union[Node, List[Node]]:
-    """Shifts the node's sampling forwards in time by a specified duration.
-
-    Each timestamp in `input`'s sampling is shifted forwards by the specified
-    duration. If `duration` is a list, then the input will be lagged by each
-    duration in the list, and a list of nodes will be returned.
+    Example:
+        Input
+            timestamps: [1, 5, 10]
+            duration: 2
+        Output
+            timestamps: [3, 8, 13]
 
     Args:
-        input: Node to lag the sampling of.
-        duration: Duration or list of Durations to lag by.
+        input: Event set to lag.
+        duration: Duration to lag by.
 
     Returns:
-        Lagged node, or list of lagged nodes if a Duration list was
-        provided.
+        Lagged node.
     """
-    return _implementation(input=input, duration=duration)
 
+    normalized_duration = normalize_duration(duration)
 
-def leak(
-    input: Node, duration: Union[Duration, List[Duration]]
-) -> Union[Node, List[Node]]:
-    """Shifts the node's sampling backwards in time by a specified duration.
-
-    Each timestamp in `input`'s sampling is shifted backwards by the specified
-    duration. If `duration` is a list, then the input will be leaked by each
-    duration in the list, and a list of nodes will be returned.
-
-    Note that this operator moves future data into the past, and should be used
-    with caution to prevent unwanted leakage.
-
-    Args:
-        input: Node to leak the sampling of.
-        duration: Duration or list of Durations to leak by.
-
-    Returns:
-        Leaked node, or list of leaked nodes if a Duration list was
-        provided.
-    """
-    return _implementation(input=input, duration=duration, should_leak=True)
+    return LagOperator(
+        input=input,
+        duration=normalized_duration,
+    ).outputs["output"]

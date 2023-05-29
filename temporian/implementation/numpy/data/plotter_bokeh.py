@@ -55,7 +55,8 @@ def plot_bokeh(
             if plot_idx >= num_plots:
                 break
 
-            feature_names = [f for f in evset.feature_names if f in features]
+            evtset_features = evset.schema.feature_names()
+            display_features = [f for f in evtset_features if f in features]
 
             xs = evset.data[index].timestamps
             uniform = is_uniform(xs)
@@ -73,14 +74,14 @@ def plot_bokeh(
 
             xs = xs[plot_mask]
 
-            if evset.is_unix_timestamp:
+            if evset.schema.is_unix_timestamp:
                 # Matplotlib understands datetimes.
                 xs = [
                     datetime.datetime.fromtimestamp(x, tz=datetime.timezone.utc)
                     for x in xs
                 ]
 
-            if len(feature_names) == 0:
+            if len(display_features) == 0:
                 # There is not features to plot. Instead, plot the timestamps.
                 figs.append(
                     _bokeh_sub_plot(
@@ -89,7 +90,7 @@ def plot_bokeh(
                         options=options,
                         color=colors[color_idx % len(colors)],
                         name="[sampling]",
-                        is_unix_timestamp=evset.is_unix_timestamp,
+                        is_unix_timestamp=evset.schema.is_unix_timestamp,
                         title=title,
                         style=Style.vline,
                     )
@@ -100,8 +101,8 @@ def plot_bokeh(
                 color_idx += 1
                 plot_idx += 1
 
-            for feature_name in feature_names:
-                feature_idx = evset.feature_names.index(feature_name)
+            for display_feature in display_features:
+                feature_idx = evtset_features.index(display_feature)
                 if plot_idx >= num_plots:
                     # Too much plots are displayed already.
                     break
@@ -118,8 +119,8 @@ def plot_bokeh(
                         ys=ys,
                         options=options,
                         color=colors[color_idx % len(colors)],
-                        name=feature_name,
-                        is_unix_timestamp=evset.is_unix_timestamp,
+                        name=display_feature,
+                        is_unix_timestamp=evset.schema.is_unix_timestamp,
                         title=title,
                         style=effective_stype,
                     )
@@ -139,16 +140,10 @@ def plot_bokeh(
         for js_var, fig in zip(js_vars, figs):
             js_inputs[js_var] = fig.x_range
 
-            sub_core_code = "\n".join(
-                [
-                    f"""
+            sub_core_code = "\n".join([f"""
             {other_js_var}.start = start;
             {other_js_var}.end = end;
-            """
-                    for other_js_var in js_vars
-                    if other_js_var != js_var
-                ]
-            )
+            """ for other_js_var in js_vars if other_js_var != js_var])
 
             core_code += f"""
             if (cb_obj == {js_var}) {{

@@ -18,9 +18,9 @@ from typing import Optional
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
-from temporian.core.data.duration import Duration
+from temporian.core.data.duration import Duration, normalize_duration
 from temporian.core.data.node import Node
-from temporian.core.data.schema import Schema, FeatureSchema
+from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.window.base import BaseWindowOperator
 
 
@@ -65,6 +65,6 @@ def moving_min(
     """
     return MovingMinOperator(
         input=input,
-        window_length=window_length,
+        window_length=normalize_duration(window_length),
         sampling=sampling,
     ).outputs["output"]

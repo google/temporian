@@ -18,7 +18,11 @@ import numpy as np
 
 from temporian.core.operators.resample import Resample
 from temporian.implementation.numpy import implementation_lib
-from temporian.implementation.numpy.data.event_set import IndexData, EventSet
+from temporian.implementation.numpy.data.event_set import (
+    IndexData,
+    EventSet,
+    tp_dtype_to_np_dtype,
+)
 from temporian.implementation.numpy_cc.operators import operators_cc
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
@@ -33,27 +37,27 @@ class ResampleNumpyImplementation(OperatorImplementation):
     def __call__(
         self, input: EventSet, sampling: EventSet
     ) -> Dict[str, EventSet]:
+        assert isinstance(self.operator, Resample)
+
+        output_schema = self.output_schema("output")
+
         # Type and replacement values
-        output_features = self._operator.outputs["output"].features
         output_missing_and_np_dtypes = [
             (
                 f.dtype.missing_value(),
-                DTYPE_REVERSE_MAPPING[f.dtype],
+                tp_dtype_to_np_dtype(f.dtype),
             )
-            for f in output_features
+            for f in output_schema.features
         ]
         # create output event set
-        dst_evset = EventSet(
-            data={},
-            feature_names=input.feature_names,
-            index_names=input.index_names,
-            is_unix_timestamp=input.is_unix_timestamp,
-        )
+        dst_evset = EventSet(data={}, schema=output_schema)
         # iterate over destination sampling
-        for index_key, index_data in sampling.iterindex():
+        for index_key, index_data in sampling.data.items():
             # intialize destination index data
             dst_mts = []
-            dst_evset[index_key] = IndexData(dst_mts, index_data.timestamps)
+
+            index_data = IndexData(dst_mts, index_data.timestamps, schema=None)
+            dst_evset[index_key] = index_data
 
             if index_key not in input.data:
                 # No matching events to sample from
@@ -68,6 +72,7 @@ class ResampleNumpyImplementation(OperatorImplementation):
                             dtype=output_np_dtype,
                         )
                     )
+                index_data.check_schema(output_schema)
                 continue
 
             src_mts = input[index_key].features
@@ -83,6 +88,7 @@ class ResampleNumpyImplementation(OperatorImplementation):
                 src_mts, output_missing_and_np_dtypes
             ):
                 # TODO: Check if running the following block in c++ is faster.
+                assert src_ts.dtype.type == output_np_dtype
                 dst_ts_data = np.full(
                     shape=len(index_data),
                     fill_value=output_missing_value,
@@ -92,6 +98,8 @@ class ResampleNumpyImplementation(OperatorImplementation):
                     sampling_idxs[first_valid_idx:]
                 ]
                 dst_mts.append(dst_ts_data)
+
+            index_data.check_schema(output_schema)
 
         return {"output": dst_evset}
 

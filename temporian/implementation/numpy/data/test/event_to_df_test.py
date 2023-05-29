@@ -19,9 +19,6 @@ from temporian.implementation.numpy.data.io import (
     event_set_to_pd_dataframe,
 )
 
-# Load all the implementations
-from temporian.implementation.numpy.operators import all_operators as _impls
-
 
 class EventToDataFrameTest(absltest.TestCase):
     def test_evset_to_df(self) -> None:

@@ -43,8 +43,8 @@ INV_DTYPE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
 
 
 def save(
-    inputs: Optional[graph.MultipleNodeArg],
-    outputs: graph.MultipleNodeArg,
+    inputs: Optional[graph.NamedNodes],
+    outputs: graph.NamedNodes,
     path: str,
 ) -> None:
     """Saves the graph between `inputs` and `outputs` to a file.
@@ -71,15 +71,11 @@ def save(
 
     # TODO: Add support for compressed / binary serialization.
 
-    if inputs is not None:
-        inputs = graph.normalize_multiple_node_arg(inputs)
+    g = graph.infer_graph_named_nodes(inputs=inputs, outputs=outputs)
 
-    outputs = graph.normalize_multiple_node_arg(outputs)
-
-    g, _ = graph.infer_graph(inputs=inputs, outputs=outputs)
     proto = serialize(g)
     with open(path, "wb") as f:
-        f.write(text_format.MessageToString(proto))
+        f.write(text_format.MessageToBytes(proto))
 
 
 def load(
@@ -100,8 +96,11 @@ def load(
         proto = text_format.Parse(f.read(), pb.Graph())
     g = unserialize(proto)
 
-    inputs = g.inputs
-    outputs = g.outputs
+    inputs = g.named_inputs
+    outputs = g.named_outputs
+
+    assert inputs is not None
+    assert outputs is not None
 
     if squeeze and len(inputs) == 1:
         inputs = list(inputs.values())[0]
@@ -115,13 +114,22 @@ def load(
 def serialize(src: graph.Graph) -> pb.Graph:
     """Serializes a graph into a protobuffer."""
 
+    if src.named_inputs is None:
+        raise ValueError("Cannot serialized a graph without named input nodes")
+    if src.named_outputs is None:
+        raise ValueError("Cannot serialized a graph without named output nodes")
+
     return pb.Graph(
         operators=[_serialize_operator(o) for o in src.operators],
         nodes=[_serialize_node(e) for e in src.nodes],
         features=[_serialize_feature(f) for f in src.features],
         samplings=[_serialize_sampling(s) for s in src.samplings],
-        inputs=[_serialize_io_signature(k, e) for k, e in src.inputs.items()],
-        outputs=[_serialize_io_signature(k, e) for k, e in src.outputs.items()],
+        inputs=[
+            _serialize_io_signature(k, e) for k, e in src.named_inputs.items()
+        ],
+        outputs=[
+            _serialize_io_signature(k, e) for k, e in src.named_outputs.items()
+        ],
     )
 
 
@@ -174,11 +182,18 @@ def unserialize(src: pb.Graph) -> graph.Graph:
             raise ValueError(f"Non existing node {node_id}")
         return nodes[node_id]
 
+    g.named_inputs = {}
+    g.named_outputs = {}
+
     for item in src.inputs:
-        g.inputs[item.key] = get_node(item.node_id)
+        node = get_node(item.node_id)
+        g.inputs.add(node)
+        g.named_inputs[item.key] = node
 
     for item in src.outputs:
-        g.outputs[item.key] = get_node(item.node_id)
+        node = get_node(item.node_id)
+        g.outputs.add(get_node(item.node_id))
+        g.named_outputs[item.key] = node
 
     return g
 
@@ -371,7 +386,7 @@ def _attribute_to_proto(
     # list of strings
     if isinstance(value, list) and all(isinstance(val, str) for val in value):
         return pb.Operator.Attribute(
-            key=key, list_str=pb.Operator.Attribute.ListString(value=value)
+            key=key, list_str=pb.Operator.Attribute.ListString(values=value)
         )
     # map<str, str>
     if (
@@ -380,7 +395,12 @@ def _attribute_to_proto(
         and all(isinstance(val, str) for val in value.values())
     ):
         return pb.Operator.Attribute(
-            key=key, map_str_str=pb.Operator.Attribute.MapStrStr(value=value)
+            key=key, map_str_str=pb.Operator.Attribute.MapStrStr(values=value)
+        )
+    # list of dtype
+    if isinstance(value, list) and all(isinstance(val, DType) for val in value):
+        return pb.Operator.Attribute(
+            key=key, list_dtype=pb.Operator.Attribute.ListDType(values=value)
         )
     raise ValueError(
         f"Non supported type {type(value)} for attribute {key}={value}"
@@ -395,11 +415,13 @@ def _attribute_from_proto(src: pb.Operator.Attribute) -> base.AttributeType:
     if src.HasField("float_64"):
         return src.float_64
     if src.HasField("list_str"):
-        return list(src.list_str.value)
+        return list(src.list_str.values)
     if src.HasField("boolean"):
         return bool(src.boolean)
     if src.HasField("map_str_str"):
-        return dict(src.map_str_str.value)
+        return dict(src.map_str_str.values)
+    if src.HasField("list_dtype"):
+        return list(src.list_dtype.values)
     raise ValueError(f"Non supported proto attribute {src}")
 
 

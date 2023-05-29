@@ -25,9 +25,20 @@ from typing import Union
 import numpy as np
 
 # Unit for durations
-Duration = float
+NormalizedDuration = float
+Duration = Union[float, int]
 
 Timestamp = Union[np.datetime64, datetime.datetime, int, float]
+
+
+def normalize_duration(x: Duration) -> NormalizedDuration:
+    if isinstance(x, (int, float)) and x > 0:
+        return NormalizedDuration(x)
+
+    raise ValueError(
+        "A duration should be a strictly positive number of type float,"
+        f" int or tp.Duration. Got {x!r} or type {type(x)}."
+    )
 
 
 def milliseconds(value: Union[int, float]) -> Duration:

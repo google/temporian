@@ -21,6 +21,10 @@ from temporian.core import serialize
 from temporian.core import graph
 from temporian.core.test import utils
 from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.io import (
+    pd_dataframe_to_event_set,
+    event_set,
+)
 
 
 class SerializeTest(absltest.TestCase):
@@ -31,11 +35,8 @@ class SerializeTest(absltest.TestCase):
         o4 = utils.OpI2O1(o2.outputs["output"], i3)
         o5 = utils.OpI1O2(o4.outputs["output"])
 
-        original, _ = graph.infer_graph(
-            {
-                "io_input_1": i1,
-                "io_input_2": i3,
-            },
+        original = graph.infer_graph_named_nodes(
+            {"io_input_1": i1, "io_input_2": i3},
             {
                 "io_output_1": o5.outputs["output_1"],
                 "io_output_2": o4.outputs["output"],
@@ -53,8 +54,12 @@ class SerializeTest(absltest.TestCase):
         self.assertEqual(len(original.features), len(restored.features))
         self.assertEqual(len(original.operators), len(restored.operators))
         self.assertEqual(len(original.nodes), len(restored.nodes))
-        self.assertEqual(original.inputs.keys(), restored.inputs.keys())
-        self.assertEqual(original.outputs.keys(), restored.outputs.keys())
+        self.assertEqual(
+            original.named_inputs.keys(), restored.named_inputs.keys()
+        )
+        self.assertEqual(
+            original.named_outputs.keys(), restored.named_outputs.keys()
+        )
         # TODO: Deep equality tests.
 
         # Ensures that "original" and "restored" don't link to the same objects.
@@ -75,30 +80,25 @@ class SerializeTest(absltest.TestCase):
             & serialize.all_identifiers(restored.nodes)
         )
         self.assertFalse(
-            serialize.all_identifiers(original.inputs.values())
-            & serialize.all_identifiers(restored.inputs.values())
+            serialize.all_identifiers(original.named_inputs.values())
+            & serialize.all_identifiers(restored.named_inputs.values())
         )
         self.assertFalse(
-            serialize.all_identifiers(original.outputs.values())
-            & serialize.all_identifiers(restored.outputs.values())
+            serialize.all_identifiers(original.named_outputs.values())
+            & serialize.all_identifiers(restored.named_outputs.values())
         )
 
     def test_serialize_autonode(self):
-        input_data = EventSet.from_dataframe(
-            pd.DataFrame(
-                {
-                    "timestamp": [0.0, 2.0, 4.0, 6.0],
-                    "f1": [1.0, 2.0, 3.0, 4.0],
-                    "x": [1, 1, 2, 2],
-                },
-            ),
-            index_names=["x"],
+        input_data = event_set(
+            timestamps=[1, 2, 3, 4],
+            features={"f1": [5, 6, 7, 8], "x": [1, 1, 2, 2]},
+            index_features=["x"],
         )
 
         input_node = input_data.node()
         output_node = tp.simple_moving_average(input_node, 2.0)
 
-        original, _ = graph.infer_graph(
+        original = graph.infer_graph_named_nodes(
             {"i": input_node},
             {"o": output_node},
         )
@@ -125,7 +125,7 @@ class SerializeTest(absltest.TestCase):
         i_event = utils.create_input_node()
         operator = utils.OpWithAttributes(i_event, **attributes)
 
-        original, _ = graph.infer_graph(
+        original = graph.infer_graph_named_nodes(
             inputs={"i_event": i_event},
             outputs={"output": operator.outputs["output"]},
         )
@@ -138,8 +138,12 @@ class SerializeTest(absltest.TestCase):
         logging.info("restored:\n%s", restored)
 
         self.assertEqual(len(original.operators), len(restored.operators))
-        self.assertEqual(original.inputs.keys(), restored.inputs.keys())
-        self.assertEqual(original.outputs.keys(), restored.outputs.keys())
+        self.assertEqual(
+            original.named_inputs.keys(), restored.named_inputs.keys()
+        )
+        self.assertEqual(
+            original.named_outputs.keys(), restored.named_outputs.keys()
+        )
 
         # Check all restored attributes for the only operator
         restored_attributes = list(restored.operators)[0].attributes
@@ -151,12 +155,12 @@ class SerializeTest(absltest.TestCase):
             & serialize.all_identifiers(restored.operators)
         )
         self.assertFalse(
-            serialize.all_identifiers(original.inputs.values())
-            & serialize.all_identifiers(restored.inputs.values())
+            serialize.all_identifiers(original.named_inputs.values())
+            & serialize.all_identifiers(restored.named_inputs.values())
         )
         self.assertFalse(
-            serialize.all_identifiers(original.outputs.values())
-            & serialize.all_identifiers(restored.outputs.values())
+            serialize.all_identifiers(original.named_outputs.values())
+            & serialize.all_identifiers(restored.named_outputs.values())
         )
 
 

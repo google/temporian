@@ -33,38 +33,34 @@ class RenameOperator(Operator):
     ):
         super().__init__()
 
-        if features and index:
-            raise ValueError(
-                "Cannot path both the `features` and `index` argument to the "
-                "rename operator."
-            )
-
         self.add_attribute("features", features)
         self.add_attribute("index", index)
 
+        self._features = features
+        self._index = index
+
         self.add_input("input", input)
 
-        if index:
-            new_indexes = [
-                (index.get(i.name, i.name), i.dtype)
-                for i in input.schema.indexes
-            ]
+        new_indexes = [
+            (index.get(i.name, i.name), i.dtype) for i in input.schema.indexes
+        ]
+        new_feature_schemas = [
+            (features.get(f.name, f.name), f.dtype)
+            for f in input.schema.features
+        ]
 
+        if index:
             self.add_output(
                 "output",
                 Node.create_new_features_new_sampling(
-                    features=input.schema.features,
+                    features=new_feature_schemas,
                     indexes=new_indexes,
                     is_unix_timestamp=input.schema.is_unix_timestamp,
                     creator=self,
                 ),
             )
-        else:
-            new_feature_schemas = [
-                (features.get(f.name, f.name), f.dtype)
-                for f in input.schema.features
-            ]
 
+        else:
             self.add_output(
                 "output",
                 Node.create_new_features_existing_sampling(
@@ -74,6 +70,14 @@ class RenameOperator(Operator):
                 ),
             )
         self.check()
+
+    @property
+    def features(self) -> Dict[str, str]:
+        return self._features
+
+    @property
+    def index(self) -> Dict[str, str]:
+        return self._index
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
@@ -114,9 +118,15 @@ def _normalize_rename_features(
         features = {schema.features[0].name: features}
 
     feature_dict = schema.feature_name_to_dtype()
-    for feature in features.items():
-        if feature not in feature_dict:
-            raise ValueError(f"The feature {feature} does not exist.")
+
+    if len(features) != len(set(features.values())):
+        raise ValueError("Multiple features renamed to the same name")
+
+    for src, dst in features.items():
+        if dst == "":
+            raise ValueError("Cannot rename to an empty string")
+        if src not in feature_dict:
+            raise KeyError(f"The feature {src!r} does not exist.")
     return features
 
 
@@ -137,9 +147,15 @@ def _normalize_rename_indexes(
         indexes = {schema.indexes[0].name: indexes}
 
     indexes_dict = schema.index_name_to_dtype()
-    for index in indexes.items():
-        if index not in indexes_dict:
-            raise ValueError(f"The index {index} does not exist.")
+
+    if len(indexes) != len(set(indexes.values())):
+        raise ValueError("Multiple indexes renamed to the same name")
+
+    for src, dst in indexes.items():
+        if dst == "":
+            raise ValueError("Cannot rename to an empty string")
+        if src not in indexes_dict:
+            raise KeyError(f"The index {src!r} does not exist.")
     return indexes
 
 

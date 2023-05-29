@@ -38,7 +38,9 @@ class Prefix(Operator):
         self.add_output(
             "output",
             Node.create_new_features_existing_sampling(
-                features=input.schema.features,
+                features=[
+                    (prefix + f.name, f.dtype) for f in input.schema.features
+                ],
                 sampling_node=input,
                 creator=self,
             ),

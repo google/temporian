@@ -19,8 +19,7 @@ import numpy as np
 from temporian.core.operators.scalar.base import (
     BaseScalarOperator,
 )
-from temporian.implementation.numpy.data.event_set import EventSet
-from temporian.implementation.numpy.data.event_set import IndexData
+from temporian.implementation.numpy.data.event_set import EventSet, IndexData
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -44,19 +43,19 @@ class BaseScalarNumpyImplementation(OperatorImplementation, ABC):
         Returns:
             Result of the operation.
         """
-        dst_evset = EventSet(
-            data={},
-            feature_names=input.feature_names,
-            index_names=input.index_names,
-            is_unix_timestamp=input.is_unix_timestamp,
-        )
-        for index_key, index_data in input.iterindex():
+
+        assert isinstance(self.operator, BaseScalarOperator)
+        output_schema = self.output_schema("output")
+
+        dst_evset = EventSet(data={}, schema=output_schema)
+        for index_key, index_data in input.data.items():
             dst_evset[index_key] = IndexData(
                 [
-                    self._do_operation(feature, self._operator.value)
+                    self._do_operation(feature, self.operator.value)
                     for feature in index_data.features
                 ],
                 index_data.timestamps,
+                schema=output_schema,
             )
 
         return {"output": dst_evset}

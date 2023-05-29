@@ -16,13 +16,21 @@ import numpy as np
 import pandas as pd
 from absl.testing import absltest
 
-from temporian.core.data.node import Node, Feature
-from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.core.data.node import Node, Feature, input_node
 from temporian.implementation.numpy.operators.cast import (
     CastNumpyImplementation,
-    CastOperator,
 )
+from temporian.core.operators.cast import CastOperator, cast
 from temporian.core.data.dtype import DType
+from temporian.implementation.numpy.data.io import (
+    pd_dataframe_to_event_set,
+    event_set,
+)
+from temporian.implementation.numpy.operators.test.test_util import (
+    assertEqualEventSet,
+    testOperatorAndImp,
+)
+from temporian.core.evaluation import evaluate
 
 
 class CastNumpyImplementationTest(absltest.TestCase):
@@ -43,7 +51,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
         blw_i64 = np.finfo(np.float64).min  # below float32 too
 
         # 2 index columns, 3 features: float64, int64, str, boolean
-        self.input_evset = EventSet.from_dataframe(
+        self.input_evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 data=[
                     [TRYO_SHOP, MATE_ID, 0.0, -14.0, abv_i32, "1.2", True],
@@ -60,17 +68,19 @@ class CastNumpyImplementationTest(absltest.TestCase):
                     "product_id",
                     "timestamp",
                     # The following are just tricky column names :)
-                    "float_64",
-                    "int_64",
-                    "str",
-                    "boolean",
+                    "f_float_64",
+                    "f_int_64",
+                    "f_str",
+                    "f_boolean",
                 ],
             ),
             index_names=["store_id", "product_id"],
         )
 
+        self.input_node = self.input_evset.node()
+
         # Expected event set when applying some downcast operations
-        self.expected_evset_1 = EventSet.from_dataframe(
+        self.expected_evset_1 = pd_dataframe_to_event_set(
             pd.DataFrame(
                 data=[
                     # Note: astype() below will truncate above/below numbers
@@ -87,18 +97,18 @@ class CastNumpyImplementationTest(absltest.TestCase):
                     "store_id",
                     "product_id",
                     "timestamp",
-                    "float_64",
-                    "int_64",
-                    "str",
-                    "boolean",
+                    "f_float_64",
+                    "f_int_64",
+                    "f_str",
+                    "f_boolean",
                 ],
                 # Even more tricky: these columns won't match their type
-            ).astype({"float_64": np.float32, "int_64": np.int32}),
+            ).astype({"f_float_64": np.float32, "f_int_64": np.int32}),
             index_names=["store_id", "product_id"],
         )
 
         # Expected when converting everything to float32
-        self.expected_evset_2 = EventSet.from_dataframe(
+        self.expected_evset_2 = pd_dataframe_to_event_set(
             pd.DataFrame(
                 data=[
                     # Note: astype() below will truncate above/below numbers
@@ -115,63 +125,50 @@ class CastNumpyImplementationTest(absltest.TestCase):
                     "store_id",
                     "product_id",
                     "timestamp",
-                    "float_64",
-                    "int_64",
-                    "str",
-                    "boolean",
+                    "f_float_64",
+                    "f_int_64",
+                    "f_str",
+                    "f_boolean",
                 ],
             ).astype(
                 {
-                    "float_64": np.float32,
-                    "int_64": np.float32,
-                    "str": np.float32,
-                    "boolean": np.float32,
+                    "f_float_64": np.float32,
+                    "f_int_64": np.float32,
+                    "f_str": np.float32,
+                    "f_boolean": np.float32,
                 }
             ),
             index_names=["store_id", "product_id"],
         )
 
-        self.sampling = Sampling(
-            [("store_id", DType.INT32), ("product_id", DType.INT64)],
-            is_unix_timestamp=False,
-        )
-        self.input_node = Node(
-            [
-                Feature("float_64", DType.FLOAT64),
-                Feature("int_64", DType.INT64),
-                Feature("str", DType.STRING),
-                Feature("boolean", DType.BOOLEAN),
-            ],
-            sampling=self.sampling,
-            creator=None,
-        )
-
     def test_cast_op_by_feature(self) -> None:
         """Test correct casting by feat. names, without overflow check."""
 
-        operator = CastOperator(
-            input=self.input_node,
-            from_features={
-                "float_64": DType.FLOAT32,
-                "int_64": DType.INT32,
-                "str": DType.FLOAT64,
-                "boolean": DType.INT64,
+        output_node = cast(
+            self.input_node,
+            target={
+                "f_float_64": DType.FLOAT32,
+                "f_int_64": DType.INT32,
+                "f_str": DType.FLOAT64,
+                "f_boolean": DType.INT64,
             },
             check_overflow=False,
         )
+        output_node.check_same_sampling(self.input_node)
 
-        cast_implementation = CastNumpyImplementation(operator)
-
-        operator_output = cast_implementation.call(input=self.input_evset)
-
-        self.assertTrue(self.expected_evset_1 == operator_output["output"])
+        output_evset = evaluate(
+            output_node,
+            {self.input_node: self.input_evset},
+            check_execution=True,
+        )
+        assertEqualEventSet(self, output_evset, self.expected_evset_1)
 
     def test_cast_op_by_dtype(self) -> None:
         """Test correct casting by origin DType, without overflow check."""
 
-        operator = CastOperator(
-            input=self.input_node,
-            from_dtypes={
+        output_node = cast(
+            self.input_node,
+            target={
                 DType.FLOAT64: DType.FLOAT32,
                 DType.INT64: DType.INT32,
                 DType.STRING: DType.FLOAT64,
@@ -180,114 +177,95 @@ class CastNumpyImplementationTest(absltest.TestCase):
             },
             check_overflow=False,
         )
-
-        cast_implementation = CastNumpyImplementation(operator)
-
-        operator_output = cast_implementation.call(input=self.input_evset)
-
-        self.assertTrue(self.expected_evset_1 == operator_output["output"])
+        output_evset = evaluate(
+            output_node,
+            {self.input_node: self.input_evset},
+            check_execution=True,
+        )
+        assertEqualEventSet(self, output_evset, self.expected_evset_1)
 
     def test_cast_to_dtype(self) -> None:
         """Test correct casting everything to float32, no overflow check."""
 
-        operator = CastOperator(
-            input=self.input_node,
-            to_dtype=DType.FLOAT32,
+        output_node = cast(
+            self.input_node,
+            target=DType.FLOAT32,
             check_overflow=False,
         )
-
-        cast_implementation = CastNumpyImplementation(operator)
-
-        operator_output = cast_implementation.call(input=self.input_evset)
-
-        self.assertTrue(self.expected_evset_2 == operator_output["output"])
+        output_evset = evaluate(
+            output_node,
+            {self.input_node: self.input_evset},
+            check_execution=True,
+        )
+        assertEqualEventSet(self, output_evset, self.expected_evset_2)
 
     def test_cast_no_effect(self) -> None:
         """Test the case in which there's nothing to do actually."""
 
-        operator = CastOperator(
-            input=self.input_node,
-            from_dtypes={
+        output_node = cast(
+            self.input_node,
+            target={
                 DType.FLOAT64: DType.FLOAT64,
                 DType.INT64: DType.INT64,
                 DType.STRING: DType.STRING,
                 DType.BOOLEAN: DType.BOOLEAN,
             },
-            check_overflow=True,
+            check_overflow=False,
         )
-
-        cast_implementation = CastNumpyImplementation(operator)
-
-        operator_output = cast_implementation.call(input=self.input_evset)
-
-        # Check against input event set
-        self.assertTrue(self.input_evset == operator_output["output"])
+        self.assertTrue(output_node is self.input_node)
 
     def test_overflow_int64_int32(self) -> None:
         """Test overflow check for int32, coming from int64."""
 
-        operator = CastOperator(
-            input=self.input_node,
-            from_features={
-                "int_64": DType.INT32,
-            },
+        output_node = cast(
+            self.input_node,
+            target={DType.INT64: DType.INT32},
             check_overflow=True,
         )
 
-        cast_implementation = CastNumpyImplementation(operator)
-
         with self.assertRaisesRegex(ValueError, "Overflow"):
-            _ = cast_implementation.call(input=self.input_evset)
+            _ = evaluate(
+                output_node,
+                {self.input_node: self.input_evset},
+                check_execution=True,
+            )
 
     def test_overflow_float64_float32(self) -> None:
         """Test overflow check for float32, coming from float64."""
 
-        operator = CastOperator(
-            input=self.input_node,
-            from_dtypes={
-                DType.FLOAT64: DType.FLOAT32,
-            },
+        output_node = cast(
+            self.input_node,
+            target={DType.FLOAT64: DType.FLOAT32},
             check_overflow=True,
         )
 
-        cast_implementation = CastNumpyImplementation(operator)
-
         with self.assertRaisesRegex(ValueError, "Overflow"):
-            _ = cast_implementation.call(input=self.input_evset)
-
-    def test_overflow_float64_int64(self) -> None:
-        """Test overflow check for int64, coming from max float64"""
-
-        operator = CastOperator(
-            input=self.input_node,
-            from_features={
-                "float_64": DType.INT64,
-            },
-            check_overflow=True,
-        )
-
-        cast_implementation = CastNumpyImplementation(operator)
-
-        with self.assertRaisesRegex(ValueError, "Overflow"):
-            _ = cast_implementation.call(input=self.input_evset)
+            _ = evaluate(
+                output_node,
+                {self.input_node: self.input_evset},
+                check_execution=True,
+            )
 
     def test_no_overflow_boolean(self) -> None:
         """Test that no overflow error is raised when
         converting to boolean type"""
 
-        operator = CastOperator(
-            input=self.input_node,
-            from_features={
-                "int_64": DType.BOOLEAN,
-                "float_64": DType.BOOLEAN,
-            },
+        output_node = cast(
+            self.input_node,
+            target={"f_int_64": DType.BOOLEAN, "f_float_64": DType.BOOLEAN},
             check_overflow=True,
         )
 
-        cast_implementation = CastNumpyImplementation(operator)
+        _ = evaluate(
+            output_node,
+            {self.input_node: self.input_evset},
+            check_execution=True,
+        )
 
-        # This shouldn't raise error
-        _ = cast_implementation.call(input=self.input_evset)
+    def test_python_types(self):
+        input_data = event_set(timestamps=[1, 2], features={"a": [1, 2]})
+        output_node = cast(input_data.source_node(), float)
+        self.assertEqual(output_node.features[0].dtype, DType.FLOAT64)
 
 
 if __name__ == "__main__":

@@ -18,8 +18,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional, Tuple, TYPE_CHECKING, Any, Union
 
-from numpy import isin
-
 from temporian.core.data.dtype import DType, IndexDType
 from temporian.core.data.schema import Schema, FeatureSchema, IndexSchema
 from temporian.utils import string
@@ -41,6 +39,9 @@ class Sampling:
     def __hash__(self):
         return id(self)
 
+    def __repr__(self):
+        return f"Sampling(id={id(self)}, creator={self.creator})"
+
 
 @dataclass
 class Feature:
@@ -50,6 +51,9 @@ class Feature:
 
     def __hash__(self):
         return id(self)
+
+    def __repr__(self):
+        return f"Feature(id={id(self)}, creator={self.creator})"
 
 
 class Node(object):
@@ -208,6 +212,27 @@ class Node(object):
     def creator(self, creator: Optional[Operator]):
         self._creator = creator
 
+    @property
+    def features(self) -> List[FeatureSchema]:
+        return self.schema.features
+
+    @property
+    def indexes(self) -> List[IndexSchema]:
+        return self.schema.indexes
+
+    def check_same_sampling(self, other: Node):
+        self.schema.check_compatible_index(other.schema)
+        if self.sampling_node is not other.sampling_node:
+            raise ValueError(
+                "Arguments should have the same sampling. "
+                f"{self.sampling_node} is different from "
+                f"{other.sampling_node}. Two create two nodes with the same "
+                "sampling, use the argument `same_sampling_as` with "
+                "`tp.input_node` or `tp.event_set`. You can also use the "
+                "operator `tp.resample` align the sampling of two event sets "
+                "with the same index (but different sampling)."
+            )
+
     def evaluate(
         self,
         input: EvaluationInput,
@@ -240,7 +265,7 @@ class Node(object):
         schema_print = string.indent(repr(self._schema))
         return (
             f"schema:\n{schema_print}\n"
-            "features: {self._features}\n"
+            f"features: {self._features}\n"
             f"sampling: {self._sampling},\n"
             f"name: {self._name}\n"
             f"creator: {self._creator}\n"
@@ -257,7 +282,9 @@ class Node(object):
             " element-wise or use cast() operator to convert to boolean."
         )
 
-    def _error(self, op_name: str, other: Any, allowed_types: str) -> None:
+    def _raise_error(
+        self, op_name: str, other: Any, allowed_types: str
+    ) -> None:
         """Raises an error message.
 
         This method is a utilities used in operators implementations,
@@ -280,7 +307,8 @@ class Node(object):
 
             return not_equal_scalar(input=self, value=other)
 
-        self._error("ne", other, "int,float,bool,str")
+        self._raise_error("ne", other, "int,float,bool,str")
+        assert False
 
     def __add__(self, other: Any) -> Node:
         # TODO: In this and other operants, factor code and add support for
@@ -296,7 +324,8 @@ class Node(object):
 
             return add_scalar(input=self, value=other)
 
-        self._error("add", other, "int,float")
+        self._raise_error("add", other, "int,float")
+        assert False
 
     def __radd__(self, other: Any) -> Node:
         return self.__add__(other)
@@ -314,7 +343,8 @@ class Node(object):
 
             return subtract_scalar(minuend=self, subtrahend=other)
 
-        self._error("subtract", other, "int,float")
+        self._raise_error("subtract", other, "int,float")
+        assert False
 
     def __rsub__(self, other: Any) -> Node:
         if isinstance(other, T_SCALAR):
@@ -324,7 +354,8 @@ class Node(object):
 
             return subtract_scalar(minuend=other, subtrahend=self)
 
-        self._error("subtract", other, "int,float")
+        self._raise_error("subtract", other, "int,float")
+        assert False
 
     def __mul__(self, other: Any) -> Node:
         if isinstance(other, Node):
@@ -339,7 +370,8 @@ class Node(object):
 
             return multiply_scalar(input=self, value=other)
 
-        self._error("multiply", other, "int,float")
+        self._raise_error("multiply", other, "int,float")
+        assert False
 
     def __rmul__(self, other: Any) -> Node:
         return self.__mul__(other)
@@ -370,7 +402,8 @@ class Node(object):
 
             return divide_scalar(numerator=self, denominator=other)
 
-        self._error("divide", other, "(int,float)")
+        self._raise_error("divide", other, "(int,float)")
+        assert False
 
     def __rtruediv__(self, other: Any) -> Node:
         if isinstance(other, T_SCALAR):
@@ -378,7 +411,8 @@ class Node(object):
 
             return divide_scalar(numerator=other, denominator=self)
 
-        self._error("divide", other, "(int,float)")
+        self._raise_error("divide", other, "(int,float)")
+        assert False
 
     def __floordiv__(self, other: Any) -> Node:
         if isinstance(other, Node):
@@ -393,7 +427,8 @@ class Node(object):
 
             return floordiv_scalar(numerator=self, denominator=other)
 
-        self._error("floor_divide", other, "(int,float)")
+        self._raise_error("floor_divide", other, "(int,float)")
+        assert False
 
     def __rfloordiv__(self, other: Any) -> Node:
         if isinstance(other, T_SCALAR):
@@ -403,7 +438,8 @@ class Node(object):
 
             return floordiv_scalar(numerator=other, denominator=self)
 
-        self._error("floor_divide", other, "(int,float)")
+        self._raise_error("floor_divide", other, "(int,float)")
+        assert False
 
     def __pow__(self, other: Any) -> Node:
         if isinstance(other, Node):
@@ -416,7 +452,8 @@ class Node(object):
 
             return power_scalar(base=self, exponent=other)
 
-        self._error("exponentiate", other, "(int,float)")
+        self._raise_error("exponentiate", other, "(int,float)")
+        assert False
 
     def __rpow__(self, other: Any) -> Node:
         if isinstance(other, T_SCALAR):
@@ -424,7 +461,8 @@ class Node(object):
 
             return power_scalar(base=other, exponent=self)
 
-        self._error("exponentiate", other, "(int,float)")
+        self._raise_error("exponentiate", other, "(int,float)")
+        assert False
 
     def __mod__(self, other: Any) -> Node:
         if isinstance(other, Node):
@@ -437,7 +475,8 @@ class Node(object):
 
             return modulo_scalar(numerator=self, denominator=other)
 
-        self._error("compute modulo (%)", other, "(int,float)")
+        self._raise_error("compute modulo (%)", other, "(int,float)")
+        assert False
 
     def __rmod__(self, other: Any) -> Node:
         if isinstance(other, T_SCALAR):
@@ -445,7 +484,8 @@ class Node(object):
 
             return modulo_scalar(numerator=other, denominator=self)
 
-        self._error("compute modulo (%)", other, "(int,float)")
+        self._raise_error("compute modulo (%)", other, "(int,float)")
+        assert False
 
     def __gt__(self, other: Any):
         if isinstance(other, Node):
@@ -460,7 +500,8 @@ class Node(object):
 
             return greater_scalar(input=self, value=other)
 
-        self._error("compare", other, "(int,float)")
+        self._raise_error("compare", other, "(int,float)")
+        assert False
 
     def __ge__(self, other: Any):
         if isinstance(other, Node):
@@ -475,7 +516,8 @@ class Node(object):
 
             return greater_equal_scalar(input=self, value=other)
 
-        self._error("compare", other, "(int,float)")
+        self._raise_error("compare", other, "(int,float)")
+        assert False
 
     def __lt__(self, other: Any):
         if isinstance(other, Node):
@@ -490,7 +532,8 @@ class Node(object):
 
             return less_scalar(input=self, value=other)
 
-        self._error("compare", other, "(int,float)")
+        self._raise_error("compare", other, "(int,float)")
+        assert False
 
     def __le__(self, other: Any):
         if isinstance(other, Node):
@@ -505,7 +548,8 @@ class Node(object):
 
             return less_equal_scalar(input=self, value=other)
 
-        self._error("compare", other, "(int,float)")
+        self._raise_error("compare", other, "(int,float)")
+        assert False
 
     def _error_only_boolean(self, boolean_op: str, other: Any) -> None:
         raise ValueError(
@@ -518,21 +562,27 @@ class Node(object):
             from temporian.core.operators.binary import logical_and
 
             return logical_and(input_1=self, input_2=other)
+
         self._error_only_boolean("&", other)
+        assert False
 
     def __or__(self, other: Any) -> Node:
         if isinstance(other, Node):
             from temporian.core.operators.binary import logical_or
 
             return logical_or(input_1=self, input_2=other)
+
         self._error_only_boolean("|", other)
+        assert False
 
     def __xor__(self, other: Any) -> Node:
         if isinstance(other, Node):
             from temporian.core.operators.binary import logical_xor
 
             return logical_xor(input_1=self, input_2=other)
+
         self._error_only_boolean("^", other)
+        assert False
 
 
 def input_node(
@@ -542,7 +592,24 @@ def input_node(
     same_sampling_as: Optional[Node] = None,
     name: Optional[str] = None,
 ) -> Node:
-    """Creates a node manually.
+    """Creates an input node.
+
+    An input node can be used to feed data into a graph.
+
+    Usage example:
+
+        # Without index
+        a = input_node(features=[("f1", tp.float64), ("f2", tp.string)])
+
+        # With an index
+        a = input_node(
+            features=[("f1", tp.float64), ("f2", tp.string)],
+            indexes = ["f2"],
+            )
+
+        # Two nodes with the same sampling
+        a = input_node(features=[("f1", tp.float64)])
+        b = input_node(features=[("f2", tp.float64)], same_sampling_as=a)
 
     Args:
         features: List of names and dtypes of the features.

@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Dict, Tuple
 
 from temporian.core.data.node import Node
+from temporian.core.data.schema import Schema
 from temporian.core.operators.base import Operator
 from temporian.core.operators.base import OperatorExceptionDecorator
 from temporian.implementation.numpy.data.event_set import (
@@ -13,6 +14,7 @@ from temporian.implementation.numpy.data.event_set import (
 
 class OperatorImplementation(ABC):
     def __init__(self, operator: Operator):
+        assert operator is not None
         self._operator = operator
         # TODO: Check operator type
 
@@ -32,22 +34,25 @@ class OperatorImplementation(ABC):
     def __call__(self, **inputs: EventSet) -> Dict[str, EventSet]:
         """Applies the operator to its inputs."""
 
+    def output_schema(self, key: str) -> Schema:
+        return self._operator.outputs[key].schema
+
 
 def _check_value_to_schema(
     values: Dict[str, EventSet],
     nodes: Dict[str, Node],
     label: str,
 ) -> None:
-    """Checks if features are matching their definition."""
+    """Checks if event sets are matching the expected schema."""
 
     for key, node in nodes.items():
         value = values[key]
 
         if value.schema != node.schema:
             raise RuntimeError(
-                "Non matching schema between event set and input node. "
-                f"event set={value.schema} vs "
-                f"input node={node.schema}"
+                "Unexpected event set schema.\n"
+                f"event set schema =\n{value.schema}\n"
+                f"expected schema =\n{node.schema}"
             )
 
         index_value = value.get_arbitrary_index_value()
@@ -55,10 +60,16 @@ def _check_value_to_schema(
             index_data = value.data[index_value]
 
             if len(index_data.features) != len(value.schema.features):
+                print("@@@@index_data:", index_data, flush=True)
+                print("@@@@value:", value, flush=True)
+                print("@@@@value.schema:", value.schema, flush=True)
+                print("@@@@node.schema:", node.schema, flush=True)
+
                 raise RuntimeError(
-                    f"Non matching number of {label} features. "
-                    f"expected={len(value.schema.features)} vs "
-                    f"effective={len(index_data.features)}"
+                    "Invalid internal number of input features for argument"
+                    f" {label!r}.\nexpected ="
+                    f" {len(value.schema.features)}\neffective ="
+                    f" {len(index_data.features)}.\n\nSchema:\n{value.schema}"
                 )
 
             for feature_value, feature_schema in zip(
@@ -88,7 +99,7 @@ def _check_input(
     """Checks if the input/output of an operator matches its definition."""
 
     with OperatorExceptionDecorator(operator):
-        # Check input keys
+        # Check input schema
         effective_input_keys = set(inputs.keys())
         expected_input_keys = set(operator.inputs.keys())
         if effective_input_keys != expected_input_keys:
@@ -109,7 +120,7 @@ def _check_output(
     """Checks if the input/output of an operator matches its definition."""
 
     with OperatorExceptionDecorator(operator):
-        # Check output keys
+        # Check output schema
         effective_output_keys = set(outputs.keys())
         expected_output_keys = set(operator.outputs.keys())
         if effective_output_keys != expected_output_keys:
@@ -121,7 +132,8 @@ def _check_output(
 
         _check_value_to_schema(outputs, nodes=operator.outputs, label="outputs")
 
-        for output_key, output_node in operator.outputs.items():
+        # Check for unnecessary memory copy.
+        for output_key in operator.outputs.keys():
             output = outputs[output_key]
 
             # TODO: Check copy or referencing of feature data.
@@ -136,11 +148,11 @@ def _check_output(
                 is_same, reason = _is_same_sampling(output, input)
                 if expected_matching_sampling and not is_same:
                     raise RuntimeError(
-                        f"The sampling of input '{input_key}' and output "
-                        f"'{output_key}' are expected to have THE SAME "
-                        "sampling. However, a different sampling was generated "
-                        f"during the op execution ({input} "
-                        f"vs {output}). Reason: {reason}"
+                        f"The sampling of the input argument '{input_key}' and"
+                        f" output '{output_key}' are expected to have THE SAME"
+                        " sampling. However, a different sampling was"
+                        f" generated during the op execution ({input} vs"
+                        f" {output}). Reason: {reason}"
                     )
 
 
@@ -162,8 +174,8 @@ def _is_same_sampling(evset_1: EventSet, evset_2: EventSet) -> Tuple[bool, str]:
             return (
                 False,
                 (
-                    f"Timestamps at index key {index_key} are not the same"
-                    " np.ndarray"
+                    f"Timestamps for index value {index_key} have two different"
+                    " allocated np.arrays."
                 ),
             )
 

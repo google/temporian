@@ -21,6 +21,7 @@ from temporian.core.data.node import Node
 from temporian.core.data.schema import Schema, FeatureSchema, IndexSchema
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
+from temporian.core.operators.drop_index import drop_index
 
 
 class AddIndexOperator(Operator):
@@ -82,8 +83,8 @@ class AddIndexOperator(Operator):
             new_indexes.append(
                 IndexSchema(name=index_name, dtype=feature_dict[index_name])
             )
-        # Note: The new index is added before the existing index items.
-        return new_indexes + input.schema.indexes
+        # Note: The new index is added after the existing index items.
+        return input.schema.indexes + new_indexes
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
@@ -92,7 +93,7 @@ class AddIndexOperator(Operator):
             attributes=[
                 pb.OperatorDef.Attribute(
                     key="index_to_add",
-                    type=pb.OperatorDef.Attribute.Type.REPEATED_STRING,
+                    type=pb.OperatorDef.Attribute.Type.LIST_STRING,
                 ),
             ],
             inputs=[pb.OperatorDef.Input(key="input")],
@@ -127,28 +128,26 @@ def _normalize_index_to_add(
     return index_names
 
 
-# Replace with Add index
+def _normalize_index_to_set(
+    index_names: str | List[str],
+) -> List[str]:
+    if isinstance(index_names, str):
+        return [index_names]
+
+    if len(index_names) == 0:
+        raise ValueError("Cannot specify empty list as `index_names` argument.")
+
+    return index_names
+
+
 def add_index(input: Node, index_to_add: str | List[str]) -> Node:
     """Adds one or more features as index in a node.
-
-    Optionally, the new index columns can be appended to the existing index.
-
-    The input `input` object remains unchanged. The function returns a new
-    node with the specified index changes.
 
     Examples:
         Given an input `Node` with index names ['A', 'B', 'C'] and features
         names ['X', 'Y', 'Z']:
 
-        1. `add_index(input, feature_names=['X'], append=False)`
-           Output `Node` will have index names ['X'] and features names
-           ['Y', 'Z'].
-
-        2. `add_index(input, feature_names=['X', 'Y'], append=False)`
-           Output `Node` will have index names ['X', 'Y'] and
-           features names ['Z'].
-
-        3. `add_index(input, feature_names=['X', 'Y'], append=True)`
+        3. `add_index(input, feature_names=['X', 'Y'])`
            Output `Node` will have index names ['A', 'B', 'C', 'X', 'Y'] and
            features names ['Z'].
 
@@ -159,8 +158,7 @@ def add_index(input: Node, index_to_add: str | List[str]) -> Node:
             the new index. These feature names should already exist in `input`.
 
     Returns:
-        New `Node` with the updated index, where the specified feature names
-        have been set or appended as index columns, based on the `append` flag.
+         New `Node` with the updated index.
 
     Raises:
         KeyError: If any of the specified `index_to_add` are not found in
@@ -169,3 +167,51 @@ def add_index(input: Node, index_to_add: str | List[str]) -> Node:
 
     index_to_add = _normalize_index_to_add(index_to_add)
     return AddIndexOperator(input, index_to_add).outputs["output"]
+
+
+def set_index(input: Node, index: str | List[str]) -> Node:
+    """Replaces the index in a node.
+
+    "set_index" is implemented as drop_index + add_index.
+
+    Examples:
+        Given an input `Node` with index names ['A', 'B', 'C'] and features
+        names ['X', 'Y', 'Z']:
+
+        1. `set_index(input, index=['X'])`
+           Output `Node` will have index names ['X'] and features names
+           ['A', 'B', 'C', 'Y', 'Z'].
+
+        2. `set_index(input, index=['X', 'Y'])`
+           Output `Node` will have index names ['X', 'Y'] and
+           features names ['A', 'B', 'C', 'Z'].
+
+    Args:
+        input: Input `Node` object for which the index is to be set or
+            updated.
+        index: List of index / feature names (strings) used as
+            the new index. These feature names should be either index or
+            features in `input`.
+
+    Returns:
+        New `Node` with the updated index.
+
+    Raises:
+        KeyError: If any of the specified `index_to_add` are not found in
+            `input`.
+    """
+
+    new_index = _normalize_index_to_set(index)
+
+    # Note
+    # The set_index is implemented as a drop_index + add_index.
+    # The implementation could be improved (simpoler, faster) with a new
+    # operator to re-order the index items.
+
+    if len(input.schema.indexes) != 0:
+        input = drop_index(input)
+
+    if len(new_index) != 0:
+        input = add_index(input, new_index)
+
+    return input

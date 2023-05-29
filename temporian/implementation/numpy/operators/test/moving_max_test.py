@@ -25,9 +25,8 @@ from temporian.implementation.numpy.operators.window.moving_max import (
     MovingMaxNumpyImplementation,
     operators_cc,
 )
-from temporian.implementation.numpy.data.event_set import IndexData
-from temporian.implementation.numpy.data.event_set import EventSet
 from numpy.testing import assert_array_equal
+from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
 
 
 def _f64(l):
@@ -70,7 +69,7 @@ class MovingMaxOperatorTest(absltest.TestCase):
     def test_flat(self):
         """A simple time sequence."""
 
-        input_data = EventSet.from_dataframe(
+        input_data = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [10.0, 20.0, 1],
@@ -93,7 +92,7 @@ class MovingMaxOperatorTest(absltest.TestCase):
 
         output = instance.call(input=input_data)
 
-        expected_output = EventSet.from_dataframe(
+        expected_output = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [10.0, 20.0, 1],

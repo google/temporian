@@ -2,9 +2,6 @@ from absl.testing import absltest
 
 from temporian.implementation.numpy.data.io import event_set
 
-# Load all the implementations
-from temporian.implementation.numpy.operators import all_operators as _impls
-
 
 class EventTest(absltest.TestCase):
     def setUp(self):

@@ -18,10 +18,10 @@ from abc import ABC, abstractmethod
 from typing import Optional, List
 
 
-from temporian.core.data.duration import Duration
+from temporian.core.data.duration import Duration, NormalizedDuration
 from temporian.core.data import dtype
 from temporian.core.data.node import Node
-from temporian.core.data.schema import Schema, FeatureSchema
+from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -32,7 +32,7 @@ class BaseWindowOperator(Operator, ABC):
     def __init__(
         self,
         input: Node,
-        window_length: Duration,
+        window_length: NormalizedDuration,
         sampling: Optional[Node] = None,
     ):
         super().__init__()
@@ -74,7 +74,7 @@ class BaseWindowOperator(Operator, ABC):
         self.check()
 
     @property
-    def window_length(self) -> Duration:
+    def window_length(self) -> NormalizedDuration:
         return self._window_length
 
     @property

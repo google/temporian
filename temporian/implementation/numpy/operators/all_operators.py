@@ -7,6 +7,7 @@ from temporian.implementation.numpy.operators import filter
 from temporian.implementation.numpy.operators import glue
 from temporian.implementation.numpy.operators import unary
 from temporian.implementation.numpy.operators import lag
+from temporian.implementation.numpy.operators import leak
 from temporian.implementation.numpy.operators import prefix
 from temporian.implementation.numpy.operators import propagate
 from temporian.implementation.numpy.operators import select

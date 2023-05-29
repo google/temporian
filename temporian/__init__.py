@@ -14,6 +14,7 @@
 
 """Temporian."""
 
+from ast import Index
 from temporian.core import evaluation
 from temporian.core import operator_lib
 from temporian.core import graph
@@ -27,20 +28,13 @@ from temporian.io.read_event_set import read_event_set
 from temporian.io.save_event_set import save_event_set
 
 from temporian.implementation.numpy.data.event_set import EventSet
-from temporian.implementation.numpy.data.io import (
-    event_set,
-    pd_dataframe_to_event_set,
-)
-
+from temporian.implementation.numpy.data import io
 from temporian.implementation.numpy.data.plotter import plot
 
 # Operators
 from temporian.core.operators.all_operators import *
 
 from temporian.core.operator_lib import registered_operators as get_operators
-
-# Load all the implementations
-from temporian.implementation.numpy.operators import all_operators as _impls
 
 # dtypes
 float32 = dtype.DType.FLOAT32
@@ -55,5 +49,10 @@ __version__ = "0.0.1"
 evaluate = evaluation.evaluate
 load = serialize.load
 save = serialize.save
-input_node = node.input_node
+source_node = node.input_node
 Event = node.Node
+Schema = node.Schema
+Feature = node.FeatureSchema
+Index = node.IndexSchema
+event_set = io.event_set
+pd_dataframe_to_event_set = io.pd_dataframe_to_event_set

@@ -23,9 +23,6 @@ from temporian.implementation.numpy.data.io import (
     pd_dataframe_to_event_set,
 )
 
-# Load all the implementations
-from temporian.implementation.numpy.operators import all_operators as _impls
-
 
 class DataFrameToEventTest(absltest.TestCase):
     def test_correct(self) -> None:

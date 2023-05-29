@@ -26,12 +26,10 @@ from temporian.implementation.numpy.operators.window.simple_moving_average impor
     SimpleMovingAverageNumpyImplementation,
     operators_cc,
 )
-from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core.data import node as node_lib
-from temporian.core.data import feature as feature_lib
-from temporian.core.data import dtype as dtype_lib
 import math
 from numpy.testing import assert_array_equal
+from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
 
 
 def _f64(l):
@@ -106,7 +104,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
     def test_flat(self):
         """A simple event set."""
 
-        evset = EventSet.from_dataframe(
+        evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [10.0, 20.0, 1],
@@ -124,11 +122,13 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             window_length=5.0,
             sampling=None,
         )
+        op.outputs["output"].check_same_sampling(evset.node())
+
         self.assertEqual(op.list_matching_io_samplings(), [("input", "output")])
         instance = SimpleMovingAverageNumpyImplementation(op)
         output = instance.call(input=evset)
 
-        expected_output = EventSet.from_dataframe(
+        expected_output = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [10.0, 20.0, 1],
@@ -146,7 +146,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
     def test_with_index(self):
         """Indexed Event sets."""
 
-        evset = EventSet.from_dataframe(
+        evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     ["X1", "Y1", 10.0, 1],
@@ -173,7 +173,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
         instance = SimpleMovingAverageNumpyImplementation(op)
 
         output = instance.call(input=evset)
-        expected_output = EventSet.from_dataframe(
+        expected_output = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     ["X1", "Y1", 10.0, 1],
@@ -196,7 +196,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
     def test_with_sampling(self):
         """Event sets with user provided sampling."""
 
-        evset = EventSet.from_dataframe(
+        evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [10.0, 1],
@@ -209,17 +209,20 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             )
         )
 
+        sampling_node = node_lib.input_node([])
         op = SimpleMovingAverageOperator(
             input=evset.node(),
             window_length=3.0,
-            sampling=node_lib.input_node([]),
+            sampling=sampling_node,
         )
+        op.outputs["output"].check_same_sampling(sampling_node)
+
         self.assertEqual(
             op.list_matching_io_samplings(), [("sampling", "output")]
         )
         instance = SimpleMovingAverageNumpyImplementation(op)
 
-        sampling_data = EventSet.from_dataframe(
+        sampling_data = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [-1.0],
@@ -235,7 +238,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
         )
 
         output = instance.call(input=evset, sampling=sampling_data)
-        expected_output = EventSet.from_dataframe(
+        expected_output = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [nan, -1.0],
@@ -255,7 +258,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
     def test_with_nan(self):
         """The input features contains nan values."""
 
-        evset = EventSet.from_dataframe(
+        evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [nan, 1],
@@ -275,7 +278,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
         )
         instance = SimpleMovingAverageNumpyImplementation(op)
 
-        sampling_data = EventSet.from_dataframe(
+        sampling_data = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [1],
@@ -292,7 +295,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
         )
 
         output = instance.call(input=evset, sampling=sampling_data)
-        expected_output = EventSet.from_dataframe(
+        expected_output = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [nan, 1],

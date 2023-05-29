@@ -49,48 +49,38 @@ class BaseBinaryNumpyImplementation(OperatorImplementation):
         Raises:
             ValueError: If sampling of both event sets is not equal.
         """
+        assert isinstance(self.operator, BaseBinaryOperator)
+        output_schema = self.output_schema("output")
 
-        if input_1.feature_count != input_2.feature_count:
+        if len(input_1.schema.features) != len(input_2.schema.features):
             raise ValueError(
                 "Both event sets must have the same number of features."
             )
-
-        # gather operator outputs
-        prefix = self._operator.prefix
+        num_features = len(input_1.schema.features)
 
         # create destination event set
-        dst_feature_names = [
-            f"{prefix}_{feature_name_1}_{feature_name_2}"
-            for feature_name_1, feature_name_2 in zip(
-                input_1.feature_names, input_2.feature_names
-            )
-        ]
-        dst_evset = EventSet(
-            data={},
-            feature_names=dst_feature_names,
-            index_names=input_1.index_names,
-            is_unix_timestamp=input_1.is_unix_timestamp,
-        )
-        for index_key, index_data in input_1.iterindex():
-            # initialize destination index data
-            dst_evset[index_key] = IndexData([], index_data.timestamps)
+        dst_evset = EventSet(data={}, schema=output_schema)
 
+        assert len(input_1.data) == len(input_2.data)
+
+        for index_key, index_data in input_1.data.items():
             # iterate over index key features
             input_1_features = index_data.features
             input_2_features = input_2[index_key].features
-            for input_1_feature, input_2_feature in zip(
-                input_1_features, input_2_features
-            ):
-                # check both features have the same dtype
-                if input_1_feature.dtype.type != input_2_feature.dtype.type:
-                    raise ValueError(
-                        "Both features must have the same dtype."
-                        f" input_1_feature: {input_1_feature} has dtype "
-                        f"{input_1_feature.dtype}, input_2_feature: "
-                        f"{input_2_feature} has dtype {input_2_feature.dtype}."
-                    )
+            dst_features = []
+
+            for feature_idx in range(num_features):
+                input_1_feature = input_1_features[feature_idx]
+                input_2_feature = input_2_features[feature_idx]
+                assert input_1_feature.dtype.type == input_2_feature.dtype.type
 
                 result = self._do_operation(input_1_feature, input_2_feature)
-                dst_evset[index_key].features.append(result)
+                dst_features.append(result)
+
+            dst_evset[index_key] = IndexData(
+                features=dst_features,
+                timestamps=index_data.timestamps,
+                schema=output_schema,
+            )
 
         return {"output": dst_evset}

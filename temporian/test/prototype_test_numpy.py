@@ -14,8 +14,6 @@
 import pandas as pd
 from absl.testing import absltest
 
-from temporian.implementation.numpy.data.event_set import EventSet
-
 # Even if not used, ensure that all the necessary code is loaded.
 import temporian as tp
 
@@ -30,7 +28,7 @@ class PrototypeTest(absltest.TestCase):
         BOOK_ID = 2
         PIXEL_ID = 3
 
-        self.evset_1 = EventSet.from_dataframe(
+        self.evset_1 = tp.pd_dataframe_to_event_set(
             pd.DataFrame(
                 data=[
                     [TRYOLABS_SHOP, MATE_ID, 0.0, 14],
@@ -46,7 +44,8 @@ class PrototypeTest(absltest.TestCase):
             ),
             index_names=["store_id", "product_id"],
         )
-        self.evset_2 = EventSet.from_dataframe(
+
+        self.evset_2 = tp.pd_dataframe_to_event_set(
             pd.DataFrame(
                 data=[
                     [TRYOLABS_SHOP, MATE_ID, 0.0, -14],
@@ -61,10 +60,8 @@ class PrototypeTest(absltest.TestCase):
                 columns=["store_id", "product_id", "timestamp", "costs"],
             ),
             index_names=["store_id", "product_id"],
+            same_sampling_as=self.evset_1,
         )
-        # set same sampling
-        for index_key, index_data in self.evset_1.data.items():
-            self.evset_2[index_key].timestamps = index_data.timestamps
 
         # TODO: Remove the following line when "from_dataframe" support creating
         # event set with shared sampling. Note that "evset_1" and
@@ -72,9 +69,8 @@ class PrototypeTest(absltest.TestCase):
 
         self.node_1 = self.evset_1.node()
         self.node_2 = self.evset_2.node()
-        self.node_2._sampling = self.node_1._sampling
 
-        self.expected_evset = EventSet.from_dataframe(
+        self.expected_evset = tp.pd_dataframe_to_event_set(
             pd.DataFrame(
                 data=[
                     [TRYOLABS_SHOP, MATE_ID, 0.0, 14, -14, 0, -14],
@@ -116,9 +112,8 @@ class PrototypeTest(absltest.TestCase):
                 self.node_1: self.evset_1,
                 self.node_2: self.evset_2,
             },
-            # TODO: The glue operator has some issues with dtypes. Re-enable
-            # checking when solved.
             check_execution=True,
+            verbose=2,
         )
         self.assertEqual(self.expected_evset, output_evset)
 

@@ -19,7 +19,7 @@ from temporian.core.test import utils
 
 
 class GraphTest(absltest.TestCase):
-    def test_infer_graph_basic(self):
+    def test_infer_graph_no_names(self):
         """Lists all the objects in a graph."""
 
         i1 = utils.create_input_node()
@@ -27,33 +27,94 @@ class GraphTest(absltest.TestCase):
         i3 = utils.create_input_node()
         o4 = utils.OpI2O1(o2.outputs["output"], i3)
         o5 = utils.OpI1O2(o4.outputs["output"])
+        output_1 = o5.outputs["output_1"]
+        output_2 = o4.outputs["output"]
 
-        g, _ = graph.infer_graph(
-            {
-                "io_input_1": i1,
-                "io_input_2": i3,
-            },
-            {
-                "io_output_1": o5.outputs["output_1"],
-                "io_output_2": o4.outputs["output"],
-            },
-        )
+        g = graph.infer_graph({i1, i3}, {output_1, output_2})
+
         self.assertLen(g.operators, 3)
         self.assertLen(g.samplings, 3)
         self.assertLen(g.nodes, 6)
         self.assertLen(g.features, 10)
+        self.assertSetEqual(g.inputs, {i1, i3})
+        self.assertSetEqual(g.outputs, {output_1, output_2})
+        self.assertIsNone(g.named_inputs)
+        self.assertIsNone(g.named_outputs)
 
-    def test_infer_graph_passing_op(self):
+        with self.assertRaisesRegex(ValueError, "All the input nodes and only"):
+            g.set_input_node_names({"io_input_1": i1})
+
+        with self.assertRaisesRegex(ValueError, "All the input nodes and only"):
+            g.set_input_node_names(
+                {"io_input_1": o2.outputs["output"], "io_input_2": i3}
+            )
+
+        g.set_input_node_names({"io_input_1": i1, "io_input_2": i3})
+        g.set_output_node_names(
+            {"io_output_1": output_1, "io_output_2": output_2}
+        )
+
+    def test_infer_graph_with_names(self):
+        """Lists all the objects in a graph."""
+
+        i1 = utils.create_input_node()
+        o2 = utils.OpI1O1(i1)
+        i3 = utils.create_input_node()
+        o4 = utils.OpI2O1(o2.outputs["output"], i3)
+        o5 = utils.OpI1O2(o4.outputs["output"])
+        output_1 = o5.outputs["output_1"]
+        output_2 = o4.outputs["output"]
+
+        g = graph.infer_graph_named_nodes(
+            {"io_input_1": i1, "io_input_2": i3},
+            {"io_output_1": output_1, "io_output_2": output_2},
+        )
+
+        self.assertLen(g.operators, 3)
+        self.assertLen(g.samplings, 3)
+        self.assertLen(g.nodes, 6)
+        self.assertLen(g.features, 10)
+        self.assertSetEqual(g.inputs, {i1, i3})
+        self.assertSetEqual(g.outputs, {output_1, output_2})
+        g.set_input_node_names({"io_input_1": i1, "io_input_2": i3})
+        g.set_output_node_names(
+            {"io_output_1": output_1, "io_output_2": output_2}
+        )
+
+    def test_infer_graph_with_node_names(self):
+        """Lists all the objects in a graph."""
+
+        i1 = utils.create_input_node("io_input_1")
+        o2 = utils.OpI1O1(i1)
+        i3 = utils.create_input_node("io_input_2")
+        o4 = utils.OpI2O1(o2.outputs["output"], i3)
+        o5 = utils.OpI1O2(o4.outputs["output"])
+        output_1 = o5.outputs["output_1"]
+        output_2 = o4.outputs["output"]
+        output_1.name = "io_output_1"
+        output_2.name = "io_output_2"
+
+        g = graph.infer_graph_named_nodes([i1, i3], [output_1, output_2])
+
+        self.assertLen(g.operators, 3)
+        self.assertLen(g.samplings, 3)
+        self.assertLen(g.nodes, 6)
+        self.assertLen(g.features, 10)
+        self.assertSetEqual(g.inputs, {i1, i3})
+        self.assertSetEqual(g.outputs, {output_1, output_2})
+        g.set_input_node_names({"io_input_1": i1, "io_input_2": i3})
+        g.set_output_node_names(
+            {"io_output_1": output_1, "io_output_2": output_2}
+        )
+
+    def test_infer_graph_noop(self):
         """With an opt that just passes features."""
 
         a = utils.create_input_node()
         b = utils.OpI1O1NotCreator(a)
         c = utils.OpI1O1(b.outputs["output"])
 
-        g, _ = graph.infer_graph(
-            {"my_input": a},
-            {"my_output": c.outputs["output"]},
-        )
+        g = graph.infer_graph({a}, {c.outputs["output"]})
 
         self.assertLen(g.operators, 2)
         self.assertLen(g.samplings, 2)
@@ -67,9 +128,9 @@ class GraphTest(absltest.TestCase):
         b = utils.OpI1O1NotCreator(a)
         c = utils.OpI1O1(b.outputs["output"])
 
-        g, _ = graph.infer_graph(
-            {"my_input": b.outputs["output"]},
-            {"my_output": c.outputs["output"]},
+        g = graph.infer_graph(
+            {b.outputs["output"]},
+            {c.outputs["output"]},
         )
 
         self.assertLen(g.operators, 1)
@@ -80,14 +141,11 @@ class GraphTest(absltest.TestCase):
     def test_infer_graph_missing_input(self):
         """The input is missing."""
 
-        i = utils.create_input_node()
+        i = utils.create_input_node("missing_node")
         o2 = utils.OpI1O1(i)
 
-        with self.assertRaisesRegex(
-            ValueError,
-            "but not provided as input",
-        ):
-            graph.infer_graph({}, {"io_output": o2.outputs["output"]})
+        with self.assertRaisesRegex(ValueError, " but not provided as input"):
+            graph.infer_graph(set(), {o2.outputs["output"]})
 
     def test_infer_graph_automatic_input(self):
         """Infer automatically the input."""
@@ -100,12 +158,9 @@ class GraphTest(absltest.TestCase):
         o4 = utils.OpI2O1(o2.outputs["output"], i3)
         o5 = utils.OpI1O2(o4.outputs["output"])
 
-        g, _ = graph.infer_graph(
+        g = graph.infer_graph(
             None,
-            {
-                "io_output_1": o5.outputs["output_1"],
-                "io_output_2": o4.outputs["output"],
-            },
+            {o5.outputs["output_1"], o4.outputs["output"]},
         )
 
         self.assertLen(g.operators, 3)
@@ -113,31 +168,18 @@ class GraphTest(absltest.TestCase):
         self.assertLen(g.nodes, 6)
         self.assertLen(g.features, 10)
 
-    def test_automatic_input_missing_name(self):
-        """Automated input is not allowed if the input node is not named."""
-
-        i1 = utils.create_input_node()
-        o2 = utils.OpI1O1(i1)
-
-        with self.assertRaisesRegex(
-            ValueError, "Cannot infer input on unnamed node"
-        ):
-            graph.infer_graph(None, {"io_output_1": o2.outputs["output"]})
-
     def test_automatic_input_equality_graph(self):
         """Automated inference when the input is the same as the output."""
 
         i1 = utils.create_input_node()
-        i1.name = "io_1"
-
-        g, _ = graph.infer_graph(None, {"io_2": i1})
+        g = graph.infer_graph(None, {i1})
 
         self.assertLen(g.operators, 0)
         self.assertLen(g.nodes, 1)
         self.assertLen(g.samplings, 1)
         self.assertLen(g.inputs, 1)
         self.assertLen(g.outputs, 1)
-        self.assertEqual(g.inputs["io_1"], g.outputs["io_2"])
+        self.assertEqual(g.inputs, g.outputs)
 
 
 if __name__ == "__main__":

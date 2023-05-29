@@ -14,26 +14,27 @@
 
 """Construction and evaluation of an operator schedule for a set of inputs."""
 
+from dataclasses import dataclass
 import time
 import sys
-from typing import Any, Dict, List, Set, Tuple, Union
+from typing import Any, Dict, List, Set, Union, Optional
 from collections import defaultdict
 
 from temporian.core.data.node import Node
-from temporian.core.operators import base
+from temporian.core.operators.base import Operator
 from temporian.implementation.numpy import evaluation as np_eval
 from temporian.implementation.numpy.data.event_set import EventSet
-from temporian.core import graph
+from temporian.core.graph import infer_graph, Graph
+from temporian.core.schedule import Schedule
 
-
-EvaluationQuery = Union[Node, List[Node], Dict[str, Node]]
+EvaluationQuery = Union[Node, List[Node], Set[Node], Dict[str, Node]]
 EvaluationInput = Union[
-    # dict of node/node name to corresponding event set
-    Dict[graph.NodeInputArg, EventSet],
-    # list of event sets, and nodes are associated by name
-    List[EventSet],
-    # single event set, and node is associated by name
+    # A dict node to corresponding event set.
+    Dict[Node, EventSet],
+    # A single event set. Equivalent to {event_set.source_node() : event_set}.
     EventSet,
+    # A list of event sets. Feed each event set individually like EventSet.
+    List[EventSet],
 ]
 EvaluationResult = Union[EventSet, List[EventSet], Dict[str, EventSet]]
 
@@ -77,27 +78,22 @@ def evaluate(
 
     begin_time = time.perf_counter()
 
-    normalized_query = _normalize_query(query)
-
     input = _normalize_input(input)
+    normalized_query = _normalize_query(query)
 
     if verbose >= 1:
         print("Build schedule", file=sys.stderr)
 
     # Schedule execution
-    input_nodes = list(input.keys())
-    schedule, names_to_nodes = build_schedule(
+    assert isinstance(normalized_query, set)
+    input_nodes = set(input.keys())
+    schedule = build_schedule(
         inputs=input_nodes, outputs=normalized_query, verbose=verbose
     )
 
-    # Replace node names for actual nodes in input
-    for name, node in names_to_nodes.items():
-        input[node] = input[name]
-        del input[name]
-
     if verbose == 1:
         print(
-            f"Run {len(schedule)} operators",
+            f"Run {len(schedule.ordered_operators)} operators",
             file=sys.stderr,
         )
 
@@ -124,17 +120,15 @@ def evaluate(
 
 
 def build_schedule(
-    inputs: List[graph.NodeInputArg],
-    outputs: List[Node],
-    verbose: int = 0,
-) -> Tuple[List[base.Operator], Dict[str, Node]]:
+    inputs: Optional[Set[Node]], outputs: Set[Node], verbose: int = 0
+) -> Schedule:
     """Calculates which operators need to be executed in which order to compute
     a set of output nodes given a set of input nodes.
 
     This implementation is based on Kahn's algorithm.
 
     Args:
-        inputs: Input nodes or names of input nodes.
+        inputs: Input nodes.
         outputs: Output nodes.
         verbose: If >0, prints details about the execution on the standard error
             output. The larger the number, the more information is displayed.
@@ -152,38 +146,31 @@ def build_schedule(
     #
     # Fails if the outputs cannot be computed from the inputs e.g. some inputs
     # are missing.
-    g, names_to_nodes = graph.infer_graph(
-        _list_to_dict(inputs), _list_to_dict(outputs)
-    )
+    graph = infer_graph(inputs, outputs)
+
+    schedule = Schedule(input_nodes=graph.inputs)
 
     if verbose >= 2:
         print("Graph:\n", graph, file=sys.stderr)
 
-    # Sequence of operators to execute. This is the result of the
-    # "build_schedule" function.
-    planned_ops: List[base.Operator] = []
-
     # Operators ready to be computed (i.e. ready to be added to "planned_ops")
     # as all their inputs are already computed by "planned_ops" or specified by
     # "inputs".
-    ready_ops: Set[base.Operator] = set()
+    ready_ops: Set[Operator] = set()
 
     # "node_to_op[e]" is the list of operators with node "e" as input.
-    node_to_op: Dict[Node, List[base.Operator]] = defaultdict(lambda: [])
+    node_to_op: Dict[Node, List[Operator]] = defaultdict(lambda: [])
 
     # "op_to_num_pending_inputs[op]" is the number of "not yet scheduled" inputs
     # of operator "op". Operators in "op_to_num_pending_inputs" have not yet
     # scheduled.
-    op_to_num_pending_inputs: Dict[base.Operator, int] = defaultdict(lambda: 0)
+    op_to_num_pending_inputs: Dict[Operator, int] = defaultdict(lambda: 0)
 
     # Compute "node_to_op" and "op_to_num_pending_inputs".
-    inputs_set = set(inputs)
-    for op in g.operators:
+    for op in graph.operators:
         num_pending_inputs = 0
         for input_node in op.inputs.values():
-            if input_node in inputs_set or (
-                input_node.name and input_node.name in inputs_set
-            ):
+            if input_node in graph.inputs:
                 # This input is already available
                 continue
             node_to_op[input_node].append(op)
@@ -201,7 +188,7 @@ def build_schedule(
         op = ready_ops.pop()
 
         # Schedule the op
-        planned_ops.append(op)
+        schedule.ordered_operators.append(op)
 
         # Update all the ops that depends on "op". Enlist the ones that are
         # ready to be computed
@@ -221,70 +208,55 @@ def build_schedule(
                     del op_to_num_pending_inputs[new_op]
 
     assert not op_to_num_pending_inputs
+    return schedule
 
-    return planned_ops, names_to_nodes
 
-
-def _normalize_input(
-    input: EvaluationInput,
-) -> Dict[graph.NodeInputArg, EventSet]:
-    """Normalizes an input into a dictionary of node or node names to evsets."""
+def _normalize_input(input: EvaluationInput) -> Dict[Node, EventSet]:
+    """Normalizes an input into a dictionary of node to evsets."""
 
     if isinstance(input, dict):
+        keys_are_node = all([isinstance(x, Node) for x in input.keys()])
+        values_are_node = all([isinstance(x, EventSet) for x in input.values()])
+
+        if not keys_are_node or not values_are_node:
+            raise ValueError(
+                "Invalid input argument. Dictionary input argument should be a"
+                f" dictionary of Node to EventSet. Instead, got {input!r}"
+            )
+
         return input
 
     if isinstance(input, EventSet):
-        if not input.name:
-            raise ValueError(
-                f"{input} must have a name to be used as an unnamed input."
-                " Either set its name or pass inputs as a dict."
-            )
-        return {input.name: input}
+        return {input.source_node(): input}
 
     if isinstance(input, list):
-        if not all((evset.name for evset in input)):
-            raise ValueError(
-                f"All event sets in {input} must have a name to be used as"
-                " unnamed inputs. Either set their names or pass inputs as a"
-                " dict."
-            )
-        result = {evset.name: evset for evset in input}
-        if len(result) < len(input):
-            raise ValueError(
-                f"Duplicate names in {input}. Input node names must be unique."
-            )
-        return result
+        return {evset.source_node(): evset for evset in input}
 
     raise TypeError(
-        f"Evaluate input argument must be one of {EvaluationInput}."
-        f" Received {type(input)} instead."
+        "Evaluate input argument must be an EventSet, list of EventSet, or a"
+        f" dictionary of Node to EventSets. Received {input!r} instead."
     )
 
 
-def _normalize_query(query: EvaluationQuery) -> List[Node]:
+def _normalize_query(query: EvaluationQuery) -> Set[Node]:
     """Normalizes a query into a list of query nodes."""
-    normalized_query: List[Node] = {}
 
     if isinstance(query, Node):
-        # The query is a single value
-        normalized_query = [query]
+        return {query}
 
-    elif isinstance(query, list):
-        # The query is a list
-        normalized_query = query
+    if isinstance(query, set):
+        return query
 
-    elif isinstance(query, dict):
-        # The query is a dictionary
-        normalized_query = list(query.values())
+    if isinstance(query, list):
+        return set(query)
 
-    else:
-        # TODO: improve error message
-        raise TypeError(
-            f"Evaluate query argument must be one of {EvaluationQuery}."
-            f" Received {type(query)} instead."
-        )
+    if isinstance(query, dict):
+        return set(query.values())
 
-    return normalized_query
+    raise TypeError(
+        f"Evaluate query argument must be one of {EvaluationQuery}."
+        f" Received {type(query)} instead."
+    )
 
 
 def _denormalize_outputs(
@@ -305,8 +277,3 @@ def _denormalize_outputs(
         }
 
     raise RuntimeError("Unexpected case")
-
-
-def _list_to_dict(l: List[Any]) -> Dict[str, Any]:
-    """Converts a list into a dict with a text index key."""
-    return {str(i): x for i, x in enumerate(l)}

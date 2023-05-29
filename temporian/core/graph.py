@@ -14,14 +14,12 @@
 
 """Graph class definition and inference logic."""
 
-from typing import List, Set, Dict, Tuple, Union, Optional
+from typing import List, Set, Dict, Union, Optional
 
 from temporian.core.data.node import Node, Feature, Sampling
-from temporian.core.data.schema import Schema
 from temporian.core.operators import base
 
-MultipleNodeArg = Union[Dict[str, Node], List[Node], Node]
-NodeInputArg = Union[Node, str]
+NamedNodes = Union[Dict[str, Node], List[Node], Set[Node], Node]
 
 
 class Graph:
@@ -32,8 +30,10 @@ class Graph:
         self._features: Set[Feature] = set()
         self._nodes: Set[Node] = set()
         self._samplings: Set[Sampling] = set()
-        self._inputs: Dict[str, Node] = {}
-        self._outputs: Dict[str, Node] = {}
+        self._inputs: Set[Node] = set()
+        self._outputs: Set[Node] = set()
+        self._named_inputs: Optional[Dict[str, Node]] = None
+        self._named_outputs: Optional[Dict[str, Node]] = None
 
     @property
     def samplings(self) -> Set[Sampling]:
@@ -52,12 +52,28 @@ class Graph:
         return self._nodes
 
     @property
-    def inputs(self) -> Dict[str, Node]:
+    def inputs(self) -> Set[Node]:
         return self._inputs
 
     @property
-    def outputs(self) -> Dict[str, Node]:
+    def outputs(self) -> Set[Node]:
         return self._outputs
+
+    @property
+    def named_inputs(self) -> Optional[Dict[str, Node]]:
+        return self._named_inputs
+
+    @property
+    def named_outputs(self) -> Optional[Dict[str, Node]]:
+        return self._named_outputs
+
+    @named_inputs.setter
+    def named_inputs(self, named_inputs: Optional[Dict[str, Node]]):
+        self._named_inputs = named_inputs
+
+    @named_outputs.setter
+    def named_outputs(self, named_outputs: Optional[Dict[str, Node]]):
+        self._named_outputs = named_outputs
 
     def add_operator(self, operator: base.Operator) -> None:
         self._operators.add(operator)
@@ -71,23 +87,37 @@ class Graph:
     def add_node(self, node: Node) -> None:
         self._nodes.add(node)
 
-    @inputs.setter
-    def inputs(self, inputs: Dict[str, Node]) -> None:
-        self._inputs = inputs
-
-    @outputs.setter
-    def outputs(self, outputs: Dict[str, Node]) -> None:
-        self._outputs = outputs
-
     def input_features(self) -> Set[Feature]:
         return {
-            feature
-            for node in self.inputs.values()
-            for feature in node.feature_nodes
+            feature for node in self.inputs for feature in node.feature_nodes
         }
 
+    def set_input_node_names(self, names: Dict[str, Node]):
+        if self._inputs is not None:
+            named_nodes = set(names.values())
+            if named_nodes != self._inputs:
+                raise ValueError(
+                    "All the input nodes and only the input nodes should be"
+                    f" renamed. Input nodes: {self._inputs}. Renamed nodes:"
+                    f" {names}"
+                )
+
+        self._named_inputs = names
+
+    def set_output_node_names(self, names: Dict[str, Node]):
+        if self._outputs is not None:
+            named_nodes = set(names.values())
+            if named_nodes != self._outputs:
+                raise ValueError(
+                    "All the input nodes and only the input nodes should be"
+                    f" renamed. Input nodes: {self._outputs}. Renamed nodes:"
+                    f" {names}"
+                )
+
+        self._named_outputs = names
+
     def input_samplings(self) -> Set[Sampling]:
-        return {node.sampling_node for node in self.inputs.values()}
+        return {node.sampling_node for node in self.inputs}
 
     def __repr__(self):
         s = "Graph\n============\n"
@@ -111,31 +141,62 @@ class Graph:
                 s += f"\t{k}:{v}\n"
             s += "\n"
 
-        p2("Inputs", self.inputs)
-        p2("Output", self.outputs)
+        def p3(title, l):
+            nonlocal s
+            s += f"{title} ({len(l)}):\n"
+            for v in l:
+                s += f"\t{v}\n"
+            s += "\n"
+
+        if self.named_inputs is not None:
+            p2("Named inputs", self.named_inputs)
+        else:
+            p3("Inputs", self.inputs)
+
+        if self.named_outputs is not None:
+            p2("Named output", self.named_outputs)
+        else:
+            p3("Output", self.outputs)
         return s
 
 
-def infer_graph(
-    inputs: Optional[Dict[str, NodeInputArg]],
-    outputs: Dict[str, Node],
-) -> Tuple[Graph, Dict[str, Node]]:
-    """Extracts all the objects between the output and input nodes.
+def infer_graph_named_nodes(
+    inputs: Optional[NamedNodes],
+    outputs: NamedNodes,
+) -> Graph:
+    normalized_inputs: Optional[Dict[str, Node]] = None
+    input_nodes = None
+    if inputs is not None:
+        normalized_inputs = normalize_named_nodes(inputs)
+        input_nodes = set(normalized_inputs.values())
 
-    Fails if any inputs are missing.
+    outputs = normalize_named_nodes(outputs)
+    output_nodes = set(outputs.values())
+
+    g = infer_graph(inputs=input_nodes, outputs=output_nodes)
+    if normalized_inputs is None:
+        normalized_inputs = normalize_named_nodes(list(g.inputs))
+
+    g.set_input_node_names(normalized_inputs)
+    g.set_output_node_names(outputs)
+    return g
+
+
+def infer_graph(
+    inputs: Optional[Set[Node]],
+    outputs: Set[Node] | Dict[str, Node],
+) -> Graph:
+    """Extracts all the nodes in between the output and input nodes.
+
+    If inputs is set, fails if outputs cannot be computed from "inputs".
+    If inputs is not set, determine the set of input required.
 
     Args:
-        inputs: Mapping of strings to input nodes or node names. If None, the
-            inputs are inferred. In this case, input nodes have to be named.
-        outputs: Output nodes.
+        inputs: Set of available input nodes. If None, inputs are inferred.
+        outputs: Set of expected output nodes.
 
     Returns:
-        Tuple of:
-            - Inferred graph.
-            - Mapping of node name inputs to nodes. The keys are the string
-            values in the `inputs` argument, and the values are the nodes
-            corresponding to each one. If a value was already a node, it won't
-            be present in the returned dictionary.
+        The inferred graph.
 
     Raises:
         ValueError: If there are repeated nodes in the `inputs`; an
@@ -157,68 +218,24 @@ def infer_graph(
     #       continue
     #   Adds all the input nodes of node's creator op to the pending list
 
-    g = Graph()
-    g.outputs = outputs
+    # # Extract the names
+    # outputs_set = outputs if isinstance(outputs, set) else set(outputs.values())
+    # if inputs is None:
+    #     input_set = None
+    # else:
+    #     input_set = inputs if isinstance(inputs, set) else set(inputs.values())
 
-    # The next node to process. Nodes are processed from the outputs to
+    graph = Graph()
+    graph.outputs.update(outputs)
+
+    # The next nodes to process. Nodes are processed from the outputs to
     # the inputs.
-    pending_nodes: Set[Node] = set()
-    pending_nodes.update(outputs.values())
-
-    # Index the input nodes for fast retrieval.
-    input_nodes: Set[Node] = set()
-
-    # Index the input node names for fast retrieval.
-    # Use dict instead of set since we will need their key.
-    input_node_names_to_idx_str: Dict[str, str] = {}
-
-    # Create map of node/node name inputs to corresponding node.
-    names_to_nodes: Dict[str, Node] = {}
-
-    if inputs is not None:
-        g.inputs: Dict[str, Node] = {}
-
-        for idx_str, node_or_name in inputs.items():
-            if isinstance(node_or_name, Node):
-                # Fail if same node is passed as input twice.
-                if node_or_name in input_nodes:
-                    raise ValueError(
-                        f"Duplicate nodes in {inputs}. Input nodes must be"
-                        " unique."
-                    )
-                input_nodes.add(node_or_name)
-
-                # Only add node_or_name to g.inputs if its a node
-                # If a name, it will be added to g.inputs and names_to_nodes
-                # when we find it while traversing the graph.
-                g.inputs[idx_str] = node_or_name
-
-            elif isinstance(node_or_name, str):
-                # Fail if same node is passed as input twice.
-                # Need to check name against other input names and against names
-                # of input nodes.
-                if (
-                    node_or_name
-                    in {node.name for node in input_nodes if node.name}
-                    or node_or_name in input_node_names_to_idx_str
-                ):
-                    raise ValueError(
-                        f"Duplicate nodes or names in {inputs}. Input nodes and"
-                        " names must be unique."
-                    )
-                input_node_names_to_idx_str[node_or_name] = idx_str
-
-            else:
-                raise ValueError(
-                    f"Unexpected input {node_or_name}. "
-                    "Expecting a node or node name."
-                )
+    pending_nodes: Set[Node] = outputs.copy()
 
     # Features already processed.
     done_nodes: Set[Node] = set()
 
-    # List of the missing nodes. They will be used to infer the input features
-    # (if infer_inputs=True), or to raise an error (if infer_inputs=False).
+    # List of the missing nodes. Used to create an error message.
     missing_nodes: Set[Node] = set()
 
     while pending_nodes:
@@ -227,27 +244,23 @@ def infer_graph(
         pending_nodes.remove(node)
         assert node not in done_nodes
 
-        g.add_node(node)
+        graph.add_node(node)
 
-        if node in input_nodes:
+        if inputs is not None and node in inputs:
             # The feature is provided by the user.
-            continue
-
-        elif node.name and node.name in input_node_names_to_idx_str:
-            # The feature is provided by the user.
-            # Add node to g.inputs and names_to_nodes now that we have it.
-            idx_str = input_node_names_to_idx_str[node.name]
-            g.inputs[idx_str] = node
-            names_to_nodes[node.name] = node
+            graph.inputs.add(node)
             continue
 
         if node.creator is None:
             # The node does not have a source.
-            missing_nodes.add(node)
+            if inputs is not None:
+                missing_nodes.add(node)
+            else:
+                graph.inputs.add(node)
             continue
 
-        # Record the operator.
-        g.add_operator(node.creator)
+        # Record the operator op.
+        graph.add_operator(node.creator)
 
         # Add the parent nodes to the pending list.
         for input_node in node.creator.inputs.values():
@@ -260,41 +273,35 @@ def infer_graph(
         # Record the operator outputs. While the user did not request
         # them, they will be created (and so, we need to track them).
         for output_node in node.creator.outputs.values():
-            g.add_node(output_node)
+            graph.add_node(output_node)
 
-    if inputs is None:
-        # Infer the inputs
-        infered_inputs: Dict[str, Node] = {}
-        for node in missing_nodes:
-            if node.name is None:
-                raise ValueError(f"Cannot infer input on unnamed node {node}")
-            infered_inputs[node.name] = node
-        g.inputs = infered_inputs
-
-    else:
+    if missing_nodes:
         # Fail if not all nodes are sourced.
-        if missing_nodes:
-            raise ValueError(
-                "Some nodes are required but "
-                f"not provided as input:\n {missing_nodes}"
-            )
+        raise ValueError(
+            "The following input nodes are required but not provided as"
+            f" input:\n{missing_nodes}"
+        )
 
     # Record all the features and samplings.
-    for e in g.nodes:
-        g.add_sampling(e.sampling_node)
+    for e in graph.nodes:
+        graph.add_sampling(e.sampling_node)
         for f in e.feature_nodes:
-            g.add_feature(f)
+            graph.add_feature(f)
 
-    return g, names_to_nodes
+    return graph
 
 
-def normalize_multiple_node_arg(src: MultipleNodeArg) -> Dict[str, Node]:
+def normalize_named_nodes(src: NamedNodes) -> Dict[str, Node]:
     """Normalizes a node or list of nodes into a dictionary of nodes."""
 
     save_src = src
 
     if isinstance(src, Node):
+        # Will be further processed after.
         src = [src]
+
+    if isinstance(src, set):
+        src = list(src)
 
     if isinstance(src, list):
         new_src = {}

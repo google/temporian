@@ -172,14 +172,14 @@ sales_raw["sales"] = sales_raw["sales"].astype(np.float32)
 print("Convert to Temporian EventSets")
 print("===========================")
 
-sales_data = tp.EventSet.from_dataframe(
+sales_data = tp.pd_dataframe_to_event_set(
     sales_raw,
     index_names=["item_id", "dept_id", "cat_id", "store_id", "state_id"],
 )
 
-calendar_data = tp.EventSet.from_dataframe(calendar_raw)
+calendar_data = tp.pd_dataframe_to_event_set(calendar_raw)
 
-sell_prices_data = tp.EventSet.from_dataframe(
+sell_prices_data = tp.pd_dataframe_to_event_set(
     sell_prices_raw,
     index_names=["store_id", "item_id"],
 )

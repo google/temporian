@@ -47,7 +47,7 @@ def main():
     product_ids = np.random.choice(ids, N)
     store_ids = np.random.choice(ids, N)
 
-    evset = EventSet.from_dataframe(
+    evset = tp.pd_dataframe_to_event_set(
         pd.DataFrame(
             {
                 STORE: store_ids,
@@ -65,14 +65,12 @@ def main():
 
     res: EventSet = tp.evaluate(
         sma,
-        input={
-            node: evset,
-        },
+        input={node: evset},
         check_execution=False,
     )
 
     # Print output's first row, useful to check reproducibility
-    print(res.first_index_data())
+    print(res)
 
 
 if __name__ == "__main__":

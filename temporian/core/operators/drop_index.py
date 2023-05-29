@@ -88,8 +88,8 @@ class DropIndexOperator(Operator):
                 FeatureSchema(name=index_name, dtype=index_dict[index_name])
             )
 
-        # Note: The new features are added first.
-        return new_features + input.schema.features
+        # Note: The new features are added after the existing features.
+        return input.schema.features + new_features
 
     @property
     def output_feature_schemas(self) -> List[FeatureSchema]:
@@ -114,7 +114,7 @@ class DropIndexOperator(Operator):
             attributes=[
                 pb.OperatorDef.Attribute(
                     key="index_to_drop",
-                    type=pb.OperatorDef.Attribute.Type.REPEATED_STRING,
+                    type=pb.OperatorDef.Attribute.Type.LIST_STRING,
                 ),
                 pb.OperatorDef.Attribute(
                     key="keep",

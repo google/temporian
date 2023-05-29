@@ -16,6 +16,7 @@ py_library(
         ":filter",
         ":glue",
         ":lag",
+        ":leak",
         ":prefix",
         ":propagate",
         ":rename",
@@ -107,6 +108,20 @@ py_library(
 )
 
 py_library(
+    name = "leak",
+    srcs = ["leak.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:duration",
+        "//temporian/core/data:node",
+        "//temporian/core/data:schema",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
     name = "filter",
     srcs = ["filter.py"],
     srcs_version = "PY3",
@@ -166,6 +181,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        ":drop_index",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",

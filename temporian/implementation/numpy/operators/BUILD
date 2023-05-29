@@ -17,6 +17,7 @@ py_library(
         ":filter",
         ":glue",
         ":lag",
+        ":leak",
         ":prefix",
         ":propagate",
         ":rename",
@@ -89,6 +90,19 @@ py_library(
         ":base",
         "//temporian/core/data:duration",
         "//temporian/core/operators:lag",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event_set",
+    ],
+)
+
+py_library(
+    name = "leak",
+    srcs = ["leak.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/data:duration",
+        "//temporian/core/operators:leak",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
     ],

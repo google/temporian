@@ -47,7 +47,7 @@ def main():
     product_ids = np.random.choice(ids, N)
     store_ids = np.random.choice(ids, N)
 
-    evset_1 = EventSet.from_dataframe(
+    evset_1 = tp.pd_dataframe_to_event_set(
         pd.DataFrame(
             {
                 STORE: store_ids,
@@ -59,7 +59,7 @@ def main():
         index_names=[STORE, PRODUCT],
     )
 
-    evset_2 = EventSet.from_dataframe(
+    evset_2 = tp.pd_dataframe_to_event_set(
         pd.DataFrame(
             {
                 STORE: store_ids,

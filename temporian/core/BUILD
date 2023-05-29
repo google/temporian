@@ -12,8 +12,9 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":graph",
-        "//temporian/core/data:schema",
+        ":schedule",
         "//temporian/core/data:node",
+        "//temporian/core/data:schema",
         "//temporian/core/operators:base",
         "//temporian/implementation/numpy:evaluation",
         "//temporian/implementation/numpy/data:event_set",
@@ -27,12 +28,18 @@ py_library(
 )
 
 py_library(
+    name = "schedule",
+    srcs = ["schedule.py"],
+    srcs_version = "PY3",
+)
+
+py_library(
     name = "graph",
     srcs = ["graph.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/core/data:schema",
         "//temporian/core/data:node",
+        "//temporian/core/data:schema",
         "//temporian/core/operators:base",
     ],
 )
@@ -43,8 +50,8 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":operator_lib",
-        "//temporian/core/data:schema",
         "//temporian/core/data:node",
+        "//temporian/core/data:schema",
         "//temporian/core/operators:base",
     ],
 )

@@ -26,10 +26,10 @@ from temporian.implementation.numpy.operators.window.moving_standard_deviation i
     MovingStandardDeviationNumpyImplementation,
     operators_cc,
 )
-from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core.data import node as node_lib
 import math
 from numpy.testing import assert_almost_equal
+from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
 
 
 def _f64(l):
@@ -57,7 +57,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
     def test_flat(self):
         """A simple event set."""
 
-        input_data = EventSet.from_dataframe(
+        input_data = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [10.0, 20.0, 1],
@@ -80,7 +80,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
 
         output = instance(input=input_data)
 
-        expected_output = EventSet.from_dataframe(
+        expected_output = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [0, 0, 1],
@@ -98,7 +98,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
     def test_with_index(self):
         """Indexed event sets."""
 
-        input_data = EventSet.from_dataframe(
+        input_data = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     ["X1", "Y1", 10.0, 1],
@@ -126,7 +126,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
 
         output = instance(input=input_data)
 
-        expected_output = EventSet.from_dataframe(
+        expected_output = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     ["X1", "Y1", 0, 1],
@@ -149,7 +149,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
     def test_with_sampling(self):
         """Event sets with user provided sampling."""
 
-        input_data = EventSet.from_dataframe(
+        input_data = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [10.0, 1],
@@ -172,7 +172,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
         )
         instance = MovingStandardDeviationNumpyImplementation(op)
 
-        sampling_data = EventSet.from_dataframe(
+        sampling_data = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [-1.0],
@@ -189,7 +189,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
 
         output = instance(input=input_data, sampling=sampling_data)
 
-        expected_output = EventSet.from_dataframe(
+        expected_output = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [math.nan, -1.0],
@@ -209,7 +209,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
     def test_with_nan(self):
         """The input features contains nan values."""
 
-        input_data = EventSet.from_dataframe(
+        input_data = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [math.nan, 1],
@@ -229,7 +229,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
         )
         instance = MovingStandardDeviationNumpyImplementation(op)
 
-        sampling_data = EventSet.from_dataframe(
+        sampling_data = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [1],
@@ -247,7 +247,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
 
         output = instance(input=input_data, sampling=sampling_data)
 
-        expected_output = EventSet.from_dataframe(
+        expected_output = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [math.nan, 1],

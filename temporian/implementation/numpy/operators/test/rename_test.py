@@ -17,11 +17,11 @@ from absl.testing import absltest
 import numpy as np
 import pandas as pd
 
-from temporian.core.operators.rename import RenameOperator
-from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.core.operators.rename import RenameOperator, rename
 from temporian.implementation.numpy.operators.rename import (
     RenameNumpyImplementation,
 )
+from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
 
 
 class RenameOperatorTest(absltest.TestCase):
@@ -36,7 +36,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["store_id", "timestamp", "sales", "costs", "weather"],
         )
 
-        self.input_evset = EventSet.from_dataframe(
+        self.input_evset = pd_dataframe_to_event_set(
             self.df, index_names=["store_id"]
         )
         self.input_node = self.input_evset.node()
@@ -49,7 +49,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["store_id", "timestamp", "sales", "costs", "weather"],
         )
 
-        self_input_evset_2 = EventSet.from_dataframe(
+        self_input_evset_2 = pd_dataframe_to_event_set(
             df, index_names=["store_id", "sales"]
         )
         self.input_node_2 = self_input_evset_2.node()
@@ -64,7 +64,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["timestamp", "sales"],
         )
 
-        self.input_evset = EventSet.from_dataframe(df)
+        self.input_evset = pd_dataframe_to_event_set(df)
         self.input_node = self.input_evset.node()
 
         new_df = pd.DataFrame(
@@ -75,11 +75,10 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["timestamp", "costs"],
         )
 
-        expected_evset = EventSet.from_dataframe(new_df)
+        expected_evset = pd_dataframe_to_event_set(new_df)
 
-        operator = RenameOperator(self.input_node, "costs")
-
-        impl = RenameNumpyImplementation(operator)
+        output = rename(self.input_node, "costs")
+        impl = RenameNumpyImplementation(output.creator)
         renamed_evset = impl.call(input=self.input_evset)["output"]
 
         self.assertEqual(renamed_evset, expected_evset)
@@ -94,7 +93,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["timestamp", "sales"],
         )
 
-        self.input_evset = EventSet.from_dataframe(df)
+        self.input_evset = pd_dataframe_to_event_set(df)
         self.input_node = self.input_evset.node()
 
         new_df = pd.DataFrame(
@@ -105,11 +104,11 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["timestamp", "costs"],
         )
 
-        expected_evset = EventSet.from_dataframe(new_df)
+        expected_evset = pd_dataframe_to_event_set(new_df)
 
-        operator = RenameOperator(self.input_node, {"sales": "costs"})
+        output = rename(self.input_node, {"sales": "costs"})
 
-        impl = RenameNumpyImplementation(operator)
+        impl = RenameNumpyImplementation(output.creator)
         renamed_evset = impl.call(input=self.input_evset)["output"]
 
         self.assertEqual(renamed_evset, expected_evset)
@@ -124,15 +123,15 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["store_id", "timestamp", "new_sales", "costs", "profit"],
         )
 
-        expected_evset = EventSet.from_dataframe(
+        expected_evset = pd_dataframe_to_event_set(
             new_df, index_names=["store_id"]
         )
 
-        operator = RenameOperator(
+        output = rename(
             input=self.input_node,
             features={"sales": "new_sales", "weather": "profit"},
         )
-        impl = RenameNumpyImplementation(operator)
+        impl = RenameNumpyImplementation(output.creator)
         renamed_evset = impl.call(input=self.input_evset)["output"]
 
         self.assertEqual(renamed_evset, expected_evset)
@@ -147,15 +146,15 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["product_id", "timestamp", "sales", "costs", "weather"],
         )
 
-        expected_evset = EventSet.from_dataframe(
+        expected_evset = pd_dataframe_to_event_set(
             new_df, index_names=["product_id"]
         )
 
-        operator = RenameOperator(
+        output = rename(
             input=self.input_node,
             index="product_id",
         )
-        impl = RenameNumpyImplementation(operator)
+        impl = RenameNumpyImplementation(output.creator)
         renamed_evset = impl.call(input=self.input_evset)["output"]
 
         self.assertEqual(renamed_evset, expected_evset)
@@ -170,15 +169,15 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["product_id", "timestamp", "sales", "costs", "weather"],
         )
 
-        expected_evset = EventSet.from_dataframe(
+        expected_evset = pd_dataframe_to_event_set(
             new_df, index_names=["product_id"]
         )
 
-        operator = RenameOperator(
+        output = rename(
             input=self.input_node,
             index={"store_id": "product_id"},
         )
-        impl = RenameNumpyImplementation(operator)
+        impl = RenameNumpyImplementation(output.creator)
         renamed_evset = impl.call(input=self.input_evset)["output"]
 
         self.assertEqual(renamed_evset, expected_evset)
@@ -194,7 +193,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["store_id", "timestamp", "sales", "costs", "weather"],
         )
 
-        self.input_evset = EventSet.from_dataframe(
+        self.input_evset = pd_dataframe_to_event_set(
             df, index_names=["store_id", "costs"]
         )
 
@@ -208,15 +207,15 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["product_id", "timestamp", "sales", "roi", "weather"],
         )
 
-        expected_evset = EventSet.from_dataframe(
+        expected_evset = pd_dataframe_to_event_set(
             new_df, index_names=["product_id", "roi"]
         )
 
-        operator = RenameOperator(
+        output = rename(
             input=self.input_node,
             index={"store_id": "product_id", "costs": "roi"},
         )
-        impl = RenameNumpyImplementation(operator)
+        impl = RenameNumpyImplementation(output.creator)
         renamed_evset = impl.call(input=self.input_evset)["output"]
 
         self.assertEqual(renamed_evset, expected_evset)
@@ -224,7 +223,7 @@ class RenameOperatorTest(absltest.TestCase):
     def test_rename_feature_with_empty_str(self) -> None:
         """Test renaming feature with empty string."""
         with self.assertRaises(ValueError):
-            RenameOperator(input=self.input_node, features={"sales": ""})
+            rename(input=self.input_node, features={"sales": ""})
 
     def test_rename_feature_with_empty_str_without_dict(self) -> None:
         """Test renaming feature with empty string."""
@@ -236,25 +235,25 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["timestamp", "sales"],
         )
 
-        self.input_node = EventSet.from_dataframe(df).node()
+        self.input_node = pd_dataframe_to_event_set(df).node()
 
         with self.assertRaises(ValueError):
-            RenameOperator(self.input_node, "")
+            rename(self.input_node, "")
 
     def test_rename_feature_with_non_str_object(self) -> None:
         """Test renaming feature with non string object."""
         with self.assertRaises(ValueError):
-            RenameOperator(input=self.input_node, features={"sales": 1})
+            rename(input=self.input_node, features={"sales": 1})
 
     def test_rename_feature_with_non_existent_feature(self) -> None:
         """Test renaming feature with non existent feature."""
         with self.assertRaises(KeyError):
-            RenameOperator(input=self.input_node, features={"sales_1": "costs"})
+            rename(input=self.input_node, features={"sales_1": "costs"})
 
     def test_rename_feature_with_duplicated_new_feature_names(self) -> None:
         """Test renaming feature with duplicated new names."""
         with self.assertRaises(ValueError):
-            RenameOperator(
+            rename(
                 input=self.input_node,
                 features={"sales": "new_sales", "costs": "new_sales"},
             )
@@ -262,7 +261,7 @@ class RenameOperatorTest(absltest.TestCase):
     def test_rename_index_with_empty_str(self) -> None:
         """Test renaming index with empty string."""
         with self.assertRaises(ValueError):
-            RenameOperator(input=self.input_node, index={"sales": ""})
+            rename(input=self.input_node, index={"sales": ""})
 
     def test_rename_index_with_empty_str_without_dict(self) -> None:
         """Test renaming index with empty string."""
@@ -274,27 +273,22 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["timestamp", "sales"],
         )
 
-        self.input_node = EventSet.from_dataframe(
+        self.input_node = pd_dataframe_to_event_set(
             df, index_names=["sales"]
         ).node()
 
         with self.assertRaises(ValueError):
-            RenameOperator(self.input_node, index="")
-
-    def test_rename_index_with_non_str_object(self) -> None:
-        """Test renaming index with non string object."""
-        with self.assertRaises(ValueError):
-            RenameOperator(input=self.input_node, index={"sales": 1})
+            rename(self.input_node, index="")
 
     def test_rename_index_with_non_existent_index(self) -> None:
         """Test renaming index with non existent index."""
         with self.assertRaises(KeyError):
-            RenameOperator(input=self.input_node, index={"sales_1": "costs"})
+            rename(input=self.input_node, index={"sales_1": "costs"})
 
     def test_rename_index_with_duplicated_new_index_names(self) -> None:
         """Test renaming index with duplicated new names."""
         with self.assertRaises(ValueError):
-            RenameOperator(
+            rename(
                 input=self.input_node,
                 index={"store_id": "new_sales", "sales": "new_sales"},
             )
@@ -302,11 +296,11 @@ class RenameOperatorTest(absltest.TestCase):
     def test_rename_feature_and_index_with_same_name(self) -> None:
         """Test renaming feature and index with same name."""
 
-        operator = RenameOperator(
+        output = rename(
             input=self.input_node,
             index={"store_id": "sales"},
         )
-        impl = RenameNumpyImplementation(operator)
+        impl = RenameNumpyImplementation(output.creator)
 
         with self.assertRaises(ValueError):
             impl.call(input=self.input_evset)["output"]
@@ -321,15 +315,18 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["sales", "timestamp", "store_id", "costs", "weather"],
         )
 
-        expected_evset = EventSet.from_dataframe(new_df, index_names=["sales"])
+        expected_evset = pd_dataframe_to_event_set(
+            new_df, index_names=["sales"]
+        )
 
-        operator = RenameOperator(
+        output = rename(
             input=self.input_node,
             features={"sales": "store_id"},
             index={"store_id": "sales"},
         )
-        impl = RenameNumpyImplementation(operator)
+        impl = RenameNumpyImplementation(output.creator)
         renamed_evset = impl.call(input=self.input_evset)["output"]
+
         self.assertEqual(renamed_evset, expected_evset)
 
 

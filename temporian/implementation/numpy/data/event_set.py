@@ -37,9 +37,12 @@ _PYTHON_DTYPE_MAPPING = {
     np.int64: DType.INT64,
 }
 
-# Mapping of temporian types to / from numpy types.
+# Mapping of temporian types to and from numpy types.
 #
-# np.object_ is not automatically converted into DType.STRING
+# Remarks:
+#   - np.object_ is not automatically converted into DType.STRING.
+#   - Strings are always represented internally as np.str_ for features and str
+#     for index values.
 _DTYPE_MAPPING = {
     np.float64: DType.FLOAT64,
     np.float32: DType.FLOAT32,
@@ -55,7 +58,7 @@ _DTYPE_REVERSE_MAPPING = {
     DType.FLOAT32: np.float32,
     DType.INT64: np.int64,
     DType.INT32: np.int32,
-    DType.STRING: np.string_,
+    DType.STRING: np.str_,
     DType.BOOLEAN: np.bool_,
 }
 
@@ -85,6 +88,10 @@ def numpy_array_to_tp_dtype(
     return numpy_dtype_to_tp_dtype(feature_name, numpy_array.dtype.type)
 
 
+def tp_dtype_to_np_dtype(dtype: DType) -> Any:
+    return _DTYPE_REVERSE_MAPPING[dtype]
+
+
 def normalize_features(
     raw_feature_values: Any,
 ) -> np.ndarray:
@@ -100,19 +107,19 @@ def normalize_features(
             [isinstance(x, (str, bytes)) for x in raw_feature_values]
         ):
             # All the values are python strings.
-            raw_feature_values = np.array(raw_feature_values, dtype=np.string_)
+            raw_feature_values = np.array(raw_feature_values, dtype=np.str_)
         else:
             raw_feature_values = np.array(raw_feature_values)
 
     else:
-        if raw_feature_values.dtype.type == np.str_:
-            raw_feature_values = raw_feature_values.astype(np.string_)
+        if raw_feature_values.dtype.type == np.string_:
+            raw_feature_values = raw_feature_values.astype(np.str_)
 
         if raw_feature_values.dtype.type == np.object_ and all(
             isinstance(x, str) for x in raw_feature_values
         ):
             # This is a np.array of python string.
-            raw_feature_values = raw_feature_values.astype(np.string_)
+            raw_feature_values = raw_feature_values.astype(np.str_)
 
         if raw_feature_values.dtype.type == np.datetime64:
             raw_feature_values = raw_feature_values.astype(
@@ -147,6 +154,23 @@ def normalize_timestamps(
 
         return raw_timestamps, False
 
+    if raw_timestamps.dtype.type == np.object_:
+        if all(isinstance(x, str) for x in raw_timestamps):
+            # raw_timestamps is a date. Cast to unix epoch in float64 seconds.
+            raw_timestamps = (
+                raw_timestamps.astype("datetime64[ns]").astype(np.float64) / 1e9
+            )
+            return raw_timestamps, True
+
+        def is_pandas_timestamps(x):
+            return (
+                str(type(x))
+                == "<class 'pandas._libs.tslibs.timestamps.Timestamp'>"
+            )
+
+        if all(is_pandas_timestamps(x) for x in raw_timestamps):
+            raw_timestamps = np.array([x.to_numpy() for x in raw_timestamps])
+
     if raw_timestamps.dtype.type == np.datetime64:
         # raw_timestamps is a date. Cast to unix epoch in float64 seconds.
         raw_timestamps = (
@@ -154,16 +178,22 @@ def normalize_timestamps(
         )
         return raw_timestamps, True
 
-    if raw_timestamps.dtype.type == np.object_ and all(
-        isinstance(x, str) for x in raw_timestamps
-    ):
-        # raw_timestamps is a date. Cast to unix epoch in float64 seconds.
-        raw_timestamps = (
-            raw_timestamps.astype("datetime64[ns]").astype(np.float64) / 1e9
+    object_description = (
+        f"{raw_timestamps!r}.\nDetails: type={type(raw_timestamps)}"
+    )
+    if isinstance(raw_timestamps, np.ndarray):
+        object_description += (
+            f" np.dtype={raw_timestamps.dtype}"
+            f" np.dtype.type={raw_timestamps.dtype.type}"
         )
-        return raw_timestamps, True
+        if raw_timestamps.dtype.type == np.object_:
+            object_description += f" type(value[0])={type(raw_timestamps[0])}"
 
-    raise ValueError(f"No support values for timestamps: {raw_timestamps}")
+    raise ValueError(
+        "Invalid timestamps value. Timestamps can be (1) a list / np.array of"
+        " int,  float, int32, int64, float32, float64, str, np.datetime64, and"
+        f" pd.Timestamp. Instead, got {object_description}"
+    )
 
 
 @dataclass
@@ -224,9 +254,9 @@ class IndexData:
 
         if len(self.features) != len(schema.features):
             raise ValueError(
-                "Wrong number of features. Event has"
-                f" {len(self.features)} features while schema indicates"
-                f" {len(schema.features)} features."
+                "Wrong number of features. Event has "
+                f"{len(self.features)} features while schema has "
+                f"{len(schema.features)} features."
             )
 
         for feature_data, feature_schema in zip(self.features, schema.features):
@@ -245,8 +275,10 @@ class IndexData:
 
             if self.timestamps.shape != feature_data.shape:
                 raise ValueError(
-                    "The number of feature values does not match the number of"
-                    " timestamps."
+                    "The number of feature values for"
+                    f" {feature_schema.name!r} ({len(feature_data)}) does not"
+                    " match the number of timestamp values"
+                    f" ({len(self.timestamps)})."
                 )
 
     def __eq__(self, other) -> bool:
@@ -279,10 +311,8 @@ class EventSet:
     """Actual temporal data.
 
     Use `tp.event_set` to create an event set manually.
-    Use `tp.EventSet.from_dataframe` to create an event set from a pandas
+    Use `tp.pd_dataframe_to_event_set` to create an event set from a pandas
     dataframe.
-
-    TODO: tp.EventSet.from_dataframe -> tp.pd_dataframe_to_event_set
     """
 
     def __init__(
@@ -324,7 +354,24 @@ class EventSet:
             return next(iter(self._data.keys()))
         return None
 
+    def get_arbitrary_index_data(self) -> Optional[IndexData]:
+        """Gets an arbitrary index item.
+
+        If the event set is empty, return None.
+        """
+
+        if self._data:
+            return next(iter(self._data.values()))
+        return None
+
     def node(self, force_new_node=False) -> Node:
+        print(
+            "Warning: use `event_set.source_node()` instead of"
+            " `event_set.node()`"
+        )
+        return self.source_node(force_new_node)
+
+    def source_node(self, force_new_node=False) -> Node:
         """Creates a node able to consume the the event set.
 
         If called multiple times, always return the same node.
@@ -348,7 +395,6 @@ class EventSet:
         df: pd.DataFrame,
         index_names: Optional[List[str]] = None,
         timestamp_column: str = "timestamp",
-        is_sorted: bool = False,
         name: Optional[str] = None,
     ) -> EventSet:
         from temporian.implementation.numpy.data import io
@@ -359,159 +405,6 @@ class EventSet:
             timestamp_column=timestamp_column,
             name=name,
         )
-        # """Creates an EventSet from a pandas DataFrame.
-
-        # Args:
-        #     df: DataFrame to convert to an EventSet.
-        #     index_names: Names of the DataFrame columns to be used as index for
-        #         the event set. Defaults to [].
-        #     timestamp_column: Name of the column containing the timestamps.
-        #         Supported date types:
-        #         `{np.datetime64, pd.Timestamp, datetime.datetime}`.
-        #         Timestamps of these types are converted to UTC epoch float.
-        #     is_sorted: If True, the DataFrame is assumed to be sorted by
-        #         timestamp. If False, the DataFrame will be sorted by timestamp.
-        #     name: Optional name for the EventSet.
-
-        # Returns:
-        #     EventSet created from DataFrame.
-
-        # Raises:
-        #     ValueError: If `index_names` or `timestamp_column` are not in `df`'s
-        #         columns.
-        #     ValueError: If a column has an unsupported dtype.
-
-        # Example:
-        #     >>> import pandas as pd
-        #     >>> from temporian.implementation.numpy.data.event_set import EventSet
-        #     >>> df = pd.DataFrame(
-        #     ...     data=[
-        #     ...         [666964, 1.0, 740.0],
-        #     ...         [666964, 2.0, 508.0],
-        #     ...         [574016, 3.0, 573.0],
-        #     ...     ],
-        #     ...     columns=["product_id", "timestamp", "costs"],
-        #     ... )
-        #     >>> evset = EventSet.from_dataframe(df, index_names=["product_id"])
-        # """
-
-        # # TODO: Detect "is_sorted" automatically.
-
-        # df = df.copy(deep=False)
-        # if index_names is None:
-        #     index_names = []
-
-        # # check index names and timestamp name are in df columns
-        # missing_columns = [
-        #     column
-        #     for column in index_names + [timestamp_column]
-        #     if column not in df.columns
-        # ]
-        # if missing_columns:
-        #     raise ValueError(
-        #         f"Missing columns {missing_columns} in DataFrame. "
-        #         f"Columns: {df.columns}"
-        #     )
-
-        # # check timestamp_column is not on index_names
-        # if timestamp_column in index_names:
-        #     raise ValueError(
-        #         f"Timestamp column {timestamp_column} cannot be on index_names"
-        #     )
-
-        # # check if created sampling's values will be unix timestamps
-        # is_unix_timestamp = df[timestamp_column].dtype.kind not in ("i", "f")
-
-        # # convert timestamp column to Unix Epoch Float
-        # df[timestamp_column] = normalize_timestamps(df[timestamp_column])
-
-        # # sort by timestamp if it's not sorted
-        # # TODO: we may consider using kind="mergesort" if we know that most of
-        # # the time the data will be sorted.
-        # if not is_sorted and not np.all(np.diff(df[timestamp_column]) >= 0):
-        #     df = df.sort_values(by=timestamp_column)
-
-        # # check column dtypes, every dtype should be a key of DTYPE_MAPPING
-        # for column in df.columns:
-        #     # if dtype is object, check if it only contains string values
-        #     if df[column].dtype.type is np.object_:
-        #         df[column] = df[column].fillna("")
-        #         # Check if there are any non-string elements in the column
-        #         non_string_mask = df[column].map(type) != str
-        #         if non_string_mask.any():
-        #             raise ValueError(
-        #                 f'Cannot convert column "{column}". Column of type'
-        #                 ' "Object" can only have string values. However, the'
-        #                 " following non-string values were found: "
-        #                 f" {df[column][non_string_mask]}"
-        #             )
-        #         # convert object column to np.string_
-        #         df[column] = df[column].astype("string")
-
-        #     # convert pandas' StringDtype to np.string_
-        #     elif df[column].dtype.type is np.string_:
-        #         df[column] = df[column].str.decode("utf-8").astype("string")
-
-        #     elif (
-        #         df[column].dtype.type not in DTYPE_MAPPING
-        #         and df[column].dtype.type is not str
-        #     ):
-        #         raise ValueError(
-        #             f"Unsupported dtype {df[column].dtype} for column"
-        #             f" {column}. Supported dtypes: {DTYPE_MAPPING.keys()}"
-        #         )
-
-        # # columns that are not indexes or timestamp
-        # feature_names = [
-        #     column
-        #     for column in df.columns
-        #     if column not in index_names + [timestamp_column]
-        # ]
-        # # fill missing values with np.nan
-        # df = df.fillna(np.nan)
-
-        # data = {}
-        # if index_names:
-        #     grouping_key = (
-        #         index_names[0] if len(index_names) == 1 else index_names
-        #     )
-        #     group_by_indexes = df.groupby(grouping_key)
-
-        #     for index, group in group_by_indexes:
-        #         timestamps = group[timestamp_column].to_numpy()
-
-        #         # Convert group to tuple, useful when its only one value
-        #         if not isinstance(index, tuple):
-        #             index = (index,)
-
-        #         data[index] = IndexData(
-        #             features=[
-        #                 group[feature_name].to_numpy(
-        #                     dtype=group[feature_name].dtype.type
-        #                 )
-        #                 for feature_name in feature_names
-        #             ],
-        #             timestamps=timestamps,
-        #         )
-
-        # # user did not provide an index
-        # else:
-        #     timestamps = df[timestamp_column].to_numpy()
-        #     data[()] = IndexData(
-        #         features=[
-        #             df[feature_name].to_numpy(dtype=df[feature_name].dtype.type)
-        #             for feature_name in feature_names
-        #         ],
-        #         timestamps=timestamps,
-        #     )
-
-        # return EventSet(
-        #     data=data,
-        #     feature_names=feature_names,
-        #     index_names=index_names,
-        #     is_unix_timestamp=is_unix_timestamp,
-        #     name=name,
-        # )
 
     def to_dataframe(self) -> pd.DataFrame:
         """Convert a EventSet to a pandas DataFrame.
@@ -587,85 +480,9 @@ class EventSet:
 
         return True
 
-        # if len(self._data) != len(other.data):
-        #     return False
-
-        # for index_key, index_data_self in self._data.items():
-        #     if index_key not in other.data:
-        #         return False
-
-        #     # check same features
-        #     index_data_other = other[index_key]
-        #     for feature_self, feature_other in zip(
-        #         index_data_self.features, index_data_other.features
-        #     ):
-        #         if feature_self.dtype.type != feature_other.dtype.type:
-        #             return False
-
-        #         # check if the array has a float dtype. If so, compare with
-        #         # `allclose`
-        #         if feature_self.dtype.kind == "f":
-        #             equal = np.allclose(
-        #                 feature_self,
-        #                 feature_other,
-        #                 rtol=rtol,
-        #                 atol=atol,
-        #                 equal_nan=True,
-        #             )
-        #         else:
-        #             # compare non-float arrays
-        #             equal = np.array_equal(feature_self, feature_other)
-
-        #         if not equal:
-        #             return False
-
-        #     # check same timestamps
-        #     if not np.allclose(
-        #         index_data_self.timestamps,
-        #         index_data_other.timestamps,
-        #         rtol=rtol,
-        #         atol=atol,
-        #         equal_nan=True,
-        #     ):
-        #         return False
-
-        # return True
-
     def plot(self, *args, **wargs) -> Any:
         """Plots the event set. See tp.plot for details."""
 
         from temporian.implementation.numpy.data import plotter
 
         return plotter.plot(evsets=self, *args, **wargs)
-
-
-# def _convert_timestamp_column_to_unix_epoch_float(
-#     timestamp_column: pd.Series,
-# ) -> pd.DataFrame:
-#     """Converts a timestamp column to Unix Epoch Float.
-
-#     Args:
-#         timestamp_column: Timestamp column to convert.
-
-#     Returns:
-#         Timestamp column converted to Unix Epoch float.
-#     """
-#     # check if timestamp column contains missing values and raise error
-#     if timestamp_column.isna().any():
-#         raise ValueError(
-#             f"Cannot convert timestamp column {timestamp_column.name} "
-#             "to Unix Epoch Float because it contains missing values."
-#         )
-
-#     # if timestamp_column is already float64, ignore it
-#     if timestamp_column.dtype == "float64":
-#         return timestamp_column
-
-#     # if timestamp_column is int or float != float64 convert to float64
-#     if timestamp_column.dtype.kind in ("i", "f"):
-#         return timestamp_column.astype("float64")
-
-#     # string and objects will be converted to datetime, then to float
-#     timestamp_column = pd.to_datetime(timestamp_column, errors="raise")
-#     timestamp_column = timestamp_column.view("int64") / 1e9
-#     return timestamp_column

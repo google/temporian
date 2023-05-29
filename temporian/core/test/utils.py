@@ -196,7 +196,7 @@ class OpWithAttributes(base.Operator):
                 ),
                 pb.OperatorDef.Attribute(
                     key="attr_list",
-                    type=pb.OperatorDef.Attribute.Type.REPEATED_STRING,
+                    type=pb.OperatorDef.Attribute.Type.LIST_STRING,
                 ),
                 pb.OperatorDef.Attribute(
                     key="attr_float",

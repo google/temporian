@@ -132,7 +132,7 @@ def plot(
 
     if features is None:
         # Don't filter anything: use all features from all events
-        features = set().union(*[e.feature_names for e in evsets])
+        features = set().union(*[e.schema.feature_names() for e in evsets])
     elif isinstance(features, str):
         features = {features}
     elif isinstance(features, list):
@@ -193,9 +193,10 @@ def get_num_plots(
                     " available indexes with 'evset.index' and provide one of"
                     " those index to the 'index' argument of 'plot'."
                     ' Alternatively, set "index=None" to select a random'
-                    f" index value (e.g., {evset.first_index_key()}."
+                    f" index value (e.g., {evset.get_arbitrary_index_value()}."
                 )
-            num_features = len(set(evset.feature_names).intersection(features))
+            candidate_features = set(evset.schema.feature_names())
+            num_features = len(candidate_features.intersection(features))
             if num_features == 0:
                 # We plot the sampling
                 num_features = 1

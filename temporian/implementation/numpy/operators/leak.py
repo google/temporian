@@ -14,29 +14,38 @@
 
 from typing import Dict
 
-from temporian.core.operators.prefix import Prefix
+from temporian.core.operators.leak import LeakOperator
 from temporian.implementation.numpy import implementation_lib
+from temporian.implementation.numpy.data.event_set import IndexData
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
-class PrefixNumpyImplementation(OperatorImplementation):
-    """Numpy implementation of the prefix operator."""
-
-    def __init__(self, operator: Prefix) -> None:
+class LeakNumpyImplementation(OperatorImplementation):
+    def __init__(self, operator: LeakOperator) -> None:
         super().__init__(operator)
-        assert isinstance(operator, Prefix)
+        assert isinstance(operator, LeakOperator)
 
     def __call__(self, input: EventSet) -> Dict[str, EventSet]:
-        assert isinstance(self.operator, Prefix)
+        assert isinstance(self.operator, LeakOperator)
         output_schema = self.output_schema("output")
-        dst_evset = EventSet(
-            data=input.data,
-            schema=output_schema,
-        )
-        return {"output": dst_evset}
+
+        # gather operator attributes
+        duration = self.operator.duration
+
+        # create output event set
+        output_evset = EventSet(data={}, schema=output_schema)
+        # fill output event set data
+        for index_key, index_data in input.data.items():
+            output_evset[index_key] = IndexData(
+                index_data.features,
+                index_data.timestamps - duration,
+                schema=output_schema,
+            )
+
+        return {"output": output_evset}
 
 
 implementation_lib.register_operator_implementation(
-    Prefix, PrefixNumpyImplementation
+    LeakOperator, LeakNumpyImplementation
 )

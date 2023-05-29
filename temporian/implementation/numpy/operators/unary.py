@@ -22,19 +22,21 @@ class BaseUnaryNumpyImplementation(OperatorImplementation):
         super().__init__(operator)
 
     def __call__(self, input: EventSet) -> Dict[str, EventSet]:
+        assert isinstance(self.operator, BaseUnaryOperator)
+
+        output_schema = self.output_schema("output")
         dst_evset = EventSet(
             data={},
-            feature_names=input.feature_names,
-            index_names=input.index_names,
-            is_unix_timestamp=input.is_unix_timestamp,
+            schema=output_schema,
         )
-        for index_key, index_data in input.iterindex():
+        for index_key, index_data in input.data.items():
             dst_evset[index_key] = IndexData(
                 [
                     self._do_operation(feature)
                     for feature in index_data.features
                 ],
                 index_data.timestamps,
+                schema=output_schema,
             )
 
         return {"output": dst_evset}

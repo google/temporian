@@ -8,9 +8,6 @@ from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.core.data.schema import Schema
 from temporian.core.data.dtype import DType
 
-# Load all the implementations
-from temporian.implementation.numpy.operators import all_operators as _impls
-
 
 class IOTest(absltest.TestCase):
     def test_event_set(self):

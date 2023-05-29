@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any, List, Optional, Union
+from typing import Any, List, Optional, Union, Dict
 
 import numpy as np
 import pandas as pd
@@ -21,10 +21,11 @@ DataArray = Union[List[Any], np.ndarray]
 
 def event_set(
     timestamps: DataArray,
-    features: dict[str, DataArray],
+    features: Optional[Dict[str, DataArray]] = None,
     index_features: Optional[List[str]] = None,
     name: Optional[str] = None,
     is_unix_timestamp: Union[bool, str] = "auto",
+    same_sampling_as: Optional[EventSet] = None,
 ) -> EventSet:
     """Creates an event set from raw data (e.g. python lists,  numpy arrays).
 
@@ -48,11 +49,21 @@ def event_set(
         index_features: Names of the features in "features" to be used as index.
           If empty (default), the data is not indexed.
         name: Name of the node.
-        is_unix_timestamp: If "auto" (default), the fact that the timestamp is interpretable as unix timestamps is true if the timestamps are date or date-like object. If "is_unix_timestamp" is boolean, "is_unix_timestamp" defines if the timestamps are unix timestamps.
+        is_unix_timestamp: If "auto" (default), the fact that the timestamp is
+          interpretable as unix timestamps is true if the timestamps are date
+          or date-like object. If "is_unix_timestamp" is boolean,
+          "is_unix_timestamp" defines if the timestamps are unix timestamps.
+        same_sampling_as: If set, the created event set is guarentied to have
+          the same sampling as "same_sampling_as". In this case, "indexes" and
+          "is_unix_timestamp" should not be provided. Some operators require for
+          input nodes to have the same sampling.
 
     Returns:
         An event set.
     """
+
+    if features is None:
+        features = {}
 
     features = {
         name: normalize_features(value) for name, value in features.items()
@@ -102,6 +113,34 @@ def event_set(
 
     evtset.name = name
 
+    if same_sampling_as is not None:
+        evtset.schema.check_compatible_index(
+            same_sampling_as.schema,
+            label="the new event set and `same_sampling_as`",
+        )
+
+        if evtset.data.keys() != same_sampling_as.data.keys():
+            raise ValueError(
+                "The new event set and `same_sampling_as` have the same index,"
+                " but different index values. Both should have the same index"
+                " keys to have the same sampling."
+            )
+
+        for key, same_sampling_as_value in same_sampling_as.data.items():
+            if not np.all(
+                evtset.data[key].timestamps == same_sampling_as_value.timestamps
+            ):
+                raise ValueError(
+                    "The new event set and `same_sampling_as` have different"
+                    f" timestamps values for the index={key!r}. The timestamps"
+                    " should be equal for both to have the same sampling."
+                )
+
+            # Discard the new timestamps arrays.
+            evtset.data[key].timestamps = same_sampling_as_value.timestamps
+
+        evtset.node()._sampling = same_sampling_as.node().sampling_node
+
     return evtset
 
 
@@ -110,8 +149,9 @@ def pd_dataframe_to_event_set(
     index_names: Optional[List[str]] = None,
     timestamp_column: str = "timestamp",
     name: Optional[str] = None,
-):
-    """Creates an EventSet from a pandas DataFrame.
+    same_sampling_as: Optional[EventSet] = None,
+) -> EventSet:
+    """Converts a pandas DataFrame into an Event Set.
 
     Args:
         df: DataFrame to convert to an EventSet.
@@ -124,6 +164,10 @@ def pd_dataframe_to_event_set(
         is_sorted: If True, the DataFrame is assumed to be sorted by
             timestamp. If False, the DataFrame will be sorted by timestamp.
         name: Optional name for the EventSet.
+        same_sampling_as: If set, the created event set is guarentied to have
+          the same sampling as "same_sampling_as". In this case, "indexes" and
+          "is_unix_timestamp" should not be provided. Some operators require for
+          input nodes to have the same sampling.
 
 
     Returns:
@@ -145,7 +189,7 @@ def pd_dataframe_to_event_set(
         ...     ],
         ...     columns=["product_id", "timestamp", "costs"],
         ... )
-        >>> evset = EventSet.from_dataframe(df, index_names=["product_id"])
+        >>> evset = pd_dataframe_to_event_set(df, index_names=["product_id"])
     """
 
     feature_dict = df.drop(columns=timestamp_column).to_dict("series")
@@ -155,6 +199,7 @@ def pd_dataframe_to_event_set(
         features={k: v.to_numpy(copy=True) for k, v in feature_dict.items()},
         index_features=index_names,
         name=name,
+        same_sampling_as=same_sampling_as,
     )
 
 
@@ -176,7 +221,7 @@ def event_set_to_pd_dataframe(
         + [timestamp_key]
     )
     data = {column_name: [] for column_name in column_names}
-    for index_key, index_data in evtset._data.items():
+    for index_key, index_data in evtset.data.items():
         assert isinstance(index_key, tuple)
 
         # Timestamps

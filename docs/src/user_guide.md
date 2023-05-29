@@ -771,7 +771,7 @@ evset = tp.read_event_set(
 tp.save_event_set(evset, path="path/to/file.csv")
 ```
 
-Converting `EventSet` data to and from pandas DataFrames is also easily done via `EventSet.to_dataframe` and `EventSet.from_dataframe`.
+Converting `EventSet` data to and from pandas DataFrames is also easily done via `EventSet.to_dataframe` and `tp.pd_dataframe_to_event_set`.
 
 ```python
 import pandas as pd
@@ -783,7 +783,7 @@ df = pd.DataFrame({
 })
 
 # Create EventSet from DataFrame.
-evset = EventSet.from_dataframe(df)
+evset = tp.pd_dataframe_to_event_set(df)
 
 # Convert EventSet to DataFrame.
 df = evset.to_dataframe()

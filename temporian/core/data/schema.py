@@ -129,6 +129,6 @@ class Schema:
     ):
         if self.indexes != other.indexes:
             raise ValueError(
-                f"Non matching index between {label}."
-                f" {self.indexes} != {other.indexes}"
+                f"The index of {label} don't match. {self.indexes} !="
+                f" {other.indexes}"
             )

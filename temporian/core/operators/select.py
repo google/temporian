@@ -67,7 +67,7 @@ class SelectOperator(Operator):
             attributes=[
                 pb.OperatorDef.Attribute(
                     key="feature_names",
-                    type=pb.OperatorDef.Attribute.Type.REPEATED_STRING,
+                    type=pb.OperatorDef.Attribute.Type.LIST_STRING,
                     is_optional=False,
                 ),
             ],
@@ -93,7 +93,9 @@ def select(
     Returns:
         Node containing only the selected features.
     """
-    if isinstance(feature_names, list):
+    if isinstance(feature_names, list) and all(
+        isinstance(f, str) for f in feature_names
+    ):
         pass
     elif isinstance(feature_names, str):
         feature_names = [feature_names]

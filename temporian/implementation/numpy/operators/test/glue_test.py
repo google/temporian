@@ -19,12 +19,18 @@ import pandas as pd
 
 from temporian.core.data.node import Feature
 from temporian.core.operators.glue import GlueOperator
-from temporian.core.data import node as node_lib
+from temporian.core.data.node import input_node
 from temporian.core.data.dtype import DType
-
-from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.glue import (
     GlueNumpyImplementation,
+)
+from temporian.implementation.numpy.data.io import (
+    pd_dataframe_to_event_set,
+    event_set,
+)
+from temporian.implementation.numpy.operators.test.test_util import (
+    assertEqualEventSet,
+    testOperatorAndImp,
 )
 
 
@@ -34,120 +40,90 @@ class GlueNumpyImplementationTest(absltest.TestCase):
     def setUp(self) -> None:
         pass
 
-    def test_base(self):
-        common_data = {
-            "timestamp": np.array([1, 1, 2, 3, 4]),
-            "user_id": ["user_1", "user_1", "user_1", "user_1", "user_2"],
-        }
-        evset_1 = EventSet.from_dataframe(
-            pd.DataFrame(
-                {
-                    **common_data,
-                    "feature_1": [10, 11, 12, 13, 14],
-                }
-            ),
-            index_names=["user_id"],
-        )
-        evset_2 = EventSet.from_dataframe(
-            pd.DataFrame(
-                {
-                    **common_data,
-                    "feature_2": [20, 21, 22, 23, 24],
-                    "feature_3": [30, 31, 32, 33, 34],
-                }
-            ),
-            index_names=["user_id"],
-        )
-        evset_3 = EventSet.from_dataframe(
-            pd.DataFrame(
-                {
-                    **common_data,
-                    "feature_4": [40, 41, 42, 43, 44],
-                }
-            ),
-            index_names=["user_id"],
-        )
-        # set same sampling
-        for index_key, index_data in evset_1.data.items():
-            evset_2[index_key].timestamps = index_data.timestamps
-            evset_3[index_key].timestamps = index_data.timestamps
-
-        expected_evset = EventSet.from_dataframe(
-            pd.DataFrame(
-                {
-                    **common_data,
-                    "feature_1": [10, 11, 12, 13, 14],
-                    "feature_2": [20, 21, 22, 23, 24],
-                    "feature_3": [30, 31, 32, 33, 34],
-                    "feature_4": [40, 41, 42, 43, 44],
-                }
-            ),
-            index_names=["user_id"],
+    def test_manual_nodes(self):
+        evset_1 = event_set(
+            timestamps=[1, 1, 2, 3, 4],
+            features={
+                "user_id": ["user_1", "user_1", "user_1", "user_1", "user_2"],
+                "feature_1": [10, 11, 12, 13, 14],
+            },
+            index_features=["user_id"],
         )
 
-        # TODO: Update when "from_dataframe" support the creation of event sets
-        # with shared sampling.
-        node_1 = evset_1.node()
-        node_2 = evset_2.node()
-        node_3 = evset_3.node()
+        evset_2 = event_set(
+            timestamps=[1, 1, 2, 3, 4],
+            features={
+                "user_id": ["user_1", "user_1", "user_1", "user_1", "user_2"],
+                "feature_2": [20, 21, 22, 23, 24],
+                "feature_3": [30, 31, 32, 33, 34],
+            },
+            index_features=["user_id"],
+            same_sampling_as=evset_1,
+        )
 
-        node_2._sampling = node_1._sampling
-        node_3._sampling = node_1._sampling
+        evset_3 = event_set(
+            timestamps=[1, 1, 2, 3, 4],
+            features={
+                "user_id": ["user_1", "user_1", "user_1", "user_1", "user_2"],
+                "feature_4": [40, 41, 42, 43, 44],
+            },
+            index_features=["user_id"],
+            same_sampling_as=evset_1,
+        )
+
+        expected_evset = event_set(
+            timestamps=[1, 1, 2, 3, 4],
+            features={
+                "user_id": ["user_1", "user_1", "user_1", "user_1", "user_2"],
+                "feature_1": [10, 11, 12, 13, 14],
+                "feature_2": [20, 21, 22, 23, 24],
+                "feature_3": [30, 31, 32, 33, 34],
+                "feature_4": [40, 41, 42, 43, 44],
+            },
+            index_features=["user_id"],
+        )
 
         operator = GlueOperator(
-            input_0=node_1,
-            input_1=node_2,
-            input_2=node_3,
+            input_0=evset_1.node(),
+            input_1=evset_2.node(),
+            input_2=evset_3.node(),
         )
+        operator.outputs["output"].check_same_sampling(evset_1.node())
+        operator.outputs["output"].check_same_sampling(evset_2.node())
+        operator.outputs["output"].check_same_sampling(evset_3.node())
+
         implementation = GlueNumpyImplementation(operator=operator)
+        testOperatorAndImp(self, operator, implementation)
         output = implementation.call(
             input_0=evset_1, input_1=evset_2, input_2=evset_3
-        )
-        self.assertEqual(
-            output["output"],
-            expected_evset,
-        )
+        )["output"]
+        assertEqualEventSet(self, output, expected_evset)
 
     def test_non_matching_sampling(self):
         with self.assertRaisesRegex(
             ValueError,
-            "All glue arguments should have the same sampling.",
+            "Arguments should have the same sampling.",
         ):
-            _ = GlueOperator(
-                input_0=node_lib.input_node(
-                    [Feature(name="a", dtype=DType.FLOAT64)],
-                    sampling=Sampling(
-                        index_levels=[("x", DType.INT64)],
-                        is_unix_timestamp=False,
-                    ),
-                ),
-                input_1=node_lib.input_node(
-                    [Feature(name="b", dtype=DType.FLOAT64)],
-                    sampling=Sampling(
-                        index_levels=[("x", DType.INT64)],
-                        is_unix_timestamp=False,
-                    ),
-                ),
+            n1 = input_node(
+                features=[("a", DType.FLOAT64)], indexes=[("x", DType.STRING)]
             )
+            n2 = input_node(
+                features=[("b", DType.FLOAT64)], indexes=[("x", DType.STRING)]
+            )
+            _ = GlueOperator(input_0=n1, input_1=n2)
 
     def test_duplicate_feature(self):
         with self.assertRaisesRegex(
             ValueError,
             'Feature "a" is defined in multiple input nodes',
         ):
-            sampling = Sampling(
-                index_levels=[("x", DType.INT64)], is_unix_timestamp=False
+            n1 = input_node(
+                features=[("a", DType.FLOAT64)], indexes=[("x", DType.STRING)]
             )
-            _ = GlueOperator(
-                input_0=node_lib.input_node(
-                    [Feature(name="a", dtype=DType.FLOAT64)],
-                    sampling=sampling,
-                ),
-                input_1=node_lib.input_node(
-                    [Feature(name="a", dtype=DType.FLOAT64)],
-                    sampling=sampling,
-                ),
+            n2 = input_node(
+                features=[("a", DType.FLOAT64)], same_sampling_as=n1
             )
+            _ = GlueOperator(input_0=n1, input_1=n2)
 
 
 if __name__ == "__main__":

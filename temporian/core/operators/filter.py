@@ -54,6 +54,8 @@ class FilterOperator(Operator):
         self.add_input("input", input)
         self.add_input("condition", condition)
 
+        input.check_same_sampling(condition)
+
         self.add_output(
             "output",
             Node.create_new_features_new_sampling(

@@ -66,13 +66,9 @@ class GlueOperator(Operator):
 
             if first_sampling_node is None:
                 first_sampling_node = input
+            else:
+                input.check_same_sampling(first_sampling_node)
 
-            elif input.sampling_node is not first_sampling_node.sampling_node:
-                raise ValueError(
-                    "All glue arguments should have the same sampling."
-                    f" {first_sampling_node.sampling_node} is different from"
-                    f" {input.sampling_node}."
-                )
         assert first_sampling_node is not None
 
         self.add_output(

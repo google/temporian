@@ -21,7 +21,7 @@ from temporian.core.operators.resample import Resample
 from temporian.implementation.numpy.operators.resample import (
     ResampleNumpyImplementation,
 )
-from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
 
 
 class ResampleOperatorTest(absltest.TestCase):
@@ -29,7 +29,7 @@ class ResampleOperatorTest(absltest.TestCase):
         pass
 
     def test_base(self):
-        evset = EventSet.from_dataframe(
+        evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 {
                     "timestamp": [1, 5, 8, 9, 1, 1],
@@ -41,9 +41,8 @@ class ResampleOperatorTest(absltest.TestCase):
             ),
             index_names=["x"],
         )
-        node = evset.node()
 
-        sampling_evset = EventSet.from_dataframe(
+        sampling_evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 {
                     "timestamp": [-1, 1, 6, 10, 2, 2, 1],
@@ -52,9 +51,8 @@ class ResampleOperatorTest(absltest.TestCase):
             ),
             index_names=["x"],
         )
-        sampling_node = sampling_evset.node()
 
-        expected_output = EventSet.from_dataframe(
+        expected_output = pd_dataframe_to_event_set(
             pd.DataFrame(
                 {
                     "timestamp": [-1, 1, 6, 10, 2, 2, 1],
@@ -68,9 +66,13 @@ class ResampleOperatorTest(absltest.TestCase):
         )
 
         # Run op
-        op = Resample(input=node, sampling=sampling_node)
+        op = Resample(input=evset.node(), sampling=sampling_evset.node())
+        op.outputs["output"].check_same_sampling(sampling_evset.node())
         instance = ResampleNumpyImplementation(op)
         output = instance.call(input=evset, sampling=sampling_evset)["output"]
+
+        print("output:\n", output)
+        print("expected_output:\n", expected_output)
 
         self.assertEqual(output, expected_output)
 

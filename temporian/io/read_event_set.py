@@ -14,15 +14,16 @@
 
 """Utility for reading an event set from disk."""
 
-from typing import List
+from typing import List, Optional
 import pandas as pd
 from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
 
 
 def read_event_set(
     path: str,
     timestamp_column: str,
-    index_names: List[str] = None,
+    index_names: Optional[List[str]] = None,
     sep: str = ",",
 ) -> EventSet:
     """Reads an EventSet from a file.
@@ -44,6 +45,6 @@ def read_event_set(
         index_names = []
 
     df = pd.read_csv(path, sep=sep)
-    return EventSet.from_dataframe(
+    return pd_dataframe_to_event_set(
         df, index_names=index_names, timestamp_column=timestamp_column
     )

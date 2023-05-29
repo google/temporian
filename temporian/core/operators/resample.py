@@ -32,16 +32,13 @@ class Resample(Operator):
         self.add_input("input", input)
         self.add_input("sampling", sampling)
 
-        input.schema.check_compatible_index(
-            sampling.schema, "input and sampling"
-        )
+        input.schema.check_compatible_index(sampling.schema)
 
         self.add_output(
             "output",
-            Node.create_new_features_new_sampling(
+            Node.create_new_features_existing_sampling(
                 features=input.schema.features,
-                indexes=input.schema.indexes,
-                is_unix_timestamp=input.schema.is_unix_timestamp,
+                sampling_node=sampling,
                 creator=self,
             ),
         )

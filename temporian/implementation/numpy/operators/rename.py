@@ -14,19 +14,21 @@ class RenameNumpyImplementation(OperatorImplementation):
         assert isinstance(operator, RenameOperator)
 
     def __call__(self, input: EventSet) -> Dict[str, EventSet]:
-        features = self._operator.features
-        index = self._operator.index
+        assert isinstance(self.operator, RenameOperator)
+
+        features = self.operator.features
+        index = self.operator.index
 
         # rename features
         new_feature_names = [
             features.get(feature_name, feature_name)
-            for feature_name in input.feature_names
+            for feature_name in input.schema.feature_names()
         ]
 
         # rename index
         new_index_names = [
             index.get(index_name, index_name)
-            for index_name in input.index_names
+            for index_name in input.schema.index_names()
         ]
 
         # check that after renaming everything there are no common values
@@ -40,9 +42,7 @@ class RenameNumpyImplementation(OperatorImplementation):
         # create output evset
         output_evset = EventSet(
             data=input.data,
-            feature_names=new_feature_names,
-            index_names=new_index_names,
-            is_unix_timestamp=input.is_unix_timestamp,
+            schema=self.output_schema("output"),
         )
 
         return {"output": output_evset}

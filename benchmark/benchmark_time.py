@@ -54,7 +54,7 @@ def _build_toy_dataset(
     else:
         data_2 = np.random.randn(n)
 
-    return EventSet.from_dataframe(
+    return tp.pd_dataframe_to_event_set(
         pd.DataFrame(
             {
                 "timestamp": timestamps,
@@ -65,7 +65,6 @@ def _build_toy_dataset(
             }
         ),
         index_names=["index_1", "index_2"],
-        is_sorted=True,
     )
 
 
@@ -104,7 +103,9 @@ def benchmark_calendar_day_of_month(runner):
         timestamps = np.sort(np.random.randn(n) * 1_700_000_000).astype(
             "datetime64[s]"
         )
-        ds = EventSet.from_dataframe(pd.DataFrame({"timestamp": timestamps}))
+        ds = tp.pd_dataframe_to_event_set(
+            pd.DataFrame({"timestamp": timestamps})
+        )
 
         node = ds.node()
         output = tp.calendar_day_of_month(node)
@@ -219,9 +220,7 @@ def benchmark_from_dataframe(runner):
 
                     runner.benchmark(
                         benchmark_name,
-                        lambda: EventSet.from_dataframe(
-                            df, index_names, is_sorted=True
-                        ),
+                        lambda: tp.pd_dataframe_to_event_set(df, index_names),
                     )
 
 
@@ -246,7 +245,7 @@ def benchmark_add_index(runner):
         feature_5 = np.random.choice(feature_values, number_timestamps)
         feature_6 = np.random.choice(feature_values, number_timestamps)
 
-        evset = EventSet.from_dataframe(
+        evset = tp.pd_dataframe_to_event_set(
             pd.DataFrame(
                 {
                     "timestamp": timestamps,
@@ -260,7 +259,6 @@ def benchmark_add_index(runner):
                     "feature_6": feature_6,
                 }
             ),
-            is_sorted=True,
             index_names=["index_1", "index_2"],
         )
 
@@ -275,12 +273,11 @@ def benchmark_add_index(runner):
         ]
 
         for index in possible_indexes:
-            for append in [False]:
-                output = tp.add_index(node, index, append=append)
-                runner.benchmark(
-                    f"add_index:s:{number_timestamps:_}:num_idx:{len(index)}:append:{append}",
-                    lambda: tp.evaluate(output, input={node: evset}),
-                )
+            output = tp.add_index(node, index)
+            runner.benchmark(
+                f"add_index:s:{number_timestamps:_}:num_idx:{len(index)}",
+                lambda: tp.evaluate(output, input={node: evset}),
+            )
 
 
 class BenchmarkResult(NamedTuple):

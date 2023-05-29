@@ -14,7 +14,7 @@
 
 """Cast operator class and public API function definition."""
 
-from typing import Union, Dict, Optional
+from typing import Union, Dict, Optional, List, Any, Type
 from temporian.core.data.schema import Schema, FeatureSchema
 
 from temporian.core.data.dtype import DType
@@ -23,33 +23,67 @@ from temporian.core.data.node import Node, Feature
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
+ExtandedDType = Union[Type, Type[float], Type[int], Type[str], Type[bool]]
+
+
+def _normalize_dtype(x: Any) -> ExtandedDType:
+    if isinstance(x, DType):
+        return x
+    if x == int:
+        return DType.INT64
+    if x == float:
+        return DType.FLOAT64
+    if x == str:
+        return DType.STRING
+    if x == bool:
+        return DType.BOOLEAN
+    raise ValueError(f"Cannot normalize {x!r} as a DType.")
+
 
 class CastOperator(Operator):
     def __init__(
         self,
         input: Node,
-        to_dtype: Optional[DType] = None,
-        from_dtypes: Optional[Dict[DType, DType]] = None,
-        from_features: Optional[Dict[str, DType] | Dict[str, str]] = None,
-        check_overflow: bool = True,
+        check_overflow: bool,
+        single_dtype: Optional[DType] = None,
+        dtype_map: Optional[Dict[DType, DType]] = None,
+        name_map: Optional[Dict[str, DType]] = None,
+        dtypes: Optional[List[DType]] = None,
     ):
+        """Constructor.
+
+        There can only be one of single_dtype, dtype_map, name_map, or dtypes.
+        - single_dtype: All the input features are casted to single_dtype.
+        - dtype_map: Mapping between feature name and new dtype.
+        - name_map: Mapping between current dtype and new dtype.
+        - dtypes: Dtype for each of the input feature (indexed by feature idx).
+        """
+
         super().__init__()
 
-        # Check that provided arguments are coherent
-        self._check_args(input, to_dtype, from_dtypes, from_features)
-
-        # Convert anything to {feature_name: target_dtype}, include all features
-        from_features_all = self._get_feature_dtype_map(
-            input, to_dtype, from_dtypes, from_features
+        # Exactly one argument is set.
+        assert (
+            sum(
+                x is not None
+                for x in [single_dtype, dtype_map, name_map, dtypes]
+            )
+            == 1
         )
+
+        # "_new_dtypes" is an array of target dtype for all the input features
+        # (in the same order as the input features).
+        if dtypes is None:
+            dtypes = self._build_dtypes(
+                input, single_dtype, dtype_map, name_map
+            )
+
+        self._dtypes = dtypes
+        self._check_overflow = check_overflow
+        assert len(self._dtypes) == len(input.schema.features)
 
         # Attributes
+        self.add_attribute("dtypes", self._dtypes)
         self.add_attribute("check_overflow", check_overflow)
-        # Convert dtype -> str for serialization
-        self.add_attribute(
-            "from_features",
-            {feat: dtype.value for feat, dtype in from_features_all.items()},
-        )
 
         # Inputs
         self.add_input("input", input)
@@ -61,11 +95,10 @@ class CastOperator(Operator):
             indexes=input.schema.indexes,
             is_unix_timestamp=input.schema.is_unix_timestamp,
         )
-        reuse_node = True
-        for feature_node, feature_schema in zip(
-            input.feature_nodes, input.schema.features
+        is_noop = True
+        for new_dtype, feature_node, feature_schema in zip(
+            self._dtypes, input.feature_nodes, input.schema.features
         ):
-            new_dtype = from_features_all[feature_schema.name]
             output_schema.features.append(
                 FeatureSchema(feature_schema.name, new_dtype)
             )
@@ -74,10 +107,10 @@ class CastOperator(Operator):
                 output_features.append(feature_node)
             else:
                 # Create new feature
-                reuse_node = False
+                is_noop = False
                 output_features.append(Feature(creator=self))
 
-        if reuse_node:
+        if is_noop:
             # Nothing to cast
             self.add_output("output", input)
         else:
@@ -93,85 +126,43 @@ class CastOperator(Operator):
             )
 
         # Used in implementation
-        self.reuse_node = reuse_node
+        self._is_noop = is_noop
 
         self.check()
 
     @property
     def check_overflow(self) -> bool:
-        assert isinstance(self.attributes["check_overflow"], bool)
-        return self.attributes["check_overflow"]
+        return self._check_overflow
 
     @property
-    def from_features(self) -> dict[str, DType]:
-        return self.attributes["from_features"]
+    def dtypes(self) -> List[DType]:
+        return self._dtypes
 
-    def _check_args(
+    @property
+    def is_noop(self) -> bool:
+        return self._is_noop
+
+    def _build_dtypes(
         self,
         input: Node,
-        to_dtype: Optional[DType] = None,
-        from_dtypes: Optional[Dict[DType, DType]] = None,
-        from_features: Optional[Dict[str, DType]] = None,
-    ) -> None:
-        # Check that only one of these args was provided
-        oneof_args = [to_dtype, from_dtypes, from_features]
-        if sum(arg is not None for arg in oneof_args) != 1:
-            raise ValueError(
-                "One and only one of to_dtype, from_dtypes or from_features"
-                " should be provided to CastOperator."
-            )
+        single_dtype: Optional[DType] = None,
+        dtype_map: Optional[Dict[DType, DType]] = None,
+        name_map: Optional[Dict[str, DType]] = None,
+    ) -> List[DType]:
+        if single_dtype is not None:
+            return [single_dtype] * len(input.schema.features)
 
-        # Check: to_dtype is actually a dtype
-        if to_dtype is not None and not isinstance(to_dtype, DType):
-            raise ValueError(f"Cast: expected DType but got {type(to_dtype)=}")
+        if name_map is not None:
+            return [
+                name_map.get(f.name, f.dtype) for f in input.schema.features
+            ]
 
-        # Check: from_dtypes is a dict {dtype: dtype}
-        if from_dtypes is not None and (
-            not isinstance(from_dtypes, dict)
-            or any(not isinstance(key, DType) for key in from_dtypes)
-            or any(not isinstance(val, DType) for val in from_dtypes.values())
-        ):
-            raise ValueError(
-                "Cast: target dict must have valid DTypes or feature names"
-            )
+        if dtype_map is not None:
+            return [
+                dtype_map.get(f.dtype, f.dtype) for f in input.schema.features
+            ]
 
-        # Check: from_features is {feature_name: dtype}
-        if from_features is not None and (
-            not isinstance(from_features, dict)
-            or any(key not in input.feature_names for key in from_features)
-            or any(
-                not isinstance(val, (DType, str))
-                for val in from_features.values()
-            )
-        ):
-            raise ValueError(
-                "Cast: target dict must have valid DTypes or feature names"
-            )
-
-    def _get_feature_dtype_map(
-        self,
-        input: Node,
-        to_dtype: Optional[DType] = None,
-        from_dtypes: Optional[Dict[DType, DType]] = None,
-        from_features: Optional[Dict[str, DType]] = None,
-    ) -> Dict[str, DType]:
-        if to_dtype is not None:
-            return {feature.name: to_dtype for feature in input.schema.features}
-        if from_features is not None:
-            # NOTE: In this special case, it's allowed to provide target DType
-            # as a string instead of DType (for serialization purposes, since
-            # from_features is also an attribute)
-            return {
-                feature.name: DType(
-                    from_features.get(feature.name, feature.dtype)
-                )
-                for feature in input.schema.features
-            }
-        if from_dtypes is not None:
-            return {
-                feature.name: from_dtypes.get(feature.dtype, feature.dtype)
-                for feature in input.schema.features
-            }
+        assert False
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
@@ -179,19 +170,15 @@ class CastOperator(Operator):
             key="CAST",
             attributes=[
                 pb.OperatorDef.Attribute(
-                    key="from_features",
-                    type=pb.OperatorDef.Attribute.Type.MAP_STR_STR,
-                    is_optional=False,
+                    key="dtypes",
+                    type=pb.OperatorDef.Attribute.Type.LIST_DTYPE,
                 ),
                 pb.OperatorDef.Attribute(
                     key="check_overflow",
                     type=pb.OperatorDef.Attribute.Type.BOOL,
-                    is_optional=False,
                 ),
             ],
-            inputs=[
-                pb.OperatorDef.Input(key="input"),
-            ],
+            inputs=[pb.OperatorDef.Input(key="input")],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
 
@@ -201,12 +188,16 @@ operator_lib.register_operator(CastOperator)
 
 def cast(
     input: Node,
-    target: Union[DType, Union[Dict[str, DType], Dict[DType, DType]]],
+    target: Union[
+        ExtandedDType,
+        Dict[str, ExtandedDType],
+        Dict[ExtandedDType, ExtandedDType],
+    ],
     check_overflow: bool = True,
 ) -> Node:
     """Casts the dtype of features to the dtype(s) specified in `target`.
 
-    Feature names are preserved, and reused (not copied) if not changed.
+    Features not impacted by cast are kept.
 
     Examples:
         Given an input `Node` with features 'A' (`INT64`), 'B'
@@ -253,32 +244,49 @@ def cast(
             mixed.
     """
     # Convert 'target' to one of these:
-    to_dtype = None
-    from_features = None
-    from_dtypes = None
+    single_dtype: Optional[DType] = None
+    name_map: Optional[Dict[str, DType]] = None
+    dtype_map: Optional[Dict[DType, DType]] = None
 
     # Further type verifications are done in the operator
-    if isinstance(target, map):
-        feature_dict = input.schema.feature_name_to_dtype()
-        if all(key in feature_dict for key in target):
-            from_features = target
-        elif all(isinstance(key, DType) for key in target):
-            from_dtypes = target
-        else:
-            raise ValueError(
-                "Cast: mapping keys should be all DType or feature names.\n"
-                f"Keys: {target.keys()}\n"
-                f"Feature names: {feature_dict.keys()}"
-            )
-    elif isinstance(target, DType):
-        to_dtype = target
-    else:
-        raise ValueError(f"Not supported target type {target}")
+    if isinstance(target, dict):
+        keys_are_strs = all(isinstance(v, str) for v in target.keys())
+        keys_are_dtypes = all(isinstance(v, DType) for v in target.keys())
+        values_are_dtypes = all(isinstance(v, DType) for v in target.values())
+
+        if keys_are_strs and values_are_dtypes:
+            name_map = {
+                key: _normalize_dtype(value) for key, value in target.items()
+            }
+
+            input_feature_names = input.schema.feature_names()
+            for feature_name in name_map.keys():
+                if feature_name not in input_feature_names:
+                    raise ValueError(f"Unknown feature {feature_name!r}")
+
+        elif keys_are_dtypes and values_are_dtypes:
+            dtype_map = {
+                _normalize_dtype(key): _normalize_dtype(value)
+                for key, value in target.items()
+            }
+    elif isinstance(target, DType) or target in [float, int, str, bool]:
+        single_dtype = _normalize_dtype(target)
+
+    if single_dtype is None and name_map is None and dtype_map is None:
+        raise ValueError(
+            "`target` should be one of the following: (1) a Temporian dtype"
+            " e.g. tp.float64, (2) a dictionary of feature name (str) to"
+            " temporian dtype, or (3) a dictionary of temporian dtype to"
+            " temporian dtype. Alternatively, Temporian dtypes can be replaced"
+            " with python type. For example cast(..., target=float) is"
+            " equivalent to cast(..., target=tp.float64).\nInstead got,"
+            f" `target` = {target!r}."
+        )
 
     return CastOperator(
         input,
-        to_dtype=to_dtype,
-        from_features=from_features,
-        from_dtypes=from_dtypes,
+        single_dtype=single_dtype,
+        name_map=name_map,
+        dtype_map=dtype_map,
         check_overflow=check_overflow,
     ).outputs["output"]

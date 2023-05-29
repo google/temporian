@@ -30,6 +30,9 @@ class PropagateNumpyImplementation(OperatorImplementation):
     def __call__(
         self, input: EventSet, sampling: EventSet
     ) -> Dict[str, EventSet]:
+        assert isinstance(self.operator, Propagate)
+        output_schema = self.output_schema("output")
+
         dst_data = {}
 
         for sampling_index in sampling.data:
@@ -45,12 +48,7 @@ class PropagateNumpyImplementation(OperatorImplementation):
 
             dst_data[sampling_index] = input.data[src_index]
 
-        output_evset = EventSet(
-            data=dst_data,
-            feature_names=input.feature_names,
-            index_names=sampling.index_names,
-            is_unix_timestamp=sampling.is_unix_timestamp,
-        )
+        output_evset = EventSet(data=dst_data, schema=output_schema)
         return {"output": output_evset}
 
 
