@@ -25,8 +25,6 @@
 # from temporian.my_module import _private_name
 
 # Core
-from temporian.core import operator_lib
-from temporian.core import graph
 from temporian.core import serialize
 from temporian.core.data import dtype
 from temporian.core.data import node
@@ -34,8 +32,8 @@ from temporian.core.data import feature
 from temporian.core.data import sampling
 from temporian.core.data import duration
 from temporian.core.evaluation import evaluate
-from temporian.core.operator_lib import registered_operators
 from temporian.core.operators import base
+from temporian.core.operators.all_operators import *
 
 # Implementation
 from temporian.implementation.numpy.data.event_set import EventSet
@@ -45,8 +43,8 @@ from temporian.implementation.numpy.data.plotter import plot
 from temporian.io.read_event_set import read_event_set
 from temporian.io.save_event_set import save_event_set
 
-# Operators
-from temporian.core.operators.all_operators import *
+# Operators registration mechanism
+from temporian.core.operator_lib import registered_operators as _ops
 from temporian.implementation.numpy.operators import all_operators as _impls
 
 # Dtypes
