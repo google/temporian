@@ -161,32 +161,34 @@ class Graph:
 
 
 def infer_graph_named_nodes(
-    inputs: Optional[NamedNodes],
-    outputs: NamedNodes,
+    inputs: Optional[NamedNodes], outputs: NamedNodes
 ) -> Graph:
+    """Extracts the nodes in between the output and input nodes.
+
+    Unlike infer_graph, infer_graph_named_nodes requires for the input and
+    output nodes to be named.
+    """
+
     normalized_inputs: Optional[Dict[str, Node]] = None
     input_nodes = None
     if inputs is not None:
         normalized_inputs = normalize_named_nodes(inputs)
         input_nodes = set(normalized_inputs.values())
 
-    outputs = normalize_named_nodes(outputs)
-    output_nodes = set(outputs.values())
+    normalized_outputs = normalize_named_nodes(outputs)
+    output_nodes = set(normalized_outputs.values())
 
     g = infer_graph(inputs=input_nodes, outputs=output_nodes)
     if normalized_inputs is None:
         normalized_inputs = normalize_named_nodes(list(g.inputs))
 
     g.set_input_node_names(normalized_inputs)
-    g.set_output_node_names(outputs)
+    g.set_output_node_names(normalized_outputs)
     return g
 
 
-def infer_graph(
-    inputs: Optional[Set[Node]],
-    outputs: Set[Node] | Dict[str, Node],
-) -> Graph:
-    """Extracts all the nodes in between the output and input nodes.
+def infer_graph(inputs: Optional[Set[Node]], outputs: Set[Node]) -> Graph:
+    """Extracts the nodes in between the output and input nodes.
 
     If inputs is set, fails if outputs cannot be computed from "inputs".
     If inputs is not set, determine the set of input required.

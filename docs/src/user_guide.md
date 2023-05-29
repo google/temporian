@@ -627,8 +627,9 @@ Horizontal operators can be understood as operators that are applied independent
 
 Operators that modify an `EventSet`'s index are called _vertical operators_. The most important vertical operators are:
 
-- `tp.add_index`: Set features as index or add them to the existing one.
+- `tp.add_index`: Add features to the index.
 - `tp.drop_index`: Remove features from the index, optionally keeping them as features.
+- `tp.set_index`: Changes the index.
 - `tp.propagate`: Expand an index based on another `EventSet`’s index.
 
 By default `EventSets` are _flat_, which means they have no index, and therefore all events are in a single global index group.
