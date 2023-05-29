@@ -32,7 +32,6 @@ from temporian.core.data import feature
 from temporian.core.data import sampling
 from temporian.core.data import duration
 from temporian.core.evaluation import evaluate
-from temporian.core.operators import base
 from temporian.core.operators.all_operators import *
 
 # Implementation
