@@ -131,7 +131,7 @@ operator_lib.register_operator(DropIndexOperator)
 
 def _normalize_index_to_drop(
     input: Node,
-    index_names: Optional[List[str] | str],
+    index_names: Optional[Union[List[str], str]],
 ) -> List[str]:
     if index_names is None:
         # Drop all the indexes
