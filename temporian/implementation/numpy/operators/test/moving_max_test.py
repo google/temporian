@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from absl.testing import absltest
 import math
 
+from absl.testing import absltest
 import pandas as pd
 import numpy as np
+from numpy.testing import assert_array_equal
 
 from temporian.core.operators.window.moving_max import (
     MovingMaxOperator,
@@ -25,9 +26,7 @@ from temporian.implementation.numpy.operators.window.moving_max import (
     MovingMaxNumpyImplementation,
     operators_cc,
 )
-from temporian.implementation.numpy.data.event_set import IndexData
 from temporian.implementation.numpy.data.event_set import EventSet
-from numpy.testing import assert_array_equal
 
 
 def _f64(l):
@@ -49,11 +48,11 @@ class MovingMaxOperatorTest(absltest.TestCase):
     def test_cc_wo_sampling(self):
         assert_array_equal(
             operators_cc.moving_max(
-                _f64([0, 1, 2, 3, 5, 20]),
-                _f32([nan, 10, nan, 12, 13, 14]),
+                _f64([0, 1, 2, 3, 5, 5, 20]),
+                _f32([nan, 10, nan, 12, 13, 14, 15]),
                 3.5,
             ),
-            _f32([nan, 10, 10, 12, 13, 14]),
+            _f32([nan, 10, 10, 12, 14, 14, 15]),
         )
 
     def test_cc_w_sampling(self):
