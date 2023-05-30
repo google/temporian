@@ -60,11 +60,6 @@ def _check_value_to_schema(
             index_data = value.data[index_value]
 
             if len(index_data.features) != len(value.schema.features):
-                print("@@@@index_data:", index_data, flush=True)
-                print("@@@@value:", value, flush=True)
-                print("@@@@value.schema:", value.schema, flush=True)
-                print("@@@@node.schema:", node.schema, flush=True)
-
                 raise RuntimeError(
                     "Invalid internal number of input features for argument"
                     f" {label!r}.\nexpected ="
@@ -138,6 +133,7 @@ def _check_output(
 
             # TODO: Check copy or referencing of feature data.
             matching_samplings = set(operator.list_matching_io_samplings())
+
             for input_key in operator.inputs.keys():
                 input = inputs[input_key]
 
@@ -169,7 +165,15 @@ def _is_same_sampling(evset_1: EventSet, evset_2: EventSet) -> Tuple[bool, str]:
         if i >= num_checks:
             break
 
-        index_data_2 = evset_2[index_key]
+        if index_key not in evset_2.data:
+            return (
+                False,
+                (
+                    f"Index {index_key} missing from one of the two event sets."
+                    f" When comparing {evset_1} with {evset_2}"
+                ),
+            )
+        index_data_2 = evset_2.data[index_key]
         if index_data_1.timestamps is not index_data_2.timestamps:
             return (
                 False,

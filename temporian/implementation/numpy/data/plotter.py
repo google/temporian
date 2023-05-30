@@ -150,8 +150,8 @@ def plot(
         width_px=width_px,
         height_per_plot_px=height_per_plot_px,
         max_points=max_points,
-        min_time=min_time,
-        max_time=max_time,
+        min_time=duration.normalize_timestamps_or_none(min_time),
+        max_time=duration.normalize_timestamps_or_none(max_time),
         max_num_plots=max_num_plots,
         style=style,
     )

@@ -2,7 +2,6 @@ from __future__ import annotations
 from typing import Any, List, Optional, Union, Dict
 
 import numpy as np
-import pandas as pd
 
 from temporian.implementation.numpy.data.event_set import (
     EventSet,
@@ -145,7 +144,7 @@ def event_set(
 
 
 def pd_dataframe_to_event_set(
-    df: pd.DataFrame,
+    df: "pandas.DataFrame",
     index_names: Optional[List[str]] = None,
     timestamp_column: str = "timestamp",
     name: Optional[str] = None,
@@ -205,7 +204,7 @@ def pd_dataframe_to_event_set(
 
 def event_set_to_pd_dataframe(
     evtset: EventSet,
-) -> pd.DataFrame:
+) -> "pandas.DataFrame":
     """Convert a EventSet to a pandas DataFrame.
 
     Returns:
@@ -236,5 +235,7 @@ def event_set_to_pd_dataframe(
         # Indexes
         for i, index_name in enumerate(evtset.schema.index_names()):
             data[index_name].extend([index_key[i]] * len(index_data.timestamps))
+
+    import pandas as pd
 
     return pd.DataFrame(data)

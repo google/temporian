@@ -15,6 +15,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple, Union
+import math
 
 import numpy as np
 import pandas as pd
@@ -93,40 +94,55 @@ def tp_dtype_to_np_dtype(dtype: DType) -> Any:
 
 
 def normalize_features(
-    raw_feature_values: Any,
+    feature_values: Any,
 ) -> np.ndarray:
     """Normalies a list of feature values to temporian format.
 
     "normalize_features" should match "_DTYPE_MAPPING".
     """
 
-    if not isinstance(raw_feature_values, np.ndarray):
+    if str(type(feature_values)) == "<class 'pandas.core.series.Series'>":
+        if feature_values.dtype == "object":
+            feature_values = feature_values.fillna("")
+        feature_values = feature_values.to_numpy(copy=True)
+
+    if not isinstance(feature_values, np.ndarray):
         # The data is not a np.array
 
-        if isinstance(raw_feature_values, list) and all(
-            [isinstance(x, (str, bytes)) for x in raw_feature_values]
-        ):
+        all_str = all(
+            (
+                isinstance(x, (str, bytes)) or x is math.nan or x is np.nan
+                for x in feature_values
+            )
+        )
+
+        if all_str:
             # All the values are python strings.
-            raw_feature_values = np.array(raw_feature_values, dtype=np.str_)
+            feature_values = [
+                "" if x is math.nan or x is np.nan else x
+                for x in feature_values
+            ]
+            feature_values = np.array(feature_values, dtype=np.str_)
         else:
-            raw_feature_values = np.array(raw_feature_values)
+            feature_values = np.array(feature_values)
 
-    else:
-        if raw_feature_values.dtype.type == np.string_:
-            raw_feature_values = raw_feature_values.astype(np.str_)
+    if feature_values.dtype.type == np.string_:
+        feature_values = feature_values.astype(np.str_)
 
-        if raw_feature_values.dtype.type == np.object_ and all(
-            isinstance(x, str) for x in raw_feature_values
-        ):
-            # This is a np.array of python string.
-            raw_feature_values = raw_feature_values.astype(np.str_)
+    if feature_values.dtype.type == np.object_ and all(
+        isinstance(x, str) or x is math.nan or x is np.nan
+        for x in feature_values
+    ):
+        # This is a np.array of python string.
+        feature_values = np.array(
+            ["" if x is math.nan or x is np.nan else x for x in feature_values]
+        )
+        feature_values = feature_values.astype(np.str_)
 
-        if raw_feature_values.dtype.type == np.datetime64:
-            raw_feature_values = raw_feature_values.astype(
-                "datetime64[s]"
-            ).astype(np.int64)
+    if feature_values.dtype.type == np.datetime64:
+        feature_values = feature_values.astype("datetime64[s]").astype(np.int64)
 
-    return raw_feature_values
+    return feature_values
 
 
 def normalize_timestamps(

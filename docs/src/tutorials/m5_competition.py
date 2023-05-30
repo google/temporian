@@ -204,8 +204,10 @@ print("============")
 
 plot_options = {
     # We only plot the 1st year of data to make the plot more readable.
-    "min_time": datetime(2015, 1, 1),
-    "max_time": datetime(2016, 1, 1),
+    # TODO: There seems to be issues with dates.
+    # "min_time": datetime(2015, 1, 1),
+    # "max_time": datetime(2016, 1, 1),
+    "return_fig": True,
 }
 
 sales_data.plot(**plot_options).savefig(
