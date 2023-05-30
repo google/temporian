@@ -365,10 +365,6 @@ class EventSet:
         return None
 
     def node(self, force_new_node=False) -> Node:
-        print(
-            "Warning: use `event_set.source_node()` instead of"
-            " `event_set.node()`"
-        )
         return self.source_node(force_new_node)
 
     def source_node(self, force_new_node=False) -> Node:

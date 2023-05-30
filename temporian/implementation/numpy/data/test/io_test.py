@@ -17,6 +17,7 @@ class IOTest(absltest.TestCase):
                 "feature_1": [0.5, 0.6, math.nan, 0.9],
                 "feature_2": ["red", "blue", "red", "blue"],
                 "feature_3": [10, -1, 5, 5],
+                "feature_4": ["a", "b", math.nan, "c"],
             },
             index_features=["feature_2"],
         )
@@ -25,6 +26,7 @@ class IOTest(absltest.TestCase):
             features=[
                 ("feature_1", DType.FLOAT64),
                 ("feature_3", DType.INT64),
+                ("feature_4", DType.STRING),
             ],
             indexes=[("feature_2", DType.STRING)],
             is_unix_timestamp=False,
@@ -32,12 +34,20 @@ class IOTest(absltest.TestCase):
         expected_evset = EventSet(
             data={
                 ("red",): IndexData(
-                    features=[np.array([0.5, math.nan]), np.array([10, 5])],
+                    features=[
+                        np.array([0.5, math.nan]),
+                        np.array([10, 5]),
+                        np.array(["a", ""]),
+                    ],
                     timestamps=np.array([1.0, 3.0], dtype=np.float64),
                     schema=expected_schema,
                 ),
                 ("blue",): IndexData(
-                    features=[np.array([0.6, 0.9]), np.array([-1, 5])],
+                    features=[
+                        np.array([0.6, 0.9]),
+                        np.array([-1, 5]),
+                        np.array(["b", "c"]),
+                    ],
                     timestamps=np.array([2.0, 4.0], dtype=np.float64),
                     schema=expected_schema,
                 ),

@@ -40,7 +40,6 @@ def testOperatorAndImp(self, op: Operator, imp: OperatorImplementation):
     """
 
     serialized_op = serialize._serialize_operator(op)
-    # logging.info("serialized_op:\n%s", serialized_op)
 
     nodes = {}
     for node in op.inputs.values():
@@ -48,5 +47,4 @@ def testOperatorAndImp(self, op: Operator, imp: OperatorImplementation):
     for node in op.outputs.values():
         nodes[serialize._identifier(node)] = node
 
-    unserialized_op = serialize._unserialize_operator(serialized_op, nodes)
-    # logging.info("unserialized_op:\n%s", unserialized_op)
+    _ = serialize._unserialize_operator(serialized_op, nodes)

@@ -14,17 +14,14 @@
 
 from absl import logging
 from absl.testing import absltest
-import pandas as pd
-
+import os
+import tempfile
 import temporian as tp
 from temporian.core import serialize
 from temporian.core import graph
+from temporian.core.data.dtype import DType
 from temporian.core.test import utils
-from temporian.implementation.numpy.data.event_set import EventSet
-from temporian.implementation.numpy.data.io import (
-    pd_dataframe_to_event_set,
-    event_set,
-)
+from temporian.implementation.numpy.data.io import event_set
 
 
 class SerializeTest(absltest.TestCase):
@@ -121,6 +118,7 @@ class SerializeTest(absltest.TestCase):
             "attr_float": 5.0,
             "attr_bool": True,
             "attr_map": {"good": "bye", "nice": "to", "meet": "you"},
+            "attr_list_dtypes": [DType.FLOAT32, DType.STRING],
         }
         i_event = utils.create_input_node()
         operator = utils.OpWithAttributes(i_event, **attributes)
@@ -162,6 +160,35 @@ class SerializeTest(absltest.TestCase):
             serialize.all_identifiers(original.named_outputs.values())
             & serialize.all_identifiers(restored.named_outputs.values())
         )
+
+    def test_serialize_and_run(self):
+        input_data = tp.event_set(
+            timestamps=[1, 2, 3], features={"x": [1, 2, 3], "y": [4, 5, 6]}
+        )
+
+        input_node = input_data.source_node()
+        x = input_node
+        x = tp.cast(x, float)
+        x = x["x"]
+        x = 2 * x
+        output_node = x
+
+        result = tp.evaluate(output_node, {input_node: input_data})
+        print("result:", result)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_graph.tem")
+            tp.save(
+                inputs={"a": input_node}, outputs={"b": output_node}, path=path
+            )
+            loaded_inputs, loaded_outputs = tp.load(path=path, squeeze=True)
+
+        loaded_results = tp.evaluate(
+            loaded_outputs, {loaded_inputs: input_data}
+        )
+        print("loaded_results:", loaded_results)
+
+        self.assertEqual(result, loaded_results)
 
 
 if __name__ == "__main__":

@@ -23,14 +23,12 @@ import numpy as np
 import pandas as pd
 import temporian as tp
 
-from temporian.implementation.numpy.data.event_set import EventSet
-
 # TODO(gbm): Add flag to control which benchmark to run.
 
 
 def _build_toy_dataset(
     n: int, data_prefix="", data2_is_categorical_integer=False
-) -> EventSet:
+) -> tp.EventSet:
     """Builds a toy dataset with two features.
 
     Args:

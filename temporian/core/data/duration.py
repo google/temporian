@@ -66,7 +66,7 @@ def seconds(value: Union[int, float]) -> Duration:
     Returns:
         Same number of seconds.
     """
-    return Duration(value)
+    return NormalizedDuration(value)
 
 
 def minutes(value: Union[int, float]) -> Duration:
@@ -78,7 +78,7 @@ def minutes(value: Union[int, float]) -> Duration:
     Returns:
         Equivalent number of seconds.
     """
-    return Duration(value * 60)
+    return NormalizedDuration(value * 60)
 
 
 def hours(value: Union[int, float]) -> Duration:
@@ -90,7 +90,7 @@ def hours(value: Union[int, float]) -> Duration:
     Returns:
         Equivalent number of seconds.
     """
-    return Duration(value * 60 * 60)
+    return NormalizedDuration(value * 60 * 60)
 
 
 def days(value: Union[int, float]) -> Duration:
@@ -102,7 +102,7 @@ def days(value: Union[int, float]) -> Duration:
     Returns:
         Equivalent number of seconds.
     """
-    return Duration(value * 60 * 60 * 24)
+    return NormalizedDuration(value * 60 * 60 * 24)
 
 
 def weeks(value: Union[int, float]) -> Duration:
@@ -114,7 +114,7 @@ def weeks(value: Union[int, float]) -> Duration:
     Returns:
         Equivalent number of seconds.
     """
-    return Duration(value * 60 * 60 * 24 * 7)
+    return NormalizedDuration(value * 60 * 60 * 24 * 7)
 
 
 def convert_date_to_duration(date: Timestamp) -> Duration:

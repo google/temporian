@@ -283,6 +283,7 @@ def _unserialize_operator(
 
 
 def _serialize_node(src: Node) -> pb.Node:
+    assert len(src.schema.features) == len(src.feature_nodes)
     return pb.Node(
         id=_identifier(src),
         sampling_id=_identifier(src.sampling_node),
@@ -304,13 +305,16 @@ def _unserialize_node(
             raise ValueError(f"Non existing feature {key}")
         return features[key]
 
-    return Node(
+    node = Node(
         schema=_unserialize_schema(src.schema),
         features=[get_feature(f) for f in src.feature_ids],
         sampling=samplings[src.sampling_id],
         name=src.name,
         creator=None,
     )
+
+    assert len(node.schema.features) == len(node.feature_nodes)
+    return node
 
 
 def _serialize_feature(src: Feature) -> pb.Node.Feature:
@@ -337,10 +341,17 @@ def _unserialize_sampling(src: pb.Node.Sampling) -> Sampling:
 
 def _serialize_schema(src: Schema) -> pb.Schema:
     return pb.Schema(
-        features=[],
+        features=[
+            pb.Schema.Feature(
+                name=feature.name,
+                dtype=_serialize_dtype(feature.dtype),
+            )
+            for feature in src.features
+        ],
         indexes=[
             pb.Schema.Index(
-                name=index.name, dtype=_serialize_dtype(index.dtype)
+                name=index.name,
+                dtype=_serialize_dtype(index.dtype),
             )
             for index in src.indexes
         ],
@@ -350,7 +361,10 @@ def _serialize_schema(src: Schema) -> pb.Schema:
 
 def _unserialize_schema(src: pb.Schema) -> Schema:
     return Schema(
-        features=[],
+        features=[
+            (feature.name, _unserialize_dtype(feature.dtype))
+            for feature in src.features
+        ],
         indexes=[
             (index.name, _unserialize_dtype(index.dtype))
             for index in src.indexes
@@ -400,7 +414,10 @@ def _attribute_to_proto(
     # list of dtype
     if isinstance(value, list) and all(isinstance(val, DType) for val in value):
         return pb.Operator.Attribute(
-            key=key, list_dtype=pb.Operator.Attribute.ListDType(values=value)
+            key=key,
+            list_dtype=pb.Operator.Attribute.ListDType(
+                values=[_serialize_dtype(x) for x in value]
+            ),
         )
     raise ValueError(
         f"Non supported type {type(value)} for attribute {key}={value}"
@@ -421,7 +438,7 @@ def _attribute_from_proto(src: pb.Operator.Attribute) -> base.AttributeType:
     if src.HasField("map_str_str"):
         return dict(src.map_str_str.values)
     if src.HasField("list_dtype"):
-        return list(src.list_dtype.values)
+        return [_unserialize_dtype(x) for x in src.list_dtype.values]
     raise ValueError(f"Non supported proto attribute {src}")
 
 

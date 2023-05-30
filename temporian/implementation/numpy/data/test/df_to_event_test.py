@@ -14,10 +14,10 @@
 
 import datetime
 
+import math
 from absl.testing import absltest
 import numpy as np
 import pandas as pd
-
 from temporian.implementation.numpy.data.io import (
     event_set,
     pd_dataframe_to_event_set,
@@ -434,6 +434,23 @@ class DataFrameToEventTest(absltest.TestCase):
         )
         evset = pd_dataframe_to_event_set(
             df, index_names=[], timestamp_column="timestamp"
+        )
+
+        self.assertEqual(evset, expected_evset)
+
+    def test_nan_in_string(self) -> None:
+        evset = pd_dataframe_to_event_set(
+            pd.DataFrame(
+                {
+                    "timestamp": [1, 2, 3],
+                    "x": ["a", math.nan, "b"],
+                    "y": [1, 2, 3],
+                }
+            )
+        )
+
+        expected_evset = event_set(
+            timestamps=[1, 2, 3], features={"x": ["a", "", "b"], "y": [1, 2, 3]}
         )
 
         self.assertEqual(evset, expected_evset)

@@ -210,6 +210,10 @@ class OpWithAttributes(base.Operator):
                     key="attr_map",
                     type=pb.OperatorDef.Attribute.Type.MAP_STR_STR,
                 ),
+                pb.OperatorDef.Attribute(
+                    key="attr_list_dtypes",
+                    type=pb.OperatorDef.Attribute.Type.LIST_DTYPE,
+                ),
             ],
         )
 
@@ -221,7 +225,8 @@ class OpWithAttributes(base.Operator):
         attr_list: List[str],
         attr_float: float,
         attr_bool: bool,
-        attr_map: Mapping[str, str],
+        attr_map: dict[str, str],
+        attr_list_dtypes: List[DType],
     ):
         super().__init__()
         self.add_attribute("attr_int", attr_int)
@@ -230,6 +235,8 @@ class OpWithAttributes(base.Operator):
         self.add_attribute("attr_float", attr_float)
         self.add_attribute("attr_bool", attr_bool)
         self.add_attribute("attr_map", attr_map)
+        self.add_attribute("attr_list_dtypes", attr_list_dtypes)
+
         self.add_input("input", input)
         self.add_output(
             "output",

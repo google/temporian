@@ -37,6 +37,11 @@ class SelectOperator(Operator):
         input_feature_names = input.schema.feature_names()
 
         for feature_name in feature_names:
+            if feature_name not in input_feature_names:
+                raise ValueError(
+                    f"Selected features {feature_name!r} is not part of the"
+                    f" available features {input_feature_names!r}."
+                )
             feature_idx = input_feature_names.index(feature_name)
             output_features.append(input.feature_nodes[feature_idx])
             output_feature_schemas.append(input.schema.features[feature_idx])

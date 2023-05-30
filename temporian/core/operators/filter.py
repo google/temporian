@@ -32,29 +32,22 @@ class FilterOperator(Operator):
         if len(condition.schema.features) != 1:
             raise ValueError(
                 "Condition must be a single feature. Got"
-                f" {len(condition.schema.features)} instead."
+                f" {condition.schema} instead."
             )
 
         # check that condition is a boolean feature
         if condition.schema.features[0].dtype != DType.BOOLEAN:
             raise ValueError(
                 "Condition must be a boolean feature. Got"
-                f" {condition.schema.features[0].dtype} instead."
+                f" {condition.schema} instead."
             )
 
         # check both nodes have same sampling
-        if input.schema.indexes != condition.schema.indexes:
-            raise ValueError(
-                "Node and condition must have the same sampling. Got"
-                f" {input.schema.indexes} and"
-                f" {condition.schema.indexes} instead."
-            )
+        input.check_same_sampling(condition)
 
         # inputs
         self.add_input("input", input)
         self.add_input("condition", condition)
-
-        input.check_same_sampling(condition)
 
         self.add_output(
             "output",

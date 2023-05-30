@@ -16,12 +16,13 @@ import numpy as np
 import pandas as pd
 from absl.testing import absltest
 
-from temporian.core.data.node import Node, Feature, input_node
+from temporian.core.data.node import input_node
 from temporian.implementation.numpy.operators.cast import (
     CastNumpyImplementation,
 )
 from temporian.core.operators.cast import CastOperator, cast
 from temporian.core.data.dtype import DType
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.io import (
     pd_dataframe_to_event_set,
     event_set,
@@ -141,6 +142,12 @@ class CastNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id", "product_id"],
         )
 
+    def test_cast_manual(self) -> None:
+        node = input_node([("x", DType.FLOAT32), ("y", DType.FLOAT32)])
+        op = CastOperator(node, check_overflow=True, single_dtype=DType.INT64)
+        imp = CastNumpyImplementation(op)
+        testOperatorAndImp(self, op, imp)
+
     def test_cast_op_by_feature(self) -> None:
         """Test correct casting by feat. names, without overflow check."""
 
@@ -161,6 +168,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
             {self.input_node: self.input_evset},
             check_execution=True,
         )
+        assert isinstance(output_evset, EventSet)
         assertEqualEventSet(self, output_evset, self.expected_evset_1)
 
     def test_cast_op_by_dtype(self) -> None:
@@ -182,6 +190,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
             {self.input_node: self.input_evset},
             check_execution=True,
         )
+        assert isinstance(output_evset, EventSet)
         assertEqualEventSet(self, output_evset, self.expected_evset_1)
 
     def test_cast_to_dtype(self) -> None:
@@ -197,6 +206,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
             {self.input_node: self.input_evset},
             check_execution=True,
         )
+        assert isinstance(output_evset, EventSet)
         assertEqualEventSet(self, output_evset, self.expected_evset_2)
 
     def test_cast_no_effect(self) -> None:
