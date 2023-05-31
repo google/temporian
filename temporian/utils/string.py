@@ -8,7 +8,10 @@ def indent(text: str, num_spaces: int = 4) -> str:
 
 
 def pretty_num_bytes(nbytes: int) -> str:
-    """Converts a number of bytes in a human readable form."""
+    """Converts a number of bytes in a human readable form.
+
+    Example: 1500 -> "1.5 GB".
+    """
 
     if nbytes > 5e8:
         return f"{(nbytes / 1e9):.1f} GB"
