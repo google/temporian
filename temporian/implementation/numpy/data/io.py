@@ -7,7 +7,7 @@ from temporian.implementation.numpy.data.event_set import (
     EventSet,
     IndexData,
     numpy_array_to_tp_dtype,
-    normalize_timestamps,
+    normalize_timestamp,
     normalize_features,
 )
 from temporian.core.evaluation import evaluate
@@ -45,16 +45,15 @@ def event_set(
         timestamps: Array of timestamps values. Can be a list of numpy array of
             float, integer, datetimes or dates.
         features: Dictionary of feature values.
-        index_features: Names of the features in "features" to be used as index.
+        index_features: Names of the features in `features` to be used as index.
           If empty (default), the data is not indexed.
         name: Name of the node.
         is_unix_timestamp: If "auto" (default), the fact that the timestamp is
           interpretable as unix timestamps is true if the timestamps are date
-          or date-like object. If "is_unix_timestamp" is boolean,
-          "is_unix_timestamp" defines if the timestamps are unix timestamps.
+          or date-like object. If `is_unix_timestamp` is boolean,
+          `is_unix_timestamp` defines if the timestamps are unix timestamps.
         same_sampling_as: If set, the created event set is guarentied to have
-          the same sampling as "same_sampling_as". In this case, "indexes" and
-          "is_unix_timestamp" should not be provided. Some operators require for
+          the same sampling as `same_sampling_as`. Some operators require for
           input nodes to have the same sampling.
 
     Returns:
@@ -69,7 +68,7 @@ def event_set(
     }
 
     # Convert timestamps to expected type.
-    timestamps, auto_is_unix_timestamp = normalize_timestamps(timestamps)
+    timestamps, auto_is_unix_timestamp = normalize_timestamp(timestamps)
 
     if not np.all(timestamps[:-1] <= timestamps[1:]):
         order = np.argsort(timestamps, kind="mergesort")
@@ -164,9 +163,7 @@ def pd_dataframe_to_event_set(
             timestamp. If False, the DataFrame will be sorted by timestamp.
         name: Optional name for the EventSet.
         same_sampling_as: If set, the created event set is guarentied to have
-          the same sampling as "same_sampling_as". In this case, "indexes" and
-          "is_unix_timestamp" should not be provided. Some operators require for
-          input nodes to have the same sampling.
+          the same sampling as `same_sampling_as`.
 
 
     Returns:

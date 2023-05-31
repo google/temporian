@@ -42,7 +42,7 @@ def normalize_duration(x: Duration) -> NormalizedDuration:
     )
 
 
-def normalize_timestamps(x: Timestamp) -> NormalizedTimestamp:
+def normalize_timestamp(x: Timestamp) -> NormalizedTimestamp:
     if isinstance(x, np.datetime64):
         return x.astype("datetime64[ns]").astype(np.float64) / 1e9
 
@@ -58,10 +58,10 @@ def normalize_timestamps(x: Timestamp) -> NormalizedTimestamp:
     raise ValueError(f"Invalid timestamp {x!r} of type {type(x)}.")
 
 
-def normalize_timestamps_or_none(x: Optional[Timestamp]) -> NormalizedTimestamp:
+def normalize_timestamp_or_none(x: Optional[Timestamp]) -> NormalizedTimestamp:
     if x is None:
         return None
-    return normalize_timestamps(x)
+    return normalize_timestamp(x)
 
 
 def milliseconds(value: Union[int, float]) -> Duration:

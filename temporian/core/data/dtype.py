@@ -93,6 +93,9 @@ class DType(Enum):
 
 
 # The dtype of indexes.
+
+# TODO: IndexDType should only be the integer and str types in DType. Let's
+# find a way for IndexDType to only represent those types.
 IndexDType = DType
 
 

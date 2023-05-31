@@ -169,13 +169,13 @@ def _matplotlib_sub_plot(
         args = {}
         if options.min_time is not None:
             args["left"] = (
-                duration.normalize_timestamps(options.min_time)
+                duration.normalize_timestamp(options.min_time)
                 if not is_unix_timestamp
                 else options.min_time
             )
         if options.max_time is not None:
             args["right"] = (
-                duration.normalize_timestamps(options.max_time)
+                duration.normalize_timestamp(options.max_time)
                 if not is_unix_timestamp
                 else options.max_time
             )

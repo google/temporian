@@ -98,7 +98,7 @@ def normalize_features(
 ) -> np.ndarray:
     """Normalies a list of feature values to temporian format.
 
-    "normalize_features" should match "_DTYPE_MAPPING".
+    `normalize_features` should match `_DTYPE_MAPPING`.
     """
 
     if str(type(feature_values)) == "<class 'pandas.core.series.Series'>":
@@ -145,7 +145,7 @@ def normalize_features(
     return feature_values
 
 
-def normalize_timestamps(
+def normalize_timestamp(
     raw_timestamps: Any,
 ) -> Tuple[np.ndarray, bool]:
     """Normalizes timestamps to temporian format.
@@ -216,7 +216,7 @@ def normalize_timestamps(
 class IndexData:
     """Features and timestamps data for a single index item.
 
-    Note: The "schema" constructor argument is only used for checking. If
+    Note: The `schema` constructor argument is only used for checking. If
     schema=None, no checking is done. Checking can be done manually with
     "index_data.check_schema(...)".
 
@@ -388,7 +388,7 @@ class EventSet:
 
         If called multiple times, always return the same node.
         Args:
-            force_new_node: If false (default), return the same node if "node"
+            force_new_node: If false (default), return the same node if `node`
               is called multiple times. If true, return a new node each time.
         """
 

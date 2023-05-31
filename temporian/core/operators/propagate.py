@@ -118,7 +118,7 @@ def propagate(input: Node, sampling: Node, resample: bool = False) -> Node:
         input: Node to propagate.
         sampling: Index to propagate over.
         resample: If true, apply a tp.resample operator. In this case, the
-          output of "propagate" has the same sampling as "sampling".
+          output of `propagate` has the same sampling as `sampling`.
 
     Returns:
         Node propagated over `sampling`'s index.

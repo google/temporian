@@ -14,7 +14,6 @@
 
 """Temporian."""
 
-from ast import Index
 from temporian.core import evaluation
 from temporian.core import operator_lib
 from temporian.core import graph

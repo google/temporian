@@ -44,8 +44,8 @@ class BaseBinaryOperator(Operator):
                 "The left and right arguments should have the same number of "
                 f"features. Left features = {input_1.schema.features}, right "
                 f"features = {input_2.schema.features}. Note: The name of the "
-                "features do not have to match: Event set are combined by "
-                "index feature-wise."
+                "features do not have to match: Features are combined "
+                "index-wise."
             )
 
         # check that features have same dtype
