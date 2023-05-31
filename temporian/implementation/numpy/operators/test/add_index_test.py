@@ -3,7 +3,6 @@ from absl.testing import absltest
 import pandas as pd
 
 from temporian.core.operators.add_index import (
-    AddIndexOperator,
     add_index,
     set_index,
 )
@@ -15,7 +14,6 @@ from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
 from temporian.core.evaluation import evaluate
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
-    testOperatorAndImp,
 )
 
 

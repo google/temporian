@@ -221,11 +221,13 @@ def infer_graph(inputs: Optional[Set[Node]], outputs: Set[Node]) -> Graph:
     #   Adds all the input nodes of node's creator op to the pending list
 
     # # Extract the names
-    # outputs_set = outputs if isinstance(outputs, set) else set(outputs.values())
+    # outputs_set = outputs if isinstance(outputs, set) else
+    #         set(outputs.values())
     # if inputs is None:
     #     input_set = None
     # else:
-    #     input_set = inputs if isinstance(inputs, set) else set(inputs.values())
+    #     input_set = inputs if isinstance(inputs, set) else
+    #         set(inputs.values())
 
     graph = Graph()
     graph.outputs.update(outputs)

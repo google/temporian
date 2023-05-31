@@ -14,10 +14,6 @@
 
 from absl.testing import absltest
 
-import numpy as np
-import pandas as pd
-
-from temporian.core.data.node import Feature
 from temporian.core.operators.glue import GlueOperator
 from temporian.core.data.node import input_node
 from temporian.core.data.dtype import DType
@@ -25,7 +21,6 @@ from temporian.implementation.numpy.operators.glue import (
     GlueNumpyImplementation,
 )
 from temporian.implementation.numpy.data.io import (
-    pd_dataframe_to_event_set,
     event_set,
 )
 from temporian.implementation.numpy.operators.test.test_util import (

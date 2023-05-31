@@ -27,8 +27,6 @@ from temporian.implementation.numpy.operators.window.simple_moving_average impor
     operators_cc,
 )
 from temporian.core.data import node as node_lib
-import math
-from numpy.testing import assert_array_equal
 from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
 
 

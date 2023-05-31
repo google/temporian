@@ -17,7 +17,7 @@ from absl.testing import absltest
 import numpy as np
 import pandas as pd
 
-from temporian.core.operators.rename import RenameOperator, rename
+from temporian.core.operators.rename import rename
 from temporian.implementation.numpy.operators.rename import (
     RenameNumpyImplementation,
 )

@@ -29,8 +29,8 @@ def plot_bokeh(
         ColumnDataSource,
         CategoricalColorMapper,
         HoverTool,
+        CustomJS,
     )
-    from bokeh.models import ColumnDataSource, CustomJS
     from bokeh.palettes import Dark2_5 as colors
 
     num_plots = get_num_plots(evsets, indexes, features, options)

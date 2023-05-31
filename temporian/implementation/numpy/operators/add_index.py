@@ -1,7 +1,5 @@
 from collections import defaultdict
-from typing import Dict, List, Any
-
-import numpy as np
+from typing import Dict
 
 from temporian.core.operators.add_index import AddIndexOperator
 from temporian.implementation.numpy import implementation_lib

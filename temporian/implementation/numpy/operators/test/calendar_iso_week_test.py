@@ -19,7 +19,6 @@ import pandas as pd
 from temporian.core.operators.calendar.iso_week import (
     CalendarISOWeekOperator,
 )
-from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.implementation.numpy.operators.calendar.iso_week import (
     CalendarISOWeekNumpyImplementation,
 )
@@ -29,7 +28,6 @@ from temporian.implementation.numpy.data.io import (
 )
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
-    testOperatorAndImp,
 )
 
 

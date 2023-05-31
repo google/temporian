@@ -16,7 +16,7 @@ import numpy as np
 import pandas as pd
 from absl.testing import absltest
 
-from temporian.core.data.node import Node, Feature, input_node
+from temporian.core.data.node import input_node
 from temporian.implementation.numpy.operators.unary import (
     InvertNumpyImplementation,
     AbsNumpyImplementation,
@@ -33,7 +33,6 @@ from temporian.core.data.dtype import DType
 from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
-    testOperatorAndImp,
 )
 
 

@@ -14,17 +14,16 @@
 
 """Construction and evaluation of an operator schedule for a set of inputs."""
 
-from dataclasses import dataclass
 import time
 import sys
-from typing import Any, Dict, List, Set, Union, Optional
+from typing import Dict, List, Set, Union, Optional
 from collections import defaultdict
 
 from temporian.core.data.node import Node
 from temporian.core.operators.base import Operator
 from temporian.implementation.numpy import evaluation as np_eval
 from temporian.implementation.numpy.data.event_set import EventSet
-from temporian.core.graph import infer_graph, Graph
+from temporian.core.graph import infer_graph
 from temporian.core.schedule import Schedule
 
 EvaluationQuery = Union[Node, List[Node], Set[Node], Dict[str, Node]]

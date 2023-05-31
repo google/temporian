@@ -221,8 +221,8 @@ def duration_abbreviation(
 
     Args:
         duration: Duration in seconds.
-        cutoff: Cutoff for the abbreviation. For example, if cutoff is "day", the
-            smallest unit will be days. Possible options are "week",
+        cutoff: Cutoff for the abbreviation. For example, if cutoff is "day",
+            the smallest unit will be days. Possible options are "week",
             "day", "hour" and "minute", "seconds" and "milliseconds". Default is
             "milliseconds".
 

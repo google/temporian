@@ -14,7 +14,7 @@
 
 from absl.testing import absltest
 
-from temporian.core.data.node import Node, input_node
+from temporian.core.data.node import input_node
 from temporian.core.operators import base
 from temporian.proto import core_pb2 as pb
 

@@ -185,8 +185,8 @@ def _is_same_sampling(evset_1: EventSet, evset_2: EventSet) -> Tuple[bool, str]:
 
     if debug_mode:
         # Compare index keys.
-        # TODO: is there a way to avoid checking all keys here (keys might come in
-        # different orders, can't compare top num_check keys in each evset)
+        # TODO: is there a way to avoid checking all keys here (keys might come
+        # in different orders, can't compare top num_check keys in each evset)
 
         diff_keys = set(evset_1.data.keys()).difference(evset_2.data.keys())
         if diff_keys:

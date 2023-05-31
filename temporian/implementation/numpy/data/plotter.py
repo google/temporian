@@ -15,9 +15,9 @@
 """Plotting utility."""
 
 from typing import NamedTuple, Optional, Union, List, Any, Set
+from enum import Enum
 
 import numpy as np
-from enum import Enum
 
 from temporian.core.data import duration
 from temporian.implementation.numpy.data.event_set import EventSet

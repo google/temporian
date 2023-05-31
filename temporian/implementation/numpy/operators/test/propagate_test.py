@@ -20,7 +20,6 @@ from temporian.core.operators.propagate import Propagate
 from temporian.implementation.numpy.operators.propagate import (
     PropagateNumpyImplementation,
 )
-from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
 
 

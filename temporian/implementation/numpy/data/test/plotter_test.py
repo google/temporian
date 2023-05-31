@@ -1,10 +1,8 @@
 from absl.testing import parameterized, absltest
 
 import matplotlib
-import numpy as np
 
 from temporian.implementation.numpy.data import plotter
-from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.implementation.numpy.data.io import event_set
 
 

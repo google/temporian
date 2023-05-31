@@ -18,7 +18,7 @@ from abc import abstractmethod
 
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
-from temporian.core.data.schema import Schema, FeatureSchema
+from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -113,4 +113,5 @@ class BaseBinaryOperator(Operator):
     def output_feature_dtype(
         self, feature_1: FeatureSchema, feature_2: FeatureSchema
     ) -> DType:
+        del feature_2
         return feature_1.dtype

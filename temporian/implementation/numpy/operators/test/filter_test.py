@@ -14,15 +14,11 @@
 
 from absl.testing import absltest
 
-import numpy as np
-import pandas as pd
-
 from temporian.core.operators.filter import FilterOperator
 from temporian.implementation.numpy.operators.filter import (
     FilterNumpyImplementation,
 )
 from temporian.implementation.numpy.data.io import (
-    pd_dataframe_to_event_set,
     event_set,
 )
 from temporian.implementation.numpy.operators.test.test_util import (

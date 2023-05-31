@@ -14,7 +14,7 @@
 
 """Event/scalar arithmetic operators classes and public API definitions."""
 
-from typing import Union, List
+from typing import Union
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType

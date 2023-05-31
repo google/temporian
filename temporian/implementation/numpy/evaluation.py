@@ -15,10 +15,9 @@
 import sys
 import time
 
-from typing import Dict, List
+from typing import Dict
 
 from temporian.core.data.node import Node
-from temporian.core.operators.base import Operator
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core.schedule import Schedule

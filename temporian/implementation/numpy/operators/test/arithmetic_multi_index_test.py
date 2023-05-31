@@ -17,8 +17,7 @@ import pandas as pd
 from absl.testing import absltest
 
 from temporian.core.data.dtype import DType
-from temporian.core.data.node import Node, input_node
-from temporian.core.data.node import Feature
+from temporian.core.data.node import input_node
 from temporian.core.operators.binary import (
     AddOperator,
     SubtractOperator,

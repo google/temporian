@@ -67,6 +67,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 columns=["store_id", "timestamp", "costs"],
             ),
             index_names=["store_id"],
+            same_sampling_as=self.evset_1,
         )
         self.evset_3 = pd_dataframe_to_event_set(
             pd.DataFrame(
@@ -80,17 +81,11 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 columns=["store_id", "timestamp", "costs"],
             ),
             index_names=["store_id"],
+            same_sampling_as=self.evset_1,
         )
         self.node_1 = self.evset_1.node()
         self.node_2 = self.evset_2.node()
         self.node_3 = self.evset_3.node()
-
-        # FIXME: This should not be necessary
-        self.node_2._sampling = self.node_1._sampling
-        self.node_3._sampling = self.node_1._sampling
-        for index, data in self.evset_1.data.items():
-            self.evset_2[index].timestamps = data.timestamps
-            self.evset_3[index].timestamps = data.timestamps
 
     def test_correct_sum(self) -> None:
         """Test correct sum operator."""

@@ -17,7 +17,6 @@ from absl.testing import absltest
 import pandas as pd
 
 from temporian.core.operators.drop_index import DropIndexOperator
-from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.drop_index import (
     DropIndexNumpyImplementation,
 )
@@ -71,7 +70,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         )
         operator_impl = DropIndexNumpyImplementation(operator)
         testOperatorAndImp(self, operator, operator_impl)
-        output = operator_impl.__call__(input=self.input_evset)["output"]
+        output = operator_impl.call(input=self.input_evset)["output"]
         assertEqualEventSet(self, output, expected_output)
 
     def test_drop_item_id(self) -> None:
@@ -98,7 +97,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         )
         operator_impl = DropIndexNumpyImplementation(operator)
         testOperatorAndImp(self, operator, operator_impl)
-        output = operator_impl.__call__(input=self.input_evset)["output"]
+        output = operator_impl.call(input=self.input_evset)["output"]
         assertEqualEventSet(self, output, expected_output)
 
     def test_drop_store_id(self) -> None:
@@ -125,7 +124,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
 
         operator_impl = DropIndexNumpyImplementation(operator)
         testOperatorAndImp(self, operator, operator_impl)
-        output = operator_impl.__call__(input=self.input_evset)["output"]
+        output = operator_impl.call(input=self.input_evset)["output"]
         assertEqualEventSet(self, output, expected_output)
 
     def test_drop_item_id_keep_false(self) -> None:
@@ -153,7 +152,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
 
         operator_impl = DropIndexNumpyImplementation(operator)
         testOperatorAndImp(self, operator, operator_impl)
-        output = operator_impl.__call__(input=self.input_evset)["output"]
+        output = operator_impl.call(input=self.input_evset)["output"]
         assertEqualEventSet(self, output, expected_output)
 
     def test_drop_store_id_keep_false(self) -> None:
@@ -180,7 +179,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         )
         operator_impl = DropIndexNumpyImplementation(operator)
         testOperatorAndImp(self, operator, operator_impl)
-        output = operator_impl.__call__(input=self.input_evset)["output"]
+        output = operator_impl.call(input=self.input_evset)["output"]
         assertEqualEventSet(self, output, expected_output)
 
     def test_str_index(self):
@@ -215,7 +214,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         operator = DropIndexOperator(input=node, index_to_drop=["b"], keep=True)
         operator_impl = DropIndexNumpyImplementation(operator)
         testOperatorAndImp(self, operator, operator_impl)
-        output = operator_impl.__call__(input=evset)["output"]
+        output = operator_impl.call(input=evset)["output"]
         assertEqualEventSet(self, output, expected_output)
 
 

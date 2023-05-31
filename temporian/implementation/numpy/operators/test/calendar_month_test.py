@@ -19,7 +19,6 @@ from absl.testing import absltest
 from temporian.core.operators.calendar.month import (
     CalendarMonthOperator,
 )
-from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.implementation.numpy.operators.calendar.month import (
     CalendarMonthNumpyImplementation,
 )
@@ -29,7 +28,6 @@ from temporian.implementation.numpy.data.io import (
 )
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
-    testOperatorAndImp,
 )
 
 

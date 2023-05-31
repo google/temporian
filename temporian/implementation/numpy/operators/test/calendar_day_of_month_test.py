@@ -16,7 +16,7 @@ from absl.testing import absltest
 import numpy as np
 import pandas as pd
 
-from temporian.core.data.node import Node, input_node
+from temporian.core.data.node import input_node
 from temporian.core.operators.calendar.day_of_month import (
     CalendarDayOfMonthOperator,
 )
@@ -24,7 +24,6 @@ from temporian.implementation.numpy.data.io import (
     pd_dataframe_to_event_set,
     event_set,
 )
-from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.implementation.numpy.operators.calendar.day_of_month import (
     CalendarDayOfMonthNumpyImplementation,
 )

@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from absl.testing import absltest
 import math
 
+from absl.testing import absltest
 import pandas as pd
 import numpy as np
+from numpy.testing import assert_array_equal
 
 from temporian.core.operators.window.moving_max import (
     MovingMaxOperator,
@@ -25,7 +26,6 @@ from temporian.implementation.numpy.operators.window.moving_max import (
     MovingMaxNumpyImplementation,
     operators_cc,
 )
-from numpy.testing import assert_array_equal
 from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
 
 

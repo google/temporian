@@ -208,14 +208,16 @@ def cast(
            string value in 'D' is invalid, or any column value is out of range
            for `INT32`.
 
-        2. `cast(input, target={dtype.INT64: dtype.INT32, dtype.STRING: dtype.FLOAT32})`
+        2. `cast(input, target={dtype.INT64: dtype.INT32,
+                dtype.STRING: dtype.FLOAT32})`
             Convert features 'A' and 'B' to `INT32`, 'D' to `FLOAT32`, leave 'C'
             unchanged.
 
         3. `cast(input, target={'A': dtype.FLOAT32, 'B': dtype.INT32})`
             Convert 'A' to `FLOAT32` and 'B' to `INT32`.
 
-        4. `cast(input, target={'A': dtype.FLOAT32, dtype.FLOAT64: dtype.INT32})`
+        4. `cast(input, target={'A': dtype.FLOAT32,
+                dtype.FLOAT64: dtype.INT32})`
             Raises ValueError: don't mix dtype and feature name keys
 
     Args:

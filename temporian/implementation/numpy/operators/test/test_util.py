@@ -16,7 +16,6 @@ from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 from temporian.core.operators.base import Operator
 from temporian.core import serialize
-from absl import logging
 
 
 def assertEqualEventSet(self, real: EventSet, expected: EventSet):

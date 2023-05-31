@@ -14,8 +14,6 @@
 
 """Glue operator class and public API function definition."""
 
-from typing import Dict, List
-
 from temporian.core import operator_lib
 from temporian.core.data.node import Node
 from temporian.core.data.schema import Schema

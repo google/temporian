@@ -14,19 +14,11 @@
 
 from absl.testing import absltest
 
-import pandas as pd
-
-from temporian.core import evaluation
-from temporian.core.data.dtype import DType
-from temporian.core.data.node import Node
-from temporian.core.data.node import Feature
-from temporian.core.operators.leak import leak
 from temporian.core.operators.leak import LeakOperator
 from temporian.implementation.numpy.operators.leak import (
     LeakNumpyImplementation,
 )
 from temporian.implementation.numpy.data.io import (
-    pd_dataframe_to_event_set,
     event_set,
 )
 from temporian.implementation.numpy.operators.test.test_util import (
