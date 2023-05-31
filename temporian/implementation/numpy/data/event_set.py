@@ -129,15 +129,17 @@ def normalize_features(
     if feature_values.dtype.type == np.string_:
         feature_values = feature_values.astype(np.str_)
 
+    # TODO: This is slow. Speed-up.
     if feature_values.dtype.type == np.object_ and all(
         isinstance(x, str) or x is math.nan or x is np.nan
         for x in feature_values
     ):
         # This is a np.array of python string.
+        # TODO: This is slow. Speed-up.
         feature_values = np.array(
-            ["" if x is math.nan or x is np.nan else x for x in feature_values]
+            ["" if x is math.nan or x is np.nan else x for x in feature_values],
+            dtype=np.str_,
         )
-        feature_values = feature_values.astype(np.str_)
 
     if feature_values.dtype.type == np.datetime64:
         feature_values = feature_values.astype("datetime64[s]").astype(np.int64)
@@ -469,6 +471,7 @@ class EventSet:
             f"features: {self.schema.features}\n"
             "events:\n"
             f"{data_repr}\n"
+            f"memory usage: {string.pretty_num_bytes(self.memory_usage())}\n"
         )
 
     def __getitem__(self, index: Tuple) -> IndexData:
@@ -498,3 +501,13 @@ class EventSet:
         from temporian.implementation.numpy.data import plotter
 
         return plotter.plot(evsets=self, *args, **wargs)
+
+    def memory_usage(self) -> int:
+        """Gets the approximated memory usage of the event set in bytes."""
+
+        size = 0
+        for index_key, index_data in self.data.items():
+            size += index_key.__sizeof__() + index_data.timestamps.nbytes
+            for feature in index_data.features:
+                size += feature.nbytes
+        return size

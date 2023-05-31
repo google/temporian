@@ -37,7 +37,9 @@ class AddIndexNumpyImplementation(OperatorImplementation):
             # src_data.
             #
             # TODO: Do more efficiently. E.g. with numpy masks.
+
             new_index_to_value_idxs = defaultdict(list)
+            # TODO: This is slow. Speed-up.
             for event_idx, new_index in enumerate(
                 zip(*[src_data.features[f_idx] for f_idx in new_index_idxs])
             ):

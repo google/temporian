@@ -39,8 +39,15 @@ events:
         timestamps: [0.4 0.5]
         'a': [7 8]
         'b': [ 9 10]
+memory usage: 200 B
 """,
         )
+
+    def test_memory_usage(self):
+        memory_usage = self._evset.memory_usage()
+        print("memory_usage:", memory_usage)
+        self.assertLessEqual(memory_usage, 200 + 100)
+        self.assertGreaterEqual(memory_usage, 200 - 100)
 
 
 if __name__ == "__main__":
