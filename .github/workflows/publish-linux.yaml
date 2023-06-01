@@ -1,4 +1,4 @@
-name: publish
+name: publish-linux
 
 # TODO: change to either only run on release branch or on tags/releases
 on:
@@ -29,7 +29,7 @@ jobs:
           path: dist
 
   test-install-linux:
-    needs: [build]
+    needs: [build-linux]
     runs-on: ubuntu-latest
     strategy:
       matrix:

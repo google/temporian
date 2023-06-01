@@ -1,4 +1,4 @@
-name: publish
+name: publish-macos
 
 # TODO: change to either only run on release branch or on tags/releases
 on:
@@ -35,7 +35,7 @@ jobs:
           path: dist
 
   test-install-macos:
-    needs: [build]
+    needs: [build-macos]
     runs-on: macos-12
     strategy:
       matrix:
