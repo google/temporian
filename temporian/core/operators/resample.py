@@ -35,7 +35,7 @@ class Resample(Operator):
 
         self.add_output(
             "output",
-            Node.create_new_features_existing_sampling(
+            create_node_new_features_existing_sampling(
                 features=input.schema.features,
                 sampling_node=sampling,
                 creator=self,

@@ -64,7 +64,7 @@ class BaseWindowOperator(Operator, ABC):
 
         self.add_output(
             "output",
-            Node.create_new_features_existing_sampling(
+            create_node_new_features_existing_sampling(
                 features=feature_schemas,
                 sampling_node=effective_sampling_node,
                 creator=self,

@@ -25,6 +25,9 @@ from typing import Union, Optional
 import numpy as np
 
 # Unit for durations
+#
+# NormalizedDuration is used by internal code that handle duration.
+# Duration is a duration provided by the user though the API.
 NormalizedDuration = float
 Duration = Union[float, int]
 

@@ -47,7 +47,7 @@ class SinceLast(Operator):
 
         self.add_output(
             "output",
-            Node.create_new_features_existing_sampling(
+            create_node_new_features_existing_sampling(
                 features=[("since_last", DType.FLOAT64)],
                 sampling_node=effective_sampling_node,
                 creator=self,

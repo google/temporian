@@ -52,7 +52,7 @@ class RenameOperator(Operator):
         if index:
             self.add_output(
                 "output",
-                Node.create_new_features_new_sampling(
+                create_node_new_features_new_sampling(
                     features=new_feature_schemas,
                     indexes=new_indexes,
                     is_unix_timestamp=input.schema.is_unix_timestamp,
@@ -63,7 +63,7 @@ class RenameOperator(Operator):
         else:
             self.add_output(
                 "output",
-                Node.create_new_features_existing_sampling(
+                create_node_new_features_existing_sampling(
                     features=new_feature_schemas,
                     sampling_node=input,
                     creator=self,

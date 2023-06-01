@@ -60,7 +60,7 @@ class Propagate(Operator):
         # Note: The propagate operator creates a new sampling.
         self.add_output(
             "output",
-            Node.create_new_features_new_sampling(
+            create_node_new_features_new_sampling(
                 features=input.schema.features,
                 indexes=sampling.schema.indexes,
                 is_unix_timestamp=sampling.schema.is_unix_timestamp,

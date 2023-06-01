@@ -40,7 +40,7 @@ class BaseCalendarOperator(Operator, ABC):
 
         self.add_output(
             "output",
-            Node.create_new_features_existing_sampling(
+            create_node_new_features_existing_sampling(
                 features=[(self.output_feature_name, DType.INT32)],
                 sampling_node=sampling,
                 creator=self,

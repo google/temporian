@@ -29,7 +29,7 @@ class UniqueTimestamps(Operator):
 
         self.add_output(
             "output",
-            Node.create_new_features_new_sampling(
+            create_node_new_features_new_sampling(
                 features=[],
                 indexes=input.schema.indexes,
                 is_unix_timestamp=input.schema.is_unix_timestamp,

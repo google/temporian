@@ -44,7 +44,7 @@ class AddIndexOperator(Operator):
 
         self.add_output(
             "output",
-            Node.create_new_features_new_sampling(
+            create_node_new_features_new_sampling(
                 features=self._output_feature_schemas,
                 indexes=self._output_indexes,
                 is_unix_timestamp=input.schema.is_unix_timestamp,

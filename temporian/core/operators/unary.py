@@ -45,7 +45,7 @@ class BaseUnaryOperator(Operator):
 
         self.add_output(
             "output",
-            Node.create_new_features_existing_sampling(
+            create_node_new_features_existing_sampling(
                 features=[
                     (feature.name, self.get_output_dtype(feature.dtype))
                     for feature in input.schema.features
