@@ -36,7 +36,7 @@ jobs:
 
   test-install-macos:
     needs: [build-macos]
-    runs-on: macos-12
+    runs-on: macos-latest
     strategy:
       matrix:
         # python-version: ["3.8", "3.9", "3.10", "3.11"] TODO: revert
@@ -61,3 +61,26 @@ jobs:
 
       - name: Test installation
         run: python ./tools/check_install.py
+
+  publish-macos:
+    needs: [build-macos]
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Download builds for all Python versions
+        uses: actions/download-artifact@v3
+        with:
+          name: dist-macos-*
+          path: dist
+
+      - name: Publish to PyPI
+        # TODO: change to prod PyPI, and prod token in repo's secrets
+        run: |
+          poetry config repositories.test-pypi https://test.pypi.org/legacy/
+          poetry config pypi-token.test-pypi ${{ secrets.TEST_PYPI_TOKEN }}
+          poetry publish -r test-pypi -n
