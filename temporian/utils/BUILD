@@ -21,3 +21,9 @@ py_library(
     srcs = ["string.py"],
     srcs_version = "PY3",
 )
+
+py_library(
+    name = "config",
+    srcs = ["config.py"],
+    srcs_version = "PY3",
+)

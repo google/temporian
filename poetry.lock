@@ -84,7 +84,10 @@ python-versions = ">=3.7.2"
 [package.dependencies]
 lazy-object-proxy = ">=1.4.0"
 typing-extensions = {version = ">=4.0.0", markers = "python_version < \"3.11\""}
-wrapt = {version = ">=1.11,<2", markers = "python_version < \"3.11\""}
+wrapt = [
+    {version = ">=1.11,<2", markers = "python_version < \"3.11\""},
+    {version = ">=1.14,<2", markers = "python_version >= \"3.11\""},
+]
 
 [[package]]
 name = "asttokens"
@@ -133,6 +136,9 @@ description = "Internationalization utilities"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
+
+[package.dependencies]
+pytz = {version = ">=2015.7", markers = "python_version < \"3.9\""}
 
 [[package]]
 name = "backcall"
@@ -250,14 +256,6 @@ python-versions = ">=3.7"
 
 [package.dependencies]
 colorama = {version = "*", markers = "platform_system == \"Windows\""}
-
-[[package]]
-name = "cloudpickle"
-version = "2.2.1"
-description = "Extended pickling support for Python objects"
-category = "dev"
-optional = false
-python-versions = ">=3.6"
 
 [[package]]
 name = "colorama"
@@ -495,11 +493,11 @@ test = ["flaky", "ipyparallel", "pre-commit", "pytest (>=7.0)", "pytest-asyncio"
 
 [[package]]
 name = "ipython"
-version = "8.13.2"
+version = "8.12.2"
 description = "IPython: Productive Interactive Computing"
 category = "dev"
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.8"
 
 [package.dependencies]
 appnope = {version = "*", markers = "sys_platform == \"darwin\""}
@@ -615,8 +613,10 @@ python-versions = ">=3.7"
 attrs = ">=17.4.0"
 fqdn = {version = "*", optional = true, markers = "extra == \"format-nongpl\""}
 idna = {version = "*", optional = true, markers = "extra == \"format-nongpl\""}
+importlib-resources = {version = ">=1.4.0", markers = "python_version < \"3.9\""}
 isoduration = {version = "*", optional = true, markers = "extra == \"format-nongpl\""}
 jsonpointer = {version = ">1.13", optional = true, markers = "extra == \"format-nongpl\""}
+pkgutil-resolve-name = {version = ">=1.3.10", markers = "python_version < \"3.9\""}
 pyrsistent = ">=0.14.0,<0.17.0 || >0.17.0,<0.17.1 || >0.17.1,<0.17.2 || >0.17.2"
 rfc3339-validator = {version = "*", optional = true, markers = "extra == \"format-nongpl\""}
 rfc3986-validator = {version = ">0.1.0", optional = true, markers = "extra == \"format-nongpl\""}
@@ -756,6 +756,7 @@ python-versions = ">=3.8"
 [package.dependencies]
 async-lru = ">=1.0.0"
 importlib-metadata = {version = ">=4.8.3", markers = "python_version < \"3.10\""}
+importlib-resources = {version = ">=1.4", markers = "python_version < \"3.9\""}
 ipykernel = "*"
 jinja2 = ">=3.0.3"
 jupyter-core = "*"
@@ -1012,6 +1013,17 @@ Markdown = ">=3.3"
 mkdocs = ">=1.1"
 
 [[package]]
+name = "mkdocs-exclude-search"
+version = "0.6.5"
+description = "A mkdocs plugin that lets you exclude selected files or sections from the search index."
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+mkdocs = ">=1.0.4"
+
+[[package]]
 name = "mkdocs-gen-files"
 version = "0.4.0"
 description = "MkDocs plugin to programmatically generate documentation pages during the build"
@@ -1253,6 +1265,7 @@ python-versions = ">=3.8"
 numpy = [
     {version = ">=1.20.3", markers = "python_version < \"3.10\""},
     {version = ">=1.21.0", markers = "python_version >= \"3.10\""},
+    {version = ">=1.23.2", markers = "python_version >= \"3.11\""},
 ]
 python-dateutil = ">=2.8.1"
 pytz = ">=2020.1"
@@ -1318,6 +1331,14 @@ python-versions = ">=3.7"
 [package.extras]
 docs = ["furo", "olefile", "sphinx (>=2.4)", "sphinx-copybutton", "sphinx-inline-tabs", "sphinx-removed-in", "sphinxext-opengraph"]
 tests = ["check-manifest", "coverage", "defusedxml", "markdown2", "olefile", "packaging", "pyroma", "pytest", "pytest-cov", "pytest-timeout"]
+
+[[package]]
+name = "pkgutil-resolve-name"
+version = "1.3.10"
+description = "Resolve a name to an object."
+category = "dev"
+optional = false
+python-versions = ">=3.6"
 
 [[package]]
 name = "platformdirs"
@@ -1421,7 +1442,10 @@ python-versions = ">=3.7.2"
 [package.dependencies]
 astroid = ">=2.15.4,<=2.17.0-dev0"
 colorama = {version = ">=0.4.5", markers = "sys_platform == \"win32\""}
-dill = {version = ">=0.2", markers = "python_version < \"3.11\""}
+dill = [
+    {version = ">=0.2", markers = "python_version < \"3.11\""},
+    {version = ">=0.3.6", markers = "python_version >= \"3.11\""},
+]
 isort = ">=4.2.5,<6"
 mccabe = ">=0.6,<0.8"
 platformdirs = ">=2.2.0"
@@ -1444,14 +1468,6 @@ python-versions = ">=3.7"
 [package.dependencies]
 markdown = ">=3.2"
 pyyaml = "*"
-
-[[package]]
-name = "pynvml"
-version = "11.4.1"
-description = "Python Bindings for the NVIDIA Management Library"
-category = "dev"
-optional = false
-python-versions = ">=3.6"
 
 [[package]]
 name = "pyparsing"
@@ -1589,37 +1605,6 @@ description = "Pure python rfc3986 validator"
 category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-
-[[package]]
-name = "rich"
-version = "13.3.5"
-description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
-category = "dev"
-optional = false
-python-versions = ">=3.7.0"
-
-[package.dependencies]
-markdown-it-py = ">=2.2.0,<3.0.0"
-pygments = ">=2.13.0,<3.0.0"
-
-[package.extras]
-jupyter = ["ipywidgets (>=7.5.1,<9)"]
-
-[[package]]
-name = "scalene"
-version = "1.5.21.2"
-description = "Scalene: A high-resolution, low-overhead CPU, GPU, and memory profiler for Python"
-category = "dev"
-optional = false
-python-versions = ">=3.8,!=3.11.0"
-
-[package.dependencies]
-cloudpickle = ">=1.5.0"
-Jinja2 = ">=3.0.3"
-psutil = ">=5.9.2"
-pynvml = ">=11.0.0,<11.5"
-rich = ">=10.7.0"
-wheel = ">=0.36.1"
 
 [[package]]
 name = "send2trash"
@@ -1867,17 +1852,6 @@ optional = ["python-socks", "wsaccel"]
 test = ["websockets"]
 
 [[package]]
-name = "wheel"
-version = "0.40.0"
-description = "A built-package format for Python"
-category = "dev"
-optional = false
-python-versions = ">=3.7"
-
-[package.extras]
-test = ["pytest (>=6.0.0)"]
-
-[[package]]
 name = "wrapt"
 version = "1.15.0"
 description = "Module for decorators, wrappers and monkey patching."
@@ -1907,8 +1881,8 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.9,<3.11"
-content-hash = "1f8478c930c2a23730409549917e6009e4f00ac00e897ec309e37332cf995970"
+python-versions = "^3.8,<3.12"
+content-hash = "8cb1616d41169d9b505e51aadcd4b4a54fef2eebaf7c3ffa9330e1d634eb3e89"
 
 [metadata.files]
 absl-py = [
@@ -2155,10 +2129,6 @@ click = [
     {file = "click-8.1.3-py3-none-any.whl", hash = "sha256:bb4d8133cb15a609f44e8213d9b391b0809795062913b383c62be0ee95b1db48"},
     {file = "click-8.1.3.tar.gz", hash = "sha256:7682dc8afb30297001674575ea00d1814d808d6a36af415a82bd481d37ba7b8e"},
 ]
-cloudpickle = [
-    {file = "cloudpickle-2.2.1-py3-none-any.whl", hash = "sha256:61f594d1f4c295fa5cd9014ceb3a1fc4a70b0de1164b94fbc2d854ccba056f9f"},
-    {file = "cloudpickle-2.2.1.tar.gz", hash = "sha256:d89684b8de9e34a2a43b3460fbca07d09d6e25ce858df4d5a44240403b6178f5"},
-]
 colorama = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
@@ -2301,8 +2271,8 @@ ipykernel = [
     {file = "ipykernel-6.23.1.tar.gz", hash = "sha256:1aba0ae8453e15e9bc6b24e497ef6840114afcdb832ae597f32137fa19d42a6f"},
 ]
 ipython = [
-    {file = "ipython-8.13.2-py3-none-any.whl", hash = "sha256:ffca270240fbd21b06b2974e14a86494d6d29290184e788275f55e0b55914926"},
-    {file = "ipython-8.13.2.tar.gz", hash = "sha256:7dff3fad32b97f6488e02f87b970f309d082f758d7b7fc252e3b19ee0e432dbb"},
+    {file = "ipython-8.12.2-py3-none-any.whl", hash = "sha256:ea8801f15dfe4ffb76dea1b09b847430ffd70d827b41735c64a0638a04103bfc"},
+    {file = "ipython-8.12.2.tar.gz", hash = "sha256:c7b80eb7f5a855a88efc971fda506ff7a91c280b42cdae26643e0f601ea281ea"},
 ]
 isoduration = [
     {file = "isoduration-20.11.0-py3-none-any.whl", hash = "sha256:b2904c2a4228c3d44f409c8ae8e2370eb21a26f7ac2ec5446df141dde3452042"},
@@ -2619,6 +2589,10 @@ mkdocs-autorefs = [
     {file = "mkdocs-autorefs-0.4.1.tar.gz", hash = "sha256:70748a7bd025f9ecd6d6feeba8ba63f8e891a1af55f48e366d6d6e78493aba84"},
     {file = "mkdocs_autorefs-0.4.1-py3-none-any.whl", hash = "sha256:a2248a9501b29dc0cc8ba4c09f4f47ff121945f6ce33d760f145d6f89d313f5b"},
 ]
+mkdocs-exclude-search = [
+    {file = "mkdocs-exclude-search-0.6.5.tar.gz", hash = "sha256:6a126367653caf946c56e446ff30ffdec931438a3e2a8740feff3f8682d52a54"},
+    {file = "mkdocs_exclude_search-0.6.5-py3-none-any.whl", hash = "sha256:475e372dd17195700acd00213bcc804280d63f39cb7a0c76a801aceefd2807a6"},
+]
 mkdocs-gen-files = [
     {file = "mkdocs-gen-files-0.4.0.tar.gz", hash = "sha256:377bff8ee8e93515916689f483d971643f83a94eed7e92318854da8f344f0163"},
     {file = "mkdocs_gen_files-0.4.0-py3-none-any.whl", hash = "sha256:3241a4c947ecd11763ca77cc645015305bf71a0e1b9b886801c114fcf9971e71"},
@@ -2826,6 +2800,10 @@ pillow = [
     {file = "Pillow-9.5.0-pp39-pypy39_pp73-win_amd64.whl", hash = "sha256:1e7723bd90ef94eda669a3c2c19d549874dd5badaeefabefd26053304abe5799"},
     {file = "Pillow-9.5.0.tar.gz", hash = "sha256:bf548479d336726d7a0eceb6e767e179fbde37833ae42794602631a070d630f1"},
 ]
+pkgutil-resolve-name = [
+    {file = "pkgutil_resolve_name-1.3.10-py3-none-any.whl", hash = "sha256:ca27cc078d25c5ad71a9de0a7a330146c4e014c2462d9af19c6b828280649c5e"},
+    {file = "pkgutil_resolve_name-1.3.10.tar.gz", hash = "sha256:357d6c9e6a755653cfd78893817c0853af365dd51ec97f3d358a819373bbd174"},
+]
 platformdirs = [
     {file = "platformdirs-3.5.1-py3-none-any.whl", hash = "sha256:e2378146f1964972c03c085bb5662ae80b2b8c06226c54b2ff4aa9483e8a13a5"},
     {file = "platformdirs-3.5.1.tar.gz", hash = "sha256:412dae91f52a6f84830f39a8078cecd0e866cb72294a5c66808e74d5e88d251f"},
@@ -2892,10 +2870,6 @@ pylint = [
 pymdown-extensions = [
     {file = "pymdown_extensions-10.0.1-py3-none-any.whl", hash = "sha256:ae66d84013c5d027ce055693e09a4628b67e9dec5bce05727e45b0918e36f274"},
     {file = "pymdown_extensions-10.0.1.tar.gz", hash = "sha256:b44e1093a43b8a975eae17b03c3a77aad4681b3b56fce60ce746dbef1944c8cb"},
-]
-pynvml = [
-    {file = "pynvml-11.4.1-py3-none-any.whl", hash = "sha256:d27be542cd9d06558de18e2deffc8022ccd7355bc7382255d477038e7e424c6c"},
-    {file = "pynvml-11.4.1.tar.gz", hash = "sha256:b2e4a33b80569d093b513f5804db0c7f40cfc86f15a013ae7a8e99c5e175d5dd"},
 ]
 pyparsing = [
     {file = "pyparsing-3.0.9-py3-none-any.whl", hash = "sha256:5026bae9a10eeaefb61dab2f09052b9f4307d44aee4eda64b309723d8d206bbc"},
@@ -3193,27 +3167,6 @@ rfc3986-validator = [
     {file = "rfc3986_validator-0.1.1-py2.py3-none-any.whl", hash = "sha256:2f235c432ef459970b4306369336b9d5dbdda31b510ca1e327636e01f528bfa9"},
     {file = "rfc3986_validator-0.1.1.tar.gz", hash = "sha256:3d44bde7921b3b9ec3ae4e3adca370438eccebc676456449b145d533b240d055"},
 ]
-rich = [
-    {file = "rich-13.3.5-py3-none-any.whl", hash = "sha256:69cdf53799e63f38b95b9bf9c875f8c90e78dd62b2f00c13a911c7a3b9fa4704"},
-    {file = "rich-13.3.5.tar.gz", hash = "sha256:2d11b9b8dd03868f09b4fffadc84a6a8cda574e40dc90821bd845720ebb8e89c"},
-]
-scalene = [
-    {file = "scalene-1.5.21.2-cp310-cp310-macosx_11_7_universal2.whl", hash = "sha256:390bbfaeee85c857491208c6b0c6ba0c1a5e22fbe48c01ecc02b54d7537e1570"},
-    {file = "scalene-1.5.21.2-cp310-cp310-manylinux_2_24_x86_64.whl", hash = "sha256:4ec3761e95dd044ccfb9765c5ef82520ba3e3f98fa1b03d9c0615133fb8d3330"},
-    {file = "scalene-1.5.21.2-cp310-cp310-win_amd64.whl", hash = "sha256:63f605c50748abd569c309894c4df1140e7110bba19c5f0c2fea9ba63dc1310c"},
-    {file = "scalene-1.5.21.2-cp311-cp311-macosx_10_9_universal2.whl", hash = "sha256:c2f8d2aa936532d4440252a54644bd9983fa3ad5af04321426897fb6624b376c"},
-    {file = "scalene-1.5.21.2-cp311-cp311-manylinux_2_24_x86_64.whl", hash = "sha256:17efceb7354537c03596bf3b915cf16a664eb795e2174ea32caf754d529a4e44"},
-    {file = "scalene-1.5.21.2-cp311-cp311-win_amd64.whl", hash = "sha256:06e760349ba34480d05a9ed011857cb6c6a62045649885ba65eae3a5a5481cb3"},
-    {file = "scalene-1.5.21.2-cp37-cp37m-macosx_10_15_universal2.whl", hash = "sha256:1d53b9ceb13a8f307a9a3037a09e837b4a096c111cf5d34aba20295d4874fdba"},
-    {file = "scalene-1.5.21.2-cp37-cp37m-manylinux_2_24_x86_64.whl", hash = "sha256:304e190d8e63c8edb89da090d42194f966bb91ed246dcf746b24236bae31c6cd"},
-    {file = "scalene-1.5.21.2-cp38-cp38-macosx_10_15_universal2.whl", hash = "sha256:b8c1816aed21c70171d20fd9d617e41c030ee333712e870e092f2da7dc3cd002"},
-    {file = "scalene-1.5.21.2-cp38-cp38-manylinux_2_24_x86_64.whl", hash = "sha256:41afd36effe8fa62052abe602348facfcb8945d1730cdc1caa1d56b3c2e6f71e"},
-    {file = "scalene-1.5.21.2-cp38-cp38-win_amd64.whl", hash = "sha256:312f9d08c3e6bcb086b8363245c932b09f4f27c3a0501e51bdfbcfc22683e5fb"},
-    {file = "scalene-1.5.21.2-cp39-cp39-macosx_11_7_universal2.whl", hash = "sha256:78687e1081b5ed385a9f0d84c5a1528c7e7ef768a7f214145e2917694ce05f7f"},
-    {file = "scalene-1.5.21.2-cp39-cp39-manylinux_2_24_x86_64.whl", hash = "sha256:f9eda1727e5d211ecbe15a53881af3393609a3c606419e32920951b568ffcb46"},
-    {file = "scalene-1.5.21.2-cp39-cp39-win_amd64.whl", hash = "sha256:db81038fc22fbd9376985a7ae5544983c1c91317799ee93bcc28573396b52390"},
-    {file = "scalene-1.5.21.2.tar.gz", hash = "sha256:1580d74fe45545b36bd805ea1508c475ea794abe05bf590e2e59506da8c0d03e"},
-]
 send2trash = [
     {file = "Send2Trash-1.8.2-py3-none-any.whl", hash = "sha256:a384719d99c07ce1eefd6905d2decb6f8b7ed054025bb0e618919f945de4f679"},
     {file = "Send2Trash-1.8.2.tar.gz", hash = "sha256:c132d59fa44b9ca2b1699af5c86f57ce9f4c5eb56629d5d55fbb7a35f84e2312"},
@@ -3335,10 +3288,6 @@ webencodings = [
 websocket-client = [
     {file = "websocket-client-1.5.1.tar.gz", hash = "sha256:3f09e6d8230892547132177f575a4e3e73cfdf06526e20cc02aa1c3b47184d40"},
     {file = "websocket_client-1.5.1-py3-none-any.whl", hash = "sha256:cdf5877568b7e83aa7cf2244ab56a3213de587bbe0ce9d8b9600fc77b455d89e"},
-]
-wheel = [
-    {file = "wheel-0.40.0-py3-none-any.whl", hash = "sha256:d236b20e7cb522daf2390fa84c55eea81c5c30190f90f29ae2ca1ad8355bf247"},
-    {file = "wheel-0.40.0.tar.gz", hash = "sha256:cd1196f3faee2b31968d626e1731c94f99cbdb67cf5a46e4f5656cbee7738873"},
 ]
 wrapt = [
     {file = "wrapt-1.15.0-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:ca1cccf838cd28d5a0883b342474c630ac48cac5df0ee6eacc9c7290f76b11c1"},

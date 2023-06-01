@@ -45,8 +45,8 @@ py_library(
 )
 
 py_library(
-    name = "serialize",
-    srcs = ["serialize.py"],
+    name = "serialization",
+    srcs = ["serialization.py"],
     srcs_version = "PY3",
     deps = [
         ":operator_lib",

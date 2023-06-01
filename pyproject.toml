@@ -2,14 +2,12 @@
 name = "temporian"
 version = "0.1.0"
 description = "Temporian is a library to pre-process temporal signals before their use as input features with off-the-shelf tabular machine learning libraries (e.g., TensorFlow Decision Forests)."
-authors = [
-    "Google Inc."
-]
+authors = ["Google Inc."]
 maintainers = [
     "Mathieu Guillame-Bert <gbm@google.com>",
     "Guillermo Etchebarne <getchebarne@tryolabs.com>",
     "Ian Spektor <ispektor@tryolabs.com>",
-    "Richard Stotz <richardstotz@google.com>"
+    "Richard Stotz <richardstotz@google.com>",
 ]
 repository = "https://github.com/google/temporian"
 classifiers = [
@@ -50,7 +48,7 @@ isort = "^5.12.0"
 toml = "^0.10.2"
 pylint = "^2.15.10"
 memory-profiler = "^0.61.0"
-scalene = "^1.5.20"
+# scalene = "^1.5.20" # Scalene doesn't support Python 3.11 yet
 mkdocs = "^1.4.2"
 mkdocstrings = { extras = ["python"], version = "^0.20.0" }
 mkdocs-material = "^9.1.5"
@@ -62,6 +60,7 @@ bokeh = "^3.1.0"
 ipykernel = "^6.22.0"
 griffe = "0.26.0"
 jupyterlab = "^4.0.0"
+mkdocs-exclude-search = "^0.6.5"
 
 [tool.black]
 line-length = 80
