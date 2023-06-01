@@ -35,17 +35,19 @@ operator_lib.register_operator(CalendarMinuteOperator)
 
 
 def calendar_minute(sampling: Node) -> Node:
-    """Obtaisn the minute the timestamps in a node's sampling are in.
+    """Obtain the minute the timestamps in a node's sampling are in.
 
-    Features in input node are ignored. Output feature contains numbers between
+    Features in the input node are ignored, only the timestamps in
+    `Node.sampling` are used and they must be unix timestamps
+    (check  `Node.sampling.is_unix_timestamp`).
+
+    Output feature contains numbers between
     0 and 59.
 
     Args:
         sampling: Node to get the minutes from.
 
     Returns:
-        Node with a single feature corresponding to the minute each timestamp
-        in `sampling`'s sampling belongs to, with the same sampling as
-        `sampling`.
+        Single feature with the minute each timestamp in `sampling` belongs to.
     """
     return CalendarMinuteOperator(sampling).outputs["output"]

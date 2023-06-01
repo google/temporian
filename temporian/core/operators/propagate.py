@@ -110,9 +110,9 @@ def propagate(
     """Propagates feature values over a larger index.
 
     Given `input` and `sampling` where `input` contains a super index of
-    `sampling` (e.g., the index of `input` is `["x"]`, and the index of sampling
-    is `["x","y"]`), duplicates the features of `input` over the index of
-    `sampling`.
+    `sampling` (e.g., the index of `input` is `["x"]`, and the index of
+    `sampling` is `["x","y"]`), duplicates the features of `input` over the
+    index of `sampling`.
 
     Example:
 

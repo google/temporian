@@ -37,15 +37,16 @@ operator_lib.register_operator(CalendarDayOfWeekOperator)
 def calendar_day_of_week(sampling: Node) -> Node:
     """Obtains the day of the week the timestamps in a node's sampling are in.
 
-    Features in input node are ignored. Output feature contains numbers from 0
-    (Monday) to 6 (Sunday).
+    Features in the input node are ignored, only the timestamps in
+    `Node.sampling` are used and they must be unix timestamps
+    (check  `Node.sampling.is_unix_timestamp`).
+
+    Output feature contains numbers from 0 (Monday) to 6 (Sunday).
 
     Args:
         sampling: Node to get the days of week from.
 
     Returns:
-        Node with a single feature corresponding to the day of the week each
-        timestamp in `sampling`'s sampling belongs to, with the same sampling as
-        `sampling`.
+        Single feature with the day each timestamp in `sampling` belongs to.
     """
     return CalendarDayOfWeekOperator(sampling).outputs["output"]

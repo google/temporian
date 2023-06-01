@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Dict, Tuple
 
 from temporian.core.data.node import Node
+from temporian.utils import config
 from temporian.core.operators.base import Operator
 from temporian.core.operators.base import OperatorExceptionDecorator
 from temporian.implementation.numpy.data.event_set import DTYPE_MAPPING
@@ -152,11 +153,7 @@ def _check_same_sampling(
     evset_1: EventSet, evset_2: EventSet
 ) -> Tuple[bool, str]:
     # number of index keys to check in default mode
-    num_check = (
-        1000
-        if os.environ.get("TEMPORIAN_DEBUG_MODE", False) is True
-        else len(evset_1.data)
-    )
+    num_check = 1000 if config.DEBUG_MODE else len(evset_1.data)
     # compare index names
     if evset_1.index_names != evset_2.index_names:
         return (False, "Different index names")

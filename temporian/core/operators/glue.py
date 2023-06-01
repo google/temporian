@@ -55,7 +55,7 @@ class GlueOperator(Operator):
                 if f.name in feature_names:
                     raise ValueError(
                         f'Feature "{f.name}" is defined in multiple input'
-                        " nodes."
+                        " nodes to glue. Consider using prefix() or rename()."
                     )
                 feature_names.add(f.name)
 

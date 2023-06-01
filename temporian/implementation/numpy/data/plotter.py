@@ -85,6 +85,7 @@ def plot(
         max_num_plots: Maximum number of plots to display. If more plots are
             available, only plot the first `max_num_plots` ones and print a
             warning.
+        style: A `Style` or equivalent string like: `line`, `marker` or `vline`.
         return_fig: If true, returns the figure object. The figure object
             depends on the backend.
         interactive: If true, creates an interactive plotting. interactive=True

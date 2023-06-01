@@ -11,6 +11,9 @@ import mkdocs_gen_files
 with open("README.md", "r", encoding="utf-8") as f:
     content = f.read()
 
+# fix `docs/src/` links
+content = re.sub(r"docs\/src\/([\w\/-]+)\.py", r"./\1", content)
+
 # remove "docs" from gifs and images
 content = re.sub(r"\]\(/?docs/", r"](", content)
 
@@ -22,6 +25,10 @@ content = re.sub(r"src=\"/?docs/", 'src="', content)
 content = re.sub(
     r"temporian\/([\w\/-]+)\.py", r"reference/temporian/\1", content
 )
+
+# Remove entire "## Documentation" and "## Contributing" sections
+content = re.sub(r"## Documentation.*## ", "## ", content, flags=re.DOTALL)
+content = re.sub(r"## Contributing.*## ", "## ", content, flags=re.DOTALL)
 
 # write the index
 with mkdocs_gen_files.open("index.md", "w") as fd:  #

@@ -6,5 +6,6 @@ mkdocs-gen-files==0.4.0
 mkdocs-literate-nav==0.6.0
 mkdocs-section-index==0.3.5
 mkdocs-jupyter===0.24.1
+mkdocs-exclude-search===0.6.5
 black==22.12.0
 griffe==0.26.0

@@ -133,15 +133,15 @@ class CastNumpyImplementationTest(absltest.TestCase):
         )
 
         self.sampling = Sampling(
-            [("store_id", DType.INT32), ("product_id", DType.INT64)],
+            [("store_id", int), ("product_id", int)],
             is_unix_timestamp=False,
         )
         self.input_node = Node(
             [
-                Feature("float_64", DType.FLOAT64),
-                Feature("int_64", DType.INT64),
-                Feature("str", DType.STRING),
-                Feature("boolean", DType.BOOLEAN),
+                ("float_64", float),  # tp.float64
+                ("int_64", int),  # tp.int64
+                ("str", str),
+                ("boolean", bool),
             ],
             sampling=self.sampling,
             creator=None,
@@ -289,6 +289,46 @@ class CastNumpyImplementationTest(absltest.TestCase):
 
         # This shouldn't raise error
         _ = cast_implementation.call(input=self.input_evset)
+
+    def test_cast_by_feature_python_types(self) -> None:
+        """Test correct casting by feat. names and using some python types"""
+
+        operator = CastOperator(
+            input=self.input_node,
+            from_features={
+                "float_64": DType.FLOAT32,
+                "int_64": DType.INT32,
+                "str": float,
+                "boolean": int,
+            },
+            check_overflow=False,
+        )
+
+        cast_implementation = CastNumpyImplementation(operator)
+
+        operator_output = cast_implementation.call(input=self.input_evset)
+
+        self.assertTrue(self.expected_evset_1 == operator_output["output"])
+
+    def test_cast_by_dtype_python_types(self) -> None:
+        """Test correct casting by origin DType, without overflow check."""
+
+        operator = CastOperator(
+            input=self.input_node,
+            from_dtypes={
+                float: DType.FLOAT32,
+                int: DType.INT32,
+                str: DType.FLOAT64,
+                bool: DType.INT64,
+            },
+            check_overflow=False,
+        )
+
+        cast_implementation = CastNumpyImplementation(operator)
+
+        operator_output = cast_implementation.call(input=self.input_evset)
+
+        self.assertTrue(self.expected_evset_1 == operator_output["output"])
 
 
 if __name__ == "__main__":

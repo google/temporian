@@ -34,22 +34,43 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
 
   TAccumulator accumulator;
 
-  // Index of the first value in the RW.
+  // Index of the first value in the window.
   size_t begin_idx = 0;
+  // Index of the first value outside the window.
+  size_t end_idx = 0;
 
-  for (size_t sampling_idx = 0; sampling_idx < n_event; sampling_idx++) {
-
-    accumulator.Add(v_values[sampling_idx]);
-
+  while (end_idx < n_event) {
     // Note: We accumulate values in (t-window_length, t] with t=
-    // v_timestamps[sampling_idx].
-    const auto left_limit = v_timestamps[sampling_idx] - window_length;
+    // v_timestamps[end_idx], and there may be several contiguous equal
+    // values in v_timestamps.
+
+    // Add all values with same timestamp as the current one.
+    accumulator.Add(v_values[end_idx]);
+    const auto current_ts = v_timestamps[end_idx];
+    size_t first_diff_ts_idx = end_idx + 1;
+    while (
+      first_diff_ts_idx < n_event &&
+      v_timestamps[first_diff_ts_idx] == current_ts
+    ) {
+      accumulator.Add(v_values[first_diff_ts_idx]);
+      first_diff_ts_idx++;
+    }
+
+    // Remove all values that no longer belong to the window.
+    const auto left_limit = v_timestamps[end_idx] - window_length;
     while (begin_idx < n_event && v_timestamps[begin_idx] <= left_limit) {
       accumulator.Remove(v_values[begin_idx]);
       begin_idx++;
     }
 
-    v_output[sampling_idx] = accumulator.Result();
+    // Set current value of window to all values with the same timestamp.
+    const auto result = accumulator.Result();
+    for (size_t i = end_idx; i < first_diff_ts_idx; i++) {
+      v_output[i] = result;
+    }
+
+    // Move pointer to the index of the last value with the same timestamp.
+    end_idx = first_diff_ts_idx;
   }
 
   return output;

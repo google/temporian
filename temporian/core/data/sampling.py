@@ -26,10 +26,15 @@ from typing import (
     Union,
 )
 
-from temporian.core.data.dtype import DType
+from temporian.core.data.dtype import DType, py_types_to_dtypes
 
 if TYPE_CHECKING:
     from temporian.core.operators.base import Operator
+
+
+class IndexLevel(NamedTuple):
+    name: str
+    dtype: IndexDType
 
 
 class IndexDType(Enum):
@@ -38,15 +43,13 @@ class IndexDType(Enum):
     STRING = DType.STRING.value
 
 
-class IndexLevel(NamedTuple):
-    name: str
-    dtype: IndexDType
+IndexType = Union[IndexDType, int, str]
 
 
 class Index:
     def __init__(
         self,
-        levels: Union[Tuple[str, IndexDType], List[Tuple[str, IndexDType]]],
+        levels: Union[Tuple[str, IndexType], List[Tuple[str, IndexType]]],
     ) -> None:
         # TODO: Check for correct DType.
         if isinstance(levels, Tuple):
@@ -61,6 +64,7 @@ class Index:
                     f" Got {type(name)}."
                 )
             # type check dtype
+            dtype = py_types_to_dtypes(dtype)
             if all(
                 dtype.value != index_dtype.value for index_dtype in IndexDType
             ):
@@ -120,10 +124,8 @@ class Sampling(object):
     def __init__(
         self,
         index_levels: Union[
-            Tuple[str, IndexDType],
-            List[Tuple[str, IndexDType]],
-            Tuple[str, DType],
-            List[Tuple[str, DType]],
+            Tuple[str, AnyDType],
+            List[Tuple[str, AnyDType]],
             Index,
         ],
         is_unix_timestamp: bool,

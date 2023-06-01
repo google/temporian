@@ -17,25 +17,33 @@
 from typing import Union, Mapping, Optional
 from temporian.core.data.feature import Feature
 
-from temporian.core.data.dtype import DType
+from temporian.core.data.dtype import DType, py_types_to_dtypes
 from temporian.core import operator_lib
 from temporian.core.data.node import Node
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
+dtype = Union[DType, type]
+
+
 class CastOperator(Operator):
     def __init__(
         self,
         input: Node,
-        to_dtype: Optional[DType] = None,
-        from_dtypes: Optional[Mapping[DType, DType]] = None,
+        to_dtype: Optional[dtype] = None,
+        from_dtypes: Optional[Mapping[dtype, dtype]] = None,
         from_features: Union[
-            Mapping[str, DType], Mapping[str, str], None
+            Mapping[str, dtype], Mapping[str, str], None
         ] = None,
         check_overflow: bool = True,
     ):
         super().__init__()
+
+        # Convert to DTypes any python types found
+        to_dtype = py_types_to_dtypes(to_dtype)
+        from_dtypes = py_types_to_dtypes(from_dtypes)
+        from_features = py_types_to_dtypes(from_features)
 
         # Check that provided arguments are coherent
         self._check_args(input, to_dtype, from_dtypes, from_features)
@@ -196,30 +204,32 @@ operator_lib.register_operator(CastOperator)
 
 def cast(
     input: Node,
-    target: Union[DType, Union[Mapping[str, DType], Mapping[DType, DType]]],
+    target: Union[dtype, Union[Mapping[str, dtype], Mapping[dtype, dtype]]],
     check_overflow: bool = True,
 ) -> Node:
     """Casts the dtype of features to the dtype(s) specified in `target`.
 
+    Python types are also accepted, with numeric types mapped to 64-bit DTypes.
+
     Feature names are preserved, and reused (not copied) if not changed.
 
     Examples:
-        Given an input `Node` with features 'A' (`INT64`), 'B'
-        (`INT64`), 'C' (`FLOAT64`) and 'D' (`STRING`):
+        Given an input `Node` with features 'A' (`int64`), 'B'
+        (`int64`), 'C' (`float64`) and 'D' (`str_`):
 
-        1. `cast(input, target=dtype.INT32)`
-           Try to convert all features to `INT32`, or raise `ValueError` if some
+        1. `cast(input, target=tp.int32)`
+           Try to convert all features to `int32`, or raise `ValueError` if some
            string value in 'D' is invalid, or any column value is out of range
-           for `INT32`.
+           for `int32`.
 
-        2. `cast(input, target={dtype.INT64: dtype.INT32, dtype.STRING: dtype.FLOAT32})`
-            Convert features 'A' and 'B' to `INT32`, 'D' to `FLOAT32`, leave 'C'
-            unchanged.
+        2. `cast(input, target={int: tp.int32, tp.str_: tp.float32})`
+            Convert features 'A' and 'B' to `int32` (note that `int=tp.int64`),
+            'D' to `float32`, leave 'C' unchanged.
 
-        3. `cast(input, target={'A': dtype.FLOAT32, 'B': dtype.INT32})`
-            Convert 'A' to `FLOAT32` and 'B' to `INT32`.
+        3. `cast(input, target={'A': tp.float32, 'B': tp.int32})`
+            Convert 'A' to `float32` and 'B' to `int32`.
 
-        4. `cast(input, target={'A': dtype.FLOAT32, dtype.FLOAT64: dtype.INT32})`
+        4. `cast(input, target={'A': tp.float32, tp.float64: tp.int32})`
             Raises ValueError: don't mix dtype and feature name keys
 
     Args:
@@ -227,10 +237,9 @@ def cast(
         target: Single dtype or a map. Providing a single dtype will cast all
             columns to it. The mapping keys can be either feature names or the
             original dtypes (and not both types mixed), and the values are the
-            target dtypes for them. All dtypes must be temporian types (see
-            `dtype.py`).
+            target dtypes for them.
         check_overflow: Flag to check overflow when casting to a dtype with a
-            shorter range (e.g: `INT64`->`INT32`). Note that this check adds
+            shorter range (e.g: `int64`->`int32`). Note that this check adds
             some computation overhead. Defaults to `True`.
 
     Returns:
@@ -256,7 +265,7 @@ def cast(
     if isinstance(target, Mapping):
         if all(key in input.feature_names for key in target):
             from_features = target
-        elif all(isinstance(key, DType) for key in target):
+        elif all(isinstance(key, (DType, type)) for key in target):
             from_dtypes = target
         else:
             raise ValueError(
