@@ -24,8 +24,7 @@ function temporian::setup_environment() {
     echo "PYTHON_BIN_PATH=${PYTHON_BIN_PATH}"
     export WHEEL_BIN="${PYTHON_DIR}"/bin/wheel
     ${PIP_BIN} install --upgrade pip
-    ${PIP_BIN} install poetry
-    pip3 install auditwheel==5.2.0
+    ${PIP_BIN} install poetry auditwheel==5.2.0
 }
 
 function temporian::build_wheel() {

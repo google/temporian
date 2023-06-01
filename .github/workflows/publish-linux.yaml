@@ -54,5 +54,5 @@ jobs:
           name=${version//./}
           pip install ./dist/temporian-0.1.0-cp$name-cp$name-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
 
-      - name: Test import
+      - name: Test import # TODO: use check_install.py
         run: python -c "import temporian"
