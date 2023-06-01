@@ -54,13 +54,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: dist-macos-${{ matrix.python-version }}
-          path: ./dist
+          path: dist
 
       - name: Install from wheel
-        run: |
-          version="${{ matrix.python-version }}"
-          name=${version//./}
-          pip install ./dist/temporian-0.1.0-cp$name-cp$name-macosx_12_0_x86_64.whl
+        run: pip install dist/*.whl
 
-      - name: Test import # TODO: use check_install.py
+      - name: Test installation
         run: python ./tools/check_install.py

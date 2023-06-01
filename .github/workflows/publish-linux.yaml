@@ -49,13 +49,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: dists-linux
-          path: ./dist
+          path: dist
 
       - name: Install from wheel
         run: |
           version="${{ matrix.python-version }}"
           name=${version//./}
-          pip install ./dist/temporian-0.1.0-cp$name-cp$name-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+          pip install dist/temporian-0.1.0-cp$name-cp$name-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
 
-      - name: Test import # TODO: use check_install.py
-        run: python ./tools/check_install.py
+      - name: Test installation
+        run: python tools/check_install.py
