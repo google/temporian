@@ -255,29 +255,25 @@ class {capitalized_op}OperatorTest(absltest.TestCase):
         pass
 
     def test_base(self):
-        evset = pd_dataframe_to_event_set(
-            pd.DataFrame(
-                {{
-                    "timestamp": [1, 2,3,4],
+        evset = event_set(
+            timestamps=[1,2,3,4],
+            features={{
                     "a": [1.0, 2.0, 3.0, 4.0],
-                    "b": [5,6,7,8],
+                    "b": [5, 6, 7, 8],
                     "c": ["A", "A", "B", "B"],
-                }}
-            ),
-            index_names=["c"],
+            }},
+            index_features=["c"],
         )
         node = evset.node()
 
-        expected_output = pd_dataframe_to_event_set(
-            pd.DataFrame(
-                {{
-                    "timestamp": [1, 2,3,4],
+        expected_output = event_set(
+            timestamps=[1,2,3,4],
+            features={{
                     "a": [1.0, 2.0, 3.0, 4.0],
-                    "b": [5,6,7,8],
+                    "b": [5, 6, 7, 8],
                     "c": ["A", "A", "B", "B"],
-                }}
-            ),
-            index_names=["c"],
+            }},
+            index_features=["c"],
         )
 
         # Run op

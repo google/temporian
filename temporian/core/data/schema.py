@@ -16,13 +16,10 @@
 
 from __future__ import annotations
 
-from typing import List, Tuple, TYPE_CHECKING, Dict, Union
+from typing import List, Tuple, Dict, Union
 
 from dataclasses import dataclass
 from temporian.core.data.dtype import DType, IndexDType
-
-if TYPE_CHECKING:
-    from temporian.core.operators.base import Operator
 
 
 @dataclass
@@ -61,20 +58,8 @@ class Schema:
         indexes: Union[List[IndexSchema], List[Tuple[str, IndexDType]]],
         is_unix_timestamp: bool,
     ):
-        def normalize_feature(x):
-            if isinstance(x, FeatureSchema):
-                return x
-            assert len(x) == 2
-            return FeatureSchema(x[0], x[1])
-
-        def normalize_index(x):
-            if isinstance(x, IndexSchema):
-                return x
-            assert len(x) == 2
-            return IndexSchema(x[0], x[1])
-
-        self._features = list(map(normalize_feature, features))
-        self._indexes = list(map(normalize_index, indexes))
+        self._features = list(map(_normalize_feature, features))
+        self._indexes = list(map(_normalize_index, indexes))
         self._is_unix_timestamp = is_unix_timestamp
 
     def __eq__(self, other):
@@ -132,3 +117,17 @@ class Schema:
                 f"The index of {label} don't match. {self.indexes} !="
                 f" {other.indexes}"
             )
+
+
+def _normalize_feature(x):
+    if isinstance(x, FeatureSchema):
+        return x
+    assert len(x) == 2
+    return FeatureSchema(x[0], x[1])
+
+
+def _normalize_index(x):
+    if isinstance(x, IndexSchema):
+        return x
+    assert len(x) == 2
+    return IndexSchema(x[0], x[1])

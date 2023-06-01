@@ -15,7 +15,7 @@
 from absl.testing import absltest
 
 from temporian.core.operators.glue import GlueOperator
-from temporian.core.data.node import input_node
+from temporian.core.data.node import source_node
 from temporian.core.data.dtype import DType
 from temporian.implementation.numpy.operators.glue import (
     GlueNumpyImplementation,
@@ -99,10 +99,10 @@ class GlueNumpyImplementationTest(absltest.TestCase):
             ValueError,
             "Arguments should have the same sampling.",
         ):
-            n1 = input_node(
+            n1 = source_node(
                 features=[("a", DType.FLOAT64)], indexes=[("x", DType.STRING)]
             )
-            n2 = input_node(
+            n2 = source_node(
                 features=[("b", DType.FLOAT64)], indexes=[("x", DType.STRING)]
             )
             _ = GlueOperator(input_0=n1, input_1=n2)
@@ -112,10 +112,10 @@ class GlueNumpyImplementationTest(absltest.TestCase):
             ValueError,
             'Feature "a" is defined in multiple input nodes',
         ):
-            n1 = input_node(
+            n1 = source_node(
                 features=[("a", DType.FLOAT64)], indexes=[("x", DType.STRING)]
             )
-            n2 = input_node(
+            n2 = source_node(
                 features=[("a", DType.FLOAT64)], same_sampling_as=n1
             )
             _ = GlueOperator(input_0=n1, input_1=n2)

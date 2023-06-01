@@ -22,15 +22,9 @@ def plot_bokeh(
     features: Set[str],
     options: Options,
 ):
-    from bokeh.plotting import figure
     from bokeh.io import output_notebook, show
-    from bokeh.layouts import gridplot, column
-    from bokeh.models import (
-        ColumnDataSource,
-        CategoricalColorMapper,
-        HoverTool,
-        CustomJS,
-    )
+    from bokeh.layouts import gridplot
+    from bokeh.models import CustomJS
     from bokeh.palettes import Dark2_5 as colors
 
     num_plots = get_num_plots(evsets, indexes, features, options)
@@ -193,11 +187,7 @@ def _bokeh_sub_plot(
     """Plots "(xs, ys)" on the axis "ax"."""
 
     from bokeh.plotting import figure
-    from bokeh.io import output_notebook, show
-    from bokeh.layouts import gridplot, column
-    from bokeh.models import ColumnDataSource, CategoricalColorMapper, HoverTool
-    from bokeh.models import ColumnDataSource, CustomJS, Range1d
-    from bokeh.palettes import Dark2_5 as colors
+    from bokeh.models import Range1d
 
     tools = [
         "xpan",

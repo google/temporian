@@ -18,6 +18,8 @@ from temporian.core.data.schema import Schema
 DataArray = Union[List[Any], np.ndarray]
 
 
+# Note: Keep the documentation about supported types in sync with
+# "normalize_timestamp" and "normalize_features".
 def event_set(
     timestamps: DataArray,
     features: Optional[Dict[str, DataArray]] = None,
@@ -26,7 +28,7 @@ def event_set(
     is_unix_timestamp: Union[bool, str] = "auto",
     same_sampling_as: Optional[EventSet] = None,
 ) -> EventSet:
-    """Creates an event set from raw data (e.g. python lists,  numpy arrays).
+    """Creates an event set from arrays (list, numpy, pandas) of values.
 
     Usage example:
 
@@ -41,20 +43,35 @@ def event_set(
         )
         ```
 
+    Supported values for `timestamps` are:
+        - Python list of int, float, str, bytes and datetime.
+        - Numpy arrays of int{32, 64}, float{32, 64}, str_, string_ / bytes_,
+           datetime64, object (containing "str"),
+        - Pandas series of int{32, 64}, float{32, 64}, Timestamp.
+
+    Timestamps provided as string are interpreted as ISO 8601 date or datetime.
+
+    Supported values for `features`'s values are:
+        - Python list of int, float, str, bytes, bool, and datetime.
+        - Numpy arrays of int{32, 64}, float{32, 64}, str_, string_ / bytes_,
+            datetime64, object (containing "str"),
+        - Pandas series of int{32, 64}, float{32, 64}, Timestamp.
+
+    Features provided as datetime are interpreted as int64 unix epoch.
+
     Args:
-        timestamps: Array of timestamps values. Can be a list of numpy array of
-            float, integer, datetimes or dates.
+        timestamps: Array of timestamps values.
         features: Dictionary of feature values.
         index_features: Names of the features in `features` to be used as index.
-          If empty (default), the data is not indexed.
+            If empty (default), the data is not indexed.
         name: Name of the node.
         is_unix_timestamp: If "auto" (default), the fact that the timestamp is
-          interpretable as unix timestamps is true if the timestamps are date
-          or date-like object. If `is_unix_timestamp` is boolean,
-          `is_unix_timestamp` defines if the timestamps are unix timestamps.
+            interpretable as unix timestamps is true if the timestamps are date
+            or date-like object. If `is_unix_timestamp` is boolean,
+            `is_unix_timestamp` defines if the timestamps are unix timestamps.
         same_sampling_as: If set, the created event set is guarentied to have
-          the same sampling as `same_sampling_as`. Some operators require for
-          input nodes to have the same sampling.
+            the same sampling as `same_sampling_as`. Some operators require for
+            input nodes to have the same sampling.
 
     Returns:
         An event set.
@@ -159,11 +176,9 @@ def pd_dataframe_to_event_set(
             Supported date types:
             `{np.datetime64, pd.Timestamp, datetime.datetime}`.
             Timestamps of these types are converted to UTC epoch float.
-        is_sorted: If True, the DataFrame is assumed to be sorted by
-            timestamp. If False, the DataFrame will be sorted by timestamp.
         name: Optional name for the EventSet.
         same_sampling_as: If set, the created event set is guarentied to have
-          the same sampling as `same_sampling_as`.
+            the same sampling as `same_sampling_as`.
 
 
     Returns:

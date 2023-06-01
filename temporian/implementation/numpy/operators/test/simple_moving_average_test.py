@@ -207,7 +207,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             )
         )
 
-        sampling_node = node_lib.input_node([])
+        sampling_node = node_lib.source_node([])
         op = SimpleMovingAverageOperator(
             input=evset.node(),
             window_length=3.0,
@@ -272,7 +272,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
         op = SimpleMovingAverageOperator(
             input=evset.node(),
             window_length=1.0,
-            sampling=node_lib.input_node([]),
+            sampling=node_lib.source_node([]),
         )
         instance = SimpleMovingAverageNumpyImplementation(op)
 

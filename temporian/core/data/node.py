@@ -25,7 +25,6 @@ from temporian.utils import string
 if TYPE_CHECKING:
     from temporian.core.evaluation import EvaluationInput, EvaluationResult
     from temporian.core.operators.base import Operator
-    from temporian.implementation.numpy.data.event_set import EventSet
 
 T_SCALAR = (int, float)
 
@@ -192,8 +191,7 @@ class Node(object):
     ) -> None:
         """Raises an error message.
 
-        This method is a utilities used in operators implementations,
-        e.g., +, -, *.
+        This utility method is used in operator implementations, e.g., +, - *.
         """
 
         raise ValueError(
@@ -490,7 +488,7 @@ class Node(object):
         assert False
 
 
-def input_node(
+def source_node(
     features: List[Tuple[str, DType]],
     indexes: Optional[List[Tuple[str, IndexDType]]] = None,
     is_unix_timestamp: bool = False,
@@ -503,29 +501,31 @@ def input_node(
 
     Usage example:
 
+        ```
         # Without index
-        a = input_node(features=[("f1", tp.float64), ("f2", tp.string)])
+        a = source_node(features=[("f1", tp.float64), ("f2", tp.string)])
 
         # With an index
-        a = input_node(
+        a = source_node(
             features=[("f1", tp.float64), ("f2", tp.string)],
-            indexes = ["f2"],
-            )
+            indexes=["f2"],
+        )
 
         # Two nodes with the same sampling
-        a = input_node(features=[("f1", tp.float64)])
-        b = input_node(features=[("f2", tp.float64)], same_sampling_as=a)
+        a = source_node(features=[("f1", tp.float64)])
+        b = source_node(features=[("f2", tp.float64)], same_sampling_as=a)
+        ```
 
     Args:
         features: List of names and dtypes of the features.
         indexes: List of names and dtypes of the index. If empty, the data is
-          assumed not indexed.
+            assumed not indexed.
         is_unix_timestamp: If true, the timestamps are interpreted as unix
-          timestamps in seconds.
+            timestamps in seconds.
         same_sampling_as: If set, the created node is guarentied to have the
-          same sampling as same_sampling_as`. In this case, `indexes` and
-          `is_unix_timestamp` should not be provided. Some operators require for
-          input nodes to have the same sampling.
+            same sampling as same_sampling_as`. In this case, `indexes` and
+            `is_unix_timestamp` should not be provided. Some operators require
+            for input nodes to have the same sampling.
     """
 
     if same_sampling_as is not None:

@@ -35,8 +35,11 @@ def testOperatorAndImp(self, op: Operator, imp: OperatorImplementation):
     """Tests an operator and its implementation.
 
     Currently test:
-      - Serialization / unserialization of the opeator.
+      - Serialization / unserialization of the operator.
     """
+
+    # TODO: Add tests related to the implementation.
+    del imp
 
     serialized_op = serialize._serialize_operator(op)
 

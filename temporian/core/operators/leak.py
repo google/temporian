@@ -21,7 +21,7 @@ from temporian.core.data.duration import (
     NormalizedDuration,
     normalize_duration,
 )
-from temporian.core.data.node import Node
+from temporian.core.data.node import Node, create_node_new_features_new_sampling
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -74,7 +74,7 @@ operator_lib.register_operator(LeakOperator)
 
 
 def leak(input: Node, duration: Duration) -> Node:
-    """Remove timestamps in the past.
+    """Move timestamps in the past.
 
     In other words, shifts the timestamp values backward in time.
 
@@ -90,7 +90,7 @@ def leak(input: Node, duration: Duration) -> Node:
             timestamps: [-1, 2, 7]
 
     Args:
-        input: Event set to leak.
+        input: Node to leak.
         duration: Duration to leak by.
 
     Returns:

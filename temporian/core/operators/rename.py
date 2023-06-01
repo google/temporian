@@ -16,7 +16,11 @@
 from typing import Dict, Optional, Union
 
 from temporian.core import operator_lib
-from temporian.core.data.node import Node
+from temporian.core.data.node import (
+    Node,
+    create_node_new_features_new_sampling,
+    create_node_new_features_existing_sampling,
+)
 from temporian.core.data.schema import Schema
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
@@ -112,7 +116,7 @@ def _normalize_rename_features(
         if len(schema.features) != 1:
             raise ValueError(
                 "Cannot apply rename operator with a single rename string when "
-                "the event set containg multiple features. Pass a dictionary "
+                "the event set contains multiple features. Pass a dictionary "
                 "of rename strings instead."
             )
         features = {schema.features[0].name: features}
@@ -141,7 +145,7 @@ def _normalize_rename_indexes(
         if len(schema.indexes) != 1:
             raise ValueError(
                 "Cannot apply rename operator with a single rename string when "
-                "the event set containg multiple indexes. Pass a dictionary "
+                "the event set contains multiple indexes. Pass a dictionary "
                 "of rename strings instead."
             )
         indexes = {schema.indexes[0].name: indexes}
@@ -182,7 +186,7 @@ def rename(
         index: New index name or mapping from old names to new names.
 
     Returns:
-        Event with renamed features and index.
+        Node with renamed features and index.
     """
 
     features = _normalize_rename_features(input.schema, features)

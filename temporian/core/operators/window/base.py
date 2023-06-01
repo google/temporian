@@ -20,7 +20,10 @@ from typing import Optional
 
 from temporian.core.data.duration import NormalizedDuration
 from temporian.core.data import dtype
-from temporian.core.data.node import Node
+from temporian.core.data.node import (
+    Node,
+    create_node_new_features_existing_sampling,
+)
 from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb

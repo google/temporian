@@ -20,7 +20,6 @@ import pandas as pd
 from temporian.core.operators.since_last import SinceLast
 from temporian.implementation.numpy.operators.since_last import (
     SinceLastNumpyImplementation,
-    operators_cc,
 )
 from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
 

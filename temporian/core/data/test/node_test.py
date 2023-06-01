@@ -21,7 +21,7 @@ from temporian.implementation.numpy.data.event_set import EventSet
 
 class NodeTest(absltest.TestCase):
     def test_evaluate_input(self):
-        node = utils.create_input_node()
+        node = utils.create_source_node()
         evset = utils.create_input_event_set()
         result = node.evaluate({node: evset})
         self.assertIsInstance(result, EventSet)

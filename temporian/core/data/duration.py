@@ -61,12 +61,6 @@ def normalize_timestamp(x: Timestamp) -> NormalizedTimestamp:
     raise ValueError(f"Invalid timestamp {x!r} of type {type(x)}.")
 
 
-def normalize_timestamp_or_none(x: Optional[Timestamp]) -> NormalizedTimestamp:
-    if x is None:
-        return None
-    return normalize_timestamp(x)
-
-
 def milliseconds(value: Union[int, float]) -> Duration:
     """Converts input value from milliseconds to a `Duration` in seconds.
 

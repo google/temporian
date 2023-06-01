@@ -165,7 +165,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
         op = MovingStandardDeviationOperator(
             input=input_data.node(),
             window_length=3.1,
-            sampling=node_lib.input_node([]),
+            sampling=node_lib.source_node([]),
         )
         self.assertEqual(
             op.list_matching_io_samplings(), [("sampling", "output")]
@@ -225,7 +225,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
         op = MovingStandardDeviationOperator(
             input=input_data.node(),
             window_length=1.1,
-            sampling=node_lib.input_node([]),
+            sampling=node_lib.source_node([]),
         )
         instance = MovingStandardDeviationNumpyImplementation(op)
 
