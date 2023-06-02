@@ -75,8 +75,14 @@ jobs:
       - name: Download builds for all Python versions
         uses: actions/download-artifact@v3
         with:
-          name: dist-macos-*
+          # Skipping name: key to download all artifacts from this workflow
+          # Artifacts are are downloaded to dist/<artifact-name>
           path: dist
+
+      - name: Move wheels and sources to dist/
+        run: |
+          mv dist/*/*.whl dist/
+          mv dist/*/*.tar.gz dist/
 
       - name: Publish to PyPI
         # TODO: change to prod PyPI, and prod token in repo's secrets
