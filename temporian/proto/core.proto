@@ -84,20 +84,20 @@ message Operator {
       map<string, string> values = 1;
     }
     message ListDType{
-      repeated DType values = 1;
+      repeated DType values = 1 [packed = true];
     }
   }
 }
 
 // Data types
 enum DType {
-  UNDEFINED = 0;
-  FLOAT64 = 1;
-  INT64 = 2;
-  FLOAT32 = 3;
-  INT32 = 4;
-  BOOLEAN = 5;
-  STRING = 6;
+  DTYPE_UNDEFINED = 0;
+  DTYPE_FLOAT64 = 1;
+  DTYPE_INT64 = 2;
+  DTYPE_FLOAT32 = 3;
+  DTYPE_INT32 = 4;
+  DTYPE_BOOLEAN = 5;
+  DTYPE_STRING = 6;
 }
 
 // Connections between operators
