@@ -14,7 +14,7 @@
 
 """Cast operator class and public API function definition."""
 
-from typing import Union, Mapping, Optional
+from typing import Dict, Union, Mapping, Optional
 from temporian.core.data.feature import Feature
 
 from temporian.core.data.dtype import DType, py_types_to_dtypes
@@ -87,12 +87,14 @@ class CastOperator(Operator):
         # Output node: don't create new if all features are reused
         self.add_output(
             "output",
-            input
-            if reuse_node
-            else Node(
-                features=output_features,
-                sampling=input.sampling,
-                creator=self,
+            (
+                input
+                if reuse_node
+                else Node(
+                    features=output_features,
+                    sampling=input.sampling,
+                    creator=self,
+                )
             ),
         )
 
@@ -106,7 +108,7 @@ class CastOperator(Operator):
         return self.attributes["check_overflow"]
 
     @property
-    def from_features(self) -> dict[str, DType]:
+    def from_features(self) -> Dict[str, DType]:
         return self.attributes["from_features"]
 
     def _check_args(
@@ -157,7 +159,7 @@ class CastOperator(Operator):
         to_dtype: Optional[DType] = None,
         from_dtypes: Optional[Mapping[DType, DType]] = None,
         from_features: Optional[Mapping[str, DType]] = None,
-    ) -> dict[str, DType]:
+    ) -> Dict[str, DType]:
         if to_dtype is not None:
             return {feature.name: to_dtype for feature in input.features}
         if from_features is not None:

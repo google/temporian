@@ -15,6 +15,7 @@
 """Propagate operator class and public API function definition."""
 
 
+from typing import List
 from temporian.core import operator_lib
 from temporian.core.data.node import Node
 from temporian.core.data.feature import Feature
@@ -34,7 +35,7 @@ class Propagate(Operator):
         self.add_input("input", input)
         self.add_input("sampling", sampling)
 
-        self._index_mapping: list[int] = []
+        self._index_mapping: List[int] = []
         sampling_index_name = sampling.sampling.index.names
         sampling_index_dtypes = sampling.sampling.index.dtypes
         for index in input.sampling.index:

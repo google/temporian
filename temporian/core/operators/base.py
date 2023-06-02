@@ -15,14 +15,14 @@
 """Base operator class and auxiliary classes definition."""
 
 from abc import ABC
-from typing import Union, Any
+from typing import Dict, List, Tuple, Union, Any
 
 from temporian.core.data.node import Node
 from temporian.proto import core_pb2 as pb
 
 
 # Valid types for operator attributes
-AttributeType = Union[str, int, float, bool, list[str], dict[str, str]]
+AttributeType = Union[str, int, float, bool, List[str], Dict[str, str]]
 
 
 class OperatorExceptionDecorator(object):
@@ -58,11 +58,11 @@ class Operator(ABC):
     """Interface definition and common logic for operators."""
 
     def __init__(self):
-        self._inputs: dict[str, Node] = {}
-        self._outputs: dict[str, Node] = {}
-        self._attributes: dict[str, AttributeType] = {}
+        self._inputs: Dict[str, Node] = {}
+        self._outputs: Dict[str, Node] = {}
+        self._attributes: Dict[str, AttributeType] = {}
         self._definition: pb.OperatorDef = self.build_op_definition()
-        self._attr_types: dict[str, type] = {
+        self._attr_types: Dict[str, type] = {
             attr.key: attr.type for attr in self._definition.attributes
         }
 
@@ -73,27 +73,27 @@ class Operator(ABC):
         )
 
     @property
-    def attributes(self) -> dict[str, AttributeType]:
+    def attributes(self) -> Dict[str, AttributeType]:
         return self._attributes
 
     @property
-    def inputs(self) -> dict[str, Node]:
+    def inputs(self) -> Dict[str, Node]:
         return self._inputs
 
     @property
-    def outputs(self) -> dict[str, Node]:
+    def outputs(self) -> Dict[str, Node]:
         return self._outputs
 
     @attributes.setter
-    def attributes(self, attributes: dict[str, AttributeType]):
+    def attributes(self, attributes: Dict[str, AttributeType]):
         self._attributes = attributes
 
     @inputs.setter
-    def inputs(self, inputs: dict[str, Node]):
+    def inputs(self, inputs: Dict[str, Node]):
         self._inputs = inputs
 
     @outputs.setter
-    def outputs(self, outputs: dict[str, Node]):
+    def outputs(self, outputs: Dict[str, Node]):
         self._outputs = outputs
 
     def add_input(self, key: str, node: Node) -> None:
@@ -173,7 +173,7 @@ class Operator(ABC):
     def operator_key(cls) -> str:
         return cls.build_op_definition().key
 
-    def list_matching_io_samplings(self) -> list[tuple[str, str]]:
+    def list_matching_io_samplings(self) -> List[Tuple[str, str]]:
         """List pairs of input/output pairs with the same sampling.
 
         This function is used to check the correct implementation of ops are
@@ -181,7 +181,7 @@ class Operator(ABC):
         """
         # TODO: Optimize the number of matches: We don't need all the currently
         # computed matches to check the output validity.
-        matches: list[tuple[str, str]] = []
+        matches: List[Tuple[str, str]] = []
         for output_key, output_value in self._outputs.items():
             for input_key, input_value in self._inputs.items():
                 if output_value.sampling is input_value.sampling:
@@ -236,14 +236,14 @@ class Operator(ABC):
             and not is_list_str(value)
         ):
             raise ValueError(
-                f"Attribute {value=} type mismatch: list[str] expected"
+                f"Attribute {value=} type mismatch: List[str] expected"
             )
         if (
             attr_type == pb.OperatorDef.Attribute.Type.MAP_STR_STR
             and not is_dict_str(value)
         ):
             raise ValueError(
-                f"Attribute {value=} type mismatch: dict[str,str] expected"
+                f"Attribute {value=} type mismatch: Dict[str,str] expected"
             )
 
         # Special case: ANY attribute type, still needs to be a valid type

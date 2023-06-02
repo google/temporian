@@ -15,6 +15,7 @@
 """Unary operators (e.g: ~, isnan, abs) and public API definitions."""
 
 from abc import abstractmethod
+from typing import List
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
@@ -86,7 +87,7 @@ class BaseUnaryOperator(Operator):
     @classmethod
     @property
     @abstractmethod
-    def allowed_dtypes(cls) -> list[DType]:
+    def allowed_dtypes(cls) -> List[DType]:
         """Gets the dtypes that should work with this operator."""
 
     @classmethod
@@ -103,7 +104,7 @@ class InvertOperator(BaseUnaryOperator):
 
     @classmethod
     @property
-    def allowed_dtypes(cls) -> list[DType]:
+    def allowed_dtypes(cls) -> List[DType]:
         return [DType.BOOLEAN]
 
     @classmethod
@@ -119,7 +120,7 @@ class IsNanOperator(BaseUnaryOperator):
 
     @classmethod
     @property
-    def allowed_dtypes(cls) -> list[DType]:
+    def allowed_dtypes(cls) -> List[DType]:
         return [
             DType.BOOLEAN,
             DType.FLOAT32,
@@ -141,7 +142,7 @@ class NotNanOperator(BaseUnaryOperator):
 
     @classmethod
     @property
-    def allowed_dtypes(cls) -> list[DType]:
+    def allowed_dtypes(cls) -> List[DType]:
         return [
             DType.BOOLEAN,
             DType.FLOAT32,
@@ -163,7 +164,7 @@ class AbsOperator(BaseUnaryOperator):
 
     @classmethod
     @property
-    def allowed_dtypes(cls) -> list[DType]:
+    def allowed_dtypes(cls) -> List[DType]:
         return [
             DType.FLOAT32,
             DType.FLOAT64,
@@ -184,7 +185,7 @@ class LogOperator(BaseUnaryOperator):
 
     @classmethod
     @property
-    def allowed_dtypes(cls) -> list[DType]:
+    def allowed_dtypes(cls) -> List[DType]:
         return [
             DType.FLOAT32,
             DType.FLOAT64,
