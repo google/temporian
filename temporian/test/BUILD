@@ -13,6 +13,8 @@ py_test(
     deps = [
         # already_there/absl/logging
         # already_there/absl/testing:absltest
+        # already_there/bokeh
+        # already_there/matplotlib
         "//temporian",
     ],
 )
@@ -20,25 +22,25 @@ py_test(
 py_test(
     name = "prototype_test_numpy",
     srcs = ["prototype_test_numpy.py"],
-    data = ["test_data/prototype"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
         # already_there/pandas
         "//temporian",
     ],
+    data = ["//temporian/test/test_data"],
 )
 
 py_test(
     name = "io_test",
     srcs = ["io_test.py"],
-    data = ["test_data/io"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
         # already_there/pandas
         "//temporian",
     ],
+    data = ["//temporian/test/test_data"],
 )
 
 py_test(
