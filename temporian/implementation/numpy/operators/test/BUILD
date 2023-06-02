@@ -9,7 +9,9 @@ py_library(
     srcs_version = "PY3",
     deps = [
         "//temporian/core:serialize",
+        "//temporian/core/operators:base",
         "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy/operators:base",
     ],
 )
 
@@ -20,11 +22,10 @@ py_test(
     srcs = ["arithmetic_test.py"],
     srcs_version = "PY3",
     deps = [
-        ":test_util",
-        "//temporian/core/data:node",
+        # already_there/absl/testing:absltest
+        # already_there/numpy
+        # already_there/pandas
         "//temporian/core/operators/binary",
-        "//temporian/implementation/numpy:evaluation",
-        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/binary",
     ],
@@ -35,11 +36,10 @@ py_test(
     srcs = ["relational_test.py"],
     srcs_version = "PY3",
     deps = [
-        ":test_util",
-        "//temporian/core/data:node",
+        # already_there/absl/testing:absltest
+        # already_there/numpy
+        # already_there/pandas
         "//temporian/core/operators/binary",
-        "//temporian/implementation/numpy:evaluation",
-        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/binary",
     ],
@@ -50,11 +50,9 @@ py_test(
     srcs = ["logical_test.py"],
     srcs_version = "PY3",
     deps = [
-        ":test_util",
-        "//temporian/core/data:node",
+        # already_there/absl/testing:absltest
+        # already_there/pandas
         "//temporian/core/operators/binary",
-        "//temporian/implementation/numpy:evaluation",
-        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/binary",
     ],
@@ -66,8 +64,10 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_util",
+        # already_there/absl/testing:absltest
+        # already_there/numpy
+        # already_there/pandas
         "//temporian/core/operators/scalar",
-        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/scalar",
     ],
@@ -78,9 +78,10 @@ py_test(
     srcs = ["relational_scalar_test.py"],
     srcs_version = "PY3",
     deps = [
-        ":test_util",
+        # already_there/absl/testing:absltest
+        # already_there/numpy
+        # already_there/pandas
         "//temporian/core/operators/scalar",
-        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/scalar",
     ],
@@ -92,13 +93,15 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_util",
+        # already_there/absl/testing:absltest
+        # already_there/numpy
+        # already_there/pandas
+        "//temporian/core/data:dtype",
         # absl/testing:absltest dep,
         "//temporian/core/data:node",
         "//temporian/core/operators/binary",
-        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/binary",
-        "//temporian/implementation/numpy:evaluation",
     ],
 )
 
@@ -108,8 +111,13 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_util",
+        # already_there/absl/testing:absltest
+        # already_there/numpy
+        # already_there/pandas
+        "//temporian/core:evaluation",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:node",
         "//temporian/core/operators:cast",
-        "//temporian/implementation/numpy:evaluation",
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators:cast",
@@ -122,9 +130,8 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_util",
+        # already_there/absl/testing:absltest
         "//temporian/core/operators:filter",
-        "//temporian/implementation/numpy:evaluation",
-        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators:filter",
     ],
@@ -136,9 +143,10 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_util",
+        # already_there/absl/testing:absltest
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:node",
         "//temporian/core/operators:glue",
-        "//temporian/implementation/numpy:evaluation",
-        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators:glue",
     ],
@@ -150,9 +158,11 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_util",
-        "//temporian/core/operators:unary",
-        "//temporian/implementation/numpy:evaluation",
-        "//temporian/implementation/numpy/data:event_set",
+        # already_there/absl/testing:absltest
+        # already_there/numpy
+        # already_there/pandas
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:node",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators:unary",
     ],
@@ -164,10 +174,11 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_util",
+        # already_there/absl/testing:absltest
+        # already_there/numpy
+        # already_there/pandas
         "//temporian/core/data:node",
         "//temporian/core/operators/calendar:day_of_month",
-        "//temporian/implementation/numpy:evaluation",
-        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/calendar:day_of_month",
     ],
@@ -179,10 +190,10 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_util",
-        "//temporian/core/data:node",
+        # already_there/absl/testing:absltest
+        # already_there/numpy
+        # already_there/pandas
         "//temporian/core/operators/calendar:day_of_week",
-        "//temporian/implementation/numpy:evaluation",
-        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/calendar:day_of_week",
     ],
@@ -194,10 +205,10 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_util",
-        "//temporian/core/data:node",
+        # already_there/absl/testing:absltest
+        # already_there/numpy
+        # already_there/pandas
         "//temporian/core/operators/calendar:day_of_year",
-        "//temporian/implementation/numpy:evaluation",
-        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/calendar:day_of_year",
     ],
@@ -209,10 +220,10 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_util",
-        "//temporian/core/data:node",
+        # already_there/absl/testing:absltest
+        # already_there/numpy
+        # already_there/pandas
         "//temporian/core/operators/calendar:hour",
-        "//temporian/implementation/numpy:evaluation",
-        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/calendar:hour",
     ],
@@ -224,10 +235,10 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_util",
-        "//temporian/core/data:node",
+        # already_there/absl/testing:absltest
+        # already_there/numpy
+        # already_there/pandas
         "//temporian/core/operators/calendar:iso_week",
-        "//temporian/implementation/numpy:evaluation",
-        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/calendar:iso_week",
     ],
@@ -239,10 +250,10 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_util",
-        "//temporian/core/data:node",
+        # already_there/absl/testing:absltest
+        # already_there/numpy
+        # already_there/pandas
         "//temporian/core/operators/calendar:minute",
-        "//temporian/implementation/numpy:evaluation",
-        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/calendar:minute",
     ],
@@ -254,10 +265,10 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_util",
-        "//temporian/core/data:node",
-        "//temporian/core/operators/calendar:minute",
-        "//temporian/implementation/numpy:evaluation",
-        "//temporian/implementation/numpy/data:event_set",
+        # already_there/absl/testing:absltest
+        # already_there/numpy
+        # already_there/pandas
+        "//temporian/core/operators/calendar:month",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/calendar:month",
     ],
@@ -269,10 +280,10 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_util",
-        "//temporian/core/data:node",
+        # already_there/absl/testing:absltest
+        # already_there/numpy
+        # already_there/pandas
         "//temporian/core/operators/calendar:second",
-        "//temporian/implementation/numpy:evaluation",
-        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/calendar:second",
     ],
@@ -284,10 +295,10 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_util",
-        "//temporian/core/data:node",
+        # already_there/absl/testing:absltest
+        # already_there/numpy
+        # already_there/pandas
         "//temporian/core/operators/calendar:year",
-        "//temporian/implementation/numpy:evaluation",
-        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/calendar:year",
     ],
@@ -299,9 +310,8 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_util",
-        "//temporian/core:evaluation",
+        # already_there/absl/testing:absltest
         "//temporian/core/operators:lag",
-        "//temporian/implementation/numpy:evaluation",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators:lag",
     ],
@@ -327,9 +337,10 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_util",
+        # already_there/absl/testing:absltest
+        # already_there/pandas
         # absl/testing:absltest dep,
         "//temporian/core/operators:drop_index",
-        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators:drop_index",
     ],
@@ -340,11 +351,11 @@ py_test(
     srcs = ["select_test.py"],
     srcs_version = "PY3",
     deps = [
-        ":test_util",
+        # already_there/absl/testing:absltest
+        # already_there/numpy
+        # already_there/pandas
         "//temporian/core:evaluation",
         "//temporian/core/operators:select",
-        "//temporian/implementation/numpy:evaluation",
-        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators:select",
     ],
@@ -355,11 +366,10 @@ py_test(
     srcs = ["rename_test.py"],
     srcs_version = "PY3",
     deps = [
-        ":test_util",
-        "//temporian/core:evaluation",
+        # already_there/absl/testing:absltest
+        # already_there/numpy
+        # already_there/pandas
         "//temporian/core/operators:rename",
-        "//temporian/implementation/numpy:evaluation",
-        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators:rename",
     ],
@@ -371,10 +381,10 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_util",
-        # absl/testing:absltest dep,
-        "//temporian/core/data:node",
+        # already_there/absl/testing:absltest
+        # already_there/pandas
+        "//temporian/core:evaluation",
         "//temporian/core/operators:add_index",
-        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators:add_index",
     ],
@@ -524,10 +534,8 @@ py_test(
     srcs = ["unique_timestamps_test.py"],
     srcs_version = "PY3",
     deps = [
-        ":test_util",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
+        # already_there/absl/testing:absltest
+        # already_there/pandas
         "//temporian/core/operators:unique_timestamps",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators:unique_timestamps",

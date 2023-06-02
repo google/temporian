@@ -10,9 +10,10 @@ py_test(
     srcs = ["df_to_event_test.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/implementation/numpy/data:event_set",
+        # already_there/absl/testing:absltest
+        # already_there/numpy
+        # already_there/pandas
         "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators:all_operators",
     ],
 )
 
@@ -21,9 +22,9 @@ py_test(
     srcs = ["event_to_df_test.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/implementation/numpy/data:event_set",
+        # already_there/absl/testing:absltest
+        # already_there/pandas
         "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators:all_operators",
     ],
 )
 
@@ -32,9 +33,8 @@ py_test(
     srcs = ["event_test.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/implementation/numpy/data:event_set",
+        # already_there/absl/testing:absltest
         "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators:all_operators",
     ],
 )
 
@@ -43,10 +43,10 @@ py_test(
     srcs = ["plotter_test.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/implementation/numpy/data:event_set",
+        # already_there/absl/testing:parameterized
+        # already_there/matplotlib
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/data:plotter",
-        "//temporian/implementation/numpy/operators:all_operators",
     ],
 )
 
@@ -55,8 +55,12 @@ py_test(
     srcs = ["io_test.py"],
     srcs_version = "PY3",
     deps = [
+        # already_there/absl/testing:absltest
+        # already_there/numpy
+        # already_there/pandas
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:schema",
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators:all_operators",
     ],
 )

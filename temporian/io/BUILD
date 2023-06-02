@@ -10,7 +10,9 @@ py_library(
     srcs = ["read_event_set.py"],
     srcs_version = "PY3",
     deps = [
+        # already_there/pandas
         "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy/data:io",
     ],
 )
 

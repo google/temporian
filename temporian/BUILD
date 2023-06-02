@@ -21,6 +21,7 @@ py_library(
         "//temporian/core/data:schema",
         "//temporian/core/operators:all_operators",
         "//temporian/core/operators:base",
+        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/data:plotter",
         "//temporian/io:read_event_set",

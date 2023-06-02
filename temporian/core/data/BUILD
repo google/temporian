@@ -33,12 +33,16 @@ py_library(
     name = "schema",
     srcs = ["schema.py"],
     srcs_version = "PY3",
-    deps = [],
+    deps = [
+        ":dtype",
+    ],
 )
 
 py_library(
     name = "duration",
     srcs = ["duration.py"],
     srcs_version = "PY3",
-    deps = [],
+    deps = [
+        # already_there/numpy
+        ],
 )

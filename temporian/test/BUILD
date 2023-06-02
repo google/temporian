@@ -11,9 +11,8 @@ py_test(
     srcs = ["api_test.py"],
     srcs_version = "PY3",
     deps = [
-        # absl/logging dep,
-        # absl/testing:absltest dep,
-        # pandas dep,
+        # already_there/absl/logging
+        # already_there/absl/testing:absltest
         "//temporian",
     ],
 )
@@ -24,6 +23,8 @@ py_test(
     data = ["test_data/prototype"],
     srcs_version = "PY3",
     deps = [
+        # already_there/absl/testing:absltest
+        # already_there/pandas
         "//temporian",
     ],
 )
@@ -34,23 +35,18 @@ py_test(
     data = ["test_data/io"],
     srcs_version = "PY3",
     deps = [
-        # absl/logging dep,
-        # absl/testing:absltest dep,
-        # pandas dep,
+        # already_there/absl/testing:absltest
+        # already_there/pandas
         "//temporian",
-        "//temporian/implementation/numpy/data:event_set",
     ],
 )
-
 
 py_test(
     name = "user_guide_test",
     srcs = ["user_guide_test.py"],
     srcs_version = "PY3",
     deps = [
-        # absl/logging dep,
-        # absl/testing:absltest dep,
-        # pandas dep,
+        # already_there/absl/testing:absltest
         "//temporian",
     ],
 )

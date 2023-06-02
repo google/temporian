@@ -26,7 +26,9 @@ py_library(
         ":since_last",
         ":unary",
         ":unique_timestamps",
-        "//temporian/implementation/numpy/operators/binary",
+        "//temporian/implementation/numpy/operators/binary:arithmetic",
+        "//temporian/implementation/numpy/operators/binary:logical",
+        "//temporian/implementation/numpy/operators/binary:relational",
         "//temporian/implementation/numpy/operators/calendar:day_of_month",
         "//temporian/implementation/numpy/operators/calendar:day_of_week",
         "//temporian/implementation/numpy/operators/calendar:day_of_year",
@@ -36,7 +38,8 @@ py_library(
         "//temporian/implementation/numpy/operators/calendar:month",
         "//temporian/implementation/numpy/operators/calendar:second",
         "//temporian/implementation/numpy/operators/calendar:year",
-        "//temporian/implementation/numpy/operators/scalar",
+        "//temporian/implementation/numpy/operators/scalar:arithmetic_scalar",
+        "//temporian/implementation/numpy/operators/scalar:relational_scalar",
         "//temporian/implementation/numpy/operators/window:moving_count",
         "//temporian/implementation/numpy/operators/window:moving_max",
         "//temporian/implementation/numpy/operators/window:moving_min",
@@ -88,7 +91,6 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
-        "//temporian/core/data:duration",
         "//temporian/core/operators:lag",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
@@ -101,7 +103,6 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
-        "//temporian/core/data:duration",
         "//temporian/core/operators:leak",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
@@ -114,6 +115,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        # already_there/numpy
         "//temporian/core/operators:drop_index",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
@@ -162,10 +164,8 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
-        "//temporian/core/data:duration",
         "//temporian/core/operators:prefix",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",
     ],
 )
@@ -176,7 +176,6 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
-        "//temporian/core/data:duration",
         "//temporian/core/operators:propagate",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
@@ -203,7 +202,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
-        "//temporian/core/data:duration",
+        # already_there/numpy
         "//temporian/core/operators:since_last",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
@@ -217,6 +216,8 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        # already_there/numpy
+        "//temporian/core/data:dtype",
         "//temporian/core/operators:cast",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
@@ -229,6 +230,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        # already_there/numpy
         "//temporian/core/operators:unary",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
@@ -241,10 +243,9 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
-        "//temporian/core/data:duration",
+        # already_there/numpy
         "//temporian/core/operators:unique_timestamps",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",
     ],
 )

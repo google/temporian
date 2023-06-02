@@ -14,7 +14,6 @@ py_library(
         ":graph",
         ":schedule",
         "//temporian/core/data:node",
-        "//temporian/core/data:schema",
         "//temporian/core/operators:base",
         "//temporian/implementation/numpy:evaluation",
         "//temporian/implementation/numpy/data:event_set",
@@ -31,6 +30,10 @@ py_library(
     name = "schedule",
     srcs = ["schedule.py"],
     srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:node",
+        "//temporian/core/operators:base",
+    ],
 )
 
 py_library(
@@ -39,7 +42,6 @@ py_library(
     srcs_version = "PY3",
     deps = [
         "//temporian/core/data:node",
-        "//temporian/core/data:schema",
         "//temporian/core/operators:base",
     ],
 )
@@ -49,9 +51,13 @@ py_library(
     srcs = ["serialize.py"],
     srcs_version = "PY3",
     deps = [
+        ":graph",
         ":operator_lib",
+        # already_there/google/protobuf
+        "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators:base",
+        "//temporian/proto:core_py_proto",
     ],
 )

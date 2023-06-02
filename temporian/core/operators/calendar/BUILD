@@ -10,11 +10,6 @@ py_library(
     name = "calendar",
     srcs = ["__init__.py"],
     srcs_version = "PY3",
-    deps = [
-        ":base",
-        ":day_of_month",
-        ":day_of_week",
-    ],
 )
 
 py_library(
@@ -23,7 +18,6 @@ py_library(
     srcs_version = "PY3",
     deps = [
         "//temporian/core/data:dtype",
-        "//temporian/core/data:schema",
         "//temporian/core/data:node",
         "//temporian/core/operators:base",
         "//temporian/proto:core_py_proto",

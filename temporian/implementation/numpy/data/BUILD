@@ -17,9 +17,11 @@ py_library(
     srcs = ["event_set.py"],
     srcs_version = "PY3",
     deps = [
+        # already_there/numpy
+        # already_there/pandas
         "//temporian/core/data:dtype",
-        "//temporian/core/data:duration",
         "//temporian/core/data:node",
+        "//temporian/core/data:schema",
         "//temporian/utils:string",
     ],
 )
@@ -30,8 +32,11 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":event_set",
-         "//temporian/core:evaluation",
-         "//temporian/core/operators:all_operators",
+        # already_there/numpy
+        # already_there/pandas
+        "//temporian/core:evaluation",
+        "//temporian/core/data:schema",
+        "//temporian/core/operators:all_operators",
     ],
 )
 
