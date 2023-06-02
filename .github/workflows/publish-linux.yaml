@@ -60,7 +60,7 @@ jobs:
         run: python tools/check_install.py
 
   publish-linux:
-    needs: [build-linux]
+    needs: [test-install-linux]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
