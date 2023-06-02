@@ -27,7 +27,7 @@ py_test(
     srcs = ["magic_methods_test.py"],
     srcs_version = "PY3",
     deps = [
-        # absl/testing:absltest dep,
+        # already_there/absl/testing:absltest
         ":utils",
         "//temporian/core/data:node",
         "//temporian/core/operators:base",
@@ -44,7 +44,6 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
-        # absl/testing:absltest dep,
         "//temporian/core/data:node",
         "//temporian/core/operators:base",
         "//temporian/proto:core_py_proto",
@@ -56,8 +55,6 @@ py_test(
     srcs = ["graph_test.py"],
     srcs_version = "PY3",
     deps = [
-        # absl/logging dep,
-        # absl/testing:absltest dep,
         ":utils",
         # already_there/absl/testing:absltest
         "//temporian/core:graph",
@@ -69,8 +66,6 @@ py_test(
     srcs = ["serialize_test.py"],
     srcs_version = "PY3",
     deps = [
-        # absl/logging dep,
-        # absl/testing:absltest dep,
         ":utils",
         # already_there/absl/logging
         # already_there/absl/testing:absltest
@@ -87,8 +82,6 @@ py_test(
     srcs = ["evaluation_test.py"],
     srcs_version = "PY3",
     deps = [
-        # absl/logging dep,
-        # absl/testing:absltest dep,
         ":utils",
         # already_there/absl/testing:absltest
         "//temporian/core:evaluation",
