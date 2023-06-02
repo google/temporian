@@ -238,7 +238,7 @@ struct MovingSumAccumulator : Accumulator<INPUT, OUTPUT> {
 
 template <typename INPUT, typename OUTPUT>
 struct MovingExtremumAccumulator : Accumulator<INPUT, OUTPUT> {
-  virtual ~Accumulator() = default;
+  virtual ~MovingExtremumAccumulator() = default;
   virtual bool Compare(INPUT a, INPUT b) = 0;
 
   void Add(INPUT value) override {
