@@ -25,10 +25,10 @@ jobs:
       - name: Install Poetry
         uses: snok/install-poetry@v1
 
-      - name: Build packages for all Python versions
+      - name: Build package
         run: poetry build
 
-      - name: Save packages for following jobs
+      - name: Save package for following jobs
         uses: actions/upload-artifact@v3
         with:
           name: dist-macos-${{ matrix.python-version }}

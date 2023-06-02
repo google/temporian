@@ -1,4 +1,4 @@
-# Building and installing
+# Building Temporian
 
 Temporian is not a pure Python package, so special care is required when
 packaging it for distribution. This document outlines how to build a Temporian
@@ -37,7 +37,15 @@ the following command to start the docker (might require superuser permissions):
 Within the docker, run the following command
 
 ```sh
-./tools/build_manylinux.sh
+PYTHON_VERSION=<version> ./tools/build_manylinux_all.sh
+```
+
+where `<version>` is one of `38`, `39`, `310`, `311`.
+
+Or, in case you want to build for all supported Python versions
+
+```sh
+./tools/build_manylinux_all.sh
 ```
 
 This will place the manylinux packages in the `dist/` directory under

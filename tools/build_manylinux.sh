@@ -2,6 +2,11 @@
 
 # When run in a manylinux2014 container, builds temporian and fixes the binaries
 # for compatibility.
+# Usage: PYTHON_VERSION=<version> tools/build_manylinux.sh
+# where <version> is 38, 39, 310, or 311.
+
+set -x
+set -e
 
 function temporian::setup_environment() {
     if [[ -z "${PYTHON_VERSION}" ]]; then
@@ -40,13 +45,6 @@ function temporian::stamp_wheels() {
     done
 }
 
-set -x
-# TODO: uncomment when done testing action
-# for PYTHON_VERSION in 38 39 310 311; do
-#     temporian::setup_environment
-#     temporian::build_wheel
-# done
-PYTHON_VERSION="310"
 temporian::setup_environment
 temporian::build_wheel
 temporian::stamp_wheels
