@@ -178,19 +178,19 @@ def convert_date_to_duration(date: Timestamp) -> NormalizedDuration:
 def convert_numpy_datetime64_to_duration(
     date: np.datetime64,
 ) -> NormalizedDuration:
-    """Convert numpy datetime64 to duration epoch UTC"""
+    """Convert numpy datetime64 to duration epoch UTC."""
     return float(date.astype("datetime64[s]").astype("float64"))
 
 
 def convert_datetime_to_duration(date: datetime.datetime) -> NormalizedDuration:
-    """Convert datetime to duration epoch UTC"""
+    """Convert datetime to duration epoch UTC."""
     return float(date.replace(tzinfo=datetime.timezone.utc).timestamp())
 
 
 def convert_datetime_date_to_duration(
     date: datetime.date,
 ) -> NormalizedDuration:
-    """Convert date to duration epoch UTC"""
+    """Convert date to duration epoch UTC."""
     return convert_datetime_to_duration(
         datetime.datetime.combine(date, datetime.time(0, 0))
     )

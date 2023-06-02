@@ -108,9 +108,7 @@ class SerializeTest(absltest.TestCase):
         logging.info("restored:\n%s", restored)
 
     def test_serialize_attributes(self):
-        """
-        Test serialization with different types of operator attributes
-        """
+        """Test serialization with different types of operator attributes."""
         attributes = {
             "attr_int": 1,
             "attr_str": "hello",
