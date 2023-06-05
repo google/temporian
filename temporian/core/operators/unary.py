@@ -37,10 +37,11 @@ class BaseUnaryOperator(Operator):
             raise TypeError(f"Input must be of type Node but got {type(input)}")
 
         for feature in input.features:
-            if feature.dtype not in self.allowed_dtypes:
+            if feature.dtype not in self.allowed_dtypes():
                 raise ValueError(
-                    f"DTypes supported by the operator: {self.allowed_dtypes}."
-                    f" Got feature {feature.name} with dtype {feature.dtype}."
+                    "DTypes supported by the operator:"
+                    f" {self.allowed_dtypes()}. Got feature {feature.name} with"
+                    f" dtype {feature.dtype}."
                 )
 
         # inputs
@@ -70,7 +71,7 @@ class BaseUnaryOperator(Operator):
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
-            key=cls.op_key_definition,
+            key=cls.op_key_definition(),
             attributes=[],
             inputs=[
                 pb.OperatorDef.Input(key="input"),
@@ -79,13 +80,11 @@ class BaseUnaryOperator(Operator):
         )
 
     @classmethod
-    @property
     @abstractmethod
     def op_key_definition(cls) -> str:
         """Gets the op. key used for serialization in build_op_definition."""
 
     @classmethod
-    @property
     @abstractmethod
     def allowed_dtypes(cls) -> List[DType]:
         """Gets the dtypes that should work with this operator."""
@@ -98,12 +97,10 @@ class BaseUnaryOperator(Operator):
 
 class InvertOperator(BaseUnaryOperator):
     @classmethod
-    @property
     def op_key_definition(cls) -> str:
         return "INVERT"
 
     @classmethod
-    @property
     def allowed_dtypes(cls) -> List[DType]:
         return [DType.BOOLEAN]
 
@@ -114,12 +111,10 @@ class InvertOperator(BaseUnaryOperator):
 
 class IsNanOperator(BaseUnaryOperator):
     @classmethod
-    @property
     def op_key_definition(cls) -> str:
         return "IS_NAN"
 
     @classmethod
-    @property
     def allowed_dtypes(cls) -> List[DType]:
         return [
             DType.BOOLEAN,
@@ -136,12 +131,10 @@ class IsNanOperator(BaseUnaryOperator):
 
 class NotNanOperator(BaseUnaryOperator):
     @classmethod
-    @property
     def op_key_definition(cls) -> str:
         return "NOT_NAN"
 
     @classmethod
-    @property
     def allowed_dtypes(cls) -> List[DType]:
         return [
             DType.BOOLEAN,
@@ -158,12 +151,10 @@ class NotNanOperator(BaseUnaryOperator):
 
 class AbsOperator(BaseUnaryOperator):
     @classmethod
-    @property
     def op_key_definition(cls) -> str:
         return "ABS"
 
     @classmethod
-    @property
     def allowed_dtypes(cls) -> List[DType]:
         return [
             DType.FLOAT32,
@@ -179,12 +170,10 @@ class AbsOperator(BaseUnaryOperator):
 
 class LogOperator(BaseUnaryOperator):
     @classmethod
-    @property
     def op_key_definition(cls) -> str:
         return "LOG"
 
     @classmethod
-    @property
     def allowed_dtypes(cls) -> List[DType]:
         return [
             DType.FLOAT32,

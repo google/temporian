@@ -36,7 +36,7 @@ class BaseCalendarNumpyImplementation(OperatorImplementation):
         # create destination event set
         dst_evset = EventSet(
             data={},
-            feature_names=[self.operator.output_feature_name],
+            feature_names=[self.operator.output_feature_name()],
             index_names=sampling.index_names,
             is_unix_timestamp=True,
         )

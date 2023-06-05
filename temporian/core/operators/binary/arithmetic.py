@@ -25,7 +25,6 @@ class BaseArithmeticOperator(BaseBinaryOperator):
     PREFIX = ""
 
     @classmethod
-    @property
     def operator_def_key(cls) -> str:
         return cls.DEF_KEY
 

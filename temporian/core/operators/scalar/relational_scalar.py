@@ -44,7 +44,6 @@ class RelationalScalarOperator(BaseScalarOperator):
         ]
 
     @classmethod
-    @property
     def operator_def_key(cls) -> str:
         return cls.DEF_KEY
 

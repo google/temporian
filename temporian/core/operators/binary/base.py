@@ -86,7 +86,7 @@ class BaseBinaryOperator(Operator):
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
-            key=cls.operator_def_key,
+            key=cls.operator_def_key(),
             attributes=[],
             inputs=[
                 pb.OperatorDef.Input(key="input_1"),
@@ -96,7 +96,6 @@ class BaseBinaryOperator(Operator):
         )
 
     @classmethod
-    @property
     @abstractmethod
     def operator_def_key(cls) -> str:
         """Gets the key of the operator definition."""

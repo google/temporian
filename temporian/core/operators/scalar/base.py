@@ -105,7 +105,7 @@ class BaseScalarOperator(Operator):
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
-            key=cls.operator_def_key,
+            key=cls.operator_def_key(),
             attributes=[
                 pb.OperatorDef.Attribute(
                     key="value",
@@ -125,7 +125,6 @@ class BaseScalarOperator(Operator):
         )
 
     @classmethod
-    @property
     def operator_def_key(cls) -> str:
         """Gets the key of the operator definition."""
         return cls.DEF_KEY
