@@ -19,18 +19,31 @@ This is how a minimal end-to-end example looks like:
 ```python
 import temporian as tp
 
-# Load data.
-evset = tp.from_csv("path/to/temporal_data.csv", timestamp_column="time")
-node = evset.node()
+# Load data and create input node.
+evset = tp.from_csv("temporal_data.csv", timestamp_column="date")
+source = evset.node()
 
 # Apply operators to create a processing graph.
-sma = tp.simple_moving_average(node, window_length=tp.days(7))
+sma = tp.simple_moving_average(source, window_length=tp.duration.days(7))
 
-# Run the graph on the input data.
-result = sma.evaluate(evset)
+# Run the graph.
+result_evset = sma.evaluate({source: evset})
+
+# Show output.
+print(result_evset)
+result_evset.plot()
 ```
 
-Check the [Getting Started tutorial](examples/tutorials/getting_started.ipynb) to try it!
+This is an example `temporal_data.csv` to use with the code above:
+
+```
+date,feature_1,feature_2
+2023-01-01,10.0,3.0
+2023-01-02,20.0,4.0
+2023-02-01,30.0,5.0
+```
+
+Check the [Getting Started tutorial](https://temporian.readthedocs.io/en/latest/tutorials/getting_started/) to learn more!
 
 ## Key features
 
@@ -49,7 +62,7 @@ Temporian helps you **focus on high-level modeling**.
 
 Temporal data processing is commonly done with generic data processing tools. However, this approach is often tedious, error-prone, and requires engineers to learn and re-implement existing methods. Additionally, the complexity of these tools can lead engineers to create less effective pipelines in order to reduce complexity. This can increase the cost of developing and maintaining performant ML pipelines.
 
-To see the benefit of Temporian over general data processing libraries, compare the original **Feature engineering** section of our [Khipu 2023 Forecasting Tutorial](https://github.com/tryolabs/khipu-2023), which uses pandas to preprocess the M5 sales dataset, to the [updated version using Temporian](examples/m5_competition.py).
+To see the benefit of Temporian over general data processing libraries, compare the original **Feature engineering** section of our [Khipu 2023 Forecasting Tutorial](https://github.com/tryolabs/khipu-2023), which uses pandas to preprocess the M5 sales dataset, to the [updated version using Temporian](https://github.com/google/temporian/tree/main/examples/m5_competition.py).
 
 ## Documentation
 
