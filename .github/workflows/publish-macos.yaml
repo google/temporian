@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-macos:
-    runs-on: macos-latest
+    runs-on: macos-latest-xl
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
@@ -55,7 +55,10 @@ jobs:
           path: dist
 
       - name: Install from wheel
-        run: pip install dist/*.whl
+        run: |
+          python --version
+          pip --version
+          pip install dist/*.whl
 
       - name: Test installation
         run: python ./tools/check_install.py
