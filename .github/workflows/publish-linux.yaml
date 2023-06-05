@@ -86,4 +86,4 @@ jobs:
         run: |
           poetry config repositories.test-pypi https://test.pypi.org/legacy/
           poetry config pypi-token.test-pypi ${{ secrets.TEST_PYPI_TOKEN }}
-          poetry publish -r test-pypi -n
+          poetry publish -r test-pypi --no-interaction --skip-existing
