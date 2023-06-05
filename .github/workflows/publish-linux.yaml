@@ -79,7 +79,7 @@ jobs:
       - name: Move wheels and sources to dist/
         run: |
           mv dist/*/*.whl dist/
-          mv -f dist/*/*.tar.gz dist/
+          mv -n dist/*/*.tar.gz dist/
 
       - name: Publish to PyPI
         # TODO: change to prod PyPI, and prod token in repo's secrets
