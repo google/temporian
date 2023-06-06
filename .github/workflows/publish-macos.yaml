@@ -39,6 +39,10 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
+    # Workaround for macos pip compatibility issue
+    # See https://github.com/actions/setup-python/issues/469
+    env:
+      SYSTEM_VERSION_COMPAT: 0
     steps:
       - name: Checkout
         uses: actions/checkout@v3
