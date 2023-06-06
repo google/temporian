@@ -62,8 +62,8 @@ py_test(
 )
 
 py_test(
-    name = "serialize_test",
-    srcs = ["serialize_test.py"],
+    name = "serialization_test",
+    srcs = ["serialization_test.py"],
     srcs_version = "PY3",
     deps = [
         ":utils",
@@ -71,7 +71,7 @@ py_test(
         # already_there/absl/testing:absltest
         "//temporian",
         "//temporian/core:graph",
-        "//temporian/core:serialize",
+        "//temporian/core:serialization",
         "//temporian/core/data:dtype",
         "//temporian/implementation/numpy/data:io",
     ],

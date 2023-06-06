@@ -14,7 +14,7 @@ py_library(
         "//temporian/core:evaluation",
         "//temporian/core:graph",
         "//temporian/core:operator_lib",
-        "//temporian/core:serialize",
+        "//temporian/core:serialization",
         "//temporian/core/data:dtype",
         "//temporian/core/data:duration",
         "//temporian/core/data:node",

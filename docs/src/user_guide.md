@@ -1,8 +1,6 @@
 # User Guide
 
-This is a complete tour of Temporian's capabilities.
-
-Feel free to read the first sections (e.g. up until [Index, horizontal and vertical operators](#index-horizontal-and-vertical-operators)) and then look at some of the task-specific [tutorials](https://temporian.readthedocs.io/en/latest/tutorials/).
+This is a complete tour of Temporian's capabilities. For a brief introduction to how the library works, please refer to [3 minutes to Temporian](./3_minutes).
 
 ## What is temporal data?
 
@@ -16,22 +14,22 @@ The most basic unit of data in Temporian is referred to as an _event_. An event 
 
 Here is an example of an event:
 
-```python
-"timestamp": 05-02-2023
-"feature_1": 0.5
-"feature_2": "red"
-"feature_3": 10
+```
+timestamp: 05-02-2023
+feature_1: 0.5
+feature_2: "red"
+feature_3: 10
 ```
 
 Events are not handled individually. Instead, events are grouped together into **`EventSets`**. When representing an `EventSet`, it is convenient to group similar features together and to sort them according to the timestamps in increasing order.
 
-Here is an example of an `EventSet` containing four events:
+Here is an example of an `EventSet` containing four events, each with three features:
 
-```python
-"timestamp": [04-02-2023, 06-02-2023, 07-02-2023, 07-02-2023]
-"feature_1": [0.5, 0.6, NaN, 0.9]
-"feature_2": ["red", "blue", "red", "blue"]
-"feature_3":  [10, -1, 5, 5]
+```
+timestamp: [04-02-2023, 06-02-2023, 07-02-2023, 07-02-2023]
+feature_1: [0.5, 0.6, NaN, 0.9]
+feature_2: ["red", "blue", "red", "blue"]
+feature_3:  [10, -1, 5, 5]
 ```
 
 **Remarks:**
@@ -92,7 +90,7 @@ Let's see how to compute the simple moving average of two features `feature_1` a
 
 ```python
 # Define the input of the graph.
-a_node = tp.input_node(
+a_node = tp.source_node(
     features=[
         ("feature_1", tp.float64),
         ("feature_2", tp.int64),
@@ -346,7 +344,7 @@ Note however that some operators do output new feature names not present in thei
 Temporian is strict on feature data types (also called dtype). This means that often, you cannot perform operations between features of different types. For example, you cannot subtract a `tp.float32` and a `tp.float64`. Instead, you must manually cast the features to the same type before performing the operation.
 
 ```python
-node = tp.input_node(features=[("f1", tp.float32), ("f2", tp.float64)])
+node = tp.source_node(features=[("f1", tp.float32), ("f2", tp.float64)])
 
 added = tp.cast(node["f1"], tp.float64) + node["f2"]
 ```
@@ -706,7 +704,7 @@ To avoid future leakage, Temporian operators are guaranteed to not cause future 
 `tp.leak` can be useful for precomputing labels or evaluating machine learning models. However, its outputs shouldn’t be used as input features. To check programmatically if a `Node` depends on `tp.leak`, we can use the `tp.has_leak` function.
 
 ```python
->>> a = tp.input_node(features=[("feature_1", tp.float32)])
+>>> a = tp.source_node(features=[("feature_1", tp.float32)])
 >>> b = tp.moving_count(a, 1)
 >>> c = tp.moving_count(tp.leak(b, 1), 2)
 

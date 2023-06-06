@@ -31,7 +31,7 @@ class GlueNumpyImplementation(OperatorImplementation):
 
     def __call__(
         self,
-        **inputs: Dict[str, EventSet],
+        **inputs: EventSet,
     ) -> Dict[str, EventSet]:
         assert isinstance(self.operator, GlueOperator)
         output_schema = self.output_schema("output")

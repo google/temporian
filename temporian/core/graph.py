@@ -191,7 +191,7 @@ def infer_graph(inputs: Optional[Set[Node]], outputs: Set[Node]) -> Graph:
     """Extracts the nodes in between the output and input nodes.
 
     If inputs is set, fails if outputs cannot be computed from `inputs`.
-    If inputs is not set, infers the set of input required.
+    If inputs is not set, infers the required set of inputs.
 
     Args:
         inputs: Set of available input nodes. If None, inputs are inferred.

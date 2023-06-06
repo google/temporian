@@ -7,7 +7,7 @@ from temporian.implementation.numpy.data.event_set import (
     EventSet,
     IndexData,
     numpy_array_to_tp_dtype,
-    normalize_timestamp,
+    normalize_timestamps,
     normalize_features,
 )
 from temporian.core.evaluation import evaluate
@@ -15,23 +15,26 @@ from temporian.core.operators.all_operators import add_index
 from temporian.core.data.schema import Schema
 
 # Array of values as feed by the user.
-DataArray = Union[List[Any], np.ndarray]
+DataArray = Union[List[Any], np.ndarray, "pandas.Series"]
 
 
+# Note: Keep the documentation about supported types in sync with
+# "normalize_timestamp" and "normalize_features".
 def event_set(
     timestamps: DataArray,
     features: Optional[Dict[str, DataArray]] = None,
     index_features: Optional[List[str]] = None,
     name: Optional[str] = None,
-    is_unix_timestamp: Union[bool, str] = "auto",
+    is_unix_timestamp: Optional[bool] = None,
     same_sampling_as: Optional[EventSet] = None,
 ) -> EventSet:
-    """Creates an event set from raw data (e.g. python lists,  numpy arrays).
+    """Creates an event set from arrays (list, numpy, pandas).
 
     Usage example:
 
         ```python
-        evset = tp.evset = tp.event_set(
+        # Creates an event set with 4 timestamps and 3 features.
+        evset = tp.event_set(
             timestamps=[1, 2, 3, 4],
             features={
                 "feature_1": [0.5, 0.6, math.nan, 0.9],
@@ -39,22 +42,65 @@ def event_set(
                 "feature_3": [10, -1, 5, 5],
             },
         )
+
+        # Creates an event set with an index.
+        evset = tp.event_set(
+            timestamps=[1, 2, 3, 4],
+            features={
+                "feature_1": [0.5, 0.6, math.nan, 0.9],
+                "feature_2": ["red", "blue", "red", "blue"],
+            },
+            index_features=["feature_2"],
+        )
+
+        # Create an evet set with datetimes.
+        from datetime import datetime
+        evset = tp.event_set(
+            timestamps=[datetime(2015, 1, 1), datetime(2015, 1, 2)],
+            features={
+                "feature_1": [0.5, 0.6],
+                "feature_2": ["red", "blue"],
+            },
+            index_features=["feature_2"],
+        )
         ```
 
+    Supported values for `timestamps`:
+
+        - List of int, float, str, bytes and datetime.
+        - Numpy arrays of int{32, 64}, float{32, 64}, str_, string_ / bytes_,
+           Numpy datetime64, and object containing "str".
+        - Pandas series of int{32, 64}, float{32, 64}, Pandas Timestamp.
+
+    String timestamps are interpreted as ISO 8601 datetime.
+
+    Supported values for `features`:
+
+        - List of int, float, str, bytes, bool, and datetime.
+        - Numpy arrays of int{32, 64}, float{32, 64}, str_, string_ / bytes_,
+            Numpy datetime64, or object containing "str".
+        - Pandas series of int{32, 64}, float{32, 64}, Pandas Timestamp.
+
+    Date / datetime features are converted to int64 unix times.
+    NaN for float-like features are interpreted as missing values.
+
     Args:
-        timestamps: Array of timestamps values. Can be a list of numpy array of
-            float, integer, datetimes or dates.
-        features: Dictionary of feature values.
-        index_features: Names of the features in `features` to be used as index.
-          If empty (default), the data is not indexed.
-        name: Name of the node.
-        is_unix_timestamp: If "auto" (default), the fact that the timestamp is
-          interpretable as unix timestamps is true if the timestamps are date
-          or date-like object. If `is_unix_timestamp` is boolean,
-          `is_unix_timestamp` defines if the timestamps are unix timestamps.
-        same_sampling_as: If set, the created event set is guarentied to have
-          the same sampling as `same_sampling_as`. Some operators require for
-          input nodes to have the same sampling.
+        timestamps: Array of timestamps values.
+        features: Dictionary of feature names to feature values. Feature
+            and timestamp arrays must be of the same length.
+        index_features: Names of the features to use as index. If empty
+            (default), the data is not indexed. Only integer and string features
+            can be used as index.
+        name: Optional name of the event set. Used for debugging, and
+            graph serialization.
+        is_unix_timestamp: Whether the timestamps correspond to unix time. Unix
+            times are required for calendar operators. If `None` (default),
+            timestamps are interpreted as unix times if the `timestamps`
+            argument is an array of date or date-like object.
+        same_sampling_as: If set, the new event set is cheched and tagged as
+            having the same sampling as `same_sampling_as`. Some operators,
+            such as `tp.filter`, require their inputes to have the same
+            sampling.
 
     Returns:
         An event set.
@@ -68,14 +114,14 @@ def event_set(
     }
 
     # Convert timestamps to expected type.
-    timestamps, auto_is_unix_timestamp = normalize_timestamp(timestamps)
+    timestamps, auto_is_unix_timestamp = normalize_timestamps(timestamps)
 
     if not np.all(timestamps[:-1] <= timestamps[1:]):
         order = np.argsort(timestamps, kind="mergesort")
         timestamps = timestamps[order]
         features = {name: value[order] for name, value in features.items()}
 
-    if is_unix_timestamp == "auto":
+    if is_unix_timestamp is None:
         is_unix_timestamp = auto_is_unix_timestamp
     assert isinstance(is_unix_timestamp, bool)
 
@@ -149,43 +195,53 @@ def pd_dataframe_to_event_set(
     name: Optional[str] = None,
     same_sampling_as: Optional[EventSet] = None,
 ) -> EventSet:
-    """Converts a pandas DataFrame into an Event Set.
+    """Converts a Pandas DataFrame into an Event Set.
+
+    TODO: Rename argument `index_names` to `index_features`.
+
+    The column `timestamp_column` (default to "timestamp") contains the
+    timestamps. Columns `index_names` (default to `None`, equivalent to `[]`),
+    contains the index. The remaining columns are converted into features.
+
+    See `tp.event_set` for the list of supported timestamp and feature types.
+
+    Usage example:
+
+    ```
+    import pandas as pd
+    df = pd.DataFrame(
+        data=[
+            [1.0, 5, "A"],
+            [2.0, 6, "A"],
+            [3.0, 7, "B"],
+        ],
+        columns=["timestamp", "feature_1", "feature_2"],
+    )
+
+    evset = tp.pd_dataframe_to_event_set(df, index_names=["feature_2"])
+    ```
 
     Args:
-        df: DataFrame to convert to an EventSet.
-        index_names: Names of the DataFrame columns to be used as index for
-            the event set. Defaults to [].
-        timestamp_column: Name of the column containing the timestamps.
-            Supported date types:
-            `{np.datetime64, pd.Timestamp, datetime.datetime}`.
-            Timestamps of these types are converted to UTC epoch float.
-        is_sorted: If True, the DataFrame is assumed to be sorted by
-            timestamp. If False, the DataFrame will be sorted by timestamp.
-        name: Optional name for the EventSet.
-        same_sampling_as: If set, the created event set is guarentied to have
-          the same sampling as `same_sampling_as`.
-
+        df: A non indexed Pandas dataframe.
+        index_names: Names of the features to use as index. If empty
+            (default), the data is not indexed. Only integer and string features
+            can be used as index.
+        timestamp_column: Name of the column containing the timestamps. See
+            `tp.event_set`for the list of supported timestamp types.
+        name: Optional name of the event set. Used for debugging, and
+            graph serialization.
+        same_sampling_as: If set, the new event set is cheched and tagged as
+            having the same sampling as `same_sampling_as`. Some operators,
+            such as `tp.filter`, require their inputes to have the same
+            sampling.
 
     Returns:
-        EventSet created from DataFrame.
+        An event set.
 
     Raises:
         ValueError: If `index_names` or `timestamp_column` are not in `df`'s
             columns.
         ValueError: If a column has an unsupported dtype.
-
-    Example:
-        >>> import pandas as pd
-        >>> from temporian.implementation.numpy.data.event_set import EventSet
-        >>> df = pd.DataFrame(
-        ...     data=[
-        ...         [666964, 1.0, 740.0],
-        ...         [666964, 2.0, 508.0],
-        ...         [574016, 3.0, 573.0],
-        ...     ],
-        ...     columns=["product_id", "timestamp", "costs"],
-        ... )
-        >>> evset = pd_dataframe_to_event_set(df, index_names=["product_id"])
     """
 
     feature_dict = df.drop(columns=timestamp_column).to_dict("series")
@@ -202,11 +258,13 @@ def pd_dataframe_to_event_set(
 def event_set_to_pd_dataframe(
     evtset: EventSet,
 ) -> "pandas.DataFrame":
-    """Convert a EventSet to a pandas DataFrame.
+    """Convert an EventSet to a pandas DataFrame.
 
     Returns:
         DataFrame created from EventSet.
     """
+
+    import pandas as pd
 
     timestamp_key = "timestamp"
 
@@ -232,7 +290,5 @@ def event_set_to_pd_dataframe(
         # Indexes
         for i, index_name in enumerate(evtset.schema.index_names()):
             data[index_name].extend([index_key[i]] * len(index_data.timestamps))
-
-    import pandas as pd
 
     return pd.DataFrame(data)

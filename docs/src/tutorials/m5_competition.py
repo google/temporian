@@ -77,8 +77,8 @@ calendar_raw.info()
 
 # Melt dataset
 #
-# The different timesteps of sale data ("sales_raw") are stored in different
-# columns. Instead, we want for each timesteps to be a different row.
+# The different timestamps of sale data ("sales_raw") are stored in different
+# columns. Instead, we want for each timestamps to be a different row.
 #
 # For example:
 #   The record "id,item_id,dept_id,d_1,d_2,d_3...d_n" will be converted into

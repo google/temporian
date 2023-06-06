@@ -51,6 +51,8 @@ class OperatorExceptionDecorator(object):
             # No exceptions
             return True
 
+        # TODO: Add more details about the caller.
+
         if exc_val:
             # Add operator details in the exception.
             message = f"While running operator {self._operator!r}.\n"

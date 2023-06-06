@@ -2,7 +2,13 @@
 from typing import List, Optional
 
 from temporian.core.data.dtype import DType
-from temporian.core.data.node import Node, input_node
+from temporian.core.data.node import (
+    Node,
+    source_node,
+    create_node_with_new_reference,
+    create_node_new_features_new_sampling,
+    create_node_new_features_existing_sampling,
+)
 from temporian.core.operators import base
 from temporian.proto import core_pb2 as pb
 from temporian.core import operator_lib
@@ -13,8 +19,8 @@ from temporian.implementation.numpy.data.io import event_set
 # For example "OpI1O2" has 1 input and 2 outputs.
 
 
-def create_input_node(name: Optional[str] = None):
-    return input_node(
+def create_source_node(name: Optional[str] = None):
+    return source_node(
         features=[
             ("f1", DType.FLOAT64),
             ("f2", DType.FLOAT64),
@@ -53,7 +59,7 @@ class OpI1O1(base.Operator):
         self.add_input("input", input)
         self.add_output(
             "output",
-            Node.create_new_features_new_sampling(
+            create_node_new_features_new_sampling(
                 features=[
                     ("f3", DType.FLOAT64),
                     ("f4", DType.INT64),
@@ -85,7 +91,7 @@ class OpI1O1NotCreator(base.Operator):
         self.add_input("input", input)
         self.add_output(
             "output",
-            Node.create_with_new_reference(
+            create_node_with_new_reference(
                 schema=input.schema,
                 features=input.feature_nodes,
                 sampling=input.sampling_node,
@@ -116,7 +122,7 @@ class OpI2O1(base.Operator):
         self.add_input("input_2", input_2)
         self.add_output(
             "output",
-            Node.create_new_features_existing_sampling(
+            create_node_new_features_existing_sampling(
                 features=[
                     ("f5", DType.BOOLEAN),
                     ("f6", DType.STRING),
@@ -150,7 +156,7 @@ class OpI1O2(base.Operator):
         self.add_input("input", input)
         self.add_output(
             "output_1",
-            Node.create_new_features_existing_sampling(
+            create_node_new_features_existing_sampling(
                 features=[("f1", DType.INT32)],
                 sampling_node=input,
                 creator=self,
@@ -158,7 +164,7 @@ class OpI1O2(base.Operator):
         )
         self.add_output(
             "output_2",
-            Node.create_new_features_existing_sampling(
+            create_node_new_features_existing_sampling(
                 features=[("f1", DType.FLOAT32)],
                 sampling_node=input,
                 creator=self,
@@ -236,7 +242,7 @@ class OpWithAttributes(base.Operator):
         self.add_input("input", input)
         self.add_output(
             "output",
-            Node.create_new_features_existing_sampling(
+            create_node_new_features_existing_sampling(
                 features=[],
                 sampling_node=input,
                 creator=self,

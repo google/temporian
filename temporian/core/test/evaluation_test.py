@@ -21,7 +21,7 @@ from temporian.implementation.numpy.data.event_set import EventSet
 
 class EvaluationTest(absltest.TestCase):
     def test_schedule_trivial(self):
-        a = utils.create_input_node()
+        a = utils.create_source_node()
         b = utils.OpI1O1(a)
 
         schedule = evaluation.build_schedule(
@@ -30,14 +30,14 @@ class EvaluationTest(absltest.TestCase):
         self.assertEqual(schedule.ordered_operators, [b])
 
     def test_schedule_empty(self):
-        a = utils.create_input_node()
+        a = utils.create_source_node()
 
         schedule = evaluation.build_schedule(inputs={a}, outputs={a})
         self.assertEqual(schedule.ordered_operators, [])
 
     def test_schedule_two_delayed_inputs(self):
-        i1 = utils.create_input_node()
-        i2 = utils.create_input_node()
+        i1 = utils.create_source_node()
+        i2 = utils.create_source_node()
         o1 = utils.OpI1O1(i1)
         o2 = utils.OpI1O1(i2)
         o3 = utils.OpI2O1(o1.outputs["output"], o2.outputs["output"])
@@ -50,9 +50,9 @@ class EvaluationTest(absltest.TestCase):
         )
 
     def test_schedule_basic(self):
-        i1 = utils.create_input_node()
+        i1 = utils.create_source_node()
         o2 = utils.OpI1O1(i1)
-        i3 = utils.create_input_node()
+        i3 = utils.create_source_node()
         o4 = utils.OpI2O1(o2.outputs["output"], i3)
         o5 = utils.OpI1O2(o4.outputs["output"])
 
@@ -66,7 +66,7 @@ class EvaluationTest(absltest.TestCase):
         )
 
     def test_schedule_mid_chain(self):
-        i1 = utils.create_input_node()
+        i1 = utils.create_source_node()
         o2 = utils.OpI1O1(i1)
         o3 = utils.OpI1O1(o2.outputs["output"])
         o4 = utils.OpI1O1(o3.outputs["output"])
@@ -78,13 +78,13 @@ class EvaluationTest(absltest.TestCase):
         self.assertEqual(schedule.ordered_operators, [o4, o5])
 
     def test_evaluate_value(self):
-        i1 = utils.create_input_node()
+        i1 = utils.create_source_node()
         result = evaluation.evaluate(i1, {i1: utils.create_input_event_set()})
         self.assertIsInstance(result, EventSet)
 
     def test_evaluate_query_list(self):
-        i1 = utils.create_input_node()
-        i2 = utils.create_input_node()
+        i1 = utils.create_source_node()
+        i2 = utils.create_source_node()
         result = evaluation.evaluate(
             [i1, i2],
             {
@@ -96,8 +96,8 @@ class EvaluationTest(absltest.TestCase):
         self.assertLen(result, 2)
 
     def test_evaluate_query_dict(self):
-        i1 = utils.create_input_node()
-        i2 = utils.create_input_node()
+        i1 = utils.create_source_node()
+        i2 = utils.create_source_node()
         result = evaluation.evaluate(
             {"i1": i1, "i2": i2},
             {
@@ -153,7 +153,7 @@ class EvaluationTest(absltest.TestCase):
         self.assertTrue(result[2] is e2)
 
     def test_evaluate_repeated_unnamed_inputs(self):
-        i1 = utils.create_input_node(name="i1")
+        i1 = utils.create_source_node(name="i1")
         evset_1 = utils.create_input_event_set(name="i1")
         evset_2 = utils.create_input_event_set(name="i1")
 

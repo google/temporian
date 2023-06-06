@@ -17,7 +17,7 @@
 from typing import List, Union
 
 from temporian.core import operator_lib
-from temporian.core.data.node import Node
+from temporian.core.data.node import Node, create_node_with_new_reference
 from temporian.core.operators.base import Operator
 from temporian.core.data.schema import Schema
 from temporian.proto import core_pb2 as pb
@@ -48,7 +48,7 @@ class SelectOperator(Operator):
 
         self.add_output(
             "output",
-            Node.create_with_new_reference(
+            create_node_with_new_reference(
                 schema=Schema(
                     features=output_feature_schemas,
                     indexes=input.schema.indexes,

@@ -1,6 +1,6 @@
 package(
-    default_visibility = ["//visibility:public"],
-    licenses = ["notice"],
+    default_visibility=["//visibility:public"],
+    licenses=["notice"],
 )
 
 py_library(
@@ -8,7 +8,7 @@ py_library(
     srcs = ["test_util.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/core:serialize",
+        "//temporian/core:serialization",
         "//temporian/core/operators:base",
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/operators:base",
@@ -59,10 +59,10 @@ py_test(
 )
 
 py_test(
-    name = "arithmetic_scalar_test",
-    srcs = ["arithmetic_scalar_test.py"],
-    srcs_version = "PY3",
-    deps = [
+    name="arithmetic_scalar_test",
+    srcs=["arithmetic_scalar_test.py"],
+    srcs_version="PY3",
+    deps=[
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
@@ -88,10 +88,10 @@ py_test(
 )
 
 py_test(
-    name = "arithmetic_multi_index_test",
-    srcs = ["arithmetic_multi_index_test.py"],
-    srcs_version = "PY3",
-    deps = [
+    name="arithmetic_multi_index_test",
+    srcs=["arithmetic_multi_index_test.py"],
+    srcs_version="PY3",
+    deps=[
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
@@ -106,10 +106,10 @@ py_test(
 )
 
 py_test(
-    name = "cast_test",
-    srcs = ["cast_test.py"],
-    srcs_version = "PY3",
-    deps = [
+    name="cast_test",
+    srcs=["cast_test.py"],
+    srcs_version="PY3",
+    deps=[
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
@@ -125,10 +125,10 @@ py_test(
 )
 
 py_test(
-    name = "filter_test",
-    srcs = ["filter_test.py"],
-    srcs_version = "PY3",
-    deps = [
+    name="filter_test",
+    srcs=["filter_test.py"],
+    srcs_version="PY3",
+    deps=[
         ":test_util",
         # already_there/absl/testing:absltest
         "//temporian/core/operators:filter",
@@ -138,10 +138,10 @@ py_test(
 )
 
 py_test(
-    name = "glue_test",
-    srcs = ["glue_test.py"],
-    srcs_version = "PY3",
-    deps = [
+    name="glue_test",
+    srcs=["glue_test.py"],
+    srcs_version="PY3",
+    deps=[
         ":test_util",
         # already_there/absl/testing:absltest
         "//temporian/core/data:dtype",
@@ -153,10 +153,10 @@ py_test(
 )
 
 py_test(
-    name = "unary_test",
-    srcs = ["unary_test.py"],
-    srcs_version = "PY3",
-    deps = [
+    name="unary_test",
+    srcs=["unary_test.py"],
+    srcs_version="PY3",
+    deps=[
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
@@ -169,10 +169,10 @@ py_test(
 )
 
 py_test(
-    name = "calendar_day_of_month_test",
-    srcs = ["calendar_day_of_month_test.py"],
-    srcs_version = "PY3",
-    deps = [
+    name="calendar_day_of_month_test",
+    srcs=["calendar_day_of_month_test.py"],
+    srcs_version="PY3",
+    deps=[
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
@@ -185,10 +185,10 @@ py_test(
 )
 
 py_test(
-    name = "calendar_day_of_week_test",
-    srcs = ["calendar_day_of_week_test.py"],
-    srcs_version = "PY3",
-    deps = [
+    name="calendar_day_of_week_test",
+    srcs=["calendar_day_of_week_test.py"],
+    srcs_version="PY3",
+    deps=[
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
@@ -200,10 +200,10 @@ py_test(
 )
 
 py_test(
-    name = "calendar_day_of_year_test",
-    srcs = ["calendar_day_of_year_test.py"],
-    srcs_version = "PY3",
-    deps = [
+    name="calendar_day_of_year_test",
+    srcs=["calendar_day_of_year_test.py"],
+    srcs_version="PY3",
+    deps=[
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
@@ -215,10 +215,10 @@ py_test(
 )
 
 py_test(
-    name = "calendar_hour_test",
-    srcs = ["calendar_hour_test.py"],
-    srcs_version = "PY3",
-    deps = [
+    name="calendar_hour_test",
+    srcs=["calendar_hour_test.py"],
+    srcs_version="PY3",
+    deps=[
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
@@ -230,10 +230,10 @@ py_test(
 )
 
 py_test(
-    name = "calendar_iso_week_test",
-    srcs = ["calendar_iso_week_test.py"],
-    srcs_version = "PY3",
-    deps = [
+    name="calendar_iso_week_test",
+    srcs=["calendar_iso_week_test.py"],
+    srcs_version="PY3",
+    deps=[
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
@@ -245,10 +245,10 @@ py_test(
 )
 
 py_test(
-    name = "calendar_minute_test",
-    srcs = ["calendar_minute_test.py"],
-    srcs_version = "PY3",
-    deps = [
+    name="calendar_minute_test",
+    srcs=["calendar_minute_test.py"],
+    srcs_version="PY3",
+    deps=[
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
@@ -260,10 +260,10 @@ py_test(
 )
 
 py_test(
-    name = "calendar_month_test",
-    srcs = ["calendar_month_test.py"],
-    srcs_version = "PY3",
-    deps = [
+    name="calendar_month_test",
+    srcs=["calendar_month_test.py"],
+    srcs_version="PY3",
+    deps=[
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
@@ -275,10 +275,10 @@ py_test(
 )
 
 py_test(
-    name = "calendar_second_test",
-    srcs = ["calendar_second_test.py"],
-    srcs_version = "PY3",
-    deps = [
+    name="calendar_second_test",
+    srcs=["calendar_second_test.py"],
+    srcs_version="PY3",
+    deps=[
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
@@ -290,10 +290,10 @@ py_test(
 )
 
 py_test(
-    name = "calendar_year_test",
-    srcs = ["calendar_year_test.py"],
-    srcs_version = "PY3",
-    deps = [
+    name="calendar_year_test",
+    srcs=["calendar_year_test.py"],
+    srcs_version="PY3",
+    deps=[
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
@@ -305,10 +305,10 @@ py_test(
 )
 
 py_test(
-    name = "lag_test",
-    srcs = ["lag_test.py"],
-    srcs_version = "PY3",
-    deps = [
+    name="lag_test",
+    srcs=["lag_test.py"],
+    srcs_version="PY3",
+    deps=[
         ":test_util",
         # already_there/absl/testing:absltest
         "//temporian/core/operators:lag",
@@ -333,10 +333,10 @@ py_test(
 )
 
 py_test(
-    name = "drop_index_test",
-    srcs = ["drop_index_test.py"],
-    srcs_version = "PY3",
-    deps = [
+    name="drop_index_test",
+    srcs=["drop_index_test.py"],
+    srcs_version="PY3",
+    deps=[
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/pandas
@@ -377,10 +377,10 @@ py_test(
 )
 
 py_test(
-    name = "add_index_test",
-    srcs = ["add_index_test.py"],
-    srcs_version = "PY3",
-    deps = [
+    name="add_index_test",
+    srcs=["add_index_test.py"],
+    srcs_version="PY3",
+    deps=[
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/pandas

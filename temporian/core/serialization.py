@@ -46,7 +46,7 @@ def save(
 
     Usage example:
         ```python
-        a = t.input_node(...)
+        a = t.source_node(...)
         b = t.sma(a, window_length=7.0)
         t.save(inputs={"io_a": a}, outputs={"io_b": b}, path="graph.tem")
 
@@ -110,9 +110,9 @@ def serialize(src: graph.Graph) -> pb.Graph:
     """Serializes a graph into a protobuffer."""
 
     if src.named_inputs is None:
-        raise ValueError("Cannot serialized a graph without named input nodes")
+        raise ValueError("Cannot serialize a graph without named input nodes")
     if src.named_outputs is None:
-        raise ValueError("Cannot serialized a graph without named output nodes")
+        raise ValueError("Cannot serialize a graph without named output nodes")
 
     return pb.Graph(
         operators=[_serialize_operator(o) for o in src.operators],

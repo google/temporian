@@ -18,7 +18,10 @@ from abc import abstractmethod
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
-from temporian.core.data.node import Node
+from temporian.core.data.node import (
+    Node,
+    create_node_new_features_existing_sampling,
+)
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -45,7 +48,7 @@ class BaseUnaryOperator(Operator):
 
         self.add_output(
             "output",
-            Node.create_new_features_existing_sampling(
+            create_node_new_features_existing_sampling(
                 features=[
                     (feature.name, self.get_output_dtype(feature.dtype))
                     for feature in input.schema.features

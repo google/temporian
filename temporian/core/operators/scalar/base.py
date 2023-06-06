@@ -17,7 +17,10 @@
 from typing import Union, List
 
 from temporian.core.data.dtype import DType
-from temporian.core.data.node import Node
+from temporian.core.data.node import (
+    Node,
+    create_node_new_features_existing_sampling,
+)
 from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
@@ -92,7 +95,7 @@ class BaseScalarOperator(Operator):
 
         self.add_output(
             "output",
-            Node.create_new_features_existing_sampling(
+            create_node_new_features_existing_sampling(
                 features=output_features,
                 sampling_node=input,
                 creator=self,

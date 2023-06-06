@@ -46,7 +46,7 @@ def _check_overflow(
         raise ValueError(
             f"Overflow when casting feature {feature_name!r} from dtype"
             f" {origin_dtype} to dtype {dst_dtype} {data=}. You can disable"
-            " overflow checking with check_overflow=True."
+            " overflow checking with check_overflow=False."
         )
 
 
