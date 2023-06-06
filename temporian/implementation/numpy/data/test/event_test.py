@@ -2,6 +2,8 @@ from absl.testing import absltest
 
 from temporian.implementation.numpy.data.io import event_set
 
+# TODO: Rename file to "event_set_test" and rename the following class to EventSetTest.
+
 
 class EventTest(absltest.TestCase):
     def setUp(self):

@@ -16,7 +16,7 @@
 
 
 from temporian.core import operator_lib
-from temporian.core.data.node import Node
+from temporian.core.data.node import Node, create_node_new_features_new_sampling
 from temporian.core.operators.base import Operator
 from temporian.core.operators.resample import Resample
 from temporian.proto import core_pb2 as pb
@@ -60,7 +60,7 @@ class Propagate(Operator):
         # Note: The propagate operator creates a new sampling.
         self.add_output(
             "output",
-            Node.create_new_features_new_sampling(
+            create_node_new_features_new_sampling(
                 features=input.schema.features,
                 indexes=sampling.schema.indexes,
                 is_unix_timestamp=sampling.schema.is_unix_timestamp,
@@ -90,10 +90,12 @@ class Propagate(Operator):
 operator_lib.register_operator(Propagate)
 
 
+# TODO: Do we want for "propagate" to take a list of feature names
+# (like add_index) instead?
 def propagate(input: Node, sampling: Node, resample: bool = False) -> Node:
-    """Propagates feature values over a larger index.
+    """Propagates feature values over a sub index.
 
-    Given `input` and `sampling` where `input` contains a super index of
+    Given `input` and `sampling` where `input` has a super index of
     `sampling` (e.g., the index of `input` is `["x"]`, and the index of
     `sampling` is `["x","y"]`), duplicates the features of `input` over the
     index of `sampling`.
@@ -117,7 +119,7 @@ def propagate(input: Node, sampling: Node, resample: bool = False) -> Node:
         input: Node to propagate.
         sampling: Index to propagate over.
         resample: If true, apply a tp.resample operator. In this case, the
-          output of `propagate` has the same sampling as `sampling`.
+            output of `propagate` has the same sampling as `sampling`.
 
     Returns:
         Node propagated over `sampling`'s index.

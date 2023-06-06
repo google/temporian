@@ -25,6 +25,9 @@ from typing import Union, Optional
 import numpy as np
 
 # Unit for durations
+#
+# NormalizedDuration is used by internal code that handle duration.
+# Duration is a duration provided by the user though the API.
 NormalizedDuration = float
 Duration = Union[float, int]
 
@@ -56,12 +59,6 @@ def normalize_timestamp(x: Timestamp) -> NormalizedTimestamp:
         return x
 
     raise ValueError(f"Invalid timestamp {x!r} of type {type(x)}.")
-
-
-def normalize_timestamp_or_none(x: Optional[Timestamp]) -> NormalizedTimestamp:
-    if x is None:
-        return None
-    return normalize_timestamp(x)
 
 
 def milliseconds(value: Union[int, float]) -> Duration:

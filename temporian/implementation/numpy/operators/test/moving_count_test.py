@@ -166,7 +166,7 @@ class MovingCountOperatorTest(absltest.TestCase):
         op = MovingCountOperator(
             input=evset.node(),
             window_length=3.1,
-            sampling=node_lib.input_node([]),
+            sampling=node_lib.source_node([]),
         )
         self.assertEqual(
             op.list_matching_io_samplings(), [("sampling", "output")]
@@ -226,7 +226,7 @@ class MovingCountOperatorTest(absltest.TestCase):
         op = MovingCountOperator(
             input=evset.node(),
             window_length=1.1,
-            sampling=node_lib.input_node([]),
+            sampling=node_lib.source_node([]),
         )
         instance = MovingCountNumpyImplementation(op)
 

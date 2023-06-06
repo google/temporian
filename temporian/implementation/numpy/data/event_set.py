@@ -16,12 +16,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 import math
+import datetime
 
 import numpy as np
-import pandas as pd
 
 from temporian.core.data.dtype import DType
-from temporian.core.data.node import Node
+from temporian.core.data.node import Node, create_node_with_new_reference
 from temporian.core.data.schema import Schema
 from temporian.utils import string
 
@@ -96,7 +96,9 @@ def tp_dtype_to_np_dtype(dtype: DType) -> Any:
 def normalize_features(
     feature_values: Any,
 ) -> np.ndarray:
-    """Normalies a list of feature values to temporian format.
+    """Normalizes a list of feature values to temporian format.
+
+    Keep this function in sync with the documentation of "io.event_set".
 
     `normalize_features` should match `_DTYPE_MAPPING`.
     """
@@ -147,10 +149,12 @@ def normalize_features(
     return feature_values
 
 
-def normalize_timestamp(
-    raw_timestamps: Any,
+def normalize_timestamps(
+    values: Any,
 ) -> Tuple[np.ndarray, bool]:
     """Normalizes timestamps to temporian format.
+
+    Keep this function in sync with the documentation of "io.event_set".
 
     Returns:
         Normalized timestamps (numpy float64 of unix epoch in seconds) and if
@@ -158,59 +162,54 @@ def normalize_timestamp(
     """
 
     # Convert to numpy array
-    if not isinstance(raw_timestamps, np.ndarray):
-        raw_timestamps = np.array(raw_timestamps)
+    if not isinstance(values, np.ndarray):
+        values = np.array(values)
 
-    # raw_timestamps is represented as a number. Cast to float64.
-    if raw_timestamps.dtype.type in [np.float32, np.int64, np.int32]:
-        raw_timestamps = raw_timestamps.astype(np.float64)
+    # values is represented as a number. Cast to float64.
+    if values.dtype.type in [np.float32, np.int64, np.int32]:
+        values = values.astype(np.float64)
 
-    if raw_timestamps.dtype.type == np.float64:
+    if values.dtype.type == np.float64:
         # Check NaN
-        if np.isnan(raw_timestamps).any():
+        if np.isnan(values).any():
             raise ValueError("Timestamps contains NaN values.")
 
-        return raw_timestamps, False
+        return values, False
 
-    if raw_timestamps.dtype.type == np.object_:
-        if all(isinstance(x, str) for x in raw_timestamps):
-            # raw_timestamps is a date. Cast to unix epoch in float64 seconds.
-            raw_timestamps = (
-                raw_timestamps.astype("datetime64[ns]").astype(np.float64) / 1e9
-            )
-            return raw_timestamps, True
+    if values.dtype.type in [np.str_, np.string_]:
+        values = values.astype("datetime64[ns]")
 
-        def is_pandas_timestamps(x):
-            return (
-                str(type(x))
-                == "<class 'pandas._libs.tslibs.timestamps.Timestamp'>"
-            )
+    if values.dtype.type == np.object_:
+        if all(isinstance(x, str) for x in values) or all(
+            isinstance(x, datetime.datetime) for x in values
+        ):
+            # values is a date. Cast to unix epoch in float64 seconds.
+            values = values.astype("datetime64[ns]")
 
-        if all(is_pandas_timestamps(x) for x in raw_timestamps):
-            raw_timestamps = np.array([x.to_numpy() for x in raw_timestamps])
+        elif all(
+            str(type(x)) == "<class 'pandas._libs.tslibs.timestamps.Timestamp'>"
+            for x in values
+        ):
+            values = np.array([x.to_numpy() for x in values])
 
-    if raw_timestamps.dtype.type == np.datetime64:
-        # raw_timestamps is a date. Cast to unix epoch in float64 seconds.
-        raw_timestamps = (
-            raw_timestamps.astype("datetime64[ns]").astype(np.float64) / 1e9
-        )
-        return raw_timestamps, True
+    if values.dtype.type == np.datetime64:
+        # values is a date. Cast to unix epoch in float64 seconds.
+        values = values.astype("datetime64[ns]").astype(np.float64) / 1e9
+        return values, True
 
-    object_description = (
-        f"{raw_timestamps!r}.\nDetails: type={type(raw_timestamps)}"
-    )
-    if isinstance(raw_timestamps, np.ndarray):
+    object_description = f"{values!r}.\nDetails: type={type(values)}"
+    if isinstance(values, np.ndarray):
         object_description += (
-            f" np.dtype={raw_timestamps.dtype}"
-            f" np.dtype.type={raw_timestamps.dtype.type}"
+            f" np.dtype={values.dtype} np.dtype.type={values.dtype.type}"
         )
-        if raw_timestamps.dtype.type == np.object_:
-            object_description += f" type(value[0])={type(raw_timestamps[0])}"
+        if values.dtype.type == np.object_:
+            object_description += f" type(value[0])={type(values[0])}"
 
+    # Keep this function in sync with the documentation of "io.event_set".
     raise ValueError(
-        "Invalid timestamps value. Timestamps can be (1) a list / np.array of"
-        " int,  float, int32, int64, float32, float64, str, np.datetime64, and"
-        f" pd.Timestamp. Instead, got {object_description}"
+        "Invalid timestamps value. Check `tp.event_set` documentation for the"
+        " list of supported timestamp types. Instead, got"
+        f" {object_description}."
     )
 
 
@@ -219,8 +218,8 @@ class IndexData:
     """Features and timestamps data for a single index item.
 
     Note: The `schema` constructor argument is only used for checking. If
-    schema=None, no checking is done. Checking can be done manually with
-    "index_data.check_schema(...)".
+    `schema=None`, no checking is done. Checking can be done manually with
+    `index_data.check_schema(...)`.
 
     Attributes:
         features: List of one-dimensional NumPy arrays representing the
@@ -320,7 +319,7 @@ class IndexData:
         return True
 
     def __len__(self) -> int:
-        """Number of events / timesteps."""
+        """Number of events / timestamps."""
 
         return len(self.timestamps)
 
@@ -363,7 +362,7 @@ class EventSet:
         self._name = name
 
     def get_arbitrary_index_value(self) -> Optional[Tuple]:
-        """Gets an arbitrary index item.
+        """Gets an arbitrary index value.
 
         If the event set is empty, return None.
         """
@@ -373,7 +372,7 @@ class EventSet:
         return None
 
     def get_arbitrary_index_data(self) -> Optional[IndexData]:
-        """Gets an arbitrary index item.
+        """Gets an arbitrary index data.
 
         If the event set is empty, return None.
         """
@@ -382,23 +381,43 @@ class EventSet:
             return next(iter(self._data.values()))
         return None
 
-    def node(self, force_new_node=False) -> Node:
+    def node(self, force_new_node: bool = False) -> Node:
         return self.source_node(force_new_node)
 
-    def source_node(self, force_new_node=False) -> Node:
+    def source_node(self, force_new_node: bool = False) -> Node:
         """Creates a node able to consume the the event set.
 
-        If called multiple times, always return the same node.
+        If called multiple times with force_new_node=False (default), the same
+        node is returned.
+
+        Usage example:
+
+        ```
+        my_evset = tp.event_set(
+            timestamps=[1, 2, 3, 4],
+            features={
+                "feature_1": [0.5, 0.6, math.nan, 0.9],
+                "feature_2": ["red", "blue", "red", "blue"],
+            },
+        )
+
+        my_node = my_evset.source_node()
+        ```
+
         Args:
-            force_new_node: If false (default), return the same node if `node`
-              is called multiple times. If true, return a new node each time.
+            force_new_node: If false (default), return the same node each time
+                `source_node` is called. If true, a new node is created each
+                time.
+
+        Returns:
+            A node able to consume the content of the event set.
         """
 
         if self._internal_node is not None and not force_new_node:
             # "node" was already called. Return the cached node.
             return self._internal_node
 
-        self._internal_node = Node.create_with_new_reference(
+        self._internal_node = create_node_with_new_reference(
             schema=self._schema,
             name=self._name,
         )
@@ -406,7 +425,7 @@ class EventSet:
 
     @staticmethod
     def from_dataframe(
-        df: pd.DataFrame,
+        df: "pd.DataFrame",
         index_names: Optional[List[str]] = None,
         timestamp_column: str = "timestamp",
         name: Optional[str] = None,
@@ -420,8 +439,10 @@ class EventSet:
             name=name,
         )
 
-    def to_dataframe(self) -> pd.DataFrame:
-        """Convert a EventSet to a pandas DataFrame.
+    def to_dataframe(self) -> "pd.DataFrame":
+        """Convert an EventSet to a pandas DataFrame.
+
+        See `tp.pd_dataframe_to_event_set` for details.
 
         Returns:
             DataFrame created from EventSet.

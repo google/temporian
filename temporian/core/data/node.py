@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Node and related classes"""
+"""Node and related classes."""
 
 from __future__ import annotations
 from dataclasses import dataclass
@@ -25,45 +25,19 @@ from temporian.utils import string
 if TYPE_CHECKING:
     from temporian.core.evaluation import EvaluationInput, EvaluationResult
     from temporian.core.operators.base import Operator
-    from temporian.implementation.numpy.data.event_set import EventSet
 
 T_SCALAR = (int, float)
-
-
-@dataclass
-class Sampling:
-    """A sampling is a reference to the way data is sampled."""
-
-    creator: Optional[Operator] = None
-
-    def __hash__(self):
-        return id(self)
-
-    def __repr__(self):
-        return f"Sampling(id={id(self)}, creator={self.creator})"
-
-
-@dataclass
-class Feature:
-    """A feature is a reference to sampled data."""
-
-    creator: Optional[Operator] = None
-
-    def __hash__(self):
-        return id(self)
-
-    def __repr__(self):
-        return f"Feature(id={id(self)}, creator={self.creator})"
 
 
 class Node(object):
     """A node is a reference to the input/output of ops in a compute graph.
 
-    A node does not contain any data. Use "node.evaluate(...)" to get the values
-    transiting in a node.
+    Use `tp.input_node` to create a node manually, or use
+    `event_set.source_node()` to create a node compatible with a given
+    event-set.
 
-    Use "tp.input_node" to create a node manually, or use "event_set.node()" to
-    create a node compatible with a given event set.
+    A node does not contain any data. Use `node.evaluate(...)` to get the
+    event-set resulting from a node.
     """
 
     def __init__(
@@ -74,130 +48,45 @@ class Node(object):
         name: Optional[str] = None,
         creator: Optional[Operator] = None,
     ):
-        """Creates a new node manualy.
-
-        When possible, use one of the helper functions below.
-        """
-
         self._schema = schema
         self._features = features
         self._sampling = sampling
         self._creator = creator
         self._name = name
 
-    @staticmethod
-    def create_new_features_existing_sampling(
-        features: Union[List[FeatureSchema], List[Tuple[str, DType]]],
-        sampling_node: Node,
-        creator: Optional[Operator],
-        name: Optional[str] = None,
-    ) -> Node:
-        """Creates a node with an existing sampling and new features.
-
-        When possible, this is the Node creation function to use.
-        """
-
-        # TODO: Use better way
-        assert sampling_node is not None
-        assert features is not None
-        assert isinstance(sampling_node, Node)
-        assert isinstance(features, List)
-        assert (
-            len(features) == 0
-            or isinstance(features[0], FeatureSchema)
-            or isinstance(features[0], tuple)
-        )
-
-        return Node(
-            schema=Schema(
-                features=features,
-                # The index and is_unix_timestamp is defined by the sampling.
-                indexes=sampling_node.schema.indexes,
-                is_unix_timestamp=sampling_node.schema.is_unix_timestamp,
-            ),
-            # Making use to use the same sampling reference.
-            sampling=sampling_node.sampling_node,
-            # New features.
-            features=[Feature(creator=creator) for _ in features],
-            name=name,
-            creator=creator,
-        )
-
-    @staticmethod
-    def create_new_features_new_sampling(
-        features: Union[List[FeatureSchema], List[Tuple[str, DType]]],
-        indexes: Union[List[IndexSchema], List[Tuple[str, IndexDType]]],
-        is_unix_timestamp: bool,
-        creator: Optional[Operator],
-        name: Optional[str] = None,
-    ) -> Node:
-        """Creates a node with a new sampling and new features."""
-
-        # TODO: Use better way
-        assert isinstance(features, List)
-        assert (
-            len(features) == 0
-            or isinstance(features[0], FeatureSchema)
-            or isinstance(features[0], tuple)
-        )
-
-        return Node(
-            schema=Schema(
-                features=features,
-                indexes=indexes,
-                is_unix_timestamp=is_unix_timestamp,
-            ),
-            # New sampling
-            sampling=Sampling(creator=creator),
-            # New features.
-            features=[Feature(creator=creator) for _ in features],
-            name=name,
-            creator=creator,
-        )
-
-    @staticmethod
-    def create_with_new_reference(
-        schema: Schema,
-        sampling: Optional[Sampling] = None,
-        features: Optional[List[Feature]] = None,
-        name: Optional[str] = None,
-        creator: Optional[Operator] = None,
-    ) -> Node:
-        """Creates a node with NEW features and NEW sampling.
-
-        If sampling is not specified, a new sampling is created.
-        Similarly, if features is not specifies, new features are created.
-        """
-
-        if sampling is None:
-            sampling = Sampling(creator=creator)
-
-        if features is None:
-            features = [Feature(creator=creator) for _ in schema.features]
-        assert len(features) == len(schema.features)
-
-        return Node(
-            schema=schema,
-            sampling=sampling,
-            features=features,
-            name=name,
-            creator=creator,
-        )
-
     @property
     def schema(self) -> Schema:
+        """Schema of a node.
+
+        The schema defines the name and dtype of the features and the index.
+        """
         return self._schema
 
     @property
     def sampling_node(self) -> Sampling:
+        """Sampling node.
+
+        Equality between sampling nodes is used to check that two nodes are
+        sampled similarly. Use `node.check_same_sampling(...)` instead of
+        using `sampling_node`.
+        """
         return self._sampling
 
     @property
     def feature_nodes(self) -> List[Feature]:
+        """Feature nodes.
+
+        Equality between feature nodes is used to check that two nodes use
+        the same feature data.
+        """
         return self._features
 
     @property
     def name(self) -> Optional[str]:
+        """Name of a node.
+
+        The name of a node is used to facilitate debugging and to specify the
+        input / output signature of a graph during graph import / export."""
         return self._name
 
     @name.setter
@@ -206,6 +95,11 @@ class Node(object):
 
     @property
     def creator(self) -> Optional[Operator]:
+        """Creator.
+
+        The creator is the operator that outputs this node. Manually created
+        nodes have a None creator.
+        """
         return self._creator
 
     @creator.setter
@@ -214,23 +108,33 @@ class Node(object):
 
     @property
     def features(self) -> List[FeatureSchema]:
+        """Feature schema.
+
+        Alias for `node.schema.features`.
+        """
         return self.schema.features
 
     @property
     def indexes(self) -> List[IndexSchema]:
+        """Index schema.
+
+        Alias for `node.indexes.features`.
+        """
         return self.schema.indexes
 
     def check_same_sampling(self, other: Node):
+        """Checks is two nodes have the same sampling."""
+
         self.schema.check_compatible_index(other.schema)
         if self.sampling_node is not other.sampling_node:
             raise ValueError(
                 "Arguments should have the same sampling. "
                 f"{self.sampling_node} is different from "
-                f"{other.sampling_node}. Two create two nodes with the same "
-                "sampling, use the argument `same_sampling_as` with "
-                "`tp.input_node` or `tp.event_set`. You can also use the "
-                "operator `tp.resample` align the sampling of two event sets "
-                "with the same index (but different sampling)."
+                f"{other.sampling_node}. To create input nodes with the same "
+                "sampling, use the argument `same_sampling_as` of "
+                "`tp.input_node` or `tp.event_set`. To align the sampling of "
+                "two nodes with similar index but different sampling, use the "
+                "operator `tp.resample`."
             )
 
     def evaluate(
@@ -287,8 +191,7 @@ class Node(object):
     ) -> None:
         """Raises an error message.
 
-        This method is a utilities used in operators implementations,
-        e.g., +, -, *.
+        This utility method is used in operator implementations, e.g., +, - *.
         """
 
         raise ValueError(
@@ -585,7 +488,7 @@ class Node(object):
         assert False
 
 
-def input_node(
+def source_node(
     features: List[Tuple[str, DType]],
     indexes: Optional[List[Tuple[str, IndexDType]]] = None,
     is_unix_timestamp: bool = False,
@@ -598,29 +501,31 @@ def input_node(
 
     Usage example:
 
+        ```
         # Without index
-        a = input_node(features=[("f1", tp.float64), ("f2", tp.string)])
+        a = source_node(features=[("f1", tp.float64), ("f2", tp.string)])
 
         # With an index
-        a = input_node(
+        a = source_node(
             features=[("f1", tp.float64), ("f2", tp.string)],
-            indexes = ["f2"],
-            )
+            indexes=["f2"],
+        )
 
         # Two nodes with the same sampling
-        a = input_node(features=[("f1", tp.float64)])
-        b = input_node(features=[("f2", tp.float64)], same_sampling_as=a)
+        a = source_node(features=[("f1", tp.float64)])
+        b = source_node(features=[("f2", tp.float64)], same_sampling_as=a)
+        ```
 
     Args:
         features: List of names and dtypes of the features.
         indexes: List of names and dtypes of the index. If empty, the data is
-          assumed not indexed.
+            assumed not indexed.
         is_unix_timestamp: If true, the timestamps are interpreted as unix
-          timestamps in seconds.
-        same_sampling_as: If set, the created node is guarentied to have the
-          same sampling as same_sampling_as`. In this case, `indexes` and
-          `is_unix_timestamp` should not be provided. Some operators require for
-          input nodes to have the same sampling.
+            timestamps in seconds.
+        same_sampling_as: If set, the created node is guaranteed to have the
+            same sampling as same_sampling_as`. In this case, `indexes` and
+            `is_unix_timestamp` should not be provided. Some operators require
+            for input nodes to have the same sampling.
     """
 
     if same_sampling_as is not None:
@@ -628,7 +533,7 @@ def input_node(
             raise ValueError(
                 "indexes cannot be provided with same_sampling_as=True"
             )
-        return Node.create_new_features_existing_sampling(
+        return create_node_new_features_existing_sampling(
             features=features,
             sampling_node=same_sampling_as,
             name=name,
@@ -639,10 +544,135 @@ def input_node(
         if indexes is None:
             indexes = []
 
-        return Node.create_new_features_new_sampling(
+        return create_node_new_features_new_sampling(
             features=features,
             indexes=indexes,
             is_unix_timestamp=is_unix_timestamp,
             name=name,
             creator=None,
         )
+
+
+@dataclass
+class Sampling:
+    """A sampling is a reference to the way data is sampled."""
+
+    creator: Optional[Operator] = None
+
+    def __hash__(self):
+        return id(self)
+
+    def __repr__(self):
+        return f"Sampling(id={id(self)}, creator={self.creator})"
+
+
+@dataclass
+class Feature:
+    """A feature is a reference to sampled data."""
+
+    creator: Optional[Operator] = None
+
+    def __hash__(self):
+        return id(self)
+
+    def __repr__(self):
+        return f"Feature(id={id(self)}, creator={self.creator})"
+
+
+def create_node_new_features_existing_sampling(
+    features: Union[List[FeatureSchema], List[Tuple[str, DType]]],
+    sampling_node: Node,
+    creator: Optional[Operator],
+    name: Optional[str] = None,
+) -> Node:
+    """Creates a node with an existing sampling and new features.
+
+    When possible, this is the Node creation function to use.
+    """
+
+    # TODO: Use better way
+    assert sampling_node is not None
+    assert features is not None
+    assert isinstance(sampling_node, Node)
+    assert isinstance(features, List)
+    assert (
+        len(features) == 0
+        or isinstance(features[0], FeatureSchema)
+        or isinstance(features[0], tuple)
+    )
+
+    return Node(
+        schema=Schema(
+            features=features,
+            # The index and is_unix_timestamp is defined by the sampling.
+            indexes=sampling_node.schema.indexes,
+            is_unix_timestamp=sampling_node.schema.is_unix_timestamp,
+        ),
+        # Making use to use the same sampling reference.
+        sampling=sampling_node.sampling_node,
+        # New features.
+        features=[Feature(creator=creator) for _ in features],
+        name=name,
+        creator=creator,
+    )
+
+
+def create_node_new_features_new_sampling(
+    features: Union[List[FeatureSchema], List[Tuple[str, DType]]],
+    indexes: Union[List[IndexSchema], List[Tuple[str, IndexDType]]],
+    is_unix_timestamp: bool,
+    creator: Optional[Operator],
+    name: Optional[str] = None,
+) -> Node:
+    """Creates a node with a new sampling and new features."""
+
+    # TODO: Use better way
+    assert isinstance(features, List)
+    assert (
+        len(features) == 0
+        or isinstance(features[0], FeatureSchema)
+        or isinstance(features[0], tuple)
+    )
+
+    return Node(
+        schema=Schema(
+            features=features,
+            indexes=indexes,
+            is_unix_timestamp=is_unix_timestamp,
+        ),
+        # New sampling
+        sampling=Sampling(creator=creator),
+        # New features.
+        features=[Feature(creator=creator) for _ in features],
+        name=name,
+        creator=creator,
+    )
+
+
+def create_node_with_new_reference(
+    schema: Schema,
+    sampling: Optional[Sampling] = None,
+    features: Optional[List[Feature]] = None,
+    name: Optional[str] = None,
+    creator: Optional[Operator] = None,
+) -> Node:
+    """Creates a node with NEW features and NEW sampling.
+
+    If sampling is not specified, a new sampling is created.
+    Similarly, if features is not specifies, new features are created.
+    """
+
+    if sampling is None:
+        sampling = Sampling(creator=creator)
+
+    if features is None:
+        features = [Feature(creator=creator) for _ in schema.features]
+    assert len(features) == len(schema.features)
+
+    return Node(
+        schema=schema,
+        sampling=sampling,
+        features=features,
+        name=name,
+        creator=creator,
+    )

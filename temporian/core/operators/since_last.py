@@ -17,7 +17,10 @@
 from typing import Optional
 
 from temporian.core import operator_lib
-from temporian.core.data.node import Node
+from temporian.core.data.node import (
+    Node,
+    create_node_new_features_existing_sampling,
+)
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 from temporian.core.data.dtype import DType
@@ -47,7 +50,7 @@ class SinceLast(Operator):
 
         self.add_output(
             "output",
-            Node.create_new_features_existing_sampling(
+            create_node_new_features_existing_sampling(
                 features=[("since_last", DType.FLOAT64)],
                 sampling_node=effective_sampling_node,
                 creator=self,

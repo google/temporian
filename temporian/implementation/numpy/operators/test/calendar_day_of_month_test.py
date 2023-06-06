@@ -16,7 +16,7 @@ from absl.testing import absltest
 import numpy as np
 import pandas as pd
 
-from temporian.core.data.node import input_node
+from temporian.core.data.node import source_node
 from temporian.core.operators.calendar.day_of_month import (
     CalendarDayOfMonthOperator,
 )
@@ -122,7 +122,7 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
 
         with self.assertRaises(ValueError):
             CalendarDayOfMonthOperator(
-                input_node(features=[], is_unix_timestamp=False)
+                source_node(features=[], is_unix_timestamp=False)
             )
 
 

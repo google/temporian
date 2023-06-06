@@ -56,6 +56,7 @@ py_library(
     name = "base",
     srcs = ["base.py"],
     srcs_version = "PY3",
+    deps = ["//temporian/utils:config"],
 )
 
 py_library(

@@ -25,8 +25,6 @@ class DropIndexNumpyImplementation(OperatorImplementation):
     def __call__(self, input: EventSet) -> Dict[str, EventSet]:
         assert isinstance(self.operator, DropIndexOperator)
 
-        # dst_feature_names = self.operator.dst_feature_names()
-        # src_index_dtypes = input.index_dtypes()
         src_index_names = input.schema.index_names()
 
         # Idx in src_index_names of the indexes to keep in the output.
