@@ -18,9 +18,7 @@ from typing import Optional
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
-from temporian.core.data.feature import Feature
-from temporian.core.data.node import Node
-from temporian.core.data.sampling import Sampling
+from temporian.core.data.node import Node, create_node_new_features_new_sampling
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -30,58 +28,35 @@ class FilterOperator(Operator):
         super().__init__()
 
         # check that condition is a single feature
-        if len(condition.features) != 1:
+        if len(condition.schema.features) != 1:
             raise ValueError(
                 "Condition must be a single feature. Got"
-                f" {len(condition.features)} instead."
+                f" {condition.schema} instead."
             )
 
         # check that condition is a boolean feature
-        if condition.features[0].dtype != DType.BOOLEAN:
+        if condition.schema.features[0].dtype != DType.BOOLEAN:
             raise ValueError(
                 "Condition must be a boolean feature. Got"
-                f" {condition.features[0].dtype} instead."
+                f" {condition.schema} instead."
             )
 
         # check both nodes have same sampling
-        if input.sampling.index != condition.sampling.index:
-            raise ValueError(
-                "Node and condition must have the same sampling. Got"
-                f" {input.sampling} and {condition.sampling} instead."
-            )
+        input.check_same_sampling(condition)
 
         # inputs
         self.add_input("input", input)
         self.add_input("condition", condition)
 
-        output_sampling = Sampling(
-            index_levels=input.sampling.index,
-            creator=self,
-            is_unix_timestamp=input.sampling.is_unix_timestamp,
-        )
-
-        self.condition_name = condition.features[0].name
-
-        # outputs
-        output_features = [  # pylint: disable=g-complex-comprehension
-            Feature(
-                name=f.name,
-                dtype=f.dtype,
-                sampling=output_sampling,
-                creator=self,
-            )
-            for f in input.features
-        ]
-
         self.add_output(
             "output",
-            Node(
-                features=output_features,
-                sampling=output_sampling,
+            create_node_new_features_new_sampling(
+                features=input.schema.features,
+                indexes=input.schema.indexes,
+                is_unix_timestamp=input.schema.is_unix_timestamp,
                 creator=self,
             ),
         )
-
         self.check()
 
     @classmethod

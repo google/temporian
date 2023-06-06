@@ -12,13 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Sample operator class and public API function definition."""
+"""Resample operator class and public API function definition."""
 
 from typing import Optional
 
 from temporian.core import operator_lib
-from temporian.core.data.node import Node
-from temporian.core.data.feature import Feature
+from temporian.core.data.node import (
+    Node,
+    create_node_new_features_existing_sampling,
+)
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 from temporian.core.data.dtype import DType
@@ -37,36 +39,23 @@ class SinceLast(Operator):
         if sampling is not None:
             self.add_input("sampling", sampling)
             self._has_sampling = True
-            effective_sampling = sampling.sampling
-
-            if input.sampling.index != sampling.sampling.index:
-                raise ValueError(
-                    "Event and sampling do not have the same index."
-                    f" {input.sampling.index} != {sampling.sampling.index}"
-                )
+            effective_sampling_node = sampling
+            input.schema.check_compatible_index(
+                sampling.schema, "input and sampling"
+            )
 
         else:
-            effective_sampling = input.sampling
+            effective_sampling_node = input
             self._has_sampling = False
-
-        output_features = [
-            Feature(
-                name="since_last",
-                dtype=DType.FLOAT64,
-                sampling=effective_sampling,
-                creator=self,
-            )
-        ]
 
         self.add_output(
             "output",
-            Node(
-                features=output_features,
-                sampling=effective_sampling,
+            create_node_new_features_existing_sampling(
+                features=[("since_last", DType.FLOAT64)],
+                sampling_node=effective_sampling_node,
                 creator=self,
             ),
         )
-
         self.check()
 
     @classmethod
@@ -124,7 +113,7 @@ def since_last(
         sampling: Event to use the sampling of.
 
     Returns:
-        Sampled event, with same sampling as `sampling`.
+        Resampled event, with same sampling as `sampling`.
     """
 
     return SinceLast(input=input, sampling=sampling).outputs["output"]

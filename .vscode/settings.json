@@ -22,9 +22,7 @@
   "python.linting.flake8Enabled": false,
   "python.linting.pylintEnabled": true,
   "python.linting.enabled": true,
-  "editor.rulers": [
-    80
-  ],
+  "editor.rulers": [80],
   "editor.codeActionsOnSave": {
     "source.organizeImports": false
   },

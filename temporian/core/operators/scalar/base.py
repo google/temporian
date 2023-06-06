@@ -17,8 +17,11 @@
 from typing import Union, List
 
 from temporian.core.data.dtype import DType
-from temporian.core.data.node import Node
-from temporian.core.data.feature import Feature
+from temporian.core.data.node import (
+    Node,
+    create_node_new_features_existing_sampling,
+)
+from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -73,7 +76,7 @@ class BaseScalarOperator(Operator):
             ],
         }
         if not self.ignore_value_dtype_checking:
-            for feature in input.features:
+            for feature in input.schema.features:
                 if feature.dtype not in self.map_vtype_dtype[type(value)]:
                     raise ValueError(
                         f"Scalar has {type(value)=}, which can only operate"
@@ -83,20 +86,18 @@ class BaseScalarOperator(Operator):
 
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
-            Feature(
+            FeatureSchema(
                 name=feature.name,
                 dtype=self.output_feature_dtype(feature),
-                sampling=input.sampling,
-                creator=self,
             )
-            for feature in input.features
+            for feature in input.schema.features
         ]
 
         self.add_output(
             "output",
-            Node(
+            create_node_new_features_existing_sampling(
                 features=output_features,
-                sampling=input.sampling,
+                sampling_node=input,
                 creator=self,
             ),
         )
@@ -140,7 +141,7 @@ class BaseScalarOperator(Operator):
             DType.INT64,
         ]
 
-    def output_feature_dtype(self, feature: Feature) -> DType:
+    def output_feature_dtype(self, feature: FeatureSchema) -> DType:
         return feature.dtype
 
     @property

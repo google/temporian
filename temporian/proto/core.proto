@@ -24,9 +24,9 @@ message Graph {
 
   repeated Node nodes = 2;
 
-  repeated Feature features = 3;
+  repeated Node.Feature features = 3;
 
-  repeated Sampling samplings = 4;
+  repeated Node.Sampling samplings = 4;
 
   repeated IOSignature inputs = 5;
 
@@ -74,13 +74,17 @@ message Operator {
       ListString list_str = 5;
       bool boolean = 6;
       MapStrStr map_str_str = 7;
-    }
+      ListDType list_dtype = 8;
 
+    }
     message ListString{
-      repeated string value = 1;
+      repeated string values = 1;
     }
     message MapStrStr{
-      map<string, string> value = 1;
+      map<string, string> values = 1;
+    }
+    message ListDType{
+      repeated DType values = 1;
     }
   }
 }
@@ -96,65 +100,61 @@ enum DType {
   STRING = 6;
 }
 
-// Schema of an event set
+// Connections between operators
 message Node {
   // Identifier of the node. Should be unique across all the nodes of the
   // graph.
   optional string id = 1;
 
-  // Identifier of the sampling of the node.
+  // Identifier of the sampling ref.
   optional string sampling_id = 2;
 
-  // Features in the node.
+  // Identifiers of the feature refs.
   repeated string feature_ids = 3;
 
   optional string name = 4;
 
   optional string creator_operator_id = 5;
-}
 
-// Schema of a feature
+  // Description of the data transiting in the node.
+  optional Schema schema = 6;
+
+// A unique feature in the compute graph.
 message Feature {
-  // Identifier of the feature. Should be unique in all the features in the
-  // graph.
+  // Identifier of the feature.
   optional string id = 1;
 
+  // Index of the node id who's operator creator also created this feature.
+  optional string creator_operator_id = 2;
+}
+
+// A unique sampling in the compute graph.
+message Sampling {
+  // Identifier of the sampling.
+  optional string id = 1;
+
+  // Index of the node id who's operator creator also created this feature.
+  optional string creator_operator_id = 2;
+}
+
+}
+
+// Definition of the data (feature, index, etc.) in a node.
+message Schema {
+
+repeated Feature features = 1;
+repeated Index indexes = 2;
+optional bool is_unix_timestamp = 3;
+
+message Feature {
   optional string name = 2;
-
   optional DType dtype = 3;
-
-  // Identifier of the sampling of the feature.
-  optional string sampling_id = 4;
-
-  optional string creator_operator_id = 5;
 }
 
 message Index {
-  message IndexLevel {
-    // Index level names
-    optional string name = 1;
-
-    // Index level dtypes
-    optional DType dtype = 2;
-  }
-
-  repeated IndexLevel levels = 1;
+  optional string name = 2;
+  optional DType dtype = 3;
 }
-
-// Schema of a sampling.
-message Sampling {
-  // Identifier of the sampling. Should be unique across all the samplings of
-  // the graph.
-  optional string id = 1;
-
-  // Index of the sampling.
-  optional Index index = 2;
-
-  // Index of the node id who's operator creator also created this feature.
-  optional string creator_operator_id = 3;
-
-  // True if the event timestamps can be converted to dates
-  optional bool is_unix_timestamp = 4;
 }
 
 // Definition of an operator. No two operators definition can have the same key.
@@ -198,11 +198,13 @@ message OperatorDef {
       UNDEFINED = 0;
       INTEGER_64 = 1;
       STRING = 2;
-      REPEATED_STRING=3;
+      LIST_STRING=3;
       FLOAT_64 = 4;
       BOOL = 5;
       ANY = 6;
       MAP_STR_STR = 7;
+      DTYPE = 8;
+      LIST_DTYPE = 9;
     }
   }
 }

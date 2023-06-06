@@ -16,10 +16,9 @@
 
 
 from temporian.core import operator_lib
-from temporian.core.data.node import Node
-from temporian.core.data.feature import Feature
-from temporian.core.data.sampling import Sampling
+from temporian.core.data.node import Node, create_node_new_features_new_sampling
 from temporian.core.operators.base import Operator
+from temporian.core.operators.resample import Resample
 from temporian.proto import core_pb2 as pb
 
 
@@ -35,9 +34,11 @@ class Propagate(Operator):
         self.add_input("sampling", sampling)
 
         self._index_mapping: list[int] = []
-        sampling_index_name = sampling.sampling.index.names
-        sampling_index_dtypes = sampling.sampling.index.dtypes
-        for index in input.sampling.index:
+
+        sampling_index_name = sampling.schema.index_names()
+        sampling_index_dtypes = sampling.schema.index_dtypes()
+
+        for index in input.schema.indexes:
             try:
                 sampling_idx = sampling_index_name.index(index.name)
                 self._index_mapping.append(sampling_idx)
@@ -45,9 +46,9 @@ class Propagate(Operator):
                 raise ValueError(
                     "The index of input should be contained in the index of"
                     f' sampling. Index "{index.name}" from input is not'
-                    " available in sampling. input.index:"
-                    f" {input.sampling.index},"
-                    f" sampling.index={sampling.sampling.index}."
+                    " available in sampling. input.index="
+                    f" {input.schema.indexes},"
+                    f" sampling.index={sampling.schema.indexes}."
                 ) from exc
             if sampling_index_dtypes[sampling_idx] != index.dtype:
                 raise ValueError(
@@ -56,27 +57,13 @@ class Propagate(Operator):
                     f" {index.dtype} != {sampling_index_dtypes[sampling_idx]}"
                 )
 
-        output_sampling = Sampling(
-            index_levels=sampling.sampling.index,
-            creator=self,
-            is_unix_timestamp=sampling.sampling.is_unix_timestamp,
-        )
-
-        output_features = [  # pylint: disable=g-complex-comprehension
-            Feature(
-                name=f.name,
-                dtype=f.dtype,
-                sampling=output_sampling,
-                creator=self,
-            )
-            for f in input.features
-        ]
-
+        # Note: The propagate operator creates a new sampling.
         self.add_output(
             "output",
-            Node(
-                features=output_features,
-                sampling=output_sampling,
+            create_node_new_features_new_sampling(
+                features=input.schema.features,
+                indexes=sampling.schema.indexes,
+                is_unix_timestamp=sampling.schema.is_unix_timestamp,
                 creator=self,
             ),
         )
@@ -103,13 +90,12 @@ class Propagate(Operator):
 operator_lib.register_operator(Propagate)
 
 
-def propagate(
-    input: Node,
-    sampling: Node,
-) -> Node:
-    """Propagates feature values over a larger index.
+# TODO: Do we want for "propagate" to take a list of feature names
+# (like add_index) instead?
+def propagate(input: Node, sampling: Node, resample: bool = False) -> Node:
+    """Propagates feature values over a sub index.
 
-    Given `input` and `sampling` where `input` contains a super index of
+    Given `input` and `sampling` where `input` has a super index of
     `sampling` (e.g., the index of `input` is `["x"]`, and the index of
     `sampling` is `["x","y"]`), duplicates the features of `input` over the
     index of `sampling`.
@@ -132,12 +118,19 @@ def propagate(
     Args:
         input: Node to propagate.
         sampling: Index to propagate over.
+        resample: If true, apply a tp.resample operator. In this case, the
+            output of `propagate` has the same sampling as `sampling`.
 
     Returns:
         Node propagated over `sampling`'s index.
     """
 
-    return Propagate(
+    result = Propagate(
         input=input,
         sampling=sampling,
     ).outputs["output"]
+
+    if resample:
+        result = Resample(input=result, sampling=sampling).outputs["output"]
+
+    return result

@@ -20,14 +20,45 @@ This datatype is equivalent to a double in C.
 """
 import datetime
 from enum import Enum
-from typing import Union
+from typing import Union, Optional
 
 import numpy as np
 
 # Unit for durations
-Duration = float
+#
+# NormalizedDuration is used by internal code that handle duration.
+# Duration is a duration provided by the user though the API.
+NormalizedDuration = float
+Duration = Union[float, int]
 
 Timestamp = Union[np.datetime64, datetime.datetime, int, float]
+NormalizedTimestamp = float
+
+
+def normalize_duration(x: Duration) -> NormalizedDuration:
+    if isinstance(x, (int, float)) and x > 0:
+        return NormalizedDuration(x)
+
+    raise ValueError(
+        "A duration should be a strictly positive number of type float,"
+        f" int or tp.Duration. Got {x!r} of type {type(x)}."
+    )
+
+
+def normalize_timestamp(x: Timestamp) -> NormalizedTimestamp:
+    if isinstance(x, np.datetime64):
+        return x.astype("datetime64[ns]").astype(np.float64) / 1e9
+
+    if isinstance(x, datetime.datetime):
+        return float(x.timestamp())
+
+    if isinstance(x, int):
+        return float(x)
+
+    if isinstance(x, float):
+        return x
+
+    raise ValueError(f"Invalid timestamp {x!r} of type {type(x)}.")
 
 
 def milliseconds(value: Union[int, float]) -> Duration:
@@ -55,7 +86,7 @@ def seconds(value: Union[int, float]) -> Duration:
     Returns:
         Same number of seconds.
     """
-    return Duration(value)
+    return NormalizedDuration(value)
 
 
 def minutes(value: Union[int, float]) -> Duration:
@@ -67,7 +98,7 @@ def minutes(value: Union[int, float]) -> Duration:
     Returns:
         Equivalent number of seconds.
     """
-    return Duration(value * 60)
+    return NormalizedDuration(value * 60)
 
 
 def hours(value: Union[int, float]) -> Duration:
@@ -79,7 +110,7 @@ def hours(value: Union[int, float]) -> Duration:
     Returns:
         Equivalent number of seconds.
     """
-    return Duration(value * 60 * 60)
+    return NormalizedDuration(value * 60 * 60)
 
 
 def days(value: Union[int, float]) -> Duration:
@@ -91,7 +122,7 @@ def days(value: Union[int, float]) -> Duration:
     Returns:
         Equivalent number of seconds.
     """
-    return Duration(value * 60 * 60 * 24)
+    return NormalizedDuration(value * 60 * 60 * 24)
 
 
 def weeks(value: Union[int, float]) -> Duration:
@@ -103,10 +134,10 @@ def weeks(value: Union[int, float]) -> Duration:
     Returns:
         Equivalent number of seconds.
     """
-    return Duration(value * 60 * 60 * 24 * 7)
+    return NormalizedDuration(value * 60 * 60 * 24 * 7)
 
 
-def convert_date_to_duration(date: Timestamp) -> Duration:
+def convert_date_to_duration(date: Timestamp) -> NormalizedDuration:
     """Converts date value to a number representing the Unix timestamp.
 
     If a float or int, it is returned as float.
@@ -141,17 +172,21 @@ def convert_date_to_duration(date: Timestamp) -> Duration:
     raise TypeError(f"Unsupported type: {type(date)}")
 
 
-def convert_numpy_datetime64_to_duration(date: np.datetime64) -> Duration:
+def convert_numpy_datetime64_to_duration(
+    date: np.datetime64,
+) -> NormalizedDuration:
     """Convert numpy datetime64 to duration epoch UTC"""
-    return date.astype("datetime64[s]").astype("float64")
+    return float(date.astype("datetime64[s]").astype("float64"))
 
 
-def convert_datetime_to_duration(date: datetime.datetime) -> Duration:
+def convert_datetime_to_duration(date: datetime.datetime) -> NormalizedDuration:
     """Convert datetime to duration epoch UTC"""
-    return date.replace(tzinfo=datetime.timezone.utc).timestamp()
+    return float(date.replace(tzinfo=datetime.timezone.utc).timestamp())
 
 
-def convert_datetime_date_to_duration(date: datetime.date) -> Duration:
+def convert_datetime_date_to_duration(
+    date: datetime.date,
+) -> NormalizedDuration:
     """Convert date to duration epoch UTC"""
     return convert_datetime_to_duration(
         datetime.datetime.combine(date, datetime.time(0, 0))
@@ -183,8 +218,8 @@ def duration_abbreviation(
 
     Args:
         duration: Duration in seconds.
-        cutoff: Cutoff for the abbreviation. For example, if cutoff is "day", the
-            smallest unit will be days. Possible options are "week",
+        cutoff: Cutoff for the abbreviation. For example, if cutoff is "day",
+            the smallest unit will be days. Possible options are "week",
             "day", "hour" and "minute", "seconds" and "milliseconds". Default is
             "milliseconds".
 

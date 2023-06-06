@@ -13,13 +13,15 @@
 # limitations under the License.
 
 """Rename operator."""
-from typing import List, Union, Dict
+from typing import Dict, Optional, Union
 
 from temporian.core import operator_lib
-from temporian.core.data.node import Node
-from temporian.core.data.feature import Feature
-from temporian.core.data.sampling import Sampling
-from temporian.core.data.sampling import IndexLevel
+from temporian.core.data.node import (
+    Node,
+    create_node_new_features_new_sampling,
+    create_node_new_features_existing_sampling,
+)
+from temporian.core.data.schema import Schema
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -30,138 +32,56 @@ class RenameOperator(Operator):
     def __init__(
         self,
         input: Node,
-        features: Union[str, Dict[str, str]] = None,
-        index: Union[str, Dict[str, str]] = None,
+        features: Dict[str, str],
+        index: Dict[str, str],
     ):
-        def check_rename_dict(
-            rename_dict: Dict[str, str],
-            node_names: List[str],
-            dict_name: str = "features",
-        ) -> Dict[str, str]:
-            # check that there are no duplicate values in rename_dict values
-            if len(set(rename_dict.values())) != len(rename_dict.values()):
-                raise ValueError(
-                    f"Duplicate values in {dict_name}. Values must be unique."
-                )
-
-            # check that every value is a string
-            if not all(
-                isinstance(value, str) for value in rename_dict.values()
-            ):
-                raise ValueError(
-                    f"Expected all values in {dict_name} to be strings."
-                )
-
-            # check that every dict value is non empty
-            if not all(value for value in rename_dict.values()):
-                raise ValueError(
-                    f"Expected all values in {dict_name} to be non-empty."
-                )
-
-            # check that every key is in event_names
-            for key in rename_dict.keys():
-                if key not in node_names:
-                    raise KeyError(
-                        f"Key '{key}' not found in node. Possible names:"
-                        f" {node_names}."
-                    )
-
-            return rename_dict
-
         super().__init__()
 
-        self.features = {}
+        self.add_attribute("features", features)
+        self.add_attribute("index", index)
 
-        if isinstance(features, str):
-            # check that node only has one feature
-            if len(input.features) != 1:
-                raise ValueError(
-                    "Expected input to have only one feature when passed a"
-                    f" single string. Got {len(input.features)} features"
-                    " instead."
-                )
-            if not features:
-                raise ValueError("Expected feature to be a non-empty string.")
-            only_feature_name = input.features[0].name
-            self.features = {only_feature_name: features}
+        self._features = features
+        self._index = index
 
-        elif isinstance(features, dict):
-            # check that every key is a feature name in node
-            feature_names = [feature.name for feature in input.features]
-            self.features = check_rename_dict(features, feature_names)
-
-        node_index_names = input.index_names
-
-        self.index = {}
-
-        if isinstance(index, str):
-            # check that node only has one index
-            if len(node_index_names) != 1:
-                raise ValueError(
-                    "Expected node to have only one index when passed a"
-                    " single string in index. Got"
-                    f" {len(node_index_names)} indexes instead."
-                )
-            # check index is non empty
-            if not index:
-                raise ValueError("Expected index to be a non-empty string.")
-            only_index_name = node_index_names[0]
-            self.index = {only_index_name: index}
-
-        elif isinstance(index, dict):
-            # check that every key is an index name in node
-            self.index = check_rename_dict(index, node_index_names, "index")
-
-        self.add_attribute("features", self.features)
-
-        self.add_attribute("index", self.index)
-
-        # inputs
         self.add_input("input", input)
 
-        output_sampling = input.sampling
-
-        if index:
-            output_sampling = self.new_sampling(input.sampling)
-
-        # outputs
-        output_features = [  # pylint: disable=g-complex-comprehension
-            Feature(
-                name=self.features.get(f.name, f.name),
-                dtype=f.dtype,
-                sampling=output_sampling,
-                creator=self,
-            )
-            for f in input.features
+        new_indexes = [
+            (index.get(i.name, i.name), i.dtype) for i in input.schema.indexes
+        ]
+        new_feature_schemas = [
+            (features.get(f.name, f.name), f.dtype)
+            for f in input.schema.features
         ]
 
-        self.add_output(
-            "output",
-            Node(
-                features=output_features,
-                sampling=output_sampling,
-                creator=self,
-            ),
-        )
-
-        self.check()
-
-    def new_sampling(self, old_sampling: Sampling) -> Sampling:
-        new_index_levels = []
-        for level in old_sampling.index.levels:
-            new_name = level.name
-            if level.name in self.index:
-                new_name = self.index[level.name]
-
-            new_index_levels.append(
-                IndexLevel(name=new_name, dtype=level.dtype)
+        if index:
+            self.add_output(
+                "output",
+                create_node_new_features_new_sampling(
+                    features=new_feature_schemas,
+                    indexes=new_indexes,
+                    is_unix_timestamp=input.schema.is_unix_timestamp,
+                    creator=self,
+                ),
             )
 
-        return Sampling(
-            index_levels=new_index_levels,
-            creator=self,
-            is_unix_timestamp=old_sampling.is_unix_timestamp,
-        )
+        else:
+            self.add_output(
+                "output",
+                create_node_new_features_existing_sampling(
+                    features=new_feature_schemas,
+                    sampling_node=input,
+                    creator=self,
+                ),
+            )
+        self.check()
+
+    @property
+    def features(self) -> Dict[str, str]:
+        return self._features
+
+    @property
+    def index(self) -> Dict[str, str]:
+        return self._index
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
@@ -171,17 +91,13 @@ class RenameOperator(Operator):
                 pb.OperatorDef.Attribute(
                     key="features",
                     type=pb.OperatorDef.Attribute.Type.MAP_STR_STR,
-                    is_optional=False,
                 ),
                 pb.OperatorDef.Attribute(
                     key="index",
                     type=pb.OperatorDef.Attribute.Type.MAP_STR_STR,
-                    is_optional=False,
                 ),
             ],
-            inputs=[
-                pb.OperatorDef.Input(key="input"),
-            ],
+            inputs=[pb.OperatorDef.Input(key="input")],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
 
@@ -189,10 +105,68 @@ class RenameOperator(Operator):
 operator_lib.register_operator(RenameOperator)
 
 
+def _normalize_rename_features(
+    schema: Schema,
+    features: Optional[Union[str, Dict[str, str]]],
+) -> Dict[str, str]:
+    if features is None:
+        return {}
+
+    if isinstance(features, str):
+        if len(schema.features) != 1:
+            raise ValueError(
+                "Cannot apply rename operator with a single rename string when "
+                "the event set contains multiple features. Pass a dictionary "
+                "of rename strings instead."
+            )
+        features = {schema.features[0].name: features}
+
+    feature_dict = schema.feature_name_to_dtype()
+
+    if len(features) != len(set(features.values())):
+        raise ValueError("Multiple features renamed to the same name")
+
+    for src, dst in features.items():
+        if dst == "":
+            raise ValueError("Cannot rename to an empty string")
+        if src not in feature_dict:
+            raise KeyError(f"The feature {src!r} does not exist.")
+    return features
+
+
+def _normalize_rename_indexes(
+    schema: Schema,
+    indexes: Optional[Union[str, Dict[str, str]]],
+) -> Dict[str, str]:
+    if indexes is None:
+        return {}
+
+    if isinstance(indexes, str):
+        if len(schema.indexes) != 1:
+            raise ValueError(
+                "Cannot apply rename operator with a single rename string when "
+                "the event set contains multiple indexes. Pass a dictionary "
+                "of rename strings instead."
+            )
+        indexes = {schema.indexes[0].name: indexes}
+
+    indexes_dict = schema.index_name_to_dtype()
+
+    if len(indexes) != len(set(indexes.values())):
+        raise ValueError("Multiple indexes renamed to the same name")
+
+    for src, dst in indexes.items():
+        if dst == "":
+            raise ValueError("Cannot rename to an empty string")
+        if src not in indexes_dict:
+            raise KeyError(f"The index {src!r} does not exist.")
+    return indexes
+
+
 def rename(
     input: Node,
-    features: Union[str, Dict[str, str]] = None,
-    index: Union[str, Dict[str, str]] = None,
+    features: Optional[Union[str, Dict[str, str]]] = None,
+    index: Optional[Union[str, Dict[str, str]]] = None,
 ) -> Node:
     """Renames a node's features and index.
 
@@ -212,6 +186,10 @@ def rename(
         index: New index name or mapping from old names to new names.
 
     Returns:
-        Event with renamed features and index.
+        Node with renamed features and index.
     """
+
+    features = _normalize_rename_features(input.schema, features)
+    index = _normalize_rename_indexes(input.schema, index)
+
     return RenameOperator(input, features, index).outputs["output"]

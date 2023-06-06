@@ -47,7 +47,7 @@ def main():
     product_ids = np.random.choice(ids, N)
     store_ids = np.random.choice(ids, N)
 
-    evset_1 = EventSet.from_dataframe(
+    evset_1 = tp.pd_dataframe_to_event_set(
         pd.DataFrame(
             {
                 STORE: store_ids,
@@ -59,7 +59,7 @@ def main():
         index_names=[STORE, PRODUCT],
     )
 
-    evset_2 = EventSet.from_dataframe(
+    evset_2 = tp.pd_dataframe_to_event_set(
         pd.DataFrame(
             {
                 STORE: store_ids,
@@ -77,7 +77,7 @@ def main():
 
     a = tp.glue(node_1, node_2)
     b = tp.prefix("sma_", tp.simple_moving_average(a, window_length=10.0))
-    c = tp.glue(a, tp.sample(b, a))
+    c = tp.glue(a, tp.resample(b, a))
 
     res: EventSet = tp.evaluate(
         c,

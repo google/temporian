@@ -41,3 +41,16 @@ py_test(
         "//temporian/implementation/numpy/data:event_set",
     ],
 )
+
+
+py_test(
+    name = "user_guide_test",
+    srcs = ["user_guide_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # absl/logging dep,
+        # absl/testing:absltest dep,
+        # pandas dep,
+        "//temporian",
+    ],
+)

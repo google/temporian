@@ -15,8 +15,10 @@
 """Prefix operator class and public API function definition."""
 
 from temporian.core import operator_lib
-from temporian.core.data.node import Node
-from temporian.core.data.feature import Feature
+from temporian.core.data.node import (
+    Node,
+    create_node_new_features_existing_sampling,
+)
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -34,25 +36,17 @@ class Prefix(Operator):
 
         # TODO: When supported, re-use existing feature instead of creating a
         # new one.
-        output_features = [  # pylint: disable=g-complex-comprehension
-            Feature(
-                name=prefix + f.name,
-                dtype=f.dtype,
-                sampling=input.sampling,
-                creator=self,
-            )
-            for f in input.features
-        ]
 
         self.add_output(
             "output",
-            Node(
-                features=output_features,
-                sampling=input.sampling,
+            create_node_new_features_existing_sampling(
+                features=[
+                    (prefix + f.name, f.dtype) for f in input.schema.features
+                ],
+                sampling_node=input,
                 creator=self,
             ),
         )
-
         self.check()
 
     @property

@@ -66,8 +66,8 @@ Benchmarking and profiling of pre-configured scripts is available as follow:
 #### Time and memory profiling
 
 ```shell
-bazel run -c opt benchmark:profile_time -- [name]
-bazel run -c opt benchmark:profile_memory -- [name] [-p]
+bazel run -c opt //benchmark:profile_time -- [name]
+bazel run -c opt //benchmark:profile_memory -- [name] [-p]
 ```
 
 where `[name]` is the name of one of the python scripts in
@@ -79,7 +79,7 @@ consumption.
 #### Time benchmarking
 
 ```shell
-bazel run -c opt benchmark:benchmark_time
+bazel run -c opt //benchmark:benchmark_time
 ```
 
 ### Running docs server

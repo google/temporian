@@ -90,7 +90,7 @@ Let's see how to compute the simple moving average of two features `feature_1` a
 
 ```python
 # Define the input of the graph.
-a_node = tp.input_node(
+a_node = tp.source_node(
     features=[
         ("feature_1", tp.float64),
         ("feature_2", tp.int64),
@@ -344,7 +344,7 @@ Note however that some operators do output new feature names not present in thei
 Temporian is strict on feature data types (also called dtype). This means that often, you cannot perform operations between features of different types. For example, you cannot subtract a `tp.float32` and a `tp.float64`. Instead, you must manually cast the features to the same type before performing the operation.
 
 ```python
-node = tp.input_node(features=[("f1", tp.float32), ("f2", tp.float64)])
+node = tp.source_node(features=[("f1", tp.float32), ("f2", tp.float64)])
 
 added = tp.cast(node["f1"], tp.float64) + node["f2"]
 ```
@@ -613,7 +613,7 @@ daily_sales = tp.EventSet(
 a = daily_sales.node()
 
 # Set the "product" feature as the index.
-b = tp.set_index(a, "product")
+b = tp.add_index(a, "product")
 
 # Compute the moving sum of each product individually.
 c = tp.moving_sum(b, window_length=tp.duration.weeks(1))
@@ -625,8 +625,9 @@ Horizontal operators can be understood as operators that are applied independent
 
 Operators that modify an `EventSet`'s index are called _vertical operators_. The most important vertical operators are:
 
-- `tp.set_index`: Set features as index or add them to the existing one.
+- `tp.add_index`: Add features to the index.
 - `tp.drop_index`: Remove features from the index, optionally keeping them as features.
+- `tp.set_index`: Changes the index.
 - `tp.propagate`: Expand an index based on another `EventSet`’s index.
 
 By default `EventSets` are _flat_, which means they have no index, and therefore all events are in a single global index group.
@@ -658,7 +659,7 @@ b = tp.glue(
         "sales"
     ),
 )
-b = tp.set_index(b, ["product", "store"] )
+b = tp.add_index(b, ["product", "store"] )
 
 # Moving sum computed individually for each (product, store).
 c = tp.moving_sum(b["sales"], window_length=tp.duration.weeks(1))
@@ -667,7 +668,7 @@ c = tp.moving_sum(b["sales"], window_length=tp.duration.weeks(1))
 Now, let's compute the daily sum of sales for each store.
 
 ```python
-d = tp.set_index(a, "store")
+d = tp.add_index(a, "store")
 e = tp.moving_sum(d["sales"], window_length=tp.duration.weeks(1))
 
 # Which is equivalent to
@@ -703,7 +704,7 @@ To avoid future leakage, Temporian operators are guaranteed to not cause future 
 `tp.leak` can be useful for precomputing labels or evaluating machine learning models. However, its outputs shouldn’t be used as input features. To check programmatically if a `Node` depends on `tp.leak`, we can use the `tp.has_leak` function.
 
 ```python
->>> a = tp.input_node(features=[("feature_1", tp.float32)])
+>>> a = tp.source_node(features=[("feature_1", tp.float32)])
 >>> b = tp.moving_count(a, 1)
 >>> c = tp.moving_count(tp.leak(b, 1), 2)
 
@@ -769,7 +770,7 @@ evset = tp.read_event_set(
 tp.save_event_set(evset, path="path/to/file.csv")
 ```
 
-Converting `EventSet` data to and from pandas DataFrames is also easily done via `EventSet.to_dataframe` and `EventSet.from_dataframe`.
+Converting `EventSet` data to and from pandas DataFrames is also easily done via `EventSet.to_dataframe` and `tp.pd_dataframe_to_event_set`.
 
 ```python
 import pandas as pd
@@ -781,7 +782,7 @@ df = pd.DataFrame({
 })
 
 # Create EventSet from DataFrame.
-evset = EventSet.from_dataframe(df)
+evset = tp.pd_dataframe_to_event_set(df)
 
 # Convert EventSet to DataFrame.
 df = evset.to_dataframe()

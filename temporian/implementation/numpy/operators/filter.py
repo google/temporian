@@ -16,10 +16,11 @@ class FilterNumpyImplementation(OperatorImplementation):
     def __call__(
         self, input: EventSet, condition: EventSet
     ) -> Dict[str, EventSet]:
-        output_evset = EventSet(
-            {}, input.feature_names, input.index_names, input.is_unix_timestamp
-        )
-        for condition_index, condition_data in condition.iterindex():
+        assert isinstance(self.operator, FilterOperator)
+        output_schema = self.output_schema("output")
+
+        output_evset = EventSet(data={}, schema=output_schema)
+        for condition_index, condition_data in condition.data.items():
             # get boolean mask from condition
             mask = condition_data.features[0]
 
@@ -32,7 +33,7 @@ class FilterNumpyImplementation(OperatorImplementation):
             ]
 
             output_evset[condition_index] = IndexData(
-                filtered_features, filtered_timestamps
+                filtered_features, filtered_timestamps, schema=output_schema
             )
 
         return {"output": output_evset}

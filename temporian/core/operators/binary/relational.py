@@ -17,7 +17,7 @@
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
-from temporian.core.data.feature import Feature
+from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.binary.base import BaseBinaryOperator
 
 
@@ -36,7 +36,7 @@ class BaseRelationalOperator(BaseBinaryOperator):
 
     # override parent dtype method
     def output_feature_dtype(
-        self, feature_1: Feature, feature_2: Feature
+        self, feature_1: FeatureSchema, feature_2: FeatureSchema
     ) -> DType:
         return DType.BOOLEAN
 

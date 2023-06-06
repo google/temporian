@@ -9,11 +9,12 @@ py_library(
     srcs_version = "PY3",
     deps = [
         "//temporian/core:operator_lib",
-        "//temporian/core/data:feature",
+        "//temporian/core/data:dtype",
         "//temporian/core/data:node",
-        "//temporian/core/data:sampling",
+        "//temporian/core/data:schema",
         "//temporian/core/operators:base",
         "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy/data:io",
     ],
 )
 
@@ -28,7 +29,6 @@ py_test(
         # absl/testing:absltest dep,
         ":utils",
         "//temporian/core/data:node",
-        "//temporian/core/data:sampling",
         "//temporian/core/operators:base",
         "//temporian/core/operators:unary",
         "//temporian/core/operators/binary",
@@ -44,7 +44,6 @@ py_test(
     deps = [
         # absl/testing:absltest dep,
         "//temporian/core/data:node",
-        "//temporian/core/data:sampling",
         "//temporian/core/operators:base",
         "//temporian/proto:core_py_proto",
     ],
@@ -61,8 +60,7 @@ py_test(
         "//temporian/core:graph",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
-        "//temporian/core/data:feature",
-        "//temporian/core/data:sampling",
+        "//temporian/core/data:schema",
         "//temporian/core/operators:base",
         "//temporian/proto:core_py_proto",
     ],
@@ -81,8 +79,7 @@ py_test(
         "//temporian/core:serialization",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
-        "//temporian/core/data:feature",
-        "//temporian/core/data:sampling",
+        "//temporian/core/data:schema",
         "//temporian/core/operators:base",
         "//temporian/proto:core_py_proto",
     ],
@@ -99,10 +96,10 @@ py_test(
         "//temporian/core:evaluation",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
-        "//temporian/core/data:feature",
-        "//temporian/core/data:sampling",
+        "//temporian/core/data:schema",
         "//temporian/core/operators:base",
         "//temporian/proto:core_py_proto",
+        "//temporian/implementation/numpy/operators:all_operators",
     ],
 )
 

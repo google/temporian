@@ -17,8 +17,11 @@
 from abc import abstractmethod
 
 from temporian.core.data.dtype import DType
-from temporian.core.data.node import Node
-from temporian.core.data.feature import Feature
+from temporian.core.data.node import (
+    Node,
+    create_node_new_features_existing_sampling,
+)
+from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -37,47 +40,46 @@ class BaseBinaryOperator(Operator):
         self.add_input("input_1", input_1)
         self.add_input("input_2", input_2)
 
-        if input_1.sampling is not input_2.sampling:
-            raise ValueError("input_1 and input_2 must have same sampling.")
+        input_1.check_same_sampling(input_2)
 
-        if len(input_1.features) != len(input_2.features):
+        if len(input_1.schema.features) != len(input_2.schema.features):
             raise ValueError(
-                "input_1 and input_2 must have same number of features."
+                "The left and right arguments should have the same number of "
+                f"features. Left features = {input_1.schema.features}, right "
+                f"features = {input_2.schema.features}. Note: The name of the "
+                "features do not have to match: Features are combined "
+                "index-wise."
             )
 
         # check that features have same dtype
-        for feature_1, feature_2 in zip(input_1.features, input_2.features):
+        for feature_idx, (feature_1, feature_2) in enumerate(
+            zip(input_1.schema.features, input_2.schema.features)
+        ):
             if feature_1.dtype != feature_2.dtype:
                 raise ValueError(
-                    (
-                        "input_1 and input_2 must have same dtype for each"
-                        " feature."
-                    ),
-                    (
-                        f"feature_1: {feature_1}, feature_2: {feature_2} have"
-                        " dtypes:"
-                    ),
-                    f"{feature_1.dtype}, {feature_2.dtype}.",
+                    "The operator is applied feature-wise, and "
+                    "corresponding features (with the same index) should have "
+                    "the same dtype. However the dtypes of the "
+                    f" {feature_idx}-th features don't match. Left argument ="
+                    f" {feature_1}, right argument = {feature_2}."
                 )
-
-        sampling = input_1.sampling
 
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
-            Feature(
+            FeatureSchema(
                 name=self.output_feature_name(feature_1, feature_2),
                 dtype=self.output_feature_dtype(feature_1, feature_2),
-                sampling=sampling,
-                creator=self,
             )
-            for feature_1, feature_2 in zip(input_1.features, input_2.features)
+            for feature_1, feature_2 in zip(
+                input_1.schema.features, input_2.schema.features
+            )
         ]
 
         self.add_output(
             "output",
-            Node(
+            create_node_new_features_existing_sampling(
                 features=output_features,
-                sampling=sampling,
+                sampling_node=input_1,
                 creator=self,
             ),
         )
@@ -107,11 +109,12 @@ class BaseBinaryOperator(Operator):
         """Gets the prefix to use for the output features."""
 
     def output_feature_name(
-        self, feature_1: Feature, feature_2: Feature
+        self, feature_1: FeatureSchema, feature_2: FeatureSchema
     ) -> str:
         return f"{self.prefix}_{feature_1.name}_{feature_2.name}"
 
     def output_feature_dtype(
-        self, feature_1: Feature, feature_2: Feature
+        self, feature_1: FeatureSchema, feature_2: FeatureSchema
     ) -> DType:
+        del feature_2
         return feature_1.dtype

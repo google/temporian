@@ -21,74 +21,70 @@ from temporian.implementation.numpy.data.event_set import EventSet
 
 class EvaluationTest(absltest.TestCase):
     def test_schedule_trivial(self):
-        a = utils.create_input_node()
+        a = utils.create_source_node()
         b = utils.OpI1O1(a)
 
-        schedule, _ = evaluation._build_schedule(
-            inputs=[a],
-            outputs=[b.outputs["output"]],
+        schedule = evaluation.build_schedule(
+            inputs={a}, outputs={b.outputs["output"]}
         )
-        self.assertEqual(schedule, [b])
+        self.assertEqual(schedule.ordered_operators, [b])
 
     def test_schedule_empty(self):
-        a = utils.create_input_node()
+        a = utils.create_source_node()
 
-        schedule, _ = evaluation._build_schedule(
-            inputs=[a],
-            outputs=[a],
-        )
-        self.assertEqual(schedule, [])
+        schedule = evaluation.build_schedule(inputs={a}, outputs={a})
+        self.assertEqual(schedule.ordered_operators, [])
 
     def test_schedule_two_delayed_inputs(self):
-        i1 = utils.create_input_node()
-        i2 = utils.create_input_node()
+        i1 = utils.create_source_node()
+        i2 = utils.create_source_node()
         o1 = utils.OpI1O1(i1)
         o2 = utils.OpI1O1(i2)
         o3 = utils.OpI2O1(o1.outputs["output"], o2.outputs["output"])
-        schedule, _ = evaluation._build_schedule(
-            inputs=[i1, i2],
-            outputs=[o3.outputs["output"]],
+        schedule = evaluation.build_schedule(
+            inputs={i1, i2}, outputs={o3.outputs["output"]}
         )
         self.assertTrue(
-            (schedule == [o2, o1, o3]) or (schedule == [o1, o2, o3])
+            (schedule.ordered_operators == [o2, o1, o3])
+            or (schedule.ordered_operators == [o1, o2, o3])
         )
 
     def test_schedule_basic(self):
-        i1 = utils.create_input_node()
+        i1 = utils.create_source_node()
         o2 = utils.OpI1O1(i1)
-        i3 = utils.create_input_node()
+        i3 = utils.create_source_node()
         o4 = utils.OpI2O1(o2.outputs["output"], i3)
         o5 = utils.OpI1O2(o4.outputs["output"])
 
-        schedule, _ = evaluation._build_schedule(
-            inputs=[i1, i3],
-            outputs=[o5.outputs["output_1"], o4.outputs["output"]],
+        schedule = evaluation.build_schedule(
+            inputs={i1, i3},
+            outputs={o5.outputs["output_1"], o4.outputs["output"]},
         )
         self.assertTrue(
-            (schedule == [o2, o4, o5]) or (schedule == [o4, o2, o5])
+            (schedule.ordered_operators == [o2, o4, o5])
+            or (schedule.ordered_operators == [o4, o2, o5])
         )
 
     def test_schedule_mid_chain(self):
-        i1 = utils.create_input_node()
+        i1 = utils.create_source_node()
         o2 = utils.OpI1O1(i1)
         o3 = utils.OpI1O1(o2.outputs["output"])
         o4 = utils.OpI1O1(o3.outputs["output"])
         o5 = utils.OpI1O1(o4.outputs["output"])
 
-        schedule, _ = evaluation._build_schedule(
-            inputs=[o3.outputs["output"]],
-            outputs=[o5.outputs["output"]],
+        schedule = evaluation.build_schedule(
+            inputs={o3.outputs["output"]}, outputs={o5.outputs["output"]}
         )
-        self.assertEqual(schedule, [o4, o5])
+        self.assertEqual(schedule.ordered_operators, [o4, o5])
 
     def test_evaluate_value(self):
-        i1 = utils.create_input_node()
+        i1 = utils.create_source_node()
         result = evaluation.evaluate(i1, {i1: utils.create_input_event_set()})
         self.assertIsInstance(result, EventSet)
 
     def test_evaluate_query_list(self):
-        i1 = utils.create_input_node()
-        i2 = utils.create_input_node()
+        i1 = utils.create_source_node()
+        i2 = utils.create_source_node()
         result = evaluation.evaluate(
             [i1, i2],
             {
@@ -100,8 +96,8 @@ class EvaluationTest(absltest.TestCase):
         self.assertLen(result, 2)
 
     def test_evaluate_query_dict(self):
-        i1 = utils.create_input_node()
-        i2 = utils.create_input_node()
+        i1 = utils.create_source_node()
+        i2 = utils.create_source_node()
         result = evaluation.evaluate(
             {"i1": i1, "i2": i2},
             {
@@ -110,45 +106,26 @@ class EvaluationTest(absltest.TestCase):
             },
         )
         self.assertIsInstance(result, dict)
+        assert isinstance(result, dict)
         self.assertLen(result, 2)
         self.assertEqual(set(result.keys()), {"i1", "i2"})
 
-    def test_evaluate_named_input_data(self):
-        i1 = utils.create_input_node("i1")
-        i2 = utils.create_input_node("i2")
-
+    def test_evaluate_input_event_set(self):
+        input_evtset = utils.create_input_event_set()
         result = evaluation.evaluate(
-            [i1, i2],
-            {
-                "i1": utils.create_input_event_set(),
-                "i2": utils.create_input_event_set(),
-            },
+            input_evtset.source_node(),
+            input_evtset,
         )
+        self.assertIsInstance(result, EventSet)
 
-        self.assertIsInstance(result, list)
-        self.assertLen(result, 2)
-
-    def test_evaluate_mixed_input_data(self):
-        i1 = utils.create_input_node("i1")
-        i2 = utils.create_input_node("i2")
-
+    def test_evaluate_input_list_event_set(self):
+        input_1 = utils.create_input_event_set()
+        input_2 = utils.create_input_event_set()
         result = evaluation.evaluate(
-            [i1, i2],
-            {
-                "i1": utils.create_input_event_set(),
-                i2: utils.create_input_event_set(),
-            },
+            [input_1.source_node(), input_2.source_node()],
+            [input_1, input_2],
         )
-
         self.assertIsInstance(result, list)
-        self.assertLen(result, 2)
-
-    def test_evaluate_single_unnamed_input_no_name(self):
-        e1 = utils.create_input_event_set()
-        i1 = e1.node()
-
-        with self.assertRaises(ValueError):
-            evaluation.evaluate(i1, e1)
 
     def test_evaluate_single_unnamed_input_named(self):
         e1 = utils.create_input_event_set("i1")
@@ -159,15 +136,6 @@ class EvaluationTest(absltest.TestCase):
         self.assertIsInstance(result, EventSet)
         self.assertTrue(result is e1)
 
-    def test_evaluate_list_unnamed_inputs_no_name(self):
-        e1 = utils.create_input_event_set("i1")
-        i1 = e1.node()
-        e2 = utils.create_input_event_set()
-        i2 = e2.node()
-
-        with self.assertRaises(ValueError):
-            evaluation.evaluate([i1, i2], [e1, e2])
-
     def test_evaluate_list_unnamed_inputs_named(self):
         e1 = utils.create_input_event_set("i1")
         i1 = e1.node()
@@ -177,6 +145,7 @@ class EvaluationTest(absltest.TestCase):
         i3 = e3.node()
 
         result = evaluation.evaluate([i3, i1, i2], [e1, e2, e3])
+        isinstance(result, list)
 
         self.assertIsInstance(result, list)
         self.assertTrue(result[0] is e3)
@@ -184,29 +153,12 @@ class EvaluationTest(absltest.TestCase):
         self.assertTrue(result[2] is e2)
 
     def test_evaluate_repeated_unnamed_inputs(self):
-        i1 = utils.create_input_node(name="i1")
+        i1 = utils.create_source_node(name="i1")
         evset_1 = utils.create_input_event_set(name="i1")
         evset_2 = utils.create_input_event_set(name="i1")
 
         with self.assertRaises(ValueError):
-            evaluation.evaluate(
-                i1,
-                [evset_1, evset_2],
-            )
-
-    def test_evaluate_repeated_input_node_and_name(self):
-        i1 = utils.create_input_node(name="i1")
-        evset_1 = utils.create_input_event_set()
-        evset_2 = utils.create_input_event_set()
-
-        with self.assertRaises(ValueError):
-            evaluation.evaluate(
-                i1,
-                {
-                    i1: evset_1,
-                    "i1": evset_2,
-                },
-            )
+            evaluation.evaluate(i1, [evset_1, evset_2])
 
 
 if __name__ == "__main__":

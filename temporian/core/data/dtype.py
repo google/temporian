@@ -16,10 +16,12 @@
 
 import math
 from enum import Enum
-from typing import Union, Any, Mapping, List
+from typing import Union
 
 
 class DType(Enum):
+    """The type of a feature."""
+
     FLOAT64 = "float64"
     FLOAT32 = "float32"
     INT64 = "int64"
@@ -42,7 +44,8 @@ class DType(Enum):
         return self in (DType.INT64, DType.INT32)
 
     def missing_value(self) -> Union[float, int, str]:
-        """Returns missing value for specific dtype.
+        """
+        Returns missing value for specific dtype.
 
         Returns:
             The default missing value for the given data type.
@@ -61,7 +64,8 @@ class DType(Enum):
 
     @classmethod
     def from_python_type(cls, python_type: type) -> "DType":
-        """Returns DType from python type.
+        """
+        Returns DType from python type.
 
         Args:
             python_type: Python type.
@@ -88,28 +92,16 @@ class DType(Enum):
         raise ValueError(f"Non-implemented type {python_type}")
 
 
-def py_types_to_dtypes(target: Any) -> Any:
-    """Converts any python types found to temporian types.
+# The dtype of indexes.
 
-    This function works recursively on List or Mapping.
-    Any other kind of data is left unchanged.
+# TODO: IndexDType should only be the integer and str types in DType. Let's
+# find a way for IndexDType to only represent those types.
+IndexDType = DType
 
-    Args:
-        target: Any object.
 
-    Returns:
-        The same input object, with `type` elements changed by `DType`.
-
-    Raises:
-        ValueError: If there's a `type` that cannot be converted to temporian.
-    """
-    if isinstance(target, type):
-        target = DType.from_python_type(target)
-    elif isinstance(target, Mapping):
-        target = {
-            py_types_to_dtypes(key): py_types_to_dtypes(val)
-            for key, val in target.items()
-        }
-    elif isinstance(target, List):
-        target = [py_types_to_dtypes(val) for val in target]
-    return target
+def check_is_valid_index_dtype(dtype: DType):
+    if dtype not in [DType.INT32, DType.INT64, DType.STRING]:
+        raise ValueError(
+            f"Trying to create an index with dtype={dtype}. The dtype of an"
+            " index can only be int32, int64 or string."
+        )

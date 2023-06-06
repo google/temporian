@@ -11,6 +11,8 @@ py_test(
     srcs_version = "PY3",
     deps = [
         "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/implementation/numpy/operators:all_operators",
     ],
 )
 
@@ -20,6 +22,8 @@ py_test(
     srcs_version = "PY3",
     deps = [
         "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/implementation/numpy/operators:all_operators",
     ],
 )
 
@@ -27,7 +31,11 @@ py_test(
     name = "event_test",
     srcs = ["event_test.py"],
     srcs_version = "PY3",
-    deps = ["//temporian/implementation/numpy/data:event_set"],
+    deps = [
+        "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/implementation/numpy/operators:all_operators",
+    ],
 )
 
 py_test(
@@ -36,6 +44,19 @@ py_test(
     srcs_version = "PY3",
     deps = [
         "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/data:plotter",
+        "//temporian/implementation/numpy/operators:all_operators",
+    ],
+)
+
+py_test(
+    name = "io_test",
+    srcs = ["io_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/implementation/numpy/operators:all_operators",
     ],
 )

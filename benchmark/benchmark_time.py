@@ -23,14 +23,12 @@ import numpy as np
 import pandas as pd
 import temporian as tp
 
-from temporian.implementation.numpy.data.event_set import EventSet
-
 # TODO(gbm): Add flag to control which benchmark to run.
 
 
 def _build_toy_dataset(
     n: int, data_prefix="", data2_is_categorical_integer=False
-) -> EventSet:
+) -> tp.EventSet:
     """Builds a toy dataset with two features.
 
     Args:
@@ -54,7 +52,7 @@ def _build_toy_dataset(
     else:
         data_2 = np.random.randn(n)
 
-    return EventSet.from_dataframe(
+    return tp.pd_dataframe_to_event_set(
         pd.DataFrame(
             {
                 "timestamp": timestamps,
@@ -65,7 +63,6 @@ def _build_toy_dataset(
             }
         ),
         index_names=["index_1", "index_2"],
-        is_sorted=True,
     )
 
 
@@ -104,7 +101,9 @@ def benchmark_calendar_day_of_month(runner):
         timestamps = np.sort(np.random.randn(n) * 1_700_000_000).astype(
             "datetime64[s]"
         )
-        ds = EventSet.from_dataframe(pd.DataFrame({"timestamp": timestamps}))
+        ds = tp.pd_dataframe_to_event_set(
+            pd.DataFrame({"timestamp": timestamps})
+        )
 
         node = ds.node()
         output = tp.calendar_day_of_month(node)
@@ -124,7 +123,7 @@ def benchmark_sample(runner):
 
             node_1 = ds_1.node()
             node_2 = ds_2.node()
-            output = tp.sample(node_1, node_2)
+            output = tp.resample(node_1, node_2)
 
             runner.benchmark(
                 f"sample:e{m:_}_s{n:_}",
@@ -219,13 +218,11 @@ def benchmark_from_dataframe(runner):
 
                     runner.benchmark(
                         benchmark_name,
-                        lambda: EventSet.from_dataframe(
-                            df, index_names, is_sorted=True
-                        ),
+                        lambda: tp.pd_dataframe_to_event_set(df, index_names),
                     )
 
 
-def benchmark_set_index(runner):
+def benchmark_add_index(runner):
     runner.add_separator()
 
     np.random.seed(0)
@@ -246,7 +243,7 @@ def benchmark_set_index(runner):
         feature_5 = np.random.choice(feature_values, number_timestamps)
         feature_6 = np.random.choice(feature_values, number_timestamps)
 
-        evset = EventSet.from_dataframe(
+        evset = tp.pd_dataframe_to_event_set(
             pd.DataFrame(
                 {
                     "timestamp": timestamps,
@@ -260,7 +257,6 @@ def benchmark_set_index(runner):
                     "feature_6": feature_6,
                 }
             ),
-            is_sorted=True,
             index_names=["index_1", "index_2"],
         )
 
@@ -275,12 +271,11 @@ def benchmark_set_index(runner):
         ]
 
         for index in possible_indexes:
-            for append in [False]:
-                output = tp.set_index(node, index, append=append)
-                runner.benchmark(
-                    f"set_index:s:{number_timestamps:_}:num_idx:{len(index)}:append:{append}",
-                    lambda: tp.evaluate(output, input={node: evset}),
-                )
+            output = tp.add_index(node, index)
+            runner.benchmark(
+                f"add_index:s:{number_timestamps:_}:num_idx:{len(index)}",
+                lambda: tp.evaluate(output, input={node: evset}),
+            )
 
 
 class BenchmarkResult(NamedTuple):
@@ -366,7 +361,7 @@ def main():
         "propagate",
         "cast",
         "unique_timestamps",
-        "set_index",
+        "add_index",
     ]
     if args.functions is not None:
         benchmarks_to_run = args.functions

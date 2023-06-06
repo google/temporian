@@ -15,9 +15,9 @@
 """Plotting utility."""
 
 from typing import NamedTuple, Optional, Union, List, Any, Set
+from enum import Enum
 
 import numpy as np
-from enum import Enum
 
 from temporian.core.data import duration
 from temporian.implementation.numpy.data.event_set import EventSet
@@ -132,7 +132,7 @@ def plot(
 
     if features is None:
         # Don't filter anything: use all features from all events
-        features = set().union(*[e.feature_names for e in evsets])
+        features = set().union(*[e.schema.feature_names() for e in evsets])
     elif isinstance(features, str):
         features = {features}
     elif isinstance(features, list):
@@ -150,8 +150,16 @@ def plot(
         width_px=width_px,
         height_per_plot_px=height_per_plot_px,
         max_points=max_points,
-        min_time=min_time,
-        max_time=max_time,
+        min_time=(
+            duration.normalize_timestamp(min_time)
+            if min_time is not None
+            else None
+        ),
+        max_time=(
+            duration.normalize_timestamp(max_time)
+            if max_time is not None
+            else None
+        ),
         max_num_plots=max_num_plots,
         style=style,
     )
@@ -193,9 +201,10 @@ def get_num_plots(
                     " available indexes with 'evset.index' and provide one of"
                     " those index to the 'index' argument of 'plot'."
                     ' Alternatively, set "index=None" to select a random'
-                    f" index value (e.g., {evset.first_index_key()}."
+                    f" index value (e.g., {evset.get_arbitrary_index_value()}."
                 )
-            num_features = len(set(evset.feature_names).intersection(features))
+            candidate_features = set(evset.schema.feature_names())
+            num_features = len(candidate_features.intersection(features))
             if num_features == 0:
                 # We plot the sampling
                 num_features = 1

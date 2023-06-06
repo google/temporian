@@ -147,7 +147,7 @@ py_library(
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
-        "//temporian/core/data:feature",
+        "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -247,6 +247,7 @@ from temporian.implementation.numpy.data.event import EventSet
 from temporian.implementation.numpy.operators.{lower_op} import (
     {capitalized_op}NumpyImplementation,
 )
+from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
 
 
 class {capitalized_op}OperatorTest(absltest.TestCase):
@@ -254,29 +255,25 @@ class {capitalized_op}OperatorTest(absltest.TestCase):
         pass
 
     def test_base(self):
-        evset = EventSet.from_dataframe(
-            pd.DataFrame(
-                {{
-                    "timestamp": [1, 2,3,4],
+        evset = event_set(
+            timestamps=[1,2,3,4],
+            features={{
                     "a": [1.0, 2.0, 3.0, 4.0],
-                    "b": [5,6,7,8],
+                    "b": [5, 6, 7, 8],
                     "c": ["A", "A", "B", "B"],
-                }}
-            ),
-            index_names=["c"],
+            }},
+            index_features=["c"],
         )
         node = evset.node()
 
-        expected_output = EventSet.from_dataframe(
-            pd.DataFrame(
-                {{
-                    "timestamp": [1, 2,3,4],
+        expected_output = event_set(
+            timestamps=[1,2,3,4],
+            features={{
                     "a": [1.0, 2.0, 3.0, 4.0],
-                    "b": [5,6,7,8],
+                    "b": [5, 6, 7, 8],
                     "c": ["A", "A", "B", "B"],
-                }}
-            ),
-            index_names=["c"],
+            }},
+            index_features=["c"],
         )
 
         # Run op
@@ -310,7 +307,7 @@ py_test(
     deps = [
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
-        "//temporian/core/data:feature",
+        "//temporian/core/data:schema",
         "//temporian/core/operators:{lower_op}",
         "//temporian/implementation/numpy/operators:{lower_op}",
     ],

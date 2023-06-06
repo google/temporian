@@ -20,8 +20,18 @@ py_library(
         "//temporian/core/data:dtype",
         "//temporian/core/data:duration",
         "//temporian/core/data:node",
-        "//temporian/core/data:sampling",
         "//temporian/utils:string",
+    ],
+)
+
+py_library(
+    name = "io",
+    srcs = ["io.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":event_set",
+         "//temporian/core:evaluation",
+         "//temporian/core/operators:all_operators",
     ],
 )
 

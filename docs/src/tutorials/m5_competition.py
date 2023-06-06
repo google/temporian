@@ -77,8 +77,8 @@ calendar_raw.info()
 
 # Melt dataset
 #
-# The different timesteps of sale data ("sales_raw") are stored in different
-# columns. Instead, we want for each timesteps to be a different row.
+# The different timestamps of sale data ("sales_raw") are stored in different
+# columns. Instead, we want for each timestamps to be a different row.
 #
 # For example:
 #   The record "id,item_id,dept_id,d_1,d_2,d_3...d_n" will be converted into
@@ -172,14 +172,14 @@ sales_raw["sales"] = sales_raw["sales"].astype(np.float32)
 print("Convert to Temporian EventSets")
 print("===========================")
 
-sales_data = tp.EventSet.from_dataframe(
+sales_data = tp.pd_dataframe_to_event_set(
     sales_raw,
     index_names=["item_id", "dept_id", "cat_id", "store_id", "state_id"],
 )
 
-calendar_data = tp.EventSet.from_dataframe(calendar_raw)
+calendar_data = tp.pd_dataframe_to_event_set(calendar_raw)
 
-sell_prices_data = tp.EventSet.from_dataframe(
+sell_prices_data = tp.pd_dataframe_to_event_set(
     sell_prices_raw,
     index_names=["store_id", "item_id"],
 )
@@ -204,8 +204,10 @@ print("============")
 
 plot_options = {
     # We only plot the 1st year of data to make the plot more readable.
-    "min_time": datetime(2015, 1, 1),
-    "max_time": datetime(2016, 1, 1),
+    # TODO: There seems to be issues with dates.
+    # "min_time": datetime(2015, 1, 1),
+    # "max_time": datetime(2016, 1, 1),
+    "return_fig": True,
 }
 
 sales_data.plot(**plot_options).savefig(
@@ -240,7 +242,7 @@ augmented_sales = tp.glue(
 lagged_sales = []
 for lag in [1, 2]:
     lagged_sales.append(
-        tp.sample(
+        tp.resample(
             tp.prefix(f"lag_{lag}.", tp.lag(sales, tp.duration.days(lag))),
             sales,
         )
@@ -257,7 +259,7 @@ calendar_events = tp.glue(
 label_sales = []
 for lag in [1, 2, 3]:
     label_sales.append(
-        tp.sample(
+        tp.resample(
             tp.prefix(f"leak_{lag}.", tp.leak(sales, tp.duration.days(lag))),
             sales,
         )
@@ -277,7 +279,7 @@ sum_daily_sales_per_dept = tp.prefix(
 )
 
 # For each item, add the sum of departement sales for this specific item.
-sales_aggregated_item_level = tp.sample(
+sales_aggregated_item_level = tp.resample(
     tp.propagate(sum_daily_sales_per_dept, sales), sales
 )
 

@@ -5,7 +5,6 @@ from absl.testing import absltest
 import pandas as pd
 
 import temporian as tp
-from temporian.implementation.numpy.data.event_set import EventSet
 
 
 class IOTest(absltest.TestCase):
@@ -27,7 +26,7 @@ class IOTest(absltest.TestCase):
             index_names=["product_id"],
         )
 
-        expected_evset = EventSet.from_dataframe(
+        expected_evset = tp.pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [666964, 1.0, 740.0],
@@ -52,7 +51,7 @@ class IOTest(absltest.TestCase):
             columns=["product_id", "timestamp", "costs"],
         )
 
-        evset = EventSet.from_dataframe(df=df, index_names=["product_id"])
+        evset = tp.pd_dataframe_to_event_set(df=df, index_names=["product_id"])
 
         tp.save_event_set(evset=evset, path=self.save_path)
 

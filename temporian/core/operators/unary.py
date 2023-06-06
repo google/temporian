@@ -18,8 +18,10 @@ from abc import abstractmethod
 
 from temporian.core import operator_lib
 from temporian.core.data.dtype import DType
-from temporian.core.data.node import Node
-from temporian.core.data.feature import Feature
+from temporian.core.data.node import (
+    Node,
+    create_node_new_features_existing_sampling,
+)
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -35,32 +37,23 @@ class BaseUnaryOperator(Operator):
         if not isinstance(input, Node):
             raise TypeError(f"Input must be of type Node but got {type(input)}")
 
-        for feature in input.features:
+        for feature in input.schema.features:
             if feature.dtype not in self.allowed_dtypes:
                 raise ValueError(
                     f"DTypes supported by the operator: {self.allowed_dtypes}."
                     f" Got feature {feature.name} with dtype {feature.dtype}."
                 )
 
-        # inputs
         self.add_input("input", input)
-
-        # outputs
-        output_features = [  # pylint: disable=g-complex-comprehension
-            Feature(
-                name=feature.name,
-                dtype=self.get_output_dtype(feature.dtype),
-                sampling=input.sampling,
-                creator=self,
-            )
-            for feature in input.features
-        ]
 
         self.add_output(
             "output",
-            Node(
-                features=output_features,
-                sampling=input.sampling,
+            create_node_new_features_existing_sampling(
+                features=[
+                    (feature.name, self.get_output_dtype(feature.dtype))
+                    for feature in input.schema.features
+                ],
+                sampling_node=input,
                 creator=self,
             ),
         )

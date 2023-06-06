@@ -15,17 +15,20 @@
 import sys
 import time
 
-from typing import Dict, List
+from typing import Dict
 
 from temporian.core.data.node import Node
-from temporian.core.operators import base
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.core.schedule import Schedule
+
+# Loads all the numpy operator implementations
+from temporian.implementation.numpy.operators import all_operators as _impls
 
 
 def evaluate_schedule(
     inputs: Dict[Node, EventSet],
-    schedule: List[base.Operator],
+    schedule: Schedule,
     verbose: int,
     check_execution: bool,
 ) -> Dict[Node, EventSet]:
@@ -42,7 +45,8 @@ def evaluate_schedule(
     """
     data = {**inputs}
 
-    for operator_idx, operator in enumerate(schedule):
+    num_operators = len(schedule.ordered_operators)
+    for operator_idx, operator in enumerate(schedule.ordered_operators):
         operator_def = operator.definition()
 
         # Get implementation
@@ -56,15 +60,16 @@ def evaluate_schedule(
         if verbose == 1:
             print(
                 (
-                    f"    {operator_idx+1} / {len(schedule)}:"
+                    f"    {operator_idx+1} / {num_operators}:"
                     f" {operator.operator_key()}"
                 ),
                 file=sys.stderr,
                 end="",
             )
         elif verbose >= 2:
+            print("=============================", file=sys.stderr)
             print(
-                f"Run {operator}",
+                f"{operator_idx+1} / {num_operators}: Run {operator}",
                 file=sys.stderr,
             )
 
@@ -73,6 +78,9 @@ def evaluate_schedule(
             input_key: data[input_node]
             for input_key, input_node in operator.inputs.items()
         }
+
+        if verbose >= 2:
+            print(f"Inputs:\n{operator_inputs}\n", file=sys.stderr)
 
         # Compute output
         begin_time = time.perf_counter()
@@ -85,6 +93,7 @@ def evaluate_schedule(
         if verbose == 1:
             print(f" [{end_time - begin_time:.5f} s]", file=sys.stderr)
         elif verbose >= 2:
+            print(f"Outputs:\n{operator_outputs}\n", file=sys.stderr)
             print(f"Duration: {end_time - begin_time} s", file=sys.stderr)
 
         # materialize data in output nodes

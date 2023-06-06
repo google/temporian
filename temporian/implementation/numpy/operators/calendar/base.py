@@ -19,8 +19,7 @@ from typing import Dict, Any
 import numpy as np
 
 from temporian.core.operators.calendar.base import BaseCalendarOperator
-from temporian.implementation.numpy.data.event_set import IndexData
-from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -33,14 +32,12 @@ class BaseCalendarNumpyImplementation(OperatorImplementation):
         assert isinstance(operator, BaseCalendarOperator)
 
     def __call__(self, sampling: EventSet) -> Dict[str, EventSet]:
+        assert isinstance(self.operator, BaseCalendarOperator)
+        output_schema = self.output_schema("output")
+
         # create destination event set
-        dst_evset = EventSet(
-            data={},
-            feature_names=[self.operator.output_feature_name],
-            index_names=sampling.index_names,
-            is_unix_timestamp=True,
-        )
-        for index_key, index_data in sampling.iterindex():
+        dst_evset = EventSet(data={}, schema=output_schema)
+        for index_key, index_data in sampling.data.items():
             value = np.array(
                 [
                     self._get_value_from_datetime(
@@ -52,7 +49,9 @@ class BaseCalendarNumpyImplementation(OperatorImplementation):
                 np.int32
             )  # TODO: parametrize output dtype
 
-            dst_evset[index_key] = IndexData([value], index_data.timestamps)
+            dst_evset[index_key] = IndexData(
+                [value], index_data.timestamps, schema=output_schema
+            )
 
         return {"output": dst_evset}
 
