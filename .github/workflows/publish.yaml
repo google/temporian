@@ -26,7 +26,7 @@ jobs:
       - name: Save package for following jobs
         uses: actions/upload-artifact@v3
         with:
-          name: dists-ubuntu-${{ matrix.python-version }}
+          name: dist-ubuntu-${{ matrix.python-version }}
           path: dist
 
   build-macos:
@@ -78,7 +78,7 @@ jobs:
       - name: Download build
         uses: actions/download-artifact@v3
         with:
-          name: dists-${{ matrix.platform }}-${{ matrix.python-version }}
+          name: dist-${{ matrix.platform }}-${{ matrix.python-version }}
           path: dist
 
       - name: Install from wheel
