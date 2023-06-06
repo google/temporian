@@ -2,6 +2,7 @@ import os
 from abc import ABC, abstractmethod
 from typing import Dict, Tuple
 
+from temporian.utils import config
 from temporian.core.data.node import Node
 from temporian.core.data.schema import Schema
 from temporian.core.operators.base import Operator
@@ -158,8 +159,7 @@ def _is_same_sampling(evset_1: EventSet, evset_2: EventSet) -> Tuple[bool, str]:
 
     # Number of index values where to ensure that the numpy array containing
     # timestamps is the same for both evset_1 and evset_2.
-    debug_mode = os.environ.get("TEMPORIAN_DEBUG_MODE", "0") in ["1", "true"]
-    num_checks = 1 if debug_mode else len(evset_1.data)
+    num_checks = 1 if config.DEBUG_MODE else len(evset_1.data)
 
     for i, (index_key, index_data_1) in enumerate(evset_1.data.items()):
         if i >= num_checks:
@@ -183,7 +183,7 @@ def _is_same_sampling(evset_1: EventSet, evset_2: EventSet) -> Tuple[bool, str]:
                 ),
             )
 
-    if debug_mode:
+    if config.DEBUG_MODE:
         # Compare index keys.
         # TODO: is there a way to avoid checking all keys here (keys might come
         # in different orders, can't compare top num_check keys in each evset)

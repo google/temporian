@@ -522,7 +522,7 @@ def source_node(
             assumed not indexed.
         is_unix_timestamp: If true, the timestamps are interpreted as unix
             timestamps in seconds.
-        same_sampling_as: If set, the created node is guarentied to have the
+        same_sampling_as: If set, the created node is guaranteed to have the
             same sampling as same_sampling_as`. In this case, `indexes` and
             `is_unix_timestamp` should not be provided. Some operators require
             for input nodes to have the same sampling.
