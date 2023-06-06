@@ -10,5 +10,8 @@ py_test(
     name = "string_test",
     srcs = ["string_test.py"],
     srcs_version = "PY3",
-    deps = ["//temporian/utils:string"],
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/utils:string",
+    ],
 )

@@ -19,5 +19,9 @@ py_binary(
     name = "benchmark_time",
     srcs = ["benchmark_time.py"],
     srcs_version = "PY3",
-    deps = ["//temporian"],
+    deps = [
+        # already_there/numpy
+        # already_there/pandas
+        "//temporian",
+    ],
 )

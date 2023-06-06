@@ -10,8 +10,8 @@ py_test(
     srcs = ["propagate_test.py"],
     srcs_version = "PY3",
     deps = [
+        # already_there/absl/testing:absltest
         "//temporian/core/data:dtype",
-        "//temporian/core/data:schema",
         "//temporian/core/data:node",
         "//temporian/core/operators:propagate",
     ],

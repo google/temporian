@@ -27,12 +27,12 @@ from temporian.core.data.dtype import DType
 from temporian.proto import core_pb2 as pb
 
 DTYPE_MAPPING = {
-    DType.FLOAT64: pb.DType.FLOAT64,
-    DType.FLOAT32: pb.DType.FLOAT32,
-    DType.INT64: pb.DType.INT64,
-    DType.INT32: pb.DType.INT32,
-    DType.BOOLEAN: pb.DType.BOOLEAN,
-    DType.STRING: pb.DType.STRING,
+    DType.FLOAT64: pb.DType.DTYPE_FLOAT64,
+    DType.FLOAT32: pb.DType.DTYPE_FLOAT32,
+    DType.INT64: pb.DType.DTYPE_INT64,
+    DType.INT32: pb.DType.DTYPE_INT32,
+    DType.BOOLEAN: pb.DType.DTYPE_BOOLEAN,
+    DType.STRING: pb.DType.DTYPE_STRING,
 }
 INV_DTYPE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
 

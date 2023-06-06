@@ -1,10 +1,11 @@
 #include <assert.h>
+#include <pybind11/numpy.h>
+#include <pybind11/pybind11.h>
+
 #include <cstdint>
 #include <deque>
 #include <iostream>
 #include <map>
-#include <pybind11/numpy.h>
-#include <pybind11/pybind11.h>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -21,7 +22,6 @@ template <typename INPUT, typename OUTPUT, typename TAccumulator>
 py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
                                const py::array_t<INPUT> &evset_values,
                                const double window_length) {
-
   // Input size
   const size_t n_event = evset_timestamps.shape(0);
 
@@ -121,7 +121,9 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
 }
 
 // Note: We only use inheritence to compile check the code.
-template <typename INPUT, typename OUTPUT> struct Accumulator {
+template <typename INPUT, typename OUTPUT>
+struct Accumulator {
+  virtual ~Accumulator() = default;
   virtual void Add(INPUT value) = 0;
   virtual void Remove(INPUT value) = 0;
   virtual OUTPUT Result() = 0;
@@ -129,7 +131,6 @@ template <typename INPUT, typename OUTPUT> struct Accumulator {
 
 template <typename INPUT, typename OUTPUT>
 struct SimpleMovingAverageAccumulator : Accumulator<INPUT, OUTPUT> {
-
   void Add(INPUT value) override {
     if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
       if (std::isnan(value)) {
@@ -165,7 +166,6 @@ struct SimpleMovingAverageAccumulator : Accumulator<INPUT, OUTPUT> {
 
 template <typename INPUT, typename OUTPUT>
 struct MovingStandardDeviationAccumulator : Accumulator<INPUT, OUTPUT> {
-
   void Add(INPUT value) override {
     if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
       if (std::isnan(value)) {
@@ -205,9 +205,7 @@ struct MovingStandardDeviationAccumulator : Accumulator<INPUT, OUTPUT> {
 
 template <typename INPUT, typename OUTPUT>
 struct MovingCountAccumulator : Accumulator<INPUT, OUTPUT> {
-
   void Add(INPUT value) override {
-
     static_assert(std::is_same<OUTPUT, int32_t>::value,
                   "OUTPUT must be int32_t");
 
@@ -236,7 +234,6 @@ struct MovingCountAccumulator : Accumulator<INPUT, OUTPUT> {
 
 template <typename INPUT, typename OUTPUT>
 struct MovingSumAccumulator : Accumulator<INPUT, OUTPUT> {
-
   void Add(INPUT value) override {
     if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
       if (std::isnan(value)) {
@@ -263,7 +260,7 @@ struct MovingSumAccumulator : Accumulator<INPUT, OUTPUT> {
 
 template <typename INPUT, typename OUTPUT>
 struct MovingExtremumAccumulator : Accumulator<INPUT, OUTPUT> {
-
+  virtual ~MovingExtremumAccumulator() = default;
   virtual bool Compare(INPUT a, INPUT b) = 0;
 
   void Add(INPUT value) override {
@@ -333,20 +330,20 @@ struct MovingMaxAccumulator : MovingExtremumAccumulator<INPUT, OUTPUT> {
 //   INPUT: Input value type.
 //   OUTPUT: Output value type.
 //   ACCUMULATOR: Accumulator class.
-#define REGISTER_CC_FUNC(NAME, INPUT, OUTPUT, ACCUMULATOR)                     \
-                                                                               \
-  py::array_t<OUTPUT> NAME(const ArrayD &evset_timestamps,                     \
-                           const py::array_t<INPUT> &evset_values,             \
-                           const double window_length) {                       \
-    return accumulate<INPUT, OUTPUT, ACCUMULATOR<INPUT, OUTPUT>>(              \
-        evset_timestamps, evset_values, window_length);                        \
-  }                                                                            \
-                                                                               \
-  py::array_t<OUTPUT> NAME(                                                    \
-      const ArrayD &evset_timestamps, const py::array_t<INPUT> &evset_values,  \
-      const ArrayD &sampling_timestamps, const double window_length) {         \
-    return accumulate<INPUT, OUTPUT, ACCUMULATOR<INPUT, OUTPUT>>(              \
-        evset_timestamps, evset_values, sampling_timestamps, window_length);   \
+#define REGISTER_CC_FUNC(NAME, INPUT, OUTPUT, ACCUMULATOR)                    \
+                                                                              \
+  py::array_t<OUTPUT> NAME(const ArrayD &evset_timestamps,                    \
+                           const py::array_t<INPUT> &evset_values,            \
+                           const double window_length) {                      \
+    return accumulate<INPUT, OUTPUT, ACCUMULATOR<INPUT, OUTPUT>>(             \
+        evset_timestamps, evset_values, window_length);                       \
+  }                                                                           \
+                                                                              \
+  py::array_t<OUTPUT> NAME(                                                   \
+      const ArrayD &evset_timestamps, const py::array_t<INPUT> &evset_values, \
+      const ArrayD &sampling_timestamps, const double window_length) {        \
+    return accumulate<INPUT, OUTPUT, ACCUMULATOR<INPUT, OUTPUT>>(             \
+        evset_timestamps, evset_values, sampling_timestamps, window_length);  \
   }
 
 // Note: ";" are not needed for the code, but are required for our code
@@ -382,7 +379,7 @@ REGISTER_CC_FUNC(moving_count, double, int32_t, MovingCountAccumulator);
 REGISTER_CC_FUNC(moving_count, int32_t, int32_t, MovingCountAccumulator);
 REGISTER_CC_FUNC(moving_count, int64_t, int32_t, MovingCountAccumulator);
 REGISTER_CC_FUNC(moving_count, bool, int32_t, MovingCountAccumulator);
-} // namespace
+}  // namespace
 
 // Register c++ functions to pybind with and without sampling.
 //

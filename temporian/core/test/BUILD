@@ -3,6 +3,7 @@ package(
     licenses = ["notice"],
 )
 
+
 py_library(
     name = "utils",
     srcs = ["utils.py"],
@@ -11,10 +12,10 @@ py_library(
         "//temporian/core:operator_lib",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
-        "//temporian/core/data:schema",
         "//temporian/core/operators:base",
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
+        "//temporian/proto:core_py_proto",
     ],
 )
 
@@ -26,7 +27,7 @@ py_test(
     srcs = ["magic_methods_test.py"],
     srcs_version = "PY3",
     deps = [
-        # absl/testing:absltest dep,
+        # already_there/absl/testing:absltest
         ":utils",
         "//temporian/core/data:node",
         "//temporian/core/operators:base",
@@ -42,7 +43,7 @@ py_test(
     srcs = ["operator_test.py"],
     srcs_version = "PY3",
     deps = [
-        # absl/testing:absltest dep,
+        # already_there/absl/testing:absltest
         "//temporian/core/data:node",
         "//temporian/core/operators:base",
         "//temporian/proto:core_py_proto",
@@ -54,15 +55,9 @@ py_test(
     srcs = ["graph_test.py"],
     srcs_version = "PY3",
     deps = [
-        # absl/logging dep,
-        # absl/testing:absltest dep,
         ":utils",
+        # already_there/absl/testing:absltest
         "//temporian/core:graph",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/core/operators:base",
-        "//temporian/proto:core_py_proto",
     ],
 )
 
@@ -71,17 +66,14 @@ py_test(
     srcs = ["serialization_test.py"],
     srcs_version = "PY3",
     deps = [
-        # absl/logging dep,
-        # absl/testing:absltest dep,
         ":utils",
+        # already_there/absl/logging
+        # already_there/absl/testing:absltest
         "//temporian",
         "//temporian/core:graph",
         "//temporian/core:serialization",
         "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/core/operators:base",
-        "//temporian/proto:core_py_proto",
+        "//temporian/implementation/numpy/data:io",
     ],
 )
 
@@ -90,16 +82,10 @@ py_test(
     srcs = ["evaluation_test.py"],
     srcs_version = "PY3",
     deps = [
-        # absl/logging dep,
-        # absl/testing:absltest dep,
         ":utils",
+        # already_there/absl/testing:absltest
         "//temporian/core:evaluation",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/core/operators:base",
-        "//temporian/proto:core_py_proto",
-        "//temporian/implementation/numpy/operators:all_operators",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -108,6 +94,7 @@ py_test(
     srcs = ["registered_operators_test.py"],
     srcs_version = "PY3",
     deps = [
+        # already_there/absl/testing:absltest
         "//temporian/core:operator_lib",
         "//temporian/core/operators:all_operators",
     ],
