@@ -1,6 +1,6 @@
 name: publish-macos
 
-# TODO: change to either only run on release branch or on tags/releases
+# TODO: change to only run on release branch
 on:
   push:
     branches:
@@ -90,6 +90,8 @@ jobs:
   publish:
     needs: [test-install]
     runs-on: ubuntu-latest
+    # TODO: change to production-pypi
+    environment: test-pypi
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -113,5 +115,5 @@ jobs:
         # TODO: change to prod PyPI, and prod token in repo's secrets
         run: |
           poetry config repositories.test-pypi https://test.pypi.org/legacy/
-          poetry config pypi-token.test-pypi ${{ secrets.TEST_PYPI_TOKEN }}
+          poetry config pypi-token.test-pypi ${{ secrets.PYPI_TOKEN }}
           poetry publish -r test-pypi --no-interaction --skip-existing
