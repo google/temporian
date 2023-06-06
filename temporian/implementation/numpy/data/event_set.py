@@ -17,6 +17,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 import math
 import datetime
+import sys
 
 import numpy as np
 
@@ -523,12 +524,20 @@ class EventSet:
 
         return plotter.plot(evsets=self, *args, **wargs)
 
-    def memory_usage(self) -> int:
-        """Gets the approximated memory usage of the event set in bytes."""
-
-        size = 0
+    def __sizeof__(self) -> int:
+        size = sys.getsizeof(self.data)
         for index_key, index_data in self.data.items():
-            size += index_key.__sizeof__() + index_data.timestamps.nbytes
+            size += sys.getsizeof(index_key) + sys.getsizeof(
+                index_data.timestamps
+            )
             for feature in index_data.features:
-                size += feature.nbytes
+                size += sys.getsizeof(feature)
         return size
+
+    def memory_usage(self) -> int:
+        """Gets the approximated memory usage of the event set in bytes.
+
+        Takes into account garbage collector overhead.
+        """
+
+        return sys.getsizeof(self)
