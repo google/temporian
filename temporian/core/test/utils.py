@@ -1,5 +1,5 @@
 """Utilities for unit testing."""
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import (
@@ -227,7 +227,7 @@ class OpWithAttributes(base.Operator):
         attr_list: List[str],
         attr_float: float,
         attr_bool: bool,
-        attr_map: dict[str, str],
+        attr_map: Dict[str, str],
         attr_list_dtypes: List[DType],
     ):
         super().__init__()

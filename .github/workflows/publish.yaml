@@ -90,7 +90,7 @@ jobs:
   publish:
     needs: [test-install]
     runs-on: ubuntu-latest
-    # TODO: change to production-pypi
+    # TODO: change to "pypi"
     environment: test-pypi
     steps:
       - name: Checkout
