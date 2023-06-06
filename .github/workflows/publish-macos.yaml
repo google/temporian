@@ -59,10 +59,7 @@ jobs:
           path: dist
 
       - name: Install from wheel
-        run: |
-          python --version
-          pip --version
-          pip install dist/*.whl
+        run: pip install dist/*.whl
 
       - name: Test installation
         run: python ./tools/check_install.py
