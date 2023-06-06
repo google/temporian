@@ -25,7 +25,7 @@ from temporian.core.operators.binary import (
     ModuloOperator,
     PowerOperator,
 )
-from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
 from temporian.implementation.numpy.operators.binary import (
     AddNumpyImplementation,
     SubtractNumpyImplementation,
@@ -42,7 +42,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
     addition, subtraction, division and multiplication"""
 
     def setUp(self):
-        self.evset_1 = EventSet.from_dataframe(
+        self.evset_1 = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [0, 1.0, 10.0],
@@ -55,7 +55,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
             ),
             index_names=["store_id"],
         )
-        self.evset_2 = EventSet.from_dataframe(
+        self.evset_2 = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [0, 1.0, 0.0],
@@ -67,8 +67,9 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 columns=["store_id", "timestamp", "costs"],
             ),
             index_names=["store_id"],
+            same_sampling_as=self.evset_1,
         )
-        self.evset_3 = EventSet.from_dataframe(
+        self.evset_3 = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [0, 1.0, 0.0],
@@ -80,22 +81,16 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 columns=["store_id", "timestamp", "costs"],
             ),
             index_names=["store_id"],
+            same_sampling_as=self.evset_1,
         )
         self.node_1 = self.evset_1.node()
         self.node_2 = self.evset_2.node()
         self.node_3 = self.evset_3.node()
 
-        # FIXME: This should not be necessary
-        self.node_2._sampling = self.node_1._sampling
-        self.node_3._sampling = self.node_1._sampling
-        for index, data in self.evset_1.data.items():
-            self.evset_2[index].timestamps = data.timestamps
-            self.evset_3[index].timestamps = data.timestamps
-
     def test_correct_sum(self) -> None:
         """Test correct sum operator."""
 
-        output_evset = EventSet.from_dataframe(
+        output_evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [0, 1.0, 10.0],
@@ -113,6 +108,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
             input_1=self.node_1,
             input_2=self.node_2,
         )
+        operator.outputs["output"].check_same_sampling(self.node_1)
 
         sum_implementation = AddNumpyImplementation(operator)
 
@@ -124,7 +120,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
     def test_correct_subtraction(self) -> None:
         """Test correct subtraction operator."""
 
-        output_evset = EventSet.from_dataframe(
+        output_evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [0, 1.0, 10.0],
@@ -152,7 +148,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
     def test_correct_multiplication(self) -> None:
         """Test correct multiplication operator."""
 
-        output_evset = EventSet.from_dataframe(
+        output_evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [0, 1.0, 0.0],
@@ -181,7 +177,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
     def test_correct_division(self) -> None:
         """Test correct division operator."""
 
-        output_evset = EventSet.from_dataframe(
+        output_evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [0, 1.0, np.inf],
@@ -212,7 +208,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         """Test correct floor division operator."""
 
         # Using evset_1 and evset_3
-        output_evset = EventSet.from_dataframe(
+        output_evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [0, 1.0, np.inf],
@@ -243,7 +239,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         """Test correct modulo operator."""
 
         # Using evset_1 and evset_3
-        output_evset = EventSet.from_dataframe(
+        output_evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [0, 1.0, np.nan],
@@ -274,7 +270,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         """Test correct power operator."""
 
         # Using evset_1 and evset_3
-        output_evset = EventSet.from_dataframe(
+        output_evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [0, 1.0, 1.0],

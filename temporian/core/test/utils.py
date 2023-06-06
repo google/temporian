@@ -1,45 +1,45 @@
 """Utilities for unit testing."""
-from typing import List, Mapping, Optional
+from typing import List, Optional
 
-import pandas as pd
-
-from temporian.core.data import node as node_lib
 from temporian.core.data.dtype import DType
-from temporian.core.data.feature import Feature
-from temporian.core.data.node import Node
-from temporian.core.data.sampling import Sampling
+from temporian.core.data.node import (
+    Node,
+    source_node,
+    create_node_with_new_reference,
+    create_node_new_features_new_sampling,
+    create_node_new_features_existing_sampling,
+)
 from temporian.core.operators import base
 from temporian.proto import core_pb2 as pb
 from temporian.core import operator_lib
 from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.io import event_set
 
 # The name of the operator is defined by the number of inputs and outputs.
 # For example "OpI1O2" has 1 input and 2 outputs.
 
 
-def create_input_node(name: Optional[str] = None):
-    return node_lib.input_node(
+def create_source_node(name: Optional[str] = None):
+    return source_node(
         features=[
-            Feature("f1", DType.FLOAT64),
-            Feature("f2", DType.FLOAT64),
+            ("f1", DType.FLOAT64),
+            ("f2", DType.FLOAT64),
         ],
-        index_levels=[("x", DType.INT32), ("y", DType.STRING)],
+        indexes=[("x", DType.INT64), ("y", DType.STRING)],
         name=name,
     )
 
 
 def create_input_event_set(name: Optional[str] = None) -> EventSet:
-    return EventSet.from_dataframe(
-        pd.DataFrame(
-            {
-                "timestamp": [0, 2, 4, 6],
-                "x": [10, 20, 30, 40],
-                "y": ["a", "b", "c", "d"],
-                "f1": [1.0, 2.0, 3.0, 4.0],
-                "f2": [5.0, 6.0, 7.0, 8.0],
-            }
-        ),
-        index_names=["x", "y"],
+    return event_set(
+        timestamps=[0, 2, 4, 6],
+        features={
+            "x": [10, 20, 30, 40],
+            "y": ["a", "b", "c", "d"],
+            "f1": [1.0, 2.0, 3.0, 4.0],
+            "f2": [5.0, 6.0, 7.0, 8.0],
+        },
+        index_features=["x", "y"],
         name=name,
     )
 
@@ -59,24 +59,13 @@ class OpI1O1(base.Operator):
         self.add_input("input", input)
         self.add_output(
             "output",
-            Node(
+            create_node_new_features_new_sampling(
                 features=[
-                    Feature(
-                        "f3",
-                        DType.FLOAT64,
-                        sampling=input.sampling,
-                        creator=self,
-                    ),
-                    Feature(
-                        "f4",
-                        DType.INT64,
-                        sampling=input.sampling,
-                        creator=self,
-                    ),
+                    ("f3", DType.FLOAT64),
+                    ("f4", DType.INT64),
                 ],
-                sampling=Sampling(
-                    index_levels=[], creator=self, is_unix_timestamp=False
-                ),
+                indexes=[],
+                is_unix_timestamp=False,
                 creator=self,
             ),
         )
@@ -102,9 +91,10 @@ class OpI1O1NotCreator(base.Operator):
         self.add_input("input", input)
         self.add_output(
             "output",
-            Node(
-                features=[f for f in input.features],
-                sampling=input.sampling,
+            create_node_with_new_reference(
+                schema=input.schema,
+                features=input.feature_nodes,
+                sampling=input.sampling_node,
                 creator=self,
             ),
         )
@@ -132,22 +122,12 @@ class OpI2O1(base.Operator):
         self.add_input("input_2", input_2)
         self.add_output(
             "output",
-            Node(
+            create_node_new_features_existing_sampling(
                 features=[
-                    Feature(
-                        "f5",
-                        DType.BOOLEAN,
-                        sampling=input_1.sampling,
-                        creator=self,
-                    ),
-                    Feature(
-                        "f6",
-                        DType.STRING,
-                        sampling=input_1.sampling,
-                        creator=self,
-                    ),
+                    ("f5", DType.BOOLEAN),
+                    ("f6", DType.STRING),
                 ],
-                sampling=input_1.sampling,
+                sampling_node=input_1,
                 creator=self,
             ),
         )
@@ -176,31 +156,17 @@ class OpI1O2(base.Operator):
         self.add_input("input", input)
         self.add_output(
             "output_1",
-            Node(
-                features=[
-                    Feature(
-                        "f1",
-                        DType.INT32,
-                        sampling=input.sampling,
-                        creator=self,
-                    )
-                ],
-                sampling=input.sampling,
+            create_node_new_features_existing_sampling(
+                features=[("f1", DType.INT32)],
+                sampling_node=input,
                 creator=self,
             ),
         )
         self.add_output(
             "output_2",
-            Node(
-                features=[
-                    Feature(
-                        "f1",
-                        DType.FLOAT32,
-                        sampling=input.sampling,
-                        creator=self,
-                    ),
-                ],
-                sampling=input.sampling,
+            create_node_new_features_existing_sampling(
+                features=[("f1", DType.FLOAT32)],
+                sampling_node=input,
                 creator=self,
             ),
         )
@@ -232,7 +198,7 @@ class OpWithAttributes(base.Operator):
                 ),
                 pb.OperatorDef.Attribute(
                     key="attr_list",
-                    type=pb.OperatorDef.Attribute.Type.REPEATED_STRING,
+                    type=pb.OperatorDef.Attribute.Type.LIST_STRING,
                 ),
                 pb.OperatorDef.Attribute(
                     key="attr_float",
@@ -246,6 +212,10 @@ class OpWithAttributes(base.Operator):
                     key="attr_map",
                     type=pb.OperatorDef.Attribute.Type.MAP_STR_STR,
                 ),
+                pb.OperatorDef.Attribute(
+                    key="attr_list_dtypes",
+                    type=pb.OperatorDef.Attribute.Type.LIST_DTYPE,
+                ),
             ],
         )
 
@@ -257,7 +227,8 @@ class OpWithAttributes(base.Operator):
         attr_list: List[str],
         attr_float: float,
         attr_bool: bool,
-        attr_map: Mapping[str, str],
+        attr_map: dict[str, str],
+        attr_list_dtypes: List[DType],
     ):
         super().__init__()
         self.add_attribute("attr_int", attr_int)
@@ -266,12 +237,14 @@ class OpWithAttributes(base.Operator):
         self.add_attribute("attr_float", attr_float)
         self.add_attribute("attr_bool", attr_bool)
         self.add_attribute("attr_map", attr_map)
+        self.add_attribute("attr_list_dtypes", attr_list_dtypes)
+
         self.add_input("input", input)
         self.add_output(
             "output",
-            Node(
+            create_node_new_features_existing_sampling(
                 features=[],
-                sampling=input.sampling,
+                sampling_node=input,
                 creator=self,
             ),
         )

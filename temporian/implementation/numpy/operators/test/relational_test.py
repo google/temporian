@@ -24,7 +24,6 @@ from temporian.core.operators.binary import (
     LessEqualOperator,
     LessOperator,
 )
-from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.binary import (
     EqualNumpyImplementation,
     NotEqualNumpyImplementation,
@@ -33,6 +32,7 @@ from temporian.implementation.numpy.operators.binary import (
     LessEqualNumpyImplementation,
     LessNumpyImplementation,
 )
+from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
 
 
 class ArithmeticNumpyImplementationTest(absltest.TestCase):
@@ -40,7 +40,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
     addition, subtraction, division and multiplication"""
 
     def setUp(self):
-        self.evset_1 = EventSet.from_dataframe(
+        self.evset_1 = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [0, 1.0, 10.0],
@@ -55,7 +55,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id"],
         )
 
-        self.evset_2 = EventSet.from_dataframe(
+        self.evset_2 = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [0, 1.0, 10.0],
@@ -79,7 +79,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
 
     def test_correct_equal(self) -> None:
         """Test correct equal operator."""
-        output_evset = EventSet.from_dataframe(
+        output_evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [0, 1.0, True],
@@ -94,6 +94,9 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id"],
         )
         operator = EqualOperator(input_1=self.node_1, input_2=self.node_2)
+        operator.outputs["output"].check_same_sampling(self.node_1)
+        operator.outputs["output"].check_same_sampling(self.node_2)
+
         operator_output = EqualNumpyImplementation(operator).call(
             input_1=self.evset_1, input_2=self.evset_2
         )
@@ -101,7 +104,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
 
     def test_correct_not_equal(self) -> None:
         """Test correct not-equal operator."""
-        output_evset = EventSet.from_dataframe(
+        output_evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [0, 1.0, False],
@@ -122,7 +125,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         self.assertEqual(output_evset, operator_output["output"])
 
     def test_correct_greater(self) -> None:
-        output_evset = EventSet.from_dataframe(
+        output_evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [0, 1.0, False],
@@ -143,7 +146,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         self.assertEqual(output_evset, operator_output["output"])
 
     def test_correct_greater_equal(self) -> None:
-        output_evset = EventSet.from_dataframe(
+        output_evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [0, 1.0, True],
@@ -164,7 +167,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         self.assertEqual(output_evset, operator_output["output"])
 
     def test_correct_less(self) -> None:
-        output_evset = EventSet.from_dataframe(
+        output_evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [0, 1.0, False],
@@ -185,7 +188,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         self.assertEqual(output_evset, operator_output["output"])
 
     def test_correct_less_equal(self) -> None:
-        output_evset = EventSet.from_dataframe(
+        output_evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [0, 1.0, True],

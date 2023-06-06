@@ -31,14 +31,19 @@ class UniqueTimestampsNumpyImplementation(OperatorImplementation):
         assert isinstance(operator, UniqueTimestamps)
 
     def __call__(self, input: EventSet) -> Dict[str, EventSet]:
+        assert isinstance(self.operator, UniqueTimestamps)
+
+        output_schema = self.output_schema("output")
         evset = EventSet(
             data={
-                index_key: IndexData([], np.unique(index_data.timestamps))
-                for index_key, index_data in input.iterindex()
+                index_key: IndexData(
+                    features=[],
+                    timestamps=np.unique(index_data.timestamps),
+                    schema=output_schema,
+                )
+                for index_key, index_data in input.data.items()
             },
-            feature_names=[],
-            index_names=input.index_names,
-            is_unix_timestamp=input.is_unix_timestamp,
+            schema=output_schema,
         )
         return {"output": evset}
 

@@ -19,8 +19,8 @@ import pandas as pd
 
 from temporian.core.evaluation import evaluate
 from temporian.core.operators.select import SelectOperator
-from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators import select
+from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
 
 
 class SelectOperatorTest(absltest.TestCase):
@@ -45,7 +45,9 @@ class SelectOperatorTest(absltest.TestCase):
 
         self.features = ["sales", "costs", "weather"]
 
-        self.input_evset = EventSet.from_dataframe(df, index_names=["store_id"])
+        self.input_evset = pd_dataframe_to_event_set(
+            df, index_names=["store_id"]
+        )
         self.input_node = self.input_evset.node()
 
     def test_select_one_feature(self) -> None:
@@ -62,11 +64,15 @@ class SelectOperatorTest(absltest.TestCase):
             columns=["store_id", "timestamp", "sales"],
         )
 
-        operator = SelectOperator(input=self.input_node, feature_names="sales")
+        operator = SelectOperator(
+            input=self.input_node, feature_names=["sales"]
+        )
+        operator.outputs["output"].check_same_sampling(self.input_node)
+
         impl = select.SelectNumpyImplementation(operator)
         output_evset = impl.call(input=self.input_evset)["output"]
 
-        expected_evset = EventSet.from_dataframe(
+        expected_evset = pd_dataframe_to_event_set(
             new_df, index_names=["store_id"]
         )
 
@@ -92,7 +98,7 @@ class SelectOperatorTest(absltest.TestCase):
         impl = select.SelectNumpyImplementation(operator)
         output_evset = impl.call(input=self.input_evset)["output"]
 
-        expected_evset = EventSet.from_dataframe(
+        expected_evset = pd_dataframe_to_event_set(
             new_df, index_names=["store_id"]
         )
 
@@ -111,7 +117,7 @@ class SelectOperatorTest(absltest.TestCase):
             ],
             columns=["store_id", "timestamp", "sales"],
         )
-        expected_evset = EventSet.from_dataframe(
+        expected_evset = pd_dataframe_to_event_set(
             new_df, index_names=["store_id"]
         )
 
@@ -137,7 +143,7 @@ class SelectOperatorTest(absltest.TestCase):
             ],
             columns=["store_id", "timestamp", "sales", "costs"],
         )
-        expected_evset = EventSet.from_dataframe(
+        expected_evset = pd_dataframe_to_event_set(
             new_df, index_names=["store_id"]
         )
 

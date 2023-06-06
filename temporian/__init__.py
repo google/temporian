@@ -27,8 +27,7 @@
 from temporian.core import serialization
 from temporian.core.data import dtype
 from temporian.core.data import node
-from temporian.core.data import feature
-from temporian.core.data import sampling
+from temporian.core.data import schema
 from temporian.core.data import duration
 from temporian.core.evaluation import evaluate
 from temporian.core.operators.all_operators import *
@@ -40,6 +39,11 @@ from temporian.implementation.numpy.data.plotter import plot
 # IO
 from temporian.io.read_event_set import read_event_set
 from temporian.io.save_event_set import save_event_set
+
+from temporian.implementation.numpy.data import io
+from temporian.implementation.numpy.data.plotter import plot
+
+from temporian.core.operator_lib import registered_operators as get_operators
 
 # Operators registration mechanism
 from temporian.core.operator_lib import registered_operators as _ops
@@ -54,9 +58,16 @@ bool_ = dtype.DType.BOOLEAN
 str_ = dtype.DType.STRING
 
 # Aliases
-Feature = feature.Feature
 load = serialization.load
 save = serialization.save
-input_node = node.input_node
+source_node = node.source_node
+Event = node.Node
+Schema = node.Schema
+Feature = node.FeatureSchema
+Index = node.IndexSchema
+
+# TODO: To update.
+event_set = io.event_set
+pd_dataframe_to_event_set = io.pd_dataframe_to_event_set
 
 __version__ = "0.0.1"

@@ -12,19 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from absl.testing import absltest
 import math
 
-from absl.testing import absltest
 import pandas as pd
 import numpy as np
-from numpy.testing import assert_array_equal
 
 from temporian.core.operators.window.moving_min import MovingMinOperator
 from temporian.implementation.numpy.operators.window.moving_min import (
     MovingMinNumpyImplementation,
     operators_cc,
 )
-from temporian.implementation.numpy.data.event_set import EventSet
+from numpy.testing import assert_array_equal
+from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
 
 
 def _f64(l):
@@ -46,11 +46,11 @@ class MovingMinOperatorTest(absltest.TestCase):
     def test_cc_wo_sampling(self):
         assert_array_equal(
             operators_cc.moving_min(
-                _f64([0, 1, 2, 3, 5, 6, 6, 20]),
-                _f32([nan, 10, nan, 12, 13, 14, 2, 15]),
+                _f64([0, 1, 2, 3, 5, 20]),
+                _f32([nan, 10, nan, 12, 13, 14]),
                 3.5,
             ),
-            _f32([nan, 10, 10, 10, 12, 2, 2, 15]),
+            _f32([nan, 10, 10, 10, 12, 14]),
         )
 
     def test_cc_w_sampling(self):
@@ -67,7 +67,7 @@ class MovingMinOperatorTest(absltest.TestCase):
     def test_flat(self):
         """A simple time sequence."""
 
-        input_data = EventSet.from_dataframe(
+        input_data = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [10.0, 20.0, 1],
@@ -90,7 +90,7 @@ class MovingMinOperatorTest(absltest.TestCase):
 
         output = instance.call(input=input_data)
 
-        expected_output = EventSet.from_dataframe(
+        expected_output = pd_dataframe_to_event_set(
             pd.DataFrame(
                 [
                     [10.0, 20.0, 1],

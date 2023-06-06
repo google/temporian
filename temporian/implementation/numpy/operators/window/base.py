@@ -36,29 +36,33 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
         input: EventSet,
         sampling: Optional[EventSet] = None,
     ) -> Dict[str, EventSet]:
+        assert isinstance(self.operator, BaseWindowOperator)
+
         # if no sampling is provided, apply operator to the evset's own
         # timestamps
         if sampling is None:
             sampling = input
 
         # create destination evset
-        dst_evset = EventSet(
-            {},
-            feature_names=input.feature_names,
-            index_names=sampling.index_names,
-            is_unix_timestamp=sampling.is_unix_timestamp,
-        )
+        output_schema = self.operator.outputs["output"].schema
+        dst_evset = EventSet(data={}, schema=output_schema)
         # For each index
-        for index_key, index_data in input.iterindex():
+        for index_key, index_data in input.data.items():
             dst_features = []
             dst_timestamps = sampling[index_key].timestamps
-            dst_evset[index_key] = IndexData(dst_features, dst_timestamps)
+            dst_index_data = IndexData(
+                features=dst_features,
+                timestamps=dst_timestamps,
+                schema=None,
+            )
             self._compute(
                 src_timestamps=index_data.timestamps,
                 src_features=index_data.features,
                 sampling_timestamps=dst_timestamps,
                 dst_features=dst_features,
             )
+            dst_index_data.check_schema(output_schema)
+            dst_evset[index_key] = dst_index_data
 
         return {"output": dst_evset}
 
@@ -73,6 +77,8 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
         sampling_timestamps: np.ndarray,
         dst_features: List[np.ndarray],
     ) -> None:
+        assert isinstance(self.operator, BaseWindowOperator)
+
         implementation = self._implementation()
         for src_ts in src_features:
             kwargs = {
@@ -80,7 +86,7 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
                 "evset_values": src_ts,
                 "window_length": self.operator.window_length,
             }
-            if self._operator.has_sampling:
+            if self.operator.has_sampling:
                 kwargs["sampling_timestamps"] = sampling_timestamps
             dst_feature = implementation(**kwargs)
             dst_features.append(dst_feature)

@@ -17,10 +17,10 @@ from absl.testing import absltest
 
 import pandas as pd
 from temporian.core.operators.unique_timestamps import UniqueTimestamps
-from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.unique_timestamps import (
     UniqueTimestampsNumpyImplementation,
 )
+from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
 
 
 class UniqueTimestampsOperatorTest(absltest.TestCase):
@@ -28,7 +28,7 @@ class UniqueTimestampsOperatorTest(absltest.TestCase):
         pass
 
     def test_base(self):
-        evset = EventSet.from_dataframe(
+        evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 {
                     "timestamp": [1, 2, 2, 2, 3, 3, 3, 4],
@@ -40,7 +40,7 @@ class UniqueTimestampsOperatorTest(absltest.TestCase):
         )
         node = evset.node()
 
-        expected_output = EventSet.from_dataframe(
+        expected_output = pd_dataframe_to_event_set(
             pd.DataFrame(
                 {
                     "timestamp": [1, 2, 3, 3, 4],

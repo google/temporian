@@ -19,10 +19,15 @@ import pandas as pd
 from temporian.core.operators.calendar.iso_week import (
     CalendarISOWeekOperator,
 )
-from temporian.implementation.numpy.data.event_set import IndexData
-from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.calendar.iso_week import (
     CalendarISOWeekNumpyImplementation,
+)
+from temporian.implementation.numpy.data.io import (
+    pd_dataframe_to_event_set,
+    event_set,
+)
+from temporian.implementation.numpy.operators.test.test_util import (
+    assertEqualEventSet,
 )
 
 
@@ -31,7 +36,7 @@ class CalendarISOWeekNumpyImplementationTest(absltest.TestCase):
 
     def test_basic(self) -> None:
         "Basic test with flat node."
-        input_evset = EventSet.from_dataframe(
+        input_evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 data=[
                     [
@@ -58,25 +63,24 @@ class CalendarISOWeekNumpyImplementationTest(absltest.TestCase):
                 columns=["timestamp"],
             ),
         )
-        input_node = input_evset.node()
-        output_evset = EventSet(
-            data={
-                (): IndexData(
-                    [np.array([1, 1, 2, 52, 1, 2, 12, 52]).astype(np.int32)],
-                    input_evset.first_index_data().timestamps,
-                ),
+
+        output_evset = event_set(
+            timestamps=input_evset.get_arbitrary_index_data().timestamps,
+            features={
+                "calendar_iso_week": np.array(
+                    [1, 1, 2, 52, 1, 2, 12, 52]
+                ).astype(np.int32),
             },
-            feature_names=["calendar_iso_week"],
-            index_names=[],
             is_unix_timestamp=True,
         )
-        operator = CalendarISOWeekOperator(input_node)
-        impl = CalendarISOWeekNumpyImplementation(operator)
-        output = impl.call(sampling=input_evset)
 
-        self.assertTrue(output_evset == output["output"])
+        operator = CalendarISOWeekOperator(input_evset.node())
+        impl = CalendarISOWeekNumpyImplementation(operator)
+        output = impl.call(sampling=input_evset)["output"]
+
+        assertEqualEventSet(self, output, output_evset)
         self.assertTrue(
-            output["output"].first_index_data().features[0].dtype == np.int32
+            output.get_arbitrary_index_data().features[0].dtype == np.int32
         )
 
 

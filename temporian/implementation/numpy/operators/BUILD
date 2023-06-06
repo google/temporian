@@ -11,17 +11,18 @@ py_library(
     srcs = ["all_operators.py"],
     srcs_version = "PY3",
     deps = [
+        ":add_index",
         ":cast",
         ":drop_index",
         ":filter",
         ":glue",
         ":lag",
+        ":leak",
         ":prefix",
         ":propagate",
         ":rename",
-        ":sample",
+        ":resample",
         ":select",
-        ":set_index",
         ":since_last",
         ":unary",
         ":unique_timestamps",
@@ -96,6 +97,19 @@ py_library(
 )
 
 py_library(
+    name = "leak",
+    srcs = ["leak.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/data:duration",
+        "//temporian/core/operators:leak",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event_set",
+    ],
+)
+
+py_library(
     name = "drop_index",
     srcs = ["drop_index.py"],
     srcs_version = "PY3",
@@ -132,12 +146,12 @@ py_library(
 )
 
 py_library(
-    name = "set_index",
-    srcs = ["set_index.py"],
+    name = "add_index",
+    srcs = ["add_index.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
-        "//temporian/core/operators:set_index",
+        "//temporian/core/operators:add_index",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
     ],
@@ -171,13 +185,13 @@ py_library(
 )
 
 py_library(
-    name = "sample",
-    srcs = ["sample.py"],
+    name = "resample",
+    srcs = ["resample.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
         "//temporian/core/data:duration",
-        "//temporian/core/operators:sample",
+        "//temporian/core/operators:resample",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy_cc/operators:operators_cc",

@@ -17,19 +17,19 @@ from absl.testing import absltest
 
 import pandas as pd
 
-from temporian.core.operators.sample import Sample
-from temporian.implementation.numpy.operators.sample import (
-    SampleNumpyImplementation,
+from temporian.core.operators.resample import Resample
+from temporian.implementation.numpy.operators.resample import (
+    ResampleNumpyImplementation,
 )
-from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
 
 
-class SampleOperatorTest(absltest.TestCase):
+class ResampleOperatorTest(absltest.TestCase):
     def setUp(self):
         pass
 
     def test_base(self):
-        evset = EventSet.from_dataframe(
+        evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 {
                     "timestamp": [1, 5, 8, 9, 1, 1],
@@ -41,9 +41,8 @@ class SampleOperatorTest(absltest.TestCase):
             ),
             index_names=["x"],
         )
-        node = evset.node()
 
-        sampling_evset = EventSet.from_dataframe(
+        sampling_evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 {
                     "timestamp": [-1, 1, 6, 10, 2, 2, 1],
@@ -52,9 +51,8 @@ class SampleOperatorTest(absltest.TestCase):
             ),
             index_names=["x"],
         )
-        sampling_node = sampling_evset.node()
 
-        expected_output = EventSet.from_dataframe(
+        expected_output = pd_dataframe_to_event_set(
             pd.DataFrame(
                 {
                     "timestamp": [-1, 1, 6, 10, 2, 2, 1],
@@ -68,9 +66,13 @@ class SampleOperatorTest(absltest.TestCase):
         )
 
         # Run op
-        op = Sample(input=node, sampling=sampling_node)
-        instance = SampleNumpyImplementation(op)
+        op = Resample(input=evset.node(), sampling=sampling_evset.node())
+        op.outputs["output"].check_same_sampling(sampling_evset.node())
+        instance = ResampleNumpyImplementation(op)
         output = instance.call(input=evset, sampling=sampling_evset)["output"]
+
+        print("output:\n", output)
+        print("expected_output:\n", expected_output)
 
         self.assertEqual(output, expected_output)
 

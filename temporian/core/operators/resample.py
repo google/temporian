@@ -12,16 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Sample operator class and public API function definition."""
+"""Resample operator class and public API function definition."""
 
 from temporian.core import operator_lib
-from temporian.core.data.node import Node
-from temporian.core.data.feature import Feature
+from temporian.core.data.node import (
+    Node,
+    create_node_new_features_existing_sampling,
+)
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
-class Sample(Operator):
+class Resample(Operator):
     def __init__(
         self,
         input: Node,
@@ -32,37 +34,22 @@ class Sample(Operator):
         self.add_input("input", input)
         self.add_input("sampling", sampling)
 
-        if input.sampling.index != sampling.sampling.index:
-            raise ValueError(
-                "Node and sampling do not have the same index."
-                f" {input.sampling.index} != {sampling.sampling.index}"
-            )
-
-        output_features = [  # pylint: disable=g-complex-comprehension
-            Feature(
-                name=f.name,
-                dtype=f.dtype,
-                sampling=sampling.sampling,
-                creator=self,
-            )
-            for f in input.features
-        ]
+        input.schema.check_compatible_index(sampling.schema)
 
         self.add_output(
             "output",
-            Node(
-                features=output_features,
-                sampling=sampling.sampling,
+            create_node_new_features_existing_sampling(
+                features=input.schema.features,
+                sampling_node=sampling,
                 creator=self,
             ),
         )
-
         self.check()
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
-            key="SAMPLE",
+            key="RESAMPLE",
             attributes=[],
             inputs=[
                 pb.OperatorDef.Input(key="input"),
@@ -72,14 +59,14 @@ class Sample(Operator):
         )
 
 
-operator_lib.register_operator(Sample)
+operator_lib.register_operator(Resample)
 
 
-def sample(
+def resample(
     input: Node,
     sampling: Node,
 ) -> Node:
-    """Samples a node at each timestamp of a sampling.
+    """Resamples a node at each timestamp of a sampling.
 
     If a timestamp in `sampling` does not have a corresponding timestamp in
     `input`, the last timestamp in `input` is used instead. If this timestamp
@@ -105,7 +92,7 @@ def sample(
         sampling: Node to use the sampling of.
 
     Returns:
-        Sampled node, with same sampling as `sampling`.
+        Resampled node, with same sampling as `sampling`.
     """
 
-    return Sample(input=input, sampling=sampling).outputs["output"]
+    return Resample(input=input, sampling=sampling).outputs["output"]

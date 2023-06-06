@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy as np
 import pandas as pd
 from absl.testing import absltest
 
@@ -21,12 +20,12 @@ from temporian.core.operators.binary import (
     LogicalOrOperator,
     LogicalXorOperator,
 )
-from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.binary import (
     LogicalAndNumpyImplementation,
     LogicalOrNumpyImplementation,
     LogicalXorNumpyImplementation,
 )
+from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
 
 
 class ArithmeticNumpyImplementationTest(absltest.TestCase):
@@ -34,12 +33,12 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
     addition, subtraction, division and multiplication"""
 
     def setUp(self):
-        self.evset_1 = EventSet.from_dataframe(
+        self.evset_1 = pd_dataframe_to_event_set(
             pd.DataFrame(
                 {"timestamp": [1, 2, 3, 4], "x": [True, False, True, False]}
             )
         )
-        self.evset_2 = EventSet.from_dataframe(
+        self.evset_2 = pd_dataframe_to_event_set(
             pd.DataFrame(
                 {"timestamp": [1, 2, 3, 4], "x": [True, False, False, True]}
             )
@@ -54,7 +53,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
 
     def test_correct_and(self) -> None:
         """Test correct AND operator."""
-        output_evset = EventSet.from_dataframe(
+        output_evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 {
                     "timestamp": [1, 2, 3, 4],
@@ -63,6 +62,9 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
             )
         )
         operator = LogicalAndOperator(input_1=self.node_1, input_2=self.node_2)
+        operator.outputs["output"].check_same_sampling(self.node_1)
+        operator.outputs["output"].check_same_sampling(self.node_2)
+
         operator_output = LogicalAndNumpyImplementation(operator).call(
             input_1=self.evset_1, input_2=self.evset_2
         )
@@ -70,7 +72,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
 
     def test_correct_or(self) -> None:
         """Test correct OR operator."""
-        output_evset = EventSet.from_dataframe(
+        output_evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 {"timestamp": [1, 2, 3, 4], "or_x_x": [True, False, True, True]}
             )
@@ -83,7 +85,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
 
     def test_correct_xor(self) -> None:
         """Test correct XOR operator."""
-        output_evset = EventSet.from_dataframe(
+        output_evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 {
                     "timestamp": [1, 2, 3, 4],

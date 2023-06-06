@@ -51,12 +51,12 @@ from temporian.core.operators.calendar.hour import calendar_hour
 from temporian.core.operators.calendar.minute import calendar_minute
 from temporian.core.operators.calendar.second import calendar_second
 from temporian.core.operators.calendar.year import calendar_year
-from temporian.core.operators.set_index import set_index
+from temporian.core.operators.add_index import add_index
 from temporian.core.operators.lag import lag
-from temporian.core.operators.lag import leak
+from temporian.core.operators.leak import leak
 from temporian.core.operators.prefix import prefix
 from temporian.core.operators.propagate import propagate
-from temporian.core.operators.sample import sample
+from temporian.core.operators.resample import resample
 from temporian.core.operators.select import select
 from temporian.core.operators.rename import rename
 

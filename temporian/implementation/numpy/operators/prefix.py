@@ -28,18 +28,11 @@ class PrefixNumpyImplementation(OperatorImplementation):
         assert isinstance(operator, Prefix)
 
     def __call__(self, input: EventSet) -> Dict[str, EventSet]:
-        # gather operator attributes
-        prefix = self._operator.prefix
-
-        # create output evset
+        assert isinstance(self.operator, Prefix)
+        output_schema = self.output_schema("output")
         dst_evset = EventSet(
             data=input.data,
-            feature_names=[
-                f"{prefix}{feature_name}"
-                for feature_name in input.feature_names
-            ],
-            index_names=input.index_names,
-            is_unix_timestamp=input.is_unix_timestamp,
+            schema=output_schema,
         )
         return {"output": dst_evset}
 

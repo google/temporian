@@ -62,9 +62,9 @@ jobs:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
         platform: ["ubuntu", "macos"]
     runs-on: ${{ matrix.platform }}-latest
-    # Workaround for macos pip compatibility issue
-    # See https://github.com/actions/setup-python/issues/469
     env:
+      # Workaround for macos pip compatibility issue
+      # See https://github.com/actions/setup-python/issues/469
       SYSTEM_VERSION_COMPAT: 0
     steps:
       - name: Checkout
@@ -96,11 +96,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-
       - name: Install Poetry
         uses: snok/install-poetry@v1
 
@@ -121,4 +116,5 @@ jobs:
         run: |
           poetry config repositories.test-pypi https://test.pypi.org/legacy/
           poetry config pypi-token.test-pypi ${{ secrets.PYPI_TOKEN }}
+          poetry publish --help
           poetry publish -r test-pypi --no-interaction --skip-existing

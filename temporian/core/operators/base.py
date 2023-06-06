@@ -16,13 +16,16 @@
 
 from abc import ABC
 from typing import Dict, List, Tuple, Union, Any
+from temporian.core.data.dtype import DType
 
 from temporian.core.data.node import Node
 from temporian.proto import core_pb2 as pb
 
 
 # Valid types for operator attributes
-AttributeType = Union[str, int, float, bool, List[str], Dict[str, str]]
+AttributeType = Union[
+    str, int, float, bool, List[str], Dict[str, str], List[DType]
+]
 
 
 class OperatorExceptionDecorator(object):
@@ -48,9 +51,15 @@ class OperatorExceptionDecorator(object):
             # No exceptions
             return True
 
+        # TODO: Add more details about the caller.
+
         if exc_val:
             # Add operator details in the exception.
-            exc_val.args += (f'In operator "{self._operator}".',)
+            message = f"While running operator {self._operator!r}.\n"
+            if len(exc_val.args) == 1 and isinstance(exc_val.args[0], str):
+                exc_val.args = (message + exc_val.args[0],)
+            else:
+                exc_val.args += (message,)
         return False
 
 
@@ -66,10 +75,10 @@ class Operator(ABC):
             attr.key: attr.type for attr in self._definition.attributes
         }
 
-    def __str__(self):
+    def __repr__(self):
         return (
-            f"Operator<key: {self.definition().key}, id: {id(self)},"
-            f" attributes: {self.attributes}>"
+            f"Operator(key={self.definition().key!r}, id={id(self)!r},"
+            f" attributes={self.attributes!r})"
         )
 
     @property
@@ -184,7 +193,7 @@ class Operator(ABC):
         matches: List[Tuple[str, str]] = []
         for output_key, output_value in self._outputs.items():
             for input_key, input_value in self._inputs.items():
-                if output_value.sampling is input_value.sampling:
+                if output_value.sampling_node is input_value.sampling_node:
                     matches.append((input_key, output_key))
 
         return matches
@@ -211,6 +220,11 @@ class Operator(ABC):
                 isinstance(v, str) for v in value
             )
 
+        def is_list_dtype(value):
+            return isinstance(value, list) and all(
+                isinstance(v, DType) for v in value
+            )
+
         # Check exact matching between attr type (except ANY) and value type
         if (
             attr_type == pb.OperatorDef.Attribute.Type.STRING
@@ -232,7 +246,7 @@ class Operator(ABC):
         ):
             raise ValueError(f"Attribute {value=} mismatch: bool expected")
         if (
-            attr_type == pb.OperatorDef.Attribute.Type.REPEATED_STRING
+            attr_type == pb.OperatorDef.Attribute.Type.LIST_STRING
             and not is_list_str(value)
         ):
             raise ValueError(
@@ -245,6 +259,13 @@ class Operator(ABC):
             raise ValueError(
                 f"Attribute {value=} type mismatch: Dict[str,str] expected"
             )
+        if (
+            attr_type == pb.OperatorDef.Attribute.Type.LIST_DTYPE
+            and not is_list_dtype(value)
+        ):
+            raise ValueError(
+                f"Attribute {value=} type mismatch: list[DType] expected"
+            )
 
         # Special case: ANY attribute type, still needs to be a valid type
         if (
@@ -255,6 +276,7 @@ class Operator(ABC):
             and not isinstance(value, float)
             and not is_list_str(value)
             and not is_dict_str(value)
+            and not is_list_dtype(value)
         ):
             raise ValueError(
                 "Attribute of type ANY has an invalid value type:"

@@ -22,27 +22,26 @@ from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
 class LagNumpyImplementation(OperatorImplementation):
-    """Numpy implementation of the lag and leak operators."""
-
     def __init__(self, operator: LagOperator) -> None:
         super().__init__(operator)
         assert isinstance(operator, LagOperator)
 
     def __call__(self, input: EventSet) -> Dict[str, EventSet]:
+        assert isinstance(self.operator, LagOperator)
+        output_schema = self.output_schema("output")
+
         # gather operator attributes
-        duration = self._operator.duration
+        duration = self.operator.duration
 
         # create output event set
-        output_evset = EventSet(
-            {},
-            feature_names=input.feature_names,
-            index_names=input.index_names,
-            is_unix_timestamp=input.is_unix_timestamp,
-        )
+        output_evset = EventSet(data={}, schema=output_schema)
+
         # fill output event set data
-        for index_key, index_data in input.iterindex():
+        for index_key, index_data in input.data.items():
             output_evset[index_key] = IndexData(
-                index_data.features, index_data.timestamps + duration
+                index_data.features,
+                index_data.timestamps + duration,
+                schema=output_schema,
             )
 
         return {"output": output_evset}

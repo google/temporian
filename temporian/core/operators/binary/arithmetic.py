@@ -75,7 +75,7 @@ class DivideOperator(BaseArithmeticOperator):
         super().__init__(input_1, input_2)
 
         # Assuming previous dtype check of input_1 and input_2 features
-        for feat in input_1.features:
+        for feat in input_1.schema.features:
             if feat.dtype in [DType.INT32, DType.INT64]:
                 raise ValueError(
                     "Cannot use the divide operator on feature "

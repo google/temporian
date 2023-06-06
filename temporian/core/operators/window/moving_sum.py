@@ -19,9 +19,9 @@ from typing import Optional
 import numpy as np
 
 from temporian.core import operator_lib
-from temporian.core.data.duration import Duration
+from temporian.core.data.duration import Duration, normalize_duration
 from temporian.core.data.node import Node
-from temporian.core.data.feature import Feature
+from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.window.base import BaseWindowOperator
 from temporian.core.data.dtype import DType
 
@@ -31,7 +31,7 @@ class MovingSumOperator(BaseWindowOperator):
     def operator_def_key(cls) -> str:
         return "MOVING_SUM"
 
-    def get_feature_dtype(self, feature: Feature) -> DType:
+    def get_feature_dtype(self, feature: FeatureSchema) -> DType:
         return feature.dtype
 
 
@@ -67,7 +67,7 @@ def moving_sum(
     """
     return MovingSumOperator(
         input=input,
-        window_length=window_length,
+        window_length=normalize_duration(window_length),
         sampling=sampling,
     ).outputs["output"]
 
@@ -93,5 +93,5 @@ def cumsum(
     """
     return MovingSumOperator(
         input=input,
-        window_length=np.inf,
+        window_length=normalize_duration(np.inf),
     ).outputs["output"]

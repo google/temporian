@@ -20,7 +20,7 @@ from temporian.core.operators.propagate import Propagate
 from temporian.implementation.numpy.operators.propagate import (
     PropagateNumpyImplementation,
 )
-from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
 
 
 class PropagateOperatorTest(absltest.TestCase):
@@ -28,7 +28,7 @@ class PropagateOperatorTest(absltest.TestCase):
         pass
 
     def test_base(self):
-        evset = EventSet.from_dataframe(
+        evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 {
                     "timestamp": [1, 2, 3],
@@ -40,7 +40,7 @@ class PropagateOperatorTest(absltest.TestCase):
         )
         node = evset.node()
 
-        sampling_evset = EventSet.from_dataframe(
+        sampling_evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 {
                     "timestamp": [1, 1, 1, 1],
@@ -52,7 +52,7 @@ class PropagateOperatorTest(absltest.TestCase):
         )
         sampling_node = sampling_evset.node()
 
-        expected_output = EventSet.from_dataframe(
+        expected_output = pd_dataframe_to_event_set(
             pd.DataFrame(
                 {
                     "timestamp": [1, 2, 1, 2, 3, 3],
@@ -65,6 +65,8 @@ class PropagateOperatorTest(absltest.TestCase):
         )
         # Run op
         op = Propagate(input=node, sampling=sampling_node)
+        self.assertEqual(op.list_matching_io_samplings(), [])
+
         instance = PropagateNumpyImplementation(op)
         output = instance.call(input=evset, sampling=sampling_evset)["output"]
         self.assertEqual(output, expected_output)

@@ -19,10 +19,15 @@ from absl.testing import absltest
 from temporian.core.operators.calendar.month import (
     CalendarMonthOperator,
 )
-from temporian.implementation.numpy.data.event_set import IndexData
-from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.calendar.month import (
     CalendarMonthNumpyImplementation,
+)
+from temporian.implementation.numpy.data.io import (
+    pd_dataframe_to_event_set,
+    event_set,
+)
+from temporian.implementation.numpy.operators.test.test_util import (
+    assertEqualEventSet,
 )
 
 
@@ -31,7 +36,7 @@ class CalendarMonthNumpyImplementationTest(absltest.TestCase):
 
     def test_basic(self) -> None:
         "Basic test with flat node."
-        input_evset = EventSet.from_dataframe(
+        input_evset = pd_dataframe_to_event_set(
             pd.DataFrame(
                 data=[
                     [pd.to_datetime("1970-01-01 00:00:00", utc=True)],
@@ -45,26 +50,23 @@ class CalendarMonthNumpyImplementationTest(absltest.TestCase):
             ),
         )
 
-        input_node = input_evset.node()
-
-        output_evset = EventSet(
-            data={
-                (): IndexData(
-                    [np.array([1, 1, 7, 12, 12, 12], dtype=np.int32)],
-                    input_evset[()].timestamps,
-                )
+        output_evset = event_set(
+            timestamps=input_evset.get_arbitrary_index_data().timestamps,
+            features={
+                "calendar_month": np.array([1, 1, 7, 12, 12, 12]).astype(
+                    np.int32
+                ),
             },
-            feature_names=["calendar_month"],
-            index_names=[],
             is_unix_timestamp=True,
         )
-        operator = CalendarMonthOperator(input_node)
-        impl = CalendarMonthNumpyImplementation(operator)
-        output = impl.call(sampling=input_evset)
 
-        self.assertTrue(output_evset == output["output"])
+        operator = CalendarMonthOperator(input_evset.node())
+        impl = CalendarMonthNumpyImplementation(operator)
+        output = impl.call(sampling=input_evset)["output"]
+
+        assertEqualEventSet(self, output, output_evset)
         self.assertTrue(
-            output["output"].first_index_data().features[0].dtype == np.int32
+            output.get_arbitrary_index_data().features[0].dtype == np.int32
         )
 
 

@@ -21,22 +21,16 @@ from temporian.implementation.numpy.data.event_set import EventSet
 
 class NodeTest(absltest.TestCase):
     def test_evaluate_input(self):
-        node = utils.create_input_node()
+        node = utils.create_source_node()
         evset = utils.create_input_event_set()
-
         result = node.evaluate({node: evset})
-
         self.assertIsInstance(result, EventSet)
         self.assertTrue(result is evset)
 
     def test_evaluate_single_operator(self):
-        a = utils.create_input_node(name="node")
         evset = utils.create_input_event_set()
-
-        sma = tp.simple_moving_average(a, 10)
-
-        result = sma.evaluate({"node": evset})
-
+        result = tp.simple_moving_average(evset.source_node(), 10)
+        result = result.evaluate(evset)
         self.assertIsInstance(result, EventSet)
 
 
