@@ -49,8 +49,8 @@ def plot_bokeh(
             if plot_idx >= num_plots:
                 break
 
-            evtset_features = evset.schema.feature_names()
-            display_features = [f for f in evtset_features if f in features]
+            evset_features = evset.schema.feature_names()
+            display_features = [f for f in evset_features if f in features]
 
             xs = evset.data[index].timestamps
             uniform = is_uniform(xs)
@@ -96,7 +96,7 @@ def plot_bokeh(
                 plot_idx += 1
 
             for display_feature in display_features:
-                feature_idx = evtset_features.index(display_feature)
+                feature_idx = evset_features.index(display_feature)
                 if plot_idx >= num_plots:
                     # Too much plots are displayed already.
                     break
