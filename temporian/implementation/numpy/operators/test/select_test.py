@@ -20,7 +20,7 @@ import pandas as pd
 from temporian.core.evaluation import evaluate
 from temporian.core.operators.select import SelectOperator
 from temporian.implementation.numpy.operators import select
-from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
+from temporian.io.pandas import from_pandas
 
 
 class SelectOperatorTest(absltest.TestCase):
@@ -45,9 +45,7 @@ class SelectOperatorTest(absltest.TestCase):
 
         self.features = ["sales", "costs", "weather"]
 
-        self.input_evset = pd_dataframe_to_event_set(
-            df, index_names=["store_id"]
-        )
+        self.input_evset = from_pandas(df, index_names=["store_id"])
         self.input_node = self.input_evset.node()
 
     def test_select_one_feature(self) -> None:
@@ -72,9 +70,7 @@ class SelectOperatorTest(absltest.TestCase):
         impl = select.SelectNumpyImplementation(operator)
         output_evset = impl.call(input=self.input_evset)["output"]
 
-        expected_evset = pd_dataframe_to_event_set(
-            new_df, index_names=["store_id"]
-        )
+        expected_evset = from_pandas(new_df, index_names=["store_id"])
 
         self.assertTrue(output_evset == expected_evset)
 
@@ -98,9 +94,7 @@ class SelectOperatorTest(absltest.TestCase):
         impl = select.SelectNumpyImplementation(operator)
         output_evset = impl.call(input=self.input_evset)["output"]
 
-        expected_evset = pd_dataframe_to_event_set(
-            new_df, index_names=["store_id"]
-        )
+        expected_evset = from_pandas(new_df, index_names=["store_id"])
 
         self.assertTrue(output_evset == expected_evset)
 
@@ -117,9 +111,7 @@ class SelectOperatorTest(absltest.TestCase):
             ],
             columns=["store_id", "timestamp", "sales"],
         )
-        expected_evset = pd_dataframe_to_event_set(
-            new_df, index_names=["store_id"]
-        )
+        expected_evset = from_pandas(new_df, index_names=["store_id"])
 
         output_evset = evaluate(
             self.input_node["sales"],
@@ -143,9 +135,7 @@ class SelectOperatorTest(absltest.TestCase):
             ],
             columns=["store_id", "timestamp", "sales", "costs"],
         )
-        expected_evset = pd_dataframe_to_event_set(
-            new_df, index_names=["store_id"]
-        )
+        expected_evset = from_pandas(new_df, index_names=["store_id"])
 
         output_evset = evaluate(
             self.input_node[["sales", "costs"]],

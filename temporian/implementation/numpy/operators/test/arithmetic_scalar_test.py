@@ -34,7 +34,7 @@ from temporian.implementation.numpy.operators.scalar import (
     PowerScalarNumpyImplementation,
     ModuloScalarNumpyImplementation,
 )
-from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
+from temporian.io.pandas import from_pandas
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
     testOperatorAndImp,
@@ -46,7 +46,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
     addition, subtraction, division and multiplication"""
 
     def setUp(self):
-        self.evset = pd_dataframe_to_event_set(
+        self.evset = from_pandas(
             pd.DataFrame(
                 [
                     [0, 1.0, 10.0],
@@ -67,7 +67,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         value = 10.0
 
-        output_evset = pd_dataframe_to_event_set(
+        output_evset = from_pandas(
             pd.DataFrame(
                 [
                     [0, 1.0, 20.0],
@@ -97,7 +97,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         value = 10.0
 
-        output_evset = pd_dataframe_to_event_set(
+        output_evset = from_pandas(
             pd.DataFrame(
                 [
                     [0, 1.0, 0.0],
@@ -128,7 +128,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         """
         value = 10.0
 
-        output_evset = pd_dataframe_to_event_set(
+        output_evset = from_pandas(
             pd.DataFrame(
                 [
                     [0, 1.0, 0.0],
@@ -159,7 +159,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         value = 10.0
 
-        output_evset = pd_dataframe_to_event_set(
+        output_evset = from_pandas(
             pd.DataFrame(
                 [
                     [0, 1.0, 100.0],
@@ -188,7 +188,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         value = 10.0
 
-        output_evset = pd_dataframe_to_event_set(
+        output_evset = from_pandas(
             pd.DataFrame(
                 [
                     [0, 1.0, 1.0],
@@ -217,7 +217,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         """Test correct division operator with value as numerator."""
         value = 10.0
 
-        output_evset = pd_dataframe_to_event_set(
+        output_evset = from_pandas(
             pd.DataFrame(
                 [
                     [0, 1.0, 1.0],
@@ -248,7 +248,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         value = 10.0
 
-        output_evset = pd_dataframe_to_event_set(
+        output_evset = from_pandas(
             pd.DataFrame(
                 [
                     [0, 1.0, 1.0],
@@ -277,7 +277,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         """Test correct floor division operator with value as numerator."""
         value = 10.0
 
-        output_evset = pd_dataframe_to_event_set(
+        output_evset = from_pandas(
             pd.DataFrame(
                 [
                     [0, 1.0, 1.0],
@@ -307,7 +307,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         """Test correct modulo operator."""
 
         value = 7.0
-        output_evset = pd_dataframe_to_event_set(
+        output_evset = from_pandas(
             pd.DataFrame(
                 [
                     [0, 1.0, 3.0],
@@ -336,7 +336,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         """Test correct modulo operator with value to the left."""
 
         value = 25.0
-        output_evset = pd_dataframe_to_event_set(
+        output_evset = from_pandas(
             pd.DataFrame(
                 [
                     [0, 1.0, 5.0],
@@ -364,7 +364,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         """Test correct power operator."""
 
         value = 2.0
-        output_evset = pd_dataframe_to_event_set(
+        output_evset = from_pandas(
             pd.DataFrame(
                 [
                     [0, 1.0, 100.0],
@@ -393,7 +393,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         """Test correct power operator with value as base."""
 
         value = 2.0
-        output_evset = pd_dataframe_to_event_set(
+        output_evset = from_pandas(
             pd.DataFrame(
                 [
                     [0, 1.0, 1024.0],
@@ -420,7 +420,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
     def test_correct_sum_multi_index(self) -> None:
         """Test correct sum operator with multiple indexes."""
 
-        evset = pd_dataframe_to_event_set(
+        evset = from_pandas(
             pd.DataFrame(
                 [
                     [0, 101, 1.0, 10.0],
@@ -436,7 +436,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         value = 10.0
 
-        output_evset = pd_dataframe_to_event_set(
+        output_evset = from_pandas(
             pd.DataFrame(
                 [
                     [0, 101, 1.0, 20.0],
@@ -475,7 +475,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         # Value: float, feature: int -> output should not be upcasted to float
         value = 10.0
 
-        event_data = pd_dataframe_to_event_set(
+        event_data = from_pandas(
             pd.DataFrame(
                 [
                     [0, 1.0, 10],
@@ -511,7 +511,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
     def test_addition_with_int(self) -> None:
         """Test correct addition operator with int value."""
 
-        evset = pd_dataframe_to_event_set(
+        evset = from_pandas(
             pd.DataFrame(
                 [
                     [0, 1.0, 10, 5.5],
@@ -529,7 +529,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
         value = 10
 
-        output_evset = pd_dataframe_to_event_set(
+        output_evset = from_pandas(
             pd.DataFrame(
                 [
                     [0, 1.0, 20, 15.5],

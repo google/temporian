@@ -21,7 +21,7 @@ from temporian.core.operators.resample import Resample
 from temporian.implementation.numpy.operators.resample import (
     ResampleNumpyImplementation,
 )
-from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
+from temporian.io.pandas import from_pandas
 
 
 class ResampleOperatorTest(absltest.TestCase):
@@ -29,7 +29,7 @@ class ResampleOperatorTest(absltest.TestCase):
         pass
 
     def test_base(self):
-        evset = pd_dataframe_to_event_set(
+        evset = from_pandas(
             pd.DataFrame(
                 {
                     "timestamp": [1, 5, 8, 9, 1, 1],
@@ -42,7 +42,7 @@ class ResampleOperatorTest(absltest.TestCase):
             index_names=["x"],
         )
 
-        sampling_evset = pd_dataframe_to_event_set(
+        sampling_evset = from_pandas(
             pd.DataFrame(
                 {
                     "timestamp": [-1, 1, 6, 10, 2, 2, 1],
@@ -52,7 +52,7 @@ class ResampleOperatorTest(absltest.TestCase):
             index_names=["x"],
         )
 
-        expected_output = pd_dataframe_to_event_set(
+        expected_output = from_pandas(
             pd.DataFrame(
                 {
                     "timestamp": [-1, 1, 6, 10, 2, 2, 1],

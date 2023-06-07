@@ -46,11 +46,11 @@ def save(
 
     Usage example:
         ```python
-        a = t.source_node(...)
-        b = t.sma(a, window_length=7.0)
-        t.save(inputs={"io_a": a}, outputs={"io_b": b}, path="graph.tem")
+        a = tp.input_node(...)
+        b = tp.sma(a, window_length=7.0)
+        tp.save(inputs={"io_a": a}, outputs={"io_b": b}, path="graph.tem")
 
-        inputs, outputs = t.load(path="graph.tem")
+        inputs, outputs = tp.load(path="graph.tem")
         print(t.evaluate(
             query=outputs["io_b"],
             input_data{inputs["io_a"]: pandas.DataFrame(...)}

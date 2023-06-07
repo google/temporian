@@ -164,7 +164,7 @@ class SerializeTest(absltest.TestCase):
             timestamps=[1, 2, 3], features={"x": [1, 2, 3], "y": [4, 5, 6]}
         )
 
-        input_node = input_data.source_node()
+        input_node = input_data.node()
         x = input_node
         x = tp.cast(x, float)
         x = x["x"]

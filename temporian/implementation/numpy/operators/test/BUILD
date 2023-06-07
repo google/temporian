@@ -27,6 +27,7 @@ py_test(
         # already_there/pandas
         "//temporian/core/operators/binary",
         "//temporian/implementation/numpy/data:io",
+        "//temporian/io:pandas",
         "//temporian/implementation/numpy/operators/binary",
     ],
 )
@@ -39,6 +40,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
+        "//temporian/io:pandas",
         "//temporian/core/operators/binary",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/binary",
@@ -52,6 +54,7 @@ py_test(
     deps = [
         # already_there/absl/testing:absltest
         # already_there/pandas
+        "//temporian/io:pandas",
         "//temporian/core/operators/binary",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/binary",
@@ -67,6 +70,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
+        "//temporian/io:pandas",
         "//temporian/core/operators/scalar",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/scalar",
@@ -81,6 +85,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
+        "//temporian/io:pandas",
         "//temporian/core/operators/scalar",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/scalar",
@@ -96,9 +101,10 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
-        "//temporian/core/data:dtype",
         # absl/testing:absltest dep,
+        "//temporian/core/data:dtype",
         "//temporian/core/data:node",
+        "//temporian/io:pandas",
         "//temporian/core/operators/binary",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/binary",
@@ -114,6 +120,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
+        "//temporian/io:pandas",
         "//temporian/core:evaluation",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
@@ -161,6 +168,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
+        "//temporian/io:pandas",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/implementation/numpy/data:io",
@@ -177,6 +185,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
+        "//temporian/io:pandas",
         "//temporian/core/data:node",
         "//temporian/core/operators/calendar:day_of_month",
         "//temporian/implementation/numpy/data:io",
@@ -193,6 +202,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
+        "//temporian/io:pandas",
         "//temporian/core/operators/calendar:day_of_week",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/calendar:day_of_week",
@@ -208,6 +218,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
+        "//temporian/io:pandas",
         "//temporian/core/operators/calendar:day_of_year",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/calendar:day_of_year",
@@ -223,6 +234,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
+        "//temporian/io:pandas",
         "//temporian/core/operators/calendar:hour",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/calendar:hour",
@@ -238,6 +250,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
+        "//temporian/io:pandas",
         "//temporian/core/operators/calendar:iso_week",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/calendar:iso_week",
@@ -253,6 +266,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
+        "//temporian/io:pandas",
         "//temporian/core/operators/calendar:minute",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/calendar:minute",
@@ -268,6 +282,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
+        "//temporian/io:pandas",
         "//temporian/core/operators/calendar:month",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/calendar:month",
@@ -283,6 +298,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
+        "//temporian/io:pandas",
         "//temporian/core/operators/calendar:second",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/calendar:second",
@@ -298,6 +314,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
+        "//temporian/io:pandas",
         "//temporian/core/operators/calendar:year",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/calendar:year",
@@ -340,7 +357,7 @@ py_test(
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/pandas
-        # absl/testing:absltest dep,
+        "//temporian/io:pandas",
         "//temporian/core/operators:drop_index",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators:drop_index",
@@ -355,6 +372,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
+        "//temporian/io:pandas",
         "//temporian/core:evaluation",
         "//temporian/core/operators:select",
         "//temporian/implementation/numpy/data:io",
@@ -370,6 +388,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
+        "//temporian/io:pandas",
         "//temporian/core/operators:rename",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators:rename",
@@ -384,6 +403,7 @@ py_test(
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/pandas
+        "//temporian/io:pandas",
         "//temporian/core:evaluation",
         "//temporian/core/operators:add_index",
         "//temporian/implementation/numpy/data:io",
@@ -399,6 +419,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/pandas
         # already_there/numpy
+        "//temporian/io:pandas",
         ":test_util",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
@@ -418,6 +439,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/pandas
         # already_there/numpy
+        "//temporian/io:pandas",
         ":test_util",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
@@ -436,6 +458,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/pandas
         # already_there/numpy
+        "//temporian/io:pandas",
         ":test_util",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
@@ -454,6 +477,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/pandas
         # already_there/numpy
+        "//temporian/io:pandas",
         ":test_util",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
@@ -472,6 +496,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/pandas
         # already_there/numpy
+        "//temporian/io:pandas",
         ":test_util",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
@@ -490,6 +515,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/pandas
         # already_there/numpy
+        "//temporian/io:pandas",
         ":test_util",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
@@ -508,6 +534,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/pandas
         # already_there/numpy
+        "//temporian/io:pandas",
         ":test_util",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
@@ -527,6 +554,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/pandas
         # already_there/numpy
+        "//temporian/io:pandas",
         ":test_util",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
@@ -546,6 +574,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/pandas
         # already_there/numpy
+        "//temporian/io:pandas",
         ":test_util",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
@@ -565,6 +594,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/pandas
         # already_there/numpy
+        "//temporian/io:pandas",
         "//temporian/core/operators:unique_timestamps",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators:unique_timestamps",
@@ -579,6 +609,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/pandas
         # already_there/numpy
+        "//temporian/io:pandas",
         ":test_util",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",

@@ -26,7 +26,7 @@ pip install temporian
 import temporian as tp
 
 # Load data.
-evset = tp.read_event_set("path/to/temporal_data.csv", timestamp_column="time")
+evset = tp.from_csv("path/to/temporal_data.csv", timestamp_column="time")
 node = evset.node()
 
 # Apply operators to create a processing graph.

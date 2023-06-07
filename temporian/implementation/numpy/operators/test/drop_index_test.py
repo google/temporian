@@ -20,7 +20,7 @@ from temporian.core.operators.drop_index import DropIndexOperator
 from temporian.implementation.numpy.operators.drop_index import (
     DropIndexNumpyImplementation,
 )
-from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
+from temporian.io.pandas import from_pandas
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
     testOperatorAndImp,
@@ -29,7 +29,7 @@ from temporian.implementation.numpy.operators.test.test_util import (
 
 class DropIndexNumpyImplementationTest(absltest.TestCase):
     def setUp(self) -> None:
-        self.input_evset = pd_dataframe_to_event_set(
+        self.input_evset = from_pandas(
             pd.DataFrame(
                 [
                     [0, 1, 0.4, 10.0],
@@ -48,7 +48,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         self.input_node = self.input_evset.node()
 
     def test_drop_all(self) -> None:
-        expected_output = pd_dataframe_to_event_set(
+        expected_output = from_pandas(
             pd.DataFrame(
                 [
                     [0.1, 13.0, 0, 2],
@@ -75,7 +75,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
 
     def test_drop_item_id(self) -> None:
         # Need to do some re-ordering due to timestamp collisions in sort
-        expected_output = pd_dataframe_to_event_set(
+        expected_output = from_pandas(
             pd.DataFrame(
                 [
                     [0, 0.1, 13.0, 2],
@@ -101,7 +101,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         assertEqualEventSet(self, output, expected_output)
 
     def test_drop_store_id(self) -> None:
-        expected_output = pd_dataframe_to_event_set(
+        expected_output = from_pandas(
             pd.DataFrame(
                 [
                     [2, 0.1, 13.0, 0],
@@ -129,7 +129,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
 
     def test_drop_item_id_keep_false(self) -> None:
         # Need to do some re-ordering due to timestamp collisions in sort
-        expected_output = pd_dataframe_to_event_set(
+        expected_output = from_pandas(
             pd.DataFrame(
                 [
                     [0, 0.1, 13.0],
@@ -157,7 +157,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
 
     def test_drop_store_id_keep_false(self) -> None:
         # Need to do some re-ordering due to timestamp collisions in sort
-        expected_output = pd_dataframe_to_event_set(
+        expected_output = from_pandas(
             pd.DataFrame(
                 [
                     [2, 0.1, 13.0],
@@ -183,7 +183,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         assertEqualEventSet(self, output, expected_output)
 
     def test_str_index(self):
-        evset = pd_dataframe_to_event_set(
+        evset = from_pandas(
             pd.DataFrame(
                 {
                     "timestamp": [1, 2, 2, 3],
@@ -197,7 +197,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         )
         node = evset.node()
 
-        expected_output = pd_dataframe_to_event_set(
+        expected_output = from_pandas(
             pd.DataFrame(
                 {
                     "timestamp": [1, 2, 2, 3],

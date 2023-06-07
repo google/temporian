@@ -14,7 +14,7 @@
 
 from absl.testing import absltest
 
-from temporian.core.data.node import source_node
+from temporian.core.data.node import input_node
 from temporian.core.test import utils
 from temporian.core.data.dtype import DType
 from temporian.core.operators.binary import (
@@ -59,21 +59,21 @@ from temporian.core.operators.unary import AbsOperator, InvertOperator
 
 class MagicMethodsTest(absltest.TestCase):
     def setUp(self):
-        self.sampling_node = source_node(
+        self.sampling_node = input_node(
             features=[],
             indexes=[("x", DType.INT32)],
             is_unix_timestamp=False,
         )
 
         # Nodes with floating point types
-        self.node_float_1 = source_node(
+        self.node_float_1 = input_node(
             features=[
                 ("f1", DType.FLOAT32),
                 ("f2", DType.FLOAT64),
             ],
             same_sampling_as=self.sampling_node,
         )
-        self.node_float_2 = source_node(
+        self.node_float_2 = input_node(
             features=[
                 ("f3", DType.FLOAT32),
                 ("f4", DType.FLOAT64),
@@ -82,14 +82,14 @@ class MagicMethodsTest(absltest.TestCase):
         )
 
         # Nodes with integer types (only for division operations)
-        self.node_int_1 = source_node(
+        self.node_int_1 = input_node(
             features=[
                 ("f5", DType.INT32),
                 ("f6", DType.INT64),
             ],
             same_sampling_as=self.sampling_node,
         )
-        self.node_int_2 = source_node(
+        self.node_int_2 = input_node(
             features=[
                 ("f7", DType.INT32),
                 ("f8", DType.INT64),

@@ -21,7 +21,7 @@ from temporian.core.operators.since_last import SinceLast
 from temporian.implementation.numpy.operators.since_last import (
     SinceLastNumpyImplementation,
 )
-from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
+from temporian.io.pandas import from_pandas
 
 nan = math.nan
 
@@ -31,7 +31,7 @@ class SinceLastOperatorTest(absltest.TestCase):
         pass
 
     def test_no_sampling(self):
-        event_data = pd_dataframe_to_event_set(
+        event_data = from_pandas(
             pd.DataFrame(
                 {
                     "timestamp": [1, 5, 8, 9, 1, 1, 2],
@@ -42,7 +42,7 @@ class SinceLastOperatorTest(absltest.TestCase):
         )
         event = event_data.node()
 
-        expected_output = pd_dataframe_to_event_set(
+        expected_output = from_pandas(
             pd.DataFrame(
                 {
                     "timestamp": [1, 5, 8, 9, 1, 1, 2],
@@ -63,17 +63,17 @@ class SinceLastOperatorTest(absltest.TestCase):
         self.assertEqual(output, expected_output)
 
     def test_with_sampling(self):
-        event_data = pd_dataframe_to_event_set(
+        event_data = from_pandas(
             pd.DataFrame({"timestamp": [1, 2, 2, 4]}),
         )
         event = event_data.node()
 
-        sampling_data = pd_dataframe_to_event_set(
+        sampling_data = from_pandas(
             pd.DataFrame({"timestamp": [-1, 1, 1.5, 2, 2.1, 4, 5]})
         )
         sampling = sampling_data.node()
 
-        expected_output = pd_dataframe_to_event_set(
+        expected_output = from_pandas(
             pd.DataFrame(
                 {
                     "timestamp": [-1, 1, 1.5, 2, 2.1, 4, 5],
