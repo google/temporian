@@ -74,3 +74,4 @@ from temporian.core.operators.unique_timestamps import unique_timestamps
 from temporian.core.operators.since_last import since_last
 from temporian.core.operators.begin import begin
 from temporian.core.operators.end import end
+from temporian.core.operators.tick import tick

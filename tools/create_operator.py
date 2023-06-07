@@ -79,7 +79,7 @@ def main(argv):
 """{capitalized_op} operator class and public API function definitions."""
 
 from temporian.core import operator_lib
-from temporian.core.data.node import Node
+from temporian.core.data.node import Node, create_node_new_features_new_sampling
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -183,8 +183,9 @@ py_library(
 
 
 from typing import Dict
+import numpy as np
 
-from temporian.implementation.numpy.data.event import EventSet
+from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.core.operators.{lower_op} import {capitalized_op}
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.base import OperatorImplementation
@@ -197,7 +198,7 @@ class {capitalized_op}NumpyImplementation(OperatorImplementation):
 
     def __call__(
         self, input: EventSet) -> Dict[str, EventSet]:
-        assert isinstance(operator, {capitalized_op})
+        assert isinstance(self.operator, {capitalized_op})
 
         output_schema = self.output_schema("output")
 
@@ -206,15 +207,9 @@ class {capitalized_op}NumpyImplementation(OperatorImplementation):
 
         # fill output event set data
         for index_key, index_data in input.data.items():
-            if len(index_data.timestamps) == 0:
-                dst_timestamps = np.array([], dtype=np.float64)
-            else:
-                dst_timestamps = np.array(
-                    [index_data.timestamps[0]], dtype=np.float64
-                )
             output_evset[index_key] = IndexData(
                 [],
-                dst_timestamps,
+                np.array([1], dtype=np.float64),
                 schema=output_schema,
             )
 
@@ -301,11 +296,9 @@ class {capitalized_op}OperatorTest(absltest.TestCase):
         node = evset.node()
 
         expected_output = event_set(
-            timestamps=[1,2,3,4],
+            timestamps=[1, 1],
             features={{
-                    "a": [1.0, 2.0, 3.0, 4.0],
-                    "b": [5, 6, 7, 8],
-                    "c": ["A", "A", "B", "B"],
+                    "c": ["A", "B"],
             }},
             index_features=["c"],
         )
@@ -359,6 +352,8 @@ py_test(
 - The "all_operators" rule in temporian/implementation/numpy/operators/BUILD
 - The "test_base" function in temporian/core/test/registered_operators_test.py
 - The "test_base" function in temporian/implementation/numpy/test/registered_operators_test.py
+- Import of temporian/implementation/numpy/operators/all_operators.py
+- Import of temporian/core/operators/all_operators.py
 """
     )
 

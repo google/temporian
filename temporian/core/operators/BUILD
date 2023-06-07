@@ -27,6 +27,7 @@ py_library(
         ":unique_timestamps",
         ":begin",
         ":end",
+        ":tick",
         "//temporian/core/operators/binary",
         "//temporian/core/operators/calendar:day_of_month",
         "//temporian/core/operators/calendar:day_of_week",
@@ -269,6 +270,19 @@ py_library(
 py_library(
     name = "end",
     srcs = ["end.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:node",
+        "//temporian/core/data:schema",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "tick",
+    srcs = ["tick.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
