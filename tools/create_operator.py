@@ -90,7 +90,17 @@ class {capitalized_op}(Operator):
 
         self.add_input("input", input)
         self.add_attribute("param", param)
-        self.add_output("output", input)
+
+        self.add_output(
+            "output",
+            create_node_new_features_new_sampling(
+                features=[],
+                indexes=input.schema.indexes,
+                is_unix_timestamp=input.schema.is_unix_timestamp,
+                creator=self,
+            ),
+        )
+
         self.check()
 
     @classmethod
@@ -187,8 +197,28 @@ class {capitalized_op}NumpyImplementation(OperatorImplementation):
 
     def __call__(
         self, input: EventSet) -> Dict[str, EventSet]:
+        assert isinstance(operator, {capitalized_op})
 
-        return {{"output": input}}
+        output_schema = self.output_schema("output")
+
+        # create output event set
+        output_evset = EventSet(data={{}}, schema=output_schema)
+
+        # fill output event set data
+        for index_key, index_data in input.data.items():
+            if len(index_data.timestamps) == 0:
+                dst_timestamps = np.array([], dtype=np.float64)
+            else:
+                dst_timestamps = np.array(
+                    [index_data.timestamps[0]], dtype=np.float64
+                )
+            output_evset[index_key] = IndexData(
+                [],
+                dst_timestamps,
+                schema=output_schema,
+            )
+
+        return {{"output": output_evset}}
 
 
 implementation_lib.register_operator_implementation(
@@ -211,7 +241,9 @@ py_library(
     name = "{lower_op}",
     srcs = ["{lower_op}.py"],
     srcs_version = "PY3",
-    deps = [ ":base",
+    deps = [
+        # already_there/numpy
+        ":base",
         "//temporian/core/data:duration",
         "//temporian/core/operators:{lower_op}",
         "//temporian/implementation/numpy:implementation_lib",
@@ -241,14 +273,16 @@ py_library(
 
 from absl.testing import absltest
 
-import pandas as pd
+import numpy as np
 from temporian.core.operators.{lower_op} import {capitalized_op}
-from temporian.implementation.numpy.data.event import EventSet
+from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy.operators.{lower_op} import (
     {capitalized_op}NumpyImplementation,
 )
-from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
-
+from temporian.implementation.numpy.operators.test.test_util import (
+    assertEqualEventSet,
+    testOperatorAndImp,
+)
 
 class {capitalized_op}OperatorTest(absltest.TestCase):
     def setUp(self):
@@ -279,9 +313,10 @@ class {capitalized_op}OperatorTest(absltest.TestCase):
         # Run op
         op = {capitalized_op}(input=node, param=1.0)
         instance = {capitalized_op}NumpyImplementation(op)
+        testOperatorAndImp(self, op, instance)
         output = instance.call(input=evset)["output"]
 
-        self.assertEqual(output, expected_output)
+        assertEqualEventSet(self, output, expected_output)
 
 
 if __name__ == "__main__":
@@ -305,15 +340,27 @@ py_test(
     srcs = ["{lower_op}_test.py"],
     srcs_version = "PY3",
     deps = [
+        # already_there/absl/testing:absltest
+        ":test_util",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
+        "//temporian/implementation/numpy/data:io",
         "//temporian/core/operators:{lower_op}",
         "//temporian/implementation/numpy/operators:{lower_op}",
     ],
 )
     """
         )
+
+    print(
+        """Don't forget to register the new operators in:
+- The "all_operators" rule in temporian/core/operators/BUILD
+- The "all_operators" rule in temporian/implementation/numpy/operators/BUILD
+- The "test_base" function in temporian/core/test/registered_operators_test.py
+- The "test_base" function in temporian/implementation/numpy/test/registered_operators_test.py
+"""
+    )
 
 
 if __name__ == "__main__":
