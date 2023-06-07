@@ -20,6 +20,16 @@ py_test(
 )
 
 py_test(
+    name = "docstring_test",
+    srcs = ["docstring_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian",
+    ],
+)
+
+
+py_test(
     name = "prototype_test_numpy",
     srcs = ["prototype_test_numpy.py"],
     srcs_version = "PY3",

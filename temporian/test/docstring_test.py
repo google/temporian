@@ -13,7 +13,6 @@
 # limitations under the License.
 import doctest
 import inspect
-from pathlib import Path
 
 
 from absl.testing import absltest
@@ -21,6 +20,7 @@ from absl.testing import absltest
 import numpy as np
 import pandas as pd
 import temporian as tp
+
 
 class DocstringsTest(absltest.TestCase):
     """
@@ -30,19 +30,36 @@ class DocstringsTest(absltest.TestCase):
     hello
 
     """
-    def test_docstrings(self):
-        for path in Path("temporian").rglob("*.py"):
-            try:
 
-                # Run with pd,np,tp already loaded
-                doctest.testfile(
-                    str(path), module_relative=False, raise_on_error=True,
-                    globs={"np": np, "pd": pd, "tp": tp}
+    def test_docstrings(self):
+        tested_modules = set()
+        for api_object in tp.__dict__.values():
+            if inspect.ismodule(api_object):
+                module = api_object
+            else:
+                module = inspect.getmodule(api_object)
+                if module is None:
+                    continue
+
+            # Avoid testing twice
+            module_name = module.__name__
+            if "temporian" not in module_name or module_name in tested_modules:
+                continue
+
+            tested_modules.add(module.__name__)
+            try:
+                # Run with np.pd,tp + module globals as exec context
+                doctest.testmod(
+                    module,
+                    globs={"np": np, "tp": tp, "pd": pd},
+                    extraglobs=module.__dict__,
+                    raise_on_error=True,
                 )
 
             # Failure due to mismatch on expected result
             except doctest.DocTestFailure as e:
                 ex = e.example
+                path = inspect.getfile(module)
                 # Re-raise as bazel assertion
                 self.assertEqual(
                     ex.want,
@@ -56,11 +73,13 @@ class DocstringsTest(absltest.TestCase):
             # Failure due to exception raised during code execution
             except doctest.UnexpectedException as e:
                 ex = e.example
+                path = inspect.getfile(module)
                 raise AssertionError(
-                        f"Exception running docstring example on file {path}:{ex.lineno}\n"
-                        f">>> {ex.source}"
-                        f"{e.exc_info[0]}: {e.exc_info[1]}"
+                    "Exception running docstring example on file"
+                    f" {path}:{ex.lineno}\n>>> {ex.source}{e.exc_info[0]}:"
+                    f" {e.exc_info[1]}"
                 ) from e
+
 
 if __name__ == "__main__":
     absltest.main()

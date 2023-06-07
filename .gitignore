@@ -6,6 +6,7 @@ tmp
 build_package
 .ipynb_checkpoints
 tmp_*
+.env
 
 # benchmark outputs
 profile.*
