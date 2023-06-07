@@ -1,14 +1,15 @@
 [tool.poetry]
 name = "temporian"
-version = "0.1.3" # TODO: roll back to 0.1.0
-description = "Temporian is a library to pre-process temporal signals before their use as input features with off-the-shelf tabular machine learning libraries (e.g., TensorFlow Decision Forests)."
-authors = ["Google Inc."]
-maintainers = [
+version = "0.1.4" # TODO: roll back to 0.1.0
+description = "Temporian is a Python package for feature engineering of temporal data, focusing on preventing common modeling errors and providing a simple and powerful API, a first-class iterative development experience, and efficient and well-tested implementations of common and not-so-common temporal data preprocessing functions."
+authors = [
     "Mathieu Guillame-Bert <gbm@google.com>",
+    "Braulio Ríos <braulio.rios@tryolabs.com>",
     "Guillermo Etchebarne <getchebarne@tryolabs.com>",
     "Ian Spektor <ispektor@tryolabs.com>",
     "Richard Stotz <richardstotz@google.com>",
 ]
+maintainers = ["Mathieu Guillame-Bert <gbm@google.com>"]
 repository = "https://github.com/google/temporian"
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",

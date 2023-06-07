@@ -118,5 +118,4 @@ jobs:
         # TODO: change to prod PyPI repo
         run: |
           poetry config repositories.test-pypi https://test.pypi.org/legacy/
-          poetry publish --help
           poetry publish -r test-pypi --no-interaction --skip-existing
