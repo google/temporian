@@ -5,32 +5,10 @@ package(
 
 # Tests
 # =====
-py_test(
-    name = "df_to_event_test",
-    srcs = ["df_to_event_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/numpy
-        # already_there/pandas
-        "//temporian/implementation/numpy/data:io",
-    ],
-)
 
 py_test(
-    name = "event_to_df_test",
-    srcs = ["event_to_df_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/pandas
-        "//temporian/implementation/numpy/data:io",
-    ],
-)
-
-py_test(
-    name = "event_test",
-    srcs = ["event_test.py"],
+    name = "event_set_test",
+    srcs = ["event_set_test.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest

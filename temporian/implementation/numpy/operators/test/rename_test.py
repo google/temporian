@@ -21,7 +21,7 @@ from temporian.core.operators.rename import rename
 from temporian.implementation.numpy.operators.rename import (
     RenameNumpyImplementation,
 )
-from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
+from temporian.io.pandas import from_pandas
 
 
 class RenameOperatorTest(absltest.TestCase):
@@ -36,9 +36,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["store_id", "timestamp", "sales", "costs", "weather"],
         )
 
-        self.input_evset = pd_dataframe_to_event_set(
-            self.df, index_names=["store_id"]
-        )
+        self.input_evset = from_pandas(self.df, index_names=["store_id"])
         self.input_node = self.input_evset.node()
 
         df = pd.DataFrame(
@@ -49,9 +47,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["store_id", "timestamp", "sales", "costs", "weather"],
         )
 
-        self_input_evset_2 = pd_dataframe_to_event_set(
-            df, index_names=["store_id", "sales"]
-        )
+        self_input_evset_2 = from_pandas(df, index_names=["store_id", "sales"])
         self.input_node_2 = self_input_evset_2.node()
 
     def test_rename_single_feature_with_str(self) -> None:
@@ -64,7 +60,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["timestamp", "sales"],
         )
 
-        self.input_evset = pd_dataframe_to_event_set(df)
+        self.input_evset = from_pandas(df)
         self.input_node = self.input_evset.node()
 
         new_df = pd.DataFrame(
@@ -75,7 +71,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["timestamp", "costs"],
         )
 
-        expected_evset = pd_dataframe_to_event_set(new_df)
+        expected_evset = from_pandas(new_df)
 
         output = rename(self.input_node, "costs")
         impl = RenameNumpyImplementation(output.creator)
@@ -93,7 +89,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["timestamp", "sales"],
         )
 
-        self.input_evset = pd_dataframe_to_event_set(df)
+        self.input_evset = from_pandas(df)
         self.input_node = self.input_evset.node()
 
         new_df = pd.DataFrame(
@@ -104,7 +100,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["timestamp", "costs"],
         )
 
-        expected_evset = pd_dataframe_to_event_set(new_df)
+        expected_evset = from_pandas(new_df)
 
         output = rename(self.input_node, {"sales": "costs"})
 
@@ -123,9 +119,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["store_id", "timestamp", "new_sales", "costs", "profit"],
         )
 
-        expected_evset = pd_dataframe_to_event_set(
-            new_df, index_names=["store_id"]
-        )
+        expected_evset = from_pandas(new_df, index_names=["store_id"])
 
         output = rename(
             input=self.input_node,
@@ -146,9 +140,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["product_id", "timestamp", "sales", "costs", "weather"],
         )
 
-        expected_evset = pd_dataframe_to_event_set(
-            new_df, index_names=["product_id"]
-        )
+        expected_evset = from_pandas(new_df, index_names=["product_id"])
 
         output = rename(
             input=self.input_node,
@@ -169,9 +161,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["product_id", "timestamp", "sales", "costs", "weather"],
         )
 
-        expected_evset = pd_dataframe_to_event_set(
-            new_df, index_names=["product_id"]
-        )
+        expected_evset = from_pandas(new_df, index_names=["product_id"])
 
         output = rename(
             input=self.input_node,
@@ -193,9 +183,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["store_id", "timestamp", "sales", "costs", "weather"],
         )
 
-        self.input_evset = pd_dataframe_to_event_set(
-            df, index_names=["store_id", "costs"]
-        )
+        self.input_evset = from_pandas(df, index_names=["store_id", "costs"])
 
         self.input_node = self.input_evset.node()
 
@@ -207,9 +195,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["product_id", "timestamp", "sales", "roi", "weather"],
         )
 
-        expected_evset = pd_dataframe_to_event_set(
-            new_df, index_names=["product_id", "roi"]
-        )
+        expected_evset = from_pandas(new_df, index_names=["product_id", "roi"])
 
         output = rename(
             input=self.input_node,
@@ -235,7 +221,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["timestamp", "sales"],
         )
 
-        self.input_node = pd_dataframe_to_event_set(df).node()
+        self.input_node = from_pandas(df).node()
 
         with self.assertRaises(ValueError):
             rename(self.input_node, "")
@@ -273,9 +259,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["timestamp", "sales"],
         )
 
-        self.input_node = pd_dataframe_to_event_set(
-            df, index_names=["sales"]
-        ).node()
+        self.input_node = from_pandas(df, index_names=["sales"]).node()
 
         with self.assertRaises(ValueError):
             rename(self.input_node, index="")
@@ -315,9 +299,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["sales", "timestamp", "store_id", "costs", "weather"],
         )
 
-        expected_evset = pd_dataframe_to_event_set(
-            new_df, index_names=["sales"]
-        )
+        expected_evset = from_pandas(new_df, index_names=["sales"])
 
         output = rename(
             input=self.input_node,

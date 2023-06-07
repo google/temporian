@@ -25,7 +25,7 @@ from temporian.implementation.numpy.operators.binary import (
     LogicalOrNumpyImplementation,
     LogicalXorNumpyImplementation,
 )
-from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
+from temporian.io.pandas import from_pandas
 
 
 class ArithmeticNumpyImplementationTest(absltest.TestCase):
@@ -33,12 +33,12 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
     addition, subtraction, division and multiplication"""
 
     def setUp(self):
-        self.evset_1 = pd_dataframe_to_event_set(
+        self.evset_1 = from_pandas(
             pd.DataFrame(
                 {"timestamp": [1, 2, 3, 4], "x": [True, False, True, False]}
             )
         )
-        self.evset_2 = pd_dataframe_to_event_set(
+        self.evset_2 = from_pandas(
             pd.DataFrame(
                 {"timestamp": [1, 2, 3, 4], "x": [True, False, False, True]}
             )
@@ -53,7 +53,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
 
     def test_correct_and(self) -> None:
         """Test correct AND operator."""
-        output_evset = pd_dataframe_to_event_set(
+        output_evset = from_pandas(
             pd.DataFrame(
                 {
                     "timestamp": [1, 2, 3, 4],
@@ -72,7 +72,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
 
     def test_correct_or(self) -> None:
         """Test correct OR operator."""
-        output_evset = pd_dataframe_to_event_set(
+        output_evset = from_pandas(
             pd.DataFrame(
                 {"timestamp": [1, 2, 3, 4], "or_x_x": [True, False, True, True]}
             )
@@ -85,7 +85,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
 
     def test_correct_xor(self) -> None:
         """Test correct XOR operator."""
-        output_evset = pd_dataframe_to_event_set(
+        output_evset = from_pandas(
             pd.DataFrame(
                 {
                     "timestamp": [1, 2, 3, 4],

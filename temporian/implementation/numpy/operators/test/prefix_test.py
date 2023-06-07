@@ -21,7 +21,7 @@ from temporian.implementation.numpy.operators.prefix import (
     PrefixNumpyImplementation,
 )
 
-from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
+from temporian.io.pandas import from_pandas
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
     testOperatorAndImp,
@@ -30,7 +30,7 @@ from temporian.implementation.numpy.operators.test.test_util import (
 
 class PrefixOperatorTest(absltest.TestCase):
     def test_base(self):
-        evset = pd_dataframe_to_event_set(
+        evset = from_pandas(
             pd.DataFrame(
                 {
                     "timestamp": [1, 2, 3],
@@ -43,7 +43,7 @@ class PrefixOperatorTest(absltest.TestCase):
         )
         node = evset.node()
 
-        expected_output = pd_dataframe_to_event_set(
+        expected_output = from_pandas(
             pd.DataFrame(
                 {
                     "timestamp": [1, 2, 3],

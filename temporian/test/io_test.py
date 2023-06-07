@@ -14,17 +14,17 @@ def test_data() -> str:
 
 
 class IOTest(absltest.TestCase):
-    def test_read_event_set(self) -> None:
+    def test_from_csv(self) -> None:
         path = os.path.join(
             test_data(), "temporian/test/test_data/io/input.csv"
         )
-        evset = tp.read_event_set(
+        evset = tp.from_csv(
             path=path,
             timestamp_column="timestamp",
             index_names=["product_id"],
         )
 
-        expected_evset = tp.pd_dataframe_to_event_set(
+        expected_evset = tp.from_pandas(
             pd.DataFrame(
                 [
                     [666964, 1.0, 740.0],
@@ -39,7 +39,7 @@ class IOTest(absltest.TestCase):
 
         self.assertEqual(evset, expected_evset)
 
-    def test_save_event_set(self) -> None:
+    def test_to_csv(self) -> None:
         df = pd.DataFrame(
             [
                 [666964, 1.0, 740.0],
@@ -49,16 +49,16 @@ class IOTest(absltest.TestCase):
             columns=["product_id", "timestamp", "costs"],
         )
 
-        evset = tp.pd_dataframe_to_event_set(df=df, index_names=["product_id"])
+        evset = tp.from_pandas(df=df, index_names=["product_id"])
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "events.csv")
-            tp.save_event_set(evset=evset, path=path)
+            tp.to_csv(evset=evset, path=path)
 
             # check if file exists
             self.assertTrue(Path(path).exists())
 
-            saved_evset = tp.read_event_set(
+            saved_evset = tp.from_csv(
                 path=path,
                 timestamp_column="timestamp",
                 index_names=["product_id"],

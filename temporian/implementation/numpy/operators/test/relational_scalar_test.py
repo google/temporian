@@ -32,7 +32,7 @@ from temporian.implementation.numpy.operators.scalar import (
     GreaterEqualScalarNumpyImplementation,
     LessEqualScalarNumpyImplementation,
 )
-from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
+from temporian.io.pandas import from_pandas
 
 
 class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
@@ -40,7 +40,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
     addition, subtraction, division and multiplication"""
 
     def setUp(self):
-        self.evset = pd_dataframe_to_event_set(
+        self.evset = from_pandas(
             pd.DataFrame(
                 [
                     [0, 1.0, 10.0],
@@ -60,7 +60,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         """Test correct equal operator."""
         value = 12.0
 
-        output_evset = pd_dataframe_to_event_set(
+        output_evset = from_pandas(
             pd.DataFrame(
                 [
                     [0, 1.0, False],
@@ -90,7 +90,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         """Test equal operator against a nan value."""
         value = np.nan
 
-        output_evset = pd_dataframe_to_event_set(
+        output_evset = from_pandas(
             pd.DataFrame(
                 [
                     [0, 1.0, False],
@@ -116,10 +116,10 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         self.assertEqual(output_evset, operator_output["output"])
 
     def test_greater_scalar(self) -> None:
-        event_data = pd_dataframe_to_event_set(
+        event_data = from_pandas(
             pd.DataFrame({"timestamp": [1, 2, 3], "x": [1, 2, 3]})
         )
-        expected_data = pd_dataframe_to_event_set(
+        expected_data = from_pandas(
             pd.DataFrame({"timestamp": [1, 2, 3], "x": [False, False, True]})
         )
 
@@ -133,10 +133,10 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         self.assertEqual(expected_data, operator_output["output"])
 
     def test_less_scalar(self) -> None:
-        event_data = pd_dataframe_to_event_set(
+        event_data = from_pandas(
             pd.DataFrame({"timestamp": [1, 2, 3], "x": [1, 2, 3]})
         )
-        expected_data = pd_dataframe_to_event_set(
+        expected_data = from_pandas(
             pd.DataFrame({"timestamp": [1, 2, 3], "x": [True, False, False]})
         )
 
@@ -151,10 +151,10 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         self.assertEqual(expected_data, operator_output["output"])
 
     def test_greater_equal_scalar(self) -> None:
-        event_data = pd_dataframe_to_event_set(
+        event_data = from_pandas(
             pd.DataFrame({"timestamp": [1, 2, 3], "x": [1, 2, 3]})
         )
-        expected_data = pd_dataframe_to_event_set(
+        expected_data = from_pandas(
             pd.DataFrame({"timestamp": [1, 2, 3], "x": [False, True, True]})
         )
 
@@ -168,10 +168,10 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         self.assertEqual(expected_data, operator_output["output"])
 
     def test_less_equal_scalar(self) -> None:
-        event_data = pd_dataframe_to_event_set(
+        event_data = from_pandas(
             pd.DataFrame({"timestamp": [1, 2, 3], "x": [1, 2, 3]})
         )
-        expected_data = pd_dataframe_to_event_set(
+        expected_data = from_pandas(
             pd.DataFrame({"timestamp": [1, 2, 3], "x": [True, True, False]})
         )
 
@@ -185,10 +185,10 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         self.assertEqual(expected_data, operator_output["output"])
 
     def test_not_equal_scalar(self) -> None:
-        event_data = pd_dataframe_to_event_set(
+        event_data = from_pandas(
             pd.DataFrame({"timestamp": [1, 2, 3], "x": [1, 2, 3]})
         )
-        expected_data = pd_dataframe_to_event_set(
+        expected_data = from_pandas(
             pd.DataFrame({"timestamp": [1, 2, 3], "x": [True, False, True]})
         )
 
@@ -203,10 +203,10 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
 
     def test_not_equal_nan(self) -> None:
         # a != nan should be True always (even if a=np.nan)
-        event_data = pd_dataframe_to_event_set(
+        event_data = from_pandas(
             pd.DataFrame({"timestamp": [1, 2, 3], "x": [1, 2, np.nan]})
         )
-        expected_data = pd_dataframe_to_event_set(
+        expected_data = from_pandas(
             pd.DataFrame({"timestamp": [1, 2, 3], "x": [True, True, True]})
         )
 

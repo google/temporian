@@ -16,9 +16,7 @@ from absl.testing import absltest
 
 from temporian.core.operators.lag import LagOperator
 from temporian.implementation.numpy.operators.lag import LagNumpyImplementation
-from temporian.implementation.numpy.data.io import (
-    event_set,
-)
+from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
     testOperatorAndImp,

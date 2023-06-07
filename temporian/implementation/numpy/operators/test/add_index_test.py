@@ -10,7 +10,7 @@ from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy.operators.add_index import (
     AddIndexNumpyImplementation,
 )
-from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
+from temporian.io.pandas import from_pandas
 from temporian.core.evaluation import evaluate
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
@@ -19,7 +19,7 @@ from temporian.implementation.numpy.operators.test.test_util import (
 
 class AddIndexNumpyImplementationTest(absltest.TestCase):
     def setUp(self) -> None:
-        self.input_evset = pd_dataframe_to_event_set(
+        self.input_evset = from_pandas(
             pd.DataFrame(
                 [
                     ["A", 0, 1, 0.4, 10.0],
@@ -45,7 +45,7 @@ class AddIndexNumpyImplementationTest(absltest.TestCase):
         self.input_node = self.input_evset.node()
 
     def test_add_index_single(self) -> None:
-        expected_evset = pd_dataframe_to_event_set(
+        expected_evset = from_pandas(
             pd.DataFrame(
                 [
                     ["A", 0, 1, 0.4, 10.0],
@@ -74,7 +74,7 @@ class AddIndexNumpyImplementationTest(absltest.TestCase):
         assertEqualEventSet(self, output_evset, expected_evset)
 
     def test_add_index_multiple(self) -> None:
-        expected_evset = pd_dataframe_to_event_set(
+        expected_evset = from_pandas(
             pd.DataFrame(
                 [
                     ["A", 0, 1, 0.4, 10.0],
@@ -107,7 +107,7 @@ class AddIndexNumpyImplementationTest(absltest.TestCase):
         assertEqualEventSet(self, output_evset, expected_evset)
 
     def test_set_index_single(self) -> None:
-        expected_evset = pd_dataframe_to_event_set(
+        expected_evset = from_pandas(
             pd.DataFrame(
                 [
                     [0, 2, 0.1, 13.0, "B"],
@@ -137,7 +137,7 @@ class AddIndexNumpyImplementationTest(absltest.TestCase):
         assertEqualEventSet(self, output_evset, expected_evset)
 
     def test_set_index_multiple(self) -> None:
-        expected_evset = pd_dataframe_to_event_set(
+        expected_evset = from_pandas(
             pd.DataFrame(
                 [
                     [0, 2, 0.1, 13.0, "B"],

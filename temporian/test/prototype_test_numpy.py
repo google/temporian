@@ -28,7 +28,7 @@ class PrototypeTest(absltest.TestCase):
         BOOK_ID = 2
         PIXEL_ID = 3
 
-        self.evset_1 = tp.pd_dataframe_to_event_set(
+        self.evset_1 = tp.from_pandas(
             pd.DataFrame(
                 data=[
                     [TRYOLABS_SHOP, MATE_ID, 0.0, 14],
@@ -45,7 +45,7 @@ class PrototypeTest(absltest.TestCase):
             index_names=["store_id", "product_id"],
         )
 
-        self.evset_2 = tp.pd_dataframe_to_event_set(
+        self.evset_2 = tp.from_pandas(
             pd.DataFrame(
                 data=[
                     [TRYOLABS_SHOP, MATE_ID, 0.0, -14],
@@ -63,14 +63,14 @@ class PrototypeTest(absltest.TestCase):
             same_sampling_as=self.evset_1,
         )
 
-        # TODO: Remove the following line when "from_dataframe" support creating
+        # TODO: Remove the following line when "from_pandas" support creating
         # event set with shared sampling. Note that "evset_1" and
         # "evset_2" should have the same sampling in this tests.
 
         self.node_1 = self.evset_1.node()
         self.node_2 = self.evset_2.node()
 
-        self.expected_evset = tp.pd_dataframe_to_event_set(
+        self.expected_evset = tp.from_pandas(
             pd.DataFrame(
                 data=[
                     [TRYOLABS_SHOP, MATE_ID, 0.0, 14, -14, 0, -14],

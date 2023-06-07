@@ -16,7 +16,7 @@ import numpy as np
 import pandas as pd
 from absl.testing import absltest
 
-from temporian.core.data.node import source_node
+from temporian.core.data.node import input_node
 from temporian.implementation.numpy.operators.unary import (
     InvertNumpyImplementation,
     AbsNumpyImplementation,
@@ -30,7 +30,7 @@ from temporian.implementation.numpy.operators.unary import (
     NotNanOperator,
 )
 from temporian.core.data.dtype import DType
-from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
+from temporian.io.pandas import from_pandas
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
 )
@@ -49,7 +49,7 @@ class UnaryNumpyImplementationTest(absltest.TestCase):
         PIXEL_ID = 3
 
         # 2 index columns, 2 boolean features
-        self.input_evset = pd_dataframe_to_event_set(
+        self.input_evset = from_pandas(
             pd.DataFrame(
                 data=[
                     [TRYO_SHOP, MATE_ID, 0.0, True, True],
@@ -74,7 +74,7 @@ class UnaryNumpyImplementationTest(absltest.TestCase):
 
         # Expected event set after invert
         # 2 index columns, 2 boolean features
-        self.expected_evset = pd_dataframe_to_event_set(
+        self.expected_evset = from_pandas(
             pd.DataFrame(
                 data=[
                     [TRYO_SHOP, MATE_ID, 0.0, False, False],
@@ -97,7 +97,7 @@ class UnaryNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id", "product_id"],
         )
 
-        self.input_node = source_node(
+        self.input_node = input_node(
             [("boolean_1", DType.BOOLEAN), ("boolean_2", DType.BOOLEAN)],
             indexes=[("store_id", DType.INT64), ("product_id", DType.INT64)],
         )
@@ -126,7 +126,7 @@ class UnaryNumpyImplementationTest(absltest.TestCase):
 
     def test_error_nonboolean(self) -> None:
         """Check that trying a non-boolean event raises ValueError"""
-        invalid_node = source_node(
+        invalid_node = input_node(
             [("boolean_1", DType.BOOLEAN), ("int_2", DType.INT32)],
             indexes=[("store_id", DType.INT32), ("product_id", DType.INT64)],
         )
@@ -135,10 +135,10 @@ class UnaryNumpyImplementationTest(absltest.TestCase):
             _ = InvertOperator(input=invalid_node)
 
     def test_correct_abs(self) -> None:
-        event_data = pd_dataframe_to_event_set(
+        event_data = from_pandas(
             pd.DataFrame({"timestamp": [1, 2, 3], "x": [1, -2, -3]})
         )
-        expected_data = pd_dataframe_to_event_set(
+        expected_data = from_pandas(
             pd.DataFrame({"timestamp": [1, 2, 3], "x": [1, 2, 3]})
         )
         operator = AbsOperator(input=event_data.node())
@@ -149,10 +149,10 @@ class UnaryNumpyImplementationTest(absltest.TestCase):
         assertEqualEventSet(self, expected_data, operator_output["output"])
 
     def test_correct_log(self) -> None:
-        event_data = pd_dataframe_to_event_set(
+        event_data = from_pandas(
             pd.DataFrame({"timestamp": [1, 2, 3, 4], "x": [1, np.e, 0, 10]})
         )
-        expected_data = pd_dataframe_to_event_set(
+        expected_data = from_pandas(
             pd.DataFrame(
                 {"timestamp": [1, 2, 3, 4], "x": [0, 1, -np.inf, np.log(10)]}
             )
@@ -165,7 +165,7 @@ class UnaryNumpyImplementationTest(absltest.TestCase):
         assertEqualEventSet(self, expected_data, operator_output["output"])
 
     def test_correct_isnan(self) -> None:
-        event_data = pd_dataframe_to_event_set(
+        event_data = from_pandas(
             pd.DataFrame(
                 {
                     "timestamp": [1, 2, 3, 4, 5],
@@ -173,7 +173,7 @@ class UnaryNumpyImplementationTest(absltest.TestCase):
                 }
             )
         )
-        expected_data = pd_dataframe_to_event_set(
+        expected_data = from_pandas(
             pd.DataFrame(
                 {
                     "timestamp": [1, 2, 3, 4, 5],
@@ -189,7 +189,7 @@ class UnaryNumpyImplementationTest(absltest.TestCase):
         assertEqualEventSet(self, expected_data, operator_output["output"])
 
     def test_correct_notnan(self) -> None:
-        event_data = pd_dataframe_to_event_set(
+        event_data = from_pandas(
             pd.DataFrame(
                 {
                     "timestamp": [1, 2, 3, 4, 5],
@@ -197,7 +197,7 @@ class UnaryNumpyImplementationTest(absltest.TestCase):
                 }
             )
         )
-        expected_data = pd_dataframe_to_event_set(
+        expected_data = from_pandas(
             pd.DataFrame(
                 {
                     "timestamp": [1, 2, 3, 4, 5],

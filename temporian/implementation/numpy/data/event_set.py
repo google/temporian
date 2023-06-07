@@ -329,7 +329,7 @@ class EventSet:
     """Actual temporal data.
 
     Use `tp.event_set` to create an event set manually.
-    Use `tp.pd_dataframe_to_event_set` to create an event set from a pandas
+    Use `tp.from_pandas` to create an event set from a pandas
     dataframe.
     """
 
@@ -383,9 +383,6 @@ class EventSet:
         return None
 
     def node(self, force_new_node: bool = False) -> Node:
-        return self.source_node(force_new_node)
-
-    def source_node(self, force_new_node: bool = False) -> Node:
         """Creates a node able to consume the the event set.
 
         If called multiple times with force_new_node=False (default), the same
@@ -402,13 +399,12 @@ class EventSet:
             },
         )
 
-        my_node = my_evset.source_node()
+        my_node = my_evset.node()
         ```
 
         Args:
             force_new_node: If false (default), return the same node each time
-                `source_node` is called. If true, a new node is created each
-                time.
+                `node` is called. If true, a new node is created each time.
 
         Returns:
             A node able to consume the content of the event set.
@@ -423,35 +419,6 @@ class EventSet:
             name=self._name,
         )
         return self._internal_node
-
-    @staticmethod
-    def from_dataframe(
-        df: "pd.DataFrame",
-        index_names: Optional[List[str]] = None,
-        timestamp_column: str = "timestamp",
-        name: Optional[str] = None,
-    ) -> EventSet:
-        from temporian.implementation.numpy.data import io
-
-        return io.pd_dataframe_to_event_set(
-            df=df,
-            index_names=index_names,
-            timestamp_column=timestamp_column,
-            name=name,
-        )
-
-    def to_dataframe(self) -> "pd.DataFrame":
-        """Convert an EventSet to a pandas DataFrame.
-
-        See `tp.pd_dataframe_to_event_set` for details.
-
-        Returns:
-            DataFrame created from EventSet.
-        """
-
-        from temporian.implementation.numpy.data import io
-
-        return io.event_set_to_pd_dataframe(self)
 
     def __repr__(self) -> str:
         def repr_features(features: List[np.ndarray]) -> str:

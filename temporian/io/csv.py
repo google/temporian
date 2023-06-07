@@ -12,14 +12,47 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Utility for saving an event set to disk."""
+"""Utility for reading an event set from disk."""
 
 from typing import List, Optional
-
 from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.io.pandas import from_pandas, to_pandas
 
 
-def save_event_set(
+def from_csv(
+    path: str,
+    timestamp_column: str,
+    index_names: Optional[List[str]] = None,
+    sep: str = ",",
+) -> EventSet:
+    """Reads an EventSet from a file.
+
+    Args:
+        path: Path to the file.
+        timestamp_column: Name of the column to be used as timestamps for the
+            event set.
+        index_names: Names of the columns to be used as index for the event set.
+            If None, a flat event set will be created.
+        sep: Separator to use.
+
+
+    Returns:
+        EventSet read from file.
+
+    """
+
+    import pandas as pd
+
+    if index_names is None:
+        index_names = []
+
+    df = pd.read_csv(path, sep=sep)
+    return from_pandas(
+        df, index_names=index_names, timestamp_column=timestamp_column
+    )
+
+
+def to_csv(
     evset: EventSet,
     path: str,
     sep: str = ",",
@@ -35,5 +68,5 @@ def save_event_set(
         na_rep: Representation to use for missing values.
         columns: Columns to save. If `None`, saves all columns.
     """
-    df = evset.to_dataframe()
+    df = to_pandas(evset)
     df.to_csv(path, index=False, sep=sep, na_rep=na_rep, columns=columns)
