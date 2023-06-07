@@ -16,7 +16,7 @@ import numpy as np
 import pandas as pd
 from absl.testing import absltest
 
-from temporian.core.data.node import source_node
+from temporian.core.data.node import input_node
 from temporian.implementation.numpy.operators.cast import (
     CastNumpyImplementation,
 )
@@ -143,7 +143,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
         )
 
     def test_cast_manual(self) -> None:
-        node = source_node([("x", DType.FLOAT32), ("y", DType.FLOAT32)])
+        node = input_node([("x", DType.FLOAT32), ("y", DType.FLOAT32)])
         op = CastOperator(node, check_overflow=True, dtype=DType.INT64)
         imp = CastNumpyImplementation(op)
         testOperatorAndImp(self, op, imp)
@@ -274,7 +274,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
 
     def test_python_types(self):
         input_data = event_set(timestamps=[1, 2], features={"a": [1, 2]})
-        output_node = cast(input_data.source_node(), float)
+        output_node = cast(input_data.node(), float)
         self.assertEqual(output_node.features[0].dtype, DType.FLOAT64)
 
 

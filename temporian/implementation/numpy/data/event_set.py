@@ -383,9 +383,6 @@ class EventSet:
         return None
 
     def node(self, force_new_node: bool = False) -> Node:
-        return self.source_node(force_new_node)
-
-    def source_node(self, force_new_node: bool = False) -> Node:
         """Creates a node able to consume the the event set.
 
         If called multiple times with force_new_node=False (default), the same
@@ -402,13 +399,12 @@ class EventSet:
             },
         )
 
-        my_node = my_evset.source_node()
+        my_node = my_evset.node()
         ```
 
         Args:
             force_new_node: If false (default), return the same node each time
-                `source_node` is called. If true, a new node is created each
-                time.
+                `node` is called. If true, a new node is created each time.
 
         Returns:
             A node able to consume the content of the event set.

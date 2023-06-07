@@ -4,7 +4,7 @@ from typing import List, Optional
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import (
     Node,
-    source_node,
+    input_node,
     create_node_with_new_reference,
     create_node_new_features_new_sampling,
     create_node_new_features_existing_sampling,
@@ -20,7 +20,7 @@ from temporian.implementation.numpy.data.io import event_set
 
 
 def create_source_node(name: Optional[str] = None):
-    return source_node(
+    return input_node(
         features=[
             ("f1", DType.FLOAT64),
             ("f2", DType.FLOAT64),

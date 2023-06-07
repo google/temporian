@@ -29,7 +29,7 @@ class NodeTest(absltest.TestCase):
 
     def test_evaluate_single_operator(self):
         evset = utils.create_input_event_set()
-        result = tp.simple_moving_average(evset.source_node(), 10)
+        result = tp.simple_moving_average(evset.node(), 10)
         result = result.evaluate(evset)
         self.assertIsInstance(result, EventSet)
 

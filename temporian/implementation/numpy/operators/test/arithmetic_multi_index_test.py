@@ -17,7 +17,7 @@ import pandas as pd
 from absl.testing import absltest
 
 from temporian.core.data.dtype import DType
-from temporian.core.data.node import source_node
+from temporian.core.data.node import input_node
 from temporian.core.operators.binary import (
     AddOperator,
     SubtractOperator,
@@ -231,11 +231,11 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id", "product_id"],
         )
 
-        self.node_1 = source_node(
+        self.node_1 = input_node(
             [("sales", DType.FLOAT64), ("revenue", DType.FLOAT32)],
             indexes=[("store_id", DType.INT64), ("product_id", DType.INT64)],
         )
-        self.node_2 = source_node(
+        self.node_2 = input_node(
             [("costs", DType.FLOAT64), ("sales", DType.FLOAT32)],
             same_sampling_as=self.node_1,
         )

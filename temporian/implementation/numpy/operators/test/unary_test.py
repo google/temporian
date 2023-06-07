@@ -16,7 +16,7 @@ import numpy as np
 import pandas as pd
 from absl.testing import absltest
 
-from temporian.core.data.node import source_node
+from temporian.core.data.node import input_node
 from temporian.implementation.numpy.operators.unary import (
     InvertNumpyImplementation,
     AbsNumpyImplementation,
@@ -97,7 +97,7 @@ class UnaryNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id", "product_id"],
         )
 
-        self.input_node = source_node(
+        self.input_node = input_node(
             [("boolean_1", DType.BOOLEAN), ("boolean_2", DType.BOOLEAN)],
             indexes=[("store_id", DType.INT64), ("product_id", DType.INT64)],
         )
@@ -126,7 +126,7 @@ class UnaryNumpyImplementationTest(absltest.TestCase):
 
     def test_error_nonboolean(self) -> None:
         """Check that trying a non-boolean event raises ValueError"""
-        invalid_node = source_node(
+        invalid_node = input_node(
             [("boolean_1", DType.BOOLEAN), ("int_2", DType.INT32)],
             indexes=[("store_id", DType.INT32), ("product_id", DType.INT64)],
         )

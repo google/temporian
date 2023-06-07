@@ -33,8 +33,8 @@ class TFPTest(absltest.TestCase):
 
         evset_2 = tp.event_set(timestamps=[1.0, 2.0, 2.0])
 
-        i1 = evset_1.source_node()
-        i2 = evset_2.source_node()
+        i1 = evset_1.node()
+        i2 = evset_2.node()
 
         h1 = tp.simple_moving_average(input=i1, window_length=7)
         h2 = tp.resample(input=h1, sampling=i2)
@@ -61,7 +61,7 @@ class TFPTest(absltest.TestCase):
             )
 
     def test_serialization(self):
-        a = tp.source_node([("f1", tp.float32), ("f2", tp.float32)])
+        a = tp.input_node([("f1", tp.float32), ("f2", tp.float32)])
         b = tp.simple_moving_average(input=a, window_length=7)
 
         with tempfile.TemporaryDirectory() as tempdir:
@@ -74,7 +74,7 @@ class TFPTest(absltest.TestCase):
         self.assertSetEqual(set(outputs.keys()), {"b"})
 
     def test_serialization_single_node(self):
-        a = tp.source_node(
+        a = tp.input_node(
             [("f1", tp.float32), ("f2", tp.float32)], name="my_source_node"
         )
         b = tp.simple_moving_average(input=a, window_length=7)
@@ -94,7 +94,7 @@ class TFPTest(absltest.TestCase):
         self.assertSetEqual(set(outputs.keys()), {"my_output_node"})
 
     def test_serialization_squeeze_loading_results(self):
-        a = tp.source_node(
+        a = tp.input_node(
             [("f1", tp.float32), ("f2", tp.float32)],
             name="my_source_node",
         )
@@ -115,7 +115,7 @@ class TFPTest(absltest.TestCase):
         self.assertEqual(o.name, "my_output_node")
 
     def test_serialization_infer_inputs(self):
-        a = tp.source_node(
+        a = tp.input_node(
             [("f1", tp.float32), ("f2", tp.float32)],
             name="my_source_node",
         )

@@ -60,7 +60,7 @@ str_ = dtype.DType.STRING
 # Aliases
 load = serialization.load
 save = serialization.save
-source_node = node.source_node
+input_node = node.input_node
 Event = node.Node
 Schema = node.Schema
 Feature = node.FeatureSchema
