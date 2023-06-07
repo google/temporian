@@ -19,14 +19,25 @@ from temporian.core import operator_lib
 from temporian.core.data.node import Node, create_node_new_features_new_sampling
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
+from temporian.core.data.duration import (
+    Duration,
+    NormalizedDuration,
+    normalize_duration,
+)
 
 
 class Tick(Operator):
-    def __init__(self, input: Node, param: float):
+    def __init__(
+        self, input: Node, interval: NormalizedDuration, rounding: bool
+    ):
         super().__init__()
 
+        self._interval = interval
+        self._rounding = rounding
+
         self.add_input("input", input)
-        self.add_attribute("param", param)
+        self.add_attribute("interval", interval)
+        self.add_attribute("rounding", rounding)
 
         self.add_output(
             "output",
@@ -40,15 +51,26 @@ class Tick(Operator):
 
         self.check()
 
+    @property
+    def interval(self) -> NormalizedDuration:
+        return self._interval
+
+    @property
+    def rounding(self) -> bool:
+        return self._rounding
+
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
             key="TICK",
             attributes=[
                 pb.OperatorDef.Attribute(
-                    key="param",
+                    key="interval",
                     type=pb.OperatorDef.Attribute.Type.FLOAT_64,
-                    is_optional=False,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="rounding",
+                    type=pb.OperatorDef.Attribute.Type.BOOL,
                 ),
             ],
             inputs=[pb.OperatorDef.Input(key="input")],
@@ -59,18 +81,39 @@ class Tick(Operator):
 operator_lib.register_operator(Tick)
 
 
-def tick(input: Node, param: float) -> Node:
-    """<Text>
+def tick(input: Node, interval: Duration, rounding: bool = True) -> Node:
+    """Generates timestamps at regular intervaled in the range of a guide.
 
     Args:
-        input: <Text>
-        param: <Text>
+        input: Guide node. The start and end time boundaries to generate the new
+            timestamps are defined by the range of timestamps in `input`.
+        interval: Tick interval.
+        rounding: If false, the first tick is generated at the first timestamp
+            (similar to "tp.begin"). If true (default), ticks are generated on
+            timestamps that are multiple of "interval".
 
-    Example:
-        <Text>
+    Example #1:
+        Input
+            events: [1, 5.5, 5.6, 8.6]
+        Argument
+            interval: 4
+            rounding: false
+        Output
+            timestamp: 1, 5
+
+    Example #2:
+        Input
+            events: [1, 5.5, 5.6, 8.6]
+        Argument
+            interval: 4
+            rounding: true
+        Output
+            timestamp: 4, 8
 
     Returns:
         <Text>
     """
 
-    return Tick(input=input, param=param).outputs["output"]
+    return Tick(
+        input=input, interval=normalize_duration(interval), rounding=rounding
+    ).outputs["output"]

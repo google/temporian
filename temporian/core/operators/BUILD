@@ -290,5 +290,6 @@ py_library(
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
+        "//temporian/core/data:duration",
     ],
 )

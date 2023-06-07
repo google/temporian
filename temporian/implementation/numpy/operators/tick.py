@@ -18,6 +18,7 @@
 
 from typing import Dict
 
+import math
 import numpy as np
 from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.core.operators.tick import Tick
@@ -40,9 +41,28 @@ class TickNumpyImplementation(OperatorImplementation):
 
         # fill output event set data
         for index_key, index_data in input.data.items():
+            if len(index_data.timestamps) == 0:
+                dst_timestamps = np.array([], dtype=np.float64)
+            else:
+                begin = index_data.timestamps[0]
+                end = index_data.timestamps[-1]
+
+                if self.operator.rounding:
+                    dst_timestamps = np.arange(
+                        begin,
+                        math.nextafter(end, math.inf),
+                        self.operator.interval,
+                    )
+                else:
+                    dst_timestamps = np.arange(
+                        begin,
+                        math.nextafter(end, math.inf),
+                        self.operator.interval,
+                    )
+
             output_evset[index_key] = IndexData(
                 [],
-                np.array([1], dtype=np.float64),
+                dst_timestamps,
                 schema=output_schema,
             )
 
