@@ -33,6 +33,7 @@ class CodeExamplesTest(absltest.TestCase):
 
     def test_code_examples(self):
         for path in Path("docs").rglob("*.md"):
+            print(f"Testing code examples in {path}")
             try:
                 # Run with pd,np,tp already loaded
                 doctest.testfile(
@@ -40,6 +41,7 @@ class CodeExamplesTest(absltest.TestCase):
                     module_relative=False,
                     raise_on_error=True,
                     globs={"np": np, "pd": pd, "tp": tp},
+                    verbose=False,
                 )
 
             # Failure due to mismatch on expected result

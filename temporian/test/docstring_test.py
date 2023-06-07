@@ -49,12 +49,13 @@ class DocstringsTest(absltest.TestCase):
             tested_modules.add(module.__name__)
             try:
                 # Run with np.pd,tp + module globals as exec context
-                doctest.testmod(
+                _, test_count = doctest.testmod(
                     module,
                     globs={"np": np, "tp": tp, "pd": pd},
                     extraglobs=module.__dict__,
                     raise_on_error=True,
                 )
+                print(f"Checked {test_count} doc examples on: {module_name}")
 
             # Failure due to mismatch on expected result
             except doctest.DocTestFailure as e:

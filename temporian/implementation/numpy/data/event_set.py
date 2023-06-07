@@ -234,6 +234,7 @@ class IndexData:
         >>> index_data = IndexData(features, timestamps)
         >>> len(index_data)
         3
+
         ```
     """
 
@@ -244,7 +245,7 @@ class IndexData:
         self,
         features: List[np.ndarray],
         timestamps: np.ndarray,
-        schema: Optional[Schema],
+        schema: Optional[Schema] = None,
     ) -> None:
         """Initializes the IndexData object by checking and setting the features
         and timestamps.
