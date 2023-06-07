@@ -48,17 +48,21 @@ class TickNumpyImplementation(OperatorImplementation):
                 end = index_data.timestamps[-1]
 
                 if self.operator.rounding:
-                    dst_timestamps = np.arange(
-                        begin,
-                        math.nextafter(end, math.inf),
-                        self.operator.interval,
+                    save_begin = begin
+                    begin = (
+                        float(begin // self.operator.interval)
+                        * self.operator.interval
                     )
-                else:
-                    dst_timestamps = np.arange(
-                        begin,
-                        math.nextafter(end, math.inf),
-                        self.operator.interval,
-                    )
+
+                    if save_begin != begin:
+                        begin += self.operator.interval
+
+                dst_timestamps = np.arange(
+                    begin,
+                    math.nextafter(end, math.inf),
+                    self.operator.interval,
+                    dtype=np.float64,
+                )
 
             output_evset[index_key] = IndexData(
                 [],
