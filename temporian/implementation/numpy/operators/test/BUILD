@@ -619,3 +619,35 @@ py_test(
         "//temporian/implementation/numpy/operators:since_last",
     ],
 )
+
+py_test(
+    name = "begin_test",
+    srcs = ["begin_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        ":test_util",
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:node",
+        "//temporian/core/data:schema",
+        "//temporian/core/operators:begin",
+        "//temporian/implementation/numpy/operators:begin",
+    ],
+)
+
+py_test(
+    name = "end_test",
+    srcs = ["end_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        ":test_util",
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:node",
+        "//temporian/core/data:schema",
+        "//temporian/core/operators:end",
+        "//temporian/implementation/numpy/operators:end",
+    ],
+)
