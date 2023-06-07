@@ -92,6 +92,9 @@ jobs:
     runs-on: ubuntu-latest
     # TODO: change to "pypi"
     environment: test-pypi
+    env:
+      # TODO: change to POETRY_PYPI_TOKEN_PYPI
+      POETRY_PYPI_TOKEN_TEST_PYPI: ${{ secrets.PYPI_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -112,9 +115,8 @@ jobs:
           mv -n dist/*/*.tar.gz dist/
 
       - name: Publish to PyPI
-        # TODO: change to prod PyPI, and prod token in repo's secrets
+        # TODO: change to prod PyPI repo
         run: |
           poetry config repositories.test-pypi https://test.pypi.org/legacy/
-          poetry config pypi-token.test-pypi ${{ secrets.PYPI_TOKEN }}
           poetry publish --help
           poetry publish -r test-pypi --no-interaction --skip-existing
