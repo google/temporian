@@ -111,7 +111,7 @@ def tick(input: Node, interval: Duration, rounding: bool = True) -> Node:
             timestamp: 4, 8
 
     Returns:
-        <Text>
+        A feature-less node with regular timestamps.
     """
 
     return Tick(
