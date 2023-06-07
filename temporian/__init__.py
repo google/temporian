@@ -23,14 +23,6 @@
 # name:
 # from temporian.module import submodule as _submodule
 
-# # Load packages privately
-# from temporian.core import serialization as _serialization
-# from temporian.core.data import dtype as _dtype
-# from temporian.core.data import node as _node
-# from temporian.core.data import schema as _schema
-# from temporian.core.data import duration as _duration
-# from temporian.core import evaluation as _evaluation
-
 # pylint: disable=wrong-import-position
 
 __version__ = "0.0.1"
