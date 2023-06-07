@@ -37,18 +37,12 @@ the following command to start the docker (might require superuser permissions):
 Within the docker, run the following command
 
 ```sh
-PYTHON_VERSION=<version> ./tools/build_manylinux_all.sh
+PYTHON_VERSION=<version> ./tools/build_manylinux.sh
 ```
 
 where `<version>` is one of `38`, `39`, `310`, `311`.
 
-Or, in case you want to build for all supported Python versions
-
-```sh
-./tools/build_manylinux_all.sh
-```
-
-This will place the manylinux packages in the `dist/` directory under
+This will place the manylinux package in the `dist/` directory under
 Temporian's root.
 
 ## MacOS builds
@@ -60,7 +54,7 @@ and run
 poetry build
 ```
 
-Note that separate builds for ARM64 and Intel Macs are necessary
+Note that separate builds for ARM64 and Intel Macs are necessary.
 
 ## Windows builds
 

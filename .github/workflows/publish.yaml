@@ -29,7 +29,7 @@ jobs:
           name: dist-ubuntu-${{ matrix.python-version }}
           path: dist
 
-  build:
+  build-macos:
     runs-on: macos-latest-xl
     strategy:
       matrix:
@@ -56,7 +56,7 @@ jobs:
           path: dist
 
   test-install:
-    needs: [build]
+    needs: [build-linux, build-macos]
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
