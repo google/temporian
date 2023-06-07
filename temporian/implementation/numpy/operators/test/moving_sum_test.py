@@ -30,7 +30,7 @@ from temporian.implementation.numpy.operators.window.moving_sum import (
 from temporian.core.data import node as node_lib
 import math
 from numpy.testing import assert_array_equal
-from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
+from temporian.io.pandas import from_pandas
 
 
 def _f64(l):
@@ -58,7 +58,7 @@ class MovingSumOperatorTest(absltest.TestCase):
     def test_flat(self):
         """A simple event set."""
 
-        evset = pd_dataframe_to_event_set(
+        evset = from_pandas(
             pd.DataFrame(
                 [
                     [10.0, 20.0, 1],
@@ -81,7 +81,7 @@ class MovingSumOperatorTest(absltest.TestCase):
 
         output = instance(input=evset)
 
-        expected_output = pd_dataframe_to_event_set(
+        expected_output = from_pandas(
             pd.DataFrame(
                 [
                     [10.0, 20.0, 1],
@@ -99,7 +99,7 @@ class MovingSumOperatorTest(absltest.TestCase):
     def test_with_index(self):
         """Indexed event set."""
 
-        evset = pd_dataframe_to_event_set(
+        evset = from_pandas(
             pd.DataFrame(
                 [
                     ["X1", "Y1", 10.0, 1],
@@ -127,7 +127,7 @@ class MovingSumOperatorTest(absltest.TestCase):
 
         output = instance(input=evset)
 
-        expected_output = pd_dataframe_to_event_set(
+        expected_output = from_pandas(
             pd.DataFrame(
                 [
                     ["X1", "Y1", 10.0, 1],
@@ -150,7 +150,7 @@ class MovingSumOperatorTest(absltest.TestCase):
     def test_with_sampling(self):
         """Event sets with user provided sampling."""
 
-        evset = pd_dataframe_to_event_set(
+        evset = from_pandas(
             pd.DataFrame(
                 [
                     [10.0, 1],
@@ -173,7 +173,7 @@ class MovingSumOperatorTest(absltest.TestCase):
         )
         instance = MovingSumNumpyImplementation(op)
 
-        sampling_data = pd_dataframe_to_event_set(
+        sampling_data = from_pandas(
             pd.DataFrame(
                 [
                     [-1.0],
@@ -190,7 +190,7 @@ class MovingSumOperatorTest(absltest.TestCase):
 
         output = instance(input=evset, sampling=sampling_data)
 
-        expected_output = pd_dataframe_to_event_set(
+        expected_output = from_pandas(
             pd.DataFrame(
                 [
                     [0, -1.0],
@@ -210,7 +210,7 @@ class MovingSumOperatorTest(absltest.TestCase):
     def test_with_nan(self):
         """The input features contains nan values."""
 
-        evset = pd_dataframe_to_event_set(
+        evset = from_pandas(
             pd.DataFrame(
                 [
                     [math.nan, 1],
@@ -230,7 +230,7 @@ class MovingSumOperatorTest(absltest.TestCase):
         )
         instance = MovingSumNumpyImplementation(op)
 
-        sampling_data = pd_dataframe_to_event_set(
+        sampling_data = from_pandas(
             pd.DataFrame(
                 [
                     [1],
@@ -248,7 +248,7 @@ class MovingSumOperatorTest(absltest.TestCase):
 
         output = instance(input=evset, sampling=sampling_data)
 
-        expected_output = pd_dataframe_to_event_set(
+        expected_output = from_pandas(
             pd.DataFrame(
                 [
                     [0, 1],
@@ -269,7 +269,7 @@ class MovingSumOperatorTest(absltest.TestCase):
     def test_cumsum(self):
         """Infinite window length (aka: cumsum function)"""
 
-        input_data = pd_dataframe_to_event_set(
+        input_data = from_pandas(
             pd.DataFrame(
                 [
                     ["X1", "Y1", 10.0, 1.0, 1],
@@ -297,7 +297,7 @@ class MovingSumOperatorTest(absltest.TestCase):
 
         output = instance(input=input_data)
 
-        expected_output = pd_dataframe_to_event_set(
+        expected_output = from_pandas(
             pd.DataFrame(
                 [
                     ["X1", "Y1", 10.0, 1.0, 1],

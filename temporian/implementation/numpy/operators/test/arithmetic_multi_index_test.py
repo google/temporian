@@ -25,7 +25,7 @@ from temporian.core.operators.binary import (
     DivideOperator,
     FloorDivOperator,
 )
-from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
+from temporian.io.pandas import from_pandas
 from temporian.implementation.numpy.operators.binary import (
     AddNumpyImplementation,
     SubtractNumpyImplementation,
@@ -53,7 +53,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
         PIXEL_ID = 3
 
         # 2 index columns, 2 feature columns (float64 and float32)
-        self.evset_1 = pd_dataframe_to_event_set(
+        self.evset_1 = from_pandas(
             pd.DataFrame(
                 data=[
                     [TRYOLABS_SHOP, MATE_ID, 0.0, -14.0, 1.0],
@@ -78,7 +78,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id", "product_id"],
         )
 
-        self.evset_2 = pd_dataframe_to_event_set(
+        self.evset_2 = from_pandas(
             pd.DataFrame(
                 data=[
                     [GOOGLE_SHOP, BOOK_ID, 1.0, 3, -8.0],
@@ -105,7 +105,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
         )
 
         # Expected result after addition
-        self.expected_evset_add = pd_dataframe_to_event_set(
+        self.expected_evset_add = from_pandas(
             pd.DataFrame(
                 [
                     [TRYOLABS_SHOP, MATE_ID, 0.0, -9.5, 6],
@@ -130,7 +130,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id", "product_id"],
         )
         # Expected result after subtraction
-        self.expected_evset_subtract = pd_dataframe_to_event_set(
+        self.expected_evset_subtract = from_pandas(
             pd.DataFrame(
                 [
                     [TRYOLABS_SHOP, MATE_ID, 0.0, -18.5, -4],
@@ -155,7 +155,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id", "product_id"],
         )
         # Expected result after multiplication
-        self.expected_evset_multiply = pd_dataframe_to_event_set(
+        self.expected_evset_multiply = from_pandas(
             pd.DataFrame(
                 [
                     [TRYOLABS_SHOP, MATE_ID, 0.0, -63, 5],
@@ -180,7 +180,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             index_names=["store_id", "product_id"],
         )
         # Expected result after division
-        self.expected_evset_divide = pd_dataframe_to_event_set(
+        self.expected_evset_divide = from_pandas(
             pd.DataFrame(
                 [
                     [TRYOLABS_SHOP, MATE_ID, 0.0, -14 / 4.5, 0.2],
@@ -206,7 +206,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
         )
 
         # Expected result after floor division
-        self.expected_evset_floordiv = pd_dataframe_to_event_set(
+        self.expected_evset_floordiv = from_pandas(
             pd.DataFrame(
                 [
                     [TRYOLABS_SHOP, MATE_ID, 0.0, -4.0, 0],

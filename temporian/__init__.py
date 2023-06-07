@@ -23,51 +23,76 @@
 # name:
 # from temporian.module import submodule as _submodule
 
-# Core
-from temporian.core import serialization
-from temporian.core.data import dtype
-from temporian.core.data import node
-from temporian.core.data import schema
-from temporian.core.data import duration
-from temporian.core.evaluation import evaluate
-from temporian.core.operators.all_operators import *
+# # Load packages privately
+# from temporian.core import serialization as _serialization
+# from temporian.core.data import dtype as _dtype
+# from temporian.core.data import node as _node
+# from temporian.core.data import schema as _schema
+# from temporian.core.data import duration as _duration
+# from temporian.core import evaluation as _evaluation
 
-# Implementation
-from temporian.implementation.numpy.data.event_set import EventSet
-from temporian.implementation.numpy.data.plotter import plot
-
-# IO
-from temporian.io.read_event_set import read_event_set
-from temporian.io.save_event_set import save_event_set
-
-from temporian.implementation.numpy.data import io
-from temporian.implementation.numpy.data.plotter import plot
-
-from temporian.core.operator_lib import registered_operators as get_operators
-
-# Operators registration mechanism
-from temporian.core.operator_lib import registered_operators as _ops
-from temporian.implementation.numpy.operators import all_operators as _impls
-
-# Dtypes
-float32 = dtype.DType.FLOAT32
-float64 = dtype.DType.FLOAT64
-int32 = dtype.DType.INT32
-int64 = dtype.DType.INT64
-bool_ = dtype.DType.BOOLEAN
-str_ = dtype.DType.STRING
-
-# Aliases
-load = serialization.load
-save = serialization.save
-input_node = node.input_node
-Event = node.Node
-Schema = node.Schema
-Feature = node.FeatureSchema
-Index = node.IndexSchema
-
-# TODO: To update.
-event_set = io.event_set
-pd_dataframe_to_event_set = io.pd_dataframe_to_event_set
+# pylint: disable=wrong-import-position
 
 __version__ = "0.0.1"
+
+# Register the ops definitions and implementations.
+from temporian.implementation.numpy.operators import all_operators as _impls
+
+
+# Actual API
+# ==========
+
+# Nodes and related
+from temporian.core.data import node as _node
+
+Node = _node.Node
+input_node = _node.input_node
+
+# Dtypes
+from temporian.core.data import dtype as _dtype
+
+float32 = _dtype.DType.FLOAT32
+float64 = _dtype.DType.FLOAT64
+int32 = _dtype.DType.INT32
+int64 = _dtype.DType.INT64
+bool_ = _dtype.DType.BOOLEAN
+str_ = _dtype.DType.STRING
+
+# Schema
+from temporian.core.data.schema import Schema
+
+# Duration
+# TODO: Only export the durations (e.g. milliseconds, seconds).
+from temporian.core.data import duration
+
+
+# Event set
+from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.io import event_set
+
+# Graph serialization
+from temporian.core import serialization as _serialization
+
+load = _serialization.load
+save = _serialization.save
+
+# Graph execution
+from temporian.core.evaluation import evaluate
+
+# Operators
+from temporian.core.operators.all_operators import *
+from temporian.core.operator_lib import registered_operators as get_operators
+
+# IO
+from temporian.io import csv as _csv
+
+to_csv = _csv.to_csv
+from_csv = _csv.from_csv
+
+from temporian.io import pandas as _pandas
+
+to_pandas = _pandas.to_pandas
+from_pandas = _pandas.from_pandas
+
+# Plotting
+from temporian.implementation.numpy.data.plotter import plot

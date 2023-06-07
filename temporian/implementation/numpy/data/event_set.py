@@ -329,7 +329,7 @@ class EventSet:
     """Actual temporal data.
 
     Use `tp.event_set` to create an event set manually.
-    Use `tp.pd_dataframe_to_event_set` to create an event set from a pandas
+    Use `tp.from_pandas` to create an event set from a pandas
     dataframe.
     """
 
@@ -419,35 +419,6 @@ class EventSet:
             name=self._name,
         )
         return self._internal_node
-
-    @staticmethod
-    def from_dataframe(
-        df: "pd.DataFrame",
-        index_names: Optional[List[str]] = None,
-        timestamp_column: str = "timestamp",
-        name: Optional[str] = None,
-    ) -> EventSet:
-        from temporian.implementation.numpy.data import io
-
-        return io.pd_dataframe_to_event_set(
-            df=df,
-            index_names=index_names,
-            timestamp_column=timestamp_column,
-            name=name,
-        )
-
-    def to_dataframe(self) -> "pd.DataFrame":
-        """Convert an EventSet to a pandas DataFrame.
-
-        See `tp.pd_dataframe_to_event_set` for details.
-
-        Returns:
-            DataFrame created from EventSet.
-        """
-
-        from temporian.implementation.numpy.data import io
-
-        return io.event_set_to_pd_dataframe(self)
 
     def __repr__(self) -> str:
         def repr_features(features: List[np.ndarray]) -> str:

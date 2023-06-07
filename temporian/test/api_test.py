@@ -60,6 +60,19 @@ class TFPTest(absltest.TestCase):
                 os.path.join(tempdir, "p2.png")
             )
 
+    def test_pandas(self):
+        evset = tp.event_set(
+            timestamps=[0.0, 2.0, 4.0, 6.0],
+            features={
+                "f1": [1.0, 2.0, 3.0, 4.0],
+                "f2": [5.0, 6.0, 7.0, 8.0],
+            },
+        )
+
+        df = tp.to_pandas(evset)
+        reconstructed_evset = tp.from_pandas(df)
+        self.assertEqual(evset, reconstructed_evset)
+
     def test_serialization(self):
         a = tp.input_node([("f1", tp.float32), ("f2", tp.float32)])
         b = tp.simple_moving_average(input=a, window_length=7)

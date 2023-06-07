@@ -20,10 +20,9 @@ from temporian.core.data.node import input_node
 from temporian.core.operators.calendar.day_of_month import (
     CalendarDayOfMonthOperator,
 )
-from temporian.implementation.numpy.data.io import (
-    pd_dataframe_to_event_set,
-    event_set,
-)
+from temporian.io.pandas import from_pandas
+from temporian.implementation.numpy.data.io import event_set
+
 from temporian.implementation.numpy.operators.calendar.day_of_month import (
     CalendarDayOfMonthNumpyImplementation,
 )
@@ -38,7 +37,7 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
 
     def test_no_index(self) -> None:
         """Test calendar day of month operator with flat node."""
-        input_evset = pd_dataframe_to_event_set(
+        input_evset = from_pandas(
             pd.DataFrame(
                 data=[
                     [pd.to_datetime("1970-01-01 00:00:00", utc=True)],
@@ -70,7 +69,7 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
 
     def test_with_index(self) -> None:
         """Test calendar day of month operator with indexed node."""
-        input_evset = pd_dataframe_to_event_set(
+        input_evset = from_pandas(
             pd.DataFrame(
                 data=[
                     [pd.to_datetime("1970-01-01 00:00:00", utc=True), 1],

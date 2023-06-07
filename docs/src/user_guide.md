@@ -44,7 +44,7 @@ In the next code examples, variables with names like `evset` refer to an `EventS
 You can create an `EventSet` as follows:
 
 ```python
-evset = tp.EventSet(
+evset = tp.event_set(
 	timestamps=[04-02-2023, 06-02-2023, 07-02-2023, 07-02-2023],
 	features={
         "feature_1": [0.5, 0.6, NaN, 0.9],
@@ -105,7 +105,7 @@ c_node = tp.simple_moving_average(a_node, window_length=10)
 d_node = b_node + c_node
 
 # Create an EventSet compatible with the graph.
-a_evset = tp.EventSet(
+a_evset = tp.event_set(
 	timestamps=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
 	features={
         "feature_1": [1.0, 2.0, 3.0, 4.0, 2.0, 3.0, 4.0, 5.0, 6.0, 3.0],
@@ -158,7 +158,7 @@ If an `EventSet` is available (i.e., data is available) this step can be changed
 
 ```python
 # Define an EventSet.
-a_evset = tp.EventSet(
+a_evset = tp.event_set(
 	timestamps=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
 	features={
         "feature_1": [1.0, 2.0, 3.0, 4.0, 2.0, 3.0, 4.0, 5.0, 6.0, 3.0],
@@ -183,7 +183,7 @@ To ease the feature engineering of dates, Temporian contains a set of _calendar 
 Calendar operators require the time in their inputs to be Unix time, so applying them on non-Unix timestamps will result in errors being raised. Temporian can sometimes automatically recognize if input timestamps correspond to Unix time (e.g. when an `EventSet` is created from a pandas DataFrame with a datetime column, or when passing a list of datetime objects as timestamps in `EventSet`'s constructor). If creating `EventSets` manually and passing floats directly to `timestamps`, you need to explicitly specify whether they correspond to Unix times or not via the `is_unix_timestamp` argument.
 
 ```python
->>> a_evset = tp.EventSet(
+>>> a_evset = tp.event_set(
 >>>     timestamps=[
 >>>         pd.to_datetime("Monday Mar 13 12:00:00 2023", utc=True),
 >>>         pd.to_datetime("Tuesday Mar 14 12:00:00 2023", utc=True),
@@ -235,7 +235,7 @@ The `evset.plot()` function is shorter to write and is used for displaying a sin
 Here's an example of using the `evset.plot()` function:
 
 ```python
-evset = tp.EventSet(
+evset = tp.event_set(
 	timestamps=[1, 2, 3, 4, 5],
 	features={
         "feature_1": [0.5, 0.6, 0.4, 0.4, 0.9],
@@ -273,7 +273,7 @@ events.plot(interactive=True)
 Each feature is identified by a name, and the list of features is available through the `features` property of an `EventSet`.
 
 ```python
->>> events = tp.EventSet(
+>>> events = tp.event_set(
 >>> 	timestamps=[1,2,3,4,5],
 >>> 	features={
 >>> 	    "feature_1": [0.5, 0.6, 0.4, 0.4, 0.9],
@@ -411,7 +411,7 @@ evset_added = tp.add(evset_1, evset_2)
 Arithmetic operators are applied index-feature-wise and timestamp-wise on events with multiple features.
 
 ```python
->>> evset = tp.EventSet(
+>>> evset = tp.event_set(
 >>>     timestamps=[1, 10],
 >>>     features={
 >>>         "f1": [1.0, 11.0],
@@ -441,7 +441,7 @@ EventSet(
 **Warning:** The Python equality operator (`==`) does not compute element-wise equality between features of an `EventSet`. Use the `tp.equal` operator instead.
 
 ```python
-evset = tp.EventSet(
+evset = tp.event_set(
 	timestamps=[1, 2],
 	features={
 	"f1": [1, 3],
@@ -487,7 +487,7 @@ If you want to apply arithmetic operators on `EventSets` with different sampling
 For operations involving scalars, operations are applied index-feature-element-wise.
 
 ```python
->>> evset = tp.EventSet(
+>>> evset = tp.event_set(
 >>> 	timestamps=[1,2,3,4],
 >>> 	features={
 >>> 	     "feature_1": [0.5, 0.6, 0.4 ,0.4],
@@ -529,13 +529,13 @@ If a timestamp is present in `sampling` but not in `input`, a new timestamp is c
 Given this example:
 
 ```python
-evset = tp.EventSet(
+evset = tp.event_set(
     timestamps=[10, 20, 30],
     features={
         "x": [1.0, 2.0, 3.0],
     },
 )
-sampling = tp.EventSet(
+sampling = tp.event_set(
     timestamps=[0, 9, 10, 11, 19, 20, 21],
 )
 
@@ -602,7 +602,7 @@ It is sometimes desirable for events in an `EventSet` not to interact with each 
 To compute the weekly sales of individual products, you can define the `product` feature as the `EventSet`'s _index_. The moving sum operator will then be applied independently to the events corresponding to each product.
 
 ```python
-daily_sales = tp.EventSet(
+daily_sales = tp.event_set(
 	timestamps=[...],
 	features={
         "product": [...],
@@ -637,7 +637,7 @@ Also, keep in mind that only string and integer features can be used as indexes.
 `EventSets` can have multiple features as index. In the next example, assume our daily sale aggregates are also annotated with `store` data.
 
 ```python
-daily_sales = tp.EventSet(
+daily_sales = tp.event_set(
 	timestamps=[...],
 	features={
         "product": [...],
@@ -722,7 +722,7 @@ In this example, `b` does not have a future leak, but `c` does because it depend
 `EventSet` data can be accessed using the `index()` and `feature()` functions. Temporian internally relies on NumPy, which means that the data access functions always return NumPy arrays.
 
 ```python
-evset = tp.EventSet(
+evset = tp.event_set(
 	timestamps=[1, 2, 3, 5, 6],
 	features={
         "f1": [0.1, 0.2, 0.3, 1.1, 1.2],
@@ -744,7 +744,7 @@ evset.index("red").feature("f1")
 If an `EventSet` does not have an index, `feature` can be called directly:
 
 ```python
-evset = tp.EventSet(
+evset = tp.event_set(
 	timestamps=[1, 2, 3, 5, 6],
 	features={
         "f1": [0.1, 0.2, 0.3, 1.1, 1.2],
@@ -756,21 +756,21 @@ evset.feature("f1")
 
 ## Import and export data
 
-`EventSets` can be read from and saved to disk via the `tp.read_event_set` and `tp.save_event_set` functions.
+`EventSets` can be read from and saved to csvfiles via the `tp.from_csv` and `tp.to_csv` functions.
 
 ```python
-# Read EventSet from .csv file.
-evset = tp.read_event_set(
+# Read EventSet from a .csv file.
+evset = tp.from_csv(
     path="path/to/file.csv",
     timestamp_column="timestamp",
     index_names=["product_id"],
 )
 
-# Save EventSet to .csv file.
-tp.save_event_set(evset, path="path/to/file.csv")
+# Save EventSet to a .csv file.
+tp.to_csv(evset, path="path/to/file.csv")
 ```
 
-Converting `EventSet` data to and from pandas DataFrames is also easily done via `EventSet.to_dataframe` and `tp.pd_dataframe_to_event_set`.
+Converting `EventSet` data to and from pandas DataFrames is also easily done via `tp.to_pandas` and `tp.from_pandas`.
 
 ```python
 import pandas as pd
@@ -782,10 +782,10 @@ df = pd.DataFrame({
 })
 
 # Create EventSet from DataFrame.
-evset = tp.pd_dataframe_to_event_set(df)
+evset = tp.from_pandas(df)
 
 # Convert EventSet to DataFrame.
-df = evset.to_dataframe()
+df = tp.to_pandas(evset)
 ```
 
 ## Serialization and deserialization of a graph
@@ -794,7 +794,7 @@ Temporian graphs can be exported and imported to a safe-to-share file with `tp.s
 
 ```python
 # Define a graph.
-evset = tp.EventSet(
+evset = tp.event_set(
 	timestamps=[1, 2, 3],
 	features={"f1": [0.1, 0.2, 0.3]},
 )

@@ -20,9 +20,7 @@ from temporian.core.data.dtype import DType
 from temporian.implementation.numpy.operators.glue import (
     GlueNumpyImplementation,
 )
-from temporian.implementation.numpy.data.io import (
-    event_set,
-)
+from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
     testOperatorAndImp,

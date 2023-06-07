@@ -52,7 +52,7 @@ def _build_toy_dataset(
     else:
         data_2 = np.random.randn(n)
 
-    return tp.pd_dataframe_to_event_set(
+    return tp.from_pandas(
         pd.DataFrame(
             {
                 "timestamp": timestamps,
@@ -101,9 +101,7 @@ def benchmark_calendar_day_of_month(runner):
         timestamps = np.sort(np.random.randn(n) * 1_700_000_000).astype(
             "datetime64[s]"
         )
-        ds = tp.pd_dataframe_to_event_set(
-            pd.DataFrame({"timestamp": timestamps})
-        )
+        ds = tp.from_pandas(pd.DataFrame({"timestamp": timestamps}))
 
         node = ds.node()
         output = tp.calendar_day_of_month(node)
@@ -179,9 +177,9 @@ def benchmark_unique_timestamps(runner):
         )
 
 
-def benchmark_from_dataframe(runner):
+def benchmark_from_pandas(runner):
     runner.add_separator()
-    # TODO: Add num_timestamps = 100_000 and 1_000_000 when from_dataframe is
+    # TODO: Add num_timestamps = 100_000 and 1_000_000 when from_pandas is
     # fast enough.
     for num_timestamps in [10_000]:
         for num_indexes in [0, 1, 3, 5]:
@@ -210,7 +208,7 @@ def benchmark_from_dataframe(runner):
                     df = pd.DataFrame(dt)
 
                     benchmark_name = (
-                        f"from_dataframe:s:{num_timestamps:_}_"
+                        f"from_pandas:s:{num_timestamps:_}_"
                         f"numidx:{num_indexes}_"
                         f"numidxval:{num_index_values}_"
                         f"idx:{'str' if index_is_string else 'int'}"
@@ -218,7 +216,7 @@ def benchmark_from_dataframe(runner):
 
                     runner.benchmark(
                         benchmark_name,
-                        lambda: tp.pd_dataframe_to_event_set(df, index_names),
+                        lambda: tp.from_pandas(df, index_names),
                     )
 
 
@@ -243,7 +241,7 @@ def benchmark_add_index(runner):
         feature_5 = np.random.choice(feature_values, number_timestamps)
         feature_6 = np.random.choice(feature_values, number_timestamps)
 
-        evset = tp.pd_dataframe_to_event_set(
+        evset = tp.from_pandas(
             pd.DataFrame(
                 {
                     "timestamp": timestamps,
@@ -353,7 +351,7 @@ def main():
     runner = Runner()
 
     benchmarks_to_run = [
-        "from_dataframe",
+        "from_pandas",
         "simple_moving_average",
         "select_and_glue",
         "calendar_day_of_month",

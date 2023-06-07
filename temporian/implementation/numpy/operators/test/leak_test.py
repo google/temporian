@@ -18,9 +18,7 @@ from temporian.core.operators.leak import LeakOperator
 from temporian.implementation.numpy.operators.leak import (
     LeakNumpyImplementation,
 )
-from temporian.implementation.numpy.data.io import (
-    event_set,
-)
+from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
     testOperatorAndImp,
