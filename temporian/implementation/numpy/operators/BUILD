@@ -26,6 +26,8 @@ py_library(
         ":since_last",
         ":unary",
         ":unique_timestamps",
+        ":begin",
+        ":end",
         "//temporian/implementation/numpy/operators/binary:arithmetic",
         "//temporian/implementation/numpy/operators/binary:logical",
         "//temporian/implementation/numpy/operators/binary:relational",
@@ -247,6 +249,37 @@ py_library(
         # already_there/numpy
         "//temporian/core/operators:unique_timestamps",
         "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event_set",
+    ],
+)
+
+py_library(
+    name = "begin",
+    srcs = ["begin.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/numpy
+        ":base",
+        "//temporian/core/data:duration",
+        "//temporian/core/operators:begin",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy:utils",
+        "//temporian/implementation/numpy/data:event_set",
+    ],
+)
+
+
+py_library(
+    name = "end",
+    srcs = ["end.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/numpy
+        ":base",
+        "//temporian/core/data:duration",
+        "//temporian/core/operators:end",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",
     ],
 )
