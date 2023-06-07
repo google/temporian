@@ -111,10 +111,10 @@ class EvaluationTest(absltest.TestCase):
         self.assertEqual(set(result.keys()), {"i1", "i2"})
 
     def test_evaluate_input_event_set(self):
-        input_evtset = utils.create_input_event_set()
+        input_evset = utils.create_input_event_set()
         result = evaluation.evaluate(
-            input_evtset.source_node(),
-            input_evtset,
+            input_evset.source_node(),
+            input_evset,
         )
         self.assertIsInstance(result, EventSet)
 

@@ -143,27 +143,27 @@ def event_set(
         timestamps=timestamps,
         schema=schema,
     )
-    evtset = EventSet(
+    evset = EventSet(
         schema=schema,
         data={(): index_data},
     )
 
     if index_features:
         # Index the data
-        input_node = evtset.node()
+        input_node = evset.node()
         output_node = add_index(input_node, index_to_add=index_features)
-        evtset = evaluate(output_node, {input_node: evtset})
-        assert isinstance(evtset, EventSet)
+        evset = evaluate(output_node, {input_node: evset})
+        assert isinstance(evset, EventSet)
 
-    evtset.name = name
+    evset.name = name
 
     if same_sampling_as is not None:
-        evtset.schema.check_compatible_index(
+        evset.schema.check_compatible_index(
             same_sampling_as.schema,
             label="the new event set and `same_sampling_as`",
         )
 
-        if evtset.data.keys() != same_sampling_as.data.keys():
+        if evset.data.keys() != same_sampling_as.data.keys():
             raise ValueError(
                 "The new event set and `same_sampling_as` have the same index,"
                 " but different index values. Both should have the same index"
@@ -172,7 +172,7 @@ def event_set(
 
         for key, same_sampling_as_value in same_sampling_as.data.items():
             if not np.all(
-                evtset.data[key].timestamps == same_sampling_as_value.timestamps
+                evset.data[key].timestamps == same_sampling_as_value.timestamps
             ):
                 raise ValueError(
                     "The new event set and `same_sampling_as` have different"
@@ -181,11 +181,11 @@ def event_set(
                 )
 
             # Discard the new timestamps arrays.
-            evtset.data[key].timestamps = same_sampling_as_value.timestamps
+            evset.data[key].timestamps = same_sampling_as_value.timestamps
 
-        evtset.node()._sampling = same_sampling_as.node().sampling_node
+        evset.node()._sampling = same_sampling_as.node().sampling_node
 
-    return evtset
+    return evset
 
 
 def pd_dataframe_to_event_set(
@@ -256,7 +256,7 @@ def pd_dataframe_to_event_set(
 
 
 def event_set_to_pd_dataframe(
-    evtset: EventSet,
+    evset: EventSet,
 ) -> "pandas.DataFrame":
     """Convert an EventSet to a pandas DataFrame.
 
@@ -270,12 +270,12 @@ def event_set_to_pd_dataframe(
 
     # Collect data into a dictionary.
     column_names = (
-        evtset.schema.index_names()
-        + evtset.schema.feature_names()
+        evset.schema.index_names()
+        + evset.schema.feature_names()
         + [timestamp_key]
     )
     data = {column_name: [] for column_name in column_names}
-    for index_key, index_data in evtset.data.items():
+    for index_key, index_data in evset.data.items():
         assert isinstance(index_key, tuple)
 
         # Timestamps
@@ -283,12 +283,12 @@ def event_set_to_pd_dataframe(
 
         # Features
         for feature_name, feature in zip(
-            evtset.schema.feature_names(), index_data.features
+            evset.schema.feature_names(), index_data.features
         ):
             data[feature_name].extend(feature)
 
         # Indexes
-        for i, index_name in enumerate(evtset.schema.index_names()):
+        for i, index_name in enumerate(evset.schema.index_names()):
             data[index_name].extend([index_key[i]] * len(index_data.timestamps))
 
     return pd.DataFrame(data)

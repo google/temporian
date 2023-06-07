@@ -16,7 +16,7 @@ from temporian.core.data.dtype import DType
 class IOTest(absltest.TestCase):
     def test_event_set(self):
         # a
-        evtset = event_set(
+        evset = event_set(
             timestamps=[1, 2, 3, 4],
             features={
                 "feature_1": [0.5, 0.6, math.nan, 0.9],
@@ -68,9 +68,9 @@ class IOTest(absltest.TestCase):
             schema=expected_schema,
         )
 
-        print("evtset:\n", evtset)
+        print("evset:\n", evset)
         print("expected_evset:\n", expected_evset)
-        self.assertEqual(repr(evtset), repr(expected_evset))
+        self.assertEqual(repr(evset), repr(expected_evset))
 
     def test_timestamps_non_unix_time(self):
         for timestamps in [
@@ -83,12 +83,12 @@ class IOTest(absltest.TestCase):
             pd.Series([2]),
         ]:
             logging.info("Testing: %s (%s)", timestamps, type(timestamps))
-            evtset = event_set(timestamps)
+            evset = event_set(timestamps)
             assert_array_equal(
-                evtset.get_arbitrary_index_data().timestamps,
+                evset.get_arbitrary_index_data().timestamps,
                 np.array([2], dtype=np.float64),
             )
-            self.assertFalse(evtset.schema.is_unix_timestamp)
+            self.assertFalse(evset.schema.is_unix_timestamp)
 
     def test_timestamps_unix_time(self):
         for timestamps in [
@@ -106,12 +106,12 @@ class IOTest(absltest.TestCase):
             pd.Series(["1970-01-02"]),
         ]:
             logging.info("Testing: %s (%s)", timestamps, type(timestamps))
-            evtset = event_set(timestamps)
+            evset = event_set(timestamps)
             assert_array_equal(
-                evtset.get_arbitrary_index_data().timestamps,
+                evset.get_arbitrary_index_data().timestamps,
                 np.array([86400], dtype=np.float64),
             )
-            self.assertTrue(evtset.schema.is_unix_timestamp)
+            self.assertTrue(evset.schema.is_unix_timestamp)
 
 
 if __name__ == "__main__":

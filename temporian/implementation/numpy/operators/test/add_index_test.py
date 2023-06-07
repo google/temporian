@@ -172,23 +172,23 @@ class AddIndexNumpyImplementationTest(absltest.TestCase):
     def test_set_index_multiple_change_order(self) -> None:
         common = {"features": {"a": [], "b": [], "c": []}, "timestamps": []}
 
-        evtset_abc = event_set(**common, index_features=["a", "b", "c"])
-        evtset_acb = event_set(**common, index_features=["a", "c", "b"])
-        evtset_cba = event_set(**common, index_features=["c", "b", "a"])
-        evtset_cab = event_set(**common, index_features=["c", "a", "b"])
+        evset_abc = event_set(**common, index_features=["a", "b", "c"])
+        evset_acb = event_set(**common, index_features=["a", "c", "b"])
+        evset_cba = event_set(**common, index_features=["c", "b", "a"])
+        evset_cab = event_set(**common, index_features=["c", "a", "b"])
 
-        def run(src_evtset, new_index, expected_evtset):
-            output = set_index(src_evtset.node(), new_index)
+        def run(src_evset, new_index, expected_evset):
+            output = set_index(src_evset.node(), new_index)
             output_evset = evaluate(
-                output, {src_evtset.node(): src_evtset}, check_execution=True
+                output, {src_evset.node(): src_evset}, check_execution=True
             )
-            assertEqualEventSet(self, output_evset, expected_evtset)
+            assertEqualEventSet(self, output_evset, expected_evset)
 
-        run(evtset_abc, ["a", "b", "c"], evtset_abc)
-        run(evtset_abc, ["a", "c", "b"], evtset_acb)
-        run(evtset_abc, ["c", "b", "a"], evtset_cba)
-        run(evtset_abc, ["c", "a", "b"], evtset_cab)
-        run(evtset_cba, ["a", "b", "c"], evtset_abc)
+        run(evset_abc, ["a", "b", "c"], evset_abc)
+        run(evset_abc, ["a", "c", "b"], evset_acb)
+        run(evset_abc, ["c", "b", "a"], evset_cba)
+        run(evset_abc, ["c", "a", "b"], evset_cab)
+        run(evset_cba, ["a", "b", "c"], evset_abc)
 
 
 if __name__ == "__main__":
