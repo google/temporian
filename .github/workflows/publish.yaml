@@ -7,37 +7,17 @@ on:
       - publish-action
 
 jobs:
-  build:
+  build-linux:
+    runs-on: ubuntu-latest
+    container: gcr.io/tfx-oss-public/manylinux2014-bazel:bazel-5.3.0
     strategy:
       matrix:
-        platform:
-          [
-            ["ubuntu", "gcr.io/tfx-oss-public/manylinux2014-bazel:bazel-5.3.0"],
-            ["macos", null],
-          ]
         python-version: ["3.8", "3.9", "3.10", "3.11"]
-    runs-on: ${{ matrix.platform[0] }}-latest
-    container: ${{ matrix.platform[1] }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set up Python ${{ matrix.python-version }}
-        if: matrix.platform[0] == 'macos'
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install Poetry
-        if: matrix.platform[0] == 'macos'
-        uses: snok/install-poetry@v1
-
-      - name: Build macos
-        if: matrix.platform[0] == 'macos'
-        run: poetry build
-
-      - name: Build linux
-        if: matrix.platform[0] == 'ubuntu'
+      - name: Build package
         run: |
           version="${{ matrix.python-version }}"
           versionstr=${version//./}
@@ -46,7 +26,33 @@ jobs:
       - name: Save package for following jobs
         uses: actions/upload-artifact@v3
         with:
-          name: dist-${{ matrix.platform[0] }}-${{ matrix.python-version }}
+          name: dist-ubuntu-${{ matrix.python-version }}
+          path: dist
+
+  build:
+    runs-on: macos-latest-xl
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Build package
+        run: poetry build
+
+      - name: Save package for following jobs
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-macos-${{ matrix.python-version }}
           path: dist
 
   test-install:
