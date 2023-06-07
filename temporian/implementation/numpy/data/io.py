@@ -143,27 +143,27 @@ def event_set(
         timestamps=timestamps,
         schema=schema,
     )
-    evtset = EventSet(
+    evset = EventSet(
         schema=schema,
         data={(): index_data},
     )
 
     if index_features:
         # Index the data
-        input_node = evtset.node()
+        input_node = evset.node()
         output_node = add_index(input_node, index_to_add=index_features)
-        evtset = evaluate(output_node, {input_node: evtset})
-        assert isinstance(evtset, EventSet)
+        evset = evaluate(output_node, {input_node: evset})
+        assert isinstance(evset, EventSet)
 
-    evtset.name = name
+    evset.name = name
 
     if same_sampling_as is not None:
-        evtset.schema.check_compatible_index(
+        evset.schema.check_compatible_index(
             same_sampling_as.schema,
             label="the new event set and `same_sampling_as`",
         )
 
-        if evtset.data.keys() != same_sampling_as.data.keys():
+        if evset.data.keys() != same_sampling_as.data.keys():
             raise ValueError(
                 "The new event set and `same_sampling_as` have the same index,"
                 " but different index values. Both should have the same index"
@@ -172,7 +172,7 @@ def event_set(
 
         for key, same_sampling_as_value in same_sampling_as.data.items():
             if not np.all(
-                evtset.data[key].timestamps == same_sampling_as_value.timestamps
+                evset.data[key].timestamps == same_sampling_as_value.timestamps
             ):
                 raise ValueError(
                     "The new event set and `same_sampling_as` have different"
@@ -181,8 +181,8 @@ def event_set(
                 )
 
             # Discard the new timestamps arrays.
-            evtset.data[key].timestamps = same_sampling_as_value.timestamps
+            evset.data[key].timestamps = same_sampling_as_value.timestamps
 
-        evtset.node()._sampling = same_sampling_as.node().sampling_node
+        evset.node()._sampling = same_sampling_as.node().sampling_node
 
-    return evtset
+    return evset
