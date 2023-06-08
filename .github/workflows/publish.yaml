@@ -7,6 +7,10 @@ on:
       - publish-action
 
 jobs:
+  test:
+    uses: google/temporian/.github/workflows/test.yaml@main
+    secrets: inherit
+
   build-linux:
     runs-on: ubuntu-latest
     container: gcr.io/tfx-oss-public/manylinux2014-bazel:bazel-5.3.0
