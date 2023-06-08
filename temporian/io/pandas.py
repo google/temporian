@@ -99,6 +99,8 @@ def to_pandas(
 
     timestamp_key = "timestamp"
 
+    OPTIMIZE
+
     # Collect data into a dictionary.
     column_names = (
         evtset.schema.index_names()
