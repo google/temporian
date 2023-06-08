@@ -8,7 +8,8 @@ on:
 
 jobs:
   test:
-    uses: google/temporian/.github/workflows/test.yaml@main
+    # TODO: change to @main
+    uses: google/temporian/.github/workflows/test.yaml@publish-action
     secrets: inherit
 
   build-linux:
