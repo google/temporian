@@ -12,34 +12,42 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict
 
-from temporian.core.operators.lag import LagOperator
-from temporian.implementation.numpy import implementation_lib
+"""Implementation for the Begin operator."""
+
+
+from typing import Dict
+import numpy as np
+
 from temporian.implementation.numpy.data.event_set import IndexData, EventSet
+from temporian.core.operators.begin import Begin
+from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
-class LagNumpyImplementation(OperatorImplementation):
-    def __init__(self, operator: LagOperator) -> None:
+class BeginNumpyImplementation(OperatorImplementation):
+    def __init__(self, operator: Begin) -> None:
+        assert isinstance(operator, Begin)
         super().__init__(operator)
-        assert isinstance(operator, LagOperator)
 
     def __call__(self, input: EventSet) -> Dict[str, EventSet]:
-        assert isinstance(self.operator, LagOperator)
+        assert isinstance(self.operator, Begin)
         output_schema = self.output_schema("output")
-
-        # gather operator attributes
-        duration = self.operator.duration
 
         # create output event set
         output_evset = EventSet(data={}, schema=output_schema)
 
         # fill output event set data
         for index_key, index_data in input.data.items():
+            if len(index_data.timestamps) == 0:
+                dst_timestamps = np.array([], dtype=np.float64)
+            else:
+                dst_timestamps = np.array(
+                    [index_data.timestamps[0]], dtype=np.float64
+                )
             output_evset[index_key] = IndexData(
-                index_data.features,
-                index_data.timestamps + duration,
+                [],
+                dst_timestamps,
                 schema=output_schema,
             )
 
@@ -47,5 +55,5 @@ class LagNumpyImplementation(OperatorImplementation):
 
 
 implementation_lib.register_operator_implementation(
-    LagOperator, LagNumpyImplementation
+    Begin, BeginNumpyImplementation
 )

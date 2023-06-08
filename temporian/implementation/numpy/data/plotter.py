@@ -227,6 +227,9 @@ def get_num_plots(
 def auto_style(uniform: bool, xs, ys) -> Style:
     """Finds the best plotting style."""
 
+    if len(ys) <= 1:
+        return Style.marker
+
     if len(ys) == 0:
         all_ys_are_equal = True
     else:
