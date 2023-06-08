@@ -392,15 +392,15 @@ class EventSet:
         Usage example:
 
         ```
-        my_evset = tp.event_set(
-            timestamps=[1, 2, 3, 4],
-            features={
-                "feature_1": [0.5, 0.6, math.nan, 0.9],
-                "feature_2": ["red", "blue", "red", "blue"],
-            },
-        )
+        >>> my_evset = tp.event_set(
+        ...     timestamps=[1, 2, 3, 4],
+        ...     features={
+        ...         "feature_1": [0.5, 0.6, np.nan, 0.9],
+        ...         "feature_2": ["red", "blue", "red", "blue"],
+        ...     },
+        ... )
+        >>> my_node = my_evset.node()
 
-        my_node = my_evset.node()
         ```
 
         Args:
@@ -486,7 +486,15 @@ class EventSet:
         return True
 
     def plot(self, *args, **wargs) -> Any:
-        """Plots the event set. See tp.plot for details."""
+        """Plots the event set. See tp.plot for details.
+
+        Example usage:
+        ```
+        >>> evset = tp.event_set(timestamps=[1, 2, 3], features={"f1": [0, 42, 10]})
+        >>> evset.plot()
+
+        ```
+        """
 
         from temporian.implementation.numpy.data import plotter
 

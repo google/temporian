@@ -38,18 +38,17 @@ def from_pandas(
 
     Usage example:
 
-    ```
-    import pandas as pd
-    df = pd.DataFrame(
-        data=[
-            [1.0, 5, "A"],
-            [2.0, 6, "A"],
-            [3.0, 7, "B"],
-        ],
-        columns=["timestamp", "feature_1", "feature_2"],
-    )
+    ```python
+    >>> df = pd.DataFrame(
+    ...     data=[
+    ...         [1.0, 5, "A"],
+    ...         [2.0, 6, "A"],
+    ...         [3.0, 7, "B"],
+    ...     ],
+    ...     columns=["timestamp", "feature_1", "feature_2"],
+    ... )
+    >>> evset = tp.from_pandas(df, index_names=["feature_2"])
 
-    evset = tp.from_pandas(df, index_names=["feature_2"])
     ```
 
     Args:
