@@ -11,9 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import sys
 import doctest
 import inspect
-
+import traceback
 
 from absl.testing import absltest
 
@@ -53,9 +54,15 @@ class DocstringsTest(absltest.TestCase):
                     module,
                     globs={"np": np, "tp": tp, "pd": pd},
                     extraglobs=module.__dict__,
+                    # Use ... to match anything and ignore different whitespaces
+                    optionflags=doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE,
                     raise_on_error=True,
+                    verbose=False,
                 )
-                print(f"Checked {test_count} doc examples on: {module_name}")
+                if test_count:
+                    print(f"Tested {test_count} doc examples on: {module_name}")
+                else:
+                    print(f"No examples in {module_name}")
 
             # Failure due to mismatch on expected result
             except doctest.DocTestFailure as e:
@@ -75,6 +82,9 @@ class DocstringsTest(absltest.TestCase):
             except doctest.UnexpectedException as e:
                 ex = e.example
                 path = inspect.getfile(module)
+                print("\n\nTraceback:")
+                traceback.print_tb(e.exc_info[2], file=sys.stdout)
+                print("\n\n")
                 raise AssertionError(
                     "Exception running docstring example on file"
                     f" {path}:{ex.lineno}\n>>> {ex.source}{e.exc_info[0]}:"

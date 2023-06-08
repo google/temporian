@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import doctest
-import inspect
 from pathlib import Path
 
 from absl.testing import absltest
@@ -41,6 +40,8 @@ class CodeExamplesTest(absltest.TestCase):
                     module_relative=False,
                     raise_on_error=True,
                     globs={"np": np, "pd": pd, "tp": tp},
+                    # Use ... to match anything and ignore different whitespaces
+                    optionflags=doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE,
                     verbose=False,
                 )
 
