@@ -1,15 +1,13 @@
 name: publish
 
-# TODO: change to only run on release branch
 on:
   push:
     branches:
-      - publish-action
+      - release
 
 jobs:
   test:
-    # TODO: change to @main
-    uses: google/temporian/.github/workflows/test.yaml@publish-action
+    uses: google/temporian/.github/workflows/test.yaml@main
     secrets: inherit
 
   build-linux:
@@ -95,11 +93,9 @@ jobs:
   publish:
     needs: [test-install]
     runs-on: ubuntu-latest
-    # TODO: change to "pypi"
-    environment: test-pypi
+    environment: pypi
     env:
-      # TODO: change to POETRY_PYPI_TOKEN_PYPI
-      POETRY_PYPI_TOKEN_TEST_PYPI: ${{ secrets.PYPI_TOKEN }}
+      POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -121,6 +117,4 @@ jobs:
 
       - name: Publish to PyPI
         # TODO: change to prod PyPI repo
-        run: |
-          poetry config repositories.test-pypi https://test.pypi.org/legacy/
-          poetry publish -r test-pypi --no-interaction --skip-existing
+        run: poetry publish --no-interaction --skip-existing
