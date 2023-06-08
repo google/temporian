@@ -21,12 +21,10 @@ from temporian.core.operators.calendar.base import BaseCalendarOperator
 
 class CalendarDayOfWeekOperator(BaseCalendarOperator):
     @classmethod
-    @property
     def operator_def_key(cls) -> str:
         return "CALENDAR_DAY_OF_WEEK"
 
     @classmethod
-    @property
     def output_feature_name(cls) -> str:
         return "calendar_day_of_week"
 

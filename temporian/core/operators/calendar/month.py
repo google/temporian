@@ -25,12 +25,10 @@ class CalendarMonthOperator(BaseCalendarOperator):
     """
 
     @classmethod
-    @property
     def operator_def_key(cls) -> str:
         return "CALENDAR_MONTH"
 
     @classmethod
-    @property
     def output_feature_name(cls) -> str:
         return "calendar_month"
 

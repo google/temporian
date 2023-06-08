@@ -26,7 +26,6 @@ from temporian.core.operators.window.base import BaseWindowOperator
 
 class MovingMaxOperator(BaseWindowOperator):
     @classmethod
-    @property
     def operator_def_key(cls) -> str:
         return "MOVING_MAX"
 
