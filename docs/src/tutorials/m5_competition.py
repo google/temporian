@@ -172,14 +172,14 @@ sales_raw["sales"] = sales_raw["sales"].astype(np.float32)
 print("Convert to Temporian EventSets")
 print("===========================")
 
-sales_data = tp.pd_dataframe_to_event_set(
+sales_data = tp.from_pandas(
     sales_raw,
     index_names=["item_id", "dept_id", "cat_id", "store_id", "state_id"],
 )
 
-calendar_data = tp.pd_dataframe_to_event_set(calendar_raw)
+calendar_data = tp.from_pandas(calendar_raw)
 
-sell_prices_data = tp.pd_dataframe_to_event_set(
+sell_prices_data = tp.from_pandas(
     sell_prices_raw,
     index_names=["store_id", "item_id"],
 )
@@ -319,8 +319,9 @@ tabular_dataset_data.plot(**plot_options).savefig(
 print("Export to csv file")
 print("==================")
 
-tabular_dataset_data.to_dataframe().to_csv(
-    os.path.join(work_directory, "tabular_dataset.csv"), index=False
+tp.to_csv(
+    tabular_dataset_data,
+    path=os.path.join(work_directory, "tabular_dataset.csv"),
 )
 
 print("The artefacts are available in:", work_directory)

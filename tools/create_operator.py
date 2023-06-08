@@ -247,7 +247,7 @@ from temporian.implementation.numpy.data.event import EventSet
 from temporian.implementation.numpy.operators.{lower_op} import (
     {capitalized_op}NumpyImplementation,
 )
-from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
+from temporian.io.pandas import from_pandas
 
 
 class {capitalized_op}OperatorTest(absltest.TestCase):

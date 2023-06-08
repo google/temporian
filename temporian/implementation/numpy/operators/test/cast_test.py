@@ -16,17 +16,15 @@ import numpy as np
 import pandas as pd
 from absl.testing import absltest
 
-from temporian.core.data.node import source_node
+from temporian.core.data.node import input_node
 from temporian.implementation.numpy.operators.cast import (
     CastNumpyImplementation,
 )
 from temporian.core.operators.cast import CastOperator, cast
 from temporian.core.data.dtype import DType
 from temporian.implementation.numpy.data.event_set import EventSet
-from temporian.implementation.numpy.data.io import (
-    pd_dataframe_to_event_set,
-    event_set,
-)
+from temporian.io.pandas import from_pandas
+from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
     testOperatorAndImp,
@@ -52,7 +50,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
         blw_i64 = np.finfo(np.float64).min  # below float32 too
 
         # 2 index columns, 3 features: float64, int64, str, boolean
-        self.input_evset = pd_dataframe_to_event_set(
+        self.input_evset = from_pandas(
             pd.DataFrame(
                 data=[
                     [TRYO_SHOP, MATE_ID, 0.0, -14.0, abv_i32, "1.2", True],
@@ -81,7 +79,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
         self.input_node = self.input_evset.node()
 
         # Expected event set when applying some downcast operations
-        self.expected_evset_1 = pd_dataframe_to_event_set(
+        self.expected_evset_1 = from_pandas(
             pd.DataFrame(
                 data=[
                     # Note: astype() below will truncate above/below numbers
@@ -109,7 +107,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
         )
 
         # Expected when converting everything to float32
-        self.expected_evset_2 = pd_dataframe_to_event_set(
+        self.expected_evset_2 = from_pandas(
             pd.DataFrame(
                 data=[
                     # Note: astype() below will truncate above/below numbers
@@ -143,7 +141,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
         )
 
     def test_cast_manual(self) -> None:
-        node = source_node([("x", DType.FLOAT32), ("y", DType.FLOAT32)])
+        node = input_node([("x", DType.FLOAT32), ("y", DType.FLOAT32)])
         op = CastOperator(node, check_overflow=True, dtype=DType.INT64)
         imp = CastNumpyImplementation(op)
         testOperatorAndImp(self, op, imp)
@@ -274,7 +272,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
 
     def test_python_types(self):
         input_data = event_set(timestamps=[1, 2], features={"a": [1, 2]})
-        output_node = cast(input_data.source_node(), float)
+        output_node = cast(input_data.node(), float)
         self.assertEqual(output_node.features[0].dtype, DType.FLOAT64)
 
 

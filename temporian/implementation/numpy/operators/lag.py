@@ -16,8 +16,7 @@ from typing import Dict
 
 from temporian.core.operators.lag import LagOperator
 from temporian.implementation.numpy import implementation_lib
-from temporian.implementation.numpy.data.event_set import IndexData
-from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 

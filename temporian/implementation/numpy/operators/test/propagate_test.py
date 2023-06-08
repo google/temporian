@@ -20,7 +20,7 @@ from temporian.core.operators.propagate import Propagate
 from temporian.implementation.numpy.operators.propagate import (
     PropagateNumpyImplementation,
 )
-from temporian.implementation.numpy.data.io import pd_dataframe_to_event_set
+from temporian.io.pandas import from_pandas
 
 
 class PropagateOperatorTest(absltest.TestCase):
@@ -28,7 +28,7 @@ class PropagateOperatorTest(absltest.TestCase):
         pass
 
     def test_base(self):
-        evset = pd_dataframe_to_event_set(
+        evset = from_pandas(
             pd.DataFrame(
                 {
                     "timestamp": [1, 2, 3],
@@ -40,7 +40,7 @@ class PropagateOperatorTest(absltest.TestCase):
         )
         node = evset.node()
 
-        sampling_evset = pd_dataframe_to_event_set(
+        sampling_evset = from_pandas(
             pd.DataFrame(
                 {
                     "timestamp": [1, 1, 1, 1],
@@ -52,7 +52,7 @@ class PropagateOperatorTest(absltest.TestCase):
         )
         sampling_node = sampling_evset.node()
 
-        expected_output = pd_dataframe_to_event_set(
+        expected_output = from_pandas(
             pd.DataFrame(
                 {
                     "timestamp": [1, 2, 1, 2, 3, 3],

@@ -15,7 +15,7 @@ import temporian as tp
 def check_install():
     # Generate a synthetic dataset
     timestamps = np.arange(0, 100, 0.1)
-    source_evset = tp.EventSet.from_dataframe(
+    source_evset = tp.from_pandas(
         pd.DataFrame({"timestamp": timestamps, "signal": np.sin(timestamps)})
     )
     source_node = source_evset.node()

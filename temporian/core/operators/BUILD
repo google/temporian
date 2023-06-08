@@ -25,6 +25,8 @@ py_library(
         ":since_last",
         ":unary",
         ":unique_timestamps",
+        ":begin",
+        ":end",
         "//temporian/core/operators/binary",
         "//temporian/core/operators/calendar:day_of_month",
         "//temporian/core/operators/calendar:day_of_week",
@@ -53,6 +55,7 @@ py_library(
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
+        "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -62,6 +65,7 @@ py_library(
     srcs = ["base.py"],
     srcs_version = "PY3",
     deps = [
+        "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/proto:core_py_proto",
     ],
@@ -74,6 +78,7 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
+        "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
@@ -87,8 +92,8 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
+        "//temporian/core/data:dtype",
         "//temporian/core/data:node",
-        "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -102,7 +107,6 @@ py_library(
         "//temporian/core:operator_lib",
         "//temporian/core/data:duration",
         "//temporian/core/data:node",
-        "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -130,7 +134,6 @@ py_library(
         "//temporian/core:operator_lib",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
-        "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -168,7 +171,6 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:duration",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
@@ -195,11 +197,8 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
-        ":select",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:duration",
         "//temporian/core/data:node",
-        "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -211,11 +210,8 @@ py_library(
     deps = [
         ":base",
         ":resample",
-        ":select",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:duration",
         "//temporian/core/data:node",
-        "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -226,11 +222,8 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
-        ":select",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:duration",
         "//temporian/core/data:node",
-        "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -241,11 +234,9 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
-        ":select",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:duration",
+        "//temporian/core/data:dtype",
         "//temporian/core/data:node",
-        "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -253,6 +244,31 @@ py_library(
 py_library(
     name = "unique_timestamps",
     srcs = ["unique_timestamps.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:node",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "begin",
+    srcs = ["begin.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:node",
+        "//temporian/core/data:schema",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "end",
+    srcs = ["end.py"],
     srcs_version = "PY3",
     deps = [
         ":base",

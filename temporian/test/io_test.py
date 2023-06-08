@@ -1,32 +1,30 @@
 import os
 from pathlib import Path
 
+from absl import flags
 from absl.testing import absltest
 import pandas as pd
+import tempfile
 
 import temporian as tp
 
 
+def test_data() -> str:
+    return os.path.join(flags.FLAGS.test_srcdir, "temporian")
+
+
 class IOTest(absltest.TestCase):
-    def setUp(self) -> None:
-        self.read_path = "temporian/test/test_data/io/input.csv"
-        self.save_path = "temporian/test/test_data/io/save_event.csv"
-
-        if Path(self.save_path).exists():
-            os.remove(self.save_path)
-
-    def tearDown(self) -> None:
-        if Path(self.save_path).exists():
-            os.remove(self.save_path)
-
-    def test_read_event_set(self) -> None:
-        evset = tp.read_event_set(
-            path=self.read_path,
+    def test_from_csv(self) -> None:
+        path = os.path.join(
+            test_data(), "temporian/test/test_data/io/input.csv"
+        )
+        evset = tp.from_csv(
+            path=path,
             timestamp_column="timestamp",
             index_names=["product_id"],
         )
 
-        expected_evset = tp.pd_dataframe_to_event_set(
+        expected_evset = tp.from_pandas(
             pd.DataFrame(
                 [
                     [666964, 1.0, 740.0],
@@ -41,7 +39,7 @@ class IOTest(absltest.TestCase):
 
         self.assertEqual(evset, expected_evset)
 
-    def test_save_event_set(self) -> None:
+    def test_to_csv(self) -> None:
         df = pd.DataFrame(
             [
                 [666964, 1.0, 740.0],
@@ -51,20 +49,22 @@ class IOTest(absltest.TestCase):
             columns=["product_id", "timestamp", "costs"],
         )
 
-        evset = tp.pd_dataframe_to_event_set(df=df, index_names=["product_id"])
+        evset = tp.from_pandas(df=df, index_names=["product_id"])
 
-        tp.save_event_set(evset=evset, path=self.save_path)
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "events.csv")
+            tp.to_csv(evset=evset, path=path)
 
-        # check if file exists
-        self.assertTrue(Path(self.save_path).exists())
+            # check if file exists
+            self.assertTrue(Path(path).exists())
 
-        saved_evset = tp.read_event_set(
-            path=self.save_path,
-            timestamp_column="timestamp",
-            index_names=["product_id"],
-        )
+            saved_evset = tp.from_csv(
+                path=path,
+                timestamp_column="timestamp",
+                index_names=["product_id"],
+            )
 
-        self.assertEqual(evset, saved_evset)
+            self.assertEqual(evset, saved_evset)
 
 
 if __name__ == "__main__":

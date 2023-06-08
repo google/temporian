@@ -30,7 +30,7 @@ EvaluationQuery = Union[Node, List[Node], Set[Node], Dict[str, Node]]
 EvaluationInput = Union[
     # A dict node to corresponding event set.
     Dict[Node, EventSet],
-    # A single event set. Equivalent to {event_set.source_node() : event_set}.
+    # A single event set. Equivalent to {event_set.node() : event_set}.
     EventSet,
     # A list of event sets. Feed each event set individually like EventSet.
     List[EventSet],
@@ -226,10 +226,10 @@ def _normalize_input(input: EvaluationInput) -> Dict[Node, EventSet]:
         return input
 
     if isinstance(input, EventSet):
-        return {input.source_node(): input}
+        return {input.node(): input}
 
     if isinstance(input, list):
-        return {evset.source_node(): evset for evset in input}
+        return {evset.node(): evset for evset in input}
 
     raise TypeError(
         "Evaluate input argument must be an EventSet, list of EventSet, or a"

@@ -14,7 +14,7 @@
 
 from absl.testing import absltest
 
-from temporian.core.data.node import source_node
+from temporian.core.data.node import input_node
 from temporian.core.data.dtype import DType
 from temporian.core.operators.propagate import propagate
 
@@ -24,7 +24,7 @@ class PropagateOperatorTest(absltest.TestCase):
         pass
 
     def test_basic(self):
-        node = source_node(
+        node = input_node(
             [
                 ("a", DType.FLOAT64),
                 ("b", DType.FLOAT64),
@@ -32,7 +32,7 @@ class PropagateOperatorTest(absltest.TestCase):
             indexes=[("x", DType.STRING)],
             is_unix_timestamp=False,
         )
-        sampling = source_node(
+        sampling = input_node(
             [],
             indexes=[("x", DType.STRING), ("y", DType.STRING)],
             is_unix_timestamp=False,
@@ -40,7 +40,7 @@ class PropagateOperatorTest(absltest.TestCase):
         _ = propagate(input=node, sampling=sampling)
 
     def test_error_wrong_index(self):
-        node = source_node(
+        node = input_node(
             [
                 ("a", DType.FLOAT64),
                 ("b", DType.FLOAT64),
@@ -48,7 +48,7 @@ class PropagateOperatorTest(absltest.TestCase):
             indexes=[("z", DType.STRING)],
             is_unix_timestamp=False,
         )
-        sampling = source_node(
+        sampling = input_node(
             [],
             indexes=[("x", DType.STRING), ("y", DType.STRING)],
             is_unix_timestamp=False,
@@ -60,7 +60,7 @@ class PropagateOperatorTest(absltest.TestCase):
             _ = propagate(input=node, sampling=sampling)
 
     def test_error_wrong_index_type(self):
-        node = source_node(
+        node = input_node(
             [
                 ("a", DType.FLOAT64),
                 ("b", DType.FLOAT64),
@@ -68,7 +68,7 @@ class PropagateOperatorTest(absltest.TestCase):
             indexes=[("x", DType.INT32)],
             is_unix_timestamp=False,
         )
-        sampling = source_node(
+        sampling = input_node(
             [],
             indexes=[("x", DType.STRING), ("y", DType.STRING)],
             is_unix_timestamp=False,

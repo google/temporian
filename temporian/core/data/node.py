@@ -33,7 +33,7 @@ class Node(object):
     """A node is a reference to the input/output of ops in a compute graph.
 
     Use `tp.input_node` to create a node manually, or use
-    `event_set.source_node()` to create a node compatible with a given
+    `event_set.node()` to create a node compatible with a given
     event-set.
 
     A node does not contain any data. Use `node.evaluate(...)` to get the
@@ -488,7 +488,7 @@ class Node(object):
         assert False
 
 
-def source_node(
+def input_node(
     features: List[Tuple[str, DType]],
     indexes: Optional[List[Tuple[str, IndexDType]]] = None,
     is_unix_timestamp: bool = False,

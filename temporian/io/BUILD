@@ -5,20 +5,25 @@ package(
 
 # Libraries
 # =========
+
 py_library(
-    name = "read_event_set",
-    srcs = ["read_event_set.py"],
+    name = "csv",
+    srcs = ["csv.py"],
     srcs_version = "PY3",
     deps = [
+        # already_there/pandas
+        ":pandas",
         "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
 py_library(
-    name = "save_event_set",
-    srcs = ["save_event_set.py"],
+    name = "pandas",
+    srcs = ["pandas.py"],
     srcs_version = "PY3",
     deps = [
+        # already_there/pandas
         "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy/data:io",
     ],
 )
