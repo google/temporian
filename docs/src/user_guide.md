@@ -44,26 +44,27 @@ In the next code examples, variables with names like `evset` refer to an `EventS
 You can create an `EventSet` as follows:
 
 ```python
-evset = tp.event_set(
-	timestamps=[04-02-2023, 06-02-2023, 07-02-2023, 07-02-2023],
-	features={
-        "feature_1": [0.5, 0.6, NaN, 0.9],
-        "feature_2": ["red", "blue", "red", "blue"],
-        "feature_3":  [10, -1, 5, 5],
-	}
-)
+>>> evset = tp.event_set(
+... 	timestamps=["2023-02-04","2023-02-06","2023-02-07","2023-02-07"],
+... 	features={
+...         "feature_1": [0.5, 0.6, np.nan, 0.9],
+...         "feature_2": ["red", "blue", "red", "blue"],
+...         "feature_3":  [10, -1, 5, 5],
+... 	}
+... )
+
 ```
 
 `EventSets` can be printed.
 
 ```python
-print(evset)
+>>> print(evset)  # doctest:+SKIP
 ```
 
 `EventSets` can be plotted.
 
 ```python
-evset.plot()
+>>> evset.plot()  # doctest:+SKIP
 ```
 
 **Note:** You'll learn how to create an `EventSet` using other data sources such as pandas DataFrames later.
@@ -89,36 +90,38 @@ Operators are not executed individually, but rather combined to form an operator
 Let's see how to compute the simple moving average of two features `feature_1` and `feature_2` using two different window lengths, and then sum the results:
 
 ```python
-# Define the input of the graph.
-a_node = tp.input_node(
-    features=[
-        ("feature_1", tp.float64),
-        ("feature_2", tp.int64),
-    ],
-    index=[("feature_3", tp.string)],
-    name="a",
-)
-
-# Define the operators in the graph.
-b_node = tp.simple_moving_average(a_node, window_length=5)
-c_node = tp.simple_moving_average(a_node, window_length=10)
-d_node = b_node + c_node
-
-# Create an EventSet compatible with the graph.
-a_evset = tp.event_set(
-	timestamps=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-	features={
-        "feature_1": [1.0, 2.0, 3.0, 4.0, 2.0, 3.0, 4.0, 5.0, 6.0, 3.0],
-        "feature_2": [54, 23, 53, 12, 12, 32, 23, 12, 2, 4],
-	},
-    name="a",
-)
-
-# Feed the EventSet to the graph. The result is also an EventSet.
-d_evset = tp.evaluate(d, {a_node: a_evset})
-
-# Print the result.
-print(d_evset)
+>>> # Define the input of the graph.
+>>> a_node = tp.input_node(
+...     features=[
+...         ("feature_1", tp.float64),
+...         ("feature_2", tp.float64),
+...     ],
+...     indexes=[("feature_3", tp.str_)],
+...     name="a",
+... )
+>>>
+>>> # Define the operators in the graph.
+>>> b_node = tp.simple_moving_average(a_node, window_length=5)
+>>> c_node = tp.simple_moving_average(a_node, window_length=10)
+>>> d_node = b_node + c_node
+>>>
+>>> # Create an EventSet compatible with the graph.
+>>> a_evset = tp.event_set(
+... 	timestamps=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+... 	features={
+...         "feature_1": [1.0, 2.0, 3.0, 4.0, 2.0, 3.0, 4.0, 5.0, 6.0, 3.0],
+...         "feature_2": [54.0, 23.0, 53.0, 12.0, 12.0, 32.0, 23.0, 12.0, 2.0, 4.0],
+...         "feature_3": ["i1", "i1", "i1", "i1", "i1", "i2", "i2", "i2", "i2", "i2",],
+... 	},
+...     index_features=["feature_3"],
+...     name="a",
+... )
+>>>
+>>> # Feed the EventSet to the graph. The result is also an EventSet.
+>>> d_evset = tp.evaluate(d_node, {a_node: a_evset})
+>>>
+>>> # Print the result.
+>>> print(d_evset)  # doctest:+SKIP
 ```
 
 The `tp.evaluate` function's signature is `tp.evaluate(<outputs>, <inputs>)`.
@@ -137,15 +140,16 @@ The `<inputs>` can be specified as a dictionary of `Nodes` to `EventSets`, a dic
 To simplify its usage when the graph contains a single output `Node`, `node.evaluate` is equivalent to `tp.evaluate(node, <inputs>)`.
 
 ```python
-# All these statements are equivalent.
-tp.evaluate(d_node, {a_node: a_evset})
-tp.evaluate(d_node, {"a": a_evset})
-tp.evaluate(d_node, [a_evset])
-tp.evaluate(d_node, a_evset)
-d_node.evaluate({a_node: a_evset})
-d_node.evaluate({"a": a_evset})
-d_node.evaluate([a_evset])
-d_node.evaluate(a_evset)
+>>> # All these statements are equivalent.
+>>> d_evset = tp.evaluate(d_node, {a_node: a_evset})
+>>> # d_evset = tp.evaluate(d_node, {"a": a_evset})
+>>> # d_evset = tp.evaluate(d_node, [a_evset])
+>>> # d_evset = tp.evaluate(d_node, a_evset)
+>>> d_evset = d_node.evaluate({a_node: a_evset})
+>>> # d_evset = d_node.evaluate({"a": a_evset})
+>>> # d_evset = d_node.evaluate([a_evset])
+>>> # d_evset = d_node.evaluate(a_evset)
+
 ```
 
 **Warning:** It is more efficient to evaluate multiple output `Nodes` together with `tp.evaluate` than to evaluate them separately with `node_1.evaluate(...)`, `node_2.evaluate(...)`, etc. Only use `node.evaluate` for debugging purposes or when you only have a single output `Node`.
@@ -157,19 +161,19 @@ Previously, we defined the input of the graph `a_node` with `tp.input_node`. Thi
 If an `EventSet` is available (i.e., data is available) this step can be changed to use `evset.node()` instead, which will return a `Node` that is compatible with it. This is especially useful when creating `EventSets` from existing data, such as pandas DataFrames or CSV files.
 
 ```python
-# Define an EventSet.
-a_evset = tp.event_set(
-	timestamps=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-	features={
-        "feature_1": [1.0, 2.0, 3.0, 4.0, 2.0, 3.0, 4.0, 5.0, 6.0, 3.0],
-        "feature_2": [54, 23, 53, 12, 12, 32, 23, 12, 2, 4],
-	},
-    name="a",
-)
+>>> # Define an EventSet.
+>>> a_evset = tp.event_set(
+... 	timestamps=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+... 	features={
+...         "feature_1": [1.0, 2.0, 3.0, 4.0, 2.0, 3.0, 4.0, 5.0, 6.0, 3.0],
+...         "feature_2": [54, 23, 53, 12, 12, 32, 23, 12, 2, 4],
+... 	},
+...     name="a",
+... )
 
-# Define the input of a graph using an existing EventSet.
-# This line is equivalent to the `tp.input_node` line above.
-a_node = a_data.node()
+>>> # Define the input of a graph using an existing EventSet.
+>>> # This line is equivalent to the `tp.input_node` line above.
+>>> a_node = a_evset.node()
 
 # ... Define operators and evaluate the graph as above.
 ```
@@ -184,32 +188,29 @@ Calendar operators require the time in their inputs to be Unix time, so applying
 
 ```python
 >>> a_evset = tp.event_set(
->>>     timestamps=[
->>>         pd.to_datetime("Monday Mar 13 12:00:00 2023", utc=True),
->>>         pd.to_datetime("Tuesday Mar 14 12:00:00 2023", utc=True),
->>>         pd.to_datetime("Friday Mar 17 00:00:01 2023", utc=True),
->>>     ],
->>>     features={
->>>         "feature_1": [1, 2, 3],
->>>         "feature_2": ["a", "b", "c"],
->>>     },
->>> )
+...     timestamps=[
+...         pd.to_datetime("Monday Mar 13 12:00:00 2023", utc=True),
+...         pd.to_datetime("Tuesday Mar 14 12:00:00 2023", utc=True),
+...         pd.to_datetime("Friday Mar 17 00:00:01 2023", utc=True),
+...     ],
+...     features={
+...         "feature_1": [1, 2, 3],
+...         "feature_2": ["a", "b", "c"],
+...     },
+... )
 >>> a_node = a_evset.node()
 >>> b_node = tp.glue(a_node, tp.calendar_day_of_week(a_node))
->>> print(b_node.evaluate(a_evset))
+>>> b_node.evaluate(a_evset)
+indexes: ...
+features: [('feature_1', int64), ('feature_2', str_), ('calendar_day_of_week', int32)]
+events:
+     (3 events):
+        timestamps: [1.6787e+09 1.6788e+09 1.6790e+09]
+        'feature_1': [1 2 3]
+        'feature_2': ['a' 'b' 'c']
+        'calendar_day_of_week': [0 1 4]
+...
 
-EventSet(
-    timestamps=[
-        pd.Timestamp("2023-03-13 12:00:00+0000", tz="UTC"),
-        pd.Timestamp("2023-03-14 12:00:00+0000", tz="UTC"),
-        pd.Timestamp("2023-03-17 00:00:01+0000", tz="UTC"),
-    ],
-    features={
-        "feature_1": [1, 2, 3],
-        "feature_2": ["a", "b", "c"],
-        "calendar_day_of_week": [0, 1, 4],
-    },
-)
 ```
 
 Temporian accepts time inputs in various formats, including integer, float, Python date or datetime, NumPy datetime, and pandas datetime. Date and datetime objects are internally converted to floats as Unix time in seconds, compatible with the calendar operators.
@@ -217,11 +218,14 @@ Temporian accepts time inputs in various formats, including integer, float, Pyth
 Operators can take _durations_ as input arguments. For example, the simple moving average operator takes a `window_length` argument. Temporian exposes several utility functions to help creating those duration arguments when using Unix timestamps:
 
 ```python
-# Define a 1-day moving average.
-b = tp.simple_moving_avegage(a, window_length = tp.duration.days(1))
+>>> a = tp.input_node(features=[("feature_1", tp.float64)])
+>>>
+>>> # Define a 1-day moving average.
+>>> b = tp.simple_moving_average(a, window_length=tp.duration.days(1))
+>>>
+>>> # Equivalent.
+>>> b = tp.simple_moving_average(a, window_length=24 * 60 * 60)
 
-# Equivalent.
-b = tp.simple_moving_avegage(a, window_length = 24 * 60 * 60)
 ```
 
 ## Plotting
@@ -235,14 +239,15 @@ The `evset.plot()` function is shorter to write and is used for displaying a sin
 Here's an example of using the `evset.plot()` function:
 
 ```python
-evset = tp.event_set(
-	timestamps=[1, 2, 3, 4, 5],
-	features={
-        "feature_1": [0.5, 0.6, 0.4, 0.4, 0.9],
-        "feature_2": ["red", "blue", "red", "blue", "green"]
-    }
-)
-evset.plot()
+>>> evset = tp.event_set(
+... 	timestamps=[1, 2, 3, 4, 5],
+... 	features={
+...         "feature_1": [0.5, 0.6, 0.4, 0.4, 0.9],
+...         "feature_2": ["red", "blue", "red", "blue", "green"]
+...     }
+... )
+>>> evset.plot()
+
 ```
 
 By default, the plotting style is selected automatically based on the data.
@@ -252,20 +257,23 @@ For example, uniformly sampled numerical features (i.e., time series) are plotte
 Here's an example of using the `evset.plot()` function with options:
 
 ```python
-figure = evset.plot(
-    style="marker",
-    width_px=400,
-    min_time=2,
-    max_time=10,
-    return_fig=True,
-)
+>>> figure = evset.plot(
+...     style="marker",
+...     width_px=400,
+...     min_time=2,
+...     max_time=10,
+...     return_fig=True,
+... )
+
 ```
 
 The plots are static images by default. However, interactive plotting can be very powerful. To enable interactive plotting, use `interactive=True`. Note that interactive plotting requires the `bokeh` Python library to be installed.
 
 ```python
 !pip install bokeh -q
-events.plot(interactive=True)
+
+>>> events.plot(interactive=True)
+
 ```
 
 ## Feature naming
@@ -274,11 +282,11 @@ Each feature is identified by a name, and the list of features is available thro
 
 ```python
 >>> events = tp.event_set(
->>> 	timestamps=[1,2,3,4,5],
->>> 	features={
->>> 	    "feature_1": [0.5, 0.6, 0.4, 0.4, 0.9],
->>> 	    "feature_2": [1.0, 2.0, 3.0, 2.0, 1.0]}
->>>     )
+... 	timestamps=[1,2,3,4,5],
+... 	features={
+... 	    "feature_1": [0.5, 0.6, 0.4, 0.4, 0.9],
+... 	    "feature_2": [1.0, 2.0, 3.0, 2.0, 1.0]}
+...     )
 >>> node = events.node()
 >>> print(node.feature_names)
 
