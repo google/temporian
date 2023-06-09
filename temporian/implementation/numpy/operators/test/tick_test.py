@@ -31,11 +31,11 @@ class TickOperatorTest(absltest.TestCase):
     def setUp(self):
         pass
 
-    def test_no_rounding(self):
+    def test_no_align(self):
         evset = event_set([1, 5.5])
         expected_output = event_set([1, 5])
 
-        op = Tick(input=evset.node(), interval=4.0, rounding=False)
+        op = Tick(input=evset.node(), interval=4.0, align=False)
         instance = TickNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
         output = instance.call(input=evset)["output"]
@@ -46,18 +46,18 @@ class TickOperatorTest(absltest.TestCase):
         evset = event_set([0, 4, 8])
         expected_output = event_set([0, 4, 8])
 
-        op = Tick(input=evset.node(), interval=4.0, rounding=False)
+        op = Tick(input=evset.node(), interval=4.0, align=False)
         instance = TickNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
         output = instance.call(input=evset)["output"]
 
         assertEqualEventSet(self, output, expected_output)
 
-    def test_rounding(self):
+    def test_align(self):
         evset = event_set([1, 5.5, 8.1])
         expected_output = event_set([4, 8])
 
-        op = Tick(input=evset.node(), interval=4.0, rounding=True)
+        op = Tick(input=evset.node(), interval=4.0, align=True)
         instance = TickNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
         output = instance.call(input=evset)["output"]
@@ -68,29 +68,29 @@ class TickOperatorTest(absltest.TestCase):
         evset = event_set([])
         expected_output = event_set([])
 
-        op = Tick(input=evset.node(), interval=4.0, rounding=False)
+        op = Tick(input=evset.node(), interval=4.0, align=False)
         instance = TickNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
         output = instance.call(input=evset)["output"]
 
         assertEqualEventSet(self, output, expected_output)
 
-    def test_no_rounding_single(self):
+    def test_no_align_single(self):
         evset = event_set([1])
         expected_output = event_set([1])
 
-        op = Tick(input=evset.node(), interval=4.0, rounding=False)
+        op = Tick(input=evset.node(), interval=4.0, align=False)
         instance = TickNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
         output = instance.call(input=evset)["output"]
 
         assertEqualEventSet(self, output, expected_output)
 
-    def test_rounding_single(self):
+    def test_align_single(self):
         evset = event_set([1])
         expected_output = event_set([])
 
-        op = Tick(input=evset.node(), interval=4.0, rounding=True)
+        op = Tick(input=evset.node(), interval=4.0, align=True)
         instance = TickNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
         output = instance.call(input=evset)["output"]
