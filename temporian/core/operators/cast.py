@@ -64,9 +64,10 @@ class CastOperator(Operator):
             check_overflow: Check for casting overflow.
             dtype: All the input features are casted to dtype.
             dtype_to_dtype: Mapping between feature name and new dtype.
-            feature_name_to_dtype: Mapping between current dtype and new dtype.
+                feature_name_to_dtype: Mapping between current dtype and new
+                dtype.
             dtypes: Dtype for each of the input feature (indexed by feature
-            idx).
+                idx).
         """
 
         super().__init__()

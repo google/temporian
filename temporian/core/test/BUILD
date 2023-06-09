@@ -70,7 +70,7 @@ py_test(
         # already_there/absl/testing:absltest
         "//temporian",
         "//temporian/core:graph",
-        "//temporian/core:serialization",
+        "//temporian/core/serialization:serialize",
         "//temporian/core/data:dtype",
         "//temporian/implementation/numpy/data:io",
     ],

@@ -25,7 +25,9 @@
 
 # NOTE: Wildcard imports (*) are treated and parsed as part of root-level
 # imports, so same rules apply to modules imported with a wildcard.
-# Also, note that they are shown as subfolders in the documentation.
+# Also:
+# - Modules imported with wildcards are shown as subfolders in the docs.
+# - Wildcard imports are only allowed for modules, which must have an init file.
 
 # pylint: disable=wrong-import-position
 # pylint: disable=line-too-long
@@ -47,6 +49,7 @@ from temporian.core.data.node import input_node
 # Dtypes
 from temporian.core.data import dtype as _dtype
 
+# TODO: Show these in the docs.
 float32 = _dtype.DType.FLOAT32
 float64 = _dtype.DType.FLOAT64
 int32 = _dtype.DType.INT32
@@ -57,18 +60,15 @@ str_ = _dtype.DType.STRING
 # Schema
 from temporian.core.data.schema import Schema
 
-# Duration
-# TODO: Only export the durations (e.g. milliseconds, seconds).
+# Durations
 from temporian.core.data import duration
-
 
 # Event set
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.io import event_set
 
 # Graph serialization
-from temporian.core.serialization import load
-from temporian.core.serialization import save
+from temporian.core.serialization import *
 
 # Graph execution
 from temporian.core.evaluation import evaluate

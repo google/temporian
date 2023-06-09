@@ -68,7 +68,7 @@ def save(
 
     g = graph.infer_graph_named_nodes(inputs=inputs, outputs=outputs)
 
-    proto = serialize(g)
+    proto = _serialize(g)
     with open(path, "wb") as f:
         f.write(text_format.MessageToBytes(proto))
 
@@ -89,7 +89,7 @@ def load(
 
     with open(path, "rb") as f:
         proto = text_format.Parse(f.read(), pb.Graph())
-    g = unserialize(proto)
+    g = _unserialize(proto)
 
     inputs = g.named_inputs
     outputs = g.named_outputs
@@ -106,7 +106,7 @@ def load(
     return inputs, outputs
 
 
-def serialize(src: graph.Graph) -> pb.Graph:
+def _serialize(src: graph.Graph) -> pb.Graph:
     """Serializes a graph into a protobuffer."""
 
     if src.named_inputs is None:
@@ -128,7 +128,7 @@ def serialize(src: graph.Graph) -> pb.Graph:
     )
 
 
-def unserialize(src: pb.Graph) -> graph.Graph:
+def _unserialize(src: pb.Graph) -> graph.Graph:
     """Unserializes a protobuffer into a graph."""
 
     # Decode the components.
@@ -207,7 +207,7 @@ def _identifier_or_none(item: Any) -> Optional[str]:
     return str(id(item))
 
 
-def all_identifiers(collection: Any) -> Set[str]:
+def _all_identifiers(collection: Any) -> Set[str]:
     """Builds the set of identifiers of a collections of nodes/features/..."""
     return {_identifier(x) for x in collection}
 

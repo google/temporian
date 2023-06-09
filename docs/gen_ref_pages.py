@@ -49,21 +49,11 @@ while files_to_parse:
 
                 # Handle wildcard imports by parsing the imported module
                 if name == "*":
+                    # Add the module's __init__ file to the stack if it exists
                     module_path = Path(words[1].replace(".", "/"))
-                    module_name = module_path.name
-
-                    # If the imported module is a file, add the file itself
-                    if module_path.with_suffix(".py").exists():
-                        files_to_parse.append(
-                            (module_name, module_path.with_suffix(".py"))
-                        )
-                        continue
-
-                    # If it is a module, add its __init__ file
-                    elif (module_path / "__init__.py").exists():
-                        files_to_parse.append(
-                            (module_name, module_path / "__init__.py")
-                        )
+                    init_path = module_path / "__init__.py"
+                    if init_path.exists():
+                        files_to_parse.append((module_path.name, init_path))
                         continue
 
                     else:

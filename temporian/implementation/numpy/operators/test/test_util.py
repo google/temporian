@@ -15,7 +15,7 @@
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 from temporian.core.operators.base import Operator
-from temporian.core import serialization
+from temporian.core.serialization import serialize
 
 
 def assertEqualEventSet(self, real: EventSet, expected: EventSet):
@@ -41,12 +41,12 @@ def testOperatorAndImp(self, op: Operator, imp: OperatorImplementation):
     # TODO: Add tests related to the implementation.
     del imp
 
-    serialized_op = serialization._serialize_operator(op)
+    serialized_op = serialize._serialize_operator(op)
 
     nodes = {}
     for node in op.inputs.values():
-        nodes[serialization._identifier(node)] = node
+        nodes[serialize._identifier(node)] = node
     for node in op.outputs.values():
-        nodes[serialization._identifier(node)] = node
+        nodes[serialize._identifier(node)] = node
 
-    _ = serialization._unserialize_operator(serialized_op, nodes)
+    _ = serialize._unserialize_operator(serialized_op, nodes)
