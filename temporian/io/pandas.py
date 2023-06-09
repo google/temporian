@@ -87,7 +87,7 @@ def from_pandas(
 
 
 def to_pandas(
-    evtset: EventSet,
+    evset: EventSet,
 ) -> "pandas.DataFrame":
     """Convert an EventSet to a pandas DataFrame.
 
@@ -103,12 +103,12 @@ def to_pandas(
 
     # Collect data into a dictionary.
     column_names = (
-        evtset.schema.index_names()
-        + evtset.schema.feature_names()
+        evset.schema.index_names()
+        + evset.schema.feature_names()
         + [timestamp_key]
     )
     data = {column_name: [] for column_name in column_names}
-    for index_key, index_data in evtset.data.items():
+    for index_key, index_data in evset.data.items():
         assert isinstance(index_key, tuple)
 
         # Timestamps
@@ -116,12 +116,12 @@ def to_pandas(
 
         # Features
         for feature_name, feature in zip(
-            evtset.schema.feature_names(), index_data.features
+            evset.schema.feature_names(), index_data.features
         ):
             data[feature_name].extend(feature)
 
         # Indexes
-        for i, index_name in enumerate(evtset.schema.index_names()):
+        for i, index_name in enumerate(evset.schema.index_names()):
             data[index_name].extend([index_key[i]] * len(index_data.timestamps))
 
     return pd.DataFrame(data)

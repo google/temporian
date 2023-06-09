@@ -30,7 +30,6 @@ class SimpleMovingAverageOperator(BaseWindowOperator):
     """
 
     @classmethod
-    @property
     def operator_def_key(cls) -> str:
         return "SIMPLE_MOVING_AVERAGE"
 

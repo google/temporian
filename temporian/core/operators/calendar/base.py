@@ -45,7 +45,7 @@ class BaseCalendarOperator(Operator, ABC):
         self.add_output(
             "output",
             create_node_new_features_existing_sampling(
-                features=[(self.output_feature_name, DType.INT32)],
+                features=[(self.output_feature_name(), DType.INT32)],
                 sampling_node=sampling,
                 creator=self,
             ),
@@ -55,19 +55,17 @@ class BaseCalendarOperator(Operator, ABC):
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
-            key=cls.operator_def_key,
+            key=cls.operator_def_key(),
             inputs=[pb.OperatorDef.Input(key="sampling")],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
 
     @classmethod
-    @property
     @abstractmethod
     def operator_def_key(cls) -> str:
         """Gets the key of the operator definition."""
 
     @classmethod
-    @property
     @abstractmethod
     def output_feature_name(cls) -> str:
         """Gets the name of the generated feature in the output node."""
