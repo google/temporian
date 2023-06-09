@@ -76,17 +76,18 @@ plugins:
           options:
             # https://mkdocstrings.github.io/python/usage/#globallocal-options
             docstring_style: google
-            heading_level: 2
+            heading_level: 1
             members_order: source
             show_source: true
-            show_category_heading: true
             show_submodules: true
             merge_init_into_class: false
             show_signature: true
             separate_signature: true
-            show_signature_annotations: false
+            show_signature_annotations: true
             show_if_no_docstring: false # TODO: TBD if we want this enabled
-            group_by_category: false
+            group_by_category: true
+            show_category_heading: false
+            show_root_heading: true
 
 # Customization for Markdown
 markdown_extensions:

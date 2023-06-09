@@ -84,6 +84,8 @@ if non_parsable_imports:
         " <symbol> as <name>`, or `from <module> import *`."
     )
 
+nav["temporian"] = "index.md"
+
 for symbol, path in sorted(members):
     symbol_path = Path(symbol.replace(".", "/"))
     symbol_name = symbol_path.name
@@ -97,11 +99,10 @@ for symbol, path in sorted(members):
     nav[parts] = doc_path.as_posix()
 
     with mkdocs_gen_files.open(full_doc_path, "w") as fd:
-        print("# tp." + symbol_name, file=fd)
         identifier = ".".join(list(src_path.parts))
         print("::: " + identifier, file=fd)
 
     mkdocs_gen_files.set_edit_path(full_doc_path, path)
 
-with mkdocs_gen_files.open("reference/index.md", "w") as nav_file:
+with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
     nav_file.writelines(nav.build_literate_nav())

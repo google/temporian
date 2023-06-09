@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 """Begin operator class and public API function definitions."""
 
 from temporian.core import operator_lib
@@ -66,5 +65,4 @@ def begin(input: Node) -> Node:
     Returns:
         A feature-less node with a single timestamp.
     """
-
     return Begin(input=input).outputs["output"]
