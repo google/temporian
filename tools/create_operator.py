@@ -73,8 +73,7 @@ def main(argv):
         "w",
         encoding="utf-8",
     ) as file:
-        file.write(
-            f'''{license_content()}
+        file.write(f'''{license_content()}
 
 """{capitalized_op} operator class and public API function definitions."""
 
@@ -128,8 +127,7 @@ def {lower_op}(input: Node, param: float) -> Node:
 
     return {capitalized_op}(input=input, param=param).outputs["output"]
 
-'''
-        )
+''')
 
     # Operator build
     with open(
@@ -137,8 +135,7 @@ def {lower_op}(input: Node, param: float) -> Node:
         "a",
         encoding="utf-8",
     ) as file:
-        file.write(
-            f"""
+        file.write(f"""
 py_library(
     name = "{lower_op}",
     srcs = ["{lower_op}.py"],
@@ -151,8 +148,7 @@ py_library(
         "//temporian/proto:core_py_proto",
     ],
 )
-    """
-        )
+    """)
 
     # Operator implementation
     with open(
@@ -166,8 +162,7 @@ py_library(
         "w",
         encoding="utf-8",
     ) as file:
-        file.write(
-            f'''{license_content()}
+        file.write(f'''{license_content()}
 
 """Implementation for the {capitalized_op} operator."""
 
@@ -194,8 +189,7 @@ class {capitalized_op}NumpyImplementation(OperatorImplementation):
 implementation_lib.register_operator_implementation(
     {capitalized_op}, {capitalized_op}NumpyImplementation
 )
-'''
-        )
+''')
 
     # Operator implementation build
     with open(
@@ -205,14 +199,13 @@ implementation_lib.register_operator_implementation(
         "a",
         encoding="utf-8",
     ) as file:
-        file.write(
-            f"""
+        file.write(f"""
 py_library(
     name = "{lower_op}",
     srcs = ["{lower_op}.py"],
     srcs_version = "PY3",
     deps = [ ":base",
-        "//temporian/core/data:duration",
+        "//temporian/core/data:duration_utils",
         "//temporian/core/operators:{lower_op}",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy:utils",
@@ -220,8 +213,7 @@ py_library(
     ],
 )
 
-    """
-        )
+    """)
 
     # Operator implementation test
     with open(
@@ -236,8 +228,7 @@ py_library(
         "w",
         encoding="utf-8",
     ) as file:
-        file.write(
-            f"""{license_content()}
+        file.write(f"""{license_content()}
 
 from absl.testing import absltest
 
@@ -287,8 +278,7 @@ class {capitalized_op}OperatorTest(absltest.TestCase):
 if __name__ == "__main__":
     absltest.main()
 
-"""
-        )
+""")
 
     # Operator implementation test  build
     with open(
@@ -298,8 +288,7 @@ if __name__ == "__main__":
         "a",
         encoding="utf-8",
     ) as file:
-        file.write(
-            f"""
+        file.write(f"""
 py_test(
     name = "{lower_op}_test",
     srcs = ["{lower_op}_test.py"],
@@ -312,8 +301,7 @@ py_test(
         "//temporian/implementation/numpy/operators:{lower_op}",
     ],
 )
-    """
-        )
+    """)
 
 
 if __name__ == "__main__":

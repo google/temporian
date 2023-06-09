@@ -7,6 +7,16 @@ package(
 # =========
 
 py_library(
+    name = "io",
+    srcs = ["__init__.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":csv",
+        ":pandas",
+    ],
+)
+
+py_library(
     name = "csv",
     srcs = ["csv.py"],
     srcs_version = "PY3",

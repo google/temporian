@@ -19,7 +19,7 @@ from typing import Optional
 import numpy as np
 
 from temporian.core import operator_lib
-from temporian.core.data.duration import Duration, normalize_duration
+from temporian.core.data.duration_utils import Duration, normalize_duration
 from temporian.core.data.node import Node
 from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.window.base import BaseWindowOperator

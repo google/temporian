@@ -15,7 +15,7 @@
 """Checks that the expected operators are registered."""
 
 from absl.testing import absltest
-from temporian.implementation.numpy.operators import all_operators as imps
+from temporian.implementation.numpy import operators as imps
 from temporian.implementation.numpy import implementation_lib
 
 

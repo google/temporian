@@ -18,7 +18,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 
-from temporian.core.data.duration import NormalizedDuration
+from temporian.core.data.duration_utils import NormalizedDuration
 from temporian.core.data import dtype
 from temporian.core.data.node import (
     Node,

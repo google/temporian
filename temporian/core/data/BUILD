@@ -43,6 +43,15 @@ py_library(
     srcs = ["duration.py"],
     srcs_version = "PY3",
     deps = [
+        ":duration_utils",
+    ],
+)
+
+py_library(
+    name = "duration_utils",
+    srcs = ["duration_utils.py"],
+    srcs_version = "PY3",
+    deps = [
         # already_there/numpy
-        ],
+    ],
 )

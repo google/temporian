@@ -6,13 +6,15 @@ package(
 # Libraries
 # =========
 py_library(
-    name = "all_operators",
-    srcs = ["all_operators.py"],
+    name = "operators",
+    srcs = ["__init__.py"],
     srcs_version = "PY3",
     deps = [
         ":add_index",
+        ":begin",
         ":cast",
         ":drop_index",
+        ":end",
         ":filter",
         ":glue",
         ":lag",
@@ -25,8 +27,6 @@ py_library(
         ":since_last",
         ":unary",
         ":unique_timestamps",
-        ":begin",
-        ":end",
         "//temporian/core/operators/binary",
         "//temporian/core/operators/calendar:day_of_month",
         "//temporian/core/operators/calendar:day_of_week",
@@ -105,7 +105,7 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:duration",
+        "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
         "//temporian/proto:core_py_proto",
     ],
@@ -118,7 +118,7 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:duration",
+        "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",

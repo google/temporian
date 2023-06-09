@@ -36,7 +36,7 @@ py_library(
         # already_there/pandas
         "//temporian/core:evaluation",
         "//temporian/core/data:schema",
-        "//temporian/core/operators:all_operators",
+        "//temporian/core/operators",
     ],
 )
 

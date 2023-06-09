@@ -5,7 +5,7 @@ from typing import Optional, List, Set
 
 import numpy as np
 
-from temporian.core.data import duration
+from temporian.core.data.duration_utils import normalize_timestamp
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.plotter import (
     Options,
@@ -168,13 +168,13 @@ def _matplotlib_sub_plot(
         args = {}
         if options.min_time is not None:
             args["left"] = (
-                duration.normalize_timestamp(options.min_time)
+                normalize_timestamp(options.min_time)
                 if not is_unix_timestamp
                 else options.min_time
             )
         if options.max_time is not None:
             args["right"] = (
-                duration.normalize_timestamp(options.max_time)
+                normalize_timestamp(options.max_time)
                 if not is_unix_timestamp
                 else options.max_time
             )

@@ -7,13 +7,15 @@ package(
 # =========
 
 py_library(
-    name = "all_operators",
-    srcs = ["all_operators.py"],
+    name = "operators",
+    srcs = ["__init__.py"],
     srcs_version = "PY3",
     deps = [
         ":add_index",
+        ":begin",
         ":cast",
         ":drop_index",
+        ":end",
         ":filter",
         ":glue",
         ":lag",
@@ -26,8 +28,6 @@ py_library(
         ":since_last",
         ":unary",
         ":unique_timestamps",
-        ":begin",
-        ":end",
         "//temporian/implementation/numpy/operators/binary:arithmetic",
         "//temporian/implementation/numpy/operators/binary:logical",
         "//temporian/implementation/numpy/operators/binary:relational",
@@ -49,12 +49,6 @@ py_library(
         "//temporian/implementation/numpy/operators/window:moving_sum",
         "//temporian/implementation/numpy/operators/window:simple_moving_average",
     ],
-)
-
-py_library(
-    name = "operators",
-    srcs = ["__init__.py"],
-    srcs_version = "PY3",
 )
 
 py_library(
@@ -191,7 +185,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
-        "//temporian/core/data:duration",
+        "//temporian/core/data:duration_utils",
         "//temporian/core/operators:resample",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
@@ -260,14 +254,13 @@ py_library(
     deps = [
         # already_there/numpy
         ":base",
-        "//temporian/core/data:duration",
+        "//temporian/core/data:duration_utils",
         "//temporian/core/operators:begin",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",
     ],
 )
-
 
 py_library(
     name = "end",
@@ -276,7 +269,7 @@ py_library(
     deps = [
         # already_there/numpy
         ":base",
-        "//temporian/core/data:duration",
+        "//temporian/core/data:duration_utils",
         "//temporian/core/operators:end",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy:utils",

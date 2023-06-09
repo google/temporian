@@ -19,7 +19,7 @@ from enum import Enum
 
 import numpy as np
 
-from temporian.core.data import duration
+from temporian.core.data import duration_utils
 from temporian.implementation.numpy.data.event_set import EventSet
 
 
@@ -43,8 +43,8 @@ class Options(NamedTuple):
     height_per_plot_px: int
     width_px: int
     max_points: Optional[int]
-    min_time: Optional[duration.Timestamp]
-    max_time: Optional[duration.Timestamp]
+    min_time: Optional[duration_utils.Timestamp]
+    max_time: Optional[duration_utils.Timestamp]
     max_num_plots: int
     style: Style
     interactive: bool
@@ -57,8 +57,8 @@ def plot(
     width_px: int = 1024,
     height_per_plot_px: int = 150,
     max_points: Optional[int] = None,
-    min_time: Optional[duration.Timestamp] = None,
-    max_time: Optional[duration.Timestamp] = None,
+    min_time: Optional[duration_utils.Timestamp] = None,
+    max_time: Optional[duration_utils.Timestamp] = None,
     max_num_plots: int = 20,
     style: Union[Style, str] = Style.auto,
     return_fig: bool = False,
@@ -151,12 +151,12 @@ def plot(
         height_per_plot_px=height_per_plot_px,
         max_points=max_points,
         min_time=(
-            duration.normalize_timestamp(min_time)
+            duration_utils.normalize_timestamp(min_time)
             if min_time is not None
             else None
         ),
         max_time=(
-            duration.normalize_timestamp(max_time)
+            duration_utils.normalize_timestamp(max_time)
             if max_time is not None
             else None
         ),

@@ -3,7 +3,6 @@ package(
     licenses = ["notice"],
 )
 
-
 py_library(
     name = "utils",
     srcs = ["utils.py"],
@@ -96,6 +95,6 @@ py_test(
     deps = [
         # already_there/absl/testing:absltest
         "//temporian/core:operator_lib",
-        "//temporian/core/operators:all_operators",
+        "//temporian/core/operators",
     ],
 )

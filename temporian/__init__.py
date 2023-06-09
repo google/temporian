@@ -25,6 +25,7 @@
 
 # NOTE: Wildcard imports (*) are treated and parsed as part of root-level
 # imports, so same rules apply to modules imported with a wildcard.
+# Also, note that they are shown as subfolders in the documentation.
 
 # pylint: disable=wrong-import-position
 # pylint: disable=line-too-long
@@ -32,7 +33,8 @@
 __version__ = "0.0.1"
 
 # Register the ops definitions and implementations.
-from temporian.implementation.numpy.operators import all_operators as _impls
+from temporian.core.operator_lib import registered_operators as _ops
+from temporian.implementation.numpy import operators as _impls
 
 
 # Actual API
@@ -72,15 +74,10 @@ from temporian.core.serialization import save
 from temporian.core.evaluation import evaluate
 
 # Operators
-from temporian.core.operators.all_operators import *
-from temporian.core.operator_lib import registered_operators as get_operators
+from temporian.core.operators import *
 
 # IO
-from temporian.io.csv import to_csv
-from temporian.io.csv import from_csv
-
-from temporian.io.pandas import to_pandas
-from temporian.io.pandas import from_pandas
+from temporian.io import *
 
 # Plotting
 from temporian.implementation.numpy.data.plotter import plot
