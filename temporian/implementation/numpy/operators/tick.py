@@ -59,7 +59,7 @@ class TickNumpyImplementation(OperatorImplementation):
 
                 dst_timestamps = np.arange(
                     begin,
-                    math.nextafter(end, math.inf),
+                    np.nextafter(end, math.inf),
                     self.operator.interval,
                     dtype=np.float64,
                 )
