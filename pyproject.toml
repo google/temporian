@@ -1,14 +1,11 @@
 [tool.poetry]
 name = "temporian"
-version = "0.1.0"
-description = "Temporian is a library to pre-process temporal signals before their use as input features with off-the-shelf tabular machine learning libraries (e.g., TensorFlow Decision Forests)."
-authors = ["Google Inc."]
-maintainers = [
-    "Mathieu Guillame-Bert <gbm@google.com>",
-    "Guillermo Etchebarne <getchebarne@tryolabs.com>",
-    "Ian Spektor <ispektor@tryolabs.com>",
-    "Richard Stotz <richardstotz@google.com>",
+version = "0.1.1"
+description = "Temporian is a Python package for feature engineering of temporal data, focusing on preventing common modeling errors and providing a simple and powerful API, a first-class iterative development experience, and efficient and well-tested implementations of common and not-so-common temporal data preprocessing functions."
+authors = [
+    "Mathieu Guillame-Bert, Braulio Ríos, Guillermo Etchebarne, Ian Spektor, Richard Stotz <gbm@google.com>",
 ]
+maintainers = ["Mathieu Guillame-Bert <gbm@google.com>"]
 repository = "https://github.com/google/temporian"
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
@@ -48,7 +45,7 @@ isort = "^5.12.0"
 toml = "^0.10.2"
 pylint = "^2.15.10"
 memory-profiler = "^0.61.0"
-# scalene = "^1.5.20" # Scalene doesn't support Python 3.11 yet
+# scalene = "^1.5.20" # FIXME: scalene doesn't support Python 3.11
 mkdocs = "^1.4.2"
 mkdocstrings = { extras = ["python"], version = "^0.20.0" }
 mkdocs-material = "^9.1.5"

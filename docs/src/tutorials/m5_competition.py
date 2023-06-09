@@ -319,8 +319,9 @@ tabular_dataset_data.plot(**plot_options).savefig(
 print("Export to csv file")
 print("==================")
 
-tabular_dataset_data.to_pandas().to_csv(
-    os.path.join(work_directory, "tabular_dataset.csv"), index=False
+tp.to_csv(
+    tabular_dataset_data,
+    path=os.path.join(work_directory, "tabular_dataset.csv"),
 )
 
 print("The artefacts are available in:", work_directory)

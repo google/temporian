@@ -42,7 +42,6 @@ class BaseLogicalOperator(BaseBinaryOperator):
         return DType.BOOLEAN
 
     @classmethod
-    @property
     def operator_def_key(cls) -> str:
         return cls.OP_NAME.upper()
 

@@ -21,12 +21,10 @@ from temporian.core.operators.calendar.base import BaseCalendarOperator
 
 class CalendarMinuteOperator(BaseCalendarOperator):
     @classmethod
-    @property
     def operator_def_key(cls) -> str:
         return "CALENDAR_MINUTE"
 
     @classmethod
-    @property
     def output_feature_name(cls) -> str:
         return "calendar_minute"
 

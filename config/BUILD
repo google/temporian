@@ -5,6 +5,6 @@ sh_binary(
     srcs = ["move_generated_files.sh"],
     data = [
         "//temporian/implementation/numpy_cc/operators:operators_cc",
-        #"//temporian/proto:core_pb2.py",
+        "//temporian/proto:core_py_proto",
     ],
 )
