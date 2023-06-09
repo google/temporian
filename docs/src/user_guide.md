@@ -140,17 +140,21 @@ The `<inputs>` can be specified as a dictionary of `Nodes` to `EventSets`, a dic
 To simplify its usage when the graph contains a single output `Node`, `node.evaluate` is equivalent to `tp.evaluate(node, <inputs>)`.
 
 ```python
->>> # All these statements are equivalent.
+>>> # These statements are equivalent.
 >>> d_evset = tp.evaluate(d_node, {a_node: a_evset})
+>>> d_evset = d_node.evaluate({a_node: a_evset})
+
+```
+
+<!-- TODO
+# Not implemented yet:
 >>> # d_evset = tp.evaluate(d_node, {"a": a_evset})
 >>> # d_evset = tp.evaluate(d_node, [a_evset])
 >>> # d_evset = tp.evaluate(d_node, a_evset)
->>> d_evset = d_node.evaluate({a_node: a_evset})
 >>> # d_evset = d_node.evaluate({"a": a_evset})
 >>> # d_evset = d_node.evaluate([a_evset])
 >>> # d_evset = d_node.evaluate(a_evset)
-
-```
+-->
 
 **Warning:** It is more efficient to evaluate multiple output `Nodes` together with `tp.evaluate` than to evaluate them separately with `node_1.evaluate(...)`, `node_2.evaluate(...)`, etc. Only use `node.evaluate` for debugging purposes or when you only have a single output `Node`.
 
@@ -668,96 +672,185 @@ All operators presented so far work on a sequence of related events. For instanc
 
 It is sometimes desirable for events in an `EventSet` not to interact with each other. For example, assume a dataset containing the sum of daily sales of a set of products. The objective is to compute the sum of weekly sales of each product independently. In this scenario, the weekly moving sum should be applied individually to each product. If not, you would compute the weekly sales of all the products together.
 
-To compute the weekly sales of individual products, you can define the `product` feature as the `EventSet`'s _index_. The moving sum operator will then be applied independently to the events corresponding to each product.
+To compute the weekly sales of individual products, you can define the `product` feature as the _index_.
 
 ```python
-daily_sales = tp.event_set(
-	timestamps=[...],
-	features={
-        "product": [...],
-        "sale": [...],
-    },
-)
+>>> daily_sales = tp.event_set(
+... 	timestamps=["2020-01-01", "2020-01-01", "2020-01-02", "2020-01-02"],
+... 	features={
+...         "product": [1, 2, 1, 2],
+...         "sale": [100.0, 300.0, 90.0, 400.0],
+...     },
+...     index_features=["product"]
+... )
+>>> print(daily_sales)
+indexes: [('product', int64)]
+features: [('sale', float64)]
+events:
+    product=1 (2 events):
+        timestamps: [...]
+        'sale': [100. 90.]
+    product=2 (2 events):
+        timestamps: [...]
+        'sale': [300. 400.]
+...
 
-a = daily_sales.node()
+```
 
-# Set the "product" feature as the index.
-b = tp.add_index(a, "product")
+The moving sum operator will then be applied independently to the events corresponding to each product.
 
-# Compute the moving sum of each product individually.
-c = tp.moving_sum(b, window_length=tp.duration.weeks(1))
+```python
+>>> a = daily_sales.node()
+>>>
+>>> # Compute the moving sum of each index (product) individually.
+>>> b = tp.moving_sum(a, window_length=tp.duration.weeks(1))
+>>>
+>>> b.evaluate({a: daily_sales})
+indexes: [('product', int64)]
+features: [('sale', float64)]
+events:
+    product=1 (2 events):
+        timestamps: [...]
+        'sale': [100. 190.]
+    product=2 (2 events):
+        timestamps: [...]
+        'sale': [300. 700.]
+...
 
-c.evaluate({a: daily_sales})
 ```
 
 Horizontal operators can be understood as operators that are applied independently on each index.
 
-Operators that modify an `EventSet`'s index are called _vertical operators_. The most important vertical operators are:
+Operators that modify a node's index are called _vertical operators_. The most important vertical operators are:
 
 - `tp.add_index`: Add features to the index.
 - `tp.drop_index`: Remove features from the index, optionally keeping them as features.
 - `tp.set_index`: Changes the index.
 - `tp.propagate`: Expand an index based on another `EventSet`’s index.
 
-By default `EventSets` are _flat_, which means they have no index, and therefore all events are in a single global index group.
+By default, `EventSets` are _flat_, which means they have no index, and therefore all events are in a single global index group.
 
 Also, keep in mind that only string and integer features can be used as indexes.
 
 `EventSets` can have multiple features as index. In the next example, assume our daily sale aggregates are also annotated with `store` data.
 
 ```python
-daily_sales = tp.event_set(
-	timestamps=[...],
-	features={
-        "product": [...],
-        "store": [...],
-        "price": [...],
-        "quantity": [...],
-	}
-)
+>>> daily_sales = tp.event_set(
+... 	timestamps=["2020-01-01", "2020-01-01", "2020-01-02", "2020-01-02"],
+... 	features={
+...         "store": [1, 1, 1, 2],
+...         "product": [1, 2, 1, 2],
+...         "sale": [100.0, 200.0, 110.0, 300.0],
+...     },
+... )
+>>> print(daily_sales)
+indexes: []
+features: [('store', int64), ('product', int64), ('sale', float64)]
+events:
+     (4 events):
+        timestamps: [...]
+        'store': [1 1 1 2]
+        'product': [1 2 1 2]
+        'sale': [100. 200. 110. 300.]
+...
+
 ```
 
-Let's compute the daily sum of sales for each `(product, store)` pair.
+Since we haven't defined the `index_features` yet,
+the `store` and `product` are just regular features above.
+Let's add the `(product, store)` pair as the index.
 
 ```python
-a = daily_sales.node()
-b = tp.glue(
-    a,
-    tp.rename(
-        a["price"] * a["quantity"],
-        "sales"
-    ),
-)
-b = tp.add_index(b, ["product", "store"] )
+>>> a = daily_sales.node()
+>>> b = tp.add_index(a, ["product", "store"])
+>>> b.evaluate({a: daily_sales})
+indexes: [('product', int64), ('store', int64)]
+features: [('sale', float64)]
+events:
+    product=1 store=1 (2 events):
+        timestamps: [...]
+        'sale': [100. 110.]
+    product=2 store=1 (1 events):
+        timestamps: [...]
+        'sale': [200.]
+    product=2 store=2 (1 events):
+        timestamps: [...]
+        'sale': [300.]
+...
 
-# Moving sum computed individually for each (product, store).
-c = tp.moving_sum(b["sales"], window_length=tp.duration.weeks(1))
 ```
 
-Now, let's compute the daily sum of sales for each store.
+The `moving_sum` operator can be used to calculate the weekly sum of sales
+for each `(product, store)` pair.
 
 ```python
-d = tp.add_index(a, "store")
-e = tp.moving_sum(d["sales"], window_length=tp.duration.weeks(1))
+>>> # Weekly sales by product and store
+>>> c = tp.moving_sum(b["sale"], window_length=tp.duration.weeks(1))
+>>> c.evaluate({a: daily_sales})
+indexes: [('product', int64), ('store', int64)]
+features: [('sale', float64)]
+events:
+    product=1 store=1 (2 events):
+        timestamps: [...]
+        'sale': [100. 210.]
+    product=2 store=1 (1 events):
+        timestamps: [...]
+        'sale': [200.]
+    product=2 store=2 (1 events):
+        timestamps: [...]
+        'sale': [300.]
+...
 
-# Which is equivalent to
-d = tp.drop_index(b, "product")
-e = tp.moving_sum(d["sales"], window_length=tp.duration.weeks(1))
 ```
 
-Finally, let's compute the ratio of sales of each `(product, store)` pair compared to the corresponding `store`.
-
-Since `c` (daily sales for each product and store) and `e` (daily sales for each store) have different indexes, we cannot use `tp.divide` (or `/`) directly - we must first `propagate` `e` to the `["product", "store"]` index.
+If we want the weekly sum of sales per `store`, we can just drop the `product` index.
 
 ```python
-# Copy the content of e (indexed by (store)) into each (store, product).
-f = c / tp.propagate(e, sampling=c, resample=True)
+>>> # Weekly sales by store (including all products)
+>>> d = tp.drop_index(b, "product")
+>>> e = tp.moving_sum(d["sale"], window_length=tp.duration.weeks(1))
+>>> e.evaluate({a: daily_sales})
+indexes: [('store', int64)]
+features: [('sale', float64)]
+events:
+    store=1 (3 events):
+        timestamps: [...]
+        'sale': [300. 300. 410.]
+    store=2 (1 events):
+        timestamps: [...]
+        'sale': [300.]
+...
 
-# Equivalent.
-f = c / tp.resample(
-    tp.propagate(e, sampling=c),
-    sampling=c,
-)
+```
+
+Finally, let's calculate the ratio of sales of each `(product, store)` pair compared to the whole `store` sales.
+
+Since `c` (weekly sales for each product and store) and `e` (weekly sales for each store) have different indexes, we cannot use `tp.divide` (or `/`) directly - we must first `propagate` `e` to the `["product", "store"]` index.
+
+```python
+>>> # Copy the content of e (indexed by (store)) into each (store, product).
+>>> f = c / tp.propagate(e, sampling=c, resample=True)
+>>>
+>>> # Equivalent.
+>>> f = c / tp.resample(
+...     tp.propagate(e, sampling=c),
+...     sampling=c,
+... )
+>>> print(f.evaluate({a: daily_sales}))
+indexes: [('product', int64), ('store', int64)]
+features: [('div_sale_sale', float64)]
+events:
+    product=1 store=1 (2 events):
+        timestamps: [...]
+        'div_sale_sale': [0.3333 0.5122]
+    product=2 store=1 (1 events):
+        timestamps: [...]
+        'div_sale_sale': [0.6667]
+    product=2 store=2 (1 events):
+        timestamps: [...]
+        'div_sale_sale': [1.]
+...
+
 ```
 
 The `tp.propagate` operator expands the index of its `input` (`e` in this case) to match the index of its `sampling` by copying the content of `input` into each corresponding index group of `sampling`. Note that the features in `sampling`'s index must be a superset of the ones in `input`'s index.
@@ -770,24 +863,53 @@ Another type of leakage is future leakage, where a model uses data before it is 
 
 To avoid future leakage, Temporian operators are guaranteed to not cause future leakage, except for the `tp.leak` operator. This means that it is impossible to inadvertently add future leakage to a Temporian program.
 
-`tp.leak` can be useful for precomputing labels or evaluating machine learning models. However, its outputs shouldn’t be used as input features. To check programmatically if a `Node` depends on `tp.leak`, we can use the `tp.has_leak` function.
+`tp.leak` can be useful for precomputing labels or evaluating machine learning models. However, its outputs shouldn’t be used as input features.
 
 ```python
 >>> a = tp.input_node(features=[("feature_1", tp.float32)])
 >>> b = tp.moving_count(a, 1)
 >>> c = tp.moving_count(tp.leak(b, 1), 2)
 
->>> print(tp.has_leak(b))
-False
-
->>> print(tp.has_leak(c))
-True
 ```
 
-In this example, `b` does not have a future leak, but `c` does because it depends on `tp.leak`. By using `tp.has_leak`, we can programmatically identify future leakage and modify our code accordingly.
+In this example, `b` does not have a future leak, but `c` does because it depends on `tp.leak`.
+
+<!-- TODO: Not implemented yet
+
+To check programmatically if a `Node` depends on `tp.leak`, we can use the `tp.has_leak` function.
+```python
+# >>> print(tp.has_leak(b))
+# False
+
+# >>> print(tp.has_leak(c))
+# True
+
+```
+
+By using `tp.has_leak`, we can programmatically identify future leakage and modify our code accordingly.
+-->
 
 ## Accessing `EventSet` data
 
+`EventSet` data can be accessed using their `data` attribute. Temporian internally relies on NumPy, which means that the data access functions always return NumPy arrays.
+
+```python
+>>> evset = tp.event_set(
+... 	timestamps=[1, 2, 3, 5, 6],
+... 	features={
+...         "f1": [0.1, 0.2, 0.3, 1.1, 1.2],
+...         "f2": ["red", "red", "red", "blue", "blue"],
+... 	},
+... 	index_features=["f2"],
+... )
+>>>
+>>> # Access the data for the index `f2=red`.
+>>> evset.data[("red",)]
+IndexData(features=[array([0.1, 0.2, 0.3])], timestamps=array([1., 2., 3.]))
+
+```
+
+<!--
 `EventSet` data can be accessed using the `index()` and `feature()` functions. Temporian internally relies on NumPy, which means that the data access functions always return NumPy arrays.
 
 ```python
@@ -797,17 +919,20 @@ evset = tp.event_set(
         "f1": [0.1, 0.2, 0.3, 1.1, 1.2],
         "f2": ["red", "red", "red", "blue", "blue"],
 	},
-	index=["f2"],
+	index_features=["f2"],
 )
 
 # Access the data for the index `f2=red`.
 evset.index("red")
 
+
 # Equivalent.
 evset.index(("red", ))
 
+
 # Access the data for the index `f2=red` and feature `f1`.
 evset.index("red").feature("f1")
+
 ```
 
 If an `EventSet` does not have an index, `feature` can be called directly:
@@ -822,6 +947,7 @@ evset = tp.event_set(
 )
 evset.feature("f1")
 ```
+-->
 
 ## Import and export data
 
@@ -842,19 +968,18 @@ tp.to_csv(evset, path="path/to/file.csv")
 Converting `EventSet` data to and from pandas DataFrames is also easily done via `tp.to_pandas` and `tp.from_pandas`.
 
 ```python
-import pandas as pd
+>>> df = pd.DataFrame({
+...     "timestamp": [1, 2, 3, 5, 6],
+...     "f1": [0.1, 0.2, 0.3, 1.1, 1.2],
+...     "f2": ["red", "red", "red", "blue", "blue"],
+... })
+>>>
+>>> # Create EventSet from DataFrame.
+>>> evset = tp.from_pandas(df)
+>>>
+>>> # Convert EventSet to DataFrame.
+>>> df = tp.to_pandas(evset)
 
-df = pd.DataFrame({
-    "timestamp": [1, 2, 3, 5, 6],
-    "f1": [0.1, 0.2, 0.3, 1.1, 1.2],
-    "f2": ["red", "red", "red", "blue", "blue"],
-})
-
-# Create EventSet from DataFrame.
-evset = tp.from_pandas(df)
-
-# Convert EventSet to DataFrame.
-df = tp.to_pandas(evset)
 ```
 
 ## Serialization and deserialization of a graph
