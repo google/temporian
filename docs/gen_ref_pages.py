@@ -87,10 +87,10 @@ if non_parsable_imports:
     )
 
 for symbol, path in sorted(members):
-    module_path = path.relative_to(SRC_PATH.parent).with_suffix("")
-    doc_path = Path(SRC_PATH, symbol).with_suffix(".md")
+    doc_path = Path(SRC_PATH, symbol)
+    parts = list(doc_path.parts)
 
-    parts = list(module_path.parts)
+    doc_path = doc_path.with_suffix(".md")
 
     if parts[-1] == "__init__":
         parts = parts[:-1]
