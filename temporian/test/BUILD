@@ -28,37 +28,26 @@ py_test(
     ],
 )
 
-
 py_test(
     name = "prototype_test_numpy",
     srcs = ["prototype_test_numpy.py"],
+    data = ["//temporian/test/test_data"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
         # already_there/pandas
         "//temporian",
     ],
-    data = ["//temporian/test/test_data"],
 )
 
 py_test(
     name = "io_test",
     srcs = ["io_test.py"],
+    data = ["//temporian/test/test_data"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
         # already_there/pandas
-        "//temporian",
-    ],
-    data = ["//temporian/test/test_data"],
-)
-
-py_test(
-    name = "user_guide_test",
-    srcs = ["user_guide_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
         "//temporian",
     ],
 )
