@@ -17,7 +17,7 @@ profile.*
 site/
 
 # Build outputs
-build
+build/
 dist
 setup.py
 temporian.egg-info
