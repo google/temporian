@@ -35,10 +35,8 @@ from temporian.implementation.numpy.operators import all_operators as _impls
 # ==========
 
 # Nodes and related
-from temporian.core.data import node as _node
-
-Node = _node.Node
-input_node = _node.input_node
+from temporian.core.data.node import Node
+from temporian.core.data.node import input_node
 
 # Dtypes
 from temporian.core.data import dtype as _dtype
@@ -63,10 +61,8 @@ from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.io import event_set
 
 # Graph serialization
-from temporian.core import serialization as _serialization
-
-load = _serialization.load
-save = _serialization.save
+from temporian.core.serialization import load
+from temporian.core.serialization import save
 
 # Graph execution
 from temporian.core.evaluation import evaluate
@@ -76,15 +72,11 @@ from temporian.core.operators.all_operators import *
 from temporian.core.operator_lib import registered_operators as get_operators
 
 # IO
-from temporian.io import csv as _csv
+from temporian.io.csv import to_csv
+from temporian.io.csv import from_csv
 
-to_csv = _csv.to_csv
-from_csv = _csv.from_csv
-
-from temporian.io import pandas as _pandas
-
-to_pandas = _pandas.to_pandas
-from_pandas = _pandas.from_pandas
+from temporian.io.pandas import to_pandas
+from temporian.io.pandas import from_pandas
 
 # Plotting
 from temporian.implementation.numpy.data.plotter import plot

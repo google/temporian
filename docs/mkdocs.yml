@@ -76,10 +76,9 @@ plugins:
           options:
             # https://mkdocstrings.github.io/python/usage/#globallocal-options
             docstring_style: google
-            heading_level: 1
+            heading_level: 2
             members_order: source
             show_source: true
-            show_root_heading: true
             show_category_heading: true
             show_submodules: true
             merge_init_into_class: false
