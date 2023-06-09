@@ -87,6 +87,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "SINCE_LAST",
             "SUBTRACTION",
             "SUBTRACTION_SCALAR",
+            "TICK",
             "UNIQUE_TIMESTAMPS",
             "XOR",
         ]

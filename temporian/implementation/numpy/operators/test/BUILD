@@ -651,3 +651,19 @@ py_test(
         "//temporian/implementation/numpy/operators:end",
     ],
 )
+
+py_test(
+    name = "tick_test",
+    srcs = ["tick_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        ":test_util",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:node",
+        "//temporian/core/data:schema",
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/core/operators:tick",
+        "//temporian/implementation/numpy/operators:tick",
+    ],
+)

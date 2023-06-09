@@ -25,6 +25,7 @@ py_library(
         ":resample",
         ":select",
         ":since_last",
+        ":tick",
         ":unary",
         ":unique_timestamps",
         "//temporian/core/operators/binary",
@@ -273,6 +274,20 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
+        "//temporian/core/data:node",
+        "//temporian/core/data:schema",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
+    name = "tick",
+    srcs = ["tick.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
