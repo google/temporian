@@ -18,53 +18,72 @@ members: Set[Tuple[str, Path]] = set()
 
 non_parsable_imports = []
 
-with open("temporian/__init__.py", "r", encoding="utf8") as f:
-    lines = f.read().splitlines()
+# We need to be able to parse other files to allow wildcard imports
+files_to_parse = [SRC_PATH / "__init__.py"]
 
-for line in lines:
-    words = line.split(" ")
+while files_to_parse:
+    file = files_to_parse.pop()
 
-    # It is an import statement
-    if words[0] == "from":
-        # Remove trailing "as <name>" if it exists and save symbol's name
-        symbol = None
-        if words[-2] == "as":
-            # If symbol was renamed to a private name, skip it
-            if words[-1].startswith("_"):
-                continue
+    with open(file, "r", encoding="utf8") as f:
+        lines = f.read().splitlines()
 
-            symbol = words[-1]
-            words = words[:-2]
+    for line in lines:
+        words = line.split(" ")
 
-        # `words` is now in the form "from module.submodule import symbol"
-        if words[-2] == "import":
-            name = words[-1]
+        # It is an import statement
+        if words[0] == "from":
+            # Remove trailing "as <name>" if it exists and save symbol's name
+            symbol = None
+            if words[-2] == "as":
+                # If symbol was renamed to a private name, skip it
+                if words[-1].startswith("_"):
+                    continue
 
-            # TODO: handle wildcard imports
-            if name == "*":
-                continue
+                symbol = words[-1]
+                words = words[:-2]
 
-            # If symbol wasn't renamed, use its imported name
-            if symbol is None:
-                symbol = name
+            # `words` is now in the form "from module.submodule import symbol"
+            if words[-2] == "import":
+                name = words[-1]
 
-            path = Path(words[1].replace(".", "/")) / name
+                # Handle wildcard imports by parsing the imported module
+                if name == "*":
+                    module_path = Path(words[1].replace(".", "/"))
 
-            members.add((symbol, path))
+                    # If the imported module is a file, add the file itself
+                    if module_path.with_suffix(".py").exists():
+                        files_to_parse.append(module_path.with_suffix(".py"))
+                        continue
 
-        # It is a multi-symbol import statement, error will be raised below
-        else:
-            non_parsable_imports.append(line)
+                    # If it is a module, add its __init__ file
+                    elif (module_path / "__init__.py").exists():
+                        files_to_parse.append(module_path / "__init__.py")
+                        continue
 
-print(members)
+                    else:
+                        non_parsable_imports.append(line)
+                        continue
+
+
+                # If symbol wasn't renamed, use its imported name
+                if symbol is None:
+                    symbol = name
+
+                path = Path(words[1].replace(".", "/")) / name
+
+                members.add((symbol, path))
+
+            # It is a multi-symbol import statement, error will be raised below
+            else:
+                non_parsable_imports.append(line)
 
 if non_parsable_imports:
     raise RuntimeError(
         "`gen_ref_pages` failed to parse the following import statements in"
         f" the top-level __init__.py file: {non_parsable_imports}. Import"
         " statements in the top-level module must import a single symbol each,"
-        " in the form `from <module> import <symbol>` or `from <module> import"
-        " <symbol> as <name>`."
+        " in the form `from <module> import <symbol>`, `from <module> import"
+        " <symbol> as <name>`, or `from <module> import *`."
     )
 
 for symbol, path in sorted(members):

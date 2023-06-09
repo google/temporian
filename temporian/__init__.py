@@ -14,16 +14,20 @@
 
 """Temporian."""
 
-# WARNING: The API reference documentation reads this file and expects a single
+# NOTE: The API reference documentation reads this file and expects a single
 # import per line. Do not import several symbols from the same module in a
-# single line.
+# single line. Do not allow import to break lines.
 
-# TIP: If you need to import something here that isn't part of the public API,
+# NOTE: If you need to import something here that isn't part of the public API,
 # and therefore shouldn't show up in the documentation, import it with a private
 # name:
 # from temporian.module import submodule as _submodule
 
+# NOTE: Wildcard imports (*) are treated and parsed as part of root-level
+# imports, so same rules apply to modules imported with a wildcard.
+
 # pylint: disable=wrong-import-position
+# pylint: disable=line-too-long
 
 __version__ = "0.0.1"
 
