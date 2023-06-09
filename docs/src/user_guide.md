@@ -58,13 +58,24 @@ You can create an `EventSet` as follows:
 `EventSets` can be printed.
 
 ```python
->>> print(evset)  # doctest:+SKIP
+>>> print(evset)
+indexes: []
+features: [('feature_1', float64), ('feature_2', str_), ('feature_3', int64)]
+events:
+     (4 events):
+        timestamps: [...]
+        'feature_1': [0.5 0.6 nan 0.9]
+        'feature_2': ['red' 'blue' 'red' 'blue']
+        'feature_3': [10 -1  5  5]
+...
+
 ```
 
 `EventSets` can be plotted.
 
 ```python
->>> evset.plot()  # doctest:+SKIP
+>>> evset.plot()
+
 ```
 
 **Note:** You'll learn how to create an `EventSet` using other data sources such as pandas DataFrames later.
