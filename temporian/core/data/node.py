@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 T_SCALAR = (int, float)
 
 
-class Node(object):
+class Node:
     """A node is a reference to the input/output of ops in a compute graph.
 
     Use `tp.input_node` to create a node manually, or use

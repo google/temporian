@@ -28,7 +28,7 @@ AttributeType = Union[
 ]
 
 
-class OperatorExceptionDecorator(object):
+class OperatorExceptionDecorator:
     """Adds details about an operator to exceptions raised in a block.
 
     Usage example:

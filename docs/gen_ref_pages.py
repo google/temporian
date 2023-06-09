@@ -19,10 +19,11 @@ members: Set[Tuple[str, Path]] = set()
 non_parsable_imports = []
 
 # We need to be able to parse other files to allow wildcard imports
-files_to_parse = [SRC_PATH / "__init__.py"]
+# Storing pair of (prefix, path) to parse in a stack
+files_to_parse = [(None, SRC_PATH / "__init__.py")]
 
 while files_to_parse:
-    file = files_to_parse.pop()
+    prefix, file = files_to_parse.pop()
 
     with open(file, "r", encoding="utf8") as f:
         lines = f.read().splitlines()
@@ -49,15 +50,20 @@ while files_to_parse:
                 # Handle wildcard imports by parsing the imported module
                 if name == "*":
                     module_path = Path(words[1].replace(".", "/"))
+                    module_name = module_path.name
 
                     # If the imported module is a file, add the file itself
                     if module_path.with_suffix(".py").exists():
-                        files_to_parse.append(module_path.with_suffix(".py"))
+                        files_to_parse.append(
+                            (module_name, module_path.with_suffix(".py"))
+                        )
                         continue
 
                     # If it is a module, add its __init__ file
                     elif (module_path / "__init__.py").exists():
-                        files_to_parse.append(module_path / "__init__.py")
+                        files_to_parse.append(
+                            (module_name, module_path / "__init__.py")
+                        )
                         continue
 
                     else:
@@ -69,6 +75,9 @@ while files_to_parse:
                     symbol = name
 
                 path = Path(words[1].replace(".", "/")) / name
+
+                if prefix:
+                    symbol = prefix + "." + symbol
 
                 members.add((symbol, path))
 
@@ -86,24 +95,21 @@ if non_parsable_imports:
     )
 
 for symbol, path in sorted(members):
-    doc_path = Path(SRC_PATH, symbol)
+    symbol_path = Path(symbol.replace(".", "/"))
+    symbol_name = symbol_path.name
+    src_path = SRC_PATH / symbol_name
+
+    doc_path = SRC_PATH / symbol_path
     parts = list(doc_path.parts)
-
     doc_path = doc_path.with_suffix(".md")
-
-    if parts[-1] == "__init__":
-        parts = parts[:-1]
-        doc_path = doc_path.with_name("index.md")
-    elif parts[-1] == "__main__":
-        continue
-
     full_doc_path = Path("reference", doc_path)
 
     nav[parts] = doc_path.as_posix()
 
     with mkdocs_gen_files.open(full_doc_path, "w") as fd:
-        print("# tp." + symbol, file=fd)
-        identifier = ".".join(parts)
+        print(f"writing {symbol_name} to {full_doc_path}")
+        print("# tp." + symbol_name, file=fd)
+        identifier = ".".join(list(src_path.parts))
         print("::: " + identifier, file=fd)
 
     mkdocs_gen_files.set_edit_path(full_doc_path, path)
