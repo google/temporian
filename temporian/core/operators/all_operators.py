@@ -2,6 +2,7 @@
 
 # pylint: disable=unused-import
 # pylint: disable=line-too-long
+# fmt: off
 from temporian.core.operators.binary import divide
 from temporian.core.operators.binary import multiply
 from temporian.core.operators.binary import subtract

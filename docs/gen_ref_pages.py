@@ -64,7 +64,6 @@ while files_to_parse:
                         non_parsable_imports.append(line)
                         continue
 
-
                 # If symbol wasn't renamed, use its imported name
                 if symbol is None:
                     symbol = name
