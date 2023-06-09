@@ -99,7 +99,7 @@ def to_pandas(
 
     timestamp_key = "timestamp"
 
-    OPTIMIZE
+    # TODO: Optimize
 
     # Collect data into a dictionary.
     column_names = (
