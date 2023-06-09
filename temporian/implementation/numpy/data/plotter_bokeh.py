@@ -134,10 +134,16 @@ def plot_bokeh(
         for js_var, fig in zip(js_vars, figs):
             js_inputs[js_var] = fig.x_range
 
-            sub_core_code = "\n".join([f"""
+            sub_core_code = "\n".join(
+                [
+                    f"""
             {other_js_var}.start = start;
             {other_js_var}.end = end;
-            """ for other_js_var in js_vars if other_js_var != js_var])
+            """
+                    for other_js_var in js_vars
+                    if other_js_var != js_var
+                ]
+            )
 
             core_code += f"""
             if (cb_obj == {js_var}) {{
