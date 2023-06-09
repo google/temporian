@@ -272,13 +272,13 @@ The plots are static images by default. However, interactive plotting can be ver
 ```python
 !pip install bokeh -q
 
->>> events.plot(interactive=True)
+>>> evset.plot(interactive=True)
 
 ```
 
 ## Feature naming
 
-Each feature is identified by a name, and the list of features is available through the `features` property of an `EventSet`.
+Each feature is identified by a name, and the list of features is available through the `features` property of a node.
 
 ```python
 >>> events = tp.event_set(
@@ -288,63 +288,91 @@ Each feature is identified by a name, and the list of features is available thro
 ... 	    "feature_2": [1.0, 2.0, 3.0, 2.0, 1.0]}
 ...     )
 >>> node = events.node()
->>> print(node.feature_names)
+>>> print(node.features)
+[('feature_1', float64), ('feature_2', float64)]
 
-["feature_1", "feature_2"]
 ```
 
 Most operators do not change the input feature's names.
 
 ```python
->>> tp.moving_sum(node, window_length=10).feature_names
+>>> tp.moving_sum(node, window_length=10).features
+[('feature_1', float64), ('feature_2', float64)]
 
-["feature_1", "feature_2"]
+```
+
+Some operators combine two input features with different names, in which case the output name is also combined.
+
+```python
+>>> result = node["feature_1"] * node["feature_2"]
+>>> result.features
+[('mult_feature_1_feature_2', float64)]
+
+```
+
+The calendar operators don't depend on input features but on the timestamps, so the output feature name doesn't
+relate to the input feature names.
+
+```python
+>>> date_events = tp.event_set(
+... 	timestamps=["2020-02-15", "2020-06-20"],
+... 	features={"some_feature": [10, 20]}
+...     )
+>>> date_node = date_events.node()
+>>> print(tp.calendar_month(date_node).features)
+[('calendar_month', int32)]
+
 ```
 
 You can modify feature names using the `tp.rename` and `tp.prefix` operators. `tp.rename` changes the name of features, while `tp.prefix` adds a prefix in front of existing feature names. Note that they do not modify the content of the input `Node`, but return a new `Node` with the modified feature names.
 
 ```python
-# Rename a single feature.
-renamed_f1 = tp.rename("renamed_feature_1", node["feature_1"])
+>>> # Rename a single feature.
+>>> renamed_f1 = tp.rename(node["feature_1"], "renamed_1")
+>>> print(renamed_f1.features)
+[('renamed_1', float64)]
 
-# Rename all features.
-renamed_node = tp.rename(["renamed_feature_1", "renamed_feature_2"], node)
+>>> # Rename all features.
+>>> renamed_node = tp.rename(node,
+...     {"feature_1": "renamed_1", "feature_2": "renamed_2"}
+... )
+>>> print(renamed_node.features)
+[('renamed_1', float64), ('renamed_2', float64)]
+
 ```
 
 ```python
-# Prefix a single feature.
-prefixed_f1 = tp.prefix("rename.", node["feature_1"])
+>>> # Prefix a single feature.
+>>> prefixed_f1 = tp.prefix("prefixed.", node["feature_1"])
+>>> print(prefixed_f1.features)
+[('prefixed.feature_1', float64)]
 
-# Prefix all features.
-prefixed_node = tp.prefix("rename.", node)
+>>> # Prefix all features.
+>>> prefixed_node = tp.prefix("prefixed.", node)
+>>> print(prefixed_node.features)
+[('prefixed.feature_1', float64), ('prefixed.feature_2', float64)]
+
 ```
 
-It is recommended to use `tp.rename` and `tp.prefix` to organize your data.
+It is recommended to use `tp.rename` and `tp.prefix` to organize your data,
+and avoid duplicated feature names.
 
 ```python
-sma_7_node = tp.prefix("sma_7.", tp.simple_moving_average(node, tp.duration.days(7)))
-sma_14_node = tp.prefix("sma_14.", tp.simple_moving_average(node, tp.duration.days(14)))
+>>> sma_7_node = tp.prefix("sma_7.", tp.simple_moving_average(node, tp.duration.days(7)))
+>>> sma_14_node = tp.prefix("sma_14.", tp.simple_moving_average(node, tp.duration.days(14)))
+
 ```
 
-The `tp.glue` operator can be used to concatenate different features into a single `Node`. The following pattern is commonly used in Temporian programs.
+The `tp.glue` operator can be used to concatenate different features into a single `Node`.
+But it will fail if two features with the same name are provided.
+The following pattern is commonly used in Temporian programs.
 
 ```python
-result = tp.glue(
-    tp.prefix("sma_7.", tp.simple_moving_average(node, tp.duration.days(7))),
-    tp.prefix("sma_14.", tp.simple_moving_average(node, tp.duration.days(14))),
-)
-```
+>>> result = tp.glue(
+...     tp.prefix("sma_7.", tp.simple_moving_average(node, tp.duration.days(7))),
+...     tp.prefix("sma_14.", tp.simple_moving_average(node, tp.duration.days(14))),
+... )
 
-Note however that some operators do output new feature names not present in their inputs. This is notably the case for calendar operators and some arithmetic operators.
-
-```python
->>> print((node["feature_1"] + node["feature_2"]).feature_names)
-
-["add_feature_1_feature_2"]
-
->>> print(tp.calendar_month(node).feature_names)
-
-["calendar_month"]
 ```
 
 ## Casting
@@ -352,16 +380,16 @@ Note however that some operators do output new feature names not present in thei
 Temporian is strict on feature data types (also called dtype). This means that often, you cannot perform operations between features of different types. For example, you cannot subtract a `tp.float32` and a `tp.float64`. Instead, you must manually cast the features to the same type before performing the operation.
 
 ```python
-node = tp.input_node(features=[("f1", tp.float32), ("f2", tp.float64)])
+>>> node = tp.input_node(features=[("f1", tp.float32), ("f2", tp.float64)])
+>>> added = tp.cast(node["f1"], tp.float64) + node["f2"]
 
-added = tp.cast(node["f1"], tp.float64) + node["f2"]
 ```
 
 Casting is especially useful to reduce memory usage. For example, if a feature only contains values between 0 and 10000, using `tp.int32` instead of `tp.int64` will halve memory usage. These optimizations are critical when working with large datasets.
 
 Casting can also be a necessary step before calling operators that only accept certain input data types.
 
-Note that in Python, 1.0 and 1 are respectively `float64` and `int64` values.
+Note that in Python, the values `1.0` and `1` are respectively `float64` and `int64`.
 
 Temporian supports data type casting through the `tp.cast` operator. Destination data types can be specified in three different ways:
 
@@ -369,151 +397,161 @@ Temporian supports data type casting through the `tp.cast` operator. Destination
 
    ```python
    >>> node.features
+   [('f1', float32), ('f2', float64)]
 
-   [("feat_a", tp.float32), ("feat_b", tp.float64)]
+   >>> print(tp.cast(node, tp.str_).features)
+   [('f1', str_), ('f2', str_)]
 
-   >>> print(tp.cast(node, tp.string).features)
-
-   [("feat_a", tp.string), ("feat_b", tp.string)]
    ```
 
 2. Feature name to data type mapping: converts each feature (specified by name) to a specific data type.
 
    ```python
-   >>> node.features
+   >>> print(tp.cast(node, {"f1": tp.str_, "f2": tp.int64}).features)
+   [('f1', str_), ('f2', int64)]
 
-   [("feat_a", tp.float32), ("feat_b", tp.float64)]
-
-   >>> print(tp.cast(node, {"feat_a": tp.string, "feat_b": tp.int64}).features)
-
-   [("feat_a", tp.string), ("feat_b", tp.int64)]
    ```
 
 3. Data type to data type mapping: converts all features of a specific data type to another data type.
 
    ```python
-   >>> node.features
+   >>> print(tp.cast(node, {tp.float32: tp.str_, tp.float64: tp.int64}).features)
+   [('f1', str_), ('f2', int64)]
 
-   [("feat_a", tp.float32), ("feat_b", tp.float64), ("feat_c", tp.float64)]
-
-   >>> print(tp.cast(node, {tp.float32: tp.string, tp.float64: tp.int64}))
-
-   [("feat_a", tp.string), ("feat_b", tp.int64), ("feat_c", tp.int64)]
    ```
 
 Keep in mind that the casting can fail when the graph is evaluated. For instance, attempting to cast `"word"` to `tp.float64` will result in an error. These errors cannot be caught prior to graph evaluation.
 
 ## Arithmetic operators
 
-Arithmetic operators are operations between the features of an `EventSet` (or between the features of events with the same sampling. Common mathematical and bit operations are supported, such as addition (+), subtraction (-), product (\*), division (/), floor division (//), modulo (%), comparisons (>, >=, <, <=), and bitwise operators (&, |, ~).
+Arithmetic operators can be used between the features of a node, to perform element-wise calculations.
+Common mathematical and bit operations are supported, such as addition (`+`), subtraction (`-`), product (`*`), division (`/`), floor division (`//`), modulo (`%`), comparisons (`>, >=, <, <=`), and bitwise operators (`&, |, ~`).
 
-These operators can be invoked with python operators or by an explicit call:
-
-```python
-evset_added = evset_1 + evset_2
-
-# Equivalent.
-evset_added = tp.add(evset_1, evset_2)
-```
-
-Arithmetic operators are applied index-feature-wise and timestamp-wise on events with multiple features.
+These operators are applied index-wise and timestamp-wise, between features in the same position.
 
 ```python
 >>> evset = tp.event_set(
->>>     timestamps=[1, 10],
->>>     features={
->>>         "f1": [1.0, 11.0],
->>>         "f2": [2.0, 12.0],
->>>         "f3": [3.0, 13.0],
->>>         "f4": [4.0, 14.0],
->>>     },
->>> )
+...     timestamps=[1, 10],
+...     features={
+...         "f1": [0, 1],
+...         "f2": [10.0, 20.0],
+...         "f3": [100, 100],
+...         "f4": [1000.0, 1000.0],
+...     },
+... )
 >>> node = evset.node()
 
->>> node_f12 = node[["f1", "f2"]]
->>> node_f34 = node[["f3", "f4"]]
+>>> node_added = node[["f1", "f2"]] + node[["f3", "f4"]]
 
->>> node_added = (node_f12 + node_f34)
 >>> evset_added = node_added.evaluate(evset)
 >>> print(evset_added)
+indexes: ...
+features: [('add_f1_f3', int64), ('add_f2_f4', float64)]
+events:
+     (2 events):
+        timestamps: [ 1. 10.]
+        'add_f1_f3': [100 101]
+        'add_f2_f4': [1010. 1020.]
+...
 
-EventSet(
-	timestamps=[1, 10],
-	features={
-	    "add_f1_f3": [4.0, 24.0],
-	    "add_f2_f4": [6.0, 26.0],
-    },
-)
 ```
 
-**Warning:** The Python equality operator (`==`) does not compute element-wise equality between features of an `EventSet`. Use the `tp.equal` operator instead.
+Note that features of type `int64` and `float64` are not mixed above, because otherwise the operation would fail
+without an explicit type cast.
 
 ```python
-evset = tp.event_set(
-	timestamps=[1, 2],
-	features={
-	"f1": [1, 3],
-	"f2": [2, 3]}
-)
-node = evset.node()
+>>> # Attempt to mix dtypes.
+>>> node["f1"] + node["f2"]
+Traceback (most recent call last):
+    ...
+ValueError: ... corresponding features (with the same index) should have the same dtype. ...
 
-tp.equal(node["f1"], node["f2"]).evaluate(events)
 ```
 
-Arithmetic operators act feature-wise, i.e. they perform index-feature-wise operations (for each feature in each index key). For operations between `EventSets`, this implies that the input `EventSets` must have the same number of features and sampling.
+Refer to the [Casting](#casting) section for more on this.
+
+All the operators have an equivalent functional form. The example above using `+`, could be rewritten with `tp.add()`.
 
 ```python
->>> evset_1.feature_names
+>>> # Equivalent.
+>>> node_added = tp.add(node[["f1", "f2"]], node[["f3", "f4"]])
 
-["feat_a", "feat_b"]
-
->>> evset_2.feature_names
-
-["feat_c"]
-
->>> evset_1 + evset_2
-
-ValueError("evset_1 and evset_2 must have same number of features.")
 ```
 
+Other usual comparison and logic operators also work (except `==`, see below).
+
 ```python
->>> evset_1.sampling.index
+>>> is_greater = node[["f1", "f2"]] > node[["f3", "f4"]]
+>>> is_less_or_equal = node[["f1", "f2"]] <= node[["f3", "f4"]]
+>>> is_wrong = is_greater & is_less_or_equal
 
-["idx_x", "idx_y"]
-
->>> evset_2.sampling.index
-
-["idx_x", "idx_z"]
-
->>> evset_1 + evset_2
-
-ValueError("evset_1 and evset_2 must have same sampling.")
 ```
 
-If you want to apply arithmetic operators on `EventSets` with different samplings, take a look at [Vertical operators](#index-horizontal-and-vertical-operators).
-
-For operations involving scalars, operations are applied index-feature-element-wise.
+**Warning:** The Python equality operator (`==`) does not compute element-wise equality between features. Use the `tp.equal()` operator instead.
 
 ```python
->>> evset = tp.event_set(
->>> 	timestamps=[1,2,3,4],
->>> 	features={
->>> 	     "feature_1": [0.5, 0.6, 0.4 ,0.4],
->>> 	     "feature_2": [1.0, 2.0, 3.0, 2.0],
->>>     },
->>> )
->>> node = evset.node()
+>>> # Works element-wise as expected
+>>> tp.equal(node["f1"], node["f3"])
+schema:
+    features: [('eq_f1_f3', bool_)]
+    ...
 
->>> node_added  = node + 1.0
->>> print(node_added.evaluate(evset))
+>>> # This is just a boolean
+>>> (node["f1"] == node["f3"])
+False
 
-EventSet(
-	timestamps=[1, 2, 3, 4],
-	features={
-	    "feature_1": [1.5, 1.6, 1.4, 1.4],
-	    "feature_2": [2.0, 3.0, 4.0, 3.0],
-    },
-)
+```
+
+All these operators act feature-wise, i.e. they perform index-feature-wise operations (for each feature in each index key). This implies that the input nodes must have the same number of features.
+
+```python
+>>> node[["f1", "f2"]] + node["f3"]
+Traceback (most recent call last):
+    ...
+ValueError: The left and right arguments should have the same number of features. ...
+
+```
+
+The input nodes must also have the same sampling and index.
+
+```python
+>>> sampling_1 = tp.event_set(
+...     timestamps=[0, 1],
+...     features={"f1": [1, 2]},
+... )
+>>> sampling_2 = tp.event_set(
+...     timestamps=[1, 2],
+...     features={"f1": [3, 4]},
+... )
+>>> sampling_1.node() + sampling_2.node()
+Traceback (most recent call last):
+    ...
+ValueError: Arguments should have the same sampling. ...
+
+```
+
+If you want to apply arithmetic operators on nodes with different samplings, take a look at
+[Sampling](#sampling) section.
+
+If you want to apply them on nodes with different indices, check the
+[Vertical operators](#index-horizontal-and-vertical-operators) section.
+
+Operations involving scalars are applied index-feature-element-wise.
+
+```python
+>>> node_scalar = node * 10
+>>> print(node_scalar.evaluate(evset))
+indexes: ...
+features: [('f1', int64), ('f2', float64), ('f3', int64), ('f4', float64)]
+events:
+     (2 events):
+        timestamps: [ 1. 10.]
+        'f1': [ 0 10]
+        'f2': [100. 200.]
+        'f3': [1000 1000]
+        'f4': [10000. 10000.]
+...
+
 ```
 
 ## Sampling
@@ -537,19 +575,27 @@ If a timestamp is present in `sampling` but not in `input`, a new timestamp is c
 Given this example:
 
 ```python
-evset = tp.event_set(
-    timestamps=[10, 20, 30],
-    features={
-        "x": [1.0, 2.0, 3.0],
-    },
-)
-sampling = tp.event_set(
-    timestamps=[0, 9, 10, 11, 19, 20, 21],
-)
+>>> evset = tp.event_set(
+...     timestamps=[10, 20, 30],
+...     features={
+...         "x": [1.0, 2.0, 3.0],
+...     },
+... )
+>>> node = evset.node()
+>>> sampling_evset = tp.event_set(
+...     timestamps=[0, 9, 10, 11, 19, 20, 21],
+... )
+>>> sampling_node = sampling_evset.node()
+>>> resampled = tp.resample(input=node, sampling=sampling_node)
+>>> resampled.evaluate({node: evset, sampling_node: sampling_evset})
+indexes: []
+features: [('x', float64)]
+events:
+     (7 events):
+        timestamps: [ 0.  9. 10. 11. 19. 20. 21.]
+        'x': [nan nan  1.  1.  1.  2.  2.]
+...
 
-resampled = tp.resample(input=evset.node(), sampling=sampling.node())
-
-resampled.evaluate([evset, sampling])
 ```
 
 The following would be the matching between the timestamps of `sampling` and `input`:
@@ -565,14 +611,29 @@ float: `NaN`
 integer: `0`
 string: `""`
 
-Back to the example of the `tp.add` operator, `a` and `b` with different sampling can be added in one of the following ways:
+Back to the example of the `tp.add` operator, `a` and `b` with different sampling can be added as follows:
 
 ```python
-a["feature_1"] + tp.resample(b, a)["feature_2"]
-a["feature_1"] + tp.resample(b["feature_2"], a)
+>>> sampling_a = tp.event_set(
+...     timestamps=[0, 1, 2],
+...     features={"f1": [10, 20, 30]},
+... )
+>>> sampling_b = tp.event_set(
+...     timestamps=[1, 2, 3],
+...     features={"f1": [5, 4, 3]},
+... )
+>>> a = sampling_a.node()
+>>> b = sampling_b.node()
+>>> result = a + tp.resample(b, a)
+>>> result.evaluate({a: sampling_a, b: sampling_b})
+indexes: []
+features: [('add_f1_f1', int64)]
+events:
+     (3 events):
+        timestamps: [0. 1. 2.]
+        'add_f1_f1': [10 25 34]
+...
 
-# Assuming that `c` is another EventSet.
-tp.resample(a["feature_1"], c) + tp.resample(b["feature_2"], c)
 ```
 
 `tp.resample` is critical to combine events from different, non-synchronized sources. For example, consider a system with two sensors, a thermometer for temperature and a manometer for pressure. The temperature sensor produces measurements every 1 to 10 minutes, while the pressure sensor returns measurements every second. Additionally assume that both sensors are not synchronized. Finally, assume that you need to combine the temperature and pressure measurements with the equation `temperature / pressure`.
