@@ -47,7 +47,7 @@ class TickNumpyImplementation(OperatorImplementation):
                 begin = index_data.timestamps[0]
                 end = index_data.timestamps[-1]
 
-                if self.operator.rounding:
+                if self.operator.align:
                     save_begin = begin
                     begin = (
                         float(begin // self.operator.interval)
@@ -59,7 +59,7 @@ class TickNumpyImplementation(OperatorImplementation):
 
                 dst_timestamps = np.arange(
                     begin,
-                    math.nextafter(end, math.inf),
+                    np.nextafter(end, math.inf),
                     self.operator.interval,
                     dtype=np.float64,
                 )

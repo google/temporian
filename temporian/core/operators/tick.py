@@ -27,17 +27,15 @@ from temporian.core.data.duration import (
 
 
 class Tick(Operator):
-    def __init__(
-        self, input: Node, interval: NormalizedDuration, rounding: bool
-    ):
+    def __init__(self, input: Node, interval: NormalizedDuration, align: bool):
         super().__init__()
 
         self._interval = interval
-        self._rounding = rounding
+        self._align = align
 
         self.add_input("input", input)
         self.add_attribute("interval", interval)
-        self.add_attribute("rounding", rounding)
+        self.add_attribute("align", align)
 
         self.add_output(
             "output",
@@ -56,8 +54,8 @@ class Tick(Operator):
         return self._interval
 
     @property
-    def rounding(self) -> bool:
-        return self._rounding
+    def align(self) -> bool:
+        return self._align
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
@@ -69,7 +67,7 @@ class Tick(Operator):
                     type=pb.OperatorDef.Attribute.Type.FLOAT_64,
                 ),
                 pb.OperatorDef.Attribute(
-                    key="rounding",
+                    key="align",
                     type=pb.OperatorDef.Attribute.Type.BOOL,
                 ),
             ],
@@ -81,23 +79,24 @@ class Tick(Operator):
 operator_lib.register_operator(Tick)
 
 
-def tick(input: Node, interval: Duration, rounding: bool = True) -> Node:
-    """Generates timestamps at regular intervaled in the range of a guide.
+# TODO: Add support for begin/end arguments.
+def tick(input: Node, interval: Duration, align: bool = True) -> Node:
+    """Generates timestamps at regular intervals in the range of a guide.
 
     Args:
         input: Guide node. The start and end time boundaries to generate the new
             timestamps are defined by the range of timestamps in `input`.
         interval: Tick interval.
-        rounding: If false, the first tick is generated at the first timestamp
-            (similar to "tp.begin"). If true (default), ticks are generated on
-            timestamps that are multiple of "interval".
+        align: If false, the first tick is generated at the first timestamp
+            (similar to `tp.begin`). If true (default), ticks are generated on
+            timestamps that are multiple of `interval`.
 
     Example #1:
         Input
             events: [1, 5.5, 5.6, 8.6]
         Argument
             interval: 4
-            rounding: false
+            align: false
         Output
             timestamp: 1, 5
 
@@ -106,7 +105,7 @@ def tick(input: Node, interval: Duration, rounding: bool = True) -> Node:
             events: [1, 5.5, 5.6, 8.6]
         Argument
             interval: 4
-            rounding: true
+            align: true
         Output
             timestamp: 4, 8
 
@@ -115,5 +114,5 @@ def tick(input: Node, interval: Duration, rounding: bool = True) -> Node:
     """
 
     return Tick(
-        input=input, interval=normalize_duration(interval), rounding=rounding
+        input=input, interval=normalize_duration(interval), align=align
     ).outputs["output"]
