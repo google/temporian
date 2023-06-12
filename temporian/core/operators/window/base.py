@@ -19,7 +19,7 @@ from typing import Optional
 
 
 from temporian.core.data.duration_utils import NormalizedDuration
-from temporian.core.data import dtype
+from temporian.core.data.dtypes.dtype import DType
 from temporian.core.data.node import (
     Node,
     create_node_new_features_existing_sampling,
@@ -107,5 +107,5 @@ class BaseWindowOperator(Operator, ABC):
         """Gets the key of the operator definition."""
 
     @abstractmethod
-    def get_feature_dtype(self, feature: FeatureSchema) -> dtype.DType:
+    def get_feature_dtype(self, feature: FeatureSchema) -> DType:
         """Gets the dtype of the output feature."""

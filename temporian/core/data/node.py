@@ -18,7 +18,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional, Tuple, TYPE_CHECKING, Any, Union
 
-from temporian.core.data.dtype import DType, IndexDType
+from temporian.core.data.dtypes.dtype import DType, IndexDType
 from temporian.core.data.schema import Schema, FeatureSchema, IndexSchema
 from temporian.utils import string
 

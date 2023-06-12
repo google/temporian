@@ -47,15 +47,7 @@ from temporian.core.data.node import Node
 from temporian.core.data.node import input_node
 
 # Dtypes
-from temporian.core.data import dtype as _dtype
-
-# TODO: Show these in the docs.
-float32 = _dtype.DType.FLOAT32
-float64 = _dtype.DType.FLOAT64
-int32 = _dtype.DType.INT32
-int64 = _dtype.DType.INT64
-bool_ = _dtype.DType.BOOLEAN
-str_ = _dtype.DType.STRING
+from temporian.core.data.dtypes import *
 
 # Schema
 from temporian.core.data.schema import Schema

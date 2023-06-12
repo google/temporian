@@ -335,7 +335,7 @@ py_test(
     deps = [
         # already_there/absl/testing:absltest
         ":test_util",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/implementation/numpy/data:io",

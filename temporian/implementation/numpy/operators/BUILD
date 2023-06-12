@@ -215,7 +215,7 @@ py_library(
     deps = [
         ":base",
         # already_there/numpy
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/operators:cast",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",

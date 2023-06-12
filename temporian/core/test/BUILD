@@ -9,8 +9,8 @@ py_library(
     srcs_version = "PY3",
     deps = [
         "//temporian/core:operator_lib",
-        "//temporian/core/data:dtype",
         "//temporian/core/data:node",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/operators:base",
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
@@ -71,7 +71,7 @@ py_test(
         "//temporian",
         "//temporian/core:graph",
         "//temporian/core/serialization:serialize",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/implementation/numpy/data:io",
     ],
 )

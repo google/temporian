@@ -19,7 +19,7 @@ from __future__ import annotations
 from typing import List, Tuple, Dict, Union
 
 from dataclasses import dataclass
-from temporian.core.data.dtype import DType, IndexDType
+from temporian.core.data.dtypes.dtype import DType, IndexDType
 
 
 @dataclass

@@ -102,7 +102,7 @@ py_test(
         # already_there/numpy
         # already_there/pandas
         # absl/testing:absltest dep,
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/io:pandas",
         "//temporian/core/operators/binary",
@@ -122,7 +122,7 @@ py_test(
         # already_there/pandas
         "//temporian/io:pandas",
         "//temporian/core:evaluation",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/operators:cast",
         "//temporian/implementation/numpy/data:event_set",
@@ -151,7 +151,7 @@ py_test(
     deps = [
         ":test_util",
         # already_there/absl/testing:absltest
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/operators:glue",
         "//temporian/implementation/numpy/data:io",
@@ -169,7 +169,7 @@ py_test(
         # already_there/numpy
         # already_there/pandas
         "//temporian/io:pandas",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators:unary",
@@ -421,7 +421,7 @@ py_test(
         # already_there/numpy
         "//temporian/io:pandas",
         ":test_util",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators/window:simple_moving_average",
@@ -441,7 +441,7 @@ py_test(
         # already_there/numpy
         "//temporian/io:pandas",
         ":test_util",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators/window:moving_standard_deviation",
@@ -460,7 +460,7 @@ py_test(
         # already_there/numpy
         "//temporian/io:pandas",
         ":test_util",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators/window:moving_sum",
@@ -479,7 +479,7 @@ py_test(
         # already_there/numpy
         "//temporian/io:pandas",
         ":test_util",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators/window:moving_count",
@@ -498,7 +498,7 @@ py_test(
         # already_there/numpy
         "//temporian/io:pandas",
         ":test_util",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators/window:moving_min",
@@ -517,7 +517,7 @@ py_test(
         # already_there/numpy
         "//temporian/io:pandas",
         ":test_util",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators/window:moving_max",
@@ -536,7 +536,7 @@ py_test(
         # already_there/numpy
         "//temporian/io:pandas",
         ":test_util",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators:propagate",
@@ -556,7 +556,7 @@ py_test(
         # already_there/numpy
         "//temporian/io:pandas",
         ":test_util",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators:resample",
@@ -576,7 +576,7 @@ py_test(
         # already_there/numpy
         "//temporian/io:pandas",
         ":test_util",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators:prefix",
@@ -611,7 +611,7 @@ py_test(
         # already_there/numpy
         "//temporian/io:pandas",
         ":test_util",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators:since_last",
@@ -628,7 +628,7 @@ py_test(
         # already_there/absl/testing:absltest
         ":test_util",
         "//temporian/implementation/numpy/data:io",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators:begin",
@@ -644,7 +644,7 @@ py_test(
         # already_there/absl/testing:absltest
         ":test_util",
         "//temporian/implementation/numpy/data:io",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators:end",
@@ -659,7 +659,7 @@ py_test(
     deps = [
         # already_there/absl/testing:absltest
         ":test_util",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/implementation/numpy/data:io",

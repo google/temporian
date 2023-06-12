@@ -19,7 +19,7 @@ import tempfile
 import temporian as tp
 from temporian.core.serialization import serialize
 from temporian.core import graph
-from temporian.core.data.dtype import DType
+from temporian.core.data.dtypes.dtype import DType
 from temporian.core.test import utils
 from temporian.implementation.numpy.data.io import event_set
 

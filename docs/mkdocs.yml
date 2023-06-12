@@ -88,8 +88,8 @@ plugins:
             group_by_category: true
             show_category_heading: false
             show_root_heading: true
-            preload_modules: [temporian.core.operators]
-            allow_inspection: false
+            # preload_modules: [temporian.core.operators]
+            # allow_inspection: true
 
 # Customization for Markdown
 markdown_extensions:

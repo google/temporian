@@ -23,7 +23,7 @@ py_library(
         # already_there/google/protobuf
         "//temporian/core:graph",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators:base",
