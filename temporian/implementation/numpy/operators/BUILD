@@ -28,6 +28,7 @@ py_library(
         ":unique_timestamps",
         ":begin",
         ":end",
+        ":tick",
         "//temporian/implementation/numpy/operators/binary:arithmetic",
         "//temporian/implementation/numpy/operators/binary:logical",
         "//temporian/implementation/numpy/operators/binary:relational",
@@ -278,6 +279,21 @@ py_library(
         ":base",
         "//temporian/core/data:duration",
         "//temporian/core/operators:end",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy:utils",
+        "//temporian/implementation/numpy/data:event_set",
+    ],
+)
+
+py_library(
+    name = "tick",
+    srcs = ["tick.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/numpy
+        ":base",
+        "//temporian/core/data:duration",
+        "//temporian/core/operators:tick",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",
