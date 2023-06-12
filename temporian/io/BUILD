@@ -33,6 +33,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         # already_there/pandas
+        # already_there/numpy
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
     ],
