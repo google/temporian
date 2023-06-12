@@ -6,7 +6,7 @@ This is a _very_ quick introduction to how Temporian works. For a complete tour 
 
 The most basic unit of data in Temporian is an **event**. An event consists of a timestamp and a set of feature values.
 
-Events are not handled individually. Instead, events are grouped together into an **[EventSet](../reference/temporian/implementation/numpy/data/event_set)**.
+Events are not handled individually. Instead, events are grouped together into an **[EventSet][temporian.EventSet]**.
 
 `EventSet`s are the main data structure in Temporian, and represent **[multivariate time sequences](../user_guide/#what-is-temporal-data)**. Note that "multivariate" indicates that each event in the time sequence holds several feature values, and "sequence" indicates that the events are not necessarily sampled at a uniform rate (in which case we would call it a time "series").
 
@@ -34,11 +34,11 @@ If the `EventSet` has one (or many) indexes, it will hold one time sequence for 
 
 There are two big phases in any Temporian script: graph **definition** and **evaluation**. This is a common pattern in computing libraries, and it allows us to perform optimizations before the graph is evaluated, share Temporian programs across different platforms, and more.
 
-A graph is created by using **operators**. For example, the [`tp.simple_moving_average()`](../reference/temporian/core/operators/window/simple_moving_average) operator computes the [simple moving average](https://en.wikipedia.org/wiki/Moving_average) of each feature in an `EventSet`. You can find documentation for all available operators [here](../reference/temporian/core/operators/all_operators).
+A graph is created by using **operators**. For example, the [`tp.simple_moving_average()`][temporian.simple_moving_average] operator computes the [simple moving average](https://en.wikipedia.org/wiki/Moving_average) of each feature in an `EventSet`. You can find documentation for all available operators [here](../reference/).
 
 Note that when calling operators you are only defining the graph - i.e., you are telling Temporian what operations you want to perform on your data, but those operations are not yet being performed.
 
-Operators are not applied directly to `EventSet`s, but to **[Nodes](../reference/temporian/core/data/node)**. You can think of a `Node` as the placeholder for an `EventSet` in the graph. When applying operators to `Node`s, you get back new `Node`s that are placeholders for the results of those operations. You can create arbitrarily complex graphs by combining operators and nodes.
+Operators are not applied directly to `EventSet`s, but to **[Nodes][temporian.Node]**. You can think of a `Node` as the placeholder for an `EventSet` in the graph. When applying operators to `Node`s, you get back new `Node`s that are placeholders for the results of those operations. You can create arbitrarily complex graphs by combining operators and nodes.
 
 ```python
 # Obtain the Node corresponding to the EventSet we created above
@@ -51,13 +51,13 @@ addition_lagged = tp.lag(addition, duration=tp.duration.days(7))
 
 <!-- TODO: add image of the generated graph -->
 
-Your graph can now be run by calling [`evaluate()`](../reference/temporian/core/data/node/#temporian.core.data.node.Node.evaluate) on any `Node` in the graph, which will perform all necessary operations and return the resulting `EventSet`.
+Your graph can now be run by calling [`.evaluate()`][temporian.Node.evaluate] on any `Node` in the graph, which will perform all necessary operations and return the resulting `EventSet`.
 
 ```python
 result = addition_lagged.evaluate(evset)
 ```
 
-Note that you need to pass the `EventSet`s that correspond to the source `Node`s in the graph to `evaluate()` (since those are not part of the graph definition). Also, several `Node`s can be evaluated at the same time by calling [`tp.evaluate()`](../reference/temporian/core/evaluation/#temporian.core.evaluation.evaluate) directly.
+Note that you need to pass the `EventSet`s that correspond to the source `Node`s in the graph to [`.evaluate()`][temporian.Node.evaluate] (since those are not part of the graph definition). Also, several `Node`s can be evaluated at the same time by calling [`tp.evaluate()`][temporian.evaluate] directly.
 
 🥳 Congratulations! You're all set to write your first pieces of Temporian code.
 
