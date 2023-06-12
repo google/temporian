@@ -43,7 +43,7 @@ date,feature_1,feature_2
 2023-02-01,30.0,5.0
 ```
 
-Check the [Getting Started tutorial](https://temporian.readthedocs.io/en/latest/tutorials/getting_started/) to try it out!
+Check the [Getting Started tutorial](https://temporian.readthedocs.io/en/stable/tutorials/getting_started/) to try it out!
 
 ## Key features
 

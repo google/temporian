@@ -625,10 +625,10 @@ Horizontal operators can be understood as operators that are applied independent
 
 Operators that modify an [`EventSet`][temporian.EventSet]'s index are called _vertical operators_. The most important vertical operators are:
 
-- [`tp.add_index()`][]temporian.add_index: Add features to the index.
-- [`tp.drop_index()`][]temporian.drop_index: Remove features from the index, optionally keeping them as features.
-- [`tp.set_index()`][]temporian.set_index: Changes the index.
-- [`tp.propagate()`][]temporian.propagate: Expand an index based on another [`EventSet`][temporian.EventSet]’s index.
+- [`tp.add_index()`][temporian.add_index]: Add features to the index.
+- [`tp.drop_index()`][temporian.drop_index]: Remove features from the index, optionally keeping them as features.
+- [`tp.set_index()`][temporian.set_index]: Changes the index.
+- [`tp.propagate()`][temporian.propagate]: Expand an index based on another [`EventSet`][temporian.EventSet]’s index.
 
 By default [`EventSets`][temporian.EventSet] are _flat_, which means they have no index, and therefore all events are in a single global index group.
 
@@ -701,7 +701,7 @@ Another type of leakage is future leakage, where a model uses data before it is 
 
 To avoid future leakage, Temporian operators are guaranteed to not cause future leakage, except for the [`tp.leak()`][temporian.leak] operator. This means that it is impossible to inadvertently add future leakage to a Temporian program.
 
-[`tp.leak()`][temporian.leak] can be useful for precomputing labels or evaluating machine learning models. However, its outputs shouldn’t be used as input features. To check programmatically if a [`Node`][temporian.Node] depends on [`tp.leak()`][]temporian.leak, we can use the [`tp.has_leak()`][temporian.has_leak] function.
+[`tp.leak()`][temporian.leak] can be useful for precomputing labels or evaluating machine learning models. However, its outputs shouldn’t be used as input features. To check programmatically if a [`Node`][temporian.Node] depends on [`tp.leak()`][temporian.leak], we can use the [`tp.has_leak()`][temporian.has_leak] function.
 
 ```python
 >>> a = tp.input_node(features=[("feature_1", tp.float32)])
@@ -715,7 +715,7 @@ False
 True
 ```
 
-In this example, `b` does not have a future leak, but `c` does because it depends on [`tp.leak()`][]temporian.leak. By using [`tp.has_leak()`][]temporian.has_leak, we can programmatically identify future leakage and modify our code accordingly.
+In this example, `b` does not have a future leak, but `c` does because it depends on [`tp.leak()`][temporian.leak]. By using [`tp.has_leak()`][temporian.has_leak], we can programmatically identify future leakage and modify our code accordingly.
 
 ## Accessing [`EventSet`][temporian.EventSet] data
 
@@ -770,7 +770,7 @@ evset = tp.from_csv(
 tp.to_csv(evset, path="path/to/file.csv")
 ```
 
-Converting [`EventSet`][temporian.EventSet] data to and from pandas DataFrames is also easily done via [`tp.to_pandas()`][temporian.to_pandas] and [`tp.from_pandas()`][]temporian.from_pandas.
+Converting [`EventSet`][temporian.EventSet] data to and from pandas DataFrames is also easily done via [`tp.to_pandas()`][temporian.to_pandas] and [`tp.from_pandas()`][temporian.from_pandas].
 
 ```python
 import pandas as pd
@@ -790,7 +790,7 @@ df = tp.to_pandas(evset)
 
 ## Serialization and deserialization of a graph
 
-Temporian graphs can be exported and imported to a safe-to-share file with [`tp.save()`][temporian.save] and [`tp.load()`][]temporian.load. In both functions input and output [`Nodes`][temporian.Node] need to be named, or be assigned a name by passing them as a dictionary.
+Temporian graphs can be exported and imported to a safe-to-share file with [`tp.save()`][temporian.save] and [`tp.load()`][temporian.load]. In both functions input and output [`Nodes`][temporian.Node] need to be named, or be assigned a name by passing them as a dictionary.
 
 ```python
 # Define a graph.

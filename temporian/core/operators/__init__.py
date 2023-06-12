@@ -68,6 +68,7 @@ from temporian.core.operators.calendar.minute import calendar_minute
 from temporian.core.operators.calendar.second import calendar_second
 from temporian.core.operators.calendar.year import calendar_year
 from temporian.core.operators.add_index import add_index
+from temporian.core.operators.add_index import set_index
 from temporian.core.operators.lag import lag
 from temporian.core.operators.leak import leak
 from temporian.core.operators.prefix import prefix
