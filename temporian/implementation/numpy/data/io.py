@@ -67,19 +67,19 @@ def event_set(
 
     Supported values for `timestamps`:
 
-        - List of int, float, str, bytes and datetime.
-        - Numpy arrays of int{32, 64}, float{32, 64}, str_, string_ / bytes_,
-           Numpy datetime64, and object containing "str".
-        - Pandas series of int{32, 64}, float{32, 64}, Pandas Timestamp.
+    - List of int, float, str, bytes and datetime.
+    - Numpy arrays of int{32, 64}, float{32, 64}, str_, string_ / bytes_,
+        Numpy datetime64, and object containing "str".
+    - Pandas series of int{32, 64}, float{32, 64}, Pandas Timestamp.
 
     String timestamps are interpreted as ISO 8601 datetime.
 
     Supported values for `features`:
 
-        - List of int, float, str, bytes, bool, and datetime.
-        - Numpy arrays of int{32, 64}, float{32, 64}, str_, string_ / bytes_,
-            Numpy datetime64, or object containing "str".
-        - Pandas series of int{32, 64}, float{32, 64}, Pandas Timestamp.
+    - List of int, float, str, bytes, bool, and datetime.
+    - Numpy arrays of int{32, 64}, float{32, 64}, str_, string_ / bytes_,
+        Numpy datetime64, or object containing "str".
+    - Pandas series of int{32, 64}, float{32, 64}, Pandas Timestamp.
 
     Date / datetime features are converted to int64 unix times.
     NaN for float-like features are interpreted as missing values.

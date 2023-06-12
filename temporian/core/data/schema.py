@@ -48,7 +48,7 @@ class Schema:
 
     Attributes:
         features: List of feature names and types.
-        indexes: List of index names ans types.
+        indexes: List of index names and types.
         is_unix_timestamp: Whether values correspond to Unix timestamps.
     """
 

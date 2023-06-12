@@ -44,15 +44,15 @@ These are what set Temporian apart.
 - **Prevents modeling errors**: Temporian programs are guaranteed not to have future leakage unless the user calls the `leak` function, ensuring that models are not trained on future data.
 - **Iterative development**: Temporian can be used to develop preprocessing pipelines in Colab or local notebooks, allowing users to visualize results each step of the way to identify and correct errors early on.
 - **Efficient and well-tested implementations**: Temporian contains efficient and well-tested implementations of a variety of temporal data processing functions. For instance, our implementation of window operators is **x2000** faster than the same function implemented with NumPy.
-- **Wide range of preprocessing functions**: Temporian contains a wide range of preprocessing functions, including moving window operations, lagging, calendar features, arithmetic operations, index manipulation and propagation, resampling, and more. For a full list of the available operators, see the [operators documentation](https://temporian.readthedocs.io/en/latest/reference/temporian/core/operators/all_operators/).
+- **Wide range of preprocessing functions**: Temporian contains a wide range of preprocessing functions, including moving window operations, lagging, calendar features, arithmetic operations, index manipulation and propagation, resampling, and more. For a full list of the available operators, see the [operators documentation](https://temporian.readthedocs.io/en/stable/reference/).
 
 ## Getting started
 
-Check out [3 minutes to Temporian](https://temporian.readthedocs.io/en/latest/3_minutes/) for a quick introduction to how Temporian works.
+Check out [3 minutes to Temporian](https://temporian.readthedocs.io/en/stable/3_minutes/) for a quick introduction to how Temporian works.
 
 ## Documentation
 
-The official documentation is available at [temporian.readthedocs.io](https://temporian.readthedocs.io/en/latest/).
+The official documentation is available at [temporian.readthedocs.io](https://temporian.readthedocs.io/en/stable/).
 
 ## Contributing
 

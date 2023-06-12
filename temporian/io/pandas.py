@@ -19,6 +19,7 @@ from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.io import event_set
 
 
+# TODO: Rename argument `index_names` to `index_features`.
 def from_pandas(
     df: "pandas.DataFrame",
     index_names: Optional[List[str]] = None,
@@ -26,15 +27,14 @@ def from_pandas(
     name: Optional[str] = None,
     same_sampling_as: Optional[EventSet] = None,
 ) -> EventSet:
-    """Converts a Pandas DataFrame into an Event Set.
-
-    TODO: Rename argument `index_names` to `index_features`.
+    """Converts a Pandas DataFrame into an EventSet.
 
     The column `timestamp_column` (default to "timestamp") contains the
     timestamps. Columns `index_names` (default to `None`, equivalent to `[]`),
     contains the index. The remaining columns are converted into features.
 
-    See `tp.event_set` for the list of supported timestamp and feature types.
+    See [`tp.event_set`][temporian.event_set] for the list of supported
+    timestamp and feature types.
 
     Usage example:
 
@@ -89,7 +89,7 @@ def from_pandas(
 def to_pandas(
     evset: EventSet,
 ) -> "pandas.DataFrame":
-    """Convert an EventSet to a pandas DataFrame.
+    """Converts an EventSet to a pandas DataFrame.
 
     Returns:
         DataFrame created from EventSet.

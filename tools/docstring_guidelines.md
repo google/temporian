@@ -134,6 +134,7 @@ Omit unnecessary prepositions at the start of each arg's description, such as
 **Returns: (or Yields: for generators)**
 
 Describe the semantics of the return value.
+If more than a single line, break into a new line with an extra indentation.
 Do not document the expected return type (type hints are enough).
 Do not include the section for functions that return `None`.
 If a tuple is returned, describe it as: `Returns: A tuple (a, b) where a is...`.
@@ -167,18 +168,18 @@ Example:
 
     Returns:
         Dict mapping keys to the corresponding table row data fetched. Each row
-        is represented as a tuple of strings.
+            is represented as a tuple of strings.
 
-        For example:
-            ```
-            {b'Serak': ('Rigel VII', 'Preparer'),
-            b'Zim': ('Irk', 'Invader'),
-            b'Lrrr': ('Omicron Persei 8', 'Emperor')}
-            ```
+            For example:
+                ```
+                {b'Serak': ('Rigel VII', 'Preparer'),
+                b'Zim': ('Irk', 'Invader'),
+                b'Lrrr': ('Omicron Persei 8', 'Emperor')}
+                ```
 
-        Returned keys are always bytes. If a key from the keys argument is
-        missing from the dictionary, then that row was not found in the
-        table (and `require_all_keys` must have been False).
+            Returned keys are always bytes. If a key from the keys argument is
+            missing from the dictionary, then that row was not found in the
+            table (and `require_all_keys` must have been False).
 
     Raises:
         IOError: An error occurred accessing the smalltable.

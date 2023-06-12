@@ -89,7 +89,7 @@ plugins:
             show_category_heading: false
             show_root_heading: true
             preload_modules: [temporian.core.operators]
-            allow_inspection: true
+            allow_inspection: false
 
 # Customization for Markdown
 markdown_extensions:

@@ -99,10 +99,7 @@ for symbol, path in sorted(members):
     nav[parts] = doc_path.as_posix()
 
     with mkdocs_gen_files.open(full_doc_path, "w") as fd:
-        # print("# tp." + symbol_name, file=fd)
         identifier = ".".join(list(src_path.parts))
-        # if symbol_name == "begin":
-        #     identifier += ".begin"
         print(identifier)
         print("::: " + identifier, file=fd)
 

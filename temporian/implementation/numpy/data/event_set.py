@@ -328,9 +328,9 @@ class IndexData:
 class EventSet:
     """Actual temporal data.
 
-    Use `tp.event_set` to create an event set manually.
-    Use `tp.from_pandas` to create an event set from a pandas
-    dataframe.
+    Use [`tp.event_set()`][temporian.event_set] to create an event set manually,
+    or [`tp.from_pandas()`][temporian.from_pandas] to create an event set from a
+    pandas DataFrame.
     """
 
     def __init__(
@@ -385,7 +385,7 @@ class EventSet:
     def node(self, force_new_node: bool = False) -> Node:
         """Creates a node able to consume the the event set.
 
-        If called multiple times with force_new_node=False (default), the same
+        If called multiple times with `force_new_node=False` (default), the same
         node is returned.
 
         Usage example:
@@ -485,7 +485,8 @@ class EventSet:
         return True
 
     def plot(self, *args, **wargs) -> Any:
-        """Plots the event set. See tp.plot for details."""
+        """Plots the event set. See [`tp.plot()`][temporian.plot] for details.
+        """
 
         from temporian.implementation.numpy.data import plotter
 
