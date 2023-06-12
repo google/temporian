@@ -14,6 +14,8 @@
 
 """Utility for reading an event set from disk."""
 
+import numpy as np
+
 from typing import List, Optional
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.io import event_set
@@ -99,27 +101,25 @@ def to_pandas(
 
     timestamp_key = "timestamp"
 
-    # Collect data into a dictionary.
-    column_names = (
-        evset.schema.index_names()
-        + evset.schema.feature_names()
-        + [timestamp_key]
-    )
-    data = {column_name: [] for column_name in column_names}
-    for index_key, index_data in evset.data.items():
-        assert isinstance(index_key, tuple)
+    index_names = evset.schema.index_names()
+    feature_names = evset.schema.feature_names()
+
+    column_names = index_names + feature_names + [timestamp_key]
+    dst = {column_name: [] for column_name in column_names}
+    for index, data in evset.data.items():
+        assert isinstance(index, tuple)
 
         # Timestamps
-        data[timestamp_key].extend(index_data.timestamps)
+        dst[timestamp_key].append(data.timestamps)
 
         # Features
-        for feature_name, feature in zip(
-            evset.schema.feature_names(), index_data.features
-        ):
-            data[feature_name].extend(feature)
+        for feature_name, feature in zip(feature_names, data.features):
+            dst[feature_name].append(feature)
 
         # Indexes
-        for i, index_name in enumerate(evset.schema.index_names()):
-            data[index_name].extend([index_key[i]] * len(index_data.timestamps))
+        num_timestamps = len(data.timestamps)
+        for index_name, index_item in zip(index_names, index):
+            dst[index_name].append(np.repeat(index_item, num_timestamps))
 
-    return pd.DataFrame(data)
+    dst = {k: np.concatenate(v) for k, v in dst.items()}
+    return pd.DataFrame(dst)
