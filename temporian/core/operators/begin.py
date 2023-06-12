@@ -20,7 +20,7 @@ from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
-class Begin(Operator):
+class BeginOperator(Operator):
     def __init__(self, input: Node):
         super().__init__()
 
@@ -47,7 +47,7 @@ class Begin(Operator):
         )
 
 
-operator_lib.register_operator(Begin)
+operator_lib.register_operator(BeginOperator)
 
 
 def begin(input: Node) -> Node:
@@ -65,4 +65,4 @@ def begin(input: Node) -> Node:
     Returns:
         A feature-less node with a single timestamp.
     """
-    return Begin(input=input).outputs["output"]
+    return BeginOperator(input=input).outputs["output"]

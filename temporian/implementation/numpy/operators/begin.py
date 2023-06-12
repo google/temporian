@@ -20,18 +20,18 @@ from typing import Dict
 import numpy as np
 
 from temporian.implementation.numpy.data.event_set import IndexData, EventSet
-from temporian.core.operators.begin import Begin
+from temporian.core.operators.begin import BeginOperator
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
 class BeginNumpyImplementation(OperatorImplementation):
-    def __init__(self, operator: Begin) -> None:
-        assert isinstance(operator, Begin)
+    def __init__(self, operator: BeginOperator) -> None:
+        assert isinstance(operator, BeginOperator)
         super().__init__(operator)
 
     def __call__(self, input: EventSet) -> Dict[str, EventSet]:
-        assert isinstance(self.operator, Begin)
+        assert isinstance(self.operator, BeginOperator)
         output_schema = self.output_schema("output")
 
         # create output event set
@@ -55,5 +55,5 @@ class BeginNumpyImplementation(OperatorImplementation):
 
 
 implementation_lib.register_operator_implementation(
-    Begin, BeginNumpyImplementation
+    BeginOperator, BeginNumpyImplementation
 )

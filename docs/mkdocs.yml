@@ -70,7 +70,7 @@ plugins:
       default_handler: python
       handlers:
         python:
-          paths: [temporian]
+          paths: [..]
           import:
             - https://docs.python.org/3/objects.inv
           options:
@@ -78,16 +78,18 @@ plugins:
             docstring_style: google
             heading_level: 1
             members_order: source
-            show_source: true
-            show_submodules: true
+            show_source: false
+            show_submodules: false
             merge_init_into_class: false
             show_signature: true
             separate_signature: true
             show_signature_annotations: true
-            show_if_no_docstring: false # TODO: TBD if we want this enabled
+            show_if_no_docstring: false
             group_by_category: true
             show_category_heading: false
             show_root_heading: true
+            preload_modules: [temporian.core.operators]
+            allow_inspection: true
 
 # Customization for Markdown
 markdown_extensions:
