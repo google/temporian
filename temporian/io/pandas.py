@@ -33,7 +33,7 @@ def from_pandas(
     timestamps. Columns `index_names` (default to `None`, equivalent to `[]`),
     contains the index. The remaining columns are converted into features.
 
-    See [`tp.event_set`][temporian.event_set] for the list of supported
+    See [`tp.event_set()`][temporian.event_set] for the list of supported
     timestamp and feature types.
 
     Usage example:
@@ -58,13 +58,14 @@ def from_pandas(
             (default), the data is not indexed. Only integer and string features
             can be used as index.
         timestamp_column: Name of the column containing the timestamps. See
-            `tp.event_set`for the list of supported timestamp types.
+            [`tp.event_set()`][temporian.event_set] for the list of supported
+            timestamp types.
         name: Optional name of the event set. Used for debugging, and
             graph serialization.
         same_sampling_as: If set, the new event set is cheched and tagged as
             having the same sampling as `same_sampling_as`. Some operators,
-            such as `tp.filter`, require their inputes to have the same
-            sampling.
+            such as [`tp.filter()`][temporian.filter], require their inputs to
+            have the same sampling.
 
     Returns:
         An event set.

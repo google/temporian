@@ -99,8 +99,8 @@ def event_set(
             argument is an array of date or date-like object.
         same_sampling_as: If set, the new event set is cheched and tagged as
             having the same sampling as `same_sampling_as`. Some operators,
-            such as `tp.filter`, require their inputes to have the same
-            sampling.
+            such as [`tp.filter()`][temporian.filter], require their inputs to
+            have the same sampling.
 
     Returns:
         An event set.

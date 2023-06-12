@@ -88,8 +88,8 @@ def tick(input: Node, interval: Duration, align: bool = True) -> Node:
             timestamps are defined by the range of timestamps in `input`.
         interval: Tick interval.
         align: If false, the first tick is generated at the first timestamp
-            (similar to `tp.begin`). If true (default), ticks are generated on
-            timestamps that are multiple of `interval`.
+            (similar to [`tp.begin()`][temporian.begin]). If true (default),
+            ticks are generated on timestamps that are multiple of `interval`.
 
     Example #1:
         Input

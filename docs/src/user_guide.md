@@ -80,7 +80,7 @@ You will see that Temporian is agnostic to the semantics of events, and that oft
 
 ## Graph and Operators
 
-Processing operations are performed by **Operators**. For instance, the [`tp.simple_moving_average()`](https://temporian.readthedocs.io/en/latest/reference/temporian/core/operators/window/simple_moving_average/) operator computes the [simple moving average](https://en.wikipedia.org/wiki/Moving_average) of each feature in an `EventSet`.
+Processing operations are performed by **Operators**. For instance, the [`tp.simple_moving_average()`][temporian.simple_moving_average] operator computes the [simple moving average](https://en.wikipedia.org/wiki/Moving_average) of each feature in an `EventSet`.
 
 Operators are not executed individually, but rather combined to form an operator **Graph**. A graph takes one or multiple `EventSets` as input and produces one or multiple `EventSets` as output. Graphs can contain an arbitrary number of operators, which can consume the ouput of other operators as input. You can see a graph as a computation graph where `Nodes` are operators.
 
@@ -121,17 +121,17 @@ d_evset = tp.evaluate(d, {a_node: a_evset})
 print(d_evset)
 ```
 
-The `tp.evaluate` function's signature is `tp.evaluate(<outputs>, <inputs>)`.
+The [`tp.evaluate()`][temporian.evaluate] function's signature is `tp.evaluate(<outputs>, <inputs>)`.
 
-The `<outputs>` can be specified as a `Node`, a list of `Nodes`, or a dictionary of names to `Nodes`, and the result of `tp.evaluate` will be of the same type. For example, if `<outputs>` is a list of three `Nodes`, the result will be a list of the three corresponding `EventSets`.
+The `<outputs>` can be specified as a `Node`, a list of `Nodes`, or a dictionary of names to `Nodes`, and the result of [`tp.evaluate()`][temporian.evaluate] will be of the same type. For example, if `<outputs>` is a list of three `Nodes`, the result will be a list of the three corresponding `EventSets`.
 
 The `<inputs>` can be specified as a dictionary of `Nodes` to `EventSets`, a dictionary of names to `EventSets`, a list of `EventSets` or a single `EventSet`, which lets Temporian know the `Nodes` of the graph that each input `EventSet` corresponds to. In the case of a dictionary of names to `EventSets`, the names must match the names of `Nodes` in the graph, and in the case of a list or single `EventSet`, the names of those `EventSets` must do the same. If specifying the inputs as a dictionary, we could skip passing a name to `a_evset`.
 
 **Remarks:**
 
 - It's important to distinguish between _`EventSets`_, such as `a_evset`, that contain data, and _`Nodes`_, like `a_node` and `b_node`, that connect operators together and compose the computation graph, but do not contain data.
-- No computation is performed during the definition of the graph (i.e., when calling the operator functions). All computation is done during `tp.evaluate`.
-- In `tp.evaluate`, the second argument defines a mapping between input `Nodes` and `EventSets`. If all necessary input `Nodes` are not fed, an error will be raised.
+- No computation is performed during the definition of the graph (i.e., when calling the operator functions). All computation is done during [`tp.evaluate()`][temporian.evaluate].
+- In [`tp.evaluate()`][temporian.evaluate], the second argument defines a mapping between input `Nodes` and `EventSets`. If all necessary input `Nodes` are not fed, an error will be raised.
 - In most cases you will only pass `EventSets` that correspond to the graph's input `Nodes`, but Temporian also supports passing `EventSets` to intermediate `Nodes` in the graph. In the example provided, `a_node` is fed, but we could also feed `b_node` and `c_node`. In that case we would not need to feed `a_node`, since no `Nodes` need to be computed from it anymore.
 
 To simplify its usage when the graph contains a single output `Node`, `node.evaluate` is equivalent to `tp.evaluate(node, <inputs>)`.
@@ -148,11 +148,11 @@ d_node.evaluate([a_evset])
 d_node.evaluate(a_evset)
 ```
 
-**Warning:** It is more efficient to evaluate multiple output `Nodes` together with `tp.evaluate` than to evaluate them separately with `node_1.evaluate(...)`, `node_2.evaluate(...)`, etc. Only use `node.evaluate` for debugging purposes or when you only have a single output `Node`.
+**Warning:** It is more efficient to evaluate multiple output `Nodes` together with [`tp.evaluate()`][temporian.evaluate] than to evaluate them separately with `node_1.evaluate(...)`, `node_2.evaluate(...)`, etc. Only use `node.evaluate` for debugging purposes or when you only have a single output `Node`.
 
 ## Creating a `Node` from an `EventSet`
 
-Previously, we defined the input of the graph `a_node` with `tp.input_node`. This way of listing features manually and their respective data type is cumbersome.
+Previously, we defined the input of the graph `a_node` with [`tp.input_node()`][temporian.input_node]. This way of listing features manually and their respective data type is cumbersome.
 
 If an `EventSet` is available (i.e., data is available) this step can be changed to use `evset.node()` instead, which will return a `Node` that is compatible with it. This is especially useful when creating `EventSets` from existing data, such as pandas DataFrames or CSV files.
 
@@ -178,7 +178,7 @@ a_node = a_data.node()
 
 In Temporian, times are always represented by a float64 value. Users have the freedom to choose the semantic to this value. For example, the time can be the number of nanoseconds since the start of the day, the number of cycles of a process, the number of years since the big bang, or the number of seconds since January 1, 1970, at 00:00:00 UTC, also known as Unix or POSIX time.
 
-To ease the feature engineering of dates, Temporian contains a set of _calendar operators_. Those operators are specialized in creating features from dates and datetimes. For instance, the `tp.calendar_hours` operator returns the hour of the date in the range `0-23`.
+To ease the feature engineering of dates, Temporian contains a set of _calendar operators_. Those operators are specialized in creating features from dates and datetimes. For instance, the [`tp.calendar_hour()`][temporian.calendar_hour] operator returns the hour of the date in the range `0-23`.
 
 Calendar operators require the time in their inputs to be Unix time, so applying them on non-Unix timestamps will result in errors being raised. Temporian can sometimes automatically recognize if input timestamps correspond to Unix time (e.g. when an `EventSet` is created from a pandas DataFrame with a datetime column, or when passing a list of datetime objects as timestamps in `EventSet`'s constructor). If creating `EventSets` manually and passing floats directly to `timestamps`, you need to explicitly specify whether they correspond to Unix times or not via the `is_unix_timestamp` argument.
 
@@ -228,11 +228,11 @@ b = tp.simple_moving_avegage(a, window_length = 24 * 60 * 60)
 
 Data visualization is crucial for gaining insights into data and the system it represents. It also helps in detecting unexpected behavior and issues, making debugging and iterative development easier.
 
-Temporian provides two plotting functions for data visualization: `evset.plot(<options>)` and `tp.plot([<list of EventSets>], <option>)`.
+Temporian provides two plotting functions for data visualization: [`evset.plot()`][temporian.EventSet.plot] and [`tp.plot()`][temporian.plot].
 
-The `evset.plot()` function is shorter to write and is used for displaying a single `EventSet`, while the `tp.plot()` function is used for displaying multiple `EventSets` together. This function is particularly useful when `EventSets` are indexed (see [Index, horizontal and vertical operators](#index-horizontal-and-vertical-operators)) or have different samplings (see [Sampling](#sampling)).
+The [`evset.plot()`][temporian.EventSet.plot] function is shorter to write and is used for displaying a single `EventSet`, while the [`tp.plot()`][temporian.plot] function is used for displaying multiple `EventSets` together. This function is particularly useful when `EventSets` are indexed (see [Index, horizontal and vertical operators](#index-horizontal-and-vertical-operators)) or have different samplings (see [Sampling](#sampling)).
 
-Here's an example of using the `evset.plot()` function:
+Here's an example of using the [`evset.plot()`][temporian.EventSet.plot] function:
 
 ```python
 evset = tp.event_set(
@@ -293,7 +293,7 @@ Most operators do not change the input feature's names.
 ["feature_1", "feature_2"]
 ```
 
-You can modify feature names using the `tp.rename` and `tp.prefix` operators. `tp.rename` changes the name of features, while `tp.prefix` adds a prefix in front of existing feature names. Note that they do not modify the content of the input `Node`, but return a new `Node` with the modified feature names.
+You can modify feature names using the [`tp.rename()`][temporian.rename] and [`tp.prefix()`][temporian.prefix] operators. [`tp.rename()`][temporian.rename] changes the name of features, while [`tp.prefix()`][temporian.prefix] adds a prefix in front of existing feature names. Note that they do not modify the content of the input `Node`, but return a new `Node` with the modified feature names.
 
 ```python
 # Rename a single feature.
@@ -311,14 +311,14 @@ prefixed_f1 = tp.prefix("rename.", node["feature_1"])
 prefixed_node = tp.prefix("rename.", node)
 ```
 
-It is recommended to use `tp.rename` and `tp.prefix` to organize your data.
+It is recommended to use [`tp.rename()`][temporian.rename] and [`tp.prefix()`][temporian.prefix] to organize your data.
 
 ```python
 sma_7_node = tp.prefix("sma_7.", tp.simple_moving_average(node, tp.duration.days(7)))
 sma_14_node = tp.prefix("sma_14.", tp.simple_moving_average(node, tp.duration.days(14)))
 ```
 
-The `tp.glue` operator can be used to concatenate different features into a single `Node`. The following pattern is commonly used in Temporian programs.
+The [`tp.glue()`][temporian.glue] operator can be used to concatenate different features into a single `Node`. The following pattern is commonly used in Temporian programs.
 
 ```python
 result = tp.glue(
@@ -355,7 +355,7 @@ Casting can also be a necessary step before calling operators that only accept c
 
 Note that in Python, 1.0 and 1 are respectively `float64` and `int64` values.
 
-Temporian supports data type casting through the `tp.cast` operator. Destination data types can be specified in three different ways:
+Temporian supports data type casting through the [`tp.cast()`][temporian.cast] operator. Destination data types can be specified in three different ways:
 
 1. Single data type: converts all input features to the same destination data type.
 
@@ -438,7 +438,7 @@ EventSet(
 )
 ```
 
-**Warning:** The Python equality operator (`==`) does not compute element-wise equality between features of an `EventSet`. Use the `tp.equal` operator instead.
+**Warning:** The Python equality operator (`==`) does not compute element-wise equality between features of an `EventSet`. Use the [`tp.equal()`][temporian.equal] operator instead.
 
 ```python
 evset = tp.event_set(
@@ -510,15 +510,15 @@ EventSet(
 
 ## Sampling
 
-Arithmetic operators, such as `tp.add`, require their input arguments to have the same timestamps and [Index](#index-horizontal-and-vertical-operators). The unique combination of timestamps and index is called a _sampling_.
+Arithmetic operators, such as [`tp.add()`][temporian.add], require their input arguments to have the same timestamps and [Index](#index-horizontal-and-vertical-operators). The unique combination of timestamps and index is called a _sampling_.
 
 <!-- TODO: example -->
 
 For example, if `Nodes` `a` and `b` have different samplings, `a["feature_1"] + b["feature_2"]` will fail.
 
-To use arithmetic operators on `EventSets` with different samplings, one of the `EventSets` needs to be resampled to the sampling of the other `EventSet`. Resampling is done with the `tp.resample` operator.
+To use arithmetic operators on `EventSets` with different samplings, one of the `EventSets` needs to be resampled to the sampling of the other `EventSet`. Resampling is done with the [`tp.resample()`][temporian.resample] operator.
 
-The `tp.resample` operator takes two `EventSets` called `input` and `sampling`, and returns the resampling of the features of `input` according to the timestamps of `sampling` according to the following rules:
+The [`tp.resample()`][temporian.resample] operator takes two `EventSets` called `input` and `sampling`, and returns the resampling of the features of `input` according to the timestamps of `sampling` according to the following rules:
 
 If a timestamp is present in `input` but not in `sampling`, the timestamp is dropped.
 If a timestamp is present in both `input` and `sampling`, the timestamp is kept.
@@ -557,7 +557,7 @@ float: `NaN`
 integer: `0`
 string: `""`
 
-Back to the example of the `tp.add` operator, `a` and `b` with different sampling can be added in one of the following ways:
+Back to the example of the [`tp.add()`][temporian.add] operator, `a` and `b` with different sampling can be added in one of the following ways:
 
 ```python
 a["feature_1"] + tp.resample(b, a)["feature_2"]
@@ -567,7 +567,7 @@ a["feature_1"] + tp.resample(b["feature_2"], a)
 tp.resample(a["feature_1"], c) + tp.resample(b["feature_2"], c)
 ```
 
-`tp.resample` is critical to combine events from different, non-synchronized sources. For example, consider a system with two sensors, a thermometer for temperature and a manometer for pressure. The temperature sensor produces measurements every 1 to 10 minutes, while the pressure sensor returns measurements every second. Additionally assume that both sensors are not synchronized. Finally, assume that you need to combine the temperature and pressure measurements with the equation `temperature / pressure`.
+[`tp.resample()`][temporian.resample] is critical to combine events from different, non-synchronized sources. For example, consider a system with two sensors, a thermometer for temperature and a manometer for pressure. The temperature sensor produces measurements every 1 to 10 minutes, while the pressure sensor returns measurements every second. Additionally assume that both sensors are not synchronized. Finally, assume that you need to combine the temperature and pressure measurements with the equation `temperature / pressure`.
 
 <!-- TODO: image -->
 
@@ -584,14 +584,14 @@ sampling_source = ... # Uniform timestamps every 10 seconds.
 r = tp.resample(termometer["temperature"], sampling_source) / tp.resample(manometer["pressure"], sampling_source)
 ```
 
-Moving window operators, such as the `tp.simple_moving_average` or `tp.moving_count` operators, have an optional `sampling` argument. For example, the signature of the simple moving average operator is `tp.simple_moving_average(input: Node, window_length: Duration, sampling: Optional[Node] = None)`. If `sampling` is not set, the result will maintain the sampling of the `input` argument. If `sampling` is set, the moving window will be sampled at each timestamp of `sampling` instead, and the result will have those new ones.
+Moving window operators, such as the [`tp.simple_moving_average()`][temporian.simple_moving_average] or [`tp.moving_count()`][temporian.moving_count] operators, have an optional `sampling` argument. For example, the signature of the simple moving average operator is [`tp.simple_moving_average()(][temporian.simple_moving_average]input: Node, window_length: Duration, sampling: Optional[Node] = None)`. If `sampling`is not set, the result will maintain the sampling of the`input`argument. If`sampling`is set, the moving window will be sampled at each timestamp of`sampling` instead, and the result will have those new ones.
 
 ```python
 b = tp.simple_moving_average(input=a, window_length=10)
 c = tp.simple_moving_average(input=a, window_length=10, sampling=d)
 ```
 
-Note that if planning to resample the result of a moving window operator, passing the `sampling` argument is both more efficient and more accurate than calling `tp.resample` on the result.
+Note that if planning to resample the result of a moving window operator, passing the `sampling` argument is both more efficient and more accurate than calling [`tp.resample()`][temporian.resample] on the result.
 
 ## Index, horizontal and vertical operators
 
@@ -625,10 +625,10 @@ Horizontal operators can be understood as operators that are applied independent
 
 Operators that modify an `EventSet`'s index are called _vertical operators_. The most important vertical operators are:
 
-- `tp.add_index`: Add features to the index.
-- `tp.drop_index`: Remove features from the index, optionally keeping them as features.
-- `tp.set_index`: Changes the index.
-- `tp.propagate`: Expand an index based on another `EventSet`’s index.
+- [`tp.add_index()`][]temporian.add_index: Add features to the index.
+- [`tp.drop_index()`][]temporian.drop_index: Remove features from the index, optionally keeping them as features.
+- [`tp.set_index()`][]temporian.set_index: Changes the index.
+- [`tp.propagate()`][]temporian.propagate: Expand an index based on another `EventSet`’s index.
 
 By default `EventSets` are _flat_, which means they have no index, and therefore all events are in a single global index group.
 
@@ -678,7 +678,7 @@ e = tp.moving_sum(d["sales"], window_length=tp.duration.weeks(1))
 
 Finally, let's compute the ratio of sales of each `(product, store)` pair compared to the corresponding `store`.
 
-Since `c` (daily sales for each product and store) and `e` (daily sales for each store) have different indexes, we cannot use `tp.divide` (or `/`) directly - we must first `propagate` `e` to the `["product", "store"]` index.
+Since `c` (daily sales for each product and store) and `e` (daily sales for each store) have different indexes, we cannot use [`tp.divide()`][temporian.divide] (or `/`) directly - we must first `propagate` `e` to the `["product", "store"]` index.
 
 ```python
 # Copy the content of e (indexed by (store)) into each (store, product).
@@ -691,7 +691,7 @@ f = c / tp.resample(
 )
 ```
 
-The `tp.propagate` operator expands the index of its `input` (`e` in this case) to match the index of its `sampling` by copying the content of `input` into each corresponding index group of `sampling`. Note that the features in `sampling`'s index must be a superset of the ones in `input`'s index.
+The [`tp.propagate()`][temporian.propagate] operator expands the index of its `input` (`e` in this case) to match the index of its `sampling` by copying the content of `input` into each corresponding index group of `sampling`. Note that the features in `sampling`'s index must be a superset of the ones in `input`'s index.
 
 ## Future leakage
 
@@ -699,9 +699,9 @@ In supervised learning, [leakage](<https://en.wikipedia.org/wiki/Leakage_(machin
 
 Another type of leakage is future leakage, where a model uses data before it is available. Future leakage is particularly easy to create, as all feature data is ultimately available to the model, the problem being it being accessed at the wrong time.
 
-To avoid future leakage, Temporian operators are guaranteed to not cause future leakage, except for the `tp.leak` operator. This means that it is impossible to inadvertently add future leakage to a Temporian program.
+To avoid future leakage, Temporian operators are guaranteed to not cause future leakage, except for the [`tp.leak()`][temporian.leak] operator. This means that it is impossible to inadvertently add future leakage to a Temporian program.
 
-`tp.leak` can be useful for precomputing labels or evaluating machine learning models. However, its outputs shouldn’t be used as input features. To check programmatically if a `Node` depends on `tp.leak`, we can use the `tp.has_leak` function.
+[`tp.leak()`][temporian.leak] can be useful for precomputing labels or evaluating machine learning models. However, its outputs shouldn’t be used as input features. To check programmatically if a `Node` depends on [`tp.leak()`][]temporian.leak, we can use the [`tp.has_leak()`][temporian.has_leak] function.
 
 ```python
 >>> a = tp.input_node(features=[("feature_1", tp.float32)])
@@ -715,7 +715,7 @@ False
 True
 ```
 
-In this example, `b` does not have a future leak, but `c` does because it depends on `tp.leak`. By using `tp.has_leak`, we can programmatically identify future leakage and modify our code accordingly.
+In this example, `b` does not have a future leak, but `c` does because it depends on [`tp.leak()`][]temporian.leak. By using [`tp.has_leak()`][]temporian.has_leak, we can programmatically identify future leakage and modify our code accordingly.
 
 ## Accessing `EventSet` data
 
@@ -756,7 +756,7 @@ evset.feature("f1")
 
 ## Import and export data
 
-`EventSets` can be read from and saved to csvfiles via the `tp.from_csv` and `tp.to_csv` functions.
+`EventSets` can be read from and saved to csvfiles via the [`tp.from_csv()`][temporian.from_csv] and [`tp.to_csv()`][temporian.to_csv] functions.
 
 ```python
 # Read EventSet from a .csv file.
@@ -770,7 +770,7 @@ evset = tp.from_csv(
 tp.to_csv(evset, path="path/to/file.csv")
 ```
 
-Converting `EventSet` data to and from pandas DataFrames is also easily done via `tp.to_pandas` and `tp.from_pandas`.
+Converting `EventSet` data to and from pandas DataFrames is also easily done via [`tp.to_pandas()`][temporian.to_pandas] and [`tp.from_pandas()`][]temporian.from_pandas.
 
 ```python
 import pandas as pd
@@ -790,7 +790,7 @@ df = tp.to_pandas(evset)
 
 ## Serialization and deserialization of a graph
 
-Temporian graphs can be exported and imported to a safe-to-share file with `tp.save` and `tp.load`. In both functions input and output `Nodes` need to be named, or be assigned a name by passing them as a dictionary.
+Temporian graphs can be exported and imported to a safe-to-share file with [`tp.save()`][temporian.save] and [`tp.load()`][]temporian.load. In both functions input and output `Nodes` need to be named, or be assigned a name by passing them as a dictionary.
 
 ```python
 # Define a graph.
