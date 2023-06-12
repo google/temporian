@@ -107,7 +107,7 @@ def glue(
 
     Example:
 
-        ```
+        ```python
         input_1 = ... # Feature A & B
         input_2 = ... # Feature C & D
         input_3 = ... # Feature E & F
@@ -121,7 +121,7 @@ def glue(
 
     Example:
 
-        ```
+        ```python
         # Assume input_1, input_2 and input_3 dont have the same sampling
         input_1 = ... # Feature A & B
         input_2 = ... # Feature C & D

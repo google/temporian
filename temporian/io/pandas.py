@@ -38,7 +38,7 @@ def from_pandas(
 
     Usage example:
 
-    ```
+    ```python
     import pandas as pd
     df = pd.DataFrame(
         data=[

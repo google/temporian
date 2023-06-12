@@ -74,7 +74,7 @@ def resample(
     `dtype.MissingValue(...)`.
 
     Example:
-        ```
+        ```python
         Inputs:
             input:
                 timestamps: 1, 5, 8, 9

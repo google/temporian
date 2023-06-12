@@ -390,7 +390,7 @@ class EventSet:
 
         Usage example:
 
-        ```
+        ```python
         my_evset = tp.event_set(
             timestamps=[1, 2, 3, 4],
             features={

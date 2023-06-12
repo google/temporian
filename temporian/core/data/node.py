@@ -501,7 +501,7 @@ def input_node(
 
     Usage example:
 
-        ```
+        ```python
         # Without index
         a = source_node(features=[("f1", tp.float64), ("f2", tp.string)])
 

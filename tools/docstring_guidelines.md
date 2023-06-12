@@ -78,7 +78,7 @@ Example:
     description of exported classes and functions and/or usage examples.
 
     Example:
-        ```
+        ```python
         foo = ClassFoo()
         bar = foo.FunctionBar()
         ```
@@ -154,7 +154,7 @@ Example:
     represented by table_handle.  String keys will be UTF-8 encoded.
 
     Example:
-        ```
+        ```python
         rows = fetch_rows(handle, keys)
         ```
 
