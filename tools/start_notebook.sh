@@ -12,7 +12,7 @@
 #
 # Check example/toy_example.ipynb for an example.
 
-set -xev
+set -vex
 
 # Build temporian
 bazel build -c opt //temporian
@@ -21,12 +21,10 @@ bazel build -c opt //temporian
 PKDIR="$(pwd)/build_package"
 rm -fr ${PKDIR}
 mkdir -p ${PKDIR}
-find temporian -name "*.py" -type f -exec rsync -R {} ${PKDIR}/ \;
 
-( cd bazel-bin && \
-    find temporian \( -name "*.so" -o -name "*.py" \) -type f -exec rsync -R {} ${PKDIR}/ \;
-)
+rsync -v -r --include='*/' --include='*.py' --exclude='*' "temporian/" "${PKDIR}/temporian/"
+rsync -v -r --include='*/' --include='*.py' --include='*.so' --exclude='*' --exclude='test' "bazel-bin/temporian/" "${PKDIR}/temporian/"
 
 # Start notebook
 # Note: Use "notebook" or "lab" ("jupyterlab").
-PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python PYTHONPATH="${PKDIR}/:$PYTHONPATH" jupyter-lab
+PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python PYTHONPATH="${PKDIR}/:$PYTHONPATH" jupyter-lab --no-browser
