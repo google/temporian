@@ -50,16 +50,6 @@ while files_to_parse:
                 # We only allow wildcard imports from modules explicitly named
                 # api_symbols to prevent unwanted names in the public API
                 if name == "*":
-                    # TODO: remove this first possibility
-                    module_path = Path(words[1].replace(".", "/"))
-                    init_path = module_path / "__init__.py"
-                    if init_path.exists():
-                        new_prefix = (
-                            (prefix + ".") if prefix else ""
-                        ) + module_path.name
-                        files_to_parse.append((new_prefix, init_path))
-                        continue
-
                     module_path = Path(words[1].replace(".", "/")).with_suffix(
                         ".py"
                     )
