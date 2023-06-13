@@ -5,7 +5,6 @@ from typing import Optional, List, Any, Set
 
 import numpy as np
 
-from temporian.core.data.duration_utils import convert_date_to_duration
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.plotter import (
     Options,
@@ -225,14 +224,18 @@ def _bokeh_sub_plot(
         args = {}
         if options.min_time is not None:
             args["start"] = (
-                convert_date_to_duration(options.min_time)
-                if not is_unix_timestamp
+                datetime.datetime.fromtimestamp(
+                    options.min_time, tz=datetime.timezone.utc
+                )
+                if is_unix_timestamp
                 else options.min_time
             )
         if options.max_time is not None:
             args["end"] = (
-                convert_date_to_duration(options.max_time)
-                if not is_unix_timestamp
+                datetime.datetime.fromtimestamp(
+                    options.max_time, tz=datetime.timezone.utc
+                )
+                if is_unix_timestamp
                 else options.max_time
             )
         fig.x_range = Range1d(**args)
