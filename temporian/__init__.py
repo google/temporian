@@ -26,8 +26,9 @@
 # NOTE: Wildcard imports (*) are treated and parsed as part of root-level
 # imports, so same rules apply to modules imported with a wildcard.
 # Also:
-# - Modules imported with wildcards are shown as subfolders in the docs.
-# - Wildcard imports are only allowed for modules, which must have an init file.
+# - Wildcard imports are only allowed from modules explicitly called api_symbols
+# - Modules imported with wildcards are shown as subfolders in the docs, with
+# the folder's name being the api_symbols.py file's parent's name.
 
 # pylint: disable=wrong-import-position
 # pylint: disable=line-too-long
