@@ -14,6 +14,15 @@
 
 """
 Benchmark Python API.
+
+Usage example:
+
+# Run the full benchmark.
+bazel run -c opt //benchmark:benchmark_time
+
+# Only run the "add_index" runs.
+bazel run -c opt //benchmark:benchmark_time -- -f=add_index
+
 """
 import argparse
 import time
@@ -22,8 +31,6 @@ from typing import List, NamedTuple, Union
 import numpy as np
 import pandas as pd
 import temporian as tp
-
-# TODO(gbm): Add flag to control which benchmark to run.
 
 
 def _build_toy_dataset(
@@ -152,8 +159,8 @@ def benchmark_cast(runner):
             output = tp.cast(
                 node,
                 {
-                    "data_1": tp.dtype.DType.INT32,
-                    "data_2": tp.dtype.DType.FLOAT32,
+                    "data_1": tp.int32,
+                    "data_2": tp.float32,
                 },
                 check_overflow=check,
             )

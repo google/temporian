@@ -112,19 +112,18 @@ def normalize_features(
     if not isinstance(feature_values, np.ndarray):
         # The data is not a np.array
 
-        all_str = all(
-            (
-                isinstance(x, (str, bytes)) or x is math.nan or x is np.nan
-                for x in feature_values
-            )
-        )
+        # Looks for an indication of a string or non-string array.
+        is_string = False
+        for x in feature_values:
+            if isinstance(x, (str, bytes)):
+                is_string = True
+                break
+            if isinstance(x, (int, bool, float)):
+                is_string = False
+                break
 
-        if all_str:
+        if is_string:
             # All the values are python strings.
-            feature_values = [
-                "" if x is math.nan or x is np.nan else x
-                for x in feature_values
-            ]
             feature_values = np.array(feature_values, dtype=np.str_)
         else:
             feature_values = np.array(feature_values)
@@ -133,16 +132,9 @@ def normalize_features(
         feature_values = feature_values.astype(np.str_)
 
     # TODO: This is slow. Speed-up.
-    if feature_values.dtype.type == np.object_ and all(
-        isinstance(x, str) or x is math.nan or x is np.nan
-        for x in feature_values
-    ):
-        # This is a np.array of python string.
-        # TODO: This is slow. Speed-up.
-        feature_values = np.array(
-            ["" if x is math.nan or x is np.nan else x for x in feature_values],
-            dtype=np.str_,
-        )
+    if feature_values.dtype.type == np.object_:
+        # DO NOT SUBMIT: Warning
+        feature_values = feature_values.astype(np.str_)
 
     if feature_values.dtype.type == np.datetime64:
         feature_values = feature_values.astype("datetime64[s]").astype(np.int64)
@@ -307,9 +299,6 @@ class IndexData:
             return False
 
         for f1, f2 in zip(self.features, other.features):
-            if f1.dtype != f2.dtype:
-                return False
-
             if f1.dtype.kind == "f":
                 if not np.allclose(f1, f2, equal_nan=True):
                     return False

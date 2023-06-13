@@ -46,7 +46,7 @@ class IOTest(absltest.TestCase):
                     features=[
                         np.array([0.5, math.nan]),
                         np.array([10, 5]),
-                        np.array(["a", ""]),
+                        np.array(["a", "nan"]),
                         np.array(["d", ""]),
                         np.array([1, 3]),
                     ],
@@ -70,7 +70,7 @@ class IOTest(absltest.TestCase):
 
         print("evset:\n", evset)
         print("expected_evset:\n", expected_evset)
-        self.assertEqual(repr(evset), repr(expected_evset))
+        self.assertEqual(evset, expected_evset)
 
     def test_timestamps_non_unix_time(self):
         for timestamps in [
