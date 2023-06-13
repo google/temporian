@@ -88,6 +88,8 @@ plugins:
             group_by_category: true
             show_category_heading: false
             show_root_heading: true
+            # show_root_toc_entry: false
+            # show_symbol_type_heading: false
             # preload_modules: [temporian.core.operators]
             # allow_inspection: true
 
