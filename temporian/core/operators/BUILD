@@ -5,9 +5,10 @@ package(
 
 # Libraries
 # =========
+
 py_library(
-    name = "operators",
-    srcs = ["__init__.py"],
+    name = "api_symbols",
+    srcs = ["api_symbols.py"],
     srcs_version = "PY3",
     deps = [
         ":add_index",
@@ -29,22 +30,9 @@ py_library(
         ":unary",
         ":unique_timestamps",
         "//temporian/core/operators/binary",
-        "//temporian/core/operators/calendar:day_of_month",
-        "//temporian/core/operators/calendar:day_of_week",
-        "//temporian/core/operators/calendar:day_of_year",
-        "//temporian/core/operators/calendar:hour",
-        "//temporian/core/operators/calendar:iso_week",
-        "//temporian/core/operators/calendar:minute",
-        "//temporian/core/operators/calendar:month",
-        "//temporian/core/operators/calendar:second",
-        "//temporian/core/operators/calendar:year",
+        "//temporian/core/operators/calendar",
         "//temporian/core/operators/scalar",
-        "//temporian/core/operators/window:moving_count",
-        "//temporian/core/operators/window:moving_max",
-        "//temporian/core/operators/window:moving_min",
-        "//temporian/core/operators/window:moving_standard_deviation",
-        "//temporian/core/operators/window:moving_sum",
-        "//temporian/core/operators/window:simple_moving_average",
+        "//temporian/core/operators/window",
     ],
 )
 

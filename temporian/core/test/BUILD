@@ -95,6 +95,6 @@ py_test(
     deps = [
         # already_there/absl/testing:absltest
         "//temporian/core:operator_lib",
-        "//temporian/core/operators",
+        "//temporian/core/operators:api_symbols",
     ],
 )

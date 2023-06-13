@@ -10,6 +10,23 @@ py_library(
     name = "window",
     srcs = ["__init__.py"],
     srcs_version = "PY3",
+    deps = [
+        ":api_symbols",
+    ],
+)
+
+py_library(
+    name = "api_symbols",
+    srcs = ["api_symbols.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":moving_count",
+        ":moving_max",
+        ":moving_min",
+        ":moving_standard_deviation",
+        ":moving_sum",
+        ":simple_moving_average",
+    ],
 )
 
 py_library(

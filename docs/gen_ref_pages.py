@@ -47,18 +47,31 @@ while files_to_parse:
             if words[-2] == "import":
                 name = words[-1]
 
-                # Handle wildcard imports by parsing the imported module
+                # We only allow wildcard imports from modules explicitly named
+                # api_symbols to prevent unwanted names in the public API
                 if name == "*":
-                    # Add the module's __init__ file to the stack if it exists
+                    # TODO: remove this first possibility
                     module_path = Path(words[1].replace(".", "/"))
                     init_path = module_path / "__init__.py"
                     if init_path.exists():
-                        files_to_parse.append((module_path.name, init_path))
+                        new_prefix = (
+                            (prefix + ".") if prefix else ""
+                        ) + module_path.name
+                        files_to_parse.append((new_prefix, init_path))
                         continue
 
-                    else:
-                        non_parsable_imports.append(line)
+                    module_path = Path(words[1].replace(".", "/")).with_suffix(
+                        ".py"
+                    )
+                    if module_path.stem == "api_symbols":
+                        new_prefix = (
+                            (prefix + ".") if prefix else ""
+                        ) + module_path.parent.name
+                        files_to_parse.append((new_prefix, module_path))
                         continue
+
+                    non_parsable_imports.append(line)
+                    continue
 
                 # If symbol wasn't renamed, use its imported name
                 if symbol is None:
@@ -100,7 +113,6 @@ for symbol, path in sorted(members):
 
     with mkdocs_gen_files.open(full_doc_path, "w") as fd:
         identifier = ".".join(list(src_path.parts))
-        print(identifier)
         print("::: " + identifier, file=fd)
 
     mkdocs_gen_files.set_edit_path(full_doc_path, path)

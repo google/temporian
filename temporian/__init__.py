@@ -47,7 +47,7 @@ from temporian.core.data.node import Node
 from temporian.core.data.node import input_node
 
 # Dtypes
-from temporian.core.data.dtypes import *
+from temporian.core.data.dtypes.api_symbols import *
 
 # Schema
 from temporian.core.data.schema import Schema
@@ -60,16 +60,16 @@ from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.io import event_set
 
 # Graph serialization
-from temporian.core.serialization import *
+from temporian.core.serialization.api_symbols import *
 
 # Graph execution
 from temporian.core.evaluation import evaluate
 
 # Operators
-from temporian.core.operators import *
+from temporian.core.operators.api_symbols import *
 
 # IO
-from temporian.io import *
+from temporian.io.api_symbols import *
 
 # Plotting
 from temporian.implementation.numpy.data.plotter import plot

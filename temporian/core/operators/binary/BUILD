@@ -11,6 +11,18 @@ py_library(
     srcs = ["__init__.py"],
     srcs_version = "PY3",
     deps = [
+        ":api_symbols",
+        ":arithmetic",
+        ":logical",
+        ":relational",
+    ],
+)
+
+py_library(
+    name = "api_symbols",
+    srcs = ["api_symbols.py"],
+    srcs_version = "PY3",
+    deps = [
         ":arithmetic",
         ":logical",
         ":relational",
@@ -43,8 +55,8 @@ py_library(
 )
 
 py_library(
-    name = "relational",
-    srcs = ["relational.py"],
+    name = "logical",
+    srcs = ["logical.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
@@ -56,8 +68,8 @@ py_library(
 )
 
 py_library(
-    name = "logical",
-    srcs = ["logical.py"],
+    name = "relational",
+    srcs = ["relational.py"],
     srcs_version = "PY3",
     deps = [
         ":base",

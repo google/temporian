@@ -11,3 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+# pylint: disable=unused-import
+
+from temporian.core.data.dtypes.dtype import float64
+from temporian.core.data.dtypes.dtype import float32
+from temporian.core.data.dtypes.dtype import int32
+from temporian.core.data.dtypes.dtype import int64
+from temporian.core.data.dtypes.dtype import bool_
+from temporian.core.data.dtypes.dtype import str_

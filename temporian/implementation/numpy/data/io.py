@@ -11,7 +11,7 @@ from temporian.implementation.numpy.data.event_set import (
     normalize_features,
 )
 from temporian.core.evaluation import evaluate
-from temporian.core.operators import add_index
+from temporian.core.operators.add_index import add_index
 from temporian.core.data.schema import Schema
 
 # Array of values as feed by the user.

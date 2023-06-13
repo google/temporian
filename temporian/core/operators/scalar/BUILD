@@ -11,6 +11,17 @@ py_library(
     srcs = ["__init__.py"],
     srcs_version = "PY3",
     deps = [
+        "api_symbols",
+        ":arithmetic_scalar",
+        ":relational_scalar",
+    ],
+)
+
+py_library(
+    name = "api_symbols",
+    srcs = ["api_symbols.py"],
+    srcs_version = "PY3",
+    deps = [
         ":arithmetic_scalar",
         ":relational_scalar",
     ],
