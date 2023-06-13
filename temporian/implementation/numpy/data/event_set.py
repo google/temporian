@@ -13,9 +13,10 @@
 # limitations under the License.
 
 from __future__ import annotations
+
+import logging
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
-import math
 import datetime
 import sys
 
@@ -96,6 +97,7 @@ def tp_dtype_to_np_dtype(dtype: DType) -> Any:
 
 def normalize_features(
     feature_values: Any,
+    name: str,
 ) -> np.ndarray:
     """Normalizes a list of feature values to temporian format.
 
@@ -133,6 +135,15 @@ def normalize_features(
 
     # TODO: This is slow. Speed-up.
     if feature_values.dtype.type == np.object_:
+        logging.warning(
+            (
+                'Feature "%s" is provided as an array of numpy.object_ or'
+                " equivalent, so Temporian interpret this feature as"
+                " tp.string_. To remove this warning, feed specific numpy types"
+                " e.g. np.float32, np.str_."
+            ),
+            name,
+        )
         # DO NOT SUBMIT: Warning
         feature_values = feature_values.astype(np.str_)
 
