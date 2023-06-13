@@ -1,6 +1,9 @@
 site_name: Temporian
 site_url: https://temporian.readthedocs.io/en/stable/
+site_description: "Temporian: a Python package for feature engineering of temporal data."
+
 repo_url: https://github.com/google/temporian
+edit_uri_template: tree/main/temporian/{path_noext}
 
 # Theme
 theme:
@@ -13,6 +16,8 @@ theme:
     - navigation.sections
     - navigation.instant
     - navigation.indexes
+    - content.action.edit
+    - content.action.view
   palette:
     # Palette toggle for dark mode
     - scheme: slate
@@ -60,6 +65,7 @@ plugins:
         - gen_ref_pages.py
   - literate-nav:
       nav_file: SUMMARY.md
+  - social
   - mkdocs-jupyter:
       # Execute notebooks when building docs (set to true when temporian runs in a notebook w/o the start_notebook script).
       execute: false
