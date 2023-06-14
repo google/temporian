@@ -103,17 +103,41 @@ operator_lib.register_operator(GlueOperator)
 def glue(
     *inputs: Node,
 ) -> Node:
-    """Concatenates together nodes with the same sampling.
+    """Concatenates together nodes with the same sampling. Feature names cannot be duplicated across nodes.
 
     Example:
 
         ```python
-        >>> a = tp.input_node(features=[("A1", tp.str_), ("A2", tp.int32)])
-        >>> b = tp.input_node(features=[("B", tp.float64)], same_sampling_as=a)
-        >>> c = tp.input_node(features=[("C", tp.float64)], same_sampling_as=a)
-        >>> output = tp.glue(a, b, c)
+        >>> a = tp.input_node(features=[("A1", tp.float64), ("A2", tp.float64)])
+        >>> b = a["A1"] + a["A2"]
+        >>> c = a["A1"] - a["A2"]
+
+        # Glue all features from a,b,c
+        >>> d = tp.glue(a, b, c)
+        >>> d.features
+        [('A1', float64), ('A2', float64), ('add_A1_A2', float64), ('sub_A1_A2', float64)]
+
+        ```
+
+    To glue nodes with duplicated feature names, add a prefix or rename before:
+
+    Example:
+
+    ```python
+        >>> a = tp.input_node(features=[("f1", tp.float64), ("f2", tp.float64)])
+
+        # Same feature names as a
+        >>> b = tp.simple_moving_average(a, 5)
+
+        # Add a prefix before glue
+        >>> output = tp.glue(a, tp.prefix("sma_", b))
         >>> output.features
-        [('A1', str_), ('A2', int32), ('B', float64), ('C', float64)]
+        [('f1', float64), ('f2', float64), ('sma_f1', float64), ('sma_f2', float64)]
+
+        # Or rename before glue
+        >>> output = tp.glue(a["f1"], tp.rename(b["f1"], "new_feature"))
+        >>> output.features
+        [('f1', float64), ('new_feature', float64)]
 
         ```
 
