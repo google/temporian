@@ -1,4 +1,4 @@
-# Building and installing
+# Building Temporian
 
 Temporian is not a pure Python package, so special care is required when
 packaging it for distribution. This document outlines how to build a Temporian
@@ -29,24 +29,32 @@ within the manylinux2014 container are encouraged.
 
 We use the TFX manylinux docker that includes a working Bazel installation. Run
 the following command to start the docker (might require superuser permissions):
-```
+
+```sh
 ./tools/start_compile_docker.sh
 ```
+
 Within the docker, run the following command
+
+```sh
+PYTHON_VERSION=<version> ./tools/build_manylinux.sh
 ```
-./tools/build_manylinux.sh
-```
-This will place the manylinux packages in the `dist/` directory under
+
+where `<version>` is one of `38`, `39`, `310`, `311`.
+
+This will place the manylinux package in the `dist/` directory under
 Temporian's root.
 
 ## MacOS builds
 
 Simply activate the desired Python version (e.g. using Pyenv) install Poetry
 and run
-```
+
+```sh
 poetry build
 ```
-Note that separate builds for ARM64 and Intel Macs are necessary
+
+Note that separate builds for ARM64 and Intel Macs are necessary.
 
 ## Windows builds
 

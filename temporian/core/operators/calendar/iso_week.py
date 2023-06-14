@@ -21,12 +21,10 @@ from temporian.core.operators.calendar.base import BaseCalendarOperator
 
 class CalendarISOWeekOperator(BaseCalendarOperator):
     @classmethod
-    @property
     def operator_def_key(cls) -> str:
         return "CALENDAR_ISO_WEEK"
 
     @classmethod
-    @property
     def output_feature_name(cls) -> str:
         return "calendar_iso_week"
 

@@ -25,7 +25,6 @@ from temporian.core.operators.window.base import BaseWindowOperator
 
 class MovingStandardDeviationOperator(BaseWindowOperator):
     @classmethod
-    @property
     def operator_def_key(cls) -> str:
         return "MOVING_STANDARD_DEVIATION"
 

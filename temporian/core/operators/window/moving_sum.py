@@ -28,7 +28,6 @@ from temporian.core.data.dtype import DType
 
 class MovingSumOperator(BaseWindowOperator):
     @classmethod
-    @property
     def operator_def_key(cls) -> str:
         return "MOVING_SUM"
 

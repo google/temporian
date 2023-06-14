@@ -16,3 +16,13 @@ profile.*
 
 # Mkdocs build
 site/
+
+# Build outputs
+build
+dist
+setup.py
+temporian.egg-info
+temporian/proto/core_pb2.py
+
+# MacOS
+**/.DS_Store

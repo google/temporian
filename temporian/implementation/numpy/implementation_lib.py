@@ -14,7 +14,7 @@
 
 """Registering mechanism for operator implementation classes."""
 
-from typing import Any
+from typing import Any, Dict
 
 _OPERATOR_IMPLEMENTATIONS = {}
 
@@ -39,6 +39,6 @@ def get_implementation_class(key: str):
     return _OPERATOR_IMPLEMENTATIONS[key]
 
 
-def registered_implementations() -> dict[str, Any]:
+def registered_implementations() -> Dict[str, Any]:
     """Lists the registered operator implementations."""
     return _OPERATOR_IMPLEMENTATIONS

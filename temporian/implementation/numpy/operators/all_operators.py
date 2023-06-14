@@ -42,3 +42,6 @@ from temporian.implementation.numpy.operators.calendar import minute
 from temporian.implementation.numpy.operators.calendar import second
 from temporian.implementation.numpy.operators import since_last
 from temporian.implementation.numpy.operators import unique_timestamps
+from temporian.implementation.numpy.operators import begin
+from temporian.implementation.numpy.operators import end
+from temporian.implementation.numpy.operators import tick

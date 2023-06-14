@@ -29,6 +29,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "ADDITION_SCALAR",
             "ADD_INDEX",
             "AND",
+            "BEGIN",
             "CALENDAR_DAY_OF_MONTH",
             "CALENDAR_DAY_OF_WEEK",
             "CALENDAR_DAY_OF_YEAR",
@@ -42,6 +43,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "DIVISION",
             "DIVISION_SCALAR",
             "DROP_INDEX",
+            "END",
             "EQUAL",
             "EQUAL_SCALAR",
             "FILTER",
@@ -85,6 +87,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "SINCE_LAST",
             "SUBTRACTION",
             "SUBTRACTION_SCALAR",
+            "TICK",
             "UNIQUE_TIMESTAMPS",
             "XOR",
         ]
