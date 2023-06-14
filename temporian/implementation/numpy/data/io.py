@@ -30,39 +30,40 @@ def event_set(
 ) -> EventSet:
     """Creates an event set from arrays (list, numpy, pandas).
 
-    Usage example:
+    Usage examples:
 
         ```python
-        # Creates an event set with 4 timestamps and 3 features.
-        evset = tp.event_set(
-            timestamps=[1, 2, 3, 4],
-            features={
-                "feature_1": [0.5, 0.6, math.nan, 0.9],
-                "feature_2": ["red", "blue", "red", "blue"],
-                "feature_3": [10, -1, 5, 5],
-            },
-        )
+        >>> # Creates an event set with 4 timestamps and 3 features.
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3, 4],
+        ...     features={
+        ...         "feature_1": [0.5, 0.6, np.nan, 0.9],
+        ...         "feature_2": ["red", "blue", "red", "blue"],
+        ...         "feature_3": [10, -1, 5, 5],
+        ...     },
+        ... )
 
-        # Creates an event set with an index.
-        evset = tp.event_set(
-            timestamps=[1, 2, 3, 4],
-            features={
-                "feature_1": [0.5, 0.6, math.nan, 0.9],
-                "feature_2": ["red", "blue", "red", "blue"],
-            },
-            index_features=["feature_2"],
-        )
+        >>> # Creates an event set with an index.
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3, 4],
+        ...     features={
+        ...         "feature_1": [0.5, 0.6, np.nan, 0.9],
+        ...         "feature_2": ["red", "blue", "red", "blue"],
+        ...     },
+        ...     index_features=["feature_2"],
+        ... )
 
-        # Create an evet set with datetimes.
-        from datetime import datetime
-        evset = tp.event_set(
-            timestamps=[datetime(2015, 1, 1), datetime(2015, 1, 2)],
-            features={
-                "feature_1": [0.5, 0.6],
-                "feature_2": ["red", "blue"],
-            },
-            index_features=["feature_2"],
-        )
+        >>> # Create an evet set with datetimes.
+        >>> from datetime import datetime
+        >>> evset = tp.event_set(
+        ...     timestamps=[datetime(2015, 1, 1), datetime(2015, 1, 2)],
+        ...     features={
+        ...         "feature_1": [0.5, 0.6],
+        ...         "feature_2": ["red", "blue"],
+        ...     },
+        ...     index_features=["feature_2"],
+        ... )
+
         ```
 
     Supported values for `timestamps`:

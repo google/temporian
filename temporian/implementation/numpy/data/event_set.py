@@ -234,6 +234,7 @@ class IndexData:
         >>> index_data = IndexData(features, timestamps)
         >>> len(index_data)
         3
+
         ```
     """
 
@@ -244,7 +245,7 @@ class IndexData:
         self,
         features: List[np.ndarray],
         timestamps: np.ndarray,
-        schema: Optional[Schema],
+        schema: Optional[Schema] = None,
     ) -> None:
         """Initializes the IndexData object by checking and setting the features
         and timestamps.
@@ -391,15 +392,15 @@ class EventSet:
         Usage example:
 
         ```python
-        my_evset = tp.event_set(
-            timestamps=[1, 2, 3, 4],
-            features={
-                "feature_1": [0.5, 0.6, math.nan, 0.9],
-                "feature_2": ["red", "blue", "red", "blue"],
-            },
-        )
+        >>> my_evset = tp.event_set(
+        ...     timestamps=[1, 2, 3, 4],
+        ...     features={
+        ...         "feature_1": [0.5, 0.6, np.nan, 0.9],
+        ...         "feature_2": ["red", "blue", "red", "blue"],
+        ...     },
+        ... )
+        >>> my_node = my_evset.node()
 
-        my_node = my_evset.node()
         ```
 
         Args:
@@ -486,6 +487,14 @@ class EventSet:
 
     def plot(self, *args, **wargs) -> Any:
         """Plots the event set. See [`tp.plot()`][temporian.plot] for details.
+
+        Example usage:
+
+            ```python
+            >>> evset = tp.event_set(timestamps=[1, 2, 3], features={"f1": [0, 42, 10]})
+            >>> evset.plot()
+
+            ```
         """
 
         from temporian.implementation.numpy.data import plotter

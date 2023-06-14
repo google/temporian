@@ -74,17 +74,22 @@ def resample(
     `dtype.MissingValue(...)`.
 
     Example:
-        ```python
-        Inputs:
-            input:
-                timestamps: 1, 5, 8, 9
-                feature_1:  1.0, 2.0, 3.0, 4.0
-            sampling:
-                timestamps: -1, 1, 6, 10
 
-        Output:
-            timestamps: -1, 1, 6, 10
-            feature_1: nan, 1.0, 2.0, 4.0
+        ```python
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 5, 8, 9],
+        ...     features={"f1": [1.0, 2.0, 3.0, 4.0]}
+        ... )
+        >>> sampling = tp.event_set(timestamps=[-1, 1, 6, 10])
+        >>> input_node = evset.node()
+        >>> sampling_node = sampling.node()
+        >>> out_node = tp.resample(input_node, sampling=sampling_node)
+        >>> out_node.evaluate({input_node: evset, sampling_node: sampling})
+        indexes: ...
+                timestamps: [-1.  1.  6. 10.]
+                'f1': [nan  1.  2.  4.]
+        ...
+
         ```
 
     Args:

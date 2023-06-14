@@ -108,12 +108,13 @@ def glue(
     Example:
 
         ```python
-        input_1 = ... # Feature A & B
-        input_2 = ... # Feature C & D
-        input_3 = ... # Feature E & F
+        >>> a = tp.input_node(features=[("A1", tp.str_), ("A2", tp.int32)])
+        >>> b = tp.input_node(features=[("B", tp.float64)], same_sampling_as=a)
+        >>> c = tp.input_node(features=[("C", tp.float64)], same_sampling_as=a)
+        >>> output = tp.glue(a, b, c)
+        >>> output.features
+        [('A1', str_), ('A2', int32), ('B', float64), ('C', float64)]
 
-        # Output has features A, B, C, D, E & F
-        output = np.glue(input_1, input_2, input_3)
         ```
 
     To concatenate nodes with different samplings, use
@@ -122,16 +123,16 @@ def glue(
     Example:
 
         ```python
-        # Assume input_1, input_2 and input_3 dont have the same sampling
-        input_1 = ... # Feature A & B
-        input_2 = ... # Feature C & D
-        input_3 = ... # Feature E & F
+        >>> a = tp.input_node(features=[("A", tp.str_)])
+        >>> b = tp.input_node(features=[("B", tp.float64)])
+        >>> c = tp.input_node(features=[("C", tp.float64)])
+        >>> output = tp.glue(a,
+        ...                  tp.resample(b, sampling=a),
+        ...                  tp.resample(c, sampling=a)
+        ...          )
+        >>> output.features
+        [('A', str_), ('B', float64), ('C', float64)]
 
-        # Output has features A, B, C, D, E & F, and the same sampling as
-        # input_1
-        output = tp.glue(input_1,
-            tp.resample(input_2, sampling=input_1),
-            tp.resample(input_3, sampling=input_1))
         ```
 
     Args:

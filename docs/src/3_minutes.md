@@ -13,15 +13,16 @@ Events are not handled individually. Instead, events are grouped together into a
 You can create an [`EventSet`][temporian.EventSet] from a pandas DataFrame, NumPy arrays, CSV files, and more. Here is an example of an [`EventSet`][temporian.EventSet] containing four events and three features:
 
 ```python
-evset = tp.EventSet(
-	timestamps=["04-02-2023", "06-02-2023", "07-02-2023", "07-02-2023"],
-	features={
-        "feature_1": [0.5, 0.6, NaN, 0.9],
-        "feature_2": ["red", "blue", "red", "blue"],
-        "feature_3":  [10, -1, 5, 5],
-	},
-    index=["feature_2"],
-)
+>>> evset = tp.event_set(
+...     timestamps=["2023-02-04", "2023-02-06", "2023-02-07", "2023-02-07"],
+...     features={
+...         "feature_1": [0.5, 0.6, np.nan, 0.9],
+...         "feature_2": ["red", "blue", "red", "blue"],
+...         "feature_3":  [10.0, -1.0, 5.0, 5.0],
+...     },
+...     index_features=["feature_2"],
+... )
+
 ```
 
 An [`EventSet`][temporian.EventSet] can hold one or several time sequences, depending on what its **[index](../user_guide/#index-horizontal-and-vertical-operators)** is.
@@ -41,12 +42,13 @@ Note that when calling operators you are only defining the graph - i.e., you are
 Operators are not applied directly to [`EventSets`][temporian.EventSet], but to **[Nodes][temporian.Node]**. You can think of a [`Node`][temporian.Node] as the placeholder for an [`EventSet`][temporian.EventSet] in the graph. When applying operators to [`Nodes`][temporian.Node], you get back new [`Nodes`][temporian.Node] that are placeholders for the results of those operations. You can create arbitrarily complex graphs by combining operators and nodes.
 
 ```python
-# Obtain the Node corresponding to the EventSet we created above
-source = evset.node()
+>>> # Obtain the Node corresponding to the EventSet we created above
+>>> source = evset.node()
+>>>
+>>> # Apply operators to existing Nodes to generate new Nodes
+>>> addition = source["feature_1"] + source["feature_3"]
+>>> addition_lagged = tp.lag(addition, duration=tp.duration.days(7))
 
-# Apply operators to existing Nodes to generate new Nodes
-addition = source["feature_1"] + source["feature_3"]
-addition_lagged = tp.lag(addition, duration=tp.duration.days(7))
 ```
 
 <!-- TODO: add image of the generated graph -->
@@ -54,7 +56,8 @@ addition_lagged = tp.lag(addition, duration=tp.duration.days(7))
 Your graph can now be run by calling [`.evaluate()`][temporian.Node.evaluate] on any [`Node`][temporian.Node] in the graph, which will perform all necessary operations and return the resulting [`EventSet`][temporian.EventSet].
 
 ```python
-result = addition_lagged.evaluate(evset)
+>>> result = addition_lagged.evaluate(evset)
+
 ```
 
 Note that you need to pass the [`EventSets`][temporian.EventSet] that correspond to the source [`Nodes`][temporian.Node] in the graph to [`.evaluate()`][temporian.Node.evaluate] (since those are not part of the graph definition). Also, several [`Nodes`][temporian.Node] can be evaluated at the same time by calling [`tp.evaluate()`][temporian.evaluate] directly.
