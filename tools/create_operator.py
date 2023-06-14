@@ -239,7 +239,7 @@ py_library(
     deps = [
         # already_there/numpy
         ":base",
-        "//temporian/core/data:duration",
+        "//temporian/core/data:duration_utils",
         "//temporian/core/operators:{lower_op}",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy:utils",
@@ -335,7 +335,7 @@ py_test(
     deps = [
         # already_there/absl/testing:absltest
         ":test_util",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/implementation/numpy/data:io",

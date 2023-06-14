@@ -3,15 +3,14 @@ package(
     licenses = ["notice"],
 )
 
-
 py_library(
     name = "utils",
     srcs = ["utils.py"],
     srcs_version = "PY3",
     deps = [
         "//temporian/core:operator_lib",
-        "//temporian/core/data:dtype",
         "//temporian/core/data:node",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/operators:base",
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
@@ -31,7 +30,7 @@ py_test(
         ":utils",
         "//temporian/core/data:node",
         "//temporian/core/operators:base",
-        "//temporian/core/operators:unary",
+        "//temporian/core/operators/unary",
         "//temporian/core/operators/binary",
         "//temporian/core/operators/scalar",
         "//temporian/proto:core_py_proto",
@@ -71,8 +70,8 @@ py_test(
         # already_there/absl/testing:absltest
         "//temporian",
         "//temporian/core:graph",
-        "//temporian/core:serialization",
-        "//temporian/core/data:dtype",
+        "//temporian/core/serialization:serialize",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/implementation/numpy/data:io",
     ],
 )
@@ -96,6 +95,6 @@ py_test(
     deps = [
         # already_there/absl/testing:absltest
         "//temporian/core:operator_lib",
-        "//temporian/core/operators:all_operators",
+        "//temporian/core/operators:api_symbols",
     ],
 )

@@ -21,7 +21,7 @@ py_library(
         "//temporian/core:schedule",
         "//temporian/core/data:node",
         "//temporian/implementation/numpy/data:event_set",
-        "//temporian/implementation/numpy/operators:all_operators",
+        "//temporian/implementation/numpy/operators",
     ],
 )
 

@@ -21,7 +21,7 @@ from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
-class End(Operator):
+class EndOperator(Operator):
     def __init__(self, input: Node):
         super().__init__()
 
@@ -48,7 +48,7 @@ class End(Operator):
         )
 
 
-operator_lib.register_operator(End)
+operator_lib.register_operator(EndOperator)
 
 
 def end(input: Node) -> Node:
@@ -67,4 +67,4 @@ def end(input: Node) -> Node:
         A feature-less node with a single timestamp.
     """
 
-    return End(input=input).outputs["output"]
+    return EndOperator(input=input).outputs["output"]

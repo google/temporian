@@ -19,7 +19,7 @@ from temporian.core import operator_lib
 from temporian.core.data.node import Node, create_node_new_features_new_sampling
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
-from temporian.core.data.duration import (
+from temporian.core.data.duration_utils import (
     Duration,
     NormalizedDuration,
     normalize_duration,
@@ -88,8 +88,8 @@ def tick(input: Node, interval: Duration, align: bool = True) -> Node:
             timestamps are defined by the range of timestamps in `input`.
         interval: Tick interval.
         align: If false, the first tick is generated at the first timestamp
-            (similar to `tp.begin`). If true (default), ticks are generated on
-            timestamps that are multiple of `interval`.
+            (similar to [`tp.begin()`][temporian.begin]). If true (default),
+            ticks are generated on timestamps that are multiple of `interval`.
 
     Example #1:
         Input

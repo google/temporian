@@ -1,4 +1,12 @@
 [data-md-color-scheme="temporian"] {
     --md-primary-fg-color--light: #24201D;
     --md-primary-fg-color--dark: #24201D;
+    background-color: red;
+    --md-default-bg-color: red;
+}
+
+/* Change background color when dark mode */
+[data-md-color-scheme="slate"] {
+    --md-default-bg-color: #121212;
+    --md-code-bg-color: #212121;
 }

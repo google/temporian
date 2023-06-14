@@ -20,18 +20,18 @@ from typing import Dict
 import numpy as np
 
 from temporian.implementation.numpy.data.event_set import IndexData, EventSet
-from temporian.core.operators.end import End
+from temporian.core.operators.end import EndOperator
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
 class EndNumpyImplementation(OperatorImplementation):
-    def __init__(self, operator: End) -> None:
-        assert isinstance(operator, End)
+    def __init__(self, operator: EndOperator) -> None:
+        assert isinstance(operator, EndOperator)
         super().__init__(operator)
 
     def __call__(self, input: EventSet) -> Dict[str, EventSet]:
-        assert isinstance(self.operator, End)
+        assert isinstance(self.operator, EndOperator)
         output_schema = self.output_schema("output")
 
         # create output event set
@@ -54,4 +54,6 @@ class EndNumpyImplementation(OperatorImplementation):
         return {"output": output_evset}
 
 
-implementation_lib.register_operator_implementation(End, EndNumpyImplementation)
+implementation_lib.register_operator_implementation(
+    EndOperator, EndNumpyImplementation
+)

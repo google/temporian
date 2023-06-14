@@ -105,3 +105,12 @@ def check_is_valid_index_dtype(dtype: DType):
             f"Trying to create an index with dtype={dtype}. The dtype of an"
             " index can only be int32, int64 or string."
         )
+
+
+# API dtypes definition
+float32 = DType.FLOAT32
+float64 = DType.FLOAT64
+int32 = DType.INT32
+int64 = DType.INT64
+bool_ = DType.BOOLEAN
+str_ = DType.STRING

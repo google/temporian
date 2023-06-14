@@ -5,14 +5,17 @@ package(
 
 # Libraries
 # =========
+
 py_library(
-    name = "all_operators",
-    srcs = ["all_operators.py"],
+    name = "api_symbols",
+    srcs = ["api_symbols.py"],
     srcs_version = "PY3",
     deps = [
         ":add_index",
+        ":begin",
         ":cast",
         ":drop_index",
+        ":end",
         ":filter",
         ":glue",
         ":lag",
@@ -23,28 +26,13 @@ py_library(
         ":resample",
         ":select",
         ":since_last",
-        ":unary",
-        ":unique_timestamps",
-        ":begin",
-        ":end",
         ":tick",
-        "//temporian/core/operators/binary",
-        "//temporian/core/operators/calendar:day_of_month",
-        "//temporian/core/operators/calendar:day_of_week",
-        "//temporian/core/operators/calendar:day_of_year",
-        "//temporian/core/operators/calendar:hour",
-        "//temporian/core/operators/calendar:iso_week",
-        "//temporian/core/operators/calendar:minute",
-        "//temporian/core/operators/calendar:month",
-        "//temporian/core/operators/calendar:second",
-        "//temporian/core/operators/calendar:year",
-        "//temporian/core/operators/scalar",
-        "//temporian/core/operators/window:moving_count",
-        "//temporian/core/operators/window:moving_max",
-        "//temporian/core/operators/window:moving_min",
-        "//temporian/core/operators/window:moving_standard_deviation",
-        "//temporian/core/operators/window:moving_sum",
-        "//temporian/core/operators/window:simple_moving_average",
+        ":unique_timestamps",
+        "//temporian/core/operators/binary:api_symbols",
+        "//temporian/core/operators/calendar:api_symbols",
+        "//temporian/core/operators/scalar:api_symbols",
+        "//temporian/core/operators/unary:api_symbols",
+        "//temporian/core/operators/window:api_symbols",
     ],
 )
 
@@ -66,8 +54,8 @@ py_library(
     srcs = ["base.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/core/data:dtype",
         "//temporian/core/data:node",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -79,22 +67,9 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
-        "//temporian/proto:core_py_proto",
-    ],
-)
-
-py_library(
-    name = "unary",
-    srcs = ["unary.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":base",
-        "//temporian/core:operator_lib",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -106,7 +81,7 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:duration",
+        "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
         "//temporian/proto:core_py_proto",
     ],
@@ -119,7 +94,7 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:duration",
+        "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
@@ -133,8 +108,8 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:dtype",
         "//temporian/core/data:node",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -236,8 +211,8 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:dtype",
         "//temporian/core/data:node",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -287,9 +262,9 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
+        "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
-        "//temporian/core/data:duration",
     ],
 )

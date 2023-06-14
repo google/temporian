@@ -19,7 +19,7 @@ py_library(
     deps = [
         # already_there/numpy
         # already_there/pandas
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/utils:string",
@@ -36,7 +36,7 @@ py_library(
         # already_there/pandas
         "//temporian/core:evaluation",
         "//temporian/core/data:schema",
-        "//temporian/core/operators:all_operators",
+        "//temporian/core/operators:add_index",
     ],
 )
 

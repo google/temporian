@@ -15,7 +15,7 @@
 
 from absl.testing import absltest
 
-from temporian.core.operators.end import End
+from temporian.core.operators.end import EndOperator
 from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy.operators.end import (
     EndNumpyImplementation,
@@ -44,7 +44,7 @@ class EndOperatorTest(absltest.TestCase):
         )
 
         # Run op
-        op = End(input=node)
+        op = EndOperator(input=node)
         instance = EndNumpyImplementation(op)
         output = instance.call(input=evset)["output"]
 

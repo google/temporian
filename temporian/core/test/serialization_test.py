@@ -17,9 +17,9 @@ from absl.testing import absltest
 import os
 import tempfile
 import temporian as tp
-from temporian.core import serialization
+from temporian.core.serialization import serialize
 from temporian.core import graph
-from temporian.core.data.dtype import DType
+from temporian.core.data.dtypes.dtype import DType
 from temporian.core.test import utils
 from temporian.implementation.numpy.data.io import event_set
 
@@ -41,10 +41,10 @@ class SerializeTest(absltest.TestCase):
         )
         logging.info("original:\n%s", original)
 
-        proto = serialization.serialize(original)
+        proto = serialize._serialize(original)
         logging.info("proto:\n%s", proto)
 
-        restored = serialization.unserialize(proto)
+        restored = serialize._unserialize(proto)
         logging.info("restored:\n%s", restored)
 
         self.assertEqual(len(original.samplings), len(restored.samplings))
@@ -61,28 +61,28 @@ class SerializeTest(absltest.TestCase):
 
         # Ensures that "original" and "restored" don't link to the same objects.
         self.assertFalse(
-            serialization.all_identifiers(original.samplings)
-            & serialization.all_identifiers(restored.samplings)
+            serialize._all_identifiers(original.samplings)
+            & serialize._all_identifiers(restored.samplings)
         )
         self.assertFalse(
-            serialization.all_identifiers(original.features)
-            & serialization.all_identifiers(restored.features)
+            serialize._all_identifiers(original.features)
+            & serialize._all_identifiers(restored.features)
         )
         self.assertFalse(
-            serialization.all_identifiers(original.operators)
-            & serialization.all_identifiers(restored.operators)
+            serialize._all_identifiers(original.operators)
+            & serialize._all_identifiers(restored.operators)
         )
         self.assertFalse(
-            serialization.all_identifiers(original.nodes)
-            & serialization.all_identifiers(restored.nodes)
+            serialize._all_identifiers(original.nodes)
+            & serialize._all_identifiers(restored.nodes)
         )
         self.assertFalse(
-            serialization.all_identifiers(original.named_inputs.values())
-            & serialization.all_identifiers(restored.named_inputs.values())
+            serialize._all_identifiers(original.named_inputs.values())
+            & serialize._all_identifiers(restored.named_inputs.values())
         )
         self.assertFalse(
-            serialization.all_identifiers(original.named_outputs.values())
-            & serialization.all_identifiers(restored.named_outputs.values())
+            serialize._all_identifiers(original.named_outputs.values())
+            & serialize._all_identifiers(restored.named_outputs.values())
         )
 
     def test_serialize_autonode(self):
@@ -101,10 +101,10 @@ class SerializeTest(absltest.TestCase):
         )
         logging.info("original:\n%s", original)
 
-        proto = serialization.serialize(original)
+        proto = serialize._serialize(original)
         logging.info("proto:\n%s", proto)
 
-        restored = serialization.unserialize(proto)
+        restored = serialize._unserialize(proto)
         logging.info("restored:\n%s", restored)
 
     def test_serialize_attributes(self):
@@ -127,10 +127,10 @@ class SerializeTest(absltest.TestCase):
         )
         logging.info("original:\n%s", original)
 
-        proto = serialization.serialize(original)
+        proto = serialize._serialize(original)
         logging.info("proto:\n%s", proto)
 
-        restored = serialization.unserialize(proto)
+        restored = serialize._unserialize(proto)
         logging.info("restored:\n%s", restored)
 
         self.assertEqual(len(original.operators), len(restored.operators))
@@ -147,16 +147,16 @@ class SerializeTest(absltest.TestCase):
             self.assertEqual(attr_value, restored_attributes[attr_name])
 
         self.assertFalse(
-            serialization.all_identifiers(original.operators)
-            & serialization.all_identifiers(restored.operators)
+            serialize._all_identifiers(original.operators)
+            & serialize._all_identifiers(restored.operators)
         )
         self.assertFalse(
-            serialization.all_identifiers(original.named_inputs.values())
-            & serialization.all_identifiers(restored.named_inputs.values())
+            serialize._all_identifiers(original.named_inputs.values())
+            & serialize._all_identifiers(restored.named_inputs.values())
         )
         self.assertFalse(
-            serialization.all_identifiers(original.named_outputs.values())
-            & serialization.all_identifiers(restored.named_outputs.values())
+            serialize._all_identifiers(original.named_outputs.values())
+            & serialize._all_identifiers(restored.named_outputs.values())
         )
 
     def test_serialize_and_run(self):

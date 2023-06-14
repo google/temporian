@@ -17,12 +17,17 @@
   "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter"
   },
+  "black-formatter.path": [
+    "${workspaceFolder}/.venv/bin/black"
+  ],
   "editor.tabSize": 4,
-  "editor.formatOnSave": false,
+  "editor.formatOnSave": true,
   "python.linting.flake8Enabled": false,
   "python.linting.pylintEnabled": true,
   "python.linting.enabled": true,
-  "editor.rulers": [80],
+  "editor.rulers": [
+    80
+  ],
   "editor.codeActionsOnSave": {
     "source.organizeImports": false
   },
