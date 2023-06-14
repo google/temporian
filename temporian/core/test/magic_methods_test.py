@@ -121,7 +121,6 @@ class MagicMethodsTest(absltest.TestCase):
             assert node in node_list
             assert node in node_map
 
-
     #########################################
     ### Get/set item with square brackets ###
     #########################################
@@ -153,7 +152,6 @@ class MagicMethodsTest(absltest.TestCase):
         assert len(node_out.schema.features) == 0
         node_out.check_same_sampling(self.node_float_1)
 
-
     def test_getitem_errors(self):
         with self.assertRaises(IndexError):
             self.node_float_1["f3"]
@@ -165,7 +163,6 @@ class MagicMethodsTest(absltest.TestCase):
             self.node_float_1[["f1", 0]]
         with self.assertRaises(TypeError):
             self.node_float_1[None]
-
 
     def test_setitem_fails(self):
         # Try to modify existent feature
