@@ -163,6 +163,12 @@ class Node(object):
 
         return select(self, feature_names)
 
+    def __setitem__(self, feature_names: Any, value: Any) -> None:
+        """Fails, features cannot be assigned"""
+
+        raise TypeError("Cannot assign features to an existing node. "
+                        "New nodes should be created instead.")
+
     def __repr__(self) -> str:
         """Human readable representation of a node."""
 
