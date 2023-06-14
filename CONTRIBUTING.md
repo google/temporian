@@ -100,10 +100,6 @@ or in markdown files under the [docs/](docs/) directory,
 will be executed and tested using the python's
 built-in [doctest](https://docs.python.org/3/library/doctest.html) module.
 
-These are part of the bazel unit tests (under `//temporian/test:docstring_test`
-and `//docs/code_examples_test`), so they need to pass before merging any
-GitHub Pull Request.
-
 For example, the following piece of code would be executed, and the outputs
 must match the expected result indicated:
 
@@ -148,3 +144,15 @@ ValueError: ... corresponding features (with the same index) should have the sam
 ```
 
 Finally, note that globals like `tp`, `pd` and `np` are always included in the execution context, no need to import them.
+
+To check if your examples are correct, you may run:
+
+```shell
+# Test all examples in code docstrings (only api-facing modules)
+bazel test //temporian/test:docstring_test --test_output=streamed
+
+# Test all examples in /docs/*.md
+bazel test //docs/code_examples_test --test_output=streamed
+```
+
+In case of unexpected outputs, the result is printed and compared to the expected values, so that they can be fixed.
