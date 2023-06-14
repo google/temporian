@@ -133,7 +133,6 @@ def normalize_features(
     if feature_values.dtype.type == np.string_:
         feature_values = feature_values.astype(np.str_)
 
-    # TODO: This is slow. Speed-up.
     if feature_values.dtype.type == np.object_:
         logging.warning(
             (
@@ -142,7 +141,6 @@ def normalize_features(
             ),
             name,
         )
-        # DO NOT SUBMIT: Warning
         feature_values = feature_values.astype(np.str_)
 
     if feature_values.dtype.type == np.datetime64:
