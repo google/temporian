@@ -54,12 +54,6 @@ plugins:
   - exclude-search:
       # Avoid this since it excludes all ipynb
       exclude_unreferenced: false
-      # Exclude reference's Index page
-      exclude:
-        - reference
-      # Include all pages inside reference
-      ignore:
-        - reference/*
   - autorefs
   - gen-files:
       scripts:
