@@ -48,8 +48,14 @@ nav:
 plugins:
   - search
   - exclude-search:
-      # Exclude all files not listed in the nav section nor referenced by other files.
-      exclude_unreferenced: true
+      # Avoid this since it excludes all ipynb
+      exclude_unreferenced: false
+      # Exclude reference's Index page
+      exclude:
+        - reference
+      # Include all pages inside reference
+      ignore:
+        - reference/*
   - autorefs
   - gen-files:
       scripts:

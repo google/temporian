@@ -59,6 +59,9 @@ bazel test //...:all
 
 You can use the Bazel test flag `--test_output=streamed` to see the test logs in realtime.
 
+Note that these tests also include docstring examples, using the builtin `doctest` module.
+See the [Adding code examples](#adding-code-examples) section for more information.
+
 ### Benchmarking and profiling
 
 Benchmarking and profiling of pre-configured scripts is available as follow:
@@ -89,3 +92,59 @@ Live preview your local changes to the documentation with
 ```shell
 mkdocs serve -f docs/mkdocs.yml
 ```
+
+### Adding code examples
+
+Any code examples that are included in the docstrings of api-facing modules,
+or in markdown files under the [docs/](docs/) directory,
+will be executed and tested using the python's
+built-in [doctest](https://docs.python.org/3/library/doctest.html) module.
+
+These are part of the bazel unit tests (under `//temporian/test:docstring_test`
+and `//docs/code_examples_test`), so they need to pass before merging any
+GitHub Pull Request.
+
+For example, the following piece of code would be executed, and the outputs
+must match the expected result indicated:
+
+```python
+>>> evset = tp.event_set(
+... 	timestamps=["2020-01-01", "2020-02-02"],
+... )
+>>> print(evset)
+indexes: []
+features: []
+events:
+     (2 events):
+        timestamps: [...]
+...
+
+```
+
+Note from this example:
+
+- If the `>>>` indicator is not present, the code will not be run or tested.
+- Multi-line statements need a preceding `...` instead of `>>>`.
+- All the lines immediately following `>>>` or `...` and before a blank line, are the expected outputs.
+- You should always leave a blank line before closing the code block, to indicate the end of the test.
+- The `...` inside the expected result is used to match anything. Here, the exact timestamps and the latest line (which includes memory usage information).
+
+You cannot use `...` in the first matching line to ignore the whole output (it's ambiguous with multi-lines).
+In that case, you may use the `SKIP` flag as follows:
+
+```
+>>> print("hello")  # doctest:+SKIP
+This result doesn't need to match
+```
+
+Exceptions can also be expected, but it's better to avoid being too specific with the expected result:
+
+```python
+>>> node["f1"] + node["f2"]
+Traceback (most recent call last):
+    ...
+ValueError: ... corresponding features (with the same index) should have the same dtype. ...
+
+```
+
+Finally, note that globals like `tp`, `pd` and `np` are always included in the execution context, no need to import them.

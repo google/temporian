@@ -502,18 +502,19 @@ def input_node(
     Usage example:
 
         ```
-        # Without index
-        a = source_node(features=[("f1", tp.float64), ("f2", tp.string)])
+        >>> # Without index
+        >>> a = input_node(features=[("f1", tp.float64), ("f2", tp.str_)])
 
-        # With an index
-        a = source_node(
-            features=[("f1", tp.float64), ("f2", tp.string)],
-            indexes=["f2"],
-        )
+        >>> # With an index
+        >>> a = input_node(
+        ...     features=[("f1", tp.float64), ("f2", tp.str_)],
+        ...     indexes=["f2"],
+        ... )
 
-        # Two nodes with the same sampling
-        a = source_node(features=[("f1", tp.float64)])
-        b = source_node(features=[("f2", tp.float64)], same_sampling_as=a)
+        >>> # Two nodes with the same sampling
+        >>> a = input_node(features=[("f1", tp.float64)])
+        >>> b = input_node(features=[("f2", tp.float64)], same_sampling_as=a)
+
         ```
 
     Args:
