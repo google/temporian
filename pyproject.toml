@@ -58,6 +58,7 @@ ipykernel = "^6.22.0"
 griffe = "0.26.0"
 jupyterlab = "^4.0.0"
 mkdocs-exclude-search = "^0.6.5"
+apache-beam[dataframe] = "^2.48.0"
 
 [tool.black]
 line-length = 80
