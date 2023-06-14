@@ -52,8 +52,8 @@ nav:
 plugins:
   - search
   - exclude-search:
-      # Avoid this since it excludes all ipynb
-      exclude_unreferenced: false
+      exclude:
+        - reference/SUMMARY
   - autorefs
   - gen-files:
       scripts:
