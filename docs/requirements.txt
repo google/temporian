@@ -9,3 +9,5 @@ mkdocs-jupyter===0.24.1
 mkdocs-exclude-search===0.6.5
 black==22.12.0
 griffe==0.26.0
+cairosvg==2.7.0
+pillow==9.5.0

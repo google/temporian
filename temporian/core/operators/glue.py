@@ -117,8 +117,8 @@ def glue(
 
         ```
 
-    To concatenate nodes with a different sampling, use the operator
-    `tp.resample(...)` first.
+    To concatenate nodes with different samplings, use
+    [`tp.resample()`][temporian.resample] first.
 
     Example:
 
@@ -132,6 +132,8 @@ def glue(
         ...          )
         >>> output.features
         [('A', str_), ('B', float64), ('C', float64)]
+
+        ```
 
     Args:
         *inputs: Nodes to concatenate.

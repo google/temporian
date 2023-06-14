@@ -8,8 +8,8 @@ py_library(
     srcs = ["test_util.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/core:serialization",
         "//temporian/core/operators:base",
+        "//temporian/core/serialization:serialize",
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/operators:base",
     ],
@@ -62,10 +62,10 @@ py_test(
 )
 
 py_test(
-    name="arithmetic_scalar_test",
-    srcs=["arithmetic_scalar_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "arithmetic_scalar_test",
+    srcs = ["arithmetic_scalar_test.py"],
+    srcs_version = "PY3",
+    deps = [
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
@@ -93,16 +93,16 @@ py_test(
 )
 
 py_test(
-    name="arithmetic_multi_index_test",
-    srcs=["arithmetic_multi_index_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "arithmetic_multi_index_test",
+    srcs = ["arithmetic_multi_index_test.py"],
+    srcs_version = "PY3",
+    deps = [
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
         # absl/testing:absltest dep,
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/io:pandas",
         "//temporian/core/operators/binary",
@@ -112,17 +112,17 @@ py_test(
 )
 
 py_test(
-    name="cast_test",
-    srcs=["cast_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "cast_test",
+    srcs = ["cast_test.py"],
+    srcs_version = "PY3",
+    deps = [
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
         "//temporian/io:pandas",
         "//temporian/core:evaluation",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/operators:cast",
         "//temporian/implementation/numpy/data:event_set",
@@ -132,10 +132,10 @@ py_test(
 )
 
 py_test(
-    name="filter_test",
-    srcs=["filter_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "filter_test",
+    srcs = ["filter_test.py"],
+    srcs_version = "PY3",
+    deps = [
         ":test_util",
         # already_there/absl/testing:absltest
         "//temporian/core/operators:filter",
@@ -145,13 +145,13 @@ py_test(
 )
 
 py_test(
-    name="glue_test",
-    srcs=["glue_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "glue_test",
+    srcs = ["glue_test.py"],
+    srcs_version = "PY3",
+    deps = [
         ":test_util",
         # already_there/absl/testing:absltest
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/operators:glue",
         "//temporian/implementation/numpy/data:io",
@@ -160,16 +160,16 @@ py_test(
 )
 
 py_test(
-    name="unary_test",
-    srcs=["unary_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "unary_test",
+    srcs = ["unary_test.py"],
+    srcs_version = "PY3",
+    deps = [
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
         "//temporian/io:pandas",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators:unary",
@@ -177,10 +177,10 @@ py_test(
 )
 
 py_test(
-    name="calendar_day_of_month_test",
-    srcs=["calendar_day_of_month_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "calendar_day_of_month_test",
+    srcs = ["calendar_day_of_month_test.py"],
+    srcs_version = "PY3",
+    deps = [
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
@@ -194,10 +194,10 @@ py_test(
 )
 
 py_test(
-    name="calendar_day_of_week_test",
-    srcs=["calendar_day_of_week_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "calendar_day_of_week_test",
+    srcs = ["calendar_day_of_week_test.py"],
+    srcs_version = "PY3",
+    deps = [
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
@@ -210,10 +210,10 @@ py_test(
 )
 
 py_test(
-    name="calendar_day_of_year_test",
-    srcs=["calendar_day_of_year_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "calendar_day_of_year_test",
+    srcs = ["calendar_day_of_year_test.py"],
+    srcs_version = "PY3",
+    deps = [
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
@@ -226,10 +226,10 @@ py_test(
 )
 
 py_test(
-    name="calendar_hour_test",
-    srcs=["calendar_hour_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "calendar_hour_test",
+    srcs = ["calendar_hour_test.py"],
+    srcs_version = "PY3",
+    deps = [
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
@@ -242,10 +242,10 @@ py_test(
 )
 
 py_test(
-    name="calendar_iso_week_test",
-    srcs=["calendar_iso_week_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "calendar_iso_week_test",
+    srcs = ["calendar_iso_week_test.py"],
+    srcs_version = "PY3",
+    deps = [
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
@@ -258,10 +258,10 @@ py_test(
 )
 
 py_test(
-    name="calendar_minute_test",
-    srcs=["calendar_minute_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "calendar_minute_test",
+    srcs = ["calendar_minute_test.py"],
+    srcs_version = "PY3",
+    deps = [
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
@@ -274,10 +274,10 @@ py_test(
 )
 
 py_test(
-    name="calendar_month_test",
-    srcs=["calendar_month_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "calendar_month_test",
+    srcs = ["calendar_month_test.py"],
+    srcs_version = "PY3",
+    deps = [
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
@@ -290,10 +290,10 @@ py_test(
 )
 
 py_test(
-    name="calendar_second_test",
-    srcs=["calendar_second_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "calendar_second_test",
+    srcs = ["calendar_second_test.py"],
+    srcs_version = "PY3",
+    deps = [
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
@@ -306,10 +306,10 @@ py_test(
 )
 
 py_test(
-    name="calendar_year_test",
-    srcs=["calendar_year_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "calendar_year_test",
+    srcs = ["calendar_year_test.py"],
+    srcs_version = "PY3",
+    deps = [
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
@@ -322,10 +322,10 @@ py_test(
 )
 
 py_test(
-    name="lag_test",
-    srcs=["lag_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "lag_test",
+    srcs = ["lag_test.py"],
+    srcs_version = "PY3",
+    deps = [
         ":test_util",
         # already_there/absl/testing:absltest
         "//temporian/core/operators:lag",
@@ -350,10 +350,10 @@ py_test(
 )
 
 py_test(
-    name="drop_index_test",
-    srcs=["drop_index_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "drop_index_test",
+    srcs = ["drop_index_test.py"],
+    srcs_version = "PY3",
+    deps = [
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/pandas
@@ -396,10 +396,10 @@ py_test(
 )
 
 py_test(
-    name="add_index_test",
-    srcs=["add_index_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "add_index_test",
+    srcs = ["add_index_test.py"],
+    srcs_version = "PY3",
+    deps = [
         ":test_util",
         # already_there/absl/testing:absltest
         # already_there/pandas
@@ -421,7 +421,7 @@ py_test(
         # already_there/numpy
         "//temporian/io:pandas",
         ":test_util",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators/window:simple_moving_average",
@@ -441,7 +441,7 @@ py_test(
         # already_there/numpy
         "//temporian/io:pandas",
         ":test_util",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators/window:moving_standard_deviation",
@@ -460,7 +460,7 @@ py_test(
         # already_there/numpy
         "//temporian/io:pandas",
         ":test_util",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators/window:moving_sum",
@@ -479,7 +479,7 @@ py_test(
         # already_there/numpy
         "//temporian/io:pandas",
         ":test_util",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators/window:moving_count",
@@ -498,7 +498,7 @@ py_test(
         # already_there/numpy
         "//temporian/io:pandas",
         ":test_util",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators/window:moving_min",
@@ -517,7 +517,7 @@ py_test(
         # already_there/numpy
         "//temporian/io:pandas",
         ":test_util",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators/window:moving_max",
@@ -536,7 +536,7 @@ py_test(
         # already_there/numpy
         "//temporian/io:pandas",
         ":test_util",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators:propagate",
@@ -556,7 +556,7 @@ py_test(
         # already_there/numpy
         "//temporian/io:pandas",
         ":test_util",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators:resample",
@@ -576,7 +576,7 @@ py_test(
         # already_there/numpy
         "//temporian/io:pandas",
         ":test_util",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators:prefix",
@@ -611,7 +611,7 @@ py_test(
         # already_there/numpy
         "//temporian/io:pandas",
         ":test_util",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators:since_last",
@@ -628,7 +628,7 @@ py_test(
         # already_there/absl/testing:absltest
         ":test_util",
         "//temporian/implementation/numpy/data:io",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators:begin",
@@ -644,7 +644,7 @@ py_test(
         # already_there/absl/testing:absltest
         ":test_util",
         "//temporian/implementation/numpy/data:io",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators:end",
@@ -659,7 +659,7 @@ py_test(
     deps = [
         # already_there/absl/testing:absltest
         ":test_util",
-        "//temporian/core/data:dtype",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/implementation/numpy/data:io",

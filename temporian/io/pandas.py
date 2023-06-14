@@ -21,6 +21,7 @@ from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.io import event_set
 
 
+# TODO: Rename argument `index_names` to `index_features`.
 def from_pandas(
     df: "pandas.DataFrame",
     index_names: Optional[List[str]] = None,
@@ -28,30 +29,29 @@ def from_pandas(
     name: Optional[str] = None,
     same_sampling_as: Optional[EventSet] = None,
 ) -> EventSet:
-    """Converts a Pandas DataFrame into an Event Set.
-
-    TODO: Rename argument `index_names` to `index_features`.
+    """Converts a Pandas DataFrame into an EventSet.
 
     The column `timestamp_column` (default to "timestamp") contains the
     timestamps. Columns `index_names` (default to `None`, equivalent to `[]`),
     contains the index. The remaining columns are converted into features.
 
-    See `tp.event_set` for the list of supported timestamp and feature types.
+    See [`tp.event_set()`][temporian.event_set] for the list of supported
+    timestamp and feature types.
 
     Usage example:
 
-    ```python
-    >>> df = pd.DataFrame(
-    ...     data=[
-    ...         [1.0, 5, "A"],
-    ...         [2.0, 6, "A"],
-    ...         [3.0, 7, "B"],
-    ...     ],
-    ...     columns=["timestamp", "feature_1", "feature_2"],
-    ... )
-    >>> evset = tp.from_pandas(df, index_names=["feature_2"])
+        ```python
+        >>> df = pd.DataFrame(
+        ...     data=[
+        ...         [1.0, 5, "A"],
+        ...         [2.0, 6, "A"],
+        ...         [3.0, 7, "B"],
+        ...     ],
+        ...     columns=["timestamp", "feature_1", "feature_2"],
+        ... )
+        >>> evset = tp.from_pandas(df, index_names=["feature_2"])
 
-    ```
+        ```
 
     Args:
         df: A non indexed Pandas dataframe.
@@ -59,13 +59,14 @@ def from_pandas(
             (default), the data is not indexed. Only integer and string features
             can be used as index.
         timestamp_column: Name of the column containing the timestamps. See
-            `tp.event_set`for the list of supported timestamp types.
+            [`tp.event_set()`][temporian.event_set] for the list of supported
+            timestamp types.
         name: Optional name of the event set. Used for debugging, and
             graph serialization.
         same_sampling_as: If set, the new event set is cheched and tagged as
             having the same sampling as `same_sampling_as`. Some operators,
-            such as `tp.filter`, require their inputes to have the same
-            sampling.
+            such as [`tp.filter()`][temporian.filter], require their inputs to
+            have the same sampling.
 
     Returns:
         An event set.
@@ -90,7 +91,7 @@ def from_pandas(
 def to_pandas(
     evset: EventSet,
 ) -> "pandas.DataFrame":
-    """Convert an EventSet to a pandas DataFrame.
+    """Converts an EventSet to a pandas DataFrame.
 
     Returns:
         DataFrame created from EventSet.

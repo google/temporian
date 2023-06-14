@@ -5,7 +5,6 @@ from typing import Optional, List, Any, Set
 
 import numpy as np
 
-from temporian.core.data import duration
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.plotter import (
     Options,

@@ -74,7 +74,8 @@ def resample(
     `dtype.MissingValue(...)`.
 
     Example:
-        ```
+
+        ```python
         >>> evset = tp.event_set(
         ...     timestamps=[1, 5, 8, 9],
         ...     features={"f1": [1.0, 2.0, 3.0, 4.0]}

@@ -144,11 +144,6 @@ class TFPTest(absltest.TestCase):
         self.assertEqual(i.name, "my_source_node")
         self.assertEqual(o.name, "my_output_node")
 
-    def test_list_registered_operators(self):
-        logging.info("The operators:")
-        for k, v in tp.get_operators().items():
-            logging.info("  %s: %s", k, v)
-
     def test_event_set(self):
         evset = tp.event_set(
             timestamps=[1, 2, 3, 4],

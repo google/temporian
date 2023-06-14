@@ -45,19 +45,3 @@ py_library(
         "//temporian/core/operators:base",
     ],
 )
-
-py_library(
-    name = "serialization",
-    srcs = ["serialization.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":graph",
-        ":operator_lib",
-        # already_there/google/protobuf
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/core/operators:base",
-        "//temporian/proto:core_py_proto",
-    ],
-)

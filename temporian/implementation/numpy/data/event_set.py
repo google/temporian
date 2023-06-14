@@ -21,7 +21,7 @@ import sys
 
 import numpy as np
 
-from temporian.core.data.dtype import DType
+from temporian.core.data.dtypes.dtype import DType
 from temporian.core.data.node import Node, create_node_with_new_reference
 from temporian.core.data.schema import Schema
 from temporian.utils import string
@@ -329,9 +329,9 @@ class IndexData:
 class EventSet:
     """Actual temporal data.
 
-    Use `tp.event_set` to create an event set manually.
-    Use `tp.from_pandas` to create an event set from a pandas
-    dataframe.
+    Use [`tp.event_set()`][temporian.event_set] to create an event set manually,
+    or [`tp.from_pandas()`][temporian.from_pandas] to create an event set from a
+    pandas DataFrame.
     """
 
     def __init__(
@@ -386,12 +386,12 @@ class EventSet:
     def node(self, force_new_node: bool = False) -> Node:
         """Creates a node able to consume the the event set.
 
-        If called multiple times with force_new_node=False (default), the same
+        If called multiple times with `force_new_node=False` (default), the same
         node is returned.
 
         Usage example:
 
-        ```
+        ```python
         >>> my_evset = tp.event_set(
         ...     timestamps=[1, 2, 3, 4],
         ...     features={
@@ -486,14 +486,15 @@ class EventSet:
         return True
 
     def plot(self, *args, **wargs) -> Any:
-        """Plots the event set. See tp.plot for details.
+        """Plots the event set. See [`tp.plot()`][temporian.plot] for details.
 
         Example usage:
-        ```
-        >>> evset = tp.event_set(timestamps=[1, 2, 3], features={"f1": [0, 42, 10]})
-        >>> evset.plot()
 
-        ```
+            ```python
+            >>> evset = tp.event_set(timestamps=[1, 2, 3], features={"f1": [0, 42, 10]})
+            >>> evset.plot()
+
+            ```
         """
 
         from temporian.implementation.numpy.data import plotter
