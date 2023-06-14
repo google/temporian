@@ -30,7 +30,7 @@ py_test(
         ":utils",
         "//temporian/core/data:node",
         "//temporian/core/operators:base",
-        "//temporian/core/operators:unary",
+        "//temporian/core/operators/unary",
         "//temporian/core/operators/binary",
         "//temporian/core/operators/scalar",
         "//temporian/proto:core_py_proto",

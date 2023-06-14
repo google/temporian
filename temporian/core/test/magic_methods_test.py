@@ -54,7 +54,7 @@ from temporian.core.operators.scalar import (
     LessEqualScalarOperator,
     LessScalarOperator,
 )
-from temporian.core.operators.unary import AbsOperator, InvertOperator
+from temporian.core.operators.unary.unary import AbsOperator, InvertOperator
 
 
 class MagicMethodsTest(absltest.TestCase):

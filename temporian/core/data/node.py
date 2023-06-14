@@ -290,12 +290,12 @@ class Node:
         return multiply_scalar(input=self, value=-1)
 
     def __invert__(self):
-        from temporian.core.operators.unary import invert
+        from temporian.core.operators.unary.unary import invert
 
         return invert(input=self)
 
     def __abs__(self):
-        from temporian.core.operators.unary import abs
+        from temporian.core.operators.unary.unary import abs
 
         return abs(input=self)
 

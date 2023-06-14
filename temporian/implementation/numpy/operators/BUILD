@@ -229,7 +229,7 @@ py_library(
     deps = [
         ":base",
         # already_there/numpy
-        "//temporian/core/operators:unary",
+        "//temporian/core/operators/unary",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
     ],

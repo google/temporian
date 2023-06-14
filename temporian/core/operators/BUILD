@@ -27,12 +27,12 @@ py_library(
         ":select",
         ":since_last",
         ":tick",
-        ":unary",
         ":unique_timestamps",
-        "//temporian/core/operators/binary",
-        "//temporian/core/operators/calendar",
-        "//temporian/core/operators/scalar",
-        "//temporian/core/operators/window",
+        "//temporian/core/operators/binary:api_symbols",
+        "//temporian/core/operators/calendar:api_symbols",
+        "//temporian/core/operators/scalar:api_symbols",
+        "//temporian/core/operators/unary:api_symbols",
+        "//temporian/core/operators/window:api_symbols",
     ],
 )
 
@@ -69,19 +69,6 @@ py_library(
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
-        "//temporian/core/data/dtypes:dtype",
-        "//temporian/proto:core_py_proto",
-    ],
-)
-
-py_library(
-    name = "unary",
-    srcs = ["unary.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":base",
-        "//temporian/core:operator_lib",
-        "//temporian/core/data:node",
         "//temporian/core/data/dtypes:dtype",
         "//temporian/proto:core_py_proto",
     ],

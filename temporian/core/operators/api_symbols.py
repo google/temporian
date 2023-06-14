@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Operators."""
+"""Operators API Symbols."""
 
 # pylint: disable=unused-import
 # pylint: disable=line-too-long
@@ -28,11 +28,7 @@ from temporian.core.operators.scalar.api_symbols import *
 
 from temporian.core.operators.window.api_symbols import *
 
-from temporian.core.operators.unary import abs
-from temporian.core.operators.unary import invert
-from temporian.core.operators.unary import isnan
-from temporian.core.operators.unary import notnan
-from temporian.core.operators.unary import log
+from temporian.core.operators.unary.api_symbols import *
 
 from temporian.core.operators.cast import cast
 from temporian.core.operators.drop_index import drop_index
