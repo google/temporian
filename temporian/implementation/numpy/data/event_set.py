@@ -464,9 +464,19 @@ class EventSet:
         )
 
     def __getitem__(self, index: Tuple) -> IndexData:
+        if not isinstance(index, tuple):
+            raise TypeError(
+                "EventSet items can only be accessed by index tuples. "
+                "Use evset.node() to select features and operate on it."
+            )
         return self.data[index]
 
     def __setitem__(self, index: Tuple, value: IndexData) -> None:
+        if not isinstance(index, tuple) or not isinstance(value, IndexData):
+            raise TypeError(
+                "EventSets are not intended to be modified externally. "
+                "Use evset.node() to operate on it."
+            )
         self.data[index] = value
 
     def __eq__(self, other) -> bool:
