@@ -17,7 +17,7 @@
 from typing import Union, Dict, Optional, List, Any, Type
 from temporian.core.data.schema import Schema, FeatureSchema
 
-from temporian.core.data.dtype import DType
+from temporian.core.data.dtypes.dtype import DType
 from temporian.core import operator_lib
 from temporian.core.data.node import (
     Node,
@@ -64,9 +64,10 @@ class CastOperator(Operator):
             check_overflow: Check for casting overflow.
             dtype: All the input features are casted to dtype.
             dtype_to_dtype: Mapping between feature name and new dtype.
-            feature_name_to_dtype: Mapping between current dtype and new dtype.
+                feature_name_to_dtype: Mapping between current dtype and new
+                dtype.
             dtypes: Dtype for each of the input feature (indexed by feature
-            idx).
+                idx).
         """
 
         super().__init__()

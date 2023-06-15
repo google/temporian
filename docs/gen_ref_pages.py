@@ -5,6 +5,7 @@ Source: https://mkdocstrings.github.io/recipes/
 """
 
 from pathlib import Path
+from typing import Set, Tuple
 
 import mkdocs_gen_files
 
@@ -12,78 +13,99 @@ nav = mkdocs_gen_files.Nav()
 
 SRC_PATH = Path("temporian")
 
-paths = set()
+# Stores symbol and path of each public API member
+members: Set[Tuple[str, Path]] = set()
+
 non_parsable_imports = []
 
-with open("temporian/__init__.py", "r", encoding="utf8") as f:
-    lines = f.read().splitlines()
+# We need to be able to parse other files to allow wildcard imports
+# Storing pair of (prefix, path) to parse in a stack
+files_to_parse = [(None, SRC_PATH / "__init__.py")]
 
-for line in lines:
-    words = line.split(" ")
+while files_to_parse:
+    prefix, file = files_to_parse.pop()
 
-    # It is an import statement
-    if words[0] == "from":
-        # Remove trailing "as <name>" if it exists
-        if words[-2] == "as":
-            # If symbol was renamed to a private name, skip it
-            if words[-1].startswith("_"):
-                continue
+    with open(file, "r", encoding="utf8") as f:
+        lines = f.read().splitlines()
 
-            words = words[:-2]
+    for line in lines:
+        words = line.split(" ")
 
-        # It is a single-symbol import like "from <module> import <symbol>"
-        if words[-2] == "import":
-            module_path = Path(words[1].replace(".", "/"))
+        # It is an import statement
+        if words[0] == "from":
+            # Remove trailing "as <name>" if it exists and save symbol's name
+            symbol = None
+            if words[-2] == "as":
+                # If symbol was renamed to a private name, skip it
+                if words[-1].startswith("_"):
+                    continue
 
-            # Check if the import is a dir module
-            module_path_with_suffix = module_path / words[-1]
-            if module_path_with_suffix.exists():
-                module_path = module_path_with_suffix
+                symbol = words[-1]
+                words = words[:-2]
 
-            # Check if the import is a file module
-            module_path_with_suffix = module_path / (words[-1] + ".py")
-            if module_path_with_suffix.exists():
-                module_path = module_path_with_suffix.with_suffix("")
+            # `words` is now in the form "from module.submodule import symbol"
+            if words[-2] == "import":
+                name = words[-1]
 
-            # If it's not a module import it is a normal symbol import
-            # (function, class, etc.) so we add its whole module to the docs
+                # We only allow wildcard imports from modules explicitly named
+                # api_symbols to prevent unwanted names in the public API
+                if name == "*":
+                    module_path = Path(words[1].replace(".", "/")).with_suffix(
+                        ".py"
+                    )
+                    if module_path.stem == "api_symbols":
+                        new_prefix = (
+                            (prefix + ".") if prefix else ""
+                        ) + module_path.parent.name
+                        files_to_parse.append((new_prefix, module_path))
+                        continue
 
-            paths.add(module_path)
+                    non_parsable_imports.append(line)
+                    continue
 
-        else:
-            non_parsable_imports.append(line)
+                # If symbol wasn't renamed, use its imported name
+                if symbol is None:
+                    symbol = name
+
+                path = Path(words[1].replace(".", "/")) / name
+
+                if prefix:
+                    symbol = prefix + "." + symbol
+
+                members.add((symbol, path))
+
+            # It is a multi-symbol import statement, error will be raised below
+            else:
+                non_parsable_imports.append(line)
 
 if non_parsable_imports:
     raise RuntimeError(
         "`gen_ref_pages` failed to parse the following import statements in"
         f" the top-level __init__.py file: {non_parsable_imports}. Import"
         " statements in the top-level module must import a single symbol each,"
-        " in the form `from <module> import <symbol>` or `from <module> import"
-        " <symbol> as <name>`."
+        " in the form `from <module> import <symbol>`, `from <module> import"
+        " <symbol> as <name>`, or `from <module> import *`."
     )
 
-for path in sorted(paths):
-    if path.parent.name not in ["test", "tests"]:
-        module_path = path.relative_to(SRC_PATH.parent).with_suffix("")
-        doc_path = path.relative_to(SRC_PATH.parent).with_suffix(".md")
-        full_doc_path = Path("reference", doc_path)
+nav["temporian"] = "index.md"
 
-        parts = list(module_path.parts)
+for symbol, path in sorted(members):
+    symbol_path = Path(symbol.replace(".", "/"))
+    symbol_name = symbol_path.name
+    src_path = SRC_PATH / symbol_name
 
-        if parts[-1] == "__init__":
-            parts = parts[:-1]
-            doc_path = doc_path.with_name("index.md")
-            full_doc_path = full_doc_path.with_name("index.md")
-        elif parts[-1] == "__main__":
-            continue
+    doc_path = SRC_PATH / symbol_path
+    parts = list(doc_path.parts)
+    doc_path = doc_path.with_suffix(".md")
+    full_doc_path = Path("reference", doc_path)
 
-        nav[parts] = doc_path.as_posix()
+    nav[parts] = doc_path.as_posix()
 
-        with mkdocs_gen_files.open(full_doc_path, "w") as fd:
-            identifier = ".".join(parts)
-            print("::: " + identifier, file=fd)
+    with mkdocs_gen_files.open(full_doc_path, "w") as fd:
+        identifier = ".".join(list(src_path.parts))
+        print("::: " + identifier, file=fd)
 
-        mkdocs_gen_files.set_edit_path(full_doc_path, path)
+    mkdocs_gen_files.set_edit_path(full_doc_path, path)
 
-with mkdocs_gen_files.open("reference/index.md", "w") as nav_file:
+with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
     nav_file.writelines(nav.build_literate_nav())

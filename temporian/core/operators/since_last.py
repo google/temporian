@@ -23,7 +23,7 @@ from temporian.core.data.node import (
 )
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
-from temporian.core.data.dtype import DType
+from temporian.core.data.dtypes.dtype import DType
 
 
 class SinceLast(Operator):
@@ -85,27 +85,36 @@ def since_last(
     """Amount of time since the last distinct timestamp.
 
     Example 1:
-        ```
-        Inputs:
-            input:
-                timestamps: 1, 5, 8, 8, 9
+        ```python
+        >>> t_evset = tp.event_set(timestamps=[1, 5, 8, 8, 9])
+        >>> t_node = t_evset.node()
+        >>> since_node = tp.since_last(t_node)
+        >>> since_node.evaluate({t_node: t_evset})
+        indexes: ...
+                timestamps: [1. 5. 8. 8. 9.]
+                'since_last': [nan  4.  3.  0.  1.]
+        ...
 
-        Output:
-            since_last: NaN, 4, 3, 0, 1
-            timestamps: 1, 5, 8, 8, 9
         ```
 
     Example 2:
-        ```
-        Inputs:
-            input:
-                timestamps: 1, 5, 8, 9
-            sampling:
-                timestamps: -1, 1, 6, 10
+        ```python
+        >>> since_evset = tp.event_set(timestamps=[2, 5, 7])
+        >>> sampling_evset = tp.event_set(timestamps=[1, 4, 6, 10])
+        >>> since_node = since_evset.node()
+        >>> sampling_node = sampling_evset.node()
 
-        Output:
-            since_last: NaN, 0, 1, 1
-            timestamps: -1, 1, 5, 6, 10
+        >>> # Time elapsed between each sampling event
+        >>> # and the latest previous event in since_evset
+        >>> result = tp.since_last(since_node, sampling_node)
+        >>> result.evaluate({since_node: since_evset,
+        ...     sampling_node: sampling_evset}
+        ... )
+        indexes: ...
+                timestamps: [ 1. 4. 6. 10.]
+                'since_last': [nan  2.  1.  3.]
+        ...
+
         ```
 
     Args:

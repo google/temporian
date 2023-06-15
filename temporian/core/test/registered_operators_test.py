@@ -17,7 +17,7 @@
 from absl.testing import absltest
 
 from temporian.core import operator_lib
-from temporian.core.operators import all_operators as _op
+from temporian.core.operators import api_symbols
 
 
 class RegisteredOperatorsTest(absltest.TestCase):

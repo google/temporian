@@ -1,5 +1,9 @@
 site_name: Temporian
+site_url: https://temporian.readthedocs.io/en/stable/
+site_description: A Python package for feature engineering of temporal data.
+
 repo_url: https://github.com/google/temporian
+edit_uri_template: tree/main/temporian/{path_noext}
 
 # Theme
 theme:
@@ -48,8 +52,8 @@ nav:
 plugins:
   - search
   - exclude-search:
-      # Exclude all files not listed in the nav section nor referenced by other files.
-      exclude_unreferenced: true
+      exclude:
+        - reference/SUMMARY
   - autorefs
   - gen-files:
       scripts:
@@ -59,6 +63,7 @@ plugins:
         - gen_ref_pages.py
   - literate-nav:
       nav_file: SUMMARY.md
+  - social
   - mkdocs-jupyter:
       # Execute notebooks when building docs (set to true when temporian runs in a notebook w/o the start_notebook script).
       execute: false
@@ -70,7 +75,7 @@ plugins:
       default_handler: python
       handlers:
         python:
-          paths: [temporian]
+          paths: [..]
           import:
             - https://docs.python.org/3/objects.inv
           options:
@@ -78,16 +83,20 @@ plugins:
             docstring_style: google
             heading_level: 1
             members_order: source
-            show_source: true
-            show_root_heading: true
-            show_category_heading: true
-            show_submodules: true
+            show_source: false
+            show_submodules: false
             merge_init_into_class: false
             show_signature: true
             separate_signature: true
-            show_signature_annotations: false
-            show_if_no_docstring: false # TODO: TBD if we want this enabled
-            group_by_category: false
+            show_signature_annotations: true
+            show_if_no_docstring: false
+            group_by_category: true
+            show_category_heading: false
+            show_root_heading: true
+            # show_root_toc_entry: false
+            # show_symbol_type_heading: false
+            # preload_modules: [temporian.core.operators]
+            # allow_inspection: true
 
 # Customization for Markdown
 markdown_extensions:

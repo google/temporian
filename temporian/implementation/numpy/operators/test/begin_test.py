@@ -15,7 +15,7 @@
 
 from absl.testing import absltest
 
-from temporian.core.operators.begin import Begin
+from temporian.core.operators.begin import BeginOperator
 from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy.operators.begin import (
     BeginNumpyImplementation,
@@ -44,7 +44,7 @@ class BeginOperatorTest(absltest.TestCase):
         )
 
         # Run op
-        op = Begin(input=node)
+        op = BeginOperator(input=node)
         instance = BeginNumpyImplementation(op)
         output = instance.call(input=evset)["output"]
 

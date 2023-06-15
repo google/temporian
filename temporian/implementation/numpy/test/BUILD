@@ -13,6 +13,6 @@ py_test(
     deps = [
         # already_there/absl/testing:absltest
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy/operators:all_operators",
+        "//temporian/implementation/numpy/operators",
     ],
 )

@@ -21,7 +21,7 @@ import sys
 
 import numpy as np
 
-from temporian.core.data.dtype import DType
+from temporian.core.data.dtypes.dtype import DType
 from temporian.core.data.node import Node, create_node_with_new_reference
 from temporian.core.data.schema import Schema
 from temporian.utils import string
@@ -234,6 +234,7 @@ class IndexData:
         >>> index_data = IndexData(features, timestamps)
         >>> len(index_data)
         3
+
         ```
     """
 
@@ -244,7 +245,7 @@ class IndexData:
         self,
         features: List[np.ndarray],
         timestamps: np.ndarray,
-        schema: Optional[Schema],
+        schema: Optional[Schema] = None,
     ) -> None:
         """Initializes the IndexData object by checking and setting the features
         and timestamps.
@@ -328,9 +329,9 @@ class IndexData:
 class EventSet:
     """Actual temporal data.
 
-    Use `tp.event_set` to create an event set manually.
-    Use `tp.from_pandas` to create an event set from a pandas
-    dataframe.
+    Use [`tp.event_set()`][temporian.event_set] to create an event set manually,
+    or [`tp.from_pandas()`][temporian.from_pandas] to create an event set from a
+    pandas DataFrame.
     """
 
     def __init__(
@@ -385,21 +386,21 @@ class EventSet:
     def node(self, force_new_node: bool = False) -> Node:
         """Creates a node able to consume the the event set.
 
-        If called multiple times with force_new_node=False (default), the same
+        If called multiple times with `force_new_node=False` (default), the same
         node is returned.
 
         Usage example:
 
-        ```
-        my_evset = tp.event_set(
-            timestamps=[1, 2, 3, 4],
-            features={
-                "feature_1": [0.5, 0.6, math.nan, 0.9],
-                "feature_2": ["red", "blue", "red", "blue"],
-            },
-        )
+        ```python
+        >>> my_evset = tp.event_set(
+        ...     timestamps=[1, 2, 3, 4],
+        ...     features={
+        ...         "feature_1": [0.5, 0.6, np.nan, 0.9],
+        ...         "feature_2": ["red", "blue", "red", "blue"],
+        ...     },
+        ... )
+        >>> my_node = my_evset.node()
 
-        my_node = my_evset.node()
         ```
 
         Args:
@@ -485,7 +486,16 @@ class EventSet:
         return True
 
     def plot(self, *args, **wargs) -> Any:
-        """Plots the event set. See tp.plot for details."""
+        """Plots the event set. See [`tp.plot()`][temporian.plot] for details.
+
+        Example usage:
+
+            ```python
+            >>> evset = tp.event_set(timestamps=[1, 2, 3], features={"f1": [0, 42, 10]})
+            >>> evset.plot()
+
+            ```
+        """
 
         from temporian.implementation.numpy.data import plotter
 

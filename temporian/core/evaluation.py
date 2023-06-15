@@ -68,9 +68,9 @@ def evaluate(
 
     Returns:
         An object with the same structure as `query` containing the results.
-        If `query` is a dictionary of nodes, the returned object will be a
-        dictionary of event sets. If `query` is a list of nodes, the
-        returned value will be a list of event sets with the same order.
+            If `query` is a dictionary of nodes, the returned object will be a
+            dictionary of event sets. If `query` is a list of nodes, the
+            returned value will be a list of event sets with the same order.
     """
     # TODO: Create an internal configuration object for options such as
     # `check_execution`.

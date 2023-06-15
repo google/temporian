@@ -11,7 +11,7 @@ from temporian.implementation.numpy.data.event_set import (
     normalize_features,
 )
 from temporian.core.evaluation import evaluate
-from temporian.core.operators.all_operators import add_index
+from temporian.core.operators.add_index import add_index
 from temporian.core.data.schema import Schema
 
 # Array of values as feed by the user.
@@ -30,56 +30,57 @@ def event_set(
 ) -> EventSet:
     """Creates an event set from arrays (list, numpy, pandas).
 
-    Usage example:
+    Usage examples:
 
         ```python
-        # Creates an event set with 4 timestamps and 3 features.
-        evset = tp.event_set(
-            timestamps=[1, 2, 3, 4],
-            features={
-                "feature_1": [0.5, 0.6, math.nan, 0.9],
-                "feature_2": ["red", "blue", "red", "blue"],
-                "feature_3": [10, -1, 5, 5],
-            },
-        )
+        >>> # Creates an event set with 4 timestamps and 3 features.
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3, 4],
+        ...     features={
+        ...         "feature_1": [0.5, 0.6, np.nan, 0.9],
+        ...         "feature_2": ["red", "blue", "red", "blue"],
+        ...         "feature_3": [10, -1, 5, 5],
+        ...     },
+        ... )
 
-        # Creates an event set with an index.
-        evset = tp.event_set(
-            timestamps=[1, 2, 3, 4],
-            features={
-                "feature_1": [0.5, 0.6, math.nan, 0.9],
-                "feature_2": ["red", "blue", "red", "blue"],
-            },
-            index_features=["feature_2"],
-        )
+        >>> # Creates an event set with an index.
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3, 4],
+        ...     features={
+        ...         "feature_1": [0.5, 0.6, np.nan, 0.9],
+        ...         "feature_2": ["red", "blue", "red", "blue"],
+        ...     },
+        ...     index_features=["feature_2"],
+        ... )
 
-        # Create an evet set with datetimes.
-        from datetime import datetime
-        evset = tp.event_set(
-            timestamps=[datetime(2015, 1, 1), datetime(2015, 1, 2)],
-            features={
-                "feature_1": [0.5, 0.6],
-                "feature_2": ["red", "blue"],
-            },
-            index_features=["feature_2"],
-        )
+        >>> # Create an evet set with datetimes.
+        >>> from datetime import datetime
+        >>> evset = tp.event_set(
+        ...     timestamps=[datetime(2015, 1, 1), datetime(2015, 1, 2)],
+        ...     features={
+        ...         "feature_1": [0.5, 0.6],
+        ...         "feature_2": ["red", "blue"],
+        ...     },
+        ...     index_features=["feature_2"],
+        ... )
+
         ```
 
     Supported values for `timestamps`:
 
-        - List of int, float, str, bytes and datetime.
-        - Numpy arrays of int{32, 64}, float{32, 64}, str_, string_ / bytes_,
-           Numpy datetime64, and object containing "str".
-        - Pandas series of int{32, 64}, float{32, 64}, Pandas Timestamp.
+    - List of int, float, str, bytes and datetime.
+    - Numpy arrays of int{32, 64}, float{32, 64}, str_, string_ / bytes_,
+        Numpy datetime64, and object containing "str".
+    - Pandas series of int{32, 64}, float{32, 64}, Pandas Timestamp.
 
     String timestamps are interpreted as ISO 8601 datetime.
 
     Supported values for `features`:
 
-        - List of int, float, str, bytes, bool, and datetime.
-        - Numpy arrays of int{32, 64}, float{32, 64}, str_, string_ / bytes_,
-            Numpy datetime64, or object containing "str".
-        - Pandas series of int{32, 64}, float{32, 64}, Pandas Timestamp.
+    - List of int, float, str, bytes, bool, and datetime.
+    - Numpy arrays of int{32, 64}, float{32, 64}, str_, string_ / bytes_,
+        Numpy datetime64, or object containing "str".
+    - Pandas series of int{32, 64}, float{32, 64}, Pandas Timestamp.
 
     Date / datetime features are converted to int64 unix times.
     NaN for float-like features are interpreted as missing values.
@@ -99,8 +100,8 @@ def event_set(
             argument is an array of date or date-like object.
         same_sampling_as: If set, the new event set is cheched and tagged as
             having the same sampling as `same_sampling_as`. Some operators,
-            such as `tp.filter`, require their inputes to have the same
-            sampling.
+            such as [`tp.filter()`][temporian.filter], require their inputs to
+            have the same sampling.
 
     Returns:
         An event set.

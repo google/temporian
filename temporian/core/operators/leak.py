@@ -16,7 +16,7 @@
 
 
 from temporian.core import operator_lib
-from temporian.core.data.duration import (
+from temporian.core.data.duration_utils import (
     Duration,
     NormalizedDuration,
     normalize_duration,

@@ -6,6 +6,8 @@ tmp
 build_package
 .ipynb_checkpoints
 tmp_*
+.cache/
+.env
 
 # benchmark outputs
 profile.*
@@ -17,7 +19,7 @@ profile.*
 site/
 
 # Build outputs
-build
+build/
 dist
 setup.py
 temporian.egg-info

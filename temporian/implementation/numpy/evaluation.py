@@ -23,7 +23,7 @@ from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core.schedule import Schedule
 
 # Loads all the numpy operator implementations
-from temporian.implementation.numpy.operators import all_operators as _impls
+from temporian.implementation.numpy import operators as _impls
 
 
 def evaluate_schedule(

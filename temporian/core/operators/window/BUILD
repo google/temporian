@@ -10,6 +10,23 @@ py_library(
     name = "window",
     srcs = ["__init__.py"],
     srcs_version = "PY3",
+    deps = [
+        ":api_symbols",
+    ],
+)
+
+py_library(
+    name = "api_symbols",
+    srcs = ["api_symbols.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":moving_count",
+        ":moving_max",
+        ":moving_min",
+        ":moving_standard_deviation",
+        ":moving_sum",
+        ":simple_moving_average",
+    ],
 )
 
 py_library(
@@ -17,10 +34,10 @@ py_library(
     srcs = ["base.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:duration",
+        "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/operators:base",
         "//temporian/proto:core_py_proto",
     ],
@@ -33,10 +50,10 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:duration",
+        "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
+        "//temporian/core/data/dtypes:dtype",
     ],
 )
 
@@ -47,10 +64,10 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:duration",
+        "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
+        "//temporian/core/data/dtypes:dtype",
     ],
 )
 
@@ -62,8 +79,8 @@ py_library(
         ":base",
         # already_there/numpy
         "//temporian/core:operator_lib",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:duration",
+        "//temporian/core/data/dtypes:dtype",
+        "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
     ],
@@ -76,10 +93,10 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:duration",
+        "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
+        "//temporian/core/data/dtypes:dtype",
     ],
 )
 
@@ -90,10 +107,10 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:duration",
+        "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
+        "//temporian/core/data/dtypes:dtype",
     ],
 )
 
@@ -104,9 +121,9 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:duration",
+        "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
+        "//temporian/core/data/dtypes:dtype",
     ],
 )

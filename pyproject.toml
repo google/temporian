@@ -59,6 +59,8 @@ griffe = "0.26.0"
 jupyterlab = "^4.0.0"
 mkdocs-exclude-search = "^0.6.5"
 apache-beam[dataframe] = "^2.48.0"
+pillow = "^9.5.0"
+cairosvg = "^2.7.0"
 
 [tool.black]
 line-length = 80

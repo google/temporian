@@ -19,7 +19,7 @@ from __future__ import annotations
 from typing import List, Tuple, Dict, Union
 
 from dataclasses import dataclass
-from temporian.core.data.dtype import DType, IndexDType
+from temporian.core.data.dtypes.dtype import DType, IndexDType
 
 
 @dataclass
@@ -48,7 +48,7 @@ class Schema:
 
     Attributes:
         features: List of feature names and types.
-        indexes: List of index names ans types.
+        indexes: List of index names and types.
         is_unix_timestamp: Whether values correspond to Unix timestamps.
     """
 

@@ -18,7 +18,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional, Tuple, TYPE_CHECKING, Any, Union
 
-from temporian.core.data.dtype import DType, IndexDType
+from temporian.core.data.dtypes.dtype import DType, IndexDType
 from temporian.core.data.schema import Schema, FeatureSchema, IndexSchema
 from temporian.utils import string
 
@@ -29,15 +29,16 @@ if TYPE_CHECKING:
 T_SCALAR = (int, float)
 
 
-class Node(object):
+class Node:
     """A node is a reference to the input/output of ops in a compute graph.
 
-    Use `tp.input_node` to create a node manually, or use
-    `event_set.node()` to create a node compatible with a given
-    event-set.
+    Use [`tp.input_node()`][temporian.input_node] to create a node manually, or
+    use [`event_set.node()`][temporian.EventSet.node] to create a node
+    compatible with a given event set.
 
-    A node does not contain any data. Use `node.evaluate(...)` to get the
-    event-set resulting from a node.
+    A node does not contain any data. Use
+    [`node.evaluate()`][temporian.Node.evaluate] to get the event set resulting
+    from a node.
     """
 
     def __init__(
@@ -59,6 +60,9 @@ class Node(object):
         """Schema of a node.
 
         The schema defines the name and dtype of the features and the index.
+
+        Returns:
+            Schema of the node.
         """
         return self._schema
 
@@ -67,8 +71,9 @@ class Node(object):
         """Sampling node.
 
         Equality between sampling nodes is used to check that two nodes are
-        sampled similarly. Use `node.check_same_sampling(...)` instead of
-        using `sampling_node`.
+        sampled similarly. Use
+        [`node.check_same_sampling()`][temporian.Node.check_same_sampling]
+        instead of `sampling_node`.
         """
         return self._sampling
 
@@ -98,7 +103,7 @@ class Node(object):
         """Creator.
 
         The creator is the operator that outputs this node. Manually created
-        nodes have a None creator.
+        nodes have a `None` creator.
         """
         return self._creator
 
@@ -123,7 +128,7 @@ class Node(object):
         return self.schema.indexes
 
     def check_same_sampling(self, other: Node):
-        """Checks is two nodes have the same sampling."""
+        """Checks if two nodes have the same sampling."""
 
         self.schema.check_compatible_index(other.schema)
         if self.sampling_node is not other.sampling_node:
@@ -145,7 +150,7 @@ class Node(object):
     ) -> EvaluationResult:
         """Evaluates the node on the specified input.
 
-        See `tp.evaluate` for details.
+        See [`tp.evaluate()`][temporian.evaluate] for details.
         """
         from temporian.core.evaluation import evaluate
 
@@ -285,12 +290,12 @@ class Node(object):
         return multiply_scalar(input=self, value=-1)
 
     def __invert__(self):
-        from temporian.core.operators.unary import invert
+        from temporian.core.operators.unary.unary import invert
 
         return invert(input=self)
 
     def __abs__(self):
-        from temporian.core.operators.unary import abs
+        from temporian.core.operators.unary.unary import abs
 
         return abs(input=self)
 
@@ -501,19 +506,20 @@ def input_node(
 
     Usage example:
 
-        ```
-        # Without index
-        a = source_node(features=[("f1", tp.float64), ("f2", tp.string)])
+        ```python
+        >>> # Without index
+        >>> a = input_node(features=[("f1", tp.float64), ("f2", tp.str_)])
 
-        # With an index
-        a = source_node(
-            features=[("f1", tp.float64), ("f2", tp.string)],
-            indexes=["f2"],
-        )
+        >>> # With an index
+        >>> a = input_node(
+        ...     features=[("f1", tp.float64), ("f2", tp.str_)],
+        ...     indexes=["f2"],
+        ... )
 
-        # Two nodes with the same sampling
-        a = source_node(features=[("f1", tp.float64)])
-        b = source_node(features=[("f2", tp.float64)], same_sampling_as=a)
+        >>> # Two nodes with the same sampling
+        >>> a = input_node(features=[("f1", tp.float64)])
+        >>> b = input_node(features=[("f2", tp.float64)], same_sampling_as=a)
+
         ```
 
     Args:
@@ -526,6 +532,9 @@ def input_node(
             same sampling as same_sampling_as`. In this case, `indexes` and
             `is_unix_timestamp` should not be provided. Some operators require
             for input nodes to have the same sampling.
+
+    Returns:
+        Node with the given specifications.
     """
 
     if same_sampling_as is not None:

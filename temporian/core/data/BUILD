@@ -13,18 +13,12 @@ py_library(
 )
 
 py_library(
-    name = "dtype",
-    srcs = ["dtype.py"],
-    srcs_version = "PY3",
-)
-
-py_library(
     name = "node",
     srcs = ["node.py"],
     srcs_version = "PY3",
     deps = [
-        ":dtype",
         ":schema",
+        "//temporian/core/data/dtypes:dtype",
         "//temporian/utils:string",
     ],
 )
@@ -34,7 +28,7 @@ py_library(
     srcs = ["schema.py"],
     srcs_version = "PY3",
     deps = [
-        ":dtype",
+        "//temporian/core/data/dtypes:dtype",
     ],
 )
 
@@ -43,6 +37,15 @@ py_library(
     srcs = ["duration.py"],
     srcs_version = "PY3",
     deps = [
+        ":duration_utils",
+    ],
+)
+
+py_library(
+    name = "duration_utils",
+    srcs = ["duration_utils.py"],
+    srcs_version = "PY3",
+    deps = [
         # already_there/numpy
-        ],
+    ],
 )
