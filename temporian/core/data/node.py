@@ -508,17 +508,17 @@ def input_node(
 
         ```python
         >>> # Without index
-        >>> a = input_node(features=[("f1", tp.float64), ("f2", tp.str_)])
+        >>> a = tp.input_node(features=[("f1", tp.float64), ("f2", tp.str_)])
 
         >>> # With an index
-        >>> a = input_node(
+        >>> a = tp.input_node(
         ...     features=[("f1", tp.float64), ("f2", tp.str_)],
         ...     indexes=["f2"],
         ... )
 
         >>> # Two nodes with the same sampling
-        >>> a = input_node(features=[("f1", tp.float64)])
-        >>> b = input_node(features=[("f2", tp.float64)], same_sampling_as=a)
+        >>> a = tp.input_node(features=[("f1", tp.float64)])
+        >>> b = tp.input_node(features=[("f2", tp.float64)], same_sampling_as=a)
 
         ```
 
