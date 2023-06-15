@@ -13,9 +13,10 @@
 # limitations under the License.
 
 from __future__ import annotations
+
+import logging
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
-import math
 import datetime
 import sys
 
@@ -96,6 +97,7 @@ def tp_dtype_to_np_dtype(dtype: DType) -> Any:
 
 def normalize_features(
     feature_values: Any,
+    name: str,
 ) -> np.ndarray:
     """Normalizes a list of feature values to temporian format.
 
@@ -112,19 +114,18 @@ def normalize_features(
     if not isinstance(feature_values, np.ndarray):
         # The data is not a np.array
 
-        all_str = all(
-            (
-                isinstance(x, (str, bytes)) or x is math.nan or x is np.nan
-                for x in feature_values
-            )
-        )
+        # Looks for an indication of a string or non-string array.
+        is_string = False
+        for x in feature_values:
+            if isinstance(x, (str, bytes)):
+                is_string = True
+                break
+            if isinstance(x, (int, bool, float)):
+                is_string = False
+                break
 
-        if all_str:
+        if is_string:
             # All the values are python strings.
-            feature_values = [
-                "" if x is math.nan or x is np.nan else x
-                for x in feature_values
-            ]
             feature_values = np.array(feature_values, dtype=np.str_)
         else:
             feature_values = np.array(feature_values)
@@ -132,17 +133,15 @@ def normalize_features(
     if feature_values.dtype.type == np.string_:
         feature_values = feature_values.astype(np.str_)
 
-    # TODO: This is slow. Speed-up.
-    if feature_values.dtype.type == np.object_ and all(
-        isinstance(x, str) or x is math.nan or x is np.nan
-        for x in feature_values
-    ):
-        # This is a np.array of python string.
-        # TODO: This is slow. Speed-up.
-        feature_values = np.array(
-            ["" if x is math.nan or x is np.nan else x for x in feature_values],
-            dtype=np.str_,
+    if feature_values.dtype.type == np.object_:
+        logging.warning(
+            (
+                'Feature "%s" is an array of numpy.object_ or'
+                " equivalent. Temporian casted it as numpy.str_."
+            ),
+            name,
         )
+        feature_values = feature_values.astype(np.str_)
 
     if feature_values.dtype.type == np.datetime64:
         feature_values = feature_values.astype("datetime64[s]").astype(np.int64)
@@ -308,9 +307,6 @@ class IndexData:
             return False
 
         for f1, f2 in zip(self.features, other.features):
-            if f1.dtype != f2.dtype:
-                return False
-
             if f1.dtype.kind == "f":
                 if not np.allclose(f1, f2, equal_nan=True):
                     return False

@@ -111,7 +111,8 @@ def event_set(
         features = {}
 
     features = {
-        name: normalize_features(value) for name, value in features.items()
+        name: normalize_features(value, name)
+        for name, value in features.items()
     }
 
     # Convert timestamps to expected type.
