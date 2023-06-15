@@ -348,12 +348,13 @@ py_test(
 
     print(
         """Don't forget to register the new operators in:
-- The "all_operators" rule in temporian/core/operators/BUILD
-- The "all_operators" rule in temporian/implementation/numpy/operators/BUILD
+- The "api_symbols" rule in temporian/core/operators/BUILD
+- The "operators" rule in temporian/implementation/numpy/operators/BUILD
 - The "test_base" function in temporian/core/test/registered_operators_test.py
 - The "test_base" function in temporian/implementation/numpy/test/registered_operators_test.py
-- Import of temporian/implementation/numpy/operators/all_operators.py
-- Import of temporian/core/operators/all_operators.py
+- Import of temporian/implementation/numpy/operators/__init__.py
+- Import of temporian/core/operators/api_symbols.py
+- The API ref's home page docs/reference/index.md
 """
     )
 
