@@ -103,7 +103,7 @@ operator_lib.register_operator(GlueOperator)
 def glue(
     *inputs: Node,
 ) -> Node:
-    """Concatenates together nodes with the same sampling.
+    """Concatenates Nodes with the same sampling.
 
     Example:
 

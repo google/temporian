@@ -88,7 +88,7 @@ def select(
     input: Node,
     feature_names: Union[str, List[str]],
 ) -> Node:
-    """Selects a subset of features from a node.
+    """Selects a subset of features from a Node.
 
     Args:
         input: Node to select features from.

@@ -41,7 +41,7 @@ class IndexSchema:
 
 
 class Schema:
-    """A schema defines the type of data in an event set.
+    """A schema defines the type of data in a [`Node`][temporian.Node] or [`EventSet`][temporian.EventSet].
 
     A schema does not contain any actual data.
     A schema can be shared by multiple nodes.

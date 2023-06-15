@@ -25,7 +25,7 @@ def from_csv(
     index_names: Optional[List[str]] = None,
     sep: str = ",",
 ) -> EventSet:
-    """Reads an EventSet from a file.
+    """Reads an EventSet from a CSV file.
 
     Args:
         path: Path to the file.
@@ -59,7 +59,7 @@ def to_csv(
     na_rep: Optional[str] = None,
     columns: Optional[List[str]] = None,
 ):
-    """Saves an EventSet to a file.
+    """Saves an EventSet to a CSV file.
 
     Args:
         evset: EventSet to save.

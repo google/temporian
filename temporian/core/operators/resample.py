@@ -66,7 +66,7 @@ def resample(
     input: Node,
     sampling: Node,
 ) -> Node:
-    """Resamples a node at each timestamp of a sampling.
+    """Resamples a Node at each timestamp of another Node.
 
     If a timestamp in `sampling` does not have a corresponding timestamp in
     `input`, the last timestamp in `input` is used instead. If this timestamp
