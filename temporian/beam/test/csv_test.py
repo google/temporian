@@ -15,12 +15,10 @@
 from absl.testing import absltest
 import os
 from absl import flags
-import temporian as tp
-
 from apache_beam.testing.test_pipeline import TestPipeline
 from apache_beam.testing.util import assert_that
 from apache_beam.testing.util import equal_to
-import apache_beam as beam
+from apache_beam.io.fileio import MatchFiles
 import temporian.beam as tp_beam
 
 
@@ -33,23 +31,30 @@ class TFPTest(absltest.TestCase):
         input_csv_path = os.path.join(
             test_data(), "temporian/test/test_data/io/input.csv"
         )
-
-        a = tp.input_node(
-            features=[
-                ("sales", tp.float32),
-                ("client", tp.str_),
-            ]
-        )
-        b = tp.add_index(a, "client")
-        c = tp.moving_sum(b, tp.duration.weeks(1))
-
         with TestPipeline() as p:
-            output = (
-                p
-                | tp_beam.read_csv(input_csv_path)
-                | tp_beam.run(inputs=a, outputs=c)
+            output = p | tp_beam.read_csv(input_csv_path)
+            assert_that(
+                output,
+                equal_to(
+                    [
+                        {
+                            "product_id": "666964",
+                            "timestamp": "1.0",
+                            "costs": "740.0",
+                        },
+                        {
+                            "product_id": "666964",
+                            "timestamp": "2.0",
+                            "costs": "508.0",
+                        },
+                        {
+                            "product_id": "574016",
+                            "timestamp": "3.0",
+                            "costs": "573.0",
+                        },
+                    ]
+                ),
             )
-            assert_that(output, equal_to([]))
 
 
 if __name__ == "__main__":

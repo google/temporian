@@ -13,21 +13,17 @@
     "**/.venv/**": true,
     "**/bazel-*/**": true
   },
-  "python.formatting.provider": "black",
+  "python.formatting.provider": "none",
   "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter"
   },
-  "black-formatter.path": [
-    "${workspaceFolder}/.venv/bin/black"
-  ],
+  "black-formatter.path": ["${workspaceFolder}/.venv/bin/black"],
   "editor.tabSize": 4,
   "editor.formatOnSave": true,
   "python.linting.flake8Enabled": false,
   "python.linting.pylintEnabled": true,
   "python.linting.enabled": true,
-  "editor.rulers": [
-    80
-  ],
+  "editor.rulers": [80],
   "editor.codeActionsOnSave": {
     "source.organizeImports": false
   },
