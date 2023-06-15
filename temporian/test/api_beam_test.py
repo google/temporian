@@ -22,6 +22,7 @@ from apache_beam.testing.util import assert_that
 from apache_beam.testing.util import equal_to
 import apache_beam as beam
 import temporian.beam as tp_beam
+import tempfile
 
 
 def test_data() -> str:
@@ -30,24 +31,30 @@ def test_data() -> str:
 
 class TFPTest(absltest.TestCase):
     def test_base(self):
-        input_csv_path = os.path.join(
-            test_data(), "temporian/test/test_data/io/input.csv"
+        tmp_dir = tempfile.gettempdir()
+        input_path = os.path.join(tmp_dir, "input.csv")
+        input_data = tp.event_set(
+            timestamps=[1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
+            features={
+                "a": [2, 3, 4, 3, 2, 22, 23, 24, 23, 22],
+                "b": ["x", "x", "x", "x", "x", "y", "y", "y", "y", "y"],
+                "c": ["X", "Y", "Y", "X", "Z", "Z", "Z", "X", "Y", "X"],
+                "d": [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10],
+                "e": [1, 1, 1, 2, 2, 1, 1, 1, 1, 1],
+            },
+            index_features=["b"],
         )
+        tp.to_csv(input_data, path=input_path)
 
-        a = tp.input_node(
-            features=[
-                ("sales", tp.float32),
-                ("client", tp.str_),
-            ]
-        )
-        b = tp.add_index(a, "client")
-        c = tp.moving_sum(b, tp.duration.weeks(1))
+        input_node = input_data.node()
+        #b = tp.add_index(a, "client")
+        output_node = tp.moving_sum(input_node, 2.5)
 
         with TestPipeline() as p:
             output = (
                 p
-                | tp_beam.read_csv(input_csv_path)
-                | tp_beam.run(inputs=a, outputs=c)
+                | tp_beam.read_csv(input_path)
+                | tp_beam.run(inputs=input_node, outputs=output_node)
             )
             assert_that(output, equal_to([]))
 

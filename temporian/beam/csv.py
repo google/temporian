@@ -3,6 +3,7 @@
 import apache_beam as beam
 import csv
 from apache_beam.io.fileio import MatchFiles
+from temporian.core.data.node import Schema
 
 
 def _parse_csv_file(file):
@@ -13,9 +14,13 @@ def _parse_csv_file(file):
 
 
 @beam.ptransform_fn
-def read_csv(pipe, file_pattern):
+def read_csv(pipe, file_pattern: str):
     return (
         pipe
         | "List files" >> MatchFiles(file_pattern)
         | "Parse file" >> beam.FlatMap(_parse_csv_file)
     )
+
+@beam.ptransform_fn
+def read_csv_with_schema(pipe, file_pattern: str, schema: Schema):
+    pass
