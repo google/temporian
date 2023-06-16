@@ -94,8 +94,62 @@ def add(
     Each feature in `input_1` is added to the feature in `input_2` in the same
     position.
 
-    `input_1` and `input_2` must have the same sampling and the same number of
-    features.
+    `input_1` and `input_2` must have the same sampling, index,
+    number of features and dtype for the features in the same positions.
+
+    Basic example:
+        ```python
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f1": [0, 100, 200], "f2": [10, -10, 5]}
+        ... )
+        >>> source = evset.node()
+
+        >>> # Equivalent
+        >>> c = tp.add(source["f1"], source["f2"])
+        >>> c = source["f1"] + source["f2"]
+
+        >>> c.evaluate({source: evset})
+        indexes: []
+        features: [('add_f1_f2', int64)]
+        events:
+            (3 events):
+                timestamps: [1. 2. 3.]
+                'add_f1_f2': [ 10 90 205]
+        ...
+
+        ```
+
+    Cast dtypes example:
+        ```python
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f1": [0, 100, 200], "f2": [-30.0, 10.0, 5.0]}
+        ... )
+        >>> source = evset.node()
+
+        >>> # a is int64 but b is float64
+        >>> a = source["f1"]
+        >>> b = source["f2"]
+
+        >>> # Cannot add different dtypes
+        >>> c = a + b
+        Traceback (most recent call last):
+            ...
+        ValueError: ... corresponding features should have the same dtype. ...
+
+        >>> # Cast f1 to float
+        >>> c = tp.cast(a, tp.float64) + b
+        >>> c.evaluate({source: evset})
+        indexes: []
+        features: [('add_f1_f2', float64)]
+        events:
+            (3 events):
+                timestamps: [1. 2. 3.]
+                'add_f1_f2': [-30. 110. 205.]
+        ...
+
+        ```
 
     Args:
         input_1: First node.
@@ -119,8 +173,36 @@ def subtract(
     Each feature in `input_2` is subtracted from the feature in `input_1` in the
     same position.
 
-    `input_1` and `input_2` must have the same sampling and the same number of
-    features.
+    `input_1` and `input_2` must have the same sampling, index,
+    number of features and dtype for the features in the same positions.
+
+    Basic example:
+        ```python
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f1": [0, 100, 200], "f2": [10, 20, -5]}
+        ... )
+        >>> source = evset.node()
+        >>> a = source["f1"]
+        >>> b = source["f2"]
+
+        >>> # Equivalent
+        >>> c = tp.subtract(a, b)
+        >>> c = a - b
+
+        >>> c.evaluate({source: evset})
+        indexes: []
+        features: [('sub_f1_f2', int64)]
+        events:
+            (3 events):
+                timestamps: [1. 2. 3.]
+                'sub_f1_f2': [-10 80 205]
+        ...
+
+        ```
+
+    See [`tp.add()`](../add) examples to see how to match samplings, dtypes and
+    index, in order to apply arithmetic operators in different nodes.
 
     Args:
         input_1: First node.
@@ -144,8 +226,36 @@ def multiply(
     Each feature in `input_1` is multiplied by the feature in `input_2` in the
     same position.
 
-    `input_1` and `input_2` must have the same sampling and the same number of
-    features.
+    `input_1` and `input_2` must have the same sampling, index,
+    number of features and dtype for the features in the same positions.
+
+    Basic example:
+        ```python
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f1": [0, 100, 200], "f2": [10, 3, 2]}
+        ... )
+        >>> source = evset.node()
+        >>> a = source["f1"]
+        >>> b = source["f2"]
+
+        >>> # Equivalent
+        >>> c = tp.multiply(a, b)
+        >>> c = a * b
+
+        >>> c.evaluate({source: evset})
+        indexes: []
+        features: [('mult_f1_f2', int64)]
+        events:
+            (3 events):
+                timestamps: [1. 2. 3.]
+                'mult_f1_f2': [ 0 300 400]
+        ...
+
+        ```
+
+    See [`tp.add()`](../add) examples to see how to match samplings, dtypes and
+    index, in order to apply arithmetic operators in different nodes.
 
     Args:
         input_1: First node.
@@ -169,8 +279,72 @@ def divide(
     Each feature in `numerator` is divided by the feature in `denominator` in
     the same position.
 
-    `numerator` and `denominator` must have the same sampling and the same
-    number of features.
+    This operator cannot be used in features with dtypes `int32` or `int64`.
+    Cast to float before (see example) or use the [`tp.floordiv`](../floordiv)
+    operator instead.
+
+    `numerator` and `denominator` must have the same sampling, index,
+    number of features and dtype for the features in the same positions.
+
+    Basic example:
+        ```python
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f1": [0.0, 100.0, 200.0], "f2": [10.0, 20.0, 50.0]}
+        ... )
+        >>> source = evset.node()
+        >>> a = source["f1"]
+        >>> b = source["f2"]
+
+        >>> # Equivalent
+        >>> c = tp.divide(a, b)
+        >>> c = a / b
+
+        >>> c.evaluate({source: evset})
+        indexes: []
+        features: [('div_f1_f2', float64)]
+        events:
+            (3 events):
+                timestamps: [1. 2. 3.]
+                'div_f1_f2': [0. 5. 4.]
+        ...
+
+        ```
+
+    Casting integer features:
+        ```python
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f1": [0, 100, 200], "f2": [10, 20, 50]}
+        ... )
+        >>> source = evset.node()
+
+        >>> # Both features are int64
+        >>> a = source["f1"]
+        >>> b = source["f2"]
+
+        >>> # Cannot divide int64 features
+        >>> c = a / b
+        Traceback (most recent call last):
+            ...
+        ValueError: Cannot use the divide operator on feature f1 of type int64. ...
+
+        >>> # Cast to tp.float64 or tp.float32 before
+        >>> c = tp.cast(a, float) / tp.cast(b, float)
+        >>> c.evaluate({source: evset})
+        indexes: []
+        features: [('div_f1_f2', float64)]
+        events:
+            (3 events):
+                timestamps: [1. 2. 3.]
+                'div_f1_f2': [0. 5. 4.]
+        ...
+
+        ```
+
+    See [`tp.add()`](../add) examples to see how to match samplings, dtypes and
+    index, in order to apply arithmetic operators in different nodes.
+
 
     Args:
         numerator: Numerator node.
@@ -196,8 +370,36 @@ def floordiv(
     Each feature in `numerator` is divided by the feature in `denominator` in
     the same position.
 
-    `numerator` and `denominator` must have the same sampling and the same
-    number of features.
+    `numerator` and `denominator` must have the same sampling, index,
+    number of features and dtype for the features in the same positions.
+
+    Basic example:
+        ```python
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f1": [0, 100, 200], "f2": [10, 3, 150]}
+        ... )
+        >>> source = evset.node()
+        >>> a = source["f1"]
+        >>> b = source["f2"]
+
+        >>> # Equivalent
+        >>> c = tp.floordiv(a, b)
+        >>> c = a // b
+
+        >>> c.evaluate({source: evset})
+        indexes: []
+        features: [('floordiv_f1_f2', int64)]
+        events:
+            (3 events):
+                timestamps: [1. 2. 3.]
+                'floordiv_f1_f2': [ 0 33 1]
+        ...
+
+        ```
+
+    See [`tp.add()`](../add) examples to see how to match samplings, dtypes and
+    index, in order to apply arithmetic operators in different nodes.
 
     Args:
         numerator: Numerator node.
@@ -219,8 +421,36 @@ def modulo(
     """Computes modulo or remainder of division between two
     nodes.
 
-    `numerator` and `denominator` must have the same sampling and the same number of
-    features.
+    `numerator` and `denominator` must have the same sampling, index,
+    number of features and dtype for the features in the same positions.
+
+    Basic example:
+        ```python
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f1": [0, 7, 200], "f2": [10, 5, 150]}
+        ... )
+        >>> source = evset.node()
+        >>> a = source["f1"]
+        >>> b = source["f2"]
+
+        >>> # Equivalent
+        >>> c = tp.modulo(a, b)
+        >>> c = a % b
+
+        >>> c.evaluate({source: evset})
+        indexes: []
+        features: [('mod_f1_f2', int64)]
+        events:
+            (3 events):
+                timestamps: [1. 2. 3.]
+                'mod_f1_f2': [ 0 2 50]
+        ...
+
+        ```
+
+    See [`tp.add()`](../add) examples to see how to match samplings, dtypes and
+    index, in order to apply arithmetic operators in different nodes.
 
     Args:
         numerator: First node.
@@ -243,6 +473,37 @@ def power(
 
     `base` and `exponent` must have the same sampling and the same number of
     features.
+
+    `base` and `exponent` must have the same sampling, index,
+    number of features and dtype for the features in the same positions.
+
+    Basic example:
+        ```python
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f1": [5, 2, 4], "f2": [0, 3, 2]}
+        ... )
+        >>> source = evset.node()
+        >>> a = source["f1"]
+        >>> b = source["f2"]
+
+        >>> # Equivalent
+        >>> c = tp.power(a, b)
+        >>> c = a ** b
+
+        >>> c.evaluate({source: evset})
+        indexes: []
+        features: [('pow_f1_f2', int64)]
+        events:
+            (3 events):
+                timestamps: [1. 2. 3.]
+                'pow_f1_f2': [ 1 8 16]
+        ...
+
+        ```
+
+    See [`tp.add()`](../add) examples to see how to match samplings, dtypes and
+    index, in order to apply arithmetic operators in different nodes.
 
     Args:
         base: First node.
