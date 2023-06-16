@@ -13,11 +13,10 @@
     "**/.venv/**": true,
     "**/bazel-*/**": true
   },
-  "python.formatting.provider": "none",
+  "python.formatting.provider": "black",
   "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter"
   },
-  "black-formatter.path": ["${workspaceFolder}/.venv/bin/black"],
   "editor.tabSize": 4,
   "editor.formatOnSave": true,
   "python.linting.flake8Enabled": false,
