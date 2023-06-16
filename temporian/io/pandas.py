@@ -116,10 +116,10 @@ def to_pandas(
     # Set index/date manually in pandas
     >>> df["timestamp"] = pd.to_datetime(df["timestamp"], unit='s')
     >>> df.set_index("my_index")
-                   feature_1  timestamp
+                feature_1  timestamp
     my_index
-    red              0.5 2015-01-01
-    red              0.6 2015-01-02
+    red         0.5     2015-01-01
+    red         0.6     2015-01-02
 
     ```
 
