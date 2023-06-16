@@ -42,6 +42,8 @@ BeamEventSet = Tuple[
     Tuple[BeamIndexAndFeature, ...], Tuple[np.ndarray, Optional[np.ndarray]]
 ]
 
+PColBeamEventSet = beam.PCollection[BeamEventSet]
+
 
 def _parse_csv_file(
     file: beam.io.filesystem.FileMetadata,

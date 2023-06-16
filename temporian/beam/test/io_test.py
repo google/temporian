@@ -18,15 +18,13 @@ from absl import flags
 from apache_beam.testing.test_pipeline import TestPipeline
 from apache_beam.testing.util import assert_that
 from apache_beam.testing.util import equal_to
-import temporian.beam as tp_beam
+from temporian.beam.io import read_csv_raw, read_csv, write_csv
 from temporian.core.data.node import Schema
 from temporian.core.data.dtypes import dtype
 from temporian.implementation.numpy.data.io import event_set
 import tempfile
 from temporian.io.csv import to_csv
 import apache_beam as beam
-
-# from temporian.beam.io import materialize_results
 
 
 def test_data() -> str:
@@ -39,7 +37,7 @@ class IOTest(absltest.TestCase):
             test_data(), "temporian/test/test_data/io/input.csv"
         )
         with TestPipeline() as p:
-            output = p | tp_beam.read_csv_raw(input_csv_path)
+            output = p | read_csv_raw(input_csv_path)
             assert_that(
                 output,
                 equal_to(
@@ -95,18 +93,13 @@ class IOTest(absltest.TestCase):
             is_unix_timestamp=False,
         )
 
-        def my_print(x):
-            print(x)
-            return x
-
         # Note: It is not clear how to check values of PCollection that contains
         # numpy arrays. assert_that + equal_to does not work.
         with TestPipeline() as p:
             output = (
                 p
-                | tp_beam.read_csv(input_path, schema)
-                | tp_beam.write_csv(output_path, schema, shard_name_template="")
-                | beam.Map(my_print)
+                | read_csv(input_path, schema)
+                | write_csv(output_path, schema, shard_name_template="")
             )
             assert_that(
                 output,

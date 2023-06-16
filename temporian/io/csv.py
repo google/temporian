@@ -21,7 +21,7 @@ from temporian.io.pandas import from_pandas, to_pandas
 
 def from_csv(
     path: str,
-    timestamp_column: str,
+    timestamp_column: str = "timestamp",
     index_names: Optional[List[str]] = None,
     sep: str = ",",
 ) -> EventSet:

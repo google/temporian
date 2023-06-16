@@ -90,3 +90,16 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
                 kwargs["sampling_timestamps"] = sampling_timestamps
             dst_feature = implementation(**kwargs)
             dst_features.append(dst_feature)
+
+    def apply_feature_wise(
+        self,
+        src_timestamps: np.ndarray,
+        src_feature: np.ndarray,
+    ) -> np.ndarray:
+        implementation = self._implementation()
+        kwargs = {
+            "evset_timestamps": src_timestamps,
+            "evset_values": src_feature,
+            "window_length": self.operator.window_length,
+        }
+        return implementation(**kwargs)
