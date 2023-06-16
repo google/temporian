@@ -93,6 +93,36 @@ def to_pandas(
 ) -> "pandas.DataFrame":
     """Converts an EventSet to a pandas DataFrame.
 
+    Example:
+    ```python
+    >>> from datetime import datetime
+
+    >>> evset = tp.event_set(
+    ...     timestamps=[datetime(2015, 1, 1), datetime(2015, 1, 2)],
+    ...     features={
+    ...         "feature_1": [0.5, 0.6],
+    ...         "my_index": ["red", "red"],
+    ...     },
+    ...     index_features=["my_index"],
+    ... )
+
+    # Indices are not set as dataframe's indices and dates are unix timestamps
+    >>> df = tp.to_pandas(evset)
+    >>> df
+      my_index   feature_1     timestamp
+    0       red        0.5  1.420070e+09
+    1       red        0.6  1.420157e+09
+
+    # Set index/date manually in pandas
+    >>> df["timestamp"] = pd.to_datetime(df["timestamp"], unit='s')
+    >>> df.set_index("my_index")
+                   feature_1  timestamp
+    my_index
+    red              0.5 2015-01-01
+    red              0.6 2015-01-02
+
+    ```
+
     Returns:
         DataFrame created from EventSet.
     """

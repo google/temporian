@@ -25,7 +25,14 @@ def from_csv(
     index_names: Optional[List[str]] = None,
     sep: str = ",",
 ) -> EventSet:
-    """Reads an EventSet from a file.
+    """Reads a [`tp.EventSet`](temporian.EventSet) from a file.
+
+    Example:
+    ```python
+    evset = tp.from_csv("path/to/temporal_data.csv", timestamp_column="date")
+    ...
+
+    ```
 
     Args:
         path: Path to the file.
@@ -59,7 +66,14 @@ def to_csv(
     na_rep: Optional[str] = None,
     columns: Optional[List[str]] = None,
 ):
-    """Saves an EventSet to a file.
+    """Saves an [`EventSet`](temporian.EventSet) to a file.
+
+    Example:
+    ```python
+    evset = tp.event_set(timestamps=[1,], features={"f1": [0.1]})
+    tp.to_csv(evset, "path/to/output_data.csv")
+
+    ```
 
     Args:
         evset: EventSet to save.
