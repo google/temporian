@@ -46,15 +46,49 @@ def save(
 
     Usage example:
         ```python
-        a = tp.input_node(...)
-        b = tp.sma(a, window_length=7.0)
-        tp.save(inputs={"io_a": a}, outputs={"io_b": b}, path="graph.tem")
+        >>> evset = tp.event_set(
+        ...    timestamps=[1, 2, 3],
+        ...    features={"input_feature": [0, 42, 10]}
+        ... )
 
-        inputs, outputs = tp.load(path="graph.tem")
-        print(t.evaluate(
-            query=outputs["io_b"],
-            input_data{inputs["io_a"]: pandas.DataFrame(...)}
-        ))
+        >>> # Create a graph
+        >>> a = evset.node()
+        >>> b = tp.moving_sum(a, 2)
+        >>> b = tp.rename(b, "result_feature")
+
+        >>> # Check evaluation
+        >>> b.evaluate({a: evset})
+        indexes: []
+        features: [('result_feature', int64)]
+        events:
+            (3 events):
+                timestamps: [1. 2. 3.]
+                'result_feature': [ 0 42 52]
+        ...
+
+
+        >>> # Save the graph
+        >>> file_path = tmp_dir / "graph.tem"
+        >>> tp.save(inputs={"input_node": a},
+        ...     outputs={"output_node": b},
+        ...     path=file_path
+        ... )
+
+        >>> # Load the graph
+        >>> inputs, outputs = tp.load(path=file_path)
+
+        >>> # Evaluate reloaded graph
+        >>> a_reloaded = inputs["input_node"]
+        >>> b_reloaded = outputs["output_node"]
+        >>> b_reloaded.evaluate({a_reloaded: evset})
+        indexes: []
+        features: [('result_feature', int64)]
+        events:
+            (3 events):
+                timestamps: [1. 2. 3.]
+                'result_feature': [ 0 42 52]
+        ...
+
         ```
 
     Args:
@@ -77,6 +111,8 @@ def load(
     path: str, squeeze: bool = False
 ) -> Tuple[Union[Node, Dict[str, Node]], Union[Node, Dict[str, Node]]]:
     """Loads a graph from a file.
+
+    See [`tp.save()`](temporian.save) for examples.
 
     Args:
         path: File path to load from.

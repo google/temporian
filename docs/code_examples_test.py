@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import doctest
+import tempfile
 from pathlib import Path
 
 from absl.testing import absltest
@@ -31,6 +32,8 @@ class CodeExamplesTest(absltest.TestCase):
     """
 
     def test_code_examples(self):
+        tmp_dir_handle = tempfile.TemporaryDirectory()
+        tmp_dir = Path(tmp_dir_handle.name)
         for path in Path("docs").rglob("*.md"):
             print(f"Testing code examples in {path}")
             try:
@@ -39,7 +42,7 @@ class CodeExamplesTest(absltest.TestCase):
                     str(path),
                     module_relative=False,
                     raise_on_error=True,
-                    globs={"np": np, "pd": pd, "tp": tp},
+                    globs={"np": np, "pd": pd, "tp": tp, "tmp_dir": tmp_dir},
                     # Use ... to match anything and ignore different whitespaces
                     optionflags=doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE,
                     verbose=False,
@@ -66,6 +69,7 @@ class CodeExamplesTest(absltest.TestCase):
                     f" {path}:{ex.lineno}\n>>> {ex.source}{e.exc_info[0]}:"
                     f" {e.exc_info[1]}"
                 ) from e
+        tmp_dir_handle.cleanup()
 
 
 if __name__ == "__main__":
