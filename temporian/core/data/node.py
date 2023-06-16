@@ -500,7 +500,7 @@ def input_node(
     same_sampling_as: Optional[Node] = None,
     name: Optional[str] = None,
 ) -> Node:
-    """Creates an input node.
+    """Creates an input [`Node`][temporian.Node].
 
     An input node can be used to feed data into a graph.
 
