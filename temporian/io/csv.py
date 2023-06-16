@@ -28,28 +28,28 @@ def from_csv(
     """Reads a [`tp.EventSet`](temporian.EventSet) from a file.
 
     Example:
-    ```python
-    >>> # Example CSV
-    >>> temp_file = tmp_dir / "temporal_data.csv"
-    >>> _ = open(temp_file, "w").write(
-    ...     "date,feature_1,feature_2\\n"
-    ...     "2023-01-01,10.0,3.0\\n"
-    ...     "2023-01-02,20.0,4.0\\n"
-    ...     "2023-02-01,30.0,5.0"
-    ... )
-    >>> # Load CSV
-    >>> evset = tp.from_csv(temp_file, timestamp_column="date")
-    >>> evset
-    indexes: []
-    features: [('feature_1', float64), ('feature_2', float64)]
-    events:
-         (3 events):
-            timestamps: [1.6725e+09 1.6726e+09 1.6752e+09]
-            'feature_1': [10. 20. 30.]
-            'feature_2': [3. 4. 5.]
-    ...
+        ```python
+        >>> # Example CSV
+        >>> temp_file = tmp_dir / "temporal_data.csv"
+        >>> _ = open(temp_file, "w").write(
+        ...     "date,feature_1,feature_2\\n"
+        ...     "2023-01-01,10.0,3.0\\n"
+        ...     "2023-01-02,20.0,4.0\\n"
+        ...     "2023-02-01,30.0,5.0"
+        ... )
+        >>> # Load CSV
+        >>> evset = tp.from_csv(temp_file, timestamp_column="date")
+        >>> evset
+        indexes: []
+        features: [('feature_1', float64), ('feature_2', float64)]
+        events:
+            (3 events):
+                timestamps: [1.6725e+09 1.6726e+09 1.6752e+09]
+                'feature_1': [10. 20. 30.]
+                'feature_2': [3. 4. 5.]
+        ...
 
-    ```
+        ```
 
     Args:
         path: Path to the file.
@@ -86,12 +86,12 @@ def to_csv(
     """Saves an [`EventSet`](temporian.EventSet) to a file.
 
     Example:
-    ```python
-    >>> output_path = tmp_dir / "output_data.csv"
-    >>> evset = tp.event_set(timestamps=[1,], features={"f1": [0.1]})
-    >>> tp.to_csv(evset, output_path)
+        ```python
+        >>> output_path = tmp_dir / "output_data.csv"
+        >>> evset = tp.event_set(timestamps=[1,], features={"f1": [0.1]})
+        >>> tp.to_csv(evset, output_path)
 
-    ```
+        ```
 
     Args:
         evset: EventSet to save.

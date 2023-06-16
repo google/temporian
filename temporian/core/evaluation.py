@@ -53,61 +53,57 @@ def evaluate(
 
 
     Single input/output example:
+        ```python
+        >>> input_evset = tp.event_set(timestamps=[1, 2, 3], features={"f": [0, 4, 10]})
+        >>> input_node = input_evset.node()
+        >>> output_node = tp.moving_sum(input_node, 5)
 
-    ```python
-    >>> input_evset = tp.event_set(timestamps=[1, 2, 3], features={"f1": [0, 42, 10]})
-    >>> input_node = input_evset.node()
-    >>> output_node = tp.moving_sum(input_node, 5)
+        >>> # Equivalents
+        >>> output_evset = tp.evaluate(output_node, {input_node: input_evset})
+        >>> output_evset = output_node.evaluate({input_node: input_evset})
 
-    >>> output_evset = tp.evaluate(output_node, {input_node: input_evset})
-
-    >>> # Short-hand for single output
-    >>> output_evset = output_node.evaluate({input_node: input_evset})
-
-    ```
+        ```
 
     Multiple inputs/outputs example:
+        ```python
+        >>> evset_1 = tp.event_set(timestamps=[1, 2, 3], features={"f1": [0.1, 42, 10]})
+        >>> evset_2 = tp.event_set(timestamps=[1, 2, 3],
+        ...     features={"f2": [-1.5, 50, 30]},
+        ...     same_sampling_as=evset_1
+        ... )
 
-    ```python
-    >>> evset_1 = tp.event_set(timestamps=[1, 2, 3], features={"f1": [0.1, 42, 10]})
-    >>> evset_2 = tp.event_set(timestamps=[1, 2, 3],
-    ...     features={"f2": [-1.5, 50, 30]},
-    ...     same_sampling_as=evset_1
-    ... )
+        >>> # Graph with 2 inputs and 2 steps
+        >>> input_1 = evset_1.node()
+        >>> input_2 = evset_2.node()
+        >>> step_1 = input_1 + input_2
+        >>> step_2 = tp.simple_moving_average(step_1, 2)
 
-    >>> # Graph with 2 inputs and 2 steps
-    >>> input_1 = evset_1.node()
-    >>> input_2 = evset_2.node()
-    >>> step_1 = input_1 + input_2
-    >>> step_2 = tp.simple_moving_average(step_1, 2)
+        >>> # Get step_1 and step_2 at once
+        >>> evset_step_1, evset_step_2 = tp.evaluate([step_1, step_2],
+        ...     {input_1: evset_1, input_2: evset_2}
+        ... )
 
-    >>> # Get step_1 and step_2 at once
-    >>> evset_step_1, evset_step_2 = tp.evaluate([step_1, step_2],
-    ...     {input_1: evset_1, input_2: evset_2}
-    ... )
-
-    ```
+        ```
 
     Named input example:
+        ```python
+        >>> input_evset = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f1": [0, 42, 10]},
+        ...     name="my_input"
+        ... )
+        >>> input_node = input_evset.node()
 
-    ```python
-    >>> input_evset = tp.event_set(
-    ...     timestamps=[1, 2, 3],
-    ...     features={"f1": [0, 42, 10]},
-    ...     name="my_input"
-    ... )
-    >>> input_node = input_evset.node()
+        >>> # Check input name equals evset's name
+        >>> input_node.name
+        'my_input'
 
-    >>> # Check input name equals evset's name
-    >>> input_node.name
-    'my_input'
+        >>> output_node = tp.moving_sum(input_node, 5)
 
-    >>> output_node = tp.moving_sum(input_node, 5)
+        >>> # Find input node by name
+        >>> output_evset = output_node.evaluate(input_evset)
 
-    >>> # Find input node by name
-    >>> output_evset = output_node.evaluate(input_evset)
-
-    ```
+        ```
 
     Args:
         query: Nodes to compute. Supports Node, dict of Nodes and list of Nodes.
