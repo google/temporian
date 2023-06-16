@@ -19,5 +19,21 @@ py_library(
     srcs_version="PY3",
     deps=[
         "//temporian/beam/operators/window:moving_sum",
+        ":select",
+    ],
+)
+
+
+py_library(
+    name="select",
+    srcs=["select.py"],
+    srcs_version="PY3",
+    deps=[
+        "//temporian/utils:config",
+        "//temporian/beam/operators:base",
+        "//temporian/core/operators:select",
+        "//temporian/implementation/numpy/operators:select",
+        "//temporian/beam:io",
+        "//temporian/implementation/numpy/operators:base",
     ],
 )

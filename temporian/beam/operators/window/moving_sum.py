@@ -6,7 +6,7 @@ from temporian.implementation.numpy.operators.window.moving_sum import (
     MovingSumNumpyImplementation as CurrentOperatorImplementation,
 )
 from temporian.beam.operators.base import BeamOperatorImplementation
-from typing import Iterable, Dict, Any, Tuple, Union, Optional, List, Set
+from typing import Dict
 from temporian.beam.io import BeamEventSet, PColBeamEventSet
 import apache_beam as beam
 from temporian.implementation.numpy.operators.base import OperatorImplementation

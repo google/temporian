@@ -18,3 +18,4 @@
 # pylint: disable=line-too-long
 # fmt: off
 from temporian.beam.operators.window import moving_sum
+from temporian.beam.operators import select

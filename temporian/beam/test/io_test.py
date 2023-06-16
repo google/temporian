@@ -79,27 +79,15 @@ class IOTest(absltest.TestCase):
         )
         to_csv(input_data, path=input_path)
 
-        # Input schema
-        schema = Schema(
-            features=[
-                ("a", dtype.float32),
-                ("c", dtype.str_),
-                ("d", dtype.int32),
-            ],
-            indexes=[
-                ("b", dtype.str_),
-                ("e", dtype.int32),
-            ],
-            is_unix_timestamp=False,
-        )
-
         # Note: It is not clear how to check values of PCollection that contains
         # numpy arrays. assert_that + equal_to does not work.
         with TestPipeline() as p:
             output = (
                 p
-                | read_csv(input_path, schema)
-                | write_csv(output_path, schema, shard_name_template="")
+                | read_csv(input_path, input_data.schema)
+                | write_csv(
+                    output_path, input_data.schema, shard_name_template=""
+                )
             )
             assert_that(
                 output,
@@ -111,16 +99,16 @@ class IOTest(absltest.TestCase):
             self.assertEqual(
                 content,
                 """timestamp,b,e,a,c,d
-1.0,x,1,2.0,X,-1
-2.0,x,1,3.0,Y,-2
-3.0,x,1,4.0,Y,-3
-1.0,y,1,22.0,Z,-6
-2.0,y,1,23.0,Z,-7
-3.0,y,1,24.0,X,-8
-4.0,y,1,23.0,Y,-9
-5.0,y,1,22.0,X,-10
-4.0,x,2,3.0,X,-4
-5.0,x,2,2.0,Z,-5
+1.0,x,1,2,X,-1
+2.0,x,1,3,Y,-2
+3.0,x,1,4,Y,-3
+1.0,y,1,22,Z,-6
+2.0,y,1,23,Z,-7
+3.0,y,1,24,X,-8
+4.0,y,1,23,Y,-9
+5.0,y,1,22,X,-10
+4.0,x,2,3,X,-4
+5.0,x,2,2,Z,-5
 """,
             )
 
