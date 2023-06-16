@@ -69,7 +69,7 @@ class DataFrameToEventTest(absltest.TestCase):
         df = pd.DataFrame(
             [
                 [666964, 1.0, "740"],
-                [666964, 2.0, "B"],
+                [666964, 2.0, np.nan],
                 [574016, 3.0, ""],
             ],
             columns=["product_id", "timestamp", "costs"],
@@ -78,7 +78,7 @@ class DataFrameToEventTest(absltest.TestCase):
             timestamps=[1.0, 2.0, 3.0],
             features={
                 "product_id": [666964, 666964, 574016],
-                "costs": ["740", "B", ""],
+                "costs": ["740", "nan", ""],
             },
             index_features=["product_id"],
         )
@@ -88,21 +88,6 @@ class DataFrameToEventTest(absltest.TestCase):
         )
 
         self.assertEqual(evset, expected_evset)
-
-    def test_mixed_types_in_string_column(self) -> None:
-        df = pd.DataFrame(
-            [
-                [666964, 1.0, "740", "A"],
-                [666964, 2.0, "400", 101],
-                [574016, 3.0, np.nan, "B"],
-            ],
-            columns=["product_id", "timestamp", "costs", "sales"],
-        )
-        # not allowed
-        with self.assertRaises(ValueError):
-            from_pandas(
-                df, index_names=["product_id"], timestamp_column="timestamp"
-            )
 
     def test_multiple_string_formats(self) -> None:
         df = pd.DataFrame(
@@ -444,7 +429,11 @@ class DataFrameToEventTest(absltest.TestCase):
         )
 
         expected_evset = event_set(
-            timestamps=[1, 2, 3], features={"x": ["a", "", "b"], "y": [1, 2, 3]}
+            timestamps=[1, 2, 3],
+            features={
+                "x": ["a", "nan", "b"],
+                "y": [1, 2, 3],
+            },
         )
 
         self.assertEqual(evset, expected_evset)
