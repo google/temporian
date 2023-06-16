@@ -33,6 +33,9 @@ class TFPTest(absltest.TestCase):
     def test_base(self):
         tmp_dir = tempfile.gettempdir()
         input_path = os.path.join(tmp_dir, "input.csv")
+        output_path = os.path.join(tmp_dir, "output.csv")
+
+        # Create a dataset
         input_data = tp.event_set(
             timestamps=[1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
             features={
@@ -46,17 +49,26 @@ class TFPTest(absltest.TestCase):
         )
         tp.to_csv(input_data, path=input_path)
 
+        # Define some computation
         input_node = input_data.node()
-        #b = tp.add_index(a, "client")
-        output_node = tp.moving_sum(input_node, 2.5)
+        # TODO: Do some computation.
+        output_node = input_node
 
+        # Execute computation in Beam and save the result in a csv file.
         with TestPipeline() as p:
             output = (
                 p
-                | tp_beam.read_csv(input_path)
-                | tp_beam.run(inputs=input_node, outputs=output_node)
+                | tp_beam.read_csv(input_path, input_node.schema)
+                # TODO: Do some computation.
+                # | tp_beam.run(inputs=input_node, outputs=output_node)
+                | tp_beam.write_csv(
+                    output_path, output_node.schema, shard_name_template=""
+                )
             )
-            assert_that(output, equal_to([]))
+            assert_that(output, equal_to([output_path]))
+
+        with open(output_path, "r", encoding="utf-8") as f:
+            print("Results:\n" + f.read(), flush=True)
 
 
 if __name__ == "__main__":

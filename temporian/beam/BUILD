@@ -10,14 +10,17 @@ py_library(
     name = "beam",
     srcs = ["__init__.py"],
     srcs_version = "PY3",
-    deps = [":csv", ":evaluation"],
+    deps = [":io", ":evaluation"],
 )
 
 py_library(
-    name = "csv",
-    srcs = ["csv.py"],
+    name = "io",
+    srcs = ["io.py"],
     srcs_version = "PY3",
-    deps = [],
+    deps = [
+        "//temporian/core/data:node",
+        "//temporian/core/data/dtypes:dtype",
+        ],
 )
 
 py_library(
