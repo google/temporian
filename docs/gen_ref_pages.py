@@ -2,12 +2,12 @@
 Generate the code reference pages.
 
 This script traverses the markdown files under docs/src/reference and for each:
-- If the file is not empty it is ignored and will appear in the docs as-is.
-- If the file has no extension, it is interpreted as a placeholder for the
-    top-level symbol with its same name and its reference page is generated in
-    its same path.
-    E.g., if an empty file named `docs/src/reference/temporianio/to_csv.md`
-    exists, the reference page for `temporian.to_csv` will be generated in
+- If the file is not empty it is ignored and will appear in the docs as-is
+    (after mkdocstrings has filled in any identifiers inside it).
+- If the file is empty, it is interpreted as a placeholder for the top-level
+    symbol with its same name and its reference page is generated in its same
+    path. E.g., if an empty docs/src/reference/temporian/io/to_csv.md file
+    exists, the reference page for `temporian.to_csv` will be generated under
     reference/temporian/io/to_csv/ in the docs.
 
 Related: https://mkdocstrings.github.io/recipes/
