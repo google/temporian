@@ -18,7 +18,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional, Tuple, TYPE_CHECKING, Any, Union
 
-from temporian.core.data.dtypes.dtype import DType, IndexDType
+from temporian.core.data.dtype import DType, IndexDType
 from temporian.core.data.schema import Schema, FeatureSchema, IndexSchema
 from temporian.utils import string
 
@@ -298,12 +298,12 @@ class Node:
         return multiply_scalar(input=self, value=-1)
 
     def __invert__(self):
-        from temporian.core.operators.unary.unary import invert
+        from temporian.core.operators.unary import invert
 
         return invert(input=self)
 
     def __abs__(self):
-        from temporian.core.operators.unary.unary import abs
+        from temporian.core.operators.unary import abs
 
         return abs(input=self)
 

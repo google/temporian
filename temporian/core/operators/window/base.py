@@ -19,7 +19,7 @@ from typing import Optional
 
 
 from temporian.core.data.duration_utils import NormalizedDuration
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 from temporian.core.data.node import (
     Node,
     create_node_new_features_existing_sampling,

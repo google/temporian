@@ -23,7 +23,7 @@ from temporian.core import graph
 from temporian.core.data.node import Node, Sampling, Feature
 from temporian.core.data.schema import Schema
 from temporian.core.operators import base
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 from temporian.proto import core_pb2 as pb
 
 DTYPE_MAPPING = {
