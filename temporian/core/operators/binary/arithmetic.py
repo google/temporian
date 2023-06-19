@@ -104,10 +104,12 @@ def add(
         ...     features={"f1": [0, 100, 200], "f2": [10, -10, 5]}
         ... )
         >>> source = evset.node()
+        >>> a = source["f1"]
+        >>> b = source["f2"]
 
         >>> # Equivalent
-        >>> c = tp.add(source["f1"], source["f2"])
-        >>> c = source["f1"] + source["f2"]
+        >>> c = tp.add(a, b)
+        >>> c = a + b
 
         >>> c.evaluate({source: evset})
         indexes: []
@@ -147,6 +149,82 @@ def add(
             (3 events):
                 timestamps: [1. 2. 3.]
                 'add_f1_f2': [-30. 110. 205.]
+        ...
+
+        ```
+
+    Resample example:
+        ```python
+        >>> a_evset = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"fa": [1, 2, 3]},
+        ...     name="sample_a"
+        ... )
+        >>> b_evset = tp.event_set(
+        ...     timestamps=[-1, 1.5, 3, 5],
+        ...     features={"fb": [-10, 15, 30, 50]},
+        ...     name="sample_b"
+        ... )
+        >>> a = a_evset.node()
+        >>> b = b_evset.node()
+
+        >>> # Cannot add different samplings
+        >>> c = a + b
+        Traceback (most recent call last):
+            ...
+        ValueError: ... should have the same sampling. ...
+
+        >>> # Resample a to match b timestamps
+        >>> a_resampled = tp.resample(a, sampling=b)
+        >>> c = a_resampled + b
+        >>> c.evaluate([a_evset, b_evset])
+        indexes: []
+        features: [('add_fa_fb', int64)]
+        events:
+            (4 events):
+                timestamps: [-1. 1.5 3. 5. ]
+                'add_fa_fb': [-10 16 33 53]
+        ...
+
+        ```
+
+    Reindex example:
+        ```python
+        >>> a_evset = tp.event_set(
+        ...     timestamps=[1, 2, 3, 4],
+        ...     features={
+        ...         "store": [1, 1, 1, 1],
+        ...         "product": [1, 2, 3, 4],
+        ...         "sales": [10, 20, 30, 40]
+        ...     },
+        ...     index_features=["store", "product"]
+        ... )
+        >>> b_evset = tp.event_set(
+        ...     timestamps=[1, 2, 3, 4],
+        ...     features={
+        ...         "store": [1, 1, 1, 1],
+        ...         "product": [5, 6, 7, 8],
+        ...         "sales": [10, 20, 30, 40]
+        ...     },
+        ...     index_features=["store", "product"]
+        ... )
+        >>> a = a_evset.node()
+        >>> b = b_evset.node()
+
+        >>> # Get sales per store
+        >>> a_store = tp.drop_index(a, "product")
+        >>> b_store = tp.drop_index(b, "product")
+
+        >>> # We also need to explicit same samplings
+        >>> b_store = tp.resample(b_store, a_store)
+
+        >>> c = a_store["sales"] + b_store["sales"]
+
+        >>> c.evaluate({a: a_evset, b: b_evset})
+        indexes: [('store', int64)]
+        ...
+                timestamps: [1. 2. 3. 4.]
+                'add_sales_sales': [20 40 60 80]
         ...
 
         ```
