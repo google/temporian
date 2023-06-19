@@ -12,27 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# type: ignore
+# pylint: disable=wrong-import-position
+# pylint: disable=line-too-long
+# pylint: disable=no-name-in-module
+# fmt: off
+
 """Temporian."""
 
 # NOTE: If you need to import something here that isn't part of the public API,
-# and therefore shouldn't show up in the documentation, import it with a private
-# name:
+# import it with a private name (and delete the symbol if possible):
 # from temporian.module import submodule as _submodule
+# del _submodule
 
-# pylint: disable=wrong-import-position
-# pylint: disable=line-too-long
-# fmt: off
+__version__ = "0.1.1"
 
-__version__ = "0.0.1"
-
-# Register the ops definitions and implementations.
+# Register all operator implementations
 from temporian.implementation.numpy import operators as _impls
+del _impls
 
 
-# ACTUAL API
-# ==========
+# ================== #
+# PUBLIC API SYMBOLS #
+# ================== #
 
-# Nodes and related
+# Nodes
 from temporian.core.data.node import Node
 from temporian.core.data.node import input_node
 
@@ -50,11 +54,11 @@ from temporian.core.data.schema import Schema
 # Durations
 from temporian.core.data import duration
 
-# Event set
+# EventSets
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.io import event_set
 
-# Graph serialization
+# Serialization
 from temporian.core.serialization import load
 from temporian.core.serialization import save
 
@@ -154,3 +158,12 @@ from temporian.core.operators.window.moving_sum import moving_sum
 from temporian.core.operators.window.moving_count import moving_count
 from temporian.core.operators.window.moving_min import moving_min
 from temporian.core.operators.window.moving_max import moving_max
+
+# Remove automatic file tree symbols from public API
+# pylint: disable=undefined-variable
+del proto
+del io
+del core
+del utils
+del implementation
+# pylint: enable=undefined-variable

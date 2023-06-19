@@ -13,17 +13,19 @@
 # limitations under the License.
 
 from absl.testing import absltest
+from pathlib import Path
+
 import temporian as tp
 
 PUBLIC_API_SYMBOLS = {
+    "EventSet",
     "Node",
-    "input_node",
     "Schema",
     "duration",
-    "EventSet",
-    "event_set",
-    "plot",
     "evaluate",
+    "event_set",
+    "input_node",
+    "plot",
     # IO
     "to_csv",
     "from_csv",
@@ -116,10 +118,24 @@ PUBLIC_API_SYMBOLS = {
 }
 
 
-class PublicSymbolsTest(absltest.TestCase):
+class PublicAPITest(absltest.TestCase):
     def test_public_symbols(self):
+        """Asserts that the symbols exposed under tp.<> are exactly the
+        ones we expect."""
         symbols = {s for s in dir(tp) if not s.startswith("__")}
         self.assertEqual(PUBLIC_API_SYMBOLS, symbols)
+
+    def test_public_symbols_in_docs(self):
+        """Asserts that all symbols exposed under tp.<> have an auto generated
+        documentation page.
+
+        Note that this might need to change in the future, since for example we
+        might want to group some symbols under the same page."""
+        ref_path = Path("docs/src/reference")
+        ref_files = ref_path.rglob("*.md")
+        ref_files_names = {file.with_suffix("").name for file in ref_files}
+        for symbol in PUBLIC_API_SYMBOLS:
+            self.assertIn(symbol, ref_files_names)
 
 
 if __name__ == "__main__":

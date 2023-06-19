@@ -15,3 +15,8 @@ py_test(
         "//temporian",
     ],
 )
+
+filegroup(
+    name = "reference",
+    srcs = glob(["src/reference/**/*.md"]),
+)
