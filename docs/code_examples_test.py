@@ -50,24 +50,28 @@ class CodeExamplesTest(absltest.TestCase):
 
             # Failure due to mismatch on expected result
             except doctest.DocTestFailure as e:
+                test = e.test
                 ex = e.example
+                lineno = test.lineno + ex.lineno
                 # Re-raise as bazel assertion
                 self.assertEqual(
                     ex.want,
                     e.got,
                     (
-                        f"Docstring example failed on file {path}:{ex.lineno}\n"
-                        f">>> {ex.source}"
+                        f"Docstring example starting at line {lineno} failed on"
+                        f"file {path}\n >>> {ex.source}"
                     ),
                 )
 
             # Failure due to exception raised during code execution
             except doctest.UnexpectedException as e:
+                test = e.test
                 ex = e.example
+                lineno = test.lineno + ex.lineno
                 raise AssertionError(
-                    "Exception running docstring example on file"
-                    f" {path}:{ex.lineno}\n>>> {ex.source}{e.exc_info[0]}:"
-                    f" {e.exc_info[1]}"
+                    "Exception running docstring example starting at line "
+                    f"{lineno} on file {path}\n"
+                    f">>> {ex.source}{e.exc_info[0]}: {e.exc_info[1]}"
                 ) from e
         tmp_dir_handle.cleanup()
 
