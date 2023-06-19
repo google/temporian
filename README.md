@@ -1,6 +1,10 @@
 <img src="https://github.com/google/temporian/blob/main/docs/src/assets/banner.png?raw=true" width="100%" alt="Temporian logo">
 
-![tests](https://github.com/google/temporian/actions/workflows/test.yaml/badge.svg) ![formatting](https://github.com/google/temporian/actions/workflows/formatting.yaml/badge.svg) [![docs](https://readthedocs.org/projects/temporian/badge/?version=latest)](https://temporian.readthedocs.io/en/latest/?badge=latest)
+[![pypi](https://img.shields.io/pypi/v/temporian?color=blue)](https://pypi.org/project/temporian/)
+[![docs](https://readthedocs.org/projects/temporian/badge/?version=stable)](https://temporian.readthedocs.io/en/stable/?badge=stable)
+![tests](https://github.com/google/temporian/actions/workflows/test.yaml/badge.svg)
+![formatting](https://github.com/google/temporian/actions/workflows/formatting.yaml/badge.svg)
+![publish](https://github.com/google/temporian/actions/workflows/publish.yaml/badge.svg)
 
 **Temporian** is a Python package for **feature engineering of temporal data**, focusing on **preventing common modeling errors** and providing a **simple and powerful API**, a first-class **iterative development** experience, and **efficient and well-tested implementations** of common and not-so-common temporal data preprocessing functions.
 
