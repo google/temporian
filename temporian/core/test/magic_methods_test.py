@@ -121,6 +121,74 @@ class MagicMethodsTest(absltest.TestCase):
             assert node in node_list
             assert node in node_map
 
+    #########################################
+    ### Get/set item with square brackets ###
+    #########################################
+    def test_getitem_single(self):
+        node_out = self.node_float_1["f2"]
+        assert len(node_out.schema.features) == 1
+        assert node_out.schema.features[0].name == "f2"
+        assert node_out.schema.features[0].dtype == DType.FLOAT64
+        # Raises ValueError if fails
+        node_out.check_same_sampling(self.node_float_1)
+
+    def test_getitem_multiple(self):
+        node_out = self.node_float_1[["f2"]]
+        assert len(node_out.schema.features) == 1
+        assert node_out.schema.features[0].name == "f2"
+        assert node_out.schema.features[0].dtype == DType.FLOAT64
+        node_out.check_same_sampling(self.node_float_1)
+
+        node_out = self.node_float_1[["f2", "f1"]]
+        assert len(node_out.schema.features) == 2
+        assert node_out.schema.features[0].name == "f2"
+        assert node_out.schema.features[0].dtype == DType.FLOAT64
+        assert node_out.schema.features[1].name == "f1"
+        assert node_out.schema.features[1].dtype == DType.FLOAT32
+        node_out.check_same_sampling(self.node_float_1)
+
+        # Node with empty features
+        node_out = self.node_float_1[[]]
+        assert len(node_out.schema.features) == 0
+        node_out.check_same_sampling(self.node_float_1)
+
+    def test_getitem_errors(self):
+        with self.assertRaises(IndexError):
+            self.node_float_1["f3"]
+        with self.assertRaises(IndexError):
+            self.node_float_1[["f1", "f3"]]
+        with self.assertRaises(TypeError):
+            self.node_float_1[0]
+        with self.assertRaises(TypeError):
+            self.node_float_1[["f1", 0]]
+        with self.assertRaises(TypeError):
+            self.node_float_1[None]
+
+    def test_setitem_fails(self):
+        # Try to modify existent feature
+        with self.assertRaisesRegex(TypeError, "Cannot assign"):
+            self.node_float_1["f1"] = self.node_float_2["f3"]
+        with self.assertRaisesRegex(TypeError, "Cannot assign"):
+            self.node_float_1["f1"] = None
+
+        # Try to assign inexistent feature
+        with self.assertRaisesRegex(TypeError, "Cannot assign"):
+            self.node_float_1["f5"] = self.node_float_2["f3"]
+        with self.assertRaisesRegex(TypeError, "Cannot assign"):
+            self.node_float_1["f5"] = None
+
+        # Try to assign multiple features
+        with self.assertRaisesRegex(TypeError, "Cannot assign"):
+            self.node_float_1[["f1", "f2"]] = self.node_float_2[["f3", "f4"]]
+        with self.assertRaisesRegex(TypeError, "Cannot assign"):
+            self.node_float_1[["f1", "f2"]] = None
+
+        # Weird cases
+        with self.assertRaisesRegex(TypeError, "Cannot assign"):
+            self.node_float_1[[]] = None
+        with self.assertRaisesRegex(TypeError, "Cannot assign"):
+            self.node_float_1[None] = None
+
     ###################################
     ### Relational binary operators ###
     ###################################
