@@ -108,9 +108,21 @@ def check_is_valid_index_dtype(dtype: DType):
 
 
 # API dtypes definition
+
 float32 = DType.FLOAT32
+"""32-bit floating point number."""
+
 float64 = DType.FLOAT64
+"""64-bit floating point number."""
+
 int32 = DType.INT32
+"""32-bit integer."""
+
 int64 = DType.INT64
+"""64-bit integer."""
+
 bool_ = DType.BOOLEAN
+"""Boolean value."""
+
 str_ = DType.STRING
+"""String value."""
