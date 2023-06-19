@@ -35,9 +35,25 @@ operator_lib.register_operator(CalendarYearOperator)
 def calendar_year(sampling: Node) -> Node:
     """Obtains the year the timestamps in a node's sampling are in.
 
-    Features in the input node are ignored, only the timestamps in
-    `Node.sampling` are used and they must be unix timestamps
-    (check  `Node.sampling.is_unix_timestamp`).
+    Features in the input node are ignored, only the timestamps are used and
+    they must be unix timestamps (`is_unix_timestamp=True`).
+
+    Usage example:
+        ```python
+        >>> evset = tp.event_set(
+        ...    timestamps=["2021-02-04", "2022-02-20", "2023-03-01", "2023-05-07"],
+        ...    name='random_moments'
+        ... )
+        >>> tp.calendar_year(evset.node()).evaluate(evset)
+        indexes: ...
+        features: [('calendar_year', int32)]
+        events:
+            (4 events):
+                timestamps: [...]
+                'calendar_year': [2021 2022 2023 2023]
+        ...
+
+        ```
 
     Args:
         sampling: Node to get the years from.

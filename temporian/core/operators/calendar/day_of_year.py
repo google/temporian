@@ -35,11 +35,27 @@ operator_lib.register_operator(CalendarDayOfYearOperator)
 def calendar_day_of_year(sampling: Node) -> Node:
     """Obtains the day of year the timestamps in a node's sampling are in.
 
-    Features in the input node are ignored, only the timestamps in
-    `Node.sampling` are used and they must be unix timestamps
-    (check  `Node.sampling.is_unix_timestamp`).
+    Features in the input node are ignored, only the timestamps are used and
+    they must be unix timestamps (`is_unix_timestamp=True`).
 
     Output feature contains numbers between 1 and 366.
+
+    Usage example:
+        ```python
+        >>> evset = tp.event_set(
+        ...    timestamps=["2020-01-01", "2021-06-01", "2022-12-31", "2024-12-31"],
+        ...    name='two_years'
+        ... )
+        >>> tp.calendar_day_of_year(evset.node()).evaluate(evset)
+        indexes: ...
+        features: [('calendar_day_of_year', int32)]
+        events:
+            (4 events):
+                timestamps: [...]
+                'calendar_day_of_year': [ 1 152 365 366]
+        ...
+
+        ```
 
     Args:
         sampling: Node to get the days of year from.
