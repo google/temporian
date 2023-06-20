@@ -32,7 +32,8 @@ def evaluate_schedule(
     verbose: int,
     check_execution: bool,
 ) -> Dict[Node, EventSet]:
-    """Evaluates a schedule on a dictionary of input event sets.
+    """Evaluates a schedule on a dictionary of input
+    [`EventSets`][temporian.EventSet].
 
     Args:
         inputs: Mapping of nodes to materialized EventSets.
