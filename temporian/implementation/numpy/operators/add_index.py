@@ -21,14 +21,14 @@ class AddIndexNumpyImplementation(OperatorImplementation):
         src_feature_names = input.schema.feature_names()
         new_index_idxs = [
             src_feature_names.index(f_name)
-            for f_name in self.operator.index_to_add
+            for f_name in self.operator.indexes_to_add
         ]
 
         # Idx of input features not added to index.
         kept_feature_idxs = [
             idx
             for idx, f_name in enumerate(src_feature_names)
-            if f_name not in self.operator.index_to_add
+            if f_name not in self.operator.indexes_to_add
         ]
 
         dst_data = {}
@@ -47,7 +47,7 @@ class AddIndexNumpyImplementation(OperatorImplementation):
                 new_index_to_value_idxs[new_index].append(event_idx)
 
             for new_index, example_idxs in new_index_to_value_idxs.items():
-                # Note: The new index is added after the existing index items.
+                # Note: The new indexes added after the existing ones.
                 dst_index = src_index + new_index
                 assert isinstance(dst_index, tuple)
 

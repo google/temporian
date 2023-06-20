@@ -31,7 +31,7 @@ def from_csv(
         path: Path to the file.
         timestamps: Name of the column to be used as timestamps for the
             event set.
-        indexes: Names of the columns to be used as index for the event set.
+        indexes: Names of the columns to be used as indexes for the event set.
             If None, a flat event set will be created.
         sep: Separator to use.
 

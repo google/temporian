@@ -144,7 +144,7 @@ class RenameOperatorTest(absltest.TestCase):
 
         output = rename(
             input=self.input_node,
-            index="product_id",
+            indexes="product_id",
         )
         impl = RenameNumpyImplementation(output.creator)
         renamed_evset = impl.call(input=self.input_evset)["output"]
@@ -165,7 +165,7 @@ class RenameOperatorTest(absltest.TestCase):
 
         output = rename(
             input=self.input_node,
-            index={"store_id": "product_id"},
+            indexes={"store_id": "product_id"},
         )
         impl = RenameNumpyImplementation(output.creator)
         renamed_evset = impl.call(input=self.input_evset)["output"]
@@ -199,7 +199,7 @@ class RenameOperatorTest(absltest.TestCase):
 
         output = rename(
             input=self.input_node,
-            index={"store_id": "product_id", "costs": "roi"},
+            indexes={"store_id": "product_id", "costs": "roi"},
         )
         impl = RenameNumpyImplementation(output.creator)
         renamed_evset = impl.call(input=self.input_evset)["output"]
@@ -247,7 +247,7 @@ class RenameOperatorTest(absltest.TestCase):
     def test_rename_index_with_empty_str(self) -> None:
         """Test renaming index with empty string."""
         with self.assertRaises(ValueError):
-            rename(input=self.input_node, index={"sales": ""})
+            rename(input=self.input_node, indexes={"sales": ""})
 
     def test_rename_index_with_empty_str_without_dict(self) -> None:
         """Test renaming index with empty string."""
@@ -262,19 +262,19 @@ class RenameOperatorTest(absltest.TestCase):
         self.input_node = from_pandas(df, indexes=["sales"]).node()
 
         with self.assertRaises(ValueError):
-            rename(self.input_node, index="")
+            rename(self.input_node, indexes="")
 
     def test_rename_index_with_non_existent_index(self) -> None:
         """Test renaming index with non existent index."""
         with self.assertRaises(KeyError):
-            rename(input=self.input_node, index={"sales_1": "costs"})
+            rename(input=self.input_node, indexes={"sales_1": "costs"})
 
     def test_rename_index_with_duplicated_new_indexes(self) -> None:
         """Test renaming index with duplicated new names."""
         with self.assertRaises(ValueError):
             rename(
                 input=self.input_node,
-                index={"store_id": "new_sales", "sales": "new_sales"},
+                indexes={"store_id": "new_sales", "sales": "new_sales"},
             )
 
     def test_rename_feature_and_index_with_same_name(self) -> None:
@@ -282,7 +282,7 @@ class RenameOperatorTest(absltest.TestCase):
 
         output = rename(
             input=self.input_node,
-            index={"store_id": "sales"},
+            indexes={"store_id": "sales"},
         )
         impl = RenameNumpyImplementation(output.creator)
 
@@ -304,7 +304,7 @@ class RenameOperatorTest(absltest.TestCase):
         output = rename(
             input=self.input_node,
             features={"sales": "store_id"},
-            index={"store_id": "sales"},
+            indexes={"store_id": "sales"},
         )
         impl = RenameNumpyImplementation(output.creator)
         renamed_evset = impl.call(input=self.input_evset)["output"]

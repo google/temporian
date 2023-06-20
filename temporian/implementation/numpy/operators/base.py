@@ -154,9 +154,9 @@ def _check_output(
 
 def _is_same_sampling(evset_1: EventSet, evset_2: EventSet) -> Tuple[bool, str]:
     if evset_1.schema.indexes != evset_2.schema.indexes:
-        return (False, "Different index names")
+        return (False, "Different indexes")
 
-    # Number of index values where to ensure that the numpy array containing
+    # Number of index keys to ensure that the numpy array containing
     # timestamps is the same for both evset_1 and evset_2.
     num_checks = 1 if config.DEBUG_MODE else len(evset_1.data)
 
@@ -177,7 +177,7 @@ def _is_same_sampling(evset_1: EventSet, evset_2: EventSet) -> Tuple[bool, str]:
             return (
                 False,
                 (
-                    f"Timestamps for index value {index_key} have two different"
+                    f"Timestamps for index key {index_key} have two different"
                     " allocated np.arrays."
                 ),
             )

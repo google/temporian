@@ -66,7 +66,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = DropIndexOperator(
-            self.input_node, index_to_drop=["store_id", "item_id"], keep=True
+            self.input_node, indexes_to_drop=["store_id", "item_id"], keep=True
         )
         operator_impl = DropIndexNumpyImplementation(operator)
         testOperatorAndImp(self, operator, operator_impl)
@@ -93,7 +93,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = DropIndexOperator(
-            self.input_node, index_to_drop=["item_id"], keep=True
+            self.input_node, indexes_to_drop=["item_id"], keep=True
         )
         operator_impl = DropIndexNumpyImplementation(operator)
         testOperatorAndImp(self, operator, operator_impl)
@@ -119,7 +119,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = DropIndexOperator(
-            self.input_node, index_to_drop=["store_id"], keep=True
+            self.input_node, indexes_to_drop=["store_id"], keep=True
         )
 
         operator_impl = DropIndexNumpyImplementation(operator)
@@ -147,7 +147,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = DropIndexOperator(
-            self.input_node, index_to_drop=["item_id"], keep=False
+            self.input_node, indexes_to_drop=["item_id"], keep=False
         )
 
         operator_impl = DropIndexNumpyImplementation(operator)
@@ -175,7 +175,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         )
 
         operator = DropIndexOperator(
-            self.input_node, index_to_drop=["store_id"], keep=False
+            self.input_node, indexes_to_drop=["store_id"], keep=False
         )
         operator_impl = DropIndexNumpyImplementation(operator)
         testOperatorAndImp(self, operator, operator_impl)
@@ -211,7 +211,9 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
         )
 
         # Run op
-        operator = DropIndexOperator(input=node, index_to_drop=["b"], keep=True)
+        operator = DropIndexOperator(
+            input=node, indexes_to_drop=["b"], keep=True
+        )
         operator_impl = DropIndexNumpyImplementation(operator)
         testOperatorAndImp(self, operator, operator_impl)
         output = operator_impl.call(input=evset)["output"]

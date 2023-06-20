@@ -40,10 +40,10 @@ Check the index on the left for a more detailed description of any symbol.
 
 | Symbols                                                 | Description                                                                                 |
 | ------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| [`tp.add_index()`][temporian.add_index]                 | Adds one or more features as index in a [`Node`][temporian.Node].                           |
+| [`tp.add_index()`][temporian.add_index]                 | Adds indexes to a [`Node`][temporian.Node].                                                 |
 | [`tp.begin()`][temporian.begin]                         | Generates a single timestamp at the beginning of the input.                                 |
 | [`tp.cast()`][temporian.cast]                           | Casts the dtype of features.                                                                |
-| [`tp.drop_index()`][temporian.drop_index]               | Removes one or more index columns from a [`Node`][temporian.Node].                          |
+| [`tp.drop_index()`][temporian.drop_index]               | Removes indexes from a [`Node`][temporian.Node].                                            |
 | [`tp.end()`][temporian.end]                             | Generates a single timestamp at the end of the input.                                       |
 | [`tp.filter()`][temporian.filter]                       | Filters out events in a [`Node`][temporian.Node] for which a condition is false.            |
 | [`tp.glue()`][temporian.glue]                           | Concatenates [`Nodes`][temporian.Node] with the same sampling.                              |
@@ -54,6 +54,7 @@ Check the index on the left for a more detailed description of any symbol.
 | [`tp.rename()`][temporian.rename]                       | Renames a [`Node`][temporian.Node]'s features and index.                                    |
 | [`tp.resample()`][temporian.resample]                   | Resamples a [`Node`][temporian.Node] at each timestamp of another [`Node`][temporian.Node]. |
 | [`tp.select()`][temporian.select]                       | Selects a subset of features from a [`Node`][temporian.Node].                               |
+| [`tp.set_index()`][temporian.set_index]                 | Replaces the indexes in a [`Node`][temporian.Node].                                         |
 | [`tp.since_last()`][temporian.since_last]               | Computes the amount of time since the last distinct timestamp.                              |
 | [`tp.tick()`][temporian.tick]                           | Generates timestamps at regular intervals in the range of a guide.                          |
 | [`tp.unique_timestamps()`][temporian.unique_timestamps] | Removes events with duplicated timestamps from a [`Node`][temporian.Node].                  |

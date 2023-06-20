@@ -138,7 +138,7 @@ class Node:
                 f"{other.sampling_node}. To create input nodes with the same "
                 "sampling, use the argument `same_sampling_as` of "
                 "`tp.input_node` or `tp.event_set`. To align the sampling of "
-                "two nodes with similar index but different sampling, use the "
+                "two nodes with same indexes but different sampling, use the "
                 "operator `tp.resample`."
             )
 
@@ -621,7 +621,7 @@ def create_node_new_features_existing_sampling(
     return Node(
         schema=Schema(
             features=features,
-            # The index and is_unix_timestamp is defined by the sampling.
+            # The indexes and is_unix_timestamp are defined by the sampling.
             indexes=sampling_node.schema.indexes,
             is_unix_timestamp=sampling_node.schema.is_unix_timestamp,
         ),

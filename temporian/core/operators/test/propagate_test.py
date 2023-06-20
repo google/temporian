@@ -55,7 +55,10 @@ class PropagateOperatorTest(absltest.TestCase):
         )
         with self.assertRaisesRegex(
             ValueError,
-            "The index of input should be contained in the index of sampling",
+            (
+                "The indexes of input should be contained in the indexes of"
+                " sampling"
+            ),
         ):
             _ = propagate(input=node, sampling=sampling)
 

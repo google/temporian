@@ -27,7 +27,7 @@ from temporian.core.data.node import Node, create_node_with_new_reference
 from temporian.core.data.schema import Schema
 from temporian.utils import string
 
-# Maximum of printed index when calling repr(evset)
+# Maximum of printed index groups when calling repr(evset)
 MAX_NUM_PRINTED_INDEX = 5
 
 # Maximum of printed features when calling repr(evset)
@@ -45,7 +45,7 @@ _PYTHON_DTYPE_MAPPING = {
 # Remarks:
 #   - np.object_ is not automatically converted into DType.STRING.
 #   - Strings are always represented internally as np.str_ for features and str
-#     for index values.
+#     for index groups.
 _DTYPE_MAPPING = {
     np.float64: DType.FLOAT64,
     np.float32: DType.FLOAT32,
@@ -215,7 +215,7 @@ def normalize_timestamps(
 
 @dataclass
 class IndexData:
-    """Features and timestamps data for a single index item.
+    """Features and timestamps data for a single index group.
 
     Note: The `schema` constructor argument is only used for checking. If
     `schema=None`, no checking is done. Checking can be done manually with
@@ -359,6 +359,7 @@ class EventSet:
     def name(self, name: Optional[str]) -> None:
         self._name = name
 
+    # TODO: rename to get_arbitrary_index_key
     def get_arbitrary_index_value(self) -> Optional[Tuple]:
         """Gets an arbitrary index value.
 
@@ -369,6 +370,7 @@ class EventSet:
             return next(iter(self._data.keys()))
         return None
 
+    # TODO: rename to get_arbitrary_index_group
     def get_arbitrary_index_data(self) -> Optional[IndexData]:
         """Gets an arbitrary index data.
 
@@ -463,8 +465,9 @@ class EventSet:
     def __getitem__(self, index: Tuple) -> IndexData:
         if not isinstance(index, tuple):
             raise TypeError(
-                "EventSet items can only be accessed by index tuples. "
-                "Use evset.node() to select features and operate on it."
+                "EventSet items can only be accessed by index keys (tuples of"
+                " values for each index in the EventSet). Use evset.node() to"
+                " select features and operate on it."
             )
         return self.data[index]
 

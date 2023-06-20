@@ -31,13 +31,13 @@ class DropIndexNumpyImplementation(OperatorImplementation):
         final_index_idxs = [
             idx
             for idx, f_name in enumerate(src_index_names)
-            if f_name not in self.operator.index_to_drop
+            if f_name not in self.operator.indexes_to_drop
         ]
         # Idx in src_index_names of the indexes to remove in the output.
         final_nonindex_idxs = [
             idx
             for idx, f_name in enumerate(src_index_names)
-            if f_name in self.operator.index_to_drop
+            if f_name in self.operator.indexes_to_drop
         ]
         # Non-aggregated (i.e., in separate containers) event data indexed by
         # the destination index.

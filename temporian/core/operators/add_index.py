@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Set index operator class and public API function definition."""
+"""Add and set index operators classes and public API function definitions."""
 
 from typing import List, Union
 
@@ -28,19 +28,19 @@ class AddIndexOperator(Operator):
     def __init__(
         self,
         input: Node,
-        index_to_add: List[str],
+        indexes_to_add: List[str],
     ) -> None:
         super().__init__()
 
         self._output_feature_schemas = self._get_output_feature_schemas(
-            input, index_to_add
+            input, indexes_to_add
         )
-        self._output_indexes = self._get_output_indexes(input, index_to_add)
-        self._index_to_add = index_to_add
+        self._output_indexes = self._get_output_indexes(input, indexes_to_add)
+        self._indexes_to_add = indexes_to_add
 
         self.add_input("input", input)
 
-        self.add_attribute("index_to_add", index_to_add)
+        self.add_attribute("indexes_to_add", indexes_to_add)
 
         self.add_output(
             "output",
@@ -54,36 +54,34 @@ class AddIndexOperator(Operator):
         self.check()
 
     def _get_output_feature_schemas(
-        self, input: Node, index_to_add: List[str]
+        self, input: Node, indexes_to_add: List[str]
     ) -> List[FeatureSchema]:
         return [
             feature
             for feature in input.schema.features
-            if feature.name not in index_to_add
+            if feature.name not in indexes_to_add
         ]
 
     def _get_output_indexes(
-        self, input: Node, index_to_add: List[str]
+        self, input: Node, indexes_to_add: List[str]
     ) -> List[IndexSchema]:
         index_dict = input.schema.index_name_to_dtype()
         feature_dict = input.schema.feature_name_to_dtype()
 
         new_indexes: List[IndexSchema] = []
-        for index_name in index_to_add:
+        for index_name in indexes_to_add:
             if index_name not in feature_dict:
-                raise ValueError(
-                    f"Add index {index_name} is not part of the features."
-                )
+                raise ValueError(f"{index_name} is not a feature in input.")
 
             if index_name in index_dict:
                 raise ValueError(
-                    f"Add index {index_name} is already part of the index."
+                    f"{index_name} is already an index in input."
                 )
 
             new_indexes.append(
                 IndexSchema(name=index_name, dtype=feature_dict[index_name])
             )
-        # Note: The new index is added after the existing index items.
+        # Note: The new indexes are added after the existing ones.
         return input.schema.indexes + new_indexes
 
     @classmethod
@@ -92,7 +90,7 @@ class AddIndexOperator(Operator):
             key="ADD_INDEX",
             attributes=[
                 pb.OperatorDef.Attribute(
-                    key="index_to_add",
+                    key="indexes_to_add",
                     type=pb.OperatorDef.Attribute.Type.LIST_STRING,
                 ),
             ],
@@ -109,8 +107,8 @@ class AddIndexOperator(Operator):
         return self._output_indexes
 
     @property
-    def index_to_add(self) -> List[str]:
-        return self._index_to_add
+    def indexes_to_add(self) -> List[str]:
+        return self._indexes_to_add
 
 
 operator_lib.register_operator(AddIndexOperator)
@@ -141,7 +139,7 @@ def _normalize_indexes_to_set(
 
 
 def add_index(input: Node, indexes: Union[str, List[str]]) -> Node:
-    """Adds one or more features as indexes in a node.
+    """Adds indexes to a Node.
 
     Examples:
 
@@ -170,7 +168,7 @@ def add_index(input: Node, indexes: Union[str, List[str]]) -> Node:
 
 
 def set_index(input: Node, indexes: Union[str, List[str]]) -> Node:
-    """Replaces the indexes in a node.
+    """Replaces the indexes in a Node.
 
     `set_index` is implemented as `drop_index` + `add_index`.
 

@@ -167,9 +167,9 @@ def event_set(
 
         if evset.data.keys() != same_sampling_as.data.keys():
             raise ValueError(
-                "The new event set and `same_sampling_as` have the same index,"
-                " but different index values. Both should have the same index"
-                " keys to have the same sampling."
+                "The new event set and `same_sampling_as` have the same"
+                " indexes, but different index keys. They should have the"
+                " same index keys to have the same sampling."
             )
 
         for key, same_sampling_as_value in same_sampling_as.data.items():
