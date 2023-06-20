@@ -82,12 +82,23 @@ def leak(input: Node, duration: Duration) -> Node:
     with caution to prevent unwanted future leakage. For instance, this op
     should generally not be used to compute the input features of a model.
 
-    Example:
-        Input
-            timestamps: [1, 5, 10]
-            duration: 2
-        Output
-            timestamps: [-1, 2, 7]
+    Basic usage:
+        ```python
+        >>> a_evset = tp.event_set(
+        ...     timestamps=[0, 1, 5, 6],
+        ...     features={"value": [0, 1, 5, 6]},
+        ... )
+        >>> a = a_evset.node()
+
+        >>> result = tp.leak(a, tp.duration.seconds(2))
+        >>> result.evaluate({a: a_evset})
+        indexes: ...
+            (4 events):
+                timestamps: [-2. -1. 3. 4.]
+                'value': [0 1 5 6]
+        ...
+
+        ```
 
     Args:
         input: Node to leak.
