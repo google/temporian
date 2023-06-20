@@ -33,7 +33,7 @@ class AddIndexNumpyImplementation(OperatorImplementation):
 
         dst_data = {}
         for src_index, src_data in input.data.items():
-            # Maps, for each new index value, the indices of the events in
+            # Maps, for each new index key, the indices of the events in
             # src_data.
             #
             # TODO: Do more efficiently. E.g. with numpy masks.

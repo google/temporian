@@ -51,9 +51,9 @@ class DropIndexNumpyImplementation(OperatorImplementation):
                 # Convert the dropped indexes into features
                 num_timestamps = len(src_index_data.timestamps)
                 for idx in final_nonindex_idxs:
-                    index_value = src_index_key[idx]
+                    index_key = src_index_key[idx]
                     new_feature_data = np.full(
-                        shape=num_timestamps, fill_value=index_value
+                        shape=num_timestamps, fill_value=index_key
                     )
                     new_features_data.append(new_feature_data)
 
