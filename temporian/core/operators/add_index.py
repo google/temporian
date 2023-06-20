@@ -28,19 +28,19 @@ class AddIndexOperator(Operator):
     def __init__(
         self,
         input: Node,
-        indexes_to_add: List[str],
+        indexes: List[str],
     ) -> None:
         super().__init__()
 
         self._output_feature_schemas = self._get_output_feature_schemas(
-            input, indexes_to_add
+            input, indexes
         )
-        self._output_indexes = self._get_output_indexes(input, indexes_to_add)
-        self._indexes_to_add = indexes_to_add
+        self._output_indexes = self._get_output_indexes(input, indexes)
+        self._indexes = indexes
 
         self.add_input("input", input)
 
-        self.add_attribute("indexes_to_add", indexes_to_add)
+        self.add_attribute("indexes", indexes)
 
         self.add_output(
             "output",
@@ -54,32 +54,30 @@ class AddIndexOperator(Operator):
         self.check()
 
     def _get_output_feature_schemas(
-        self, input: Node, indexes_to_add: List[str]
+        self, input: Node, indexes: List[str]
     ) -> List[FeatureSchema]:
         return [
             feature
             for feature in input.schema.features
-            if feature.name not in indexes_to_add
+            if feature.name not in indexes
         ]
 
     def _get_output_indexes(
-        self, input: Node, indexes_to_add: List[str]
+        self, input: Node, indexes: List[str]
     ) -> List[IndexSchema]:
         index_dict = input.schema.index_name_to_dtype()
         feature_dict = input.schema.feature_name_to_dtype()
 
         new_indexes: List[IndexSchema] = []
-        for index_name in indexes_to_add:
-            if index_name not in feature_dict:
-                raise ValueError(f"{index_name} is not a feature in input.")
+        for index in indexes:
+            if index not in feature_dict:
+                raise ValueError(f"{index} is not a feature in input.")
 
-            if index_name in index_dict:
-                raise ValueError(
-                    f"{index_name} is already an index in input."
-                )
+            if index in index_dict:
+                raise ValueError(f"{index} is already an index in input.")
 
             new_indexes.append(
-                IndexSchema(name=index_name, dtype=feature_dict[index_name])
+                IndexSchema(name=index, dtype=feature_dict[index])
             )
         # Note: The new indexes are added after the existing ones.
         return input.schema.indexes + new_indexes
@@ -90,7 +88,7 @@ class AddIndexOperator(Operator):
             key="ADD_INDEX",
             attributes=[
                 pb.OperatorDef.Attribute(
-                    key="indexes_to_add",
+                    key="indexes",
                     type=pb.OperatorDef.Attribute.Type.LIST_STRING,
                 ),
             ],
@@ -107,14 +105,14 @@ class AddIndexOperator(Operator):
         return self._output_indexes
 
     @property
-    def indexes_to_add(self) -> List[str]:
-        return self._indexes_to_add
+    def indexes(self) -> List[str]:
+        return self._indexes
 
 
 operator_lib.register_operator(AddIndexOperator)
 
 
-def _normalize_indexes_to_add(
+def _normalize_indexes(
     indexes: Union[str, List[str]],
 ) -> List[str]:
     if isinstance(indexes, str):
@@ -163,7 +161,7 @@ def add_index(input: Node, indexes: Union[str, List[str]]) -> Node:
         KeyError: If any of the specified `indexes` are not found in `input`.
     """
 
-    indexes = _normalize_indexes_to_add(indexes)
+    indexes = _normalize_indexes(indexes)
     return AddIndexOperator(input, indexes).outputs["output"]
 
 

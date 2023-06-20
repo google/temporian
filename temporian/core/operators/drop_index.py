@@ -27,28 +27,28 @@ class DropIndexOperator(Operator):
     def __init__(
         self,
         input: Node,
-        indexes_to_drop: List[str],
+        indexes: List[str],
         keep: bool,
     ) -> None:
         super().__init__()
 
-        # `indexes_to_drop`` is the list of indexes in `input` to drop. If
+        # `indexes`` is the list of indexes in `input` to drop. If
         # `keep` is true, those indexes will be converted into features.
-        self._indexes_to_drop = indexes_to_drop
+        self._indexes = indexes
         self._keep = keep
 
         self.add_input("input", input)
-        self.add_attribute("indexes_to_drop", indexes_to_drop)
+        self.add_attribute("indexes", indexes)
         self.add_attribute("keep", keep)
 
         self._output_feature_schemas = self._get_output_feature_schemas(
-            input, indexes_to_drop, keep
+            input, indexes, keep
         )
 
         self._output_indexes = [
             index_level
             for index_level in input.schema.indexes
-            if index_level.name not in indexes_to_drop
+            if index_level.name not in indexes
         ]
 
         self.add_output(
@@ -63,7 +63,7 @@ class DropIndexOperator(Operator):
         self.check()
 
     def _get_output_feature_schemas(
-        self, input: Node, indexes_to_drop: List[str], keep: bool
+        self, input: Node, indexes: List[str], keep: bool
     ) -> List[FeatureSchema]:
         if not keep:
             return input.schema.features
@@ -72,18 +72,18 @@ class DropIndexOperator(Operator):
         feature_dict = input.schema.feature_name_to_dtype()
 
         new_features: List[FeatureSchema] = []
-        for index_name in indexes_to_drop:
-            if index_name not in index_dict:
-                raise ValueError(f"{index_name} is not an index in input.")
+        for index in indexes:
+            if index not in index_dict:
+                raise ValueError(f"{index} is not an index in input.")
 
-            if index_name in feature_dict:
+            if index in feature_dict:
                 raise ValueError(
-                    f"{index_name} already exists in input's features. If you"
+                    f"{index} already exists in input's features. If you"
                     " want to drop the index, specify `keep=False`."
                 )
 
             new_features.append(
-                FeatureSchema(name=index_name, dtype=index_dict[index_name])
+                FeatureSchema(name=index, dtype=index_dict[index])
             )
 
         # Note: The new features are added after the existing features.
@@ -98,8 +98,8 @@ class DropIndexOperator(Operator):
         return self._output_indexes
 
     @property
-    def indexes_to_drop(self) -> List[str]:
-        return self._indexes_to_drop
+    def indexes(self) -> List[str]:
+        return self._indexes
 
     @property
     def keep(self) -> bool:
@@ -111,7 +111,7 @@ class DropIndexOperator(Operator):
             key="DROP_INDEX",
             attributes=[
                 pb.OperatorDef.Attribute(
-                    key="indexes_to_drop",
+                    key="indexes",
                     type=pb.OperatorDef.Attribute.Type.LIST_STRING,
                 ),
                 pb.OperatorDef.Attribute(
@@ -127,7 +127,7 @@ class DropIndexOperator(Operator):
 operator_lib.register_operator(DropIndexOperator)
 
 
-def _normalize_indexes_to_drop(
+def _normalize_indexes(
     input: Node,
     indexes: Optional[Union[List[str], str]],
 ) -> List[str]:
@@ -195,5 +195,5 @@ def drop_index(
         ValueError: If a feature name coming from the indexes already exists in
             `input`, and the `keep` flag is set to `True`.
     """
-    indexes = _normalize_indexes_to_drop(input, indexes)
+    indexes = _normalize_indexes(input, indexes)
     return DropIndexOperator(input, indexes, keep).outputs["output"]
