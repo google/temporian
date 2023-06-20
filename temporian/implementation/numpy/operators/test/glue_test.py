@@ -108,7 +108,7 @@ class GlueNumpyImplementationTest(absltest.TestCase):
     def test_duplicate_feature(self):
         with self.assertRaisesRegex(
             ValueError,
-            'Feature "a" is defined in multiple input nodes',
+            'Feature "a" is defined in multiple input Nodes',
         ):
             n1 = input_node(
                 features=[("a", DType.FLOAT64)], indexes=[("x", DType.STRING)]
