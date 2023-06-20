@@ -291,7 +291,7 @@ class {capitalized_op}OperatorTest(absltest.TestCase):
                     "b": [5, 6, 7, 8],
                     "c": ["A", "A", "B", "B"],
             }},
-            index_features=["c"],
+            indexes=["c"],
         )
         node = evset.node()
 
@@ -300,7 +300,7 @@ class {capitalized_op}OperatorTest(absltest.TestCase):
             features={{
                     "c": ["A", "B"],
             }},
-            index_features=["c"],
+            indexes=["c"],
         )
 
         # Run op

@@ -116,102 +116,101 @@ class AddIndexOperator(Operator):
 operator_lib.register_operator(AddIndexOperator)
 
 
-def _normalize_index_to_add(
-    index_names: Union[str, List[str]],
+def _normalize_indexes_to_add(
+    indexes: Union[str, List[str]],
 ) -> List[str]:
-    if isinstance(index_names, str):
-        return [index_names]
+    if isinstance(indexes, str):
+        return [indexes]
 
-    if len(index_names) == 0:
-        raise ValueError("Cannot specify empty list as `index_names` argument.")
+    if len(indexes) == 0:
+        raise ValueError("Cannot specify empty list as `indexes` argument.")
 
-    return index_names
+    return indexes
 
 
-def _normalize_index_to_set(
-    index_names: Union[str, List[str]],
+def _normalize_indexes_to_set(
+    indexes: Union[str, List[str]],
 ) -> List[str]:
-    if isinstance(index_names, str):
-        return [index_names]
+    if isinstance(indexes, str):
+        return [indexes]
 
-    if len(index_names) == 0:
-        raise ValueError("Cannot specify empty list as `index_names` argument.")
+    if len(indexes) == 0:
+        raise ValueError("Cannot specify empty list as `indexes` argument.")
 
-    return index_names
+    return indexes
 
 
-def add_index(input: Node, index_to_add: Union[str, List[str]]) -> Node:
-    """Adds one or more features as index in a node.
+def add_index(input: Node, indexes: Union[str, List[str]]) -> Node:
+    """Adds one or more features as indexes in a node.
 
     Examples:
-        Given an input `Node` with index names ['A', 'B', 'C'] and features
-        names ['X', 'Y', 'Z']:
 
-        3. `add_index(input, feature_names=['X', 'Y'])`
-           Output `Node` will have index names ['A', 'B', 'C', 'X', 'Y'] and
-           features names ['Z'].
+        Given an input `Node` with indexes ['A', 'B', 'C'] and features
+        ['X', 'Y', 'Z']:
 
-    Args:
-        input: Input `Node` object for which the index is to be set or
-            updated.
-        index_to_add: List of feature names (strings) that should be used as
-            the new index. These feature names should already exist in `input`.
-
-    Returns:
-         New `Node` with the updated index.
-
-    Raises:
-        KeyError: If any of the specified `index_to_add` are not found in
-            `input`.
-    """
-
-    index_to_add = _normalize_index_to_add(index_to_add)
-    return AddIndexOperator(input, index_to_add).outputs["output"]
-
-
-def set_index(input: Node, index: Union[str, List[str]]) -> Node:
-    """Replaces the index in a node.
-
-    "set_index" is implemented as drop_index + add_index.
-
-    Examples:
-        Given an input `Node` with index names ['A', 'B', 'C'] and features
-        names ['X', 'Y', 'Z']:
-
-        1. `set_index(input, index=['X'])`
-           Output `Node` will have index names ['X'] and features names
-           ['A', 'B', 'C', 'Y', 'Z'].
-
-        2. `set_index(input, index=['X', 'Y'])`
-           Output `Node` will have index names ['X', 'Y'] and
-           features names ['A', 'B', 'C', 'Z'].
+        1. `add_index(input, indexes=['X', 'Y'])`
+           Output `Node` will have indexes ['A', 'B', 'C', 'X', 'Y'] and
+           features ['Z'].
 
     Args:
-        input: Input `Node` object for which the index is to be set or
+        input: Input `Node` object for which the indexes are to be set or
             updated.
-        index: List of index / feature names (strings) used as
-            the new index. These feature names should be either index or
-            features in `input`.
+        indexes: List of feature names (strings) that should be added to the
+            indexes. These feature names should already exist in `input`.
 
     Returns:
         New `Node` with the updated index.
 
     Raises:
-        KeyError: If any of the specified `index_to_add` are not found in
-            `input`.
+        KeyError: If any of the specified `indexes` are not found in `input`.
     """
 
-    new_index = _normalize_index_to_set(index)
+    indexes = _normalize_indexes_to_add(indexes)
+    return AddIndexOperator(input, indexes).outputs["output"]
+
+
+def set_index(input: Node, indexes: Union[str, List[str]]) -> Node:
+    """Replaces the indexes in a node.
+
+    `set_index` is implemented as `drop_index` + `add_index`.
+
+    Examples:
+
+        Given an input `Node` with indexes ['A', 'B', 'C'] and features
+        ['X', 'Y', 'Z']:
+
+        1. `set_index(input, indexes=['X'])`
+           Output `Node` will have indexes ['X'] and features
+           ['A', 'B', 'C', 'Y', 'Z'].
+
+        2. `set_index(input, indexes=['X', 'Y'])`
+           Output `Node` will have indexes ['X', 'Y'] and features
+           ['A', 'B', 'C', 'Z'].
+
+    Args:
+        input: Input `Node` object for which the indexes are to be set.
+        indexes: List of index / feature names (strings) used as
+            the new indexes. These feature names should be either indexes or
+            features in `input`.
+
+    Returns:
+        New `Node` with the updated indexes.
+
+    Raises:
+        KeyError: If any of the specified `indexes` are not found in `input`.
+    """
+
+    indexes = _normalize_indexes_to_set(indexes)
 
     # Note
     # The set_index is implemented as a drop_index + add_index.
-    # The implementation could be improved (simpoler, faster) with a new
-    # operator to re-order the index items.
+    # The implementation could be improved (simpler, faster) with a new
+    # operator to re-order the indexes.
 
     if len(input.schema.indexes) != 0:
         input = drop_index(input)
 
-    if len(new_index) != 0:
-        input = add_index(input, new_index)
+    if len(indexes) != 0:
+        input = add_index(input, indexes)
 
     return input

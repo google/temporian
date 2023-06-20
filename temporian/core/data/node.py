@@ -123,7 +123,7 @@ class Node:
     def indexes(self) -> List[IndexSchema]:
         """Index schema.
 
-        Alias for `node.indexes.features`.
+        Alias for `node.schema.indexes`.
         """
         return self.schema.indexes
 

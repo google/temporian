@@ -124,7 +124,7 @@ Let's see how to compute the simple moving average of two features `feature_1` a
 ...         "feature_2": [54.0, 23.0, 53.0, 12.0, 12.0, 32.0, 23.0, 12.0, 2.0, 4.0],
 ...         "feature_3": ["i1", "i1", "i1", "i1", "i1", "i2", "i2", "i2", "i2", "i2",],
 ... 	},
-...     index_features=["feature_3"],
+...     indexes=["feature_3"],
 ...     name="a",
 ... )
 >>>
@@ -689,7 +689,7 @@ To compute the weekly sales of individual products, you can define the `product`
 ...         "product": [1, 2, 1, 2],
 ...         "sale": [100.0, 300.0, 90.0, 400.0],
 ...     },
-...     index_features=["product"]
+...     indexes=["product"]
 ... )
 >>> print(daily_sales)
 indexes: [('product', int64)]
@@ -764,7 +764,7 @@ events:
 
 ```
 
-Since we haven't defined the `index_features` yet,
+Since we haven't defined the `indexes` yet,
 the `store` and `product` are just regular features above.
 Let's add the `(product, store)` pair as the index.
 
@@ -908,7 +908,7 @@ By using [`tp.has_leak()`][temporian.has_leak], we can programmatically identify
 ...         "f1": [0.1, 0.2, 0.3, 1.1, 1.2],
 ...         "f2": ["red", "red", "red", "blue", "blue"],
 ... 	},
-... 	index_features=["f2"],
+... 	indexes=["f2"],
 ... )
 >>>
 >>> # Access the data for the index `f2=red`.
@@ -927,7 +927,7 @@ evset = tp.event_set(
         "f1": [0.1, 0.2, 0.3, 1.1, 1.2],
         "f2": ["red", "red", "red", "blue", "blue"],
 	},
-	index_features=["f2"],
+	indexes=["f2"],
 )
 
 # Access the data for the index `f2=red`.
@@ -965,8 +965,8 @@ evset.feature("f1")
 # Read EventSet from a .csv file.
 evset = tp.from_csv(
     path="path/to/file.csv",
-    timestamp_column="timestamp",
-    index_names=["product_id"],
+    timestamps="timestamp",
+    indexes=["product_id"],
 )
 
 # Save EventSet to a .csv file.

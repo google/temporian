@@ -20,7 +20,7 @@ You can create an [`EventSet`][temporian.EventSet] from a pandas DataFrame, NumP
 ...         "feature_2": ["red", "blue", "red", "blue"],
 ...         "feature_3":  [10.0, -1.0, 5.0, 5.0],
 ...     },
-...     index_features=["feature_2"],
+...     indexes=["feature_2"],
 ... )
 
 ```

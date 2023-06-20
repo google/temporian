@@ -24,16 +24,16 @@ from temporian.implementation.numpy.data.io import event_set
 # TODO: Rename argument `index_names` to `index_features`.
 def from_pandas(
     df: "pandas.DataFrame",
-    index_names: Optional[List[str]] = None,
-    timestamp_column: str = "timestamp",
+    indexes: Optional[List[str]] = None,
+    timestamps: str = "timestamp",
     name: Optional[str] = None,
     same_sampling_as: Optional[EventSet] = None,
 ) -> EventSet:
     """Converts a Pandas DataFrame into an EventSet.
 
-    The column `timestamp_column` (default to "timestamp") contains the
-    timestamps. Columns `index_names` (default to `None`, equivalent to `[]`),
-    contains the index. The remaining columns are converted into features.
+    The column `timestamps` (defaults to "timestamp") contains the
+    timestamps. Columns `indexes` (default to `None`, equivalent to `[]`),
+    contains the indexes. The remaining columns are converted into features.
 
     See [`tp.event_set()`][temporian.event_set] for the list of supported
     timestamp and feature types.
@@ -49,16 +49,16 @@ def from_pandas(
         ...     ],
         ...     columns=["timestamp", "feature_1", "feature_2"],
         ... )
-        >>> evset = tp.from_pandas(df, index_names=["feature_2"])
+        >>> evset = tp.from_pandas(df, indexes=["feature_2"])
 
         ```
 
     Args:
         df: A non indexed Pandas dataframe.
-        index_names: Names of the features to use as index. If empty
-            (default), the data is not indexed. Only integer and string features
-            can be used as index.
-        timestamp_column: Name of the column containing the timestamps. See
+        indexes: Names of the columns to use as indexes. If empty
+            (default), the data is not indexed. Only integer and string columns
+            can be used as indexes.
+        timestamps: Name of the column containing the timestamps. See
             [`tp.event_set()`][temporian.event_set] for the list of supported
             timestamp types.
         name: Optional name of the event set. Used for debugging, and
@@ -72,17 +72,17 @@ def from_pandas(
         An event set.
 
     Raises:
-        ValueError: If `index_names` or `timestamp_column` are not in `df`'s
+        ValueError: If `indexes` or `timestamps` are not in `df`'s
             columns.
         ValueError: If a column has an unsupported dtype.
     """
 
-    feature_dict = df.drop(columns=timestamp_column).to_dict("series")
+    feature_dict = df.drop(columns=timestamps).to_dict("series")
 
     return event_set(
-        timestamps=df[timestamp_column].to_numpy(copy=True),
+        timestamps=df[timestamps].to_numpy(copy=True),
         features={k: v.to_numpy(copy=True) for k, v in feature_dict.items()},
-        index_features=index_names,
+        indexes=indexes,
         name=name,
         same_sampling_as=same_sampling_as,
     )

@@ -129,35 +129,35 @@ class DropIndexOperator(Operator):
 operator_lib.register_operator(DropIndexOperator)
 
 
-def _normalize_index_to_drop(
+def _normalize_indexes_to_drop(
     input: Node,
-    index_names: Optional[Union[List[str], str]],
+    indexes: Optional[Union[List[str], str]],
 ) -> List[str]:
-    if index_names is None:
+    if indexes is None:
         # Drop all the indexes
         return input.schema.index_names()
 
-    if isinstance(index_names, str):
-        index_names = [index_names]
+    if isinstance(indexes, str):
+        indexes = [indexes]
 
-    if len(index_names) == 0:
-        raise ValueError("Cannot specify empty list as `index_names` argument.")
+    if len(indexes) == 0:
+        raise ValueError("Cannot specify empty list as `indexes` argument.")
 
     # Check that requested indexes exist
     index_dict = input.schema.index_name_to_dtype()
-    for index_item in index_names:
-        if index_item not in index_dict:
+    for index in indexes:
+        if index not in index_dict:
             raise KeyError(
-                f"Dropped index {index_item} is not part of the index"
+                f"Dropped index {index} is not part of the index"
                 f" {input.schema.indexes}."
             )
 
-    return index_names
+    return indexes
 
 
 def drop_index(
     input: Node,
-    index_to_drop: Optional[Union[str, List[str]]] = None,
+    indexes: Optional[Union[str, List[str]]] = None,
     keep: bool = True,
 ) -> Node:
     """Removes one or more index columns from a node.
@@ -166,21 +166,21 @@ def drop_index(
         Given an input `Node` with index names ['A', 'B', 'C'] and features
         names ['X', 'Y', 'Z']:
 
-        1. `drop_index(input, index_names='A', keep=True)`
+        1. `drop_index(input, indexes='A', keep=True)`
            Output `Node` will have index names ['B', 'C'] and features names
            ['X', 'Y', 'Z', 'A'].
 
-        2. `drop_index(input, index_names=['A', 'B'], keep=False)`
+        2. `drop_index(input, indexes=['A', 'B'], keep=False)`
            Output `Node` will have index names ['C'] and features names
            ['X', 'Y', 'Z'].
 
-        3. `drop_index(input, index_names=None, keep=True)`
+        3. `drop_index(input, indexes=None, keep=True)`
            Output `Node` will have index names [] (empty index) and features
            names ['X', 'Y', 'Z', 'A', 'B', 'C'].
 
     Args:
         input: Node from which the specified index columns should be removed.
-        index_to_drop: Index column(s) to be removed from `input`. This can be a
+        indexes: Index column(s) to be removed from `input`. This can be a
             single column name (`str`) or a list of column names (`List[str]`).
             If not specified or set to `None`, all index columns in `input` will
             be removed. Defaults to `None`.
@@ -199,5 +199,5 @@ def drop_index(
         ValueError: If a feature name coming from the index already exists in
             `input`, and the `keep` flag is set to `True`.
     """
-    index_to_drop = _normalize_index_to_drop(input, index_to_drop)
-    return DropIndexOperator(input, index_to_drop, keep).outputs["output"]
+    indexes = _normalize_indexes_to_drop(input, indexes)
+    return DropIndexOperator(input, indexes, keep).outputs["output"]

@@ -21,35 +21,31 @@ from temporian.io.pandas import from_pandas, to_pandas
 
 def from_csv(
     path: str,
-    timestamp_column: str,
-    index_names: Optional[List[str]] = None,
+    timestamps: str,
+    indexes: Optional[List[str]] = None,
     sep: str = ",",
 ) -> EventSet:
     """Reads an EventSet from a CSV file.
 
     Args:
         path: Path to the file.
-        timestamp_column: Name of the column to be used as timestamps for the
+        timestamps: Name of the column to be used as timestamps for the
             event set.
-        index_names: Names of the columns to be used as index for the event set.
+        indexes: Names of the columns to be used as index for the event set.
             If None, a flat event set will be created.
         sep: Separator to use.
 
-
     Returns:
         EventSet read from file.
-
     """
 
     import pandas as pd
 
-    if index_names is None:
-        index_names = []
+    if indexes is None:
+        indexes = []
 
     df = pd.read_csv(path, sep=sep)
-    return from_pandas(
-        df, index_names=index_names, timestamp_column=timestamp_column
-    )
+    return from_pandas(df, indexes=indexes, timestamps=timestamps)
 
 
 def to_csv(

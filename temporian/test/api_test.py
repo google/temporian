@@ -152,7 +152,7 @@ class TFPTest(absltest.TestCase):
                 "feature_2": ["red", "blue", "red", "blue"],
                 "feature_3": [10, -1, 5, 5],
             },
-            index_features=["feature_2"],
+            indexes=["feature_2"],
         )
         print(evset)
 

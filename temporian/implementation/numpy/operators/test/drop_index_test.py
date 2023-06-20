@@ -43,7 +43,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "item_id", "timestamp", "sales"],
             ),
-            index_names=["store_id", "item_id"],
+            indexes=["store_id", "item_id"],
         )
         self.input_node = self.input_evset.node()
 
@@ -62,7 +62,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["timestamp", "sales", "store_id", "item_id"],
             ),
-            index_names=[],
+            indexes=[],
         )
 
         operator = DropIndexOperator(
@@ -89,7 +89,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sales", "item_id"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = DropIndexOperator(
@@ -115,7 +115,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["item_id", "timestamp", "sales", "store_id"],
             ),
-            index_names=["item_id"],
+            indexes=["item_id"],
         )
 
         operator = DropIndexOperator(
@@ -143,7 +143,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sales"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = DropIndexOperator(
@@ -171,7 +171,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["item_id", "timestamp", "sales"],
             ),
-            index_names=["item_id"],
+            indexes=["item_id"],
         )
 
         operator = DropIndexOperator(
@@ -193,7 +193,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
                     "c": ["C1", "C2", "C1", "C2"],
                 }
             ),
-            index_names=["b", "c"],
+            indexes=["b", "c"],
         )
         node = evset.node()
 
@@ -207,7 +207,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
                     "c": ["C1", "C2", "C1", "C2"],
                 }
             ),
-            index_names=["c"],
+            indexes=["c"],
         )
 
         # Run op

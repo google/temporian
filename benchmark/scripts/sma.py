@@ -56,7 +56,7 @@ def main():
                 SALES: np.random.randn(N) * 100,
             }
         ),
-        index_names=[STORE, PRODUCT],
+        indexes=[STORE, PRODUCT],
     )
 
     node = evset.node()

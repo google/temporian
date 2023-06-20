@@ -75,7 +75,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             ).astype(
                 {"revenue": np.float32}  # Default is float64
             ),
-            index_names=["store_id", "product_id"],
+            indexes=["store_id", "product_id"],
         )
 
         self.evset_2 = from_pandas(
@@ -100,7 +100,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             ).astype(
                 {"sales": np.float32}  # Default is float64
             ),
-            index_names=["store_id", "product_id"],
+            indexes=["store_id", "product_id"],
             same_sampling_as=self.evset_1,
         )
 
@@ -127,7 +127,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             ).astype(
                 {"add_revenue_sales": np.float32}  # Default is float64
             ),
-            index_names=["store_id", "product_id"],
+            indexes=["store_id", "product_id"],
         )
         # Expected result after subtraction
         self.expected_evset_subtract = from_pandas(
@@ -152,7 +152,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             ).astype(
                 {"sub_revenue_sales": np.float32}  # Default is float64
             ),
-            index_names=["store_id", "product_id"],
+            indexes=["store_id", "product_id"],
         )
         # Expected result after multiplication
         self.expected_evset_multiply = from_pandas(
@@ -177,7 +177,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             ).astype(
                 {"mult_revenue_sales": np.float32}  # Default is float64
             ),
-            index_names=["store_id", "product_id"],
+            indexes=["store_id", "product_id"],
         )
         # Expected result after division
         self.expected_evset_divide = from_pandas(
@@ -202,7 +202,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             ).astype(
                 {"div_revenue_sales": np.float32}  # Default is float64
             ),
-            index_names=["store_id", "product_id"],
+            indexes=["store_id", "product_id"],
         )
 
         # Expected result after floor division
@@ -228,7 +228,7 @@ class ArithmeticMultiIndexNumpyImplementationTest(absltest.TestCase):
             ).astype(
                 {"floordiv_revenue_sales": np.float32}  # Default is float64
             ),
-            index_names=["store_id", "product_id"],
+            indexes=["store_id", "product_id"],
         )
 
         self.node_1 = input_node(

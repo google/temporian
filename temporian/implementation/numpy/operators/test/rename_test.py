@@ -36,7 +36,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["store_id", "timestamp", "sales", "costs", "weather"],
         )
 
-        self.input_evset = from_pandas(self.df, index_names=["store_id"])
+        self.input_evset = from_pandas(self.df, indexes=["store_id"])
         self.input_node = self.input_evset.node()
 
         df = pd.DataFrame(
@@ -47,7 +47,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["store_id", "timestamp", "sales", "costs", "weather"],
         )
 
-        self_input_evset_2 = from_pandas(df, index_names=["store_id", "sales"])
+        self_input_evset_2 = from_pandas(df, indexes=["store_id", "sales"])
         self.input_node_2 = self_input_evset_2.node()
 
     def test_rename_single_feature_with_str(self) -> None:
@@ -119,7 +119,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["store_id", "timestamp", "new_sales", "costs", "profit"],
         )
 
-        expected_evset = from_pandas(new_df, index_names=["store_id"])
+        expected_evset = from_pandas(new_df, indexes=["store_id"])
 
         output = rename(
             input=self.input_node,
@@ -140,7 +140,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["product_id", "timestamp", "sales", "costs", "weather"],
         )
 
-        expected_evset = from_pandas(new_df, index_names=["product_id"])
+        expected_evset = from_pandas(new_df, indexes=["product_id"])
 
         output = rename(
             input=self.input_node,
@@ -161,7 +161,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["product_id", "timestamp", "sales", "costs", "weather"],
         )
 
-        expected_evset = from_pandas(new_df, index_names=["product_id"])
+        expected_evset = from_pandas(new_df, indexes=["product_id"])
 
         output = rename(
             input=self.input_node,
@@ -183,7 +183,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["store_id", "timestamp", "sales", "costs", "weather"],
         )
 
-        self.input_evset = from_pandas(df, index_names=["store_id", "costs"])
+        self.input_evset = from_pandas(df, indexes=["store_id", "costs"])
 
         self.input_node = self.input_evset.node()
 
@@ -195,7 +195,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["product_id", "timestamp", "sales", "roi", "weather"],
         )
 
-        expected_evset = from_pandas(new_df, index_names=["product_id", "roi"])
+        expected_evset = from_pandas(new_df, indexes=["product_id", "roi"])
 
         output = rename(
             input=self.input_node,
@@ -259,7 +259,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["timestamp", "sales"],
         )
 
-        self.input_node = from_pandas(df, index_names=["sales"]).node()
+        self.input_node = from_pandas(df, indexes=["sales"]).node()
 
         with self.assertRaises(ValueError):
             rename(self.input_node, index="")
@@ -269,7 +269,7 @@ class RenameOperatorTest(absltest.TestCase):
         with self.assertRaises(KeyError):
             rename(input=self.input_node, index={"sales_1": "costs"})
 
-    def test_rename_index_with_duplicated_new_index_names(self) -> None:
+    def test_rename_index_with_duplicated_new_indexes(self) -> None:
         """Test renaming index with duplicated new names."""
         with self.assertRaises(ValueError):
             rename(
@@ -299,7 +299,7 @@ class RenameOperatorTest(absltest.TestCase):
             columns=["sales", "timestamp", "store_id", "costs", "weather"],
         )
 
-        expected_evset = from_pandas(new_df, index_names=["sales"])
+        expected_evset = from_pandas(new_df, indexes=["sales"])
 
         output = rename(
             input=self.input_node,

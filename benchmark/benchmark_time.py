@@ -69,7 +69,7 @@ def _build_toy_dataset(
                 data_prefix + "data_2": data_2,
             }
         ),
-        index_names=["index_1", "index_2"],
+        indexes=["index_1", "index_2"],
     )
 
 
@@ -262,7 +262,7 @@ def benchmark_add_index(runner):
                     "feature_6": feature_6,
                 }
             ),
-            index_names=["index_1", "index_2"],
+            indexes=["index_1", "index_2"],
         )
 
         node = evset.node()

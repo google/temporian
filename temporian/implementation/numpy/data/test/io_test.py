@@ -26,7 +26,7 @@ class IOTest(absltest.TestCase):
                 "feature_5": pd.Series(["d", "e", math.nan, "f"]),
                 "feature_6": pd.Series([1, 2, 3, 4]),
             },
-            index_features=["feature_2"],
+            indexes=["feature_2"],
         )
 
         expected_schema = Schema(

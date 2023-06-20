@@ -45,7 +45,7 @@ class SelectOperatorTest(absltest.TestCase):
 
         self.features = ["sales", "costs", "weather"]
 
-        self.input_evset = from_pandas(df, index_names=["store_id"])
+        self.input_evset = from_pandas(df, indexes=["store_id"])
         self.input_node = self.input_evset.node()
 
     def test_select_one_feature(self) -> None:
@@ -70,7 +70,7 @@ class SelectOperatorTest(absltest.TestCase):
         impl = select.SelectNumpyImplementation(operator)
         output_evset = impl.call(input=self.input_evset)["output"]
 
-        expected_evset = from_pandas(new_df, index_names=["store_id"])
+        expected_evset = from_pandas(new_df, indexes=["store_id"])
 
         self.assertTrue(output_evset == expected_evset)
 
@@ -94,7 +94,7 @@ class SelectOperatorTest(absltest.TestCase):
         impl = select.SelectNumpyImplementation(operator)
         output_evset = impl.call(input=self.input_evset)["output"]
 
-        expected_evset = from_pandas(new_df, index_names=["store_id"])
+        expected_evset = from_pandas(new_df, indexes=["store_id"])
 
         self.assertTrue(output_evset == expected_evset)
 
@@ -111,7 +111,7 @@ class SelectOperatorTest(absltest.TestCase):
             ],
             columns=["store_id", "timestamp", "sales"],
         )
-        expected_evset = from_pandas(new_df, index_names=["store_id"])
+        expected_evset = from_pandas(new_df, indexes=["store_id"])
 
         output_evset = evaluate(
             self.input_node["sales"],
@@ -135,7 +135,7 @@ class SelectOperatorTest(absltest.TestCase):
             ],
             columns=["store_id", "timestamp", "sales", "costs"],
         )
-        expected_evset = from_pandas(new_df, index_names=["store_id"])
+        expected_evset = from_pandas(new_df, indexes=["store_id"])
 
         output_evset = evaluate(
             self.input_node[["sales", "costs"]],

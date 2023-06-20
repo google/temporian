@@ -16,7 +16,7 @@ class EventTest(absltest.TestCase):
                 "x": [1, 1, 1, 2, 2],
                 "y": ["hello", "hello", "hello", "world", "world"],
             },
-            index_features=["x", "y"],
+            indexes=["x", "y"],
         )
 
     def test_getitem(self):
