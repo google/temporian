@@ -96,7 +96,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
         self.assertEqual(repr(output), repr({"output": expected_output}))
 
     def test_with_index(self):
-        """Indexed event sets."""
+        """Indexed EventSets."""
 
         input_data = from_pandas(
             pd.DataFrame(

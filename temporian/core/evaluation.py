@@ -32,7 +32,7 @@ EvaluationInput = Union[
     Dict[Node, EventSet],
     # A single event set. Equivalent to {event_set.node() : event_set}.
     EventSet,
-    # A list of event sets. Feed each event set individually like EventSet.
+    # A list of EventSets. Feed each event set individually like EventSet.
     List[EventSet],
 ]
 EvaluationResult = Union[EventSet, List[EventSet], Dict[str, EventSet]]
@@ -44,10 +44,10 @@ def evaluate(
     verbose: int = 0,
     check_execution: bool = True,
 ) -> EvaluationResult:
-    """Evaluates nodes on event sets.
+    """Evaluates nodes on [`EventSets`][temporian.EventSet].
 
     Performs all computation defined by the graph between the `query` nodes and
-    the `input` event sets.
+    the `input` EventSet.
 
     The result is returned in the same format as the `query` argument.
 
@@ -55,9 +55,9 @@ def evaluate(
         query: Nodes to compute. Supports Node, dict of Nodes and list of Nodes.
         input: Event sets to be used for the computation. Supports EventSet,
             list of EventSets, dict of Nodes to EventSets, and dict of node
-            names to event sets. If a single event set or list of event sets,
+            names to EventSet. If a single event set or list of EventSet,
             they must be named and will be used as input for the nodes with the
-            same name. If a dict of node names to event sets, they will be used
+            same name. If a dict of node names to EventSet, they will be used
             as input for the nodes with those names. If a dict of nodes to event
             sets, they will be used as input for those nodes.
         verbose: If >0, prints details about the execution on the standard error
@@ -69,8 +69,8 @@ def evaluate(
     Returns:
         An object with the same structure as `query` containing the results.
             If `query` is a dictionary of nodes, the returned object will be a
-            dictionary of event sets. If `query` is a list of nodes, the
-            returned value will be a list of event sets with the same order.
+            dictionary of EventSet. If `query` is a list of nodes, the
+            returned value will be a list of EventSet with the same order.
     """
     # TODO: Create an internal configuration object for options such as
     # `check_execution`.

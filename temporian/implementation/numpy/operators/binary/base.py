@@ -36,8 +36,7 @@ class BaseBinaryNumpyImplementation(OperatorImplementation):
     def __call__(
         self, input_1: EventSet, input_2: EventSet
     ) -> Dict[str, EventSet]:
-        """Applies the corresponding arithmetic operation between two event
-        sets.
+        """Applies the corresponding arithmetic operation between two EventSets.
 
         Args:
             input_1: First event set.
@@ -47,14 +46,14 @@ class BaseBinaryNumpyImplementation(OperatorImplementation):
             Result of the operation.
 
         Raises:
-            ValueError: If sampling of both event sets is not equal.
+            ValueError: If sampling of both EventSets is not equal.
         """
         assert isinstance(self.operator, BaseBinaryOperator)
         output_schema = self.output_schema("output")
 
         if len(input_1.schema.features) != len(input_2.schema.features):
             raise ValueError(
-                "Both event sets must have the same number of features."
+                "Both EventSets must have the same number of features."
             )
         num_features = len(input_1.schema.features)
 
