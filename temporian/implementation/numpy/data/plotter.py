@@ -202,7 +202,7 @@ def get_num_plots(
                     " the available indexes with 'evset.indexes' and provide"
                     " one of those to the 'indexes' argument of 'plot'."
                     " Alternatively, set 'indexes=None' to select a random"
-                    f" index key (e.g., {evset.get_arbitrary_index_value()}."
+                    f" index key (e.g., {evset.get_arbitrary_index_key()}."
                 )
             candidate_features = set(evset.schema.feature_names())
             num_features = len(candidate_features.intersection(features))

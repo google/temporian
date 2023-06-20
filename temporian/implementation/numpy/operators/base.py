@@ -55,9 +55,9 @@ def _check_value_to_schema(
                 f"expected schema =\n{node.schema}"
             )
 
-        index_value = value.get_arbitrary_index_value()
-        if index_value is not None:
-            index_data = value.data[index_value]
+        index_key = value.get_arbitrary_index_key()
+        if index_key is not None:
+            index_data = value.data[index_key]
 
             if len(index_data.features) != len(value.schema.features):
                 raise RuntimeError(

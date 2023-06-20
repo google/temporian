@@ -359,9 +359,8 @@ class EventSet:
     def name(self, name: Optional[str]) -> None:
         self._name = name
 
-    # TODO: rename to get_arbitrary_index_key
-    def get_arbitrary_index_value(self) -> Optional[Tuple]:
-        """Gets an arbitrary index value.
+    def get_arbitrary_index_key(self) -> Optional[Tuple]:
+        """Gets an arbitrary index key.
 
         If the event set is empty, return None.
         """
@@ -370,9 +369,8 @@ class EventSet:
             return next(iter(self._data.keys()))
         return None
 
-    # TODO: rename to get_arbitrary_index_group
     def get_arbitrary_index_data(self) -> Optional[IndexData]:
-        """Gets an arbitrary index data.
+        """Gets data from an arbitrary index key.
 
         If the event set is empty, return None.
         """
