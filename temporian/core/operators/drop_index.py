@@ -160,37 +160,84 @@ def drop_index(
     index_to_drop: Optional[Union[str, List[str]]] = None,
     keep: bool = True,
 ) -> Node:
-    """Removes one or more index columns from a node.
+    """Removes one or more index columns from a [`Node`](temporian.Node).
 
-    Examples:
-        Given an input `Node` with index names ['A', 'B', 'C'] and features
-        names ['X', 'Y', 'Z']:
+    Usage example:
+        ```python
+        >>> a_evset = tp.event_set(
+        ...     timestamps=[1, 2, 1, 0, 1, 1],
+        ...     features={
+        ...         "store": [1, 1, 1, 2, 2, 2],
+        ...         "product": [1, 1, 2, 1, 1, 2],
+        ...         "sales": [1, 1, 1, 1, 1, 1]
+        ...     },
+        ...     index_features=["store", "product"]
+        ... )
+        >>> a = a_evset.node()
 
-        1. `drop_index(input, index_names='A', keep=True)`
-           Output `Node` will have index names ['B', 'C'] and features names
-           ['X', 'Y', 'Z', 'A'].
+        >>> # Both store and product are indices
+        >>> a_evset
+        indexes: [('store', int64), ('product', int64)]
+        features: [('sales', int64)]
+        events:
+            store=2 product=1 (2 events):
+                timestamps: [0. 1.]
+                'sales': [1 1]
+            store=1 product=1 (2 events):
+                timestamps: [1. 2.]
+                'sales': [1 1]
+            store=1 product=2 (1 events):
+                timestamps: [1.]
+                'sales': [1]
+            store=2 product=2 (1 events):
+                timestamps: [1.]
+                'sales': [1]
+        ...
 
-        2. `drop_index(input, index_names=['A', 'B'], keep=False)`
-           Output `Node` will have index names ['C'] and features names
-           ['X', 'Y', 'Z'].
+        >>> # Drop "product", remove it from features
+        >>> result = tp.drop_index(a, "product", keep=False)
+        >>> result.evaluate({a: a_evset})
+        indexes: [('store', int64)]
+        features: [('sales', int64)]
+        events:
+            store=2 (3 events):
+                timestamps: [0. 1. 1.]
+                'sales': [1 1 1]
+            store=1 (3 events):
+                timestamps: [1. 1. 2.]
+                'sales': [1 1 1]
+        ...
 
-        3. `drop_index(input, index_names=None, keep=True)`
-           Output `Node` will have index names [] (empty index) and features
-           names ['X', 'Y', 'Z', 'A', 'B', 'C'].
+        >>> # Drop both indices, keep them as features
+        >>> result = tp.drop_index(a, ["product", "store"])
+        >>> result.evaluate({a: a_evset})
+        indexes: []
+        features: [('sales', int64), ('product', int64), ('store', int64)]
+        events:
+            (6 events):
+                timestamps: [0. 1. 1. 1. 1. 2.]
+                'sales': [1 1 1 1 1 1]
+                'product': [2 2 1 1 2 1]
+                'store': [1 1 1 2 2 1]
+        ...
+
+        ```
 
     Args:
-        input: Node from which the specified index columns should be removed.
+        input: [`Node`](temporian.Node) from which the specified index columns
+            should be removed.
         index_to_drop: Index column(s) to be removed from `input`. This can be a
             single column name (`str`) or a list of column names (`List[str]`).
             If not specified or set to `None`, all index columns in `input` will
             be removed. Defaults to `None`.
         keep: Flag indicating whether the removed index columns should be kept
-            as features in the output `Node`. Defaults to `True`.
+            as features in the output [`Node`](temporian.Node). Defaults to `True`.
 
     Returns:
-        A new `Node` object with the updated index, where the specified index
-        column(s) have been removed. If `keep` is set to `True`, the removed
-        index columns will be included as features in the output `Node`.
+        A new [`Node`](temporian.Node) object with the updated index, where the
+        specified index column(s) have been removed. If `keep` is set to `True`,
+        the removed index columns will be included as features in the output
+        [`Node`](temporian.Node).
 
     Raises:
         ValueError: If an empty list is provided as the `index_names` argument.

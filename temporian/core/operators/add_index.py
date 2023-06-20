@@ -141,24 +141,78 @@ def _normalize_index_to_set(
 
 
 def add_index(input: Node, index_to_add: Union[str, List[str]]) -> Node:
-    """Adds one or more features as index in a node.
+    """Adds one or more features as index in a [`Node`](temporian.Node).
 
-    Examples:
-        Given an input `Node` with index names ['A', 'B', 'C'] and features
-        names ['X', 'Y', 'Z']:
+    Usage example:
+        ```python
+        >>> a_evset = tp.event_set(
+        ...     timestamps=[1, 2, 1, 0, 1, 1],
+        ...     features={
+        ...         "store": [1, 1, 1, 2, 2, 2],
+        ...         "product": [1, 1, 2, 1, 1, 2],
+        ...         "sales": [1, 1, 1, 1, 1, 1]
+        ...     },
+        ... )
 
-        3. `add_index(input, feature_names=['X', 'Y'])`
-           Output `Node` will have index names ['A', 'B', 'C', 'X', 'Y'] and
-           features names ['Z'].
+        >>> # No index, store and product are regularfeatures
+        >>> a_evset
+        indexes: []
+        features: [('store', int64), ('product', int64), ('sales', int64)]
+        events:
+            (6 events):
+                timestamps: [0. 1. 1. 1. 1. 2.]
+                'store': [2 1 1 2 2 1]
+                'product': [1 1 2 1 2 1]
+                'sales': [1 1 1 1 1 1]
+        ...
+
+        >>> # Add only "store" as index
+        >>> a = a_evset.node()
+        >>> result = tp.add_index(a, "store")
+        >>> result.evaluate({a: a_evset})
+        indexes: [('store', int64)]
+        features: [('product', int64), ('sales', int64)]
+        events:
+            store=2 (3 events):
+                timestamps: [0. 1. 1.]
+                'product': [1 1 2]
+                'sales': [1 1 1]
+            store=1 (3 events):
+                timestamps: [1. 1. 2.]
+                'product': [1 2 1]
+                'sales': [1 1 1]
+        ...
+
+        >>> # Add "store" and "product" as indices
+        >>> result = tp.add_index(a, ["store", "product"])
+        >>> result.evaluate({a: a_evset})
+        indexes: [('store', int64), ('product', int64)]
+        features: [('sales', int64)]
+        events:
+            store=2 product=1 (2 events):
+                timestamps: [0. 1.]
+                'sales': [1 1]
+            store=1 product=1 (2 events):
+                timestamps: [1. 2.]
+                'sales': [1 1]
+            store=1 product=2 (1 events):
+                timestamps: [1.]
+                'sales': [1]
+            store=2 product=2 (1 events):
+                timestamps: [1.]
+                'sales': [1]
+        ...
+
+        ```
 
     Args:
-        input: Input `Node` object for which the index is to be set or
+        input: Input [`Node`](temporian.Node) object for which the index is to be set or
             updated.
         index_to_add: List of feature names (strings) that should be used as
             the new index. These feature names should already exist in `input`.
 
     Returns:
-         New `Node` with the updated index.
+         New [`Node`](temporian.Node) with the updated index.
 
     Raises:
         KeyError: If any of the specified `index_to_add` are not found in
@@ -170,31 +224,87 @@ def add_index(input: Node, index_to_add: Union[str, List[str]]) -> Node:
 
 
 def set_index(input: Node, index: Union[str, List[str]]) -> Node:
-    """Replaces the index in a node.
+    """Replaces the index in a [`Node`](temporian.Node).
 
-    "set_index" is implemented as drop_index + add_index.
+    This function is implemented as [`tp.drop_index()`](../drop_index)
+    + [`tp.add_index()`](../add_index).
 
-    Examples:
-        Given an input `Node` with index names ['A', 'B', 'C'] and features
-        names ['X', 'Y', 'Z']:
 
-        1. `set_index(input, index=['X'])`
-           Output `Node` will have index names ['X'] and features names
-           ['A', 'B', 'C', 'Y', 'Z'].
+    Usage example:
+        ```python
+        >>> a_evset = tp.event_set(
+        ...     timestamps=[1, 2, 1, 0, 1, 1],
+        ...     features={
+        ...         "store": [1, 1, 1, 2, 2, 2],
+        ...         "product": [1, 1, 2, 1, 1, 2],
+        ...         "sales": [1, 1, 1, 1, 1, 1]
+        ...     },
+        ...     index_features=["store"]
+        ... )
+        >>> a = a_evset.node()
 
-        2. `set_index(input, index=['X', 'Y'])`
-           Output `Node` will have index names ['X', 'Y'] and
-           features names ['A', 'B', 'C', 'Z'].
+        >>> # "store" is the current index
+        >>> a_evset
+        indexes: [('store', int64)]
+        features: [('product', int64), ('sales', int64)]
+        events:
+            store=2 (3 events):
+                timestamps: [0. 1. 1.]
+                'product': [1 1 2]
+                'sales': [1 1 1]
+            store=1 (3 events):
+                timestamps: [1. 1. 2.]
+                'product': [1 2 1]
+                'sales': [1 1 1]
+        ...
+
+        >>> # Set "product" as the only index, remove store
+        >>> result = tp.set_index(a, "product")
+        >>> result.evaluate({a: a_evset})
+        indexes: [('product', int64)]
+        features: [('sales', int64), ('store', int64)]
+        events:
+            product=1 (4 events):
+                timestamps: [0. 1. 1. 2.]
+                'sales': [1 1 1 1]
+                'store': [2 2 1 1]
+            product=2 (2 events):
+                timestamps: [1. 1.]
+                'sales': [1 1]
+                'store': [2 1]
+        ...
+
+        >>> # Set both "store" and "product" as indices
+        >>> result = tp.set_index(a, ["store", "product"])
+        >>> result.evaluate({a: a_evset})
+        indexes: [('store', int64), ('product', int64)]
+        features: [('sales', int64)]
+        events:
+            store=2 product=1 (2 events):
+                timestamps: [0. 1.]
+                'sales': [1 1]
+            store=2 product=2 (1 events):
+                timestamps: [1.]
+                'sales': [1]
+            store=1 product=1 (2 events):
+                timestamps: [1. 2.]
+                'sales': [1 1]
+            store=1 product=2 (1 events):
+                timestamps: [1.]
+                'sales': [1]
+        ...
+
+        ```
 
     Args:
-        input: Input `Node` object for which the index is to be set or
-            updated.
+        input: Input [`Node`](temporian.Node) object for which the index is to
+            be set or updated.
         index: List of index / feature names (strings) used as
             the new index. These feature names should be either index or
             features in `input`.
 
     Returns:
-        New `Node` with the updated index.
+        New [`Node`](temporian.Node) with the updated index.
 
     Raises:
         KeyError: If any of the specified `index_to_add` are not found in
