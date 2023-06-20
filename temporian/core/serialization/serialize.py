@@ -58,9 +58,9 @@ def save(
         ```
 
     Args:
-        inputs: Input nodes. If None, the inputs is inferred. In this case,
-            input nodes have to be named.
-        outputs: Output nodes.
+        inputs: Input Nodes. If None, the inputs is inferred. In this case,
+            input Nodes have to be named.
+        outputs: Output Nodes.
         path: File path to save to.
     """
 
@@ -80,11 +80,11 @@ def load(
 
     Args:
         path: File path to load from.
-        squeeze: If true, and if the input/output contains a single node,
-            returns a node (instead of a dictionary of nodes).
+        squeeze: If true, and if the input/output contains a single Node,
+            returns a Node (instead of a dictionary of Nodes).
 
     Returns:
-        Input and output nodes.
+        Input and output Nodes.
     """
 
     with open(path, "rb") as f:
@@ -110,9 +110,9 @@ def _serialize(src: graph.Graph) -> pb.Graph:
     """Serializes a graph into a protobuffer."""
 
     if src.named_inputs is None:
-        raise ValueError("Cannot serialize a graph without named input nodes")
+        raise ValueError("Cannot serialize a graph without named input Nodes")
     if src.named_outputs is None:
-        raise ValueError("Cannot serialize a graph without named output nodes")
+        raise ValueError("Cannot serialize a graph without named output Nodes")
 
     return pb.Graph(
         operators=[_serialize_operator(o) for o in src.operators],

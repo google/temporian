@@ -50,8 +50,8 @@ def _check_value_to_schema(
 
         if value.schema != node.schema:
             raise RuntimeError(
-                "Unexpected event set schema.\n"
-                f"event set schema =\n{value.schema}\n"
+                "Unexpected EventSet set schema.\n"
+                f"actual schema =\n{value.schema}\n"
                 f"expected schema =\n{node.schema}"
             )
 

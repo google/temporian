@@ -42,7 +42,7 @@ class SelectNumpyImplementation(OperatorImplementation):
             src_feature_names.index(feature_name)
             for feature_name in feature_names
         ]
-        # create output event set
+        # create output EventSet
         output_evset = EventSet(data={}, schema=output_schema)
         # select feature index key-wise
         for index_key, index_data in input.data.items():

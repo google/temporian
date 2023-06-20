@@ -39,8 +39,8 @@ class BaseBinaryNumpyImplementation(OperatorImplementation):
         """Applies the corresponding arithmetic operation between two EventSets.
 
         Args:
-            input_1: First event set.
-            input_2: Second event set.
+            input_1: First EventSet.
+            input_2: Second EventSet.
 
         Returns:
             Result of the operation.
@@ -57,7 +57,7 @@ class BaseBinaryNumpyImplementation(OperatorImplementation):
             )
         num_features = len(input_1.schema.features)
 
-        # create destination event set
+        # create destination EventSet
         dst_evset = EventSet(data={}, schema=output_schema)
 
         assert len(input_1.data) == len(input_2.data)

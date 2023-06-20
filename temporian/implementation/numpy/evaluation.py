@@ -36,7 +36,7 @@ def evaluate_schedule(
     [`EventSets`][temporian.EventSet].
 
     Args:
-        inputs: Mapping of nodes to materialized EventSets.
+        inputs: Mapping of Nodes to materialized EventSets.
         schedule: Sequence of operators to apply on the data.
         verbose: If >0, prints details about the execution on the standard error
             output. The larger the number, the more information is displayed.

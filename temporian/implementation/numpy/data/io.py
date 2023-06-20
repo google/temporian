@@ -28,12 +28,12 @@ def event_set(
     is_unix_timestamp: Optional[bool] = None,
     same_sampling_as: Optional[EventSet] = None,
 ) -> EventSet:
-    """Creates an event set from arrays (list, numpy, pandas).
+    """Creates an EventSet from arrays (list, numpy, pandas).
 
     Usage examples:
 
         ```python
-        >>> # Creates an event set with 4 timestamps and 3 features.
+        >>> # Creates an EventSet with 4 timestamps and 3 features.
         >>> evset = tp.event_set(
         ...     timestamps=[1, 2, 3, 4],
         ...     features={
@@ -43,7 +43,7 @@ def event_set(
         ...     },
         ... )
 
-        >>> # Creates an event set with an index.
+        >>> # Creates an EventSet with an index.
         >>> evset = tp.event_set(
         ...     timestamps=[1, 2, 3, 4],
         ...     features={
@@ -92,19 +92,19 @@ def event_set(
         index_features: Names of the features to use as index. If empty
             (default), the data is not indexed. Only integer and string features
             can be used as index.
-        name: Optional name of the event set. Used for debugging, and
+        name: Optional name of the EventSet. Used for debugging, and
             graph serialization.
         is_unix_timestamp: Whether the timestamps correspond to unix time. Unix
             times are required for calendar operators. If `None` (default),
             timestamps are interpreted as unix times if the `timestamps`
             argument is an array of date or date-like object.
-        same_sampling_as: If set, the new event set is cheched and tagged as
+        same_sampling_as: If set, the new EventSet is cheched and tagged as
             having the same sampling as `same_sampling_as`. Some operators,
             such as [`tp.filter()`][temporian.filter], require their inputs to
             have the same sampling.
 
     Returns:
-        An event set.
+        An EventSet.
     """
 
     if features is None:
@@ -162,12 +162,12 @@ def event_set(
     if same_sampling_as is not None:
         evset.schema.check_compatible_index(
             same_sampling_as.schema,
-            label="the new event set and `same_sampling_as`",
+            label="the new EventSet and `same_sampling_as`",
         )
 
         if evset.data.keys() != same_sampling_as.data.keys():
             raise ValueError(
-                "The new event set and `same_sampling_as` have the same index,"
+                "The new EventSet and `same_sampling_as` have the same index,"
                 " but different index values. Both should have the same index"
                 " keys to have the same sampling."
             )
@@ -177,7 +177,7 @@ def event_set(
                 evset.data[key].timestamps == same_sampling_as_value.timestamps
             ):
                 raise ValueError(
-                    "The new event set and `same_sampling_as` have different"
+                    "The new EventSet and `same_sampling_as` have different"
                     f" timestamps values for the index={key!r}. The timestamps"
                     " should be equal for both to have the same sampling."
                 )

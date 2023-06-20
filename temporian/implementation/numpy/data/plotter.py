@@ -197,7 +197,7 @@ def get_num_plots(
         for evset in evsets:
             if index not in evset.data:
                 raise ValueError(
-                    f"Index '{index}' does not exist in event set. Check the"
+                    f"Index '{index}' does not exist in EventSet. Check the"
                     " available indexes with 'evset.index' and provide one of"
                     " those index to the 'index' argument of 'plot'."
                     ' Alternatively, set "index=None" to select a random'
