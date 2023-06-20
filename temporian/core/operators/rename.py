@@ -179,6 +179,31 @@ def rename(
     The index renaming follows the same criteria, accepting a single string or
     a mapping for multiple index levels.
 
+    Basic usage:
+        ```python
+        >>> a_evset = tp.event_set(
+        ...    timestamps=[0, 1],
+        ...    features={"f1": [0, 2], "f2": [5, 6]}
+        ... )
+        >>> a = a_evset.node()
+        >>> b = a * 5
+
+        >>> # Rename single feature from b
+        >>> b_1 = tp.rename(b["f1"], "output_1")
+
+        >>> # Rename multiple features in a (mapping)
+        >>> a_rename = tp.rename(a, {"f1": "input_1", "f2": "input_2"})
+
+        >>> result = tp.glue(a_rename, b_1)
+        >>> result.evaluate({a: a_evset})
+        indexes: ...
+                'input_1': [0 2]
+                'input_2': [5 6]
+                'output_1': [ 0 10]
+        ...
+
+        ```
+
     Args:
         input: Node to rename.
 
