@@ -168,7 +168,7 @@ def rename(
     features: Optional[Union[str, Dict[str, str]]] = None,
     index: Optional[Union[str, Dict[str, str]]] = None,
 ) -> Node:
-    """Renames a node's features and index.
+    """Renames a Node's features and index.
 
     If the input has a single feature, then the `features` can be a
     single string with the new name.

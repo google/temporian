@@ -82,7 +82,7 @@ def since_last(
     input: Node,
     sampling: Optional[Node] = None,
 ) -> Node:
-    """Amount of time since the last distinct timestamp.
+    """Computes the amount of time since the last distinct timestamp.
 
     Example 1:
         ```python

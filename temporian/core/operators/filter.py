@@ -80,7 +80,7 @@ def filter(
     input: Node,
     condition: Optional[Node] = None,
 ) -> Node:
-    """Filters out timestamps in a node for which a condition is false.
+    """Filters out events in a Node for which a condition is false.
 
     Each timestamp in `input` is only kept if the corresponding value for that
     timestamp in `condition` is `True`.
