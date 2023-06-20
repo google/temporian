@@ -141,7 +141,7 @@ def _normalize_index_to_set(
 
 
 def add_index(input: Node, index_to_add: Union[str, List[str]]) -> Node:
-    """Adds one or more features as index in a [`Node`](temporian.Node).
+    """Adds one or more features as index in a node.
 
     Usage example:
         ```python
@@ -206,13 +206,13 @@ def add_index(input: Node, index_to_add: Union[str, List[str]]) -> Node:
         ```
 
     Args:
-        input: Input [`Node`](temporian.Node) object for which the index is to be set or
+        input: Input node object for which the index is to be set or
             updated.
         index_to_add: List of feature names (strings) that should be used as
             the new index. These feature names should already exist in `input`.
 
     Returns:
-         New [`Node`](temporian.Node) with the updated index.
+         New node with the updated index.
 
     Raises:
         KeyError: If any of the specified `index_to_add` are not found in
@@ -224,7 +224,7 @@ def add_index(input: Node, index_to_add: Union[str, List[str]]) -> Node:
 
 
 def set_index(input: Node, index: Union[str, List[str]]) -> Node:
-    """Replaces the index in a [`Node`](temporian.Node).
+    """Replaces the index in a node.
 
     This function is implemented as [`tp.drop_index()`](../drop_index)
     + [`tp.add_index()`](../add_index).
@@ -297,14 +297,14 @@ def set_index(input: Node, index: Union[str, List[str]]) -> Node:
         ```
 
     Args:
-        input: Input [`Node`](temporian.Node) object for which the index is to
+        input: Input node object for which the index is to
             be set or updated.
         index: List of index / feature names (strings) used as
             the new index. These feature names should be either index or
             features in `input`.
 
     Returns:
-        New [`Node`](temporian.Node) with the updated index.
+        New node with the updated index.
 
     Raises:
         KeyError: If any of the specified `index_to_add` are not found in

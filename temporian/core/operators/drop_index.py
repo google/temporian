@@ -160,7 +160,7 @@ def drop_index(
     index_to_drop: Optional[Union[str, List[str]]] = None,
     keep: bool = True,
 ) -> Node:
-    """Removes one or more index columns from a [`Node`](temporian.Node).
+    """Removes one or more index columns from a node.
 
     Usage example:
         ```python
@@ -224,20 +224,20 @@ def drop_index(
         ```
 
     Args:
-        input: [`Node`](temporian.Node) from which the specified index columns
+        input: node from which the specified index columns
             should be removed.
         index_to_drop: Index column(s) to be removed from `input`. This can be a
             single column name (`str`) or a list of column names (`List[str]`).
             If not specified or set to `None`, all index columns in `input` will
             be removed. Defaults to `None`.
         keep: Flag indicating whether the removed index columns should be kept
-            as features in the output [`Node`](temporian.Node). Defaults to `True`.
+            as features in the output node. Defaults to `True`.
 
     Returns:
-        A new [`Node`](temporian.Node) object with the updated index, where the
+        A new node object with the updated index, where the
         specified index column(s) have been removed. If `keep` is set to `True`,
         the removed index columns will be included as features in the output
-        [`Node`](temporian.Node).
+        node.
 
     Raises:
         ValueError: If an empty list is provided as the `index_names` argument.
