@@ -272,7 +272,17 @@ class CastNumpyImplementationTest(absltest.TestCase):
 
     def test_python_types(self):
         input_data = event_set(timestamps=[1, 2], features={"a": [1, 2]})
+
+        # All features
         output_node = cast(input_data.node(), float)
+        self.assertEqual(output_node.features[0].dtype, DType.FLOAT64)
+
+        # Map type->type
+        output_node = cast(input_data.node(), {int: float})
+        self.assertEqual(output_node.features[0].dtype, DType.FLOAT64)
+
+        # Map feature->type
+        output_node = cast(input_data.node(), {"a": float})
         self.assertEqual(output_node.features[0].dtype, DType.FLOAT64)
 
 
