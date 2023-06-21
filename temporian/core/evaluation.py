@@ -52,7 +52,7 @@ def evaluate(
     The result is returned in the same format as the `query` argument.
 
 
-    Single input/output example:
+    Single input output example:
         ```python
         >>> input_evset = tp.event_set(timestamps=[1, 2, 3], features={"f": [0, 4, 10]})
         >>> input_node = input_evset.node()
@@ -64,7 +64,7 @@ def evaluate(
 
         ```
 
-    Multiple inputs/outputs example:
+    Multiple inputs and outputs example:
         ```python
         >>> evset_1 = tp.event_set(timestamps=[1, 2, 3], features={"f1": [0.1, 42, 10]})
         >>> evset_2 = tp.event_set(timestamps=[1, 2, 3],

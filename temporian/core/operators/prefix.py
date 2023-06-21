@@ -77,7 +77,7 @@ def prefix(
 ) -> Node:
     """Adds a prefix to the names of the features in a node.
 
-    Basic usage:
+    Usage example:
         ```python
         >>> a_evset = tp.event_set(
         ...    timestamps=[0, 1],
@@ -86,7 +86,7 @@ def prefix(
         >>> a = a_evset.node()
         >>> b = a * 5
 
-        >>> # prefix both a and b and glue
+        >>> # Prefix before glue to avoid duplicated names
         >>> result = tp.glue(tp.prefix("original_", a), tp.prefix("result_", b))
         >>> result.evaluate({a: a_evset})
         indexes: ...

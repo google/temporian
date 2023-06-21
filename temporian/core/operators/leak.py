@@ -82,7 +82,7 @@ def leak(input: Node, duration: Duration) -> Node:
     with caution to prevent unwanted future leakage. For instance, this op
     should generally not be used to compute the input features of a model.
 
-    Basic usage:
+    Usage example:
         ```python
         >>> a_evset = tp.event_set(
         ...     timestamps=[0, 1, 5, 6],
