@@ -179,7 +179,7 @@ def rename(
     The index renaming follows the same criteria, accepting a single string or
     a mapping for multiple index levels.
 
-    Basic usage:
+    Usage example:
         ```python
         >>> a_evset = tp.event_set(
         ...    timestamps=[0, 1],
