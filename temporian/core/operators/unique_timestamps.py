@@ -58,15 +58,19 @@ def unique_timestamps(input: Node) -> Node:
     once. If the input is indexed, the unique operation is applied independently
     for each index.
 
-    Example:
+    Usage example:
+        ```python
+        >>> a_evset = tp.event_set(timestamps=[5, 9, 9, 16], features={'f': [1,2,3,4]})
+        >>> a = a_evset.node()
 
-        Inputs:
-            input:
-                feature_1: ['a', 'b', 'c', 'd']
-                timestamps: [1, 2, 2, 4]
-
-        Output:
-            timestamps: [1, 2, 4]
+        >>> result = tp.unique_timestamps(a)
+        >>> result.evaluate({a: a_evset})
+        indexes: []
+        features: []
+        events:
+             (3 events):
+                timestamps: [ 5. 9. 16.]
+        ...
 
     Args:
         input: Node, possibly with features, to process.
