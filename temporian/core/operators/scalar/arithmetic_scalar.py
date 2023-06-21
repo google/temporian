@@ -78,6 +78,26 @@ def add_scalar(
 
     `value` is added to each item in each feature in `input`.
 
+    Usage example:
+        ```python
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f1": [0, 100, 200], "f2": [10, -10, 5]}
+        ... )
+        >>> a = evset.node()
+
+        >>> # Equivalent
+        >>> c = tp.add_scalar(a, 3)
+        >>> c = a + 3
+        >>> c.evaluate({a: evset})
+        indexes: ...
+                timestamps: [1. 2. 3.]
+                'f1': [ 3 103 203]
+                'f2': [13 -7 8]
+        ...
+
+        ```
+
     Args:
         input: Node to add a scalar to.
         value: Scalar value to add to the input.
@@ -101,6 +121,36 @@ def subtract_scalar(
 
     Either `minuend` or `subtrahend` should be a scalar value, but not both. If
     looking to subtract two nodes, use the `subtract` operator instead.
+
+    Usage example:
+        ```python
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f1": [0, 100, 200], "f2": [10, -10, 5]}
+        ... )
+        >>> a = evset.node()
+
+        >>> # Equivalent
+        >>> c = tp.subtract_scalar(a, 3)
+        >>> c = a - 3
+        >>> c.evaluate({a: evset})
+        indexes: ...
+                timestamps: [1. 2. 3.]
+                'f1': [ -3  97 197]
+                'f2': [ 7 -13   2]
+        ...
+
+        >>> # Equivalent
+        >>> c = tp.subtract_scalar(3, a)
+        >>> c = 3 - a
+        >>> c.evaluate({a: evset})
+        indexes: ...
+                timestamps: [1. 2. 3.]
+                'f1': [ 3  -97 -197]
+                'f2': [-7 13  -2]
+        ...
+
+        ```
 
     Args:
         minuend: Node or scalar value being subtracted from.
@@ -140,6 +190,26 @@ def multiply_scalar(
 
     Each item in each feature in `input` is multiplied by `value`.
 
+    Usage example:
+        ```python
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f1": [0, 100, 200], "f2": [10, -10, 5]}
+        ... )
+        >>> a = evset.node()
+
+        >>> # Equivalent
+        >>> c = tp.multiply_scalar(a, 2)
+        >>> c = a * 2
+        >>> c.evaluate({a: evset})
+        indexes: ...
+                timestamps: [1. 2. 3.]
+                'f1': [ 0 200 400]
+                'f2': [ 20 -20 10]
+        ...
+
+        ```
+
     Args:
         input: Node to multiply.
         value: Scalar value to multiply the input by.
@@ -163,6 +233,36 @@ def divide_scalar(
 
     Either `numerator` or `denominator` should be a scalar value, but not both.
     If looking to divide two nodes, use the `divide` operator instead.
+
+    Usage example:
+        ```python
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f1": [0., 100., 200.], "f2": [10., -10., 5.]}
+        ... )
+        >>> a = evset.node()
+
+        >>> # Equivalent
+        >>> c = tp.divide_scalar(a, 2)
+        >>> c = a / 2
+        >>> c.evaluate({a: evset})
+        indexes: ...
+                timestamps: [1. 2. 3.]
+                'f1': [ 0. 50. 100.]
+                'f2': [ 5. -5. 2.5]
+        ...
+
+        >>> # Equivalent
+        >>> c = tp.divide_scalar(1000, a)
+        >>> c = 1000 / a
+        >>> c.evaluate({a: evset})
+        indexes: ...
+                timestamps: [1. 2. 3.]
+                'f1': [inf 10. 5.]
+                'f2': [ 100. -100. 200.]
+        ...
+
+        ```
 
     Args:
         numerator: Numerator node or value.
@@ -205,6 +305,36 @@ def floordiv_scalar(
     Either `numerator` or `denominator` should be a scalar value, but not both.
     If looking to floordiv two nodes, use the `floordiv` operator instead.
 
+    Usage example:
+        ```python
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f1": [1, 100, 200], "f2": [10., -10., 5.]}
+        ... )
+        >>> a = evset.node()
+
+        >>> # Equivalent
+        >>> c = tp.floordiv_scalar(a, 3)
+        >>> c = a // 3
+        >>> c.evaluate({a: evset})
+        indexes: ...
+                timestamps: [1. 2. 3.]
+                'f1': [ 0 33 66]
+                'f2': [ 3. -4. 1.]
+        ...
+
+        >>> # Equivalent
+        >>> c = tp.floordiv_scalar(300, a)
+        >>> c = 300 // a
+        >>> c.evaluate({a: evset})
+        indexes: ...
+                timestamps: [1. 2. 3.]
+                'f1': [300 3 1]
+                'f2': [ 30. -30. 60.]
+        ...
+
+        ```
+
     Args:
         numerator: Numerator node or value.
         denominator: Denominator node or value.
@@ -244,6 +374,36 @@ def modulo_scalar(
     Either `numerator` or `denominator` should be a scalar value, but not both.
     For the operation between two nodes, use the `modulo` operator instead.
 
+    Usage example:
+        ```python
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f1": [1, 100, 200], "f2": [10., -10., 5.]}
+        ... )
+        >>> a = evset.node()
+
+        >>> # Equivalent
+        >>> c = tp.modulo_scalar(a, 3)
+        >>> c = a % 3
+        >>> c.evaluate({a: evset})
+        indexes: ...
+                timestamps: [1. 2. 3.]
+                'f1': [1 1 2]
+                'f2': [1. 2. 2.]
+        ...
+
+        >>> # Equivalent
+        >>> c = tp.floordiv_scalar(300, a)
+        >>> c = 300 % a
+        >>> c.evaluate({a: evset})
+        indexes: ...
+                timestamps: [1. 2. 3.]
+                'f1': [ 0 0 100]
+                'f2': [ 0. -0. 0.]
+        ...
+
+        ```
+
     Args:
         numerator: Node or scalar to divide.
         denominator: Node or scalar to divide by.
@@ -282,6 +442,36 @@ def power_scalar(
 
     Either `base` or `exponent` should be a scalar value, but not both.
     For the operation between two nodes, use the `power` operator instead.
+
+    Usage example:
+        ```python
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f1": [0, 2, 3], "f2": [1., 2., 3.]}
+        ... )
+        >>> a = evset.node()
+
+        >>> # Equivalent
+        >>> c = tp.power_scalar(a, 3)
+        >>> c = a ** 3
+        >>> c.evaluate({a: evset})
+        indexes: ...
+                timestamps: [1. 2. 3.]
+                'f1': [ 0 8 27]
+                'f2': [ 1. 8. 27.]
+        ...
+
+        >>> # Equivalent
+        >>> c = tp.power_scalar(3, a)
+        >>> c = 3 ** a
+        >>> c.evaluate({a: evset})
+        indexes: ...
+                timestamps: [1. 2. 3.]
+                'f1': [ 1 9 27]
+                'f2': [ 3. 9. 27.]
+        ...
+
+        ```
 
     Args:
         base: Node or scalar to raise to the exponent

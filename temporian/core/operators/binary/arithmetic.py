@@ -104,8 +104,8 @@ def add(
         ...     features={"f1": [0, 100, 200], "f2": [10, -10, 5]}
         ... )
         >>> source = evset.node()
-        >>> a = source["f1"]
-        >>> b = source["f2"]
+        >>> a = source[["f1", "f2"]]
+        >>> b = source[["f2", "f1"]]  # Reverse order
 
         >>> # Equivalent
         >>> c = tp.add(a, b)
@@ -113,11 +113,12 @@ def add(
 
         >>> c.evaluate({source: evset})
         indexes: []
-        features: [('add_f1_f2', int64)]
+        features: [('add_f1_f2', int64), ('add_f2_f1', int64)]
         events:
             (3 events):
                 timestamps: [1. 2. 3.]
                 'add_f1_f2': [ 10 90 205]
+                'add_f2_f1': [ 10 90 205]
         ...
 
         ```
