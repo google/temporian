@@ -85,16 +85,38 @@ def filter(
     Each timestamp in `input` is only kept if the corresponding value for that
     timestamp in `condition` is `True`.
 
-    `input` and `condition` must have the same sampling.
+    `input` and `condition` must have the same sampling, and `condition` must
+    have one single feature, of boolean type.
 
     filter(x) is equivalent to filter(x,x). filter(x) can be used to convert
-    a boolean mask into a timestamps. For example:
-        Input:
-            timestamps: 1 2 3
-            value: True False True
-        Output:
-            timestamps: 1 3
-            value: True True
+    a boolean mask into a timestamps.
+
+    Usage example:
+        ```python
+        >>> a_evset = tp.event_set(
+        ...     timestamps=[0, 1, 5, 6],
+        ...     features={"f1": [0, 10, 50, 60], "f2": [50, 100, 500, 600]},
+        ... )
+        >>> a = a_evset.node()
+
+        >>> # Example boolean condition
+        >>> condition = a["f1"] > 20
+        >>> condition.evaluate({a: a_evset})
+        indexes: ...
+                timestamps: [0. 1. 5. 6.]
+                'f1': [False False  True  True]
+        ...
+
+        >>> # Filter only True timestamps
+        >>> filtered = tp.filter(a, condition)
+        >>> filtered.evaluate({a: a_evset})
+        indexes: ...
+                timestamps: [5. 6.]
+                'f1': [50 60]
+                'f2': [500 600]
+        ...
+
+        ```
 
     Args:
         input: Node to filter.
