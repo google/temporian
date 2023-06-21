@@ -101,20 +101,56 @@ def propagate(input: Node, sampling: Node, resample: bool = False) -> Node:
     `sampling` is `["x","y"]`), duplicates the features of `input` over the
     index of `sampling`.
 
-    Example:
+    Example use case:
+        ```python
+        >>> products_evset = tp.event_set(
+        ...     timestamps=[1, 2, 3, 1, 2, 3],
+        ...     features={
+        ...         "product": [1, 1, 1, 2, 2, 2],
+        ...         "sales": [100., 200., 500., 1000., 2000., 5000.]
+        ...     },
+        ...     index_features=["product"],
+        ...     name="sales_per_product"
+        ... )
+        >>> store_evset = tp.event_set(
+        ...     timestamps=[1, 2, 3, 4, 5],
+        ...     features={
+        ...         "sales": [10000., 20000., 30000., 5000., 1000.]
+        ...     },
+        ...     name="sales_total_store"
+        ... )
+        >>> products_node = products_evset.node()
+        >>> store_node = store_evset.node()
 
-        Inputs:
-            input:
-                feature_1: ...
-                feature_2: ...
-                index: ["x"]
-            sampling:
-                index: ["x", "y"]
+        >>> # First attempt: divide to calculate fraction of total store sales
+        >>> products_node / store_node
+        Traceback (most recent call last):
+            ...
+        ValueError: The index of input and sampling don't match. ...
 
-        Output:
-            feature_1: ...
-            feature_2: ...
-            index: ["x", "y"]
+        >>> # Second attempt: propagate index
+        >>> store_prop = tp.propagate(store_node, products_node)
+        >>> products_fraction = products_node / store_prop
+        Traceback (most recent call last):
+            ...
+        ValueError: Arguments should have the same sampling. ...
+
+        >>> # Third attempt: propagate + resample
+        >>> store_prop = tp.propagate(store_node, products_node, resample=True)
+        >>> products_fraction = products_node / store_prop
+        >>> products_fraction.evaluate([products_evset, store_evset])
+        indexes: [('product', int64)]
+        features: [('div_sales_sales', float64)]
+        events:
+            product=1 (3 events):
+                timestamps: [1. 2. 3.]
+                'div_sales_sales': [0.01   0.01   0.0167]
+            product=2 (3 events):
+                timestamps: [1. 2. 3.]
+                'div_sales_sales': [0.1    0.1    0.1667]
+        ...
+
+        ```
 
     Args:
         input: Node to propagate.
