@@ -50,7 +50,7 @@ def simple_moving_average(
     """Computes the average of values in a sliding window over the node.
 
     For each t in sampling, and for each feature independently, returns at time
-    t the average value of the feature in the window [t - window_length, t].
+    t the average value of the feature in the window (t - window_length, t].
 
     If `sampling` is provided samples the moving window's value at each
     timestamp in `sampling`, else samples it at each timestamp in `input`.
@@ -59,6 +59,27 @@ def simple_moving_average(
 
     If the window does not contain any values (e.g., all the values are missing,
     or the window does not contain any sampling), outputs missing values.
+
+    Basic usage:
+        ```python
+        >>> a_evset = tp.event_set(
+        ...     timestamps=[0, 1, 2, 5, 6, 7],
+        ...     features={"value": [np.nan, 1, 5, 10, 15, 20]},
+        ... )
+        >>> a = a_evset.node()
+
+        >>> result = tp.simple_moving_average(a, tp.duration.seconds(4))
+        >>> result.evaluate({a: a_evset})
+        indexes: ...
+            (6 events):
+                timestamps: [0. 1. 2. 5. 6. 7.]
+                'value': [ nan 1.  3. 7.5  12.5  15. ]
+        ...
+
+        ```
+
+    See [`tp.moving_count()`](../moving_count) for examples of moving window
+    operations with external sampling and indices.
 
     Args:
         input: Features to average.

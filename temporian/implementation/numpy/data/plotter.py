@@ -67,6 +67,28 @@ def plot(
 ):
     """Plots [`EventSets`][temporian.EventSet].
 
+    This method can also be called from
+    [`EventSet.plot()`][temporian.EventSet.plot] with the same args (except
+    `evsets`).
+
+    Examples:
+        ```python
+        >>> evset = tp.event_set(timestamps=[1, 2, 4],
+        ...     features={"f1": [0, 42, 10], "f2": [10, -10, 20]})
+
+        # Default
+        >>> tp.plot(evset)
+
+        # Lines instead of markers, only f2, limit x-axis to t=2
+        >>> tp.plot(evset, style="line", features="f2", max_time=2)
+
+        # Access figure and axes
+        >>> fig = tp.plot(evset, return_fig=True)
+        >>> fig.tight_layout(pad=3.0)
+        >>> _ = fig.axes[0].set_ylim([-50, 50])
+
+        ```
+
     Args:
         evsets: Single or list of EventSets to plot.
         indexes: The index keys or list of indexes keys to plot. If indexes=None,

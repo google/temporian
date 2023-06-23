@@ -77,15 +77,26 @@ def lag(input: Node, duration: Duration) -> Node:
 
     In other words, shifts the timestamp values forwards in time.
 
-    Example:
-        Input
-            timestamps: [1, 5, 10]
-            duration: 2
-        Output
-            timestamps: [3, 8, 13]
+    Usage example:
+        ```python
+        >>> a_evset = tp.event_set(
+        ...     timestamps=[0, 1, 5, 6],
+        ...     features={"value": [0, 1, 5, 6]},
+        ... )
+        >>> a = a_evset.node()
+
+        >>> result = tp.lag(a, tp.duration.seconds(2))
+        >>> result.evaluate({a: a_evset})
+        indexes: ...
+            (4 events):
+                timestamps: [2. 3. 7. 8.]
+                'value': [0 1 5 6]
+        ...
+
+        ```
 
     Args:
-        input: Node to lag.
+        input: node to lag.
         duration: Duration to lag by.
 
     Returns:

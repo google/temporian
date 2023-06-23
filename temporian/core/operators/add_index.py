@@ -137,25 +137,77 @@ def _normalize_indexes_to_set(
 
 
 def add_index(input: Node, indexes: Union[str, List[str]]) -> Node:
-    """Adds indexes to a Node.
+    """Adds indexes to a [`Node`][temporian.Node].
 
-    Examples:
+    Usage example:
+        ```python
+        >>> a_evset = tp.event_set(
+        ...     timestamps=[1, 2, 1, 0, 1, 1],
+        ...     features={
+        ...         "f1": [1, 1, 1, 2, 2, 2],
+        ...         "f2": [1, 1, 2, 1, 1, 2],
+        ...         "f3": [1, 1, 1, 1, 1, 1]
+        ...     },
+        ... )
 
-        Given an input `Node` with indexes ['A', 'B', 'C'] and features
-        ['X', 'Y', 'Z']:
+        >>> # No index
+        >>> a_evset
+        indexes: []
+        features: [('f1', int64), ('f2', int64), ('f3', int64)]
+        events:
+            (6 events):
+                timestamps: [0. 1. 1. 1. 1. 2.]
+                'f1': [2 1 1 2 2 1]
+                'f2': [1 1 2 1 2 1]
+                'f3': [1 1 1 1 1 1]
+        ...
 
-        1. `add_index(input, indexes=['X', 'Y'])`
-           Output `Node` will have indexes ['A', 'B', 'C', 'X', 'Y'] and
-           features ['Z'].
+        >>> # Add only "f1" as index
+        >>> a = a_evset.node()
+        >>> result = tp.add_index(a, "f1")
+        >>> result.evaluate(a_evset)
+        indexes: [('f1', int64)]
+        features: [('f2', int64), ('f3', int64)]
+        events:
+            f1=2 (3 events):
+                timestamps: [0. 1. 1.]
+                'f2': [1 1 2]
+                'f3': [1 1 1]
+            f1=1 (3 events):
+                timestamps: [1. 1. 2.]
+                'f2': [1 2 1]
+                'f3': [1 1 1]
+        ...
+
+        >>> # Add "f1" and "f2" as indices
+        >>> result = tp.add_index(a, ["f1", "f2"])
+        >>> result.evaluate(a_evset)
+        indexes: [('f1', int64), ('f2', int64)]
+        features: [('f3', int64)]
+        events:
+            f1=2 f2=1 (2 events):
+                timestamps: [0. 1.]
+                'f3': [1 1]
+            f1=1 f2=1 (2 events):
+                timestamps: [1. 2.]
+                'f3': [1 1]
+            f1=1 f2=2 (1 events):
+                timestamps: [1.]
+                'f3': [1]
+            f1=2 f2=2 (1 events):
+                timestamps: [1.]
+                'f3': [1]
+        ...
+
+        ```
 
     Args:
-        input: Input `Node` object for which the indexes are to be set or
-            updated.
+        input: Node for which the indexes are to be set or updated.
         indexes: List of feature names (strings) that should be added to the
             indexes. These feature names should already exist in `input`.
 
     Returns:
-        New `Node` with the updated index.
+        New Node with the extended index.
 
     Raises:
         KeyError: If any of the specified `indexes` are not found in `input`.
@@ -166,28 +218,82 @@ def add_index(input: Node, indexes: Union[str, List[str]]) -> Node:
 
 
 def set_index(input: Node, indexes: Union[str, List[str]]) -> Node:
-    """Replaces the indexes in a Node.
+    """Replaces the index in a [`Node`][temporian.Node].
 
-    `set_index` is implemented as `drop_index` + `add_index`.
+    This function is implemented as [`tp.drop_index()`](../drop_index)
+    + [`tp.add_index()`](../add_index).
 
-    Examples:
+    Usage example:
+        ```python
+        >>> a_evset = tp.event_set(
+        ...     timestamps=[1, 2, 1, 0, 1, 1],
+        ...     features={
+        ...         "f1": [1, 1, 1, 2, 2, 2],
+        ...         "f2": [1, 1, 2, 1, 1, 2],
+        ...         "f3": [1, 1, 1, 1, 1, 1]
+        ...     },
+        ...     indexes=["f1"],
+        ... )
+        >>> a = a_evset.node()
 
-        Given an input `Node` with indexes ['A', 'B', 'C'] and features
-        ['X', 'Y', 'Z']:
+        >>> # "f1" is the current index
+        >>> a_evset
+        indexes: [('f1', int64)]
+        features: [('f2', int64), ('f3', int64)]
+        events:
+            f1=2 (3 events):
+                timestamps: [0. 1. 1.]
+                'f2': [1 1 2]
+                'f3': [1 1 1]
+            f1=1 (3 events):
+                timestamps: [1. 1. 2.]
+                'f2': [1 2 1]
+                'f3': [1 1 1]
+        ...
 
-        1. `set_index(input, indexes=['X'])`
-           Output `Node` will have indexes ['X'] and features
-           ['A', 'B', 'C', 'Y', 'Z'].
+        >>> # Set "f2" as the only index, remove "f1"
+        >>> result = tp.set_index(a, "f2")
+        >>> result.evaluate(a_evset)
+        indexes: [('f2', int64)]
+        features: [('f3', int64), ('f1', int64)]
+        events:
+            f2=1 (4 events):
+                timestamps: [0. 1. 1. 2.]
+                'f3': [1 1 1 1]
+                'f1': [2 2 1 1]
+            f2=2 (2 events):
+                timestamps: [1. 1.]
+                'f3': [1 1]
+                'f1': [2 1]
+        ...
 
-        2. `set_index(input, indexes=['X', 'Y'])`
-           Output `Node` will have indexes ['X', 'Y'] and features
-           ['A', 'B', 'C', 'Z'].
+        >>> # Set both "f1" and "f2" as indices
+        >>> result = tp.set_index(a, ["f1", "f2"])
+        >>> result.evaluate(a_evset)
+        indexes: [('f1', int64), ('f2', int64)]
+        features: [('f3', int64)]
+        events:
+            f1=2 f2=1 (2 events):
+                timestamps: [0. 1.]
+                'f3': [1 1]
+            f1=2 f2=2 (1 events):
+                timestamps: [1.]
+                'f3': [1]
+            f1=1 f2=1 (2 events):
+                timestamps: [1. 2.]
+                'f3': [1 1]
+            f1=1 f2=2 (1 events):
+                timestamps: [1.]
+                'f3': [1]
+        ...
+
+        ```
 
     Args:
-        input: Input `Node` object for which the indexes are to be set.
+        input: Node for which the indexes are to be set.
         indexes: List of index / feature names (strings) used as
-            the new indexes. These feature names should be either indexes or
-            features in `input`.
+            the new indexes. These names should be either indexes or features in
+            `input`.
 
     Returns:
         New `Node` with the updated indexes.

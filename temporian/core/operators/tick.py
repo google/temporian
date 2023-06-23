@@ -83,6 +83,32 @@ operator_lib.register_operator(Tick)
 def tick(input: Node, interval: Duration, align: bool = True) -> Node:
     """Generates timestamps at regular intervals in the range of a guide.
 
+    Example with align:
+        ```python
+        >>> a_evset = tp.event_set(timestamps=[5, 9, 16])
+        >>> a = a_evset.node()
+
+        >>> result = tp.tick(a, interval=tp.duration.seconds(3), align=True)
+        >>> result.evaluate({a: a_evset})
+        indexes: ...
+                timestamps: [ 6. 9. 12. 15.]
+        ...
+
+        ```
+
+    Example without align:
+        ```python
+        >>> a_evset = tp.event_set(timestamps=[5, 9, 16])
+        >>> a = a_evset.node()
+
+        >>> result = tp.tick(a, interval=tp.duration.seconds(3), align=False)
+        >>> result.evaluate({a: a_evset})
+        indexes: ...
+                timestamps: [ 5. 8. 11. 14.]
+        ...
+
+        ```
+
     Args:
         input: Guide node. The start and end time boundaries to generate the new
             timestamps are defined by the range of timestamps in `input`.
@@ -90,24 +116,6 @@ def tick(input: Node, interval: Duration, align: bool = True) -> Node:
         align: If false, the first tick is generated at the first timestamp
             (similar to [`tp.begin()`][temporian.begin]). If true (default),
             ticks are generated on timestamps that are multiple of `interval`.
-
-    Example #1:
-        Input
-            events: [1, 5.5, 5.6, 8.6]
-        Argument
-            interval: 4
-            align: false
-        Output
-            timestamp: 1, 5
-
-    Example #2:
-        Input
-            events: [1, 5.5, 5.6, 8.6]
-        Argument
-            interval: 4
-            align: true
-        Output
-            timestamp: 4, 8
 
     Returns:
         A feature-less node with regular timestamps.

@@ -226,7 +226,7 @@ class IndexData:
             features.
         timestamps: One-dimensional NumPy array representing the timestamps.
 
-    Example usage:
+    Usage example:
         ```
         >>> features = [np.array([1, 2, 3]), np.array([4, 5, 6])]
         >>> timestamps = np.array([0, 1, 2])
@@ -386,18 +386,17 @@ class EventSet:
         node is returned.
 
         Usage example:
+            ```python
+            >>> my_evset = tp.event_set(
+            ...     timestamps=[1, 2, 3, 4],
+            ...     features={
+            ...         "feature_1": [0.5, 0.6, np.nan, 0.9],
+            ...         "feature_2": ["red", "blue", "red", "blue"],
+            ...     },
+            ... )
+            >>> my_node = my_evset.node()
 
-        ```python
-        >>> my_evset = tp.event_set(
-        ...     timestamps=[1, 2, 3, 4],
-        ...     features={
-        ...         "feature_1": [0.5, 0.6, np.nan, 0.9],
-        ...         "feature_2": ["red", "blue", "red", "blue"],
-        ...     },
-        ... )
-        >>> my_node = my_evset.node()
-
-        ```
+            ```
 
         Args:
             force_new_node: If false (default), return the same node each time

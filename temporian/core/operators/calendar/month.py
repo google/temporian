@@ -39,12 +39,28 @@ operator_lib.register_operator(CalendarMonthOperator)
 def calendar_month(sampling: Node) -> Node:
     """Obtains the month the timestamps in a node's sampling are in.
 
-    Features in the input node are ignored, only the timestamps in
-    `Node.sampling` are used and they must be unix timestamps
-    (check  `Node.sampling.is_unix_timestamp`).
+    Features in the input node are ignored, only the timestamps are used and
+    they must be unix timestamps (`is_unix_timestamp=True`).
 
     Output feature contains numbers between
     1 and 12.
+
+    Usage example:
+        ```python
+        >>> evset = tp.event_set(
+        ...    timestamps=["2023-02-04", "2023-02-20", "2023-03-01", "2023-05-07"],
+        ...    name='special_events'
+        ... )
+        >>> tp.calendar_month(evset.node()).evaluate(evset)
+        indexes: ...
+        features: [('calendar_month', int32)]
+        events:
+            (4 events):
+                timestamps: [...]
+                'calendar_month': [2 2 3 5]
+        ...
+
+        ```
 
     Args:
         sampling: Node with unix timestamp sampling.

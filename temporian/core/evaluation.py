@@ -47,9 +47,57 @@ def evaluate(
     """Evaluates [`Nodes`][temporian.Node] on [`EventSets`][temporian.EventSet].
 
     Performs all computation defined by the graph between the `query` Nodes and
-    the `input` EventSet.
+    the `input` EventSets.
 
     The result is returned in the same format as the `query` argument.
+
+    Single input output example:
+        ```python
+        >>> input_evset = tp.event_set(timestamps=[1, 2, 3], features={"f": [0, 4, 10]})
+        >>> input_node = input_evset.node()
+        >>> output_node = tp.moving_sum(input_node, 5)
+        >>> output_evset = tp.evaluate(output_node, input_evset)
+
+        >>> # Equivalent
+        >>> output_evset = output_node.evaluate(input_evset)
+
+        >>> # Also equivalent
+        >>> output_evset = tp.evaluate(output_node, {input_node: input_evset})
+
+        ```
+
+    Multiple inputs and outputs example:
+        ```python
+        >>> evset_1 = tp.event_set(timestamps=[1, 2, 3], features={"f1": [0.1, 42, 10]})
+        >>> evset_2 = tp.event_set(timestamps=[1, 2, 3],
+        ...     features={"f2": [-1.5, 50, 30]},
+        ...     same_sampling_as=evset_1
+        ... )
+
+        >>> # Graph with 2 inputs and 2 steps
+        >>> input_1 = evset_1.node()
+        >>> input_2 = evset_2.node()
+        >>> step_1 = input_1 + input_2
+        >>> step_2 = tp.simple_moving_average(step_1, 2)
+
+        >>> # Get step_1 and step_2 at once
+        >>> evset_step_1, evset_step_2 = tp.evaluate([step_1, step_2],
+        ...     {input_1: evset_1, input_2: evset_2}
+        ... )
+
+        >>> # Equivalent
+        evset_step_1, evset_step_2 = tp.evaluate(
+        ...     [step_1, step_2],
+        ...     [evset_1, evset_2],
+        ... )
+
+        >>> # Also equivalent. EventSets are mapped by their .node(), not by position.
+        >>> evset_step_1, evset_step_2 = tp.evaluate(
+        ...     [step_1, step_2],
+        ...     [evset_2, evset_1],
+        ... )
+
+        ```
 
     Args:
         query: Nodes to compute. Supports Node, dict of Nodes and list of Nodes.

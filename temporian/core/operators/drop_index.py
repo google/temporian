@@ -157,22 +157,68 @@ def drop_index(
     indexes: Optional[Union[str, List[str]]] = None,
     keep: bool = True,
 ) -> Node:
-    """Removes indexes from a Node.
+    """Removes indexes from a [`Node`][temporian.Node].
 
-    Examples:
-        Given an input `Node` with indexes ['A', 'B', 'C'] and features
-        ['X', 'Y', 'Z']:
+    Usage example:
+        ```python
+        >>> a_evset = tp.event_set(
+        ...     timestamps=[1, 2, 1, 0, 1, 1],
+        ...     features={
+        ...         "f1": [1, 1, 1, 2, 2, 2],
+        ...         "f2": [1, 1, 2, 1, 1, 2],
+        ...         "f3": [1, 1, 1, 1, 1, 1]
+        ...     },
+        ...     indexes=["f1", "f2"]
+        ... )
+        >>> a = a_evset.node()
 
-        1. `drop_index(input, indexes='A', keep=True)`
-           Output `Node` will have indexes ['B', 'C'] and features
-           ['X', 'Y', 'Z', 'A'].
+        >>> # Both f1 and f2 are indices
+        >>> a_evset
+        indexes: [('f1', int64), ('f2', int64)]
+        features: [('f3', int64)]
+        events:
+            f1=2 f2=1 (2 events):
+                timestamps: [0. 1.]
+                'f3': [1 1]
+            f1=1 f2=1 (2 events):
+                timestamps: [1. 2.]
+                'f3': [1 1]
+            f1=1 f2=2 (1 events):
+                timestamps: [1.]
+                'f3': [1]
+            f1=2 f2=2 (1 events):
+                timestamps: [1.]
+                'f3': [1]
+        ...
 
-        2. `drop_index(input, indexes=['A', 'B'], keep=False)`
-           Output `Node` will have indexes ['C'] and features ['X', 'Y', 'Z'].
+        >>> # Drop "f2", remove it from features
+        >>> result = tp.drop_index(a, "f2", keep=False)
+        >>> result.evaluate({a: a_evset})
+        indexes: [('f1', int64)]
+        features: [('f3', int64)]
+        events:
+            f1=2 (3 events):
+                timestamps: [0. 1. 1.]
+                'f3': [1 1 1]
+            f1=1 (3 events):
+                timestamps: [1. 1. 2.]
+                'f3': [1 1 1]
+        ...
 
-        3. `drop_index(input, indexes=None, keep=True)`
-           Output `Node` will have indexes [] (empty index) and features
-           ['X', 'Y', 'Z', 'A', 'B', 'C'].
+        >>> # Drop both indices, keep them as features
+        >>> result = tp.drop_index(a, ["f2", "f1"])
+        >>> result.evaluate({a: a_evset})
+        indexes: []
+        features: [('f3', int64), ('f2', int64), ('f1', int64)]
+        events:
+            (6 events):
+                timestamps: [0. 1. 1. 1. 1. 2.]
+                'f3': [1 1 1 1 1 1]
+                'f2': [2 2 1 1 2 1]
+                'f1': [1 1 1 2 2 1]
+        ...
+
+        ```
 
     Args:
         input: Node from which the specified indexes should be removed.
@@ -184,9 +230,8 @@ def drop_index(
             as features in the output `Node`. Defaults to `True`.
 
     Returns:
-        A new `Node` object with the updated index, where the specified index
-        column(s) have been removed. If `keep` is set to `True`, the removed
-        indexes will be included as features in the output `Node`.
+        New `Node` with the specified indexes removed. If `keep` is set to
+        `True`, the removed indexes will be included as features in it.
 
     Raises:
         ValueError: If an empty list is provided as the `index_names` argument.

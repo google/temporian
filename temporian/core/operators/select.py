@@ -95,6 +95,44 @@ def select(
         feature_names: Name or list of names of the features to select from the
             input.
 
+    Usage example:
+        ```python
+        >>> a_evset = tp.event_set(
+        ...     timestamps=[1, 2],
+        ...     features={"A": [1, 2], "B": ['s', 'm'], "C": [5.0, 5.5]},
+        ... )
+        >>> a = a_evset.node()
+
+        >>> # Select single feature
+        >>> b = a['B']
+        >>> # Equivalent
+        >>> b = tp.select(a, 'B')
+        >>> b.evaluate({a: a_evset})
+        indexes: []
+        features: [('B', str_)]
+        events:
+            (2 events):
+                timestamps: [1. 2.]
+                'B': ['s' 'm']
+        ...
+
+        >>> # Select multiple features
+        >>> b = a[['B', 'C']]
+        >>> # Equivalent
+        >>> b = tp.select(a, ['B', 'C'])
+        >>> b.evaluate({a: a_evset})
+        indexes: []
+        features: [('B', str_), ('C', float64)]
+        events:
+            (2 events):
+                timestamps: [1. 2.]
+                'B': ['s' 'm']
+                'C': [5.  5.5]
+        ...
+
+        ```
+
+
     Returns:
         Node containing only the selected features.
     """
