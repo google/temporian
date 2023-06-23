@@ -19,9 +19,17 @@ from typing import Union
 
 
 Duration = Union[float, int]
-"""A duration in seconds.
+"""A duration in seconds, stored as a float64.
 
-Mostly useful as input to some operator's arguments."""
+In Temporian, timestamps and durations are float64 values, and it is up to the
+user to choose the semantic of this value.
+
+However, some functions are datetime-related (such as the functions defined in
+this module, calendar operators, plotting functions, and more) and assume that
+durations are expressed in seconds (see
+[Time units](https://temporian.readthedocs.io/en/latest/user_guide/#time-units)),
+so it is recommended to use seconds as timestamps where possible.
+"""
 
 
 def milliseconds(value: Union[int, float]) -> Duration:
