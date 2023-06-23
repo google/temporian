@@ -13,17 +13,18 @@
 # limitations under the License.
 
 
-from temporian.core.operators.window.moving_sum import moving_sum
 from absl.testing import absltest
+
 from temporian.implementation.numpy.data.io import event_set
 from temporian.beam.test.utils import check_beam_implementation
 from temporian.core.operators.select import select
 
 
-class IOTest(absltest.TestCase):
-    def test_run(self):
-        # Create input data
-        input_data = event_set(
+class SelectTest(absltest.TestCase):
+    def build_input(self, index_features=None):
+        if index_features is None:
+            index_features = ["a", "b"]
+        return event_set(
             timestamps=[1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
             features={
                 "a": ["x", "x", "x", "x", "x", "y", "y", "y", "y", "y"],
@@ -32,16 +33,29 @@ class IOTest(absltest.TestCase):
                 "d": [100, 101, 102, 103, 104, 105, 106, 106, 107, 108],
                 "e": [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10],
             },
-            index_features=["a", "b"],
+            index_features=index_features,
         )
 
-        # Define computation
-        output_node = select(moving_sum(input_data.node(), 3), "d")
+    def test_one(self):
+        input_data = self.build_input()
+        output_node = select(input_data.node(), "c")
 
         check_beam_implementation(
-            self,
-            input_data=input_data,
-            output_node=output_node,
+            self, input_data=input_data, output_node=output_node
+        )
+
+    def test_multiple(self):
+        input_data = self.build_input()
+        output_node = select(input_data.node(), ["c", "d"])
+        check_beam_implementation(
+            self, input_data=input_data, output_node=output_node
+        )
+
+    def test_no_index(self):
+        input_data = self.build_input(index_features=[])
+        output_node = select(input_data.node(), "c")
+        check_beam_implementation(
+            self, input_data=input_data, output_node=output_node
         )
 
 

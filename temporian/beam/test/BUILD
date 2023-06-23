@@ -25,16 +25,11 @@ py_test(
     srcs=["evaluation_test.py"],
     srcs_version="PY3",
     deps=[
-        "//temporian/beam:io",
-        "//temporian/beam:evaluation",
-        "//temporian/core/data:node",
-        "//temporian/core/data/dtypes:dtype",
         "//temporian/implementation/numpy/data:io",
-        "//temporian/io:csv",
-        "//temporian/implementation/numpy/operators/test:test_util",
-        ":utils",
+        "//temporian/beam/test:utils",
+        "//temporian/core/operators:select",
+        "//temporian/core/operators/window:moving_sum",
     ],
-    data=["//temporian/test/test_data"],
 )
 
 # Libraries
@@ -44,5 +39,12 @@ py_library(
     name="utils",
     srcs=["utils.py"],
     srcs_version="PY3",
-    deps=[],
+    deps=[
+        "//temporian/beam:io",
+        "//temporian/beam:evaluation",
+        "//temporian/io:csv",
+        "//temporian/core/data:node",
+        "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy/operators/test:test_util",
+    ],
 )

@@ -12,17 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from absl.testing import absltest
 import os
+import tempfile
+
+from absl.testing import absltest
 from absl import flags
 import temporian as tp
 
+import temporian.beam as tpb
 from apache_beam.testing.test_pipeline import TestPipeline
 from apache_beam.testing.util import assert_that
 from apache_beam.testing.util import equal_to
-import apache_beam as beam
-import temporian.beam as tp_beam
-import tempfile
 
 
 def test_data() -> str:
@@ -30,38 +30,32 @@ def test_data() -> str:
 
 
 class TFPTest(absltest.TestCase):
-    def test_base(self):
+    def test_run(self):
         tmp_dir = tempfile.gettempdir()
         input_path = os.path.join(tmp_dir, "input.csv")
         output_path = os.path.join(tmp_dir, "output.csv")
 
-        # Create a dataset
+        # Create a toy dataset and save it in a csv file.
         input_data = tp.event_set(
-            timestamps=[1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
+            timestamps=[1, 2, 13, 14, 15],
             features={
-                "a": [2, 3, 4, 3, 2, 22, 23, 24, 23, 22],
-                "b": ["x", "x", "x", "x", "x", "y", "y", "y", "y", "y"],
-                "c": ["X", "Y", "Y", "X", "Z", "Z", "Z", "X", "Y", "X"],
-                "d": [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10],
-                "e": [1, 1, 1, 2, 2, 1, 1, 1, 1, 1],
+                "a": ["x", "y", "z", "x", "y"],
+                "b": [1, 2, 3, 2, 1],
             },
-            index_features=["b"],
         )
         tp.to_csv(input_data, path=input_path)
 
-        # Define some computation
-        input_node = input_data.node()
-        # TODO: Do some computation.
-        output_node = input_node
+        # Create a graph.
+        input_node = tp.input_node([("a", tp.str_), ("b", tp.float32)])
+        output_node = tp.moving_sum(input_node["b"], 4)
 
-        # Execute computation in Beam and save the result in a csv file.
+        # Execute the graph in Beam and export the result in a csv file.
         with TestPipeline() as p:
             output = (
                 p
-                | tp_beam.read_csv(input_path, input_node.schema)
-                # TODO: Do some computation.
-                # | tp_beam.run(inputs=input_node, outputs=output_node)
-                | tp_beam.write_csv(
+                | tpb.read_csv(input_path, input_node.schema)
+                | tpb.run(input=input_node, output=output_node)
+                | tpb.write_csv(
                     output_path, output_node.schema, shard_name_template=""
                 )
             )
@@ -69,6 +63,60 @@ class TFPTest(absltest.TestCase):
 
         with open(output_path, "r", encoding="utf-8") as f:
             print("Results:\n" + f.read(), flush=True)
+
+    def test_run_multi_io(self):
+        tmp_dir = tempfile.gettempdir()
+        input_path_1 = os.path.join(tmp_dir, "input_1.csv")
+        input_path_2 = os.path.join(tmp_dir, "input_2.csv")
+        output_path_1 = os.path.join(tmp_dir, "output_1.csv")
+        output_path_2 = os.path.join(tmp_dir, "output_2.csv")
+
+        # Create a toy dataset and save it in a csv file.
+        input_data_1 = tp.event_set(
+            timestamps=[1, 2, 13, 14, 15],
+            features={"a": [1, 2, 3, 2, 1]},
+        )
+        tp.to_csv(input_data_1, path=input_path_1)
+
+        input_data_2 = tp.event_set(
+            timestamps=[2, 3, 8],
+            features={"b": [1, 2, 3]},
+        )
+        tp.to_csv(input_data_2, path=input_path_2)
+
+        # Create a graph.
+        #
+        # TODO: Update example with a multiple IO op when at least one
+        # multi-IO op is implemented.
+        input_node_1 = tp.input_node([("a", tp.float32)])
+        input_node_2 = tp.input_node([("b", tp.float32)])
+        output_node_1 = tp.moving_sum(input_node_1, 4)
+        output_node_2 = tp.moving_sum(input_node_2, 4)
+
+        # Execute the graph in Beam and export the result in a csv file.
+        with TestPipeline() as p:
+            input_beam_1 = p | tpb.read_csv(input_path_1, input_node_1.schema)
+            input_beam_2 = p | tpb.read_csv(input_path_2, input_node_2.schema)
+
+            outputs = tpb.run_multi_io(
+                inputs={
+                    input_node_1: input_beam_1,
+                    input_node_2: input_beam_2,
+                },
+                outputs=[output_node_1, output_node_2],
+            )
+            outputs[output_node_1] | tpb.write_csv(
+                output_path_1, output_node_1.schema, shard_name_template=""
+            )
+            outputs[output_node_2] | tpb.write_csv(
+                output_path_2, output_node_2.schema, shard_name_template=""
+            )
+
+        with open(output_path_1, "r", encoding="utf-8") as f:
+            print("Output 1:\n" + f.read(), flush=True)
+
+        with open(output_path_2, "r", encoding="utf-8") as f:
+            print("Output 2:\n" + f.read(), flush=True)
 
 
 if __name__ == "__main__":

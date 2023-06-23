@@ -12,19 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from absl.testing import absltest
 import os
+import tempfile
+
+from absl.testing import absltest
 from absl import flags
 from apache_beam.testing.test_pipeline import TestPipeline
 from apache_beam.testing.util import assert_that
 from apache_beam.testing.util import equal_to
 from temporian.beam.io import read_csv_raw, read_csv, write_csv
-from temporian.core.data.node import Schema
-from temporian.core.data.dtypes import dtype
 from temporian.implementation.numpy.data.io import event_set
-import tempfile
 from temporian.io.csv import to_csv
-import apache_beam as beam
 
 
 def test_data() -> str:

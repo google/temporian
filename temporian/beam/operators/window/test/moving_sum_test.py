@@ -17,11 +17,10 @@ from temporian.core.operators.window.moving_sum import moving_sum
 from absl.testing import absltest
 from temporian.implementation.numpy.data.io import event_set
 from temporian.beam.test.utils import check_beam_implementation
-from temporian.core.operators.select import select
 
 
 class IOTest(absltest.TestCase):
-    def test_run(self):
+    def test_base(self):
         # Create input data
         input_data = event_set(
             timestamps=[1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
@@ -36,7 +35,7 @@ class IOTest(absltest.TestCase):
         )
 
         # Define computation
-        output_node = select(moving_sum(input_data.node(), 3), "d")
+        output_node = moving_sum(input_data.node(), 3)
 
         check_beam_implementation(
             self,

@@ -58,23 +58,25 @@ def _parse_csv_file(
 
 @beam.ptransform_fn
 def read_csv_raw(pipe, file_pattern: str) -> beam.PCollection[Dict[str, str]]:
-    """Reads a csv file or set of files into a PCollection of key->values.
+    """Reads a file or set of csv files into a PCollection of key->values.
 
-    This is the same format as the official beam IO connectors:
+    This format is similar to output of the official beam IO connectors:
     https://beam.apache.org/documentation/io/connectors/
 
-    Note: The values are always strings. Use `convert_to_tp_event_set` (or
-    better, use `read_csv` instead of `read_csv_raw`) to convert values to the
-    expected pipeline dtype.
+    CSV values are always string, so the output of `read_csv_raw` is always
+    a dictionary of string to string. Use `to_event_set` (or better, use
+    `read_csv` instead of `read_csv_raw`) to cast values to the expected
+    pipeline input dtype.
 
     Args:
-        pipe: Beam pipe.
+        pipe: A begin Beam pipe.
         file_pattern: Path or path matching expression compatible with
-            MatchFiles.
+            `MatchFiles`.
 
     Returns:
         A PCollection of dictionary of key:value.
     """
+
     return (
         pipe
         | "List files" >> MatchFiles(file_pattern)
@@ -133,25 +135,28 @@ class _MergeTimestampsDP(beam.DoFn):
 
 
 @beam.ptransform_fn
-def convert_to_tp_event_set(
-    pipe: beam.PCollection[Dict[str, str]],
+def to_event_set(
+    pipe: beam.PCollection[Dict[str, Any]],
     schema: Schema,
     timestamp_key: str = "timestamp",
 ) -> beam.PCollection[BeamEventSet]:
     """Converts a PCollection of key:value to a Beam event-set.
 
-    Use this method when importing data using the beam i/o connectors.
+    This method is compatible with the output of `read_csv_raw` and the
+    Official Beam IO connectors.
 
-    If importing data from csv files, you can use `read_csv` instead.
+    When importing data from csv files, use `read_csv` to convert csv files
+    directly into event sets.
 
-    Note: Timestamps have to be numerical values.
-    TODO: Support datetime timestamps.
+    Unlike Temporian in-process event set import method (`tp.event_set`), this
+    method (`tpb.to_event_set`) requires for timestamps to be numerical values.
+    TODO: Add support for datetime timestamps.
 
     Args:
-        pipe: Beam pipe.
-        schema: Schema of the data. If you have a Temporian node, the schema is
+        pipe: Beam pipe of key values.
+        schema: Schema of the data. Note: The schema of a Temporian node is
             available with `node.schema`.
-        timestamp_key: key containing the timestamps.
+        timestamp_key: Key containing the timestamps.
 
     Returns:
         PCollection of Beam event set.
@@ -172,26 +177,25 @@ def convert_to_tp_event_set(
 def read_csv(
     pipe, file_pattern: str, schema: Schema, timestamp_key: str = "timestamp"
 ) -> beam.PCollection[BeamEventSet]:
-    """Reads a csv file or set of files into a Beam event set.
+    """Reads a file or set of csv files into a Beam event set.
 
-    Note: Timestamps have to be numerical values.
-    TODO: Support datetime timestamps.
+    Limitation: Timestamps have to be numerical values. See documentation of
+    `to_event_set` for more details.
 
     Usage example:
 
     ```
     input_node: tp.Node = ...
-    p | tp_beam.read_csv("/tmp/path.csv", input_node.schema) | ...
-
+    p | tpb.read_csv("/tmp/path.csv", input_node.schema) | ...
     ```
 
     Args:
-        pipe: Beam pipe.
+        pipe: Begin Beam pipe.
         file_pattern: Path or path matching expression compatible with
-            MatchFiles.
+            `MatchFiles`.
         schema: Schema of the data. If you have a Temporian node, the schema is
             available with `node.schema`.
-        timestamp_key: key containing the timestamps.
+        timestamp_key: Key containing the timestamps.
 
     Returns:
         A PCollection of dictionary of key:value.
@@ -199,8 +203,7 @@ def read_csv(
     return (
         pipe
         | "Read csv" >> read_csv_raw(file_pattern)
-        | "Convert to Event Set"
-        >> convert_to_tp_event_set(schema, timestamp_key)
+        | "Convert to Event Set" >> to_event_set(schema, timestamp_key)
     )
 
 
@@ -239,9 +242,9 @@ def write_csv(
     timestamp_key: str = "timestamp",
     **wargs,
 ):
-    """Writes a Beam event set to a csv file or set of files.
+    """Writes a Beam event set to a file or set of csv files.
 
-    Note: Timestamps are exported as numerical values.
+    Limitation: Timestamps are always stored as numerical values.
     TODO: Support datetime timestamps.
 
     Usage example:
@@ -249,19 +252,19 @@ def write_csv(
     ```
     input_node: tp.Node = ...
     ( p
-      | tp_beam.read_csv("/input.csv", input_node.schema)
+      | tpb.read_csv("/input.csv", input_node.schema)
       | ... # processing
-      | tp_beam.write_csv("/output.csv", output_node.schema)
+      | tpb.write_csv("/output.csv", output_node.schema)
     )
     ```
 
     Args:
-        pipe: Beam pipe.
+        pipe: Beam pipe containing an event set.
         file_path_prefix: Path or path matching expression compatible with
             WriteToText.
         schema: Schema of the data. If you have a Temporian node, the schema is
             available with `node.schema`.
-        timestamp_key: key containing the timestamps.
+        timestamp_key: Key containing the timestamps.
         **wargs: Arguments passed to `beam.io.textio.WriteToText`.
     """
 

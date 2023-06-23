@@ -27,7 +27,12 @@ def assertEqualEventSet(self, real: EventSet, expected: EventSet):
     self.assertEqual(
         real,
         expected,
-        f"\nREAL:\n{real}\nEXPECTED:\n{expected}",
+        (
+            "\n==========\nREAL:\n==========\n"
+            f"{real}"
+            "\n==========\nEXPECTED:\n==========\n"
+            f"{expected}"
+        ),
     )
 
 
