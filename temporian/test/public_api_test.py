@@ -16,6 +16,7 @@ from absl.testing import absltest
 from pathlib import Path
 
 import temporian as tp
+from temporian.core.operator_lib import registered_operators
 
 PUBLIC_API_SYMBOLS = {
     "EventSet",
