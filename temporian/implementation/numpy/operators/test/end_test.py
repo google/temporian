@@ -33,14 +33,14 @@ class EndOperatorTest(absltest.TestCase):
                 "a": [5, 6, 7, 8],
                 "b": ["A", "A", "B", "B"],
             },
-            index_features=["b"],
+            indexes=["b"],
         )
         node = evset.node()
 
         expected_output = event_set(
             timestamps=[2, 4],
             features={"b": ["A", "B"]},
-            index_features=["b"],
+            indexes=["b"],
         )
 
         # Run op

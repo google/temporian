@@ -20,20 +20,19 @@ class AddIndexNumpyImplementation(OperatorImplementation):
         # Idx of input features added to index.
         src_feature_names = input.schema.feature_names()
         new_index_idxs = [
-            src_feature_names.index(f_name)
-            for f_name in self.operator.index_to_add
+            src_feature_names.index(f_name) for f_name in self.operator.indexes
         ]
 
         # Idx of input features not added to index.
         kept_feature_idxs = [
             idx
             for idx, f_name in enumerate(src_feature_names)
-            if f_name not in self.operator.index_to_add
+            if f_name not in self.operator.indexes
         ]
 
         dst_data = {}
         for src_index, src_data in input.data.items():
-            # Maps, for each new index value, the indices of the events in
+            # Maps, for each new index key, the indices of the events in
             # src_data.
             #
             # TODO: Do more efficiently. E.g. with numpy masks.
@@ -47,7 +46,7 @@ class AddIndexNumpyImplementation(OperatorImplementation):
                 new_index_to_value_idxs[new_index].append(event_idx)
 
             for new_index, example_idxs in new_index_to_value_idxs.items():
-                # Note: The new index is added after the existing index items.
+                # Note: The new indexes added after the existing ones.
                 dst_index = src_index + new_index
                 assert isinstance(dst_index, tuple)
 

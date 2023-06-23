@@ -22,12 +22,12 @@ import sys
 
 import numpy as np
 
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node, create_node_with_new_reference
 from temporian.core.data.schema import Schema
 from temporian.utils import string
 
-# Maximum of printed index when calling repr(evset)
+# Maximum of printed index groups when calling repr(evset)
 MAX_NUM_PRINTED_INDEX = 5
 
 # Maximum of printed features when calling repr(evset)
@@ -45,7 +45,7 @@ _PYTHON_DTYPE_MAPPING = {
 # Remarks:
 #   - np.object_ is not automatically converted into DType.STRING.
 #   - Strings are always represented internally as np.str_ for features and str
-#     for index values.
+#     for index groups.
 _DTYPE_MAPPING = {
     np.float64: DType.FLOAT64,
     np.float32: DType.FLOAT32,
@@ -215,7 +215,7 @@ def normalize_timestamps(
 
 @dataclass
 class IndexData:
-    """Features and timestamps data for a single index item.
+    """Features and timestamps data for a single index group.
 
     Note: The `schema` constructor argument is only used for checking. If
     `schema=None`, no checking is done. Checking can be done manually with
@@ -325,8 +325,8 @@ class IndexData:
 class EventSet:
     """Actual temporal data.
 
-    Use [`tp.event_set()`][temporian.event_set] to create an event set manually,
-    or [`tp.from_pandas()`][temporian.from_pandas] to create an event set from a
+    Use [`tp.event_set()`][temporian.event_set] to create an EventSet manually,
+    or [`tp.from_pandas()`][temporian.from_pandas] to create an EventSet from a
     pandas DataFrame.
     """
 
@@ -359,10 +359,10 @@ class EventSet:
     def name(self, name: Optional[str]) -> None:
         self._name = name
 
-    def get_arbitrary_index_value(self) -> Optional[Tuple]:
-        """Gets an arbitrary index value.
+    def get_arbitrary_index_key(self) -> Optional[Tuple]:
+        """Gets an arbitrary index key.
 
-        If the event set is empty, return None.
+        If the EventSet is empty, return None.
         """
 
         if self._data:
@@ -370,9 +370,9 @@ class EventSet:
         return None
 
     def get_arbitrary_index_data(self) -> Optional[IndexData]:
-        """Gets an arbitrary index data.
+        """Gets data from an arbitrary index key.
 
-        If the event set is empty, return None.
+        If the EventSet is empty, return None.
         """
 
         if self._data:
@@ -380,7 +380,7 @@ class EventSet:
         return None
 
     def node(self, force_new_node: bool = False) -> Node:
-        """Creates a node able to consume the the event set.
+        """Creates a [`Node`][temporian.Node] able to consume the the EventSet.
 
         If called multiple times with `force_new_node=False` (default), the same
         node is returned.
@@ -403,7 +403,7 @@ class EventSet:
                 `node` is called. If true, a new node is created each time.
 
         Returns:
-            A node able to consume the content of the event set.
+            A Node able to consume the content of the EventSet.
         """
 
         if self._internal_node is not None and not force_new_node:
@@ -460,9 +460,20 @@ class EventSet:
         )
 
     def __getitem__(self, index: Tuple) -> IndexData:
+        if not isinstance(index, tuple):
+            raise TypeError(
+                "EventSet items can only be accessed by index keys (tuples of"
+                " values for each index in the EventSet). Use evset.node() to"
+                " select features and operate on it."
+            )
         return self.data[index]
 
     def __setitem__(self, index: Tuple, value: IndexData) -> None:
+        if not isinstance(index, tuple) or not isinstance(value, IndexData):
+            raise TypeError(
+                "EventSets are not intended to be modified externally. "
+                "Use evset.node() to operate on it."
+            )
         self.data[index] = value
 
     def __eq__(self, other) -> bool:
@@ -481,7 +492,7 @@ class EventSet:
         return True
 
     def plot(self, *args, **wargs) -> Any:
-        """Plots the event set. See [`tp.plot()`][temporian.plot] for details.
+        """Plots the EventSet. See [`tp.plot()`][temporian.plot] for details.
 
         Example usage:
 
@@ -507,7 +518,7 @@ class EventSet:
         return size
 
     def memory_usage(self) -> int:
-        """Gets the approximated memory usage of the event set in bytes.
+        """Gets the approximated memory usage of the EventSet in bytes.
 
         Takes into account garbage collector overhead.
         """

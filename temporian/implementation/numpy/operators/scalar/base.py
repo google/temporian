@@ -34,7 +34,7 @@ class BaseScalarNumpyImplementation(OperatorImplementation, ABC):
         """Performs the arithmetic operation corresponding to the subclass."""
 
     def __call__(self, input: EventSet) -> Dict[str, EventSet]:
-        """Applies the corresponding arithmetic operation between an event set
+        """Applies the corresponding arithmetic operation between an EventSet
         and a scalar.
 
         Args:

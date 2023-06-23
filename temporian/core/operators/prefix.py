@@ -75,7 +75,7 @@ def prefix(
     prefix: str,
     input: Node,
 ) -> Node:
-    """Adds a prefix to the names of the features in a node.
+    """Adds a prefix to the names of the features in a Node.
 
     Usage example:
         ```python

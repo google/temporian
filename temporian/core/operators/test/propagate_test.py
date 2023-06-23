@@ -15,7 +15,7 @@
 from absl.testing import absltest
 
 from temporian.core.data.node import input_node
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 from temporian.core.operators.propagate import propagate
 
 
@@ -55,7 +55,10 @@ class PropagateOperatorTest(absltest.TestCase):
         )
         with self.assertRaisesRegex(
             ValueError,
-            "The index of input should be contained in the index of sampling",
+            (
+                "The indexes of input should be contained in the indexes of"
+                " sampling"
+            ),
         ):
             _ = propagate(input=node, sampling=sampling)
 

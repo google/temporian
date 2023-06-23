@@ -12,12 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Utility functions to compute Durations from other units of time.
-
-Timestamps and durations are expressed with a double (noted float) in python."""
 from typing import Union
 
-from temporian.core.data.duration_utils import NormalizedDuration, Duration
+# NOTE: this module is shown in the docs and so will any symbol in this file
+# with a docstring and a non-private name.
+
+
+Duration = Union[float, int]
+"""A duration in seconds.
+
+Mostly useful as input to some operator's arguments."""
 
 
 def milliseconds(value: Union[int, float]) -> Duration:
@@ -49,7 +53,7 @@ def milliseconds(value: Union[int, float]) -> Duration:
     Returns:
         Equivalent number of seconds.
     """
-    return NormalizedDuration(value / 1000)
+    return float(value / 1000)
 
 
 def seconds(value: Union[int, float]) -> Duration:
@@ -92,7 +96,7 @@ def seconds(value: Union[int, float]) -> Duration:
     Returns:
         Same number of seconds.
     """
-    return NormalizedDuration(value)
+    return float(value)
 
 
 def minutes(value: Union[int, float]) -> Duration:
@@ -122,7 +126,7 @@ def minutes(value: Union[int, float]) -> Duration:
     Returns:
         Equivalent number of seconds.
     """
-    return NormalizedDuration(value * 60)
+    return float(value * 60)
 
 
 def hours(value: Union[int, float]) -> Duration:
@@ -152,7 +156,7 @@ def hours(value: Union[int, float]) -> Duration:
     Returns:
         Equivalent number of seconds.
     """
-    return NormalizedDuration(value * 60 * 60)
+    return float(value * 60 * 60)
 
 
 def days(value: Union[int, float]) -> Duration:
@@ -182,7 +186,7 @@ def days(value: Union[int, float]) -> Duration:
     Returns:
         Equivalent number of seconds.
     """
-    return NormalizedDuration(value * 60 * 60 * 24)
+    return float(value * 60 * 60 * 24)
 
 
 def weeks(value: Union[int, float]) -> Duration:
@@ -211,4 +215,4 @@ def weeks(value: Union[int, float]) -> Duration:
     Returns:
         Equivalent number of seconds.
     """
-    return NormalizedDuration(value * 60 * 60 * 24 * 7)
+    return float(value * 60 * 60 * 24 * 7)

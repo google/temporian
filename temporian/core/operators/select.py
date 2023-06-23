@@ -38,7 +38,7 @@ class SelectOperator(Operator):
 
         for feature_name in feature_names:
             if feature_name not in input_feature_names:
-                raise ValueError(
+                raise IndexError(
                     f"Selected features {feature_name!r} is not part of the"
                     f" available features {input_feature_names!r}."
                 )
@@ -88,7 +88,7 @@ def select(
     input: Node,
     feature_names: Union[str, List[str]],
 ) -> Node:
-    """Selects a subset of features from a node.
+    """Selects a subset of features from a Node.
 
     Args:
         input: Node to select features from.
@@ -143,7 +143,7 @@ def select(
     elif isinstance(feature_names, str):
         feature_names = [feature_names]
     else:
-        raise ValueError(
+        raise TypeError(
             "Unexpected type for feature_names. Expect str or list of"
             f" str. Got '{feature_names}' instead."
         )

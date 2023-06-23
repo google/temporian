@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Utility for reading an event set from disk."""
+"""Utilities for reading and saving EventSets from/to disk."""
 
 from typing import List, Optional
 from temporian.implementation.numpy.data.event_set import EventSet
@@ -21,11 +21,11 @@ from temporian.io.pandas import from_pandas, to_pandas
 
 def from_csv(
     path: str,
-    timestamp_column: str,
-    index_names: Optional[List[str]] = None,
+    timestamps: str,
+    indexes: Optional[List[str]] = None,
     sep: str = ",",
 ) -> EventSet:
-    """Reads a [`tp.EventSet`](temporian.EventSet) from a file.
+    """Reads an [`EventSet`][temporian.EventSet] from a CSV file.
 
     Example:
         ```python
@@ -53,27 +53,23 @@ def from_csv(
 
     Args:
         path: Path to the file.
-        timestamp_column: Name of the column to be used as timestamps for the
-            event set.
-        index_names: Names of the columns to be used as index for the event set.
-            If None, a flat event set will be created.
+        timestamps: Name of the column to be used as timestamps for the
+            EventSet.
+        indexes: Names of the columns to be used as indexes for the EventSet.
+            If None, a flat EventSet will be created.
         sep: Separator to use.
-
 
     Returns:
         EventSet read from file.
-
     """
 
     import pandas as pd
 
-    if index_names is None:
-        index_names = []
+    if indexes is None:
+        indexes = []
 
     df = pd.read_csv(path, sep=sep)
-    return from_pandas(
-        df, index_names=index_names, timestamp_column=timestamp_column
-    )
+    return from_pandas(df, indexes=indexes, timestamps=timestamps)
 
 
 def to_csv(
@@ -83,7 +79,7 @@ def to_csv(
     na_rep: Optional[str] = None,
     columns: Optional[List[str]] = None,
 ):
-    """Saves an [`EventSet`](temporian.EventSet) to a file.
+    """Saves an [`EventSet`][temporian.EventSet] to a CSV file.
 
     Example:
         ```python

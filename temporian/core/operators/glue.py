@@ -58,7 +58,7 @@ class GlueOperator(Operator):
                 if f.name in feature_names:
                     raise ValueError(
                         f'Feature "{f.name}" is defined in multiple input'
-                        " nodes to glue. Consider using prefix() or rename()."
+                        " Nodes to glue. Consider using prefix() or rename()."
                     )
                 feature_names.add(f.name)
 
@@ -103,7 +103,9 @@ operator_lib.register_operator(GlueOperator)
 def glue(
     *inputs: Node,
 ) -> Node:
-    """Concatenates together nodes with the same sampling. Feature names cannot be duplicated across nodes.
+    """Concatenates [`Nodes`][temporian.Node] with the same sampling.
+
+    Feature names cannot be duplicated across nodes.
 
     Example:
 

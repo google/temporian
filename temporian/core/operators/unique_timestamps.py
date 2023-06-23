@@ -52,7 +52,7 @@ operator_lib.register_operator(UniqueTimestamps)
 
 
 def unique_timestamps(input: Node) -> Node:
-    """Removes duplicated timestamps.
+    """Removes events with duplicated timestamps from a Node.
 
     Returns a feature-less node where each timestamps from `input` only appears
     once. If the input is indexed, the unique operation is applied independently

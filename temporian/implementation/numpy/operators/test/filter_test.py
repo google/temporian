@@ -54,18 +54,18 @@ class FilterOperatorTest(absltest.TestCase):
         input_data = event_set(
             timestamps=[1, 2, 3, 4],
             features={"x": [4, 5, 6, 7], "y": [1, 1, 2, 2]},
-            index_features=["y"],
+            indexes=["y"],
         )
         input_condition = event_set(
             timestamps=[1, 2, 3, 4],
             features={"c": [True, True, True, False], "y": [1, 1, 2, 2]},
-            index_features=["y"],
+            indexes=["y"],
             same_sampling_as=input_data,
         )
         expected_result = event_set(
             timestamps=[1, 2, 3],
             features={"x": [4, 5, 6], "y": [1, 1, 2]},
-            index_features=["y"],
+            indexes=["y"],
         )
         operator = FilterOperator(
             input=input_data.node(), condition=input_condition.node()

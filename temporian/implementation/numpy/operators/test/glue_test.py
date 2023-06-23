@@ -16,7 +16,7 @@ from absl.testing import absltest
 
 from temporian.core.operators.glue import GlueOperator
 from temporian.core.data.node import input_node
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 from temporian.implementation.numpy.operators.glue import (
     GlueNumpyImplementation,
 )
@@ -40,7 +40,7 @@ class GlueNumpyImplementationTest(absltest.TestCase):
                 "user_id": ["user_1", "user_1", "user_1", "user_1", "user_2"],
                 "feature_1": [10, 11, 12, 13, 14],
             },
-            index_features=["user_id"],
+            indexes=["user_id"],
         )
 
         evset_2 = event_set(
@@ -50,7 +50,7 @@ class GlueNumpyImplementationTest(absltest.TestCase):
                 "feature_2": [20, 21, 22, 23, 24],
                 "feature_3": [30, 31, 32, 33, 34],
             },
-            index_features=["user_id"],
+            indexes=["user_id"],
             same_sampling_as=evset_1,
         )
 
@@ -60,7 +60,7 @@ class GlueNumpyImplementationTest(absltest.TestCase):
                 "user_id": ["user_1", "user_1", "user_1", "user_1", "user_2"],
                 "feature_4": [40, 41, 42, 43, 44],
             },
-            index_features=["user_id"],
+            indexes=["user_id"],
             same_sampling_as=evset_1,
         )
 
@@ -73,7 +73,7 @@ class GlueNumpyImplementationTest(absltest.TestCase):
                 "feature_3": [30, 31, 32, 33, 34],
                 "feature_4": [40, 41, 42, 43, 44],
             },
-            index_features=["user_id"],
+            indexes=["user_id"],
         )
 
         operator = GlueOperator(
@@ -108,7 +108,7 @@ class GlueNumpyImplementationTest(absltest.TestCase):
     def test_duplicate_feature(self):
         with self.assertRaisesRegex(
             ValueError,
-            'Feature "a" is defined in multiple input nodes',
+            'Feature "a" is defined in multiple input Nodes',
         ):
             n1 = input_node(
                 features=[("a", DType.FLOAT64)], indexes=[("x", DType.STRING)]

@@ -28,12 +28,12 @@ class LagNumpyImplementationTest(absltest.TestCase):
         input_data = event_set(
             timestamps=[1, 2, 3, 4],
             features={"x": [4, 5, 6, 7], "y": [1, 1, 2, 2]},
-            index_features=["y"],
+            indexes=["y"],
         )
         expected_result = event_set(
             timestamps=[1 + 2, 2 + 2, 3 + 2, 4 + 2],
             features={"x": [4, 5, 6, 7], "y": [1, 1, 2, 2]},
-            index_features=["y"],
+            indexes=["y"],
         )
         op = LagOperator(input=input_data.node(), duration=2)
         imp = LagNumpyImplementation(op)

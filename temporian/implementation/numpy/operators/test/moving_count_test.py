@@ -114,7 +114,7 @@ class MovingCountOperatorTest(absltest.TestCase):
                 ],
                 columns=["x", "y", "a", "timestamp"],
             ),
-            index_names=["x", "y"],
+            indexes=["x", "y"],
         )
 
         op = MovingCountOperator(
@@ -142,7 +142,7 @@ class MovingCountOperatorTest(absltest.TestCase):
                 ],
                 columns=["x", "y", "a", "timestamp"],
             ).astype({"a": np.int32}),
-            index_names=["x", "y"],
+            indexes=["x", "y"],
         )
 
         self.assertEqual(output["output"], expected_output)

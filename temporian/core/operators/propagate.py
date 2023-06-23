@@ -45,11 +45,11 @@ class Propagate(Operator):
                 self._index_mapping.append(sampling_idx)
             except ValueError as exc:
                 raise ValueError(
-                    "The index of input should be contained in the index of"
+                    "The indexes of input should be contained in the indexes of"
                     f' sampling. Index "{index.name}" from input is not'
-                    " available in sampling. input.index="
+                    " available in sampling. input.indexes="
                     f" {input.schema.indexes},"
-                    f" sampling.index={sampling.schema.indexes}."
+                    f" sampling.indexes={sampling.schema.indexes}."
                 ) from exc
             if sampling_index_dtypes[sampling_idx] != index.dtype:
                 raise ValueError(
@@ -96,10 +96,10 @@ operator_lib.register_operator(Propagate)
 def propagate(input: Node, sampling: Node, resample: bool = False) -> Node:
     """Propagates feature values over a sub index.
 
-    Given `input` and `sampling` where `input` has a super index of
-    `sampling` (e.g., the index of `input` is `["x"]`, and the index of
-    `sampling` is `["x","y"]`), duplicates the features of `input` over the
-    index of `sampling`.
+    Given `input` and `sampling` where `input`'s indexes are a superset of
+    `sampling`'s (e.g., the indexes of `input` are `["x"]`, and the indexes of
+    `sampling` are `["x","y"]`), duplicates the features of `input` over the
+    indexes of `sampling`.
 
     Example use case:
         ```python

@@ -2,7 +2,7 @@ from typing import Dict, Tuple, List, Optional, Any
 
 import numpy as np
 
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 from temporian.core.operators.cast import CastOperator
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.data.event_set import (

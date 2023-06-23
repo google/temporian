@@ -39,7 +39,7 @@ class ResampleOperatorTest(absltest.TestCase):
                     "x": [1, 1, 1, 1, 2, 2],
                 }
             ),
-            index_names=["x"],
+            indexes=["x"],
         )
 
         sampling_evset = from_pandas(
@@ -49,7 +49,7 @@ class ResampleOperatorTest(absltest.TestCase):
                     "x": [1, 1, 1, 1, 2, 2, 3],
                 }
             ),
-            index_names=["x"],
+            indexes=["x"],
         )
 
         expected_output = from_pandas(
@@ -62,7 +62,7 @@ class ResampleOperatorTest(absltest.TestCase):
                     "x": [1, 1, 1, 1, 2, 2, 3],
                 }
             ),
-            index_names=["x"],
+            indexes=["x"],
         )
 
         # Run op

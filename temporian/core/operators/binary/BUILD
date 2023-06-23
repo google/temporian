@@ -11,18 +11,6 @@ py_library(
     srcs = ["__init__.py"],
     srcs_version = "PY3",
     deps = [
-        ":api_symbols",
-        ":arithmetic",
-        ":logical",
-        ":relational",
-    ],
-)
-
-py_library(
-    name = "api_symbols",
-    srcs = ["api_symbols.py"],
-    srcs_version = "PY3",
-    deps = [
         ":arithmetic",
         ":logical",
         ":relational",
@@ -34,9 +22,9 @@ py_library(
     srcs = ["base.py"],
     srcs_version = "PY3",
     deps = [
+        "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
-        "//temporian/core/data/dtypes:dtype",
         "//temporian/core/operators:base",
         "//temporian/proto:core_py_proto",
     ],
@@ -49,8 +37,8 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
+        "//temporian/core/data:dtype",
         "//temporian/core/data:node",
-        "//temporian/core/data/dtypes:dtype",
     ],
 )
 
@@ -61,9 +49,9 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
+        "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
-        "//temporian/core/data/dtypes:dtype",
     ],
 )
 
@@ -74,8 +62,8 @@ py_library(
     deps = [
         ":base",
         "//temporian/core:operator_lib",
+        "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
-        "//temporian/core/data/dtypes:dtype",
     ],
 )

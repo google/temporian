@@ -11,17 +11,6 @@ py_library(
     srcs = ["__init__.py"],
     srcs_version = "PY3",
     deps = [
-        ":api_symbols",
-        ":csv",
-        ":pandas",
-    ],
-)
-
-py_library(
-    name = "api_symbols",
-    srcs = ["api_symbols.py"],
-    srcs_version = "PY3",
-    deps = [
         ":csv",
         ":pandas",
     ],

@@ -74,7 +74,7 @@ operator_lib.register_operator(LeakOperator)
 
 
 def leak(input: Node, duration: Duration) -> Node:
-    """Move timestamps in the past.
+    """Subtracts a duration from a Node's timestamps.
 
     In other words, shifts the timestamp values backward in time.
 

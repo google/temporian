@@ -18,7 +18,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional, Tuple, TYPE_CHECKING, Any, Union
 
-from temporian.core.data.dtypes.dtype import DType, IndexDType
+from temporian.core.data.dtype import DType, IndexDType
 from temporian.core.data.schema import Schema, FeatureSchema, IndexSchema
 from temporian.utils import string
 
@@ -30,15 +30,15 @@ T_SCALAR = (int, float)
 
 
 class Node:
-    """A node is a reference to the input/output of ops in a compute graph.
+    """A Node is a reference to the input/output of ops in a compute graph.
 
-    Use [`tp.input_node()`][temporian.input_node] to create a node manually, or
-    use [`event_set.node()`][temporian.EventSet.node] to create a node
-    compatible with a given event set.
+    Use [`tp.input_node()`][temporian.input_node] to create a Node manually, or
+    use [`event_set.node()`][temporian.EventSet.node] to create a Node
+    compatible with a given [`EventSet`][temporian.EventSet].
 
-    A node does not contain any data. Use
-    [`node.evaluate()`][temporian.Node.evaluate] to get the event set resulting
-    from a node.
+    A Node does not contain any data. Use
+    [`node.evaluate()`][temporian.Node.evaluate] to get the
+    [`EventSet`][temporian.EventSet] resulting from a [`Nodes`][temporian.Node].
     """
 
     def __init__(
@@ -57,12 +57,12 @@ class Node:
 
     @property
     def schema(self) -> Schema:
-        """Schema of a node.
+        """Schema of the Node.
 
         The schema defines the name and dtype of the features and the index.
 
         Returns:
-            Schema of the node.
+            Schema of the Node.
         """
         return self._schema
 
@@ -88,9 +88,9 @@ class Node:
 
     @property
     def name(self) -> Optional[str]:
-        """Name of a node.
+        """Name of a Node.
 
-        The name of a node is used to facilitate debugging and to specify the
+        The name of a Node is used to facilitate debugging and to specify the
         input / output signature of a graph during graph import / export."""
         return self._name
 
@@ -102,8 +102,8 @@ class Node:
     def creator(self) -> Optional[Operator]:
         """Creator.
 
-        The creator is the operator that outputs this node. Manually created
-        nodes have a `None` creator.
+        The creator is the operator that outputs this Node. Manually created
+        Nodes have a `None` creator.
         """
         return self._creator
 
@@ -123,22 +123,22 @@ class Node:
     def indexes(self) -> List[IndexSchema]:
         """Index schema.
 
-        Alias for `node.indexes.features`.
+        Alias for `node.schema.indexes`.
         """
         return self.schema.indexes
 
     def check_same_sampling(self, other: Node):
-        """Checks if two nodes have the same sampling."""
+        """Checks if two Nodes have the same sampling."""
 
         self.schema.check_compatible_index(other.schema)
         if self.sampling_node is not other.sampling_node:
             raise ValueError(
                 "Arguments should have the same sampling. "
                 f"{self.sampling_node} is different from "
-                f"{other.sampling_node}. To create input nodes with the same "
+                f"{other.sampling_node}. To create input Nodes with the same "
                 "sampling, use the argument `same_sampling_as` of "
                 "`tp.input_node` or `tp.event_set`. To align the sampling of "
-                "two nodes with similar index but different sampling, use the "
+                "two Nodes with same indexes but different sampling, use the "
                 "operator `tp.resample`."
             )
 
@@ -148,7 +148,7 @@ class Node:
         verbose: int = 1,
         check_execution: bool = True,
     ) -> EvaluationResult:
-        """Evaluates the node on the specified input.
+        """Evaluates the Node on the specified input.
 
         See [`tp.evaluate()`][temporian.evaluate] for details.
         """
@@ -162,14 +162,22 @@ class Node:
         )
 
     def __getitem__(self, feature_names: Union[str, List[str]]) -> Node:
-        """Creates a node with a subset of the features."""
+        """Creates a Node with a subset of the features."""
 
         from temporian.core.operators.select import select
 
         return select(self, feature_names)
 
+    def __setitem__(self, feature_names: Any, value: Any) -> None:
+        """Fails, features cannot be assigned"""
+
+        raise TypeError(
+            "Cannot assign features to an existing node. "
+            "New nodes should be created instead."
+        )
+
     def __repr__(self) -> str:
-        """Human readable representation of a node."""
+        """Human readable representation of a Node."""
 
         schema_print = string.indent(repr(self._schema))
         return (
@@ -187,7 +195,7 @@ class Node:
         # Called on "if node" conditions
         # TODO: modify to similar numpy msg if we implement .any() or .all()
         raise ValueError(
-            "The truth value of a node is ambiguous. Check condition"
+            "The truth value of a Node is ambiguous. Check condition"
             " element-wise or use cast() operator to convert to boolean."
         )
 
@@ -290,12 +298,12 @@ class Node:
         return multiply_scalar(input=self, value=-1)
 
     def __invert__(self):
-        from temporian.core.operators.unary.unary import invert
+        from temporian.core.operators.unary import invert
 
         return invert(input=self)
 
     def __abs__(self):
-        from temporian.core.operators.unary.unary import abs
+        from temporian.core.operators.unary import abs
 
         return abs(input=self)
 
@@ -502,7 +510,7 @@ def input_node(
 ) -> Node:
     """Creates an input [`Node`][temporian.Node].
 
-    An input node can be used to feed data into a graph.
+    An input Node can be used to feed data into a graph.
 
     Usage example:
 
@@ -528,10 +536,10 @@ def input_node(
             assumed not indexed.
         is_unix_timestamp: If true, the timestamps are interpreted as unix
             timestamps in seconds.
-        same_sampling_as: If set, the created node is guaranteed to have the
+        same_sampling_as: If set, the created Node is guaranteed to have the
             same sampling as same_sampling_as`. In this case, `indexes` and
             `is_unix_timestamp` should not be provided. Some operators require
-            for input nodes to have the same sampling.
+            for input Nodes to have the same sampling.
 
     Returns:
         Node with the given specifications.
@@ -594,7 +602,7 @@ def create_node_new_features_existing_sampling(
     creator: Optional[Operator],
     name: Optional[str] = None,
 ) -> Node:
-    """Creates a node with an existing sampling and new features.
+    """Creates a Node with an existing sampling and new features.
 
     When possible, this is the Node creation function to use.
     """
@@ -613,7 +621,7 @@ def create_node_new_features_existing_sampling(
     return Node(
         schema=Schema(
             features=features,
-            # The index and is_unix_timestamp is defined by the sampling.
+            # The indexes and is_unix_timestamp are defined by the sampling.
             indexes=sampling_node.schema.indexes,
             is_unix_timestamp=sampling_node.schema.is_unix_timestamp,
         ),
@@ -633,7 +641,7 @@ def create_node_new_features_new_sampling(
     creator: Optional[Operator],
     name: Optional[str] = None,
 ) -> Node:
-    """Creates a node with a new sampling and new features."""
+    """Creates a Node with a new sampling and new features."""
 
     # TODO: Use better way
     assert isinstance(features, List)
@@ -665,7 +673,7 @@ def create_node_with_new_reference(
     name: Optional[str] = None,
     creator: Optional[Operator] = None,
 ) -> Node:
-    """Creates a node with NEW features and NEW sampling.
+    """Creates a Node with NEW features and NEW sampling.
 
     If sampling is not specified, a new sampling is created.
     Similarly, if features is not specifies, new features are created.

@@ -159,7 +159,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
                 ],
                 columns=["x", "y", "a", "timestamp"],
             ),
-            index_names=["x", "y"],
+            indexes=["x", "y"],
         )
 
         op = SimpleMovingAverageOperator(
@@ -186,7 +186,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
                 ],
                 columns=["x", "y", "a", "timestamp"],
             ),
-            index_names=["x", "y"],
+            indexes=["x", "y"],
         )
 
         self.assertEqual(output["output"], expected_output)

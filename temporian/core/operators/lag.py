@@ -73,7 +73,7 @@ operator_lib.register_operator(LagOperator)
 
 
 def lag(input: Node, duration: Duration) -> Node:
-    """Adds a delay to the timestamps.
+    """Adds a delay to a Node's timestamps.
 
     In other words, shifts the timestamp values forwards in time.
 

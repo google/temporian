@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Set index operator class and public API function definition."""
+"""Add and set index operators classes and public API function definitions."""
 
 from typing import List, Union
 
@@ -28,19 +28,19 @@ class AddIndexOperator(Operator):
     def __init__(
         self,
         input: Node,
-        index_to_add: List[str],
+        indexes: List[str],
     ) -> None:
         super().__init__()
 
         self._output_feature_schemas = self._get_output_feature_schemas(
-            input, index_to_add
+            input, indexes
         )
-        self._output_indexes = self._get_output_indexes(input, index_to_add)
-        self._index_to_add = index_to_add
+        self._output_indexes = self._get_output_indexes(input, indexes)
+        self._indexes = indexes
 
         self.add_input("input", input)
 
-        self.add_attribute("index_to_add", index_to_add)
+        self.add_attribute("indexes", indexes)
 
         self.add_output(
             "output",
@@ -54,36 +54,32 @@ class AddIndexOperator(Operator):
         self.check()
 
     def _get_output_feature_schemas(
-        self, input: Node, index_to_add: List[str]
+        self, input: Node, indexes: List[str]
     ) -> List[FeatureSchema]:
         return [
             feature
             for feature in input.schema.features
-            if feature.name not in index_to_add
+            if feature.name not in indexes
         ]
 
     def _get_output_indexes(
-        self, input: Node, index_to_add: List[str]
+        self, input: Node, indexes: List[str]
     ) -> List[IndexSchema]:
         index_dict = input.schema.index_name_to_dtype()
         feature_dict = input.schema.feature_name_to_dtype()
 
         new_indexes: List[IndexSchema] = []
-        for index_name in index_to_add:
-            if index_name not in feature_dict:
-                raise ValueError(
-                    f"Add index {index_name} is not part of the features."
-                )
+        for index in indexes:
+            if index not in feature_dict:
+                raise ValueError(f"{index} is not a feature in input.")
 
-            if index_name in index_dict:
-                raise ValueError(
-                    f"Add index {index_name} is already part of the index."
-                )
+            if index in index_dict:
+                raise ValueError(f"{index} is already an index in input.")
 
             new_indexes.append(
-                IndexSchema(name=index_name, dtype=feature_dict[index_name])
+                IndexSchema(name=index, dtype=feature_dict[index])
             )
-        # Note: The new index is added after the existing index items.
+        # Note: The new indexes are added after the existing ones.
         return input.schema.indexes + new_indexes
 
     @classmethod
@@ -92,7 +88,7 @@ class AddIndexOperator(Operator):
             key="ADD_INDEX",
             attributes=[
                 pb.OperatorDef.Attribute(
-                    key="index_to_add",
+                    key="indexes",
                     type=pb.OperatorDef.Attribute.Type.LIST_STRING,
                 ),
             ],
@@ -109,39 +105,39 @@ class AddIndexOperator(Operator):
         return self._output_indexes
 
     @property
-    def index_to_add(self) -> List[str]:
-        return self._index_to_add
+    def indexes(self) -> List[str]:
+        return self._indexes
 
 
 operator_lib.register_operator(AddIndexOperator)
 
 
-def _normalize_index_to_add(
-    index_names: Union[str, List[str]],
+def _normalize_indexes(
+    indexes: Union[str, List[str]],
 ) -> List[str]:
-    if isinstance(index_names, str):
-        return [index_names]
+    if isinstance(indexes, str):
+        return [indexes]
 
-    if len(index_names) == 0:
-        raise ValueError("Cannot specify empty list as `index_names` argument.")
+    if len(indexes) == 0:
+        raise ValueError("Cannot specify empty list as `indexes` argument.")
 
-    return index_names
+    return indexes
 
 
-def _normalize_index_to_set(
-    index_names: Union[str, List[str]],
+def _normalize_indexes_to_set(
+    indexes: Union[str, List[str]],
 ) -> List[str]:
-    if isinstance(index_names, str):
-        return [index_names]
+    if isinstance(indexes, str):
+        return [indexes]
 
-    if len(index_names) == 0:
-        raise ValueError("Cannot specify empty list as `index_names` argument.")
+    if len(indexes) == 0:
+        raise ValueError("Cannot specify empty list as `indexes` argument.")
 
-    return index_names
+    return indexes
 
 
-def add_index(input: Node, index_to_add: Union[str, List[str]]) -> Node:
-    """Adds one or more features as index in a node.
+def add_index(input: Node, indexes: Union[str, List[str]]) -> Node:
+    """Adds indexes to a [`Node`](temporian.Node).
 
     Usage example:
         ```python
@@ -206,29 +202,26 @@ def add_index(input: Node, index_to_add: Union[str, List[str]]) -> Node:
         ```
 
     Args:
-        input: Input node object for which the index is to be set or
-            updated.
-        index_to_add: List of feature names (strings) that should be used as
-            the new index. These feature names should already exist in `input`.
+        input: Node for which the indexes are to be set or updated.
+        indexes: List of feature names (strings) that should be added to the
+            indexes. These feature names should already exist in `input`.
 
     Returns:
-         New node with the updated index.
+        New Node with the extended index.
 
     Raises:
-        KeyError: If any of the specified `index_to_add` are not found in
-            `input`.
+        KeyError: If any of the specified `indexes` are not found in `input`.
     """
 
-    index_to_add = _normalize_index_to_add(index_to_add)
-    return AddIndexOperator(input, index_to_add).outputs["output"]
+    indexes = _normalize_indexes(indexes)
+    return AddIndexOperator(input, indexes).outputs["output"]
 
 
-def set_index(input: Node, index: Union[str, List[str]]) -> Node:
-    """Replaces the index in a node.
+def set_index(input: Node, indexes: Union[str, List[str]]) -> Node:
+    """Replaces the index in a [`Node`][temporian.Node].
 
     This function is implemented as [`tp.drop_index()`](../drop_index)
     + [`tp.add_index()`](../add_index).
-
 
     Usage example:
         ```python
@@ -239,7 +232,7 @@ def set_index(input: Node, index: Union[str, List[str]]) -> Node:
         ...         "product": [1, 1, 2, 1, 1, 2],
         ...         "sales": [1, 1, 1, 1, 1, 1]
         ...     },
-        ...     index_features=["store"]
+        ...     indexes=["store"]
         ... )
         >>> a = a_evset.node()
 
@@ -297,31 +290,29 @@ def set_index(input: Node, index: Union[str, List[str]]) -> Node:
         ```
 
     Args:
-        input: Input node object for which the index is to
-            be set or updated.
-        index: List of index / feature names (strings) used as
-            the new index. These feature names should be either index or
-            features in `input`.
+        input: Node for which the indexes are to be set.
+        indexes: List of index / feature names (strings) used as
+            the new indexes. These names should be either indexes or features in
+            `input`.
 
     Returns:
-        New node with the updated index.
+        New `Node` with the updated indexes.
 
     Raises:
-        KeyError: If any of the specified `index_to_add` are not found in
-            `input`.
+        KeyError: If any of the specified `indexes` are not found in `input`.
     """
 
-    new_index = _normalize_index_to_set(index)
+    indexes = _normalize_indexes_to_set(indexes)
 
     # Note
     # The set_index is implemented as a drop_index + add_index.
-    # The implementation could be improved (simpoler, faster) with a new
-    # operator to re-order the index items.
+    # The implementation could be improved (simpler, faster) with a new
+    # operator to re-order the indexes.
 
     if len(input.schema.indexes) != 0:
         input = drop_index(input)
 
-    if len(new_index) != 0:
-        input = add_index(input, new_index)
+    if len(indexes) != 0:
+        input = add_index(input, indexes)
 
     return input

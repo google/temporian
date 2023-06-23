@@ -39,7 +39,7 @@ class AddIndexNumpyImplementationTest(absltest.TestCase):
                     "sales",
                 ],
             ),
-            index_names=["state_id"],
+            indexes=["state_id"],
         )
 
         self.input_node = self.input_evset.node()
@@ -65,7 +65,7 @@ class AddIndexNumpyImplementationTest(absltest.TestCase):
                     "sales",
                 ],
             ),
-            index_names=["state_id", "store_id"],
+            indexes=["state_id", "store_id"],
         )
         output = add_index(self.input_node, "store_id")
         operator_impl = AddIndexNumpyImplementation(output.creator)
@@ -94,7 +94,7 @@ class AddIndexNumpyImplementationTest(absltest.TestCase):
                     "sales",
                 ],
             ),
-            index_names=["state_id", "store_id", "item_id"],
+            indexes=["state_id", "store_id", "item_id"],
         )
         output = add_index(self.input_node, ["store_id", "item_id"])
         # instance operator implementation
@@ -127,7 +127,7 @@ class AddIndexNumpyImplementationTest(absltest.TestCase):
                     "state_id",
                 ],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
         output = set_index(self.input_node, ["store_id"])
         output_evset = evaluate(
@@ -157,7 +157,7 @@ class AddIndexNumpyImplementationTest(absltest.TestCase):
                     "state_id",
                 ],
             ),
-            index_names=["store_id", "item_id"],
+            indexes=["store_id", "item_id"],
         )
         output = set_index(
             self.input_node,
@@ -172,10 +172,10 @@ class AddIndexNumpyImplementationTest(absltest.TestCase):
     def test_set_index_multiple_change_order(self) -> None:
         common = {"features": {"a": [], "b": [], "c": []}, "timestamps": []}
 
-        evset_abc = event_set(**common, index_features=["a", "b", "c"])
-        evset_acb = event_set(**common, index_features=["a", "c", "b"])
-        evset_cba = event_set(**common, index_features=["c", "b", "a"])
-        evset_cab = event_set(**common, index_features=["c", "a", "b"])
+        evset_abc = event_set(**common, indexes=["a", "b", "c"])
+        evset_acb = event_set(**common, indexes=["a", "c", "b"])
+        evset_cba = event_set(**common, indexes=["c", "b", "a"])
+        evset_cab = event_set(**common, indexes=["c", "a", "b"])
 
         def run(src_evset, new_index, expected_evset):
             output = set_index(src_evset.node(), new_index)

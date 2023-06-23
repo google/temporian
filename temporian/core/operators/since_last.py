@@ -23,7 +23,7 @@ from temporian.core.data.node import (
 )
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 
 
 class SinceLast(Operator):
@@ -82,7 +82,7 @@ def since_last(
     input: Node,
     sampling: Optional[Node] = None,
 ) -> Node:
-    """Amount of time since the last distinct timestamp.
+    """Computes the amount of time since the last distinct timestamp.
 
     Example 1:
         ```python

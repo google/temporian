@@ -21,7 +21,7 @@ from temporian.implementation.numpy.operators.cast import (
     CastNumpyImplementation,
 )
 from temporian.core.operators.cast import CastOperator, cast
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.io.pandas import from_pandas
 from temporian.implementation.numpy.data.io import event_set
@@ -73,12 +73,12 @@ class CastNumpyImplementationTest(absltest.TestCase):
                     "f_boolean",
                 ],
             ),
-            index_names=["store_id", "product_id"],
+            indexes=["store_id", "product_id"],
         )
 
         self.input_node = self.input_evset.node()
 
-        # Expected event set when applying some downcast operations
+        # Expected EventSet when applying some downcast operations
         self.expected_evset_1 = from_pandas(
             pd.DataFrame(
                 data=[
@@ -103,7 +103,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
                 ],
                 # Even more tricky: these columns won't match their type
             ).astype({"f_float_64": np.float32, "f_int_64": np.int32}),
-            index_names=["store_id", "product_id"],
+            indexes=["store_id", "product_id"],
         )
 
         # Expected when converting everything to float32
@@ -137,7 +137,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
                     "f_boolean": np.float32,
                 }
             ),
-            index_names=["store_id", "product_id"],
+            indexes=["store_id", "product_id"],
         )
 
     def test_cast_manual(self) -> None:

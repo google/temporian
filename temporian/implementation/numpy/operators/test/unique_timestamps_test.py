@@ -36,7 +36,7 @@ class UniqueTimestampsOperatorTest(absltest.TestCase):
                     "c": [1, 1, 1, 1, 1, 2, 2, 2],
                 }
             ),
-            index_names=["c"],
+            indexes=["c"],
         )
         node = evset.node()
 
@@ -47,7 +47,7 @@ class UniqueTimestampsOperatorTest(absltest.TestCase):
                     "c": [1, 1, 1, 2, 2],
                 }
             ),
-            index_names=["c"],
+            indexes=["c"],
         )
 
         # Run op

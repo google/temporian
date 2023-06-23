@@ -124,7 +124,7 @@ Let's see how to compute the simple moving average of two features `feature_1` a
 ...         "feature_2": [54.0, 23.0, 53.0, 12.0, 12.0, 32.0, 23.0, 12.0, 2.0, 4.0],
 ...         "feature_3": ["i1", "i1", "i1", "i1", "i1", "i2", "i2", "i2", "i2", "i2",],
 ... 	},
-...     index_features=["feature_3"],
+...     indexes=["feature_3"],
 ...     name="a",
 ... )
 >>>
@@ -148,7 +148,7 @@ The `<inputs>` can be specified as a dictionary of [`Nodes`][temporian.Node] to 
 - In [`tp.evaluate()`][temporian.evaluate], the second argument defines a mapping between input [`Nodes`][temporian.Node] and [`EventSets`][temporian.EventSet]. If all necessary input [`Nodes`][temporian.Node] are not fed, an error will be raised.
 - In most cases you will only pass [`EventSets`][temporian.EventSet] that correspond to the graph's input [`Nodes`][temporian.Node], but Temporian also supports passing [`EventSets`][temporian.EventSet] to intermediate [`Nodes`][temporian.Node] in the graph. In the example provided, `a_node` is fed, but we could also feed `b_node` and `c_node`. In that case we would not need to feed `a_node`, since no [`Nodes`][temporian.Node] need to be computed from it anymore.
 
-To simplify its usage when the graph contains a single output [`Node`][temporian.Node], `node.evaluate` is equivalent to `tp.evaluate(node, <inputs>)`.
+To simplify its usage when the graph contains a single output [`Node`][temporian.Node], `node.evaluate(...)` is equivalent to `tp.evaluate(node, ...)`.
 
 ```python
 >>> # These statements are equivalent.
@@ -167,7 +167,7 @@ To simplify its usage when the graph contains a single output [`Node`][temporian
 >>> # d_evset = d_node.evaluate(a_evset)
 -->
 
-**Warning:** It is more efficient to evaluate multiple output [`Nodes`][temporian.Node] together with [`tp.evaluate()`][temporian.evaluate] than to evaluate them separately with `node_1.evaluate(...)`, `node_2.evaluate(...)`, etc. Only use [`node.evaluate`][temporian.Node.evaluate] for debugging purposes or when you only have a single output [`Node`][temporian.Node].
+**Warning:** It is more efficient to evaluate multiple output [`Nodes`][temporian.Node] together with [`tp.evaluate()`][temporian.evaluate] than to evaluate them separately with `node_1.evaluate(...)`, `node_2.evaluate(...)`, etc. Only use [`node.evaluate()`][temporian.Node.evaluate] for debugging purposes or when you only have a single output [`Node`][temporian.Node].
 
 ## Creating a [`Node`][temporian.Node] from an [`EventSet`][temporian.EventSet]
 
@@ -249,7 +249,7 @@ Data visualization is crucial for gaining insights into data and the system it r
 
 Temporian provides two plotting functions for data visualization: [`evset.plot()`][temporian.EventSet.plot] and [`tp.plot()`][temporian.plot].
 
-The [`evset.plot()`][temporian.EventSet.plot] function is shorter to write and is used for displaying a single [`EventSet`][temporian.EventSet], while the [`tp.plot()`][temporian.plot] function is used for displaying multiple [`EventSets`][temporian.EventSet] together. This function is particularly useful when [`EventSets`][temporian.EventSet] are indexed (see [Index, horizontal and vertical operators](#index-horizontal-and-vertical-operators)) or have different samplings (see [Sampling](#sampling)).
+The [`evset.plot()`][temporian.EventSet.plot] function is shorter to write and is used for displaying a single [`EventSet`][temporian.EventSet], while the [`tp.plot()`][temporian.plot] function is used for displaying multiple [`EventSets`][temporian.EventSet] together. This function is particularly useful when [`EventSets`][temporian.EventSet] are indexed (see [Index, horizontal and vertical operators](#indexes-horizontal-and-vertical-operators)) or have different samplings (see [Sampling](#sampling)).
 
 Here's an example of using the [`evset.plot()`][temporian.EventSet.plot] function:
 
@@ -514,7 +514,7 @@ False
 
 ```
 
-All these operators act feature-wise, i.e. they perform index-feature-wise operations (for each feature in each index key). This implies that the input nodes must have the same number of features.
+All these operators act feature-wise, i.e. they perform index-feature-wise operations (for each feature in each index key). This implies that the input [`Nodes`][temporian.Node] must have the same number of features.
 
 ```python
 >>> node[["f1", "f2"]] + node["f3"]
@@ -524,7 +524,7 @@ ValueError: The left and right arguments should have the same number of features
 
 ```
 
-The input nodes must also have the same sampling and index.
+The input [`Nodes`][temporian.Node] must also have the same sampling and index.
 
 ```python
 >>> sampling_1 = tp.event_set(
@@ -542,11 +542,11 @@ ValueError: Arguments should have the same sampling. ...
 
 ```
 
-If you want to apply arithmetic operators on nodes with different samplings, take a look at
+If you want to apply arithmetic operators on [`Nodes`][temporian.Node] with different samplings, take a look at
 [Sampling](#sampling) section.
 
-If you want to apply them on nodes with different indices, check the
-[Vertical operators](#index-horizontal-and-vertical-operators) section.
+If you want to apply them on [`Nodes`][temporian.Node] with different indexes, check the
+[Vertical operators](#indexes-horizontal-and-vertical-operators) section.
 
 Operations involving scalars are applied index-feature-element-wise.
 
@@ -568,7 +568,7 @@ events:
 
 ## Sampling
 
-Arithmetic operators, such as [`tp.add()`][temporian.add], require their input arguments to have the same timestamps and [Index](#index-horizontal-and-vertical-operators). The unique combination of timestamps and index is called a _sampling_.
+Arithmetic operators, such as [`tp.add()`][temporian.add], require their input arguments to have the same timestamps and [Index](#indexes-horizontal-and-vertical-operators). The unique combination of timestamps and indexes is called a _sampling_.
 
 <!-- TODO: example -->
 
@@ -582,7 +582,7 @@ If a timestamp is present in `input` but not in `sampling`, the timestamp is dro
 If a timestamp is present in both `input` and `sampling`, the timestamp is kept.
 If a timestamp is present in `sampling` but not in `input`, a new timestamp is created using the feature values from the _closest anterior_ (not the closest, as that could induce future leakage) timestamp of `input`. This rule is especially useful for events that represent measurements (see [Events and [`EventSets`][temporian.EventSet]](#events-and-eventsets)).
 
-**Note:** Features in `sampling` are ignored. This also happens in some other operators that take a `sampling` argument of type [`Node`][temporian.Node] - it indicates that only the sampling (a.k.a. the index and timestamps) of that [`Node`][temporian.Node] are being used by that operator.
+**Note:** Features in `sampling` are ignored. This also happens in some other operators that take a `sampling` argument of type [`Node`][temporian.Node] - it indicates that only the sampling (a.k.a. the indexes and timestamps) of that [`Node`][temporian.Node] are being used by that operator.
 
 Given this example:
 
@@ -674,7 +674,7 @@ c = tp.simple_moving_average(input=a, window_length=10, sampling=d)
 
 Note that if planning to resample the result of a moving window operator, passing the `sampling` argument is both more efficient and more accurate than calling [`tp.resample()`][temporian.resample] on the result.
 
-## Index, horizontal and vertical operators
+## Indexes, horizontal and vertical operators
 
 All operators presented so far work on a sequence of related events. For instance, the simple moving average operator computes the average of events within a specific time window. These types of operators are called _horizontal operators_.
 
@@ -689,7 +689,7 @@ To compute the weekly sales of individual products, you can define the `product`
 ...         "product": [1, 2, 1, 2],
 ...         "sale": [100.0, 300.0, 90.0, 400.0],
 ...     },
-...     index_features=["product"]
+...     indexes=["product"]
 ... )
 >>> print(daily_sales)
 indexes: [('product', int64)]
@@ -710,7 +710,7 @@ The moving sum operator will then be applied independently to the events corresp
 ```python
 >>> a = daily_sales.node()
 >>>
->>> # Compute the moving sum of each index (product) individually.
+>>> # Compute the moving sum of each index group (a.k.a. each product) individually.
 >>> b = tp.moving_sum(a, window_length=tp.duration.weeks(1))
 >>>
 >>> b.evaluate({a: daily_sales})
@@ -729,14 +729,14 @@ events:
 
 Horizontal operators can be understood as operators that are applied independently on each index.
 
-Operators that modify a [`Node`][temporian.Node]'s index are called _vertical operators_. The most important vertical operators are:
+Operators that modify a [`Node`][temporian.Node]'s indexes are called _vertical operators_. The most important vertical operators are:
 
 - [`tp.add_index()`][temporian.add_index]: Add features to the index.
 - [`tp.drop_index()`][temporian.drop_index]: Remove features from the index, optionally keeping them as features.
 - [`tp.set_index()`][temporian.set_index]: Changes the index.
-- [`tp.propagate()`][temporian.propagate]: Expand an index based on another [`EventSet`][temporian.EventSet]’s index.
+- [`tp.propagate()`][temporian.propagate]: Expand indexes based on another [`EventSet`][temporian.EventSet]’s indexes.
 
-By default, [`EventSets`][temporian.EventSet] are _flat_, which means they have no index, and therefore all events are in a single global index group.
+By default, [`EventSets`][temporian.EventSet] are _flat_, which means they have no index, and therefore all events are in a single global group.
 
 Also, keep in mind that only string and integer features can be used as indexes.
 
@@ -764,7 +764,7 @@ events:
 
 ```
 
-Since we haven't defined the `index_features` yet,
+Since we haven't defined the `indexes` yet,
 the `store` and `product` are just regular features above.
 Let's add the `(product, store)` pair as the index.
 
@@ -861,7 +861,7 @@ events:
 
 ```
 
-The [`tp.propagate()`][temporian.propagate] operator expands the index of its `input` (`e` in this case) to match the index of its `sampling` by copying the content of `input` into each corresponding index group of `sampling`. Note that the features in `sampling`'s index must be a superset of the ones in `input`'s index.
+The [`tp.propagate()`][temporian.propagate] operator expands the indexes of its `input` (`e` in this case) to match the indexes of its `sampling` by copying the content of `input` into each corresponding index group of `sampling`. Note that `sampling`'s indexes must be a superset of `input`'s indexes.
 
 ## Future leakage
 
@@ -908,10 +908,10 @@ By using [`tp.has_leak()`][temporian.has_leak], we can programmatically identify
 ...         "f1": [0.1, 0.2, 0.3, 1.1, 1.2],
 ...         "f2": ["red", "red", "red", "blue", "blue"],
 ... 	},
-... 	index_features=["f2"],
+... 	indexes=["f2"],
 ... )
 >>>
->>> # Access the data for the index `f2=red`.
+>>> # Access the data for the index group `f2=red`.
 >>> evset.data[("red",)]
 IndexData(features=[array([0.1, 0.2, 0.3])], timestamps=array([1., 2., 3.]))
 
@@ -927,10 +927,10 @@ evset = tp.event_set(
         "f1": [0.1, 0.2, 0.3, 1.1, 1.2],
         "f2": ["red", "red", "red", "blue", "blue"],
 	},
-	index_features=["f2"],
+	indexes=["f2"],
 )
 
-# Access the data for the index `f2=red`.
+# Access the data for the index group `f2=red`.
 evset.index("red")
 
 
@@ -938,7 +938,7 @@ evset.index("red")
 evset.index(("red", ))
 
 
-# Access the data for the index `f2=red` and feature `f1`.
+# Access the data for the index group `f2=red` and feature `f1`.
 evset.index("red").feature("f1")
 
 ```
@@ -965,8 +965,8 @@ evset.feature("f1")
 # Read EventSet from a .csv file.
 evset = tp.from_csv(
     path="path/to/file.csv",
-    timestamp_column="timestamp",
-    index_names=["product_id"],
+    timestamps="timestamp",
+    indexes=["product_id"],
 )
 
 # Save EventSet to a .csv file.
