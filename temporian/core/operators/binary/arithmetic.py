@@ -198,7 +198,7 @@ def add(
         ...         "product": [1, 2, 3, 4],
         ...         "sales": [10, 20, 30, 40]
         ...     },
-        ...     index_features=["store", "product"]
+        ...     indexes=["store", "product"]
         ... )
         >>> b_evset = tp.event_set(
         ...     timestamps=[1, 2, 3, 4],
@@ -207,7 +207,7 @@ def add(
         ...         "product": [5, 6, 7, 8],
         ...         "sales": [10, 20, 30, 40]
         ...     },
-        ...     index_features=["store", "product"]
+        ...     indexes=["store", "product"]
         ... )
         >>> a = a_evset.node()
         >>> b = b_evset.node()

@@ -38,7 +38,7 @@ def from_csv(
         ...     "2023-02-01,30.0,5.0"
         ... )
         >>> # Load CSV
-        >>> evset = tp.from_csv(temp_file, timestamp_column="date")
+        >>> evset = tp.from_csv(temp_file, timestamps="date")
         >>> evset
         indexes: []
         features: [('feature_1', float64), ('feature_2', float64)]

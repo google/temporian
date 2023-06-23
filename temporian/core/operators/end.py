@@ -59,7 +59,7 @@ def end(input: Node) -> Node:
         >>> a_evset = tp.event_set(
         ...     timestamps=[5, 6, 7, 1],
         ...     features={"f": [50, 60, 70, 10], "idx": [1, 1, 1, 2]},
-        ...     index_features=["idx"]
+        ...     indexes=["idx"]
         ... )
         >>> a = a_evset.node()
 

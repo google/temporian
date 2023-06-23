@@ -101,7 +101,7 @@ def moving_count(
         ...         "value": [1, 1, 1, 1, 1, 1],
         ...         "idx": ["i1", "i1", "i1", "i2", "i2", "i2"],
         ...     },
-        ...     index_features=["idx"],
+        ...     indexes=["idx"],
         ... )
         >>> a = a_evset.node()
         >>> result = tp.moving_count(a, tp.duration.seconds(2))

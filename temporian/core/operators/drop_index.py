@@ -168,7 +168,7 @@ def drop_index(
         ...         "product": [1, 1, 2, 1, 1, 2],
         ...         "sales": [1, 1, 1, 1, 1, 1]
         ...     },
-        ...     index_features=["store", "product"]
+        ...     indexes=["store", "product"]
         ... )
         >>> a = a_evset.node()
 

@@ -109,7 +109,7 @@ def propagate(input: Node, sampling: Node, resample: bool = False) -> Node:
         ...         "product": [1, 1, 1, 2, 2, 2],
         ...         "sales": [100., 200., 500., 1000., 2000., 5000.]
         ...     },
-        ...     index_features=["product"],
+        ...     indexes=["product"],
         ...     name="sales_per_product"
         ... )
         >>> store_evset = tp.event_set(
@@ -126,7 +126,7 @@ def propagate(input: Node, sampling: Node, resample: bool = False) -> Node:
         >>> products_node / store_node
         Traceback (most recent call last):
             ...
-        ValueError: The index of input and sampling don't match. ...
+        ValueError: The indexes of input and sampling don't match. ...
 
         >>> # Second attempt: propagate index
         >>> store_prop = tp.propagate(store_node, products_node)

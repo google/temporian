@@ -102,7 +102,7 @@ def to_pandas(
         ...         "feature_1": [0.5, 0.6],
         ...         "my_index": ["red", "red"],
         ...     },
-        ...     index_features=["my_index"],
+        ...     indexes=["my_index"],
         ... )
 
         # Indices are not set as dataframe's indices and dates are unix timestamps

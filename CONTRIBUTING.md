@@ -95,13 +95,9 @@ mkdocs serve -f docs/mkdocs.yml
 
 ### Adding code examples
 
-Any code examples that are included in the docstrings of api-facing modules,
-or in markdown files under the [docs/](docs/) directory,
-will be executed and tested using the python's
-built-in [doctest](https://docs.python.org/3/library/doctest.html) module.
+Any code examples that are included in the docstrings of members of the public API, or in markdown files under the [docs/](docs/) directory,will be executed and tested using the python's built-in [doctest](https://docs.python.org/3/library/doctest.html) module.
 
-For example, the following piece of code would be executed, and the outputs
-must match the expected result indicated:
+For example, the following piece of code would be executed, and the outputs must match the expected result indicated:
 
 ```python
 >>> evset = tp.event_set(
