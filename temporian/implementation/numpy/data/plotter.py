@@ -67,8 +67,9 @@ def plot(
 ):
     """Plots [`EventSets`][temporian.EventSet].
 
-    This method can also be called from [`tp.EventSet.plot()`](temporian.EventSet.plot)
-    with the same args (except `evsets`).
+    This method can also be called from
+    [`EventSet.plot()`][temporian.EventSet.plot] with the same args (except
+    `evsets`).
 
     Examples:
         ```python

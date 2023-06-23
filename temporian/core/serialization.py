@@ -112,7 +112,7 @@ def load(
 ) -> Tuple[Union[Node, Dict[str, Node]], Union[Node, Dict[str, Node]]]:
     """Loads a graph from a file.
 
-    See [`tp.save()`](temporian.save) for examples.
+    See [`tp.save()`][temporian.save] for usage examples.
 
     Args:
         path: File path to load from.

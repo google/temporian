@@ -137,7 +137,7 @@ def _normalize_indexes_to_set(
 
 
 def add_index(input: Node, indexes: Union[str, List[str]]) -> Node:
-    """Adds indexes to a [`Node`](temporian.Node).
+    """Adds indexes to a [`Node`][temporian.Node].
 
     Usage example:
         ```python
