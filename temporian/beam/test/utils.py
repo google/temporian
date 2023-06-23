@@ -49,7 +49,7 @@ def check_beam_implementation(
     if input_node is None:
         input_node = input_data.node()
 
-    tmp_dir = tempfile.gettempdir()
+    tmp_dir = tempfile.mkdtemp()
     input_path = os.path.join(tmp_dir, "input.csv")
     output_path = os.path.join(tmp_dir, "output.csv")
 

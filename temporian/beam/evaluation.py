@@ -48,6 +48,7 @@ def run(
         | "Process data" >> tpb.run(input=input_node, output=output_node)
         | "Save result" >> tpb.write_csv(output_path, output_node.schema)
         )
+        pipeline.run()
     ```
 
     If you graph contains more than one input or output nodes, use
@@ -104,6 +105,7 @@ def run_multi_io(
         outputs[output_node_2] | tpb.write_csv(
             output_path_2, output_node_2.schema, shard_name_template=""
         )
+        pipeline.run()
     ```
 
     If you graph contains a single input and output node, use `run` instead.

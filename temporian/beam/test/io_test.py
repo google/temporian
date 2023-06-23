@@ -61,7 +61,7 @@ class IOTest(absltest.TestCase):
 
     def test_read_and_write_csv(self):
         # Create csv dataset
-        tmp_dir = tempfile.gettempdir()
+        tmp_dir = tempfile.mkdtemp()
         input_path = os.path.join(tmp_dir, "input.csv")
         output_path = os.path.join(tmp_dir, "output.csv")
         input_data = event_set(

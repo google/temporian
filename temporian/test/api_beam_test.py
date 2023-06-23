@@ -31,7 +31,7 @@ def test_data() -> str:
 
 class TFPTest(absltest.TestCase):
     def test_run(self):
-        tmp_dir = tempfile.gettempdir()
+        tmp_dir = tempfile.mkdtemp()
         input_path = os.path.join(tmp_dir, "input.csv")
         output_path = os.path.join(tmp_dir, "output.csv")
 
@@ -59,13 +59,14 @@ class TFPTest(absltest.TestCase):
                     output_path, output_node.schema, shard_name_template=""
                 )
             )
+            p.run()
             assert_that(output, equal_to([output_path]))
 
         with open(output_path, "r", encoding="utf-8") as f:
             print("Results:\n" + f.read(), flush=True)
 
     def test_run_multi_io(self):
-        tmp_dir = tempfile.gettempdir()
+        tmp_dir = tempfile.mkdtemp()
         input_path_1 = os.path.join(tmp_dir, "input_1.csv")
         input_path_2 = os.path.join(tmp_dir, "input_2.csv")
         output_path_1 = os.path.join(tmp_dir, "output_1.csv")
@@ -111,6 +112,7 @@ class TFPTest(absltest.TestCase):
             outputs[output_node_2] | tpb.write_csv(
                 output_path_2, output_node_2.schema, shard_name_template=""
             )
+            p.run()
 
         with open(output_path_1, "r", encoding="utf-8") as f:
             print("Output 1:\n" + f.read(), flush=True)

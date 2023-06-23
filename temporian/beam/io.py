@@ -11,37 +11,47 @@ from temporian.core.data.node import Schema
 from temporian.core.data.dtypes.dtype import DType
 from temporian.implementation.numpy.data.event_set import tp_dtype_to_np_dtype
 
-# Type of one of the element of the index.
+# Remark: We use tuples instead of dataclasses or named tuples as it seems
+# to be the most efficient solution for beam.
+
+# Type of an index element.
 #
 # In the numpy backend, index are represented as numpy primitives. However,
 # Beam does not support numpy primitive as index. Therefore, all index are
 # converted to python primitive of type "BeamIndex".
 BeamIndex = Union[int, float, str, bool]
 
-# Type of one of the element of the index with features.
+# Type of an index element OR a feature index (int).
 #
-# A BeamIndex concatenated with a feature index (int).
 # The feature index -1 is used to represent the timestamps of event-set without
 # features.
 BeamIndexAndFeature = BeamIndex
 
-# Structured representation of a single event / row during the conversion to
-# internal Temporian beam format. In a StructuredRow, index and features are
-# indexed by integer instead of string keys.
+# An array of timestamps.
+Timestamps = np.float64
+
+# A single event / row during the conversion from dict of key/value to internal
+# the Temporian beam format for event sets. In a StructuredRow, index and
+# features are indexed by integer instead of string keys.
 #
-# Contains the index, the timestamps, and the features.
+# Contains: the index, the timestamps, and the features.
 # The indexes and features are ordered according to a Schema.
+# Note the double 2-items tuple (instead of a one 3-items tuple) to facilitate
+# Beam operations.
 StructuredRow = Tuple[
-    Tuple[BeamIndex, ...], Tuple[np.float64, Tuple[np.generic, ...]]
+    Tuple[BeamIndex, ...], Tuple[Timestamps, Tuple[np.generic, ...]]
 ]
 
-# Unit of data for all operator computation.
-# Contains the index+feature_idx, timestamps, and feature values.
+# Unit of data for an event set used by all the operators implementations.
+#
+# Contains: the index+feature_idx, timestamps, and feature values.
 # The feature value can be None for event-set without features.
 BeamEventSet = Tuple[
     Tuple[BeamIndexAndFeature, ...], Tuple[np.ndarray, Optional[np.ndarray]]
 ]
 
+# From the point of view of the user, a "Beam event set" is a PCollection of
+# BeamEventSet.
 PColBeamEventSet = beam.PCollection[BeamEventSet]
 
 
@@ -124,7 +134,7 @@ class _MergeTimestampsDP(beam.DoFn):
         self,
         item: Tuple[
             Tuple[BeamIndex, ...],
-            Iterable[Tuple[np.float64, Tuple[np.generic, ...]]],
+            Iterable[Tuple[Timestamps, Tuple[np.generic, ...]]],
         ],
     ) -> Iterable[BeamEventSet]:
         index, feat_and_ts = item
