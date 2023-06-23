@@ -80,7 +80,7 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["timestamp", "id"],
             ),
-            index_names=["id"],
+            indexes=["id"],
         )
 
         output_evset = event_set(
@@ -96,7 +96,7 @@ class CalendarDayOfMonthNumpyImplementationTest(absltest.TestCase):
                 ),
                 "id": [1, 1, 1, 2, 2],
             },
-            index_features=["id"],
+            indexes=["id"],
             is_unix_timestamp=True,
         )
         operator = CalendarDayOfMonthOperator(input_evset.node())

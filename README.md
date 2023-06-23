@@ -24,7 +24,7 @@ This is how a minimal end-to-end example looks like:
 import temporian as tp
 
 # Load data and create input node.
-evset = tp.from_csv("temporal_data.csv", timestamp_column="date")
+evset = tp.from_csv("temporal_data.csv", timestamps="date")
 source = evset.node()
 
 # Apply operators to create a processing graph.

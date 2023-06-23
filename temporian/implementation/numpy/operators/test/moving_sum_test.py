@@ -114,7 +114,7 @@ class MovingSumOperatorTest(absltest.TestCase):
                 ],
                 columns=["x", "y", "a", "timestamp"],
             ),
-            index_names=["x", "y"],
+            indexes=["x", "y"],
         )
 
         op = MovingSumOperator(
@@ -142,7 +142,7 @@ class MovingSumOperatorTest(absltest.TestCase):
                 ],
                 columns=["x", "y", "a", "timestamp"],
             ),
-            index_names=["x", "y"],
+            indexes=["x", "y"],
         )
 
         self.assertEqual(output["output"], expected_output)
@@ -284,7 +284,7 @@ class MovingSumOperatorTest(absltest.TestCase):
                 ],
                 columns=["x", "y", "a", "b", "timestamp"],
             ),
-            index_names=["x", "y"],
+            indexes=["x", "y"],
         )
 
         op = MovingSumOperator(
@@ -312,7 +312,7 @@ class MovingSumOperatorTest(absltest.TestCase):
                 ],
                 columns=["x", "y", "a", "b", "timestamp"],
             ),
-            index_names=["x", "y"],
+            indexes=["x", "y"],
         )
 
         self.assertEqual(output["output"], expected_output)

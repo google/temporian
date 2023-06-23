@@ -20,8 +20,8 @@ class IOTest(absltest.TestCase):
         )
         evset = tp.from_csv(
             path=path,
-            timestamp_column="timestamp",
-            index_names=["product_id"],
+            timestamps="timestamp",
+            indexes=["product_id"],
         )
 
         expected_evset = tp.from_pandas(
@@ -33,8 +33,8 @@ class IOTest(absltest.TestCase):
                 ],
                 columns=["product_id", "timestamp", "costs"],
             ),
-            index_names=["product_id"],
-            timestamp_column="timestamp",
+            indexes=["product_id"],
+            timestamps="timestamp",
         )
 
         self.assertEqual(evset, expected_evset)
@@ -49,7 +49,7 @@ class IOTest(absltest.TestCase):
             columns=["product_id", "timestamp", "costs"],
         )
 
-        evset = tp.from_pandas(df=df, index_names=["product_id"])
+        evset = tp.from_pandas(df=df, indexes=["product_id"])
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "events.csv")
@@ -60,8 +60,8 @@ class IOTest(absltest.TestCase):
 
             saved_evset = tp.from_csv(
                 path=path,
-                timestamp_column="timestamp",
-                index_names=["product_id"],
+                timestamps="timestamp",
+                indexes=["product_id"],
             )
 
             self.assertEqual(evset, saved_evset)

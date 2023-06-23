@@ -52,7 +52,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sales"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         self.evset_2 = from_pandas(
@@ -67,7 +67,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "costs"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
         self.node_1 = self.evset_1.node()
         self.node_2 = self.evset_2.node()
@@ -91,7 +91,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "eq_sales_costs"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
         operator = EqualOperator(input_1=self.node_1, input_2=self.node_2)
         operator.outputs["output"].check_same_sampling(self.node_1)
@@ -116,7 +116,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "ne_sales_costs"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
         operator = NotEqualOperator(input_1=self.node_1, input_2=self.node_2)
         operator_output = NotEqualNumpyImplementation(operator).call(
@@ -137,7 +137,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "gt_sales_costs"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
         operator = GreaterOperator(input_1=self.node_1, input_2=self.node_2)
         operator_output = GreaterNumpyImplementation(operator).call(
@@ -158,7 +158,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "ge_sales_costs"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
         op = GreaterEqualOperator(input_1=self.node_1, input_2=self.node_2)
         operator_output = GreaterEqualNumpyImplementation(op).call(
@@ -179,7 +179,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "lt_sales_costs"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
         op = LessOperator(input_1=self.node_1, input_2=self.node_2)
         operator_output = LessNumpyImplementation(op).call(
@@ -200,7 +200,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "le_sales_costs"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
         op = LessEqualOperator(input_1=self.node_1, input_2=self.node_2)
         operator_output = LessEqualNumpyImplementation(op).call(

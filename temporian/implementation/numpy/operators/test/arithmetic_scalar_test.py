@@ -57,7 +57,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sales"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         self.node = self.evset.node()
@@ -78,7 +78,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sales"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = AddScalarOperator(
@@ -108,7 +108,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sales"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = SubtractScalarOperator(
@@ -139,7 +139,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sales"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = SubtractScalarOperator(
@@ -170,7 +170,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sales"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = MultiplyScalarOperator(
@@ -199,7 +199,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sales"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = DivideScalarOperator(
@@ -228,7 +228,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sales"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = DivideScalarOperator(
@@ -259,7 +259,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sales"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = FloorDivScalarOperator(
@@ -288,7 +288,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sales"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = FloorDivScalarOperator(
@@ -318,7 +318,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sales"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = ModuloScalarOperator(
@@ -347,7 +347,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sales"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = ModuloScalarOperator(
@@ -375,7 +375,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sales"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = PowerScalarOperator(
@@ -404,7 +404,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sales"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = PowerScalarOperator(
@@ -431,7 +431,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "product_id", "timestamp", "sales"],
             ),
-            index_names=["store_id", "product_id"],
+            indexes=["store_id", "product_id"],
         )
 
         value = 10.0
@@ -452,7 +452,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                     "sales",
                 ],
             ),
-            index_names=["store_id", "product_id"],
+            indexes=["store_id", "product_id"],
         )
 
         node = evset.node()
@@ -486,7 +486,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sales"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         node = event_data.node()
@@ -522,7 +522,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sales", "revenue"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         node = evset.node()
@@ -545,7 +545,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                     "revenue",
                 ],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = AddScalarOperator(

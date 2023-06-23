@@ -16,7 +16,7 @@ class EventTest(absltest.TestCase):
                 "x": [1, 1, 1, 2, 2],
                 "y": ["hello", "hello", "hello", "world", "world"],
             },
-            index_features=["x", "y"],
+            indexes=["x", "y"],
         )
 
     def test_getitem(self):
@@ -29,11 +29,11 @@ class EventTest(absltest.TestCase):
 
     def test_getitem_error(self):
         with self.assertRaisesRegex(
-            TypeError, "can only be accessed by index tuples"
+            TypeError, "can only be accessed by index keys"
         ):
             self._evset["feature"]
         with self.assertRaisesRegex(
-            TypeError, "can only be accessed by index tuples"
+            TypeError, "can only be accessed by index keys"
         ):
             self._evset[0]
 

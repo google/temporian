@@ -69,10 +69,11 @@ def plot(
 
     Args:
         evsets: Single or list of EventSets to plot.
-        indexes: The index or list of indexes to plot. If index=None, plots all
-            the available indexes. Indexes should be provided as single value
-            (e.g. string) or tuple of values. Example: index="a", index=("a",),
-            index=("a", "b",), index=["a", "b"], index=[("a", "b"), ("a", "c")].
+        indexes: The index keys or list of indexes keys to plot. If indexes=None,
+            plots all the available indexes. Indexes should be provided as
+            single value (e.g. string) or tuple of values. Example: indexes="a",
+            indexes=("a",), indexes=("a", "b",), indexes=["a", "b"],
+            indexes=[("a", "b"), ("a", "c")].
         features: Feature names of the event(s) to plot. Use
             'evset.feature_names' for the list of available names.
             If a feature doesn't exist in an event, it's silently skipped.
@@ -122,8 +123,8 @@ def plot(
     for index in indexes:
         if not isinstance(index, tuple):
             raise ValueError(
-                "An index should be a tuple or a list of tuples. Instead"
-                f' receives "indexes={original_indexes}"'
+                "Indexes should be tuples or lists of tuples. Instead"
+                f' received "indexes={original_indexes}"'
             )
 
     if isinstance(style, str):
@@ -197,11 +198,11 @@ def get_num_plots(
         for evset in evsets:
             if index not in evset.data:
                 raise ValueError(
-                    f"Index '{index}' does not exist in EventSet. Check the"
-                    " available indexes with 'evset.index' and provide one of"
-                    " those index to the 'index' argument of 'plot'."
-                    ' Alternatively, set "index=None" to select a random'
-                    f" index value (e.g., {evset.get_arbitrary_index_value()}."
+                    f"Index key '{index}' does not exist in the EventSet. Check"
+                    " the available indexes with 'evset.indexes' and provide"
+                    " one of those to the 'indexes' argument of 'plot'."
+                    " Alternatively, set 'indexes=None' to select a random"
+                    f" index key (e.g., {evset.get_arbitrary_index_key()}."
                 )
             candidate_features = set(evset.schema.feature_names())
             num_features = len(candidate_features.intersection(features))

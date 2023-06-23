@@ -20,7 +20,7 @@ You can create an [`EventSet`][temporian.EventSet] from a pandas DataFrame, NumP
 ...         "feature_2": ["red", "blue", "red", "blue"],
 ...         "feature_3":  [10.0, -1.0, 5.0, 5.0],
 ...     },
-...     index_features=["feature_2"],
+...     indexes=["feature_2"],
 ... )
 
 ```
@@ -29,7 +29,7 @@ An [`EventSet`][temporian.EventSet] can hold one or several time sequences, depe
 
 If the [`EventSet`][temporian.EventSet] has no index, it will hold a single time sequence, which means that all events will be considered part of the same group and will interact with each other when operators are applied to the [`EventSet`][temporian.EventSet].
 
-If the [`EventSet`][temporian.EventSet] has one (or many) indexes, it will hold one time sequence for each unique value (or unique combination of values) of the indexes, the events will be grouped by their index value, and operators applied to the [`EventSet`][temporian.EventSet] will be applied to each time sequence independently.
+If the [`EventSet`][temporian.EventSet] has one (or many) indexes, it will hold one time sequence for each unique value (or unique combination of values) of the indexes, the events will be grouped by their index key, and operators applied to the [`EventSet`][temporian.EventSet] will be applied to each time sequence independently.
 
 ## Graph, [`Nodes`][temporian.Node] and Operators
 

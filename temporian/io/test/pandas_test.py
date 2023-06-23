@@ -38,12 +38,10 @@ class DataFrameToEventTest(absltest.TestCase):
                 "product_id": [666964, 666964, 574016],
                 "costs": [740.0, 508.0, 573.0],
             },
-            index_features=["product_id"],
+            indexes=["product_id"],
         )
 
-        evset = from_pandas(
-            df, index_names=["product_id"], timestamp_column="timestamp"
-        )
+        evset = from_pandas(df, indexes=["product_id"], timestamps="timestamp")
 
         self.assertEqual(evset, expected_evset)
 
@@ -80,12 +78,10 @@ class DataFrameToEventTest(absltest.TestCase):
                 "product_id": [666964, 666964, 574016],
                 "costs": ["740", "nan", ""],
             },
-            index_features=["product_id"],
+            indexes=["product_id"],
         )
 
-        evset = from_pandas(
-            df, index_names=["product_id"], timestamp_column="timestamp"
-        )
+        evset = from_pandas(df, indexes=["product_id"], timestamps="timestamp")
 
         self.assertEqual(evset, expected_evset)
 
@@ -115,11 +111,9 @@ class DataFrameToEventTest(absltest.TestCase):
                 "str_1": ["A", "B", "C"],
                 "str_2": ["D", "E", "F"],
             },
-            index_features=["product_id"],
+            indexes=["product_id"],
         )
-        evset = from_pandas(
-            df, index_names=["product_id"], timestamp_column="timestamp"
-        )
+        evset = from_pandas(df, indexes=["product_id"], timestamps="timestamp")
 
         self.assertEqual(evset, expected_evset)
 
@@ -139,7 +133,7 @@ class DataFrameToEventTest(absltest.TestCase):
                 ],
                 columns=["index_x", "index_y", "timestamp", "costs"],
             ),
-            index_names=["index_x", "index_y"],
+            indexes=["index_x", "index_y"],
         )
         expected_evset = event_set(
             timestamps=[1.0, 2.0, 3.0, 1.1, 2.1, 3.1, 1.2, 2.2, 3.2],
@@ -168,7 +162,7 @@ class DataFrameToEventTest(absltest.TestCase):
                     "Y2",
                 ],
             },
-            index_features=["index_x", "index_y"],
+            indexes=["index_x", "index_y"],
         )
         self.assertEqual(evset, expected_evset)
 
@@ -188,12 +182,10 @@ class DataFrameToEventTest(absltest.TestCase):
                 "product_id": [666964, 666964, 574016],
                 "costs": [740.0, np.nan, 573.0],
             },
-            index_features=["product_id"],
+            indexes=["product_id"],
         )
 
-        evset = from_pandas(
-            df, index_names=["product_id"], timestamp_column="timestamp"
-        )
+        evset = from_pandas(df, indexes=["product_id"], timestamps="timestamp")
         self.assertEqual(evset, expected_evset)
         self.assertFalse(evset.schema.is_unix_timestamp)
 
@@ -212,12 +204,10 @@ class DataFrameToEventTest(absltest.TestCase):
                 "product_id": [666964, 666964, 574016],
                 "costs": [740.0, 508.0, 573.0],
             },
-            index_features=["product_id"],
+            indexes=["product_id"],
             is_unix_timestamp=True,
         )
-        evset = from_pandas(
-            df, index_names=["product_id"], timestamp_column="timestamp"
-        )
+        evset = from_pandas(df, indexes=["product_id"], timestamps="timestamp")
         # validate
         self.assertEqual(evset, expected_evset)
         self.assertTrue(evset.schema.is_unix_timestamp)
@@ -237,12 +227,10 @@ class DataFrameToEventTest(absltest.TestCase):
                 "product_id": [666964, 666964, 574016],
                 "costs": [740.0, 508.0, 573.0],
             },
-            index_features=["product_id"],
+            indexes=["product_id"],
             is_unix_timestamp=True,
         )
-        evset = from_pandas(
-            df, index_names=["product_id"], timestamp_column="timestamp"
-        )
+        evset = from_pandas(df, indexes=["product_id"], timestamps="timestamp")
         # validate
         self.assertEqual(evset, expected_evset)
         self.assertTrue(evset.schema.is_unix_timestamp)
@@ -263,13 +251,11 @@ class DataFrameToEventTest(absltest.TestCase):
                 "product_id": [666964, 666964, 574016],
                 "costs": [740.0, 508.0, 573.0],
             },
-            index_features=["product_id"],
+            indexes=["product_id"],
             is_unix_timestamp=True,
         )
 
-        evset = from_pandas(
-            df, index_names=["product_id"], timestamp_column="timestamp"
-        )
+        evset = from_pandas(df, indexes=["product_id"], timestamps="timestamp")
 
         # validate
         self.assertEqual(evset, expected_evset)
@@ -302,13 +288,11 @@ class DataFrameToEventTest(absltest.TestCase):
                 "product_id": [666964, 666964, 574016],
                 "costs": [740.0, 508.0, 573.0],
             },
-            index_features=["product_id"],
+            indexes=["product_id"],
             is_unix_timestamp=True,
         )
 
-        evset = from_pandas(
-            df, index_names=["product_id"], timestamp_column="timestamp"
-        )
+        evset = from_pandas(df, indexes=["product_id"], timestamps="timestamp")
         self.assertEqual(evset, expected_evset)
         self.assertTrue(evset.schema.is_unix_timestamp)
 
@@ -323,9 +307,7 @@ class DataFrameToEventTest(absltest.TestCase):
         )
 
         with self.assertRaises(ValueError):
-            from_pandas(
-                df, index_names=["product_id"], timestamp_column="timestamp"
-            )
+            from_pandas(df, indexes=["product_id"], timestamps="timestamp")
 
     def test_invalid_string_timestamp_type(self) -> None:
         df = pd.DataFrame(
@@ -338,11 +320,9 @@ class DataFrameToEventTest(absltest.TestCase):
         )
 
         with self.assertRaises(ValueError):
-            from_pandas(
-                df, index_names=["product_id"], timestamp_column="timestamp"
-            )
+            from_pandas(df, indexes=["product_id"], timestamps="timestamp")
 
-    def test_timestamp_column_with_missing_values(self) -> None:
+    def test_timestamps_with_missing_values(self) -> None:
         df = pd.DataFrame(
             [
                 [666964, 1.0, 740.0],
@@ -354,11 +334,9 @@ class DataFrameToEventTest(absltest.TestCase):
         )
 
         with self.assertRaises(ValueError):
-            from_pandas(
-                df, index_names=["product_id"], timestamp_column="timestamp"
-            )
+            from_pandas(df, indexes=["product_id"], timestamps="timestamp")
 
-    def test_timestamp_column_with_non_supported_object(self) -> None:
+    def test_timestamps_with_non_supported_object(self) -> None:
         df = pd.DataFrame(
             [
                 [666964, 1.0, 740.0],
@@ -370,9 +348,7 @@ class DataFrameToEventTest(absltest.TestCase):
         )
 
         with self.assertRaises(ValueError):
-            from_pandas(
-                df, index_names=["product_id"], timestamp_column="timestamp"
-            )
+            from_pandas(df, indexes=["product_id"], timestamps="timestamp")
 
     def test_no_index(self) -> None:
         df = pd.DataFrame(
@@ -390,7 +366,7 @@ class DataFrameToEventTest(absltest.TestCase):
                 "costs": [740.0, 508.0, 573.0],
             },
         )
-        evset = from_pandas(df, index_names=[], timestamp_column="timestamp")
+        evset = from_pandas(df, indexes=[], timestamps="timestamp")
         self.assertEqual(evset, expected_evset)
 
     def test_datetime_in_feature_column(self) -> None:
@@ -413,7 +389,7 @@ class DataFrameToEventTest(absltest.TestCase):
                 ).astype(np.int64),
             },
         )
-        evset = from_pandas(df, index_names=[], timestamp_column="timestamp")
+        evset = from_pandas(df, indexes=[], timestamps="timestamp")
 
         self.assertEqual(evset, expected_evset)
 
@@ -445,7 +421,7 @@ class DataFrameToEventTest(absltest.TestCase):
                 "product_id": [666964, 666964, 574016],
                 "costs": [740.0, 508.0, 573.0],
             },
-            index_features=["product_id"],
+            indexes=["product_id"],
         )
 
         expected_df = pd.DataFrame(
@@ -489,7 +465,7 @@ class DataFrameToEventTest(absltest.TestCase):
                 "x": ["X1", "X1", "X1", "X2", "X2", "X2", "X2", "X2", "X2"],
                 "y": ["Y1", "Y1", "Y1", "Y1", "Y1", "Y1", "Y2", "Y2", "Y2"],
             },
-            index_features=["x", "y"],
+            indexes=["x", "y"],
         )
         expected_df = pd.DataFrame(
             [
@@ -516,7 +492,7 @@ class DataFrameToEventTest(absltest.TestCase):
                 "product_id": [666964, 666964, 574016],
                 "costs": ["740.0", "508.0", "573.0"],
             },
-            index_features=["product_id"],
+            indexes=["product_id"],
         )
         expected_df = pd.DataFrame(
             [

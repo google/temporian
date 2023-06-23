@@ -69,7 +69,7 @@ class UnaryNumpyImplementationTest(absltest.TestCase):
                     "boolean_2",
                 ],
             ),
-            index_names=["store_id", "product_id"],
+            indexes=["store_id", "product_id"],
         )
 
         # Expected event set after invert
@@ -94,7 +94,7 @@ class UnaryNumpyImplementationTest(absltest.TestCase):
                     "boolean_2",
                 ],
             ),
-            index_names=["store_id", "product_id"],
+            indexes=["store_id", "product_id"],
         )
 
         self.input_node = input_node(

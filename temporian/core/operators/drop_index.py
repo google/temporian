@@ -27,28 +27,28 @@ class DropIndexOperator(Operator):
     def __init__(
         self,
         input: Node,
-        index_to_drop: List[str],
+        indexes: List[str],
         keep: bool,
     ) -> None:
         super().__init__()
 
-        # "index_to_drop" is the list of indexes in `input`` to drop. If `keep`
-        # is true, those indexes will be converted into features.
-        self._index_to_drop = index_to_drop
+        # `indexes`` is the list of indexes in `input` to drop. If
+        # `keep` is true, those indexes will be converted into features.
+        self._indexes = indexes
         self._keep = keep
 
         self.add_input("input", input)
-        self.add_attribute("index_to_drop", index_to_drop)
+        self.add_attribute("indexes", indexes)
         self.add_attribute("keep", keep)
 
         self._output_feature_schemas = self._get_output_feature_schemas(
-            input, index_to_drop, keep
+            input, indexes, keep
         )
 
         self._output_indexes = [
             index_level
             for index_level in input.schema.indexes
-            if index_level.name not in index_to_drop
+            if index_level.name not in indexes
         ]
 
         self.add_output(
@@ -63,7 +63,7 @@ class DropIndexOperator(Operator):
         self.check()
 
     def _get_output_feature_schemas(
-        self, input: Node, index_to_drop: List[str], keep: bool
+        self, input: Node, indexes: List[str], keep: bool
     ) -> List[FeatureSchema]:
         if not keep:
             return input.schema.features
@@ -72,20 +72,18 @@ class DropIndexOperator(Operator):
         feature_dict = input.schema.feature_name_to_dtype()
 
         new_features: List[FeatureSchema] = []
-        for index_name in index_to_drop:
-            if index_name not in index_dict:
-                raise ValueError(
-                    f"Drop index {index_name} is not part of the index."
-                )
+        for index in indexes:
+            if index not in index_dict:
+                raise ValueError(f"{index} is not an index in input.")
 
-            if index_name in feature_dict:
+            if index in feature_dict:
                 raise ValueError(
-                    f"Feature name {index_name} coming from index already"
-                    " exists in input."
+                    f"{index} already exists in input's features. If you"
+                    " want to drop the index, specify `keep=False`."
                 )
 
             new_features.append(
-                FeatureSchema(name=index_name, dtype=index_dict[index_name])
+                FeatureSchema(name=index, dtype=index_dict[index])
             )
 
         # Note: The new features are added after the existing features.
@@ -100,8 +98,8 @@ class DropIndexOperator(Operator):
         return self._output_indexes
 
     @property
-    def index_to_drop(self) -> List[str]:
-        return self._index_to_drop
+    def indexes(self) -> List[str]:
+        return self._indexes
 
     @property
     def keep(self) -> bool:
@@ -113,7 +111,7 @@ class DropIndexOperator(Operator):
             key="DROP_INDEX",
             attributes=[
                 pb.OperatorDef.Attribute(
-                    key="index_to_drop",
+                    key="indexes",
                     type=pb.OperatorDef.Attribute.Type.LIST_STRING,
                 ),
                 pb.OperatorDef.Attribute(
@@ -129,75 +127,73 @@ class DropIndexOperator(Operator):
 operator_lib.register_operator(DropIndexOperator)
 
 
-def _normalize_index_to_drop(
+def _normalize_indexes(
     input: Node,
-    index_names: Optional[Union[List[str], str]],
+    indexes: Optional[Union[List[str], str]],
 ) -> List[str]:
-    if index_names is None:
+    if indexes is None:
         # Drop all the indexes
         return input.schema.index_names()
 
-    if isinstance(index_names, str):
-        index_names = [index_names]
+    if isinstance(indexes, str):
+        indexes = [indexes]
 
-    if len(index_names) == 0:
-        raise ValueError("Cannot specify empty list as `index_names` argument.")
+    if len(indexes) == 0:
+        raise ValueError("Cannot specify empty list as `indexes` argument.")
 
     # Check that requested indexes exist
     index_dict = input.schema.index_name_to_dtype()
-    for index_item in index_names:
-        if index_item not in index_dict:
+    for index in indexes:
+        if index not in index_dict:
             raise KeyError(
-                f"Dropped index {index_item} is not part of the index"
-                f" {input.schema.indexes}."
+                f"{index} is not an index in {input.schema.indexes}."
             )
 
-    return index_names
+    return indexes
 
 
 def drop_index(
     input: Node,
-    index_to_drop: Optional[Union[str, List[str]]] = None,
+    indexes: Optional[Union[str, List[str]]] = None,
     keep: bool = True,
 ) -> Node:
-    """Removes one or more index columns from a node.
+    """Removes indexes from a Node.
 
     Examples:
-        Given an input `Node` with index names ['A', 'B', 'C'] and features
-        names ['X', 'Y', 'Z']:
+        Given an input `Node` with indexes ['A', 'B', 'C'] and features
+        ['X', 'Y', 'Z']:
 
-        1. `drop_index(input, index_names='A', keep=True)`
-           Output `Node` will have index names ['B', 'C'] and features names
+        1. `drop_index(input, indexes='A', keep=True)`
+           Output `Node` will have indexes ['B', 'C'] and features
            ['X', 'Y', 'Z', 'A'].
 
-        2. `drop_index(input, index_names=['A', 'B'], keep=False)`
-           Output `Node` will have index names ['C'] and features names
-           ['X', 'Y', 'Z'].
+        2. `drop_index(input, indexes=['A', 'B'], keep=False)`
+           Output `Node` will have indexes ['C'] and features ['X', 'Y', 'Z'].
 
-        3. `drop_index(input, index_names=None, keep=True)`
-           Output `Node` will have index names [] (empty index) and features
-           names ['X', 'Y', 'Z', 'A', 'B', 'C'].
+        3. `drop_index(input, indexes=None, keep=True)`
+           Output `Node` will have indexes [] (empty index) and features
+           ['X', 'Y', 'Z', 'A', 'B', 'C'].
 
     Args:
-        input: Node from which the specified index columns should be removed.
-        index_to_drop: Index column(s) to be removed from `input`. This can be a
+        input: Node from which the specified indexes should be removed.
+        indexes: Index column(s) to be removed from `input`. This can be a
             single column name (`str`) or a list of column names (`List[str]`).
-            If not specified or set to `None`, all index columns in `input` will
+            If not specified or set to `None`, all indexes in `input` will
             be removed. Defaults to `None`.
-        keep: Flag indicating whether the removed index columns should be kept
+        keep: Flag indicating whether the removed indexes should be kept
             as features in the output `Node`. Defaults to `True`.
 
     Returns:
         A new `Node` object with the updated index, where the specified index
         column(s) have been removed. If `keep` is set to `True`, the removed
-        index columns will be included as features in the output `Node`.
+        indexes will be included as features in the output `Node`.
 
     Raises:
         ValueError: If an empty list is provided as the `index_names` argument.
         KeyError: If any of the specified `index_names` are missing from
             `input`'s index.
-        ValueError: If a feature name coming from the index already exists in
+        ValueError: If a feature name coming from the indexes already exists in
             `input`, and the `keep` flag is set to `True`.
     """
-    index_to_drop = _normalize_index_to_drop(input, index_to_drop)
-    return DropIndexOperator(input, index_to_drop, keep).outputs["output"]
+    indexes = _normalize_indexes(input, indexes)
+    return DropIndexOperator(input, indexes, keep).outputs["output"]

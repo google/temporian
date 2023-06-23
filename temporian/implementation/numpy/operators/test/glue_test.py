@@ -40,7 +40,7 @@ class GlueNumpyImplementationTest(absltest.TestCase):
                 "user_id": ["user_1", "user_1", "user_1", "user_1", "user_2"],
                 "feature_1": [10, 11, 12, 13, 14],
             },
-            index_features=["user_id"],
+            indexes=["user_id"],
         )
 
         evset_2 = event_set(
@@ -50,7 +50,7 @@ class GlueNumpyImplementationTest(absltest.TestCase):
                 "feature_2": [20, 21, 22, 23, 24],
                 "feature_3": [30, 31, 32, 33, 34],
             },
-            index_features=["user_id"],
+            indexes=["user_id"],
             same_sampling_as=evset_1,
         )
 
@@ -60,7 +60,7 @@ class GlueNumpyImplementationTest(absltest.TestCase):
                 "user_id": ["user_1", "user_1", "user_1", "user_1", "user_2"],
                 "feature_4": [40, 41, 42, 43, 44],
             },
-            index_features=["user_id"],
+            indexes=["user_id"],
             same_sampling_as=evset_1,
         )
 
@@ -73,7 +73,7 @@ class GlueNumpyImplementationTest(absltest.TestCase):
                 "feature_3": [30, 31, 32, 33, 34],
                 "feature_4": [40, 41, 42, 43, 44],
             },
-            index_features=["user_id"],
+            indexes=["user_id"],
         )
 
         operator = GlueOperator(

@@ -73,7 +73,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
                     "f_boolean",
                 ],
             ),
-            index_names=["store_id", "product_id"],
+            indexes=["store_id", "product_id"],
         )
 
         self.input_node = self.input_evset.node()
@@ -103,7 +103,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
                 ],
                 # Even more tricky: these columns won't match their type
             ).astype({"f_float_64": np.float32, "f_int_64": np.int32}),
-            index_names=["store_id", "product_id"],
+            indexes=["store_id", "product_id"],
         )
 
         # Expected when converting everything to float32
@@ -137,7 +137,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
                     "f_boolean": np.float32,
                 }
             ),
-            index_names=["store_id", "product_id"],
+            indexes=["store_id", "product_id"],
         )
 
     def test_cast_manual(self) -> None:

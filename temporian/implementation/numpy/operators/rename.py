@@ -31,8 +31,8 @@ class RenameNumpyImplementation(OperatorImplementation):
             for index_name in input.schema.index_names()
         ]
 
-        # check that after renaming everything there are no common values
-        # between index names and feature names
+        # check that after renaming everything there are no common names
+        # between indexes and features
         if set(new_feature_names).intersection(set(new_index_names)):
             raise ValueError(
                 "Index names and feature names must be unique. Got"

@@ -36,7 +36,7 @@ class PropagateOperatorTest(absltest.TestCase):
                     "x": [1, 1, 2],
                 }
             ),
-            index_names=["x"],
+            indexes=["x"],
         )
         node = evset.node()
 
@@ -48,7 +48,7 @@ class PropagateOperatorTest(absltest.TestCase):
                     "y": [1, 2, 1, 2],
                 }
             ),
-            index_names=["x", "y"],
+            indexes=["x", "y"],
         )
         sampling_node = sampling_evset.node()
 
@@ -61,7 +61,7 @@ class PropagateOperatorTest(absltest.TestCase):
                     "y": [1, 1, 2, 2, 1, 2],
                 }
             ),
-            index_names=["x", "y"],
+            indexes=["x", "y"],
         )
         # Run op
         op = Propagate(input=node, sampling=sampling_node)

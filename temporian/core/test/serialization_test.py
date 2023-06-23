@@ -89,7 +89,7 @@ class SerializeTest(absltest.TestCase):
         input_data = event_set(
             timestamps=[1, 2, 3, 4],
             features={"f1": [5, 6, 7, 8], "x": [1, 1, 2, 2]},
-            index_features=["x"],
+            indexes=["x"],
         )
 
         input_node = input_data.node()
