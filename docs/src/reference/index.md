@@ -14,21 +14,12 @@ Check the index on the left for a more detailed description of any symbol.
 
 ## Functions
 
-<<<<<<< Updated upstream
-| Symbol                                    | Description                                                                            |
-| ----------------------------------------- | -------------------------------------------------------------------------------------- |
-| [`tp.evaluate()`][temporian.evaluate]     | Evaluates [`Nodes`][temporian.Node] on [`EventSets`][temporian.EventSet].              |
-| [`tp.plot()`][temporian.plot]             | Plots [`EventSets`][temporian.EventSet].                                               |
-| [`tp.event_set()`][temporian.event_set]   | Creates an [`EventSet`][temporian.EventSet] from arrays (lists, NumPy, Pandas Series.) |
-| [`tp.input_node()`][temporian.input_node] | Creates an input [`Node`][temporian.Node], that can be used to feed data into a graph. |
-=======
 | Symbol                                    | Description                                                                                   |
 | ----------------------------------------- | --------------------------------------------------------------------------------------------- |
 | [`tp.evaluate()`][temporian.evaluate]     | Evaluates [`Nodes`][temporian.Node] on [`EventSets`][temporian.EventSet].                     |
 | [`tp.plot()`][temporian.plot]             | Plots [`EventSets`][temporian.EventSet].                                                      |
 | [`tp.event_set()`][temporian.event_set]   | Creates an [`EventSet`][temporian.EventSet] from arrays (lists, NumPy arrays, Pandas Series.) |
 | [`tp.input_node()`][temporian.input_node] | Creates an input [`Node`][temporian.Node], that can be used to feed data into a graph.        |
->>>>>>> Stashed changes
 
 ## Input/output
 
