@@ -126,6 +126,8 @@ def _add_index(
     assert len(features) == 1
     timestamps, values = features[0]
 
+    # Note: This solution is very slow. This is the same used in the in-process
+    # implementation.
     new_index_to_value_idxs = defaultdict(list)
     for event_idx, new_index in enumerate(zip(*[x[1] for x in new_index])):
         new_index = tuple([v.item() for v in new_index])
