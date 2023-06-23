@@ -39,7 +39,7 @@ def milliseconds(value: Union[int, float]) -> Duration:
         >>> duration
         0.25
         >>> result = tp.moving_sum(source, window_length=duration)
-        >>> result.evaluate({source: evset})
+        >>> result.evaluate(evset)
         indexes: ...
                 timestamps: [0.5 1.  1.2]
                 'f1': [1 5 0]
@@ -82,7 +82,7 @@ def seconds(value: Union[int, float]) -> Duration:
         >>> # Actually equivalent
         >>> result = tp.moving_sum(source, window_length=3)
 
-        >>> result.evaluate({source: evset})
+        >>> result.evaluate(evset)
         indexes: ...
                 timestamps: [1. 2. 6.]
                 'f1': [ 1 6 -5]
@@ -112,7 +112,7 @@ def minutes(value: Union[int, float]) -> Duration:
         >>> source = evset.node()
 
         >>> result = tp.moving_sum(source, window_length=tp.duration.minutes(6))
-        >>> result.evaluate({source: evset})
+        >>> result.evaluate(evset)
         indexes: ...
                 timestamps: [ 300. 600. 1800.]
                 'f1': [ 1 6 -5]
@@ -142,7 +142,7 @@ def hours(value: Union[int, float]) -> Duration:
         >>> source = evset.node()
 
         >>> result = tp.moving_sum(source, window_length=tp.duration.hours(2))
-        >>> result.evaluate({source: evset})
+        >>> result.evaluate(evset)
         indexes: ...
                 timestamps: [ 3600. 7200. 36000.]
                 'f1': [ 1 6 -5]
@@ -172,7 +172,7 @@ def days(value: Union[int, float]) -> Duration:
         >>> source = evset.node()
 
         >>> result = tp.moving_sum(source, window_length=tp.duration.days(2))
-        >>> result.evaluate({source: evset})
+        >>> result.evaluate(evset)
         indexes: ...
                 timestamps: [1.5778e+09 1.5779e+09 1.5804e+09]
                 'f1': [ 1 6 -5]
@@ -201,7 +201,7 @@ def weeks(value: Union[int, float]) -> Duration:
         >>> source = evset.node()
 
         >>> result = tp.moving_sum(source, window_length=tp.duration.weeks(2))
-        >>> result.evaluate({source: evset})
+        >>> result.evaluate(evset)
         indexes: ...
                 timestamps: [1.5778e+09 1.5784e+09 1.5804e+09]
                 'f1': [ 1 6 -5]

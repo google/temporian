@@ -47,20 +47,22 @@ def evaluate(
     """Evaluates [`Nodes`][temporian.Node] on [`EventSets`][temporian.EventSet].
 
     Performs all computation defined by the graph between the `query` Nodes and
-    the `input` EventSet.
+    the `input` EventSets.
 
     The result is returned in the same format as the `query` argument.
-
 
     Single input output example:
         ```python
         >>> input_evset = tp.event_set(timestamps=[1, 2, 3], features={"f": [0, 4, 10]})
         >>> input_node = input_evset.node()
         >>> output_node = tp.moving_sum(input_node, 5)
+        >>> output_evset = tp.evaluate(output_node, input_evset)
 
-        >>> # Equivalents
+        >>> # Equivalent
+        >>> output_evset = output_node.evaluate(input_evset)
+
+        >>> # Also equivalent
         >>> output_evset = tp.evaluate(output_node, {input_node: input_evset})
-        >>> output_evset = output_node.evaluate({input_node: input_evset})
 
         ```
 
@@ -83,25 +85,17 @@ def evaluate(
         ...     {input_1: evset_1, input_2: evset_2}
         ... )
 
-        ```
-
-    Named input example:
-        ```python
-        >>> input_evset = tp.event_set(
-        ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 42, 10]},
-        ...     name="my_input"
+        >>> # Equivalent
+        evset_step_1, evset_step_2 = tp.evaluate(
+        ...     [step_1, step_2],
+        ...     [evset_1, evset_2],
         ... )
-        >>> input_node = input_evset.node()
 
-        >>> # Check input name equals evset's name
-        >>> input_node.name
-        'my_input'
-
-        >>> output_node = tp.moving_sum(input_node, 5)
-
-        >>> # Find input node by name
-        >>> output_evset = output_node.evaluate(input_evset)
+        >>> # Also equivalent. EventSets are mapped by their .node(), not by position.
+        >>> evset_step_1, evset_step_2 = tp.evaluate(
+        ...     [step_1, step_2],
+        ...     [evset_2, evset_1],
+        ... )
 
         ```
 
