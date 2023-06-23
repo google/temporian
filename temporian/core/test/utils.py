@@ -1,7 +1,7 @@
 """Utilities for unit testing."""
 from typing import Dict, List, Optional
 
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 from temporian.core.data.node import (
     Node,
     input_node,

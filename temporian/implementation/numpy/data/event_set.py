@@ -22,7 +22,7 @@ import sys
 
 import numpy as np
 
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node, create_node_with_new_reference
 from temporian.core.data.schema import Schema
 from temporian.utils import string

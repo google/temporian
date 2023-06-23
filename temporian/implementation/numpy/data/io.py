@@ -28,7 +28,8 @@ def event_set(
     is_unix_timestamp: Optional[bool] = None,
     same_sampling_as: Optional[EventSet] = None,
 ) -> EventSet:
-    """Creates an EventSet from arrays (list, numpy, pandas).
+    """Creates an [`EventSet`][temporian.EventSet] from arrays (lists, NumPy
+    arrays, Pandas Series.)
 
     Usage examples:
 

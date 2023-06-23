@@ -59,7 +59,7 @@ plugins:
       scripts:
         # Generate the index page from the README.md.
         - gen_index.py
-        # Generate the reference pages from docstrings.
+        # Generate the ref pages and navigation.
         - gen_ref_pages.py
   - literate-nav:
       nav_file: SUMMARY.md
