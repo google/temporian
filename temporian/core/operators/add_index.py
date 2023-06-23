@@ -141,7 +141,7 @@ def _normalize_index_to_set(
 
 
 def add_index(input: Node, index_to_add: Union[str, List[str]]) -> Node:
-    """Adds one or more features as index in a node.
+    """Adds one or more features as index in a Node.
 
     Examples:
         Given an input `Node` with index names ['A', 'B', 'C'] and features

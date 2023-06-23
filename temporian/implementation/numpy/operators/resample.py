@@ -49,7 +49,7 @@ class ResampleNumpyImplementation(OperatorImplementation):
             )
             for f in output_schema.features
         ]
-        # create output event set
+        # create output EventSet
         dst_evset = EventSet(data={}, schema=output_schema)
         # iterate over destination sampling
         for index_key, index_data in sampling.data.items():

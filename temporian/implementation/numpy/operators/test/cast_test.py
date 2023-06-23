@@ -78,7 +78,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
 
         self.input_node = self.input_evset.node()
 
-        # Expected event set when applying some downcast operations
+        # Expected EventSet when applying some downcast operations
         self.expected_evset_1 = from_pandas(
             pd.DataFrame(
                 data=[

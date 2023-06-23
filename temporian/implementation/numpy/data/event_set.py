@@ -325,8 +325,8 @@ class IndexData:
 class EventSet:
     """Actual temporal data.
 
-    Use [`tp.event_set()`][temporian.event_set] to create an event set manually,
-    or [`tp.from_pandas()`][temporian.from_pandas] to create an event set from a
+    Use [`tp.event_set()`][temporian.event_set] to create an EventSet manually,
+    or [`tp.from_pandas()`][temporian.from_pandas] to create an EventSet from a
     pandas DataFrame.
     """
 
@@ -362,7 +362,7 @@ class EventSet:
     def get_arbitrary_index_value(self) -> Optional[Tuple]:
         """Gets an arbitrary index value.
 
-        If the event set is empty, return None.
+        If the EventSet is empty, return None.
         """
 
         if self._data:
@@ -372,7 +372,7 @@ class EventSet:
     def get_arbitrary_index_data(self) -> Optional[IndexData]:
         """Gets an arbitrary index data.
 
-        If the event set is empty, return None.
+        If the EventSet is empty, return None.
         """
 
         if self._data:
@@ -380,7 +380,7 @@ class EventSet:
         return None
 
     def node(self, force_new_node: bool = False) -> Node:
-        """Creates a node able to consume the the event set.
+        """Creates a [`Node`][temporian.Node] able to consume the the EventSet.
 
         If called multiple times with `force_new_node=False` (default), the same
         node is returned.
@@ -404,7 +404,7 @@ class EventSet:
                 `node` is called. If true, a new node is created each time.
 
         Returns:
-            A node able to consume the content of the event set.
+            A Node able to consume the content of the EventSet.
         """
 
         if self._internal_node is not None and not force_new_node:
@@ -492,7 +492,7 @@ class EventSet:
         return True
 
     def plot(self, *args, **wargs) -> Any:
-        """Plots the event set. See [`tp.plot()`][temporian.plot] for details.
+        """Plots the EventSet. See [`tp.plot()`][temporian.plot] for details.
 
         Example usage:
 
@@ -518,7 +518,7 @@ class EventSet:
         return size
 
     def memory_usage(self) -> int:
-        """Gets the approximated memory usage of the event set in bytes.
+        """Gets the approximated memory usage of the EventSet in bytes.
 
         Takes into account garbage collector overhead.
         """

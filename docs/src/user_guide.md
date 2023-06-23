@@ -148,7 +148,7 @@ The `<inputs>` can be specified as a dictionary of [`Nodes`][temporian.Node] to 
 - In [`tp.evaluate()`][temporian.evaluate], the second argument defines a mapping between input [`Nodes`][temporian.Node] and [`EventSets`][temporian.EventSet]. If all necessary input [`Nodes`][temporian.Node] are not fed, an error will be raised.
 - In most cases you will only pass [`EventSets`][temporian.EventSet] that correspond to the graph's input [`Nodes`][temporian.Node], but Temporian also supports passing [`EventSets`][temporian.EventSet] to intermediate [`Nodes`][temporian.Node] in the graph. In the example provided, `a_node` is fed, but we could also feed `b_node` and `c_node`. In that case we would not need to feed `a_node`, since no [`Nodes`][temporian.Node] need to be computed from it anymore.
 
-To simplify its usage when the graph contains a single output [`Node`][temporian.Node], `node.evaluate` is equivalent to `tp.evaluate(node, <inputs>)`.
+To simplify its usage when the graph contains a single output [`Node`][temporian.Node], `node.evaluate(...)` is equivalent to `tp.evaluate(node, ...)`.
 
 ```python
 >>> # These statements are equivalent.
@@ -167,7 +167,7 @@ To simplify its usage when the graph contains a single output [`Node`][temporian
 >>> # d_evset = d_node.evaluate(a_evset)
 -->
 
-**Warning:** It is more efficient to evaluate multiple output [`Nodes`][temporian.Node] together with [`tp.evaluate()`][temporian.evaluate] than to evaluate them separately with `node_1.evaluate(...)`, `node_2.evaluate(...)`, etc. Only use [`node.evaluate`][temporian.Node.evaluate] for debugging purposes or when you only have a single output [`Node`][temporian.Node].
+**Warning:** It is more efficient to evaluate multiple output [`Nodes`][temporian.Node] together with [`tp.evaluate()`][temporian.evaluate] than to evaluate them separately with `node_1.evaluate(...)`, `node_2.evaluate(...)`, etc. Only use [`node.evaluate()`][temporian.Node.evaluate] for debugging purposes or when you only have a single output [`Node`][temporian.Node].
 
 ## Creating a [`Node`][temporian.Node] from an [`EventSet`][temporian.EventSet]
 
@@ -514,7 +514,7 @@ False
 
 ```
 
-All these operators act feature-wise, i.e. they perform index-feature-wise operations (for each feature in each index key). This implies that the input nodes must have the same number of features.
+All these operators act feature-wise, i.e. they perform index-feature-wise operations (for each feature in each index key). This implies that the input [`Nodes`][temporian.Node] must have the same number of features.
 
 ```python
 >>> node[["f1", "f2"]] + node["f3"]
@@ -524,7 +524,7 @@ ValueError: The left and right arguments should have the same number of features
 
 ```
 
-The input nodes must also have the same sampling and index.
+The input [`Nodes`][temporian.Node] must also have the same sampling and index.
 
 ```python
 >>> sampling_1 = tp.event_set(
@@ -542,10 +542,10 @@ ValueError: Arguments should have the same sampling. ...
 
 ```
 
-If you want to apply arithmetic operators on nodes with different samplings, take a look at
+If you want to apply arithmetic operators on [`Nodes`][temporian.Node] with different samplings, take a look at
 [Sampling](#sampling) section.
 
-If you want to apply them on nodes with different indices, check the
+If you want to apply them on [`Nodes`][temporian.Node] with different indices, check the
 [Vertical operators](#index-horizontal-and-vertical-operators) section.
 
 Operations involving scalars are applied index-feature-element-wise.

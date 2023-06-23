@@ -202,10 +202,10 @@ class {capitalized_op}NumpyImplementation(OperatorImplementation):
 
         output_schema = self.output_schema("output")
 
-        # create output event set
+        # Create output EventSet
         output_evset = EventSet(data={{}}, schema=output_schema)
 
-        # fill output event set data
+        # Fill output EventSet's data
         for index_key, index_data in input.data.items():
             output_evset[index_key] = IndexData(
                 [],

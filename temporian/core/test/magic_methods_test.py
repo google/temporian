@@ -494,12 +494,12 @@ class MagicMethodsTest(absltest.TestCase):
         # Check that bool(node) doesn't work
         boolean_node = self.node_float_1 != self.node_float_2
         with self.assertRaisesRegex(
-            ValueError, "truth value of a node is ambiguous"
+            ValueError, "truth value of a Node is ambiguous"
         ):
             bool(boolean_node)
 
         with self.assertRaisesRegex(
-            ValueError, "truth value of a node is ambiguous"
+            ValueError, "truth value of a Node is ambiguous"
         ):
             if boolean_node:  # <- this should call bool(boolean_node)
                 pass

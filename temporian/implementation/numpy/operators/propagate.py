@@ -36,7 +36,7 @@ class PropagateNumpyImplementation(OperatorImplementation):
         dst_data = {}
 
         for sampling_index in sampling.data:
-            # Compute the event set index
+            # Compute the EventSet's index
             src_index = tuple(
                 [sampling_index[i] for i in self.operator.index_mapping]
             )

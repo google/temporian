@@ -43,15 +43,15 @@ def _check_value_to_schema(
     nodes: Dict[str, Node],
     label: str,
 ) -> None:
-    """Checks if event sets are matching the expected schema."""
+    """Checks if EventSets are matching the expected schema."""
 
     for key, node in nodes.items():
         value = values[key]
 
         if value.schema != node.schema:
             raise RuntimeError(
-                "Unexpected event set schema.\n"
-                f"event set schema =\n{value.schema}\n"
+                "Unexpected EventSet set schema.\n"
+                f"actual schema =\n{value.schema}\n"
                 f"expected schema =\n{node.schema}"
             )
 
@@ -168,7 +168,7 @@ def _is_same_sampling(evset_1: EventSet, evset_2: EventSet) -> Tuple[bool, str]:
             return (
                 False,
                 (
-                    f"Index {index_key} missing from one of the two event sets."
+                    f"Index {index_key} missing from one of the two EventSets."
                     f" When comparing {evset_1} with {evset_2}"
                 ),
             )

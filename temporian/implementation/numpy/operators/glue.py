@@ -42,7 +42,7 @@ class GlueNumpyImplementation(OperatorImplementation):
         )
         if len(evsets) < 2:
             raise ValueError(
-                f"Glue operator cannot be called on a {len(evsets)} event sets."
+                f"Glue operator cannot be called on a {len(evsets)} EventSets."
             )
 
         dst_evset = EventSet(data={}, schema=output_schema)

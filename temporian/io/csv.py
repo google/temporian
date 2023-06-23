@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Utility for reading an event set from disk."""
+"""Utilities for reading and saving EventSets from/to disk."""
 
 from typing import List, Optional
 from temporian.implementation.numpy.data.event_set import EventSet
@@ -25,14 +25,14 @@ def from_csv(
     index_names: Optional[List[str]] = None,
     sep: str = ",",
 ) -> EventSet:
-    """Reads an EventSet from a CSV file.
+    """Reads an [`EventSet`][temporian.EventSet] from a CSV file.
 
     Args:
         path: Path to the file.
         timestamp_column: Name of the column to be used as timestamps for the
-            event set.
-        index_names: Names of the columns to be used as index for the event set.
-            If None, a flat event set will be created.
+            EventSet.
+        index_names: Names of the columns to be used as index for the EventSet.
+            If None, a flat EventSet will be created.
         sep: Separator to use.
 
 
@@ -59,7 +59,7 @@ def to_csv(
     na_rep: Optional[str] = None,
     columns: Optional[List[str]] = None,
 ):
-    """Saves an EventSet to a CSV file.
+    """Saves an [`EventSet`][temporian.EventSet] to a CSV file.
 
     Args:
         evset: EventSet to save.
