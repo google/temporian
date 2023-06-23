@@ -25,12 +25,6 @@ from temporian.beam.operators.base import BeamOperatorImplementation
 from temporian.beam.io import BeamEventSet, PColBeamEventSet
 
 
-def _run_item(pipe: BeamEventSet, feature_idxs: Set[int]):
-    indexes, (timestamps, input_values) = pipe
-    if indexes[-1] in feature_idxs:
-        yield indexes, (timestamps, input_values)
-
-
 class SelectBeamImplementation(BeamOperatorImplementation):
     def call(self, input: PColBeamEventSet) -> Dict[str, PColBeamEventSet]:
         assert isinstance(self.operator, CurrentOperator)
@@ -54,3 +48,9 @@ class SelectBeamImplementation(BeamOperatorImplementation):
 implementation_lib.register_operator_implementation(
     CurrentOperator, SelectBeamImplementation
 )
+
+
+def _run_item(pipe: BeamEventSet, feature_idxs: Set[int]):
+    indexes, (timestamps, input_values) = pipe
+    if indexes[-1] in feature_idxs:
+        yield indexes, (timestamps, input_values)

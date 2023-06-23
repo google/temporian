@@ -28,15 +28,6 @@ from temporian.beam.io import BeamEventSet, PColBeamEventSet
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
-def _run_item(pipe: BeamEventSet, imp: OperatorImplementation):
-    indexes, (timestamps, input_values) = pipe
-    output_values = imp.apply_feature_wise(
-        src_timestamps=timestamps,
-        src_feature=input_values,
-    )
-    return indexes, (timestamps, output_values)
-
-
 class MovingSumBeamImplementation(BeamOperatorImplementation):
     def call(self, input: PColBeamEventSet) -> Dict[str, PColBeamEventSet]:
         assert isinstance(self.operator, CurrentOperator)
@@ -55,3 +46,12 @@ class MovingSumBeamImplementation(BeamOperatorImplementation):
 implementation_lib.register_operator_implementation(
     CurrentOperator, MovingSumBeamImplementation
 )
+
+
+def _run_item(pipe: BeamEventSet, imp: OperatorImplementation):
+    indexes, (timestamps, input_values) = pipe
+    output_values = imp.apply_feature_wise(
+        src_timestamps=timestamps,
+        src_feature=input_values,
+    )
+    return indexes, (timestamps, output_values)

@@ -205,7 +205,7 @@ def set_index(input: Node, index: Union[str, List[str]]) -> Node:
 
     # Note
     # The set_index is implemented as a drop_index + add_index.
-    # The implementation could be improved (simpoler, faster) with a new
+    # The implementation could be improved (simpler, faster) with a new
     # operator to re-order the index items.
 
     if len(input.schema.indexes) != 0:

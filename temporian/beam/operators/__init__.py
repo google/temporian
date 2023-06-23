@@ -19,3 +19,4 @@
 # fmt: off
 from temporian.beam.operators.window import moving_sum
 from temporian.beam.operators import select
+from temporian.beam.operators import add_index

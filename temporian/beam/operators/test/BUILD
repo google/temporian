@@ -13,3 +13,14 @@ py_test(
         "//temporian/core/operators:select",
     ],
 )
+
+py_test(
+    name="add_index_test",
+    srcs=["add_index_test.py"],
+    srcs_version="PY3",
+    deps=[
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/beam/test:utils",
+        "//temporian/core/operators:add_index",
+    ],
+)
