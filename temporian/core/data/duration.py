@@ -38,6 +38,7 @@ def milliseconds(value: Union[int, float]) -> Duration:
         >>> duration = tp.duration.milliseconds(250)
         >>> duration
         0.25
+
         >>> result = tp.moving_sum(source, window_length=duration)
         >>> result.evaluate(evset)
         indexes: ...
@@ -63,25 +64,19 @@ def seconds(value: Union[int, float]) -> Duration:
     this method does nothing else than casting the input to `float`. It may be
     used in order to make the code more explicit.
 
-    Example:
-        ```python
-        >>> # Only converts to float
-        >>> tp.duration.seconds(3)
-        3.0
-
-        ```
-
     Explicit time units:
         ```python
-        >>> evset = tp.event_set(timestamps=[1, 2, 6], features={"f1": [1, 5, -5]})
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 6],
+        ...     features={"f1": [1, 5, -5]},
+        ... )
         >>> source = evset.node()
 
-        >>> # More explicit
-        >>> result = tp.moving_sum(source, window_length=tp.duration.seconds(3))
+        >>> duration = tp.duration.seconds(3)
+        >>> duration
+        3.0
 
-        >>> # Actually equivalent
-        >>> result = tp.moving_sum(source, window_length=3)
-
+        >>> result = tp.moving_sum(source, window_length=duration)
         >>> result.evaluate(evset)
         indexes: ...
                 timestamps: [1. 2. 6.]
