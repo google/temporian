@@ -3,7 +3,7 @@ from typing import Dict
 
 import numpy as np
 
-from temporian.core.operators.unary.unary import (
+from temporian.core.operators.unary import (
     BaseUnaryOperator,
     AbsOperator,
     InvertOperator,

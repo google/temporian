@@ -16,7 +16,7 @@
 
 from abc import ABC
 from typing import Dict, List, Tuple, Union, Any
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 
 from temporian.core.data.node import Node
 from temporian.proto import core_pb2 as pb

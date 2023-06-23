@@ -18,7 +18,7 @@ Check the index on the left for a more detailed description of any symbol.
 | ----------------------------------------- | -------------------------------------------------------------------------------------- |
 | [`tp.evaluate()`][temporian.evaluate]     | Evaluates [`Nodes`][temporian.Node] on [`EventSets`][temporian.EventSet].              |
 | [`tp.plot()`][temporian.plot]             | Plots [`EventSets`][temporian.EventSet].                                               |
-| [`tp.event_set()`][temporian.event_set]   | Creates an [`EventSet`][temporian.EventSet] from arrays (list, numpy, pandas).         |
+| [`tp.event_set()`][temporian.event_set]   | Creates an [`EventSet`][temporian.EventSet] from arrays (lists, NumPy, Pandas Series.) |
 | [`tp.input_node()`][temporian.input_node] | Creates an input [`Node`][temporian.Node], that can be used to feed data into a graph. |
 
 ## Input/output
@@ -60,11 +60,11 @@ Check the index on the left for a more detailed description of any symbol.
 
 ### Binary operators
 
-| Symbols                                                                                                                                                                                                                                           | Description                                                                   |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| [`tp.add()`][temporian.add] [`tp.subtract()`][temporian.subtract] [`tp.multiply()`][temporian.multiply] [`tp.divide()`][temporian.divide] [`tp.floordiv()`][temporian.floordiv] [`tp.modulo()`][temporian.modulo] [`tp.power()`][temporian.power] | Compute an arithmetic binary operation between two [`Nodes`][temporian.Node]. |
-| [`tp.equal()`][temporian.equal] [`tp.not_equal()`][temporian.not_equal] [`tp.greater()`][temporian.greater] [`tp.greater_equal()`][temporian.greater_equal] [`tp.less()`][temporian.less] [`tp.less_equal()`][temporian.less_equal]               | Compute a relational binary operator between two [`Nodes`][temporian.Node].   |
-| [`tp.logical_and()`][temporian.logical_and] [`tp.logical_or()`][temporian.logical_or] [`tp.logical_xor()`][temporian.logical_xor]                                                                                                                 | Compute a logical binary operation between two [`Nodes`][temporian.Node].     |
+| Symbols                                                                                                                                                                                                                                           | Description                                                                                                         |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| [`tp.add()`][temporian.add] [`tp.subtract()`][temporian.subtract] [`tp.multiply()`][temporian.multiply] [`tp.divide()`][temporian.divide] [`tp.floordiv()`][temporian.floordiv] [`tp.modulo()`][temporian.modulo] [`tp.power()`][temporian.power] | Compute an arithmetic binary operation between two [`Nodes`][temporian.Node]. Aliases for `+`, `-`, `\*`, `/`, etc. |
+| [`tp.equal()`][temporian.equal] [`tp.not_equal()`][temporian.not_equal] [`tp.greater()`][temporian.greater] [`tp.greater_equal()`][temporian.greater_equal] [`tp.less()`][temporian.less] [`tp.less_equal()`][temporian.less_equal]               | Compute a relational binary operator between two [`Nodes`][temporian.Node].                                         |
+| [`tp.logical_and()`][temporian.logical_and] [`tp.logical_or()`][temporian.logical_or] [`tp.logical_xor()`][temporian.logical_xor]                                                                                                                 | Compute a logical binary operation between two [`Nodes`][temporian.Node].                                           |
 
 ### Unary operators
 

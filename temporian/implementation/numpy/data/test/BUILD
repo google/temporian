@@ -36,7 +36,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
-        "//temporian/core/data/dtypes:dtype",
+        "//temporian/core/data:dtype",
         "//temporian/core/data:schema",
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
