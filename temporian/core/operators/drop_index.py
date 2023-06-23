@@ -164,58 +164,58 @@ def drop_index(
         >>> a_evset = tp.event_set(
         ...     timestamps=[1, 2, 1, 0, 1, 1],
         ...     features={
-        ...         "store": [1, 1, 1, 2, 2, 2],
-        ...         "product": [1, 1, 2, 1, 1, 2],
-        ...         "sales": [1, 1, 1, 1, 1, 1]
+        ...         "f1": [1, 1, 1, 2, 2, 2],
+        ...         "f2": [1, 1, 2, 1, 1, 2],
+        ...         "f3": [1, 1, 1, 1, 1, 1]
         ...     },
-        ...     indexes=["store", "product"]
+        ...     indexes=["f1", "f2"]
         ... )
         >>> a = a_evset.node()
 
-        >>> # Both store and product are indices
+        >>> # Both f1 and f2 are indices
         >>> a_evset
-        indexes: [('store', int64), ('product', int64)]
-        features: [('sales', int64)]
+        indexes: [('f1', int64), ('f2', int64)]
+        features: [('f3', int64)]
         events:
-            store=2 product=1 (2 events):
+            f1=2 f2=1 (2 events):
                 timestamps: [0. 1.]
-                'sales': [1 1]
-            store=1 product=1 (2 events):
+                'f3': [1 1]
+            f1=1 f2=1 (2 events):
                 timestamps: [1. 2.]
-                'sales': [1 1]
-            store=1 product=2 (1 events):
+                'f3': [1 1]
+            f1=1 f2=2 (1 events):
                 timestamps: [1.]
-                'sales': [1]
-            store=2 product=2 (1 events):
+                'f3': [1]
+            f1=2 f2=2 (1 events):
                 timestamps: [1.]
-                'sales': [1]
+                'f3': [1]
         ...
 
-        >>> # Drop "product", remove it from features
-        >>> result = tp.drop_index(a, "product", keep=False)
+        >>> # Drop "f2", remove it from features
+        >>> result = tp.drop_index(a, "f2", keep=False)
         >>> result.evaluate({a: a_evset})
-        indexes: [('store', int64)]
-        features: [('sales', int64)]
+        indexes: [('f1', int64)]
+        features: [('f3', int64)]
         events:
-            store=2 (3 events):
+            f1=2 (3 events):
                 timestamps: [0. 1. 1.]
-                'sales': [1 1 1]
-            store=1 (3 events):
+                'f3': [1 1 1]
+            f1=1 (3 events):
                 timestamps: [1. 1. 2.]
-                'sales': [1 1 1]
+                'f3': [1 1 1]
         ...
 
         >>> # Drop both indices, keep them as features
-        >>> result = tp.drop_index(a, ["product", "store"])
+        >>> result = tp.drop_index(a, ["f2", "f1"])
         >>> result.evaluate({a: a_evset})
         indexes: []
-        features: [('sales', int64), ('product', int64), ('store', int64)]
+        features: [('f3', int64), ('f2', int64), ('f1', int64)]
         events:
             (6 events):
                 timestamps: [0. 1. 1. 1. 1. 2.]
-                'sales': [1 1 1 1 1 1]
-                'product': [2 2 1 1 2 1]
-                'store': [1 1 1 2 2 1]
+                'f3': [1 1 1 1 1 1]
+                'f2': [2 2 1 1 2 1]
+                'f1': [1 1 1 2 2 1]
         ...
 
         ```

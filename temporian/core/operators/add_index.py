@@ -144,59 +144,59 @@ def add_index(input: Node, indexes: Union[str, List[str]]) -> Node:
         >>> a_evset = tp.event_set(
         ...     timestamps=[1, 2, 1, 0, 1, 1],
         ...     features={
-        ...         "store": [1, 1, 1, 2, 2, 2],
-        ...         "product": [1, 1, 2, 1, 1, 2],
-        ...         "sales": [1, 1, 1, 1, 1, 1]
+        ...         "f1": [1, 1, 1, 2, 2, 2],
+        ...         "f2": [1, 1, 2, 1, 1, 2],
+        ...         "f3": [1, 1, 1, 1, 1, 1]
         ...     },
         ... )
 
-        >>> # No index, store and product are regularfeatures
+        >>> # No index
         >>> a_evset
         indexes: []
-        features: [('store', int64), ('product', int64), ('sales', int64)]
+        features: [('f1', int64), ('f2', int64), ('f3', int64)]
         events:
             (6 events):
                 timestamps: [0. 1. 1. 1. 1. 2.]
-                'store': [2 1 1 2 2 1]
-                'product': [1 1 2 1 2 1]
-                'sales': [1 1 1 1 1 1]
+                'f1': [2 1 1 2 2 1]
+                'f2': [1 1 2 1 2 1]
+                'f3': [1 1 1 1 1 1]
         ...
 
-        >>> # Add only "store" as index
+        >>> # Add only "f1" as index
         >>> a = a_evset.node()
-        >>> result = tp.add_index(a, "store")
-        >>> result.evaluate({a: a_evset})
-        indexes: [('store', int64)]
-        features: [('product', int64), ('sales', int64)]
+        >>> result = tp.add_index(a, "f1")
+        >>> result.evaluate(a_evset)
+        indexes: [('f1', int64)]
+        features: [('f2', int64), ('f3', int64)]
         events:
-            store=2 (3 events):
+            f1=2 (3 events):
                 timestamps: [0. 1. 1.]
-                'product': [1 1 2]
-                'sales': [1 1 1]
-            store=1 (3 events):
+                'f2': [1 1 2]
+                'f3': [1 1 1]
+            f1=1 (3 events):
                 timestamps: [1. 1. 2.]
-                'product': [1 2 1]
-                'sales': [1 1 1]
+                'f2': [1 2 1]
+                'f3': [1 1 1]
         ...
 
-        >>> # Add "store" and "product" as indices
-        >>> result = tp.add_index(a, ["store", "product"])
-        >>> result.evaluate({a: a_evset})
-        indexes: [('store', int64), ('product', int64)]
-        features: [('sales', int64)]
+        >>> # Add "f1" and "f2" as indices
+        >>> result = tp.add_index(a, ["f1", "f2"])
+        >>> result.evaluate(a_evset)
+        indexes: [('f1', int64), ('f2', int64)]
+        features: [('f3', int64)]
         events:
-            store=2 product=1 (2 events):
+            f1=2 f2=1 (2 events):
                 timestamps: [0. 1.]
-                'sales': [1 1]
-            store=1 product=1 (2 events):
+                'f3': [1 1]
+            f1=1 f2=1 (2 events):
                 timestamps: [1. 2.]
-                'sales': [1 1]
-            store=1 product=2 (1 events):
+                'f3': [1 1]
+            f1=1 f2=2 (1 events):
                 timestamps: [1.]
-                'sales': [1]
-            store=2 product=2 (1 events):
+                'f3': [1]
+            f1=2 f2=2 (1 events):
                 timestamps: [1.]
-                'sales': [1]
+                'f3': [1]
         ...
 
         ```
@@ -228,63 +228,63 @@ def set_index(input: Node, indexes: Union[str, List[str]]) -> Node:
         >>> a_evset = tp.event_set(
         ...     timestamps=[1, 2, 1, 0, 1, 1],
         ...     features={
-        ...         "store": [1, 1, 1, 2, 2, 2],
-        ...         "product": [1, 1, 2, 1, 1, 2],
-        ...         "sales": [1, 1, 1, 1, 1, 1]
+        ...         "f1": [1, 1, 1, 2, 2, 2],
+        ...         "f2": [1, 1, 2, 1, 1, 2],
+        ...         "f3": [1, 1, 1, 1, 1, 1]
         ...     },
-        ...     indexes=["store"]
+        ...     indexes=["f1"],
         ... )
         >>> a = a_evset.node()
 
-        >>> # "store" is the current index
+        >>> # "f1" is the current index
         >>> a_evset
-        indexes: [('store', int64)]
-        features: [('product', int64), ('sales', int64)]
+        indexes: [('f1', int64)]
+        features: [('f2', int64), ('f3', int64)]
         events:
-            store=2 (3 events):
+            f1=2 (3 events):
                 timestamps: [0. 1. 1.]
-                'product': [1 1 2]
-                'sales': [1 1 1]
-            store=1 (3 events):
+                'f2': [1 1 2]
+                'f3': [1 1 1]
+            f1=1 (3 events):
                 timestamps: [1. 1. 2.]
-                'product': [1 2 1]
-                'sales': [1 1 1]
+                'f2': [1 2 1]
+                'f3': [1 1 1]
         ...
 
-        >>> # Set "product" as the only index, remove store
-        >>> result = tp.set_index(a, "product")
-        >>> result.evaluate({a: a_evset})
-        indexes: [('product', int64)]
-        features: [('sales', int64), ('store', int64)]
+        >>> # Set "f2" as the only index, remove "f1"
+        >>> result = tp.set_index(a, "f2")
+        >>> result.evaluate(a_evset)
+        indexes: [('f2', int64)]
+        features: [('f3', int64), ('f1', int64)]
         events:
-            product=1 (4 events):
+            f2=1 (4 events):
                 timestamps: [0. 1. 1. 2.]
-                'sales': [1 1 1 1]
-                'store': [2 2 1 1]
-            product=2 (2 events):
+                'f3': [1 1 1 1]
+                'f1': [2 2 1 1]
+            f2=2 (2 events):
                 timestamps: [1. 1.]
-                'sales': [1 1]
-                'store': [2 1]
+                'f3': [1 1]
+                'f1': [2 1]
         ...
 
-        >>> # Set both "store" and "product" as indices
-        >>> result = tp.set_index(a, ["store", "product"])
-        >>> result.evaluate({a: a_evset})
-        indexes: [('store', int64), ('product', int64)]
-        features: [('sales', int64)]
+        >>> # Set both "f1" and "f2" as indices
+        >>> result = tp.set_index(a, ["f1", "f2"])
+        >>> result.evaluate(a_evset)
+        indexes: [('f1', int64), ('f2', int64)]
+        features: [('f3', int64)]
         events:
-            store=2 product=1 (2 events):
+            f1=2 f2=1 (2 events):
                 timestamps: [0. 1.]
-                'sales': [1 1]
-            store=2 product=2 (1 events):
+                'f3': [1 1]
+            f1=2 f2=2 (1 events):
                 timestamps: [1.]
-                'sales': [1]
-            store=1 product=1 (2 events):
+                'f3': [1]
+            f1=1 f2=1 (2 events):
                 timestamps: [1. 2.]
-                'sales': [1 1]
-            store=1 product=2 (1 events):
+                'f3': [1 1]
+            f1=1 f2=2 (1 events):
                 timestamps: [1.]
-                'sales': [1]
+                'f3': [1]
         ...
 
         ```

@@ -194,38 +194,38 @@ def add(
         >>> a_evset = tp.event_set(
         ...     timestamps=[1, 2, 3, 4],
         ...     features={
-        ...         "store": [1, 1, 1, 1],
-        ...         "product": [1, 2, 3, 4],
-        ...         "sales": [10, 20, 30, 40]
+        ...         "f1": [1, 1, 1, 1],
+        ...         "f2": [1, 2, 3, 4],
+        ...         "f3": [10, 20, 30, 40]
         ...     },
-        ...     indexes=["store", "product"]
+        ...     indexes=["f1", "f2"]
         ... )
         >>> b_evset = tp.event_set(
         ...     timestamps=[1, 2, 3, 4],
         ...     features={
-        ...         "store": [1, 1, 1, 1],
-        ...         "product": [5, 6, 7, 8],
-        ...         "sales": [10, 20, 30, 40]
+        ...         "f1": [1, 1, 1, 1],
+        ...         "f2": [5, 6, 7, 8],
+        ...         "f3": [10, 20, 30, 40]
         ...     },
-        ...     indexes=["store", "product"]
+        ...     indexes=["f1", "f2"]
         ... )
         >>> a = a_evset.node()
         >>> b = b_evset.node()
 
-        >>> # Get sales per store
-        >>> a_store = tp.drop_index(a, "product")
-        >>> b_store = tp.drop_index(b, "product")
+        >>> # Get f3 per f1
+        >>> a_f1 = tp.drop_index(a, "f2")
+        >>> b_f1 = tp.drop_index(b, "f2")
 
         >>> # We also need to explicit same samplings
-        >>> b_store = tp.resample(b_store, a_store)
+        >>> b_f1 = tp.resample(b_f1, a_f1)
 
-        >>> c = a_store["sales"] + b_store["sales"]
+        >>> c = a_f1["f3"] + b_f1["f3"]
 
         >>> c.evaluate({a: a_evset, b: b_evset})
-        indexes: [('store', int64)]
+        indexes: [('f1', int64)]
         ...
                 timestamps: [1. 2. 3. 4.]
-                'add_sales_sales': [20 40 60 80]
+                'add_f3_f3': [20 40 60 80]
         ...
 
         ```
