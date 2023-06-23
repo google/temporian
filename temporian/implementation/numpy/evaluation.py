@@ -32,10 +32,11 @@ def evaluate_schedule(
     verbose: int,
     check_execution: bool,
 ) -> Dict[Node, EventSet]:
-    """Evaluates a schedule on a dictionary of input event sets.
+    """Evaluates a schedule on a dictionary of input
+    [`EventSets`][temporian.EventSet].
 
     Args:
-        inputs: Mapping of nodes to materialized EventSets.
+        inputs: Mapping of Nodes to materialized EventSets.
         schedule: Sequence of operators to apply on the data.
         verbose: If >0, prints details about the execution on the standard error
             output. The larger the number, the more information is displayed.

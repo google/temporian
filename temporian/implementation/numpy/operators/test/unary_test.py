@@ -29,7 +29,7 @@ from temporian.implementation.numpy.operators.unary import (
     IsNanOperator,
     NotNanOperator,
 )
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 from temporian.io.pandas import from_pandas
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,

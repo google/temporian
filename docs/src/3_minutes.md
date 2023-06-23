@@ -39,7 +39,7 @@ A graph is created by using **operators**. For example, the [`tp.simple_moving_a
 
 Note that when calling operators you are only defining the graph - i.e., you are telling Temporian what operations you want to perform on your data, but those operations are not yet being performed.
 
-Operators are not applied directly to [`EventSets`][temporian.EventSet], but to **[Nodes][temporian.Node]**. You can think of a [`Node`][temporian.Node] as the placeholder for an [`EventSet`][temporian.EventSet] in the graph. When applying operators to [`Nodes`][temporian.Node], you get back new [`Nodes`][temporian.Node] that are placeholders for the results of those operations. You can create arbitrarily complex graphs by combining operators and nodes.
+Operators are not applied directly to [`EventSets`][temporian.EventSet], but to **[Nodes][temporian.Node]**. You can think of a [`Node`][temporian.Node] as the placeholder for an [`EventSet`][temporian.EventSet] in the graph. When applying operators to [`Nodes`][temporian.Node], you get back new [`Nodes`][temporian.Node] that are placeholders for the results of those operations. You can create arbitrarily complex graphs by combining operators and [`Nodes`][temporian.Node].
 
 ```python
 >>> # Obtain the Node corresponding to the EventSet we created above

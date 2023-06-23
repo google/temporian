@@ -65,11 +65,11 @@ def plot(
     interactive: bool = False,
     backend: Optional[str] = None,
 ):
-    """Plots event sets.
+    """Plots [`EventSets`][temporian.EventSet].
 
     Args:
-        evsets: Single or list of event sets to plot.
-        indexes: The index keys or list of index keys to plot. If indexes=None,
+        evsets: Single or list of EventSets to plot.
+        indexes: The index keys or list of indexes keys to plot. If indexes=None,
             plots all the available indexes. Indexes should be provided as
             single value (e.g. string) or tuple of values. Example: indexes="a",
             indexes=("a",), indexes=("a", "b",), indexes=["a", "b"],

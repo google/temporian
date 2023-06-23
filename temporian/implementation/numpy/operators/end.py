@@ -34,10 +34,10 @@ class EndNumpyImplementation(OperatorImplementation):
         assert isinstance(self.operator, EndOperator)
         output_schema = self.output_schema("output")
 
-        # create output event set
+        # create output EventSet
         output_evset = EventSet(data={}, schema=output_schema)
 
-        # fill output event set data
+        # fill output EventSet data
         for index_key, index_data in input.data.items():
             if len(index_data.timestamps) == 0:
                 dst_timestamps = np.array([], dtype=np.float64)

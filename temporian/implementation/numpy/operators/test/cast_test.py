@@ -21,7 +21,7 @@ from temporian.implementation.numpy.operators.cast import (
     CastNumpyImplementation,
 )
 from temporian.core.operators.cast import CastOperator, cast
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.io.pandas import from_pandas
 from temporian.implementation.numpy.data.io import event_set
@@ -78,7 +78,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
 
         self.input_node = self.input_evset.node()
 
-        # Expected event set when applying some downcast operations
+        # Expected EventSet when applying some downcast operations
         self.expected_evset_1 = from_pandas(
             pd.DataFrame(
                 data=[

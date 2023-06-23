@@ -116,7 +116,7 @@ def _normalize_rename_features(
         if len(schema.features) != 1:
             raise ValueError(
                 "Cannot apply rename operator with a single rename string when "
-                "the event set contains multiple features. Pass a dictionary "
+                "the EventSet contains multiple features. Pass a dictionary "
                 "of rename strings instead."
             )
         features = {schema.features[0].name: features}
@@ -145,7 +145,7 @@ def _normalize_rename_indexes(
         if len(schema.indexes) != 1:
             raise ValueError(
                 "Cannot apply rename operator with a single rename string when "
-                "the event set contains multiple indexes. Pass a dictionary "
+                "the EventSet contains multiple indexes. Pass a dictionary "
                 "of rename strings instead."
             )
         indexes = {schema.indexes[0].name: indexes}

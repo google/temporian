@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Utility for reading an event set from disk."""
+"""Utilities for converting EventSets to pandas DataFrames and viceversa."""
 
 import numpy as np
 
@@ -29,7 +29,7 @@ def from_pandas(
     name: Optional[str] = None,
     same_sampling_as: Optional[EventSet] = None,
 ) -> EventSet:
-    """Converts a Pandas DataFrame into an EventSet.
+    """Converts a Pandas DataFrame into an [`EventSet`][temporian.EventSet].
 
     The column `timestamps` (defaults to "timestamp") contains the
     timestamps. Columns `indexes` (default to `None`, equivalent to `[]`),
@@ -61,15 +61,15 @@ def from_pandas(
         timestamps: Name of the column containing the timestamps. See
             [`tp.event_set()`][temporian.event_set] for the list of supported
             timestamp types.
-        name: Optional name of the event set. Used for debugging, and
+        name: Optional name of the EventSet. Used for debugging, and
             graph serialization.
-        same_sampling_as: If set, the new event set is cheched and tagged as
+        same_sampling_as: If set, the new EventSet is cheched and tagged as
             having the same sampling as `same_sampling_as`. Some operators,
             such as [`tp.filter()`][temporian.filter], require their inputs to
             have the same sampling.
 
     Returns:
-        An event set.
+        An EventSet.
 
     Raises:
         ValueError: If `indexes` or `timestamps` are not in `df`'s
@@ -91,7 +91,7 @@ def from_pandas(
 def to_pandas(
     evset: EventSet,
 ) -> "pandas.DataFrame":
-    """Converts an EventSet to a pandas DataFrame.
+    """Converts an [`EventSet`][temporian.EventSet] to a pandas DataFrame.
 
     Returns:
         DataFrame created from EventSet.

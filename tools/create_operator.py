@@ -202,10 +202,10 @@ class {capitalized_op}NumpyImplementation(OperatorImplementation):
 
         output_schema = self.output_schema("output")
 
-        # create output event set
+        # Create output EventSet
         output_evset = EventSet(data={{}}, schema=output_schema)
 
-        # fill output event set data
+        # Fill output EventSet's data
         for index_key, index_data in input.data.items():
             output_evset[index_key] = IndexData(
                 [],
@@ -335,7 +335,7 @@ py_test(
     deps = [
         # already_there/absl/testing:absltest
         ":test_util",
-        "//temporian/core/data/dtypes:dtype",
+        "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/implementation/numpy/data:io",
@@ -348,13 +348,13 @@ py_test(
 
     print(
         """Don't forget to register the new operators in:
-- The "api_symbols" rule in temporian/core/operators/BUILD
-- The "operators" rule in temporian/implementation/numpy/operators/BUILD
+- The imports in the top-level init file temporian/__init__.py
+- The imports in temporian/implementation/numpy/operators/__init__.py
 - The "test_base" function in temporian/core/test/registered_operators_test.py
 - The "test_base" function in temporian/implementation/numpy/test/registered_operators_test.py
-- Import of temporian/implementation/numpy/operators/__init__.py
-- Import of temporian/core/operators/api_symbols.py
-- The API ref's home page docs/reference/index.md
+- The PUBLIC_API_SYMBOLS set in temporian/test/public_symbols_test.py
+- The docs docs/src/reference/path/to/operator.md
+- The docs API ref's home page docs/reference/index.md
 """
     )
 

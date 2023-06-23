@@ -16,7 +16,7 @@ from absl.testing import absltest
 
 from temporian.core.data.node import input_node
 from temporian.core.test import utils
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 from temporian.core.operators.binary import (
     AddOperator,
     DivideOperator,
@@ -54,7 +54,7 @@ from temporian.core.operators.scalar import (
     LessEqualScalarOperator,
     LessScalarOperator,
 )
-from temporian.core.operators.unary.unary import AbsOperator, InvertOperator
+from temporian.core.operators.unary import AbsOperator, InvertOperator
 
 
 class MagicMethodsTest(absltest.TestCase):
@@ -494,12 +494,12 @@ class MagicMethodsTest(absltest.TestCase):
         # Check that bool(node) doesn't work
         boolean_node = self.node_float_1 != self.node_float_2
         with self.assertRaisesRegex(
-            ValueError, "truth value of a node is ambiguous"
+            ValueError, "truth value of a Node is ambiguous"
         ):
             bool(boolean_node)
 
         with self.assertRaisesRegex(
-            ValueError, "truth value of a node is ambiguous"
+            ValueError, "truth value of a Node is ambiguous"
         ):
             if boolean_node:  # <- this should call bool(boolean_node)
                 pass
