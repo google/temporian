@@ -44,10 +44,10 @@ def operator(fn):
         if is_eager:
             evset = output.evaluate(inputs)
             # Prevent .node() from creating a new sampling when called
-            evset._internal_node = output
+            evset._internal_node = output  # pylint: disable=protected-access
             return evset
-        else:
-            return output
+
+        return output
 
     return wrapper
 
