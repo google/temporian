@@ -17,6 +17,7 @@
 from temporian.core import operator_lib
 from temporian.core.data.node import Node, create_node_with_new_reference
 from temporian.core.data.schema import Schema
+from temporian.core.decorators import operator
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -100,6 +101,7 @@ class GlueOperator(Operator):
 operator_lib.register_operator(GlueOperator)
 
 
+@operator
 def glue(
     *inputs: Node,
 ) -> Node:

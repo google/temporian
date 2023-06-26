@@ -53,3 +53,11 @@ py_library(
     deps = [
     ],
 )
+
+py_library(
+    name = "decorators",
+    srcs = ["decorators.py"],
+    srcs_version = "PY3",
+    deps = [
+    ],
+)
