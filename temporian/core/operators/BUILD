@@ -169,6 +169,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core:decorators",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
         "//temporian/proto:core_py_proto",

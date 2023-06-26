@@ -59,5 +59,6 @@ py_library(
     srcs = ["decorators.py"],
     srcs_version = "PY3",
     deps = [
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
