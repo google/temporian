@@ -432,7 +432,7 @@ Temporian supports data type casting through the [`tp.cast()`][temporian.cast] o
 
    ```
 
-Keep in mind that the casting can fail when the graph is rund. For instance, attempting to cast `"word"` to `tp.float64` will result in an error. These errors cannot be caught prior to graph evaluation.
+Keep in mind that the casting can fail when the graph is run. For instance, attempting to cast `"word"` to `tp.float64` will result in an error. These errors cannot be caught prior to graph evaluation.
 
 ## Arithmetic operators
 
