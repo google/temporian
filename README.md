@@ -6,7 +6,22 @@
 ![formatting](https://github.com/google/temporian/actions/workflows/formatting.yaml/badge.svg)
 ![publish](https://github.com/google/temporian/actions/workflows/publish.yaml/badge.svg)
 
-**Temporian** is a Python package for **feature engineering of temporal data**, focusing on **preventing common modeling errors** and providing a **simple and powerful API**, a first-class **iterative development** experience, and **efficient and well-tested implementations** of common and not-so-common temporal data preprocessing functions.
+**Temporian** is a Python library for **feature engineering** 🛠 and **data augmentation** ⚡ of **temporal data** 📈 (e.g. time-series, transactions) in **machine learning applications** 🤖.
+
+> **Warning**
+> Temporian development is in alpha.
+
+## Key features
+
+- Temporian operates natively on **multivariate** and **multi-index time-series** and **time-sequences** data. With Temporian, all temporal data processing is unified.
+
+- Temporian favors **iterative** and **interactive** development in Colab, where users can **easily visualize intermediate results** 📊 each step of the way.
+
+- Temporian introduces a novel mechanism to **prevent unwanted future leakage** and **training/serving skew** 😰. Temporian programs always return the same result in batch and in streaming mode.
+
+- Temporian programs can run seemingly **in-process** in Python, on **large datasets using Beam** ☁️, and in **streaming for continuous** data ingestion.
+
+- Temporian's core is implemented **in C++** and **highly optimized** 🔥, so large amounts of data can be handled in-process. In some cases, Temporian can provides speed-up in the order of 1000x compared to other libraries.
 
 ## Installation
 
@@ -16,53 +31,46 @@ Temporian is available on PyPI. To install it, run:
 pip install temporian
 ```
 
-## Getting Started
+## Minimal example
 
-This is how a minimal end-to-end example looks like:
+Assuming the following dataset.
+
+```shell
+>>> head sales.csv
+timestamps,store,price,count
+2022-01-01 00:00:00+00:00,CA,27.42,61.9
+2022-01-01 00:00:00+00:00,TX,98.55,18.02
+2022-01-02 00:00:00+00:00,CA,32.74,14.93
+2022-01-02 00:00:00+00:00,TX,48.69,83.99
+...
+```
+
+We compute the weekly sales per store as follow.
 
 ```python
 import temporian as tp
 
-# Load data and create input node.
-evset = tp.from_csv("temporal_data.csv", timestamps="date")
-source = evset.node()
+input_data = tp.from_csv("sales.csv", timestamps="timestamps")
 
-# Apply operators to create a processing graph.
-sma = tp.simple_moving_average(source, window_length=tp.duration.days(7))
+# Define a Temporian program
+input_node = input_data.node()
+per_store = tp.set_index(input_node, "store")
+weekly_sum = tp.moving_sum(per_store["price"], window_length=tp.duration.days(7))
 
-# Run the graph.
-result_evset = sma.evaluate({source: evset})
+# Execute Temporian program
+output_data = weekly_sum.evaluate({input_node: input_data})
 
-# Show output.
-print(result_evset)
-result_evset.plot()
+# Plot the result
+output_data.plot()
 ```
 
-This is an example `temporal_data.csv` to use with the code above:
-
-```
-date,feature_1,feature_2
-2023-01-01,10.0,3.0
-2023-01-02,20.0,4.0
-2023-02-01,30.0,5.0
-```
+![](docs/src/assets/frontpage_plot.png)
 
 Check the [Getting Started tutorial](https://temporian.readthedocs.io/en/stable/tutorials/getting_started/) to try it out!
 
-## Key features
-
-These are what set Temporian apart.
-
-- **Simple and powerful API**: Temporian exports high level operations making processing complex programs short and ready to read.
-- **Flexible data model**: Temporian models temporal data as a sequence of events, supporting non-uniform sampling timestamps seamlessly.
-- **Prevents modeling errors**: Temporian programs are guaranteed not to have future leakage unless explicitly specified, ensuring that models are not trained on future data.
-- **Iterative development**: Temporian can be used to develop preprocessing pipelines in Colab or local notebooks, allowing users to visualize results each step of the way to identify and correct errors early on.
-- **Efficient and well-tested implementations**: Temporian contains efficient and well-tested implementations of a variety of temporal data processing functions. For instance, our implementation of window operators is **x2000** faster than the same function implemented with NumPy.
-- **Wide range of preprocessing functions**: Temporian contains a wide range of preprocessing functions, including moving window operations, lagging, calendar features, arithmetic operations, index manipulation and propagation, resampling, and more. For a full list of the available operators, see the [operators documentation](https://temporian.readthedocs.io/en/stable/reference/).
-
 ## Documentation
 
-The official documentation is available at [temporian.readthedocs.io](https://temporian.readthedocs.io/en/stable/).
+The documentation 📚 is available at [temporian.readthedocs.io](https://temporian.readthedocs.io/en/stable/). The [3 minutes to Temporian ⏰️](https://temporian.readthedocs.io/en/stable/3_minutes/) is the best way to start.
 
 ## Contributing
 
@@ -70,4 +78,4 @@ Contributions to Temporian are welcome! Check out the [contributing guide](CONTR
 
 ## Credits
 
-This project is a collaboration between Google and [Tryolabs](https://tryolabs.com/).
+Temporian is developed in collaboration between Google and [Tryolabs](https://tryolabs.com/).
