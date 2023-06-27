@@ -63,7 +63,7 @@ def main():
 
     sma = tp.simple_moving_average(node, window_length=10)
 
-    res: EventSet = tp.evaluate(
+    res: EventSet = tp.run(
         sma,
         input={node: evset},
         check_execution=False,

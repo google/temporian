@@ -161,7 +161,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
         )
         output_node.check_same_sampling(self.input_node)
 
-        output_evset = evaluate(
+        output_evset = run(
             output_node,
             {self.input_node: self.input_evset},
             check_execution=True,
@@ -183,7 +183,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
             },
             check_overflow=False,
         )
-        output_evset = evaluate(
+        output_evset = run(
             output_node,
             {self.input_node: self.input_evset},
             check_execution=True,
@@ -199,7 +199,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
             target=DType.FLOAT32,
             check_overflow=False,
         )
-        output_evset = evaluate(
+        output_evset = run(
             output_node,
             {self.input_node: self.input_evset},
             check_execution=True,
@@ -232,7 +232,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
         )
 
         with self.assertRaisesRegex(ValueError, "Overflow"):
-            _ = evaluate(
+            _ = run(
                 output_node,
                 {self.input_node: self.input_evset},
                 check_execution=True,
@@ -248,7 +248,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
         )
 
         with self.assertRaisesRegex(ValueError, "Overflow"):
-            _ = evaluate(
+            _ = run(
                 output_node,
                 {self.input_node: self.input_evset},
                 check_execution=True,
@@ -264,7 +264,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
             check_overflow=True,
         )
 
-        _ = evaluate(
+        _ = run(
             output_node,
             {self.input_node: self.input_evset},
             check_execution=True,

@@ -48,7 +48,7 @@ def calendar_minute(sampling: Node) -> Node:
         ...    timestamps=[datetime(2020,1,1,18,30), datetime(2020,1,1,23,59)],
         ...    name='random_hours'
         ... )
-        >>> tp.calendar_minute(evset.node()).evaluate(evset)
+        >>> tp.calendar_minute(evset.node()).run(evset)
         indexes: ...
         features: [('calendar_minute', int32)]
         events:

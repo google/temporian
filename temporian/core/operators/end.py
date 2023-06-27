@@ -64,7 +64,7 @@ def end(input: Node) -> Node:
         >>> a = a_evset.node()
 
         >>> a_end = tp.end(a)
-        >>> a_end.evaluate({a: a_evset})
+        >>> a_end.run({a: a_evset})
         indexes: [('idx', int64)]
         features: []
         events:

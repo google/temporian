@@ -155,7 +155,7 @@ def event_set(
         # Index the data
         input_node = evset.node()
         output_node = add_index(input_node, indexes=indexes)
-        evset = evaluate(output_node, {input_node: evset})
+        evset = run(output_node, {input_node: evset})
         assert isinstance(evset, EventSet)
 
     evset.name = name

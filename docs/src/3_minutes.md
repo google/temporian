@@ -53,14 +53,14 @@ Operators are not applied directly to [`EventSets`][temporian.EventSet], but to 
 
 <!-- TODO: add image of the generated graph -->
 
-Your graph can now be run by calling [`.evaluate()`][temporian.Node.evaluate] on any [`Node`][temporian.Node] in the graph, which will perform all necessary operations and return the resulting [`EventSet`][temporian.EventSet].
+Your graph can now be run by calling [`.run()`][temporian.Node.evaluate] on any [`Node`][temporian.Node] in the graph, which will perform all necessary operations and return the resulting [`EventSet`][temporian.EventSet].
 
 ```python
->>> result = addition_lagged.evaluate(evset)
+>>> result = addition_lagged.run(evset)
 
 ```
 
-Note that you need to pass the [`EventSets`][temporian.EventSet] that correspond to the source [`Nodes`][temporian.Node] in the graph to [`.evaluate()`][temporian.Node.evaluate] (since those are not part of the graph definition). Also, several [`Nodes`][temporian.Node] can be evaluated at the same time by calling [`tp.evaluate()`][temporian.evaluate] directly.
+Note that you need to pass the [`EventSets`][temporian.EventSet] that correspond to the source [`Nodes`][temporian.Node] in the graph to [`.run()`][temporian.Node.evaluate] (since those are not part of the graph definition). Also, several [`Nodes`][temporian.Node] can be evaluated at the same time by calling [`tp.run()`][temporian.evaluate] directly.
 
 🥳 Congratulations! You're all set to write your first pieces of Temporian code.
 

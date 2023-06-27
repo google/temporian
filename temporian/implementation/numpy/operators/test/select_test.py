@@ -113,7 +113,7 @@ class SelectOperatorTest(absltest.TestCase):
         )
         expected_evset = from_pandas(new_df, indexes=["store_id"])
 
-        output_evset = evaluate(
+        output_evset = run(
             self.input_node["sales"],
             input={
                 self.input_node: self.input_evset,
@@ -137,7 +137,7 @@ class SelectOperatorTest(absltest.TestCase):
         )
         expected_evset = from_pandas(new_df, indexes=["store_id"])
 
-        output_evset = evaluate(
+        output_evset = run(
             self.input_node[["sales", "costs"]],
             input={
                 self.input_node: self.input_evset,

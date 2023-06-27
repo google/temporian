@@ -91,7 +91,7 @@ def leak(input: Node, duration: Duration) -> Node:
         >>> a = a_evset.node()
 
         >>> result = tp.leak(a, tp.duration.seconds(2))
-        >>> result.evaluate({a: a_evset})
+        >>> result.run({a: a_evset})
         indexes: ...
             (4 events):
                 timestamps: [-2. -1. 3. 4.]

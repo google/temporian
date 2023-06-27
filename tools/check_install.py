@@ -23,7 +23,7 @@ def check_install():
         source_node["signal"], tp.duration.seconds(30)
     )
 
-    return tp.evaluate(sma, {source_node: source_evset})
+    return tp.run(sma, {source_node: source_evset})
 
 
 if __name__ == "__main__":

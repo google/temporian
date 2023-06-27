@@ -44,7 +44,7 @@ def calendar_year(sampling: Node) -> Node:
         ...    timestamps=["2021-02-04", "2022-02-20", "2023-03-01", "2023-05-07"],
         ...    name='random_moments'
         ... )
-        >>> tp.calendar_year(evset.node()).evaluate(evset)
+        >>> tp.calendar_year(evset.node()).run(evset)
         indexes: ...
         features: [('calendar_year', int32)]
         events:

@@ -130,7 +130,7 @@ class AddIndexNumpyImplementationTest(absltest.TestCase):
             indexes=["store_id"],
         )
         output = set_index(self.input_node, ["store_id"])
-        output_evset = evaluate(
+        output_evset = run(
             output, {self.input_node: self.input_evset}, check_execution=True
         )
 
@@ -163,7 +163,7 @@ class AddIndexNumpyImplementationTest(absltest.TestCase):
             self.input_node,
             ["store_id", "item_id"],
         )
-        output_evset = evaluate(
+        output_evset = run(
             output, {self.input_node: self.input_evset}, check_execution=True
         )
 
@@ -179,7 +179,7 @@ class AddIndexNumpyImplementationTest(absltest.TestCase):
 
         def run(src_evset, new_index, expected_evset):
             output = set_index(src_evset.node(), new_index)
-            output_evset = evaluate(
+            output_evset = run(
                 output, {src_evset.node(): src_evset}, check_execution=True
             )
             assertEqualEventSet(self, output_evset, expected_evset)

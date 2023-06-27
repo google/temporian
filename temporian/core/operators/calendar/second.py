@@ -47,7 +47,7 @@ def calendar_second(sampling: Node) -> Node:
         ...    timestamps=[datetime(2020,1,1,18,30,55), datetime(2020,1,1,23,59,0)],
         ...    name='random_hours'
         ... )
-        >>> tp.calendar_second(evset.node()).evaluate(evset)
+        >>> tp.calendar_second(evset.node()).run(evset)
         indexes: ...
         features: [('calendar_second', int32)]
         events:

@@ -165,7 +165,7 @@ def add_index(input: Node, indexes: Union[str, List[str]]) -> Node:
         >>> # Add only "f1" as index
         >>> a = a_evset.node()
         >>> result = tp.add_index(a, "f1")
-        >>> result.evaluate(a_evset)
+        >>> result.run(a_evset)
         indexes: [('f1', int64)]
         features: [('f2', int64), ('f3', int64)]
         events:
@@ -181,7 +181,7 @@ def add_index(input: Node, indexes: Union[str, List[str]]) -> Node:
 
         >>> # Add "f1" and "f2" as indices
         >>> result = tp.add_index(a, ["f1", "f2"])
-        >>> result.evaluate(a_evset)
+        >>> result.run(a_evset)
         indexes: [('f1', int64), ('f2', int64)]
         features: [('f3', int64)]
         events:
@@ -253,7 +253,7 @@ def set_index(input: Node, indexes: Union[str, List[str]]) -> Node:
 
         >>> # Set "f2" as the only index, remove "f1"
         >>> result = tp.set_index(a, "f2")
-        >>> result.evaluate(a_evset)
+        >>> result.run(a_evset)
         indexes: [('f2', int64)]
         features: [('f3', int64), ('f1', int64)]
         events:
@@ -269,7 +269,7 @@ def set_index(input: Node, indexes: Union[str, List[str]]) -> Node:
 
         >>> # Set both "f1" and "f2" as indices
         >>> result = tp.set_index(a, ["f1", "f2"])
-        >>> result.evaluate(a_evset)
+        >>> result.run(a_evset)
         indexes: [('f1', int64), ('f2', int64)]
         features: [('f3', int64)]
         events:

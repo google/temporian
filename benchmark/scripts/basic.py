@@ -79,7 +79,7 @@ def main():
     b = tp.prefix("sma_", tp.simple_moving_average(a, window_length=10.0))
     c = tp.glue(a, tp.resample(b, a))
 
-    res: EventSet = tp.evaluate(
+    res: EventSet = tp.run(
         c,
         input={
             node_1: evset_1,

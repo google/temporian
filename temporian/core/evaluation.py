@@ -38,7 +38,7 @@ EvaluationInput = Union[
 EvaluationResult = Union[EventSet, List[EventSet], Dict[str, EventSet]]
 
 
-def evaluate(
+def run(
     query: EvaluationQuery,
     input: EvaluationInput,
     verbose: int = 0,
@@ -56,13 +56,13 @@ def evaluate(
         >>> input_evset = tp.event_set(timestamps=[1, 2, 3], features={"f": [0, 4, 10]})
         >>> input_node = input_evset.node()
         >>> output_node = tp.moving_sum(input_node, 5)
-        >>> output_evset = tp.evaluate(output_node, input_evset)
+        >>> output_evset = tp.run(output_node, input_evset)
 
         >>> # Equivalent
-        >>> output_evset = output_node.evaluate(input_evset)
+        >>> output_evset = output_node.run(input_evset)
 
         >>> # Also equivalent
-        >>> output_evset = tp.evaluate(output_node, {input_node: input_evset})
+        >>> output_evset = tp.run(output_node, {input_node: input_evset})
 
         ```
 
@@ -81,18 +81,18 @@ def evaluate(
         >>> step_2 = tp.simple_moving_average(step_1, 2)
 
         >>> # Get step_1 and step_2 at once
-        >>> evset_step_1, evset_step_2 = tp.evaluate([step_1, step_2],
+        >>> evset_step_1, evset_step_2 = tp.run([step_1, step_2],
         ...     {input_1: evset_1, input_2: evset_2}
         ... )
 
         >>> # Equivalent
-        evset_step_1, evset_step_2 = tp.evaluate(
+        evset_step_1, evset_step_2 = tp.run(
         ...     [step_1, step_2],
         ...     [evset_1, evset_2],
         ... )
 
         >>> # Also equivalent. EventSets are mapped by their .node(), not by position.
-        >>> evset_step_1, evset_step_2 = tp.evaluate(
+        >>> evset_step_1, evset_step_2 = tp.run(
         ...     [step_1, step_2],
         ...     [evset_2, evset_1],
         ... )

@@ -46,7 +46,7 @@ def calendar_day_of_week(sampling: Node) -> Node:
         ...    timestamps=["2023-06-19", "2023-06-21", "2023-06-25", "2023-07-03"],
         ...    name='two_mondays'
         ... )
-        >>> tp.calendar_day_of_week(evset.node()).evaluate(evset)
+        >>> tp.calendar_day_of_week(evset.node()).run(evset)
         indexes: ...
         features: [('calendar_day_of_week', int32)]
         events:

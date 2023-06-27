@@ -51,7 +51,7 @@ def calendar_month(sampling: Node) -> Node:
         ...    timestamps=["2023-02-04", "2023-02-20", "2023-03-01", "2023-05-07"],
         ...    name='special_events'
         ... )
-        >>> tp.calendar_month(evset.node()).evaluate(evset)
+        >>> tp.calendar_month(evset.node()).run(evset)
         indexes: ...
         features: [('calendar_month', int32)]
         events:

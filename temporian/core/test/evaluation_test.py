@@ -79,13 +79,13 @@ class EvaluationTest(absltest.TestCase):
 
     def test_evaluate_value(self):
         i1 = utils.create_source_node()
-        result = evaluation.evaluate(i1, {i1: utils.create_input_event_set()})
+        result = evaluation.run(i1, {i1: utils.create_input_event_set()})
         self.assertIsInstance(result, EventSet)
 
     def test_evaluate_query_list(self):
         i1 = utils.create_source_node()
         i2 = utils.create_source_node()
-        result = evaluation.evaluate(
+        result = evaluation.run(
             [i1, i2],
             {
                 i1: utils.create_input_event_set(),
@@ -98,7 +98,7 @@ class EvaluationTest(absltest.TestCase):
     def test_evaluate_query_dict(self):
         i1 = utils.create_source_node()
         i2 = utils.create_source_node()
-        result = evaluation.evaluate(
+        result = evaluation.run(
             {"i1": i1, "i2": i2},
             {
                 i1: utils.create_input_event_set(),
@@ -112,13 +112,13 @@ class EvaluationTest(absltest.TestCase):
 
     def test_evaluate_input_event_set(self):
         input_evset = utils.create_input_event_set()
-        result = evaluation.evaluate(input_evset.node(), input_evset)
+        result = evaluation.run(input_evset.node(), input_evset)
         self.assertIsInstance(result, EventSet)
 
     def test_evaluate_input_list_event_set(self):
         input_1 = utils.create_input_event_set()
         input_2 = utils.create_input_event_set()
-        result = evaluation.evaluate(
+        result = evaluation.run(
             [input_1.node(), input_2.node()],
             [input_1, input_2],
         )
@@ -128,7 +128,7 @@ class EvaluationTest(absltest.TestCase):
         e1 = utils.create_input_event_set("i1")
         i1 = e1.node()
 
-        result = evaluation.evaluate(i1, e1)
+        result = evaluation.run(i1, e1)
 
         self.assertIsInstance(result, EventSet)
         self.assertTrue(result is e1)
@@ -141,7 +141,7 @@ class EvaluationTest(absltest.TestCase):
         e3 = utils.create_input_event_set("i3")
         i3 = e3.node()
 
-        result = evaluation.evaluate([i3, i1, i2], [e1, e2, e3])
+        result = evaluation.run([i3, i1, i2], [e1, e2, e3])
         isinstance(result, list)
 
         self.assertIsInstance(result, list)
@@ -155,7 +155,7 @@ class EvaluationTest(absltest.TestCase):
         evset_2 = utils.create_input_event_set(name="i1")
 
         with self.assertRaises(ValueError):
-            evaluation.evaluate(i1, [evset_1, evset_2])
+            evaluation.run(i1, [evset_1, evset_2])
 
 
 if __name__ == "__main__":

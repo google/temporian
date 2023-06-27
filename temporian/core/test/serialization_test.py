@@ -171,7 +171,7 @@ class SerializeTest(absltest.TestCase):
         x = 2 * x
         output_node = x
 
-        result = tp.evaluate(output_node, {input_node: input_data})
+        result = tp.run(output_node, {input_node: input_data})
         print("result:", result)
 
         with tempfile.TemporaryDirectory() as tempdir:
@@ -181,9 +181,7 @@ class SerializeTest(absltest.TestCase):
             )
             loaded_inputs, loaded_outputs = tp.load(path=path, squeeze=True)
 
-        loaded_results = tp.evaluate(
-            loaded_outputs, {loaded_inputs: input_data}
-        )
+        loaded_results = tp.run(loaded_outputs, {loaded_inputs: input_data})
         print("loaded_results:", loaded_results)
 
         self.assertEqual(result, loaded_results)

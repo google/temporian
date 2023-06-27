@@ -193,7 +193,7 @@ def drop_index(
 
         >>> # Drop "f2", remove it from features
         >>> result = tp.drop_index(a, "f2", keep=False)
-        >>> result.evaluate({a: a_evset})
+        >>> result.run({a: a_evset})
         indexes: [('f1', int64)]
         features: [('f3', int64)]
         events:
@@ -207,7 +207,7 @@ def drop_index(
 
         >>> # Drop both indices, keep them as features
         >>> result = tp.drop_index(a, ["f2", "f1"])
-        >>> result.evaluate({a: a_evset})
+        >>> result.run({a: a_evset})
         indexes: []
         features: [('f3', int64), ('f2', int64), ('f1', int64)]
         events:
