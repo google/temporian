@@ -11,7 +11,7 @@ from temporian.implementation.numpy.operators.add_index import (
     AddIndexNumpyImplementation,
 )
 from temporian.io.pandas import from_pandas
-from temporian.core.evaluation import evaluate
+from temporian.core.evaluation import run
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
 )
@@ -177,18 +177,18 @@ class AddIndexNumpyImplementationTest(absltest.TestCase):
         evset_cba = event_set(**common, indexes=["c", "b", "a"])
         evset_cab = event_set(**common, indexes=["c", "a", "b"])
 
-        def run(src_evset, new_index, expected_evset):
+        def my_run(src_evset, new_index, expected_evset):
             output = set_index(src_evset.node(), new_index)
             output_evset = run(
                 output, {src_evset.node(): src_evset}, check_execution=True
             )
             assertEqualEventSet(self, output_evset, expected_evset)
 
-        run(evset_abc, ["a", "b", "c"], evset_abc)
-        run(evset_abc, ["a", "c", "b"], evset_acb)
-        run(evset_abc, ["c", "b", "a"], evset_cba)
-        run(evset_abc, ["c", "a", "b"], evset_cab)
-        run(evset_cba, ["a", "b", "c"], evset_abc)
+        my_run(evset_abc, ["a", "b", "c"], evset_abc)
+        my_run(evset_abc, ["a", "c", "b"], evset_acb)
+        my_run(evset_abc, ["c", "b", "a"], evset_cba)
+        my_run(evset_abc, ["c", "a", "b"], evset_cab)
+        my_run(evset_cba, ["a", "b", "c"], evset_abc)
 
 
 if __name__ == "__main__":

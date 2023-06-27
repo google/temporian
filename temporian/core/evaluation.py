@@ -151,7 +151,7 @@ def run(
     #
     # Note: "outputs" is a dictionary of event (including the query events) to
     # event data.
-    outputs = np_eval.evaluate_schedule(
+    outputs = np_eval.run_schedule(
         input,
         schedule,
         verbose=verbose,

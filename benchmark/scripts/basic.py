@@ -13,7 +13,7 @@
 # limitations under the License.
 """Basic profiling script for temporian.
 
-The script creates two events, applies some operators, and evaluates the graph.
+The script creates two events, applies some operators, and runs the graph.
 """
 
 import numpy as np

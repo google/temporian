@@ -29,7 +29,7 @@ from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
     testOperatorAndImp,
 )
-from temporian.core.evaluation import evaluate
+from temporian.core.evaluation import run
 
 
 class CastNumpyImplementationTest(absltest.TestCase):

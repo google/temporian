@@ -135,17 +135,17 @@ Let's see how to compute the simple moving average of two features `feature_1` a
 >>> print(d_evset)  # doctest:+SKIP
 ```
 
-The [`tp.run()`][temporian.evaluate] function's signature is `tp.run(<outputs>, <inputs>)`.
+The [`tp.run()`][temporian.run] function's signature is `tp.run(<outputs>, <inputs>)`.
 
-The `<outputs>` can be specified as a [`Node`][temporian.Node], a list of [`Nodes`][temporian.Node], or a dictionary of names to [`Nodes`][temporian.Node], and the result of [`tp.run()`][temporian.evaluate] will be of the same type. For example, if `<outputs>` is a list of three [`Nodes`][temporian.Node], the result will be a list of the three corresponding [`EventSets`][temporian.EventSet].
+The `<outputs>` can be specified as a [`Node`][temporian.Node], a list of [`Nodes`][temporian.Node], or a dictionary of names to [`Nodes`][temporian.Node], and the result of [`tp.run()`][temporian.run] will be of the same type. For example, if `<outputs>` is a list of three [`Nodes`][temporian.Node], the result will be a list of the three corresponding [`EventSets`][temporian.EventSet].
 
 The `<inputs>` can be specified as a dictionary of [`Nodes`][temporian.Node] to [`EventSets`][temporian.EventSet], a dictionary of names to [`EventSets`][temporian.EventSet], a list of [`EventSets`][temporian.EventSet] or a single [`EventSet`][temporian.EventSet], which lets Temporian know the [`Nodes`][temporian.Node] of the graph that each input [`EventSet`][temporian.EventSet] corresponds to. In the case of a dictionary of names to [`EventSets`][temporian.EventSet], the names must match the names of [`Nodes`][temporian.Node] in the graph, and in the case of a list or single [`EventSet`][temporian.EventSet], the names of those [`EventSets`][temporian.EventSet] must do the same. If specifying the inputs as a dictionary, we could skip passing a name to `a_evset`.
 
 **Remarks:**
 
 - It's important to distinguish between _[`EventSets`][temporian.EventSet]_, such as `a_evset`, that contain data, and _[`Nodes`][temporian.Node]_, like `a_node` and `b_node`, that connect operators together and compose the computation graph, but do not contain data.
-- No computation is performed during the definition of the graph (i.e., when calling the operator functions). All computation is done during [`tp.run()`][temporian.evaluate].
-- In [`tp.run()`][temporian.evaluate], the second argument defines a mapping between input [`Nodes`][temporian.Node] and [`EventSets`][temporian.EventSet]. If all necessary input [`Nodes`][temporian.Node] are not fed, an error will be raised.
+- No computation is performed during the definition of the graph (i.e., when calling the operator functions). All computation is done during [`tp.run()`][temporian.run].
+- In [`tp.run()`][temporian.run], the second argument defines a mapping between input [`Nodes`][temporian.Node] and [`EventSets`][temporian.EventSet]. If all necessary input [`Nodes`][temporian.Node] are not fed, an error will be raised.
 - In most cases you will only pass [`EventSets`][temporian.EventSet] that correspond to the graph's input [`Nodes`][temporian.Node], but Temporian also supports passing [`EventSets`][temporian.EventSet] to intermediate [`Nodes`][temporian.Node] in the graph. In the example provided, `a_node` is fed, but we could also feed `b_node` and `c_node`. In that case we would not need to feed `a_node`, since no [`Nodes`][temporian.Node] need to be computed from it anymore.
 
 To simplify its usage when the graph contains a single output [`Node`][temporian.Node], `node.run(...)` is equivalent to `tp.run(node, ...)`.
@@ -167,7 +167,7 @@ To simplify its usage when the graph contains a single output [`Node`][temporian
 >>> # d_evset = d_node.run(a_evset)
 -->
 
-**Warning:** It is more efficient to evaluate multiple output [`Nodes`][temporian.Node] together with [`tp.run()`][temporian.evaluate] than to evaluate them separately with `node_1.run(...)`, `node_2.run(...)`, etc. Only use [`node.run()`][temporian.Node.evaluate] for debugging purposes or when you only have a single output [`Node`][temporian.Node].
+**Warning:** It is more efficient to run multiple output [`Nodes`][temporian.Node] together with [`tp.run()`][temporian.run] than to run them separately with `node_1.run(...)`, `node_2.run(...)`, etc. Only use [`node.run()`][temporian.Node.run] for debugging purposes or when you only have a single output [`Node`][temporian.Node].
 
 ## Creating a [`Node`][temporian.Node] from an [`EventSet`][temporian.EventSet]
 
@@ -190,7 +190,7 @@ If an [`EventSet`][temporian.EventSet] is available (i.e., data is available) th
 >>> # This line is equivalent to the `tp.input_node` line above.
 >>> a_node = a_evset.node()
 
-# ... Define operators and evaluate the graph as above.
+# ... Define operators and run the graph as above.
 ```
 
 ## Time units
@@ -432,7 +432,7 @@ Temporian supports data type casting through the [`tp.cast()`][temporian.cast] o
 
    ```
 
-Keep in mind that the casting can fail when the graph is evaluated. For instance, attempting to cast `"word"` to `tp.float64` will result in an error. These errors cannot be caught prior to graph evaluation.
+Keep in mind that the casting can fail when the graph is rund. For instance, attempting to cast `"word"` to `tp.float64` will result in an error. These errors cannot be caught prior to graph evaluation.
 
 ## Arithmetic operators
 

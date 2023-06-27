@@ -17,7 +17,7 @@ from absl.testing import absltest
 import numpy as np
 import pandas as pd
 
-from temporian.core.evaluation import evaluate
+from temporian.core.evaluation import run
 from temporian.core.operators.select import SelectOperator
 from temporian.implementation.numpy.operators import select
 from temporian.io.pandas import from_pandas
