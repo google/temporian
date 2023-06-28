@@ -19,7 +19,7 @@ jobs:
           path: ~/.cache/bazel
           key: ${{ runner.os }}-${{ matrix.python-version }}-bazel-cache-${{ hashFiles('**/BUILD', '.bazelrc', '.bazelversion', 'WORKSPACE') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.python-version }}-bazel-cache
+            ${{ runner.os }}-notebooks-
 
       - name: Notebooks cache
         id: notebooks-cache
@@ -38,9 +38,16 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: "poetry"
+          cache-dependency-path: |
+            poetry.lock
+            ./docs/src/tutorials/requirements.txt
 
-      - name: Install dependencies
+
+      - name: Install poetry dependencies
         run: poetry install --no-interaction
+
+      - name: Install notebook dependencies
+        run: pip install -r ./docs/src/tutorials/requirements.txt
 
       - name: Execute all notebooks
         run: poetry run ./tools/start_notebook.sh test
