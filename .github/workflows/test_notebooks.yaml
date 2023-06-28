@@ -19,7 +19,7 @@ jobs:
           path: ~/.cache/bazel
           key: ${{ runner.os }}-${{ matrix.python-version }}-bazel-cache-${{ hashFiles('**/BUILD', '.bazelrc', '.bazelversion', 'WORKSPACE') }}
           restore-keys: |
-            ${{ runner.os }}-notebooks-
+            ${{ runner.os }}-${{ matrix.python-version }}-bazel-cache-
 
       - name: Notebooks cache
         id: notebooks-cache
