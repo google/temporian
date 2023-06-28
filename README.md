@@ -25,7 +25,7 @@
 
 ## Installation
 
-Temporian is available on PyPI. To install it, run:
+Temporian is available on [PyPI](https://pypi.org/project/temporian/). To install it, run:
 
 ```shell
 pip install temporian
