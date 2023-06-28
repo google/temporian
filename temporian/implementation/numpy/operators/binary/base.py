@@ -16,6 +16,7 @@ from abc import abstractmethod
 
 import numpy as np
 
+from temporian.core.data.dtype import DType
 from temporian.core.operators.binary.base import BaseBinaryOperator
 from temporian.implementation.numpy.data.event_set import IndexData
 from temporian.implementation.numpy.data.event_set import EventSet
@@ -29,7 +30,10 @@ class BaseBinaryNumpyImplementation(OperatorImplementation):
 
     @abstractmethod
     def _do_operation(
-        self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
+        self,
+        evset_1_feature: np.ndarray,
+        evset_2_feature: np.ndarray,
+        dtype: DType,
     ) -> np.ndarray:
         """Performs the arithmetic operation corresponding to the subclass."""
 
@@ -73,7 +77,11 @@ class BaseBinaryNumpyImplementation(OperatorImplementation):
                 input_2_feature = input_2_features[feature_idx]
                 assert input_1_feature.dtype.type == input_2_feature.dtype.type
 
-                result = self._do_operation(input_1_feature, input_2_feature)
+                result = self._do_operation(
+                    input_1_feature,
+                    input_2_feature,
+                    input_1.schema.features[feature_idx].dtype,
+                )
                 dst_features.append(result)
 
             dst_evset[index_key] = IndexData(

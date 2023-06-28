@@ -15,6 +15,7 @@ from typing import Union
 
 import numpy as np
 
+from temporian.core.data.dtype import DType
 from temporian.implementation.numpy.operators.scalar.base import (
     BaseScalarNumpyImplementation,
 )
@@ -34,7 +35,10 @@ class AddScalarNumpyImplementation(BaseScalarNumpyImplementation):
     """Numpy implementation of the add scalar operator."""
 
     def _do_operation(
-        self, feature: np.ndarray, value: Union[float, int, str, bool]
+        self,
+        feature: np.ndarray,
+        value: Union[float, int, str, bool],
+        dtype: DType,
     ) -> np.ndarray:
         return feature + value
 
@@ -43,7 +47,10 @@ class SubtractScalarNumpyImplementation(BaseScalarNumpyImplementation):
     """Numpy implementation of the subtract scalar operator."""
 
     def _do_operation(
-        self, feature: np.ndarray, value: Union[float, int, str, bool]
+        self,
+        feature: np.ndarray,
+        value: Union[float, int, str, bool],
+        dtype: DType,
     ) -> np.ndarray:
         if self._operator.is_value_first:
             return value - feature
@@ -55,7 +62,10 @@ class MultiplyScalarNumpyImplementation(BaseScalarNumpyImplementation):
     """Numpy implementation of the multiply scalar operator."""
 
     def _do_operation(
-        self, feature: np.ndarray, value: Union[float, int, str, bool]
+        self,
+        feature: np.ndarray,
+        value: Union[float, int, str, bool],
+        dtype: DType,
     ) -> np.ndarray:
         return feature * value
 
@@ -64,7 +74,10 @@ class DivideScalarNumpyImplementation(BaseScalarNumpyImplementation):
     """Numpy implementation of the divide scalar operator."""
 
     def _do_operation(
-        self, feature: np.ndarray, value: Union[float, int, str, bool]
+        self,
+        feature: np.ndarray,
+        value: Union[float, int, str, bool],
+        dtype: DType,
     ) -> np.ndarray:
         if self._operator.is_value_first:
             return value / feature
@@ -76,7 +89,10 @@ class FloorDivideScalarNumpyImplementation(BaseScalarNumpyImplementation):
     """Numpy implementation of the floordiv scalar operator."""
 
     def _do_operation(
-        self, feature: np.ndarray, value: Union[float, int, str, bool]
+        self,
+        feature: np.ndarray,
+        value: Union[float, int, str, bool],
+        dtype: DType,
     ) -> np.ndarray:
         if self._operator.is_value_first:
             return value // feature
@@ -88,7 +104,10 @@ class ModuloScalarNumpyImplementation(BaseScalarNumpyImplementation):
     """Numpy implementation of the modulo scalar operator."""
 
     def _do_operation(
-        self, feature: np.ndarray, value: Union[float, int, str, bool]
+        self,
+        feature: np.ndarray,
+        value: Union[float, int, str, bool],
+        dtype: DType,
     ) -> np.ndarray:
         if self._operator.is_value_first:
             return value % feature
@@ -99,7 +118,10 @@ class PowerScalarNumpyImplementation(BaseScalarNumpyImplementation):
     """Numpy implementation of the power scalar operator."""
 
     def _do_operation(
-        self, feature: np.ndarray, value: Union[float, int, str, bool]
+        self,
+        feature: np.ndarray,
+        value: Union[float, int, str, bool],
+        dtype: DType,
     ) -> np.ndarray:
         if self._operator.is_value_first:
             return value**feature

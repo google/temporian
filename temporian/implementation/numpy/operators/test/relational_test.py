@@ -16,6 +16,7 @@ import numpy as np
 import pandas as pd
 from absl.testing import absltest
 
+from temporian.implementation.numpy.data.io import event_set
 from temporian.core.operators.binary import (
     EqualOperator,
     NotEqualOperator,
@@ -33,6 +34,10 @@ from temporian.implementation.numpy.operators.binary import (
     LessNumpyImplementation,
 )
 from temporian.io.pandas import from_pandas
+from temporian.implementation.numpy.operators.test.test_util import (
+    assertEqualEventSet,
+    testOperatorAndImp,
+)
 
 
 class ArithmeticNumpyImplementationTest(absltest.TestCase):
@@ -101,6 +106,52 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
             input_1=self.evset_1, input_2=self.evset_2
         )
         self.assertEqual(output_evset, operator_output["output"])
+
+    def test_equal_str(self) -> None:
+        timestamps = [1, 2, 3, 4]
+        evset_1 = event_set(
+            timestamps=timestamps,
+            features={"a": ["A", "A", "B", "B"]},
+        )
+        evset_2 = event_set(
+            timestamps=timestamps,
+            features={"b": ["A", "B", "A", "B"]},
+            same_sampling_as=evset_1,
+        )
+
+        expected_output = event_set(
+            timestamps=timestamps,
+            features={"eq_a_b": [True, False, False, True]},
+        )
+
+        op = EqualOperator(evset_1.node(), evset_2.node())
+        instance = EqualNumpyImplementation(op)
+        testOperatorAndImp(self, op, instance)
+        output = instance.call(input_1=evset_1, input_2=evset_2)["output"]
+        assertEqualEventSet(self, output, expected_output)
+
+    def test_notequal_str(self) -> None:
+        timestamps = [1, 2, 3, 4]
+        evset_1 = event_set(
+            timestamps=timestamps,
+            features={"a": ["A", "A", "B", "B"]},
+        )
+        evset_2 = event_set(
+            timestamps=timestamps,
+            features={"b": ["A", "B", "A", "B"]},
+            same_sampling_as=evset_1,
+        )
+
+        expected_output = event_set(
+            timestamps=timestamps,
+            features={"ne_a_b": [False, True, True, False]},
+        )
+
+        op = NotEqualOperator(evset_1.node(), evset_2.node())
+        instance = NotEqualNumpyImplementation(op)
+        testOperatorAndImp(self, op, instance)
+        output = instance.call(input_1=evset_1, input_2=evset_2)["output"]
+        assertEqualEventSet(self, output, expected_output)
 
     def test_correct_not_equal(self) -> None:
         """Test correct not-equal operator."""
