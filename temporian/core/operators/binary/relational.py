@@ -19,6 +19,7 @@ from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
 from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.binary.base import BaseBinaryOperator
+from temporian.core.operators.scalar.relational_scalar import equal_scalar
 
 
 class BaseRelationalOperator(BaseBinaryOperator):
@@ -118,6 +119,10 @@ def equal(
     Returns:
         Node containing the result of the comparison.
     """
+
+    if not isinstance(input_2, Node):
+        return equal_scalar(input=input_1, value=input_2)
+
     return EqualOperator(
         input_1=input_1,
         input_2=input_2,
