@@ -166,4 +166,3 @@ del io
 del core
 del utils
 del implementation
-# pylint: enable=undefined-variable
