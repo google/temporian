@@ -194,4 +194,4 @@ def _matplotlib_sub_plot(
 
     ax.grid(lw=0.4, ls="--", axis="x")
     if title:
-        ax.set_title(title)
+        ax.set_title(title, fontsize=8)
