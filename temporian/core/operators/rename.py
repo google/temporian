@@ -195,7 +195,7 @@ def rename(
         >>> a_rename = tp.rename(a, {"f1": "input_1", "f2": "input_2"})
 
         >>> result = tp.glue(a_rename, b_1)
-        >>> result.evaluate({a: a_evset})
+        >>> result.run({a: a_evset})
         indexes: ...
                 'input_1': [0 2]
                 'input_2': [5 6]

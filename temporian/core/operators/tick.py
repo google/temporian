@@ -89,7 +89,7 @@ def tick(input: Node, interval: Duration, align: bool = True) -> Node:
         >>> a = a_evset.node()
 
         >>> result = tp.tick(a, interval=tp.duration.seconds(3), align=True)
-        >>> result.evaluate({a: a_evset})
+        >>> result.run({a: a_evset})
         indexes: ...
                 timestamps: [ 6. 9. 12. 15.]
         ...
@@ -102,7 +102,7 @@ def tick(input: Node, interval: Duration, align: bool = True) -> Node:
         >>> a = a_evset.node()
 
         >>> result = tp.tick(a, interval=tp.duration.seconds(3), align=False)
-        >>> result.evaluate({a: a_evset})
+        >>> result.run({a: a_evset})
         indexes: ...
                 timestamps: [ 5. 8. 11. 14.]
         ...

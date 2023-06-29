@@ -58,7 +58,7 @@ per_store = tp.set_index(input_node, "store")
 weekly_sum = tp.moving_sum(per_store["price"], window_length=tp.duration.days(7))
 
 # Execute Temporian program
-output_data = weekly_sum.evaluate({input_node: input_data})
+output_data = weekly_sum.run({input_node: input_data})
 
 # Plot the result
 output_data.plot()

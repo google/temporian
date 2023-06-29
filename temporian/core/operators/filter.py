@@ -101,7 +101,7 @@ def filter(
 
         >>> # Example boolean condition
         >>> condition = a["f1"] > 20
-        >>> condition.evaluate({a: a_evset})
+        >>> condition.run({a: a_evset})
         indexes: ...
                 timestamps: [0. 1. 5. 6.]
                 'f1': [False False  True  True]
@@ -109,7 +109,7 @@ def filter(
 
         >>> # Filter only True timestamps
         >>> filtered = tp.filter(a, condition)
-        >>> filtered.evaluate({a: a_evset})
+        >>> filtered.run({a: a_evset})
         indexes: ...
                 timestamps: [5. 6.]
                 'f1': [50 60]

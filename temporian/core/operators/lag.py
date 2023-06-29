@@ -86,7 +86,7 @@ def lag(input: Node, duration: Duration) -> Node:
         >>> a = a_evset.node()
 
         >>> result = tp.lag(a, tp.duration.seconds(2))
-        >>> result.evaluate({a: a_evset})
+        >>> result.run({a: a_evset})
         indexes: ...
             (4 events):
                 timestamps: [2. 3. 7. 8.]

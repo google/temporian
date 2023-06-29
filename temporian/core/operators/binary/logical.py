@@ -88,7 +88,7 @@ def logical_and(
         >>> c = tp.logical_and(cond_1, cond_2)
         >>> c = cond_1 & cond_2
 
-        >>> c.evaluate({source: evset})
+        >>> c.run({source: evset})
         indexes: []
         features: [('and_f1_f1', bool_)]
         events:
@@ -109,7 +109,7 @@ def logical_and(
 
         >>> c = tp.cast(source["f1"], bool) & tp.cast(source["f2"], bool)
 
-        >>> c.evaluate({source: evset})
+        >>> c.run({source: evset})
         indexes: []
         features: [('and_f1_f2', bool_)]
         events:
@@ -160,7 +160,7 @@ def logical_or(
         >>> c = tp.logical_or(cond_1, cond_2)
         >>> c = cond_1 | cond_2
 
-        >>> c.evaluate({source: evset})
+        >>> c.run({source: evset})
         indexes: []
         features: [('or_f1_f1', bool_)]
         events:
@@ -211,7 +211,7 @@ def logical_xor(
         >>> c = tp.logical_xor(cond_1, cond_2)
         >>> c = cond_1 ^ cond_2
 
-        >>> c.evaluate({source: evset})
+        >>> c.run({source: evset})
         indexes: []
         features: [('xor_f1_f1', bool_)]
         events:

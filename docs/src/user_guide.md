@@ -1,6 +1,6 @@
 # User Guide
 
-This is a complete tour of Temporian's capabilities. For a brief introduction to how the library works, please refer to [3 minutes to Temporian](../3_minutes).
+This is a complete tour of Temporian's capabilities. For a brief introduction to how the library works, please refer to [3 minutes to Temporian](./3_minutes).
 
 ## What is temporal data?
 
@@ -129,45 +129,45 @@ Let's see how to compute the simple moving average of two features `feature_1` a
 ... )
 >>>
 >>> # Feed the EventSet to the graph. The result is also an EventSet.
->>> d_evset = tp.evaluate(d_node, {a_node: a_evset})
+>>> d_evset = tp.run(d_node, {a_node: a_evset})
 >>>
 >>> # Print the result.
 >>> print(d_evset)  # doctest:+SKIP
 ```
 
-The [`tp.evaluate()`][temporian.evaluate] function's signature is `tp.evaluate(<outputs>, <inputs>)`.
+The [`tp.run()`][temporian.run] function's signature is `tp.run(<outputs>, <inputs>)`.
 
-The `<outputs>` can be specified as a [`Node`][temporian.Node], a list of [`Nodes`][temporian.Node], or a dictionary of names to [`Nodes`][temporian.Node], and the result of [`tp.evaluate()`][temporian.evaluate] will be of the same type. For example, if `<outputs>` is a list of three [`Nodes`][temporian.Node], the result will be a list of the three corresponding [`EventSets`][temporian.EventSet].
+The `<outputs>` can be specified as a [`Node`][temporian.Node], a list of [`Nodes`][temporian.Node], or a dictionary of names to [`Nodes`][temporian.Node], and the result of [`tp.run()`][temporian.run] will be of the same type. For example, if `<outputs>` is a list of three [`Nodes`][temporian.Node], the result will be a list of the three corresponding [`EventSets`][temporian.EventSet].
 
 The `<inputs>` can be specified as a dictionary of [`Nodes`][temporian.Node] to [`EventSets`][temporian.EventSet], a dictionary of names to [`EventSets`][temporian.EventSet], a list of [`EventSets`][temporian.EventSet] or a single [`EventSet`][temporian.EventSet], which lets Temporian know the [`Nodes`][temporian.Node] of the graph that each input [`EventSet`][temporian.EventSet] corresponds to. In the case of a dictionary of names to [`EventSets`][temporian.EventSet], the names must match the names of [`Nodes`][temporian.Node] in the graph, and in the case of a list or single [`EventSet`][temporian.EventSet], the names of those [`EventSets`][temporian.EventSet] must do the same. If we specify the inputs as a dictionary, we could skip passing a name to `a_evset`.
 
 **Remarks:**
 
 - It's important to distinguish between _[`EventSets`][temporian.EventSet]_, such as `a_evset`, that contain data, and _[`Nodes`][temporian.Node]_, like `a_node` and `b_node`, that connect operators together and compose the computation graph, but do not contain data.
-- No computation is performed when defining the graph (i.e., when calling the operator functions). All computation is done during [`tp.evaluate()`][temporian.evaluate].
-- In [`tp.evaluate()`][temporian.evaluate], the second argument defines a mapping between input [`Nodes`][temporian.Node] and [`EventSets`][temporian.EventSet]. If all necessary input [`Nodes`][temporian.Node] are not fed, an error will be raised.
+- No computation is performed when defining the graph (i.e., when calling the operator functions). All computation is done during [`tp.run()`][temporian.run].
+- In [`tp.run()`][temporian.run], the second argument defines a mapping between input [`Nodes`][temporian.Node] and [`EventSets`][temporian.EventSet]. If all necessary input [`Nodes`][temporian.Node] are not fed, an error will be raised.
 - In most cases you will only pass [`EventSets`][temporian.EventSet] that correspond to the graph's input [`Nodes`][temporian.Node], but Temporian also supports passing [`EventSets`][temporian.EventSet] to intermediate [`Nodes`][temporian.Node] in the graph. In the example provided, `a_node` is fed, but we could also feed `b_node` and `c_node`. In that case we would not need to feed `a_node`, since no [`Nodes`][temporian.Node] need to be computed from it anymore.
 
-To simplify its usage when the graph contains a single output [`Node`][temporian.Node], `node.evaluate(...)` is equivalent to `tp.evaluate(node, ...)`.
+To simplify its usage when the graph contains a single output [`Node`][temporian.Node], `node.run(...)` is equivalent to `tp.run(node, ...)`.
 
 ```python
 >>> # These statements are equivalent.
->>> d_evset = tp.evaluate(d_node, {a_node: a_evset})
->>> d_evset = d_node.evaluate({a_node: a_evset})
+>>> d_evset = tp.run(d_node, {a_node: a_evset})
+>>> d_evset = d_node.run({a_node: a_evset})
 
 ```
 
 <!-- TODO
 # Not implemented yet:
->>> # d_evset = tp.evaluate(d_node, {"a": a_evset})
->>> # d_evset = tp.evaluate(d_node, [a_evset])
->>> # d_evset = tp.evaluate(d_node, a_evset)
->>> # d_evset = d_node.evaluate({"a": a_evset})
->>> # d_evset = d_node.evaluate([a_evset])
->>> # d_evset = d_node.evaluate(a_evset)
+>>> # d_evset = tp.run(d_node, {"a": a_evset})
+>>> # d_evset = tp.run(d_node, [a_evset])
+>>> # d_evset = tp.run(d_node, a_evset)
+>>> # d_evset = d_node.run({"a": a_evset})
+>>> # d_evset = d_node.run([a_evset])
+>>> # d_evset = d_node.run(a_evset)
 -->
 
-**Warning:** It is more efficient to evaluate multiple output [`Nodes`][temporian.Node] together with [`tp.evaluate()`][temporian.evaluate] than to evaluate them separately with `node_1.evaluate(...)`, `node_2.evaluate(...)`, etc. Only use [`node.evaluate()`][temporian.Node.evaluate] for debugging purposes or when you only have a single output [`Node`][temporian.Node].
+**Warning:** It is more efficient to run multiple output [`Nodes`][temporian.Node] together with [`tp.run()`][temporian.run] than to run them separately with `node_1.run(...)`, `node_2.run(...)`, etc. Only use [`node.run()`][temporian.Node.run] for debugging purposes or when you only have a single output [`Node`][temporian.Node].
 
 ## Creating a [`Node`][temporian.Node] from an [`EventSet`][temporian.EventSet]
 
@@ -190,7 +190,7 @@ If an [`EventSet`][temporian.EventSet] is available (i.e., data is available) th
 >>> # This line is equivalent to the `tp.input_node` line above.
 >>> a_node = a_evset.node()
 
-# ... Define operators and evaluate the graph as above.
+# ... Define operators and run the graph as above.
 ```
 
 ## Time units
@@ -215,7 +215,7 @@ Calendar operators require the time in their inputs to be Unix time, so applying
 ... )
 >>> a_node = a_evset.node()
 >>> b_node = tp.glue(a_node, tp.calendar_day_of_week(a_node))
->>> b_node.evaluate(a_evset)
+>>> b_node.run(a_evset)
 indexes: ...
 features: [('feature_1', int64), ('feature_2', str_), ('calendar_day_of_week', int32)]
 events:
@@ -456,7 +456,7 @@ These operators are applied index-wise and timestamp-wise, between features in t
 
 >>> node_added = node[["f1", "f2"]] + node[["f3", "f4"]]
 
->>> evset_added = node_added.evaluate(evset)
+>>> evset_added = node_added.run(evset)
 >>> print(evset_added)
 indexes: ...
 features: [('add_f1_f3', int64), ('add_f2_f4', float64)]
@@ -552,7 +552,7 @@ Operations involving scalars are applied index-feature-element-wise.
 
 ```python
 >>> node_scalar = node * 10
->>> print(node_scalar.evaluate(evset))
+>>> print(node_scalar.run(evset))
 indexes: ...
 features: [('f1', int64), ('f2', float64), ('f3', int64), ('f4', float64)]
 events:
@@ -599,7 +599,7 @@ Given this example:
 ... )
 >>> sampling_node = sampling_evset.node()
 >>> resampled = tp.resample(input=node, sampling=sampling_node)
->>> resampled.evaluate({node: evset, sampling_node: sampling_evset})
+>>> resampled.run({node: evset, sampling_node: sampling_evset})
 indexes: []
 features: [('x', float64)]
 events:
@@ -637,7 +637,7 @@ Back to the example of the [`tp.add()`][temporian.add] operator, `a` and `b` wit
 >>> a = sampling_a.node()
 >>> b = sampling_b.node()
 >>> result = a + tp.resample(b, a)
->>> result.evaluate({a: sampling_a, b: sampling_b})
+>>> result.run({a: sampling_a, b: sampling_b})
 indexes: []
 features: [('add_f1_f1', int64)]
 events:
@@ -713,7 +713,7 @@ The moving sum operator will then be applied independently to the events corresp
 >>> # Compute the moving sum of each index group (a.k.a. each product) individually.
 >>> b = tp.moving_sum(a, window_length=tp.duration.weeks(1))
 >>>
->>> b.evaluate({a: daily_sales})
+>>> b.run({a: daily_sales})
 indexes: [('product', int64)]
 features: [('sale', float64)]
 events:
@@ -770,7 +770,7 @@ Let's add the `(product, store)` pair as the index.
 ```python
 >>> a = daily_sales.node()
 >>> b = tp.add_index(a, ["product", "store"])
->>> b.evaluate({a: daily_sales})
+>>> b.run({a: daily_sales})
 indexes: [('product', int64), ('store', int64)]
 features: [('sale', float64)]
 events:
@@ -793,7 +793,7 @@ for each `(product, store)` pair.
 ```python
 >>> # Weekly sales by product and store
 >>> c = tp.moving_sum(b["sale"], window_length=tp.duration.weeks(1))
->>> c.evaluate({a: daily_sales})
+>>> c.run({a: daily_sales})
 indexes: [('product', int64), ('store', int64)]
 features: [('sale', float64)]
 events:
@@ -816,7 +816,7 @@ If we want the weekly sum of sales per `store`, we can just drop the `product` i
 >>> # Weekly sales by store (including all products)
 >>> d = tp.drop_index(b, "product")
 >>> e = tp.moving_sum(d["sale"], window_length=tp.duration.weeks(1))
->>> e.evaluate({a: daily_sales})
+>>> e.run({a: daily_sales})
 indexes: [('store', int64)]
 features: [('sale', float64)]
 events:
@@ -843,7 +843,7 @@ Since `c` (weekly sales for each product and store) and `e` (weekly sales for ea
 ...     tp.propagate(e, sampling=c),
 ...     sampling=c,
 ... )
->>> print(f.evaluate({a: daily_sales}))
+>>> print(f.run({a: daily_sales}))
 indexes: [('product', int64), ('store', int64)]
 features: [('div_sale_sale', float64)]
 events:
@@ -1014,5 +1014,5 @@ tp.save(inputs=a, outputs=[b], path="/tmp/my_graph.tem")
 loaded_inputs, loaded_outputs = tp.load(path="/tmp/my_graph.tem")
 
 # Run data on the restored graph.
-tp.evaluate(loaded_outputs["output_b"], {loaded_inputs["input_a"]: evset})
+tp.run(loaded_outputs["output_b"], {loaded_inputs["input_a"]: evset})
 ```

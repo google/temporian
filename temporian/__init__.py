@@ -63,7 +63,7 @@ from temporian.core.serialization import load
 from temporian.core.serialization import save
 
 # Graph execution
-from temporian.core.evaluation import evaluate
+from temporian.core.evaluation import run
 
 # IO
 from temporian.io.csv import to_csv
@@ -166,4 +166,3 @@ del io
 del core
 del utils
 del implementation
-# pylint: enable=undefined-variable

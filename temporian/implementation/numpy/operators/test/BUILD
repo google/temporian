@@ -29,6 +29,7 @@ py_test(
         "//temporian/implementation/numpy/data:io",
         "//temporian/io:pandas",
         "//temporian/implementation/numpy/operators/binary",
+        ":test_util",
     ],
 )
 
@@ -44,6 +45,7 @@ py_test(
         "//temporian/core/operators/binary",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/binary",
+        ":test_util",
     ],
 )
 
@@ -58,6 +60,7 @@ py_test(
         "//temporian/core/operators/binary",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/binary",
+        ":test_util",
     ],
 )
 
@@ -66,7 +69,6 @@ py_test(
     srcs = ["arithmetic_scalar_test.py"],
     srcs_version = "PY3",
     deps = [
-        ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
@@ -74,6 +76,7 @@ py_test(
         "//temporian/core/operators/scalar",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/scalar",
+        ":test_util",
     ],
 )
 
@@ -89,6 +92,7 @@ py_test(
         "//temporian/core/operators/scalar",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/scalar",
+        ":test_util",
     ],
 )
 
@@ -97,7 +101,6 @@ py_test(
     srcs = ["arithmetic_multi_index_test.py"],
     srcs_version = "PY3",
     deps = [
-        ":test_util",
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
@@ -108,6 +111,7 @@ py_test(
         "//temporian/core/operators/binary",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/binary",
+        ":test_util",
     ],
 )
 

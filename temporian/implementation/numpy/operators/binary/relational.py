@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import numpy as np
+
+from temporian.core.data.dtype import DType
 from temporian.implementation.numpy.operators.binary.base import (
     BaseBinaryNumpyImplementation,
 )
@@ -33,10 +35,16 @@ class EqualNumpyImplementation(BaseBinaryNumpyImplementation):
         super().__init__(operator)
 
     def _do_operation(
-        self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
+        self,
+        evset_1_feature: np.ndarray,
+        evset_2_feature: np.ndarray,
+        dtype: DType,
     ) -> np.ndarray:
-        # returns False on both NaNs
-        return np.equal(evset_1_feature.data, evset_2_feature.data)
+        if dtype == DType.STRING:
+            return np.char.equal(evset_1_feature.data, evset_2_feature.data)
+        else:
+            # returns False on both NaNs
+            return np.equal(evset_1_feature.data, evset_2_feature.data)
 
 
 class NotEqualNumpyImplementation(BaseBinaryNumpyImplementation):
@@ -44,9 +52,15 @@ class NotEqualNumpyImplementation(BaseBinaryNumpyImplementation):
         super().__init__(operator)
 
     def _do_operation(
-        self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
+        self,
+        evset_1_feature: np.ndarray,
+        evset_2_feature: np.ndarray,
+        dtype: DType,
     ) -> np.ndarray:
-        return np.not_equal(evset_1_feature.data, evset_2_feature.data)
+        if dtype == DType.STRING:
+            return np.char.not_equal(evset_1_feature.data, evset_2_feature.data)
+        else:
+            return np.not_equal(evset_1_feature.data, evset_2_feature.data)
 
 
 class GreaterNumpyImplementation(BaseBinaryNumpyImplementation):
@@ -54,7 +68,10 @@ class GreaterNumpyImplementation(BaseBinaryNumpyImplementation):
         super().__init__(operator)
 
     def _do_operation(
-        self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
+        self,
+        evset_1_feature: np.ndarray,
+        evset_2_feature: np.ndarray,
+        dtype: DType,
     ) -> np.ndarray:
         return np.greater(evset_1_feature.data, evset_2_feature.data)
 
@@ -64,7 +81,10 @@ class GreaterEqualNumpyImplementation(BaseBinaryNumpyImplementation):
         super().__init__(operator)
 
     def _do_operation(
-        self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
+        self,
+        evset_1_feature: np.ndarray,
+        evset_2_feature: np.ndarray,
+        dtype: DType,
     ) -> np.ndarray:
         return np.greater_equal(evset_1_feature.data, evset_2_feature.data)
 
@@ -74,7 +94,10 @@ class LessNumpyImplementation(BaseBinaryNumpyImplementation):
         super().__init__(operator)
 
     def _do_operation(
-        self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
+        self,
+        evset_1_feature: np.ndarray,
+        evset_2_feature: np.ndarray,
+        dtype: DType,
     ) -> np.ndarray:
         return np.less(evset_1_feature.data, evset_2_feature.data)
 
@@ -84,7 +107,10 @@ class LessEqualNumpyImplementation(BaseBinaryNumpyImplementation):
         super().__init__(operator)
 
     def _do_operation(
-        self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
+        self,
+        evset_1_feature: np.ndarray,
+        evset_2_feature: np.ndarray,
+        dtype: DType,
     ) -> np.ndarray:
         return np.less_equal(evset_1_feature.data, evset_2_feature.data)
 

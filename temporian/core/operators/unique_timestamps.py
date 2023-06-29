@@ -64,7 +64,7 @@ def unique_timestamps(input: Node) -> Node:
         >>> a = a_evset.node()
 
         >>> result = tp.unique_timestamps(a)
-        >>> result.evaluate({a: a_evset})
+        >>> result.run({a: a_evset})
         indexes: []
         features: []
         events:

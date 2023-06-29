@@ -107,7 +107,7 @@ def select(
         >>> b = a['B']
         >>> # Equivalent
         >>> b = tp.select(a, 'B')
-        >>> b.evaluate({a: a_evset})
+        >>> b.run({a: a_evset})
         indexes: []
         features: [('B', str_)]
         events:
@@ -120,7 +120,7 @@ def select(
         >>> b = a[['B', 'C']]
         >>> # Equivalent
         >>> b = tp.select(a, ['B', 'C'])
-        >>> b.evaluate({a: a_evset})
+        >>> b.run({a: a_evset})
         indexes: []
         features: [('B', str_), ('C', float64)]
         events:
