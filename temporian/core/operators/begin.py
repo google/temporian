@@ -64,7 +64,7 @@ def begin(input: Node) -> Node:
         >>> a = a_evset.node()
 
         >>> a_ini = tp.begin(a)
-        >>> a_ini.evaluate({a: a_evset})
+        >>> a_ini.run({a: a_evset})
         indexes: [('idx', int64)]
         features: []
         events:

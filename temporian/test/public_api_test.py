@@ -23,7 +23,7 @@ PUBLIC_API_SYMBOLS = {
     "Node",
     "Schema",
     "duration",
-    "evaluate",
+    "run",
     "event_set",
     "input_node",
     "plot",

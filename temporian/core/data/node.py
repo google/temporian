@@ -37,7 +37,7 @@ class Node:
     compatible with a given [`EventSet`][temporian.EventSet].
 
     A Node does not contain any data. Use
-    [`node.evaluate()`][temporian.Node.evaluate] to get the
+    [`node.run()`][temporian.Node.run] to get the
     [`EventSet`][temporian.EventSet] resulting from a [`Nodes`][temporian.Node].
     """
 
@@ -142,7 +142,7 @@ class Node:
                 "operator `tp.resample`."
             )
 
-    def evaluate(
+    def run(
         self,
         input: EvaluationInput,
         verbose: int = 1,
@@ -150,11 +150,11 @@ class Node:
     ) -> EvaluationResult:
         """Evaluates the Node on the specified input.
 
-        See [`tp.evaluate()`][temporian.evaluate] for details.
+        See [`tp.run()`][temporian.run] for details.
         """
-        from temporian.core.evaluation import evaluate
+        from temporian.core.evaluation import run
 
-        return evaluate(
+        return run(
             query=self,
             input=input,
             verbose=verbose,

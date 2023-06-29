@@ -57,7 +57,7 @@ def save(
         >>> b = tp.rename(b, "result_feature")
 
         >>> # Check evaluation
-        >>> b.evaluate({a: evset})
+        >>> b.run({a: evset})
         indexes: []
         features: [('result_feature', int64)]
         events:
@@ -80,7 +80,7 @@ def save(
         >>> # Evaluate reloaded graph
         >>> a_reloaded = inputs["input_node"]
         >>> b_reloaded = outputs["output_node"]
-        >>> b_reloaded.evaluate({a_reloaded: evset})
+        >>> b_reloaded.run({a_reloaded: evset})
         indexes: []
         features: [('result_feature', int64)]
         events:

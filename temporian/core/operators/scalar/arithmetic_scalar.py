@@ -89,7 +89,7 @@ def add_scalar(
         >>> # Equivalent
         >>> c = tp.add_scalar(a, 3)
         >>> c = a + 3
-        >>> c.evaluate({a: evset})
+        >>> c.run({a: evset})
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'f1': [ 3 103 203]
@@ -133,7 +133,7 @@ def subtract_scalar(
         >>> # Equivalent
         >>> c = tp.subtract_scalar(a, 3)
         >>> c = a - 3
-        >>> c.evaluate({a: evset})
+        >>> c.run({a: evset})
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'f1': [ -3  97 197]
@@ -143,7 +143,7 @@ def subtract_scalar(
         >>> # Equivalent
         >>> c = tp.subtract_scalar(3, a)
         >>> c = 3 - a
-        >>> c.evaluate({a: evset})
+        >>> c.run({a: evset})
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'f1': [ 3  -97 -197]
@@ -201,7 +201,7 @@ def multiply_scalar(
         >>> # Equivalent
         >>> c = tp.multiply_scalar(a, 2)
         >>> c = a * 2
-        >>> c.evaluate({a: evset})
+        >>> c.run({a: evset})
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'f1': [ 0 200 400]
@@ -245,7 +245,7 @@ def divide_scalar(
         >>> # Equivalent
         >>> c = tp.divide_scalar(a, 2)
         >>> c = a / 2
-        >>> c.evaluate({a: evset})
+        >>> c.run({a: evset})
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'f1': [ 0. 50. 100.]
@@ -255,7 +255,7 @@ def divide_scalar(
         >>> # Equivalent
         >>> c = tp.divide_scalar(1000, a)
         >>> c = 1000 / a
-        >>> c.evaluate({a: evset})
+        >>> c.run({a: evset})
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'f1': [inf 10. 5.]
@@ -316,7 +316,7 @@ def floordiv_scalar(
         >>> # Equivalent
         >>> c = tp.floordiv_scalar(a, 3)
         >>> c = a // 3
-        >>> c.evaluate({a: evset})
+        >>> c.run({a: evset})
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'f1': [ 0 33 66]
@@ -326,7 +326,7 @@ def floordiv_scalar(
         >>> # Equivalent
         >>> c = tp.floordiv_scalar(300, a)
         >>> c = 300 // a
-        >>> c.evaluate({a: evset})
+        >>> c.run({a: evset})
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'f1': [300 3 1]
@@ -385,7 +385,7 @@ def modulo_scalar(
         >>> # Equivalent
         >>> c = tp.modulo_scalar(a, 3)
         >>> c = a % 3
-        >>> c.evaluate({a: evset})
+        >>> c.run({a: evset})
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'f1': [1 1 2]
@@ -395,7 +395,7 @@ def modulo_scalar(
         >>> # Equivalent
         >>> c = tp.floordiv_scalar(300, a)
         >>> c = 300 % a
-        >>> c.evaluate({a: evset})
+        >>> c.run({a: evset})
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'f1': [ 0 0 100]
@@ -454,7 +454,7 @@ def power_scalar(
         >>> # Equivalent
         >>> c = tp.power_scalar(a, 3)
         >>> c = a ** 3
-        >>> c.evaluate({a: evset})
+        >>> c.run({a: evset})
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'f1': [ 0 8 27]
@@ -464,7 +464,7 @@ def power_scalar(
         >>> # Equivalent
         >>> c = tp.power_scalar(3, a)
         >>> c = 3 ** a
-        >>> c.evaluate({a: evset})
+        >>> c.run({a: evset})
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'f1': [ 1 9 27]

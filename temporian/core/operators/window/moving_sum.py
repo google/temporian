@@ -65,7 +65,7 @@ def moving_sum(
         >>> a = a_evset.node()
 
         >>> result = tp.moving_sum(a, tp.duration.seconds(4))
-        >>> result.evaluate({a: a_evset})
+        >>> result.run({a: a_evset})
         indexes: ...
             (6 events):
                 timestamps: [0. 1. 2. 5. 6. 7.]

@@ -26,7 +26,7 @@ from temporian.core.schedule import Schedule
 from temporian.implementation.numpy import operators as _impls
 
 
-def evaluate_schedule(
+def run_schedule(
     inputs: Dict[Node, EventSet],
     schedule: Schedule,
     verbose: int,

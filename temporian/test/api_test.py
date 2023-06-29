@@ -44,7 +44,7 @@ class TFPTest(absltest.TestCase):
 
         result2 = tp.glue(tp.prefix("toto.", h3))
 
-        result_data, result2_data = tp.evaluate(
+        result_data, result2_data = tp.run(
             query=[result, result2],
             input={i1: evset_1, i2: evset_2},
             verbose=2,

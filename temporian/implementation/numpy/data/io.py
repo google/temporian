@@ -10,7 +10,7 @@ from temporian.implementation.numpy.data.event_set import (
     normalize_timestamps,
     normalize_features,
 )
-from temporian.core.evaluation import evaluate
+from temporian.core.evaluation import run
 from temporian.core.operators.add_index import add_index
 from temporian.core.data.schema import Schema
 
@@ -155,7 +155,7 @@ def event_set(
         # Index the data
         input_node = evset.node()
         output_node = add_index(input_node, indexes=indexes)
-        evset = evaluate(output_node, {input_node: evset})
+        evset = run(output_node, {input_node: evset})
         assert isinstance(evset, EventSet)
 
     evset.name = name

@@ -138,7 +138,7 @@ def propagate(input: Node, sampling: Node, resample: bool = False) -> Node:
         >>> # Third attempt: propagate + resample
         >>> store_prop = tp.propagate(store_node, products_node, resample=True)
         >>> products_fraction = products_node / store_prop
-        >>> products_fraction.evaluate([products_evset, store_evset])
+        >>> products_fraction.run([products_evset, store_evset])
         indexes: [('product', int64)]
         features: [('div_sales_sales', float64)]
         events:

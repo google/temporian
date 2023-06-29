@@ -223,7 +223,7 @@ def cast(
 
         >>> # Cast all input features to the same dtype
         >>> b = tp.cast(a[["A", "C"]], tp.float32)
-        >>> b.evaluate({a: a_evset})
+        >>> b.run({a: a_evset})
         indexes: []
         features: [('A', float32), ('C', float32)]
         events:
@@ -236,7 +236,7 @@ def cast(
 
         >>> # Cast by feature name
         >>> b = tp.cast(a, {'A': bool, 'C': int})
-        >>> b.evaluate({a: a_evset})
+        >>> b.run({a: a_evset})
         indexes: []
         features: [('A', bool_), ('B', str_), ('C', int64)]
         events:
@@ -249,7 +249,7 @@ def cast(
 
         >>> # Map original_dtype -> target_dtype
         >>> b = tp.cast(a, {float: int, int: float})
-        >>> b.evaluate({a: a_evset})
+        >>> b.run({a: a_evset})
         indexes: []
         features: [('A', float64), ('B', str_), ('C', int64)]
         events:
