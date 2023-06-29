@@ -22,8 +22,8 @@ PKDIR="$(pwd)/build_package"
 rm -fr ${PKDIR}
 mkdir -p ${PKDIR}
 
-rsync -v -r --include='*/' --include='*.py' --exclude='*' "temporian/" "${PKDIR}/temporian/"
-rsync -v -r --include='*/' --include='*.py' --include='*.so' --exclude='*' --exclude='test' "bazel-bin/temporian/" "${PKDIR}/temporian/"
+rsync -v -r --safe-links --exclude='*/*test/' --include='*/' --include='*.py' --exclude='*' "temporian/" "${PKDIR}/temporian/"
+rsync -v -r --safe-links --exclude='*/*.runfiles/' --include='*/' --include='*.py' --include='*.so' --exclude='*' "bazel-bin/temporian/" "${PKDIR}/temporian/"
 
 # Start notebook
 # Note: Use "notebook" or "lab" ("jupyterlab").
