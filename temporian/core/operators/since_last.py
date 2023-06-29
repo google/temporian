@@ -89,7 +89,7 @@ def since_last(
         >>> t_evset = tp.event_set(timestamps=[1, 5, 8, 8, 9])
         >>> t_node = t_evset.node()
         >>> since_node = tp.since_last(t_node)
-        >>> since_node.evaluate({t_node: t_evset})
+        >>> since_node.run({t_node: t_evset})
         indexes: ...
                 timestamps: [1. 5. 8. 8. 9.]
                 'since_last': [nan  4.  3.  0.  1.]
@@ -107,7 +107,7 @@ def since_last(
         >>> # Time elapsed between each sampling event
         >>> # and the latest previous event in since_evset
         >>> result = tp.since_last(since_node, sampling_node)
-        >>> result.evaluate({since_node: since_evset,
+        >>> result.run({since_node: since_evset,
         ...     sampling_node: sampling_evset}
         ... )
         indexes: ...

@@ -100,7 +100,7 @@ def equal(
 
         >>> # Element-wise comparison
         >>> c = tp.equal(a, b)
-        >>> c.evaluate({source: evset})
+        >>> c.run({source: evset})
         indexes: []
         features: [('eq_f1_f2', bool_), ('eq_f2_f1', bool_)]
         events:
@@ -155,7 +155,7 @@ def not_equal(
         >>> # Equivalent
         >>> c = tp.not_equal(a, b)
         >>> c = a != b
-        >>> c.evaluate({source: evset})
+        >>> c.run({source: evset})
         indexes: []
         features: [('ne_f1_f2', bool_), ('ne_f2_f1', bool_)]
         events:
@@ -206,7 +206,7 @@ def greater(
         >>> # Equivalent
         >>> c = tp.greater(a, b)
         >>> c = a > b
-        >>> c.evaluate({source: evset})
+        >>> c.run({source: evset})
         indexes: []
         features: [('gt_f1_f2', bool_), ('gt_f2_f1', bool_)]
         events:
@@ -257,7 +257,7 @@ def greater_equal(
         >>> # Equivalent
         >>> c = tp.greater_equal(a, b)
         >>> c = a >= b
-        >>> c.evaluate({source: evset})
+        >>> c.run({source: evset})
         indexes: []
         features: [('ge_f1_f2', bool_), ('ge_f2_f1', bool_)]
         events:
@@ -308,7 +308,7 @@ def less(
         >>> # Equivalent
         >>> c = tp.less(a, b)
         >>> c = a < b
-        >>> c.evaluate({source: evset})
+        >>> c.run({source: evset})
         indexes: []
         features: [('lt_f1_f2', bool_), ('lt_f2_f1', bool_)]
         events:
@@ -359,7 +359,7 @@ def less_equal(
         >>> # Equivalent
         >>> c = tp.less_equal(a, b)
         >>> c = a <= b
-        >>> c.evaluate({source: evset})
+        >>> c.run({source: evset})
         indexes: []
         features: [('le_f1_f2', bool_), ('le_f2_f1', bool_)]
         events:

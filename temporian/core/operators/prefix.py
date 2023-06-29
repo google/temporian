@@ -88,7 +88,7 @@ def prefix(
 
         >>> # Prefix before glue to avoid duplicated names
         >>> result = tp.glue(tp.prefix("original_", a), tp.prefix("result_", b))
-        >>> result.evaluate({a: a_evset})
+        >>> result.run({a: a_evset})
         indexes: ...
                 'original_f1': [0 2]
                 'original_f2': [5 6]

@@ -106,7 +106,7 @@ class PrototypeTest(absltest.TestCase):
         e = tp.glue(d, sub_sales)
         output_node = e
 
-        output_evset = tp.evaluate(
+        output_evset = tp.run(
             output_node,
             input={
                 self.node_1: self.evset_1,

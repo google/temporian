@@ -84,7 +84,7 @@ def resample(
         >>> input_node = evset.node()
         >>> sampling_node = sampling.node()
         >>> out_node = tp.resample(input_node, sampling=sampling_node)
-        >>> out_node.evaluate({input_node: evset, sampling_node: sampling})
+        >>> out_node.run({input_node: evset, sampling_node: sampling})
         indexes: ...
                 timestamps: [-1.  1.  6. 10.]
                 'f1': [nan  1.  2.  4.]

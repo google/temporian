@@ -111,7 +111,7 @@ def add(
         >>> c = tp.add(a, b)
         >>> c = a + b
 
-        >>> c.evaluate({source: evset})
+        >>> c.run({source: evset})
         indexes: []
         features: [('add_f1_f2', int64), ('add_f2_f1', int64)]
         events:
@@ -143,7 +143,7 @@ def add(
 
         >>> # Cast f1 to float
         >>> c = tp.cast(a, tp.float64) + b
-        >>> c.evaluate({source: evset})
+        >>> c.run({source: evset})
         indexes: []
         features: [('add_f1_f2', float64)]
         events:
@@ -178,7 +178,7 @@ def add(
         >>> # Resample a to match b timestamps
         >>> a_resampled = tp.resample(a, sampling=b)
         >>> c = a_resampled + b
-        >>> c.evaluate([a_evset, b_evset])
+        >>> c.run([a_evset, b_evset])
         indexes: []
         features: [('add_fa_fb', int64)]
         events:
@@ -221,7 +221,7 @@ def add(
 
         >>> c = a_f1["f3"] + b_f1["f3"]
 
-        >>> c.evaluate({a: a_evset, b: b_evset})
+        >>> c.run({a: a_evset, b: b_evset})
         indexes: [('f1', int64)]
         ...
                 timestamps: [1. 2. 3. 4.]
@@ -269,7 +269,7 @@ def subtract(
         >>> c = tp.subtract(a, b)
         >>> c = a - b
 
-        >>> c.evaluate({source: evset})
+        >>> c.run({source: evset})
         indexes: []
         features: [('sub_f1_f2', int64)]
         events:
@@ -322,7 +322,7 @@ def multiply(
         >>> c = tp.multiply(a, b)
         >>> c = a * b
 
-        >>> c.evaluate({source: evset})
+        >>> c.run({source: evset})
         indexes: []
         features: [('mult_f1_f2', int64)]
         events:
@@ -379,7 +379,7 @@ def divide(
         >>> c = tp.divide(a, b)
         >>> c = a / b
 
-        >>> c.evaluate({source: evset})
+        >>> c.run({source: evset})
         indexes: []
         features: [('div_f1_f2', float64)]
         events:
@@ -410,7 +410,7 @@ def divide(
 
         >>> # Cast to tp.float64 or tp.float32 before
         >>> c = tp.cast(a, float) / tp.cast(b, float)
-        >>> c.evaluate({source: evset})
+        >>> c.run({source: evset})
         indexes: []
         features: [('div_f1_f2', float64)]
         events:
@@ -466,7 +466,7 @@ def floordiv(
         >>> c = tp.floordiv(a, b)
         >>> c = a // b
 
-        >>> c.evaluate({source: evset})
+        >>> c.run({source: evset})
         indexes: []
         features: [('floordiv_f1_f2', int64)]
         events:
@@ -517,7 +517,7 @@ def modulo(
         >>> c = tp.modulo(a, b)
         >>> c = a % b
 
-        >>> c.evaluate({source: evset})
+        >>> c.run({source: evset})
         indexes: []
         features: [('mod_f1_f2', int64)]
         events:
@@ -570,7 +570,7 @@ def power(
         >>> c = tp.power(a, b)
         >>> c = a ** b
 
-        >>> c.evaluate({source: evset})
+        >>> c.run({source: evset})
         indexes: []
         features: [('pow_f1_f2', int64)]
         events:

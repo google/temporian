@@ -62,7 +62,7 @@ def moving_count(
         >>> a = a_evset.node()
 
         >>> result = tp.moving_count(a, tp.duration.seconds(2))
-        >>> result.evaluate({a: a_evset})
+        >>> result.run({a: a_evset})
         indexes: ...
             (6 events):
                 timestamps: [0. 1. 2. 5. 6. 7.]
@@ -84,7 +84,7 @@ def moving_count(
         >>> sampling = sampling_evset.node()
 
         >>> result = tp.moving_count(a, tp.duration.seconds(2), sampling)
-        >>> result.evaluate({a: a_evset, sampling: sampling_evset})
+        >>> result.run({a: a_evset, sampling: sampling_evset})
         indexes: ...
             (9 events):
                 timestamps: [-1. 0. 1. 2. 3. 4. 5. 6. 7.]
@@ -105,7 +105,7 @@ def moving_count(
         ... )
         >>> a = a_evset.node()
         >>> result = tp.moving_count(a, tp.duration.seconds(2))
-        >>> result.evaluate({a: a_evset})
+        >>> result.run({a: a_evset})
         indexes: [('idx', str_)]
         features: [('value', int32)]
         events:

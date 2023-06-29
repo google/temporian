@@ -95,7 +95,7 @@ def equal_scalar(
 
         >>> # Element-wise comparison
         >>> c = tp.equal_scalar(a, 100)
-        >>> c.evaluate({a: evset})
+        >>> c.run({a: evset})
         indexes: []
         features: [('f1', bool_), ('f2', bool_)]
         events:
@@ -140,7 +140,7 @@ def not_equal_scalar(
         >>> # Equivalent
         >>> c = tp.not_equal_scalar(a, 100)
         >>> c = a != 100
-        >>> c.evaluate({a: evset})
+        >>> c.run({a: evset})
         indexes: []
         features: [('f1', bool_), ('f2', bool_)]
         events:
@@ -185,7 +185,7 @@ def greater_equal_scalar(
         >>> # Equivalent
         >>> c = tp.greater_equal_scalar(a, 100)
         >>> c = a >= 100
-        >>> c.evaluate({a: evset})
+        >>> c.run({a: evset})
         indexes: []
         features: [('f1', bool_), ('f2', bool_)]
         events:
@@ -230,7 +230,7 @@ def less_equal_scalar(
         >>> # Equivalent
         >>> c = tp.less_equal_scalar(a, 100)
         >>> c = a <= 100
-        >>> c.evaluate({a: evset})
+        >>> c.run({a: evset})
         indexes: []
         features: [('f1', bool_), ('f2', bool_)]
         events:
@@ -275,7 +275,7 @@ def greater_scalar(
         >>> # Equivalent
         >>> c = tp.greater_scalar(a, 100)
         >>> c = a > 100
-        >>> c.evaluate({a: evset})
+        >>> c.run({a: evset})
         indexes: []
         features: [('f1', bool_), ('f2', bool_)]
         events:
@@ -320,7 +320,7 @@ def less_scalar(
         >>> # Equivalent
         >>> c = tp.less_scalar(a, 100)
         >>> c = a < 100
-        >>> c.evaluate({a: evset})
+        >>> c.run({a: evset})
         indexes: []
         features: [('f1', bool_), ('f2', bool_)]
         events:
