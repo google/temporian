@@ -14,6 +14,7 @@ py_library(
         ":arithmetic",
         ":logical",
         ":relational",
+        "//temporian/core/operators/scalar:relational_scalar",
     ],
 )
 

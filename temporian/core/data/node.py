@@ -145,7 +145,7 @@ class Node:
     def run(
         self,
         input: EvaluationInput,
-        verbose: int = 1,
+        verbose: int = 0,
         check_execution: bool = True,
     ) -> EvaluationResult:
         """Evaluates the Node on the specified input.

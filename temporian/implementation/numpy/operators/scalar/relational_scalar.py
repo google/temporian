@@ -15,6 +15,7 @@ from typing import Union
 
 import numpy as np
 
+from temporian.core.data.dtype import DType
 from temporian.implementation.numpy.operators.scalar.base import (
     BaseScalarNumpyImplementation,
 )
@@ -31,43 +32,67 @@ from temporian.implementation.numpy import implementation_lib
 
 class EqualScalarNumpyImplementation(BaseScalarNumpyImplementation):
     def _do_operation(
-        self, feature: np.ndarray, value: Union[float, int, str, bool]
+        self,
+        feature: np.ndarray,
+        value: Union[float, int, str, bool],
+        dtype: DType,
     ) -> np.ndarray:
-        # Returns False if both NaNs
-        return np.equal(feature, value)
+        if dtype == DType.STRING:
+            return np.char.equal(feature, value)
+        else:
+            # Returns False if both NaNs
+            return np.equal(feature, value)
 
 
 class NotEqualScalarNumpyImplementation(BaseScalarNumpyImplementation):
     def _do_operation(
-        self, feature: np.ndarray, value: Union[float, int, str, bool]
+        self,
+        feature: np.ndarray,
+        value: Union[float, int, str, bool],
+        dtype: DType,
     ) -> np.ndarray:
-        return np.not_equal(feature, value)
+        if dtype == DType.STRING:
+            return np.char.not_equal(feature, value)
+        else:
+            return np.not_equal(feature, value)
 
 
 class GreaterEqualScalarNumpyImplementation(BaseScalarNumpyImplementation):
     def _do_operation(
-        self, feature: np.ndarray, value: Union[float, int, str, bool]
+        self,
+        feature: np.ndarray,
+        value: Union[float, int, str, bool],
+        dtype: DType,
     ) -> np.ndarray:
         return np.greater_equal(feature, value)
 
 
 class LessEqualScalarNumpyImplementation(BaseScalarNumpyImplementation):
     def _do_operation(
-        self, feature: np.ndarray, value: Union[float, int, str, bool]
+        self,
+        feature: np.ndarray,
+        value: Union[float, int, str, bool],
+        dtype: DType,
     ) -> np.ndarray:
         return np.less_equal(feature, value)
 
 
 class GreaterScalarNumpyImplementation(BaseScalarNumpyImplementation):
     def _do_operation(
-        self, feature: np.ndarray, value: Union[float, int, str, bool]
+        self,
+        feature: np.ndarray,
+        value: Union[float, int, str, bool],
+        dtype: DType,
     ) -> np.ndarray:
         return np.greater(feature, value)
 
 
 class LessScalarNumpyImplementation(BaseScalarNumpyImplementation):
     def _do_operation(
-        self, feature: np.ndarray, value: Union[float, int, str, bool]
+        self,
+        feature: np.ndarray,
+        value: Union[float, int, str, bool],
+        dtype: DType,
     ) -> np.ndarray:
         return np.less(feature, value)
 

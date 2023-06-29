@@ -136,8 +136,8 @@ def normalize_features(
     if feature_values.dtype.type == np.object_:
         logging.warning(
             (
-                'Feature "%s" is an array of numpy.object_ or'
-                " equivalent. Temporian casted it as numpy.str_."
+                'Feature "%s" is an array of numpy.object_ and was casted to'
+                " numpy.str_."
             ),
             name,
         )
