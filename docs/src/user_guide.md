@@ -1,6 +1,6 @@
 # User Guide
 
-This is a complete tour of Temporian's capabilities. For a brief introduction to how the library works, please refer to [3 minutes to Temporian](./3_minutes).
+This is a complete tour of Temporian's capabilities. For a brief introduction to how the library works, please refer to [3 minutes to Temporian](../3_minutes).
 
 ## What is temporal data?
 
