@@ -34,22 +34,21 @@ JOIN_LEFT = "left"
 class Join(Operator):
     def __init__(
         self,
-        input_1: Node,
-        input_2: Node,
+        left: Node,
+        right: Node,
         how: str = "left",
         on: Optional[str] = None,
     ):
         super().__init__()
 
-        self.add_input("input_1", input_1)
-        self.add_input("input_2", input_2)
+        self.add_input("left", left)
+        self.add_input("right", right)
         self.add_attribute("how", how)
         if on is not None:
             self.add_attribute("on", on)
+        self._on = on
 
-        input_1.schema.check_compatible_index(
-            input_2.schema, "input_1 and input_2"
-        )
+        left.schema.check_compatible_index(right.schema, "left and right")
 
         if how not in [JOIN_LEFT]:
             raise ValueError(
@@ -58,7 +57,7 @@ class Join(Operator):
             )
 
         if on is not None:
-            for node, node_name in [(input_1, "input_1"), (input_2, "input_2")]:
+            for node, node_name in [(left, "left"), (right, "right")]:
                 feature_names = node.schema.feature_names()
                 if on not in feature_names:
                     raise ValueError(
@@ -73,16 +72,16 @@ class Join(Operator):
 
         output_features = []
         output_feature_schemas = []
-        output_features.extend(input_1.feature_nodes)
-        output_feature_schemas.extend(input_1.schema.features)
+        output_features.extend(left.feature_nodes)
+        output_feature_schemas.extend(left.schema.features)
 
-        input_1_feature_names = input_1.schema.feature_names()
-        for i2_feature in input_2.schema.features:
+        left_feature_names = left.schema.feature_names()
+        for i2_feature in right.schema.features:
             if on is not None and i2_feature.name == on:
                 continue
             output_features.append(Feature(creator=self))
             output_feature_schemas.append(i2_feature)
-            if i2_feature.name in input_1_feature_names:
+            if i2_feature.name in left_feature_names:
                 raise ValueError(
                     f'Feature "{i2_feature.name}" is defined in both inputs'
                 )
@@ -92,16 +91,20 @@ class Join(Operator):
             create_node_with_new_reference(
                 schema=Schema(
                     features=output_feature_schemas,
-                    indexes=input_1.schema.indexes,
-                    is_unix_timestamp=input_1.schema.is_unix_timestamp,
+                    indexes=left.schema.indexes,
+                    is_unix_timestamp=left.schema.is_unix_timestamp,
                 ),
-                sampling=input_1.sampling_node,
+                sampling=left.sampling_node,
                 features=output_features,
                 creator=self,
             ),
         )
 
         self.check()
+
+    @property
+    def on(self) -> Optional[str]:
+        return self._on
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
@@ -119,8 +122,8 @@ class Join(Operator):
                 ),
             ],
             inputs=[
-                pb.OperatorDef.Input(key="input_1"),
-                pb.OperatorDef.Input(key="input_2"),
+                pb.OperatorDef.Input(key="left"),
+                pb.OperatorDef.Input(key="right"),
             ],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
@@ -130,8 +133,8 @@ operator_lib.register_operator(Join)
 
 
 def join(
-    input_1: Node,
-    input_2: Node,
+    left: Node,
+    right: Node,
     how: str = "left",
     on: Optional[str] = None,
 ) -> Node:
@@ -159,21 +162,21 @@ def join(
         ```
 
     Args:
-        input_1: Left node to join.
-        input_2: Right node to join.
+        left: Left node to join.
+        right: Right node to join.
         how: Should this be a "left", "inner", or "outer" join. Currently, only
             "left" join is supported.
     """
 
-    if input_1.sampling_node is input_2.sampling_node:
+    if left.sampling_node is right.sampling_node:
         raise ValueError(
             "Both inputs have the same sampling. Use tp.glue instead of"
             " tp.join."
         )
 
     return Join(
-        input_1=input_1,
-        input_2=input_2,
+        left=left,
+        right=right,
         how=how,
         on=on,
     ).outputs["output"]

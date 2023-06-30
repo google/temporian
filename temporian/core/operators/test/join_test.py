@@ -56,15 +56,13 @@ class PropagateOperatorTest(absltest.TestCase):
     def test_missing_on(self):
         input_1 = input_node([("a", DType.FLOAT64)])
         input_2 = input_node([("b", DType.FLOAT64)])
-        with self.assertRaisesRegex(ValueError, "does not exist in input_1"):
+        with self.assertRaisesRegex(ValueError, "does not exist in left"):
             _ = join(input_1, input_2, on="c")
 
     def test_wrong_on_type(self):
         input_1 = input_node([("a", DType.FLOAT64), ("c", DType.FLOAT64)])
         input_2 = input_node([("b", DType.FLOAT64)])
-        with self.assertRaisesRegex(
-            ValueError, "Got float64 instead for input_1"
-        ):
+        with self.assertRaisesRegex(ValueError, "Got float64 instead for left"):
             _ = join(input_1, input_2, on="c")
 
 

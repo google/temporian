@@ -16,7 +16,6 @@ import math
 
 from absl.testing import absltest
 
-import numpy as np
 from temporian.core.operators.join import Join
 from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy.operators.join import (
@@ -33,61 +32,61 @@ class JoinOperatorTest(absltest.TestCase):
         pass
 
     def test_base(self):
-        evset_1 = event_set(
-            timestamps=[1, 2, 3],
-            features={"a": [5, 6, 7]},
+        evset_left = event_set(
+            timestamps=[1, 2, 3, 5, 5, 6, 6],
+            features={"a": [11, 12, 13, 14, 15, 16, 17]},
         )
-        evset_2 = event_set(
-            timestamps=[1, 2, 4],
-            features={"b": [8, 9, 10]},
+        evset_right = event_set(
+            timestamps=[1, 2, 4, 5, 5],
+            features={"b": [21.0, 22.0, 23.0, 24.0, 25.0]},
         )
 
         expected_output = event_set(
-            timestamps=[1, 2, 3],
+            timestamps=[1, 2, 3, 5, 5, 6, 6],
             features={
-                "a": [5, 6, 7],
-                "b": [8, 9, math.nan],
+                "a": [11, 12, 13, 14, 15, 16, 17],
+                "b": [21.0, 22.0, math.nan, 24.0, 24.0, math.nan, math.nan],
             },
         )
 
         # Run op
-        op = Join(input_1=evset_1.node(), input_2=evset_2.node())
+        op = Join(left=evset_left.node(), right=evset_right.node())
         instance = JoinNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
-        output = instance.call(input_1=evset_1, input_2=evset_2)["output"]
+        output = instance.call(left=evset_left, right=evset_right)["output"]
 
         assertEqualEventSet(self, output, expected_output)
 
     def test_base_on(self):
-        evset_1 = event_set(
-            timestamps=[1, 2, 2, 3],
+        evset_left = event_set(
+            timestamps=[1, 2, 2, 3, 4, 5],
             features={
-                "a": [5, 6, 7, 8],
-                "c": [0, 1, 2, 3],
+                "a": [11, 12, 13, 14, 15, 16],
+                "c": [0, 1, 2, 3, 4, 5],
             },
         )
-        evset_2 = event_set(
-            timestamps=[1, 2, 2, 3],
+        evset_right = event_set(
+            timestamps=[1, 2, 2, 3, 4],
             features={
-                "b": [5, 6, 7, 8],
-                "c": [0, 2, 1, 3],
+                "c": [0, 2, 1, 3, 5],
+                "b": [11.0, 12.0, 13.0, 14.0, 15.0],
             },
         )
 
         expected_output = event_set(
-            timestamps=[1, 2, 2, 3],
+            timestamps=[1, 2, 2, 3, 4, 5],
             features={
-                "a": [5, 6, 7, 8],
-                "b": [5, 7, 6, 8],
-                "c": [0, 1, 2, 3],
+                "a": [11, 12, 13, 14, 15, 16],
+                "c": [0, 1, 2, 3, 4, 5],
+                "b": [11.0, 13.0, 12.0, 14.0, math.nan, math.nan],
             },
         )
 
         # Run op
-        op = Join(input_1=evset_1.node(), input_2=evset_2.node(), on="c")
+        op = Join(left=evset_left.node(), right=evset_right.node(), on="c")
         instance = JoinNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
-        output = instance.call(input_1=evset_1, input_2=evset_2)["output"]
+        output = instance.call(left=evset_left, right=evset_right)["output"]
 
         assertEqualEventSet(self, output, expected_output)
 
