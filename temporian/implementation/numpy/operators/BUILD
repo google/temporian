@@ -16,6 +16,7 @@ py_library(
         ":cast",
         ":drop_index",
         ":end",
+        ":enumerate",
         ":filter",
         ":glue",
         ":lag",
@@ -27,6 +28,7 @@ py_library(
         ":select",
         ":since_last",
         ":tick",
+        ":timestamps",
         ":unary",
         ":unique_timestamps",
         "//temporian/implementation/numpy/operators/binary:arithmetic",
@@ -308,7 +310,6 @@ py_library(
     ],
 )
 
-    
 py_library(
     name = "enumerate",
     srcs = ["enumerate.py"],
@@ -323,5 +324,3 @@ py_library(
         "//temporian/implementation/numpy/data:event_set",
     ],
 )
-
-    
