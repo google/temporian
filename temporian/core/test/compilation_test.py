@@ -56,6 +56,7 @@ class CompileTest(absltest.TestCase):
     def test_other_args(self):
         @tp.compile
         def f(a: int, x: EventSet, b: str) -> EventSet:
+            print(a, b)
             return tp.prefix("a", x)
 
         result = f(1, self.evset, "a")

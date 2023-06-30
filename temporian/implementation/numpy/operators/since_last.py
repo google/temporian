@@ -38,7 +38,7 @@ class SinceLastNumpyImplementation(OperatorImplementation):
         assert self.operator.has_sampling == (sampling is not None)
 
         output_schema = self.output_schema("output")
-        output_event = EventSet(data={}, schema=output_schema)
+        output_evset = EventSet(data={}, schema=output_schema)
 
         for index_key, index_data in input.data.items():
             if sampling is not None:
@@ -46,21 +46,29 @@ class SinceLastNumpyImplementation(OperatorImplementation):
                 feature_values = operators_cc.since_last(
                     index_data.timestamps, sampling_timestamps
                 )
-                output_event[index_key] = IndexData(
-                    [feature_values], sampling_timestamps, schema=output_schema
+                output_evset.set_index_value(
+                    index_key,
+                    IndexData(
+                        [feature_values],
+                        sampling_timestamps,
+                        schema=output_schema,
+                    ),
                 )
             else:
                 # TODO: Avoid memory copy.
                 feature_values = np.concatenate(
                     [[np.nan], np.diff(index_data.timestamps)]
                 )
-                output_event[index_key] = IndexData(
-                    [feature_values],
-                    index_data.timestamps,
-                    schema=output_schema,
+                output_evset.set_index_value(
+                    index_key,
+                    IndexData(
+                        [feature_values],
+                        index_data.timestamps,
+                        schema=output_schema,
+                    ),
                 )
 
-        return {"output": output_event}
+        return {"output": output_evset}
 
 
 implementation_lib.register_operator_implementation(

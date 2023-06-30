@@ -24,7 +24,7 @@ class FilterNumpyImplementation(OperatorImplementation):
             # get boolean mask from condition
             mask = condition_data.features[0]
 
-            src_event = input[condition_index]
+            src_event = input.get_index_value(condition_index)
 
             filtered_timestamps = src_event.timestamps[mask]
 
@@ -32,8 +32,11 @@ class FilterNumpyImplementation(OperatorImplementation):
                 feature_data[mask] for feature_data in src_event.features
             ]
 
-            output_evset[condition_index] = IndexData(
-                filtered_features, filtered_timestamps, schema=output_schema
+            output_evset.set_index_value(
+                condition_index,
+                IndexData(
+                    filtered_features, filtered_timestamps, schema=output_schema
+                ),
             )
 
         return {"output": output_evset}

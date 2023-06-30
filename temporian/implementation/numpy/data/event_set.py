@@ -459,22 +459,21 @@ class EventSet:
             f"memory usage: {string.pretty_num_bytes(self.memory_usage())}\n"
         )
 
-    def __getitem__(self, index: Tuple) -> IndexData:
-        if not isinstance(index, tuple):
-            raise TypeError(
-                "EventSet items can only be accessed by index keys (tuples of"
-                " values for each index in the EventSet). Use evset.node() to"
-                " select features and operate on it."
-            )
-        return self.data[index]
+    def get_index_value(self, index_key: Tuple) -> IndexData:
+        """Gets the value for a specified index key.
 
-    def __setitem__(self, index: Tuple, value: IndexData) -> None:
-        if not isinstance(index, tuple) or not isinstance(value, IndexData):
-            raise TypeError(
-                "EventSets are not intended to be modified externally. "
-                "Use evset.node() to operate on it."
-            )
-        self.data[index] = value
+        The index key must be a tuple of values corresponding to the indexes
+        of the EventSet.
+        """
+        return self.data[index_key]
+
+    def set_index_value(self, index_key: Tuple, value: IndexData) -> None:
+        """Sets the value for a specified index key.
+
+        The index key must be a tuple of values corresponding to the indexes
+        of the EventSet.
+        """
+        self.data[index_key] = value
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, EventSet):

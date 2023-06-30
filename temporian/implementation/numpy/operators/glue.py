@@ -51,10 +51,13 @@ class GlueNumpyImplementation(OperatorImplementation):
             for evset in evsets:
                 features.extend(evset.data[index_key].features)
 
-            dst_evset[index_key] = IndexData(
-                timestamps=index_data.timestamps,
-                features=features,
-                schema=output_schema,
+            dst_evset.set_index_value(
+                index_key,
+                IndexData(
+                    timestamps=index_data.timestamps,
+                    features=features,
+                    schema=output_schema,
+                ),
             )
 
         return {"output": dst_evset}

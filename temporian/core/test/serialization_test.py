@@ -25,7 +25,7 @@ from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.io import event_set
 
 
-class SerializeTest(absltest.TestCase):
+class SerializationTest(absltest.TestCase):
     def test_serialize(self):
         i1 = utils.create_source_node()
         o2 = utils.OpI1O1(i1)
@@ -160,7 +160,7 @@ class SerializeTest(absltest.TestCase):
             & serialization._all_identifiers(restored.named_outputs.values())
         )
 
-    def test_serialize_and_run(self):
+    def test_save_graph_and_load(self):
         input_data = tp.event_set(
             timestamps=[1, 2, 3], features={"x": [1, 2, 3], "y": [4, 5, 6]}
         )
@@ -187,7 +187,7 @@ class SerializeTest(absltest.TestCase):
 
         self.assertEqual(result, loaded_results)
 
-    def test_save_function(self):
+    def test_save_and_load(self):
         @tp.compile
         def f(x: EventSet):
             return tp.prefix("a_", x)
