@@ -11,6 +11,7 @@ py_test(
     srcs=["io_test.py"],
     srcs_version="PY3",
     deps=[
+        # already_there/absl/testing:absltest
         "//temporian/beam:io",
         "//temporian/core/data:node",
         "//temporian/core/data:dtype",
@@ -25,6 +26,7 @@ py_test(
     srcs=["evaluation_test.py"],
     srcs_version="PY3",
     deps=[
+        # already_there/absl/testing:absltest
         "//temporian/implementation/numpy/data:io",
         "//temporian/beam/test:utils",
         "//temporian/core/operators:select",

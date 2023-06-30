@@ -13,8 +13,9 @@
 # limitations under the License.
 
 
-from temporian.core.operators.window.moving_sum import moving_sum
 from absl.testing import absltest
+
+from temporian.core.operators.window.moving_sum import moving_sum
 from temporian.implementation.numpy.data.io import event_set
 from temporian.beam.test.utils import check_beam_implementation
 from temporian.core.operators.select import select

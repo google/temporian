@@ -8,6 +8,7 @@ py_test(
     srcs=["select_test.py"],
     srcs_version="PY3",
     deps=[
+        # already_there/absl/testing:absltest
         "//temporian/implementation/numpy/data:io",
         "//temporian/beam/test:utils",
         "//temporian/core/operators:select",
@@ -19,6 +20,7 @@ py_test(
     srcs=["add_index_test.py"],
     srcs_version="PY3",
     deps=[
+        # already_there/absl/testing:absltest
         "//temporian/implementation/numpy/data:io",
         "//temporian/beam/test:utils",
         "//temporian/core/operators:add_index",
