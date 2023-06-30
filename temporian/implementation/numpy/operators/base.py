@@ -10,6 +10,7 @@ from temporian.implementation.numpy.data.event_set import (
     EventSet,
     numpy_array_to_tp_dtype,
 )
+import numpy as np
 
 
 class OperatorImplementation(ABC):
@@ -36,6 +37,15 @@ class OperatorImplementation(ABC):
 
     def output_schema(self, key: str) -> Schema:
         return self._operator.outputs[key].schema
+
+    def apply_feature_wise(
+        self,
+        src_timestamps: np.ndarray,
+        src_feature: np.ndarray,
+    ) -> np.ndarray:
+        """Executes the op on a single feature. Optionally implemented."""
+
+        raise NotImplementedError()
 
 
 def _check_value_to_schema(
