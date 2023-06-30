@@ -23,6 +23,7 @@ py_library(
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/utils:string",
+        "//temporian/core:mixins",
     ],
 )
 

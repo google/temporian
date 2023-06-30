@@ -27,6 +27,7 @@ py_library(
     deps = [
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
+        "//temporian/implementation/numpy/data:event_set",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -37,6 +38,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core:compilation",
         "//temporian/core:operator_lib",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
@@ -51,6 +53,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core:compilation",
         "//temporian/core:operator_lib",
         "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
@@ -64,6 +67,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core:compilation",
         "//temporian/core:operator_lib",
         "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
@@ -78,6 +82,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core:compilation",
         "//temporian/core:operator_lib",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
@@ -91,6 +96,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core:compilation",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
@@ -104,9 +110,9 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core:compilation",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
-        "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -117,6 +123,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core:compilation",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
@@ -131,6 +138,7 @@ py_library(
     deps = [
         ":base",
         ":drop_index",
+        "//temporian/core:compilation",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
@@ -144,6 +152,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core:compilation",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
         "//temporian/proto:core_py_proto",
@@ -157,6 +166,7 @@ py_library(
     deps = [
         ":base",
         ":resample",
+        "//temporian/core:compilation",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
         "//temporian/proto:core_py_proto",
@@ -182,6 +192,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core:compilation",
         "//temporian/core:operator_lib",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
@@ -195,6 +206,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core:compilation",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
         "//temporian/proto:core_py_proto",
@@ -207,6 +219,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core:compilation",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
@@ -220,6 +233,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core:compilation",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
@@ -233,6 +247,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core:compilation",
         "//temporian/core:operator_lib",
         "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
@@ -246,6 +261,7 @@ py_library(
     srcs = ["unary.py"],
     srcs_version = "PY3",
     deps = [
+        "//temporian/core:compilation",
         "//temporian/core:operator_lib",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",

@@ -21,7 +21,7 @@ from temporian.implementation.numpy.data.event_set import EventSet
 
 class NodeTest(absltest.TestCase):
     def test_run_input(self):
-        node = utils.create_source_node()
+        node = utils.create_input_node()
         evset = utils.create_input_event_set()
         result = node.run({node: evset})
         self.assertIsInstance(result, EventSet)
@@ -32,6 +32,26 @@ class NodeTest(absltest.TestCase):
         result = tp.simple_moving_average(evset.node(), 10)
         result = result.run(evset)
         self.assertIsInstance(result, EventSet)
+
+    def test_hash_map(self):
+        """
+        Tests that the `Node` can be used as dict key.
+
+        NOTE: This is the reason to not overwrite `__eq__` in `Node`.
+        """
+        node_list = []
+        node_map = {}
+        for i in range(100):
+            node_name = f"node_{i}"
+            node = utils.create_input_node(name=node_name)
+            node_list.append(node)
+            node_map[node] = node_name
+
+        for idx, node in enumerate(node_list):
+            assert node_map[node] == node.name
+            assert idx == node_list.index(node)
+            assert node in node_list
+            assert node in node_map
 
 
 if __name__ == "__main__":

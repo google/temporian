@@ -15,9 +15,11 @@
 """Binary relational operators classes and public API function definitions."""
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
 from temporian.core.data.schema import FeatureSchema
+from temporian.core.operators.base import EventSetOrNode
 from temporian.core.operators.binary.base import BaseBinaryOperator
 from temporian.core.operators.scalar.relational_scalar import equal_scalar
 
@@ -71,10 +73,11 @@ class LessEqualOperator(BaseRelationalOperator):
     PREFIX = "le"
 
 
+@compile
 def equal(
-    input_1: Node,
-    input_2: Node,
-) -> Node:
+    input_1: EventSetOrNode,
+    input_2: EventSetOrNode,
+) -> EventSetOrNode:
     """Checks (element-wise) for equality between two nodes.
 
     Each feature in `input_1` is compared element-wise to the feature in
@@ -129,10 +132,11 @@ def equal(
     ).outputs["output"]
 
 
+@compile
 def not_equal(
-    input_1: Node,
-    input_2: Node,
-) -> Node:
+    input_1: EventSetOrNode,
+    input_2: EventSetOrNode,
+) -> EventSetOrNode:
     """Checks (element-wise) for differences between two nodes.
 
     Each feature in `input_1` is compared element-wise to the feature in
@@ -180,10 +184,11 @@ def not_equal(
     ).outputs["output"]
 
 
+@compile
 def greater(
-    input_left: Node,
-    input_right: Node,
-) -> Node:
+    input_left: EventSetOrNode,
+    input_right: EventSetOrNode,
+) -> EventSetOrNode:
     """Checks (element-wise) if input_left > input_right.
 
     Each feature in `input_left` is compared element-wise to the feature in
@@ -231,10 +236,11 @@ def greater(
     ).outputs["output"]
 
 
+@compile
 def greater_equal(
-    input_left: Node,
-    input_right: Node,
-) -> Node:
+    input_left: EventSetOrNode,
+    input_right: EventSetOrNode,
+) -> EventSetOrNode:
     """Checks (element-wise) if input_left >= input_right.
 
     Each feature in `input_left` is compared element-wise to the feature in
@@ -282,10 +288,11 @@ def greater_equal(
     ).outputs["output"]
 
 
+@compile
 def less(
-    input_left: Node,
-    input_right: Node,
-) -> Node:
+    input_left: EventSetOrNode,
+    input_right: EventSetOrNode,
+) -> EventSetOrNode:
     """Checks (element-wise) if input_left < input_right.
 
     Each feature in `input_left` is compared element-wise to the feature in
@@ -333,10 +340,11 @@ def less(
     ).outputs["output"]
 
 
+@compile
 def less_equal(
-    input_left: Node,
-    input_right: Node,
-) -> Node:
+    input_left: EventSetOrNode,
+    input_right: EventSetOrNode,
+) -> EventSetOrNode:
     """Checks (element-wise) if input_left <= input_right.
 
     Each feature in `input_left` is compared element-wise to the feature in

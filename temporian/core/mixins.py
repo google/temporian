@@ -26,11 +26,6 @@ class EventSetOperationsMixin:
     interchangeably.
     """
 
-    # NOTE: the return types need to be left empty for the methods that return
-    # an EventSet or Node. The type checker resolves to the correct one.
-    # Explicitly typing it as the child class from this base class doesn't seem
-    # possible.
-
     @property
     def _clsname(self) -> str:
         """Shortcut that returns the class' name."""

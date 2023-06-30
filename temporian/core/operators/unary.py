@@ -18,12 +18,13 @@ from abc import abstractmethod
 from typing import List
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import (
     Node,
     create_node_new_features_existing_sampling,
 )
-from temporian.core.operators.base import Operator
+from temporian.core.operators.base import EventSetOrNode, Operator
 from temporian.proto import core_pb2 as pb
 
 
@@ -185,9 +186,10 @@ operator_lib.register_operator(AbsOperator)
 operator_lib.register_operator(LogOperator)
 
 
+@compile
 def invert(
-    input: Node,
-) -> Node:
+    input: EventSetOrNode,
+) -> EventSetOrNode:
     """Inverts a boolean node (~node).
 
     Swaps False<->True element-wise.
@@ -204,9 +206,10 @@ def invert(
     ).outputs["output"]
 
 
+@compile
 def isnan(
-    input: Node,
-) -> Node:
+    input: EventSetOrNode,
+) -> EventSetOrNode:
     """Returns boolean features, `True` in the NaN elements of the input.
 
     Note that for `int` and `bool` this will
@@ -224,9 +227,10 @@ def isnan(
     ).outputs["output"]
 
 
+@compile
 def notnan(
-    input: Node,
-) -> Node:
+    input: EventSetOrNode,
+) -> EventSetOrNode:
     """Opposite of `isnan()`, being `True` in the elements that are not NaN.
 
     Equivalent to `invert(isnan())`. Note that for `int` and `bool` this will
@@ -244,9 +248,10 @@ def notnan(
     ).outputs["output"]
 
 
+@compile
 def abs(
-    input: Node,
-) -> Node:
+    input: EventSetOrNode,
+) -> EventSetOrNode:
     """Gets the absolute value of the input features.
 
     Args:
@@ -260,9 +265,10 @@ def abs(
     ).outputs["output"]
 
 
+@compile
 def log(
-    input: Node,
-) -> Node:
+    input: EventSetOrNode,
+) -> EventSetOrNode:
     """Calculates the natural logarithm of the features. Can only be used
     on floating point feature types.
 

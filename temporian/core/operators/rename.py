@@ -16,13 +16,14 @@
 from typing import Dict, Optional, Union
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.node import (
     Node,
     create_node_new_features_new_sampling,
     create_node_new_features_existing_sampling,
 )
 from temporian.core.data.schema import Schema
-from temporian.core.operators.base import Operator
+from temporian.core.operators.base import EventSetOrNode, Operator
 from temporian.proto import core_pb2 as pb
 
 
@@ -163,11 +164,12 @@ def _normalize_rename_indexes(
     return indexes
 
 
+@compile
 def rename(
-    input: Node,
+    input: EventSetOrNode,
     features: Optional[Union[str, Dict[str, str]]] = None,
     indexes: Optional[Union[str, Dict[str, str]]] = None,
-) -> Node:
+) -> EventSetOrNode:
     """Renames a Node's features and index.
 
     If the input has a single feature, then the `features` can be a

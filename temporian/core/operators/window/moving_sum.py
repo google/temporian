@@ -19,11 +19,13 @@ from typing import Optional
 import numpy as np
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.duration_utils import Duration, normalize_duration
+from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
 from temporian.core.data.schema import FeatureSchema
+from temporian.core.operators.base import EventSetOrNode
 from temporian.core.operators.window.base import BaseWindowOperator
-from temporian.core.data.dtype import DType
 
 
 class MovingSumOperator(BaseWindowOperator):
@@ -38,11 +40,12 @@ class MovingSumOperator(BaseWindowOperator):
 operator_lib.register_operator(MovingSumOperator)
 
 
+@compile
 def moving_sum(
-    input: Node,
+    input: EventSetOrNode,
     window_length: Duration,
-    sampling: Optional[Node] = None,
-) -> Node:
+    sampling: Optional[EventSetOrNode] = None,
+) -> EventSetOrNode:
     """Computes the sum of values in a sliding window over the node.
 
     For each t in sampling, and for each feature independently, returns at time

@@ -15,13 +15,14 @@
 """Lag operator class and public API function definitions."""
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.duration_utils import (
     Duration,
     NormalizedDuration,
     normalize_duration,
 )
 from temporian.core.data.node import Node, create_node_new_features_new_sampling
-from temporian.core.operators.base import Operator
+from temporian.core.operators.base import EventSetOrNode, Operator
 from temporian.proto import core_pb2 as pb
 
 
@@ -72,7 +73,8 @@ class LagOperator(Operator):
 operator_lib.register_operator(LagOperator)
 
 
-def lag(input: Node, duration: Duration) -> Node:
+@compile
+def lag(input: EventSetOrNode, duration: Duration) -> EventSetOrNode:
     """Adds a delay to a Node's timestamps.
 
     In other words, shifts the timestamp values forwards in time.

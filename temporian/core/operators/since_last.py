@@ -17,11 +17,12 @@
 from typing import Optional
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.node import (
     Node,
     create_node_new_features_existing_sampling,
 )
-from temporian.core.operators.base import Operator
+from temporian.core.operators.base import EventSetOrNode, Operator
 from temporian.proto import core_pb2 as pb
 from temporian.core.data.dtype import DType
 
@@ -78,10 +79,11 @@ class SinceLast(Operator):
 operator_lib.register_operator(SinceLast)
 
 
+@compile
 def since_last(
-    input: Node,
-    sampling: Optional[Node] = None,
-) -> Node:
+    input: EventSetOrNode,
+    sampling: Optional[EventSetOrNode] = None,
+) -> EventSetOrNode:
     """Computes the amount of time since the last distinct timestamp.
 
     Example 1:

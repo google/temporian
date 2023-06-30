@@ -17,14 +17,16 @@
 from typing import Union, Dict, Optional, List, Any, Type
 from temporian.core.data.schema import Schema, FeatureSchema
 
-from temporian.core.data.dtype import DType
+
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
+from temporian.core.data.dtype import DType
 from temporian.core.data.node import (
     Node,
     Feature,
     create_node_with_new_reference,
 )
-from temporian.core.operators.base import Operator
+from temporian.core.operators.base import EventSetOrNode, Operator
 from temporian.proto import core_pb2 as pb
 
 TypeOrDType = Union[DType, Type[float], Type[int], Type[str], Type[bool]]
@@ -199,15 +201,16 @@ class CastOperator(Operator):
 operator_lib.register_operator(CastOperator)
 
 
+@compile
 def cast(
-    input: Node,
+    input: EventSetOrNode,
     target: Union[
         TypeOrDType,
         Dict[str, TypeOrDType],
         Dict[TypeOrDType, TypeOrDType],
     ],
     check_overflow: bool = True,
-) -> Node:
+) -> EventSetOrNode:
     """Casts the dtype of features to the dtype(s) specified in `target`.
 
     Features not impacted by cast are kept.

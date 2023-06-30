@@ -27,9 +27,9 @@ from temporian.implementation.numpy.data.io import event_set
 
 class SerializationTest(absltest.TestCase):
     def test_serialize(self):
-        i1 = utils.create_source_node()
+        i1 = utils.create_input_node()
         o2 = utils.OpI1O1(i1)
-        i3 = utils.create_source_node()
+        i3 = utils.create_input_node()
         o4 = utils.OpI2O1(o2.outputs["output"], i3)
         o5 = utils.OpI1O2(o4.outputs["output"])
 
@@ -119,7 +119,7 @@ class SerializationTest(absltest.TestCase):
             "attr_map": {"good": "bye", "nice": "to", "meet": "you"},
             "attr_list_dtypes": [DType.FLOAT32, DType.STRING],
         }
-        i_event = utils.create_source_node()
+        i_event = utils.create_input_node()
         operator = utils.OpWithAttributes(i_event, **attributes)
 
         original = graph.infer_graph_named_nodes(

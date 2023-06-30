@@ -46,6 +46,7 @@ py_library(
         "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
+        "//temporian/core/operators:base",
     ],
 )
 
@@ -55,11 +56,13 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core:compilation",
         "//temporian/core:operator_lib",
         "//temporian/core/data:dtype",
         "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
+        "//temporian/core/operators:base",
     ],
 )
 
@@ -73,6 +76,8 @@ py_library(
         "//temporian/core:operator_lib",
         "//temporian/core/data:dtype",
         "//temporian/core/data:duration_utils",
+        "//temporian/core:compilation",
+        "//temporian/core/operators:base",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
     ],
@@ -84,11 +89,13 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core:compilation",
         "//temporian/core:operator_lib",
         "//temporian/core/data:dtype",
         "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
+        "//temporian/core/operators:base",
     ],
 )
 
@@ -98,11 +105,13 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core:compilation",
         "//temporian/core:operator_lib",
         "//temporian/core/data:dtype",
         "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
+        "//temporian/core/operators:base",
     ],
 )
 
@@ -112,10 +121,12 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core:compilation",
         "//temporian/core:operator_lib",
         "//temporian/core/data:dtype",
         "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
+        "//temporian/core/operators:base",
     ],
 )

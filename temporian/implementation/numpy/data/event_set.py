@@ -25,6 +25,7 @@ import numpy as np
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node, create_node_with_new_reference
 from temporian.core.data.schema import Schema
+from temporian.core.mixins import EventSetOperationsMixin
 from temporian.utils import string
 
 # Maximum of printed index groups when calling repr(evset)
@@ -32,13 +33,6 @@ MAX_NUM_PRINTED_INDEX = 5
 
 # Maximum of printed features when calling repr(evset)
 MAX_NUM_PRINTED_FEATURES = 10
-
-_PYTHON_DTYPE_MAPPING = {
-    str: DType.STRING,
-    # TODO: fix this, int doesn't have to be INT64 necessarily
-    int: DType.INT64,
-    np.int64: DType.INT64,
-}
 
 # Mapping of temporian types to and from numpy types.
 #
@@ -322,7 +316,7 @@ class IndexData:
         return len(self.timestamps)
 
 
-class EventSet:
+class EventSet(EventSetOperationsMixin):
     """Actual temporal data.
 
     Use [`tp.event_set()`][temporian.event_set] to create an EventSet manually,

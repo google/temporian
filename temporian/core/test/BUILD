@@ -22,8 +22,8 @@ py_library(
 # =====
 
 py_test(
-    name = "magic_methods_test",
-    srcs = ["magic_methods_test.py"],
+    name = "mixins_test",
+    srcs = ["mixins_test.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
@@ -34,6 +34,8 @@ py_test(
         "//temporian/core/operators/binary",
         "//temporian/core/operators/scalar",
         "//temporian/proto:core_py_proto",
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 

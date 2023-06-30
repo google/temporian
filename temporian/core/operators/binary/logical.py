@@ -15,9 +15,11 @@
 """Binary logic operators classes and public API function definitions."""
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
 from temporian.core.data.schema import FeatureSchema
+from temporian.core.operators.base import EventSetOrNode
 from temporian.core.operators.binary.base import BaseBinaryOperator
 
 
@@ -62,10 +64,11 @@ class LogicalXorOperator(BaseLogicalOperator):
     OP_NAME = "xor"
 
 
+@compile
 def logical_and(
-    input_1: Node,
-    input_2: Node,
-) -> Node:
+    input_1: EventSetOrNode,
+    input_2: EventSetOrNode,
+) -> EventSetOrNode:
     """Gets the logical AND (`&`) between boolean features, element-wise.
 
     Each feature in `input_1` is compared element-wise to the feature in
@@ -133,10 +136,11 @@ def logical_and(
     ).outputs["output"]
 
 
+@compile
 def logical_or(
-    input_1: Node,
-    input_2: Node,
-) -> Node:
+    input_1: EventSetOrNode,
+    input_2: EventSetOrNode,
+) -> EventSetOrNode:
     """Gets the logical OR (`|`) between boolean features, element-wise.
 
     Each feature in `input_1` is compared element-wise to the feature in
@@ -184,10 +188,11 @@ def logical_or(
     ).outputs["output"]
 
 
+@compile
 def logical_xor(
-    input_1: Node,
-    input_2: Node,
-) -> Node:
+    input_1: EventSetOrNode,
+    input_2: EventSetOrNode,
+) -> EventSetOrNode:
     """Gets the logical XOR (`^`) between boolean features, element-wise.
 
     Each feature in `input_1` is compared element-wise to the feature in
