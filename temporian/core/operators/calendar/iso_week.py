@@ -35,12 +35,28 @@ operator_lib.register_operator(CalendarISOWeekOperator)
 def calendar_iso_week(sampling: Node) -> Node:
     """Obtains the ISO week the timestamps in a node's sampling are in.
 
-    Features in the input node are ignored, only the timestamps in
-    `Node.sampling` are used and they must be unix timestamps
-    (check  `Node.sampling.is_unix_timestamp`).
+    Features in the input node are ignored, only the timestamps are used and
+    they must be unix timestamps (`is_unix_timestamp=True`).
 
     Output feature contains numbers between 1 and 53.
 
+    Usage example:
+        ```python
+        >>> evset = tp.event_set(
+        ...    # Note: 2023-01-01 is Sunday in the same week as 2022-12-31
+        ...    timestamps=["2022-12-31", "2023-01-01", "2023-01-02", "2023-12-20"],
+        ...    name='extreme_weeks'
+        ... )
+        >>> tp.calendar_iso_week(evset.node()).run(evset)
+        indexes: ...
+        features: [('calendar_iso_week', int32)]
+        events:
+            (4 events):
+                timestamps: [...]
+                'calendar_iso_week': [52 52 1 51]
+        ...
+
+        ```
     Args:
         sampling: Node to get the ISO weeks from.
 

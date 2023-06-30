@@ -23,7 +23,7 @@ from temporian.core.data.node import (
 )
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 
 
 class SinceLast(Operator):
@@ -82,14 +82,14 @@ def since_last(
     input: Node,
     sampling: Optional[Node] = None,
 ) -> Node:
-    """Amount of time since the last distinct timestamp.
+    """Computes the amount of time since the last distinct timestamp.
 
     Example 1:
         ```python
         >>> t_evset = tp.event_set(timestamps=[1, 5, 8, 8, 9])
         >>> t_node = t_evset.node()
         >>> since_node = tp.since_last(t_node)
-        >>> since_node.evaluate({t_node: t_evset})
+        >>> since_node.run({t_node: t_evset})
         indexes: ...
                 timestamps: [1. 5. 8. 8. 9.]
                 'since_last': [nan  4.  3.  0.  1.]
@@ -107,7 +107,7 @@ def since_last(
         >>> # Time elapsed between each sampling event
         >>> # and the latest previous event in since_evset
         >>> result = tp.since_last(since_node, sampling_node)
-        >>> result.evaluate({since_node: since_evset,
+        >>> result.run({since_node: since_evset,
         ...     sampling_node: sampling_evset}
         ... )
         indexes: ...

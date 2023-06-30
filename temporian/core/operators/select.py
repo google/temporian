@@ -38,7 +38,7 @@ class SelectOperator(Operator):
 
         for feature_name in feature_names:
             if feature_name not in input_feature_names:
-                raise ValueError(
+                raise IndexError(
                     f"Selected features {feature_name!r} is not part of the"
                     f" available features {input_feature_names!r}."
                 )
@@ -88,12 +88,50 @@ def select(
     input: Node,
     feature_names: Union[str, List[str]],
 ) -> Node:
-    """Selects a subset of features from a node.
+    """Selects a subset of features from a Node.
 
     Args:
         input: Node to select features from.
         feature_names: Name or list of names of the features to select from the
             input.
+
+    Usage example:
+        ```python
+        >>> a_evset = tp.event_set(
+        ...     timestamps=[1, 2],
+        ...     features={"A": [1, 2], "B": ['s', 'm'], "C": [5.0, 5.5]},
+        ... )
+        >>> a = a_evset.node()
+
+        >>> # Select single feature
+        >>> b = a['B']
+        >>> # Equivalent
+        >>> b = tp.select(a, 'B')
+        >>> b.run({a: a_evset})
+        indexes: []
+        features: [('B', str_)]
+        events:
+            (2 events):
+                timestamps: [1. 2.]
+                'B': ['s' 'm']
+        ...
+
+        >>> # Select multiple features
+        >>> b = a[['B', 'C']]
+        >>> # Equivalent
+        >>> b = tp.select(a, ['B', 'C'])
+        >>> b.run({a: a_evset})
+        indexes: []
+        features: [('B', str_), ('C', float64)]
+        events:
+            (2 events):
+                timestamps: [1. 2.]
+                'B': ['s' 'm']
+                'C': [5.  5.5]
+        ...
+
+        ```
+
 
     Returns:
         Node containing only the selected features.
@@ -105,7 +143,7 @@ def select(
     elif isinstance(feature_names, str):
         feature_names = [feature_names]
     else:
-        raise ValueError(
+        raise TypeError(
             "Unexpected type for feature_names. Expect str or list of"
             f" str. Got '{feature_names}' instead."
         )

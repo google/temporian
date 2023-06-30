@@ -35,11 +35,27 @@ operator_lib.register_operator(CalendarDayOfWeekOperator)
 def calendar_day_of_week(sampling: Node) -> Node:
     """Obtains the day of the week the timestamps in a node's sampling are in.
 
-    Features in the input node are ignored, only the timestamps in
-    `Node.sampling` are used and they must be unix timestamps
-    (check  `Node.sampling.is_unix_timestamp`).
+    Features in the input node are ignored, only the timestamps are used and
+    they must be unix timestamps (`is_unix_timestamp=True`).
 
     Output feature contains numbers from 0 (Monday) to 6 (Sunday).
+
+    Usage example:
+        ```python
+        >>> evset = tp.event_set(
+        ...    timestamps=["2023-06-19", "2023-06-21", "2023-06-25", "2023-07-03"],
+        ...    name='two_mondays'
+        ... )
+        >>> tp.calendar_day_of_week(evset.node()).run(evset)
+        indexes: ...
+        features: [('calendar_day_of_week', int32)]
+        events:
+            (4 events):
+                timestamps: [...]
+                'calendar_day_of_week': [0  2  6  0]
+        ...
+
+        ```
 
     Args:
         sampling: Node to get the days of week from.

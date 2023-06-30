@@ -52,16 +52,32 @@ operator_lib.register_operator(EndOperator)
 
 
 def end(input: Node) -> Node:
-    """Generates a single timestamp at the end of the input.
+    """Generates a single timestamp at the end of the input, per index.
+
+    Usage example:
+        ```python
+        >>> a_evset = tp.event_set(
+        ...     timestamps=[5, 6, 7, 1],
+        ...     features={"f": [50, 60, 70, 10], "idx": [1, 1, 1, 2]},
+        ...     indexes=["idx"]
+        ... )
+        >>> a = a_evset.node()
+
+        >>> a_end = tp.end(a)
+        >>> a_end.run({a: a_evset})
+        indexes: [('idx', int64)]
+        features: []
+        events:
+            idx=2 (1 events):
+                timestamps: [1.]
+            idx=1 (1 events):
+                timestamps: [7.]
+        ...
+
+        ```
 
     Args:
         input: Guide input
-
-    Example:
-        Input
-            timestamps: [1, 5, 10]
-        Output
-            timestamps: [10]
 
     Returns:
         A feature-less node with a single timestamp.

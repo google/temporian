@@ -24,12 +24,22 @@ from typing import Union
 
 import numpy as np
 
+from temporian.core.data.duration import (
+    Duration,
+    weeks,
+    days,
+    hours,
+    minutes,
+    seconds,
+    milliseconds,
+)
+
+
 # Unit for durations
 #
 # NormalizedDuration is used by internal code that handle duration.
-# Duration is a duration provided by the user though the API.
+# Duration (defined in ./duration.py) is a duration provided by the user though the API.
 NormalizedDuration = float
-Duration = Union[float, int]
 
 Timestamp = Union[np.datetime64, datetime.datetime, int, float]
 NormalizedTimestamp = float

@@ -202,10 +202,10 @@ class {capitalized_op}NumpyImplementation(OperatorImplementation):
 
         output_schema = self.output_schema("output")
 
-        # create output event set
+        # Create output EventSet
         output_evset = EventSet(data={{}}, schema=output_schema)
 
-        # fill output event set data
+        # Fill output EventSet's data
         for index_key, index_data in input.data.items():
             output_evset[index_key] = IndexData(
                 [],
@@ -291,7 +291,7 @@ class {capitalized_op}OperatorTest(absltest.TestCase):
                     "b": [5, 6, 7, 8],
                     "c": ["A", "A", "B", "B"],
             }},
-            index_features=["c"],
+            indexes=["c"],
         )
         node = evset.node()
 
@@ -300,7 +300,7 @@ class {capitalized_op}OperatorTest(absltest.TestCase):
             features={{
                     "c": ["A", "B"],
             }},
-            index_features=["c"],
+            indexes=["c"],
         )
 
         # Run op
@@ -335,7 +335,7 @@ py_test(
     deps = [
         # already_there/absl/testing:absltest
         ":test_util",
-        "//temporian/core/data/dtypes:dtype",
+        "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/implementation/numpy/data:io",
@@ -348,12 +348,13 @@ py_test(
 
     print(
         """Don't forget to register the new operators in:
-- The "all_operators" rule in temporian/core/operators/BUILD
-- The "all_operators" rule in temporian/implementation/numpy/operators/BUILD
+- The imports in the top-level init file temporian/__init__.py
+- The imports in temporian/implementation/numpy/operators/__init__.py
 - The "test_base" function in temporian/core/test/registered_operators_test.py
 - The "test_base" function in temporian/implementation/numpy/test/registered_operators_test.py
-- Import of temporian/implementation/numpy/operators/all_operators.py
-- Import of temporian/core/operators/all_operators.py
+- The PUBLIC_API_SYMBOLS set in temporian/test/public_symbols_test.py
+- The docs docs/src/reference/path/to/operator.md
+- The docs API ref's home page docs/reference/index.md
 """
     )
 

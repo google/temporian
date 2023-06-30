@@ -16,6 +16,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
+from temporian.core.data.dtype import DType
 from temporian.core.operators.scalar.base import (
     BaseScalarOperator,
 )
@@ -29,12 +30,15 @@ class BaseScalarNumpyImplementation(OperatorImplementation, ABC):
 
     @abstractmethod
     def _do_operation(
-        self, feature: np.ndarray, value: Union[float, int, str, bool]
+        self,
+        feature: np.ndarray,
+        value: Union[float, int, str, bool],
+        dtype: DType,
     ) -> np.ndarray:
         """Performs the arithmetic operation corresponding to the subclass."""
 
     def __call__(self, input: EventSet) -> Dict[str, EventSet]:
-        """Applies the corresponding arithmetic operation between an event set
+        """Applies the corresponding arithmetic operation between an EventSet
         and a scalar.
 
         Args:
@@ -51,8 +55,12 @@ class BaseScalarNumpyImplementation(OperatorImplementation, ABC):
         for index_key, index_data in input.data.items():
             dst_evset[index_key] = IndexData(
                 [
-                    self._do_operation(feature, self.operator.value)
-                    for feature in index_data.features
+                    self._do_operation(
+                        feature,
+                        self.operator.value,
+                        input.schema.features[feature_idx].dtype,
+                    )
+                    for feature_idx, feature in enumerate(index_data.features)
                 ],
                 index_data.timestamps,
                 schema=output_schema,

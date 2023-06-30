@@ -16,6 +16,7 @@ import numpy as np
 import pandas as pd
 from absl.testing import absltest
 
+from temporian.implementation.numpy.data.io import event_set
 from temporian.core.operators.binary import (
     EqualOperator,
     NotEqualOperator,
@@ -33,6 +34,10 @@ from temporian.implementation.numpy.operators.binary import (
     LessNumpyImplementation,
 )
 from temporian.io.pandas import from_pandas
+from temporian.implementation.numpy.operators.test.test_util import (
+    assertEqualEventSet,
+    testOperatorAndImp,
+)
 
 
 class ArithmeticNumpyImplementationTest(absltest.TestCase):
@@ -52,7 +57,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sales"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         self.evset_2 = from_pandas(
@@ -67,7 +72,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "costs"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
         self.node_1 = self.evset_1.node()
         self.node_2 = self.evset_2.node()
@@ -91,7 +96,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "eq_sales_costs"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
         operator = EqualOperator(input_1=self.node_1, input_2=self.node_2)
         operator.outputs["output"].check_same_sampling(self.node_1)
@@ -101,6 +106,52 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
             input_1=self.evset_1, input_2=self.evset_2
         )
         self.assertEqual(output_evset, operator_output["output"])
+
+    def test_equal_str(self) -> None:
+        timestamps = [1, 2, 3, 4]
+        evset_1 = event_set(
+            timestamps=timestamps,
+            features={"a": ["A", "A", "B", "B"]},
+        )
+        evset_2 = event_set(
+            timestamps=timestamps,
+            features={"b": ["A", "B", "A", "B"]},
+            same_sampling_as=evset_1,
+        )
+
+        expected_output = event_set(
+            timestamps=timestamps,
+            features={"eq_a_b": [True, False, False, True]},
+        )
+
+        op = EqualOperator(evset_1.node(), evset_2.node())
+        instance = EqualNumpyImplementation(op)
+        testOperatorAndImp(self, op, instance)
+        output = instance.call(input_1=evset_1, input_2=evset_2)["output"]
+        assertEqualEventSet(self, output, expected_output)
+
+    def test_notequal_str(self) -> None:
+        timestamps = [1, 2, 3, 4]
+        evset_1 = event_set(
+            timestamps=timestamps,
+            features={"a": ["A", "A", "B", "B"]},
+        )
+        evset_2 = event_set(
+            timestamps=timestamps,
+            features={"b": ["A", "B", "A", "B"]},
+            same_sampling_as=evset_1,
+        )
+
+        expected_output = event_set(
+            timestamps=timestamps,
+            features={"ne_a_b": [False, True, True, False]},
+        )
+
+        op = NotEqualOperator(evset_1.node(), evset_2.node())
+        instance = NotEqualNumpyImplementation(op)
+        testOperatorAndImp(self, op, instance)
+        output = instance.call(input_1=evset_1, input_2=evset_2)["output"]
+        assertEqualEventSet(self, output, expected_output)
 
     def test_correct_not_equal(self) -> None:
         """Test correct not-equal operator."""
@@ -116,7 +167,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "ne_sales_costs"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
         operator = NotEqualOperator(input_1=self.node_1, input_2=self.node_2)
         operator_output = NotEqualNumpyImplementation(operator).call(
@@ -137,7 +188,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "gt_sales_costs"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
         operator = GreaterOperator(input_1=self.node_1, input_2=self.node_2)
         operator_output = GreaterNumpyImplementation(operator).call(
@@ -158,7 +209,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "ge_sales_costs"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
         op = GreaterEqualOperator(input_1=self.node_1, input_2=self.node_2)
         operator_output = GreaterEqualNumpyImplementation(op).call(
@@ -179,7 +230,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "lt_sales_costs"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
         op = LessOperator(input_1=self.node_1, input_2=self.node_2)
         operator_output = LessNumpyImplementation(op).call(
@@ -200,7 +251,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "le_sales_costs"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
         op = LessEqualOperator(input_1=self.node_1, input_2=self.node_2)
         operator_output = LessEqualNumpyImplementation(op).call(

@@ -13,7 +13,7 @@
 # limitations under the License.
 """Basic profiling script for temporian.
 
-The script creates a node, applies an sma to it, and evaluates the graph.
+The script creates a node, applies an sma to it, and runs the graph.
 """
 
 import numpy as np
@@ -56,14 +56,14 @@ def main():
                 SALES: np.random.randn(N) * 100,
             }
         ),
-        index_names=[STORE, PRODUCT],
+        indexes=[STORE, PRODUCT],
     )
 
     node = evset.node()
 
     sma = tp.simple_moving_average(node, window_length=10)
 
-    res: EventSet = tp.evaluate(
+    res: EventSet = tp.run(
         sma,
         input={node: evset},
         check_execution=False,

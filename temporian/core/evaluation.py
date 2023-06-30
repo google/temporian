@@ -28,38 +28,86 @@ from temporian.core.schedule import Schedule
 
 EvaluationQuery = Union[Node, List[Node], Set[Node], Dict[str, Node]]
 EvaluationInput = Union[
-    # A dict node to corresponding event set.
+    # A dict of Nodes to corresponding EventSet.
     Dict[Node, EventSet],
-    # A single event set. Equivalent to {event_set.node() : event_set}.
+    # A single EventSet. Equivalent to {event_set.node() : event_set}.
     EventSet,
-    # A list of event sets. Feed each event set individually like EventSet.
+    # A list of EventSets. Feed each EventSet individually like EventSet.
     List[EventSet],
 ]
 EvaluationResult = Union[EventSet, List[EventSet], Dict[str, EventSet]]
 
 
-def evaluate(
+def run(
     query: EvaluationQuery,
     input: EvaluationInput,
     verbose: int = 0,
     check_execution: bool = True,
 ) -> EvaluationResult:
-    """Evaluates nodes on event sets.
+    """Evaluates [`Nodes`][temporian.Node] on [`EventSets`][temporian.EventSet].
 
-    Performs all computation defined by the graph between the `query` nodes and
-    the `input` event sets.
+    Performs all computation defined by the graph between the `query` Nodes and
+    the `input` EventSets.
 
     The result is returned in the same format as the `query` argument.
+
+    Single input output example:
+        ```python
+        >>> input_evset = tp.event_set(timestamps=[1, 2, 3], features={"f": [0, 4, 10]})
+        >>> input_node = input_evset.node()
+        >>> output_node = tp.moving_sum(input_node, 5)
+        >>> output_evset = tp.run(output_node, input_evset)
+
+        >>> # Equivalent
+        >>> output_evset = output_node.run(input_evset)
+
+        >>> # Also equivalent
+        >>> output_evset = tp.run(output_node, {input_node: input_evset})
+
+        ```
+
+    Multiple inputs and outputs example:
+        ```python
+        >>> evset_1 = tp.event_set(timestamps=[1, 2, 3], features={"f1": [0.1, 42, 10]})
+        >>> evset_2 = tp.event_set(timestamps=[1, 2, 3],
+        ...     features={"f2": [-1.5, 50, 30]},
+        ...     same_sampling_as=evset_1
+        ... )
+
+        >>> # Graph with 2 inputs and 2 steps
+        >>> input_1 = evset_1.node()
+        >>> input_2 = evset_2.node()
+        >>> step_1 = input_1 + input_2
+        >>> step_2 = tp.simple_moving_average(step_1, 2)
+
+        >>> # Get step_1 and step_2 at once
+        >>> evset_step_1, evset_step_2 = tp.run([step_1, step_2],
+        ...     {input_1: evset_1, input_2: evset_2}
+        ... )
+
+        >>> # Equivalent
+        evset_step_1, evset_step_2 = tp.run(
+        ...     [step_1, step_2],
+        ...     [evset_1, evset_2],
+        ... )
+
+        >>> # Also equivalent. EventSets are mapped by their .node(), not by position.
+        >>> evset_step_1, evset_step_2 = tp.run(
+        ...     [step_1, step_2],
+        ...     [evset_2, evset_1],
+        ... )
+
+        ```
 
     Args:
         query: Nodes to compute. Supports Node, dict of Nodes and list of Nodes.
         input: Event sets to be used for the computation. Supports EventSet,
-            list of EventSets, dict of Nodes to EventSets, and dict of node
-            names to event sets. If a single event set or list of event sets,
-            they must be named and will be used as input for the nodes with the
-            same name. If a dict of node names to event sets, they will be used
-            as input for the nodes with those names. If a dict of nodes to event
-            sets, they will be used as input for those nodes.
+            list of EventSets, dict of Nodes to EventSets, and dict of Node
+            names to EventSet. If a single EventSet or list of EventSet,
+            they must be named and will be used as input for the Nodes with the
+            same name. If a dict of Node names to EventSet, they will be used
+            as input for the Nodes with those names. If a dict of Nodes to event
+            sets, they will be used as input for those Nodes.
         verbose: If >0, prints details about the execution on the standard error
             output. The larger the number, the more information is displayed.
         check_execution: If true, the input and output of the op implementation
@@ -68,9 +116,9 @@ def evaluate(
 
     Returns:
         An object with the same structure as `query` containing the results.
-            If `query` is a dictionary of nodes, the returned object will be a
-            dictionary of event sets. If `query` is a list of nodes, the
-            returned value will be a list of event sets with the same order.
+            If `query` is a dictionary of Nodes, the returned object will be a
+            dictionary of EventSet. If `query` is a list of Nodes, the
+            returned value will be a list of EventSet with the same order.
     """
     # TODO: Create an internal configuration object for options such as
     # `check_execution`.
@@ -103,7 +151,7 @@ def evaluate(
     #
     # Note: "outputs" is a dictionary of event (including the query events) to
     # event data.
-    outputs = np_eval.evaluate_schedule(
+    outputs = np_eval.run_schedule(
         input,
         schedule,
         verbose=verbose,
@@ -122,13 +170,13 @@ def build_schedule(
     inputs: Optional[Set[Node]], outputs: Set[Node], verbose: int = 0
 ) -> Schedule:
     """Calculates which operators need to be executed in which order to compute
-    a set of output nodes given a set of input nodes.
+    a set of output Nodes given a set of input Nodes.
 
     This implementation is based on Kahn's algorithm.
 
     Args:
-        inputs: Input nodes.
-        outputs: Output nodes.
+        inputs: Input Nodes.
+        outputs: Output Nodes.
         verbose: If >0, prints details about the execution on the standard error
             output. The larger the number, the more information is displayed.
 
@@ -136,12 +184,12 @@ def build_schedule(
         Tuple of:
             - Ordered list of operators, such that the first operator should be
             computed before the second, second before the third, etc.
-            - Mapping of node name inputs to nodes. The keys are the string
-            values in the `inputs` argument, and the values are the nodes
-            corresponding to each one. If a value was already a node, it won't
+            - Mapping of Node name inputs to Nodes. The keys are the string
+            values in the `inputs` argument, and the values are the Nodes
+            corresponding to each one. If a value was already a Node, it won't
             be present in the returned dictionary.
     """
-    # List all nodes and operators in between inputs and outputs.
+    # List all Nodes and operators in between inputs and outputs.
     #
     # Fails if the outputs cannot be computed from the inputs e.g. some inputs
     # are missing.
@@ -238,7 +286,7 @@ def _normalize_input(input: EvaluationInput) -> Dict[Node, EventSet]:
 
 
 def _normalize_query(query: EvaluationQuery) -> Set[Node]:
-    """Normalizes a query into a list of query nodes."""
+    """Normalizes a query into a list of query Nodes."""
 
     if isinstance(query, Node):
         return {query}

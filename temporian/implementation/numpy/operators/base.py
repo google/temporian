@@ -53,21 +53,21 @@ def _check_value_to_schema(
     nodes: Dict[str, Node],
     label: str,
 ) -> None:
-    """Checks if event sets are matching the expected schema."""
+    """Checks if EventSets are matching the expected schema."""
 
     for key, node in nodes.items():
         value = values[key]
 
         if value.schema != node.schema:
             raise RuntimeError(
-                "Unexpected event set schema.\n"
-                f"event set schema =\n{value.schema}\n"
+                "Unexpected EventSet set schema.\n"
+                f"actual schema =\n{value.schema}\n"
                 f"expected schema =\n{node.schema}"
             )
 
-        index_value = value.get_arbitrary_index_value()
-        if index_value is not None:
-            index_data = value.data[index_value]
+        index_key = value.get_arbitrary_index_key()
+        if index_key is not None:
+            index_data = value.data[index_key]
 
             if len(index_data.features) != len(value.schema.features):
                 raise RuntimeError(
@@ -164,9 +164,9 @@ def _check_output(
 
 def _is_same_sampling(evset_1: EventSet, evset_2: EventSet) -> Tuple[bool, str]:
     if evset_1.schema.indexes != evset_2.schema.indexes:
-        return (False, "Different index names")
+        return (False, "Different indexes")
 
-    # Number of index values where to ensure that the numpy array containing
+    # Number of index keys to ensure that the numpy array containing
     # timestamps is the same for both evset_1 and evset_2.
     num_checks = 1 if config.DEBUG_MODE else len(evset_1.data)
 
@@ -178,7 +178,7 @@ def _is_same_sampling(evset_1: EventSet, evset_2: EventSet) -> Tuple[bool, str]:
             return (
                 False,
                 (
-                    f"Index {index_key} missing from one of the two event sets."
+                    f"Index {index_key} missing from one of the two EventSets."
                     f" When comparing {evset_1} with {evset_2}"
                 ),
             )
@@ -187,7 +187,7 @@ def _is_same_sampling(evset_1: EventSet, evset_2: EventSet) -> Tuple[bool, str]:
             return (
                 False,
                 (
-                    f"Timestamps for index value {index_key} have two different"
+                    f"Timestamps for index key {index_key} have two different"
                     " allocated np.arrays."
                 ),
             )

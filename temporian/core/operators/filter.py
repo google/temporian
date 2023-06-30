@@ -17,7 +17,7 @@
 from typing import Optional
 
 from temporian.core import operator_lib
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node, create_node_new_features_new_sampling
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
@@ -80,21 +80,43 @@ def filter(
     input: Node,
     condition: Optional[Node] = None,
 ) -> Node:
-    """Filters out timestamps in a node for which a condition is false.
+    """Filters out events in a Node for which a condition is false.
 
     Each timestamp in `input` is only kept if the corresponding value for that
     timestamp in `condition` is `True`.
 
-    `input` and `condition` must have the same sampling.
+    `input` and `condition` must have the same sampling, and `condition` must
+    have one single feature, of boolean type.
 
     filter(x) is equivalent to filter(x,x). filter(x) can be used to convert
-    a boolean mask into a timestamps. For example:
-        Input:
-            timestamps: 1 2 3
-            value: True False True
-        Output:
-            timestamps: 1 3
-            value: True True
+    a boolean mask into a timestamps.
+
+    Usage example:
+        ```python
+        >>> a_evset = tp.event_set(
+        ...     timestamps=[0, 1, 5, 6],
+        ...     features={"f1": [0, 10, 50, 60], "f2": [50, 100, 500, 600]},
+        ... )
+        >>> a = a_evset.node()
+
+        >>> # Example boolean condition
+        >>> condition = a["f1"] > 20
+        >>> condition.run({a: a_evset})
+        indexes: ...
+                timestamps: [0. 1. 5. 6.]
+                'f1': [False False  True  True]
+        ...
+
+        >>> # Filter only True timestamps
+        >>> filtered = tp.filter(a, condition)
+        >>> filtered.run({a: a_evset})
+        indexes: ...
+                timestamps: [5. 6.]
+                'f1': [50 60]
+                'f2': [500 600]
+        ...
+
+        ```
 
     Args:
         input: Node to filter.

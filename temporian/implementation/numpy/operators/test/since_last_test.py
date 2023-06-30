@@ -38,7 +38,7 @@ class SinceLastOperatorTest(absltest.TestCase):
                     "x": [1, 1, 1, 1, 2, 2, 2],
                 }
             ),
-            index_names=["x"],
+            indexes=["x"],
         )
         event = event_data.node()
 
@@ -50,7 +50,7 @@ class SinceLastOperatorTest(absltest.TestCase):
                     "since_last": [nan, 4, 3, 1, nan, 0, 1],
                 }
             ),
-            index_names=["x"],
+            indexes=["x"],
         )
 
         # Run op

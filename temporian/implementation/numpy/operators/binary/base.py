@@ -16,6 +16,7 @@ from abc import abstractmethod
 
 import numpy as np
 
+from temporian.core.data.dtype import DType
 from temporian.core.operators.binary.base import BaseBinaryOperator
 from temporian.implementation.numpy.data.event_set import IndexData
 from temporian.implementation.numpy.data.event_set import EventSet
@@ -29,36 +30,38 @@ class BaseBinaryNumpyImplementation(OperatorImplementation):
 
     @abstractmethod
     def _do_operation(
-        self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
+        self,
+        evset_1_feature: np.ndarray,
+        evset_2_feature: np.ndarray,
+        dtype: DType,
     ) -> np.ndarray:
         """Performs the arithmetic operation corresponding to the subclass."""
 
     def __call__(
         self, input_1: EventSet, input_2: EventSet
     ) -> Dict[str, EventSet]:
-        """Applies the corresponding arithmetic operation between two event
-        sets.
+        """Applies the corresponding arithmetic operation between two EventSets.
 
         Args:
-            input_1: First event set.
-            input_2: Second event set.
+            input_1: First EventSet.
+            input_2: Second EventSet.
 
         Returns:
             Result of the operation.
 
         Raises:
-            ValueError: If sampling of both event sets is not equal.
+            ValueError: If sampling of both EventSets is not equal.
         """
         assert isinstance(self.operator, BaseBinaryOperator)
         output_schema = self.output_schema("output")
 
         if len(input_1.schema.features) != len(input_2.schema.features):
             raise ValueError(
-                "Both event sets must have the same number of features."
+                "Both EventSets must have the same number of features."
             )
         num_features = len(input_1.schema.features)
 
-        # create destination event set
+        # create destination EventSet
         dst_evset = EventSet(data={}, schema=output_schema)
 
         assert len(input_1.data) == len(input_2.data)
@@ -74,7 +77,11 @@ class BaseBinaryNumpyImplementation(OperatorImplementation):
                 input_2_feature = input_2_features[feature_idx]
                 assert input_1_feature.dtype.type == input_2_feature.dtype.type
 
-                result = self._do_operation(input_1_feature, input_2_feature)
+                result = self._do_operation(
+                    input_1_feature,
+                    input_2_feature,
+                    input_1.schema.features[feature_idx].dtype,
+                )
                 dst_features.append(result)
 
             dst_evset[index_key] = IndexData(

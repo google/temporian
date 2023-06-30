@@ -53,7 +53,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sales"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
         self.evset_2 = from_pandas(
             pd.DataFrame(
@@ -66,7 +66,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "costs"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
             same_sampling_as=self.evset_1,
         )
         self.evset_3 = from_pandas(
@@ -80,7 +80,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "costs"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
             same_sampling_as=self.evset_1,
         )
         self.node_1 = self.evset_1.node()
@@ -101,7 +101,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "add_sales_costs"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = AddOperator(
@@ -131,7 +131,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sub_sales_costs"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = SubtractOperator(
@@ -159,7 +159,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "mult_sales_costs"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = MultiplyOperator(
@@ -188,7 +188,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "div_sales_costs"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = DivideOperator(
@@ -219,7 +219,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "floordiv_sales_costs"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = FloorDivOperator(
@@ -250,7 +250,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "mod_sales_costs"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = ModuloOperator(
@@ -281,7 +281,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "pow_sales_costs"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = PowerOperator(

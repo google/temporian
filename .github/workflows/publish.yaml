@@ -90,7 +90,7 @@ jobs:
         run: python tools/check_install.py
 
   publish:
-    needs: [test-install]
+    needs: [test, test-install]
     runs-on: ubuntu-latest
     environment: pypi
     env:

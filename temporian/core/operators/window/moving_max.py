@@ -17,7 +17,7 @@
 from typing import Optional
 
 from temporian.core import operator_lib
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 from temporian.core.data.duration_utils import Duration, normalize_duration
 from temporian.core.data.node import Node
 from temporian.core.data.schema import FeatureSchema
@@ -43,15 +43,36 @@ def moving_max(
 ) -> Node:
     """Computes the maximum in a sliding window over the node.
 
-    For each t in sampling, and for each feature independently, returns at time
-    t the max of non-nan values for the feature in the window
-    [t - window_length, t].
+    For each t in sampling, and for each index and feature independently,
+    returns at time t the max of non-nan values for the feature in the window
+    (t - window_length, t].
 
     If `sampling` is provided samples the moving window's value at each
     timestamp in `sampling`, else samples it at each timestamp in `input`.
 
     If the window does not contain any values (e.g., all the values are missing,
     or the window does not contain any sampling), outputs missing values.
+
+    Basic usage:
+        ```python
+        >>> a_evset = tp.event_set(
+        ...     timestamps=[0, 1, 2, 5, 6, 7],
+        ...     features={"value": [np.nan, 1, 5, 1, 15, 20]},
+        ... )
+        >>> a = a_evset.node()
+
+        >>> result = tp.moving_max(a, tp.duration.seconds(4))
+        >>> result.run({a: a_evset})
+        indexes: ...
+            (6 events):
+                timestamps: [0. 1. 2. 5. 6. 7.]
+                'value': [nan 1. 5. 5. 15. 20.]
+        ...
+
+        ```
+
+    See [`tp.moving_count()`](../moving_count) for examples with external
+    sampling and indices.
 
     Args:
         input: Node for which to count the number of values in each feature.

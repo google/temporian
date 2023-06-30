@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Utility for reading an event set from disk."""
+"""Utilities for reading and saving EventSets from/to disk."""
 
 from typing import List, Optional
 from temporian.implementation.numpy.data.event_set import EventSet
@@ -21,35 +21,55 @@ from temporian.io.pandas import from_pandas, to_pandas
 
 def from_csv(
     path: str,
-    timestamp_column: str = "timestamp",
-    index_names: Optional[List[str]] = None,
+    timestamps: str = "timestamp",
+    indexes: Optional[List[str]] = None,
     sep: str = ",",
 ) -> EventSet:
-    """Reads an EventSet from a file.
+    """Reads an [`EventSet`][temporian.EventSet] from a CSV file.
+
+    Example:
+        ```python
+        >>> # Example CSV
+        >>> temp_file = tmp_dir / "temporal_data.csv"
+        >>> _ = open(temp_file, "w").write(
+        ...     "date,feature_1,feature_2\\n"
+        ...     "2023-01-01,10.0,3.0\\n"
+        ...     "2023-01-02,20.0,4.0\\n"
+        ...     "2023-02-01,30.0,5.0"
+        ... )
+        >>> # Load CSV
+        >>> evset = tp.from_csv(temp_file, timestamps="date")
+        >>> evset
+        indexes: []
+        features: [('feature_1', float64), ('feature_2', float64)]
+        events:
+            (3 events):
+                timestamps: [1.6725e+09 1.6726e+09 1.6752e+09]
+                'feature_1': [10. 20. 30.]
+                'feature_2': [3. 4. 5.]
+        ...
+
+        ```
 
     Args:
         path: Path to the file.
-        timestamp_column: Name of the column to be used as timestamps for the
-            event set.
-        index_names: Names of the columns to be used as index for the event set.
-            If None, a flat event set will be created.
+        timestamps: Name of the column to be used as timestamps for the
+            EventSet.
+        indexes: Names of the columns to be used as indexes for the EventSet.
+            If None, a flat EventSet will be created.
         sep: Separator to use.
-
 
     Returns:
         EventSet read from file.
-
     """
 
     import pandas as pd
 
-    if index_names is None:
-        index_names = []
+    if indexes is None:
+        indexes = []
 
     df = pd.read_csv(path, sep=sep)
-    return from_pandas(
-        df, index_names=index_names, timestamp_column=timestamp_column
-    )
+    return from_pandas(df, indexes=indexes, timestamps=timestamps)
 
 
 def to_csv(
@@ -59,7 +79,15 @@ def to_csv(
     na_rep: Optional[str] = None,
     columns: Optional[List[str]] = None,
 ):
-    """Saves an EventSet to a file.
+    """Saves an [`EventSet`][temporian.EventSet] to a CSV file.
+
+    Example:
+        ```python
+        >>> output_path = tmp_dir / "output_data.csv"
+        >>> evset = tp.event_set(timestamps=[1,], features={"f1": [0.1]})
+        >>> tp.to_csv(evset, output_path)
+
+        ```
 
     Args:
         evset: EventSet to save.

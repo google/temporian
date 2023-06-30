@@ -42,7 +42,7 @@ class PrototypeTest(absltest.TestCase):
                 ],
                 columns=["store_id", "product_id", "timestamp", "sales"],
             ),
-            index_names=["store_id", "product_id"],
+            indexes=["store_id", "product_id"],
         )
 
         self.evset_2 = tp.from_pandas(
@@ -59,7 +59,7 @@ class PrototypeTest(absltest.TestCase):
                 ],
                 columns=["store_id", "product_id", "timestamp", "costs"],
             ),
-            index_names=["store_id", "product_id"],
+            indexes=["store_id", "product_id"],
             same_sampling_as=self.evset_1,
         )
 
@@ -92,7 +92,7 @@ class PrototypeTest(absltest.TestCase):
                     "negated_sales",
                 ],
             ),
-            index_names=["store_id", "product_id"],
+            indexes=["store_id", "product_id"],
         )
 
     def test_prototype(self) -> None:
@@ -106,7 +106,7 @@ class PrototypeTest(absltest.TestCase):
         e = tp.glue(d, sub_sales)
         output_node = e
 
-        output_evset = tp.evaluate(
+        output_evset = tp.run(
             output_node,
             input={
                 self.node_1: self.evset_1,

@@ -35,7 +35,7 @@ class BaseCalendarNumpyImplementation(OperatorImplementation):
         assert isinstance(self.operator, BaseCalendarOperator)
         output_schema = self.output_schema("output")
 
-        # create destination event set
+        # create destination EventSet
         dst_evset = EventSet(data={}, schema=output_schema)
         for index_key, index_data in sampling.data.items():
             value = np.array(

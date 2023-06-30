@@ -43,7 +43,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "item_id", "timestamp", "sales"],
             ),
-            index_names=["store_id", "item_id"],
+            indexes=["store_id", "item_id"],
         )
         self.input_node = self.input_evset.node()
 
@@ -62,11 +62,11 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["timestamp", "sales", "store_id", "item_id"],
             ),
-            index_names=[],
+            indexes=[],
         )
 
         operator = DropIndexOperator(
-            self.input_node, index_to_drop=["store_id", "item_id"], keep=True
+            self.input_node, indexes=["store_id", "item_id"], keep=True
         )
         operator_impl = DropIndexNumpyImplementation(operator)
         testOperatorAndImp(self, operator, operator_impl)
@@ -89,11 +89,11 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sales", "item_id"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = DropIndexOperator(
-            self.input_node, index_to_drop=["item_id"], keep=True
+            self.input_node, indexes=["item_id"], keep=True
         )
         operator_impl = DropIndexNumpyImplementation(operator)
         testOperatorAndImp(self, operator, operator_impl)
@@ -115,11 +115,11 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["item_id", "timestamp", "sales", "store_id"],
             ),
-            index_names=["item_id"],
+            indexes=["item_id"],
         )
 
         operator = DropIndexOperator(
-            self.input_node, index_to_drop=["store_id"], keep=True
+            self.input_node, indexes=["store_id"], keep=True
         )
 
         operator_impl = DropIndexNumpyImplementation(operator)
@@ -143,11 +143,11 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sales"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = DropIndexOperator(
-            self.input_node, index_to_drop=["item_id"], keep=False
+            self.input_node, indexes=["item_id"], keep=False
         )
 
         operator_impl = DropIndexNumpyImplementation(operator)
@@ -171,11 +171,11 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["item_id", "timestamp", "sales"],
             ),
-            index_names=["item_id"],
+            indexes=["item_id"],
         )
 
         operator = DropIndexOperator(
-            self.input_node, index_to_drop=["store_id"], keep=False
+            self.input_node, indexes=["store_id"], keep=False
         )
         operator_impl = DropIndexNumpyImplementation(operator)
         testOperatorAndImp(self, operator, operator_impl)
@@ -193,7 +193,7 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
                     "c": ["C1", "C2", "C1", "C2"],
                 }
             ),
-            index_names=["b", "c"],
+            indexes=["b", "c"],
         )
         node = evset.node()
 
@@ -207,11 +207,11 @@ class DropIndexNumpyImplementationTest(absltest.TestCase):
                     "c": ["C1", "C2", "C1", "C2"],
                 }
             ),
-            index_names=["c"],
+            indexes=["c"],
         )
 
         # Run op
-        operator = DropIndexOperator(input=node, index_to_drop=["b"], keep=True)
+        operator = DropIndexOperator(input=node, indexes=["b"], keep=True)
         operator_impl = DropIndexNumpyImplementation(operator)
         testOperatorAndImp(self, operator, operator_impl)
         output = operator_impl.call(input=evset)["output"]

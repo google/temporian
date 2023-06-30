@@ -35,12 +35,29 @@ operator_lib.register_operator(CalendarMinuteOperator)
 def calendar_minute(sampling: Node) -> Node:
     """Obtain the minute the timestamps in a node's sampling are in.
 
-    Features in the input node are ignored, only the timestamps in
-    `Node.sampling` are used and they must be unix timestamps
-    (check  `Node.sampling.is_unix_timestamp`).
+    Features in the input node are ignored, only the timestamps are used and
+    they must be unix timestamps (`is_unix_timestamp=True`).
 
     Output feature contains numbers between
     0 and 59.
+
+    Usage example:
+        ```python
+        >>> from datetime import datetime
+        >>> evset = tp.event_set(
+        ...    timestamps=[datetime(2020,1,1,18,30), datetime(2020,1,1,23,59)],
+        ...    name='random_hours'
+        ... )
+        >>> tp.calendar_minute(evset.node()).run(evset)
+        indexes: ...
+        features: [('calendar_minute', int32)]
+        events:
+            (2 events):
+                timestamps: [...]
+                'calendar_minute': [30 59]
+        ...
+
+        ```
 
     Args:
         sampling: Node to get the minutes from.

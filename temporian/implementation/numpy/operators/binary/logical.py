@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import numpy as np
+
+from temporian.core.data.dtype import DType
 from temporian.implementation.numpy.operators.binary.base import (
     BaseBinaryNumpyImplementation,
 )
@@ -30,7 +32,10 @@ class LogicalAndNumpyImplementation(BaseBinaryNumpyImplementation):
         super().__init__(operator)
 
     def _do_operation(
-        self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
+        self,
+        evset_1_feature: np.ndarray,
+        evset_2_feature: np.ndarray,
+        dtype: DType,
     ) -> np.ndarray:
         return np.logical_and(evset_1_feature.data, evset_2_feature.data)
 
@@ -42,7 +47,10 @@ class LogicalOrNumpyImplementation(BaseBinaryNumpyImplementation):
         super().__init__(operator)
 
     def _do_operation(
-        self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
+        self,
+        evset_1_feature: np.ndarray,
+        evset_2_feature: np.ndarray,
+        dtype: DType,
     ) -> np.ndarray:
         return np.logical_or(evset_1_feature.data, evset_2_feature.data)
 
@@ -54,7 +62,10 @@ class LogicalXorNumpyImplementation(BaseBinaryNumpyImplementation):
         super().__init__(operator)
 
     def _do_operation(
-        self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
+        self,
+        evset_1_feature: np.ndarray,
+        evset_2_feature: np.ndarray,
+        dtype: DType,
     ) -> np.ndarray:
         return np.logical_xor(evset_1_feature.data, evset_2_feature.data)
 

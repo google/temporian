@@ -15,10 +15,11 @@
 """Binary relational operators classes and public API function definitions."""
 
 from temporian.core import operator_lib
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
 from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.binary.base import BaseBinaryOperator
+from temporian.core.operators.scalar.relational_scalar import equal_scalar
 
 
 class BaseRelationalOperator(BaseBinaryOperator):
@@ -83,6 +84,34 @@ def equal(
     `input_1` and `input_2` must have the same sampling and the same number of
     features.
 
+    Basic example:
+        ```python
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
+        ... )
+        >>> source = evset.node()
+        >>> a = source[["f1", "f2"]]
+        >>> b = source[["f2", "f1"]]  # Reverse order
+
+        >>> # WARN: Don't use this for element-wise comparison
+        >>> a == b
+        False
+
+        >>> # Element-wise comparison
+        >>> c = tp.equal(a, b)
+        >>> c.run({source: evset})
+        indexes: []
+        features: [('eq_f1_f2', bool_), ('eq_f2_f1', bool_)]
+        events:
+            (3 events):
+                timestamps: [1. 2. 3.]
+                'eq_f1_f2': [False True False]
+                'eq_f2_f1': [False True False]
+        ...
+
+        ```
+
     Args:
         input_1: First node.
         input_2: Second node.
@@ -90,6 +119,10 @@ def equal(
     Returns:
         Node containing the result of the comparison.
     """
+
+    if not isinstance(input_2, Node):
+        return equal_scalar(input=input_1, value=input_2)
+
     return EqualOperator(
         input_1=input_1,
         input_2=input_2,
@@ -108,6 +141,31 @@ def not_equal(
 
     `input_1` and `input_2` must have the same sampling and the same number of
     features.
+
+    Basic example:
+        ```python
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
+        ... )
+        >>> source = evset.node()
+        >>> a = source[["f1", "f2"]]
+        >>> b = source[["f2", "f1"]]  # Reverse order
+
+        >>> # Equivalent
+        >>> c = tp.not_equal(a, b)
+        >>> c = a != b
+        >>> c.run({source: evset})
+        indexes: []
+        features: [('ne_f1_f2', bool_), ('ne_f2_f1', bool_)]
+        events:
+            (3 events):
+                timestamps: [1. 2. 3.]
+                'ne_f1_f2': [ True False True]
+                'ne_f2_f1': [ True False True]
+        ...
+
+        ```
 
     Args:
         input_1: First node.
@@ -135,6 +193,31 @@ def greater(
     `input_left` and `input_right` must have the same sampling and the same
     number of features.
 
+    Basic example:
+        ```python
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
+        ... )
+        >>> source = evset.node()
+        >>> a = source[["f1", "f2"]]
+        >>> b = source[["f2", "f1"]]  # Reverse order
+
+        >>> # Equivalent
+        >>> c = tp.greater(a, b)
+        >>> c = a > b
+        >>> c.run({source: evset})
+        indexes: []
+        features: [('gt_f1_f2', bool_), ('gt_f2_f1', bool_)]
+        events:
+            (3 events):
+                timestamps: [1. 2. 3.]
+                'gt_f1_f2': [ True False True]
+                'gt_f2_f1': [False False False]
+        ...
+
+        ```
+
     Args:
         input_left: node to the left of the operator
         input_right: node to the right of the operator
@@ -160,6 +243,31 @@ def greater_equal(
 
     `input_left` and `input_right` must have the same sampling and the same
     number of features.
+
+    Basic example:
+        ```python
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
+        ... )
+        >>> source = evset.node()
+        >>> a = source[["f1", "f2"]]
+        >>> b = source[["f2", "f1"]]  # Reverse order
+
+        >>> # Equivalent
+        >>> c = tp.greater_equal(a, b)
+        >>> c = a >= b
+        >>> c.run({source: evset})
+        indexes: []
+        features: [('ge_f1_f2', bool_), ('ge_f2_f1', bool_)]
+        events:
+            (3 events):
+                timestamps: [1. 2. 3.]
+                'ge_f1_f2': [ True True True]
+                'ge_f2_f1': [False True False]
+        ...
+
+        ```
 
     Args:
         input_left: node to the left of the operator
@@ -187,6 +295,31 @@ def less(
     `input_left` and `input_right` must have the same sampling and the same
     number of features.
 
+    Basic example:
+        ```python
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
+        ... )
+        >>> source = evset.node()
+        >>> a = source[["f1", "f2"]]
+        >>> b = source[["f2", "f1"]]  # Reverse order
+
+        >>> # Equivalent
+        >>> c = tp.less(a, b)
+        >>> c = a < b
+        >>> c.run({source: evset})
+        indexes: []
+        features: [('lt_f1_f2', bool_), ('lt_f2_f1', bool_)]
+        events:
+            (3 events):
+                timestamps: [1. 2. 3.]
+                'lt_f1_f2': [False False False]
+                'lt_f2_f1': [ True False True]
+        ...
+
+        ```
+
     Args:
         input_left: node to the left of the operator
         input_right: node to the right of the operator
@@ -212,6 +345,31 @@ def less_equal(
 
     `input_left` and `input_right` must have the same sampling and the same
     number of features.
+
+    Basic example:
+        ```python
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
+        ... )
+        >>> source = evset.node()
+        >>> a = source[["f1", "f2"]]
+        >>> b = source[["f2", "f1"]]  # Reverse order
+
+        >>> # Equivalent
+        >>> c = tp.less_equal(a, b)
+        >>> c = a <= b
+        >>> c.run({source: evset})
+        indexes: []
+        features: [('le_f1_f2', bool_), ('le_f2_f1', bool_)]
+        events:
+            (3 events):
+                timestamps: [1. 2. 3.]
+                'le_f1_f2': [False True False]
+                'le_f2_f1': [ True True True]
+        ...
+
+        ```
 
     Args:
         input_left: node to the left of the operator

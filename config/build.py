@@ -35,7 +35,7 @@ class _BuildCommand(build.build):
     # Add the "bazel_build" command as the first sub-command of "build". Each
     # sub_command of "build" (e.g. "build_py", "build_ext", etc.) is executed
     # sequentially when running a "build" command, if the second item in the tuple
-    # (predicate method) is evaluated to true.
+    # (predicate method) is run to true.
     sub_commands = [
         ("bazel_build", _build_cc_extensions)
     ] + build.build.sub_commands

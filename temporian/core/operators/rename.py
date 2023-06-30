@@ -33,27 +33,27 @@ class RenameOperator(Operator):
         self,
         input: Node,
         features: Dict[str, str],
-        index: Dict[str, str],
+        indexes: Dict[str, str],
     ):
         super().__init__()
 
         self.add_attribute("features", features)
-        self.add_attribute("index", index)
+        self.add_attribute("indexes", indexes)
 
         self._features = features
-        self._index = index
+        self._indexes = indexes
 
         self.add_input("input", input)
 
         new_indexes = [
-            (index.get(i.name, i.name), i.dtype) for i in input.schema.indexes
+            (indexes.get(i.name, i.name), i.dtype) for i in input.schema.indexes
         ]
         new_feature_schemas = [
             (features.get(f.name, f.name), f.dtype)
             for f in input.schema.features
         ]
 
-        if index:
+        if indexes:
             self.add_output(
                 "output",
                 create_node_new_features_new_sampling(
@@ -81,7 +81,7 @@ class RenameOperator(Operator):
 
     @property
     def index(self) -> Dict[str, str]:
-        return self._index
+        return self._indexes
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
@@ -93,7 +93,7 @@ class RenameOperator(Operator):
                     type=pb.OperatorDef.Attribute.Type.MAP_STR_STR,
                 ),
                 pb.OperatorDef.Attribute(
-                    key="index",
+                    key="indexes",
                     type=pb.OperatorDef.Attribute.Type.MAP_STR_STR,
                 ),
             ],
@@ -116,7 +116,7 @@ def _normalize_rename_features(
         if len(schema.features) != 1:
             raise ValueError(
                 "Cannot apply rename operator with a single rename string when "
-                "the event set contains multiple features. Pass a dictionary "
+                "the EventSet contains multiple features. Pass a dictionary "
                 "of rename strings instead."
             )
         features = {schema.features[0].name: features}
@@ -145,7 +145,7 @@ def _normalize_rename_indexes(
         if len(schema.indexes) != 1:
             raise ValueError(
                 "Cannot apply rename operator with a single rename string when "
-                "the event set contains multiple indexes. Pass a dictionary "
+                "the EventSet contains multiple indexes. Pass a dictionary "
                 "of rename strings instead."
             )
         indexes = {schema.indexes[0].name: indexes}
@@ -166,9 +166,9 @@ def _normalize_rename_indexes(
 def rename(
     input: Node,
     features: Optional[Union[str, Dict[str, str]]] = None,
-    index: Optional[Union[str, Dict[str, str]]] = None,
+    indexes: Optional[Union[str, Dict[str, str]]] = None,
 ) -> Node:
-    """Renames a node's features and index.
+    """Renames a Node's features and index.
 
     If the input has a single feature, then the `features` can be a
     single string with the new name.
@@ -176,20 +176,45 @@ def rename(
     If the input has multiple features, then `features` must be a mapping
     with the old names as keys and the new names as values.
 
-    The index renaming follows the same criteria, accepting a single string or
-    a mapping for multiple index levels.
+    The indexes renaming follows the same criteria, accepting a single string or
+    a mapping for multiple indexes.
+
+    Usage example:
+        ```python
+        >>> a_evset = tp.event_set(
+        ...    timestamps=[0, 1],
+        ...    features={"f1": [0, 2], "f2": [5, 6]}
+        ... )
+        >>> a = a_evset.node()
+        >>> b = a * 5
+
+        >>> # Rename single feature from b
+        >>> b_1 = tp.rename(b["f1"], "output_1")
+
+        >>> # Rename multiple features in a (mapping)
+        >>> a_rename = tp.rename(a, {"f1": "input_1", "f2": "input_2"})
+
+        >>> result = tp.glue(a_rename, b_1)
+        >>> result.run({a: a_evset})
+        indexes: ...
+                'input_1': [0 2]
+                'input_2': [5 6]
+                'output_1': [ 0 10]
+        ...
+
+        ```
 
     Args:
         input: Node to rename.
 
         features: New feature name or mapping from old names to new names.
-        index: New index name or mapping from old names to new names.
+        indexes: New index name or mapping from old names to new names.
 
     Returns:
         Node with renamed features and index.
     """
 
     features = _normalize_rename_features(input.schema, features)
-    index = _normalize_rename_indexes(input.schema, index)
+    indexes = _normalize_rename_indexes(input.schema, indexes)
 
-    return RenameOperator(input, features, index).outputs["output"]
+    return RenameOperator(input, features, indexes).outputs["output"]

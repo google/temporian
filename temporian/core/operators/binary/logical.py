@@ -15,7 +15,7 @@
 """Binary logic operators classes and public API function definitions."""
 
 from temporian.core import operator_lib
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
 from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.binary.base import BaseBinaryOperator
@@ -72,7 +72,53 @@ def logical_and(
     `input_2` in the same position.
 
     `input_1` and `input_2` must have the same sampling, the same number of
-    features, and all feature types must be `bool`.
+    features, and all feature types must be `bool` (see cast example below).
+
+    Usage example:
+        ```python
+        >>> evset = tp.event_set(timestamps=[1, 2, 3], features={"f1": [100, 150, 200]})
+        >>> source = evset.node()
+        >>> a = source["f1"]
+
+        >>> # Sample boolean features
+        >>> cond_1 = a > 100
+        >>> cond_2 = a < 200
+
+        >>> # Equivalent
+        >>> c = tp.logical_and(cond_1, cond_2)
+        >>> c = cond_1 & cond_2
+
+        >>> c.run({source: evset})
+        indexes: []
+        features: [('and_f1_f1', bool_)]
+        events:
+            (3 events):
+                timestamps: [1. 2. 3.]
+                'and_f1_f1': [False True False]
+        ...
+
+        ```
+
+    Cast integer to boolean:
+        ```python
+        >>> evset = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f1": [0, 1, 1], "f2": [1, 1, 0]}
+        ... )
+        >>> source = evset.node()
+
+        >>> c = tp.cast(source["f1"], bool) & tp.cast(source["f2"], bool)
+
+        >>> c.run({source: evset})
+        indexes: []
+        features: [('and_f1_f2', bool_)]
+        events:
+            (3 events):
+                timestamps: [1. 2. 3.]
+                'and_f1_f2': [False True False]
+        ...
+
+        ```
 
     Args:
         input_1: First node, with only boolean features.
@@ -97,7 +143,33 @@ def logical_or(
     `input_2` in the same position.
 
     `input_1` and `input_2` must have the same sampling, the same number of
-    features, and all feature types must be `bool`.
+    features, and all feature types must be `bool`
+    (see cast example in [`tp.logical_and()`](../logical_and)).
+
+    Usage example:
+        ```python
+        >>> evset = tp.event_set(timestamps=[1, 2, 3], features={"f1": [100, 150, 200]})
+        >>> source = evset.node()
+        >>> a = source["f1"]
+
+        >>> # Sample boolean features
+        >>> cond_1 = a <= 100
+        >>> cond_2 = a >= 200
+
+        >>> # Equivalent
+        >>> c = tp.logical_or(cond_1, cond_2)
+        >>> c = cond_1 | cond_2
+
+        >>> c.run({source: evset})
+        indexes: []
+        features: [('or_f1_f1', bool_)]
+        events:
+            (3 events):
+                timestamps: [1. 2. 3.]
+                'or_f1_f1': [ True False True]
+        ...
+
+        ```
 
     Args:
         input_1: First node, with only boolean features.
@@ -122,7 +194,33 @@ def logical_xor(
     `input_2` in the same position.
 
     `input_1` and `input_2` must have the same sampling, the same number of
-    features, and all feature types must be `bool`.
+    features, and all feature types must be `bool`
+    (see cast example in [`tp.logical_and()`](../logical_and)).
+
+    Usage example:
+        ```python
+        >>> evset = tp.event_set(timestamps=[1, 2, 3], features={"f1": [100, 150, 200]})
+        >>> source = evset.node()
+        >>> a = source["f1"]
+
+        >>> # Sample boolean features
+        >>> cond_1 = a > 100
+        >>> cond_2 = a < 200
+
+        >>> # Equivalent
+        >>> c = tp.logical_xor(cond_1, cond_2)
+        >>> c = cond_1 ^ cond_2
+
+        >>> c.run({source: evset})
+        indexes: []
+        features: [('xor_f1_f1', bool_)]
+        events:
+            (3 events):
+                timestamps: [1. 2. 3.]
+                'xor_f1_f1': [ True False True]
+        ...
+
+        ```
 
     Args:
         input_1: First node, with only boolean features.

@@ -21,7 +21,7 @@ from temporian.implementation.numpy.operators.cast import (
     CastNumpyImplementation,
 )
 from temporian.core.operators.cast import CastOperator, cast
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.io.pandas import from_pandas
 from temporian.implementation.numpy.data.io import event_set
@@ -29,7 +29,7 @@ from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
     testOperatorAndImp,
 )
-from temporian.core.evaluation import evaluate
+from temporian.core.evaluation import run
 
 
 class CastNumpyImplementationTest(absltest.TestCase):
@@ -73,12 +73,12 @@ class CastNumpyImplementationTest(absltest.TestCase):
                     "f_boolean",
                 ],
             ),
-            index_names=["store_id", "product_id"],
+            indexes=["store_id", "product_id"],
         )
 
         self.input_node = self.input_evset.node()
 
-        # Expected event set when applying some downcast operations
+        # Expected EventSet when applying some downcast operations
         self.expected_evset_1 = from_pandas(
             pd.DataFrame(
                 data=[
@@ -103,7 +103,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
                 ],
                 # Even more tricky: these columns won't match their type
             ).astype({"f_float_64": np.float32, "f_int_64": np.int32}),
-            index_names=["store_id", "product_id"],
+            indexes=["store_id", "product_id"],
         )
 
         # Expected when converting everything to float32
@@ -137,7 +137,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
                     "f_boolean": np.float32,
                 }
             ),
-            index_names=["store_id", "product_id"],
+            indexes=["store_id", "product_id"],
         )
 
     def test_cast_manual(self) -> None:
@@ -161,7 +161,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
         )
         output_node.check_same_sampling(self.input_node)
 
-        output_evset = evaluate(
+        output_evset = run(
             output_node,
             {self.input_node: self.input_evset},
             check_execution=True,
@@ -183,7 +183,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
             },
             check_overflow=False,
         )
-        output_evset = evaluate(
+        output_evset = run(
             output_node,
             {self.input_node: self.input_evset},
             check_execution=True,
@@ -199,7 +199,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
             target=DType.FLOAT32,
             check_overflow=False,
         )
-        output_evset = evaluate(
+        output_evset = run(
             output_node,
             {self.input_node: self.input_evset},
             check_execution=True,
@@ -232,7 +232,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
         )
 
         with self.assertRaisesRegex(ValueError, "Overflow"):
-            _ = evaluate(
+            _ = run(
                 output_node,
                 {self.input_node: self.input_evset},
                 check_execution=True,
@@ -248,7 +248,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
         )
 
         with self.assertRaisesRegex(ValueError, "Overflow"):
-            _ = evaluate(
+            _ = run(
                 output_node,
                 {self.input_node: self.input_evset},
                 check_execution=True,
@@ -264,7 +264,7 @@ class CastNumpyImplementationTest(absltest.TestCase):
             check_overflow=True,
         )
 
-        _ = evaluate(
+        _ = run(
             output_node,
             {self.input_node: self.input_evset},
             check_execution=True,
@@ -272,7 +272,17 @@ class CastNumpyImplementationTest(absltest.TestCase):
 
     def test_python_types(self):
         input_data = event_set(timestamps=[1, 2], features={"a": [1, 2]})
+
+        # All features
         output_node = cast(input_data.node(), float)
+        self.assertEqual(output_node.features[0].dtype, DType.FLOAT64)
+
+        # Map type->type
+        output_node = cast(input_data.node(), {int: float})
+        self.assertEqual(output_node.features[0].dtype, DType.FLOAT64)
+
+        # Map feature->type
+        output_node = cast(input_data.node(), {"a": float})
         self.assertEqual(output_node.features[0].dtype, DType.FLOAT64)
 
 

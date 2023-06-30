@@ -39,7 +39,7 @@ class PrefixOperatorTest(absltest.TestCase):
                     "x": [1, 1, 2],
                 }
             ),
-            index_names=["x"],
+            indexes=["x"],
         )
         node = evset.node()
 
@@ -52,7 +52,7 @@ class PrefixOperatorTest(absltest.TestCase):
                     "x": [1, 1, 2],
                 }
             ),
-            index_names=["x"],
+            indexes=["x"],
         )
 
         # Run op

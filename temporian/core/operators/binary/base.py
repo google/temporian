@@ -16,7 +16,7 @@
 
 from abc import abstractmethod
 
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 from temporian.core.data.node import (
     Node,
     create_node_new_features_existing_sampling,
@@ -58,7 +58,7 @@ class BaseBinaryOperator(Operator):
             if feature_1.dtype != feature_2.dtype:
                 raise ValueError(
                     "The operator is applied feature-wise, and "
-                    "corresponding features (with the same index) should have "
+                    "corresponding features should have "
                     "the same dtype. However the dtypes of the "
                     f" {feature_idx}-th features don't match. Left argument ="
                     f" {feature_1}, right argument = {feature_2}."

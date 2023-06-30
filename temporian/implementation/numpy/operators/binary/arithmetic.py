@@ -13,6 +13,7 @@
 # limitations under the License.
 import numpy as np
 
+from temporian.core.data.dtype import DType
 from temporian.core.operators.binary import (
     AddOperator,
     SubtractOperator,
@@ -22,7 +23,7 @@ from temporian.core.operators.binary import (
     ModuloOperator,
     PowerOperator,
 )
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.binary.base import (
     BaseBinaryNumpyImplementation,
@@ -37,7 +38,10 @@ class AddNumpyImplementation(BaseBinaryNumpyImplementation):
         assert isinstance(operator, AddOperator)
 
     def _do_operation(
-        self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
+        self,
+        evset_1_feature: np.ndarray,
+        evset_2_feature: np.ndarray,
+        dtype: DType,
     ) -> np.ndarray:
         return evset_1_feature + evset_2_feature
 
@@ -50,7 +54,10 @@ class SubtractNumpyImplementation(BaseBinaryNumpyImplementation):
         assert isinstance(operator, SubtractOperator)
 
     def _do_operation(
-        self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
+        self,
+        evset_1_feature: np.ndarray,
+        evset_2_feature: np.ndarray,
+        dtype: DType,
     ) -> np.ndarray:
         return evset_1_feature - evset_2_feature
 
@@ -63,7 +70,10 @@ class MultiplyNumpyImplementation(BaseBinaryNumpyImplementation):
         assert isinstance(operator, MultiplyOperator)
 
     def _do_operation(
-        self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
+        self,
+        evset_1_feature: np.ndarray,
+        evset_2_feature: np.ndarray,
+        dtype: DType,
     ) -> np.ndarray:
         return evset_1_feature * evset_2_feature
 
@@ -76,7 +86,10 @@ class DivideNumpyImplementation(BaseBinaryNumpyImplementation):
         assert isinstance(operator, DivideOperator)
 
     def _do_operation(
-        self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
+        self,
+        evset_1_feature: np.ndarray,
+        evset_2_feature: np.ndarray,
+        dtype: DType,
     ) -> np.ndarray:
         if evset_1_feature.dtype in [DType.INT32, DType.INT64]:
             raise ValueError(
@@ -96,7 +109,10 @@ class FloorDivNumpyImplementation(BaseBinaryNumpyImplementation):
         assert isinstance(operator, FloorDivOperator)
 
     def _do_operation(
-        self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
+        self,
+        evset_1_feature: np.ndarray,
+        evset_2_feature: np.ndarray,
+        dtype: DType,
     ) -> np.ndarray:
         return evset_1_feature // evset_2_feature
 
@@ -109,7 +125,10 @@ class ModuloNumpyImplementation(BaseBinaryNumpyImplementation):
         assert isinstance(operator, ModuloOperator)
 
     def _do_operation(
-        self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
+        self,
+        evset_1_feature: np.ndarray,
+        evset_2_feature: np.ndarray,
+        dtype: DType,
     ) -> np.ndarray:
         return evset_1_feature % evset_2_feature
 
@@ -122,7 +141,10 @@ class PowerNumpyImplementation(BaseBinaryNumpyImplementation):
         assert isinstance(operator, PowerOperator)
 
     def _do_operation(
-        self, evset_1_feature: np.ndarray, evset_2_feature: np.ndarray
+        self,
+        evset_1_feature: np.ndarray,
+        evset_2_feature: np.ndarray,
+        dtype: DType,
     ) -> np.ndarray:
         return evset_1_feature**evset_2_feature
 

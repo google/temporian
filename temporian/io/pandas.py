@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Utility for reading an event set from disk."""
+"""Utilities for converting EventSets to pandas DataFrames and viceversa."""
 
 import numpy as np
 
@@ -24,22 +24,21 @@ from temporian.implementation.numpy.data.io import event_set
 # TODO: Rename argument `index_names` to `index_features`.
 def from_pandas(
     df: "pandas.DataFrame",
-    index_names: Optional[List[str]] = None,
-    timestamp_column: str = "timestamp",
+    indexes: Optional[List[str]] = None,
+    timestamps: str = "timestamp",
     name: Optional[str] = None,
     same_sampling_as: Optional[EventSet] = None,
 ) -> EventSet:
-    """Converts a Pandas DataFrame into an EventSet.
+    """Converts a Pandas DataFrame into an [`EventSet`][temporian.EventSet].
 
-    The column `timestamp_column` (default to "timestamp") contains the
-    timestamps. Columns `index_names` (default to `None`, equivalent to `[]`),
-    contains the index. The remaining columns are converted into features.
+    The column `timestamps` (defaults to "timestamp") contains the
+    timestamps. Columns `indexes` (default to `None`, equivalent to `[]`),
+    contains the indexes. The remaining columns are converted into features.
 
     See [`tp.event_set()`][temporian.event_set] for the list of supported
     timestamp and feature types.
 
     Usage example:
-
         ```python
         >>> df = pd.DataFrame(
         ...     data=[
@@ -49,40 +48,40 @@ def from_pandas(
         ...     ],
         ...     columns=["timestamp", "feature_1", "feature_2"],
         ... )
-        >>> evset = tp.from_pandas(df, index_names=["feature_2"])
+        >>> evset = tp.from_pandas(df, indexes=["feature_2"])
 
         ```
 
     Args:
         df: A non indexed Pandas dataframe.
-        index_names: Names of the features to use as index. If empty
-            (default), the data is not indexed. Only integer and string features
-            can be used as index.
-        timestamp_column: Name of the column containing the timestamps. See
+        indexes: Names of the columns to use as indexes. If empty
+            (default), the data is not indexed. Only integer and string columns
+            can be used as indexes.
+        timestamps: Name of the column containing the timestamps. See
             [`tp.event_set()`][temporian.event_set] for the list of supported
             timestamp types.
-        name: Optional name of the event set. Used for debugging, and
+        name: Optional name of the EventSet. Used for debugging, and
             graph serialization.
-        same_sampling_as: If set, the new event set is cheched and tagged as
+        same_sampling_as: If set, the new EventSet is cheched and tagged as
             having the same sampling as `same_sampling_as`. Some operators,
             such as [`tp.filter()`][temporian.filter], require their inputs to
             have the same sampling.
 
     Returns:
-        An event set.
+        An EventSet.
 
     Raises:
-        ValueError: If `index_names` or `timestamp_column` are not in `df`'s
+        ValueError: If `indexes` or `timestamps` are not in `df`'s
             columns.
         ValueError: If a column has an unsupported dtype.
     """
 
-    feature_dict = df.drop(columns=timestamp_column).to_dict("series")
+    feature_dict = df.drop(columns=timestamps).to_dict("series")
 
     return event_set(
-        timestamps=df[timestamp_column].to_numpy(copy=True),
+        timestamps=df[timestamps].to_numpy(copy=True),
         features={k: v.to_numpy(copy=True) for k, v in feature_dict.items()},
-        index_features=index_names,
+        indexes=indexes,
         name=name,
         same_sampling_as=same_sampling_as,
     )
@@ -91,7 +90,37 @@ def from_pandas(
 def to_pandas(
     evset: EventSet,
 ) -> "pandas.DataFrame":
-    """Converts an EventSet to a pandas DataFrame.
+    """Converts an [`EventSet`][temporian.EventSet] to a pandas DataFrame.
+
+    Usage example:
+        ```python
+        >>> from datetime import datetime
+
+        >>> evset = tp.event_set(
+        ...     timestamps=[datetime(2015, 1, 1), datetime(2015, 1, 2)],
+        ...     features={
+        ...         "feature_1": [0.5, 0.6],
+        ...         "my_index": ["red", "red"],
+        ...     },
+        ...     indexes=["my_index"],
+        ... )
+
+        # Indices are not set as dataframe's indices and dates are unix timestamps
+        >>> df = tp.to_pandas(evset)
+        >>> df
+        my_index   feature_1     timestamp
+        0       red        0.5  1.420070e+09
+        1       red        0.6  1.420157e+09
+
+        # Set index/date manually in pandas
+        >>> df["timestamp"] = pd.to_datetime(df["timestamp"], unit='s')
+        >>> df.set_index("my_index")
+                    feature_1  timestamp
+        my_index
+        red         0.5     2015-01-01
+        red         0.6     2015-01-02
+
+        ```
 
     Returns:
         DataFrame created from EventSet.

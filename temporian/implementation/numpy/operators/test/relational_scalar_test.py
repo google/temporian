@@ -16,6 +16,7 @@ import numpy as np
 import pandas as pd
 from absl.testing import absltest
 
+from temporian.implementation.numpy.data.io import event_set
 from temporian.core.operators.scalar import (
     EqualScalarOperator,
     NotEqualScalarOperator,
@@ -33,6 +34,10 @@ from temporian.implementation.numpy.operators.scalar import (
     LessEqualScalarNumpyImplementation,
 )
 from temporian.io.pandas import from_pandas
+from temporian.implementation.numpy.operators.test.test_util import (
+    assertEqualEventSet,
+    testOperatorAndImp,
+)
 
 
 class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
@@ -51,7 +56,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sales"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         self.node = self.evset.node()
@@ -71,7 +76,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sales"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = EqualScalarOperator(
@@ -85,6 +90,44 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
         operator_output = impl.call(input=self.evset)
 
         self.assertEqual(output_evset, operator_output["output"])
+
+    def test_equal_str(self) -> None:
+        timestamps = [1, 2, 3, 4]
+        evset = event_set(
+            timestamps=timestamps,
+            features={"a": ["A", "A", "B", "B"]},
+        )
+        node = evset.node()
+
+        expected_output = event_set(
+            timestamps=timestamps,
+            features={"a": [True, True, False, False]},
+        )
+
+        op = EqualScalarOperator(node, "A")
+        instance = EqualScalarNumpyImplementation(op)
+        testOperatorAndImp(self, op, instance)
+        output = instance.call(input=evset)["output"]
+        assertEqualEventSet(self, output, expected_output)
+
+    def test_notequal_str(self) -> None:
+        timestamps = [1, 2, 3, 4]
+        evset = event_set(
+            timestamps=timestamps,
+            features={"a": ["A", "A", "B", "B"]},
+        )
+        node = evset.node()
+
+        expected_output = event_set(
+            timestamps=timestamps,
+            features={"a": [False, False, True, True]},
+        )
+
+        op = NotEqualScalarOperator(node, "A")
+        instance = NotEqualScalarNumpyImplementation(op)
+        testOperatorAndImp(self, op, instance)
+        output = instance.call(input=evset)["output"]
+        assertEqualEventSet(self, output, expected_output)
 
     def test_equal_nan(self) -> None:
         """Test equal operator against a nan value."""
@@ -101,7 +144,7 @@ class ArithmeticScalarNumpyImplementationTest(absltest.TestCase):
                 ],
                 columns=["store_id", "timestamp", "sales"],
             ),
-            index_names=["store_id"],
+            indexes=["store_id"],
         )
 
         operator = EqualScalarOperator(

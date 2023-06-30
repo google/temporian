@@ -17,7 +17,7 @@
 from typing import Union, Dict, Optional, List, Any, Type
 from temporian.core.data.schema import Schema, FeatureSchema
 
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 from temporian.core import operator_lib
 from temporian.core.data.node import (
     Node,
@@ -212,26 +212,55 @@ def cast(
 
     Features not impacted by cast are kept.
 
-    Examples:
-        Given an input `Node` with features 'A' (`INT64`), 'B'
-        (`INT64`), 'C' (`FLOAT64`) and 'D' (`STRING`):
 
-        1. `cast(input, target=dtype.INT32)`
-           Try to convert all features to `INT32`, or raise `ValueError` if some
-           string value in 'D' is invalid, or any column value is out of range
-           for `INT32`.
+    Usage example:
+        ```python
+        >>> a_evset = tp.event_set(
+        ...     timestamps=[1, 2],
+        ...     features={"A": [0, 2], "B": ['a', 'b'], "C": [5.0, 5.5]},
+        ... )
+        >>> a = a_evset.node()
 
-        2. `cast(input, target={dtype.INT64: dtype.INT32,
-                dtype.STRING: dtype.FLOAT32})`
-            Convert features 'A' and 'B' to `INT32`, 'D' to `FLOAT32`, leave 'C'
-            unchanged.
+        >>> # Cast all input features to the same dtype
+        >>> b = tp.cast(a[["A", "C"]], tp.float32)
+        >>> b.run({a: a_evset})
+        indexes: []
+        features: [('A', float32), ('C', float32)]
+        events:
+            (2 events):
+                timestamps: [1. 2.]
+                'A': [0. 2.]
+                'C': [5.  5.5]
+        ...
 
-        3. `cast(input, target={'A': dtype.FLOAT32, 'B': dtype.INT32})`
-            Convert 'A' to `FLOAT32` and 'B' to `INT32`.
 
-        4. `cast(input, target={'A': dtype.FLOAT32,
-                dtype.FLOAT64: dtype.INT32})`
-            Raises ValueError: don't mix dtype and feature name keys
+        >>> # Cast by feature name
+        >>> b = tp.cast(a, {'A': bool, 'C': int})
+        >>> b.run({a: a_evset})
+        indexes: []
+        features: [('A', bool_), ('B', str_), ('C', int64)]
+        events:
+            (2 events):
+                timestamps: [1. 2.]
+                'A': [False True]
+                'B': ['a' 'b']
+                'C': [5  5]
+        ...
+
+        >>> # Map original_dtype -> target_dtype
+        >>> b = tp.cast(a, {float: int, int: float})
+        >>> b.run({a: a_evset})
+        indexes: []
+        features: [('A', float64), ('B', str_), ('C', int64)]
+        events:
+            (2 events):
+                timestamps: [1. 2.]
+                'A': [0. 2.]
+                'B': ['a' 'b']
+                'C': [5  5]
+        ...
+
+        ```
 
     Args:
         input: Input `Node` object to cast the columns from.
@@ -266,8 +295,12 @@ def cast(
     # Further type verifications are done in the operator
     if isinstance(target, dict):
         keys_are_strs = all(isinstance(v, str) for v in target.keys())
-        keys_are_dtypes = all(isinstance(v, DType) for v in target.keys())
-        values_are_dtypes = all(isinstance(v, DType) for v in target.values())
+        keys_are_dtypes = all(
+            isinstance(v, (DType, type)) for v in target.keys()
+        )
+        values_are_dtypes = all(
+            isinstance(v, (DType, type)) for v in target.values()
+        )
 
         if keys_are_strs and values_are_dtypes:
             feature_name_to_dtype = {

@@ -45,3 +45,11 @@ py_library(
         "//temporian/core/operators:base",
     ],
 )
+
+py_library(
+    name = "serialization",
+    srcs = ["serialization.py"],
+    srcs_version = "PY3",
+    deps = [
+    ],
+)

@@ -28,7 +28,7 @@ class PlotterTest(parameterized.TestCase):
                 "c": ["X", "Y", "X", "X", "Z"],
                 "x": [1, 1, 1, 2, 2],
             },
-            index_features=["x"],
+            indexes=["x"],
         )
 
         _ = plotter.plot(

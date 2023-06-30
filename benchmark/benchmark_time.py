@@ -69,7 +69,7 @@ def _build_toy_dataset(
                 data_prefix + "data_2": data_2,
             }
         ),
-        index_names=["index_1", "index_2"],
+        indexes=["index_1", "index_2"],
     )
 
 
@@ -83,7 +83,7 @@ def benchmark_simple_moving_average(runner):
 
         runner.benchmark(
             f"simple_moving_average:{n:_}",
-            lambda: tp.evaluate(output, input={node: ds}),
+            lambda: tp.run(output, input={node: ds}),
         )
 
 
@@ -97,7 +97,7 @@ def benchmark_select_and_glue(runner):
 
         runner.benchmark(
             f"select_and_glue:{n:_}",
-            lambda: tp.evaluate(output, input={node: ds}),
+            lambda: tp.run(output, input={node: ds}),
         )
 
 
@@ -115,7 +115,7 @@ def benchmark_calendar_day_of_month(runner):
 
         runner.benchmark(
             f"calendar_day_of_month:{n:_}",
-            lambda: tp.evaluate(output, input={node: ds}),
+            lambda: tp.run(output, input={node: ds}),
         )
 
 
@@ -132,7 +132,7 @@ def benchmark_sample(runner):
 
             runner.benchmark(
                 f"sample:e{m:_}_s{n:_}",
-                lambda: tp.evaluate(output, input={node_1: ds_1, node_2: ds_2}),
+                lambda: tp.run(output, input={node_1: ds_1, node_2: ds_2}),
             )
 
 
@@ -145,7 +145,7 @@ def benchmark_propagate(runner):
 
         runner.benchmark(
             f"propagate:{n:_}",
-            lambda: tp.evaluate(output, input={node: ds}),
+            lambda: tp.run(output, input={node: ds}),
         )
 
 
@@ -167,7 +167,7 @@ def benchmark_cast(runner):
 
             runner.benchmark(
                 f"cast({check=}):{n}",
-                lambda: tp.evaluate(output, input={node: ds}),
+                lambda: tp.run(output, input={node: ds}),
             )
 
 
@@ -180,7 +180,7 @@ def benchmark_unique_timestamps(runner):
 
         runner.benchmark(
             f"unique_timestamps:{n}",
-            lambda: tp.evaluate(output, input={node: ds}),
+            lambda: tp.run(output, input={node: ds}),
         )
 
 
@@ -262,7 +262,7 @@ def benchmark_add_index(runner):
                     "feature_6": feature_6,
                 }
             ),
-            index_names=["index_1", "index_2"],
+            indexes=["index_1", "index_2"],
         )
 
         node = evset.node()
@@ -279,7 +279,7 @@ def benchmark_add_index(runner):
             output = tp.add_index(node, index)
             runner.benchmark(
                 f"add_index:s:{number_timestamps:_}:num_idx:{len(index)}",
-                lambda: tp.evaluate(output, input={node: evset}),
+                lambda: tp.run(output, input={node: evset}),
             )
 
 

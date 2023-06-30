@@ -29,7 +29,7 @@ from temporian.implementation.numpy.operators.unary import (
     IsNanOperator,
     NotNanOperator,
 )
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 from temporian.io.pandas import from_pandas
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
@@ -69,7 +69,7 @@ class UnaryNumpyImplementationTest(absltest.TestCase):
                     "boolean_2",
                 ],
             ),
-            index_names=["store_id", "product_id"],
+            indexes=["store_id", "product_id"],
         )
 
         # Expected event set after invert
@@ -94,7 +94,7 @@ class UnaryNumpyImplementationTest(absltest.TestCase):
                     "boolean_2",
                 ],
             ),
-            index_names=["store_id", "product_id"],
+            indexes=["store_id", "product_id"],
         )
 
         self.input_node = input_node(

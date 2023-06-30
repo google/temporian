@@ -37,16 +37,16 @@ def plot_bokeh(
             # Too much plots are displayed already.
             break
 
-        # Note: Don't display the tuple parenthesis is the index contain a
-        # single dimension.
-        title = str(index[0] if len(index) == 1 else index)
-
         # Index of the next color to use in the plot.
         color_idx = 0
 
         for evset in evsets:
             if plot_idx >= num_plots:
                 break
+
+            title = " ".join(
+                [f"{k}={v}" for k, v in zip(evset.schema.index_names(), index)]
+            )
 
             evset_features = evset.schema.feature_names()
             display_features = [f for f in evset_features if f in features]

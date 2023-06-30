@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import doctest
+import tempfile
 from pathlib import Path
 
 from absl.testing import absltest
@@ -31,6 +32,8 @@ class CodeExamplesTest(absltest.TestCase):
     """
 
     def test_code_examples(self):
+        tmp_dir_handle = tempfile.TemporaryDirectory()
+        tmp_dir = Path(tmp_dir_handle.name)
         for path in Path("docs").rglob("*.md"):
             print(f"Testing code examples in {path}")
             try:
@@ -39,7 +42,7 @@ class CodeExamplesTest(absltest.TestCase):
                     str(path),
                     module_relative=False,
                     raise_on_error=True,
-                    globs={"np": np, "pd": pd, "tp": tp},
+                    globs={"np": np, "pd": pd, "tp": tp, "tmp_dir": tmp_dir},
                     # Use ... to match anything and ignore different whitespaces
                     optionflags=doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE,
                     verbose=False,
@@ -47,25 +50,30 @@ class CodeExamplesTest(absltest.TestCase):
 
             # Failure due to mismatch on expected result
             except doctest.DocTestFailure as e:
+                test = e.test
                 ex = e.example
+                lineno = test.lineno + ex.lineno
                 # Re-raise as bazel assertion
                 self.assertEqual(
                     ex.want,
                     e.got,
                     (
-                        f"Docstring example failed on file {path}:{ex.lineno}\n"
-                        f">>> {ex.source}"
+                        f"Docstring example starting at line {lineno} failed on"
+                        f"file {path}\n >>> {ex.source}"
                     ),
                 )
 
             # Failure due to exception raised during code execution
             except doctest.UnexpectedException as e:
+                test = e.test
                 ex = e.example
+                lineno = test.lineno + ex.lineno
                 raise AssertionError(
-                    "Exception running docstring example on file"
-                    f" {path}:{ex.lineno}\n>>> {ex.source}{e.exc_info[0]}:"
-                    f" {e.exc_info[1]}"
+                    "Exception running docstring example starting at line "
+                    f"{lineno} on file {path}\n"
+                    f">>> {ex.source}{e.exc_info[0]}: {e.exc_info[1]}"
                 ) from e
+        tmp_dir_handle.cleanup()
 
 
 if __name__ == "__main__":

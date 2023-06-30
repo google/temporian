@@ -1,111 +1,58 @@
 """
 Generate the code reference pages.
 
-Source: https://mkdocstrings.github.io/recipes/
+This script traverses the markdown files under docs/src/reference and for each:
+- If the file is not empty it will appear in the docs as-is (after mkdocstrings
+    has filled in any identifiers inside it).
+- If the file is empty, it is interpreted as a placeholder for the top-level
+    symbol with its same name and its reference page is generated in its same
+    path. E.g., if an empty docs/src/reference/temporian/io/to_csv.md file
+    exists, the reference page for `temporian.to_csv` will be generated under
+    reference/temporian/io/to_csv/ in the docs.
+
+Related: https://mkdocstrings.github.io/recipes/
 """
 
 from pathlib import Path
-from typing import Set, Tuple
 
 import mkdocs_gen_files
 
 nav = mkdocs_gen_files.Nav()
 
-SRC_PATH = Path("temporian")
+REFERENCE = Path("docs/src/reference")
 
-# Stores symbol and path of each public API member
-members: Set[Tuple[str, Path]] = set()
+# Sort files by depth and name for alphabetical order and subdirs at the bottom
+paths = sorted(
+    REFERENCE.rglob("*.md"), key=lambda p: str(len(p.parts)) + str(p)
+)
 
-non_parsable_imports = []
+non_empty_files = []
 
-# We need to be able to parse other files to allow wildcard imports
-# Storing pair of (prefix, path) to parse in a stack
-files_to_parse = [(None, SRC_PATH / "__init__.py")]
+for path in paths:
+    path = Path(path)
+    ref_path = path.relative_to(REFERENCE)
+    nav_path = ref_path.with_suffix("")
+    full_ref_path = "reference" / ref_path
 
-while files_to_parse:
-    prefix, file = files_to_parse.pop()
+    nav[list(nav_path.parts)] = ref_path.as_posix()
 
-    with open(file, "r", encoding="utf8") as f:
-        lines = f.read().splitlines()
+    # If file is empty we assume it's a top-level symbol and auto
+    # generate the mkdocstring identifier for it
+    if path.stat().st_size == 0:
+        with mkdocs_gen_files.open(full_ref_path, "w") as fd:
+            ident = "temporian." + nav_path.name
+            fd.write(f"::: {ident}")
 
-    for line in lines:
-        words = line.split(" ")
+    else:
+        non_empty_files.append(str(ref_path))
 
-        # It is an import statement
-        if words[0] == "from":
-            # Remove trailing "as <name>" if it exists and save symbol's name
-            symbol = None
-            if words[-2] == "as":
-                # If symbol was renamed to a private name, skip it
-                if words[-1].startswith("_"):
-                    continue
-
-                symbol = words[-1]
-                words = words[:-2]
-
-            # `words` is now in the form "from module.submodule import symbol"
-            if words[-2] == "import":
-                name = words[-1]
-
-                # We only allow wildcard imports from modules explicitly named
-                # api_symbols to prevent unwanted names in the public API
-                if name == "*":
-                    module_path = Path(words[1].replace(".", "/")).with_suffix(
-                        ".py"
-                    )
-                    if module_path.stem == "api_symbols":
-                        new_prefix = (
-                            (prefix + ".") if prefix else ""
-                        ) + module_path.parent.name
-                        files_to_parse.append((new_prefix, module_path))
-                        continue
-
-                    non_parsable_imports.append(line)
-                    continue
-
-                # If symbol wasn't renamed, use its imported name
-                if symbol is None:
-                    symbol = name
-
-                path = Path(words[1].replace(".", "/")) / name
-
-                if prefix:
-                    symbol = prefix + "." + symbol
-
-                members.add((symbol, path))
-
-            # It is a multi-symbol import statement, error will be raised below
-            else:
-                non_parsable_imports.append(line)
-
-if non_parsable_imports:
-    raise RuntimeError(
-        "`gen_ref_pages` failed to parse the following import statements in"
-        f" the top-level __init__.py file: {non_parsable_imports}. Import"
-        " statements in the top-level module must import a single symbol each,"
-        " in the form `from <module> import <symbol>`, `from <module> import"
-        " <symbol> as <name>`, or `from <module> import *`."
-    )
-
-nav["temporian"] = "index.md"
-
-for symbol, path in sorted(members):
-    symbol_path = Path(symbol.replace(".", "/"))
-    symbol_name = symbol_path.name
-    src_path = SRC_PATH / symbol_name
-
-    doc_path = SRC_PATH / symbol_path
-    parts = list(doc_path.parts)
-    doc_path = doc_path.with_suffix(".md")
-    full_doc_path = Path("reference", doc_path)
-
-    nav[parts] = doc_path.as_posix()
-
-    with mkdocs_gen_files.open(full_doc_path, "w") as fd:
-        identifier = ".".join(list(src_path.parts))
-        print("::: " + identifier, file=fd)
-
-    mkdocs_gen_files.set_edit_path(full_doc_path, path)
+print(
+    (
+        "These md files in docs/src/reference are not empty and will be"
+        " rendered my mkdocs as-is:"
+    ),
+    non_empty_files,
+)
 
 with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
     nav_file.writelines(nav.build_literate_nav())

@@ -52,21 +52,25 @@ operator_lib.register_operator(UniqueTimestamps)
 
 
 def unique_timestamps(input: Node) -> Node:
-    """Removes duplicated timestamps.
+    """Removes events with duplicated timestamps from a Node.
 
     Returns a feature-less node where each timestamps from `input` only appears
     once. If the input is indexed, the unique operation is applied independently
     for each index.
 
-    Example:
+    Usage example:
+        ```python
+        >>> a_evset = tp.event_set(timestamps=[5, 9, 9, 16], features={'f': [1,2,3,4]})
+        >>> a = a_evset.node()
 
-        Inputs:
-            input:
-                feature_1: ['a', 'b', 'c', 'd']
-                timestamps: [1, 2, 2, 4]
-
-        Output:
-            timestamps: [1, 2, 4]
+        >>> result = tp.unique_timestamps(a)
+        >>> result.run({a: a_evset})
+        indexes: []
+        features: []
+        events:
+             (3 events):
+                timestamps: [ 5. 9. 16.]
+        ...
 
     Args:
         input: Node, possibly with features, to process.

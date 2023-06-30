@@ -74,6 +74,7 @@ disable = [
     "missing-function-docstring",
     "fixme",
     "invalid-name",
+    "no-name-in-module",
 ]
 
 [tool.pyright]

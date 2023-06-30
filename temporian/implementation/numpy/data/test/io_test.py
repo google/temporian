@@ -10,7 +10,7 @@ from datetime import datetime
 from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.core.data.schema import Schema
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 
 
 class IOTest(absltest.TestCase):
@@ -26,7 +26,7 @@ class IOTest(absltest.TestCase):
                 "feature_5": pd.Series(["d", "e", math.nan, "f"]),
                 "feature_6": pd.Series([1, 2, 3, 4]),
             },
-            index_features=["feature_2"],
+            indexes=["feature_2"],
         )
 
         expected_schema = Schema(

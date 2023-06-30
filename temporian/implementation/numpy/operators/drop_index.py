@@ -31,13 +31,13 @@ class DropIndexNumpyImplementation(OperatorImplementation):
         final_index_idxs = [
             idx
             for idx, f_name in enumerate(src_index_names)
-            if f_name not in self.operator.index_to_drop
+            if f_name not in self.operator.indexes
         ]
         # Idx in src_index_names of the indexes to remove in the output.
         final_nonindex_idxs = [
             idx
             for idx, f_name in enumerate(src_index_names)
-            if f_name in self.operator.index_to_drop
+            if f_name in self.operator.indexes
         ]
         # Non-aggregated (i.e., in separate containers) event data indexed by
         # the destination index.
@@ -51,9 +51,9 @@ class DropIndexNumpyImplementation(OperatorImplementation):
                 # Convert the dropped indexes into features
                 num_timestamps = len(src_index_data.timestamps)
                 for idx in final_nonindex_idxs:
-                    index_value = src_index_key[idx]
+                    index_key = src_index_key[idx]
                     new_feature_data = np.full(
-                        shape=num_timestamps, fill_value=index_value
+                        shape=num_timestamps, fill_value=index_key
                     )
                     new_features_data.append(new_feature_data)
 
