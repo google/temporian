@@ -24,14 +24,13 @@ from temporian.core.operators.timestamps import Timestamps
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
-class TimestampsNumpyImplementation(OperatorImplementation):
 
+class TimestampsNumpyImplementation(OperatorImplementation):
     def __init__(self, operator: Timestamps) -> None:
         assert isinstance(operator, Timestamps)
         super().__init__(operator)
 
-    def __call__(
-        self, input: EventSet) -> Dict[str, EventSet]:
+    def __call__(self, input: EventSet) -> Dict[str, EventSet]:
         assert isinstance(self.operator, Timestamps)
 
         output_schema = self.output_schema("output")
@@ -42,8 +41,8 @@ class TimestampsNumpyImplementation(OperatorImplementation):
         # Fill output EventSet's data
         for index_key, index_data in input.data.items():
             output_evset[index_key] = IndexData(
-                [],
-                np.array([1], dtype=np.float64),
+                [index_data.timestamps],
+                index_data.timestamps,
                 schema=output_schema,
             )
 
