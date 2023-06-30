@@ -47,6 +47,7 @@ Check the index on the left for a more detailed description of any symbol.
 | [`tp.end()`][temporian.end]                             | Generates a single timestamp at the end of the input.                                       |
 | [`tp.filter()`][temporian.filter]                       | Filters out events in a [`Node`][temporian.Node] for which a condition is false.            |
 | [`tp.glue()`][temporian.glue]                           | Concatenates [`Nodes`][temporian.Node] with the same sampling.                              |
+| [`tp.join()`][temporian.join]                           | Join [`Nodes`][temporian.Node] with different samplings but the same index together.        |
 | [`tp.lag()`][temporian.lag]                             | Adds a delay to a [`Node`][temporian.Node]'s timestamps.                                    |
 | [`tp.leak()`][temporian.leak]                           | Subtracts a duration from a [`Node`][temporian.Node]'s timestamps.                          |
 | [`tp.prefix()`][temporian.prefix]                       | Adds a prefix to the names of the features in a [`Node`][temporian.Node].                   |
