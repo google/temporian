@@ -74,6 +74,9 @@ from temporian.io.pandas import from_pandas
 # Plotting
 from temporian.implementation.numpy.data.plotter import plot
 
+# Compilation
+from temporian.core.compilation import compile
+
 
 # --- OPERATORS ---
 

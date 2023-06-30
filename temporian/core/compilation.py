@@ -18,7 +18,7 @@ from temporian.core.data.node import Node
 from temporian.implementation.numpy.data.event_set import EventSet
 
 
-def operator(fn):
+def compile(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
         is_eager = None
@@ -42,7 +42,7 @@ def operator(fn):
         output = fn(*args, **kwargs)
 
         if is_eager:
-            evset = output.evaluate(inputs)
+            evset = output.run(inputs)
             # Prevent .node() from creating a new sampling when called
             evset._internal_node = output  # pylint: disable=protected-access
             return evset

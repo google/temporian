@@ -98,3 +98,14 @@ py_test(
         "//temporian",
     ],
 )
+
+py_test(
+    name = "compilation_test",
+    srcs = ["compilation_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/core:operator_lib",
+        "//temporian",
+    ],
+)

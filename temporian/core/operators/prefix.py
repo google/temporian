@@ -19,7 +19,7 @@ from temporian.core.data.node import (
     Node,
     create_node_new_features_existing_sampling,
 )
-from temporian.core.decorators import operator
+from temporian.core.compilation import compile
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -72,7 +72,7 @@ class Prefix(Operator):
 operator_lib.register_operator(Prefix)
 
 
-@operator
+@compile
 def prefix(
     prefix: str,
     input: Node,

@@ -21,7 +21,7 @@ from temporian.core.data.dtype import DType
 from temporian.core.data.duration_utils import Duration, normalize_duration
 from temporian.core.data.node import Node
 from temporian.core.data.schema import FeatureSchema
-from temporian.core.decorators import operator
+from temporian.core.compilation import compile
 from temporian.core.operators.window.base import BaseWindowOperator
 
 
@@ -43,7 +43,7 @@ class SimpleMovingAverageOperator(BaseWindowOperator):
 operator_lib.register_operator(SimpleMovingAverageOperator)
 
 
-@operator
+@compile
 def simple_moving_average(
     input: Node,
     window_length: Duration,
