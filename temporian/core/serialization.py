@@ -14,16 +14,22 @@
 
 """Serialization/unserialization of a graph and its components."""
 
-from typing import Set, Any, Dict, Tuple, Optional, Mapping, Union
+from typing import Callable, Set, Any, Dict, Tuple, Optional, Mapping, Union
 
 from google.protobuf import text_format
 
 from temporian.core import operator_lib
 from temporian.core import graph
-from temporian.core.data.node import Node, Sampling, Feature
+from temporian.core.data.node import (
+    Node,
+    Sampling,
+    Feature,
+    create_node_with_new_reference,
+)
 from temporian.core.data.schema import Schema
 from temporian.core.operators import base
 from temporian.core.data.dtype import DType
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.proto import core_pb2 as pb
 
 DTYPE_MAPPING = {
@@ -38,11 +44,40 @@ INV_DTYPE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
 
 
 def save(
+    fn: Callable[[EventSet], EventSet],
+    schema: Schema,
+    path: str,
+) -> None:
+    """Saves a Temporian compiled function to a file.
+
+    The function must receive a single EventSet as input, and return a single
+    EventSet as output.
+
+    Args:
+        fn: The function to save.
+        schema: The expected Schema of the input EventSet to the function.
+        path: The path to save the function to.
+
+    Raises:
+        ValueError: If the received function is not compiled.
+    """
+    if not fn.is_tp_compiled:
+        raise ValueError(
+            "Can only save a function that has been compiled with"
+            " `@tp.compile`."
+        )
+    input = create_node_with_new_reference(schema=schema)
+    output = fn(input)
+    save_graph(inputs={"input": input}, outputs={"output": output}, path=path)
+
+
+def save_graph(
     inputs: Optional[graph.NamedNodes],
     outputs: graph.NamedNodes,
     path: str,
 ) -> None:
-    """Saves the graph between `inputs` and `outputs` to a file.
+    """Saves the graph between `inputs` and `outputs` [`Nodes`][temporian.Node]
+    to a file.
 
     Usage example:
         ```python
@@ -69,9 +104,10 @@ def save(
 
         >>> # Save the graph
         >>> file_path = tmp_dir / "graph.tem"
-        >>> tp.save(inputs={"input_node": a},
+        >>> tp.save_graph(
+        ...     inputs={"input_node": a},
         ...     outputs={"output_node": b},
-        ...     path=file_path
+        ...     path=file_path,
         ... )
 
         >>> # Load the graph
@@ -110,9 +146,10 @@ def save(
 def load(
     path: str, squeeze: bool = False
 ) -> Tuple[Union[Node, Dict[str, Node]], Union[Node, Dict[str, Node]]]:
-    """Loads a graph from a file.
+    """Loads a Temporian graph from a file.
 
-    See [`tp.save()`][temporian.save] for usage examples.
+    See [`tp.save()`][temporian.save] and
+    [`tp.save_graph()`][temporian.save_graph] for usage examples.
 
     Args:
         path: File path to load from.

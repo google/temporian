@@ -992,7 +992,7 @@ Converting [`EventSet`][temporian.EventSet] data to and from pandas DataFrames i
 
 ## Serialization and deserialization of a graph
 
-Temporian graphs can be exported and imported to a safe-to-share file with [`tp.save()`][temporian.save] and [`tp.load()`][temporian.load]. In both functions input and output [`Nodes`][temporian.Node] need to be named, or be assigned a name by passing them as a dictionary.
+Temporian graphs can be exported and imported to a safe-to-share file with [`tp.save_graph()`][temporian.save_graph] and [`tp.load()`][temporian.load]. In both functions input and output [`Nodes`][temporian.Node] need to be named, or be assigned a name by passing them as a dictionary.
 
 ```python
 # Define a graph.
@@ -1004,12 +1004,12 @@ a = evset.node()
 b = tp.moving_count(a, 1)
 
 # Save the graph.
-tp.save(inputs={"input_a": a}, outputs={"output_b": b}, path="/tmp/my_graph.tem")
+tp.save_graph(inputs={"input_a": a}, outputs={"output_b": b}, path="/tmp/my_graph.tem")
 
 # Equivalent.
 a.name = "input_a"
 b.name = "output_b"
-tp.save(inputs=a, outputs=[b], path="/tmp/my_graph.tem")
+tp.save_graph(inputs=a, outputs=[b], path="/tmp/my_graph.tem")
 
 # Load the graph.
 loaded_inputs, loaded_outputs = tp.load(path="/tmp/my_graph.tem")

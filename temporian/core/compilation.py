@@ -49,6 +49,8 @@ def compile(fn):
 
         return output
 
+    wrapper.is_tp_compiled = True
+
     return wrapper
 
 

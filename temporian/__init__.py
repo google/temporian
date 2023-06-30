@@ -61,6 +61,7 @@ from temporian.implementation.numpy.data.io import event_set
 # Serialization
 from temporian.core.serialization import load
 from temporian.core.serialization import save
+from temporian.core.serialization import save_graph
 
 # Graph execution
 from temporian.core.evaluation import run

@@ -117,7 +117,7 @@ class TFPTest(absltest.TestCase):
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_graph.tem")
-            tp.save(inputs={"a": a}, outputs={"b": b}, path=path)
+            tp.save_graph(inputs={"a": a}, outputs={"b": b}, path=path)
 
             inputs, outputs = tp.load(path=path)
 
@@ -133,7 +133,7 @@ class TFPTest(absltest.TestCase):
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_graph.tem")
-            tp.save(
+            tp.save_graph(
                 inputs=a,
                 outputs=b,
                 path=path,
@@ -154,7 +154,7 @@ class TFPTest(absltest.TestCase):
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_graph.tem")
-            tp.save(
+            tp.save_graph(
                 inputs=a,
                 outputs=b,
                 path=path,
@@ -175,7 +175,7 @@ class TFPTest(absltest.TestCase):
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_graph.tem")
-            tp.save(inputs=None, outputs=b, path=path)
+            tp.save_graph(inputs=None, outputs=b, path=path)
 
             i, o = tp.load(path=path, squeeze=True)
 

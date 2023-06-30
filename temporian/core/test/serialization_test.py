@@ -21,6 +21,7 @@ from temporian.core import serialization
 from temporian.core import graph
 from temporian.core.data.dtype import DType
 from temporian.core.test import utils
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.io import event_set
 
 
@@ -176,7 +177,7 @@ class SerializeTest(absltest.TestCase):
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_graph.tem")
-            tp.save(
+            tp.save_graph(
                 inputs={"a": input_node}, outputs={"b": output_node}, path=path
             )
             loaded_inputs, loaded_outputs = tp.load(path=path, squeeze=True)
@@ -185,6 +186,26 @@ class SerializeTest(absltest.TestCase):
         print("loaded_results:", loaded_results)
 
         self.assertEqual(result, loaded_results)
+
+    def test_save_function(self):
+        @tp.compile
+        def f(x: EventSet):
+            return tp.prefix("a_", x)
+
+        evset = tp.event_set(
+            timestamps=[1.0, 2.0, 3.0],
+            features={"costs": [100.0, 200.0, 300.0]},
+        )
+        result = f(evset)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_graph.tem")
+            tp.save(f, schema=evset.schema, path=path)
+            input, output = tp.load(path=path, squeeze=True)
+
+        loaded_result = tp.run(output, {input: evset})
+
+        self.assertEqual(result, loaded_result)
 
 
 if __name__ == "__main__":
