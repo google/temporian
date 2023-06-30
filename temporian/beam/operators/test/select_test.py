@@ -33,7 +33,7 @@ class SelectTest(absltest.TestCase):
                 "d": [100, 101, 102, 103, 104, 105, 106, 106, 107, 108],
                 "e": [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10],
             },
-            index_features=index_features,
+            indexes=index_features,
         )
 
     def test_one(self):

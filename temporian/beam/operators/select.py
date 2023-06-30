@@ -22,11 +22,11 @@ from temporian.core.operators.select import (
 )
 from temporian.beam import implementation_lib
 from temporian.beam.operators.base import BeamOperatorImplementation
-from temporian.beam.io import BeamEventSet, PColBeamEventSet
+from temporian.beam.io import IndexValue, PEventSet
 
 
 class SelectBeamImplementation(BeamOperatorImplementation):
-    def call(self, input: PColBeamEventSet) -> Dict[str, PColBeamEventSet]:
+    def call(self, input: PEventSet) -> Dict[str, PEventSet]:
         assert isinstance(self.operator, CurrentOperator)
 
         # Index of the features to keep.
@@ -50,7 +50,7 @@ implementation_lib.register_operator_implementation(
 )
 
 
-def _run_item(pipe: BeamEventSet, feature_idxs: Set[int]):
+def _run_item(pipe: IndexValue, feature_idxs: Set[int]):
     indexes, (timestamps, input_values) = pipe
     if indexes[-1] in feature_idxs:
         yield indexes, (timestamps, input_values)

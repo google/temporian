@@ -13,7 +13,7 @@ py_test(
     deps=[
         "//temporian/beam:io",
         "//temporian/core/data:node",
-        "//temporian/core/data/dtypes:dtype",
+        "//temporian/core/data:dtype",
         "//temporian/implementation/numpy/data:io",
         "//temporian/io:csv",
     ],

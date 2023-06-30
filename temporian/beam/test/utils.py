@@ -77,10 +77,10 @@ def check_beam_implementation(
         )
 
     beam_output = from_csv(
-        output_path, index_names=output_node.schema.index_names()
+        output_path, indexes=output_node.schema.index_names()
     )
 
     # Run the Temporian program using the numpy backend
-    expected_output = output_node.evaluate(input_data)
+    expected_output = output_node.run(input_data)
 
     assertEqualEventSet(self, beam_output, expected_output)

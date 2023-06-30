@@ -73,7 +73,7 @@ class IOTest(absltest.TestCase):
                 "d": [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10],
                 "e": [1, 1, 1, 2, 2, 1, 1, 1, 1, 1],
             },
-            index_features=["b", "e"],
+            indexes=["b", "e"],
         )
         to_csv(input_data, path=input_path)
 

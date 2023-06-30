@@ -20,16 +20,14 @@ from typing import Dict, List
 import apache_beam as beam
 
 from temporian.core.data.node import Node
-from temporian.beam.io import BeamEventSet
+from temporian.beam.io import PEventSet
 from temporian.core.evaluation import build_schedule
 from temporian.beam import implementation_lib
 from temporian.beam import operators as _  # Implementations
 
 
 @beam.ptransform_fn
-def run(
-    pipe: beam.PCollection[BeamEventSet], input: Node, output: Node
-) -> beam.PCollection[BeamEventSet]:
+def run(pipe: PEventSet, input: Node, output: Node) -> PEventSet:
     """Runs a single-input, single-output Temporian graph in Beam.
 
     Usage example:
@@ -72,8 +70,8 @@ def run(
 
 
 def run_multi_io(
-    inputs: Dict[Node, beam.PCollection[BeamEventSet]], outputs: List[Node]
-) -> Dict[Node, beam.PCollection[BeamEventSet]]:
+    inputs: Dict[Node, PEventSet], outputs: List[Node]
+) -> Dict[Node, PEventSet]:
     """Runs a multi-input, multi-output Temporian graph in Beam.
 
     Usage example:
@@ -111,16 +109,13 @@ def run_multi_io(
     If you graph contains a single input and output node, use `run` instead.
 
     Args:
-        pipe: A Beam PCollection containing the input event set. Use
-            `tpb.read_csv` to read data from csv files, or use
-            `tpb.to_event_set` to import an event set from a dictionary of
-            key/values such as the output of Beam IO connectors
-            (https://beam.apache.org/documentation/io/connectors/).
-        input: Input node of a Temporian graph.
-        output: Output node of a Temporian graph.
+        inputs: Node indexed dictionary of input Beam event-sets for all the
+            inputs of the Temporian graph.
+        outputs: List of output nodes to compute.
 
     Returns:
-        A Beam PCollection containing the output event set.
+        A output node indexed dictionary of output beam event-sets. Each item
+        in `outputs` becomes one item in the returned dictionary.
     """
 
     schedule = build_schedule(

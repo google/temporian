@@ -19,7 +19,7 @@ py_library(
     srcs_version="PY3",
     deps=[
         "//temporian/core/data:node",
-        "//temporian/core/data/dtypes:dtype",
+        "//temporian/core/data:dtype",
     ],
 )
 

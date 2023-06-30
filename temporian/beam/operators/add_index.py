@@ -25,32 +25,49 @@ from temporian.core.operators.add_index import (
 from temporian.beam import implementation_lib
 from temporian.beam.operators.base import BeamOperatorImplementation
 from temporian.beam.io import (
-    BeamEventSet,
-    PColBeamEventSet,
-    BeamIndexAndFeature,
+    IndexValue,
+    PEventSet,
+    BeamIndexOrFeature,
 )
 
 ExtractedIndex = Tuple[
-    Tuple[BeamIndexAndFeature, ...], Tuple[int, Optional[np.ndarray]]
+    Tuple[BeamIndexOrFeature, ...], Tuple[int, Optional[np.ndarray]]
 ]
 
 
 class AddIndexBeamImplementation(BeamOperatorImplementation):
-    def call(self, input: PColBeamEventSet) -> Dict[str, PColBeamEventSet]:
+    def call(self, input: PEventSet) -> Dict[str, PEventSet]:
+        """AddIndex implementation.
+
+        Example:
+            pipe
+                # Two features, one index
+                (20, 0), ( (100, 101), (11, 13))
+                (20, 1), ( (100, 101), (12, 14))
+
+            # Adding feature #0 to the index
+            indexes: [0]
+
+            new_index_idxs: [0]
+            kept_feature_idxs: [1]
+
+            Output
+                (20, 0, 11), ( (100,), (12))
+                (20, 0, 13), ( (101,), (14))
+        """
         assert isinstance(self.operator, CurrentOperator)
 
         # Idx of input features added to index.
         src_feature_names = self.operator.inputs["input"].schema.feature_names()
         new_index_idxs = [
-            src_feature_names.index(f_name)
-            for f_name in self.operator.index_to_add
+            src_feature_names.index(f_name) for f_name in self.operator.indexes
         ]
 
         # Idx of input features not added to index.
         kept_feature_idxs = [
             idx
             for idx, f_name in enumerate(src_feature_names)
-            if f_name not in self.operator.index_to_add
+            if f_name not in self.operator.indexes
         ]
 
         # Broadcast the data of each new index to each remaining feature.
@@ -80,14 +97,19 @@ implementation_lib.register_operator_implementation(
 
 
 def _broadcast_index_to_feature(
-    pipe: BeamEventSet, new_index_idxs: List[int], kept_feature_idxs: List[int]
+    pipe: IndexValue, new_index_idxs: List[int], kept_feature_idxs: List[int]
 ) -> ExtractedIndex:
-    """Map the values of each new index to all remaining features.
+    """Broadcast of each index-converted-feature to all other features.
 
-    The output is:
-    existing index + (remaining_feature,), (local_new_index, index_values)
+    Input
+        index + feature_index, (timestamps, feature_values)
+    Output
+        index + other_feature_index, (local_feature_index, feature_values)
 
-    Where  "local_new_index" is the idx of the index in "new_index_idxs".
+    Note
+        feature_index is a feature converted into a index.
+        local_feature_index is the index idx (if the schema) of the newly added
+            index (previously a feature).
     """
 
     indexes, (_, input_values) = pipe
@@ -104,11 +126,11 @@ def _broadcast_index_to_feature(
 
 def _add_index(
     items: Tuple[
-        Tuple[BeamIndexAndFeature, ...],
-        Tuple[Iterable[BeamEventSet], Iterable[ExtractedIndex]],
+        Tuple[BeamIndexOrFeature, ...],
+        Tuple[Iterable[IndexValue], Iterable[ExtractedIndex]],
     ]
-) -> BeamEventSet:
-    """Adds the new index data to a remaining feature."""
+) -> IndexValue:
+    """Adds the new index values to all remaining feature items."""
 
     indexes_and_feature_idx, (features, new_index) = items
     indexes = indexes_and_feature_idx[:-1]
@@ -121,11 +143,17 @@ def _add_index(
         return
     sorted(new_index, key=lambda x: x[0])
 
-    # Extract the existing features
+    # Extract the existing timestamps and feature values
     features = list(features)
     assert len(features) == 1
     timestamps, values = features[0]
 
+    # The objective is now to combine the new index and the timestamp/feature
+    # values. Note that different index items will be emitted as different items
+    # in PEventSet.
+
+    # Compute the example idxs for each unique index value.
+    #
     # Note: This solution is very slow. This is the same used in the in-process
     # implementation.
     new_index_to_value_idxs = defaultdict(list)
@@ -137,5 +165,5 @@ def _add_index(
         # Note: The new index is added after the existing index items.
         dst_indexes = indexes + new_index + (feature_idx,)
         assert isinstance(dst_indexes, tuple)
-
+        # This is the "PEventSet" format.
         yield dst_indexes, (timestamps[example_idxs], values[example_idxs])

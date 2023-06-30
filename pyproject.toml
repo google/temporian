@@ -62,6 +62,8 @@ apache-beam = "^2.48.0"
 pillow = "^9.5.0"
 cairosvg = "^2.7.0"
 
+# TODO: create a new dependency group called beam so that we can do pip install temporian[beam].
+
 [tool.black]
 line-length = 80
 preview = true

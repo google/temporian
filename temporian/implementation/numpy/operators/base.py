@@ -43,7 +43,7 @@ class OperatorImplementation(ABC):
         src_timestamps: np.ndarray,
         src_feature: np.ndarray,
     ) -> np.ndarray:
-        """If implemented, the op can be executed feature wise."""
+        """Executes the op on a single feature. Optionally implemented."""
 
         raise NotImplementedError()
 

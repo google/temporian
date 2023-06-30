@@ -18,6 +18,9 @@ from typing import Any, Dict
 
 _OPERATOR_IMPLEMENTATIONS = {}
 
+# TODO: Create a "registration" module to handle in-process and beam operator
+# registration.
+
 
 def register_operator_implementation(
     operator_class, operator_implementation_class

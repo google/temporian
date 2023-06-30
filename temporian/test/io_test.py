@@ -60,7 +60,6 @@ class IOTest(absltest.TestCase):
 
             saved_evset = tp.from_csv(
                 path=path,
-                timestamps="timestamp",
                 indexes=["product_id"],
             )
 

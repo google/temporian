@@ -37,7 +37,7 @@ Consider the following dataset.
 
 ```shell
 $ head sales.csv
-timestamps,store,price,count
+timestamp,store,price,count
 2022-01-01 00:00:00+00:00,CA,27.42,61.9
 2022-01-01 00:00:00+00:00,TX,98.55,18.02
 2022-01-02 00:00:00+00:00,CA,32.74,14.93
@@ -50,7 +50,7 @@ We compute the weekly sales per store as follows.
 ```python
 import temporian as tp
 
-input_data = tp.from_csv("sales.csv", timestamps="timestamps")
+input_data = tp.from_csv("sales.csv")
 
 # Define a Temporian program
 input_node = input_data.node()

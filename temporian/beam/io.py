@@ -8,51 +8,63 @@ import numpy as np
 import apache_beam as beam
 from apache_beam.io.fileio import MatchFiles
 from temporian.core.data.node import Schema
-from temporian.core.data.dtypes.dtype import DType
+from temporian.core.data.dtype import DType
 from temporian.implementation.numpy.data.event_set import tp_dtype_to_np_dtype
 
 # Remark: We use tuples instead of dataclasses or named tuples as it seems
 # to be the most efficient solution for beam.
 
-# Type of an index element.
+# All Temporian computation is done on PCollections of IndexValue.
+# A IndexValue contains the timestamps and values of a single feature and is
+# indexed with a Temporian index (if any is used in the computation) AND a
+# feature index.
+#
+# An important implication is that timestamps are effectively repeated for
+# each feature.
+
+# Temporian index in Beam.
 #
 # In the numpy backend, index are represented as numpy primitives. However,
 # Beam does not support numpy primitive as index. Therefore, all index are
 # converted to python primitive of type "BeamIndex".
 BeamIndex = Union[int, float, str, bool]
 
-# Type of an index element OR a feature index (int).
+# Temporian index or Feature index in Beam.
 #
-# The feature index -1 is used to represent the timestamps of event-set without
-# features.
-BeamIndexAndFeature = BeamIndex
+# The different features of an EventSets are handled as different item or a
+# Beam's PCollection. Each such item, is a IndexValue (see later), and is
+# attached to a feature by the index (integer) of this feature in the schema.
+#
+# An EventSets *without* features is represented as a single such item with a
+# feature index of `-1`.
+BeamIndexOrFeature = BeamIndex
 
-# An array of timestamps.
-Timestamps = np.float64
+# A single timestamp value.
+Timestamp = np.float64
 
 # A single event / row during the conversion from dict of key/value to internal
-# the Temporian beam format for event sets. In a StructuredRow, index and
+# the Temporian beam format for EventSets. In a StructuredRow, index and
 # features are indexed by integer instead of string keys.
 #
-# Contains: the index, the timestamps, and the features.
+# Contains: the index, the timestamp, and the features.
 # The indexes and features are ordered according to a Schema.
 # Note the double 2-items tuple (instead of a one 3-items tuple) to facilitate
 # Beam operations.
 StructuredRow = Tuple[
-    Tuple[BeamIndex, ...], Tuple[Timestamps, Tuple[np.generic, ...]]
+    Tuple[BeamIndex, ...], Tuple[Timestamp, Tuple[np.generic, ...]]
 ]
 
-# Unit of data for an event set used by all the operators implementations.
+# Unit of data for an EventSet used by all the operators implementations.
 #
 # Contains: the index+feature_idx, timestamps, and feature values.
-# The feature value can be None for event-set without features.
-BeamEventSet = Tuple[
-    Tuple[BeamIndexAndFeature, ...], Tuple[np.ndarray, Optional[np.ndarray]]
+# The feature value can be None for EventSet without features.
+IndexValue = Tuple[
+    Tuple[BeamIndexOrFeature, ...], Tuple[np.ndarray, Optional[np.ndarray]]
 ]
 
-# From the point of view of the user, a "Beam event set" is a PCollection of
-# BeamEventSet.
-PColBeamEventSet = beam.PCollection[BeamEventSet]
+# From the point of view of the user, a "Beam EventSet" is a PCollection of
+# IndexValue.
+PEventSet = beam.PCollection[IndexValue]
 
 
 def _parse_csv_file(
@@ -107,10 +119,25 @@ def _cast_index_value(value: Any, dtype: DType) -> BeamIndex:
     return _cast_feature_value(value, dtype).item()
 
 
-def _structure_fm(
+def _reindex_by_integer(
     row: Dict[str, str], schema: Schema, timestamp_key: str
 ) -> StructuredRow:
-    """Transforms a dict of key:value to a StructuredRow."""
+    """Transforms a dict of key:value to a StructuredRow.
+
+    In essence, this function replaces the string index feature and index values
+    with a integer index (based on a schema).
+
+    Example:
+        row = {"timestamps": 10, "f1": 11, "f2": 12, "i1": 13}
+        schema: features = [f1, f2], indexes = [i1]
+        timestamp_key: timestamps
+
+        Output
+            (13, ), (10, (11, 12))
+
+    This function is used during the conversion of key:value features feed by
+    the user into PEventSet, the working format used by Temporian.
+    """
 
     index_values = [
         _cast_index_value(row[index.name], index.dtype)
@@ -124,8 +151,27 @@ def _structure_fm(
     return tuple(index_values), (timestamp, tuple(feature_values))
 
 
-class _MergeTimestampsDP(beam.DoFn):
-    """Aggregates StructuredRows into BeamEventSet."""
+class _MergeTimestampsSplitFeatures(beam.DoFn):
+    """Aggregates + split StructuredRows into IndexValue.
+
+    This function aggregates together all the timestamps+values having the same
+    feature+index, and split then by features.
+
+    Example:
+        item
+            (20, ), (100, (11, 12))
+            (20, ), (101, (13, 14))
+            (21, ), (102, (15, 16))
+
+        Output
+            (20, 0), ( (100, 101), (11, 13))
+            (20, 1), ( (100, 101), (12, 14))
+            (21, 0), ( (102,), (15,))
+            (21, 1), ( (102,), (16,))
+
+    This function is used during the conversion of key:value features feed by
+    the user into PEventSet, the working format used by Temporian.
+    """
 
     def __init__(self, num_features: int):
         self._num_features = num_features
@@ -134,9 +180,9 @@ class _MergeTimestampsDP(beam.DoFn):
         self,
         item: Tuple[
             Tuple[BeamIndex, ...],
-            Iterable[Tuple[Timestamps, Tuple[np.generic, ...]]],
+            Iterable[Tuple[Timestamp, Tuple[np.generic, ...]]],
         ],
-    ) -> Iterable[BeamEventSet]:
+    ) -> Iterable[IndexValue]:
         index, feat_and_ts = item
         timestamps = np.array([v[0] for v in feat_and_ts], dtype=np.float64)
         for feature_idx in range(self._num_features):
@@ -149,18 +195,18 @@ def to_event_set(
     pipe: beam.PCollection[Dict[str, Any]],
     schema: Schema,
     timestamp_key: str = "timestamp",
-) -> beam.PCollection[BeamEventSet]:
-    """Converts a PCollection of key:value to a Beam event-set.
+) -> PEventSet:
+    """Converts a PCollection of key:value to a Beam EventSet.
 
     This method is compatible with the output of `read_csv_raw` and the
     Official Beam IO connectors.
 
     When importing data from csv files, use `read_csv` to convert csv files
-    directly into event sets.
+    directly into EventSets.
 
-    Unlike Temporian in-process event set import method (`tp.event_set`), this
-    method (`tpb.to_event_set`) requires for timestamps to be numerical values.
-    TODO: Add support for datetime timestamps.
+    Unlike Temporian in-process EventSet import method (
+    [tp.event_set][temporian.event_set])), this method (`tpb.to_event_set`)
+    requires for timestamps to be numerical values.
 
     Args:
         pipe: Beam pipe of key values.
@@ -169,25 +215,27 @@ def to_event_set(
         timestamp_key: Key containing the timestamps.
 
     Returns:
-        PCollection of Beam event set.
+        PCollection of Beam EventSet.
     """
+
+    # TODO: Add support for datetime timestamps.
 
     return (
         pipe
-        | "Structure" >> beam.Map(_structure_fm, schema, timestamp_key)
+        | "Structure" >> beam.Map(_reindex_by_integer, schema, timestamp_key)
         # Group by index values and feature index
         | "Aggregate" >> beam.GroupByKey()
         # Build feature and timestamps arrays.
         | "Merge timestamps"
-        >> beam.ParDo(_MergeTimestampsDP(len(schema.features)))
+        >> beam.ParDo(_MergeTimestampsSplitFeatures(len(schema.features)))
     )
 
 
 @beam.ptransform_fn
 def read_csv(
     pipe, file_pattern: str, schema: Schema, timestamp_key: str = "timestamp"
-) -> beam.PCollection[BeamEventSet]:
-    """Reads a file or set of csv files into a Beam event set.
+) -> PEventSet:
+    """Reads a file or set of csv files into a Beam EventSet.
 
     Limitation: Timestamps have to be numerical values. See documentation of
     `to_event_set` for more details.
@@ -220,7 +268,7 @@ def read_csv(
 def _convert_to_csv(
     item: Tuple[
         Tuple[BeamIndex, ...],
-        Iterable[BeamEventSet],
+        Iterable[IndexValue],
     ]
 ) -> str:
     index, feature_blocks = item
@@ -246,13 +294,13 @@ def _convert_to_csv(
 
 @beam.ptransform_fn
 def write_csv(
-    pipe: beam.PCollection[BeamEventSet],
+    pipe: PEventSet,
     file_path_prefix: str,
     schema: Schema,
     timestamp_key: str = "timestamp",
     **wargs,
 ):
-    """Writes a Beam event set to a file or set of csv files.
+    """Writes a Beam EventSet to a file or set of csv files.
 
     Limitation: Timestamps are always stored as numerical values.
     TODO: Support datetime timestamps.
@@ -269,7 +317,7 @@ def write_csv(
     ```
 
     Args:
-        pipe: Beam pipe containing an event set.
+        pipe: Beam pipe containing an EventSet.
         file_path_prefix: Path or path matching expression compatible with
             WriteToText.
         schema: Schema of the data. If you have a Temporian node, the schema is
