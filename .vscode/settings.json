@@ -82,5 +82,6 @@
     "queue": "cpp",
     "span": "cpp",
     "algorithm": "cpp"
-  }
+  },
+  "python.analysis.typeCheckingMode": "basic"
 }
