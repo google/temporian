@@ -17,7 +17,7 @@ py_library(
 
 
 # Tests
-#  =  =  =  =  =
+# =========
 
 py_test(
     name = "build_cleaner_test",
