@@ -1,49 +1,67 @@
-"""Clean dependencies in Bazel Python rules.
+"""Find the missing and extra dependencies in Bazel Python build rules.
+
+This program does not modify BUILD files. Instead, it lists the dependencies to
+add and remove.
 
 How to use the build cleaner.
 
-    # Run the following command to get the list of deps to add and remove.
-    # build_cleaner.py does not modify any file..
+    # Run the following command.
     tools/build_cleaner.py
 
-If case of a false positive.
-    - Update "DEP_LESS_IMPORTS" if a build-in Python module is not detected.
-    - Update "THIRD_PARTY_DEPS" if a third party module is not detected.
+If case of a false positive, you might have to update the configuration fields
+BUILD_IN_MODULES, THIRD_PARTY_MODULES, or EXTRA_SOURCE_TO_RULE.
 
 Limitations
-    - The build cleaner assumes that each python source file has a rule with the
-        same name. For Example "a/b/c.py" is available in the rule "//a/b:c".
+    - The build cleaner only infer the dependencies of py_library rules. For
+        other rules (e.g. py proto, cc wrapper), the mapping should be
+        specified manually in EXTRA_SOURCE_TO_RULE.
     - In some cases, import of module and import of symbol cannot be
         differentiated without parsing the python source code. In this case,
         build cleaner does not try to parse the python source code and rely on a
-        permissive heuristic (possible false negative).
+        permissive heuristic (possible false negative). See
+        "list_possible_source_of_import" for details.
 """
 
+from collections import defaultdict
 import ast
 from dataclasses import dataclass
 import re
 import os
-import sys
-from typing import List, Any, Tuple, Optional
+from typing import List, Any, Tuple, Optional, Dict
 
 import colorama
 from colorama import Fore
 
 # Bazel rules to scan for dependencies.
-ALLOWED_BUILD_RULES = {"py_library"}
+ALLOWED_BUILD_RULES = {
+    "py_library",
+    "py_binary",
+}
 
-# Modules that do not require a bazel dependency.
-DEP_LESS_IMPORTS = set(
-    list(sys.modules.keys())
-    + [
-        "datetime",
-        "math",
-        "csv",
-    ]
-)
+# Python modules that do not require checking / dependencies.
+BUILD_IN_MODULES = {
+    "typing",
+    "os",
+    "abc",
+    "datetime",
+    "math",
+    "csv",
+    "argparse",
+    "collections",
+    "enum",
+    "__future__",
+    "sys",
+    "dataclasses",
+    "time",
+    "io",
+    "google.protobuf.text_format",
+}
 
-# Third party modules that need a "# already_there/" rule.
-THIRD_PARTY_DEPS = {
+# Third party modules that need an "# already_there/" rule.
+#
+# While we assume that third party modules are already installed, we need to
+# list then in comments in the rule "deps" section.
+THIRD_PARTY_MODULES = {
     "numpy",
     "pandas",
     "apache_beam",
@@ -51,19 +69,24 @@ THIRD_PARTY_DEPS = {
     "logging",
 }
 
+# Mapping from source file to rule.
+#
+# Use EXTRA_SOURCE_TO_RULE to specify mapping that cannot be detected by
+# the build cleaner (e.g. proto, cc code).
+EXTRA_SOURCE_TO_RULE = {
+    ("temporian/proto/core_pb2.py", "//temporian/proto:core_py_proto"),
+    (
+        "temporian/implementation/numpy_cc/operators/operators_cc.py",
+        "//temporian/implementation/numpy_cc/operators:operators_cc",
+    ),
+}
+
+
 # Rule prefix for third party module dependencies.
 THIRD_PARTY_RULE_PREFIX = "# already_there/"
 
 # Filename of BUILD files.
 BUILD_FILENAME = "BUILD"
-
-# Import for Temporian protos.
-# i.e. import temporian.proto.core_pb2
-PROTO_IMPORT = ("temporian", "proto", "core_pb2")
-
-# The dependency rule for the Temporian protos.
-# i.e. //temporian/proto:core_py_proto
-PROTO_RULE = ("temporian", "proto", "core_py_proto")
 
 
 @dataclass
@@ -83,6 +106,9 @@ class DepsDelta:
     adds: List[Tuple[str, ...]]
     subs: List[Tuple[str, ...]]
     issues: List[str]
+
+
+SourceToRule = Dict[Tuple[str, ...], List[Tuple[str, ...]]]
 
 
 def get_keyword(call: ast.Call, key: str) -> Any:
@@ -165,7 +191,7 @@ def list_build_rules(path: str) -> List[BuildRule]:
     return rules
 
 
-def expand_dep_rule(dep: str, rule_dir: str) -> Tuple[str, ...]:
+def expand_dep(dep: str, rule_dir: str) -> Tuple[str, ...]:
     """Expands completely a bazel dep."""
 
     if dep[0] == ":":
@@ -186,45 +212,33 @@ def expand_dep_rule(dep: str, rule_dir: str) -> Tuple[str, ...]:
     return tuple(items)
 
 
-def list_possible_deps_of_import(
+def list_possible_source_of_import(
     imp_items: Tuple[str, ...]
 ) -> List[Tuple[str, ...]]:
-    """List the possible dependencies of a given import."""
+    """List the possible source file of a given import."""
 
-    assert isinstance(imp_items, tuple)
     assert len(imp_items) >= 1
 
-    # This is a proto.
-    if imp_items == PROTO_IMPORT:
-        return [PROTO_RULE]
-
-    # This is a third party dependency where a single dependency to the library
-    # is necessary.
-    if imp_items[0] in THIRD_PARTY_DEPS:
-        return [(imp_items[0], imp_items[0])]
+    if imp_items[0] in THIRD_PARTY_MODULES:
+        return [(imp_items[0], "__init__.py")]
 
     # Example of situations with import a.b.c (3)
-    deps = []
+    srcs = []
 
-    # 	//a/b:b (3)
-    # 	b is a main package, c is a symbol
+    # a/b.py
     if len(imp_items) >= 2:
-        deps.append(imp_items[:-1] + (imp_items[-2],))
+        srcs.append(imp_items[:-2] + (imp_items[-2] + ".py",))
 
-    # 	//a/b/c:c (4)
-    # 	c is a main package
-    deps.append(imp_items + (imp_items[-1],))
+    # a/b/c.py
+    srcs.append(imp_items[:-1] + (imp_items[-1] + ".py",))
 
-    # 	//a:b (2)
-    # 	b is a non-main package, c is a symbol
-    if len(imp_items) >= 2:
-        deps.append(imp_items[:-1])
+    # a/b/c/__init__.py
+    srcs.append(imp_items + ("__init__.py",))
 
-    # 	//a/b:c (3)
-    # 	c is a non-main package
-    deps.append(imp_items)
+    # a/b/__init__.py
+    srcs.append(imp_items[:-1] + ("__init__.py",))
 
-    return deps
+    return srcs
 
 
 def extract_dirname_from_path(path: str) -> List[str]:
@@ -258,64 +272,86 @@ def find_all_build_files(dir: str) -> List[str]:
     return build_file_dirs
 
 
-def find_all_rules(build_file_dirs: List[str]) -> List[Tuple[str, ...]]:
-    """List all the rules."""
+def find_source_to_rules(build_file_dirs: List[str]) -> SourceToRule:
+    """Mapping from source file to build rules."""
 
-    rules = []
+    source_to_rules = defaultdict(lambda: [])
     for build_file_dir in build_file_dirs:
         rule_base = tuple(extract_dirname_from_path(build_file_dir))
         file_rules = list_build_rules(
             os.path.join(build_file_dir, BUILD_FILENAME)
         )
-        for file_rule in file_rules:
-            rules.append(rule_base + (file_rule.name,))
-    return rules
+        for rule in file_rules:
+            for src in rule.srcs:
+                source_to_rules[rule_base + (src,)].append(
+                    rule_base + (rule.name,)
+                )
+    return source_to_rules
 
 
 def compute_delta(
     deps: List[str],
     imports: List[str],
     rule_dir: str,
-    all_rules: List[Tuple[str, ...]],
+    source_to_rules: SourceToRule,
 ) -> Optional[DepsDelta]:
-    """Computes the operation on the deps to support all the imports."""
+    """Computes the operation on the deps to support all the imports.
+
+    Args:
+        deps: Dependencies of the rule.
+        imports: Imports of the rule.
+        rule_dir: Path of the rule relative to the repo root.
+        source_to_rules: Mapping from all available source files to rules.
+    """
 
     issues = []
     adds = set()
     subs = set()
 
-    expanded_deps = [expand_dep_rule(dep, rule_dir) for dep in deps]
-    used_dependencies = [False] * len(expanded_deps)
+    # The current dependencies of the rule.
+    expanded_deps = set([expand_dep(dep, rule_dir) for dep in deps])
 
-    all_rule_set = set(all_rules)
+    # Dependencies effectively used by this rule.
+    used_deps = set()
+
+    # used_dependencies = [False] * len(expanded_deps)
 
     for imp in imports:
         imp_items = tuple(imp.split("."))
-        if imp_items[0] in DEP_LESS_IMPORTS:
-            continue
-        acceptable_deps = list_possible_deps_of_import(imp_items)
-        possible_deps = list(set(acceptable_deps).intersection(all_rule_set))
 
-        match_dep_idx = -1
-        for dep_idx, dep in enumerate(expanded_deps):
-            if dep in possible_deps:
-                match_dep_idx = dep_idx
+        # This import does not need a build rule.
+        if imp_items[0] in BUILD_IN_MODULES or imp in BUILD_IN_MODULES:
+            continue
+
+        # The source files that might solve this import.
+        possible_srcs = list_possible_source_of_import(imp_items)
+        matching_possible_src = None
+        for possible_src in possible_srcs:
+            if possible_src in source_to_rules:
+                matching_possible_src = possible_src
                 break
 
-        if match_dep_idx == -1:
-            if len(possible_deps) == 0:
-                issues.append(
-                    f'Cannot infer dependency for "{".".join(imp_items)}"'
-                )
-            else:
-                adds.add(possible_deps[0])
-        else:
-            used_dependencies[match_dep_idx] = True
-
-    for dep_idx, is_used in enumerate(used_dependencies):
-        if is_used:
+        if matching_possible_src is None:
+            issues.append(
+                f'Cannot infer dependency for "{imp}". Possible source files:'
+                f" {possible_srcs}."
+            )
             continue
-        subs.add(expanded_deps[dep_idx])
+
+        possible_deps = source_to_rules[matching_possible_src]
+
+        if len(possible_deps) > 1:
+            issues.append(f'Multiple possible rules for "{imp}"')
+
+        if possible_deps[0] not in expanded_deps:
+            adds.add(possible_deps[0])
+        else:
+            used_deps.add(possible_deps[0])
+
+    for dep in expanded_deps:
+        if dep in used_deps:
+            continue
+        subs.add(dep)
 
     if adds or subs or issues:
         return DepsDelta(adds=list(adds), subs=list(subs), issues=issues)
@@ -332,7 +368,7 @@ def to_user_rule(normalized_rule: Tuple[str, ...]) -> str:
     if (
         len(normalized_rule) == 2
         and normalized_rule[0] == normalized_rule[1]
-        and normalized_rule[0] in THIRD_PARTY_DEPS
+        and normalized_rule[0] in THIRD_PARTY_MODULES
     ):
         return THIRD_PARTY_RULE_PREFIX + normalized_rule[0] + ","
 
@@ -349,7 +385,7 @@ def to_user_rule(normalized_rule: Tuple[str, ...]) -> str:
 
 
 def clean_build_rule(
-    rule: BuildRule, rule_dir: str, all_rules: List[Tuple[str, ...]]
+    rule: BuildRule, rule_dir: str, source_to_rules: SourceToRule
 ):
     """Clean a BUILD file."""
 
@@ -358,7 +394,7 @@ def clean_build_rule(
         src_path = os.path.join(rule_dir, src)
         imports.extend(source_imports(src_path))
 
-    return compute_delta(rule.deps, imports, rule_dir, all_rules)
+    return compute_delta(rule.deps, imports, rule_dir, source_to_rules)
 
 
 def clean_repository(dir: str):
@@ -367,11 +403,14 @@ def clean_repository(dir: str):
     print(f"Found {len(build_file_dirs)} build files")
 
     print("List rules")
-    all_rules = find_all_rules(build_file_dirs)
-    for rule in THIRD_PARTY_DEPS:
-        all_rules.append((rule, rule))
-    all_rules.append(PROTO_RULE)
-    print(f"Found {len(all_rules)} rules")
+    source_to_rules = find_source_to_rules(build_file_dirs)
+    for name in THIRD_PARTY_MODULES:
+        source_to_rules[(name, "__init__.py")].append((name, name))
+    for src, rule in EXTRA_SOURCE_TO_RULE:
+        source_to_rules[tuple(extract_dirname_from_path(src))].append(
+            expand_dep(rule, "")
+        )
+    print(f"Found {len(source_to_rules)} source files")
 
     num_adds = 0
     num_subs = 0
@@ -382,7 +421,7 @@ def clean_repository(dir: str):
         rules = list_build_rules(build_file_path)
         in_is_shown = False
         for rule in rules:
-            delta = clean_build_rule(rule, build_file_dir, all_rules)
+            delta = clean_build_rule(rule, build_file_dir, source_to_rules)
             if delta is not None:
                 num_adds += len(delta.adds)
                 num_subs += len(delta.subs)
