@@ -14,6 +14,8 @@
 
 """Tests magic methods on both EventSets and Nodes."""
 
+# pylint: disable=unused-argument
+
 from typing import Union
 from absl.testing import absltest
 from absl.testing.parameterized import parameters

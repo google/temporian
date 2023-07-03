@@ -31,6 +31,10 @@ class EventSetOperationsMixin:
         """Shortcut that returns the class' name."""
         return self.__class__.__name__
 
+    #################
+    # MAGIC METHODS #
+    #################
+
     def __getitem__(self, feature_names: Union[str, List[str]]):
         """Creates an EventSet with a subset of the features."""
 

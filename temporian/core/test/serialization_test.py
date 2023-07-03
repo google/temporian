@@ -199,11 +199,39 @@ class SerializationTest(absltest.TestCase):
         result = f(evset)
 
         with tempfile.TemporaryDirectory() as tempdir:
-            path = os.path.join(tempdir, "my_graph.tem")
-            tp.save(f, schema=evset.schema, path=path)
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(f, inputs={"x": evset}, path=path)
             input, output = tp.load(path=path, squeeze=True)
 
         loaded_result = tp.run(output, {input: evset})
+
+        self.assertEqual(result, loaded_result)
+
+    def test_save_and_load_many_inputs(self):
+        @tp.compile
+        def f(x: EventSet, number: int, y: EventSet):
+            print(number)
+            return tp.glue(x, y)
+
+        x = tp.event_set(
+            timestamps=[1.0, 2.0, 3.0],
+            features={"costs": [100.0, 200.0, 300.0]},
+        )
+        y = tp.event_set(
+            timestamps=[1.0, 2.0, 3.0],
+            features={"sales": [3.0, 5.0, 2.0]},
+            same_sampling_as=x,
+        )
+        result = f(x, 3, y)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(f, inputs={"x": x, "number": 3, "y": y}, path=path)
+            inputs, output = tp.load(path=path, squeeze=True)
+
+        self.assertEqual(list(inputs.keys()), ["x", "y"])
+
+        loaded_result = tp.run(output, {inputs["x"]: x, inputs["y"]: y})
 
         self.assertEqual(result, loaded_result)
 

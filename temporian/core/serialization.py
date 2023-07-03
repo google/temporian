@@ -14,7 +14,16 @@
 
 """Serialization/unserialization of a graph and its components."""
 
-from typing import Callable, Set, Any, Dict, Tuple, Optional, Mapping, Union
+from typing import (
+    Callable,
+    Set,
+    Any,
+    Dict,
+    Tuple,
+    Optional,
+    Mapping,
+    Union,
+)
 
 from google.protobuf import text_format
 
@@ -44,18 +53,24 @@ INV_DTYPE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
 
 
 def save(
-    fn: Callable[[EventSet], EventSet],
-    schema: Schema,
+    fn: Callable,
+    inputs: Dict[str, Any],
     path: str,
 ) -> None:
-    """Saves a Temporian compiled function to a file.
+    """Saves a Temporian-compiled function to a file.
 
-    The function must receive a single EventSet as input, and return a single
-    EventSet as output.
+    Temporian saves the graph built between the function's input and output
+    EventSets or Nodes, not the function itself.
+
+    The function can receive and return other arbitrary parameters, which will
+    be used to trace the function while saving it, but will not be available
+    when loading it back up.
 
     Args:
         fn: The function to save.
-        schema: The expected Schema of the input EventSet to the function.
+        inputs: The inputs to pass to the function to trace it, keyed by
+            parameter name. For EventSet/Node parameters, the passed value can
+            be either an EventSet, a Node, or a raw Schema.
         path: The path to save the function to.
 
     Raises:
@@ -66,9 +81,39 @@ def save(
             "Can only save a function that has been compiled with"
             " `@tp.compile`."
         )
-    input = create_node_with_new_reference(schema=schema)
-    output = fn(input)
-    save_graph(inputs={"input": input}, outputs={"output": output}, path=path)
+
+    if not isinstance(inputs, dict):
+        raise ValueError(
+            "`inputs` must be a dictionary mapping the function's parameter"
+            " names to their corresponding values."
+        )
+
+    node_inputs = {}
+    inputs = inputs.copy()
+    for k, v in inputs.items():
+        node_input = _process_fn_input(v)
+        if node_input is not None:
+            inputs[k] = node_input
+            node_inputs[k] = node_input
+
+    output = fn(**inputs)
+
+    # TODO: allow returning tuple/list of outputs, with output_names param
+    save_graph(inputs=node_inputs, outputs={"output": output}, path=path)
+
+
+def _process_fn_input(input: Any) -> Optional[Node]:
+    # TODO: allow dicts and lists of stuff other than EventSet/Nodes
+    if isinstance(input, (list, dict, tuple)):
+        raise ValueError(
+            "`tp.save` does not support collections in a function's input."
+        )
+    if isinstance(input, Schema):
+        return create_node_with_new_reference(schema=input)
+    if isinstance(input, EventSet):
+        return input.node()
+    if isinstance(input, Node):
+        return input
 
 
 def save_graph(
