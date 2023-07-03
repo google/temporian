@@ -26,6 +26,7 @@ from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node, create_node_with_new_reference
 from temporian.core.data.schema import Schema
 from temporian.core.mixins import EventSetOperationsMixin
+from temporian.core.operators.base import Operator
 from temporian.utils import string
 
 # Maximum of printed index groups when calling repr(evset)
@@ -517,3 +518,16 @@ class EventSet(EventSetOperationsMixin):
         """
 
         return sys.getsizeof(self)
+
+    def check_same_sampling(self, other: EventSet):
+        """Checks if two EventSets have the same sampling."""
+        self.node().check_same_sampling(other.node())
+
+    @property
+    def creator(self) -> Optional[Operator]:
+        """Creator.
+
+        The creator is the operator that outputted this EventSet. Manually
+        created EventSets have a `None` creator.
+        """
+        return self.node()._creator
