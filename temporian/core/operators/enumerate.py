@@ -26,16 +26,15 @@ from temporian.core.data import dtype
 
 
 class Enumerate(Operator):
-    def __init__(self, input: Node, name: str):
+    def __init__(self, input: Node):
         super().__init__()
 
         self.add_input("input", input)
-        self.add_attribute("name", name)
 
         self.add_output(
             "output",
             create_node_new_features_existing_sampling(
-                features=[(name, dtype.int64)],
+                features=[("enumerate", dtype.int64)],
                 sampling_node=input,
                 creator=self,
             ),
@@ -47,13 +46,7 @@ class Enumerate(Operator):
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
             key="ENUMERATE",
-            attributes=[
-                pb.OperatorDef.Attribute(
-                    key="name",
-                    type=pb.OperatorDef.Attribute.Type.STRING,
-                    is_optional=False,
-                ),
-            ],
+            attributes=[],
             inputs=[pb.OperatorDef.Input(key="input")],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
@@ -62,7 +55,7 @@ class Enumerate(Operator):
 operator_lib.register_operator(Enumerate)
 
 
-def enumerate(input: Node, name: str) -> Node:
+def enumerate(input: Node) -> Node:
     """Create an `int64` feature with the ordinal position of each event.
 
     Each index is enumerated independently.
@@ -73,28 +66,26 @@ def enumerate(input: Node, name: str) -> Node:
         ...    timestamps=[-1, 2, 3, 5, 0],
         ...    features={"a": ["A", "A", "A", "A", "B"]},
         ...    indexes=["a"],
-        ...    name='empty_features'
         ... )
-        >>> tp.enumerate(evset.node(), name="id").run(evset)
+        >>> tp.enumerate(evset.node()).run(evset)
         indexes: [('a', str_)]
-        features: [('id', int64)]
+        features: [('enumerate', int64)]
         events:
             a=A (4 events):
                 timestamps: [-1.  2.  3.  5.]
-                'id': [0 1 2 3]
+                'enumerate': [0 1 2 3]
             a=B (1 events):
                 timestamps: [0.]
-                'id': [0]
+                'enumerate': [0]
         ...
 
         ```
 
     Args:
         input: Node to enumerate.
-        name: Name for the feature with the enumeration result.
 
     Returns:
         Single feature with each event's ordinal position in index.
     """
 
-    return Enumerate(input=input, name=name).outputs["output"]
+    return Enumerate(input=input).outputs["output"]

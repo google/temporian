@@ -56,7 +56,7 @@ operator_lib.register_operator(Timestamps)
 
 
 def timestamps(input: Node) -> Node:
-    """Create a `float64` feature from the timestamps of an event.
+    """Converts the event timestamps into a `float64` feature.
 
     Features in the input node are ignored, only the timestamps are used.
     Datetime timestamps are converted to unix timestamps.
@@ -66,7 +66,6 @@ def timestamps(input: Node) -> Node:
         >>> from datetime import datetime
         >>> evset = tp.event_set(
         ...    timestamps=[1, 2, 3, 5],
-        ...    name='simple_timestamps'
         ... )
         >>> tp.timestamps(evset.node()).run(evset)
         indexes: []
@@ -79,20 +78,34 @@ def timestamps(input: Node) -> Node:
 
         ```
 
-    Unix timestamps example:
+    Unix timestamps and filter example:
         ```python
         >>> from datetime import datetime
         >>> evset = tp.event_set(
-        ...    timestamps=[datetime(1970,1,1,0,0,30), datetime(1970,1,1,1,0,0)],
-        ...    name='old_times'
+        ...    timestamps=[datetime(1970,1,1,0,0,30), datetime(2023,1,1,1,0,0)],
         ... )
-        >>> tp.timestamps(evset.node()).run(evset)
+        >>> node = evset.node()
+        >>> tstamps = tp.timestamps(node)
+
+        >>> # Filter using the timestamps
+        >>> old_times = tp.filter(
+        ...     tstamps, tstamps < datetime(2020, 1, 1).timestamp()
+        ... )
+
+        >>> # Operate like any other feature
+        >>> multiply = old_times * 5
+        >>> result = tp.glue(
+        ...     tp.rename(old_times, 'filtered'),
+        ...     tp.rename(multiply, 'multiplied')
+        ... )
+        >>> result.run(evset)
         indexes: []
-        features: [('timestamps', float64)]
+        features: [('filtered', float64), ('multiplied', float64)]
         events:
-            (2 events):
-                timestamps: [ 30. 3600.]
-                'timestamps': [ 30. 3600.]
+            (1 events):
+                timestamps: [30.]
+                'filtered': [30.]
+                'multiplied': [150.]
         ...
 
         ```

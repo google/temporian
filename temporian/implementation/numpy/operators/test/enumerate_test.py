@@ -46,14 +46,14 @@ class EnumerateOperatorTest(absltest.TestCase):
         expected_output = event_set(
             timestamps=[1, 2, 3, 4, 0, 1],
             features={
-                "enum_res": [0, 1, 2, 3, 0, 1],
+                "enumerate": [0, 1, 2, 3, 0, 1],
                 "c": ["A", "A", "A", "A", "B", "B"],
             },
             indexes=["c"],
         )
 
         # Run op
-        op = Enumerate(input=node, name="enum_res")
+        op = Enumerate(input=node)
         instance = EnumerateNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
         output = instance.call(input=evset)["output"]
