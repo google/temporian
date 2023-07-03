@@ -13,10 +13,9 @@ build:
   tools:
     python: "3.10"
   jobs:
-    post_create_environment:
+    post_install:
       - pip install poetry
       - poetry config virtualenvs.create false
-    post_install:
       - poetry install
 
 mkdocs:
