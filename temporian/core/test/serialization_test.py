@@ -89,7 +89,10 @@ class SerializationTest(absltest.TestCase):
     def test_serialize_autonode(self):
         input_data = event_set(
             timestamps=[1, 2, 3, 4],
-            features={"f1": [5, 6, 7, 8], "x": [1, 1, 2, 2]},
+            features={
+                "f1": [5, 6, 7, 8],
+                "x": [1, 1, 2, 2],
+            },
             indexes=["x"],
         )
 

@@ -16,7 +16,6 @@ from functools import wraps
 from copy import copy
 from typing import Any, Dict, Optional, Tuple
 from temporian.core.data.node import Node
-from temporian.core.evaluation import run
 from temporian.implementation.numpy.data.event_set import EventSet
 
 
@@ -38,6 +37,8 @@ def compile(fn):
         outputs = fn(*args, **kwargs)
 
         if is_eager:
+            from temporian.core.evaluation import run
+
             return run(outputs, inputs)
 
         return outputs

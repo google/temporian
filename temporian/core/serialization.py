@@ -14,6 +14,7 @@
 
 """Serialization/unserialization of a graph and its components."""
 
+import logging
 from typing import (
     Callable,
     Set,
@@ -248,9 +249,11 @@ def _serialize(src: graph.Graph) -> pb.Graph:
 
     return pb.Graph(
         operators=[_serialize_operator(o) for o in src.operators],
-        nodes=[_serialize_node(e) for e in src.nodes],
-        features=[_serialize_feature(f) for f in src.features],
-        samplings=[_serialize_sampling(s) for s in src.samplings],
+        nodes=[_serialize_node(e, src.operators) for e in src.nodes],
+        features=[_serialize_feature(f, src.operators) for f in src.features],
+        samplings=[
+            _serialize_sampling(s, src.operators) for s in src.samplings
+        ],
         inputs=[
             _serialize_io_signature(k, e) for k, e in src.named_inputs.items()
         ],
@@ -270,9 +273,12 @@ def _unserialize(src: pb.Graph) -> graph.Graph:
     nodes = {e.id: _unserialize_node(e, samplings, features) for e in src.nodes}
     operators = {o.id: _unserialize_operator(o, nodes) for o in src.operators}
 
+    logging.info("operators:", operators)
+
     # Set the creator fields.
     def get_creator(op_id: str) -> base.Operator:
         if op_id not in operators:
+            logging.info(operators)
             raise ValueError(f"Non existing creator operator {op_id}")
         return operators[op_id]
 
@@ -409,14 +415,20 @@ def _unserialize_operator(
     return op
 
 
-def _serialize_node(src: Node) -> pb.Node:
+def _serialize_node(src: Node, operators: Set[base.Operator]) -> pb.Node:
     assert len(src.schema.features) == len(src.feature_nodes)
+    logging.info("aaaa")
+    logging.info(operators)
     return pb.Node(
         id=_identifier(src),
         sampling_id=_identifier(src.sampling_node),
         feature_ids=[_identifier(f) for f in src.feature_nodes],
         name=src.name,
-        creator_operator_id=_identifier_or_none(src.creator),
+        creator_operator_id=(
+            _identifier_or_none(src.creator)
+            if src.creator is not None and src.creator in operators
+            else None
+        ),
         schema=_serialize_schema(src.schema),
     )
 
@@ -444,10 +456,16 @@ def _unserialize_node(
     return node
 
 
-def _serialize_feature(src: Feature) -> pb.Node.Feature:
+def _serialize_feature(
+    src: Feature, operators: Set[base.Operator]
+) -> pb.Node.Feature:
     return pb.Node.Feature(
         id=_identifier(src),
-        creator_operator_id=_identifier_or_none(src.creator),
+        creator_operator_id=(
+            _identifier_or_none(src.creator)
+            if src.creator is not None and src.creator in operators
+            else None
+        ),
     )
 
 
@@ -455,10 +473,16 @@ def _unserialize_feature(src: pb.Node.Feature) -> Feature:
     return Feature(creator=None)
 
 
-def _serialize_sampling(src: Sampling) -> pb.Node.Sampling:
+def _serialize_sampling(
+    src: Sampling, operators: Set[base.Operator]
+) -> pb.Node.Sampling:
     return pb.Node.Sampling(
         id=_identifier(src),
-        creator_operator_id=_identifier_or_none(src.creator),
+        creator_operator_id=(
+            _identifier_or_none(src.creator)
+            if src.creator is not None and src.creator in operators
+            else None
+        ),
     )
 
 
