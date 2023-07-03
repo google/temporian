@@ -173,7 +173,6 @@ class SerializationTest(absltest.TestCase):
         output_node = x
 
         result = tp.run(output_node, {input_node: input_data})
-        print("result:", result)
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_graph.tem")
@@ -183,7 +182,6 @@ class SerializationTest(absltest.TestCase):
             loaded_inputs, loaded_outputs = tp.load(path=path, squeeze=True)
 
         loaded_results = tp.run(loaded_outputs, {loaded_inputs: input_data})
-        print("loaded_results:", loaded_results)
 
         self.assertEqual(result, loaded_results)
 
@@ -194,7 +192,7 @@ class SerializationTest(absltest.TestCase):
 
         evset = tp.event_set(
             timestamps=[1.0, 2.0, 3.0],
-            features={"costs": [100.0, 200.0, 300.0]},
+            features={"f1": [100.0, 200.0, 300.0]},
         )
         result = f(evset)
 
@@ -202,6 +200,10 @@ class SerializationTest(absltest.TestCase):
             path = os.path.join(tempdir, "my_fn.tem")
             tp.save(f, inputs={"x": evset}, path=path)
             input, output = tp.load(path=path, squeeze=True)
+            inputs, outputs = tp.load(path=path, squeeze=False)
+
+        self.assertEqual(list(inputs.keys()), ["x"])
+        self.assertEqual(list(outputs.keys()), ["output"])
 
         loaded_result = tp.run(output, {input: evset})
 
@@ -209,31 +211,58 @@ class SerializationTest(absltest.TestCase):
 
     def test_save_and_load_many_inputs(self):
         @tp.compile
-        def f(x: EventSet, number: int, y: EventSet):
-            print(number)
-            return tp.glue(x, y)
+        def f(x: EventSet, y: int, z: EventSet):
+            print(y)
+            return tp.glue(x, z)
 
         x = tp.event_set(
             timestamps=[1.0, 2.0, 3.0],
-            features={"costs": [100.0, 200.0, 300.0]},
+            features={"f1": [100.0, 200.0, 300.0]},
         )
-        y = tp.event_set(
+        y = 3
+        z = tp.event_set(
             timestamps=[1.0, 2.0, 3.0],
-            features={"sales": [3.0, 5.0, 2.0]},
+            features={"f2": [3.0, 5.0, 2.0]},
             same_sampling_as=x,
         )
-        result = f(x, 3, y)
+        result = f(x, y, z)
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_fn.tem")
-            tp.save(f, inputs={"x": x, "number": 3, "y": y}, path=path)
+            tp.save(f, inputs={"x": x, "y": y, "z": z}, path=path)
             inputs, output = tp.load(path=path, squeeze=True)
 
-        self.assertEqual(list(inputs.keys()), ["x", "y"])
+        self.assertEqual(list(inputs.keys()), ["x", "z"])
 
-        loaded_result = tp.run(output, {inputs["x"]: x, inputs["y"]: y})
+        loaded_result = tp.run(output, {inputs["x"]: x, inputs["z"]: z})
 
         self.assertEqual(result, loaded_result)
+
+    def test_save_and_load_dict_outputs(self):
+        @tp.compile
+        def f(x: EventSet):
+            return {
+                "a": tp.abs(x),
+                "b": tp.log(x),
+            }
+
+        x = tp.event_set(
+            timestamps=[1.0, 2.0, 3.0],
+            features={"f1": [100.0, 200.0, 300.0]},
+        )
+        results = f(x)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(f, inputs={"x": x}, path=path)
+            input, outputs = tp.load(path=path, squeeze=True)
+
+        self.assertEqual(list(outputs.keys()), ["a", "b"])
+
+        loaded_results = tp.run(outputs, {input: x})
+
+        self.assertEqual(results["a"], loaded_results["a"])
+        self.assertEqual(results["b"], loaded_results["b"])
 
 
 if __name__ == "__main__":

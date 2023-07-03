@@ -16,6 +16,7 @@ from functools import wraps
 from copy import copy
 from typing import Any, Dict, Optional, Tuple
 from temporian.core.data.node import Node
+from temporian.core.evaluation import run
 from temporian.implementation.numpy.data.event_set import EventSet
 
 
@@ -34,15 +35,12 @@ def compile(fn):
         for k, arg in kwargs.items():
             kwargs[k], is_eager = _process_argument(arg, inputs, is_eager)
 
-        output = fn(*args, **kwargs)
+        outputs = fn(*args, **kwargs)
 
         if is_eager:
-            evset = output.run(inputs)
-            # Prevent .node() from creating a new sampling when called
-            evset._internal_node = output  # pylint: disable=protected-access
-            return evset
+            return run(outputs, inputs)
 
-        return output
+        return outputs
 
     wrapper.is_tp_compiled = True
 

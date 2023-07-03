@@ -53,18 +53,23 @@ INV_DTYPE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
 
 
 def save(
-    fn: Callable,
+    fn: Callable[..., Union[EventSet, Dict[str, EventSet]]],
     inputs: Dict[str, Any],
     path: str,
 ) -> None:
     """Saves a Temporian-compiled function to a file.
 
     Temporian saves the graph built between the function's input and output
-    EventSets or Nodes, not the function itself.
+    EventSets or Nodes, not the function itself. Any arbitrary code that is
+    executed in the function will not be ran when loading it back up.
 
     The function can receive and return other arbitrary parameters, which will
     be used to trace the function while saving it, but will not be available
     when loading it back up.
+
+    The function must return an EventSet or Node or a dictionary mapping output
+    names to EventSets or Nodes. If it returns a single one, the output will be
+    saved under the name "output" by default.
 
     Args:
         fn: The function to save.
@@ -96,10 +101,19 @@ def save(
             inputs[k] = node_input
             node_inputs[k] = node_input
 
-    output = fn(**inputs)
+    outputs = fn(**inputs)
 
-    # TODO: allow returning tuple/list of outputs, with output_names param
-    save_graph(inputs=node_inputs, outputs={"output": output}, path=path)
+    if isinstance(outputs, Node):
+        outputs = {"output": outputs}
+
+    if isinstance(outputs, dict):
+        if not all(isinstance(v, Node) for v in outputs.values()):
+            raise ValueError(
+                "The function must return a single EventSet or Node or a"
+                "dictionary mapping output names to EventSets or Nodes."
+            )
+
+    save_graph(inputs=node_inputs, outputs=outputs, path=path)
 
 
 def _process_fn_input(input: Any) -> Optional[Node]:
