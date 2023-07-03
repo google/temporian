@@ -1,6 +1,8 @@
 # .readthedocs.yaml
 # Read the Docs configuration file
 # See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
+# Poetry usage based on:
+#   https://docs.readthedocs.io/en/stable/build-customization.html#install-dependencies-with-poetry
 
 # Required
 version: 2
@@ -8,12 +10,14 @@ version: 2
 # Set the version of Python and other tools you might need
 build:
   os: ubuntu-22.04
-  apt_packages:
-    - pipx
   tools:
     python: "3.10"
-  commands:
-    - pipx install poetry
-    - pipx ensurepath
-    - poetry install --no-interaction
-    - poetry run python -m mkdocs build --clean --site-dir $READTHEDOCS_OUTPUT/html --config-file docs/mkdocs.yml
+  jobs:
+    post_create_environment:
+      - pip install poetry
+      - poetry config virtualenvs.create false
+    post_install:
+      - poetry install
+
+mkdocs:
+  configuration: docs/mkdocs.yml
