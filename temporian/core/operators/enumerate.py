@@ -16,24 +16,27 @@
 """Enumerate operator class and public API function definitions."""
 
 from temporian.core import operator_lib
-from temporian.core.data.node import Node, create_node_new_features_new_sampling
+from temporian.core.data.node import (
+    Node,
+    create_node_new_features_existing_sampling,
+)
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
+from temporian.core.data import dtype
 
 
 class Enumerate(Operator):
-    def __init__(self, input: Node, param: float):
+    def __init__(self, input: Node, name: str):
         super().__init__()
 
         self.add_input("input", input)
-        self.add_attribute("param", param)
+        self.add_attribute("name", name)
 
         self.add_output(
             "output",
-            create_node_new_features_new_sampling(
-                features=[],
-                indexes=input.schema.indexes,
-                is_unix_timestamp=input.schema.is_unix_timestamp,
+            create_node_new_features_existing_sampling(
+                features=[(name, dtype.int64)],
+                sampling_node=input,
                 creator=self,
             ),
         )
@@ -46,8 +49,8 @@ class Enumerate(Operator):
             key="ENUMERATE",
             attributes=[
                 pb.OperatorDef.Attribute(
-                    key="param",
-                    type=pb.OperatorDef.Attribute.Type.FLOAT_64,
+                    key="name",
+                    type=pb.OperatorDef.Attribute.Type.STRING,
                     is_optional=False,
                 ),
             ],
@@ -59,19 +62,36 @@ class Enumerate(Operator):
 operator_lib.register_operator(Enumerate)
 
 
-def enumerate(input: Node, param: float) -> Node:
-    """<Text>
+def enumerate(input: Node, name: str) -> Node:
+    """Create an `int64` feature with the ordinal position of each event.
+
+    Each index is enumerated independently.
+
+    Usage:
+        ```python
+        >>> evset = tp.event_set(
+        ...    timestamps=[-1, 2, 3, 5, 0],
+        ...    features={"a": ["A", "A", "A", "A", "B"]},
+        ...    indexes=["a"],
+        ...    name='empty_features'
+        ... )
+        >>> tp.enumerate(evset.node(), name="enumerate_result").run(evset)
+        indexes: [('a', str_)]
+        features: [('enumerate_result', int64)]
+        events:
+            (5 events):
+                timestamps: [-1. 2. 3. 5. 0.]
+                'enumerate_result': [0. 1. 2. 3. 0.]
+        ...
+
+        ```
 
     Args:
-        input: <Text>
-        param: <Text>
-
-    Example:
-        <Text>
+        input: Node to enumerate.
+        name: Name for the feature with the enumeration result.
 
     Returns:
-        <Text>
+        Single feature with each event's ordinal position in index.
     """
 
-    return Enumerate(input=input, param=param).outputs["output"]
-
+    return Enumerate(input=input, name=name).outputs["output"]

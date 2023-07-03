@@ -24,14 +24,13 @@ from temporian.core.operators.enumerate import Enumerate
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
-class EnumerateNumpyImplementation(OperatorImplementation):
 
+class EnumerateNumpyImplementation(OperatorImplementation):
     def __init__(self, operator: Enumerate) -> None:
         assert isinstance(operator, Enumerate)
         super().__init__(operator)
 
-    def __call__(
-        self, input: EventSet) -> Dict[str, EventSet]:
+    def __call__(self, input: EventSet) -> Dict[str, EventSet]:
         assert isinstance(self.operator, Enumerate)
 
         output_schema = self.output_schema("output")
@@ -42,8 +41,8 @@ class EnumerateNumpyImplementation(OperatorImplementation):
         # Fill output EventSet's data
         for index_key, index_data in input.data.items():
             output_evset[index_key] = IndexData(
-                [],
-                np.array([1], dtype=np.float64),
+                [np.indices(index_data.timestamps.shape).flatten()],
+                index_data.timestamps,
                 schema=output_schema,
             )
 

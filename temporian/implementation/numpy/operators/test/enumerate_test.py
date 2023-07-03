@@ -26,32 +26,34 @@ from temporian.implementation.numpy.operators.test.test_util import (
     testOperatorAndImp,
 )
 
+
 class EnumerateOperatorTest(absltest.TestCase):
     def setUp(self):
         pass
 
     def test_base(self):
         evset = event_set(
-            timestamps=[1,2,3,4],
+            timestamps=[1, 2, 3, 4, 0, 1],
             features={
-                    "a": [1.0, 2.0, 3.0, 4.0],
-                    "b": [5, 6, 7, 8],
-                    "c": ["A", "A", "B", "B"],
+                "a": [1.0, 2.0, 3.0, 4.0, 0.0, 1.0],
+                "b": [5, 6, 7, 8, 1, 2],
+                "c": ["A", "A", "A", "A", "B", "B"],
             },
             indexes=["c"],
         )
         node = evset.node()
 
         expected_output = event_set(
-            timestamps=[1, 1],
+            timestamps=[1, 2, 3, 4, 0, 1],
             features={
-                    "c": ["A", "B"],
+                "enum_res": [0, 1, 2, 3, 0, 1],
+                "c": ["A", "A", "A", "A", "B", "B"],
             },
             indexes=["c"],
         )
 
         # Run op
-        op = Enumerate(input=node, param=1.0)
+        op = Enumerate(input=node, name="enum_res")
         instance = EnumerateNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
         output = instance.call(input=evset)["output"]
@@ -61,4 +63,3 @@ class EnumerateOperatorTest(absltest.TestCase):
 
 if __name__ == "__main__":
     absltest.main()
-
