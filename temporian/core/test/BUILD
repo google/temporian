@@ -22,8 +22,8 @@ py_library(
 # =====
 
 py_test(
-    name = "mixins_test",
-    srcs = ["mixins_test.py"],
+    name = "magic_methods_test",
+    srcs = ["magic_methods_test.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
