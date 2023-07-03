@@ -80,6 +80,7 @@ class TimestampsOperatorTest(absltest.TestCase):
                 "b": ["A", "A", "B"],
             },
             indexes=["b"],
+            is_unix_timestamp=True,
         )
 
         # Run op
@@ -87,20 +88,6 @@ class TimestampsOperatorTest(absltest.TestCase):
         instance = TimestampsNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
         output = instance.call(input=evset)["output"]
-
-        # expected_df = expected_output.data[("A",)].features[0]
-        # result_df = output.data[("A",)].features[0]
-        expected_df = expected_output.data[("A",)].features[0]
-        result_df = output.data[("A",)].features[0]
-
-        print(expected_df - result_df)
-        print(
-            np.array_equal(
-                expected_output.data[("B",)].timestamps,
-                output.data[("B",)].timestamps,
-            )
-        )
-        print(f"Kind={result_df.dtype.kind}")
 
         assertEqualEventSet(self, output, expected_output)
 

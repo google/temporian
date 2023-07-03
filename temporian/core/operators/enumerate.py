@@ -75,13 +75,16 @@ def enumerate(input: Node, name: str) -> Node:
         ...    indexes=["a"],
         ...    name='empty_features'
         ... )
-        >>> tp.enumerate(evset.node(), name="enumerate_result").run(evset)
+        >>> tp.enumerate(evset.node(), name="id").run(evset)
         indexes: [('a', str_)]
-        features: [('enumerate_result', int64)]
+        features: [('id', int64)]
         events:
-            (5 events):
-                timestamps: [-1. 2. 3. 5. 0.]
-                'enumerate_result': [0. 1. 2. 3. 0.]
+            a=A (4 events):
+                timestamps: [-1.  2.  3.  5.]
+                'id': [0 1 2 3]
+            a=B (1 events):
+                timestamps: [0.]
+                'id': [0]
         ...
 
         ```
