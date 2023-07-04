@@ -19,7 +19,7 @@ from typing import List, Union
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.node import Node, create_node_with_new_reference
-from temporian.core.operators.base import EventSetOrNode, Operator
+from temporian.core.operators.base import Operator
 from temporian.core.data.schema import Schema
 from temporian.proto import core_pb2 as pb
 
@@ -87,9 +87,9 @@ operator_lib.register_operator(SelectOperator)
 
 @compile
 def select(
-    input: EventSetOrNode,
+    input: Node,
     feature_names: Union[str, List[str]],
-) -> EventSetOrNode:
+) -> Node:
     """Selects a subset of features from a Node.
 
     Args:

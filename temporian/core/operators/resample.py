@@ -20,7 +20,7 @@ from temporian.core.data.node import (
     Node,
     create_node_new_features_existing_sampling,
 )
-from temporian.core.operators.base import EventSetOrNode, Operator
+from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
@@ -65,9 +65,9 @@ operator_lib.register_operator(Resample)
 
 @compile
 def resample(
-    input: EventSetOrNode,
-    sampling: EventSetOrNode,
-) -> EventSetOrNode:
+    input: Node,
+    sampling: Node,
+) -> Node:
     """Resamples a Node at each timestamp of another Node.
 
     If a timestamp in `sampling` does not have a corresponding timestamp in

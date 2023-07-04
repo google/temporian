@@ -16,7 +16,7 @@
 
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
-from temporian.core.operators.base import EventSetOrNode
+from temporian.core.data.node import Node
 from temporian.core.operators.calendar.base import BaseCalendarOperator
 
 
@@ -34,7 +34,7 @@ operator_lib.register_operator(CalendarISOWeekOperator)
 
 
 @compile
-def calendar_iso_week(sampling: EventSetOrNode) -> EventSetOrNode:
+def calendar_iso_week(sampling: Node) -> Node:
     """Obtains the ISO week the timestamps in a node's sampling are in.
 
     Features in the input node are ignored, only the timestamps are used and

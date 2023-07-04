@@ -18,7 +18,7 @@ from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.node import Node, create_node_with_new_reference
 from temporian.core.data.schema import Schema
-from temporian.core.operators.base import EventSetOrNode, Operator
+from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 # Maximum number of arguments taken by the glue operator
@@ -103,8 +103,8 @@ operator_lib.register_operator(GlueOperator)
 
 @compile
 def glue(
-    *inputs: EventSetOrNode,
-) -> EventSetOrNode:
+    *inputs: Node,
+) -> Node:
     """Concatenates [`Nodes`][temporian.Node] with the same sampling.
 
     Feature names cannot be duplicated across nodes.

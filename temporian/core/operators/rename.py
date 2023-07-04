@@ -23,7 +23,7 @@ from temporian.core.data.node import (
     create_node_new_features_existing_sampling,
 )
 from temporian.core.data.schema import Schema
-from temporian.core.operators.base import EventSetOrNode, Operator
+from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
@@ -166,10 +166,10 @@ def _normalize_rename_indexes(
 
 @compile
 def rename(
-    input: EventSetOrNode,
+    input: Node,
     features: Optional[Union[str, Dict[str, str]]] = None,
     indexes: Optional[Union[str, Dict[str, str]]] = None,
-) -> EventSetOrNode:
+) -> Node:
     """Renames a Node's features and index.
 
     If the input has a single feature, then the `features` can be a

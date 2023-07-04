@@ -21,7 +21,6 @@ from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
 from temporian.core.data.schema import FeatureSchema
-from temporian.core.operators.base import EventSetOrNode
 from temporian.core.operators.scalar.base import (
     BaseScalarOperator,
 )
@@ -76,9 +75,9 @@ class LessScalarOperator(RelationalScalarOperator):
 
 @compile
 def equal_scalar(
-    input: EventSetOrNode,
+    input: Node,
     value: Union[float, int, str, bool],
-) -> EventSetOrNode:
+) -> Node:
     """Checks for equality between a node and a scalar element-wise.
 
     Each item in each feature in `input` is compared to `value`.
@@ -125,9 +124,9 @@ def equal_scalar(
 
 @compile
 def not_equal_scalar(
-    input: EventSetOrNode,
+    input: Node,
     value: Union[float, int, str, bool],
-) -> EventSetOrNode:
+) -> Node:
     """Checks for differences between a node and a scalar element-wise.
 
     Each item in each feature in `input` is compared to `value`.
@@ -171,9 +170,9 @@ def not_equal_scalar(
 
 @compile
 def greater_equal_scalar(
-    input: EventSetOrNode,
+    input: Node,
     value: Union[float, int, str, bool],
-) -> EventSetOrNode:
+) -> Node:
     """Check if the input node is greater or equal than a scalar element-wise.
 
     Each item in each feature in `input` is compared to `value`.
@@ -217,9 +216,9 @@ def greater_equal_scalar(
 
 @compile
 def less_equal_scalar(
-    input: EventSetOrNode,
+    input: Node,
     value: Union[float, int, str, bool],
-) -> EventSetOrNode:
+) -> Node:
     """Check if the input node is less or equal than a scalar element-wise.
 
     Each item in each feature in `input` is compared to `value`.
@@ -263,9 +262,9 @@ def less_equal_scalar(
 
 @compile
 def greater_scalar(
-    input: EventSetOrNode,
+    input: Node,
     value: Union[float, int, str, bool],
-) -> EventSetOrNode:
+) -> Node:
     """Check if the input node is greater than a scalar element-wise.
 
     Each item in each feature in `input` is compared to `value`.
@@ -309,9 +308,9 @@ def greater_scalar(
 
 @compile
 def less_scalar(
-    input: EventSetOrNode,
+    input: Node,
     value: Union[float, int, str, bool],
-) -> EventSetOrNode:
+) -> Node:
     """Check if the input node is less than a scalar element-wise.
 
     Each item in each feature in `input` is compared to `value`.

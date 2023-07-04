@@ -20,7 +20,7 @@ from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node, create_node_new_features_new_sampling
-from temporian.core.operators.base import EventSetOrNode, Operator
+from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
@@ -79,9 +79,9 @@ operator_lib.register_operator(FilterOperator)
 # pylint: disable=redefined-builtin
 @compile
 def filter(
-    input: EventSetOrNode,
-    condition: Optional[EventSetOrNode] = None,
-) -> EventSetOrNode:
+    input: Node,
+    condition: Optional[Node] = None,
+) -> Node:
     """Filters out events in a Node for which a condition is false.
 
     Each timestamp in `input` is only kept if the corresponding value for that

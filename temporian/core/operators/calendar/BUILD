@@ -43,7 +43,6 @@ py_library(
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
-        "//temporian/core/operators:base",
         "//temporian/core/operators/scalar:relational_scalar",
     ],
 )
@@ -56,7 +55,6 @@ py_library(
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
-        "//temporian/core/operators:base",
         "//temporian/core/operators/scalar:relational_scalar",
     ],
 )
@@ -69,7 +67,6 @@ py_library(
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
-        "//temporian/core/operators:base",
         "//temporian/core/operators/scalar:relational_scalar",
     ],
 )
@@ -82,7 +79,6 @@ py_library(
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
-        "//temporian/core/operators:base",
         "//temporian/core/operators/scalar:relational_scalar",
     ],
 )
@@ -95,7 +91,6 @@ py_library(
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
-        "//temporian/core/operators:base",
         "//temporian/core/operators/scalar:relational_scalar",
     ],
 )
@@ -108,7 +103,6 @@ py_library(
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
-        "//temporian/core/operators:base",
         "//temporian/core/operators/scalar:relational_scalar",
     ],
 )
@@ -121,7 +115,6 @@ py_library(
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
-        "//temporian/core/operators:base",
         "//temporian/core/operators/scalar:relational_scalar",
     ],
 )
@@ -134,7 +127,6 @@ py_library(
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
-        "//temporian/core/operators:base",
         "//temporian/core/operators/scalar:relational_scalar",
     ],
 )
@@ -147,7 +139,6 @@ py_library(
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
-        "//temporian/core/operators:base",
         "//temporian/core/operators/scalar:relational_scalar",
     ],
 )

@@ -20,7 +20,6 @@ from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
-from temporian.core.operators.base import EventSetOrNode
 from temporian.core.operators.scalar.base import (
     BaseScalarOperator,
 )
@@ -74,9 +73,9 @@ class DivideScalarOperator(BaseScalarOperator):
 
 @compile
 def add_scalar(
-    input: EventSetOrNode,
+    input: Node,
     value: Union[float, int],
-) -> EventSetOrNode:
+) -> Node:
     """Adds a scalar value to a node.
 
     `value` is added to each item in each feature in `input`.
@@ -116,9 +115,9 @@ def add_scalar(
 
 @compile
 def subtract_scalar(
-    minuend: Union[EventSetOrNode, SCALAR],
-    subtrahend: Union[EventSetOrNode, SCALAR],
-) -> EventSetOrNode:
+    minuend: Union[Node, SCALAR],
+    subtrahend: Union[Node, SCALAR],
+) -> Node:
     """Subtracts a node and a scalar value.
 
     Each item in each feature in the node is subtracted with the scalar value.
@@ -188,9 +187,9 @@ def subtract_scalar(
 
 @compile
 def multiply_scalar(
-    input: EventSetOrNode,
+    input: Node,
     value: Union[float, int],
-) -> EventSetOrNode:
+) -> Node:
     """Multiplies a node by a scalar value.
 
     Each item in each feature in `input` is multiplied by `value`.
@@ -230,9 +229,9 @@ def multiply_scalar(
 
 @compile
 def divide_scalar(
-    numerator: Union[EventSetOrNode, SCALAR],
-    denominator: Union[EventSetOrNode, SCALAR],
-) -> EventSetOrNode:
+    numerator: Union[Node, SCALAR],
+    denominator: Union[Node, SCALAR],
+) -> Node:
     """Divides a node and a scalar value.
 
     Each item in each feature in the node is divided with the scalar value.
@@ -302,9 +301,9 @@ def divide_scalar(
 
 @compile
 def floordiv_scalar(
-    numerator: Union[EventSetOrNode, SCALAR],
-    denominator: Union[EventSetOrNode, SCALAR],
-) -> EventSetOrNode:
+    numerator: Union[Node, SCALAR],
+    denominator: Union[Node, SCALAR],
+) -> Node:
     """Divides a node and a scalar and takes the result's floor.
 
     Each item in each feature in the node is divided with the scalar value.
@@ -374,9 +373,9 @@ def floordiv_scalar(
 
 @compile
 def modulo_scalar(
-    numerator: Union[EventSetOrNode, SCALAR],
-    denominator: Union[EventSetOrNode, SCALAR],
-) -> EventSetOrNode:
+    numerator: Union[Node, SCALAR],
+    denominator: Union[Node, SCALAR],
+) -> Node:
     """Remainder of the division of numerator by denominator.
 
     Either `numerator` or `denominator` should be a scalar value, but not both.
@@ -444,9 +443,9 @@ def modulo_scalar(
 
 @compile
 def power_scalar(
-    base: Union[EventSetOrNode, SCALAR],
-    exponent: Union[EventSetOrNode, SCALAR],
-) -> EventSetOrNode:
+    base: Union[Node, SCALAR],
+    exponent: Union[Node, SCALAR],
+) -> Node:
     """Raise the base to the exponent (`base ** exponent`)
 
     Either `base` or `exponent` should be a scalar value, but not both.

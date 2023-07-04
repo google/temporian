@@ -46,7 +46,6 @@ py_library(
         "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
-        "//temporian/core/operators:base",
     ],
 )
 
@@ -62,7 +61,6 @@ py_library(
         "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
-        "//temporian/core/operators:base",
     ],
 )
 
@@ -77,7 +75,6 @@ py_library(
         "//temporian/core/data:dtype",
         "//temporian/core/data:duration_utils",
         "//temporian/core:compilation",
-        "//temporian/core/operators:base",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
     ],
@@ -95,7 +92,6 @@ py_library(
         "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
-        "//temporian/core/operators:base",
     ],
 )
 
@@ -111,7 +107,6 @@ py_library(
         "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
-        "//temporian/core/operators:base",
     ],
 )
 
@@ -127,6 +122,5 @@ py_library(
         "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
-        "//temporian/core/operators:base",
     ],
 )

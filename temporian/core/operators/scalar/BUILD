@@ -39,7 +39,6 @@ py_library(
         "//temporian/core:operator_lib",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
-        "//temporian/core/operators:base",
     ],
 )
 
@@ -54,6 +53,5 @@ py_library(
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
-        "//temporian/core/operators:base",
     ],
 )

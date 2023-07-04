@@ -24,7 +24,7 @@ from temporian.core.data.node import (
     Node,
     create_node_new_features_existing_sampling,
 )
-from temporian.core.operators.base import EventSetOrNode, Operator
+from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
@@ -188,8 +188,8 @@ operator_lib.register_operator(LogOperator)
 
 @compile
 def invert(
-    input: EventSetOrNode,
-) -> EventSetOrNode:
+    input: Node,
+) -> Node:
     """Inverts a boolean node (~node).
 
     Swaps False<->True element-wise.
@@ -208,8 +208,8 @@ def invert(
 
 @compile
 def isnan(
-    input: EventSetOrNode,
-) -> EventSetOrNode:
+    input: Node,
+) -> Node:
     """Returns boolean features, `True` in the NaN elements of the input.
 
     Note that for `int` and `bool` this will
@@ -229,8 +229,8 @@ def isnan(
 
 @compile
 def notnan(
-    input: EventSetOrNode,
-) -> EventSetOrNode:
+    input: Node,
+) -> Node:
     """Opposite of `isnan()`, being `True` in the elements that are not NaN.
 
     Equivalent to `invert(isnan())`. Note that for `int` and `bool` this will
@@ -250,8 +250,8 @@ def notnan(
 
 @compile
 def abs(
-    input: EventSetOrNode,
-) -> EventSetOrNode:
+    input: Node,
+) -> Node:
     """Gets the absolute value of the input features.
 
     Args:
@@ -267,8 +267,8 @@ def abs(
 
 @compile
 def log(
-    input: EventSetOrNode,
-) -> EventSetOrNode:
+    input: Node,
+) -> Node:
     """Calculates the natural logarithm of the features. Can only be used
     on floating point feature types.
 

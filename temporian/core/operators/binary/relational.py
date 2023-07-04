@@ -19,7 +19,6 @@ from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
 from temporian.core.data.schema import FeatureSchema
-from temporian.core.operators.base import EventSetOrNode
 from temporian.core.operators.binary.base import BaseBinaryOperator
 from temporian.core.operators.scalar.relational_scalar import equal_scalar
 
@@ -75,9 +74,9 @@ class LessEqualOperator(BaseRelationalOperator):
 
 @compile
 def equal(
-    input_1: EventSetOrNode,
-    input_2: EventSetOrNode,
-) -> EventSetOrNode:
+    input_1: Node,
+    input_2: Node,
+) -> Node:
     """Checks (element-wise) for equality between two nodes.
 
     Each feature in `input_1` is compared element-wise to the feature in
@@ -134,9 +133,9 @@ def equal(
 
 @compile
 def not_equal(
-    input_1: EventSetOrNode,
-    input_2: EventSetOrNode,
-) -> EventSetOrNode:
+    input_1: Node,
+    input_2: Node,
+) -> Node:
     """Checks (element-wise) for differences between two nodes.
 
     Each feature in `input_1` is compared element-wise to the feature in
@@ -186,9 +185,9 @@ def not_equal(
 
 @compile
 def greater(
-    input_left: EventSetOrNode,
-    input_right: EventSetOrNode,
-) -> EventSetOrNode:
+    input_left: Node,
+    input_right: Node,
+) -> Node:
     """Checks (element-wise) if input_left > input_right.
 
     Each feature in `input_left` is compared element-wise to the feature in
@@ -238,9 +237,9 @@ def greater(
 
 @compile
 def greater_equal(
-    input_left: EventSetOrNode,
-    input_right: EventSetOrNode,
-) -> EventSetOrNode:
+    input_left: Node,
+    input_right: Node,
+) -> Node:
     """Checks (element-wise) if input_left >= input_right.
 
     Each feature in `input_left` is compared element-wise to the feature in
@@ -290,9 +289,9 @@ def greater_equal(
 
 @compile
 def less(
-    input_left: EventSetOrNode,
-    input_right: EventSetOrNode,
-) -> EventSetOrNode:
+    input_left: Node,
+    input_right: Node,
+) -> Node:
     """Checks (element-wise) if input_left < input_right.
 
     Each feature in `input_left` is compared element-wise to the feature in
@@ -342,9 +341,9 @@ def less(
 
 @compile
 def less_equal(
-    input_left: EventSetOrNode,
-    input_right: EventSetOrNode,
-) -> EventSetOrNode:
+    input_left: Node,
+    input_right: Node,
+) -> Node:
     """Checks (element-wise) if input_left <= input_right.
 
     Each feature in `input_left` is compared element-wise to the feature in

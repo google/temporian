@@ -26,7 +26,7 @@ from temporian.core.data.node import (
     Feature,
     create_node_with_new_reference,
 )
-from temporian.core.operators.base import EventSetOrNode, Operator
+from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 TypeOrDType = Union[DType, Type[float], Type[int], Type[str], Type[bool]]
@@ -203,14 +203,14 @@ operator_lib.register_operator(CastOperator)
 
 @compile
 def cast(
-    input: EventSetOrNode,
+    input: Node,
     target: Union[
         TypeOrDType,
         Dict[str, TypeOrDType],
         Dict[TypeOrDType, TypeOrDType],
     ],
     check_overflow: bool = True,
-) -> EventSetOrNode:
+) -> Node:
     """Casts the dtype of features to the dtype(s) specified in `target`.
 
     Features not impacted by cast are kept.

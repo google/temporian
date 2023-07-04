@@ -18,7 +18,7 @@
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.node import Node, create_node_new_features_new_sampling
-from temporian.core.operators.base import EventSetOrNode, Operator
+from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
@@ -53,7 +53,7 @@ operator_lib.register_operator(UniqueTimestamps)
 
 
 @compile
-def unique_timestamps(input: EventSetOrNode) -> EventSetOrNode:
+def unique_timestamps(input: Node) -> Node:
     """Removes events with duplicated timestamps from a Node.
 
     Returns a feature-less node where each timestamps from `input` only appears

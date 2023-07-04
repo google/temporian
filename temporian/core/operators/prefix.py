@@ -20,7 +20,7 @@ from temporian.core.data.node import (
     Node,
     create_node_new_features_existing_sampling,
 )
-from temporian.core.operators.base import EventSetOrNode, Operator
+from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
@@ -75,8 +75,8 @@ operator_lib.register_operator(Prefix)
 @compile
 def prefix(
     prefix: str,
-    input: EventSetOrNode,
-) -> EventSetOrNode:
+    input: Node,
+) -> Node:
     """Adds a prefix to the names of the features in a Node.
 
     Usage example:

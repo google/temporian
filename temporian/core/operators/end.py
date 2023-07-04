@@ -18,7 +18,7 @@
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.node import Node, create_node_new_features_new_sampling
-from temporian.core.operators.base import EventSetOrNode, Operator
+from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
@@ -53,7 +53,7 @@ operator_lib.register_operator(EndOperator)
 
 
 @compile
-def end(input: EventSetOrNode) -> EventSetOrNode:
+def end(input: Node) -> Node:
     """Generates a single timestamp at the end of the input, per index.
 
     Usage example:

@@ -20,7 +20,7 @@ from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.node import Node, create_node_new_features_new_sampling
 from temporian.core.data.schema import FeatureSchema, IndexSchema
-from temporian.core.operators.base import EventSetOrNode, Operator
+from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 from temporian.core.operators.drop_index import drop_index
 
@@ -138,9 +138,7 @@ def _normalize_indexes_to_set(
 
 
 @compile
-def add_index(
-    input: EventSetOrNode, indexes: Union[str, List[str]]
-) -> EventSetOrNode:
+def add_index(input: Node, indexes: Union[str, List[str]]) -> Node:
     """Adds indexes to a [`Node`][temporian.Node].
 
     Usage example:
@@ -222,9 +220,7 @@ def add_index(
 
 
 @compile
-def set_index(
-    input: EventSetOrNode, indexes: Union[str, List[str]]
-) -> EventSetOrNode:
+def set_index(input: Node, indexes: Union[str, List[str]]) -> Node:
     """Replaces the index in a [`Node`][temporian.Node].
 
     This function is implemented as [`tp.drop_index()`](../drop_index)

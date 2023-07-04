@@ -23,7 +23,7 @@ from temporian.core.data.duration_utils import (
     normalize_duration,
 )
 from temporian.core.data.node import Node, create_node_new_features_new_sampling
-from temporian.core.operators.base import EventSetOrNode, Operator
+from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
@@ -75,7 +75,7 @@ operator_lib.register_operator(LeakOperator)
 
 
 @compile
-def leak(input: EventSetOrNode, duration: Duration) -> EventSetOrNode:
+def leak(input: Node, duration: Duration) -> Node:
     """Subtracts a duration from a Node's timestamps.
 
     In other words, shifts the timestamp values backward in time.
