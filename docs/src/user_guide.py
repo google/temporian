@@ -1,3 +1,5 @@
+# %%[markdown]
+"""
 # User Guide
 
 This is a complete tour of Temporian's capabilities. For a brief introduction to how the library works, please refer to [3 minutes to Temporian](./3_minutes).
@@ -42,41 +44,39 @@ feature_3:  [10, -1, 5, 5]
 In the next code examples, variables with names like `evset` refer to an [`EventSet`][temporian.EventSet].
 
 You can create an [`EventSet`][temporian.EventSet] as follows:
+"""
+# %%
+import temporian as tp
+import pandas as pd
+import numpy as np
 
-```python
->>> evset = tp.event_set(
-... 	timestamps=["2023-02-04","2023-02-06","2023-02-07","2023-02-07"],
-... 	features={
-...         "feature_1": [0.5, 0.6, np.nan, 0.9],
-...         "feature_2": ["red", "blue", "red", "blue"],
-...         "feature_3":  [10, -1, 5, 5],
-... 	}
-... )
+evset = tp.event_set(
+	timestamps=["2023-02-04","2023-02-06","2023-02-07","2023-02-07"],
+	features={
+        "feature_1": [0.5, 0.6, np.nan, 0.9],
+        "feature_2": ["red", "blue", "red", "blue"],
+        "feature_3":  [10, -1, 5, 5],
+	}
+)
 
-```
+# %% [markdown]
+"""
 
 [`EventSets`][temporian.EventSet] can be printed.
 
-```python
->>> print(evset)
-indexes: []
-features: [('feature_1', float64), ('feature_2', str_), ('feature_3', int64)]
-events:
-     (4 events):
-        timestamps: [...]
-        'feature_1': [0.5 0.6 nan 0.9]
-        'feature_2': ['red' 'blue' 'red' 'blue']
-        'feature_3': [10 -1  5  5]
-...
+"""
+# %%
+print(evset)
 
-```
-
+# %%[markdown]
+"""
 [`EventSets`][temporian.EventSet] can be plotted.
+"""
+# %%
+evset.plot()
 
-```python
->>> evset.plot()
-
-```
+# %% [markdown]
+"""
 
 **Note:** You'll learn how to create an [`EventSet`][temporian.EventSet] using other data sources such as pandas DataFrames later.
 
@@ -100,40 +100,42 @@ Operators are not executed individually, but rather combined to form an operator
 
 Let's see how to compute the simple moving average of two features `feature_1` and `feature_2` using two different window lengths, and then sum the results:
 
-```python
->>> # Define the input of the graph.
->>> a_node = tp.input_node(
-...     features=[
-...         ("feature_1", tp.float64),
-...         ("feature_2", tp.float64),
-...     ],
-...     indexes=[("feature_3", tp.str_)],
-...     name="a",
-... )
->>>
->>> # Define the operators in the graph.
->>> b_node = tp.simple_moving_average(a_node, window_length=5)
->>> c_node = tp.simple_moving_average(a_node, window_length=10)
->>> d_node = b_node + c_node
->>>
->>> # Create an EventSet compatible with the graph.
->>> a_evset = tp.event_set(
-... 	timestamps=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-... 	features={
-...         "feature_1": [1.0, 2.0, 3.0, 4.0, 2.0, 3.0, 4.0, 5.0, 6.0, 3.0],
-...         "feature_2": [54.0, 23.0, 53.0, 12.0, 12.0, 32.0, 23.0, 12.0, 2.0, 4.0],
-...         "feature_3": ["i1", "i1", "i1", "i1", "i1", "i2", "i2", "i2", "i2", "i2",],
-... 	},
-...     indexes=["feature_3"],
-...     name="a",
-... )
->>>
->>> # Feed the EventSet to the graph. The result is also an EventSet.
->>> d_evset = tp.run(d_node, {a_node: a_evset})
->>>
->>> # Print the result.
->>> print(d_evset)  # doctest:+SKIP
-```
+"""
+# %%
+# Define the input of the graph.
+a_node = tp.input_node(
+    features=[
+        ("feature_1", tp.float64),
+        ("feature_2", tp.float64),
+    ],
+    indexes=[("feature_3", tp.str_)],
+    name="a",
+)
+
+# Define the operators in the graph.
+b_node = tp.simple_moving_average(a_node, window_length=5)
+c_node = tp.simple_moving_average(a_node, window_length=10)
+d_node = b_node + c_node
+
+# Create an EventSet compatible with the graph.
+a_evset = tp.event_set(
+	timestamps=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+	features={
+        "feature_1": [1.0, 2.0, 3.0, 4.0, 2.0, 3.0, 4.0, 5.0, 6.0, 3.0],
+        "feature_2": [54.0, 23.0, 53.0, 12.0, 12.0, 32.0, 23.0, 12.0, 2.0, 4.0],
+        "feature_3": ["i1", "i1", "i1", "i1", "i1", "i2", "i2", "i2", "i2", "i2",],
+	},
+    indexes=["feature_3"],
+    name="a",
+)
+
+# Feed the EventSet to the graph. The result is also an EventSet.
+d_evset = tp.run(d_node, {a_node: a_evset})
+
+# Print the result.
+print(d_evset)
+# %% [markdown]
+"""
 
 The [`tp.run()`][temporian.run] function's signature is `tp.run(<outputs>, <inputs>)`.
 
@@ -150,21 +152,23 @@ The `<inputs>` can be specified as a dictionary of [`EventSetNodess`][temporian.
 
 To simplify its usage when the graph contains a single output [`EventSetNode`][temporian.EventSetNode], `node.run(...)` is equivalent to `tp.run(node, ...)`.
 
-```python
->>> # These statements are equivalent.
->>> d_evset = tp.run(d_node, {a_node: a_evset})
->>> d_evset = d_node.run({a_node: a_evset})
+"""
+# %%
+# These statements are equivalent.
+d_evset = tp.run(d_node, {a_node: a_evset})
+d_evset = d_node.run({a_node: a_evset})
 
-```
+# %% [markdown]
+"""
 
 <!-- TODO
 # Not implemented yet:
->>> # d_evset = tp.run(d_node, {"a": a_evset})
->>> # d_evset = tp.run(d_node, [a_evset])
->>> # d_evset = tp.run(d_node, a_evset)
->>> # d_evset = d_node.run({"a": a_evset})
->>> # d_evset = d_node.run([a_evset])
->>> # d_evset = d_node.run(a_evset)
+# d_evset = tp.run(d_node, {"a": a_evset})
+# d_evset = tp.run(d_node, [a_evset])
+# d_evset = tp.run(d_node, a_evset)
+# d_evset = d_node.run({"a": a_evset})
+# d_evset = d_node.run([a_evset])
+# d_evset = d_node.run(a_evset)
 -->
 
 **Warning:** It is more efficient to run multiple output [`EventSetNodes`][temporian.EventSetNode] together with [`tp.run()`][temporian.run] than to run them separately with `node_1.run(...)`, `node_2.run(...)`, etc. Only use [`node.run()`][temporian.EventSetNode.run] for debugging purposes or when you only have a single output [`EventSetNode`][temporian.EventSetNode].
@@ -175,23 +179,25 @@ Previously, we defined the input of the graph `a_node` with [`tp.input_node()`][
 
 If an [`EventSet`][temporian.EventSet] is available (i.e., data is available) this step can be changed to use `evset.node()` instead, which will return an [`EventSetNode`][temporian.EventSetNode] that is compatible with it. This is especially useful when creating [`EventSets`][temporian.EventSet] from existing data, such as pandas DataFrames or CSV files.
 
-```python
->>> # Define an EventSet.
->>> a_evset = tp.event_set(
-... 	timestamps=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-... 	features={
-...         "feature_1": [1.0, 2.0, 3.0, 4.0, 2.0, 3.0, 4.0, 5.0, 6.0, 3.0],
-...         "feature_2": [54, 23, 53, 12, 12, 32, 23, 12, 2, 4],
-... 	},
-...     name="a",
-... )
+"""
+# %%
+# Define an EventSet.
+a_evset = tp.event_set(
+	timestamps=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+	features={
+        "feature_1": [1.0, 2.0, 3.0, 4.0, 2.0, 3.0, 4.0, 5.0, 6.0, 3.0],
+        "feature_2": [54, 23, 53, 12, 12, 32, 23, 12, 2, 4],
+	},
+    name="a",
+)
 
->>> # Define the input of a graph using an existing EventSet.
->>> # This line is equivalent to the `tp.input_node` line above.
->>> a_node = a_evset.node()
+# Define the input of a graph using an existing EventSet.
+# This line is equivalent to the `tp.input_node` line above.
+a_node = a_evset.node()
 
-# ... Define operators and run the graph as above.
-```
+# Define operators and run the graph as above.
+# %% [markdown]
+"""
 
 ## Time units
 
@@ -201,47 +207,41 @@ To ease the feature engineering of dates, Temporian contains a set of _calendar 
 
 Calendar operators require the time in their inputs to be Unix time, so applying them on non-Unix timestamps will raise errors. Temporian can sometimes automatically recognize if input timestamps correspond to Unix time (e.g. when an [`EventSet`][temporian.EventSet] is created from a pandas DataFrame with a datetime column, or when passing a list of datetime objects as timestamps in [`EventSet`][temporian.EventSet]'s constructor). If creating [`EventSets`][temporian.EventSet] manually and passing floats directly to `timestamps`, you need to explicitly specify whether they correspond to Unix times or not via the `is_unix_timestamp` argument.
 
-```python
->>> a_evset = tp.event_set(
-...     timestamps=[
-...         pd.to_datetime("Monday Mar 13 12:00:00 2023", utc=True),
-...         pd.to_datetime("Tuesday Mar 14 12:00:00 2023", utc=True),
-...         pd.to_datetime("Friday Mar 17 00:00:01 2023", utc=True),
-...     ],
-...     features={
-...         "feature_1": [1, 2, 3],
-...         "feature_2": ["a", "b", "c"],
-...     },
-... )
->>> a_node = a_evset.node()
->>> b_node = tp.glue(a_node, tp.calendar_day_of_week(a_node))
->>> b_node.run(a_evset)
-indexes: ...
-features: [('feature_1', int64), ('feature_2', str_), ('calendar_day_of_week', int32)]
-events:
-     (3 events):
-        timestamps: [1.6787e+09 1.6788e+09 1.6790e+09]
-        'feature_1': [1 2 3]
-        'feature_2': ['a' 'b' 'c']
-        'calendar_day_of_week': [0 1 4]
-...
-
-```
+"""
+# %%
+a_evset = tp.event_set(
+    timestamps=[
+        pd.to_datetime("Monday Mar 13 12:00:00 2023", utc=True),
+        pd.to_datetime("Tuesday Mar 14 12:00:00 2023", utc=True),
+        pd.to_datetime("Friday Mar 17 00:00:01 2023", utc=True),
+    ],
+    features={
+        "feature_1": [1, 2, 3],
+        "feature_2": ["a", "b", "c"],
+    },
+)
+a_node = a_evset.node()
+b_node = tp.glue(a_node, tp.calendar_day_of_week(a_node))
+b_node.run(a_evset)
+# %% [markdown]
+"""
 
 Temporian accepts time inputs in various formats, including integer, float, Python date or datetime, NumPy datetime, and pandas datetime. Date and datetime objects are internally converted to floats as Unix time in seconds, compatible with the calendar operators.
 
 Operators can take _durations_ as input arguments. For example, the simple moving average operator takes a `window_length` argument. Temporian exposes several utility functions to help creating those duration arguments when using Unix timestamps:
 
-```python
->>> a = tp.input_node(features=[("feature_1", tp.float64)])
->>>
->>> # Define a 1-day moving average.
->>> b = tp.simple_moving_average(a, window_length=tp.duration.days(1))
->>>
->>> # Equivalent.
->>> b = tp.simple_moving_average(a, window_length=24 * 60 * 60)
+"""
+# %%
+a = tp.input_node(features=[("feature_1", tp.float64)])
 
-```
+# Define a 1-day moving average.
+b = tp.simple_moving_average(a, window_length=tp.duration.days(1))
+
+# Equivalent.
+b = tp.simple_moving_average(a, window_length=24 * 60 * 60)
+
+# %% [markdown]
+"""
 
 ## Plotting
 
@@ -253,17 +253,19 @@ The [`evset.plot()`][temporian.EventSet.plot] function is shorter to write and i
 
 Here's an example of using the [`evset.plot()`][temporian.EventSet.plot] function:
 
-```python
->>> evset = tp.event_set(
-... 	timestamps=[1, 2, 3, 4, 5],
-... 	features={
-...         "feature_1": [0.5, 0.6, 0.4, 0.4, 0.9],
-...         "feature_2": ["red", "blue", "red", "blue", "green"]
-...     }
-... )
->>> evset.plot()
+"""
+# %%
+evset = tp.event_set(
+	timestamps=[1, 2, 3, 4, 5],
+	features={
+        "feature_1": [0.5, 0.6, 0.4, 0.4, 0.9],
+        "feature_2": ["red", "blue", "red", "blue", "green"]
+    }
+)
+evset.plot()
 
-```
+# %% [markdown]
+"""
 
 By default, the plotting style is selected automatically based on the data.
 
@@ -271,131 +273,147 @@ For example, uniformly sampled numerical features (i.e., time series) are plotte
 
 Here's an example of using the `evset.plot()` function with options:
 
-```python
->>> figure = evset.plot(
-...     style="marker",
-...     width_px=400,
-...     min_time=2,
-...     max_time=10,
-...     return_fig=True,
-... )
+"""
+# %%
+figure = evset.plot(
+    style="marker",
+    width_px=400,
+    min_time=2,
+    max_time=10,
+    return_fig=True,
+)
 
-```
+# %% [markdown]
+"""
 
 The plots are static images by default. However, interactive plotting can be very powerful. To enable interactive plotting, use `interactive=True`. Note that interactive plotting requires the `bokeh` Python library to be installed.
 
-```python
+"""
+# %%
 !pip install bokeh -q
 
->>> evset.plot(interactive=True)
+evset.plot(interactive=True)
 
-```
+# %% [markdown]
+"""
 
 ## Feature naming
 
 Each feature is identified by a name, and the list of features is available through the `features` property of an [`EventSetNode`][temporian.EventSetNode].
 
-```python
->>> events = tp.event_set(
-... 	timestamps=[1,2,3,4,5],
-... 	features={
-... 	    "feature_1": [0.5, 0.6, 0.4, 0.4, 0.9],
-... 	    "feature_2": [1.0, 2.0, 3.0, 2.0, 1.0]}
-...     )
->>> node = events.node()
->>> print(node.features)
-[('feature_1', float64), ('feature_2', float64)]
+"""
+# %%
+events = tp.event_set(
+	timestamps=[1,2,3,4,5],
+	features={
+	    "feature_1": [0.5, 0.6, 0.4, 0.4, 0.9],
+	    "feature_2": [1.0, 2.0, 3.0, 2.0, 1.0]}
+    )
+node = events.node()
+print(node.features)
 
-```
+# %% [markdown]
+"""
 
 Most operators do not change the input feature's names.
 
-```python
->>> tp.moving_sum(node, window_length=10).features
-[('feature_1', float64), ('feature_2', float64)]
+"""
+# %%
+tp.moving_sum(node, window_length=10).features
 
-```
+# %% [markdown]
+"""
 
 Some operators combine two input features with different names, in which case the output name is also combined.
 
-```python
->>> result = node["feature_1"] * node["feature_2"]
->>> result.features
-[('mult_feature_1_feature_2', float64)]
+"""
+# %%
+result = node["feature_1"] * node["feature_2"]
+result.features
 
-```
+# %% [markdown]
+"""
 
 The calendar operators don't depend on input features but on the timestamps, so the output feature name doesn't
 relate to the input feature names.
 
-```python
->>> date_events = tp.event_set(
-... 	timestamps=["2020-02-15", "2020-06-20"],
-... 	features={"some_feature": [10, 20]}
-...     )
->>> date_node = date_events.node()
->>> print(tp.calendar_month(date_node).features)
-[('calendar_month', int32)]
+"""
+# %%
+date_events = tp.event_set(
+	timestamps=["2020-02-15", "2020-06-20"],
+	features={"some_feature": [10, 20]}
+    )
+date_node = date_events.node()
+print(tp.calendar_month(date_node).features)
 
-```
+# %% [markdown]
+"""
 
 You can modify feature names using the [`tp.rename()`][temporian.rename] and [`tp.prefix()`][temporian.prefix] operators. [`tp.rename()`][temporian.rename] changes the name of features, while [`tp.prefix()`][temporian.prefix] adds a prefix in front of existing feature names. Note that they do not modify the content of the input [`EventSetNode`][temporian.EventSetNode], but return a new [`EventSetNode`][temporian.EventSetNode] with the modified feature names.
 
-```python
->>> # Rename a single feature.
->>> renamed_f1 = tp.rename(node["feature_1"], "renamed_1")
->>> print(renamed_f1.features)
-[('renamed_1', float64)]
+"""
+# %%
+# Rename a single feature.
+renamed_f1 = tp.rename(node["feature_1"], "renamed_1")
+print(renamed_f1.features)
 
->>> # Rename all features.
->>> renamed_node = tp.rename(node,
-...     {"feature_1": "renamed_1", "feature_2": "renamed_2"}
-... )
->>> print(renamed_node.features)
-[('renamed_1', float64), ('renamed_2', float64)]
+# %%
+# Rename all features.
+renamed_node = tp.rename(node,
+    {"feature_1": "renamed_1", "feature_2": "renamed_2"}
+)
+print(renamed_node.features)
 
-```
+# %% [markdown]
+"""
 
-```python
->>> # Prefix a single feature.
->>> prefixed_f1 = tp.prefix("prefixed.", node["feature_1"])
->>> print(prefixed_f1.features)
-[('prefixed.feature_1', float64)]
+"""
+# %%
+# Prefix a single feature.
+prefixed_f1 = tp.prefix("prefixed.", node["feature_1"])
+print(prefixed_f1.features)
 
->>> # Prefix all features.
->>> prefixed_node = tp.prefix("prefixed.", node)
->>> print(prefixed_node.features)
-[('prefixed.feature_1', float64), ('prefixed.feature_2', float64)]
+# %%
+# Prefix all features.
+prefixed_node = tp.prefix("prefixed.", node)
+print(prefixed_node.features)
 
-```
+# %% [markdown]
+"""
 
 It is recommended to use [`tp.rename()`][temporian.rename] and [`tp.prefix()`][temporian.prefix] to organize your data, and avoid duplicated feature names.
 
-```python
->>> sma_7_node = tp.prefix("sma_7.", tp.simple_moving_average(node, tp.duration.days(7)))
->>> sma_14_node = tp.prefix("sma_14.", tp.simple_moving_average(node, tp.duration.days(14)))
+"""
+# %%
+sma_7_node = tp.prefix("sma_7.", tp.simple_moving_average(node, tp.duration.days(7)))
+sma_14_node = tp.prefix("sma_14.", tp.simple_moving_average(node, tp.duration.days(14)))
 
-```
+# %% [markdown]
+"""
 
 The [`tp.glue()`][temporian.glue] operator can be used to concatenate different features into a single [`EventSetNode`][temporian.EventSetNode], but it will fail if two features with the same name are provided. The following pattern is commonly used in Temporian programs.
 
-```python
->>> result = tp.glue(
-...     tp.prefix("sma_7.", tp.simple_moving_average(node, tp.duration.days(7))),
-...     tp.prefix("sma_14.", tp.simple_moving_average(node, tp.duration.days(14))),
-... )
+"""
+# %%
+result = tp.glue(
+    tp.prefix("sma_7.", tp.simple_moving_average(node, tp.duration.days(7))),
+    tp.prefix("sma_14.", tp.simple_moving_average(node, tp.duration.days(14))),
+)
 
-```
+# %% [markdown]
+"""
 
 ## Casting
 
 Temporian is strict on feature data types (also called dtype). This means that often, you cannot perform operations between features of different types. For example, you cannot subtract a `tp.float32` and a `tp.float64`. Instead, you must manually cast the features to the same type before performing the operation.
 
-```python
->>> node = tp.input_node(features=[("f1", tp.float32), ("f2", tp.float64)])
->>> added = tp.cast(node["f1"], tp.float64) + node["f2"]
+"""
+# %%
+node = tp.input_node(features=[("f1", tp.float32), ("f2", tp.float64)])
+added = tp.cast(node["f1"], tp.float64) + node["f2"]
 
-```
+# %% [markdown]
+"""
 
 Casting is especially useful to reduce memory usage. For example, if a feature only contains values between 0 and 10000, using `tp.int32` instead of `tp.int64` will halve memory usage. These optimizations are critical when working with large datasets.
 
@@ -407,30 +425,32 @@ Temporian supports data type casting through the [`tp.cast()`][temporian.cast] o
 
 1. Single data type: converts all input features to the same destination data type.
 
-   ```python
-   >>> node.features
-   [('f1', float32), ('f2', float64)]
+   """
+# %%
+node.features
+# %%
+print(tp.cast(node, tp.str_).features)
 
-   >>> print(tp.cast(node, tp.str_).features)
-   [('f1', str_), ('f2', str_)]
-
-   ```
+# %% [markdown]
+"""
 
 2. Feature name to data type mapping: converts each feature (specified by name) to a specific data type.
 
-   ```python
-   >>> print(tp.cast(node, {"f1": tp.str_, "f2": tp.int64}).features)
-   [('f1', str_), ('f2', int64)]
+"""
+# %%
+print(tp.cast(node, {"f1": tp.str_, "f2": tp.int64}).features)
 
-   ```
+# %% [markdown]
+"""
 
 3. Data type to data type mapping: converts all features of a specific data type to another data type.
 
-   ```python
-   >>> print(tp.cast(node, {tp.float32: tp.str_, tp.float64: tp.int64}).features)
-   [('f1', str_), ('f2', int64)]
+"""
+# %%
+print(tp.cast(node, {tp.float32: tp.str_, tp.float64: tp.int64}).features)
 
-   ```
+# %% [markdown]
+"""
 
 Keep in mind that casting may fail when the graph is evaluated. For instance, attempting to cast `"word"` to `tp.float64` will result in an error. These errors cannot be caught prior to graph evaluation.
 
@@ -442,105 +462,117 @@ Common mathematical and bit operations are supported, such as addition (`+`), su
 
 These operators are applied index-wise and timestamp-wise, between features in the same position.
 
-```python
->>> evset = tp.event_set(
-...     timestamps=[1, 10],
-...     features={
-...         "f1": [0, 1],
-...         "f2": [10.0, 20.0],
-...         "f3": [100, 100],
-...         "f4": [1000.0, 1000.0],
-...     },
-... )
->>> node = evset.node()
+"""
+# %%
+evset = tp.event_set(
+    timestamps=[1, 10],
+    features={
+        "f1": [0, 1],
+        "f2": [10.0, 20.0],
+        "f3": [100, 100],
+        "f4": [1000.0, 1000.0],
+    },
+)
+node = evset.node()
 
->>> node_added = node[["f1", "f2"]] + node[["f3", "f4"]]
+node_added = node[["f1", "f2"]] + node[["f3", "f4"]]
 
->>> evset_added = node_added.run(evset)
->>> print(evset_added)
-indexes: ...
-features: [('add_f1_f3', int64), ('add_f2_f4', float64)]
-events:
-     (2 events):
-        timestamps: [ 1. 10.]
-        'add_f1_f3': [100 101]
-        'add_f2_f4': [1010. 1020.]
-...
-
-```
+evset_added = node_added.run(evset)
+print(evset_added)
+# %% [markdown]
+"""
 
 Note that features of type `int64` and `float64` are not mixed above, because otherwise the operation would fail without an explicit type cast.
 
+"""
+# %%[markdown]
+"""
 ```python
->>> # Attempt to mix dtypes.
+# Attempt to mix dtypes.
 >>> node["f1"] + node["f2"]
 Traceback (most recent call last):
     ...
-ValueError: ... corresponding features should have the same dtype. ...
-
+ValueError: corresponding features should have the same dtype. ...
 ```
+"""
+# %% [markdown]
+"""
 
 Refer to the [Casting](#casting) section for more on this.
 
 All the operators have an equivalent functional form. The example above using `+`, could be rewritten with [`tp.add()`][temporian.add].
 
-```python
->>> # Equivalent.
->>> node_added = tp.add(node[["f1", "f2"]], node[["f3", "f4"]])
+"""
+# %%
+# Equivalent.
+node_added = tp.add(node[["f1", "f2"]], node[["f3", "f4"]])
 
-```
+# %% [markdown]
+"""
 
 Other usual comparison and logic operators also work (except `==`, see below).
 
-```python
->>> is_greater = node[["f1", "f2"]] > node[["f3", "f4"]]
->>> is_less_or_equal = node[["f1", "f2"]] <= node[["f3", "f4"]]
->>> is_wrong = is_greater & is_less_or_equal
+"""
+# %%
+is_greater = node[["f1", "f2"]] > node[["f3", "f4"]]
+is_less_or_equal = node[["f1", "f2"]] <= node[["f3", "f4"]]
+is_wrong = is_greater & is_less_or_equal
 
-```
+# %% [markdown]
+"""
 
 **Warning:** The Python equality operator (`==`) does not compute element-wise equality between features. Use the [`tp.equal()`][temporian.equal] operator instead.
 
-```python
->>> # Works element-wise as expected
->>> tp.equal(node["f1"], node["f3"])
-schema:
-    features: [('eq_f1_f3', bool_)]
-    ...
+"""
+# %%
+# Works element-wise as expected
+tp.equal(node["f1"], node["f3"])
 
->>> # This is just a boolean
->>> (node["f1"] == node["f3"])
+# %%
+# This is just a boolean
+(node["f1"] == node["f3"])
 False
 
-```
+# %% [markdown]
+"""
 
 All these operators act feature-wise, i.e. they perform index-feature-wise operations (for each feature in each index key). This implies that the input [`EventSetNodes`][temporian.EventSetNode] must have the same number of features.
 
+"""
+# %%[markdown]
+"""
 ```python
->>> node[["f1", "f2"]] + node["f3"]
+node[["f1", "f2"]] + node["f3"]
 Traceback (most recent call last):
     ...
 ValueError: The left and right arguments should have the same number of features. ...
-
 ```
+"""
+# %% [markdown]
+"""
 
 The input [`EventSetNodes`][temporian.EventSetNode] must also have the same sampling and index.
 
+"""
+# %%[markdown]
+"""
 ```python
->>> sampling_1 = tp.event_set(
-...     timestamps=[0, 1],
-...     features={"f1": [1, 2]},
-... )
->>> sampling_2 = tp.event_set(
-...     timestamps=[1, 2],
-...     features={"f1": [3, 4]},
-... )
->>> sampling_1.node() + sampling_2.node()
+sampling_1 = tp.event_set(
+    timestamps=[0, 1],
+    features={"f1": [1, 2]},
+)
+sampling_2 = tp.event_set(
+    timestamps=[1, 2],
+    features={"f1": [3, 4]},
+)
+sampling_1.node() + sampling_2.node()
 Traceback (most recent call last):
     ...
 ValueError: Arguments should have the same sampling. ...
-
 ```
+"""
+# %% [markdown]
+"""
 
 If you want to apply arithmetic operators on [`EventSetNodes`][temporian.EventSetNode] with different samplings, take a look at
 [Sampling](#sampling) section.
@@ -550,21 +582,12 @@ If you want to apply them on [`EventSetNodes`][temporian.EventSetNode] with diff
 
 Operations involving scalars are applied index-feature-element-wise.
 
-```python
->>> node_scalar = node * 10
->>> print(node_scalar.run(evset))
-indexes: ...
-features: [('f1', int64), ('f2', float64), ('f3', int64), ('f4', float64)]
-events:
-     (2 events):
-        timestamps: [ 1. 10.]
-        'f1': [ 0 10]
-        'f2': [100. 200.]
-        'f3': [1000 1000]
-        'f4': [10000. 10000.]
-...
-
-```
+"""
+# %%
+node_scalar = node * 10
+print(node_scalar.run(evset))
+# %% [markdown]
+"""
 
 ## Sampling
 
@@ -586,29 +609,23 @@ If a timestamp is present in `sampling` but not in `input`, a new timestamp is c
 
 Given this example:
 
-```python
->>> evset = tp.event_set(
-...     timestamps=[10, 20, 30],
-...     features={
-...         "x": [1.0, 2.0, 3.0],
-...     },
-... )
->>> node = evset.node()
->>> sampling_evset = tp.event_set(
-...     timestamps=[0, 9, 10, 11, 19, 20, 21],
-... )
->>> sampling_node = sampling_evset.node()
->>> resampled = tp.resample(input=node, sampling=sampling_node)
->>> resampled.run({node: evset, sampling_node: sampling_evset})
-indexes: []
-features: [('x', float64)]
-events:
-     (7 events):
-        timestamps: [ 0.  9. 10. 11. 19. 20. 21.]
-        'x': [nan nan  1.  1.  1.  2.  2.]
-...
-
-```
+"""
+# %%
+evset = tp.event_set(
+    timestamps=[10, 20, 30],
+    features={
+        "x": [1.0, 2.0, 3.0],
+    },
+)
+node = evset.node()
+sampling_evset = tp.event_set(
+    timestamps=[0, 9, 10, 11, 19, 20, 21],
+)
+sampling_node = sampling_evset.node()
+resampled = tp.resample(input=node, sampling=sampling_node)
+resampled.run({node: evset, sampling_node: sampling_evset})
+# %% [markdown]
+"""
 
 The following would be the matching between the timestamps of `sampling` and `input`:
 
@@ -625,28 +642,22 @@ string: `""`
 
 Back to the example of the [`tp.add()`][temporian.add] operator, `a` and `b` with different sampling can be added as follows:
 
-```python
->>> sampling_a = tp.event_set(
-...     timestamps=[0, 1, 2],
-...     features={"f1": [10, 20, 30]},
-... )
->>> sampling_b = tp.event_set(
-...     timestamps=[1, 2, 3],
-...     features={"f1": [5, 4, 3]},
-... )
->>> a = sampling_a.node()
->>> b = sampling_b.node()
->>> result = a + tp.resample(b, a)
->>> result.run({a: sampling_a, b: sampling_b})
-indexes: []
-features: [('add_f1_f1', int64)]
-events:
-     (3 events):
-        timestamps: [0. 1. 2.]
-        'add_f1_f1': [10 25 34]
-...
-
-```
+"""
+# %%
+sampling_a = tp.event_set(
+    timestamps=[0, 1, 2],
+    features={"f1": [10, 20, 30]},
+)
+sampling_b = tp.event_set(
+    timestamps=[1, 2, 3],
+    features={"f1": [5, 4, 3]},
+)
+a = sampling_a.node()
+b = sampling_b.node()
+result = a + tp.resample(b, a)
+result.run({a: sampling_a, b: sampling_b})
+# %% [markdown]
+"""
 
 [`tp.resample()`][temporian.resample] is critical to combine events from different, non-synchronized sources. For example, consider a system with two sensors, a thermometer for temperature and a manometer for pressure. The temperature sensor produces measurements every 1 to 10 minutes, while the pressure sensor returns measurements every second. Additionally assume that both sensors are not synchronized. Finally, assume that you need to combine the temperature and pressure measurements with the equation `temperature / pressure`.
 
@@ -657,11 +668,14 @@ Since the temperature and pressure [`EventSets`][temporian.EventSet] have differ
 ```python
 r = tp.resample(termometer["temperature"], manometer) / manometer["pressure"]
 ```
+"""
+# %% [markdown]
+"""
 
 When handling non-uniform timestamps it is also common to have a common resampling source.
 
 ```python
-sampling_source = ... # Uniform timestamps every 10 seconds.
+sampling_source = # Uniform timestamps every 10 seconds.
 r = tp.resample(termometer["temperature"], sampling_source) / tp.resample(manometer["pressure"], sampling_source)
 ```
 
@@ -682,50 +696,34 @@ It is sometimes desirable for events in an [`EventSet`][temporian.EventSet] not 
 
 To compute the weekly sales of individual products, you can define the `product` feature as the _index_.
 
-```python
->>> daily_sales = tp.event_set(
-... 	timestamps=["2020-01-01", "2020-01-01", "2020-01-02", "2020-01-02"],
-... 	features={
-...         "product": [1, 2, 1, 2],
-...         "sale": [100.0, 300.0, 90.0, 400.0],
-...     },
-...     indexes=["product"]
-... )
->>> print(daily_sales)
-indexes: [('product', int64)]
-features: [('sale', float64)]
-events:
-    product=1 (2 events):
-        timestamps: [...]
-        'sale': [100. 90.]
-    product=2 (2 events):
-        timestamps: [...]
-        'sale': [300. 400.]
-...
-
-```
+"""
+# %%
+daily_sales = tp.event_set(
+	timestamps=["2020-01-01", "2020-01-01", "2020-01-02", "2020-01-02"],
+	features={
+        "product": [1, 2, 1, 2],
+        "sale": [100.0, 300.0, 90.0, 400.0],
+    },
+    indexes=["product"]
+)
+print(daily_sales)
+# %% [markdown]
+"""
 
 The moving sum operator will then be applied independently to the events corresponding to each product.
 
-```python
->>> a = daily_sales.node()
->>>
->>> # Compute the moving sum of each index group (a.k.a. each product) individually.
->>> b = tp.moving_sum(a, window_length=tp.duration.weeks(1))
->>>
->>> b.run({a: daily_sales})
-indexes: [('product', int64)]
-features: [('sale', float64)]
-events:
-    product=1 (2 events):
-        timestamps: [...]
-        'sale': [100. 190.]
-    product=2 (2 events):
-        timestamps: [...]
-        'sale': [300. 700.]
-...
+"""
+# %%
+a = daily_sales.node()
 
-```
+# Compute the moving sum of each index group (a.k.a. each product) individually.
+b = tp.moving_sum(a, window_length=tp.duration.weeks(1))
+
+b.run({a: daily_sales})
+
+
+# %% [markdown]
+"""
 
 Horizontal operators can be understood as operators that are applied independently on each index.
 
@@ -742,123 +740,73 @@ Also, keep in mind that only string and integer features can be used as indexes.
 
 [`EventSets`][temporian.EventSet] can have multiple features as index. In the next example, assume our daily sale aggregates are also annotated with `store` data.
 
-```python
->>> daily_sales = tp.event_set(
-... 	timestamps=["2020-01-01", "2020-01-01", "2020-01-02", "2020-01-02"],
-... 	features={
-...         "store": [1, 1, 1, 2],
-...         "product": [1, 2, 1, 2],
-...         "sale": [100.0, 200.0, 110.0, 300.0],
-...     },
-... )
->>> print(daily_sales)
-indexes: []
-features: [('store', int64), ('product', int64), ('sale', float64)]
-events:
-     (4 events):
-        timestamps: [...]
-        'store': [1 1 1 2]
-        'product': [1 2 1 2]
-        'sale': [100. 200. 110. 300.]
-...
+"""
+# %%
+daily_sales = tp.event_set(
+	timestamps=["2020-01-01", "2020-01-01", "2020-01-02", "2020-01-02"],
+	features={
+        "store": [1, 1, 1, 2],
+        "product": [1, 2, 1, 2],
+        "sale": [100.0, 200.0, 110.0, 300.0],
+    },
+)
+print(daily_sales)
 
-```
+# %% [markdown]
+"""
 
 Since we haven't defined the `indexes` yet, `store` and `product` are just regular features above.
 Let's add the `(product, store)` pair as the index.
 
-```python
->>> a = daily_sales.node()
->>> b = tp.add_index(a, ["product", "store"])
->>> b.run({a: daily_sales})
-indexes: [('product', int64), ('store', int64)]
-features: [('sale', float64)]
-events:
-    product=1 store=1 (2 events):
-        timestamps: [...]
-        'sale': [100. 110.]
-    product=2 store=1 (1 events):
-        timestamps: [...]
-        'sale': [200.]
-    product=2 store=2 (1 events):
-        timestamps: [...]
-        'sale': [300.]
-...
+"""
+# %%
+a = daily_sales.node()
+b = tp.add_index(a, ["product", "store"])
+b.run({a: daily_sales})
 
-```
+
+# %% [markdown]
+"""
 
 The `moving_sum` operator can be used to calculate the weekly sum of sales
 for each `(product, store)` pair.
 
-```python
->>> # Weekly sales by product and store
->>> c = tp.moving_sum(b["sale"], window_length=tp.duration.weeks(1))
->>> c.run({a: daily_sales})
-indexes: [('product', int64), ('store', int64)]
-features: [('sale', float64)]
-events:
-    product=1 store=1 (2 events):
-        timestamps: [...]
-        'sale': [100. 210.]
-    product=2 store=1 (1 events):
-        timestamps: [...]
-        'sale': [200.]
-    product=2 store=2 (1 events):
-        timestamps: [...]
-        'sale': [300.]
-...
-
-```
+"""
+# %%
+# Weekly sales by product and store
+c = tp.moving_sum(b["sale"], window_length=tp.duration.weeks(1))
+c.run({a: daily_sales})
+# %% [markdown]
+"""
 
 If we want the weekly sum of sales per `store`, we can just drop the `product` index.
 
-```python
->>> # Weekly sales by store (including all products)
->>> d = tp.drop_index(b, "product")
->>> e = tp.moving_sum(d["sale"], window_length=tp.duration.weeks(1))
->>> e.run({a: daily_sales})
-indexes: [('store', int64)]
-features: [('sale', float64)]
-events:
-    store=1 (3 events):
-        timestamps: [...]
-        'sale': [300. 300. 410.]
-    store=2 (1 events):
-        timestamps: [...]
-        'sale': [300.]
-...
-
-```
+"""
+# %%
+# Weekly sales by store (including all products)
+d = tp.drop_index(b, "product")
+e = tp.moving_sum(d["sale"], window_length=tp.duration.weeks(1))
+e.run({a: daily_sales})
+# %% [markdown]
+"""
 
 Finally, let's calculate the ratio of sales of each `(product, store)` pair compared to the whole `store` sales.
 
 Since `c` (weekly sales for each product and store) and `e` (weekly sales for each store) have different indexes, we cannot use `tp.divide` (or `/`) directly - we must first `propagate` `e` to the `["product", "store"]` index.
 
-```python
->>> # Copy the content of e (indexed by (store)) into each (store, product).
->>> f = c / tp.propagate(e, sampling=c, resample=True)
->>>
->>> # Equivalent.
->>> f = c / tp.resample(
-...     tp.propagate(e, sampling=c),
-...     sampling=c,
-... )
->>> print(f.run({a: daily_sales}))
-indexes: [('product', int64), ('store', int64)]
-features: [('div_sale_sale', float64)]
-events:
-    product=1 store=1 (2 events):
-        timestamps: [...]
-        'div_sale_sale': [0.3333 0.5122]
-    product=2 store=1 (1 events):
-        timestamps: [...]
-        'div_sale_sale': [0.6667]
-    product=2 store=2 (1 events):
-        timestamps: [...]
-        'div_sale_sale': [1.]
-...
+"""
+# %%
+# Copy the content of e (indexed by (store)) into each (store, product).
+f = c / tp.propagate(e, sampling=c, resample=True)
 
-```
+# Equivalent.
+f = c / tp.resample(
+    tp.propagate(e, sampling=c),
+    sampling=c,
+)
+print(f.run({a: daily_sales}))
+# %% [markdown]
+"""
 
 The [`tp.propagate()`][temporian.propagate] operator expands the indexes of its `input` (`e` in this case) to match the indexes of its `sampling` by copying the content of `input` into each corresponding index group of `sampling`. Note that `sampling`'s indexes must be a superset of `input`'s indexes.
 
@@ -872,26 +820,27 @@ To avoid future leakage, Temporian operators are guaranteed to not cause future 
 
 [`tp.leak()`][temporian.leak] can be useful for precomputing labels or evaluating machine learning models. However, its outputs shouldn’t be used as input features.
 
-```python
->>> a = tp.input_node(features=[("feature_1", tp.float32)])
->>> b = tp.moving_count(a, 1)
->>> c = tp.moving_count(tp.leak(b, 1), 2)
+"""
+# %%
+a = tp.input_node(features=[("feature_1", tp.float32)])
+b = tp.moving_count(a, 1)
+c = tp.moving_count(tp.leak(b, 1), 2)
 
-```
+# %% [markdown]
+"""
 
 In this example, `b` does not have a future leak, but `c` does because it depends on [`tp.leak()`][temporian.leak].
 
 <!-- TODO: Not implemented yet
 
-To check programmatically if an `EventSetNode` depends on [`tp.leak()`][temporian.leak], we can use the [`tp.has_leak()`][temporian.has_leak] function.
-```python
-# >>> print(tp.has_leak(b))
+To check programmatically if a `Node` depends on [`tp.leak()`][temporian.leak], we can use the [`tp.has_leak()`][temporian.has_leak] function.
+
+# print(tp.has_leak(b))
 # False
 
-# >>> print(tp.has_leak(c))
+# print(tp.has_leak(c))
 # True
 
-```
 
 By using [`tp.has_leak()`][temporian.has_leak], we can programmatically identify future leakage and modify our code accordingly.
 -->
@@ -900,26 +849,26 @@ By using [`tp.has_leak()`][temporian.has_leak], we can programmatically identify
 
 [`EventSet`][temporian.EventSet] data can be accessed using their `data` attribute. Temporian internally relies on NumPy, which means that the data access functions always return NumPy arrays.
 
-```python
->>> evset = tp.event_set(
-... 	timestamps=[1, 2, 3, 5, 6],
-... 	features={
-...         "f1": [0.1, 0.2, 0.3, 1.1, 1.2],
-...         "f2": ["red", "red", "red", "blue", "blue"],
-... 	},
-... 	indexes=["f2"],
-... )
->>>
->>> # Access the data for the index group `f2=red`.
->>> evset.data[("red",)]
-IndexData(features=[array([0.1, 0.2, 0.3])], timestamps=array([1., 2., 3.]))
+"""
+# %%
+evset = tp.event_set(
+	timestamps=[1, 2, 3, 5, 6],
+	features={
+        "f1": [0.1, 0.2, 0.3, 1.1, 1.2],
+        "f2": ["red", "red", "red", "blue", "blue"],
+	},
+	indexes=["f2"],
+)
 
-```
+# Access the data for the index group `f2=red`.
+evset.data[("red",)]
+
+# %% [markdown]
+"""
 
 <!--
 `EventSet` data can be accessed using the `index()` and `feature()` functions. Temporian internally relies on NumPy, which means that the data access functions always return NumPy arrays.
 
-```python
 evset = tp.event_set(
 	timestamps=[1, 2, 3, 5, 6],
 	features={
@@ -940,11 +889,9 @@ evset.index(("red", ))
 # Access the data for the index group `f2=red` and feature `f1`.
 evset.index("red").feature("f1")
 
-```
 
 If an [`EventSet`][temporian.EventSet] does not have an index, `feature` can be called directly:
 
-```python
 evset = tp.event_set(
 	timestamps=[1, 2, 3, 5, 6],
 	features={
@@ -953,15 +900,15 @@ evset = tp.event_set(
 	},
 )
 evset.feature("f1")
-```
 -->
 
 ## Import and export data
 
 [`EventSets`][temporian.EventSet] can be read from and saved to csv files via the [`tp.from_csv()`][temporian.from_csv] and [`tp.to_csv()`][temporian.to_csv] functions.
 
-```python
 # Read EventSet from a .csv file.
+
+```python
 evset = tp.from_csv(
     path="path/to/file.csv",
     timestamps="timestamp",
@@ -974,20 +921,22 @@ tp.to_csv(evset, path="path/to/file.csv")
 
 Converting [`EventSet`][temporian.EventSet] data to and from pandas DataFrames is also easily done via [`tp.to_pandas()`][temporian.to_pandas] and [`tp.from_pandas()`][temporian.from_pandas].
 
-```python
->>> df = pd.DataFrame({
-...     "timestamp": [1, 2, 3, 5, 6],
-...     "f1": [0.1, 0.2, 0.3, 1.1, 1.2],
-...     "f2": ["red", "red", "red", "blue", "blue"],
-... })
->>>
->>> # Create EventSet from DataFrame.
->>> evset = tp.from_pandas(df)
->>>
->>> # Convert EventSet to DataFrame.
->>> df = tp.to_pandas(evset)
+"""
+# %%
+df = pd.DataFrame({
+    "timestamp": [1, 2, 3, 5, 6],
+    "f1": [0.1, 0.2, 0.3, 1.1, 1.2],
+    "f2": ["red", "red", "red", "blue", "blue"],
+})
 
-```
+# Create EventSet from DataFrame.
+evset = tp.from_pandas(df)
+
+# Convert EventSet to DataFrame.
+df = tp.to_pandas(evset)
+
+# %% [markdown]
+"""
 
 ## Serialization and deserialization of a graph
 
@@ -1016,3 +965,5 @@ loaded_inputs, loaded_outputs = tp.load(path="/tmp/my_graph.tem")
 # Run data on the restored graph.
 tp.run(loaded_outputs["output_b"], {loaded_inputs["input_a"]: evset})
 ```
+"""
+# %%
