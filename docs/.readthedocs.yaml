@@ -1,8 +1,11 @@
 # .readthedocs.yaml
 # Read the Docs configuration file
 # See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
+#
 # Poetry usage based on:
 #   https://docs.readthedocs.io/en/stable/build-customization.html#install-dependencies-with-poetry
+# LFS installation based on:
+#   https://docs.readthedocs.io/en/stable/build-customization.html#support-git-lfs-large-file-storage
 
 # Required
 version: 2
@@ -15,7 +18,12 @@ build:
     nodejs: "16"
   apt_packages:
     - rsync
+    - git-lfs
   jobs:
+    post_checkout:
+      - git lfs pull
+      - cp -R docs/saved_tmp docs/src/tutorials/tmp
+
     post_create_environment:
       - pip install poetry
       - poetry config virtualenvs.create false

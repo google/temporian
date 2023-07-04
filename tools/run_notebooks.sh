@@ -20,6 +20,6 @@ rsync -r --safe-links --exclude='*/*test/' --include='*/' --include='*.py' --exc
 rsync -r --safe-links --exclude='*/*.runfiles/' --include='*/' --include='*.py' --include='*.so' --exclude='*' "bazel-bin/temporian/" "${PKDIR}/temporian/"
 
 # Checks that the code in all notebooks run without errors
-for path in $(ls examples/tutorials/*.ipynb); do
+for path in $(find docs/src/ -name "*.ipynb" -not -path "*/.ipynb_checkpoints/*"); do
     PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python PYTHONPATH="${PKDIR}/:$PYTHONPATH" jupyter nbconvert --execute $path --to notebook --inplace
 done
