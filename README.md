@@ -15,13 +15,13 @@
 
 - Temporian operates natively on **multivariate** and **multi-index time-series** and **time-sequences** data. With Temporian, all temporal data processing is unified.
 
-- Temporian favours **iterative** and **interactive** development in Colab, where users can **easily visualise intermediate results** 📊 each step of the way.
+- Temporian favors **iterative** and **interactive** development in Colab, where users can **easily visualize intermediate results** 📊 each step of the way.
 
 - Temporian introduces a novel mechanism to **prevent unwanted future leakage** and **training/serving skew** 😰. Temporian programs always return the same result in batch and in streaming mode.
 
 - Temporian programs can run seamlessly **in-process** in Python, on **large datasets using [Apache Beam](https://beam.apache.org/)** ☁️, and in **streaming for continuous** data ingestion.
 
-- Temporian's core is implemented **in C++** and **highly optimised** 🔥, so large amounts of data can be handled in-process. In some cases, Temporian can provide a speed-up in the order of 1000x compared to other libraries.
+- Temporian's core is implemented **in C++** and **highly optimized** 🔥, so large amounts of data can be handled in-process. In some cases, Temporian can provide a speed-up in the order of 1000x compared to other libraries.
 
 ## Installation
 
