@@ -23,6 +23,7 @@ build:
 
     post_install:
       - poetry install
+      - pip install -r docs/src/tutorials/requirements.txt
 
     pre_build:
       - tools/run_notebooks.sh
