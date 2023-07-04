@@ -85,6 +85,7 @@ py_test(
         # already_there/absl/testing:absltest
         "//temporian/core:evaluation",
         "//temporian/implementation/numpy/data:event_set",
+        "//temporian",
     ],
 )
 

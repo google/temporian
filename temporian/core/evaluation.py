@@ -258,6 +258,59 @@ def build_schedule(
     return schedule
 
 
+def has_leak(
+    output: EvaluationQuery,
+    input: Optional[EvaluationQuery] = None,
+) -> bool:
+    """Tests if a node depends on a leak operator.
+
+    Tests if a [`Node`][temporian.Node] or collection of nodes depends on the
+    only operator that can introduce a future leakage:
+    [`tp.leak()`][temporian.leak].
+
+    Single input output example:
+        ```python
+        >>> a = tp.input_node([("f", float)])
+        >>> b = tp.moving_sum(a, 5)
+        >>> c = tp.leak(b, 6)
+        >>> d = tp.prefix("my_prefix_", c)
+        >>> e = tp.moving_sum(d, 7)
+        >>> # The computation of "e" contains a leak.
+        >>> assert tp.has_leak(e)
+        >>> # The computation of "e" given "d" does not contain a leak.
+        >>> assert not tp.has_leak(e, d)
+
+        ```
+
+    Args:
+        output: Nodes to compute. Supports Node, dict of Nodes and list of
+            Nodes.
+        input: Optional input nodes. Supports Node, dict of Nodes and list of
+            Nodes. If not specified, assumes for the input nodes to be the the
+            raw data inputs e.g. [`tp.input_node()`][temporian.input_node] and
+            [`tp.event_set()`][temporian.event_set].
+
+    Returns:
+        True if and only if the computation of `output` from `inputs` depends
+        on a [`tp.leak()`][temporian.leak] operator.
+    """
+
+    if input is None:
+        normalized_input = None
+    else:
+        normalized_input = _normalize_query(input)
+
+    normalized_output = _normalize_query(output)
+
+    graph = infer_graph(inputs=normalized_input, outputs=normalized_output)
+
+    for operator in graph.operators:
+        if operator.operator_key() == "LEAK":
+            return True
+
+    return False
+
+
 def _normalize_input(input: EvaluationInput) -> Dict[Node, EventSet]:
     """Normalizes an input into a dictionary of node to evsets."""
 

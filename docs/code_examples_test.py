@@ -59,7 +59,7 @@ class CodeExamplesTest(absltest.TestCase):
                     e.got,
                     (
                         f"Docstring example starting at line {lineno} failed on"
-                        f"file {path}\n >>> {ex.source}"
+                        f" file {path}\n >>> {ex.source}"
                     ),
                 )
 
