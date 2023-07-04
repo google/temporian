@@ -9,7 +9,7 @@ How to use the build cleaner.
     tools/build_cleaner.py
 
 If case of a false positive, you might have to update the configuration fields
-BUILD_IN_MODULES, THIRD_PARTY_MODULES, or EXTRA_SOURCE_TO_RULE.
+BUILT_IN_MODULES, THIRD_PARTY_MODULES, or EXTRA_SOURCE_TO_RULE.
 
 Limitations
     - The build cleaner only infer the dependencies of py_library rules. For
@@ -39,7 +39,7 @@ ALLOWED_BUILD_RULES = {
 }
 
 # Python modules that do not require checking / dependencies.
-BUILD_IN_MODULES = {
+BUILT_IN_MODULES = {
     "typing",
     "os",
     "abc",
@@ -86,7 +86,7 @@ EXTRA_SOURCE_TO_RULE = {
 THIRD_PARTY_RULE_PREFIX = "# already_there/"
 
 # Filename of BUILD files.
-BUILD_FILENAME = "BUILD"
+BUILD_FILENAMES = ["BUILD", "BUILD.bazel"]
 
 
 @dataclass
@@ -260,26 +260,32 @@ def extract_dirname_from_path(path: str) -> List[str]:
     return dirnames
 
 
-def find_all_build_files(dir: str) -> List[str]:
-    """List all the BUILD files."""
+def find_all_build_files(dir: str) -> List[Tuple[str, str]]:
+    """List all the BUILD files.
+
+    Returns:
+        The list of (directory, filename) of all BUILD files.
+    """
 
     build_file_dirs = []
     for root, _, files in os.walk(dir):
         for file in files:
-            if file == BUILD_FILENAME:
+            if file in BUILD_FILENAMES:
                 root = root.strip("./")
-                build_file_dirs.append(root)
+                build_file_dirs.append((root, file))
     return build_file_dirs
 
 
-def find_source_to_rules(build_file_dirs: List[str]) -> SourceToRule:
+def find_source_to_rules(
+    build_file_dirs: List[Tuple[str, str]]
+) -> SourceToRule:
     """Mapping from source file to build rules."""
 
     source_to_rules = defaultdict(lambda: [])
-    for build_file_dir in build_file_dirs:
+    for build_file_dir, build_file_name in build_file_dirs:
         rule_base = tuple(extract_dirname_from_path(build_file_dir))
         file_rules = list_build_rules(
-            os.path.join(build_file_dir, BUILD_FILENAME)
+            os.path.join(build_file_dir, build_file_name)
         )
         for rule in file_rules:
             for src in rule.srcs:
@@ -320,7 +326,7 @@ def compute_delta(
         imp_items = tuple(imp.split("."))
 
         # This import does not need a build rule.
-        if imp_items[0] in BUILD_IN_MODULES or imp in BUILD_IN_MODULES:
+        if imp_items[0] in BUILT_IN_MODULES or imp in BUILT_IN_MODULES:
             continue
 
         # The source files that might solve this import.
@@ -416,8 +422,8 @@ def clean_repository(dir: str):
     num_subs = 0
     num_issues = 0
 
-    for build_file_dir in build_file_dirs:
-        build_file_path = os.path.join(build_file_dir, BUILD_FILENAME)
+    for build_file_dir, build_file_name in build_file_dirs:
+        build_file_path = os.path.join(build_file_dir, build_file_name)
         rules = list_build_rules(build_file_path)
         in_is_shown = False
         for rule in rules:
