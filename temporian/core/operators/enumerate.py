@@ -20,6 +20,7 @@ from temporian.core.data.node import (
     Node,
     create_node_new_features_existing_sampling,
 )
+from temporian.core.compilation import compile
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 from temporian.core.data import dtype
@@ -55,6 +56,7 @@ class Enumerate(Operator):
 operator_lib.register_operator(Enumerate)
 
 
+@compile
 def enumerate(input: Node) -> Node:
     """Create an `int64` feature with the ordinal position of each event.
 
