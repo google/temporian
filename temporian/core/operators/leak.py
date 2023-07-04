@@ -16,6 +16,7 @@
 
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.duration_utils import (
     Duration,
     NormalizedDuration,
@@ -73,6 +74,7 @@ class LeakOperator(Operator):
 operator_lib.register_operator(LeakOperator)
 
 
+@compile
 def leak(input: Node, duration: Duration) -> Node:
     """Subtracts a duration from a Node's timestamps.
 

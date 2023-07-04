@@ -16,6 +16,7 @@
 from typing import Optional
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
 from temporian.core.data.duration_utils import Duration, normalize_duration
 from temporian.core.data.node import Node
@@ -37,6 +38,7 @@ class MovingStandardDeviationOperator(BaseWindowOperator):
 operator_lib.register_operator(MovingStandardDeviationOperator)
 
 
+@compile
 def moving_standard_deviation(
     input: Node,
     window_length: Duration,

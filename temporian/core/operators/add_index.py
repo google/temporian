@@ -17,6 +17,7 @@
 from typing import List, Union
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.node import Node, create_node_new_features_new_sampling
 from temporian.core.data.schema import FeatureSchema, IndexSchema
 from temporian.core.operators.base import Operator
@@ -136,6 +137,7 @@ def _normalize_indexes_to_set(
     return indexes
 
 
+@compile
 def add_index(input: Node, indexes: Union[str, List[str]]) -> Node:
     """Adds indexes to a [`Node`][temporian.Node].
 
@@ -217,6 +219,7 @@ def add_index(input: Node, indexes: Union[str, List[str]]) -> Node:
     return AddIndexOperator(input, indexes).outputs["output"]
 
 
+@compile
 def set_index(input: Node, indexes: Union[str, List[str]]) -> Node:
     """Replaces the index in a [`Node`][temporian.Node].
 

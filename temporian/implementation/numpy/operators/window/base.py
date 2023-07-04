@@ -49,7 +49,7 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
         # For each index
         for index_key, index_data in input.data.items():
             dst_features = []
-            dst_timestamps = sampling[index_key].timestamps
+            dst_timestamps = sampling.get_index_value(index_key).timestamps
             dst_index_data = IndexData(
                 features=dst_features,
                 timestamps=dst_timestamps,
@@ -62,7 +62,7 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
                 dst_features=dst_features,
             )
             dst_index_data.check_schema(output_schema)
-            dst_evset[index_key] = dst_index_data
+            dst_evset.set_index_value(index_key, dst_index_data)
 
         return {"output": dst_evset}
 

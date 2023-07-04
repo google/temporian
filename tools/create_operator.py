@@ -79,6 +79,7 @@ def main(argv):
 """{capitalized_op} operator class and public API function definitions."""
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.node import Node, create_node_new_features_new_sampling
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
@@ -122,6 +123,7 @@ class {capitalized_op}(Operator):
 operator_lib.register_operator({capitalized_op})
 
 
+@compile
 def {lower_op}(input: Node, param: float) -> Node:
     """<Text>
 
@@ -207,10 +209,13 @@ class {capitalized_op}NumpyImplementation(OperatorImplementation):
 
         # Fill output EventSet's data
         for index_key, index_data in input.data.items():
-            output_evset[index_key] = IndexData(
-                [],
-                np.array([1], dtype=np.float64),
-                schema=output_schema,
+            output_evset.set_index_value(
+                index_key,
+                IndexData(
+                    [],
+                    np.array([1], dtype=np.float64),
+                    schema=output_schema,
+                )
             )
 
         return {{"output": output_evset}}

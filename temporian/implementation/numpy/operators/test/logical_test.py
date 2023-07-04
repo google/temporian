@@ -49,7 +49,7 @@ class ArithmeticNumpyImplementationTest(absltest.TestCase):
         # FIXME: This should not be necessary
         self.node_2._sampling = self.node_1._sampling
         for index, data in self.evset_1.data.items():
-            self.evset_2[index].timestamps = data.timestamps
+            self.evset_2.get_index_value(index).timestamps = data.timestamps
 
     def test_correct_and(self) -> None:
         """Test correct AND operator."""

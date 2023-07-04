@@ -17,6 +17,7 @@
 from typing import Union
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
 from temporian.core.operators.scalar.base import (
@@ -70,6 +71,7 @@ class DivideScalarOperator(BaseScalarOperator):
                 )
 
 
+@compile
 def add_scalar(
     input: Node,
     value: Union[float, int],
@@ -111,6 +113,7 @@ def add_scalar(
     ).outputs["output"]
 
 
+@compile
 def subtract_scalar(
     minuend: Union[Node, SCALAR],
     subtrahend: Union[Node, SCALAR],
@@ -182,6 +185,7 @@ def subtract_scalar(
     )
 
 
+@compile
 def multiply_scalar(
     input: Node,
     value: Union[float, int],
@@ -223,6 +227,7 @@ def multiply_scalar(
     ).outputs["output"]
 
 
+@compile
 def divide_scalar(
     numerator: Union[Node, SCALAR],
     denominator: Union[Node, SCALAR],
@@ -294,6 +299,7 @@ def divide_scalar(
     )
 
 
+@compile
 def floordiv_scalar(
     numerator: Union[Node, SCALAR],
     denominator: Union[Node, SCALAR],
@@ -365,6 +371,7 @@ def floordiv_scalar(
     )
 
 
+@compile
 def modulo_scalar(
     numerator: Union[Node, SCALAR],
     denominator: Union[Node, SCALAR],
@@ -434,6 +441,7 @@ def modulo_scalar(
     )
 
 
+@compile
 def power_scalar(
     base: Union[Node, SCALAR],
     exponent: Union[Node, SCALAR],

@@ -13,8 +13,6 @@
 # limitations under the License.
 import pandas as pd
 from absl.testing import absltest
-
-# Even if not used, ensure that all the necessary code is loaded.
 import temporian as tp
 
 

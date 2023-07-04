@@ -15,6 +15,7 @@
 """Calendar day of week operator class and public API function definitions."""
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.node import Node
 from temporian.core.operators.calendar.base import BaseCalendarOperator
 
@@ -32,6 +33,7 @@ class CalendarDayOfWeekOperator(BaseCalendarOperator):
 operator_lib.register_operator(CalendarDayOfWeekOperator)
 
 
+@compile
 def calendar_day_of_week(sampling: Node) -> Node:
     """Obtains the day of the week the timestamps in a node's sampling are in.
 

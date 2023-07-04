@@ -17,6 +17,7 @@
 from typing import Optional
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node, create_node_new_features_new_sampling
 from temporian.core.operators.base import Operator
@@ -76,6 +77,7 @@ operator_lib.register_operator(FilterOperator)
 
 
 # pylint: disable=redefined-builtin
+@compile
 def filter(
     input: Node,
     condition: Optional[Node] = None,
