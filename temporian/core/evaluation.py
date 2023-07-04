@@ -25,6 +25,7 @@ from temporian.implementation.numpy import evaluation as np_eval
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core.graph import infer_graph
 from temporian.core.schedule import Schedule
+from temporian.core.operators.leak import LeakOperator
 
 EvaluationQuery = Union[Node, List[Node], Set[Node], Dict[str, Node]]
 EvaluationInput = Union[
@@ -265,7 +266,7 @@ def has_leak(
     """Tests if a node depends on a leak operator.
 
     Tests if a [`Node`][temporian.Node] or collection of nodes depends on the
-    only operator that can introduce a future leakage:
+    only operator that can introduce future leakage:
     [`tp.leak()`][temporian.leak].
 
     Single input output example:
@@ -276,9 +277,11 @@ def has_leak(
         >>> d = tp.prefix("my_prefix_", c)
         >>> e = tp.moving_sum(d, 7)
         >>> # The computation of "e" contains a leak.
-        >>> assert tp.has_leak(e)
+        >>> tp.has_leak(e)
+        True
         >>> # The computation of "e" given "d" does not contain a leak.
-        >>> assert not tp.has_leak(e, d)
+        >>> tp.has_leak(e, d)
+        False
 
         ```
 
@@ -304,8 +307,9 @@ def has_leak(
 
     graph = infer_graph(inputs=normalized_input, outputs=normalized_output)
 
+    leak_key = LeakOperator.operator_key()
     for operator in graph.operators:
-        if operator.operator_key() == "LEAK":
+        if operator.operator_key() == leak_key:
             return True
 
     return False

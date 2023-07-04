@@ -15,6 +15,7 @@ py_library(
         ":schedule",
         "//temporian/core/data:node",
         "//temporian/core/operators:base",
+        "//temporian/core/operators:leak",
         "//temporian/implementation/numpy:evaluation",
         "//temporian/implementation/numpy/data:event_set",
     ],
