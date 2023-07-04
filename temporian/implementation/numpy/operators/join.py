@@ -102,7 +102,6 @@ class JoinNumpyImplementation(OperatorImplementation):
                         left_item.features[left_on_feature_idx],
                         right_item.features[right_on_feature_idx],
                     )
-                    print("@@@join_idxs (on):\n", join_idxs, flush=True)
 
                 for dst_right_feature, right_feature_def in zip(
                     dst_right_data, right_feature_defs

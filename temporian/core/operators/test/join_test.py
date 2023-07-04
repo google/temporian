@@ -19,7 +19,7 @@ from temporian.core.data.dtype import DType
 from temporian.core.operators.join import join
 
 
-class PropagateOperatorTest(absltest.TestCase):
+class JoinOperatorTest(absltest.TestCase):
     def setUp(self):
         pass
 

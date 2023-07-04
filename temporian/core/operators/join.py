@@ -29,7 +29,7 @@ from temporian.proto import core_pb2 as pb
 from temporian.core.data.schema import Schema
 
 JOIN_LEFT = "left"
-
+# TODO: Add support for outer and inner joins.
 
 class Join(Operator):
     def __init__(
