@@ -14,17 +14,35 @@
 
 """Serialization/unserialization of a graph and its components."""
 
-from typing import Set, Any, Dict, Tuple, Optional, Mapping, Union
+import logging
+from typing import (
+    Callable,
+    List,
+    Set,
+    Any,
+    Dict,
+    Tuple,
+    Optional,
+    Mapping,
+    Union,
+)
 
 from google.protobuf import text_format
 
 from temporian.core import operator_lib
 from temporian.core import graph
-from temporian.core.data.node import Node, Sampling, Feature
+from temporian.core.data.node import (
+    Node,
+    Sampling,
+    Feature,
+    create_node_with_new_reference,
+)
 from temporian.core.data.schema import Schema
 from temporian.core.operators import base
 from temporian.core.data.dtype import DType
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.proto import core_pb2 as pb
+from temporian.core.operators.base import EventSetOrNode
 
 DTYPE_MAPPING = {
     DType.FLOAT64: pb.DType.DTYPE_FLOAT64,
@@ -38,11 +56,91 @@ INV_DTYPE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
 
 
 def save(
+    fn: Callable[..., Union[EventSetOrNode, Dict[str, EventSetOrNode]]],
+    inputs: Dict[str, Any],
+    path: str,
+) -> None:
+    """Saves a compiled Temporian function to a file.
+
+    Temporian saves the graph built between the function's input and output
+    EventSets or Nodes, not the function itself. Any arbitrary code that is
+    executed in the function will not be ran when loading it back up.
+
+    The function can receive and return other arbitrary parameters, which will
+    be used to trace the function while saving it, but will not be available
+    when loading it back up.
+
+    The function must return an EventSet or Node or a dictionary mapping output
+    names to EventSets or Nodes. If it returns a single one, the output will be
+    saved under the name "output" by default.
+
+    Args:
+        fn: The function to save.
+        inputs: The inputs to pass to the function to trace it, keyed by
+            parameter name. For EventSet/Node parameters, the passed value can
+            be either an EventSet, a Node, or a raw Schema.
+        path: The path to save the function to.
+
+    Raises:
+        ValueError: If the received function is not compiled.
+    """
+    if not fn.is_tp_compiled:
+        raise ValueError(
+            "Can only save a function that has been compiled with"
+            " `@tp.compile`."
+        )
+
+    if not isinstance(inputs, dict):
+        raise ValueError(
+            "`inputs` must be a dictionary mapping the function's parameter"
+            " names to their corresponding values."
+        )
+
+    node_inputs = {}
+    inputs = inputs.copy()
+    for k, v in inputs.items():
+        node_input = _process_fn_input(v)
+        if node_input is not None:
+            inputs[k] = node_input
+            node_inputs[k] = node_input
+
+    # TODO: extensively check that returned types are the expected ones
+    outputs = fn(**inputs)
+
+    if isinstance(outputs, Node):
+        outputs = {"output": outputs}
+
+    if isinstance(outputs, dict):
+        if not all(isinstance(v, Node) for v in outputs.values()):
+            raise ValueError(
+                "The function must return a single EventSet or Node or a"
+                "dictionary mapping output names to EventSets or Nodes."
+            )
+
+    save_graph(inputs=node_inputs, outputs=outputs, path=path)
+
+
+def _process_fn_input(input: Any) -> Optional[Node]:
+    # TODO: allow dicts and lists of stuff other than EventSet/Nodes
+    if isinstance(input, (list, dict, tuple)):
+        raise ValueError(
+            "`tp.save` does not support collections in a function's input."
+        )
+    if isinstance(input, Schema):
+        return create_node_with_new_reference(schema=input)
+    if isinstance(input, EventSet):
+        return input.node()
+    if isinstance(input, Node):
+        return input
+
+
+def save_graph(
     inputs: Optional[graph.NamedNodes],
     outputs: graph.NamedNodes,
     path: str,
 ) -> None:
-    """Saves the graph between `inputs` and `outputs` to a file.
+    """Saves the graph between `inputs` and `outputs` [`Nodes`][temporian.Node]
+    to a file.
 
     Usage example:
         ```python
@@ -69,9 +167,10 @@ def save(
 
         >>> # Save the graph
         >>> file_path = tmp_dir / "graph.tem"
-        >>> tp.save(inputs={"input_node": a},
+        >>> tp.save_graph(
+        ...     inputs={"input_node": a},
         ...     outputs={"output_node": b},
-        ...     path=file_path
+        ...     path=file_path,
         ... )
 
         >>> # Load the graph
@@ -110,9 +209,10 @@ def save(
 def load(
     path: str, squeeze: bool = False
 ) -> Tuple[Union[Node, Dict[str, Node]], Union[Node, Dict[str, Node]]]:
-    """Loads a graph from a file.
+    """Loads a Temporian graph from a file.
 
-    See [`tp.save()`][temporian.save] for usage examples.
+    See [`tp.save()`][temporian.save] and
+    [`tp.save_graph()`][temporian.save_graph] for usage examples.
 
     Args:
         path: File path to load from.
@@ -152,9 +252,11 @@ def _serialize(src: graph.Graph) -> pb.Graph:
 
     return pb.Graph(
         operators=[_serialize_operator(o) for o in src.operators],
-        nodes=[_serialize_node(e) for e in src.nodes],
-        features=[_serialize_feature(f) for f in src.features],
-        samplings=[_serialize_sampling(s) for s in src.samplings],
+        nodes=[_serialize_node(e, src.operators) for e in src.nodes],
+        features=[_serialize_feature(f, src.operators) for f in src.features],
+        samplings=[
+            _serialize_sampling(s, src.operators) for s in src.samplings
+        ],
         inputs=[
             _serialize_io_signature(k, e) for k, e in src.named_inputs.items()
         ],
@@ -177,6 +279,7 @@ def _unserialize(src: pb.Graph) -> graph.Graph:
     # Set the creator fields.
     def get_creator(op_id: str) -> base.Operator:
         if op_id not in operators:
+            logging.info(operators)
             raise ValueError(f"Non existing creator operator {op_id}")
         return operators[op_id]
 
@@ -236,9 +339,13 @@ def _identifier(item: Any) -> str:
     return str(id(item))
 
 
-def _identifier_or_none(item: Any) -> Optional[str]:
+def _identifier_or_none(
+    item: Any, options: Optional[List[Any]] = None
+) -> Optional[str]:
     """Creates a unique identifier for an object within a graph."""
     if item is None:
+        return None
+    if options is not None and item not in options:
         return None
     return str(id(item))
 
@@ -313,14 +420,16 @@ def _unserialize_operator(
     return op
 
 
-def _serialize_node(src: Node) -> pb.Node:
+def _serialize_node(src: Node, operators: Set[base.Operator]) -> pb.Node:
     assert len(src.schema.features) == len(src.feature_nodes)
+    logging.info("aaaa")
+    logging.info(operators)
     return pb.Node(
         id=_identifier(src),
         sampling_id=_identifier(src.sampling_node),
         feature_ids=[_identifier(f) for f in src.feature_nodes],
         name=src.name,
-        creator_operator_id=_identifier_or_none(src.creator),
+        creator_operator_id=(_identifier_or_none(src.creator, operators)),
         schema=_serialize_schema(src.schema),
     )
 
@@ -348,10 +457,12 @@ def _unserialize_node(
     return node
 
 
-def _serialize_feature(src: Feature) -> pb.Node.Feature:
+def _serialize_feature(
+    src: Feature, operators: Set[base.Operator]
+) -> pb.Node.Feature:
     return pb.Node.Feature(
         id=_identifier(src),
-        creator_operator_id=_identifier_or_none(src.creator),
+        creator_operator_id=(_identifier_or_none(src.creator, operators)),
     )
 
 
@@ -359,10 +470,12 @@ def _unserialize_feature(src: pb.Node.Feature) -> Feature:
     return Feature(creator=None)
 
 
-def _serialize_sampling(src: Sampling) -> pb.Node.Sampling:
+def _serialize_sampling(
+    src: Sampling, operators: Set[base.Operator]
+) -> pb.Node.Sampling:
     return pb.Node.Sampling(
         id=_identifier(src),
-        creator_operator_id=_identifier_or_none(src.creator),
+        creator_operator_id=(_identifier_or_none(src.creator, operators)),
     )
 
 

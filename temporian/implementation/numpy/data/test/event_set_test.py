@@ -8,7 +8,7 @@ from temporian.implementation.numpy.data.io import event_set, IndexData
 
 class EventTest(absltest.TestCase):
     def setUp(self):
-        self._evset = event_set(
+        self.evset = event_set(
             timestamps=[0.1, 0.2, 0.3, 0.4, 0.5],
             features={
                 "a": [1, 2, 3, 7, 8],
@@ -19,46 +19,35 @@ class EventTest(absltest.TestCase):
             indexes=["x", "y"],
         )
 
-    def test_getitem(self):
-        index_data = self._evset[(2, "world")]
+    def test_get_index_value(self):
+        index_data = self.evset.get_index_value((2, "world"))
         self.assertTrue(isinstance(index_data, IndexData))
         self.assertTrue(
             (np.array(index_data.features) == [[7, 8], [9, 10]]).all()
         )
         self.assertTrue((abs(index_data.timestamps - [0.4, 0.5]) < 1e-6).all())
 
-    def test_getitem_error(self):
-        with self.assertRaisesRegex(
-            TypeError, "can only be accessed by index keys"
-        ):
-            self._evset["feature"]
-        with self.assertRaisesRegex(
-            TypeError, "can only be accessed by index keys"
-        ):
-            self._evset[0]
-
-    def test_setitem_error(self):
-        with self.assertRaisesRegex(
-            TypeError, "not intended to be modified externally"
-        ):
-            self._evset["feature"] = None
-        with self.assertRaisesRegex(
-            TypeError, "not intended to be modified externally"
-        ):
-            self._evset[(2, "world")] = None
+    def test_set_index_value(self):
+        value = self.evset.get_index_value((1, "hello"))
+        modified = IndexData(
+            timestamps=value.timestamps,
+            features=[f + 1 for f in value.features],
+        )
+        self.evset.set_index_value((2, "world"), modified)
+        self.assertEqual(self.evset.get_index_value((2, "world")), modified)
 
     def test_data_access(self):
         self.assertEqual(
-            repr(self._evset.schema.features), "[('a', int64), ('b', int64)]"
+            repr(self.evset.schema.features), "[('a', int64), ('b', int64)]"
         )
         self.assertEqual(
-            repr(self._evset.schema.indexes), "[('x', int64), ('y', str_)]"
+            repr(self.evset.schema.indexes), "[('x', int64), ('y', str_)]"
         )
 
     def test_repr(self):
-        print(self._evset)
+        print(self.evset)
         self.assertEqual(
-            repr(self._evset),
+            repr(self.evset),
             """indexes: [('x', int64), ('y', str_)]
 features: [('a', int64), ('b', int64)]
 events:
@@ -75,7 +64,7 @@ memory usage: 1.2 kB
         )
 
     def test_memory_usage(self):
-        memory_usage = self._evset.memory_usage()
+        memory_usage = self.evset.memory_usage()
         print("memory_usage:", memory_usage)
 
         self.assertLessEqual(memory_usage, 1200 + 500)

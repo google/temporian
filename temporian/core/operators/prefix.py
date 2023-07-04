@@ -15,6 +15,7 @@
 """Prefix operator class and public API function definition."""
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.node import (
     Node,
     create_node_new_features_existing_sampling,
@@ -71,6 +72,7 @@ class Prefix(Operator):
 operator_lib.register_operator(Prefix)
 
 
+@compile
 def prefix(
     prefix: str,
     input: Node,

@@ -15,6 +15,7 @@
 """Calendar month operator class and public API function definitions."""
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.node import Node
 from temporian.core.operators.calendar.base import BaseCalendarOperator
 
@@ -36,6 +37,7 @@ class CalendarMonthOperator(BaseCalendarOperator):
 operator_lib.register_operator(CalendarMonthOperator)
 
 
+@compile
 def calendar_month(sampling: Node) -> Node:
     """Obtains the month the timestamps in a node's sampling are in.
 

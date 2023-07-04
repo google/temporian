@@ -17,6 +17,7 @@
 from typing import Union, List
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
 from temporian.core.data.schema import FeatureSchema
@@ -72,6 +73,7 @@ class LessScalarOperator(RelationalScalarOperator):
     DEF_KEY = "LESS_SCALAR"
 
 
+@compile
 def equal_scalar(
     input: Node,
     value: Union[float, int, str, bool],
@@ -120,6 +122,7 @@ def equal_scalar(
     ).outputs["output"]
 
 
+@compile
 def not_equal_scalar(
     input: Node,
     value: Union[float, int, str, bool],
@@ -165,6 +168,7 @@ def not_equal_scalar(
     ).outputs["output"]
 
 
+@compile
 def greater_equal_scalar(
     input: Node,
     value: Union[float, int, str, bool],
@@ -210,6 +214,7 @@ def greater_equal_scalar(
     ).outputs["output"]
 
 
+@compile
 def less_equal_scalar(
     input: Node,
     value: Union[float, int, str, bool],
@@ -255,6 +260,7 @@ def less_equal_scalar(
     ).outputs["output"]
 
 
+@compile
 def greater_scalar(
     input: Node,
     value: Union[float, int, str, bool],
@@ -300,6 +306,7 @@ def greater_scalar(
     ).outputs["output"]
 
 
+@compile
 def less_scalar(
     input: Node,
     value: Union[float, int, str, bool],

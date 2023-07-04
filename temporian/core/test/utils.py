@@ -19,7 +19,7 @@ from temporian.implementation.numpy.data.io import event_set
 # For example "OpI1O2" has 1 input and 2 outputs.
 
 
-def create_source_node(name: Optional[str] = None):
+def create_input_node(name: Optional[str] = None):
     return input_node(
         features=[
             ("f1", DType.FLOAT64),

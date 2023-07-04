@@ -99,7 +99,9 @@ def run_schedule(
 
         # materialize data in output nodes
         for output_key, output_node in operator.outputs.items():
-            data[output_node] = operator_outputs[output_key]
+            output_evset = operator_outputs[output_key]
+            output_evset._internal_node = output_node
+            data[output_node] = output_evset
 
     # TODO: Only return the required data.
     # TODO: Un-allocate not used anymore object.

@@ -15,6 +15,7 @@
 """Binary logic operators classes and public API function definitions."""
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
 from temporian.core.data.schema import FeatureSchema
@@ -62,6 +63,7 @@ class LogicalXorOperator(BaseLogicalOperator):
     OP_NAME = "xor"
 
 
+@compile
 def logical_and(
     input_1: Node,
     input_2: Node,
@@ -133,6 +135,7 @@ def logical_and(
     ).outputs["output"]
 
 
+@compile
 def logical_or(
     input_1: Node,
     input_2: Node,
@@ -184,6 +187,7 @@ def logical_or(
     ).outputs["output"]
 
 
+@compile
 def logical_xor(
     input_1: Node,
     input_2: Node,

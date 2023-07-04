@@ -22,9 +22,9 @@ class GraphTest(absltest.TestCase):
     def test_infer_graph_no_names(self):
         """Lists all the objects in a graph."""
 
-        i1 = utils.create_source_node()
+        i1 = utils.create_input_node()
         o2 = utils.OpI1O1(i1)
-        i3 = utils.create_source_node()
+        i3 = utils.create_input_node()
         o4 = utils.OpI2O1(o2.outputs["output"], i3)
         o5 = utils.OpI1O2(o4.outputs["output"])
         output_1 = o5.outputs["output_1"]
@@ -57,9 +57,9 @@ class GraphTest(absltest.TestCase):
     def test_infer_graph_with_names(self):
         """Lists all the objects in a graph."""
 
-        i1 = utils.create_source_node()
+        i1 = utils.create_input_node()
         o2 = utils.OpI1O1(i1)
-        i3 = utils.create_source_node()
+        i3 = utils.create_input_node()
         o4 = utils.OpI2O1(o2.outputs["output"], i3)
         o5 = utils.OpI1O2(o4.outputs["output"])
         output_1 = o5.outputs["output_1"]
@@ -84,9 +84,9 @@ class GraphTest(absltest.TestCase):
     def test_infer_graph_with_node_names(self):
         """Lists all the objects in a graph."""
 
-        i1 = utils.create_source_node("io_input_1")
+        i1 = utils.create_input_node("io_input_1")
         o2 = utils.OpI1O1(i1)
-        i3 = utils.create_source_node("io_input_2")
+        i3 = utils.create_input_node("io_input_2")
         o4 = utils.OpI2O1(o2.outputs["output"], i3)
         o5 = utils.OpI1O2(o4.outputs["output"])
         output_1 = o5.outputs["output_1"]
@@ -110,7 +110,7 @@ class GraphTest(absltest.TestCase):
     def test_infer_graph_noop(self):
         """With an opt that just passes features."""
 
-        a = utils.create_source_node()
+        a = utils.create_input_node()
         b = utils.OpI1O1NotCreator(a)
         c = utils.OpI1O1(b.outputs["output"])
 
@@ -124,7 +124,7 @@ class GraphTest(absltest.TestCase):
     def test_infer_graph_input_is_not_feature_creator(self):
         """When the user input is not the feature creator."""
 
-        a = utils.create_source_node()
+        a = utils.create_input_node()
         b = utils.OpI1O1NotCreator(a)
         c = utils.OpI1O1(b.outputs["output"])
 
@@ -141,7 +141,7 @@ class GraphTest(absltest.TestCase):
     def test_infer_graph_missing_input(self):
         """The input is missing."""
 
-        i = utils.create_source_node("missing_node")
+        i = utils.create_input_node("missing_node")
         o2 = utils.OpI1O1(i)
 
         with self.assertRaisesRegex(ValueError, " but not provided as input"):
@@ -150,10 +150,10 @@ class GraphTest(absltest.TestCase):
     def test_infer_graph_automatic_input(self):
         """Infer automatically the input."""
 
-        i1 = utils.create_source_node()
+        i1 = utils.create_input_node()
         i1.name = "io_input_1"
         o2 = utils.OpI1O1(i1)
-        i3 = utils.create_source_node()
+        i3 = utils.create_input_node()
         i3.name = "io_input_2"
         o4 = utils.OpI2O1(o2.outputs["output"], i3)
         o5 = utils.OpI1O2(o4.outputs["output"])
@@ -171,7 +171,7 @@ class GraphTest(absltest.TestCase):
     def test_automatic_input_equality_graph(self):
         """Automated inference when the input is the same as the output."""
 
-        i1 = utils.create_source_node()
+        i1 = utils.create_input_node()
         g = graph.infer_graph(None, {i1})
 
         self.assertLen(g.operators, 0)

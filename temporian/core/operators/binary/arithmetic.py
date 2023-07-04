@@ -15,6 +15,7 @@
 """Binary arithmetic operators classes and public API function definitions."""
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.node import Node
 from temporian.core.data.dtype import DType
 from temporian.core.operators.binary.base import BaseBinaryOperator
@@ -85,6 +86,7 @@ class DivideOperator(BaseArithmeticOperator):
                 )
 
 
+@compile
 def add(
     input_1: Node,
     input_2: Node,
@@ -243,6 +245,7 @@ def add(
     ).outputs["output"]
 
 
+@compile
 def subtract(
     input_1: Node,
     input_2: Node,
@@ -296,6 +299,7 @@ def subtract(
     ).outputs["output"]
 
 
+@compile
 def multiply(
     input_1: Node,
     input_2: Node,
@@ -349,6 +353,7 @@ def multiply(
     ).outputs["output"]
 
 
+@compile
 def divide(
     numerator: Node,
     denominator: Node,
@@ -438,6 +443,7 @@ def divide(
     ).outputs["output"]
 
 
+@compile
 def floordiv(
     numerator: Node,
     denominator: Node,
@@ -493,6 +499,7 @@ def floordiv(
     ).outputs["output"]
 
 
+@compile
 def modulo(
     numerator: Node,
     denominator: Node,
@@ -544,6 +551,7 @@ def modulo(
     ).outputs["output"]
 
 
+@compile
 def power(
     base: Node,
     exponent: Node,

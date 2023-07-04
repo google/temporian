@@ -15,6 +15,7 @@
 """Glue operator class and public API function definition."""
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.node import Node, create_node_with_new_reference
 from temporian.core.data.schema import Schema
 from temporian.core.operators.base import Operator
@@ -100,6 +101,7 @@ class GlueOperator(Operator):
 operator_lib.register_operator(GlueOperator)
 
 
+@compile
 def glue(
     *inputs: Node,
 ) -> Node:

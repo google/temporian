@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
 import datetime
 import sys
 
@@ -25,20 +25,17 @@ import numpy as np
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node, create_node_with_new_reference
 from temporian.core.data.schema import Schema
+from temporian.core.mixins import EventSetOperationsMixin
 from temporian.utils import string
+
+if TYPE_CHECKING:
+    from temporian.core.operators.base import Operator
 
 # Maximum of printed index groups when calling repr(evset)
 MAX_NUM_PRINTED_INDEX = 5
 
 # Maximum of printed features when calling repr(evset)
 MAX_NUM_PRINTED_FEATURES = 10
-
-_PYTHON_DTYPE_MAPPING = {
-    str: DType.STRING,
-    # TODO: fix this, int doesn't have to be INT64 necessarily
-    int: DType.INT64,
-    np.int64: DType.INT64,
-}
 
 # Mapping of temporian types to and from numpy types.
 #
@@ -322,7 +319,7 @@ class IndexData:
         return len(self.timestamps)
 
 
-class EventSet:
+class EventSet(EventSetOperationsMixin):
     """Actual temporal data.
 
     Use [`tp.event_set()`][temporian.event_set] to create an EventSet manually,
@@ -459,22 +456,21 @@ class EventSet:
             f"memory usage: {string.pretty_num_bytes(self.memory_usage())}\n"
         )
 
-    def __getitem__(self, index: Tuple) -> IndexData:
-        if not isinstance(index, tuple):
-            raise TypeError(
-                "EventSet items can only be accessed by index keys (tuples of"
-                " values for each index in the EventSet). Use evset.node() to"
-                " select features and operate on it."
-            )
-        return self.data[index]
+    def get_index_value(self, index_key: Tuple) -> IndexData:
+        """Gets the value for a specified index key.
 
-    def __setitem__(self, index: Tuple, value: IndexData) -> None:
-        if not isinstance(index, tuple) or not isinstance(value, IndexData):
-            raise TypeError(
-                "EventSets are not intended to be modified externally. "
-                "Use evset.node() to operate on it."
-            )
-        self.data[index] = value
+        The index key must be a tuple of values corresponding to the indexes
+        of the EventSet.
+        """
+        return self.data[index_key]
+
+    def set_index_value(self, index_key: Tuple, value: IndexData) -> None:
+        """Sets the value for a specified index key.
+
+        The index key must be a tuple of values corresponding to the indexes
+        of the EventSet.
+        """
+        self.data[index_key] = value
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, EventSet):
@@ -524,3 +520,16 @@ class EventSet:
         """
 
         return sys.getsizeof(self)
+
+    def check_same_sampling(self, other: EventSet):
+        """Checks if two EventSets have the same sampling."""
+        self.node().check_same_sampling(other.node())
+
+    @property
+    def creator(self) -> Optional[Operator]:
+        """Creator.
+
+        The creator is the operator that outputted this EventSet. Manually
+        created EventSets have a `None` creator.
+        """
+        return self.node()._creator
