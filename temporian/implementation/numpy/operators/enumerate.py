@@ -40,10 +40,13 @@ class EnumerateNumpyImplementation(OperatorImplementation):
 
         # Fill output EventSet's data
         for index_key, index_data in input.data.items():
-            output_evset[index_key] = IndexData(
-                [np.arange(len(index_data.timestamps), dtype=np.int64)],
-                index_data.timestamps,
-                schema=output_schema,
+            output_evset.set_index_value(
+                index_key,
+                IndexData(
+                    [np.arange(len(index_data.timestamps), dtype=np.int64)],
+                    index_data.timestamps,
+                    schema=output_schema,
+                ),
             )
 
         return {"output": output_evset}
