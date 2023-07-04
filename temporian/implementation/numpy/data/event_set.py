@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
 import datetime
 import sys
 
@@ -26,8 +26,10 @@ from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node, create_node_with_new_reference
 from temporian.core.data.schema import Schema
 from temporian.core.mixins import EventSetOperationsMixin
-from temporian.core.operators.base import Operator
 from temporian.utils import string
+
+if TYPE_CHECKING:
+    from temporian.core.operators.base import Operator
 
 # Maximum of printed index groups when calling repr(evset)
 MAX_NUM_PRINTED_INDEX = 5
