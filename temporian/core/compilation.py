@@ -20,26 +20,45 @@ from temporian.implementation.numpy.data.event_set import EventSet
 
 
 def compile(fn):
+    """Compiles a Temporian function.
+
+    A Temporian function is a function that takes Nodes as arguments and
+    returns Nodes as outputs. Compiling it enables it to perform eager
+    evaluation, i.e., receive and return EventSets instead of Nodes.
+
+    Args:
+        fn: The function to compile. The function must take Nodes as arguments
+            (and may have other arguments of arbitrary types) and return Nodes
+            as outputs.
+
+    Returns:
+        The compiled function.
+    """
+
     @wraps(fn)
     def wrapper(*args, **kwargs):
         is_eager = None
         args = list(args)
 
         # Node -> EventSet mapping for eager evaluation
-        inputs = {}
+        inputs_map = {}
 
         for i, arg in enumerate(args):
-            args[i], is_eager = _process_argument(arg, inputs, is_eager)
+            args[i], is_eager = _process_argument(
+                arg, is_eager=is_eager, inputs_map=inputs_map
+            )
 
         for k, arg in kwargs.items():
-            kwargs[k], is_eager = _process_argument(arg, inputs, is_eager)
+            kwargs[k], is_eager = _process_argument(
+                arg, is_eager=is_eager, inputs_map=inputs_map
+            )
 
         outputs = fn(*args, **kwargs)
 
         if is_eager:
             from temporian.core.evaluation import run
 
-            return run(outputs, inputs)
+            return run(query=outputs, input=inputs_map)
 
         return outputs
 
@@ -50,31 +69,34 @@ def compile(fn):
 
 def _process_argument(
     obj: Any,
-    inputs: Optional[Dict[Node, EventSet]],
     is_eager: Optional[bool],
+    inputs_map: Dict[Node, EventSet],
 ) -> Tuple[Any, bool]:
     """Processes arguments to an operator by checking if its being used in eager
     mode and converting EventSets to Nodes if so.
 
     Also checks that all arguments are of the same type (EventSet or Node), by
     checking that is_eager is consistent with the type of obj, and raising if
-    not."""
+    not.
+
+    Note that the inputs_map is modified in-place by this function.
+    """
     if isinstance(obj, tuple):
         obj = list(obj)
         for i, v in enumerate(obj):
-            obj[i], is_eager = _process_argument(v, inputs, is_eager)
+            obj[i], is_eager = _process_argument(v, is_eager, inputs_map)
         return tuple(obj), is_eager
 
     if isinstance(obj, list):
         obj = copy(obj)
         for i, v in enumerate(obj):
-            obj[i], is_eager = _process_argument(v, inputs, is_eager)
+            obj[i], is_eager = _process_argument(v, is_eager, inputs_map)
         return obj, is_eager
 
     if isinstance(obj, dict):
         obj = copy(obj)
         for k, v in obj.items():
-            obj[k], is_eager = _process_argument(v, inputs, is_eager)
+            obj[k], is_eager = _process_argument(v, is_eager, inputs_map)
         return obj, is_eager
 
     err = (
@@ -90,7 +112,9 @@ def _process_argument(
             # If a Node had been received and we receive an EventSet, raise
             raise ValueError(err)
         node = obj.node()
-        inputs[node] = obj
+        # Its fine to overwrite the same node since the corresponding EventSet
+        # is guaranteed to be the same one.
+        inputs_map[node] = obj
         obj = node
 
     elif isinstance(obj, Node):

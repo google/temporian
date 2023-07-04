@@ -20,8 +20,8 @@ import temporian as tp
 from temporian.core import serialization
 from temporian.core import graph
 from temporian.core.data.dtype import DType
+from temporian.core.data.node import Node
 from temporian.core.test import utils
-from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.io import event_set
 
 
@@ -190,7 +190,7 @@ class SerializationTest(absltest.TestCase):
 
     def test_save_and_load(self):
         @tp.compile
-        def f(x: EventSet):
+        def f(x: Node):
             return tp.prefix("a_", x)
 
         evset = tp.event_set(
@@ -214,7 +214,7 @@ class SerializationTest(absltest.TestCase):
 
     def test_save_and_load_many_inputs(self):
         @tp.compile
-        def f(x: EventSet, y: int, z: EventSet):
+        def f(x: Node, y: int, z: Node):
             print(y)
             return tp.glue(x, z)
 
@@ -243,7 +243,7 @@ class SerializationTest(absltest.TestCase):
 
     def test_save_and_load_dict_outputs(self):
         @tp.compile
-        def f(x: EventSet):
+        def f(x: Node):
             return {
                 "a": tp.abs(x),
                 "b": tp.log(x),

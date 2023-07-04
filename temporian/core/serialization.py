@@ -17,6 +17,7 @@
 import logging
 from typing import (
     Callable,
+    List,
     Set,
     Any,
     Dict,
@@ -41,6 +42,7 @@ from temporian.core.operators import base
 from temporian.core.data.dtype import DType
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.proto import core_pb2 as pb
+from temporian.core.operators.base import EventSetOrNode
 
 DTYPE_MAPPING = {
     DType.FLOAT64: pb.DType.DTYPE_FLOAT64,
@@ -54,11 +56,11 @@ INV_DTYPE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
 
 
 def save(
-    fn: Callable[..., Union[EventSet, Dict[str, EventSet]]],
+    fn: Callable[..., Union[EventSetOrNode, Dict[str, EventSetOrNode]]],
     inputs: Dict[str, Any],
     path: str,
 ) -> None:
-    """Saves a Temporian-compiled function to a file.
+    """Saves a compiled Temporian function to a file.
 
     Temporian saves the graph built between the function's input and output
     EventSets or Nodes, not the function itself. Any arbitrary code that is
@@ -102,6 +104,7 @@ def save(
             inputs[k] = node_input
             node_inputs[k] = node_input
 
+    # TODO: extensively check that returned types are the expected ones
     outputs = fn(**inputs)
 
     if isinstance(outputs, Node):
@@ -273,8 +276,6 @@ def _unserialize(src: pb.Graph) -> graph.Graph:
     nodes = {e.id: _unserialize_node(e, samplings, features) for e in src.nodes}
     operators = {o.id: _unserialize_operator(o, nodes) for o in src.operators}
 
-    logging.info("operators:", operators)
-
     # Set the creator fields.
     def get_creator(op_id: str) -> base.Operator:
         if op_id not in operators:
@@ -338,9 +339,13 @@ def _identifier(item: Any) -> str:
     return str(id(item))
 
 
-def _identifier_or_none(item: Any) -> Optional[str]:
+def _identifier_or_none(
+    item: Any, options: Optional[List[Any]] = None
+) -> Optional[str]:
     """Creates a unique identifier for an object within a graph."""
     if item is None:
+        return None
+    if options is not None and item not in options:
         return None
     return str(id(item))
 
@@ -424,11 +429,7 @@ def _serialize_node(src: Node, operators: Set[base.Operator]) -> pb.Node:
         sampling_id=_identifier(src.sampling_node),
         feature_ids=[_identifier(f) for f in src.feature_nodes],
         name=src.name,
-        creator_operator_id=(
-            _identifier_or_none(src.creator)
-            if src.creator is not None and src.creator in operators
-            else None
-        ),
+        creator_operator_id=(_identifier_or_none(src.creator, operators)),
         schema=_serialize_schema(src.schema),
     )
 
@@ -461,11 +462,7 @@ def _serialize_feature(
 ) -> pb.Node.Feature:
     return pb.Node.Feature(
         id=_identifier(src),
-        creator_operator_id=(
-            _identifier_or_none(src.creator)
-            if src.creator is not None and src.creator in operators
-            else None
-        ),
+        creator_operator_id=(_identifier_or_none(src.creator, operators)),
     )
 
 
@@ -478,11 +475,7 @@ def _serialize_sampling(
 ) -> pb.Node.Sampling:
     return pb.Node.Sampling(
         id=_identifier(src),
-        creator_operator_id=(
-            _identifier_or_none(src.creator)
-            if src.creator is not None and src.creator in operators
-            else None
-        ),
+        creator_operator_id=(_identifier_or_none(src.creator, operators)),
     )
 
 

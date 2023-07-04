@@ -72,18 +72,19 @@ class TFPTest(absltest.TestCase):
         h1 = tp.simple_moving_average(input=evset_1, window_length=7)
         h2 = tp.resample(input=h1, sampling=evset_2)
 
-        # TODO: add magics to EventSet
-        # Create base class that both Node and EventSet inherit from
-        # h3 = evset_1 * 2.0 + 3.0 > 10.0
-
-        # TODO: enable __getitem__ for column selection in EventSet
-        # result = tp.glue(tp.prefix("sma_", h2["f2"]), evset_2)
-
-        result = tp.glue(tp.prefix("sma_", h2), evset_2)
-
         self.assertTrue(isinstance(h1, tp.EventSet))
         self.assertTrue(isinstance(h2, tp.EventSet))
+
+        del h1
+
+        h3 = evset_1 * 2.0 + 3.0 > 10.0
+
+        result = tp.glue(tp.prefix("sma_", h2["f2"]), evset_2)
+
+        result2 = tp.glue(tp.prefix("toto.", h3))
+
         self.assertTrue(isinstance(result, tp.EventSet))
+        self.assertTrue(isinstance(result2, tp.EventSet))
 
     def test_eager_mixed_args(self):
         evset = tp.event_set(timestamps=[0.0])
