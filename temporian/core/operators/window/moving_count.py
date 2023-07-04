@@ -20,7 +20,7 @@ from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
 from temporian.core.data.duration_utils import Duration, normalize_duration
-from temporian.core.data.node import Node
+from temporian.core.data.node import EventSetNode
 from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.window.base import BaseWindowOperator
 
@@ -39,10 +39,10 @@ operator_lib.register_operator(MovingCountOperator)
 
 @compile
 def moving_count(
-    input: Node,
+    input: EventSetNode,
     window_length: Duration,
-    sampling: Optional[Node] = None,
-) -> Node:
+    sampling: Optional[EventSetNode] = None,
+) -> EventSetNode:
     """Computes the number of values in a sliding window over the node.
 
     For each t in sampling, and for each index and feature independently,
@@ -122,13 +122,13 @@ def moving_count(
         ```
 
     Args:
-        input: Node for which to count the number of values in each feature.
+        input: EventSetNode for which to count the number of values in each feature.
         window_length: Sliding window's length.
         sampling: Timestamps to sample the sliding window's value at. If not
             provided, timestamps in `input` are used.
 
     Returns:
-        Node containing the non-nan count of each feature in `input`.
+        EventSetNode containing the non-nan count of each feature in `input`.
     """
     return MovingCountOperator(
         input=input,

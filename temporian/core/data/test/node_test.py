@@ -19,7 +19,7 @@ from temporian.core.test import utils
 from temporian.implementation.numpy.data.event_set import EventSet
 
 
-class NodeTest(absltest.TestCase):
+class EventSetNodeTest(absltest.TestCase):
     def test_run_input(self):
         node = utils.create_input_node()
         evset = utils.create_input_event_set()
@@ -35,9 +35,9 @@ class NodeTest(absltest.TestCase):
 
     def test_hash_map(self):
         """
-        Tests that the `Node` can be used as dict key.
+        Tests that the `EventSetNode` can be used as dict key.
 
-        NOTE: This is the reason to not overwrite `__eq__` in `Node`.
+        NOTE: This is the reason to not overwrite `__eq__` in `EventSetNode`.
         """
         node_list = []
         node_map = {}

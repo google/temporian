@@ -36,8 +36,8 @@ del _impls
 # PUBLIC API SYMBOLS #
 # ================== #
 
-# Nodes
-from temporian.core.data.node import Node
+# EventSetNodes
+from temporian.core.data.node import EventSetNode
 from temporian.core.data.node import input_node
 
 # Dtypes

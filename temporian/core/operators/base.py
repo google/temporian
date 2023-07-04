@@ -18,7 +18,7 @@ from abc import ABC
 from typing import Dict, List, Tuple, TypeVar, Union, Any
 from temporian.core.data.dtype import DType
 
-from temporian.core.data.node import Node
+from temporian.core.data.node import EventSetNode
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.proto import core_pb2 as pb
 
@@ -29,7 +29,9 @@ AttributeType = Union[
 ]
 
 # Generic type for defining the input/output types of operators.
-EventSetOrNode = TypeVar("EventSetOrNode", EventSet, Node)
+EventSetOrEventSetNode = TypeVar(
+    "EventSetOrEventSetNode", EventSet, EventSetNode
+)
 
 
 class OperatorExceptionDecorator:
@@ -71,8 +73,8 @@ class Operator(ABC):
     """Interface definition and common logic for operators."""
 
     def __init__(self):
-        self._inputs: Dict[str, Node] = {}
-        self._outputs: Dict[str, Node] = {}
+        self._inputs: Dict[str, EventSetNode] = {}
+        self._outputs: Dict[str, EventSetNode] = {}
         self._attributes: Dict[str, AttributeType] = {}
         self._definition: pb.OperatorDef = self.build_op_definition()
         self._attr_types: Dict[str, type] = {
@@ -90,11 +92,11 @@ class Operator(ABC):
         return self._attributes
 
     @property
-    def inputs(self) -> Dict[str, Node]:
+    def inputs(self) -> Dict[str, EventSetNode]:
         return self._inputs
 
     @property
-    def outputs(self) -> Dict[str, Node]:
+    def outputs(self) -> Dict[str, EventSetNode]:
         return self._outputs
 
     @attributes.setter
@@ -102,20 +104,20 @@ class Operator(ABC):
         self._attributes = attributes
 
     @inputs.setter
-    def inputs(self, inputs: Dict[str, Node]):
+    def inputs(self, inputs: Dict[str, EventSetNode]):
         self._inputs = inputs
 
     @outputs.setter
-    def outputs(self, outputs: Dict[str, Node]):
+    def outputs(self, outputs: Dict[str, EventSetNode]):
         self._outputs = outputs
 
-    def add_input(self, key: str, node: Node) -> None:
+    def add_input(self, key: str, node: EventSetNode) -> None:
         with OperatorExceptionDecorator(self):
             if key in self.inputs:
                 raise ValueError(f'Already existing input "{key}".')
             self.inputs[key] = node
 
-    def add_output(self, key: str, node: Node) -> None:
+    def add_output(self, key: str, node: EventSetNode) -> None:
         with OperatorExceptionDecorator(self):
             if key in self.outputs:
                 raise ValueError(f'Already existing output "{key}".')

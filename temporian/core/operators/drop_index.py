@@ -18,7 +18,10 @@ from typing import List, Optional, Union
 
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
-from temporian.core.data.node import Node, create_node_new_features_new_sampling
+from temporian.core.data.node import (
+    EventSetNode,
+    create_node_new_features_new_sampling,
+)
 from temporian.core.data.schema import FeatureSchema, IndexSchema
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
@@ -27,7 +30,7 @@ from temporian.proto import core_pb2 as pb
 class DropIndexOperator(Operator):
     def __init__(
         self,
-        input: Node,
+        input: EventSetNode,
         indexes: List[str],
         keep: bool,
     ) -> None:
@@ -64,7 +67,7 @@ class DropIndexOperator(Operator):
         self.check()
 
     def _get_output_feature_schemas(
-        self, input: Node, indexes: List[str], keep: bool
+        self, input: EventSetNode, indexes: List[str], keep: bool
     ) -> List[FeatureSchema]:
         if not keep:
             return input.schema.features
@@ -129,7 +132,7 @@ operator_lib.register_operator(DropIndexOperator)
 
 
 def _normalize_indexes(
-    input: Node,
+    input: EventSetNode,
     indexes: Optional[Union[List[str], str]],
 ) -> List[str]:
     if indexes is None:
@@ -155,11 +158,11 @@ def _normalize_indexes(
 
 @compile
 def drop_index(
-    input: Node,
+    input: EventSetNode,
     indexes: Optional[Union[str, List[str]]] = None,
     keep: bool = True,
-) -> Node:
-    """Removes indexes from a [`Node`][temporian.Node].
+) -> EventSetNode:
+    """Removes indexes from an [`EventSetNode`][temporian.EventSetNode].
 
     Usage example:
         ```python
@@ -223,16 +226,16 @@ def drop_index(
         ```
 
     Args:
-        input: Node from which the specified indexes should be removed.
+        input: EventSetNode from which the specified indexes should be removed.
         indexes: Index column(s) to be removed from `input`. This can be a
             single column name (`str`) or a list of column names (`List[str]`).
             If not specified or set to `None`, all indexes in `input` will
             be removed. Defaults to `None`.
         keep: Flag indicating whether the removed indexes should be kept
-            as features in the output `Node`. Defaults to `True`.
+            as features in the output `EventSetNode`. Defaults to `True`.
 
     Returns:
-        New `Node` with the specified indexes removed. If `keep` is set to
+        New `EventSetNode` with the specified indexes removed. If `keep` is set to
         `True`, the removed indexes will be included as features in it.
 
     Raises:

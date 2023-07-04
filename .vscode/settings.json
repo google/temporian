@@ -8,7 +8,6 @@
   "search.exclude": {
     "**/.venv/": true,
     "**/bazel-*/**": true,
-    "**/reference/**/*.md": true
   },
   "files.watcherExclude": {
     "**/.venv/**": true,

@@ -16,7 +16,7 @@
 
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
-from temporian.core.data.node import Node
+from temporian.core.data.node import EventSetNode
 from temporian.core.operators.calendar.base import BaseCalendarOperator
 
 
@@ -34,7 +34,7 @@ operator_lib.register_operator(CalendarYearOperator)
 
 
 @compile
-def calendar_year(sampling: Node) -> Node:
+def calendar_year(sampling: EventSetNode) -> EventSetNode:
     """Obtains the year the timestamps in a node's sampling are in.
 
     Features in the input node are ignored, only the timestamps are used and
@@ -58,7 +58,7 @@ def calendar_year(sampling: Node) -> Node:
         ```
 
     Args:
-        sampling: Node to get the years from.
+        sampling: EventSetNode to get the years from.
 
     Returns:
         Single feature with the year each timestamp in `sampling` belongs to.

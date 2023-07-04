@@ -31,7 +31,7 @@ If the [`EventSet`][temporian.EventSet] has no index, it will hold a single time
 
 If the [`EventSet`][temporian.EventSet] has one (or many) indexes, it will hold one time sequence for each unique value (or unique combination of values) of the indexes, the events will be grouped by their index key, and operators applied to the [`EventSet`][temporian.EventSet] will be applied to each time sequence independently.
 
-## Graph, [`Nodes`][temporian.Node] and Operators
+## Graph, [`EventSetNodes`][temporian.EventSetNode] and Operators
 
 There are two big phases in any Temporian script: graph **definition** and **evaluation**. This is a common pattern in computing libraries, and it allows us to perform optimizations before the graph is run, share Temporian programs across different platforms, and more.
 
@@ -39,13 +39,13 @@ A graph is created by using **operators**. For example, the [`tp.simple_moving_a
 
 Note that when calling operators you are only defining the graph - i.e., you are telling Temporian what operations you want to perform on your data, but those operations are not yet being performed.
 
-Operators are not applied directly to [`EventSets`][temporian.EventSet], but to **[Nodes][temporian.Node]**. You can think of a [`Node`][temporian.Node] as the placeholder for an [`EventSet`][temporian.EventSet] in the graph. When applying operators to [`Nodes`][temporian.Node], you get back new [`Nodes`][temporian.Node] that are placeholders for the results of those operations. You can create arbitrarily complex graphs by combining operators and [`Nodes`][temporian.Node].
+Operators are not applied directly to [`EventSets`][temporian.EventSet], but to **[EventSetNodes][temporian.EventSetNode]**. You can think of an [`EventSetNode`][temporian.EventSetNode] as the placeholder for an [`EventSet`][temporian.EventSet] in the graph. When applying operators to [`EventSetNodes`][temporian.EventSetNode], you get back new [`EventSetNodes`][temporian.EventSetNode] that are placeholders for the results of those operations. You can create arbitrarily complex graphs by combining operators and [`EventSetNodes`][temporian.EventSetNode].
 
 ```python
->>> # Obtain the Node corresponding to the EventSet we created above
+>>> # Obtain the EventSetNode corresponding to the EventSet we created above
 >>> source = evset.node()
 >>>
->>> # Apply operators to existing Nodes to generate new Nodes
+>>> # Apply operators to existing EventSetNodes to generate new EventSetNodes
 >>> addition = source["feature_1"] + source["feature_3"]
 >>> addition_lagged = tp.lag(addition, duration=tp.duration.days(7))
 
@@ -53,14 +53,14 @@ Operators are not applied directly to [`EventSets`][temporian.EventSet], but to 
 
 <!-- TODO: add image of the generated graph -->
 
-Your graph can now be run by calling [`.run()`][temporian.Node.run] on any [`Node`][temporian.Node] in the graph, which will perform all necessary operations and return the resulting [`EventSet`][temporian.EventSet].
+Your graph can now be run by calling [`.run()`][temporian.EventSetNode.run] on any [`EventSetNode`][temporian.EventSetNode] in the graph, which will perform all necessary operations and return the resulting [`EventSet`][temporian.EventSet].
 
 ```python
 >>> result = addition_lagged.run(evset)
 
 ```
 
-Note that you need to pass the [`EventSets`][temporian.EventSet] that correspond to the source [`Nodes`][temporian.Node] in the graph to [`.run()`][temporian.Node.run] (since those are not part of the graph definition). Also, several [`Nodes`][temporian.Node] can be run at the same time by calling [`tp.run()`][temporian.run] directly.
+Note that you need to pass the [`EventSets`][temporian.EventSet] that correspond to the source [`EventSetNodes`][temporian.EventSetNode] in the graph to [`.run()`][temporian.EventSetNode.run] (since those are not part of the graph definition). Also, several [`EventSetNodes`][temporian.EventSetNode] can be run at the same time by calling [`tp.run()`][temporian.run] directly.
 
 🥳 Congratulations! You're all set to write your first pieces of Temporian code.
 

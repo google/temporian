@@ -17,7 +17,10 @@
 
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
-from temporian.core.data.node import Node, create_node_new_features_new_sampling
+from temporian.core.data.node import (
+    EventSetNode,
+    create_node_new_features_new_sampling,
+)
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 from temporian.core.data.duration_utils import (
@@ -28,7 +31,9 @@ from temporian.core.data.duration_utils import (
 
 
 class Tick(Operator):
-    def __init__(self, input: Node, interval: NormalizedDuration, align: bool):
+    def __init__(
+        self, input: EventSetNode, interval: NormalizedDuration, align: bool
+    ):
         super().__init__()
 
         self._interval = interval
@@ -82,7 +87,9 @@ operator_lib.register_operator(Tick)
 
 # TODO: Add support for begin/end arguments.
 @compile
-def tick(input: Node, interval: Duration, align: bool = True) -> Node:
+def tick(
+    input: EventSetNode, interval: Duration, align: bool = True
+) -> EventSetNode:
     """Generates timestamps at regular intervals in the range of a guide.
 
     Example with align:

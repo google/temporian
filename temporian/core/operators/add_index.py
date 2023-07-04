@@ -18,7 +18,10 @@ from typing import List, Union
 
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
-from temporian.core.data.node import Node, create_node_new_features_new_sampling
+from temporian.core.data.node import (
+    EventSetNode,
+    create_node_new_features_new_sampling,
+)
 from temporian.core.data.schema import FeatureSchema, IndexSchema
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
@@ -28,7 +31,7 @@ from temporian.core.operators.drop_index import drop_index
 class AddIndexOperator(Operator):
     def __init__(
         self,
-        input: Node,
+        input: EventSetNode,
         indexes: List[str],
     ) -> None:
         super().__init__()
@@ -55,7 +58,7 @@ class AddIndexOperator(Operator):
         self.check()
 
     def _get_output_feature_schemas(
-        self, input: Node, indexes: List[str]
+        self, input: EventSetNode, indexes: List[str]
     ) -> List[FeatureSchema]:
         return [
             feature
@@ -64,7 +67,7 @@ class AddIndexOperator(Operator):
         ]
 
     def _get_output_indexes(
-        self, input: Node, indexes: List[str]
+        self, input: EventSetNode, indexes: List[str]
     ) -> List[IndexSchema]:
         index_dict = input.schema.index_name_to_dtype()
         feature_dict = input.schema.feature_name_to_dtype()
@@ -138,8 +141,10 @@ def _normalize_indexes_to_set(
 
 
 @compile
-def add_index(input: Node, indexes: Union[str, List[str]]) -> Node:
-    """Adds indexes to a [`Node`][temporian.Node].
+def add_index(
+    input: EventSetNode, indexes: Union[str, List[str]]
+) -> EventSetNode:
+    """Adds indexes to an [`EventSetNode`][temporian.EventSetNode].
 
     Usage example:
         ```python
@@ -204,12 +209,12 @@ def add_index(input: Node, indexes: Union[str, List[str]]) -> Node:
         ```
 
     Args:
-        input: Node for which the indexes are to be set or updated.
+        input: EventSetNode for which the indexes are to be set or updated.
         indexes: List of feature names (strings) that should be added to the
             indexes. These feature names should already exist in `input`.
 
     Returns:
-        New Node with the extended index.
+        New EventSetNode with the extended index.
 
     Raises:
         KeyError: If any of the specified `indexes` are not found in `input`.
@@ -220,8 +225,10 @@ def add_index(input: Node, indexes: Union[str, List[str]]) -> Node:
 
 
 @compile
-def set_index(input: Node, indexes: Union[str, List[str]]) -> Node:
-    """Replaces the index in a [`Node`][temporian.Node].
+def set_index(
+    input: EventSetNode, indexes: Union[str, List[str]]
+) -> EventSetNode:
+    """Replaces the index in an [`EventSetNode`][temporian.EventSetNode].
 
     This function is implemented as [`tp.drop_index()`](../drop_index)
     + [`tp.add_index()`](../add_index).
@@ -293,13 +300,13 @@ def set_index(input: Node, indexes: Union[str, List[str]]) -> Node:
         ```
 
     Args:
-        input: Node for which the indexes are to be set.
+        input: EventSetNode for which the indexes are to be set.
         indexes: List of index / feature names (strings) used as
             the new indexes. These names should be either indexes or features in
             `input`.
 
     Returns:
-        New `Node` with the updated indexes.
+        New `EventSetNode` with the updated indexes.
 
     Raises:
         KeyError: If any of the specified `indexes` are not found in `input`.

@@ -16,10 +16,12 @@
 
 from typing import List, Set, Dict, Union, Optional
 
-from temporian.core.data.node import Node, Feature, Sampling
+from temporian.core.data.node import EventSetNode, Feature, Sampling
 from temporian.core.operators import base
 
-NamedNodes = Union[Dict[str, Node], List[Node], Set[Node], Node]
+NamedEventSetNodes = Union[
+    Dict[str, EventSetNode], List[EventSetNode], Set[EventSetNode], EventSetNode
+]
 
 
 class Graph:
@@ -28,12 +30,12 @@ class Graph:
     def __init__(self):
         self._operators: Set[base.Operator] = set()
         self._features: Set[Feature] = set()
-        self._nodes: Set[Node] = set()
+        self._nodes: Set[EventSetNode] = set()
         self._samplings: Set[Sampling] = set()
-        self._inputs: Set[Node] = set()
-        self._outputs: Set[Node] = set()
-        self._named_inputs: Optional[Dict[str, Node]] = None
-        self._named_outputs: Optional[Dict[str, Node]] = None
+        self._inputs: Set[EventSetNode] = set()
+        self._outputs: Set[EventSetNode] = set()
+        self._named_inputs: Optional[Dict[str, EventSetNode]] = None
+        self._named_outputs: Optional[Dict[str, EventSetNode]] = None
 
     @property
     def samplings(self) -> Set[Sampling]:
@@ -48,31 +50,31 @@ class Graph:
         return self._operators
 
     @property
-    def nodes(self) -> Set[Node]:
+    def nodes(self) -> Set[EventSetNode]:
         return self._nodes
 
     @property
-    def inputs(self) -> Set[Node]:
+    def inputs(self) -> Set[EventSetNode]:
         return self._inputs
 
     @property
-    def outputs(self) -> Set[Node]:
+    def outputs(self) -> Set[EventSetNode]:
         return self._outputs
 
     @property
-    def named_inputs(self) -> Optional[Dict[str, Node]]:
+    def named_inputs(self) -> Optional[Dict[str, EventSetNode]]:
         return self._named_inputs
 
     @property
-    def named_outputs(self) -> Optional[Dict[str, Node]]:
+    def named_outputs(self) -> Optional[Dict[str, EventSetNode]]:
         return self._named_outputs
 
     @named_inputs.setter
-    def named_inputs(self, named_inputs: Optional[Dict[str, Node]]):
+    def named_inputs(self, named_inputs: Optional[Dict[str, EventSetNode]]):
         self._named_inputs = named_inputs
 
     @named_outputs.setter
-    def named_outputs(self, named_outputs: Optional[Dict[str, Node]]):
+    def named_outputs(self, named_outputs: Optional[Dict[str, EventSetNode]]):
         self._named_outputs = named_outputs
 
     def add_operator(self, operator: base.Operator) -> None:
@@ -84,7 +86,7 @@ class Graph:
     def add_feature(self, feature: Feature) -> None:
         self._features.add(feature)
 
-    def add_node(self, node: Node) -> None:
+    def add_node(self, node: EventSetNode) -> None:
         self._nodes.add(node)
 
     def input_features(self) -> Set[Feature]:
@@ -92,7 +94,7 @@ class Graph:
             feature for node in self.inputs for feature in node.feature_nodes
         }
 
-    def set_input_node_names(self, names: Dict[str, Node]):
+    def set_input_node_names(self, names: Dict[str, EventSetNode]):
         if self._inputs is not None:
             named_nodes = set(names.values())
             if named_nodes != self._inputs:
@@ -104,7 +106,7 @@ class Graph:
 
         self._named_inputs = names
 
-    def set_output_node_names(self, names: Dict[str, Node]):
+    def set_output_node_names(self, names: Dict[str, EventSetNode]):
         if self._outputs is not None:
             named_nodes = set(names.values())
             if named_nodes != self._outputs:
@@ -132,7 +134,7 @@ class Graph:
         p("Operators", self.operators)
         p("Features", self.features)
         p("Samplings", self.samplings)
-        p("Nodes", self.nodes)
+        p("EventSetNodes", self.nodes)
 
         def p2(title, dictionary):
             nonlocal s
@@ -161,7 +163,7 @@ class Graph:
 
 
 def infer_graph_named_nodes(
-    inputs: Optional[NamedNodes], outputs: NamedNodes
+    inputs: Optional[NamedEventSetNodes], outputs: NamedEventSetNodes
 ) -> Graph:
     """Extracts the nodes in between the output and input nodes.
 
@@ -169,7 +171,7 @@ def infer_graph_named_nodes(
     output nodes to be named.
     """
 
-    normalized_inputs: Optional[Dict[str, Node]] = None
+    normalized_inputs: Optional[Dict[str, EventSetNode]] = None
     input_nodes = None
     if inputs is not None:
         normalized_inputs = normalize_named_nodes(inputs)
@@ -187,7 +189,9 @@ def infer_graph_named_nodes(
     return g
 
 
-def infer_graph(inputs: Optional[Set[Node]], outputs: Set[Node]) -> Graph:
+def infer_graph(
+    inputs: Optional[Set[EventSetNode]], outputs: Set[EventSetNode]
+) -> Graph:
     """Extracts the nodes in between the output and input nodes.
 
     If inputs is set, fails if outputs cannot be computed from `inputs`.
@@ -232,15 +236,15 @@ def infer_graph(inputs: Optional[Set[Node]], outputs: Set[Node]) -> Graph:
     graph = Graph()
     graph.outputs.update(outputs)
 
-    # The next nodes to process. Nodes are processed from the outputs to
+    # The next nodes to process. EventSetNodes are processed from the outputs to
     # the inputs.
-    pending_nodes: Set[Node] = outputs.copy()
+    pending_nodes: Set[EventSetNode] = outputs.copy()
 
     # Features already processed.
-    done_nodes: Set[Node] = set()
+    done_nodes: Set[EventSetNode] = set()
 
     # List of the missing nodes. Used to create an error message.
-    missing_nodes: Set[Node] = set()
+    missing_nodes: Set[EventSetNode] = set()
 
     while pending_nodes:
         # Select a node to process.
@@ -295,12 +299,12 @@ def infer_graph(inputs: Optional[Set[Node]], outputs: Set[Node]) -> Graph:
     return graph
 
 
-def normalize_named_nodes(src: NamedNodes) -> Dict[str, Node]:
+def normalize_named_nodes(src: NamedEventSetNodes) -> Dict[str, EventSetNode]:
     """Normalizes a node or list of nodes into a dictionary of nodes."""
 
     save_src = src
 
-    if isinstance(src, Node):
+    if isinstance(src, EventSetNode):
         # Will be further processed after.
         src = [src]
 
