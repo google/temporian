@@ -21,7 +21,7 @@ from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
 from temporian.core import operator_lib
 from temporian.core.data.node import (
-    Node,
+    EventSetNode,
     create_node_with_new_reference,
     Feature,
 )
@@ -36,8 +36,8 @@ JOIN_LEFT = "left"
 class Join(Operator):
     def __init__(
         self,
-        left: Node,
-        right: Node,
+        left: EventSetNode,
+        right: EventSetNode,
         how: str = "left",
         on: Optional[str] = None,
     ):
@@ -136,12 +136,12 @@ operator_lib.register_operator(Join)
 
 @compile
 def join(
-    left: Node,
-    right: Node,
+    left: EventSetNode,
+    right: EventSetNode,
     how: str = "left",
     on: Optional[str] = None,
-) -> Node:
-    """Join [`Nodes`][temporian.Node] with different samplings.
+) -> EventSetNode:
+    """Join [`EventSetNode`][temporian.EventSetNode]s with different samplings.
 
     Join features from two nodes based on timestamps. Optionally, join on
     timestamps and an extra in64 feature. Joined nodes should have the the same
