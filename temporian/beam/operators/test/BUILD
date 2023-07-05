@@ -1,13 +1,13 @@
 package(
-    default_visibility=["//visibility:public"],
-    licenses=["notice"],
+    default_visibility = ["//visibility:public"],
+    licenses = ["notice"],
 )
 
 py_test(
-    name="select_test",
-    srcs=["select_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "select_test",
+    srcs = ["select_test.py"],
+    srcs_version = "PY3",
+    deps = [
         # already_there/absl/testing:absltest
         "//temporian/implementation/numpy/data:io",
         "//temporian/beam/test:utils",
@@ -16,10 +16,10 @@ py_test(
 )
 
 py_test(
-    name="add_index_test",
-    srcs=["add_index_test.py"],
-    srcs_version="PY3",
-    deps=[
+    name = "add_index_test",
+    srcs = ["add_index_test.py"],
+    srcs_version = "PY3",
+    deps = [
         # already_there/absl/testing:absltest
         "//temporian/implementation/numpy/data:io",
         "//temporian/beam/test:utils",
