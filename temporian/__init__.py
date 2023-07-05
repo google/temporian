@@ -61,6 +61,7 @@ from temporian.implementation.numpy.data.io import event_set
 # Serialization
 from temporian.core.serialization import load
 from temporian.core.serialization import save
+from temporian.core.serialization import save_graph
 
 # Graph execution
 from temporian.core.evaluation import run
@@ -74,6 +75,9 @@ from temporian.io.pandas import from_pandas
 
 # Plotting
 from temporian.implementation.numpy.data.plotter import plot
+
+# Compilation
+from temporian.core.compilation import compile
 
 
 # --- OPERATORS ---
@@ -96,6 +100,8 @@ from temporian.core.operators.select import select
 from temporian.core.operators.since_last import since_last
 from temporian.core.operators.tick import tick
 from temporian.core.operators.unique_timestamps import unique_timestamps
+from temporian.core.operators.timestamps import timestamps
+from temporian.core.operators.enumerate import enumerate
 
 # Binary operators
 from temporian.core.operators.binary.arithmetic import add

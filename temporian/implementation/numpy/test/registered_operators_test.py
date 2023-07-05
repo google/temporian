@@ -43,6 +43,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "DIVISION_SCALAR",
             "DROP_INDEX",
             "END",
+            "ENUMERATE",
             "EQUAL",
             "EQUAL_SCALAR",
             "FILTER",
@@ -87,6 +88,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "SUBTRACTION",
             "SUBTRACTION_SCALAR",
             "TICK",
+            "TIMESTAMPS",
             "UNIQUE_TIMESTAMPS",
             "XOR",
         ]

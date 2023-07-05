@@ -30,13 +30,16 @@ class BaseUnaryNumpyImplementation(OperatorImplementation):
             schema=output_schema,
         )
         for index_key, index_data in input.data.items():
-            dst_evset[index_key] = IndexData(
-                [
-                    self._do_operation(feature)
-                    for feature in index_data.features
-                ],
-                index_data.timestamps,
-                schema=output_schema,
+            dst_evset.set_index_value(
+                index_key,
+                IndexData(
+                    [
+                        self._do_operation(feature)
+                        for feature in index_data.features
+                    ],
+                    index_data.timestamps,
+                    schema=output_schema,
+                ),
             )
 
         return {"output": dst_evset}

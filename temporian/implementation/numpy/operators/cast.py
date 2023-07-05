@@ -107,10 +107,13 @@ class CastNumpyImplementation(OperatorImplementation):
                     )
                 dst_features.append(src_values.astype(np_dtype))
 
-            output_evset[index_key] = IndexData(
-                features=dst_features,
-                timestamps=index_data.timestamps,
-                schema=output_schema,
+            output_evset.set_index_value(
+                index_key,
+                IndexData(
+                    features=dst_features,
+                    timestamps=index_data.timestamps,
+                    schema=output_schema,
+                ),
             )
 
         return {"output": output_evset}

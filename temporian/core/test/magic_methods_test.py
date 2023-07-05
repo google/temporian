@@ -12,10 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from absl.testing import absltest
+"""Tests magic methods on both EventSets and Nodes."""
 
-from temporian.core.data.node import input_node
-from temporian.core.test import utils
+# pylint: disable=unused-argument
+
+from typing import Union
+from absl.testing import absltest
+from absl.testing.parameterized import parameters
+import numpy as np
+
+from temporian.core.data.node import Node, input_node
 from temporian.core.data.dtype import DType
 from temporian.core.operators.binary import (
     AddOperator,
@@ -55,451 +61,549 @@ from temporian.core.operators.scalar import (
     LessScalarOperator,
 )
 from temporian.core.operators.unary import AbsOperator, InvertOperator
+from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.io import event_set
+
+NodeOrEvset = Union[Node, EventSet]
+
+# Define parameters for all tests.
+# Note that evset_X and node_X must always have matching schemas.
+evset_sampling = event_set(
+    timestamps=[1],
+    features={"x": np.array([1.0], dtype=np.int32)},
+    indexes=["x"],
+    is_unix_timestamp=False,
+)
+node_sampling = input_node(
+    features=[],
+    indexes=[("x", DType.INT32)],
+    is_unix_timestamp=False,
+)
+
+evset_float_1 = event_set(
+    timestamps=[1],
+    features={
+        "x": np.array([1.0], dtype=np.int32),
+        "f1": np.array([1.0], dtype=np.float32),
+        "f2": np.array([2.0], dtype=np.float64),
+    },
+    indexes=["x"],
+    same_sampling_as=evset_sampling,
+)
+node_float_1 = input_node(
+    features=[
+        ("f1", DType.FLOAT32),
+        ("f2", DType.FLOAT64),
+    ],
+    same_sampling_as=node_sampling,
+)
+
+evset_float_2 = event_set(
+    timestamps=[1],
+    features={
+        "x": np.array([1.0], dtype=np.int32),
+        "f3": np.array([3.0], dtype=np.float32),
+        "f4": np.array([4.0], dtype=np.float64),
+    },
+    indexes=["x"],
+    same_sampling_as=evset_sampling,
+)
+node_float_2 = input_node(
+    features=[
+        ("f3", DType.FLOAT32),
+        ("f4", DType.FLOAT64),
+    ],
+    same_sampling_as=node_sampling,
+)
+
+evset_int_1 = event_set(
+    timestamps=[1],
+    features={
+        "x": np.array([1.0], dtype=np.int32),
+        "f5": np.array([5], dtype=np.int32),
+        "f6": np.array([6], dtype=np.int64),
+    },
+    indexes=["x"],
+    same_sampling_as=evset_sampling,
+)
+node_int_1 = input_node(
+    features=[
+        ("f5", DType.INT32),
+        ("f6", DType.INT64),
+    ],
+    same_sampling_as=node_sampling,
+)
+
+evset_int_2 = event_set(
+    timestamps=[1],
+    features={
+        "x": np.array([1.0], dtype=np.int32),
+        "f7": np.array([7], dtype=np.int32),
+        "f8": np.array([8], dtype=np.int64),
+    },
+    indexes=["x"],
+    same_sampling_as=evset_sampling,
+)
+node_int_2 = input_node(
+    features=[
+        ("f7", DType.INT32),
+        ("f8", DType.INT64),
+    ],
+    same_sampling_as=node_sampling,
+)
+
+# Boolean types for logic operators
+evset_bool_1 = evset_float_1 > evset_float_2
+node_bool_1 = node_float_1 > node_float_2
+evset_bool_2 = evset_int_1 > evset_int_2
+node_bool_2 = node_int_1 > node_int_2
 
 
+# Run all methods of this class for both EventSets and their corresponding Nodes
+# NOTE: all code in the test methods must work for both evsets and nodes
+@parameters(
+    {
+        "sampling": evset_sampling,
+        "float_1": evset_float_1,
+        "float_2": evset_float_2,
+        "int_1": evset_int_1,
+        "int_2": evset_int_2,
+        "bool_1": evset_bool_1,
+        "bool_2": evset_bool_2,
+    },
+    {
+        "sampling": node_sampling,
+        "float_1": node_float_1,
+        "float_2": node_float_2,
+        "int_1": node_int_1,
+        "int_2": node_int_2,
+        "bool_1": node_bool_1,
+        "bool_2": node_bool_2,
+    },
+)
 class MagicMethodsTest(absltest.TestCase):
-    def setUp(self):
-        self.sampling_node = input_node(
-            features=[],
-            indexes=[("x", DType.INT32)],
-            is_unix_timestamp=False,
-        )
-
-        # Nodes with floating point types
-        self.node_float_1 = input_node(
-            features=[
-                ("f1", DType.FLOAT32),
-                ("f2", DType.FLOAT64),
-            ],
-            same_sampling_as=self.sampling_node,
-        )
-        self.node_float_2 = input_node(
-            features=[
-                ("f3", DType.FLOAT32),
-                ("f4", DType.FLOAT64),
-            ],
-            same_sampling_as=self.sampling_node,
-        )
-
-        # Nodes with integer types (only for division operations)
-        self.node_int_1 = input_node(
-            features=[
-                ("f5", DType.INT32),
-                ("f6", DType.INT64),
-            ],
-            same_sampling_as=self.sampling_node,
-        )
-        self.node_int_2 = input_node(
-            features=[
-                ("f7", DType.INT32),
-                ("f8", DType.INT64),
-            ],
-            same_sampling_as=self.sampling_node,
-        )
-
-        # Nodes with boolean types for logic operators
-        self.node_bool_1 = self.node_float_1 > self.node_float_2
-        self.node_bool_2 = self.node_int_1 > self.node_int_2
-
-    def test_hash_map(self):
-        """
-        Tests that the `Node` can be used as dict key.
-
-        NOTE: This is the reason to not overwrite `__eq__` in `Node`.
-        """
-        node_list = []
-        node_map = {}
-        for i in range(100):
-            node_name = f"node_{i}"
-            node = utils.create_source_node(name=node_name)
-            node_list.append(node)
-            node_map[node] = node_name
-
-        for idx, node in enumerate(node_list):
-            assert node_map[node] == node.name
-            assert idx == node_list.index(node)
-            assert node in node_list
-            assert node in node_map
-
     #########################################
     ### Get/set item with square brackets ###
     #########################################
-    def test_getitem_single(self):
-        node_out = self.node_float_1["f2"]
-        assert len(node_out.schema.features) == 1
-        assert node_out.schema.features[0].name == "f2"
-        assert node_out.schema.features[0].dtype == DType.FLOAT64
-        # Raises ValueError if fails
-        node_out.check_same_sampling(self.node_float_1)
+    def test_getitem_single(self, float_1: NodeOrEvset, **kwargs):
+        out = float_1["f2"]
 
-    def test_getitem_multiple(self):
-        node_out = self.node_float_1[["f2"]]
-        assert len(node_out.schema.features) == 1
-        assert node_out.schema.features[0].name == "f2"
-        assert node_out.schema.features[0].dtype == DType.FLOAT64
-        node_out.check_same_sampling(self.node_float_1)
+        self.assertTrue(isinstance(out, float_1.__class__))
 
-        node_out = self.node_float_1[["f2", "f1"]]
-        assert len(node_out.schema.features) == 2
-        assert node_out.schema.features[0].name == "f2"
-        assert node_out.schema.features[0].dtype == DType.FLOAT64
-        assert node_out.schema.features[1].name == "f1"
-        assert node_out.schema.features[1].dtype == DType.FLOAT32
-        node_out.check_same_sampling(self.node_float_1)
+        out.check_same_sampling(float_1)
 
-        # Node with empty features
-        node_out = self.node_float_1[[]]
-        assert len(node_out.schema.features) == 0
-        node_out.check_same_sampling(self.node_float_1)
+        self.assertEqual(len(out.schema.features), 1)
+        self.assertEqual(out.schema.features[0].name, "f2")
+        self.assertEqual(out.schema.features[0].dtype, DType.FLOAT64)
 
-    def test_getitem_errors(self):
+    def test_getitem_multiple(self, float_1: NodeOrEvset, **kwargs):
+        out = float_1[["f2", "f1"]]
+
+        self.assertTrue(isinstance(out, float_1.__class__))
+
+        out.check_same_sampling(float_1)
+
+        self.assertEqual(len(out.schema.features), 2)
+        self.assertEqual(out.schema.features[0].name, "f2")
+        self.assertEqual(out.schema.features[0].dtype, DType.FLOAT64)
+        self.assertEqual(out.schema.features[1].name, "f1")
+        self.assertEqual(out.schema.features[1].dtype, DType.FLOAT32)
+
+    def test_getitem_empty(self, float_1: NodeOrEvset, **kwargs):
+        out = float_1[[]]
+
+        self.assertTrue(isinstance(out, float_1.__class__))
+
+        out.check_same_sampling(float_1)
+        self.assertEqual(len(out.schema.features), 0)
+
+    def test_getitem_errors(self, float_1: NodeOrEvset, **kwargs):
         with self.assertRaises(IndexError):
-            self.node_float_1["f3"]
+            float_1["f3"]
         with self.assertRaises(IndexError):
-            self.node_float_1[["f1", "f3"]]
+            float_1[["f1", "f3"]]
         with self.assertRaises(TypeError):
-            self.node_float_1[0]
+            float_1[0]
         with self.assertRaises(TypeError):
-            self.node_float_1[["f1", 0]]
+            float_1[["f1", 0]]
         with self.assertRaises(TypeError):
-            self.node_float_1[None]
+            float_1[None]
 
-    def test_setitem_fails(self):
+    def test_setitem_fails(
+        self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs
+    ):
         # Try to modify existent feature
         with self.assertRaisesRegex(TypeError, "Cannot assign"):
-            self.node_float_1["f1"] = self.node_float_2["f3"]
+            float_1["f1"] = float_2["f3"]
         with self.assertRaisesRegex(TypeError, "Cannot assign"):
-            self.node_float_1["f1"] = None
+            float_1["f1"] = None
 
         # Try to assign inexistent feature
         with self.assertRaisesRegex(TypeError, "Cannot assign"):
-            self.node_float_1["f5"] = self.node_float_2["f3"]
+            float_1["f5"] = float_2["f3"]
         with self.assertRaisesRegex(TypeError, "Cannot assign"):
-            self.node_float_1["f5"] = None
+            float_1["f5"] = None
 
         # Try to assign multiple features
         with self.assertRaisesRegex(TypeError, "Cannot assign"):
-            self.node_float_1[["f1", "f2"]] = self.node_float_2[["f3", "f4"]]
+            float_1[["f1", "f2"]] = float_2[["f3", "f4"]]
         with self.assertRaisesRegex(TypeError, "Cannot assign"):
-            self.node_float_1[["f1", "f2"]] = None
+            float_1[["f1", "f2"]] = None
 
         # Weird cases
         with self.assertRaisesRegex(TypeError, "Cannot assign"):
-            self.node_float_1[[]] = None
+            float_1[[]] = None
         with self.assertRaisesRegex(TypeError, "Cannot assign"):
-            self.node_float_1[None] = None
+            float_1[None] = None
 
-    ###################################
-    ### Relational binary operators ###
-    ###################################
+    # ###################################
+    # ### Relational binary operators ###
+    # ###################################
 
-    def _check_node_boolean(self, node_out):
+    def _check_boolean(self, out: NodeOrEvset, inp: NodeOrEvset):
         # Auxiliar function to check arithmetic outputs
-        assert node_out.sampling_node is self.sampling_node.sampling_node
-        assert node_out.schema.features[0].dtype == DType.BOOLEAN
-        assert node_out.schema.features[1].dtype == DType.BOOLEAN
+        out.check_same_sampling(inp)
+        self.assertTrue(out.schema.features[0].dtype == DType.BOOLEAN)
+        self.assertTrue(out.schema.features[1].dtype == DType.BOOLEAN)
 
-    def test_not_equal(self):
-        node_out = self.node_float_1 != self.node_float_2
-        assert isinstance(node_out.creator, NotEqualOperator)
-        assert node_out.schema.features[0].name == "ne_f1_f3"
-        assert node_out.schema.features[1].name == "ne_f2_f4"
-        self._check_node_boolean(node_out)
+    def test_not_equal(
+        self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs
+    ):
+        out = float_1 != float_2
+        self.assertTrue(isinstance(out.creator, NotEqualOperator))
+        self.assertTrue(out.schema.features[0].name == "ne_f1_f3")
+        self.assertTrue(out.schema.features[1].name == "ne_f2_f4")
+        self._check_boolean(out, float_1)
 
-    def test_greater(self):
-        node_out = self.node_float_1 > self.node_float_2
-        assert isinstance(node_out.creator, GreaterOperator)
-        assert node_out.schema.features[0].name == "gt_f1_f3"
-        assert node_out.schema.features[1].name == "gt_f2_f4"
-        self._check_node_boolean(node_out)
+    def test_greater(
+        self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs
+    ):
+        out = float_1 > float_2
+        self.assertTrue(isinstance(out.creator, GreaterOperator))
+        self.assertTrue(out.schema.features[0].name == "gt_f1_f3")
+        self.assertTrue(out.schema.features[1].name == "gt_f2_f4")
+        self._check_boolean(out, float_1)
 
-    def test_less(self):
-        node_out = self.node_float_1 < self.node_float_2
-        assert isinstance(node_out.creator, LessOperator)
-        assert node_out.schema.features[0].name == "lt_f1_f3"
-        assert node_out.schema.features[1].name == "lt_f2_f4"
-        self._check_node_boolean(node_out)
+    def test_less(self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs):
+        out = float_1 < float_2
+        self.assertTrue(isinstance(out.creator, LessOperator))
+        self.assertTrue(out.schema.features[0].name == "lt_f1_f3")
+        self.assertTrue(out.schema.features[1].name == "lt_f2_f4")
+        self._check_boolean(out, float_1)
 
-    def test_greater_equal(self):
-        node_out = self.node_float_1 >= self.node_float_2
-        assert isinstance(node_out.creator, GreaterEqualOperator)
-        assert node_out.schema.features[0].name == "ge_f1_f3"
-        assert node_out.schema.features[1].name == "ge_f2_f4"
-        self._check_node_boolean(node_out)
+    def test_greater_equal(
+        self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs
+    ):
+        out = float_1 >= float_2
+        self.assertTrue(isinstance(out.creator, GreaterEqualOperator))
+        self.assertTrue(out.schema.features[0].name == "ge_f1_f3")
+        self.assertTrue(out.schema.features[1].name == "ge_f2_f4")
+        self._check_boolean(out, float_1)
 
-    def test_less_equal(self):
-        node_out = self.node_float_1 <= self.node_float_2
-        assert isinstance(node_out.creator, LessEqualOperator)
-        assert node_out.schema.features[0].name == "le_f1_f3"
-        assert node_out.schema.features[1].name == "le_f2_f4"
-        self._check_node_boolean(node_out)
+    def test_less_equal(
+        self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs
+    ):
+        out = float_1 <= float_2
+        self.assertTrue(isinstance(out.creator, LessEqualOperator))
+        self.assertTrue(out.schema.features[0].name == "le_f1_f3")
+        self.assertTrue(out.schema.features[1].name == "le_f2_f4")
+        self._check_boolean(out, float_1)
 
-    ###################################
-    ### Relational scalar operators ###
-    ###################################
+    # ###################################
+    # ### Relational scalar operators ###
+    # ###################################
 
-    def test_not_equal_scalar(self):
-        node_out = self.node_float_1 != 3
-        assert isinstance(node_out.creator, NotEqualScalarOperator)
-        assert node_out.schema.features[0].name == "f1"
-        assert node_out.schema.features[1].name == "f2"
-        self._check_node_boolean(node_out)
+    def test_not_equal_scalar(self, float_1: NodeOrEvset, **kwargs):
+        out = float_1 != 3
+        self.assertTrue(isinstance(out.creator, NotEqualScalarOperator))
+        self.assertTrue(out.schema.features[0].name == "f1")
+        self.assertTrue(out.schema.features[1].name == "f2")
+        self._check_boolean(out, float_1)
 
-    def test_greater_scalar(self):
-        node_out = self.node_float_1 > 3.0
-        assert isinstance(node_out.creator, GreaterScalarOperator)
-        assert node_out.schema.features[0].name == "f1"
-        assert node_out.schema.features[1].name == "f2"
-        self._check_node_boolean(node_out)
+    def test_greater_scalar(self, float_1: NodeOrEvset, **kwargs):
+        out = float_1 > 3.0
+        self.assertTrue(isinstance(out.creator, GreaterScalarOperator))
+        self.assertTrue(out.schema.features[0].name == "f1")
+        self.assertTrue(out.schema.features[1].name == "f2")
+        self._check_boolean(out, float_1)
 
-    def test_less_scalar(self):
-        node_out = self.node_float_1 < 3
-        assert isinstance(node_out.creator, LessScalarOperator)
-        assert node_out.schema.features[0].name == "f1"
-        assert node_out.schema.features[1].name == "f2"
-        self._check_node_boolean(node_out)
+    def test_less_scalar(self, float_1: NodeOrEvset, **kwargs):
+        out = float_1 < 3
+        self.assertTrue(isinstance(out.creator, LessScalarOperator))
+        self.assertTrue(out.schema.features[0].name == "f1")
+        self.assertTrue(out.schema.features[1].name == "f2")
+        self._check_boolean(out, float_1)
 
-    def test_greater_equal_scalar(self):
-        node_out = self.node_float_1 >= 3.0
-        assert isinstance(node_out.creator, GreaterEqualScalarOperator)
-        assert node_out.schema.features[0].name == "f1"
-        assert node_out.schema.features[1].name == "f2"
-        self._check_node_boolean(node_out)
+    def test_greater_equal_scalar(self, float_1: NodeOrEvset, **kwargs):
+        out = float_1 >= 3.0
+        self.assertTrue(isinstance(out.creator, GreaterEqualScalarOperator))
+        self.assertTrue(out.schema.features[0].name == "f1")
+        self.assertTrue(out.schema.features[1].name == "f2")
+        self._check_boolean(out, float_1)
 
-    def test_less_equal_scalar(self):
-        node_out = self.node_float_1 <= 0.5
-        assert isinstance(node_out.creator, LessEqualScalarOperator)
-        assert node_out.schema.features[0].name == "f1"
-        assert node_out.schema.features[1].name == "f2"
-        self._check_node_boolean(node_out)
+    def test_less_equal_scalar(self, float_1: NodeOrEvset, **kwargs):
+        out = float_1 <= 0.5
+        self.assertTrue(isinstance(out.creator, LessEqualScalarOperator))
+        self.assertTrue(out.schema.features[0].name == "f1")
+        self.assertTrue(out.schema.features[1].name == "f2")
+        self._check_boolean(out, float_1)
 
-    ########################
-    ### Logic operators  ###
-    ########################
+    # ########################
+    # ### Logic operators  ###
+    # ########################
 
-    def test_logic_and(self):
+    def test_logic_and(
+        self,
+        float_1: NodeOrEvset,
+        float_2: NodeOrEvset,
+        bool_1: NodeOrEvset,
+        bool_2: NodeOrEvset,
+        **kwargs,
+    ):
         # Should not work: non boolean features
         with self.assertRaises(ValueError):
-            _ = self.node_float_1 & self.node_float_2
+            _ = float_1 & float_2
 
-        node_out = self.node_bool_1 & self.node_bool_2
-        assert isinstance(node_out.creator, LogicalAndOperator)
-        self._check_node_boolean(node_out)
+        out = bool_1 & bool_2
+        self.assertTrue(isinstance(out.creator, LogicalAndOperator))
+        self._check_boolean(out, bool_1)
 
-    def test_logic_or(self):
-        node_out = self.node_bool_1 | self.node_bool_2
-        assert isinstance(node_out.creator, LogicalOrOperator)
-        self._check_node_boolean(node_out)
+    def test_logic_or(self, bool_1: NodeOrEvset, bool_2: NodeOrEvset, **kwargs):
+        out = bool_1 | bool_2
+        self.assertTrue(isinstance(out.creator, LogicalOrOperator))
+        self._check_boolean(out, bool_1)
 
-    def test_logic_xor(self):
-        node_out = self.node_bool_1 ^ self.node_bool_2
-        assert isinstance(node_out.creator, LogicalXorOperator)
-        self._check_node_boolean(node_out)
+    def test_logic_xor(
+        self, bool_1: NodeOrEvset, bool_2: NodeOrEvset, **kwargs
+    ):
+        out = bool_1 ^ bool_2
+        self.assertTrue(isinstance(out.creator, LogicalXorOperator))
+        self._check_boolean(out, bool_1)
 
-    ###################################
-    ### Arithmetic binary operators ###
-    ###################################
+    # ###################################
+    # ### Arithmetic binary operators ###
+    # ###################################
 
-    def _check_node_same_dtype(self, node_in, node_out):
+    def _check_node_same_dtype(self, inp: NodeOrEvset, out: NodeOrEvset):
         # Auxiliar function to check arithmetic outputs
-        assert node_out.sampling_node is self.sampling_node.sampling_node
-        assert (
-            node_out.schema.features[0].dtype
-            == node_in.schema.features[0].dtype
+        out.check_same_sampling(inp)
+        self.assertTrue(
+            (out.schema.features[0].dtype == inp.schema.features[0].dtype)
         )
-        assert (
-            node_out.schema.features[1].dtype
-            == node_in.schema.features[1].dtype
+        self.assertTrue(
+            (out.schema.features[1].dtype == inp.schema.features[1].dtype)
         )
 
-    def test_addition(self):
-        node_out = self.node_float_1 + self.node_float_2
-        assert isinstance(node_out.creator, AddOperator)
-        assert node_out.schema.features[0].name == "add_f1_f3"
-        assert node_out.schema.features[1].name == "add_f2_f4"
-        self._check_node_same_dtype(self.node_float_1, node_out)
+    def test_addition(
+        self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs
+    ):
+        out = float_1 + float_2
+        self.assertTrue(isinstance(out.creator, AddOperator))
+        self.assertTrue(out.schema.features[0].name == "add_f1_f3")
+        self.assertTrue(out.schema.features[1].name == "add_f2_f4")
+        self._check_node_same_dtype(float_1, out)
 
-    def test_subtraction(self):
-        node_out = self.node_float_1 - self.node_float_2
-        assert isinstance(node_out.creator, SubtractOperator)
-        assert node_out.schema.features[0].name == "sub_f1_f3"
-        assert node_out.schema.features[1].name == "sub_f2_f4"
-        self._check_node_same_dtype(self.node_float_1, node_out)
+    def test_subtraction(
+        self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs
+    ):
+        out = float_1 - float_2
+        self.assertTrue(isinstance(out.creator, SubtractOperator))
+        self.assertTrue(out.schema.features[0].name == "sub_f1_f3")
+        self.assertTrue(out.schema.features[1].name == "sub_f2_f4")
+        self._check_node_same_dtype(float_1, out)
 
-    def test_multiplication(self):
-        node_out = self.node_float_1 * self.node_float_2
-        assert isinstance(node_out.creator, MultiplyOperator)
-        assert node_out.schema.features[0].name == "mult_f1_f3"
-        assert node_out.schema.features[1].name == "mult_f2_f4"
-        self._check_node_same_dtype(self.node_float_1, node_out)
+    def test_multiplication(
+        self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs
+    ):
+        out = float_1 * float_2
+        self.assertTrue(isinstance(out.creator, MultiplyOperator))
+        self.assertTrue(out.schema.features[0].name == "mult_f1_f3")
+        self.assertTrue(out.schema.features[1].name == "mult_f2_f4")
+        self._check_node_same_dtype(float_1, out)
 
-    def test_division(self):
-        node_out = self.node_float_1 / self.node_float_2
-        assert isinstance(node_out.creator, DivideOperator)
-        assert node_out.schema.features[0].name == "div_f1_f3"
-        assert node_out.schema.features[1].name == "div_f2_f4"
-        self._check_node_same_dtype(self.node_float_1, node_out)
+    def test_division(
+        self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs
+    ):
+        out = float_1 / float_2
+        self.assertTrue(isinstance(out.creator, DivideOperator))
+        self.assertTrue(out.schema.features[0].name == "div_f1_f3")
+        self.assertTrue(out.schema.features[1].name == "div_f2_f4")
+        self._check_node_same_dtype(float_1, out)
 
-    def test_floordiv(self):
+    def test_floordiv(self, int_1: NodeOrEvset, int_2: NodeOrEvset, **kwargs):
         # First, check that truediv is not supported for integer types
         with self.assertRaises(ValueError):
-            node_out = self.node_int_1 / self.node_int_2
+            out = int_1 / int_2
 
         # Check floordiv operator instead
-        node_out = self.node_int_1 // self.node_int_2
-        assert isinstance(node_out.creator, FloorDivOperator)
-        assert node_out.schema.features[0].name == "floordiv_f5_f7"
-        assert node_out.schema.features[1].name == "floordiv_f6_f8"
-        self._check_node_same_dtype(self.node_int_1, node_out)
+        out = int_1 // int_2
+        self.assertTrue(isinstance(out.creator, FloorDivOperator))
+        self.assertTrue(out.schema.features[0].name == "floordiv_f5_f7")
+        self.assertTrue(out.schema.features[1].name == "floordiv_f6_f8")
+        self._check_node_same_dtype(int_1, out)
 
-    def test_modulo(self):
-        node_out = self.node_float_1 % self.node_float_2
-        assert isinstance(node_out.creator, ModuloOperator)
-        assert node_out.schema.features[0].name == "mod_f1_f3"
-        assert node_out.schema.features[1].name == "mod_f2_f4"
-        self._check_node_same_dtype(self.node_float_1, node_out)
+    def test_modulo(self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs):
+        out = float_1 % float_2
+        self.assertTrue(isinstance(out.creator, ModuloOperator))
+        self.assertTrue(out.schema.features[0].name == "mod_f1_f3")
+        self.assertTrue(out.schema.features[1].name == "mod_f2_f4")
+        self._check_node_same_dtype(float_1, out)
 
-    def test_power(self):
-        node_out = self.node_float_1**self.node_float_2
-        assert isinstance(node_out.creator, PowerOperator)
-        assert node_out.schema.features[0].name == "pow_f1_f3"
-        assert node_out.schema.features[1].name == "pow_f2_f4"
-        self._check_node_same_dtype(self.node_float_1, node_out)
+    def test_power(self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs):
+        out = float_1**float_2
+        self.assertTrue(isinstance(out.creator, PowerOperator))
+        self.assertTrue(out.schema.features[0].name == "pow_f1_f3")
+        self.assertTrue(out.schema.features[1].name == "pow_f2_f4")
+        self._check_node_same_dtype(float_1, out)
 
-    ###################################
-    ### Arithmetic scalar operators ###
-    ###################################
+    # ###################################
+    # ### Arithmetic scalar operators ###
+    # ###################################
 
-    def test_addition_scalar(self):
+    def test_addition_scalar(
+        self, float_1: NodeOrEvset, int_1: NodeOrEvset, **kwargs
+    ):
         # Shouldn't work: int node and float scalar
         with self.assertRaises(ValueError):
-            node_out = self.node_int_1 + 3.5
+            out = int_1 + 3.5
 
         # Should work: float node and int scalar
-        node_out = self.node_float_1 + 3
-        assert isinstance(node_out.creator, AddScalarOperator)
-        assert node_out.schema.features[0].name == "f1"
-        assert node_out.schema.features[1].name == "f2"
-        self._check_node_same_dtype(self.node_float_1, node_out)
+        out = float_1 + 3
+        self.assertTrue(isinstance(out.creator, AddScalarOperator))
+        self.assertTrue(out.schema.features[0].name == "f1")
+        self.assertTrue(out.schema.features[1].name == "f2")
+        self._check_node_same_dtype(float_1, out)
 
-    def test_right_addition_scalar(self):
+    def test_right_addition_scalar(
+        self, float_1: NodeOrEvset, int_1: NodeOrEvset, **kwargs
+    ):
         # Shouldn't work: int node and float scalar
         with self.assertRaises(ValueError):
-            node_out = 3.5 + self.node_int_1
+            out = 3.5 + int_1
 
         # Should work: float node and int scalar
-        node_out = 3 + self.node_float_1
-        assert isinstance(node_out.creator, AddScalarOperator)
-        assert node_out.schema.features[0].name == "f1"
-        assert node_out.schema.features[1].name == "f2"
-        self._check_node_same_dtype(self.node_float_1, node_out)
+        out = 3 + float_1
+        self.assertTrue(isinstance(out.creator, AddScalarOperator))
+        self.assertTrue(out.schema.features[0].name == "f1")
+        self.assertTrue(out.schema.features[1].name == "f2")
+        self._check_node_same_dtype(float_1, out)
 
-    def test_division_scalar(self):
+    def test_division_scalar(
+        self, float_1: NodeOrEvset, int_1: NodeOrEvset, **kwargs
+    ):
         # Shouldn't work: divide int node
         with self.assertRaises(ValueError):
-            node_out = self.node_int_1 / 3
+            out = int_1 / 3
 
         # Should work: float node and int scalar
-        node_out = self.node_float_1 / 3
-        assert isinstance(node_out.creator, DivideScalarOperator)
-        assert node_out.schema.features[0].name == "f1"
-        assert node_out.schema.features[1].name == "f2"
-        self._check_node_same_dtype(self.node_float_1, node_out)
+        out = float_1 / 3
+        self.assertTrue(isinstance(out.creator, DivideScalarOperator))
+        self.assertTrue(out.schema.features[0].name == "f1")
+        self.assertTrue(out.schema.features[1].name == "f2")
+        self._check_node_same_dtype(float_1, out)
 
-    def test_right_division_scalar(self):
+    def test_right_division_scalar(
+        self, float_1: NodeOrEvset, int_1: NodeOrEvset, **kwargs
+    ):
         # Shouldn't work: divide by int node
         with self.assertRaises(ValueError):
-            node_out = 3 / self.node_int_1
+            out = 3 / int_1
 
         # Should work: divide by float node
-        node_out = 3 / self.node_float_1
-        assert isinstance(node_out.creator, DivideScalarOperator)
-        assert node_out.schema.features[0].name == "f1"
-        assert node_out.schema.features[1].name == "f2"
-        self._check_node_same_dtype(self.node_float_1, node_out)
+        out = 3 / float_1
+        self.assertTrue(isinstance(out.creator, DivideScalarOperator))
+        self.assertTrue(out.schema.features[0].name == "f1")
+        self.assertTrue(out.schema.features[1].name == "f2")
+        self._check_node_same_dtype(float_1, out)
 
-    def test_floordiv_scalar(self):
+    def test_floordiv_scalar(
+        self, float_1: NodeOrEvset, int_1: NodeOrEvset, **kwargs
+    ):
         # int node
-        node_out = self.node_int_1 // 3
-        assert node_out.schema.features[0].name == "f5"
-        assert node_out.schema.features[1].name == "f6"
+        out = int_1 // 3
+        self.assertTrue(out.schema.features[0].name == "f5")
+        self.assertTrue(out.schema.features[1].name == "f6")
 
         # int node (right)
-        node_out = 3 // self.node_int_1
-        assert node_out.schema.features[0].name == "f5"
-        assert node_out.schema.features[1].name == "f6"
+        out = 3 // int_1
+        self.assertTrue(out.schema.features[0].name == "f5")
+        self.assertTrue(out.schema.features[1].name == "f6")
 
         # float node
-        node_out = self.node_float_1 // 3
-        assert isinstance(node_out.creator, FloorDivScalarOperator)
-        assert node_out.schema.features[0].name == "f1"
-        assert node_out.schema.features[1].name == "f2"
-        self._check_node_same_dtype(self.node_float_1, node_out)
+        out = float_1 // 3
+        self.assertTrue(isinstance(out.creator, FloorDivScalarOperator))
+        self.assertTrue(out.schema.features[0].name == "f1")
+        self.assertTrue(out.schema.features[1].name == "f2")
+        self._check_node_same_dtype(float_1, out)
 
-    def test_multiply_scalar(self):
-        node_out = 3 * self.node_float_1
-        assert isinstance(node_out.creator, MultiplyScalarOperator)
-        node_out = self.node_float_1 * 3
-        assert isinstance(node_out.creator, MultiplyScalarOperator)
-        assert node_out.schema.features[0].name == "f1"
-        assert node_out.schema.features[1].name == "f2"
-        self._check_node_same_dtype(self.node_float_1, node_out)
+    def test_multiply_scalar(self, float_1: NodeOrEvset, **kwargs):
+        out = 3 * float_1
+        self.assertTrue(isinstance(out.creator, MultiplyScalarOperator))
+        out = float_1 * 3
+        self.assertTrue(isinstance(out.creator, MultiplyScalarOperator))
+        self.assertTrue(out.schema.features[0].name == "f1")
+        self.assertTrue(out.schema.features[1].name == "f2")
+        self._check_node_same_dtype(float_1, out)
 
-    def test_subtract_scalar(self):
-        node_out = 3 - self.node_float_1
-        assert isinstance(node_out.creator, SubtractScalarOperator)
-        node_out = self.node_float_1 - 3
-        assert isinstance(node_out.creator, SubtractScalarOperator)
-        assert node_out.schema.features[0].name == "f1"
-        assert node_out.schema.features[1].name == "f2"
-        self._check_node_same_dtype(self.node_float_1, node_out)
+    def test_subtract_scalar(self, float_1: NodeOrEvset, **kwargs):
+        out = 3 - float_1
+        self.assertTrue(isinstance(out.creator, SubtractScalarOperator))
+        out = float_1 - 3
+        self.assertTrue(isinstance(out.creator, SubtractScalarOperator))
+        self.assertTrue(out.schema.features[0].name == "f1")
+        self.assertTrue(out.schema.features[1].name == "f2")
+        self._check_node_same_dtype(float_1, out)
 
-    def test_modulo_scalar(self):
-        node_out = 3 % self.node_float_1
-        assert isinstance(node_out.creator, ModuloScalarOperator)
-        node_out = self.node_float_1 % 3
-        assert isinstance(node_out.creator, ModuloScalarOperator)
-        assert node_out.schema.features[0].name == "f1"
-        assert node_out.schema.features[1].name == "f2"
-        self._check_node_same_dtype(self.node_float_1, node_out)
+    def test_modulo_scalar(self, float_1: NodeOrEvset, **kwargs):
+        out = 3 % float_1
+        self.assertTrue(isinstance(out.creator, ModuloScalarOperator))
+        out = float_1 % 3
+        self.assertTrue(isinstance(out.creator, ModuloScalarOperator))
+        self.assertTrue(out.schema.features[0].name == "f1")
+        self.assertTrue(out.schema.features[1].name == "f2")
+        self._check_node_same_dtype(float_1, out)
 
-    def test_power_scalar(self):
-        node_out = 3**self.node_float_1
-        assert isinstance(node_out.creator, PowerScalarOperator)
-        node_out = self.node_float_1**3
-        assert isinstance(node_out.creator, PowerScalarOperator)
-        assert node_out.schema.features[0].name == "f1"
-        assert node_out.schema.features[1].name == "f2"
-        self._check_node_same_dtype(self.node_float_1, node_out)
+    def test_power_scalar(self, float_1: NodeOrEvset, **kwargs):
+        out = 3**float_1
+        self.assertTrue(isinstance(out.creator, PowerScalarOperator))
+        out = float_1**3
+        self.assertTrue(isinstance(out.creator, PowerScalarOperator))
+        self.assertTrue(out.schema.features[0].name == "f1")
+        self.assertTrue(out.schema.features[1].name == "f2")
+        self._check_node_same_dtype(float_1, out)
 
-    ########################
-    ### Unary operators  ###
-    ########################
-    def test_abs(self):
-        node_out = abs(self.node_float_1)
-        assert isinstance(node_out.creator, AbsOperator)
-        self._check_node_same_dtype(self.node_float_1, node_out)
+    # ########################
+    # ### Unary operators  ###
+    # ########################
+    def test_abs(self, float_1: NodeOrEvset, **kwargs):
+        out = abs(float_1)
+        self.assertTrue(isinstance(out.creator, AbsOperator))
+        self._check_node_same_dtype(float_1, out)
 
-    def test_invert(self):
+    def test_invert(self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs):
         # Should not work: invert non-boolean types
         with self.assertRaises(ValueError):
-            _ = ~self.node_float_1
+            _ = ~float_1
 
-        boolean_node = self.node_float_1 != self.node_float_2
-        node_out = ~boolean_node
-        assert isinstance(node_out.creator, InvertOperator)
-        self._check_node_boolean(node_out)
+        boolean_node = float_1 != float_2
+        out = ~boolean_node
+        self.assertTrue(isinstance(out.creator, InvertOperator))
+        self._check_boolean(out, float_1)
 
-    def test_no_truth_value(self):
+    def test_no_truth_value(
+        self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs
+    ):
         # Check that bool(node) doesn't work
-        boolean_node = self.node_float_1 != self.node_float_2
+        boolean_node = float_1 != float_2
         with self.assertRaisesRegex(
-            ValueError, "truth value of a Node is ambiguous"
+            ValueError,
+            f"truth value of a {float_1.__class__.__name__} is ambiguous",
         ):
             bool(boolean_node)
 
         with self.assertRaisesRegex(
-            ValueError, "truth value of a Node is ambiguous"
+            ValueError,
+            f"truth value of a {float_1.__class__.__name__} is ambiguous",
         ):
             if boolean_node:  # <- this should call bool(boolean_node)
                 pass

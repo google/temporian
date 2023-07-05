@@ -53,17 +53,22 @@ class BaseScalarNumpyImplementation(OperatorImplementation, ABC):
 
         dst_evset = EventSet(data={}, schema=output_schema)
         for index_key, index_data in input.data.items():
-            dst_evset[index_key] = IndexData(
-                [
-                    self._do_operation(
-                        feature,
-                        self.operator.value,
-                        input.schema.features[feature_idx].dtype,
-                    )
-                    for feature_idx, feature in enumerate(index_data.features)
-                ],
-                index_data.timestamps,
-                schema=output_schema,
+            dst_evset.set_index_value(
+                index_key,
+                IndexData(
+                    [
+                        self._do_operation(
+                            feature,
+                            self.operator.value,
+                            input.schema.features[feature_idx].dtype,
+                        )
+                        for feature_idx, feature in enumerate(
+                            index_data.features
+                        )
+                    ],
+                    index_data.timestamps,
+                    schema=output_schema,
+                ),
             )
 
         return {"output": dst_evset}

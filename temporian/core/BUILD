@@ -54,3 +54,19 @@ py_library(
     deps = [
     ],
 )
+
+py_library(
+    name = "compilation",
+    srcs = ["compilation.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:event_set",
+    ],
+)
+
+py_library(
+    name = "mixins",
+    srcs = ["mixins.py"],
+    srcs_version = "PY3",
+    deps = [],
+)
