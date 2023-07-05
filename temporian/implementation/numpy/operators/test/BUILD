@@ -687,4 +687,35 @@ py_test(
         "//temporian/implementation/numpy/operators:join",
     ],
 )
-    
+
+py_test(
+    name = "timestamps_test",
+    srcs = ["timestamps_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        ":test_util",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:node",
+        "//temporian/core/data:schema",
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/core/operators:timestamps",
+        "//temporian/implementation/numpy/operators:timestamps",
+    ],
+)
+
+py_test(
+    name = "enumerate_test",
+    srcs = ["enumerate_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        ":test_util",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:node",
+        "//temporian/core/data:schema",
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/core/operators:enumerate",
+        "//temporian/implementation/numpy/operators:enumerate",
+    ],
+)

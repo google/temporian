@@ -57,7 +57,7 @@ class ResampleNumpyImplementation(OperatorImplementation):
             dst_mts = []
 
             index_data = IndexData(dst_mts, index_data.timestamps, schema=None)
-            dst_evset[index_key] = index_data
+            dst_evset.set_index_value(index_key, index_data)
 
             if index_key not in input.data:
                 # No matching events to sample from
@@ -75,8 +75,8 @@ class ResampleNumpyImplementation(OperatorImplementation):
                 index_data.check_schema(output_schema)
                 continue
 
-            src_mts = input[index_key].features
-            src_timestamps = input[index_key].timestamps
+            src_mts = input.get_index_value(index_key).features
+            src_timestamps = input.get_index_value(index_key).timestamps
             (
                 sampling_idxs,
                 first_valid_idx,

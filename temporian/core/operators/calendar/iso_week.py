@@ -15,6 +15,7 @@
 """Calendar ISO week operator class and public API function definitions."""
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.node import Node
 from temporian.core.operators.calendar.base import BaseCalendarOperator
 
@@ -32,6 +33,7 @@ class CalendarISOWeekOperator(BaseCalendarOperator):
 operator_lib.register_operator(CalendarISOWeekOperator)
 
 
+@compile
 def calendar_iso_week(sampling: Node) -> Node:
     """Obtains the ISO week the timestamps in a node's sampling are in.
 

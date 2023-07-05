@@ -64,10 +64,13 @@ class TickNumpyImplementation(OperatorImplementation):
                     dtype=np.float64,
                 )
 
-            output_evset[index_key] = IndexData(
-                [],
-                dst_timestamps,
-                schema=output_schema,
+            output_evset.set_index_value(
+                index_key,
+                IndexData(
+                    [],
+                    dst_timestamps,
+                    schema=output_schema,
+                ),
             )
 
         return {"output": output_evset}

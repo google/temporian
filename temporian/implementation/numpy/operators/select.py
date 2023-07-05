@@ -46,10 +46,13 @@ class SelectNumpyImplementation(OperatorImplementation):
         output_evset = EventSet(data={}, schema=output_schema)
         # select feature index key-wise
         for index_key, index_data in input.data.items():
-            output_evset[index_key] = IndexData(
-                [index_data.features[idx] for idx in feature_idxs],
-                index_data.timestamps,
-                schema=output_schema,
+            output_evset.set_index_value(
+                index_key,
+                IndexData(
+                    [index_data.features[idx] for idx in feature_idxs],
+                    index_data.timestamps,
+                    schema=output_schema,
+                ),
             )
 
         return {"output": output_evset}

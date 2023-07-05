@@ -17,6 +17,7 @@
 from typing import List, Optional, Union
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.node import Node, create_node_new_features_new_sampling
 from temporian.core.data.schema import FeatureSchema, IndexSchema
 from temporian.core.operators.base import Operator
@@ -152,6 +153,7 @@ def _normalize_indexes(
     return indexes
 
 
+@compile
 def drop_index(
     input: Node,
     indexes: Optional[Union[str, List[str]]] = None,

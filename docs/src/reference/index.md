@@ -45,6 +45,7 @@ Check the index on the left for a more detailed description of any symbol.
 | [`tp.cast()`][temporian.cast]                           | Casts the dtype of features.                                                                |
 | [`tp.drop_index()`][temporian.drop_index]               | Removes indexes from a [`Node`][temporian.Node].                                            |
 | [`tp.end()`][temporian.end]                             | Generates a single timestamp at the end of the input.                                       |
+| [`tp.enumerate()`][temporian.enumerate]                 | Creates an ordinal feature enumerating the events according to their timestamp.             |
 | [`tp.filter()`][temporian.filter]                       | Filters out events in a [`Node`][temporian.Node] for which a condition is false.            |
 | [`tp.glue()`][temporian.glue]                           | Concatenates [`Nodes`][temporian.Node] with the same sampling.                              |
 | [`tp.join()`][temporian.join]                           | Join [`Nodes`][temporian.Node] with different samplings but the same index together.        |
@@ -58,6 +59,7 @@ Check the index on the left for a more detailed description of any symbol.
 | [`tp.set_index()`][temporian.set_index]                 | Replaces the indexes in a [`Node`][temporian.Node].                                         |
 | [`tp.since_last()`][temporian.since_last]               | Computes the amount of time since the last distinct timestamp.                              |
 | [`tp.tick()`][temporian.tick]                           | Generates timestamps at regular intervals in the range of a guide.                          |
+| [`tp.timestamps()`][temporian.timestamps]               | Creates a feature from the events timestamps (`float64`).                                   |
 | [`tp.unique_timestamps()`][temporian.unique_timestamps] | Removes events with duplicated timestamps from a [`Node`][temporian.Node].                  |
 
 ### Binary operators

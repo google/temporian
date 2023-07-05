@@ -15,9 +15,6 @@
     "**/bazel-*/**": true
   },
   "python.formatting.provider": "black",
-  "[python]": {
-    "editor.defaultFormatter": "ms-python.black-formatter"
-  },
   "editor.tabSize": 4,
   "editor.formatOnSave": false,
   "python.linting.flake8Enabled": false,

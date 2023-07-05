@@ -15,6 +15,7 @@
 """Binary relational operators classes and public API function definitions."""
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import Node
 from temporian.core.data.schema import FeatureSchema
@@ -71,6 +72,7 @@ class LessEqualOperator(BaseRelationalOperator):
     PREFIX = "le"
 
 
+@compile
 def equal(
     input_1: Node,
     input_2: Node,
@@ -129,6 +131,7 @@ def equal(
     ).outputs["output"]
 
 
+@compile
 def not_equal(
     input_1: Node,
     input_2: Node,
@@ -180,6 +183,7 @@ def not_equal(
     ).outputs["output"]
 
 
+@compile
 def greater(
     input_left: Node,
     input_right: Node,
@@ -231,6 +235,7 @@ def greater(
     ).outputs["output"]
 
 
+@compile
 def greater_equal(
     input_left: Node,
     input_right: Node,
@@ -282,6 +287,7 @@ def greater_equal(
     ).outputs["output"]
 
 
+@compile
 def less(
     input_left: Node,
     input_right: Node,
@@ -333,6 +339,7 @@ def less(
     ).outputs["output"]
 
 
+@compile
 def less_equal(
     input_left: Node,
     input_right: Node,

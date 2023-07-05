@@ -20,15 +20,16 @@ import temporian as tp
 from temporian.core import serialization
 from temporian.core import graph
 from temporian.core.data.dtype import DType
+from temporian.core.data.node import Node
 from temporian.core.test import utils
 from temporian.implementation.numpy.data.io import event_set
 
 
-class SerializeTest(absltest.TestCase):
+class SerializationTest(absltest.TestCase):
     def test_serialize(self):
-        i1 = utils.create_source_node()
+        i1 = utils.create_input_node()
         o2 = utils.OpI1O1(i1)
-        i3 = utils.create_source_node()
+        i3 = utils.create_input_node()
         o4 = utils.OpI2O1(o2.outputs["output"], i3)
         o5 = utils.OpI1O2(o4.outputs["output"])
 
@@ -88,7 +89,10 @@ class SerializeTest(absltest.TestCase):
     def test_serialize_autonode(self):
         input_data = event_set(
             timestamps=[1, 2, 3, 4],
-            features={"f1": [5, 6, 7, 8], "x": [1, 1, 2, 2]},
+            features={
+                "f1": [5, 6, 7, 8],
+                "x": [1, 1, 2, 2],
+            },
             indexes=["x"],
         )
 
@@ -118,7 +122,7 @@ class SerializeTest(absltest.TestCase):
             "attr_map": {"good": "bye", "nice": "to", "meet": "you"},
             "attr_list_dtypes": [DType.FLOAT32, DType.STRING],
         }
-        i_event = utils.create_source_node()
+        i_event = utils.create_input_node()
         operator = utils.OpWithAttributes(i_event, **attributes)
 
         original = graph.infer_graph_named_nodes(
@@ -159,7 +163,7 @@ class SerializeTest(absltest.TestCase):
             & serialization._all_identifiers(restored.named_outputs.values())
         )
 
-    def test_serialize_and_run(self):
+    def test_save_graph_and_load(self):
         input_data = tp.event_set(
             timestamps=[1, 2, 3], features={"x": [1, 2, 3], "y": [4, 5, 6]}
         )
@@ -172,19 +176,96 @@ class SerializeTest(absltest.TestCase):
         output_node = x
 
         result = tp.run(output_node, {input_node: input_data})
-        print("result:", result)
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_graph.tem")
-            tp.save(
+            tp.save_graph(
                 inputs={"a": input_node}, outputs={"b": output_node}, path=path
             )
             loaded_inputs, loaded_outputs = tp.load(path=path, squeeze=True)
 
         loaded_results = tp.run(loaded_outputs, {loaded_inputs: input_data})
-        print("loaded_results:", loaded_results)
 
         self.assertEqual(result, loaded_results)
+
+    def test_save_and_load(self):
+        @tp.compile
+        def f(x: Node):
+            return tp.prefix("a_", x)
+
+        evset = tp.event_set(
+            timestamps=[1.0, 2.0, 3.0],
+            features={"f1": [100.0, 200.0, 300.0]},
+        )
+        result = f(evset)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(f, inputs={"x": evset}, path=path)
+            input, output = tp.load(path=path, squeeze=True)
+            inputs, outputs = tp.load(path=path, squeeze=False)
+
+        self.assertEqual(list(inputs.keys()), ["x"])
+        self.assertEqual(list(outputs.keys()), ["output"])
+
+        loaded_result = tp.run(output, {input: evset})
+
+        self.assertEqual(result, loaded_result)
+
+    def test_save_and_load_many_inputs(self):
+        @tp.compile
+        def f(x: Node, y: int, z: Node):
+            print(y)
+            return tp.glue(x, z)
+
+        x = tp.event_set(
+            timestamps=[1.0, 2.0, 3.0],
+            features={"f1": [100.0, 200.0, 300.0]},
+        )
+        y = 3
+        z = tp.event_set(
+            timestamps=[1.0, 2.0, 3.0],
+            features={"f2": [3.0, 5.0, 2.0]},
+            same_sampling_as=x,
+        )
+        result = f(x, y, z)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(f, inputs={"x": x, "y": y, "z": z}, path=path)
+            inputs, output = tp.load(path=path, squeeze=True)
+
+        self.assertEqual(list(inputs.keys()), ["x", "z"])
+
+        loaded_result = tp.run(output, {inputs["x"]: x, inputs["z"]: z})
+
+        self.assertEqual(result, loaded_result)
+
+    def test_save_and_load_dict_outputs(self):
+        @tp.compile
+        def f(x: Node):
+            return {
+                "a": tp.abs(x),
+                "b": tp.log(x),
+            }
+
+        x = tp.event_set(
+            timestamps=[1.0, 2.0, 3.0],
+            features={"f1": [100.0, 200.0, 300.0]},
+        )
+        results = f(x)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(f, inputs={"x": x}, path=path)
+            input, outputs = tp.load(path=path, squeeze=True)
+
+        self.assertEqual(list(outputs.keys()), ["a", "b"])
+
+        loaded_results = tp.run(outputs, {input: x})
+
+        self.assertEqual(results["a"], loaded_results["a"])
+        self.assertEqual(results["b"], loaded_results["b"])
 
 
 if __name__ == "__main__":

@@ -19,6 +19,7 @@ py_library(
     deps = [
         ":dtype",
         ":schema",
+        "//temporian/core:mixins",
         "//temporian/utils:string",
     ],
 )

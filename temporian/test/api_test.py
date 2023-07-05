@@ -49,8 +49,6 @@ class TFPTest(absltest.TestCase):
             input={i1: evset_1, i2: evset_2},
             verbose=2,
         )
-        logging.info("results: %s", result_data)
-        logging.info("result2: %s", result2_data)
 
         with tempfile.TemporaryDirectory() as tempdir:
             result_data.plot(return_fig=True).savefig(
@@ -58,6 +56,47 @@ class TFPTest(absltest.TestCase):
             )
             tp.plot([evset_1, evset_2], return_fig=True).savefig(
                 os.path.join(tempdir, "p2.png")
+            )
+
+    def test_eager_mode(self):
+        evset_1 = tp.event_set(
+            timestamps=[0.0, 2.0, 4.0, 6.0],
+            features={
+                "f1": [1.0, 2.0, 3.0, 4.0],
+                "f2": [5.0, 6.0, 7.0, 8.0],
+            },
+        )
+
+        evset_2 = tp.event_set(timestamps=[1.0, 2.0, 2.0])
+
+        h1 = tp.simple_moving_average(input=evset_1, window_length=7)
+        h2 = tp.resample(input=h1, sampling=evset_2)
+
+        self.assertTrue(isinstance(h1, tp.EventSet))
+        self.assertTrue(isinstance(h2, tp.EventSet))
+
+        del h1
+
+        h3 = evset_1 * 2.0 + 3.0 > 10.0
+
+        result = tp.glue(tp.prefix("sma_", h2["f2"]), evset_2)
+
+        result2 = tp.glue(tp.prefix("toto.", h3))
+
+        self.assertTrue(isinstance(result, tp.EventSet))
+        self.assertTrue(isinstance(result2, tp.EventSet))
+
+    def test_eager_mixed_args(self):
+        evset = tp.event_set(timestamps=[0.0])
+
+        with self.assertRaises(ValueError):
+            tp.simple_moving_average(
+                evset, window_length=7, sampling=evset.node()
+            )
+
+        with self.assertRaises(ValueError):
+            tp.simple_moving_average(
+                evset.node(), window_length=7, sampling=evset
             )
 
     def test_pandas(self):
@@ -79,7 +118,7 @@ class TFPTest(absltest.TestCase):
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_graph.tem")
-            tp.save(inputs={"a": a}, outputs={"b": b}, path=path)
+            tp.save_graph(inputs={"a": a}, outputs={"b": b}, path=path)
 
             inputs, outputs = tp.load(path=path)
 
@@ -95,7 +134,7 @@ class TFPTest(absltest.TestCase):
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_graph.tem")
-            tp.save(
+            tp.save_graph(
                 inputs=a,
                 outputs=b,
                 path=path,
@@ -116,7 +155,7 @@ class TFPTest(absltest.TestCase):
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_graph.tem")
-            tp.save(
+            tp.save_graph(
                 inputs=a,
                 outputs=b,
                 path=path,
@@ -137,7 +176,7 @@ class TFPTest(absltest.TestCase):
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_graph.tem")
-            tp.save(inputs=None, outputs=b, path=path)
+            tp.save_graph(inputs=None, outputs=b, path=path)
 
             i, o = tp.load(path=path, squeeze=True)
 
@@ -145,7 +184,7 @@ class TFPTest(absltest.TestCase):
         self.assertEqual(o.name, "my_output_node")
 
     def test_event_set(self):
-        evset = tp.event_set(
+        tp.event_set(
             timestamps=[1, 2, 3, 4],
             features={
                 "feature_1": [0.5, 0.6, math.nan, 0.9],
@@ -154,7 +193,6 @@ class TFPTest(absltest.TestCase):
             },
             indexes=["feature_2"],
         )
-        print(evset)
 
 
 if __name__ == "__main__":

@@ -40,6 +40,7 @@ py_library(
         "//temporian/core:operator_lib",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
+        "//temporian/core/operators/scalar:relational_scalar",
     ],
 )
 
@@ -53,6 +54,7 @@ py_library(
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
+        "//temporian/core/operators/scalar:relational_scalar",
     ],
 )
 
@@ -66,5 +68,6 @@ py_library(
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
+        "//temporian/core/operators/scalar:relational_scalar",
     ],
 )

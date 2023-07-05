@@ -16,6 +16,7 @@ py_library(
         ":cast",
         ":drop_index",
         ":end",
+        ":enumerate",
         ":filter",
         ":glue",
         ":lag",
@@ -28,6 +29,7 @@ py_library(
         ":select",
         ":since_last",
         ":tick",
+        ":timestamps",
         ":unary",
         ":unique_timestamps",
         "//temporian/implementation/numpy/operators/binary:arithmetic",
@@ -297,7 +299,6 @@ py_library(
 py_library(
     name = "join",
     srcs = ["join.py"],
-    srcs_version = "PY3",
     deps = [
         # already_there/numpy
         ":base",
@@ -307,5 +308,35 @@ py_library(
         "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy_cc/operators:operators_cc",
+    ],
+)
+
+py_library(
+    name = "timestamps",
+    srcs = ["timestamps.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/numpy
+        ":base",
+        "//temporian/core/data:duration_utils",
+        "//temporian/core/operators:timestamps",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy:utils",
+        "//temporian/implementation/numpy/data:event_set",
+    ],
+)
+
+py_library(
+    name = "enumerate",
+    srcs = ["enumerate.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/numpy
+        ":base",
+        "//temporian/core/data:duration_utils",
+        "//temporian/core/operators:enumerate",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy:utils",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )

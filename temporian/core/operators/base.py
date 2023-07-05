@@ -15,10 +15,11 @@
 """Base operator class and auxiliary classes definition."""
 
 from abc import ABC
-from typing import Dict, List, Tuple, Union, Any
+from typing import Dict, List, Tuple, TypeVar, Union, Any
 from temporian.core.data.dtype import DType
 
 from temporian.core.data.node import Node
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.proto import core_pb2 as pb
 
 
@@ -26,6 +27,9 @@ from temporian.proto import core_pb2 as pb
 AttributeType = Union[
     str, int, float, bool, List[str], Dict[str, str], List[DType]
 ]
+
+# Generic type for defining the input/output types of operators.
+EventSetOrNode = TypeVar("EventSetOrNode", EventSet, Node)
 
 
 class OperatorExceptionDecorator:
