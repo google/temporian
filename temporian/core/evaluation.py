@@ -25,6 +25,7 @@ from temporian.implementation.numpy import evaluation as np_eval
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core.graph import infer_graph
 from temporian.core.schedule import Schedule
+from temporian.core.operators.leak import LeakOperator
 
 EvaluationQuery = Union[
     EventSetNode, List[EventSetNode], Set[EventSetNode], Dict[str, EventSetNode]
@@ -260,6 +261,62 @@ def build_schedule(
 
     assert not op_to_num_pending_inputs
     return schedule
+
+
+def has_leak(
+    output: EvaluationQuery,
+    input: Optional[EvaluationQuery] = None,
+) -> bool:
+    """Tests if a node depends on a leak operator.
+
+    Tests if a [`EventSetNode`][temporian.EventSetNode] or collection of nodes
+    depends on the only operator that can introduce future leakage:
+    [`tp.leak()`][temporian.leak].
+
+    Single input output example:
+        ```python
+        >>> a = tp.input_node([("f", float)])
+        >>> b = tp.moving_sum(a, 5)
+        >>> c = tp.leak(b, 6)
+        >>> d = tp.prefix("my_prefix_", c)
+        >>> e = tp.moving_sum(d, 7)
+        >>> # The computation of "e" contains a leak.
+        >>> tp.has_leak(e)
+        True
+        >>> # The computation of "e" given "d" does not contain a leak.
+        >>> tp.has_leak(e, d)
+        False
+
+        ```
+
+    Args:
+        output: Nodes to compute. Supports Node, dict of Nodes and list of
+            Nodes.
+        input: Optional input nodes. Supports Node, dict of Nodes and list of
+            Nodes. If not specified, assumes for the input nodes to be the the
+            raw data inputs e.g. [`tp.input_node()`][temporian.input_node] and
+            [`tp.event_set()`][temporian.event_set].
+
+    Returns:
+        True if and only if the computation of `output` from `inputs` depends
+        on a [`tp.leak()`][temporian.leak] operator.
+    """
+
+    if input is None:
+        normalized_input = None
+    else:
+        normalized_input = _normalize_query(input)
+
+    normalized_output = _normalize_query(output)
+
+    graph = infer_graph(inputs=normalized_input, outputs=normalized_output)
+
+    leak_key = LeakOperator.operator_key()
+    for operator in graph.operators:
+        if operator.operator_key() == leak_key:
+            return True
+
+    return False
 
 
 def _normalize_input(input: EvaluationInput) -> Dict[EventSetNode, EventSet]:

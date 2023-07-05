@@ -65,6 +65,7 @@ from temporian.core.serialization import save_graph
 
 # Graph execution
 from temporian.core.evaluation import run
+from temporian.core.evaluation import has_leak
 
 # IO
 from temporian.io.csv import to_csv

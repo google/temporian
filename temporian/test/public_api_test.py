@@ -24,6 +24,7 @@ PUBLIC_API_SYMBOLS = {
     "Schema",
     "duration",
     "run",
+    "has_leak",
     "event_set",
     "input_node",
     "plot",
