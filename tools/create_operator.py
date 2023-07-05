@@ -355,6 +355,7 @@ py_test(
         """Don't forget to register the new operators in:
 - The imports in the top-level init file temporian/__init__.py
 - The imports in temporian/implementation/numpy/operators/__init__.py
+- The "operators" py_library in temporian/implementation/numpy/operators/BUILD
 - The "test_base" function in temporian/core/test/registered_operators_test.py
 - The "test_base" function in temporian/implementation/numpy/test/registered_operators_test.py
 - The PUBLIC_API_SYMBOLS set in temporian/test/public_symbols_test.py

@@ -47,6 +47,7 @@ PUBLIC_API_SYMBOLS = {
     # OPERATORS
     "cast",
     "drop_index",
+    "enumerate",
     "filter",
     "glue",
     "add_index",
@@ -58,11 +59,12 @@ PUBLIC_API_SYMBOLS = {
     "resample",
     "select",
     "rename",
-    "unique_timestamps",
     "since_last",
     "begin",
     "end",
     "tick",
+    "timestamps",
+    "unique_timestamps",
     # BINARY OPERATORS
     "add",
     "subtract",

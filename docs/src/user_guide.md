@@ -34,7 +34,7 @@ feature_3:  [10, -1, 5, 5]
 
 **Remarks:**
 
-- All the values of a given feature are of the same data type. For instance, `feature_1` is float64 while `feature_2` is a string.
+- All values for a given feature are of the same data type. For instance, `feature_1` is float64 while `feature_2` is a string.
 - The value NaN (for _not a number_) indicates that a value is missing.
 - Timestamps are not necessarily uniformly sampled.
 - The same timestamp can be repeated.
@@ -80,7 +80,7 @@ events:
 
 **Note:** You'll learn how to create an [`EventSet`][temporian.EventSet] using other data sources such as pandas DataFrames later.
 
-Events can carry various meanings. For instance, events can represent **regular measurements**. Suppose an electronic thermometer that generates temperature measurements every minute. This could be an [`EventSet`][temporian.EventSet] with one feature called `temperature`. In this scenario, the temperature can change in between two measurements. However, for most practical uses, the most recent measurement will be considered to be the current temperature.
+Events can carry various meanings. For instance, events can represent **regular measurements**. Suppose an electronic thermometer that generates temperature measurements every minute. This could be an [`EventSet`][temporian.EventSet] with one feature called `temperature`. In this scenario, the temperature can change between two measurements. However, for most practical uses, the most recent measurement will be considered the current temperature.
 
 <!-- TODO: Temperature plot -->
 
@@ -94,7 +94,7 @@ You will see that Temporian is agnostic to the semantics of events, and that oft
 
 Processing operations are performed by **Operators**. For instance, the [`tp.simple_moving_average()`][temporian.simple_moving_average] operator computes the [simple moving average](https://en.wikipedia.org/wiki/Moving_average) of each feature in an [`EventSet`][temporian.EventSet].
 
-Operators are not executed individually, but rather combined to form an operator **Graph**. A graph takes one or multiple [`EventSets`][temporian.EventSet] as input and produces one or multiple [`EventSets`][temporian.EventSet] as output. Graphs can contain an arbitrary number of operators, which can consume the ouput of other operators as input. You can see a graph as a computation graph where [`EventSetNodes`][temporian.EventSetNode] are operators.
+Operators are not executed individually, but rather combined to form an operator **Graph**. A graph takes one or multiple [`EventSets`][temporian.EventSet] as input and produces one or multiple [`EventSets`][temporian.EventSet] as output. Graphs can contain an arbitrary number of operators, which can consume the output of other operators as input. You can see a graph as a computation graph where [`EventSetNodes`][temporian.EventSetNodes] are operators.
 
 <!-- TODO: Graph plot -->
 
@@ -139,14 +139,14 @@ The [`tp.run()`][temporian.run] function's signature is `tp.run(<outputs>, <inpu
 
 The `<outputs>` can be specified as an [`EventSetNode`][temporian.EventSetNode], a list of [`EventSetNodes`][temporian.EventSetNode], or a dictionary of names to [`EventSetNodes`][temporian.EventSetNode], and the result of [`tp.run()`][temporian.run] will be of the same type. For example, if `<outputs>` is a list of three [`EventSetNodes`][temporian.EventSetNode], the result will be a list of the three corresponding [`EventSets`][temporian.EventSet].
 
-The `<inputs>` can be specified as a dictionary of [`EventSetNodes`][temporian.EventSetNode] to [`EventSets`][temporian.EventSet], a dictionary of names to [`EventSets`][temporian.EventSet], a list of [`EventSets`][temporian.EventSet] or a single [`EventSet`][temporian.EventSet], which lets Temporian know the [`EventSetNodes`][temporian.EventSetNode] of the graph that each input [`EventSet`][temporian.EventSet] corresponds to. In the case of a dictionary of names to [`EventSets`][temporian.EventSet], the names must match the names of [`EventSetNodes`][temporian.EventSetNode] in the graph, and in the case of a list or single [`EventSet`][temporian.EventSet], the names of those [`EventSets`][temporian.EventSet] must do the same. If specifying the inputs as a dictionary, we could skip passing a name to `a_evset`.
+The `<inputs>` can be specified as a dictionary of [`EventSetNodess`][temporian.EventSetNodes] to [`EventSets`][temporian.EventSet], a dictionary of names to [`EventSets`][temporian.EventSet], a list of [`EventSets`][temporian.EventSet] or a single [`EventSet`][temporian.EventSet], which lets Temporian know the [`EventSetNodess`][temporian.EventSetNodes] of the graph that each input [`EventSet`][temporian.EventSet] corresponds to. In the case of a dictionary of names to [`EventSets`][temporian.EventSet], the names must match the names of [`EventSetNodess`][temporian.EventSetNodes] in the graph, and in the case of a list or single [`EventSet`][temporian.EventSet], the names of those [`EventSets`][temporian.EventSet] must do the same. If we specify the inputs as a dictionary, we could skip passing a name to `a_evset`.
 
 **Remarks:**
 
-- It's important to distinguish between _[`EventSets`][temporian.EventSet]_, such as `a_evset`, that contain data, and _[`EventSetNodes`][temporian.EventSetNode]_, like `a_node` and `b_node`, that connect operators together and compose the computation graph, but do not contain data.
-- No computation is performed during the definition of the graph (i.e., when calling the operator functions). All computation is done during [`tp.run()`][temporian.run].
-- In [`tp.run()`][temporian.run], the second argument defines a mapping between input [`EventSetNodes`][temporian.EventSetNode] and [`EventSets`][temporian.EventSet]. If all necessary input [`EventSetNodes`][temporian.EventSetNode] are not fed, an error will be raised.
-- In most cases you will only pass [`EventSets`][temporian.EventSet] that correspond to the graph's input [`EventSetNodes`][temporian.EventSetNode], but Temporian also supports passing [`EventSets`][temporian.EventSet] to intermediate [`EventSetNodes`][temporian.EventSetNode] in the graph. In the example provided, `a_node` is fed, but we could also feed `b_node` and `c_node`. In that case we would not need to feed `a_node`, since no [`EventSetNodes`][temporian.EventSetNode] need to be computed from it anymore.
+- It's important to distinguish between _[`EventSets`][temporian.EventSet]_, such as `a_evset`, that contain data, and _[`EventSetNodess`][temporian.EventSetNodes]_, like `a_node` and `b_node`, that connect operators together and compose the computation graph, but do not contain data.
+- No computation is performed when defining the graph (i.e., when calling the operator functions). All computation is done during [`tp.run()`][temporian.run].
+- In [`tp.run()`][temporian.run], the second argument defines a mapping between input [`EventSetNodess`][temporian.EventSetNodes] and [`EventSets`][temporian.EventSet]. If all necessary input [`EventSetNodess`][temporian.EventSetNodes] are not fed, an error will be raised.
+- In most cases you will only pass [`EventSets`][temporian.EventSet] that correspond to the graph's input [`EventSetNodess`][temporian.EventSetNodes], but Temporian also supports passing [`EventSets`][temporian.EventSet] to intermediate [`EventSetNodess`][temporian.EventSetNodes] in the graph. In the example provided, `a_node` is fed, but we could also feed `b_node` and `c_node`. In that case we would not need to feed `a_node`, since no [`EventSetNodess`][temporian.EventSetNodes] need to be computed from it anymore.
 
 To simplify its usage when the graph contains a single output [`EventSetNode`][temporian.EventSetNode], `node.run(...)` is equivalent to `tp.run(node, ...)`.
 
@@ -197,9 +197,9 @@ If an [`EventSet`][temporian.EventSet] is available (i.e., data is available) th
 
 In Temporian, times are always represented by a float64 value. Users have the freedom to choose the semantic to this value. For example, the time can be the number of nanoseconds since the start of the day, the number of cycles of a process, the number of years since the big bang, or the number of seconds since January 1, 1970, at 00:00:00 UTC, also known as Unix or POSIX time.
 
-To ease the feature engineering of dates, Temporian contains a set of _calendar operators_. Those operators are specialized in creating features from dates and datetimes. For instance, the [`tp.calendar_hour()`][temporian.calendar_hour] operator returns the hour of the date in the range `0-23`.
+To ease the feature engineering of dates, Temporian contains a set of _calendar operators_. These operators specialize in creating features from dates and datetimes. For instance, the [`tp.calendar_hour()`][temporian.calendar_hour] operator returns the hour of the date in the range `0-23`.
 
-Calendar operators require the time in their inputs to be Unix time, so applying them on non-Unix timestamps will result in errors being raised. Temporian can sometimes automatically recognize if input timestamps correspond to Unix time (e.g. when an [`EventSet`][temporian.EventSet] is created from a pandas DataFrame with a datetime column, or when passing a list of datetime objects as timestamps in [`EventSet`][temporian.EventSet]'s constructor). If creating [`EventSets`][temporian.EventSet] manually and passing floats directly to `timestamps`, you need to explicitly specify whether they correspond to Unix times or not via the `is_unix_timestamp` argument.
+Calendar operators require the time in their inputs to be Unix time, so applying them on non-Unix timestamps will raise errors. Temporian can sometimes automatically recognize if input timestamps correspond to Unix time (e.g. when an [`EventSet`][temporian.EventSet] is created from a pandas DataFrame with a datetime column, or when passing a list of datetime objects as timestamps in [`EventSet`][temporian.EventSet]'s constructor). If creating [`EventSets`][temporian.EventSet] manually and passing floats directly to `timestamps`, you need to explicitly specify whether they correspond to Unix times or not via the `is_unix_timestamp` argument.
 
 ```python
 >>> a_evset = tp.event_set(
@@ -432,7 +432,7 @@ Temporian supports data type casting through the [`tp.cast()`][temporian.cast] o
 
    ```
 
-Keep in mind that the casting can fail when the graph is run. For instance, attempting to cast `"word"` to `tp.float64` will result in an error. These errors cannot be caught prior to graph evaluation.
+Keep in mind that casting may fail when the graph is evaluated. For instance, attempting to cast `"word"` to `tp.float64` will result in an error. These errors cannot be caught prior to graph evaluation.
 
 ## Arithmetic operators
 
@@ -764,8 +764,7 @@ events:
 
 ```
 
-Since we haven't defined the `indexes` yet,
-the `store` and `product` are just regular features above.
+Since we haven't defined the `indexes` yet, `store` and `product` are just regular features above.
 Let's add the `(product, store)` pair as the index.
 
 ```python
@@ -959,7 +958,7 @@ evset.feature("f1")
 
 ## Import and export data
 
-[`EventSets`][temporian.EventSet] can be read from and saved to csvfiles via the [`tp.from_csv()`][temporian.from_csv] and [`tp.to_csv()`][temporian.to_csv] functions.
+[`EventSets`][temporian.EventSet] can be read from and saved to csv files via the [`tp.from_csv()`][temporian.from_csv] and [`tp.to_csv()`][temporian.to_csv] functions.
 
 ```python
 # Read EventSet from a .csv file.

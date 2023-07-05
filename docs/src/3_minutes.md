@@ -2,7 +2,7 @@
 
 This is a _very_ quick introduction to how Temporian works. For a complete tour of its capabilities, please refer to the [User Guide](../user_guide).
 
-## Events and [`EventSets`][temporian.EventSet]
+## Events and EventSets
 
 The most basic unit of data in Temporian is an **event**. An event consists of a timestamp and a set of feature values.
 
@@ -31,7 +31,7 @@ If the [`EventSet`][temporian.EventSet] has no index, it will hold a single time
 
 If the [`EventSet`][temporian.EventSet] has one (or many) indexes, it will hold one time sequence for each unique value (or unique combination of values) of the indexes, the events will be grouped by their index key, and operators applied to the [`EventSet`][temporian.EventSet] will be applied to each time sequence independently.
 
-## Graph, [`EventSetNodes`][temporian.EventSetNode] and Operators
+## Graph, EventSetNodes, and Operators
 
 There are two big phases in any Temporian script: graph **definition** and **evaluation**. This is a common pattern in computing libraries, and it allows us to perform optimizations before the graph is run, share Temporian programs across different platforms, and more.
 
