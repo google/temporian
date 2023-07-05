@@ -166,6 +166,8 @@ class Operator(ABC):
                 def_type = expected_attr.type
 
                 if def_key not in self._attributes:
+                    if expected_attr.is_optional:
+                        continue
                     raise ValueError(f'Missing attr. "{expected_attr.key}".')
 
                 # Check that the value type is as defined for this attribute
