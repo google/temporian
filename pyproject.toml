@@ -61,6 +61,7 @@ mkdocs-exclude-search = "^0.6.5"
 apache-beam = "^2.48.0"
 pillow = "^9.5.0"
 cairosvg = "^2.7.0"
+colorama = "^0.4.6"
 
 # TODO: create a new dependency group called beam so that we can do pip install temporian[beam].
 

@@ -14,3 +14,13 @@ py_library(
         "//temporian",
     ],
 )
+
+
+# Tests
+# =========
+
+py_test(
+    name = "build_cleaner_test",
+    srcs = ["build_cleaner_test.py", "build_cleaner.py"],
+    srcs_version = "PY3",
+)
