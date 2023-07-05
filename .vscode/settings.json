@@ -90,5 +90,6 @@
     "random": "cpp",
     "string_view": "cpp",
     "numbers": "cpp"
-  }
+  },
+  "python.analysis.typeCheckingMode": "basic"
 }

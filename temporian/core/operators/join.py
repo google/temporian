@@ -17,6 +17,7 @@
 
 from typing import Optional
 
+from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
 from temporian.core import operator_lib
 from temporian.core.data.node import (
@@ -132,7 +133,7 @@ class Join(Operator):
 
 operator_lib.register_operator(Join)
 
-
+@compile
 def join(
     left: Node,
     right: Node,

@@ -89,7 +89,7 @@ class JoinNumpyImplementation(OperatorImplementation):
                 )
 
             if index_key in right.data:
-                right_item = right[index_key]
+                right_item = right.data[index_key]
 
                 if on is None:
                     join_idxs = operators_cc.left_join_idxs(

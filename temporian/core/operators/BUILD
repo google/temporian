@@ -276,6 +276,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core:compilation",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
