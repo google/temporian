@@ -15,6 +15,7 @@
 """Calendar minute operator class and public API function definitions."""
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.node import Node
 from temporian.core.operators.calendar.base import BaseCalendarOperator
 
@@ -32,6 +33,7 @@ class CalendarMinuteOperator(BaseCalendarOperator):
 operator_lib.register_operator(CalendarMinuteOperator)
 
 
+@compile
 def calendar_minute(sampling: Node) -> Node:
     """Obtain the minute the timestamps in a node's sampling are in.
 

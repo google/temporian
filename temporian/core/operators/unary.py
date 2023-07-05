@@ -18,6 +18,7 @@ from abc import abstractmethod
 from typing import List
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import (
     Node,
@@ -185,6 +186,7 @@ operator_lib.register_operator(AbsOperator)
 operator_lib.register_operator(LogOperator)
 
 
+@compile
 def invert(
     input: Node,
 ) -> Node:
@@ -204,6 +206,7 @@ def invert(
     ).outputs["output"]
 
 
+@compile
 def isnan(
     input: Node,
 ) -> Node:
@@ -224,6 +227,7 @@ def isnan(
     ).outputs["output"]
 
 
+@compile
 def notnan(
     input: Node,
 ) -> Node:
@@ -244,6 +248,7 @@ def notnan(
     ).outputs["output"]
 
 
+@compile
 def abs(
     input: Node,
 ) -> Node:
@@ -260,6 +265,7 @@ def abs(
     ).outputs["output"]
 
 
+@compile
 def log(
     input: Node,
 ) -> Node:

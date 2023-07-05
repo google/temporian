@@ -45,10 +45,13 @@ class BeginNumpyImplementation(OperatorImplementation):
                 dst_timestamps = np.array(
                     [index_data.timestamps[0]], dtype=np.float64
                 )
-            output_evset[index_key] = IndexData(
-                [],
-                dst_timestamps,
-                schema=output_schema,
+            output_evset.set_index_value(
+                index_key,
+                IndexData(
+                    [],
+                    dst_timestamps,
+                    schema=output_schema,
+                ),
             )
 
         return {"output": output_evset}

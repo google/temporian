@@ -27,6 +27,7 @@ PUBLIC_API_SYMBOLS = {
     "event_set",
     "input_node",
     "plot",
+    "compile",
     # IO
     "to_csv",
     "from_csv",
@@ -42,9 +43,11 @@ PUBLIC_API_SYMBOLS = {
     # SERIALIZATION
     "load",
     "save",
+    "save_graph",
     # OPERATORS
     "cast",
     "drop_index",
+    "enumerate",
     "filter",
     "glue",
     "add_index",
@@ -56,11 +59,12 @@ PUBLIC_API_SYMBOLS = {
     "resample",
     "select",
     "rename",
-    "unique_timestamps",
     "since_last",
     "begin",
     "end",
     "tick",
+    "timestamps",
+    "unique_timestamps",
     # BINARY OPERATORS
     "add",
     "subtract",

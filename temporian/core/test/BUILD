@@ -34,6 +34,8 @@ py_test(
         "//temporian/core/operators/binary",
         "//temporian/core/operators/scalar",
         "//temporian/proto:core_py_proto",
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 
@@ -91,6 +93,17 @@ py_test(
 py_test(
     name = "registered_operators_test",
     srcs = ["registered_operators_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/core:operator_lib",
+        "//temporian",
+    ],
+)
+
+py_test(
+    name = "compilation_test",
+    srcs = ["compilation_test.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest

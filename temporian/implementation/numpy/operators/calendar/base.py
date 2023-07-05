@@ -49,8 +49,9 @@ class BaseCalendarNumpyImplementation(OperatorImplementation):
                 np.int32
             )  # TODO: parametrize output dtype
 
-            dst_evset[index_key] = IndexData(
-                [value], index_data.timestamps, schema=output_schema
+            dst_evset.set_index_value(
+                index_key,
+                IndexData([value], index_data.timestamps, schema=output_schema),
             )
 
         return {"output": dst_evset}

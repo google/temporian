@@ -16,6 +16,7 @@
 from typing import Dict, Optional, Union
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.node import (
     Node,
     create_node_new_features_new_sampling,
@@ -163,6 +164,7 @@ def _normalize_rename_indexes(
     return indexes
 
 
+@compile
 def rename(
     input: Node,
     features: Optional[Union[str, Dict[str, str]]] = None,

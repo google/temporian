@@ -17,6 +17,7 @@
 from typing import List, Union
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.node import Node, create_node_with_new_reference
 from temporian.core.operators.base import Operator
 from temporian.core.data.schema import Schema
@@ -84,6 +85,7 @@ class SelectOperator(Operator):
 operator_lib.register_operator(SelectOperator)
 
 
+@compile
 def select(
     input: Node,
     feature_names: Union[str, List[str]],

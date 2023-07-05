@@ -17,6 +17,7 @@
 from typing import Optional
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.node import (
     Node,
     create_node_new_features_existing_sampling,
@@ -78,6 +79,7 @@ class SinceLast(Operator):
 operator_lib.register_operator(SinceLast)
 
 
+@compile
 def since_last(
     input: Node,
     sampling: Optional[Node] = None,

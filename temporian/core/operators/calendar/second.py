@@ -15,6 +15,7 @@
 """Calendar second operator class and public API function definitions."""
 
 from temporian.core import operator_lib
+from temporian.core.compilation import compile
 from temporian.core.data.node import Node
 from temporian.core.operators.calendar.base import BaseCalendarOperator
 
@@ -32,6 +33,7 @@ class CalendarSecondOperator(BaseCalendarOperator):
 operator_lib.register_operator(CalendarSecondOperator)
 
 
+@compile
 def calendar_second(sampling: Node) -> Node:
     """Obtains the second the timestamps in a node's sampling are in.
 
