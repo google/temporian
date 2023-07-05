@@ -54,6 +54,12 @@ BUILT_IN_MODULES = {
     "dataclasses",
     "time",
     "io",
+    "urllib",
+    "zipfile",
+    "functools",
+    "copy",
+    "tempfile",
+    "logging",
     "google.protobuf.text_format",
 }
 
@@ -65,8 +71,6 @@ THIRD_PARTY_MODULES = {
     "numpy",
     "pandas",
     "apache_beam",
-    "tempfile",
-    "logging",
 }
 
 # Mapping from source file to rule.
@@ -184,6 +188,10 @@ def list_build_rules(path: str) -> List[BuildRule]:
         srcs = get_keyword_list_or_empty(item.value, "srcs")
         assert isinstance(name, str)
 
+        if not srcs:
+            # Skip rules without sources.
+            continue
+
         rules.append(
             BuildRule(name=name, deps=deps, srcs=srcs, rule=item.value.func.id)
         )
@@ -300,6 +308,7 @@ def compute_delta(
     imports: List[str],
     rule_dir: str,
     source_to_rules: SourceToRule,
+    rule_name: str,
 ) -> Optional[DepsDelta]:
     """Computes the operation on the deps to support all the imports.
 
@@ -319,8 +328,6 @@ def compute_delta(
 
     # Dependencies effectively used by this rule.
     used_deps = set()
-
-    # used_dependencies = [False] * len(expanded_deps)
 
     for imp in imports:
         imp_items = tuple(imp.split("."))
@@ -349,6 +356,10 @@ def compute_delta(
         if len(possible_deps) > 1:
             issues.append(f'Multiple possible rules for "{imp}"')
 
+        # This module is part of the same rule as its user.
+        if possible_deps[0] == expand_dep(":" + rule_name, rule_dir):
+            continue
+
         if possible_deps[0] not in expanded_deps:
             adds.add(possible_deps[0])
         else:
@@ -376,7 +387,7 @@ def to_user_rule(normalized_rule: Tuple[str, ...]) -> str:
         and normalized_rule[0] == normalized_rule[1]
         and normalized_rule[0] in THIRD_PARTY_MODULES
     ):
-        return THIRD_PARTY_RULE_PREFIX + normalized_rule[0] + ","
+        return THIRD_PARTY_RULE_PREFIX + normalized_rule[0]
 
     if len(normalized_rule) >= 2 and normalized_rule[-1] == normalized_rule[-2]:
         return '"//' + "/".join(normalized_rule[:-1]) + '",'
@@ -400,7 +411,9 @@ def clean_build_rule(
         src_path = os.path.join(rule_dir, src)
         imports.extend(source_imports(src_path))
 
-    return compute_delta(rule.deps, imports, rule_dir, source_to_rules)
+    return compute_delta(
+        rule.deps, imports, rule_dir, source_to_rules, rule.name
+    )
 
 
 def clean_repository(dir: str):
@@ -457,7 +470,13 @@ def clean_repository(dir: str):
                         print(
                             f"      {Fore.RED}{to_user_rule(sub)}{Fore.RESET}"
                         )
+
+    success = num_adds == 0 and num_subs == 0 and num_issues == 0
     print(f"{num_adds} additions, {num_subs} removals, {num_issues} issues")
+
+    if not success:
+        print("Build cleaner found problems")
+        exit(1)
 
 
 def main():

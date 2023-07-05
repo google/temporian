@@ -21,7 +21,7 @@ py_library(
     srcs = ["csv.py"],
     srcs_version = "PY3",
     deps = [
-        # already_there/pandas
+        # force/pandas
         ":pandas",
         "//temporian/implementation/numpy/data:event_set",
     ],
@@ -32,6 +32,7 @@ py_library(
     srcs = ["pandas.py"],
     srcs_version = "PY3",
     deps = [
+        # already_there/numpy
         # force/pandas
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
