@@ -40,6 +40,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         "//temporian",
+        # already_there/absl/testing:absltest
     ],
 )
 
