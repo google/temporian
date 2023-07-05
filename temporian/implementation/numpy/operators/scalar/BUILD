@@ -22,6 +22,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         # already_there/numpy
+        "//temporian/core/data:dtype",
         "//temporian/core/operators/scalar:base",
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/operators:base",
@@ -35,6 +36,7 @@ py_library(
     deps = [
         ":base",
         # already_there/numpy
+        "//temporian/core/data:dtype",
         "//temporian/core/operators/scalar",
         "//temporian/implementation/numpy:implementation_lib",
     ],
@@ -46,6 +48,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core/data:dtype",
         # already_there/numpy
         "//temporian/core/operators/scalar",
         "//temporian/implementation/numpy:implementation_lib",

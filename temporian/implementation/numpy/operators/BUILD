@@ -19,8 +19,8 @@ py_library(
         ":enumerate",
         ":filter",
         ":glue",
-        ":lag",
         ":join",
+        ":lag",
         ":leak",
         ":prefix",
         ":propagate",
@@ -59,7 +59,14 @@ py_library(
     name = "base",
     srcs = ["base.py"],
     srcs_version = "PY3",
-    deps = ["//temporian/utils:config"],
+    deps = [
+        # already_there/numpy
+        "//temporian/utils:config",
+        "//temporian/implementation/numpy/data:event_set",
+        "//temporian/core/data:schema",
+        "//temporian/core/data:node",
+        "//temporian/core/operators:base",
+    ],
 )
 
 py_library(
@@ -189,7 +196,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
-        "//temporian/core/data:duration_utils",
+        # already_there/numpy
         "//temporian/core/operators:resample",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
@@ -258,10 +265,8 @@ py_library(
     deps = [
         # already_there/numpy
         ":base",
-        "//temporian/core/data:duration_utils",
         "//temporian/core/operators:begin",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",
     ],
 )
@@ -273,10 +278,8 @@ py_library(
     deps = [
         # already_there/numpy
         ":base",
-        "//temporian/core/data:duration_utils",
         "//temporian/core/operators:end",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",
     ],
 )
@@ -288,10 +291,8 @@ py_library(
     deps = [
         # already_there/numpy
         ":base",
-        "//temporian/core/data:duration",
         "//temporian/core/operators:tick",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",
     ],
 )
@@ -302,10 +303,8 @@ py_library(
     deps = [
         # already_there/numpy
         ":base",
-        "//temporian/core/data:duration_utils",
         "//temporian/core/operators:join",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy_cc/operators:operators_cc",
     ],
@@ -318,10 +317,8 @@ py_library(
     deps = [
         # already_there/numpy
         ":base",
-        "//temporian/core/data:duration_utils",
         "//temporian/core/operators:timestamps",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",
     ],
 )
@@ -333,10 +330,8 @@ py_library(
     deps = [
         # already_there/numpy
         ":base",
-        "//temporian/core/data:duration_utils",
         "//temporian/core/operators:enumerate",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",
     ],
 )

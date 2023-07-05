@@ -32,7 +32,7 @@ class BuildCleaner(absltest.TestCase):
         self.assertEqual(bc.to_user_rule(("a", "a")), '"//a",')
         self.assertEqual(bc.to_user_rule(("a", "b")), '"//a:b",')
         self.assertEqual(
-            bc.to_user_rule(("numpy", "numpy")), "# already_there/numpy,"
+            bc.to_user_rule(("numpy", "numpy")), "# already_there/numpy"
         )
 
     def test_compute_delta(self):
@@ -45,6 +45,7 @@ class BuildCleaner(absltest.TestCase):
                 ("a", "d.py"): [("a", "d")],
                 ("a", "e.py"): [("a", "e")],
             },
+            rule_name="f",
         )
         self.assertEqual(
             delta,
