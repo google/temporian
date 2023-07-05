@@ -95,6 +95,7 @@ def moving_sum(
     ).outputs["output"]
 
 
+@compile
 def cumsum(
     input: EventSetNode,
 ) -> EventSetNode:

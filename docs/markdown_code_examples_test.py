@@ -22,7 +22,7 @@ import pandas as pd
 import temporian as tp
 
 
-class CodeExamplesTest(absltest.TestCase):
+class MarkdownCodeExamplesTest(absltest.TestCase):
     """
     Tests all code examples in markdown files, using builtin doctest module.
     E.g:
@@ -31,7 +31,7 @@ class CodeExamplesTest(absltest.TestCase):
 
     """
 
-    def test_code_examples(self):
+    def test_markdown_code_examples(self):
         tmp_dir_handle = tempfile.TemporaryDirectory()
         tmp_dir = Path(tmp_dir_handle.name)
         for path in Path("docs").rglob("*.md"):
@@ -68,11 +68,13 @@ class CodeExamplesTest(absltest.TestCase):
                 test = e.test
                 ex = e.example
                 lineno = test.lineno + ex.lineno
+                # pylint: disable=raise-missing-from
                 raise AssertionError(
                     "Exception running docstring example starting at line "
                     f"{lineno} on file {path}\n"
                     f">>> {ex.source}{e.exc_info[0]}: {e.exc_info[1]}"
-                ) from e
+                )
+                # pylint: enable=raise-missing-from
         tmp_dir_handle.cleanup()
 
 
