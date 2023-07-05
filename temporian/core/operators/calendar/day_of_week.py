@@ -16,7 +16,7 @@
 
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
-from temporian.core.data.node import Node
+from temporian.core.data.node import EventSetNode
 from temporian.core.operators.calendar.base import BaseCalendarOperator
 
 
@@ -34,7 +34,7 @@ operator_lib.register_operator(CalendarDayOfWeekOperator)
 
 
 @compile
-def calendar_day_of_week(sampling: Node) -> Node:
+def calendar_day_of_week(sampling: EventSetNode) -> EventSetNode:
     """Obtains the day of the week the timestamps in a node's sampling are in.
 
     Features in the input node are ignored, only the timestamps are used and
@@ -60,7 +60,7 @@ def calendar_day_of_week(sampling: Node) -> Node:
         ```
 
     Args:
-        sampling: Node to get the days of week from.
+        sampling: EventSetNode to get the days of week from.
 
     Returns:
         Single feature with the day each timestamp in `sampling` belongs to.

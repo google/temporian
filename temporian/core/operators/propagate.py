@@ -18,7 +18,10 @@
 from typing import List
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
-from temporian.core.data.node import Node, create_node_new_features_new_sampling
+from temporian.core.data.node import (
+    EventSetNode,
+    create_node_new_features_new_sampling,
+)
 from temporian.core.operators.base import Operator
 from temporian.core.operators.resample import Resample
 from temporian.proto import core_pb2 as pb
@@ -27,8 +30,8 @@ from temporian.proto import core_pb2 as pb
 class Propagate(Operator):
     def __init__(
         self,
-        input: Node,
-        sampling: Node,
+        input: EventSetNode,
+        sampling: EventSetNode,
     ):
         super().__init__()
 
@@ -95,7 +98,9 @@ operator_lib.register_operator(Propagate)
 # TODO: Do we want for "propagate" to take a list of feature names
 # (like add_index) instead?
 @compile
-def propagate(input: Node, sampling: Node, resample: bool = False) -> Node:
+def propagate(
+    input: EventSetNode, sampling: EventSetNode, resample: bool = False
+) -> EventSetNode:
     """Propagates feature values over a sub index.
 
     Given `input` and `sampling` where `input`'s indexes are a superset of
@@ -155,13 +160,13 @@ def propagate(input: Node, sampling: Node, resample: bool = False) -> Node:
         ```
 
     Args:
-        input: Node to propagate.
+        input: EventSetNode to propagate.
         sampling: Index to propagate over.
         resample: If true, apply a [`tp.resample()`][temporian.resample] before
             propagating, for the output to have the same sampling as `sampling`.
 
     Returns:
-        Node propagated over `sampling`'s index.
+        EventSetNode propagated over `sampling`'s index.
     """
 
     result = Propagate(

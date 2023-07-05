@@ -22,7 +22,7 @@ T_SCALAR = (int, float)
 class EventSetOperationsMixin:
     """Mixin class for EventSet-like classes.
 
-    Defines the methods that can be called on both EventSets and Nodes
+    Defines the methods that can be called on both EventSets and EventSetNodes
     interchangeably.
     """
 

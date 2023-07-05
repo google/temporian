@@ -16,7 +16,7 @@
 
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
-from temporian.core.data.node import Node
+from temporian.core.data.node import EventSetNode
 from temporian.core.data.dtype import DType
 from temporian.core.operators.binary.base import BaseBinaryOperator
 
@@ -70,8 +70,8 @@ class DivideOperator(BaseArithmeticOperator):
 
     def __init__(
         self,
-        input_1: Node,
-        input_2: Node,
+        input_1: EventSetNode,
+        input_2: EventSetNode,
     ):
         super().__init__(input_1, input_2)
 
@@ -88,9 +88,9 @@ class DivideOperator(BaseArithmeticOperator):
 
 @compile
 def add(
-    input_1: Node,
-    input_2: Node,
-) -> Node:
+    input_1: EventSetNode,
+    input_2: EventSetNode,
+) -> EventSetNode:
     """Adds two nodes.
 
     Each feature in `input_1` is added to the feature in `input_2` in the same
@@ -247,9 +247,9 @@ def add(
 
 @compile
 def subtract(
-    input_1: Node,
-    input_2: Node,
-) -> Node:
+    input_1: EventSetNode,
+    input_2: EventSetNode,
+) -> EventSetNode:
     """Subtracts two nodes.
 
     Each feature in `input_2` is subtracted from the feature in `input_1` in the
@@ -301,9 +301,9 @@ def subtract(
 
 @compile
 def multiply(
-    input_1: Node,
-    input_2: Node,
-) -> Node:
+    input_1: EventSetNode,
+    input_2: EventSetNode,
+) -> EventSetNode:
     """Multiplies two nodes.
 
     Each feature in `input_1` is multiplied by the feature in `input_2` in the
@@ -355,9 +355,9 @@ def multiply(
 
 @compile
 def divide(
-    numerator: Node,
-    denominator: Node,
-) -> Node:
+    numerator: EventSetNode,
+    denominator: EventSetNode,
+) -> EventSetNode:
     """Divides two nodes.
 
     Each feature in `numerator` is divided by the feature in `denominator` in
@@ -445,9 +445,9 @@ def divide(
 
 @compile
 def floordiv(
-    numerator: Node,
-    denominator: Node,
-) -> Node:
+    numerator: EventSetNode,
+    denominator: EventSetNode,
+) -> EventSetNode:
     """Divides two nodes and takes the floor of the result.
 
     I.e. computes numerator//denominator.
@@ -501,9 +501,9 @@ def floordiv(
 
 @compile
 def modulo(
-    numerator: Node,
-    denominator: Node,
-) -> Node:
+    numerator: EventSetNode,
+    denominator: EventSetNode,
+) -> EventSetNode:
     """Computes modulo or remainder of division between two
     nodes.
 
@@ -553,9 +553,9 @@ def modulo(
 
 @compile
 def power(
-    base: Node,
-    exponent: Node,
-) -> Node:
+    base: EventSetNode,
+    exponent: EventSetNode,
+) -> EventSetNode:
     """Computes elements of the base raised to the elements of the exponent.
 
     `base` and `exponent` must have the same sampling and the same number of

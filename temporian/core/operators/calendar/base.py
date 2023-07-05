@@ -18,7 +18,7 @@ from abc import ABC, abstractmethod
 
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import (
-    Node,
+    EventSetNode,
     create_node_new_features_existing_sampling,
     create_node_new_features_existing_sampling,
 )
@@ -29,7 +29,7 @@ from temporian.proto import core_pb2 as pb
 class BaseCalendarOperator(Operator, ABC):
     """Interface definition and common logic for calendar operators."""
 
-    def __init__(self, sampling: Node):
+    def __init__(self, sampling: EventSetNode):
         super().__init__()
 
         if not sampling.schema.is_unix_timestamp:

@@ -18,14 +18,17 @@ from typing import List, Union
 
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
-from temporian.core.data.node import Node, create_node_with_new_reference
+from temporian.core.data.node import (
+    EventSetNode,
+    create_node_with_new_reference,
+)
 from temporian.core.operators.base import Operator
 from temporian.core.data.schema import Schema
 from temporian.proto import core_pb2 as pb
 
 
 class SelectOperator(Operator):
-    def __init__(self, input: Node, feature_names: List[str]):
+    def __init__(self, input: EventSetNode, feature_names: List[str]):
         super().__init__()
 
         self._feature_names = feature_names
@@ -87,13 +90,13 @@ operator_lib.register_operator(SelectOperator)
 
 @compile
 def select(
-    input: Node,
+    input: EventSetNode,
     feature_names: Union[str, List[str]],
-) -> Node:
-    """Selects a subset of features from a Node.
+) -> EventSetNode:
+    """Selects a subset of features from an EventSetNode.
 
     Args:
-        input: Node to select features from.
+        input: EventSetNode to select features from.
         feature_names: Name or list of names of the features to select from the
             input.
 
@@ -136,7 +139,7 @@ def select(
 
 
     Returns:
-        Node containing only the selected features.
+        EventSetNode containing only the selected features.
     """
     if isinstance(feature_names, list) and all(
         isinstance(f, str) for f in feature_names

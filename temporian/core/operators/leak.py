@@ -22,7 +22,10 @@ from temporian.core.data.duration_utils import (
     NormalizedDuration,
     normalize_duration,
 )
-from temporian.core.data.node import Node, create_node_new_features_new_sampling
+from temporian.core.data.node import (
+    EventSetNode,
+    create_node_new_features_new_sampling,
+)
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -30,7 +33,7 @@ from temporian.proto import core_pb2 as pb
 class LeakOperator(Operator):
     def __init__(
         self,
-        input: Node,
+        input: EventSetNode,
         duration: NormalizedDuration,
     ):
         super().__init__()
@@ -75,8 +78,8 @@ operator_lib.register_operator(LeakOperator)
 
 
 @compile
-def leak(input: Node, duration: Duration) -> Node:
-    """Subtracts a duration from a Node's timestamps.
+def leak(input: EventSetNode, duration: Duration) -> EventSetNode:
+    """Subtracts a duration from an EventSetNode's timestamps.
 
     In other words, shifts the timestamp values backward in time.
 
@@ -103,7 +106,7 @@ def leak(input: Node, duration: Duration) -> Node:
         ```
 
     Args:
-        input: Node to leak.
+        input: EventSetNode to leak.
         duration: Duration to leak by.
 
     Returns:

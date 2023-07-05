@@ -16,7 +16,7 @@
 
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
-from temporian.core.data.node import Node
+from temporian.core.data.node import EventSetNode
 from temporian.core.operators.calendar.base import BaseCalendarOperator
 
 
@@ -34,7 +34,7 @@ operator_lib.register_operator(CalendarSecondOperator)
 
 
 @compile
-def calendar_second(sampling: Node) -> Node:
+def calendar_second(sampling: EventSetNode) -> EventSetNode:
     """Obtains the second the timestamps in a node's sampling are in.
 
     Features in the input node are ignored, only the timestamps are used and
@@ -61,7 +61,7 @@ def calendar_second(sampling: Node) -> Node:
         ```
 
     Args:
-        sampling: Node to get the seconds from.
+        sampling: EventSetNode to get the seconds from.
 
     Returns:
         Single feature with the second each timestamp in `sampling` belongs to.

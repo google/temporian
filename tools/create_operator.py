@@ -80,13 +80,13 @@ def main(argv):
 
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
-from temporian.core.data.node import Node, create_node_new_features_new_sampling
+from temporian.core.data.node import EventSetNode, create_node_new_features_new_sampling
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
 class {capitalized_op}(Operator):
-    def __init__(self, input: Node, param: float):
+    def __init__(self, input: EventSetNode, param: float):
         super().__init__()
 
         self.add_input("input", input)
@@ -124,7 +124,7 @@ operator_lib.register_operator({capitalized_op})
 
 
 @compile
-def {lower_op}(input: Node, param: float) -> Node:
+def {lower_op}(input: EventSetNode, param: float) -> EventSetNode:
     """<Text>
 
     Args:

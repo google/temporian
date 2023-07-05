@@ -17,7 +17,7 @@
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.node import (
-    Node,
+    EventSetNode,
     create_node_new_features_existing_sampling,
 )
 from temporian.core.operators.base import Operator
@@ -28,7 +28,7 @@ class Prefix(Operator):
     def __init__(
         self,
         prefix: str,
-        input: Node,
+        input: EventSetNode,
     ):
         super().__init__()
 
@@ -75,9 +75,9 @@ operator_lib.register_operator(Prefix)
 @compile
 def prefix(
     prefix: str,
-    input: Node,
-) -> Node:
-    """Adds a prefix to the names of the features in a Node.
+    input: EventSetNode,
+) -> EventSetNode:
+    """Adds a prefix to the names of the features in an EventSetNode.
 
     Usage example:
         ```python
@@ -102,7 +102,7 @@ def prefix(
 
     Args:
         prefix: Prefix to add in front of the feature names.
-        input: Node to prefix.
+        input: EventSetNode to prefix.
 
     Returns:
         Prefixed node.

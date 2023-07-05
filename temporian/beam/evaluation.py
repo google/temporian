@@ -19,7 +19,7 @@ from typing import Dict, List
 
 import apache_beam as beam
 
-from temporian.core.data.node import Node
+from temporian.core.data.node import EventSetNode
 from temporian.beam.io import PEventSet
 from temporian.core.evaluation import build_schedule
 from temporian.beam import implementation_lib
@@ -27,7 +27,9 @@ from temporian.beam import operators as _  # Implementations
 
 
 @beam.ptransform_fn
-def run(pipe: PEventSet, input: Node, output: Node) -> PEventSet:
+def run(
+    pipe: PEventSet, input: EventSetNode, output: EventSetNode
+) -> PEventSet:
     """Runs a single-input, single-output Temporian graph in Beam.
 
     Usage example:
@@ -70,8 +72,8 @@ def run(pipe: PEventSet, input: Node, output: Node) -> PEventSet:
 
 
 def run_multi_io(
-    inputs: Dict[Node, PEventSet], outputs: List[Node]
-) -> Dict[Node, PEventSet]:
+    inputs: Dict[EventSetNode, PEventSet], outputs: List[EventSetNode]
+) -> Dict[EventSetNode, PEventSet]:
     """Runs a multi-input, multi-output Temporian graph in Beam.
 
     Usage example:
@@ -109,7 +111,7 @@ def run_multi_io(
     If you graph contains a single input and output node, use `run` instead.
 
     Args:
-        inputs: Node indexed dictionary of input Beam event-sets for all the
+        inputs: EventSetNode indexed dictionary of input Beam event-sets for all the
             inputs of the Temporian graph.
         outputs: List of output nodes to compute.
 

@@ -17,7 +17,7 @@
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
-from temporian.core.data.node import Node
+from temporian.core.data.node import EventSetNode
 from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.binary.base import BaseBinaryOperator
 from temporian.core.operators.scalar.relational_scalar import equal_scalar
@@ -74,9 +74,9 @@ class LessEqualOperator(BaseRelationalOperator):
 
 @compile
 def equal(
-    input_1: Node,
-    input_2: Node,
-) -> Node:
+    input_1: EventSetNode,
+    input_2: EventSetNode,
+) -> EventSetNode:
     """Checks (element-wise) for equality between two nodes.
 
     Each feature in `input_1` is compared element-wise to the feature in
@@ -119,10 +119,10 @@ def equal(
         input_2: Second node.
 
     Returns:
-        Node containing the result of the comparison.
+        EventSetNode containing the result of the comparison.
     """
 
-    if not isinstance(input_2, Node):
+    if not isinstance(input_2, EventSetNode):
         return equal_scalar(input=input_1, value=input_2)
 
     return EqualOperator(
@@ -133,9 +133,9 @@ def equal(
 
 @compile
 def not_equal(
-    input_1: Node,
-    input_2: Node,
-) -> Node:
+    input_1: EventSetNode,
+    input_2: EventSetNode,
+) -> EventSetNode:
     """Checks (element-wise) for differences between two nodes.
 
     Each feature in `input_1` is compared element-wise to the feature in
@@ -175,7 +175,7 @@ def not_equal(
         input_2: Second node.
 
     Returns:
-        Node containing the result of the comparison.
+        EventSetNode containing the result of the comparison.
     """
     return NotEqualOperator(
         input_1=input_1,
@@ -185,9 +185,9 @@ def not_equal(
 
 @compile
 def greater(
-    input_left: Node,
-    input_right: Node,
-) -> Node:
+    input_left: EventSetNode,
+    input_right: EventSetNode,
+) -> EventSetNode:
     """Checks (element-wise) if input_left > input_right.
 
     Each feature in `input_left` is compared element-wise to the feature in
@@ -227,7 +227,7 @@ def greater(
         input_right: node to the right of the operator
 
     Returns:
-        Node with the result of the comparison.
+        EventSetNode with the result of the comparison.
     """
     return GreaterOperator(
         input_1=input_left,
@@ -237,9 +237,9 @@ def greater(
 
 @compile
 def greater_equal(
-    input_left: Node,
-    input_right: Node,
-) -> Node:
+    input_left: EventSetNode,
+    input_right: EventSetNode,
+) -> EventSetNode:
     """Checks (element-wise) if input_left >= input_right.
 
     Each feature in `input_left` is compared element-wise to the feature in
@@ -279,7 +279,7 @@ def greater_equal(
         input_right: node to the right of the operator
 
     Returns:
-        Node with the result of the comparison.
+        EventSetNode with the result of the comparison.
     """
     return GreaterEqualOperator(
         input_1=input_left,
@@ -289,9 +289,9 @@ def greater_equal(
 
 @compile
 def less(
-    input_left: Node,
-    input_right: Node,
-) -> Node:
+    input_left: EventSetNode,
+    input_right: EventSetNode,
+) -> EventSetNode:
     """Checks (element-wise) if input_left < input_right.
 
     Each feature in `input_left` is compared element-wise to the feature in
@@ -331,7 +331,7 @@ def less(
         input_right: node to the right of the operator
 
     Returns:
-        Node with the result of the comparison.
+        EventSetNode with the result of the comparison.
     """
     return LessOperator(
         input_1=input_left,
@@ -341,9 +341,9 @@ def less(
 
 @compile
 def less_equal(
-    input_left: Node,
-    input_right: Node,
-) -> Node:
+    input_left: EventSetNode,
+    input_right: EventSetNode,
+) -> EventSetNode:
     """Checks (element-wise) if input_left <= input_right.
 
     Each feature in `input_left` is compared element-wise to the feature in
@@ -383,7 +383,7 @@ def less_equal(
         input_right: node to the right of the operator
 
     Returns:
-        Node with the result of the comparison.
+        EventSetNode with the result of the comparison.
     """
     return LessEqualOperator(
         input_1=input_left,
