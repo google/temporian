@@ -218,15 +218,14 @@ def cast(
 
     Usage example:
         ```python
-        >>> a_evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2],
         ...     features={"A": [0, 2], "B": ['a', 'b'], "C": [5.0, 5.5]},
         ... )
-        >>> a = a_evset.node()
 
         >>> # Cast all input features to the same dtype
         >>> b = tp.cast(a[["A", "C"]], tp.float32)
-        >>> b.run({a: a_evset})
+        >>> b
         indexes: []
         features: [('A', float32), ('C', float32)]
         events:
@@ -239,7 +238,7 @@ def cast(
 
         >>> # Cast by feature name
         >>> b = tp.cast(a, {'A': bool, 'C': int})
-        >>> b.run({a: a_evset})
+        >>> b
         indexes: []
         features: [('A', bool_), ('B', str_), ('C', int64)]
         events:
@@ -252,7 +251,7 @@ def cast(
 
         >>> # Map original_dtype -> target_dtype
         >>> b = tp.cast(a, {float: int, int: float})
-        >>> b.run({a: a_evset})
+        >>> b
         indexes: []
         features: [('A', float64), ('B', str_), ('C', int64)]
         events:

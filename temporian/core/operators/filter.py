@@ -98,15 +98,14 @@ def filter(
 
     Usage example:
         ```python
-        >>> a_evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[0, 1, 5, 6],
         ...     features={"f1": [0, 10, 50, 60], "f2": [50, 100, 500, 600]},
         ... )
-        >>> a = a_evset.node()
 
         >>> # Example boolean condition
         >>> condition = a["f1"] > 20
-        >>> condition.run({a: a_evset})
+        >>> condition
         indexes: ...
                 timestamps: [0. 1. 5. 6.]
                 'f1': [False False  True  True]
@@ -114,7 +113,7 @@ def filter(
 
         >>> # Filter only True timestamps
         >>> filtered = tp.filter(a, condition)
-        >>> filtered.run({a: a_evset})
+        >>> filtered
         indexes: ...
                 timestamps: [5. 6.]
                 'f1': [50 60]
