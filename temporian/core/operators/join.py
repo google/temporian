@@ -133,6 +133,7 @@ class Join(Operator):
 
 operator_lib.register_operator(Join)
 
+
 @compile
 def join(
     left: Node,

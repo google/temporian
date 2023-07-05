@@ -114,10 +114,13 @@ class JoinNumpyImplementation(OperatorImplementation):
                         ],
                     )
 
-            output_evset[index_key] = IndexData(
-                dst_left_data + dst_right_data,
-                left_item.timestamps,
-                schema=output_schema,
+            output_evset.set_index_value(
+                index_key,
+                IndexData(
+                    dst_left_data + dst_right_data,
+                    left_item.timestamps,
+                    schema=output_schema,
+                ),
             )
 
         return {"output": output_evset}
