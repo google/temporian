@@ -23,7 +23,10 @@ import sys
 import numpy as np
 
 from temporian.core.data.dtype import DType
-from temporian.core.data.node import Node, create_node_with_new_reference
+from temporian.core.data.node import (
+    EventSetNode,
+    create_node_with_new_reference,
+)
 from temporian.core.data.schema import Schema
 from temporian.core.mixins import EventSetOperationsMixin
 from temporian.utils import string
@@ -337,8 +340,8 @@ class EventSet(EventSetOperationsMixin):
         self._schema = schema
         self._name = name
 
-        # Node created when "self.node()" is called.
-        self._internal_node: Optional[Node] = None
+        # EventSetNode created when "self.node()" is called.
+        self._internal_node: Optional[EventSetNode] = None
 
     @property
     def data(self) -> Dict[Tuple, IndexData]:
@@ -376,8 +379,8 @@ class EventSet(EventSetOperationsMixin):
             return next(iter(self._data.values()))
         return None
 
-    def node(self, force_new_node: bool = False) -> Node:
-        """Creates a [`Node`][temporian.Node] able to consume the the EventSet.
+    def node(self, force_new_node: bool = False) -> EventSetNode:
+        """Creates an [`EventSetNode`][temporian.EventSetNode] able to consume the the EventSet.
 
         If called multiple times with `force_new_node=False` (default), the same
         node is returned.
@@ -400,7 +403,7 @@ class EventSet(EventSetOperationsMixin):
                 `node` is called. If true, a new node is created each time.
 
         Returns:
-            A Node able to consume the content of the EventSet.
+            A EventSetNode able to consume the content of the EventSet.
         """
 
         if self._internal_node is not None and not force_new_node:

@@ -18,7 +18,7 @@ from typing import Dict, Optional, Union
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.node import (
-    Node,
+    EventSetNode,
     create_node_new_features_new_sampling,
     create_node_new_features_existing_sampling,
 )
@@ -32,7 +32,7 @@ class RenameOperator(Operator):
 
     def __init__(
         self,
-        input: Node,
+        input: EventSetNode,
         features: Dict[str, str],
         indexes: Dict[str, str],
     ):
@@ -166,11 +166,11 @@ def _normalize_rename_indexes(
 
 @compile
 def rename(
-    input: Node,
+    input: EventSetNode,
     features: Optional[Union[str, Dict[str, str]]] = None,
     indexes: Optional[Union[str, Dict[str, str]]] = None,
-) -> Node:
-    """Renames a Node's features and index.
+) -> EventSetNode:
+    """Renames an EventSetNode's features and index.
 
     If the input has a single feature, then the `features` can be a
     single string with the new name.
@@ -207,13 +207,13 @@ def rename(
         ```
 
     Args:
-        input: Node to rename.
+        input: EventSetNode to rename.
 
         features: New feature name or mapping from old names to new names.
         indexes: New index name or mapping from old names to new names.
 
     Returns:
-        Node with renamed features and index.
+        EventSetNode with renamed features and index.
     """
 
     features = _normalize_rename_features(input.schema, features)

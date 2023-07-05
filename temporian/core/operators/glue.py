@@ -16,7 +16,10 @@
 
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
-from temporian.core.data.node import Node, create_node_with_new_reference
+from temporian.core.data.node import (
+    EventSetNode,
+    create_node_with_new_reference,
+)
 from temporian.core.data.schema import Schema
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
@@ -28,7 +31,7 @@ MAX_NUM_ARGUMENTS = 30
 class GlueOperator(Operator):
     def __init__(
         self,
-        **inputs: Node,
+        **inputs: EventSetNode,
     ):
         super().__init__()
 
@@ -59,7 +62,8 @@ class GlueOperator(Operator):
                 if f.name in feature_names:
                     raise ValueError(
                         f'Feature "{f.name}" is defined in multiple input'
-                        " Nodes to glue. Consider using prefix() or rename()."
+                        " EventSetNodes to glue. Consider using prefix() or"
+                        " rename()."
                     )
                 feature_names.add(f.name)
 
@@ -103,9 +107,9 @@ operator_lib.register_operator(GlueOperator)
 
 @compile
 def glue(
-    *inputs: Node,
-) -> Node:
-    """Concatenates [`Nodes`][temporian.Node] with the same sampling.
+    *inputs: EventSetNode,
+) -> EventSetNode:
+    """Concatenates [`EventSetNodes`][temporian.EventSetNode] with the same sampling.
 
     Feature names cannot be duplicated across nodes.
 
@@ -164,7 +168,7 @@ def glue(
         ```
 
     Args:
-        *inputs: Nodes to concatenate.
+        *inputs: EventSetNodes to concatenate.
 
     Returns:
         Concatenated nodes.

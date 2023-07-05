@@ -18,7 +18,7 @@ from abc import abstractmethod
 
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import (
-    Node,
+    EventSetNode,
     create_node_new_features_existing_sampling,
 )
 from temporian.core.data.schema import FeatureSchema
@@ -31,8 +31,8 @@ class BaseBinaryOperator(Operator):
 
     def __init__(
         self,
-        input_1: Node,
-        input_2: Node,
+        input_1: EventSetNode,
+        input_2: EventSetNode,
     ):
         super().__init__()
 

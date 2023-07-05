@@ -17,7 +17,7 @@ import time
 
 from typing import Dict
 
-from temporian.core.data.node import Node
+from temporian.core.data.node import EventSetNode
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core.schedule import Schedule
@@ -27,16 +27,16 @@ from temporian.implementation.numpy import operators as _impls
 
 
 def run_schedule(
-    inputs: Dict[Node, EventSet],
+    inputs: Dict[EventSetNode, EventSet],
     schedule: Schedule,
     verbose: int,
     check_execution: bool,
-) -> Dict[Node, EventSet]:
+) -> Dict[EventSetNode, EventSet]:
     """Evaluates a schedule on a dictionary of input
     [`EventSets`][temporian.EventSet].
 
     Args:
-        inputs: Mapping of Nodes to materialized EventSets.
+        inputs: Mapping of EventSetNodes to materialized EventSets.
         schedule: Sequence of operators to apply on the data.
         verbose: If >0, prints details about the execution on the standard error
             output. The larger the number, the more information is displayed.

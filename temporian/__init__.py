@@ -36,8 +36,8 @@ del _impls
 # PUBLIC API SYMBOLS #
 # ================== #
 
-# Nodes
-from temporian.core.data.node import Node
+# EventSetNodes
+from temporian.core.data.node import EventSetNode
 from temporian.core.data.node import input_node
 
 # Dtypes
@@ -90,6 +90,7 @@ from temporian.core.operators.drop_index import drop_index
 from temporian.core.operators.end import end
 from temporian.core.operators.filter import filter
 from temporian.core.operators.glue import glue
+from temporian.core.operators.join import join
 from temporian.core.operators.lag import lag
 from temporian.core.operators.leak import leak
 from temporian.core.operators.prefix import prefix

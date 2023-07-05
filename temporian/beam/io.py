@@ -243,7 +243,7 @@ def read_csv(
     Usage example:
 
     ```
-    input_node: tp.Node = ...
+    input_node: tp.EventSetNode = ...
     p | tpb.read_csv("/tmp/path.csv", input_node.schema) | ...
     ```
 
@@ -308,7 +308,7 @@ def write_csv(
     Usage example:
 
     ```
-    input_node: tp.Node = ...
+    input_node: tp.EventSetNode = ...
     ( p
       | tpb.read_csv("/input.csv", input_node.schema)
       | ... # processing

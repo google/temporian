@@ -28,6 +28,7 @@ py_library(
         "//temporian/core/operators:filter",
         "//temporian/core/operators:glue",
         "//temporian/core/operators:lag",
+        "//temporian/core/operators:join",
         "//temporian/core/operators:leak",
         "//temporian/core/operators:prefix",
         "//temporian/core/operators:propagate",

@@ -27,15 +27,15 @@ from temporian.implementation.numpy.operators.test.test_util import (
 from temporian.beam.io import read_csv, write_csv
 from temporian.beam.evaluation import run
 from temporian.io.csv import to_csv, from_csv
-from temporian.core.data.node import Node
+from temporian.core.data.node import EventSetNode
 from temporian.implementation.numpy.data.event_set import EventSet
 
 
 def check_beam_implementation(
     self,
     input_data: EventSet,
-    output_node: Node,
-    input_node: Optional[Node] = None,
+    output_node: EventSetNode,
+    input_node: Optional[EventSetNode] = None,
 ):
     """Checks the result of the Numpy backend against the Beam backend.
 

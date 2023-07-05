@@ -58,6 +58,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "GREATER_SCALAR",
             "INVERT",
             "IS_NAN",
+            "JOIN",
             "LAG",
             "LEAK",
             "LESS",

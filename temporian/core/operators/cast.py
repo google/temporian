@@ -22,7 +22,7 @@ from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import (
-    Node,
+    EventSetNode,
     Feature,
     create_node_with_new_reference,
 )
@@ -49,7 +49,7 @@ def _normalize_dtype(x: Any) -> TypeOrDType:
 class CastOperator(Operator):
     def __init__(
         self,
-        input: Node,
+        input: EventSetNode,
         check_overflow: bool,
         dtype: Optional[DType] = None,
         dtype_to_dtype: Optional[Dict[DType, DType]] = None,
@@ -157,7 +157,7 @@ class CastOperator(Operator):
 
     def _build_dtypes(
         self,
-        input: Node,
+        input: EventSetNode,
         dtype: Optional[DType] = None,
         dtype_to_dtype: Optional[Dict[DType, DType]] = None,
         feature_name_to_dtype: Optional[Dict[str, DType]] = None,
@@ -203,14 +203,14 @@ operator_lib.register_operator(CastOperator)
 
 @compile
 def cast(
-    input: Node,
+    input: EventSetNode,
     target: Union[
         TypeOrDType,
         Dict[str, TypeOrDType],
         Dict[TypeOrDType, TypeOrDType],
     ],
     check_overflow: bool = True,
-) -> Node:
+) -> EventSetNode:
     """Casts the dtype of features to the dtype(s) specified in `target`.
 
     Features not impacted by cast are kept.
@@ -266,7 +266,7 @@ def cast(
         ```
 
     Args:
-        input: Input `Node` object to cast the columns from.
+        input: Input `EventSetNode` object to cast the columns from.
         target: Single dtype or a map. Providing a single dtype will cast all
             columns to it. The mapping keys can be either feature names or the
             original dtypes (and not both types mixed), and the values are the
@@ -277,7 +277,7 @@ def cast(
             some computation overhead. Defaults to `True`.
 
     Returns:
-        New `Node` (or the same if no features actually changed dtype), with
+        New `EventSetNode` (or the same if no features actually changed dtype), with
         the same feature names as the input one, but with the new dtypes as
         specified in `target`.
 

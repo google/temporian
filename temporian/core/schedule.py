@@ -15,11 +15,11 @@
 from dataclasses import dataclass, field
 from typing import List, Set
 
-from temporian.core.data.node import Node
+from temporian.core.data.node import EventSetNode
 from temporian.core.operators.base import Operator
 
 
 @dataclass
 class Schedule:
     ordered_operators: List[Operator] = field(default_factory=list)
-    input_nodes: Set[Node] = field(default_factory=set)
+    input_nodes: Set[EventSetNode] = field(default_factory=set)

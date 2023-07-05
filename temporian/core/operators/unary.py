@@ -21,7 +21,7 @@ from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import (
-    Node,
+    EventSetNode,
     create_node_new_features_existing_sampling,
 )
 from temporian.core.operators.base import Operator
@@ -31,13 +31,15 @@ from temporian.proto import core_pb2 as pb
 class BaseUnaryOperator(Operator):
     def __init__(
         self,
-        input: Node,
+        input: EventSetNode,
     ):
         super().__init__()
 
         # Check input
-        if not isinstance(input, Node):
-            raise TypeError(f"Input must be of type Node but got {type(input)}")
+        if not isinstance(input, EventSetNode):
+            raise TypeError(
+                f"Input must be of type EventSetNode but got {type(input)}"
+            )
 
         for feature in input.schema.features:
             if feature.dtype not in self.allowed_dtypes():
@@ -188,15 +190,15 @@ operator_lib.register_operator(LogOperator)
 
 @compile
 def invert(
-    input: Node,
-) -> Node:
+    input: EventSetNode,
+) -> EventSetNode:
     """Inverts a boolean node (~node).
 
     Swaps False<->True element-wise.
     Does not work on integers, they should be cast to BOOLEAN beforehand.
 
     Args:
-        input: Node to invert.
+        input: EventSetNode to invert.
 
     Returns:
         Negated node.
@@ -208,8 +210,8 @@ def invert(
 
 @compile
 def isnan(
-    input: Node,
-) -> Node:
+    input: EventSetNode,
+) -> EventSetNode:
     """Returns boolean features, `True` in the NaN elements of the input.
 
     Note that for `int` and `bool` this will
@@ -217,10 +219,10 @@ def isnan(
     It only makes actual sense to use on `float` (or `tp.float32`) features.
 
     Args:
-        input: Node to check for NaNs.
+        input: EventSetNode to check for NaNs.
 
     Returns:
-        Node with `bool` features.
+        EventSetNode with `bool` features.
     """
     return IsNanOperator(
         input=input,
@@ -229,8 +231,8 @@ def isnan(
 
 @compile
 def notnan(
-    input: Node,
-) -> Node:
+    input: EventSetNode,
+) -> EventSetNode:
     """Opposite of `isnan()`, being `True` in the elements that are not NaN.
 
     Equivalent to `invert(isnan())`. Note that for `int` and `bool` this will
@@ -238,10 +240,10 @@ def notnan(
     It only makes actual sense to use on `float` (or `tp.float32`) features.
 
     Args:
-        input: Node to check for NaNs.
+        input: EventSetNode to check for NaNs.
 
     Returns:
-        Node with `bool` features.
+        EventSetNode with `bool` features.
     """
     return NotNanOperator(
         input=input,
@@ -250,15 +252,15 @@ def notnan(
 
 @compile
 def abs(
-    input: Node,
-) -> Node:
+    input: EventSetNode,
+) -> EventSetNode:
     """Gets the absolute value of the input features.
 
     Args:
-        input: Node calculate absolute value.
+        input: EventSetNode calculate absolute value.
 
     Returns:
-        Node with positive valued features.
+        EventSetNode with positive valued features.
     """
     return AbsOperator(
         input=input,
@@ -267,16 +269,16 @@ def abs(
 
 @compile
 def log(
-    input: Node,
-) -> Node:
+    input: EventSetNode,
+) -> EventSetNode:
     """Calculates the natural logarithm of the features. Can only be used
     on floating point feature types.
 
     Args:
-        input: Node to calculate natural logarithm.
+        input: EventSetNode to calculate natural logarithm.
 
     Returns:
-        Node with logarithm of input features.
+        EventSetNode with logarithm of input features.
     """
     return LogOperator(
         input=input,
