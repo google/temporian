@@ -91,11 +91,11 @@ def plot(
 
     Args:
         evsets: Single or list of EventSets to plot.
-        indexes: The index keys or list of indexes keys to plot. If indexes=None,
-            plots all the available indexes. Indexes should be provided as
-            single value (e.g. string) or tuple of values. Example: indexes="a",
-            indexes=("a",), indexes=("a", "b",), indexes=["a", "b"],
-            indexes=[("a", "b"), ("a", "c")].
+        indexes: The index keys or list of indexes keys to plot. If
+            indexes=None, plots all the available indexes. Indexes should be
+            provided as single value (e.g. string) or tuple of values. Example:
+            indexes="a", indexes=("a",), indexes=("a", "b",),
+            indexes=["a", "b"], indexes=[("a", "b"), ("a", "c")].
         features: Feature names of the event(s) to plot. Use
             'evset.feature_names' for the list of available names.
             If a feature doesn't exist in an event, it's silently skipped.

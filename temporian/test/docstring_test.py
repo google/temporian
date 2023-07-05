@@ -81,7 +81,7 @@ class DocstringsTest(absltest.TestCase):
                     e.got,
                     (
                         f"Docstring example starting at line {lineno} failed"
-                        f"on file {path}\n"
+                        f" on file {path}\n"
                         f">>> {ex.source}"
                     ),
                 )

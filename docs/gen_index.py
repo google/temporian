@@ -14,11 +14,11 @@ with open("README.md", "r", encoding="utf-8") as f:
 # fix `docs/src/` links
 content = re.sub(r"docs\/src\/([\w\/-]+)\.py", r"./\1", content)
 
-# remove "docs" from gifs and images
-content = re.sub(r"\]\(/?docs/", r"](", content)
+# remove "docs/src" from gifs and images
+content = re.sub(r"\]\(/?docs/src/", r"](", content)
 
-# remove "docs" from src fields in html
-content = re.sub(r"src=\"/?docs/", 'src="', content)
+# remove "docs/src" from src fields in html
+content = re.sub(r"src=\"/?docs/src/", 'src="', content)
 
 # fix `temporian/__/__.py` links (by adding `reference/` and removing `.py`)
 # so that they work in mkdocs.

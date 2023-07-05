@@ -8,7 +8,6 @@
   "search.exclude": {
     "**/.venv/": true,
     "**/bazel-*/**": true,
-    "**/reference/**/*.md": true
   },
   "files.watcherExclude": {
     "**/.venv/**": true,
@@ -16,7 +15,7 @@
   },
   "python.formatting.provider": "black",
   "editor.tabSize": 4,
-  "editor.formatOnSave": true,
+  "editor.formatOnSave": false,
   "python.linting.flake8Enabled": false,
   "python.linting.pylintEnabled": true,
   "python.linting.enabled": true,
@@ -78,6 +77,18 @@
     "deque": "cpp",
     "queue": "cpp",
     "span": "cpp",
-    "algorithm": "cpp"
-  }
+    "algorithm": "cpp",
+    "array": "cpp",
+    "*.tcc": "cpp",
+    "cstdarg": "cpp",
+    "cwctype": "cpp",
+    "unordered_map": "cpp",
+    "functional": "cpp",
+    "memory_resource": "cpp",
+    "numeric": "cpp",
+    "random": "cpp",
+    "string_view": "cpp",
+    "numbers": "cpp"
+  },
+  "python.analysis.typeCheckingMode": "basic"
 }

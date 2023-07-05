@@ -71,7 +71,6 @@ py_library(
         "//temporian/core:operator_lib",
         "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
-        "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -113,6 +112,7 @@ py_library(
         "//temporian/core:compilation",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
+        "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -222,7 +222,6 @@ py_library(
         "//temporian/core:compilation",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
-        "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -236,7 +235,6 @@ py_library(
         "//temporian/core:compilation",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
-        "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -251,7 +249,6 @@ py_library(
         "//temporian/core:operator_lib",
         "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
-        "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
     ],
 )
@@ -271,28 +268,44 @@ py_library(
 )
 
 py_library(
-    name = "timestamps",
-    srcs = ["timestamps.py"],
+    name = "join",
+    srcs = ["join.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core:compilation",
         "//temporian/core:operator_lib",
+        "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
     ],
 )
-    
+
+py_library(
+    name = "timestamps",
+    srcs = ["timestamps.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:compilation",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:node",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
 py_library(
     name = "enumerate",
     srcs = ["enumerate.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core:compilation",
         "//temporian/core:operator_lib",
+        "//temporian/core/data:dtype",
         "//temporian/core/data:node",
-        "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
     ],
 )
-    

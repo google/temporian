@@ -1,6 +1,9 @@
 # .readthedocs.yaml
 # Read the Docs configuration file
 # See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
+#
+# Poetry usage based on:
+#   https://docs.readthedocs.io/en/stable/build-customization.html#install-dependencies-with-poetry
 
 # Required
 version: 2
@@ -10,11 +13,22 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.10"
+    nodejs: "16"
+  apt_packages:
+    - rsync
+  jobs:
+    post_create_environment:
+      - pip install poetry
+      - poetry config virtualenvs.create false
+      - npm install -g @bazel/bazelisk
+
+    post_install:
+      - poetry install
+      - pip install -r docs/src/tutorials/requirements.txt
+
+    pre_build:
+      - tools/run_notebooks.sh docs/src/user_guide.ipynb
+      - tools/run_notebooks.sh docs/src/tutorials/getting_started.ipynb
 
 mkdocs:
   configuration: docs/mkdocs.yml
-
-# Optionally declare the Python requirements required to build your docs
-python:
-  install:
-    - requirements: docs/requirements.txt

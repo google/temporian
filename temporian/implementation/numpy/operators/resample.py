@@ -53,7 +53,7 @@ class ResampleNumpyImplementation(OperatorImplementation):
         dst_evset = EventSet(data={}, schema=output_schema)
         # iterate over destination sampling
         for index_key, index_data in sampling.data.items():
-            # intialize destination index data
+            # initialize destination index data
             dst_mts = []
 
             index_data = IndexData(dst_mts, index_data.timestamps, schema=None)

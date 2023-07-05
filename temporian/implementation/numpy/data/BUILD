@@ -18,7 +18,6 @@ py_library(
     srcs_version = "PY3",
     deps = [
         # already_there/numpy
-        # already_there/pandas
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
@@ -32,9 +31,8 @@ py_library(
     srcs = ["io.py"],
     srcs_version = "PY3",
     deps = [
-        ":event_set",
         # already_there/numpy
-        # already_there/pandas
+        ":event_set",
         "//temporian/core:evaluation",
         "//temporian/core/data:schema",
         "//temporian/core/operators:add_index",
@@ -49,5 +47,11 @@ py_library(
         "plotter_matplotlib.py",
     ],
     srcs_version = "PY3",
-    deps = [":event_set"],
+    deps = [
+        ":event_set",
+        # already_there/numpy
+        # already_there/matplotlib
+        # already_there/bokeh
+        "//temporian/core/data:duration_utils",
+    ],
 )

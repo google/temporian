@@ -3,7 +3,7 @@ from typing import Dict, List, Optional
 
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import (
-    Node,
+    EventSetNode,
     input_node,
     create_node_with_new_reference,
     create_node_new_features_new_sampling,
@@ -53,7 +53,7 @@ class OpI1O1(base.Operator):
             outputs=[pb.OperatorDef.Output(key="output")],
         )
 
-    def __init__(self, input: Node):
+    def __init__(self, input: EventSetNode):
         super().__init__()
 
         self.add_input("input", input)
@@ -86,7 +86,7 @@ class OpI1O1NotCreator(base.Operator):
             outputs=[pb.OperatorDef.Output(key="output")],
         )
 
-    def __init__(self, input: Node):
+    def __init__(self, input: EventSetNode):
         super().__init__()
         self.add_input("input", input)
         self.add_output(
@@ -116,7 +116,7 @@ class OpI2O1(base.Operator):
             outputs=[pb.OperatorDef.Output(key="output")],
         )
 
-    def __init__(self, input_1: Node, input_2: Node):
+    def __init__(self, input_1: EventSetNode, input_2: EventSetNode):
         super().__init__()
         self.add_input("input_1", input_1)
         self.add_input("input_2", input_2)
@@ -151,7 +151,7 @@ class OpI1O2(base.Operator):
             ],
         )
 
-    def __init__(self, input: Node):
+    def __init__(self, input: EventSetNode):
         super().__init__()
         self.add_input("input", input)
         self.add_output(
@@ -221,7 +221,7 @@ class OpWithAttributes(base.Operator):
 
     def __init__(
         self,
-        input: Node,
+        input: EventSetNode,
         attr_int: int,
         attr_str: str,
         attr_list: List[str],

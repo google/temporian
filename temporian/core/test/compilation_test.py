@@ -16,7 +16,7 @@ from typing import Dict, List, Tuple
 from absl.testing import absltest
 
 from temporian.implementation.numpy.data.event_set import EventSet
-from temporian.core.data.node import Node
+from temporian.core.data.node import EventSetNode
 from temporian.implementation.numpy.data.io import event_set
 from temporian.core.operators.prefix import prefix
 from temporian.core.operators.glue import glue
@@ -38,8 +38,8 @@ class CompileTest(absltest.TestCase):
 
     def test_basic(self):
         @compile
-        def f(x: Node) -> Node:
-            assert isinstance(x, Node)
+        def f(x: EventSetNode) -> EventSetNode:
+            assert isinstance(x, EventSetNode)
             return prefix("a", x)
 
         result = f(self.evset)
@@ -49,8 +49,8 @@ class CompileTest(absltest.TestCase):
 
     def test_composed(self):
         @compile
-        def f(x: Node) -> Node:
-            assert isinstance(x, Node)
+        def f(x: EventSetNode) -> EventSetNode:
+            assert isinstance(x, EventSetNode)
             return glue(
                 prefix("a", x),
                 prefix("b", x),
@@ -63,8 +63,8 @@ class CompileTest(absltest.TestCase):
 
     def test_other_args(self):
         @compile
-        def f(a: int, x: Node, b: str) -> Node:
-            assert isinstance(x, Node)
+        def f(a: int, x: EventSetNode, b: str) -> EventSetNode:
+            assert isinstance(x, EventSetNode)
             return prefix(f"{a}_{b}_", x)
 
         result = f(1, self.evset, "a")
@@ -74,9 +74,9 @@ class CompileTest(absltest.TestCase):
 
     def test_tuple_arg(self):
         @compile
-        def f(x: Tuple[Node]) -> Node:
+        def f(x: Tuple[EventSetNode]) -> EventSetNode:
             assert isinstance(x, tuple)
-            assert all(isinstance(n, Node) for n in x)
+            assert all(isinstance(n, EventSetNode) for n in x)
             return prefix("a", x[0])
 
         result = f((self.evset, self.other_evset))
@@ -86,9 +86,9 @@ class CompileTest(absltest.TestCase):
 
     def test_list_arg(self):
         @compile
-        def f(x: List[Node]) -> Node:
+        def f(x: List[EventSetNode]) -> EventSetNode:
             assert isinstance(x, list)
-            assert all(isinstance(n, Node) for n in x)
+            assert all(isinstance(n, EventSetNode) for n in x)
             return prefix("a", x[0])
 
         result = f([self.evset, self.other_evset])
@@ -98,9 +98,9 @@ class CompileTest(absltest.TestCase):
 
     def test_dict_arg(self):
         @compile
-        def f(x: Dict[str, Node]) -> Node:
+        def f(x: Dict[str, EventSetNode]) -> EventSetNode:
             assert isinstance(x, dict)
-            assert all(isinstance(n, Node) for n in x.values())
+            assert all(isinstance(n, EventSetNode) for n in x.values())
             return prefix("a", list(x.values())[0])
 
         result = f({"a": self.evset, "b": self.other_evset})
@@ -108,18 +108,46 @@ class CompileTest(absltest.TestCase):
         self.assertEqual(type(result), EventSet)
         self.assertEqual(result.schema.feature_names(), ["aa"])
 
+    def test_list_return(self):
+        @compile
+        def f(x: EventSetNode) -> List[EventSetNode]:
+            return [prefix("a", x), prefix("b", x)]
+
+        result = f(self.evset)
+
+        self.assertTrue(isinstance(result, list))
+        self.assertEqual(len(result), 2)
+        self.assertEqual(type(result[0]), EventSet)
+        self.assertEqual(type(result[1]), EventSet)
+        self.assertEqual(result[0].schema.feature_names(), ["aa"])
+        self.assertEqual(result[1].schema.feature_names(), ["ba"])
+
+    def test_dict_return(self):
+        @compile
+        def f(x: EventSetNode) -> Dict[str, EventSetNode]:
+            return {"a": prefix("a", x), "b": prefix("b", x)}
+
+        result = f(self.evset)
+
+        self.assertTrue(isinstance(result, dict))
+        self.assertEqual(len(result), 2)
+        self.assertEqual(type(result["a"]), EventSet)
+        self.assertEqual(type(result["b"]), EventSet)
+        self.assertEqual(result["a"].schema.feature_names(), ["aa"])
+        self.assertEqual(result["b"].schema.feature_names(), ["ba"])
+
     def test_mixed_args(self):
         @compile
-        def f(x: Node, y: Node) -> Node:
+        def f(x: EventSetNode, y: EventSetNode) -> EventSetNode:
             return glue(x, y)
 
         with self.assertRaisesRegex(
-            ValueError, "Cannot mix EventSets and Nodes"
+            ValueError, "Cannot mix EventSets and EventSetNodes"
         ):
             f({"a": self.evset, "b": self.other_evset.node()})
 
         with self.assertRaisesRegex(
-            ValueError, "Cannot mix EventSets and Nodes"
+            ValueError, "Cannot mix EventSets and EventSetNodes"
         ):
             f({"a": self.evset.node(), "b": self.other_evset})
 

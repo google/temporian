@@ -40,6 +40,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         "//temporian",
+        # already_there/absl/testing:absltest
     ],
 )
 
@@ -63,19 +64,6 @@ py_test(
     deps = [
         # already_there/absl/testing:absltest
         # already_there/pandas
-        "//temporian",
-    ],
-)
-
-py_test(
-    name = "public_api_test",
-    srcs = ["public_api_test.py"],
-    data = [
-        "//docs:reference",
-    ],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
         "//temporian",
     ],
 )

@@ -15,6 +15,7 @@ py_library(
         ":schedule",
         "//temporian/core/data:node",
         "//temporian/core/operators:base",
+        "//temporian/core/operators:leak",
         "//temporian/implementation/numpy:evaluation",
         "//temporian/implementation/numpy/data:event_set",
     ],
@@ -51,6 +52,14 @@ py_library(
     srcs = ["serialization.py"],
     srcs_version = "PY3",
     deps = [
+        "//temporian/core:graph",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:node",
+        "//temporian/core/data:schema",
+        "//temporian/core/operators:base",
+        "//temporian/implementation/numpy/data:event_set",
+        "//temporian/proto:core_py_proto",
     ],
 )
 
@@ -59,6 +68,7 @@ py_library(
     srcs = ["compilation.py"],
     srcs_version = "PY3",
     deps = [
+        "//temporian/core/data:node",
         "//temporian/implementation/numpy/data:event_set",
     ],
 )

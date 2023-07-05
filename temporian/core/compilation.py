@@ -14,21 +14,28 @@
 
 from functools import wraps
 from copy import copy
-from typing import Any, Dict, Optional, Tuple
-from temporian.core.data.node import Node
+from typing import Any, Dict, Optional, Tuple, Callable, Union, List
+from temporian.core.data.node import EventSetNode
 from temporian.implementation.numpy.data.event_set import EventSet
 
 
-def compile(fn):
+# TODO: unify the fn's output type with run's EvaluationQuery, and add it to the
+# public API so it shows in the docs.
+# TODO: make compile change the fn's annotations to EventSetOrNode
+def compile(
+    fn: Callable[
+        ..., Union[EventSetNode, List[EventSetNode], Dict[str, EventSetNode]]
+    ]
+) -> Callable[..., Union[EventSet, List[EventSet], Dict[str, EventSet]]]:
     """Compiles a Temporian function.
 
-    A Temporian function is a function that takes Nodes as arguments and
-    returns Nodes as outputs. Compiling it enables it to perform eager
-    evaluation, i.e., receive and return EventSets instead of Nodes.
+    A Temporian function is a function that takes EventSetNodes as arguments and
+    returns EventSetNodes as outputs. Compiling it enables it to perform eager
+    evaluation, i.e., receive and return EventSets instead of EventSetNodes.
 
     Args:
-        fn: The function to compile. The function must take Nodes as arguments
-            (and may have other arguments of arbitrary types) and return Nodes
+        fn: The function to compile. The function must take EventSetNodes as arguments
+            (and may have other arguments of arbitrary types) and return EventSetNodes
             as outputs.
 
     Returns:
@@ -40,7 +47,7 @@ def compile(fn):
         is_eager = None
         args = list(args)
 
-        # Node -> EventSet mapping for eager evaluation
+        # EventSetNode -> EventSet mapping for eager evaluation
         inputs_map = {}
 
         for i, arg in enumerate(args):
@@ -70,12 +77,12 @@ def compile(fn):
 def _process_argument(
     obj: Any,
     is_eager: Optional[bool],
-    inputs_map: Dict[Node, EventSet],
+    inputs_map: Dict[EventSetNode, EventSet],
 ) -> Tuple[Any, bool]:
     """Processes arguments to an operator by checking if its being used in eager
-    mode and converting EventSets to Nodes if so.
+    mode and converting EventSets to EventSetNodes if so.
 
-    Also checks that all arguments are of the same type (EventSet or Node), by
+    Also checks that all arguments are of the same type (EventSet or EventSetNode), by
     checking that is_eager is consistent with the type of obj, and raising if
     not.
 
@@ -100,16 +107,16 @@ def _process_argument(
         return obj, is_eager
 
     err = (
-        "Cannot mix EventSets and Nodes as inputs to an operator. Either get"
-        " the node corresponding to each EventSet with .node(), or pass"
-        " EventSets only."
+        "Cannot mix EventSets and EventSetNodes as inputs to an operator."
+        " Either get the node corresponding to each EventSet with .node(), or"
+        " pass EventSets only."
     )
 
     if isinstance(obj, EventSet):
         if is_eager is None:
             is_eager = True
         elif not is_eager:
-            # If a Node had been received and we receive an EventSet, raise
+            # If an EventSetNode had been received and we receive an EventSet, raise
             raise ValueError(err)
         node = obj.node()
         # Its fine to overwrite the same node since the corresponding EventSet
@@ -117,11 +124,11 @@ def _process_argument(
         inputs_map[node] = obj
         obj = node
 
-    elif isinstance(obj, Node):
+    elif isinstance(obj, EventSetNode):
         if is_eager is None:
             is_eager = False
         elif is_eager:
-            # If an EventSet had been received and we receive a Node, raise
+            # If an EventSet had been received and we receive an EventSetNode, raise
             raise ValueError(err)
 
     return obj, is_eager

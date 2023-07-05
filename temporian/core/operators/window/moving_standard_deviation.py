@@ -19,7 +19,7 @@ from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
 from temporian.core.data.duration_utils import Duration, normalize_duration
-from temporian.core.data.node import Node
+from temporian.core.data.node import EventSetNode
 from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.window.base import BaseWindowOperator
 
@@ -40,10 +40,10 @@ operator_lib.register_operator(MovingStandardDeviationOperator)
 
 @compile
 def moving_standard_deviation(
-    input: Node,
+    input: EventSetNode,
     window_length: Duration,
-    sampling: Optional[Node] = None,
-) -> Node:
+    sampling: Optional[EventSetNode] = None,
+) -> EventSetNode:
     """Computes the standard deviation of values in a sliding window over the
     node.
 
@@ -87,7 +87,7 @@ def moving_standard_deviation(
             provided, timestamps in `input` are used.
 
     Returns:
-        Node containing the moving standard deviation of each feature in
+        EventSetNode containing the moving standard deviation of each feature in
         `input`.
     """
     return MovingStandardDeviationOperator(

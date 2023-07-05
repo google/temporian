@@ -16,7 +16,7 @@
 
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
-from temporian.core.data.node import Node
+from temporian.core.data.node import EventSetNode
 from temporian.core.operators.calendar.base import BaseCalendarOperator
 
 
@@ -34,7 +34,7 @@ operator_lib.register_operator(CalendarMinuteOperator)
 
 
 @compile
-def calendar_minute(sampling: Node) -> Node:
+def calendar_minute(sampling: EventSetNode) -> EventSetNode:
     """Obtain the minute the timestamps in a node's sampling are in.
 
     Features in the input node are ignored, only the timestamps are used and
@@ -62,7 +62,7 @@ def calendar_minute(sampling: Node) -> Node:
         ```
 
     Args:
-        sampling: Node to get the minutes from.
+        sampling: EventSetNode to get the minutes from.
 
     Returns:
         Single feature with the minute each timestamp in `sampling` belongs to.

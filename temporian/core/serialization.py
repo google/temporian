@@ -32,7 +32,7 @@ from google.protobuf import text_format
 from temporian.core import operator_lib
 from temporian.core import graph
 from temporian.core.data.node import (
-    Node,
+    EventSetNode,
     Sampling,
     Feature,
     create_node_with_new_reference,
@@ -42,7 +42,7 @@ from temporian.core.operators import base
 from temporian.core.data.dtype import DType
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.proto import core_pb2 as pb
-from temporian.core.operators.base import EventSetOrNode
+from temporian.core.operators.base import EventSetOrEventSetNode
 
 DTYPE_MAPPING = {
     DType.FLOAT64: pb.DType.DTYPE_FLOAT64,
@@ -56,29 +56,31 @@ INV_DTYPE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
 
 
 def save(
-    fn: Callable[..., Union[EventSetOrNode, Dict[str, EventSetOrNode]]],
+    fn: Callable[
+        ..., Union[EventSetOrEventSetNode, Dict[str, EventSetOrEventSetNode]]
+    ],
     inputs: Dict[str, Any],
     path: str,
 ) -> None:
     """Saves a compiled Temporian function to a file.
 
     Temporian saves the graph built between the function's input and output
-    EventSets or Nodes, not the function itself. Any arbitrary code that is
+    EventSets or EventSetNodes, not the function itself. Any arbitrary code that is
     executed in the function will not be ran when loading it back up.
 
     The function can receive and return other arbitrary parameters, which will
     be used to trace the function while saving it, but will not be available
     when loading it back up.
 
-    The function must return an EventSet or Node or a dictionary mapping output
-    names to EventSets or Nodes. If it returns a single one, the output will be
+    The function must return an EventSet or EventSetNode or a dictionary mapping output
+    names to EventSets or EventSetNodes. If it returns a single one, the output will be
     saved under the name "output" by default.
 
     Args:
         fn: The function to save.
         inputs: The inputs to pass to the function to trace it, keyed by
-            parameter name. For EventSet/Node parameters, the passed value can
-            be either an EventSet, a Node, or a raw Schema.
+            parameter name. For EventSet/EventSetNode parameters, the passed value can
+            be either an EventSet, an EventSetNode, or a raw Schema.
         path: The path to save the function to.
 
     Raises:
@@ -107,21 +109,22 @@ def save(
     # TODO: extensively check that returned types are the expected ones
     outputs = fn(**inputs)
 
-    if isinstance(outputs, Node):
+    if isinstance(outputs, EventSetNode):
         outputs = {"output": outputs}
 
     if isinstance(outputs, dict):
-        if not all(isinstance(v, Node) for v in outputs.values()):
+        if not all(isinstance(v, EventSetNode) for v in outputs.values()):
             raise ValueError(
-                "The function must return a single EventSet or Node or a"
-                "dictionary mapping output names to EventSets or Nodes."
+                "The function must return a single EventSet or EventSetNode or"
+                " adictionary mapping output names to EventSets or"
+                " EventSetNodes."
             )
 
     save_graph(inputs=node_inputs, outputs=outputs, path=path)
 
 
-def _process_fn_input(input: Any) -> Optional[Node]:
-    # TODO: allow dicts and lists of stuff other than EventSet/Nodes
+def _process_fn_input(input: Any) -> Optional[EventSetNode]:
+    # TODO: allow dicts and lists of stuff other than EventSet/EventSetNodes
     if isinstance(input, (list, dict, tuple)):
         raise ValueError(
             "`tp.save` does not support collections in a function's input."
@@ -130,16 +133,16 @@ def _process_fn_input(input: Any) -> Optional[Node]:
         return create_node_with_new_reference(schema=input)
     if isinstance(input, EventSet):
         return input.node()
-    if isinstance(input, Node):
+    if isinstance(input, EventSetNode):
         return input
 
 
 def save_graph(
-    inputs: Optional[graph.NamedNodes],
-    outputs: graph.NamedNodes,
+    inputs: Optional[graph.NamedEventSetNodes],
+    outputs: graph.NamedEventSetNodes,
     path: str,
 ) -> None:
-    """Saves the graph between `inputs` and `outputs` [`Nodes`][temporian.Node]
+    """Saves the graph between `inputs` and `outputs` [`EventSetNodes`][temporian.EventSetNode]
     to a file.
 
     Usage example:
@@ -191,9 +194,9 @@ def save_graph(
         ```
 
     Args:
-        inputs: Input Nodes. If None, the inputs is inferred. In this case,
-            input Nodes have to be named.
-        outputs: Output Nodes.
+        inputs: Input EventSetNodes. If None, the inputs is inferred. In this case,
+            input EventSetNodes have to be named.
+        outputs: Output EventSetNodes.
         path: File path to save to.
     """
 
@@ -208,7 +211,10 @@ def save_graph(
 
 def load(
     path: str, squeeze: bool = False
-) -> Tuple[Union[Node, Dict[str, Node]], Union[Node, Dict[str, Node]]]:
+) -> Tuple[
+    Union[EventSetNode, Dict[str, EventSetNode]],
+    Union[EventSetNode, Dict[str, EventSetNode]],
+]:
     """Loads a Temporian graph from a file.
 
     See [`tp.save()`][temporian.save] and
@@ -216,11 +222,11 @@ def load(
 
     Args:
         path: File path to load from.
-        squeeze: If true, and if the input/output contains a single Node,
-            returns a Node (instead of a dictionary of Nodes).
+        squeeze: If true, and if the input/output contains a single EventSetNode,
+            returns an EventSetNode (instead of a dictionary of EventSetNodes).
 
     Returns:
-        Input and output Nodes.
+        Input and output EventSetNodes.
     """
 
     with open(path, "rb") as f:
@@ -246,9 +252,13 @@ def _serialize(src: graph.Graph) -> pb.Graph:
     """Serializes a graph into a protobuffer."""
 
     if src.named_inputs is None:
-        raise ValueError("Cannot serialize a graph without named input Nodes")
+        raise ValueError(
+            "Cannot serialize a graph without named input EventSetNodes"
+        )
     if src.named_outputs is None:
-        raise ValueError("Cannot serialize a graph without named output Nodes")
+        raise ValueError(
+            "Cannot serialize a graph without named output EventSetNodes"
+        )
 
     return pb.Graph(
         operators=[_serialize_operator(o) for o in src.operators],
@@ -311,7 +321,7 @@ def _unserialize(src: pb.Graph) -> graph.Graph:
         g.operators.add(operator)
 
     # IO Signature
-    def get_node(node_id: str) -> Node:
+    def get_node(node_id: str) -> EventSetNode:
         if node_id not in nodes:
             raise ValueError(f"Non existing node {node_id}")
         return nodes[node_id]
@@ -360,11 +370,11 @@ def _serialize_operator(src: base.Operator) -> pb.Operator:
         id=_identifier(src),
         operator_def_key=src.definition().key,
         inputs=[
-            pb.Operator.NodeArgument(key=k, node_id=_identifier(v))
+            pb.Operator.EventSetNodeArgument(key=k, node_id=_identifier(v))
             for k, v in src.inputs.items()
         ],
         outputs=[
-            pb.Operator.NodeArgument(key=k, node_id=_identifier(v))
+            pb.Operator.EventSetNodeArgument(key=k, node_id=_identifier(v))
             for k, v in src.outputs.items()
         ],
         attributes=[
@@ -374,7 +384,7 @@ def _serialize_operator(src: base.Operator) -> pb.Operator:
 
 
 def _unserialize_operator(
-    src: pb.Operator, nodes: Dict[str, Node]
+    src: pb.Operator, nodes: Dict[str, EventSetNode]
 ) -> base.Operator:
     operator_class = operator_lib.get_operator_class(src.operator_def_key)
 
@@ -420,11 +430,13 @@ def _unserialize_operator(
     return op
 
 
-def _serialize_node(src: Node, operators: Set[base.Operator]) -> pb.Node:
+def _serialize_node(
+    src: EventSetNode, operators: Set[base.Operator]
+) -> pb.EventSetNode:
     assert len(src.schema.features) == len(src.feature_nodes)
     logging.info("aaaa")
     logging.info(operators)
-    return pb.Node(
+    return pb.EventSetNode(
         id=_identifier(src),
         sampling_id=_identifier(src.sampling_node),
         feature_ids=[_identifier(f) for f in src.feature_nodes],
@@ -435,8 +447,10 @@ def _serialize_node(src: Node, operators: Set[base.Operator]) -> pb.Node:
 
 
 def _unserialize_node(
-    src: pb.Node, samplings: Dict[str, Sampling], features: Dict[str, Feature]
-) -> Node:
+    src: pb.EventSetNode,
+    samplings: Dict[str, Sampling],
+    features: Dict[str, Feature],
+) -> EventSetNode:
     if src.sampling_id not in samplings:
         raise ValueError(f"Non existing sampling {src.sampling_id} in {src}")
 
@@ -445,7 +459,7 @@ def _unserialize_node(
             raise ValueError(f"Non existing feature {key}")
         return features[key]
 
-    node = Node(
+    node = EventSetNode(
         schema=_unserialize_schema(src.schema),
         features=[get_feature(f) for f in src.feature_ids],
         sampling=samplings[src.sampling_id],
@@ -459,27 +473,27 @@ def _unserialize_node(
 
 def _serialize_feature(
     src: Feature, operators: Set[base.Operator]
-) -> pb.Node.Feature:
-    return pb.Node.Feature(
+) -> pb.EventSetNode.Feature:
+    return pb.EventSetNode.Feature(
         id=_identifier(src),
         creator_operator_id=(_identifier_or_none(src.creator, operators)),
     )
 
 
-def _unserialize_feature(src: pb.Node.Feature) -> Feature:
+def _unserialize_feature(src: pb.EventSetNode.Feature) -> Feature:
     return Feature(creator=None)
 
 
 def _serialize_sampling(
     src: Sampling, operators: Set[base.Operator]
-) -> pb.Node.Sampling:
-    return pb.Node.Sampling(
+) -> pb.EventSetNode.Sampling:
+    return pb.EventSetNode.Sampling(
         id=_identifier(src),
         creator_operator_id=(_identifier_or_none(src.creator, operators)),
     )
 
 
-def _unserialize_sampling(src: pb.Node.Sampling) -> Sampling:
+def _unserialize_sampling(src: pb.EventSetNode.Sampling) -> Sampling:
     return Sampling(creator=None)
 
 
@@ -586,7 +600,7 @@ def _attribute_from_proto(src: pb.Operator.Attribute) -> base.AttributeType:
     raise ValueError(f"Non supported proto attribute {src}")
 
 
-def _serialize_io_signature(key: str, node: Node):
+def _serialize_io_signature(key: str, node: EventSetNode):
     return pb.IOSignature(
         key=key,
         node_id=_identifier(node),
