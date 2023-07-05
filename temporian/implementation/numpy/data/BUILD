@@ -17,7 +17,6 @@ py_library(
     srcs = ["event_set.py"],
     srcs_version = "PY3",
     deps = [
-        # already_there/logging
         # already_there/numpy
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",

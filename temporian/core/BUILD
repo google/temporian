@@ -52,15 +52,14 @@ py_library(
     srcs = ["serialization.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/core/data:dtype",
-        "//temporian/core:operator_lib",
-        "//temporian/implementation/numpy/data:event_set",
         "//temporian/core:graph",
-        "//temporian/core/data:schema",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:dtype",
         "//temporian/core/data:node",
+        "//temporian/core/data:schema",
         "//temporian/core/operators:base",
+        "//temporian/implementation/numpy/data:event_set",
         "//temporian/proto:core_py_proto",
-        # already_there/logging
     ],
 )
 
@@ -69,8 +68,8 @@ py_library(
     srcs = ["compilation.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/implementation/numpy/data:event_set",
         "//temporian/core/data:node",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )
 

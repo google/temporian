@@ -59,6 +59,7 @@ BUILT_IN_MODULES = {
     "functools",
     "copy",
     "tempfile",
+    "logging",
     "google.protobuf.text_format",
 }
 
@@ -70,7 +71,6 @@ THIRD_PARTY_MODULES = {
     "numpy",
     "pandas",
     "apache_beam",
-    "logging",
 }
 
 # Mapping from source file to rule.
