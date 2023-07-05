@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Dict, Tuple
 
 from temporian.utils import config
-from temporian.core.data.node import Node
+from temporian.core.data.node import EventSetNode
 from temporian.core.data.schema import Schema
 from temporian.core.operators.base import Operator
 from temporian.core.operators.base import OperatorExceptionDecorator
@@ -50,7 +50,7 @@ class OperatorImplementation(ABC):
 
 def _check_value_to_schema(
     values: Dict[str, EventSet],
-    nodes: Dict[str, Node],
+    nodes: Dict[str, EventSetNode],
     label: str,
 ) -> None:
     """Checks if EventSets are matching the expected schema."""

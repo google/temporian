@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests magic methods on both EventSets and Nodes."""
+"""Tests magic methods on both EventSets and EventSetNodes."""
 
 # pylint: disable=unused-argument
 
@@ -21,7 +21,7 @@ from absl.testing import absltest
 from absl.testing.parameterized import parameters
 import numpy as np
 
-from temporian.core.data.node import Node, input_node
+from temporian.core.data.node import EventSetNode, input_node
 from temporian.core.data.dtype import DType
 from temporian.core.operators.binary import (
     AddOperator,
@@ -64,7 +64,7 @@ from temporian.core.operators.unary import AbsOperator, InvertOperator
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.io import event_set
 
-NodeOrEvset = Union[Node, EventSet]
+EventSetNodeOrEvset = Union[EventSetNode, EventSet]
 
 # Define parameters for all tests.
 # Note that evset_X and node_X must always have matching schemas.
@@ -159,7 +159,7 @@ evset_bool_2 = evset_int_1 > evset_int_2
 node_bool_2 = node_int_1 > node_int_2
 
 
-# Run all methods of this class for both EventSets and their corresponding Nodes
+# Run all methods of this class for both EventSets and their corresponding EventSetNodes
 # NOTE: all code in the test methods must work for both evsets and nodes
 @parameters(
     {
@@ -185,7 +185,7 @@ class MagicMethodsTest(absltest.TestCase):
     #########################################
     ### Get/set item with square brackets ###
     #########################################
-    def test_getitem_single(self, float_1: NodeOrEvset, **kwargs):
+    def test_getitem_single(self, float_1: EventSetNodeOrEvset, **kwargs):
         out = float_1["f2"]
 
         self.assertTrue(isinstance(out, float_1.__class__))
@@ -196,7 +196,7 @@ class MagicMethodsTest(absltest.TestCase):
         self.assertEqual(out.schema.features[0].name, "f2")
         self.assertEqual(out.schema.features[0].dtype, DType.FLOAT64)
 
-    def test_getitem_multiple(self, float_1: NodeOrEvset, **kwargs):
+    def test_getitem_multiple(self, float_1: EventSetNodeOrEvset, **kwargs):
         out = float_1[["f2", "f1"]]
 
         self.assertTrue(isinstance(out, float_1.__class__))
@@ -209,7 +209,7 @@ class MagicMethodsTest(absltest.TestCase):
         self.assertEqual(out.schema.features[1].name, "f1")
         self.assertEqual(out.schema.features[1].dtype, DType.FLOAT32)
 
-    def test_getitem_empty(self, float_1: NodeOrEvset, **kwargs):
+    def test_getitem_empty(self, float_1: EventSetNodeOrEvset, **kwargs):
         out = float_1[[]]
 
         self.assertTrue(isinstance(out, float_1.__class__))
@@ -217,7 +217,7 @@ class MagicMethodsTest(absltest.TestCase):
         out.check_same_sampling(float_1)
         self.assertEqual(len(out.schema.features), 0)
 
-    def test_getitem_errors(self, float_1: NodeOrEvset, **kwargs):
+    def test_getitem_errors(self, float_1: EventSetNodeOrEvset, **kwargs):
         with self.assertRaises(IndexError):
             float_1["f3"]
         with self.assertRaises(IndexError):
@@ -230,7 +230,10 @@ class MagicMethodsTest(absltest.TestCase):
             float_1[None]
 
     def test_setitem_fails(
-        self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs
+        self,
+        float_1: EventSetNodeOrEvset,
+        float_2: EventSetNodeOrEvset,
+        **kwargs,
     ):
         # Try to modify existent feature
         with self.assertRaisesRegex(TypeError, "Cannot assign"):
@@ -260,14 +263,19 @@ class MagicMethodsTest(absltest.TestCase):
     # ### Relational binary operators ###
     # ###################################
 
-    def _check_boolean(self, out: NodeOrEvset, inp: NodeOrEvset):
+    def _check_boolean(
+        self, out: EventSetNodeOrEvset, inp: EventSetNodeOrEvset
+    ):
         # Auxiliar function to check arithmetic outputs
         out.check_same_sampling(inp)
         self.assertTrue(out.schema.features[0].dtype == DType.BOOLEAN)
         self.assertTrue(out.schema.features[1].dtype == DType.BOOLEAN)
 
     def test_not_equal(
-        self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs
+        self,
+        float_1: EventSetNodeOrEvset,
+        float_2: EventSetNodeOrEvset,
+        **kwargs,
     ):
         out = float_1 != float_2
         self.assertTrue(isinstance(out.creator, NotEqualOperator))
@@ -276,7 +284,10 @@ class MagicMethodsTest(absltest.TestCase):
         self._check_boolean(out, float_1)
 
     def test_greater(
-        self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs
+        self,
+        float_1: EventSetNodeOrEvset,
+        float_2: EventSetNodeOrEvset,
+        **kwargs,
     ):
         out = float_1 > float_2
         self.assertTrue(isinstance(out.creator, GreaterOperator))
@@ -284,7 +295,12 @@ class MagicMethodsTest(absltest.TestCase):
         self.assertTrue(out.schema.features[1].name == "gt_f2_f4")
         self._check_boolean(out, float_1)
 
-    def test_less(self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs):
+    def test_less(
+        self,
+        float_1: EventSetNodeOrEvset,
+        float_2: EventSetNodeOrEvset,
+        **kwargs,
+    ):
         out = float_1 < float_2
         self.assertTrue(isinstance(out.creator, LessOperator))
         self.assertTrue(out.schema.features[0].name == "lt_f1_f3")
@@ -292,7 +308,10 @@ class MagicMethodsTest(absltest.TestCase):
         self._check_boolean(out, float_1)
 
     def test_greater_equal(
-        self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs
+        self,
+        float_1: EventSetNodeOrEvset,
+        float_2: EventSetNodeOrEvset,
+        **kwargs,
     ):
         out = float_1 >= float_2
         self.assertTrue(isinstance(out.creator, GreaterEqualOperator))
@@ -301,7 +320,10 @@ class MagicMethodsTest(absltest.TestCase):
         self._check_boolean(out, float_1)
 
     def test_less_equal(
-        self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs
+        self,
+        float_1: EventSetNodeOrEvset,
+        float_2: EventSetNodeOrEvset,
+        **kwargs,
     ):
         out = float_1 <= float_2
         self.assertTrue(isinstance(out.creator, LessEqualOperator))
@@ -313,35 +335,35 @@ class MagicMethodsTest(absltest.TestCase):
     # ### Relational scalar operators ###
     # ###################################
 
-    def test_not_equal_scalar(self, float_1: NodeOrEvset, **kwargs):
+    def test_not_equal_scalar(self, float_1: EventSetNodeOrEvset, **kwargs):
         out = float_1 != 3
         self.assertTrue(isinstance(out.creator, NotEqualScalarOperator))
         self.assertTrue(out.schema.features[0].name == "f1")
         self.assertTrue(out.schema.features[1].name == "f2")
         self._check_boolean(out, float_1)
 
-    def test_greater_scalar(self, float_1: NodeOrEvset, **kwargs):
+    def test_greater_scalar(self, float_1: EventSetNodeOrEvset, **kwargs):
         out = float_1 > 3.0
         self.assertTrue(isinstance(out.creator, GreaterScalarOperator))
         self.assertTrue(out.schema.features[0].name == "f1")
         self.assertTrue(out.schema.features[1].name == "f2")
         self._check_boolean(out, float_1)
 
-    def test_less_scalar(self, float_1: NodeOrEvset, **kwargs):
+    def test_less_scalar(self, float_1: EventSetNodeOrEvset, **kwargs):
         out = float_1 < 3
         self.assertTrue(isinstance(out.creator, LessScalarOperator))
         self.assertTrue(out.schema.features[0].name == "f1")
         self.assertTrue(out.schema.features[1].name == "f2")
         self._check_boolean(out, float_1)
 
-    def test_greater_equal_scalar(self, float_1: NodeOrEvset, **kwargs):
+    def test_greater_equal_scalar(self, float_1: EventSetNodeOrEvset, **kwargs):
         out = float_1 >= 3.0
         self.assertTrue(isinstance(out.creator, GreaterEqualScalarOperator))
         self.assertTrue(out.schema.features[0].name == "f1")
         self.assertTrue(out.schema.features[1].name == "f2")
         self._check_boolean(out, float_1)
 
-    def test_less_equal_scalar(self, float_1: NodeOrEvset, **kwargs):
+    def test_less_equal_scalar(self, float_1: EventSetNodeOrEvset, **kwargs):
         out = float_1 <= 0.5
         self.assertTrue(isinstance(out.creator, LessEqualScalarOperator))
         self.assertTrue(out.schema.features[0].name == "f1")
@@ -354,10 +376,10 @@ class MagicMethodsTest(absltest.TestCase):
 
     def test_logic_and(
         self,
-        float_1: NodeOrEvset,
-        float_2: NodeOrEvset,
-        bool_1: NodeOrEvset,
-        bool_2: NodeOrEvset,
+        float_1: EventSetNodeOrEvset,
+        float_2: EventSetNodeOrEvset,
+        bool_1: EventSetNodeOrEvset,
+        bool_2: EventSetNodeOrEvset,
         **kwargs,
     ):
         # Should not work: non boolean features
@@ -368,13 +390,15 @@ class MagicMethodsTest(absltest.TestCase):
         self.assertTrue(isinstance(out.creator, LogicalAndOperator))
         self._check_boolean(out, bool_1)
 
-    def test_logic_or(self, bool_1: NodeOrEvset, bool_2: NodeOrEvset, **kwargs):
+    def test_logic_or(
+        self, bool_1: EventSetNodeOrEvset, bool_2: EventSetNodeOrEvset, **kwargs
+    ):
         out = bool_1 | bool_2
         self.assertTrue(isinstance(out.creator, LogicalOrOperator))
         self._check_boolean(out, bool_1)
 
     def test_logic_xor(
-        self, bool_1: NodeOrEvset, bool_2: NodeOrEvset, **kwargs
+        self, bool_1: EventSetNodeOrEvset, bool_2: EventSetNodeOrEvset, **kwargs
     ):
         out = bool_1 ^ bool_2
         self.assertTrue(isinstance(out.creator, LogicalXorOperator))
@@ -384,7 +408,9 @@ class MagicMethodsTest(absltest.TestCase):
     # ### Arithmetic binary operators ###
     # ###################################
 
-    def _check_node_same_dtype(self, inp: NodeOrEvset, out: NodeOrEvset):
+    def _check_node_same_dtype(
+        self, inp: EventSetNodeOrEvset, out: EventSetNodeOrEvset
+    ):
         # Auxiliar function to check arithmetic outputs
         out.check_same_sampling(inp)
         self.assertTrue(
@@ -395,7 +421,10 @@ class MagicMethodsTest(absltest.TestCase):
         )
 
     def test_addition(
-        self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs
+        self,
+        float_1: EventSetNodeOrEvset,
+        float_2: EventSetNodeOrEvset,
+        **kwargs,
     ):
         out = float_1 + float_2
         self.assertTrue(isinstance(out.creator, AddOperator))
@@ -404,7 +433,10 @@ class MagicMethodsTest(absltest.TestCase):
         self._check_node_same_dtype(float_1, out)
 
     def test_subtraction(
-        self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs
+        self,
+        float_1: EventSetNodeOrEvset,
+        float_2: EventSetNodeOrEvset,
+        **kwargs,
     ):
         out = float_1 - float_2
         self.assertTrue(isinstance(out.creator, SubtractOperator))
@@ -413,7 +445,10 @@ class MagicMethodsTest(absltest.TestCase):
         self._check_node_same_dtype(float_1, out)
 
     def test_multiplication(
-        self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs
+        self,
+        float_1: EventSetNodeOrEvset,
+        float_2: EventSetNodeOrEvset,
+        **kwargs,
     ):
         out = float_1 * float_2
         self.assertTrue(isinstance(out.creator, MultiplyOperator))
@@ -422,7 +457,10 @@ class MagicMethodsTest(absltest.TestCase):
         self._check_node_same_dtype(float_1, out)
 
     def test_division(
-        self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs
+        self,
+        float_1: EventSetNodeOrEvset,
+        float_2: EventSetNodeOrEvset,
+        **kwargs,
     ):
         out = float_1 / float_2
         self.assertTrue(isinstance(out.creator, DivideOperator))
@@ -430,7 +468,9 @@ class MagicMethodsTest(absltest.TestCase):
         self.assertTrue(out.schema.features[1].name == "div_f2_f4")
         self._check_node_same_dtype(float_1, out)
 
-    def test_floordiv(self, int_1: NodeOrEvset, int_2: NodeOrEvset, **kwargs):
+    def test_floordiv(
+        self, int_1: EventSetNodeOrEvset, int_2: EventSetNodeOrEvset, **kwargs
+    ):
         # First, check that truediv is not supported for integer types
         with self.assertRaises(ValueError):
             out = int_1 / int_2
@@ -442,14 +482,24 @@ class MagicMethodsTest(absltest.TestCase):
         self.assertTrue(out.schema.features[1].name == "floordiv_f6_f8")
         self._check_node_same_dtype(int_1, out)
 
-    def test_modulo(self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs):
+    def test_modulo(
+        self,
+        float_1: EventSetNodeOrEvset,
+        float_2: EventSetNodeOrEvset,
+        **kwargs,
+    ):
         out = float_1 % float_2
         self.assertTrue(isinstance(out.creator, ModuloOperator))
         self.assertTrue(out.schema.features[0].name == "mod_f1_f3")
         self.assertTrue(out.schema.features[1].name == "mod_f2_f4")
         self._check_node_same_dtype(float_1, out)
 
-    def test_power(self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs):
+    def test_power(
+        self,
+        float_1: EventSetNodeOrEvset,
+        float_2: EventSetNodeOrEvset,
+        **kwargs,
+    ):
         out = float_1**float_2
         self.assertTrue(isinstance(out.creator, PowerOperator))
         self.assertTrue(out.schema.features[0].name == "pow_f1_f3")
@@ -461,7 +511,7 @@ class MagicMethodsTest(absltest.TestCase):
     # ###################################
 
     def test_addition_scalar(
-        self, float_1: NodeOrEvset, int_1: NodeOrEvset, **kwargs
+        self, float_1: EventSetNodeOrEvset, int_1: EventSetNodeOrEvset, **kwargs
     ):
         # Shouldn't work: int node and float scalar
         with self.assertRaises(ValueError):
@@ -475,7 +525,7 @@ class MagicMethodsTest(absltest.TestCase):
         self._check_node_same_dtype(float_1, out)
 
     def test_right_addition_scalar(
-        self, float_1: NodeOrEvset, int_1: NodeOrEvset, **kwargs
+        self, float_1: EventSetNodeOrEvset, int_1: EventSetNodeOrEvset, **kwargs
     ):
         # Shouldn't work: int node and float scalar
         with self.assertRaises(ValueError):
@@ -489,7 +539,7 @@ class MagicMethodsTest(absltest.TestCase):
         self._check_node_same_dtype(float_1, out)
 
     def test_division_scalar(
-        self, float_1: NodeOrEvset, int_1: NodeOrEvset, **kwargs
+        self, float_1: EventSetNodeOrEvset, int_1: EventSetNodeOrEvset, **kwargs
     ):
         # Shouldn't work: divide int node
         with self.assertRaises(ValueError):
@@ -503,7 +553,7 @@ class MagicMethodsTest(absltest.TestCase):
         self._check_node_same_dtype(float_1, out)
 
     def test_right_division_scalar(
-        self, float_1: NodeOrEvset, int_1: NodeOrEvset, **kwargs
+        self, float_1: EventSetNodeOrEvset, int_1: EventSetNodeOrEvset, **kwargs
     ):
         # Shouldn't work: divide by int node
         with self.assertRaises(ValueError):
@@ -517,7 +567,7 @@ class MagicMethodsTest(absltest.TestCase):
         self._check_node_same_dtype(float_1, out)
 
     def test_floordiv_scalar(
-        self, float_1: NodeOrEvset, int_1: NodeOrEvset, **kwargs
+        self, float_1: EventSetNodeOrEvset, int_1: EventSetNodeOrEvset, **kwargs
     ):
         # int node
         out = int_1 // 3
@@ -536,7 +586,7 @@ class MagicMethodsTest(absltest.TestCase):
         self.assertTrue(out.schema.features[1].name == "f2")
         self._check_node_same_dtype(float_1, out)
 
-    def test_multiply_scalar(self, float_1: NodeOrEvset, **kwargs):
+    def test_multiply_scalar(self, float_1: EventSetNodeOrEvset, **kwargs):
         out = 3 * float_1
         self.assertTrue(isinstance(out.creator, MultiplyScalarOperator))
         out = float_1 * 3
@@ -545,7 +595,7 @@ class MagicMethodsTest(absltest.TestCase):
         self.assertTrue(out.schema.features[1].name == "f2")
         self._check_node_same_dtype(float_1, out)
 
-    def test_subtract_scalar(self, float_1: NodeOrEvset, **kwargs):
+    def test_subtract_scalar(self, float_1: EventSetNodeOrEvset, **kwargs):
         out = 3 - float_1
         self.assertTrue(isinstance(out.creator, SubtractScalarOperator))
         out = float_1 - 3
@@ -554,7 +604,7 @@ class MagicMethodsTest(absltest.TestCase):
         self.assertTrue(out.schema.features[1].name == "f2")
         self._check_node_same_dtype(float_1, out)
 
-    def test_modulo_scalar(self, float_1: NodeOrEvset, **kwargs):
+    def test_modulo_scalar(self, float_1: EventSetNodeOrEvset, **kwargs):
         out = 3 % float_1
         self.assertTrue(isinstance(out.creator, ModuloScalarOperator))
         out = float_1 % 3
@@ -563,7 +613,7 @@ class MagicMethodsTest(absltest.TestCase):
         self.assertTrue(out.schema.features[1].name == "f2")
         self._check_node_same_dtype(float_1, out)
 
-    def test_power_scalar(self, float_1: NodeOrEvset, **kwargs):
+    def test_power_scalar(self, float_1: EventSetNodeOrEvset, **kwargs):
         out = 3**float_1
         self.assertTrue(isinstance(out.creator, PowerScalarOperator))
         out = float_1**3
@@ -575,12 +625,17 @@ class MagicMethodsTest(absltest.TestCase):
     # ########################
     # ### Unary operators  ###
     # ########################
-    def test_abs(self, float_1: NodeOrEvset, **kwargs):
+    def test_abs(self, float_1: EventSetNodeOrEvset, **kwargs):
         out = abs(float_1)
         self.assertTrue(isinstance(out.creator, AbsOperator))
         self._check_node_same_dtype(float_1, out)
 
-    def test_invert(self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs):
+    def test_invert(
+        self,
+        float_1: EventSetNodeOrEvset,
+        float_2: EventSetNodeOrEvset,
+        **kwargs,
+    ):
         # Should not work: invert non-boolean types
         with self.assertRaises(ValueError):
             _ = ~float_1
@@ -591,7 +646,10 @@ class MagicMethodsTest(absltest.TestCase):
         self._check_boolean(out, float_1)
 
     def test_no_truth_value(
-        self, float_1: NodeOrEvset, float_2: NodeOrEvset, **kwargs
+        self,
+        float_1: EventSetNodeOrEvset,
+        float_2: EventSetNodeOrEvset,
+        **kwargs,
     ):
         # Check that bool(node) doesn't work
         boolean_node = float_1 != float_2

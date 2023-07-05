@@ -19,7 +19,7 @@ from typing import Union, List
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
-from temporian.core.data.node import Node
+from temporian.core.data.node import EventSetNode
 from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.scalar.base import (
     BaseScalarOperator,
@@ -75,9 +75,9 @@ class LessScalarOperator(RelationalScalarOperator):
 
 @compile
 def equal_scalar(
-    input: Node,
+    input: EventSetNode,
     value: Union[float, int, str, bool],
-) -> Node:
+) -> EventSetNode:
     """Checks for equality between a node and a scalar element-wise.
 
     Each item in each feature in `input` is compared to `value`.
@@ -110,11 +110,11 @@ def equal_scalar(
         ```
 
     Args:
-        input: Node to compare the value to.
+        input: EventSetNode to compare the value to.
         value: Scalar value to compare to the input.
 
     Returns:
-        Node containing the result of the comparison.
+        EventSetNode containing the result of the comparison.
     """
     return EqualScalarOperator(
         input=input,
@@ -124,9 +124,9 @@ def equal_scalar(
 
 @compile
 def not_equal_scalar(
-    input: Node,
+    input: EventSetNode,
     value: Union[float, int, str, bool],
-) -> Node:
+) -> EventSetNode:
     """Checks for differences between a node and a scalar element-wise.
 
     Each item in each feature in `input` is compared to `value`.
@@ -156,11 +156,11 @@ def not_equal_scalar(
         ```
 
     Args:
-        input: Node to compare the value to.
+        input: EventSetNode to compare the value to.
         value: Scalar value to compare to the input.
 
     Returns:
-        Node containing the result of the comparison.
+        EventSetNode containing the result of the comparison.
     """
     return NotEqualScalarOperator(
         input=input,
@@ -170,9 +170,9 @@ def not_equal_scalar(
 
 @compile
 def greater_equal_scalar(
-    input: Node,
+    input: EventSetNode,
     value: Union[float, int, str, bool],
-) -> Node:
+) -> EventSetNode:
     """Check if the input node is greater or equal than a scalar element-wise.
 
     Each item in each feature in `input` is compared to `value`.
@@ -202,11 +202,11 @@ def greater_equal_scalar(
         ```
 
     Args:
-        input: Node to compare the value to.
+        input: EventSetNode to compare the value to.
         value: Scalar value to compare to the input.
 
     Returns:
-        Node containing the result of the comparison.
+        EventSetNode containing the result of the comparison.
     """
     return GreaterEqualScalarOperator(
         input=input,
@@ -216,9 +216,9 @@ def greater_equal_scalar(
 
 @compile
 def less_equal_scalar(
-    input: Node,
+    input: EventSetNode,
     value: Union[float, int, str, bool],
-) -> Node:
+) -> EventSetNode:
     """Check if the input node is less or equal than a scalar element-wise.
 
     Each item in each feature in `input` is compared to `value`.
@@ -248,11 +248,11 @@ def less_equal_scalar(
         ```
 
     Args:
-        input: Node to compare the value to.
+        input: EventSetNode to compare the value to.
         value: Scalar value to compare to the input.
 
     Returns:
-        Node containing the result of the comparison.
+        EventSetNode containing the result of the comparison.
     """
     return LessEqualScalarOperator(
         input=input,
@@ -262,9 +262,9 @@ def less_equal_scalar(
 
 @compile
 def greater_scalar(
-    input: Node,
+    input: EventSetNode,
     value: Union[float, int, str, bool],
-) -> Node:
+) -> EventSetNode:
     """Check if the input node is greater than a scalar element-wise.
 
     Each item in each feature in `input` is compared to `value`.
@@ -294,11 +294,11 @@ def greater_scalar(
         ```
 
     Args:
-        input: Node to compare the value to.
+        input: EventSetNode to compare the value to.
         value: Scalar value to compare to the input.
 
     Returns:
-        Node containing the result of the comparison.
+        EventSetNode containing the result of the comparison.
     """
     return GreaterScalarOperator(
         input=input,
@@ -308,9 +308,9 @@ def greater_scalar(
 
 @compile
 def less_scalar(
-    input: Node,
+    input: EventSetNode,
     value: Union[float, int, str, bool],
-) -> Node:
+) -> EventSetNode:
     """Check if the input node is less than a scalar element-wise.
 
     Each item in each feature in `input` is compared to `value`.
@@ -340,11 +340,11 @@ def less_scalar(
         ```
 
     Args:
-        input: Node to compare the value to.
+        input: EventSetNode to compare the value to.
         value: Scalar value to compare to the input.
 
     Returns:
-        Node containing the result of the comparison.
+        EventSetNode containing the result of the comparison.
     """
     return LessScalarOperator(
         input=input,

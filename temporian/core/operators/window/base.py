@@ -21,7 +21,7 @@ from typing import Optional
 from temporian.core.data.duration_utils import NormalizedDuration
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import (
-    Node,
+    EventSetNode,
     create_node_new_features_existing_sampling,
 )
 from temporian.core.data.schema import FeatureSchema
@@ -34,9 +34,9 @@ class BaseWindowOperator(Operator, ABC):
 
     def __init__(
         self,
-        input: Node,
+        input: EventSetNode,
         window_length: NormalizedDuration,
-        sampling: Optional[Node] = None,
+        sampling: Optional[EventSetNode] = None,
     ):
         super().__init__()
 

@@ -22,7 +22,7 @@ from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.duration_utils import Duration, normalize_duration
 from temporian.core.data.dtype import DType
-from temporian.core.data.node import Node
+from temporian.core.data.node import EventSetNode
 from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.window.base import BaseWindowOperator
 
@@ -41,10 +41,10 @@ operator_lib.register_operator(MovingSumOperator)
 
 @compile
 def moving_sum(
-    input: Node,
+    input: EventSetNode,
     window_length: Duration,
-    sampling: Optional[Node] = None,
-) -> Node:
+    sampling: Optional[EventSetNode] = None,
+) -> EventSetNode:
     """Computes the sum of values in a sliding window over the node.
 
     For each t in sampling, and for each feature independently, returns at time
@@ -86,7 +86,7 @@ def moving_sum(
             provided, timestamps in `input` are used.
 
     Returns:
-        Node containing the moving sum of each feature in `input`.
+        EventSetNode containing the moving sum of each feature in `input`.
     """
     return MovingSumOperator(
         input=input,
@@ -96,8 +96,8 @@ def moving_sum(
 
 
 def cumsum(
-    input: Node,
-) -> Node:
+    input: EventSetNode,
+) -> EventSetNode:
     """Cumulative Sum.
 
     Foreach timestamp, calculate the sum of the feature from the beginning.

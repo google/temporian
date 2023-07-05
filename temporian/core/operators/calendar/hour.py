@@ -16,7 +16,7 @@
 
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
-from temporian.core.data.node import Node
+from temporian.core.data.node import EventSetNode
 from temporian.core.operators.calendar.base import BaseCalendarOperator
 
 
@@ -34,7 +34,7 @@ operator_lib.register_operator(CalendarHourOperator)
 
 
 @compile
-def calendar_hour(sampling: Node) -> Node:
+def calendar_hour(sampling: EventSetNode) -> EventSetNode:
     """Obtains the hour the timestamps in a node's sampling are in.
 
     Features in the input node are ignored, only the timestamps are used and
@@ -61,7 +61,7 @@ def calendar_hour(sampling: Node) -> Node:
         ```
 
     Args:
-        sampling: Node to get the hours from.
+        sampling: EventSetNode to get the hours from.
 
     Returns:
         Single feature with the hour each timestamp in `sampling` belongs to.
