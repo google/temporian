@@ -21,7 +21,10 @@ from temporian.core.data.duration_utils import (
     NormalizedDuration,
     normalize_duration,
 )
-from temporian.core.data.node import Node, create_node_new_features_new_sampling
+from temporian.core.data.node import (
+    EventSetNode,
+    create_node_new_features_new_sampling,
+)
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
@@ -29,7 +32,7 @@ from temporian.proto import core_pb2 as pb
 class LagOperator(Operator):
     def __init__(
         self,
-        input: Node,
+        input: EventSetNode,
         duration: NormalizedDuration,
     ):
         super().__init__()
@@ -74,8 +77,8 @@ operator_lib.register_operator(LagOperator)
 
 
 @compile
-def lag(input: Node, duration: Duration) -> Node:
-    """Adds a delay to a Node's timestamps.
+def lag(input: EventSetNode, duration: Duration) -> EventSetNode:
+    """Adds a delay to an EventSetNode's timestamps.
 
     In other words, shifts the timestamp values forwards in time.
 

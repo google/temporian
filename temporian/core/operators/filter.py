@@ -19,13 +19,16 @@ from typing import Optional
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
-from temporian.core.data.node import Node, create_node_new_features_new_sampling
+from temporian.core.data.node import (
+    EventSetNode,
+    create_node_new_features_new_sampling,
+)
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
 class FilterOperator(Operator):
-    def __init__(self, input: Node, condition: Node):
+    def __init__(self, input: EventSetNode, condition: EventSetNode):
         super().__init__()
 
         # check that condition is a single feature
@@ -79,10 +82,10 @@ operator_lib.register_operator(FilterOperator)
 # pylint: disable=redefined-builtin
 @compile
 def filter(
-    input: Node,
-    condition: Optional[Node] = None,
-) -> Node:
-    """Filters out events in a Node for which a condition is false.
+    input: EventSetNode,
+    condition: Optional[EventSetNode] = None,
+) -> EventSetNode:
+    """Filters out events in an EventSetNode for which a condition is false.
 
     Each timestamp in `input` is only kept if the corresponding value for that
     timestamp in `condition` is `True`.
@@ -121,8 +124,8 @@ def filter(
         ```
 
     Args:
-        input: Node to filter.
-        condition: Node with a single boolean feature condition.
+        input: EventSetNode to filter.
+        condition: EventSetNode with a single boolean feature condition.
 
     Returns:
         Filtered input.

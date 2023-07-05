@@ -18,6 +18,8 @@ from temporian.core import evaluation
 from temporian.core.test import utils
 from temporian.implementation.numpy.data.event_set import EventSet
 
+import temporian as tp
+
 
 class EvaluationTest(absltest.TestCase):
     def test_schedule_trivial(self):
@@ -156,6 +158,21 @@ class EvaluationTest(absltest.TestCase):
 
         with self.assertRaises(ValueError):
             evaluation.run(i1, [evset_1, evset_2])
+
+    def test_has_leak(self):
+        a = tp.input_node([("f", float)])
+        b = tp.moving_sum(a, 5)
+        c = tp.leak(b, 5)
+        d = tp.prefix("something_", c)
+        e = tp.moving_sum(d, 2)
+
+        self.assertTrue(tp.has_leak(e))
+        self.assertTrue(tp.has_leak(e, a))
+        self.assertTrue(tp.has_leak([e], [a]))
+        self.assertTrue(tp.has_leak({"e": e}, {"a": a}))
+
+        self.assertFalse(tp.has_leak(e, c))
+        self.assertFalse(tp.has_leak(e, d))
 
 
 if __name__ == "__main__":

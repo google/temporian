@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Node and related classes."""
+"""EventSetNode and related classes."""
 
 from __future__ import annotations
 from dataclasses import dataclass
@@ -28,16 +28,16 @@ if TYPE_CHECKING:
     from temporian.core.operators.base import Operator
 
 
-class Node(EventSetOperationsMixin):
-    """A Node is a reference to the input/output of ops in a compute graph.
+class EventSetNode(EventSetOperationsMixin):
+    """A EventSetNode is a reference to the input/output of ops in a compute graph.
 
-    Use [`tp.input_node()`][temporian.input_node] to create a Node manually, or
-    use [`event_set.node()`][temporian.EventSet.node] to create a Node
+    Use [`tp.input_node()`][temporian.input_node] to create an EventSetNode manually, or
+    use [`event_set.node()`][temporian.EventSet.node] to create an EventSetNode
     compatible with a given [`EventSet`][temporian.EventSet].
 
-    A Node does not contain any data. Use
-    [`node.run()`][temporian.Node.run] to get the
-    [`EventSet`][temporian.EventSet] resulting from a [`Nodes`][temporian.Node].
+    A EventSetNode does not contain any data. Use
+    [`node.run()`][temporian.EventSetNode.run] to get the
+    [`EventSet`][temporian.EventSet] resulting from an [`EventSetNodes`][temporian.EventSetNode].
     """
 
     def __init__(
@@ -56,12 +56,12 @@ class Node(EventSetOperationsMixin):
 
     @property
     def schema(self) -> Schema:
-        """Schema of the Node.
+        """Schema of the EventSetNode.
 
         The schema defines the name and dtype of the features and the index.
 
         Returns:
-            Schema of the Node.
+            Schema of the EventSetNode.
         """
         return self._schema
 
@@ -71,7 +71,7 @@ class Node(EventSetOperationsMixin):
 
         Equality between sampling nodes is used to check that two nodes are
         sampled similarly. Use
-        [`node.check_same_sampling()`][temporian.Node.check_same_sampling]
+        [`node.check_same_sampling()`][temporian.EventSetNode.check_same_sampling]
         instead of `sampling_node`.
         """
         return self._sampling
@@ -87,9 +87,9 @@ class Node(EventSetOperationsMixin):
 
     @property
     def name(self) -> Optional[str]:
-        """Name of a Node.
+        """Name of an EventSetNode.
 
-        The name of a Node is used to facilitate debugging and to specify the
+        The name of an EventSetNode is used to facilitate debugging and to specify the
         input / output signature of a graph during graph import / export."""
         return self._name
 
@@ -101,8 +101,8 @@ class Node(EventSetOperationsMixin):
     def creator(self) -> Optional[Operator]:
         """Creator.
 
-        The creator is the operator that outputs this Node. Manually created
-        Nodes have a `None` creator.
+        The creator is the operator that outputs this EventSetNode. Manually created
+        EventSetNodes have a `None` creator.
         """
         return self._creator
 
@@ -126,19 +126,19 @@ class Node(EventSetOperationsMixin):
         """
         return self.schema.indexes
 
-    def check_same_sampling(self, other: Node):
-        """Checks if two Nodes have the same sampling."""
+    def check_same_sampling(self, other: EventSetNode):
+        """Checks if two EventSetNodes have the same sampling."""
 
         self.schema.check_compatible_index(other.schema)
         if self.sampling_node is not other.sampling_node:
             raise ValueError(
-                "Arguments should have the same sampling. "
-                f"{self.sampling_node} is different from "
-                f"{other.sampling_node}. To create input Nodes with the same "
-                "sampling, use the argument `same_sampling_as` of "
-                "`tp.input_node` or `tp.event_set`. To align the sampling of "
-                "two Nodes with same indexes but different sampling, use the "
-                "operator `tp.resample`."
+                "Arguments should have the same sampling."
+                f" {self.sampling_node} is different from"
+                f" {other.sampling_node}. To create input EventSetNodes with"
+                " the same sampling, use the argument `same_sampling_as` of"
+                " `tp.input_node` or `tp.event_set`. To align the sampling of"
+                " two EventSetNodes with same indexes but different sampling,"
+                " use the operator `tp.resample`."
             )
 
     def run(
@@ -147,7 +147,7 @@ class Node(EventSetOperationsMixin):
         verbose: int = 0,
         check_execution: bool = True,
     ) -> EvaluationResult:
-        """Evaluates the Node on the specified input.
+        """Evaluates the EventSetNode on the specified input.
 
         See [`tp.run()`][temporian.run] for details.
         """
@@ -161,7 +161,7 @@ class Node(EventSetOperationsMixin):
         )
 
     def __repr__(self) -> str:
-        """Human readable representation of a Node."""
+        """Human readable representation of an EventSetNode."""
 
         schema_print = string.indent(repr(self._schema))
         return (
@@ -178,12 +178,12 @@ def input_node(
     features: List[Tuple[str, DType]],
     indexes: Optional[List[Tuple[str, IndexDType]]] = None,
     is_unix_timestamp: bool = False,
-    same_sampling_as: Optional[Node] = None,
+    same_sampling_as: Optional[EventSetNode] = None,
     name: Optional[str] = None,
-) -> Node:
-    """Creates an input [`Node`][temporian.Node].
+) -> EventSetNode:
+    """Creates an input [`EventSetNode`][temporian.EventSetNode].
 
-    An input Node can be used to feed data into a graph.
+    An input EventSetNode can be used to feed data into a graph.
 
     Usage example:
 
@@ -209,13 +209,13 @@ def input_node(
             assumed not indexed.
         is_unix_timestamp: If true, the timestamps are interpreted as unix
             timestamps in seconds.
-        same_sampling_as: If set, the created Node is guaranteed to have the
+        same_sampling_as: If set, the created EventSetNode is guaranteed to have the
             same sampling as same_sampling_as`. In this case, `indexes` and
             `is_unix_timestamp` should not be provided. Some operators require
-            for input Nodes to have the same sampling.
+            for input EventSetNodes to have the same sampling.
 
     Returns:
-        Node with the given specifications.
+        EventSetNode with the given specifications.
     """
 
     if same_sampling_as is not None:
@@ -271,19 +271,19 @@ class Feature:
 
 def create_node_new_features_existing_sampling(
     features: Union[List[FeatureSchema], List[Tuple[str, DType]]],
-    sampling_node: Node,
+    sampling_node: EventSetNode,
     creator: Optional[Operator],
     name: Optional[str] = None,
-) -> Node:
-    """Creates a Node with an existing sampling and new features.
+) -> EventSetNode:
+    """Creates an EventSetNode with an existing sampling and new features.
 
-    When possible, this is the Node creation function to use.
+    When possible, this is the EventSetNode creation function to use.
     """
 
     # TODO: Use better way
     assert sampling_node is not None
     assert features is not None
-    assert isinstance(sampling_node, Node)
+    assert isinstance(sampling_node, EventSetNode)
     assert isinstance(features, List)
     assert (
         len(features) == 0
@@ -291,7 +291,7 @@ def create_node_new_features_existing_sampling(
         or isinstance(features[0], tuple)
     )
 
-    return Node(
+    return EventSetNode(
         schema=Schema(
             features=features,
             # The indexes and is_unix_timestamp are defined by the sampling.
@@ -313,8 +313,8 @@ def create_node_new_features_new_sampling(
     is_unix_timestamp: bool,
     creator: Optional[Operator],
     name: Optional[str] = None,
-) -> Node:
-    """Creates a Node with a new sampling and new features."""
+) -> EventSetNode:
+    """Creates an EventSetNode with a new sampling and new features."""
 
     # TODO: Use better way
     assert isinstance(features, List)
@@ -324,7 +324,7 @@ def create_node_new_features_new_sampling(
         or isinstance(features[0], tuple)
     )
 
-    return Node(
+    return EventSetNode(
         schema=Schema(
             features=features,
             indexes=indexes,
@@ -345,8 +345,8 @@ def create_node_with_new_reference(
     features: Optional[List[Feature]] = None,
     name: Optional[str] = None,
     creator: Optional[Operator] = None,
-) -> Node:
-    """Creates a Node with NEW features and NEW sampling.
+) -> EventSetNode:
+    """Creates an EventSetNode with NEW features and NEW sampling.
 
     If sampling is not specified, a new sampling is created.
     Similarly, if features is not specifies, new features are created.
@@ -359,7 +359,7 @@ def create_node_with_new_reference(
         features = [Feature(creator=creator) for _ in schema.features]
     assert len(features) == len(schema.features)
 
-    return Node(
+    return EventSetNode(
         schema=schema,
         sampling=sampling,
         features=features,

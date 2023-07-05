@@ -271,6 +271,20 @@ py_library(
 )
 
 py_library(
+    name = "join",
+    srcs = ["join.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:compilation",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:node",
+        "//temporian/core/data:schema",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+py_library(
     name = "timestamps",
     srcs = ["timestamps.py"],
     srcs_version = "PY3",
@@ -282,7 +296,7 @@ py_library(
         "//temporian/proto:core_py_proto",
     ],
 )
-    
+
 py_library(
     name = "enumerate",
     srcs = ["enumerate.py"],
@@ -295,4 +309,3 @@ py_library(
         "//temporian/proto:core_py_proto",
     ],
 )
-    

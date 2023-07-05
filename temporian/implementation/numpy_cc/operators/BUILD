@@ -23,6 +23,12 @@ pybind_library(
     hdrs = ["resample.h"],
 )
 
+pybind_library(
+    name = "join",
+    srcs = ["join.cc"],
+    hdrs = ["join.h"],
+)
+
 pybind_extension(
     name = "operators_cc",
     srcs = ["pyinit.cc"],
@@ -30,6 +36,7 @@ pybind_extension(
         ":resample",
         ":since_last",
         ":window",
+        ":join",
     ],
 )
 

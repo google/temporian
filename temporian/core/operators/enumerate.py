@@ -17,7 +17,7 @@
 
 from temporian.core import operator_lib
 from temporian.core.data.node import (
-    Node,
+    EventSetNode,
     create_node_new_features_existing_sampling,
 )
 from temporian.core.compilation import compile
@@ -27,7 +27,7 @@ from temporian.core.data import dtype
 
 
 class Enumerate(Operator):
-    def __init__(self, input: Node):
+    def __init__(self, input: EventSetNode):
         super().__init__()
 
         self.add_input("input", input)
@@ -57,7 +57,7 @@ operator_lib.register_operator(Enumerate)
 
 
 @compile
-def enumerate(input: Node) -> Node:
+def enumerate(input: EventSetNode) -> EventSetNode:
     """Create an `int64` feature with the ordinal position of each event.
 
     Each index is enumerated independently.
@@ -84,7 +84,7 @@ def enumerate(input: Node) -> Node:
         ```
 
     Args:
-        input: Node to enumerate.
+        input: EventSetNode to enumerate.
 
     Returns:
         Single feature with each event's ordinal position in index.

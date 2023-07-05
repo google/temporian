@@ -20,10 +20,11 @@ from temporian.core.operator_lib import registered_operators
 
 PUBLIC_API_SYMBOLS = {
     "EventSet",
-    "Node",
+    "EventSetNode",
     "Schema",
     "duration",
     "run",
+    "has_leak",
     "event_set",
     "input_node",
     "plot",
@@ -50,6 +51,7 @@ PUBLIC_API_SYMBOLS = {
     "enumerate",
     "filter",
     "glue",
+    "join",
     "add_index",
     "set_index",
     "lag",

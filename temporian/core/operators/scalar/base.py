@@ -18,7 +18,7 @@ from typing import Union, List
 
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import (
-    Node,
+    EventSetNode,
     create_node_new_features_existing_sampling,
 )
 from temporian.core.data.schema import FeatureSchema
@@ -33,7 +33,7 @@ class BaseScalarOperator(Operator):
 
     def __init__(
         self,
-        input: Node,
+        input: EventSetNode,
         value: Union[float, int, str, bool],
         is_value_first: bool = False,  # useful for non-commutative operators
     ):
@@ -48,8 +48,10 @@ class BaseScalarOperator(Operator):
         self.add_attribute("value", value)
         self.add_attribute("is_value_first", is_value_first)
 
-        if not isinstance(input, Node):
-            raise TypeError(f"Input must be of type Node but got {type(input)}")
+        if not isinstance(input, EventSetNode):
+            raise TypeError(
+                f"Input must be of type EventSetNode but got {type(input)}"
+            )
 
         # check that every dtype of input feature is equal to value dtype
         value_dtype = DType.from_python_type(type(value))

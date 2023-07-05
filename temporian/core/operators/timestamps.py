@@ -17,7 +17,7 @@
 
 from temporian.core import operator_lib
 from temporian.core.data.node import (
-    Node,
+    EventSetNode,
     create_node_new_features_existing_sampling,
 )
 from temporian.core.compilation import compile
@@ -27,7 +27,7 @@ from temporian.core.data import dtype
 
 
 class Timestamps(Operator):
-    def __init__(self, input: Node):
+    def __init__(self, input: EventSetNode):
         super().__init__()
 
         self.add_input("input", input)
@@ -57,7 +57,7 @@ operator_lib.register_operator(Timestamps)
 
 
 @compile
-def timestamps(input: Node) -> Node:
+def timestamps(input: EventSetNode) -> EventSetNode:
     """Converts the event timestamps into a `float64` feature.
 
     Features in the input node are ignored, only the timestamps are used.
@@ -113,7 +113,7 @@ def timestamps(input: Node) -> Node:
         ```
 
     Args:
-        input: Node to get the timestamps from.
+        input: EventSetNode to get the timestamps from.
 
     Returns:
         Single feature `timestamps` with each event's timestamp value.

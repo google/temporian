@@ -17,13 +17,16 @@
 
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
-from temporian.core.data.node import Node, create_node_new_features_new_sampling
+from temporian.core.data.node import (
+    EventSetNode,
+    create_node_new_features_new_sampling,
+)
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
 class UniqueTimestamps(Operator):
-    def __init__(self, input: Node):
+    def __init__(self, input: EventSetNode):
         super().__init__()
 
         self.add_input("input", input)
@@ -53,8 +56,8 @@ operator_lib.register_operator(UniqueTimestamps)
 
 
 @compile
-def unique_timestamps(input: Node) -> Node:
-    """Removes events with duplicated timestamps from a Node.
+def unique_timestamps(input: EventSetNode) -> EventSetNode:
+    """Removes events with duplicated timestamps from an EventSetNode.
 
     Returns a feature-less node where each timestamps from `input` only appears
     once. If the input is indexed, the unique operation is applied independently
@@ -75,10 +78,10 @@ def unique_timestamps(input: Node) -> Node:
         ...
 
     Args:
-        input: Node, possibly with features, to process.
+        input: EventSetNode, possibly with features, to process.
 
     Returns:
-        Node without features with unique timestamps in `input`.
+        EventSetNode without features with unique timestamps in `input`.
     """
 
     return UniqueTimestamps(input=input).outputs["output"]

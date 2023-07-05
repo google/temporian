@@ -17,16 +17,16 @@ syntax = "proto2";
 
 package temporian.proto;
 
-// A graph defines a set of processing operations and holds all Node,
+// A graph defines a set of processing operations and holds all EventSetNode,
 // Feature and Sampling instances.
 message Graph {
   repeated Operator operators = 1;
 
-  repeated Node nodes = 2;
+  repeated EventSetNode nodes = 2;
 
-  repeated Node.Feature features = 3;
+  repeated EventSetNode.Feature features = 3;
 
-  repeated Node.Sampling samplings = 4;
+  repeated EventSetNode.Sampling samplings = 4;
 
   repeated IOSignature inputs = 5;
 
@@ -48,15 +48,15 @@ message Operator {
   optional string operator_def_key = 2;
 
   // Input node ids by key.
-  repeated NodeArgument inputs = 3;
+  repeated EventSetNodeArgument inputs = 3;
 
   // Output node ids by key.
-  repeated NodeArgument outputs = 4;
+  repeated EventSetNodeArgument outputs = 4;
 
   // Constructor attributes.
   repeated Attribute attributes = 5;
 
-  message NodeArgument {
+  message EventSetNodeArgument {
     // Name of the argument.
     optional string key = 1;
 
@@ -101,7 +101,7 @@ enum DType {
 }
 
 // Connections between operators
-message Node {
+message EventSetNode {
   // Identifier of the node. Should be unique across all the nodes of the
   // graph.
   optional string id = 1;

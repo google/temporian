@@ -20,6 +20,7 @@ py_library(
         ":filter",
         ":glue",
         ":lag",
+        ":join",
         ":leak",
         ":prefix",
         ":propagate",
@@ -292,6 +293,21 @@ py_library(
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",
+    ],
+)
+
+py_library(
+    name = "join",
+    srcs = ["join.py"],
+    deps = [
+        # already_there/numpy
+        ":base",
+        "//temporian/core/data:duration_utils",
+        "//temporian/core/operators:join",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy:utils",
+        "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy_cc/operators:operators_cc",
     ],
 )
 
