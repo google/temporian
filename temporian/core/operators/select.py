@@ -102,17 +102,16 @@ def select(
 
     Usage example:
         ```python
-        >>> a_evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2],
         ...     features={"A": [1, 2], "B": ['s', 'm'], "C": [5.0, 5.5]},
         ... )
-        >>> a = a_evset.node()
 
         >>> # Select single feature
-        >>> b = a['B']
-        >>> # Equivalent
         >>> b = tp.select(a, 'B')
-        >>> b.run({a: a_evset})
+        >>> # Equivalent
+        >>> b = a['B']
+        >>> b
         indexes: []
         features: [('B', str_)]
         events:
@@ -122,10 +121,10 @@ def select(
         ...
 
         >>> # Select multiple features
-        >>> b = a[['B', 'C']]
+        >>> bc = tp.select(a, ['B', 'C'])
         >>> # Equivalent
-        >>> b = tp.select(a, ['B', 'C'])
-        >>> b.run({a: a_evset})
+        >>> bc = a[['B', 'C']]
+        >>> bc
         indexes: []
         features: [('B', str_), ('C', float64)]
         events:

@@ -110,42 +110,38 @@ def propagate(
 
     Example use case:
         ```python
-        >>> products_evset = tp.event_set(
+        >>> products = tp.event_set(
         ...     timestamps=[1, 2, 3, 1, 2, 3],
         ...     features={
         ...         "product": [1, 1, 1, 2, 2, 2],
         ...         "sales": [100., 200., 500., 1000., 2000., 5000.]
         ...     },
         ...     indexes=["product"],
-        ...     name="sales_per_product"
         ... )
-        >>> store_evset = tp.event_set(
+        >>> store = tp.event_set(
         ...     timestamps=[1, 2, 3, 4, 5],
         ...     features={
         ...         "sales": [10000., 20000., 30000., 5000., 1000.]
         ...     },
-        ...     name="sales_total_store"
         ... )
-        >>> products_node = products_evset.node()
-        >>> store_node = store_evset.node()
 
         >>> # First attempt: divide to calculate fraction of total store sales
-        >>> products_node / store_node
+        >>> products / store
         Traceback (most recent call last):
             ...
         ValueError: The indexes of input and sampling don't match. ...
 
         >>> # Second attempt: propagate index
-        >>> store_prop = tp.propagate(store_node, products_node)
-        >>> products_fraction = products_node / store_prop
+        >>> store_prop = tp.propagate(store, products)
+        >>> products / store_prop
         Traceback (most recent call last):
             ...
         ValueError: Arguments should have the same sampling. ...
 
         >>> # Third attempt: propagate + resample
-        >>> store_prop = tp.propagate(store_node, products_node, resample=True)
-        >>> products_fraction = products_node / store_prop
-        >>> products_fraction.run([products_evset, store_evset])
+        >>> store_resample = tp.propagate(store, products, resample=True)
+        >>> div = products / store_resample
+        >>> div
         indexes: [('product', int64)]
         features: [('div_sales_sales', float64)]
         events:

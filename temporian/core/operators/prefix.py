@@ -81,16 +81,15 @@ def prefix(
 
     Usage example:
         ```python
-        >>> a_evset = tp.event_set(
+        >>> a = tp.event_set(
         ...    timestamps=[0, 1],
         ...    features={"f1": [0, 2], "f2": [5, 6]}
         ... )
-        >>> a = a_evset.node()
         >>> b = a * 5
 
         >>> # Prefix before glue to avoid duplicated names
-        >>> result = tp.glue(tp.prefix("original_", a), tp.prefix("result_", b))
-        >>> result.run({a: a_evset})
+        >>> c = tp.glue(tp.prefix("original_", a), tp.prefix("result_", b))
+        >>> c
         indexes: ...
                 'original_f1': [0 2]
                 'original_f2': [5 6]
