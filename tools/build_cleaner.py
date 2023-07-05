@@ -6,7 +6,7 @@ add and remove.
 How to use the build cleaner.
 
     # Run the following command.
-    tools/build_cleaner.py
+    python tools/build_cleaner.py
 
 If case of a false positive, you might have to update the configuration fields
 BUILT_IN_MODULES, THIRD_PARTY_MODULES, or EXTRA_SOURCE_TO_RULE.
