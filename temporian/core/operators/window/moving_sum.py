@@ -58,16 +58,15 @@ def moving_sum(
     If the window does not contain any values (e.g., all the values are missing,
     or the window does not contain any sampling), outputs missing values.
 
-    Basic usage:
+    Example:
         ```python
-        >>> a_evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[0, 1, 2, 5, 6, 7],
         ...     features={"value": [np.nan, 1, 5, 10, 15, 20]},
         ... )
-        >>> a = a_evset.node()
 
-        >>> result = tp.moving_sum(a, tp.duration.seconds(4))
-        >>> result.run({a: a_evset})
+        >>> b = tp.moving_sum(a, tp.duration.seconds(4))
+        >>> b
         indexes: ...
             (6 events):
                 timestamps: [0. 1. 2. 5. 6. 7.]
@@ -108,6 +107,23 @@ def cumsum(
 
     While the feature does not have any values (e.g., missing initial values),
     outputs missing values.
+
+    Example:
+        ```python
+        >>> a = tp.event_set(
+        ...     timestamps=[0, 1, 2, 5, 6, 7],
+        ...     features={"value": [np.nan, 1, 5, 10, 15, 20]},
+        ... )
+
+        >>> b = tp.cumsum(a)
+        >>> b
+        indexes: ...
+            (6 events):
+                timestamps: [0. 1. 2. 5. 6. 7.]
+                'value': [ 0. 1.  6.  16.  31.  51.]
+        ...
+
+        ```
 
     Args:
         input: The node with features to accumulate.
