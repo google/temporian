@@ -86,7 +86,7 @@ def save(
         ValueError: If any of the received inputs is not of the specified types.
         ValueError: If the function doesn't return one of the specified types.
     """
-    if not fn.is_tp_compiled:
+    if not hasattr(fn, "is_tp_compiled") or not fn.is_tp_compiled:
         raise ValueError(
             "Can only save a function that has been compiled with"
             " `@tp.compile`."

@@ -214,6 +214,47 @@ class SerializationTest(absltest.TestCase):
 
         self.assertEqual(result, loaded_result)
 
+    def test_save_and_load_node_input(self):
+        @tp.compile
+        def f(x: EventSetNode):
+            return tp.prefix("a_", x)
+
+        evset = tp.event_set(
+            timestamps=[1.0, 2.0, 3.0],
+            features={"f1": [100.0, 200.0, 300.0]},
+        )
+        node = evset.node()
+        result = tp.run(f(node), {node: evset})
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(f, inputs={"x": node}, path=path)
+            input, output = tp.load_graph(path=path, squeeze=True)
+
+        loaded_result = tp.run(output, {input: evset})
+
+        self.assertEqual(result, loaded_result)
+
+    def test_save_and_load_schema_input(self):
+        @tp.compile
+        def f(x: EventSetNode):
+            return tp.prefix("a_", x)
+
+        evset = tp.event_set(
+            timestamps=[1.0, 2.0, 3.0],
+            features={"f1": [100.0, 200.0, 300.0]},
+        )
+        result = f(evset)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(f, inputs={"x": evset.schema}, path=path)
+            input, output = tp.load_graph(path=path, squeeze=True)
+
+        loaded_result = tp.run(output, {input: evset})
+
+        self.assertEqual(result, loaded_result)
+
     def test_save_and_load_many_inputs(self):
         @tp.compile
         def f(
@@ -275,6 +316,30 @@ class SerializationTest(absltest.TestCase):
 
         self.assertEqual(results["a"], loaded_results["a"])
         self.assertEqual(results["b"], loaded_results["b"])
+
+    def test_save_not_compiled(self):
+        def f(x: EventSetNode):
+            return tp.prefix("a_", x)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            with self.assertRaisesRegex(
+                ValueError, "Can only save a function that has been compiled"
+            ):
+                tp.save(f, inputs={"x": tp.event_set([1])}, path=path)
+
+    def test_save_wrong_input_types(self):
+        def f(x: EventSetNode, y: int):
+            return tp.prefix("a_", x)
+
+        f.is_tp_compiled = True  # hack to pass compiled check
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            with self.assertRaisesRegex(
+                ValueError, "The function's parameters can only be"
+            ):
+                tp.save(f, inputs={"x": tp.event_set([1]), "y": 3}, path=path)
 
 
 if __name__ == "__main__":
