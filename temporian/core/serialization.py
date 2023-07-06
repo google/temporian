@@ -42,7 +42,6 @@ from temporian.core.operators import base
 from temporian.core.data.dtype import DType
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.proto import core_pb2 as pb
-from temporian.core.operators.base import EventSetOrEventSetNode
 
 DTYPE_MAPPING = {
     DType.FLOAT64: pb.DType.DTYPE_FLOAT64,
@@ -56,35 +55,36 @@ INV_DTYPE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
 
 
 def save(
-    fn: Callable[
-        ..., Union[EventSetOrEventSetNode, Dict[str, EventSetOrEventSetNode]]
-    ],
-    inputs: Dict[str, Any],
+    fn: Callable[..., Union[EventSetNode, Dict[str, EventSetNode]]],
+    inputs: Dict[str, Union[EventSetNode, EventSet, Schema]],
     path: str,
 ) -> None:
     """Saves a compiled Temporian function to a file.
 
+    The saved function must only take arguments of type EventSetNode, and return
+    either a single EventSetNode or a dictionary of names to EventSetNodes.
+
     Temporian saves the graph built between the function's input and output
-    EventSets or EventSetNodes, not the function itself. Any arbitrary code that is
-    executed in the function will not be ran when loading it back up.
+    EventSets or EventSetNodes, not the function itself. Any arbitrary code that
+    is executed in the function will not be ran when loading it back up and
+    executing it.
 
-    The function can receive and return other arbitrary parameters, which will
-    be used to trace the function while saving it, but will not be available
-    when loading it back up.
-
-    The function must return an EventSet or EventSetNode or a dictionary mapping output
-    names to EventSets or EventSetNodes. If it returns a single one, the output will be
-    saved under the name "output" by default.
+    If you need to save a function that additionally takes other types of
+    arguments, try using `functools.partial` to create a new function that takes
+    only EventSetNodes, and save that instead.
 
     Args:
         fn: The function to save.
         inputs: The inputs to pass to the function to trace it, keyed by
-            parameter name. For EventSet/EventSetNode parameters, the passed value can
-            be either an EventSet, an EventSetNode, or a raw Schema.
+            parameter name. These values can be either EventSets, EventSetNodes,
+            or raw Schemas. In all cases, the values will be converted to
+            EventSetNodes before being passed to the function to trace it.
         path: The path to save the function to.
 
     Raises:
         ValueError: If the received function is not compiled.
+        ValueError: If any of the received inputs is not of the specified types.
+        ValueError: If the function doesn't return one of the specified types.
     """
     if not fn.is_tp_compiled:
         raise ValueError(
@@ -99,42 +99,41 @@ def save(
         )
 
     node_inputs = {}
-    inputs = inputs.copy()
     for k, v in inputs.items():
-        node_input = _process_fn_input(v)
-        if node_input is not None:
-            inputs[k] = node_input
-            node_inputs[k] = node_input
+        node_inputs[k] = _process_fn_input(v)
 
     # TODO: extensively check that returned types are the expected ones
-    outputs = fn(**inputs)
+    output = fn(**node_inputs)
 
-    if isinstance(outputs, EventSetNode):
-        outputs = {"output": outputs}
+    output = _process_fn_output(output)
 
-    if isinstance(outputs, dict):
-        if not all(isinstance(v, EventSetNode) for v in outputs.values()):
-            raise ValueError(
-                "The function must return a single EventSet or EventSetNode or"
-                " adictionary mapping output names to EventSets or"
-                " EventSetNodes."
-            )
-
-    save_graph(inputs=node_inputs, outputs=outputs, path=path)
+    save_graph(inputs=node_inputs, outputs=output, path=path)
 
 
-def _process_fn_input(input: Any) -> Optional[EventSetNode]:
-    # TODO: allow dicts and lists of stuff other than EventSet/EventSetNodes
-    if isinstance(input, (list, dict, tuple)):
-        raise ValueError(
-            "`tp.save` does not support collections in a function's input."
-        )
+def _process_fn_input(input: Any) -> EventSetNode:
     if isinstance(input, Schema):
         return create_node_with_new_reference(schema=input)
     if isinstance(input, EventSet):
         return input.node()
     if isinstance(input, EventSetNode):
         return input
+    raise ValueError(
+        "The function's parameters can only be either EventSets, EventSetNodes,"
+        " or Schemas to save it."
+    )
+
+
+def _process_fn_output(output: Any):
+    if isinstance(output, EventSetNode):
+        # TODO: add metadata to graph to return a single output in fn instead of dict with single key in this case
+        return {"output": output}
+    if isinstance(output, dict):
+        if all(isinstance(v, EventSetNode) for v in output.values()):
+            return output
+    raise ValueError(
+        "The function must return a single EventSetNode or a dictionary"
+        " mapping output names to EventSetNodes."
+    )
 
 
 def save_graph(
@@ -142,8 +141,8 @@ def save_graph(
     outputs: graph.NamedEventSetNodes,
     path: str,
 ) -> None:
-    """Saves the graph between `inputs` and `outputs` [`EventSetNodes`][temporian.EventSetNode]
-    to a file.
+    """Saves the graph between the `inputs` and `outputs`
+    [`EventSetNodes`][temporian.EventSetNode] to a file.
 
     Usage example:
         ```python

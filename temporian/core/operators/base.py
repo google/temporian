@@ -29,8 +29,8 @@ AttributeType = Union[
 ]
 
 # Generic type for defining the input/output types of operators.
-EventSetOrEventSetNode = TypeVar(
-    "EventSetOrEventSetNode", EventSet, EventSetNode
+EventSetOrNode = TypeVar(
+    "EventSetOrNode", EventSet, EventSetNode
 )
 
 

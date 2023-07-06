@@ -182,7 +182,9 @@ class SerializationTest(absltest.TestCase):
             tp.save_graph(
                 inputs={"a": input_node}, outputs={"b": output_node}, path=path
             )
-            loaded_inputs, loaded_outputs = tp.load_graph(path=path, squeeze=True)
+            loaded_inputs, loaded_outputs = tp.load_graph(
+                path=path, squeeze=True
+            )
 
         loaded_results = tp.run(loaded_outputs, {loaded_inputs: input_data})
 
@@ -214,18 +216,23 @@ class SerializationTest(absltest.TestCase):
 
     def test_save_and_load_many_inputs(self):
         @tp.compile
-        def f(x: EventSetNode, y: int, z: EventSetNode):
-            print(y)
-            return tp.glue(x, z)
+        def f(
+            x: EventSetNode, y: EventSetNode, z: EventSetNode
+        ) -> EventSetNode:
+            return tp.glue(x, y, z)
 
         x = tp.event_set(
             timestamps=[1.0, 2.0, 3.0],
             features={"f1": [100.0, 200.0, 300.0]},
         )
-        y = 3
+        y = tp.event_set(
+            timestamps=[1.0, 2.0, 3.0],
+            features={"f2": [1.0, 2.0, 3.0]},
+            same_sampling_as=x,
+        )
         z = tp.event_set(
             timestamps=[1.0, 2.0, 3.0],
-            features={"f2": [3.0, 5.0, 2.0]},
+            features={"f3": [3.0, 5.0, 2.0]},
             same_sampling_as=x,
         )
         result = f(x, y, z)
@@ -235,9 +242,11 @@ class SerializationTest(absltest.TestCase):
             tp.save(f, inputs={"x": x, "y": y, "z": z}, path=path)
             inputs, output = tp.load_graph(path=path, squeeze=True)
 
-        self.assertEqual(list(inputs.keys()), ["x", "z"])
+        self.assertEqual(list(inputs.keys()), ["x", "y", "z"])
 
-        loaded_result = tp.run(output, {inputs["x"]: x, inputs["z"]: z})
+        loaded_result = tp.run(
+            output, {inputs["x"]: x, inputs["y"]: y, inputs["z"]: z}
+        )
 
         self.assertEqual(result, loaded_result)
 

@@ -22,11 +22,7 @@ from temporian.implementation.numpy.data.event_set import EventSet
 # TODO: unify the fn's output type with run's EvaluationQuery, and add it to the
 # public API so it shows in the docs.
 # TODO: make compile change the fn's annotations to EventSetOrNode
-def compile(
-    fn: Callable[
-        ..., Union[EventSetNode, List[EventSetNode], Dict[str, EventSetNode]]
-    ]
-) -> Callable[..., Union[EventSet, List[EventSet], Dict[str, EventSet]]]:
+def compile(fn):
     """Compiles a Temporian function.
 
     A Temporian function is a function that takes EventSetNodes as arguments and
