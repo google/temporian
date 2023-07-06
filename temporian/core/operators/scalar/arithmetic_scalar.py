@@ -82,16 +82,15 @@ def add_scalar(
 
     Usage example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
         ...     features={"f1": [0, 100, 200], "f2": [10, -10, 5]}
         ... )
-        >>> a = evset.node()
 
         >>> # Equivalent
-        >>> c = tp.add_scalar(a, 3)
-        >>> c = a + 3
-        >>> c.run({a: evset})
+        >>> b = tp.add_scalar(a, 3)
+        >>> b = a + 3
+        >>> b
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'f1': [ 3 103 203]
@@ -127,16 +126,15 @@ def subtract_scalar(
 
     Usage example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
         ...     features={"f1": [0, 100, 200], "f2": [10, -10, 5]}
         ... )
-        >>> a = evset.node()
 
         >>> # Equivalent
-        >>> c = tp.subtract_scalar(a, 3)
-        >>> c = a - 3
-        >>> c.run({a: evset})
+        >>> b = tp.subtract_scalar(a, 3)
+        >>> b = a - 3
+        >>> b
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'f1': [ -3  97 197]
@@ -146,7 +144,7 @@ def subtract_scalar(
         >>> # Equivalent
         >>> c = tp.subtract_scalar(3, a)
         >>> c = 3 - a
-        >>> c.run({a: evset})
+        >>> c
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'f1': [ 3  -97 -197]
@@ -200,16 +198,15 @@ def multiply_scalar(
 
     Usage example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
         ...     features={"f1": [0, 100, 200], "f2": [10, -10, 5]}
         ... )
-        >>> a = evset.node()
 
         >>> # Equivalent
-        >>> c = tp.multiply_scalar(a, 2)
-        >>> c = a * 2
-        >>> c.run({a: evset})
+        >>> b = tp.multiply_scalar(a, 2)
+        >>> b = a * 2
+        >>> b
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'f1': [ 0 200 400]
@@ -245,16 +242,15 @@ def divide_scalar(
 
     Usage example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
         ...     features={"f1": [0., 100., 200.], "f2": [10., -10., 5.]}
         ... )
-        >>> a = evset.node()
 
         >>> # Equivalent
-        >>> c = tp.divide_scalar(a, 2)
-        >>> c = a / 2
-        >>> c.run({a: evset})
+        >>> b = tp.divide_scalar(a, 2)
+        >>> b = a / 2
+        >>> b
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'f1': [ 0. 50. 100.]
@@ -264,7 +260,7 @@ def divide_scalar(
         >>> # Equivalent
         >>> c = tp.divide_scalar(1000, a)
         >>> c = 1000 / a
-        >>> c.run({a: evset})
+        >>> c
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'f1': [inf 10. 5.]
@@ -321,16 +317,15 @@ def floordiv_scalar(
 
     Usage example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
         ...     features={"f1": [1, 100, 200], "f2": [10., -10., 5.]}
         ... )
-        >>> a = evset.node()
 
         >>> # Equivalent
-        >>> c = tp.floordiv_scalar(a, 3)
-        >>> c = a // 3
-        >>> c.run({a: evset})
+        >>> b = tp.floordiv_scalar(a, 3)
+        >>> b = a // 3
+        >>> b
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'f1': [ 0 33 66]
@@ -340,7 +335,7 @@ def floordiv_scalar(
         >>> # Equivalent
         >>> c = tp.floordiv_scalar(300, a)
         >>> c = 300 // a
-        >>> c.run({a: evset})
+        >>> c
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'f1': [300 3 1]
@@ -395,16 +390,15 @@ def modulo_scalar(
 
     Usage example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
         ...     features={"f1": [1, 100, 200], "f2": [10., -10., 5.]}
         ... )
-        >>> a = evset.node()
 
         >>> # Equivalent
-        >>> c = tp.modulo_scalar(a, 3)
-        >>> c = a % 3
-        >>> c.run({a: evset})
+        >>> b = tp.modulo_scalar(a, 3)
+        >>> b = a % 3
+        >>> b
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'f1': [1 1 2]
@@ -414,7 +408,7 @@ def modulo_scalar(
         >>> # Equivalent
         >>> c = tp.floordiv_scalar(300, a)
         >>> c = 300 % a
-        >>> c.run({a: evset})
+        >>> c
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'f1': [ 0 0 100]
@@ -469,16 +463,15 @@ def power_scalar(
 
     Usage example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
         ...     features={"f1": [0, 2, 3], "f2": [1., 2., 3.]}
         ... )
-        >>> a = evset.node()
 
         >>> # Equivalent
-        >>> c = tp.power_scalar(a, 3)
-        >>> c = a ** 3
-        >>> c.run({a: evset})
+        >>> b = tp.power_scalar(a, 3)
+        >>> b = a ** 3
+        >>> b
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'f1': [ 0 8 27]
@@ -488,7 +481,7 @@ def power_scalar(
         >>> # Equivalent
         >>> c = tp.power_scalar(3, a)
         >>> c = 3 ** a
-        >>> c.run({a: evset})
+        >>> c
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'f1': [ 1 9 27]
