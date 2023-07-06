@@ -177,7 +177,7 @@ def save_graph(
         ... )
 
         >>> # Load the graph
-        >>> inputs, outputs = tp.load(path=file_path)
+        >>> inputs, outputs = tp.load_graph(path=file_path)
 
         >>> # Evaluate reloaded graph
         >>> a_reloaded = inputs["input_node"]
@@ -209,7 +209,7 @@ def save_graph(
         f.write(text_format.MessageToBytes(proto))
 
 
-def load(
+def load_graph(
     path: str, squeeze: bool = False
 ) -> Tuple[
     Union[EventSetNode, Dict[str, EventSetNode]],

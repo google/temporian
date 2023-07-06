@@ -182,7 +182,7 @@ class SerializationTest(absltest.TestCase):
             tp.save_graph(
                 inputs={"a": input_node}, outputs={"b": output_node}, path=path
             )
-            loaded_inputs, loaded_outputs = tp.load(path=path, squeeze=True)
+            loaded_inputs, loaded_outputs = tp.load_graph(path=path, squeeze=True)
 
         loaded_results = tp.run(loaded_outputs, {loaded_inputs: input_data})
 
@@ -202,8 +202,8 @@ class SerializationTest(absltest.TestCase):
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_fn.tem")
             tp.save(f, inputs={"x": evset}, path=path)
-            input, output = tp.load(path=path, squeeze=True)
-            inputs, outputs = tp.load(path=path, squeeze=False)
+            input, output = tp.load_graph(path=path, squeeze=True)
+            inputs, outputs = tp.load_graph(path=path, squeeze=False)
 
         self.assertEqual(list(inputs.keys()), ["x"])
         self.assertEqual(list(outputs.keys()), ["output"])
@@ -233,7 +233,7 @@ class SerializationTest(absltest.TestCase):
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_fn.tem")
             tp.save(f, inputs={"x": x, "y": y, "z": z}, path=path)
-            inputs, output = tp.load(path=path, squeeze=True)
+            inputs, output = tp.load_graph(path=path, squeeze=True)
 
         self.assertEqual(list(inputs.keys()), ["x", "z"])
 
@@ -258,7 +258,7 @@ class SerializationTest(absltest.TestCase):
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_fn.tem")
             tp.save(f, inputs={"x": x}, path=path)
-            input, outputs = tp.load(path=path, squeeze=True)
+            input, outputs = tp.load_graph(path=path, squeeze=True)
 
         self.assertEqual(list(outputs.keys()), ["a", "b"])
 
