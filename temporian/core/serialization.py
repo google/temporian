@@ -56,8 +56,9 @@ INV_DTYPE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
 
 def save(
     fn: Callable[..., Union[EventSetNode, Dict[str, EventSetNode]]],
-    inputs: Dict[str, Union[EventSetNode, EventSet, Schema]],
     path: str,
+    *args: Union[EventSetNode, EventSet, Schema],
+    **kwargs: Union[EventSetNode, EventSet, Schema],
 ) -> None:
     """Saves a compiled Temporian function to a file.
 
@@ -92,18 +93,13 @@ def save(
             " `@tp.compile`."
         )
 
-    if not isinstance(inputs, dict):
-        raise ValueError(
-            "`inputs` must be a dictionary mapping the function's parameter"
-            " names to their corresponding values."
-        )
-
-    node_inputs = {}
-    for k, v in inputs.items():
-        node_inputs[k] = _process_fn_input(v)
+    # TODO: construct inputs dict from args and kwargs (merge args and kwargs)
+    # merge args and kwargs based on fn's signature
+    node_args = [_process_fn_input(arg) for arg in args]
+    node_kwargs = {k: _process_fn_input(v) for k, v in kwargs.items()}
 
     # TODO: extensively check that returned types are the expected ones
-    output = fn(**node_inputs)
+    output = fn(*node_args, **node_kwargs)
 
     output = _process_fn_output(output)
 
