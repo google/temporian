@@ -50,7 +50,7 @@ class Join(Operator):
             self.add_attribute("on", on)
         self._on = on
 
-        left.schema.check_compatible_index(right.schema, "left and right")
+        left.schema.check_compatible_index(right.schema)
 
         if how not in [JOIN_LEFT]:
             raise ValueError(

@@ -41,9 +41,7 @@ class SinceLast(Operator):
             self.add_input("sampling", sampling)
             self._has_sampling = True
             effective_sampling_node = sampling
-            input.schema.check_compatible_index(
-                sampling.schema, "input and sampling"
-            )
+            input.schema.check_compatible_index(sampling.schema)
 
         else:
             effective_sampling_node = input
