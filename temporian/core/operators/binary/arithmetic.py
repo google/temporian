@@ -101,75 +101,67 @@ def add(
 
     Basic example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
         ...     features={"f1": [0, 100, 200], "f2": [10, -10, 5]}
         ... )
-        >>> source = evset.node()
-        >>> a = source[["f1", "f2"]]
-        >>> b = source[["f2", "f1"]]  # Reverse order
+        >>> b = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f3": [-1, 1, 2], "f4": [1, -1, 5]},
+        ...     same_sampling_as=a
+        ... )
 
         >>> # Equivalent
         >>> c = tp.add(a, b)
         >>> c = a + b
-
-        >>> c.run({source: evset})
+        >>> c
         indexes: []
-        features: [('add_f1_f2', int64), ('add_f2_f1', int64)]
+        features: [('add_f1_f3', int64), ('add_f2_f4', int64)]
         events:
             (3 events):
                 timestamps: [1. 2. 3.]
-                'add_f1_f2': [ 10 90 205]
-                'add_f2_f1': [ 10 90 205]
+                'add_f1_f3': [ -1 101 202]
+                'add_f2_f4': [ 11 -11 10]
         ...
 
         ```
 
     Cast dtypes example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 100, 200], "f2": [-30.0, 10.0, 5.0]}
+        ...     features={"f1": [0, 100, 200], "f2": [10., -10., 5.]}
         ... )
-        >>> source = evset.node()
 
-        >>> # a is int64 but b is float64
-        >>> a = source["f1"]
-        >>> b = source["f2"]
-
-        >>> # Cannot add different dtypes
-        >>> c = a + b
+        >>> # Cannot add: f1 is int64 but f2 is float64
+        >>> c = a["f1"] + a["f2"]
         Traceback (most recent call last):
             ...
         ValueError: ... corresponding features should have the same dtype. ...
 
         >>> # Cast f1 to float
-        >>> c = tp.cast(a, tp.float64) + b
-        >>> c.run({source: evset})
+        >>> c = tp.cast(a["f1"], float) + a["f2"]
+        >>> c
         indexes: []
         features: [('add_f1_f2', float64)]
         events:
             (3 events):
                 timestamps: [1. 2. 3.]
-                'add_f1_f2': [-30. 110. 205.]
+                'add_f1_f2': [ 10. 90. 205.]
         ...
 
         ```
 
     Resample example:
         ```python
-        >>> a_evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
         ...     features={"fa": [1, 2, 3]},
-        ...     name="sample_a"
         ... )
-        >>> b_evset = tp.event_set(
+        >>> b = tp.event_set(
         ...     timestamps=[-1, 1.5, 3, 5],
         ...     features={"fb": [-10, 15, 30, 50]},
-        ...     name="sample_b"
         ... )
-        >>> a = a_evset.node()
-        >>> b = b_evset.node()
 
         >>> # Cannot add different samplings
         >>> c = a + b
@@ -178,9 +170,8 @@ def add(
         ValueError: ... should have the same sampling. ...
 
         >>> # Resample a to match b timestamps
-        >>> a_resampled = tp.resample(a, sampling=b)
-        >>> c = a_resampled + b
-        >>> c.run([a_evset, b_evset])
+        >>> c = tp.resample(a, sampling=b) + b
+        >>> c
         indexes: []
         features: [('add_fa_fb', int64)]
         events:
@@ -193,41 +184,42 @@ def add(
 
     Reindex example:
         ```python
-        >>> a_evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3, 4],
         ...     features={
-        ...         "f1": [1, 1, 1, 1],
-        ...         "f2": [1, 2, 3, 4],
-        ...         "f3": [10, 20, 30, 40]
+        ...         "cat": [1, 1, 2, 2],
+        ...         "M": [10, 20, 30, 40]
         ...     },
-        ...     indexes=["f1", "f2"]
+        ...     indexes=["cat"]
         ... )
-        >>> b_evset = tp.event_set(
+        >>> b = tp.event_set(
         ...     timestamps=[1, 2, 3, 4],
         ...     features={
-        ...         "f1": [1, 1, 1, 1],
-        ...         "f2": [5, 6, 7, 8],
-        ...         "f3": [10, 20, 30, 40]
+        ...         "cat": [1, 1, 2, 2],
+        ...         "N": [10, 20, 30, 40]
         ...     },
-        ...     indexes=["f1", "f2"]
         ... )
-        >>> a = a_evset.node()
-        >>> b = b_evset.node()
 
-        >>> # Get f3 per f1
-        >>> a_f1 = tp.drop_index(a, "f2")
-        >>> b_f1 = tp.drop_index(b, "f2")
+        >>> # Cannot add with different index (only 'a' is indexed by 'cat')
+        >>> c = a + b
+        Traceback (most recent call last):
+            ...
+        ValueError: Arguments don't have the same index. ...
 
-        >>> # We also need to explicit same samplings
-        >>> b_f1 = tp.resample(b_f1, a_f1)
-
-        >>> c = a_f1["f3"] + b_f1["f3"]
-
-        >>> c.run({a: a_evset, b: b_evset})
-        indexes: [('f1', int64)]
-        ...
-                timestamps: [1. 2. 3. 4.]
-                'add_f3_f3': [20 40 60 80]
+        >>> # Add index 'cat' to b
+        >>> b = tp.add_index(b, "cat")
+        >>> # Make explicit same samplings and add
+        >>> c = a + tp.resample(b, a)
+        >>> c
+        indexes: [('cat', int64)]
+        features: [('add_M_N', int64)]
+        events:
+            cat=1 (2 events):
+                timestamps: [1. 2.]
+                'add_M_N': [20 40]
+            cat=2 (2 events):
+                timestamps: [3. 4.]
+                'add_M_N': [60 80]
         ...
 
         ```
@@ -258,21 +250,22 @@ def subtract(
     `input_1` and `input_2` must have the same sampling, index,
     number of features and dtype for the features in the same positions.
 
-    Basic example:
+    Example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 100, 200], "f2": [10, 20, -5]}
+        ...     features={"f1": [0, 100, 200]}
         ... )
-        >>> source = evset.node()
-        >>> a = source["f1"]
-        >>> b = source["f2"]
+        >>> b = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f2": [10, 20, -5]},
+        ...     same_sampling_as=a
+        ... )
 
         >>> # Equivalent
         >>> c = tp.subtract(a, b)
         >>> c = a - b
-
-        >>> c.run({source: evset})
+        >>> c
         indexes: []
         features: [('sub_f1_f2', int64)]
         events:
@@ -312,21 +305,22 @@ def multiply(
     `input_1` and `input_2` must have the same sampling, index,
     number of features and dtype for the features in the same positions.
 
-    Basic example:
+    Example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 100, 200], "f2": [10, 3, 2]}
+        ...     features={"f1": [0, 100, 200]}
         ... )
-        >>> source = evset.node()
-        >>> a = source["f1"]
-        >>> b = source["f2"]
+        >>> b = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f2": [10, 3, 2]},
+        ...     same_sampling_as=a
+        ... )
 
         >>> # Equivalent
         >>> c = tp.multiply(a, b)
         >>> c = a * b
-
-        >>> c.run({source: evset})
+        >>> c
         indexes: []
         features: [('mult_f1_f2', int64)]
         events:
@@ -372,19 +366,20 @@ def divide(
 
     Basic example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0.0, 100.0, 200.0], "f2": [10.0, 20.0, 50.0]}
+        ...     features={"f1": [0.0, 100.0, 200.0]}
         ... )
-        >>> source = evset.node()
-        >>> a = source["f1"]
-        >>> b = source["f2"]
+        >>> b = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f2": [10.0, 20.0, 50.0]},
+        ...     same_sampling_as=a
+        ... )
 
         >>> # Equivalent
         >>> c = tp.divide(a, b)
         >>> c = a / b
-
-        >>> c.run({source: evset})
+        >>> c
         indexes: []
         features: [('div_f1_f2', float64)]
         events:
@@ -397,15 +392,15 @@ def divide(
 
     Casting integer features:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 100, 200], "f2": [10, 20, 50]}
+        ...     features={"f1": [0, 100, 200]}
         ... )
-        >>> source = evset.node()
-
-        >>> # Both features are int64
-        >>> a = source["f1"]
-        >>> b = source["f2"]
+        >>> b = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f2": [10, 20, 50]},
+        ...     same_sampling_as=a
+        ... )
 
         >>> # Cannot divide int64 features
         >>> c = a / b
@@ -415,7 +410,7 @@ def divide(
 
         >>> # Cast to tp.float64 or tp.float32 before
         >>> c = tp.cast(a, float) / tp.cast(b, float)
-        >>> c.run({source: evset})
+        >>> c
         indexes: []
         features: [('div_f1_f2', float64)]
         events:
@@ -460,19 +455,20 @@ def floordiv(
 
     Basic example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 100, 200], "f2": [10, 3, 150]}
+        ...     features={"f1": [0, 100, 200]}
         ... )
-        >>> source = evset.node()
-        >>> a = source["f1"]
-        >>> b = source["f2"]
+        >>> b = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f2": [10, 3, 150]},
+        ...     same_sampling_as=a
+        ... )
 
         >>> # Equivalent
         >>> c = tp.floordiv(a, b)
         >>> c = a // b
-
-        >>> c.run({source: evset})
+        >>> c
         indexes: []
         features: [('floordiv_f1_f2', int64)]
         events:
@@ -512,19 +508,20 @@ def modulo(
 
     Basic example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 7, 200], "f2": [10, 5, 150]}
+        ...     features={"f1": [0, 7, 200]}
         ... )
-        >>> source = evset.node()
-        >>> a = source["f1"]
-        >>> b = source["f2"]
+        >>> b = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f2": [10, 5, 150]},
+        ...     same_sampling_as=a
+        ... )
 
         >>> # Equivalent
         >>> c = tp.modulo(a, b)
         >>> c = a % b
-
-        >>> c.run({source: evset})
+        >>> c
         indexes: []
         features: [('mod_f1_f2', int64)]
         events:
@@ -566,19 +563,20 @@ def power(
 
     Basic example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [5, 2, 4], "f2": [0, 3, 2]}
+        ...     features={"f1": [5, 2, 4]}
         ... )
-        >>> source = evset.node()
-        >>> a = source["f1"]
-        >>> b = source["f2"]
+        >>> b = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f2": [0, 3, 2]},
+        ...     same_sampling_as=a
+        ... )
 
         >>> # Equivalent
         >>> c = tp.power(a, b)
         >>> c = a ** b
-
-        >>> c.run({source: evset})
+        >>> c
         indexes: []
         features: [('pow_f1_f2', int64)]
         events:
