@@ -44,11 +44,11 @@ def calendar_day_of_month(sampling: EventSetNode) -> EventSetNode:
 
     Usage example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...    timestamps=["2023-02-04", "2023-02-20", "2023-03-01", "2023-05-07"],
-        ...    name='special_events'
         ... )
-        >>> tp.calendar_day_of_month(evset.node()).run(evset)
+        >>> b = tp.calendar_day_of_month(a)
+        >>> b
         indexes: ...
         features: [('calendar_day_of_month', int32)]
         events:
