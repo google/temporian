@@ -61,15 +61,14 @@ def end(input: EventSetNode) -> EventSetNode:
 
     Usage example:
         ```python
-        >>> a_evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[5, 6, 7, 1],
         ...     features={"f": [50, 60, 70, 10], "idx": [1, 1, 1, 2]},
         ...     indexes=["idx"]
         ... )
-        >>> a = a_evset.node()
 
         >>> a_end = tp.end(a)
-        >>> a_end.run({a: a_evset})
+        >>> a_end
         indexes: [('idx', int64)]
         features: []
         events:

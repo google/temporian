@@ -55,16 +55,15 @@ def moving_min(
     If the window does not contain any values (e.g., all the values are missing,
     or the window does not contain any sampling), outputs missing values.
 
-    Basic usage:
+    Example:
         ```python
-        >>> a_evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[0, 1, 2, 5, 6, 7],
         ...     features={"value": [np.nan, 1, 5, 10, 15, 20]},
         ... )
-        >>> a = a_evset.node()
 
-        >>> result = tp.moving_min(a, tp.duration.seconds(4))
-        >>> result.run({a: a_evset})
+        >>> b = tp.moving_min(a, tp.duration.seconds(4))
+        >>> b
         indexes: ...
             (6 events):
                 timestamps: [0. 1. 2. 5. 6. 7.]

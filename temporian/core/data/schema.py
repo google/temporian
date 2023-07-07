@@ -109,12 +109,10 @@ class Schema:
         )
         return r
 
-    def check_compatible_index(
-        self, other: Schema, label: str = "input and sampling"
-    ):
+    def check_compatible_index(self, other: Schema):
         if self.indexes != other.indexes:
             raise ValueError(
-                f"The indexes of {label} don't match. {self.indexes} !="
+                f"Arguments don't have the same index. {self.indexes} !="
                 f" {other.indexes}"
             )
 

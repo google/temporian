@@ -44,7 +44,9 @@ class JoinOperatorTest(absltest.TestCase):
         input_2 = input_node(
             [("b", DType.FLOAT64)], indexes=[("x", DType.STRING)]
         )
-        with self.assertRaisesRegex(ValueError, "don't match"):
+        with self.assertRaisesRegex(
+            ValueError, "Arguments don't have the same index"
+        ):
             _ = join(input_1, input_2)
 
     def test_wrong_join(self):

@@ -166,7 +166,7 @@ def drop_index(
 
     Usage example:
         ```python
-        >>> a_evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 1, 0, 1, 1],
         ...     features={
         ...         "f1": [1, 1, 1, 2, 2, 2],
@@ -175,10 +175,9 @@ def drop_index(
         ...     },
         ...     indexes=["f1", "f2"]
         ... )
-        >>> a = a_evset.node()
 
         >>> # Both f1 and f2 are indices
-        >>> a_evset
+        >>> a
         indexes: [('f1', int64), ('f2', int64)]
         features: [('f3', int64)]
         events:
@@ -197,8 +196,8 @@ def drop_index(
         ...
 
         >>> # Drop "f2", remove it from features
-        >>> result = tp.drop_index(a, "f2", keep=False)
-        >>> result.run({a: a_evset})
+        >>> b = tp.drop_index(a, "f2", keep=False)
+        >>> b
         indexes: [('f1', int64)]
         features: [('f3', int64)]
         events:
@@ -211,8 +210,8 @@ def drop_index(
         ...
 
         >>> # Drop both indices, keep them as features
-        >>> result = tp.drop_index(a, ["f2", "f1"])
-        >>> result.run({a: a_evset})
+        >>> b = tp.drop_index(a, ["f2", "f1"])
+        >>> b
         indexes: []
         features: [('f3', int64), ('f2', int64), ('f1', int64)]
         events:

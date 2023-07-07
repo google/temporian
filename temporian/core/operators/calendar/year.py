@@ -42,11 +42,12 @@ def calendar_year(sampling: EventSetNode) -> EventSetNode:
 
     Usage example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...    timestamps=["2021-02-04", "2022-02-20", "2023-03-01", "2023-05-07"],
         ...    name='random_moments'
         ... )
-        >>> tp.calendar_year(evset.node()).run(evset)
+        >>> b = tp.calendar_year(a)
+        >>> b
         indexes: ...
         features: [('calendar_year', int32)]
         events:

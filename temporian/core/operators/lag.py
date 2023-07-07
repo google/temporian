@@ -84,14 +84,13 @@ def lag(input: EventSetNode, duration: Duration) -> EventSetNode:
 
     Usage example:
         ```python
-        >>> a_evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[0, 1, 5, 6],
         ...     features={"value": [0, 1, 5, 6]},
         ... )
-        >>> a = a_evset.node()
 
-        >>> result = tp.lag(a, tp.duration.seconds(2))
-        >>> result.run({a: a_evset})
+        >>> b = tp.lag(a, tp.duration.seconds(2))
+        >>> b
         indexes: ...
             (4 events):
                 timestamps: [2. 3. 7. 8.]

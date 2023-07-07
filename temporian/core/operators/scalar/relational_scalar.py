@@ -85,19 +85,18 @@ def equal_scalar(
 
     Usage example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
         ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
         ... )
-        >>> a = evset.node()
 
         >>> # WARN: Don't use this for element-wise comparison
         >>> a == 100
         False
 
         >>> # Element-wise comparison
-        >>> c = tp.equal_scalar(a, 100)
-        >>> c.run({a: evset})
+        >>> b = tp.equal_scalar(a, 100)
+        >>> b
         indexes: []
         features: [('f1', bool_), ('f2', bool_)]
         events:
@@ -134,16 +133,15 @@ def not_equal_scalar(
 
     Usage example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
         ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
         ... )
-        >>> a = evset.node()
 
         >>> # Equivalent
-        >>> c = tp.not_equal_scalar(a, 100)
-        >>> c = a != 100
-        >>> c.run({a: evset})
+        >>> b = tp.not_equal_scalar(a, 100)
+        >>> b = a != 100
+        >>> b
         indexes: []
         features: [('f1', bool_), ('f2', bool_)]
         events:
@@ -180,16 +178,15 @@ def greater_equal_scalar(
 
     Usage example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
         ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
         ... )
-        >>> a = evset.node()
 
         >>> # Equivalent
-        >>> c = tp.greater_equal_scalar(a, 100)
-        >>> c = a >= 100
-        >>> c.run({a: evset})
+        >>> b = tp.greater_equal_scalar(a, 100)
+        >>> b = a >= 100
+        >>> b
         indexes: []
         features: [('f1', bool_), ('f2', bool_)]
         events:
@@ -226,16 +223,15 @@ def less_equal_scalar(
 
     Usage example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
         ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
         ... )
-        >>> a = evset.node()
 
         >>> # Equivalent
-        >>> c = tp.less_equal_scalar(a, 100)
-        >>> c = a <= 100
-        >>> c.run({a: evset})
+        >>> b = tp.less_equal_scalar(a, 100)
+        >>> b = a <= 100
+        >>> b
         indexes: []
         features: [('f1', bool_), ('f2', bool_)]
         events:
@@ -272,16 +268,15 @@ def greater_scalar(
 
     Usage example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
         ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
         ... )
-        >>> a = evset.node()
 
         >>> # Equivalent
-        >>> c = tp.greater_scalar(a, 100)
-        >>> c = a > 100
-        >>> c.run({a: evset})
+        >>> b = tp.greater_scalar(a, 100)
+        >>> b = a > 100
+        >>> b
         indexes: []
         features: [('f1', bool_), ('f2', bool_)]
         events:
@@ -318,16 +313,15 @@ def less_scalar(
 
     Usage example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
         ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
         ... )
-        >>> a = evset.node()
 
         >>> # Equivalent
-        >>> c = tp.less_scalar(a, 100)
-        >>> c = a < 100
-        >>> c.run({a: evset})
+        >>> b = tp.less_scalar(a, 100)
+        >>> b = a < 100
+        >>> b
         indexes: []
         features: [('f1', bool_), ('f2', bool_)]
         events:

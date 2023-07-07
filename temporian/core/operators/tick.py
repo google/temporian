@@ -94,11 +94,9 @@ def tick(
 
     Example with align:
         ```python
-        >>> a_evset = tp.event_set(timestamps=[5, 9, 16])
-        >>> a = a_evset.node()
-
-        >>> result = tp.tick(a, interval=tp.duration.seconds(3), align=True)
-        >>> result.run({a: a_evset})
+        >>> a = tp.event_set(timestamps=[5, 9, 16])
+        >>> b = tp.tick(a, interval=tp.duration.seconds(3), align=True)
+        >>> b
         indexes: ...
                 timestamps: [ 6. 9. 12. 15.]
         ...
@@ -107,11 +105,9 @@ def tick(
 
     Example without align:
         ```python
-        >>> a_evset = tp.event_set(timestamps=[5, 9, 16])
-        >>> a = a_evset.node()
-
-        >>> result = tp.tick(a, interval=tp.duration.seconds(3), align=False)
-        >>> result.run({a: a_evset})
+        >>> a = tp.event_set(timestamps=[5, 9, 16])
+        >>> b = tp.tick(a, interval=tp.duration.seconds(3), align=False)
+        >>> b
         indexes: ...
                 timestamps: [ 5. 8. 11. 14.]
         ...

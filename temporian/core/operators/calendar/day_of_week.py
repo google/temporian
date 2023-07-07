@@ -44,11 +44,11 @@ def calendar_day_of_week(sampling: EventSetNode) -> EventSetNode:
 
     Usage example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...    timestamps=["2023-06-19", "2023-06-21", "2023-06-25", "2023-07-03"],
-        ...    name='two_mondays'
         ... )
-        >>> tp.calendar_day_of_week(evset.node()).run(evset)
+        >>> b = tp.calendar_day_of_week(a)
+        >>> b
         indexes: ...
         features: [('calendar_day_of_week', int32)]
         events:
