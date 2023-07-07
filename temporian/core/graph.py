@@ -14,6 +14,7 @@
 
 """Graph class definition and inference logic."""
 
+from __future__ import annotations
 from typing import List, Set, Dict, Union, Optional
 
 from temporian.core.data.node import EventSetNode, Feature, Sampling
@@ -160,6 +161,31 @@ class Graph:
         else:
             p3("Output", self.outputs)
         return s
+
+    def apply_on_inputs(
+        self, inputs: Dict[str, EventSetNode]
+    ) -> Dict[str, EventSetNode]:
+        """Applies the operators in this graph to new named inputs.
+
+        Returns:
+            A dictionary of named outputs.
+        """
+        assert self.named_inputs is not None
+        assert self.named_outputs is not None
+        for name, new_node in inputs.items():
+            if name not in self.named_inputs:
+                raise ValueError(
+                    f"Input node {name} is not in the graph's inputs. Inputs:"
+                    f" {self.named_inputs}"
+                )
+            old_node = self.named_inputs[name]
+            # Replace node as input in all operators that depend on it
+            for operator in self.operators:
+                for name, inp in operator.inputs.items():
+                    if inp == old_node:
+                        operator.inputs[name] = new_node
+            self.named_inputs[name] = new_node
+        return self.named_outputs
 
 
 def infer_graph_named_nodes(

@@ -26,6 +26,15 @@ from temporian.implementation.numpy.data.io import event_set
 
 
 class SerializationTest(absltest.TestCase):
+    def setUp(self):
+        self.evset = tp.event_set(
+            timestamps=[1, 2, 3],
+            features={
+                "x": [1.0, 2.0, 3.0],
+                "y": [4.0, 5.0, 6.0],
+            },
+        )
+
     def test_serialize(self):
         i1 = utils.create_input_node()
         o2 = utils.OpI1O1(i1)
@@ -163,19 +172,15 @@ class SerializationTest(absltest.TestCase):
             & serialization._all_identifiers(restored.named_outputs.values())
         )
 
-    def test_save_graph_and_load(self):
-        input_data = tp.event_set(
-            timestamps=[1, 2, 3], features={"x": [1, 2, 3], "y": [4, 5, 6]}
-        )
-
-        input_node = input_data.node()
+    def test_save_graph_and_load_graph(self):
+        input_node = self.evset.node()
         x = input_node
         x = tp.cast(x, float)
         x = x["x"]
         x = 2 * x
         output_node = x
 
-        result = tp.run(output_node, {input_node: input_data})
+        result = tp.run(output_node, {input_node: self.evset})
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_graph.tem")
@@ -186,31 +191,27 @@ class SerializationTest(absltest.TestCase):
                 path=path, squeeze=True
             )
 
-        loaded_results = tp.run(loaded_outputs, {loaded_inputs: input_data})
+        loaded_results = tp.run(loaded_outputs, {loaded_inputs: self.evset})
 
         self.assertEqual(result, loaded_results)
 
-    def test_save_and_load(self):
+    def test_save(self):
         @tp.compile
         def f(x: EventSetNode):
             return tp.prefix("a_", x)
 
-        evset = tp.event_set(
-            timestamps=[1.0, 2.0, 3.0],
-            features={"f1": [100.0, 200.0, 300.0]},
-        )
-        result = f(evset)
+        result = f(self.evset)
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_fn.tem")
-            tp.save(f, path, x=evset)
+            tp.save(f, path, x=self.evset)
             input, output = tp.load_graph(path=path, squeeze=True)
             inputs, outputs = tp.load_graph(path=path, squeeze=False)
 
         self.assertEqual(list(inputs.keys()), ["x"])
         self.assertEqual(list(outputs.keys()), ["output"])
 
-        loaded_result = tp.run(output, {input: evset})
+        loaded_result = tp.run(output, {input: self.evset})
 
         self.assertEqual(result, loaded_result)
 
@@ -219,19 +220,15 @@ class SerializationTest(absltest.TestCase):
         def f(x: EventSetNode):
             return tp.prefix("a_", x)
 
-        evset = tp.event_set(
-            timestamps=[1.0, 2.0, 3.0],
-            features={"f1": [100.0, 200.0, 300.0]},
-        )
-        node = evset.node()
-        result = tp.run(f(node), {node: evset})
+        node = self.evset.node()
+        result = tp.run(f(node), {node: self.evset})
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_fn.tem")
             tp.save(f, path, x=node)
             input, output = tp.load_graph(path=path, squeeze=True)
 
-        loaded_result = tp.run(output, {input: evset})
+        loaded_result = tp.run(output, {input: self.evset})
 
         self.assertEqual(result, loaded_result)
 
@@ -240,18 +237,14 @@ class SerializationTest(absltest.TestCase):
         def f(x: EventSetNode):
             return tp.prefix("a_", x)
 
-        evset = tp.event_set(
-            timestamps=[1.0, 2.0, 3.0],
-            features={"f1": [100.0, 200.0, 300.0]},
-        )
-        result = f(evset)
+        result = f(self.evset)
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_fn.tem")
-            tp.save(f, path, x=evset.schema)
+            tp.save(f, path, x=self.evset.schema)
             input, output = tp.load_graph(path=path, squeeze=True)
 
-        loaded_result = tp.run(output, {input: evset})
+        loaded_result = tp.run(output, {input: self.evset})
 
         self.assertEqual(result, loaded_result)
 
@@ -299,20 +292,16 @@ class SerializationTest(absltest.TestCase):
                 "b": tp.log(x),
             }
 
-        x = tp.event_set(
-            timestamps=[1.0, 2.0, 3.0],
-            features={"f1": [100.0, 200.0, 300.0]},
-        )
-        results = f(x)
+        results = f(self.evset)
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_fn.tem")
-            tp.save(f, path, x)
+            tp.save(f, path, self.evset)
             input, outputs = tp.load_graph(path=path, squeeze=True)
 
         self.assertEqual(list(outputs.keys()), ["a", "b"])
 
-        loaded_results = tp.run(outputs, {input: x})
+        loaded_results = tp.run(outputs, {input: self.evset})
 
         self.assertEqual(results["a"], loaded_results["a"])
         self.assertEqual(results["b"], loaded_results["b"])
@@ -326,7 +315,7 @@ class SerializationTest(absltest.TestCase):
             with self.assertRaisesRegex(
                 ValueError, "Can only save a function that has been compiled"
             ):
-                tp.save(f, path, x=tp.event_set([1]))
+                tp.save(f, path, x=self.evset)
 
     def test_save_wrong_input_types(self):
         def f(x: EventSetNode, y: int):
@@ -339,7 +328,25 @@ class SerializationTest(absltest.TestCase):
             with self.assertRaisesRegex(
                 ValueError, "The function's parameters can only be"
             ):
-                tp.save(f, path, tp.event_set([1]), 3)
+                tp.save(f, path, self.evset, 3)
+
+    def test_load(self):
+        @tp.compile
+        def f(x: EventSetNode):
+            return {"output": tp.prefix("a_", x)}
+
+        result = f(self.evset)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(f, path, x=self.evset)
+            loaded_f = tp.load(path=path)
+
+        loaded_result = loaded_f(x=self.evset)
+
+        print(f"{result=}")
+        print(f"{loaded_result=}")
+        self.assertEqual(result, loaded_result)
 
 
 if __name__ == "__main__":

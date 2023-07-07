@@ -42,9 +42,10 @@ PUBLIC_API_SYMBOLS = {
     "bool_",
     "str_",
     # SERIALIZATION
-    "load_graph",
     "save",
+    "load",
     "save_graph",
+    "load_graph",
     # OPERATORS
     "cast",
     "drop_index",

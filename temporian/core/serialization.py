@@ -39,6 +39,7 @@ from temporian.core.data.node import (
     create_node_with_new_reference,
 )
 from temporian.core.data.schema import Schema
+from temporian.core.compilation import compile
 from temporian.core.operators import base
 from temporian.core.data.dtype import DType
 from temporian.implementation.numpy.data.event_set import EventSet
@@ -55,8 +56,9 @@ DTYPE_MAPPING = {
 INV_DTYPE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
 
 
+# TODO: allow saved fn to return a single Node too
 def save(
-    fn: Callable[..., Union[EventSetNode, Dict[str, EventSetNode]]],
+    fn: Callable[..., Dict[str, EventSetNode]],
     path: str,
     *args: Union[EventSetNode, EventSet, Schema],
     **kwargs: Union[EventSetNode, EventSet, Schema],
@@ -100,58 +102,45 @@ def save(
     node_kwargs = {k: _process_fn_input(v) for k, v in merged_kwargs.items()}
 
     # TODO: extensively check that returned types are the expected ones
-    output = fn(**node_kwargs)
+    outputs = fn(**node_kwargs)
 
-    output = _process_fn_output(output)
+    outputs = _process_fn_outputs(outputs)
 
-    save_graph(inputs=node_kwargs, outputs=output, path=path)
-
-
-def _process_fn_input(input: Any) -> EventSetNode:
-    if isinstance(input, Schema):
-        return create_node_with_new_reference(schema=input)
-    if isinstance(input, EventSet):
-        return input.node()
-    if isinstance(input, EventSetNode):
-        return input
-    raise ValueError(
-        "The function's parameters can only be either EventSets, EventSetNodes,"
-        " or Schemas to save it."
-    )
+    save_graph(inputs=node_kwargs, outputs=outputs, path=path)
 
 
-def _process_fn_output(output: Any):
-    if isinstance(output, EventSetNode):
-        # TODO: add metadata to graph to return a single output in fn instead of dict with single key in this case
-        return {"output": output}
-    if isinstance(output, dict):
-        if all(isinstance(v, EventSetNode) for v in output.values()):
-            return output
-    raise ValueError(
-        "The function must return a single EventSetNode or a dictionary"
-        " mapping output names to EventSetNodes."
-    )
+def load(
+    path: str,
+) -> Callable[..., Union[EventSetNode, Dict[str, EventSetNode]]]:
+    """Loads a compiled Temporian function from a file."""
+    # inputs, outputs = load_graph(path=path)
 
+    with open(path, "rb") as f:
+        proto = text_format.Parse(f.read(), pb.Graph())
 
-def _construct_kwargs_from_args_and_kwargs(
-    fn: Callable,
-    args: Tuple[Any],
-    kwargs: Dict[str, Any],
-) -> Dict[str, Any]:
-    # Merge args into kwargs based on fn's signature.
-    param_names = inspect.signature(fn).parameters.keys()
-    if len(args) > len(param_names):
-        raise ValueError(
-            f"The function takes {len(param_names)} arguments, but"
-            f" {len(args)} positional arguments were received."
-        )
-    arg_kwargs = {k: v for k, v in zip(param_names, args)}
-    for k in arg_kwargs:
-        if k in kwargs:
-            raise ValueError(
-                f"The function received multiple values for the argument {k}."
-            )
-    return {**arg_kwargs, **kwargs}
+    g: graph.Graph = _unserialize(proto)
+    inputs = g.named_inputs
+    assert inputs is not None
+
+    @compile
+    def fn(
+        **kwargs: EventSetNode,
+    ) -> Union[EventSetNode, Dict[str, EventSetNode]]:
+        # inp = {}
+        # for k, v in kwargs.items():
+        #     if k not in inputs:
+        #         raise ValueError(
+        #             f"Received unexpected input '{k}'. Expected one of"
+        #             f" {list(inputs.keys())}."
+        #         )
+        #     inp[inputs[k]] = v
+        # if len(inp) != len(inputs):
+        #     raise ValueError(
+        #         f"Received {len(inp)} inputs, expected {len(inputs)}."
+        #     )
+        return g.apply_on_inputs(kwargs)
+
+    return fn
 
 
 def save_graph(
@@ -263,6 +252,53 @@ def load_graph(
         outputs = list(outputs.values())[0]
 
     return inputs, outputs
+
+
+def _process_fn_input(input: Any) -> EventSetNode:
+    if isinstance(input, Schema):
+        return create_node_with_new_reference(schema=input)
+    if isinstance(input, EventSet):
+        return input.node()
+    if isinstance(input, EventSetNode):
+        return input
+    raise ValueError(
+        "The function's parameters can only be either EventSets, EventSetNodes,"
+        " or Schemas to save it."
+    )
+
+
+def _process_fn_outputs(output: Any):
+    if isinstance(output, EventSetNode):
+        # TODO: add metadata to graph to return a single output in fn instead of dict with single key in this case
+        return {"output": output}
+    if isinstance(output, dict):
+        if all(isinstance(v, EventSetNode) for v in output.values()):
+            return output
+    raise ValueError(
+        "The function must return a single EventSetNode or a dictionary"
+        " mapping output names to EventSetNodes."
+    )
+
+
+def _construct_kwargs_from_args_and_kwargs(
+    fn: Callable,
+    args: Tuple[Any],
+    kwargs: Dict[str, Any],
+) -> Dict[str, Any]:
+    # Merge args into kwargs based on fn's signature.
+    param_names = inspect.signature(fn).parameters.keys()
+    if len(args) > len(param_names):
+        raise ValueError(
+            f"The function takes {len(param_names)} arguments, but"
+            f" {len(args)} positional arguments were received."
+        )
+    arg_kwargs = {k: v for k, v in zip(param_names, args)}
+    for k in arg_kwargs:
+        if k in kwargs:
+            raise ValueError(
+                f"The function received multiple values for the argument {k}."
+            )
+    return {**arg_kwargs, **kwargs}
 
 
 def _serialize(src: graph.Graph) -> pb.Graph:
