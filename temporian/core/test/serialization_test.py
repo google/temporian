@@ -410,6 +410,8 @@ class SerializationTest(absltest.TestCase):
 
         self.assertEqual(result, loaded_result)
 
+        # TODO: test failure cases of load
+
 
 if __name__ == "__main__":
     absltest.main()
