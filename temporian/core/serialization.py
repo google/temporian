@@ -14,6 +14,7 @@
 
 """Serialization/unserialization of a graph and its components."""
 
+import inspect
 import logging
 from typing import (
     Callable,
@@ -76,11 +77,13 @@ def save(
 
     Args:
         fn: The function to save.
-        inputs: The inputs to pass to the function to trace it, keyed by
-            parameter name. These values can be either EventSets, EventSetNodes,
-            or raw Schemas. In all cases, the values will be converted to
-            EventSetNodes before being passed to the function to trace it.
         path: The path to save the function to.
+        args: Positional arguments to pass to the function to trace it. The
+            arguments can be either EventSets, EventSetNodes, or raw Schemas. In
+            all cases, the values will be converted to EventSetNodes before
+            being passed to the function to trace it.
+        kwargs: Keyword arguments to pass to the function to trace it. Same
+            restrictions as for `args`.
 
     Raises:
         ValueError: If the received function is not compiled.
@@ -93,17 +96,15 @@ def save(
             " `@tp.compile`."
         )
 
-    # TODO: construct inputs dict from args and kwargs (merge args and kwargs)
-    # merge args and kwargs based on fn's signature
-    node_args = [_process_fn_input(arg) for arg in args]
-    node_kwargs = {k: _process_fn_input(v) for k, v in kwargs.items()}
+    merged_kwargs = _construct_kwargs_from_args_and_kwargs(fn, args, kwargs)
+    node_kwargs = {k: _process_fn_input(v) for k, v in merged_kwargs.items()}
 
     # TODO: extensively check that returned types are the expected ones
-    output = fn(*node_args, **node_kwargs)
+    output = fn(**node_kwargs)
 
     output = _process_fn_output(output)
 
-    save_graph(inputs=node_inputs, outputs=output, path=path)
+    save_graph(inputs=node_kwargs, outputs=output, path=path)
 
 
 def _process_fn_input(input: Any) -> EventSetNode:
@@ -130,6 +131,27 @@ def _process_fn_output(output: Any):
         "The function must return a single EventSetNode or a dictionary"
         " mapping output names to EventSetNodes."
     )
+
+
+def _construct_kwargs_from_args_and_kwargs(
+    fn: Callable,
+    args: Tuple[Any],
+    kwargs: Dict[str, Any],
+) -> Dict[str, Any]:
+    # Merge args into kwargs based on fn's signature.
+    param_names = inspect.signature(fn).parameters.keys()
+    if len(args) > len(param_names):
+        raise ValueError(
+            f"The function takes {len(param_names)} arguments, but"
+            f" {len(args)} positional arguments were received."
+        )
+    arg_kwargs = {k: v for k, v in zip(param_names, args)}
+    for k in arg_kwargs:
+        if k in kwargs:
+            raise ValueError(
+                f"The function received multiple values for the argument {k}."
+            )
+    return {**arg_kwargs, **kwargs}
 
 
 def save_graph(

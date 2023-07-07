@@ -203,7 +203,7 @@ class SerializationTest(absltest.TestCase):
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_fn.tem")
-            tp.save(f, inputs={"x": evset}, path=path)
+            tp.save(f, path, x=evset)
             input, output = tp.load_graph(path=path, squeeze=True)
             inputs, outputs = tp.load_graph(path=path, squeeze=False)
 
@@ -228,7 +228,7 @@ class SerializationTest(absltest.TestCase):
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_fn.tem")
-            tp.save(f, inputs={"x": node}, path=path)
+            tp.save(f, path, x=node)
             input, output = tp.load_graph(path=path, squeeze=True)
 
         loaded_result = tp.run(output, {input: evset})
@@ -248,7 +248,7 @@ class SerializationTest(absltest.TestCase):
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_fn.tem")
-            tp.save(f, inputs={"x": evset.schema}, path=path)
+            tp.save(f, path, x=evset.schema)
             input, output = tp.load_graph(path=path, squeeze=True)
 
         loaded_result = tp.run(output, {input: evset})
@@ -280,7 +280,7 @@ class SerializationTest(absltest.TestCase):
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_fn.tem")
-            tp.save(f, inputs={"x": x, "y": y, "z": z}, path=path)
+            tp.save(f, path, x, y, z=z)
             inputs, output = tp.load_graph(path=path, squeeze=True)
 
         self.assertEqual(list(inputs.keys()), ["x", "y", "z"])
@@ -307,7 +307,7 @@ class SerializationTest(absltest.TestCase):
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_fn.tem")
-            tp.save(f, inputs={"x": x}, path=path)
+            tp.save(f, path, x)
             input, outputs = tp.load_graph(path=path, squeeze=True)
 
         self.assertEqual(list(outputs.keys()), ["a", "b"])
@@ -326,7 +326,7 @@ class SerializationTest(absltest.TestCase):
             with self.assertRaisesRegex(
                 ValueError, "Can only save a function that has been compiled"
             ):
-                tp.save(f, inputs={"x": tp.event_set([1])}, path=path)
+                tp.save(f, path, x=tp.event_set([1]))
 
     def test_save_wrong_input_types(self):
         def f(x: EventSetNode, y: int):
@@ -339,7 +339,7 @@ class SerializationTest(absltest.TestCase):
             with self.assertRaisesRegex(
                 ValueError, "The function's parameters can only be"
             ):
-                tp.save(f, inputs={"x": tp.event_set([1]), "y": 3}, path=path)
+                tp.save(f, path, tp.event_set([1]), 3)
 
 
 if __name__ == "__main__":
