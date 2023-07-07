@@ -112,33 +112,29 @@ def save(
 def load(
     path: str,
 ) -> Callable[..., Union[EventSetNode, Dict[str, EventSetNode]]]:
-    """Loads a compiled Temporian function from a file."""
-    # inputs, outputs = load_graph(path=path)
+    """Loads a compiled Temporian function from a file.
 
+    The loaded function receives the same arguments and applies the same
+    operator graph as when it was saved.
+
+    Args:
+        path: The path to load the function from.
+
+    Returns:
+        The loaded function.
+    """
     with open(path, "rb") as f:
         proto = text_format.Parse(f.read(), pb.Graph())
 
     g: graph.Graph = _unserialize(proto)
-    inputs = g.named_inputs
-    assert inputs is not None
 
+    # TODO: improve typing of loaded function
+    # TODO: allow positional args in loaded function
     @compile
     def fn(
         **kwargs: EventSetNode,
     ) -> Union[EventSetNode, Dict[str, EventSetNode]]:
-        # inp = {}
-        # for k, v in kwargs.items():
-        #     if k not in inputs:
-        #         raise ValueError(
-        #             f"Received unexpected input '{k}'. Expected one of"
-        #             f" {list(inputs.keys())}."
-        #         )
-        #     inp[inputs[k]] = v
-        # if len(inp) != len(inputs):
-        #     raise ValueError(
-        #         f"Received {len(inp)} inputs, expected {len(inputs)}."
-        #     )
-        return g.apply_on_inputs(kwargs)
+        return g.apply_on_inputs(named_inputs=kwargs)
 
     return fn
 

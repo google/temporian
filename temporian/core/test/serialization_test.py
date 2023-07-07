@@ -348,6 +348,68 @@ class SerializationTest(absltest.TestCase):
         print(f"{loaded_result=}")
         self.assertEqual(result, loaded_result)
 
+    def test_load_use_twice(self):
+        """Tests that the loaded fn can be used more than once."""
+
+        @tp.compile
+        def f(x: EventSetNode):
+            return {"output": tp.prefix("a_", x)}
+
+        other_evset = tp.event_set(
+            timestamps=[1, 2, 3],
+            features={
+                "x": [10.0, 20.0, 30.0],
+                "y": [40.0, 50.0, 60.0],
+            },
+        )
+
+        result = f(self.evset)
+        other_result = f(other_evset)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(f, path, x=self.evset)
+            loaded_f = tp.load(path=path)
+
+        loaded_result = loaded_f(x=self.evset)
+        loaded_other_result = loaded_f(x=other_evset)
+
+        self.assertEqual(result, loaded_result)
+        self.assertEqual(other_result, loaded_other_result)
+
+    def test_load_many_kwargs(self):
+        """Tests that the loaded fn can be used more than once."""
+
+        @tp.compile
+        def f(x: EventSetNode, y: EventSetNode, z: EventSetNode):
+            return {"output": tp.glue(x, y, z)}
+
+        x = tp.event_set(
+            timestamps=[1.0, 2.0, 3.0],
+            features={"f1": [100.0, 200.0, 300.0]},
+        )
+        y = tp.event_set(
+            timestamps=[1.0, 2.0, 3.0],
+            features={"f2": [1.0, 2.0, 3.0]},
+            same_sampling_as=x,
+        )
+        z = tp.event_set(
+            timestamps=[1.0, 2.0, 3.0],
+            features={"f3": [3.0, 5.0, 2.0]},
+            same_sampling_as=x,
+        )
+
+        result = f(x, y, z)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(f, path, x=x, y=y, z=z)
+            loaded_f = tp.load(path=path)
+
+        loaded_result = loaded_f(x=x, y=y, z=z)
+
+        self.assertEqual(result, loaded_result)
+
 
 if __name__ == "__main__":
     absltest.main()
