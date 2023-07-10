@@ -138,7 +138,7 @@ def load(
     def fn(
         *args: EventSetNode,
         **kwargs: EventSetNode,
-    ) -> Union[EventSetNode, Dict[str, EventSetNode]]:
+    ) -> Dict[str, EventSetNode]:
         kwargs = _construct_kwargs_from_args_and_kwargs(
             list(g.named_inputs.keys()), args, kwargs
         )
