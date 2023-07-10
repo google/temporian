@@ -345,8 +345,6 @@ class SerializationTest(absltest.TestCase):
 
         loaded_result = loaded_f(x=self.evset)
 
-        print(f"{result=}")
-        print(f"{loaded_result=}")
         self.assertEqual(result, loaded_result)
 
     def test_load_use_twice(self):
@@ -456,6 +454,7 @@ class SerializationTest(absltest.TestCase):
             loaded_f = tp.load(path=path)
 
         doc = pydoc.render_doc(loaded_f)
+        print(doc)
         self.assertTrue(
             "x: temporian.core.data.node.EventSetNode, "
             "y: temporian.core.data.node.EventSetNode, "
@@ -463,9 +462,7 @@ class SerializationTest(absltest.TestCase):
             in doc
         )
         self.assertTrue(
-            "-> Union[temporian.core.data.node.EventSetNode, Dict[str,"
-            " temporian.core.data.node.EventSetNode]]"
-            in doc,
+            "-> Dict[str, temporian.core.data.node.EventSetNode]" in doc,
         )
 
 
