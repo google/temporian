@@ -29,9 +29,7 @@ AttributeType = Union[
 ]
 
 # Generic type for defining the input/output types of operators.
-EventSetOrNode = TypeVar(
-    "EventSetOrNode", EventSet, EventSetNode
-)
+EventSetOrNode = TypeVar("EventSetOrNode", EventSet, EventSetNode)
 
 
 class OperatorExceptionDecorator:

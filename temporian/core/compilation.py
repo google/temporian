@@ -14,15 +14,17 @@
 
 from functools import wraps
 from copy import copy
-from typing import Any, Dict, Optional, Tuple, Callable, Union, List
+from typing import Any, Dict, Optional, Tuple, Callable, TypeVar
 from temporian.core.data.node import EventSetNode
 from temporian.implementation.numpy.data.event_set import EventSet
+
+T = TypeVar("T", bound=Callable)
 
 
 # TODO: unify the fn's output type with run's EvaluationQuery, and add it to the
 # public API so it shows in the docs.
 # TODO: make compile change the fn's annotations to EventSetOrNode
-def compile(fn):
+def compile(fn: T) -> T:
     """Compiles a Temporian function.
 
     A Temporian function is a function that takes EventSetNodes as arguments and
