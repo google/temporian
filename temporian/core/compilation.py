@@ -62,7 +62,12 @@ def compile(
 
         outputs = fn(*args, **kwargs)
 
-        if is_eager:
+        if is_eager is None:
+            raise ValueError(
+                "Cannot compile a function without EventSet or EventSetNode"
+                " argument."
+            )
+        elif is_eager:
             from temporian.core.evaluation import run
 
             return run(query=outputs, input=inputs_map)
@@ -78,7 +83,7 @@ def _process_argument(
     obj: Any,
     is_eager: Optional[bool],
     inputs_map: Dict[EventSetNode, EventSet],
-) -> Tuple[Any, bool]:
+) -> Tuple[Any, Optional[bool]]:
     """Processes arguments to an operator by checking if its being used in eager
     mode and converting EventSets to EventSetNodes if so.
 

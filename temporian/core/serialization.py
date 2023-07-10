@@ -350,7 +350,7 @@ def _identifier(item: Any) -> str:
 
 
 def _identifier_or_none(
-    item: Any, options: Optional[List[Any]] = None
+    item: Any, options: Optional[Set[Any]] = None
 ) -> Optional[str]:
     """Creates a unique identifier for an object within a graph."""
     if item is None:

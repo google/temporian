@@ -32,7 +32,7 @@ from temporian.proto import core_pb2 as pb
 TypeOrDType = Union[DType, Type[float], Type[int], Type[str], Type[bool]]
 
 
-def _normalize_dtype(x: Any) -> TypeOrDType:
+def _normalize_dtype(x: Any) -> DType:
     if isinstance(x, DType):
         return x
     if x == int:
