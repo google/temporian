@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pydoc
 from absl import logging
 from absl.testing import absltest
 import os
@@ -349,7 +350,8 @@ class SerializationTest(absltest.TestCase):
         self.assertEqual(result, loaded_result)
 
     def test_load_use_twice(self):
-        """Tests that the loaded fn can be used more than once."""
+        """Tests that the loaded fn can be used more than once, since the graph
+        is only loaded once but used on each call."""
 
         @tp.compile
         def f(x: EventSetNode):
@@ -378,8 +380,6 @@ class SerializationTest(absltest.TestCase):
         self.assertEqual(other_result, loaded_other_result)
 
     def test_load_many_kwargs(self):
-        """Tests that the loaded fn can be used more than once."""
-
         @tp.compile
         def f(x: EventSetNode, y: EventSetNode, z: EventSetNode):
             return {"output": tp.glue(x, y, z)}
@@ -410,7 +410,63 @@ class SerializationTest(absltest.TestCase):
 
         self.assertEqual(result, loaded_result)
 
-        # TODO: test failure cases of load
+    def test_load_args_and_kwargs(self):
+        @tp.compile
+        def f(x: EventSetNode, y: EventSetNode, z: EventSetNode):
+            return {"output": tp.glue(x, y, z)}
+
+        x = tp.event_set(
+            timestamps=[1.0, 2.0, 3.0],
+            features={"f1": [100.0, 200.0, 300.0]},
+        )
+        y = tp.event_set(
+            timestamps=[1.0, 2.0, 3.0],
+            features={"f2": [1.0, 2.0, 3.0]},
+            same_sampling_as=x,
+        )
+        z = tp.event_set(
+            timestamps=[1.0, 2.0, 3.0],
+            features={"f3": [3.0, 5.0, 2.0]},
+            same_sampling_as=x,
+        )
+
+        result = f(x, y, z)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(f, path, x=x, y=y, z=z)
+            loaded_f = tp.load(path=path)
+
+        loaded_result = loaded_f(x, y, z)
+
+        self.assertEqual(result, loaded_result)
+
+    # TODO: test failure cases of load
+
+    def test_load_signature(self):
+        """Checks that help(loaded_f) shows the correct param spec."""
+
+        @tp.compile
+        def f(x: EventSetNode, y: EventSetNode, z: EventSetNode):
+            return {"output": tp.prefix("a_", x)}
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(f, path, x=self.evset, y=self.evset, z=self.evset)
+            loaded_f = tp.load(path=path)
+
+        doc = pydoc.render_doc(loaded_f)
+        self.assertTrue(
+            "x: temporian.core.data.node.EventSetNode, "
+            "y: temporian.core.data.node.EventSetNode, "
+            "z: temporian.core.data.node.EventSetNode"
+            in doc
+        )
+        self.assertTrue(
+            "-> Union[temporian.core.data.node.EventSetNode, Dict[str,"
+            " temporian.core.data.node.EventSetNode]]"
+            in doc,
+        )
 
 
 if __name__ == "__main__":

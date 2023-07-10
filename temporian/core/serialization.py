@@ -98,7 +98,9 @@ def save(
             " `@tp.compile`."
         )
 
-    merged_kwargs = _construct_kwargs_from_args_and_kwargs(fn, args, kwargs)
+    merged_kwargs = _construct_kwargs_from_args_and_kwargs(
+        list(inspect.signature(fn).parameters.keys()), args, kwargs
+    )
     node_kwargs = {k: _process_fn_input(v) for k, v in merged_kwargs.items()}
 
     # TODO: extensively check that returned types are the expected ones
@@ -111,7 +113,8 @@ def save(
 
 def load(
     path: str,
-) -> Callable[..., Union[EventSetNode, Dict[str, EventSetNode]]]:
+):
+    # ) -> Callable[..., Union[EventSetNode, Dict[str, EventSetNode]]]:
     """Loads a compiled Temporian function from a file.
 
     The loaded function receives the same arguments and applies the same
@@ -128,13 +131,29 @@ def load(
 
     g: graph.Graph = _unserialize(proto)
 
-    # TODO: improve typing of loaded function
-    # TODO: allow positional args in loaded function
+    assert g.named_inputs is not None
+    assert g.named_outputs is not None
+
     @compile
     def fn(
+        *args: EventSetNode,
         **kwargs: EventSetNode,
     ) -> Union[EventSetNode, Dict[str, EventSetNode]]:
+        kwargs = _construct_kwargs_from_args_and_kwargs(
+            list(g.named_inputs.keys()), args, kwargs
+        )
         return g.apply_on_inputs(named_inputs=kwargs)
+
+    fn.__signature__ = inspect.signature(fn).replace(
+        parameters=[
+            inspect.Parameter(
+                name=k,
+                annotation=EventSetNode,
+                kind=inspect.Parameter.POSITIONAL_OR_KEYWORD,
+            )
+            for k in g.named_inputs
+        ]
+    )
 
     return fn
 
@@ -277,12 +296,11 @@ def _process_fn_outputs(output: Any):
 
 
 def _construct_kwargs_from_args_and_kwargs(
-    fn: Callable,
+    param_names: List[str],
     args: Tuple[Any],
     kwargs: Dict[str, Any],
 ) -> Dict[str, Any]:
-    # Merge args into kwargs based on fn's signature.
-    param_names = inspect.signature(fn).parameters.keys()
+    """Merges args and kwargs into a single name->value param dict."""
     if len(args) > len(param_names):
         raise ValueError(
             f"The function takes {len(param_names)} arguments, but"
