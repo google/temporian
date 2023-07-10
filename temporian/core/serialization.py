@@ -114,7 +114,6 @@ def save(
 def load(
     path: str,
 ):
-    # ) -> Callable[..., Union[EventSetNode, Dict[str, EventSetNode]]]:
     """Loads a compiled Temporian function from a file.
 
     The loaded function receives the same arguments and applies the same
