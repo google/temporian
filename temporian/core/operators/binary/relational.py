@@ -86,15 +86,17 @@ def equal(
     `input_1` and `input_2` must have the same sampling and the same number of
     features.
 
-    Basic example:
+    Example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
+        ...     features={"f1": [0, 100, 200]}
         ... )
-        >>> source = evset.node()
-        >>> a = source[["f1", "f2"]]
-        >>> b = source[["f2", "f1"]]  # Reverse order
+        >>> b = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f2": [-10, 100, 5]},
+        ...     same_sampling_as=a
+        ... )
 
         >>> # WARN: Don't use this for element-wise comparison
         >>> a == b
@@ -102,14 +104,13 @@ def equal(
 
         >>> # Element-wise comparison
         >>> c = tp.equal(a, b)
-        >>> c.run({source: evset})
+        >>> c
         indexes: []
-        features: [('eq_f1_f2', bool_), ('eq_f2_f1', bool_)]
+        features: [('eq_f1_f2', bool_)]
         events:
             (3 events):
                 timestamps: [1. 2. 3.]
                 'eq_f1_f2': [False True False]
-                'eq_f2_f1': [False True False]
         ...
 
         ```
@@ -145,27 +146,28 @@ def not_equal(
     `input_1` and `input_2` must have the same sampling and the same number of
     features.
 
-    Basic example:
+    Example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
+        ...     features={"f1": [0, 100, 200]}
         ... )
-        >>> source = evset.node()
-        >>> a = source[["f1", "f2"]]
-        >>> b = source[["f2", "f1"]]  # Reverse order
+        >>> b = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f2": [-10, 100, 5]},
+        ...     same_sampling_as=a
+        ... )
 
         >>> # Equivalent
         >>> c = tp.not_equal(a, b)
         >>> c = a != b
-        >>> c.run({source: evset})
+        >>> c
         indexes: []
-        features: [('ne_f1_f2', bool_), ('ne_f2_f1', bool_)]
+        features: [('ne_f1_f2', bool_)]
         events:
             (3 events):
                 timestamps: [1. 2. 3.]
                 'ne_f1_f2': [ True False True]
-                'ne_f2_f1': [ True False True]
         ...
 
         ```
@@ -197,27 +199,28 @@ def greater(
     `input_left` and `input_right` must have the same sampling and the same
     number of features.
 
-    Basic example:
+    Example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
+        ...     features={"f1": [0, 100, 200]}
         ... )
-        >>> source = evset.node()
-        >>> a = source[["f1", "f2"]]
-        >>> b = source[["f2", "f1"]]  # Reverse order
+        >>> b = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f2": [-10, 100, 5]},
+        ...     same_sampling_as=a
+        ... )
 
         >>> # Equivalent
         >>> c = tp.greater(a, b)
         >>> c = a > b
-        >>> c.run({source: evset})
+        >>> c
         indexes: []
-        features: [('gt_f1_f2', bool_), ('gt_f2_f1', bool_)]
+        features: [('gt_f1_f2', bool_)]
         events:
             (3 events):
                 timestamps: [1. 2. 3.]
                 'gt_f1_f2': [ True False True]
-                'gt_f2_f1': [False False False]
         ...
 
         ```
@@ -249,27 +252,28 @@ def greater_equal(
     `input_left` and `input_right` must have the same sampling and the same
     number of features.
 
-    Basic example:
+    Example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
+        ...     features={"f1": [0, 100, 200]}
         ... )
-        >>> source = evset.node()
-        >>> a = source[["f1", "f2"]]
-        >>> b = source[["f2", "f1"]]  # Reverse order
+        >>> b = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f2": [-10, 100, 5]},
+        ...     same_sampling_as=a
+        ... )
 
         >>> # Equivalent
         >>> c = tp.greater_equal(a, b)
         >>> c = a >= b
-        >>> c.run({source: evset})
+        >>> c
         indexes: []
-        features: [('ge_f1_f2', bool_), ('ge_f2_f1', bool_)]
+        features: [('ge_f1_f2', bool_)]
         events:
             (3 events):
                 timestamps: [1. 2. 3.]
                 'ge_f1_f2': [ True True True]
-                'ge_f2_f1': [False True False]
         ...
 
         ```
@@ -301,27 +305,28 @@ def less(
     `input_left` and `input_right` must have the same sampling and the same
     number of features.
 
-    Basic example:
+    Example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
+        ...     features={"f1": [0, 100, 200]}
         ... )
-        >>> source = evset.node()
-        >>> a = source[["f1", "f2"]]
-        >>> b = source[["f2", "f1"]]  # Reverse order
+        >>> b = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f2": [-10, 100, 5]},
+        ...     same_sampling_as=a
+        ... )
 
         >>> # Equivalent
         >>> c = tp.less(a, b)
         >>> c = a < b
-        >>> c.run({source: evset})
+        >>> c
         indexes: []
-        features: [('lt_f1_f2', bool_), ('lt_f2_f1', bool_)]
+        features: [('lt_f1_f2', bool_)]
         events:
             (3 events):
                 timestamps: [1. 2. 3.]
                 'lt_f1_f2': [False False False]
-                'lt_f2_f1': [ True False True]
         ...
 
         ```
@@ -353,27 +358,28 @@ def less_equal(
     `input_left` and `input_right` must have the same sampling and the same
     number of features.
 
-    Basic example:
+    Example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
+        ...     features={"f1": [0, 100, 200]}
         ... )
-        >>> source = evset.node()
-        >>> a = source[["f1", "f2"]]
-        >>> b = source[["f2", "f1"]]  # Reverse order
+        >>> b = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"f2": [-10, 100, 5]},
+        ...     same_sampling_as=a
+        ... )
 
         >>> # Equivalent
         >>> c = tp.less_equal(a, b)
         >>> c = a <= b
-        >>> c.run({source: evset})
+        >>> c
         indexes: []
-        features: [('le_f1_f2', bool_), ('le_f2_f1', bool_)]
+        features: [('le_f1_f2', bool_)]
         events:
             (3 events):
                 timestamps: [1. 2. 3.]
                 'le_f1_f2': [False True False]
-                'le_f2_f1': [ True True True]
         ...
 
         ```

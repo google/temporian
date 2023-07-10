@@ -161,10 +161,7 @@ def event_set(
     evset.name = name
 
     if same_sampling_as is not None:
-        evset.schema.check_compatible_index(
-            same_sampling_as.schema,
-            label="the new EventSet and `same_sampling_as`",
-        )
+        evset.schema.check_compatible_index(same_sampling_as.schema)
 
         if evset.data.keys() != same_sampling_as.data.keys():
             raise ValueError(

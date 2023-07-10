@@ -41,9 +41,7 @@ class SinceLast(Operator):
             self.add_input("sampling", sampling)
             self._has_sampling = True
             effective_sampling_node = sampling
-            input.schema.check_compatible_index(
-                sampling.schema, "input and sampling"
-            )
+            input.schema.check_compatible_index(sampling.schema)
 
         else:
             effective_sampling_node = input
@@ -88,10 +86,9 @@ def since_last(
 
     Example 1:
         ```python
-        >>> t_evset = tp.event_set(timestamps=[1, 5, 8, 8, 9])
-        >>> t_node = t_evset.node()
-        >>> since_node = tp.since_last(t_node)
-        >>> since_node.run({t_node: t_evset})
+        >>> a = tp.event_set(timestamps=[1, 5, 8, 8, 9])
+        >>> b = tp.since_last(a)
+        >>> b
         indexes: ...
                 timestamps: [1. 5. 8. 8. 9.]
                 'since_last': [nan  4.  3.  0.  1.]
@@ -101,17 +98,13 @@ def since_last(
 
     Example 2:
         ```python
-        >>> since_evset = tp.event_set(timestamps=[2, 5, 7])
-        >>> sampling_evset = tp.event_set(timestamps=[1, 4, 6, 10])
-        >>> since_node = since_evset.node()
-        >>> sampling_node = sampling_evset.node()
+        >>> a = tp.event_set(timestamps=[2, 5, 7])
+        >>> b = tp.event_set(timestamps=[1, 4, 6, 10])
 
         >>> # Time elapsed between each sampling event
-        >>> # and the latest previous event in since_evset
-        >>> result = tp.since_last(since_node, sampling_node)
-        >>> result.run({since_node: since_evset,
-        ...     sampling_node: sampling_evset}
-        ... )
+        >>> # and the latest previous event in a
+        >>> c = tp.since_last(a, sampling=b)
+        >>> c
         indexes: ...
                 timestamps: [ 1. 4. 6. 10.]
                 'since_last': [nan  2.  1.  3.]

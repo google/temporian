@@ -116,36 +116,51 @@ def glue(
     Example:
 
         ```python
-        >>> a = tp.input_node(features=[("A1", tp.float64), ("A2", tp.float64)])
-        >>> b = a["A1"] + a["A2"]
-        >>> c = a["A1"] - a["A2"]
+        >>> a = tp.event_set(
+        ...     timestamps=[0, 1, 5],
+        ...     features={"M": [0, 10, 50], "N": [50, 100, 500]},
+        ... )
+        >>> b = a["M"] + a["N"]
+        >>> c = a["M"] - a["N"]
 
         # Glue all features from a,b,c
         >>> d = tp.glue(a, b, c)
-        >>> d.features
-        [('A1', float64), ('A2', float64), ('add_A1_A2', float64), ('sub_A1_A2', float64)]
+        >>> d
+        indexes: []
+        features: [('M', int64), ('N', int64), ('add_M_N', int64), ('sub_M_N', int64)]
+        events:
+            (3 events):
+                timestamps: [0. 1. 5.]
+                'M': [ 0 10 50]
+                'N': [ 50 100 500]
+                'add_M_N': [ 50 110 550]
+                'sub_M_N': [ -50  -90 -450]
+        ...
 
         ```
 
     To glue nodes with duplicated feature names, add a prefix or rename before:
 
-    Example:
+    Example with duplicated names:
 
     ```python
-        >>> a = tp.input_node(features=[("f1", tp.float64), ("f2", tp.float64)])
+        >>> a = tp.event_set(
+        ...     timestamps=[0, 1, 5],
+        ...     features={"M": [0, 10, 50], "N": [50, 100, 500]},
+        ... )
 
         # Same feature names as a
-        >>> b = tp.simple_moving_average(a, 5)
+        >>> b = 3 * a
 
         # Add a prefix before glue
-        >>> output = tp.glue(a, tp.prefix("sma_", b))
-        >>> output.features
-        [('f1', float64), ('f2', float64), ('sma_f1', float64), ('sma_f2', float64)]
+        >>> output = tp.glue(a, tp.prefix("3x", b))
+        >>> output.schema.features
+        [('M', int64), ('N', int64), ('3xM', int64), ('3xN', int64)]
 
         # Or rename before glue
-        >>> output = tp.glue(a["f1"], tp.rename(b["f1"], "new_feature"))
-        >>> output.features
-        [('f1', float64), ('new_feature', float64)]
+        >>> output = tp.glue(a["M"], tp.rename(b["M"], "M_new"))
+        >>> output.schema.features
+        [('M', int64), ('M_new', int64)]
 
         ```
 
@@ -155,15 +170,23 @@ def glue(
     Example:
 
         ```python
-        >>> a = tp.input_node(features=[("A", tp.str_)])
-        >>> b = tp.input_node(features=[("B", tp.float64)])
-        >>> c = tp.input_node(features=[("C", tp.float64)])
+        >>> a = tp.event_set(timestamps=[0, 2], features={"A": [0, 20]})
+        >>> b = tp.event_set(timestamps=[0, 2], features={"B": [1, 21]})
+        >>> c = tp.event_set(timestamps=[1, 4], features={"C": [10, 40]})
         >>> output = tp.glue(a,
         ...                  tp.resample(b, sampling=a),
         ...                  tp.resample(c, sampling=a)
         ...          )
-        >>> output.features
-        [('A', str_), ('B', float64), ('C', float64)]
+        >>> output
+        indexes: []
+        features: [('A', int64), ('B', int64), ('C', int64)]
+        events:
+            (2 events):
+                timestamps: [0. 2.]
+                'A': [ 0 20]
+                'B': [ 1 21]
+                'C': [ 0 10]
+        ...
 
         ```
 

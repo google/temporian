@@ -65,11 +65,9 @@ def unique_timestamps(input: EventSetNode) -> EventSetNode:
 
     Usage example:
         ```python
-        >>> a_evset = tp.event_set(timestamps=[5, 9, 9, 16], features={'f': [1,2,3,4]})
-        >>> a = a_evset.node()
-
-        >>> result = tp.unique_timestamps(a)
-        >>> result.run({a: a_evset})
+        >>> a = tp.event_set(timestamps=[5, 9, 9, 16], features={'f': [1,2,3,4]})
+        >>> b = tp.unique_timestamps(a)
+        >>> b
         indexes: []
         features: []
         events:

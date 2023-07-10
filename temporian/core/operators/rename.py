@@ -183,25 +183,33 @@ def rename(
 
     Usage example:
         ```python
-        >>> a_evset = tp.event_set(
+        >>> a = tp.event_set(
         ...    timestamps=[0, 1],
         ...    features={"f1": [0, 2], "f2": [5, 6]}
         ... )
-        >>> a = a_evset.node()
-        >>> b = a * 5
+        >>> b = 5 * a
 
-        >>> # Rename single feature from b
-        >>> b_1 = tp.rename(b["f1"], "output_1")
+        >>> # Rename single feature
+        >>> b_1 = tp.rename(b["f1"], "f1_result")
+        >>> b_1
+        indexes: []
+        features: [('f1_result', int64)]
+        events:
+             (2 events):
+                timestamps: [0. 1.]
+                'f1_result': [ 0 10]
+        ...
 
-        >>> # Rename multiple features in a (mapping)
-        >>> a_rename = tp.rename(a, {"f1": "input_1", "f2": "input_2"})
-
-        >>> result = tp.glue(a_rename, b_1)
-        >>> result.run({a: a_evset})
-        indexes: ...
-                'input_1': [0 2]
-                'input_2': [5 6]
-                'output_1': [ 0 10]
+        >>> # Rename multiple features
+        >>> b_rename = tp.rename(b, {"f1": "5xf1", "f2": "5xf2"})
+        >>> b_rename
+        indexes: []
+        features: [('5xf1', int64), ('5xf2', int64)]
+        events:
+             (2 events):
+                timestamps: [0. 1.]
+                '5xf1': [ 0 10]
+                '5xf2': [25 30]
         ...
 
         ```

@@ -95,11 +95,13 @@ class DocstringsTest(absltest.TestCase):
                 print("\n\nTraceback:")
                 traceback.print_tb(e.exc_info[2], file=sys.stdout)
                 print("\n\n")
+                # pylint: disable=raise-missing-from
                 raise AssertionError(
                     "Exception running docstring example starting at line "
                     f"{lineno} on file {path}\n>>> {ex.source}{e.exc_info[0]}:"
                     f" {e.exc_info[1]}"
-                ) from e
+                )
+                # pylint: enable=raise-missing-from
         tmp_dir_handle.cleanup()
 
 

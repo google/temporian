@@ -78,19 +78,16 @@ def logical_and(
 
     Usage example:
         ```python
-        >>> evset = tp.event_set(timestamps=[1, 2, 3], features={"f1": [100, 150, 200]})
-        >>> source = evset.node()
-        >>> a = source["f1"]
+        >>> a = tp.event_set(timestamps=[1, 2, 3], features={"f1": [100, 150, 200]})
 
         >>> # Sample boolean features
-        >>> cond_1 = a > 100
-        >>> cond_2 = a < 200
+        >>> b = a > 100
+        >>> c = a < 200
 
         >>> # Equivalent
-        >>> c = tp.logical_and(cond_1, cond_2)
-        >>> c = cond_1 & cond_2
-
-        >>> c.run({source: evset})
+        >>> d = tp.logical_and(b, c)
+        >>> d = b & c
+        >>> d
         indexes: []
         features: [('and_f1_f1', bool_)]
         events:
@@ -103,15 +100,13 @@ def logical_and(
 
     Cast integer to boolean:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3],
         ...     features={"f1": [0, 1, 1], "f2": [1, 1, 0]}
         ... )
-        >>> source = evset.node()
-
-        >>> c = tp.cast(source["f1"], bool) & tp.cast(source["f2"], bool)
-
-        >>> c.run({source: evset})
+        >>> b = tp.cast(a, bool)
+        >>> c = b["f1"] & b["f2"]
+        >>> c
         indexes: []
         features: [('and_f1_f2', bool_)]
         events:
@@ -151,19 +146,16 @@ def logical_or(
 
     Usage example:
         ```python
-        >>> evset = tp.event_set(timestamps=[1, 2, 3], features={"f1": [100, 150, 200]})
-        >>> source = evset.node()
-        >>> a = source["f1"]
+        >>> a = tp.event_set(timestamps=[1, 2, 3], features={"f1": [100, 150, 200]})
 
         >>> # Sample boolean features
-        >>> cond_1 = a <= 100
-        >>> cond_2 = a >= 200
+        >>> b = a <= 100
+        >>> c = a >= 200
 
         >>> # Equivalent
-        >>> c = tp.logical_or(cond_1, cond_2)
-        >>> c = cond_1 | cond_2
-
-        >>> c.run({source: evset})
+        >>> d = tp.logical_or(b, c)
+        >>> d = b | c
+        >>> d
         indexes: []
         features: [('or_f1_f1', bool_)]
         events:
@@ -203,19 +195,16 @@ def logical_xor(
 
     Usage example:
         ```python
-        >>> evset = tp.event_set(timestamps=[1, 2, 3], features={"f1": [100, 150, 200]})
-        >>> source = evset.node()
-        >>> a = source["f1"]
+        >>> a = tp.event_set(timestamps=[1, 2, 3], features={"f1": [100, 150, 200]})
 
         >>> # Sample boolean features
-        >>> cond_1 = a > 100
-        >>> cond_2 = a < 200
+        >>> b = a > 100
+        >>> c = a < 200
 
         >>> # Equivalent
-        >>> c = tp.logical_xor(cond_1, cond_2)
-        >>> c = cond_1 ^ cond_2
-
-        >>> c.run({source: evset})
+        >>> d = tp.logical_xor(b, c)
+        >>> d = b ^ c
+        >>> d
         indexes: []
         features: [('xor_f1_f1', bool_)]
         events:

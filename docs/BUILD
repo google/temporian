@@ -7,8 +7,8 @@ package(
 # =========
 
 py_test(
-    name = "code_examples_test",
-    srcs = ["code_examples_test.py"],
+    name = "markdown_code_examples_test",
+    srcs = ["markdown_code_examples_test.py"],
     data = glob(["**/*.md"]),
     srcs_version = "PY3",
     deps = [

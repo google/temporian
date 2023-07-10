@@ -61,15 +61,14 @@ def begin(input: EventSetNode) -> EventSetNode:
 
     Usage example:
         ```python
-        >>> a_evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[5, 6, 7, -1],
         ...     features={"f": [50, 60, 70, -10], "idx": [1, 1, 1, 2]},
         ...     indexes=["idx"]
         ... )
-        >>> a = a_evset.node()
 
         >>> a_ini = tp.begin(a)
-        >>> a_ini.run({a: a_evset})
+        >>> a_ini
         indexes: [('idx', int64)]
         features: []
         events:

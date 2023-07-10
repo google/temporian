@@ -197,6 +197,30 @@ def invert(
     Swaps False<->True element-wise.
     Does not work on integers, they should be cast to BOOLEAN beforehand.
 
+    Example:
+        ```python
+        >>> a = tp.event_set(
+        ...     timestamps=[1, 2],
+        ...     features={"M": [1, 5], "N": [1.0, 5.5]},
+        ... )
+        >>> # Boolean node
+        >>> b = a < 2
+        >>> b
+        indexes: ...
+                'M': [ True False]
+                'N': [ True False]
+        ...
+
+        >>> # Inverted node
+        >>> c = ~b
+        >>> c
+        indexes: ...
+                'M': [False True]
+                'N': [False True]
+        ...
+
+        ```
+
     Args:
         input: EventSetNode to invert.
 
@@ -217,6 +241,30 @@ def isnan(
     Note that for `int` and `bool` this will
     always be `False` since those types don't support NaNs.
     It only makes actual sense to use on `float` (or `tp.float32`) features.
+
+    See also [`tp.notnan()`][tp.notnan].
+
+    Example:
+        ```python
+        >>> a = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"M":[np.nan, 5., np.nan], "N":  [-1, 0, 5]},
+        ... )
+        >>> b = tp.isnan(a)
+        >>> b
+        indexes: ...
+                'M': [ True False True]
+                'N': [False False False]
+        ...
+
+        >>> # Count nans
+        >>> tp.cumsum(tp.cast(b["M"], int))
+        indexes: ...
+                timestamps: [1. 2. 3.]
+                'M': [1 1 2]
+        ...
+
+        ```
 
     Args:
         input: EventSetNode to check for NaNs.
@@ -239,6 +287,35 @@ def notnan(
     always be `True` since those types don't support NaNs.
     It only makes actual sense to use on `float` (or `tp.float32`) features.
 
+
+    Example:
+        ```python
+        >>> a = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"M":[np.nan, 5., np.nan], "N":  [-1, 0, 5]},
+        ... )
+        >>> b = tp.isnan(a)
+        >>> b
+        indexes: ...
+                'M': [ True False True]
+                'N': [False False False]
+        ...
+
+        >>> # Filter only not nan rows
+        >>> not_nans = ~b["M"]
+        >>> not_nans
+        indexes: ...
+                'M': [False True False]
+        ...
+
+        >>> tp.filter(a, not_nans)
+        indexes: ...
+                'M': [5.]
+                'N': [0]
+        ...
+
+        ```
+
     Args:
         input: EventSetNode to check for NaNs.
 
@@ -255,6 +332,21 @@ def abs(
     input: EventSetNode,
 ) -> EventSetNode:
     """Gets the absolute value of the input features.
+
+    Example:
+        ```python
+        >>> a = tp.event_set(
+        ...     timestamps=[1, 2, 3],
+        ...     features={"M":[np.nan, -1., 2.], "N":  [-1, -3, 5]},
+        ... )
+        >>> b = tp.abs(a)
+        >>> b
+        indexes: ...
+                'M': [nan 1. 2.]
+                'N': [1 3 5]
+        ...
+
+        ```
 
     Args:
         input: EventSetNode calculate absolute value.
@@ -273,6 +365,21 @@ def log(
 ) -> EventSetNode:
     """Calculates the natural logarithm of the features. Can only be used
     on floating point feature types.
+
+    Example:
+        ```python
+        >>> a = tp.event_set(
+        ...     timestamps=[1, 2, 3, 4, 5],
+        ...     features={"M": [np.e, 1., 2., 10., -1.]},
+        ... )
+        >>> b = tp.log(a)
+        >>> b
+        indexes: ...
+                timestamps: [1. 2. 3. 4. 5.]
+                'M': [1. 0. 0.6931 2.3026 nan]
+        ...
+
+        ```
 
     Args:
         input: EventSetNode to calculate natural logarithm.
