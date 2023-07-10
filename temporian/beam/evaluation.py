@@ -126,33 +126,33 @@ def run_multi_io(
 
     data = {**inputs}
 
-    num_operators = len(schedule.ordered_operators)
-    for operator_idx, operator in enumerate(schedule.ordered_operators):
-        operator_def = operator.definition()
+    num_steps = len(schedule.steps)
+    for step_idx, step in enumerate(schedule.steps):
+        operator_def = step.op.definition()
 
         print("=============================", file=sys.stderr)
         print(
-            f"{operator_idx+1} / {num_operators}: Run {operator}",
+            f"{step_idx+1} / {num_steps}: Run {step.op}",
             file=sys.stderr,
         )
 
         # Construct operator inputs
         operator_inputs = {
             input_key: data[input_node]
-            for input_key, input_node in operator.inputs.items()
+            for input_key, input_node in step.op.inputs.items()
         }
 
         # Get Beam implementation
         implementation_cls = implementation_lib.get_implementation_class(
             operator_def.key
         )
-        implementation = implementation_cls(operator)
+        implementation = implementation_cls(step.op)
 
         # Add implementation to Beam pipeline
         operator_outputs = implementation(**operator_inputs)
 
         # Collect outputs
-        for output_key, output_node in operator.outputs.items():
+        for output_key, output_node in step.op.outputs.items():
             data[output_node] = operator_outputs[output_key]
 
     return {output: data[output] for output in outputs}

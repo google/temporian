@@ -20,6 +20,14 @@ from temporian.core.operators.base import Operator
 
 
 @dataclass
+class ScheduleStep:
+    op: Operator
+
+    # List of nodes that will not be used anymore after "op" is executed.
+    released_nodes: List[EventSetNode]
+
+
+@dataclass
 class Schedule:
-    ordered_operators: List[Operator] = field(default_factory=list)
+    steps: List[ScheduleStep] = field(default_factory=list)
     input_nodes: Set[EventSetNode] = field(default_factory=set)

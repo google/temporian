@@ -72,6 +72,8 @@ class OperatorExceptionDecorator:
 class Operator(ABC):
     """Interface definition and common logic for operators."""
 
+    next_internal_id: int = 0
+
     def __init__(self):
         self._inputs: Dict[str, EventSetNode] = {}
         self._outputs: Dict[str, EventSetNode] = {}
@@ -81,10 +83,18 @@ class Operator(ABC):
             attr.key: attr.type for attr in self._definition.attributes
         }
 
+        # Id of the operator object such that an operator A instantiated before
+        # an operator B will have a smaller _internal_ordered_id.
+        #
+        # _internal_ordered_id is used to ensure the deterministic graph
+        # evaluation.
+        self._internal_ordered_id = Operator.next_internal_id
+        Operator.next_internal_id += 1
+
     def __repr__(self):
         return (
-            f"Operator(key={self.definition().key!r}, id={id(self)!r},"
-            f" attributes={self.attributes!r})"
+            f"Operator(key={self.definition().key!r},"
+            f" id={self._internal_ordered_id}, attributes={self.attributes!r})"
         )
 
     @property

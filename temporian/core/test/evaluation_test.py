@@ -29,13 +29,13 @@ class EvaluationTest(absltest.TestCase):
         schedule = evaluation.build_schedule(
             inputs={a}, outputs={b.outputs["output"]}
         )
-        self.assertEqual(schedule.ordered_operators, [b])
+        self.assertEqual(schedule.steps, [evaluation.ScheduleStep(b, [a])])
 
     def test_schedule_empty(self):
         a = utils.create_input_node()
 
         schedule = evaluation.build_schedule(inputs={a}, outputs={a})
-        self.assertEqual(schedule.ordered_operators, [])
+        self.assertEqual(schedule.steps, [])
 
     def test_schedule_two_delayed_inputs(self):
         i1 = utils.create_input_node()
@@ -46,9 +46,15 @@ class EvaluationTest(absltest.TestCase):
         schedule = evaluation.build_schedule(
             inputs={i1, i2}, outputs={o3.outputs["output"]}
         )
-        self.assertTrue(
-            (schedule.ordered_operators == [o2, o1, o3])
-            or (schedule.ordered_operators == [o1, o2, o3])
+        self.assertEqual(
+            schedule.steps,
+            [
+                evaluation.ScheduleStep(o1, [i1]),
+                evaluation.ScheduleStep(o2, [i2]),
+                evaluation.ScheduleStep(
+                    o3, [o1.outputs["output"], o2.outputs["output"]]
+                ),
+            ],
         )
 
     def test_schedule_basic(self):
@@ -62,9 +68,16 @@ class EvaluationTest(absltest.TestCase):
             inputs={i1, i3},
             outputs={o5.outputs["output_1"], o4.outputs["output"]},
         )
-        self.assertTrue(
-            (schedule.ordered_operators == [o2, o4, o5])
-            or (schedule.ordered_operators == [o4, o2, o5])
+
+        self.assertEqual(
+            schedule.steps,
+            [
+                evaluation.ScheduleStep(op=o2, released_nodes=[i1]),
+                evaluation.ScheduleStep(
+                    op=o4, released_nodes=[o2.outputs["output"], i3]
+                ),
+                evaluation.ScheduleStep(op=o5, released_nodes=[]),
+            ],
         )
 
     def test_schedule_mid_chain(self):
@@ -77,7 +90,35 @@ class EvaluationTest(absltest.TestCase):
         schedule = evaluation.build_schedule(
             inputs={o3.outputs["output"]}, outputs={o5.outputs["output"]}
         )
-        self.assertEqual(schedule.ordered_operators, [o4, o5])
+
+        self.assertEqual(
+            schedule.steps,
+            [
+                evaluation.ScheduleStep(
+                    op=o4, released_nodes=[o3.outputs["output"]]
+                ),
+                evaluation.ScheduleStep(
+                    op=o5, released_nodes=[o4.outputs["output"]]
+                ),
+            ],
+        )
+
+    def test_schedule_interm_results(self):
+        i1 = utils.create_input_node()
+        o2 = utils.OpI1O1(i1)
+        o3 = utils.OpI1O1(o2.outputs["output"])
+
+        schedule = evaluation.build_schedule(
+            inputs={i1}, outputs={o3.outputs["output"], o2.outputs["output"]}
+        )
+
+        self.assertEqual(
+            schedule.steps,
+            [
+                evaluation.ScheduleStep(op=o2, released_nodes=[i1]),
+                evaluation.ScheduleStep(op=o3, released_nodes=[]),
+            ],
+        )
 
     def test_run_value(self):
         i1 = utils.create_input_node()
