@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import pydoc
+import tempfile
+from typing import Dict
+
 from absl import logging
 from absl.testing import absltest
-import os
-import tempfile
 import temporian as tp
 from temporian.core import serialization
 from temporian.core import graph
@@ -199,27 +201,26 @@ class SerializationTest(absltest.TestCase):
     def test_save(self):
         @tp.compile
         def f(x: EventSetNode):
-            return tp.prefix("a_", x)
+            return {"output": tp.prefix("a_", x)}
 
         result = f(self.evset)
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_fn.tem")
             tp.save(f, path, x=self.evset)
-            input, output = tp.load_graph(path=path, squeeze=True)
-            inputs, outputs = tp.load_graph(path=path, squeeze=False)
+            inputs, outputs = tp.load_graph(path=path)
 
         self.assertEqual(list(inputs.keys()), ["x"])
         self.assertEqual(list(outputs.keys()), ["output"])
 
-        loaded_result = tp.run(output, {input: self.evset})
+        loaded_result = tp.run(outputs, {inputs["x"]: self.evset})
 
         self.assertEqual(result, loaded_result)
 
     def test_save_and_load_node_input(self):
         @tp.compile
         def f(x: EventSetNode):
-            return tp.prefix("a_", x)
+            return {"output": tp.prefix("a_", x)}
 
         node = self.evset.node()
         result = tp.run(f(node), {node: self.evset})
@@ -227,34 +228,32 @@ class SerializationTest(absltest.TestCase):
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_fn.tem")
             tp.save(f, path, x=node)
-            input, output = tp.load_graph(path=path, squeeze=True)
+            inputs, outputs = tp.load_graph(path=path)
 
-        loaded_result = tp.run(output, {input: self.evset})
+        loaded_result = tp.run(outputs, {inputs["x"]: self.evset})
 
         self.assertEqual(result, loaded_result)
 
     def test_save_and_load_schema_input(self):
         @tp.compile
         def f(x: EventSetNode):
-            return tp.prefix("a_", x)
+            return {"output": tp.prefix("a_", x)}
 
         result = f(self.evset)
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_fn.tem")
             tp.save(f, path, x=self.evset.schema)
-            input, output = tp.load_graph(path=path, squeeze=True)
+            inputs, outputs = tp.load_graph(path=path)
 
-        loaded_result = tp.run(output, {input: self.evset})
+        loaded_result = tp.run(outputs, {inputs["x"]: self.evset})
 
         self.assertEqual(result, loaded_result)
 
     def test_save_and_load_many_inputs(self):
         @tp.compile
-        def f(
-            x: EventSetNode, y: EventSetNode, z: EventSetNode
-        ) -> EventSetNode:
-            return tp.glue(x, y, z)
+        def f(x: EventSetNode, y: EventSetNode, z: EventSetNode):
+            return {"output": tp.glue(x, y, z)}
 
         x = tp.event_set(
             timestamps=[1.0, 2.0, 3.0],
@@ -275,37 +274,15 @@ class SerializationTest(absltest.TestCase):
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_fn.tem")
             tp.save(f, path, x, y, z=z)
-            inputs, output = tp.load_graph(path=path, squeeze=True)
+            inputs, outputs = tp.load_graph(path=path)
 
         self.assertEqual(list(inputs.keys()), ["x", "y", "z"])
 
         loaded_result = tp.run(
-            output, {inputs["x"]: x, inputs["y"]: y, inputs["z"]: z}
+            outputs, {inputs["x"]: x, inputs["y"]: y, inputs["z"]: z}
         )
 
         self.assertEqual(result, loaded_result)
-
-    def test_save_and_load_dict_outputs(self):
-        @tp.compile
-        def f(x: EventSetNode):
-            return {
-                "a": tp.abs(x),
-                "b": tp.log(x),
-            }
-
-        results = f(self.evset)
-
-        with tempfile.TemporaryDirectory() as tempdir:
-            path = os.path.join(tempdir, "my_fn.tem")
-            tp.save(f, path, self.evset)
-            input, outputs = tp.load_graph(path=path, squeeze=True)
-
-        self.assertEqual(list(outputs.keys()), ["a", "b"])
-
-        loaded_results = tp.run(outputs, {input: self.evset})
-
-        self.assertEqual(results["a"], loaded_results["a"])
-        self.assertEqual(results["b"], loaded_results["b"])
 
     def test_save_not_compiled(self):
         def f(x: EventSetNode):
@@ -452,7 +429,6 @@ class SerializationTest(absltest.TestCase):
             loaded_f = tp.load(path=path)
 
         doc = pydoc.render_doc(loaded_f)
-        print(doc)
         self.assertTrue(
             "x: temporian.core.data.node.EventSetNode, "
             "y: temporian.core.data.node.EventSetNode, "
