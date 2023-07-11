@@ -5,7 +5,7 @@ from typing import Optional, List, Set
 
 import numpy as np
 
-from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.event_set import EventSet, IndexType
 from temporian.implementation.numpy.data.plotter import (
     Options,
     Style,
@@ -17,7 +17,7 @@ from temporian.implementation.numpy.data.plotter import (
 
 def plot_matplotlib(
     evsets: List[EventSet],
-    indexes: List[tuple],
+    indexes: List[IndexType],
     features: Set[str],
     options: Options,
 ):

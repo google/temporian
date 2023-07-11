@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING, Union
 import datetime
 import sys
 
@@ -64,6 +64,25 @@ _DTYPE_REVERSE_MAPPING = {
     DType.STRING: np.bytes_,
     DType.BOOLEAN: np.bool_,
 }
+
+IndexItemType = Union[int, str, bytes]
+IndexType = Tuple[IndexItemType, ...]
+
+
+def normalize_index_item(x: IndexItemType) -> IndexItemType:
+    if isinstance(x, str):
+        return x.encode()
+    return x
+
+
+def normalize_index(
+    index: Optional[Union[IndexItemType, IndexType]]
+) -> Optional[Union[IndexItemType, IndexType]]:
+    if index is None:
+        return None
+    if isinstance(index, tuple):
+        return tuple([normalize_index_item(x) for x in index])
+    return normalize_index_item(index)
 
 
 def is_supported_numpy_dtype(numpy_dtype) -> bool:
@@ -332,7 +351,7 @@ class EventSet(EventSetOperationsMixin):
 
     def __init__(
         self,
-        data: Dict[Tuple, IndexData],
+        data: Dict[IndexType, IndexData],
         schema: Schema,
         name: Optional[str] = None,
     ) -> None:
@@ -344,7 +363,7 @@ class EventSet(EventSetOperationsMixin):
         self._internal_node: Optional[EventSetNode] = None
 
     @property
-    def data(self) -> Dict[Tuple, IndexData]:
+    def data(self) -> Dict[IndexType, IndexData]:
         return self._data
 
     @property
@@ -359,7 +378,7 @@ class EventSet(EventSetOperationsMixin):
     def name(self, name: Optional[str]) -> None:
         self._name = name
 
-    def get_arbitrary_index_key(self) -> Optional[Tuple]:
+    def get_arbitrary_index_key(self) -> Optional[IndexType]:
         """Gets an arbitrary index key.
 
         If the EventSet is empty, return None.
