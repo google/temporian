@@ -434,7 +434,6 @@ def _serialize_node(
     src: EventSetNode, operators: Set[base.Operator]
 ) -> pb.EventSetNode:
     assert len(src.schema.features) == len(src.feature_nodes)
-    logging.info("aaaa")
     logging.info(operators)
     return pb.EventSetNode(
         id=_identifier(src),
@@ -548,6 +547,8 @@ def _attribute_to_proto(
 ) -> pb.Operator.Attribute:
     if isinstance(value, str):
         return pb.Operator.Attribute(key=key, str=value)
+    if isinstance(value, bytes):
+        return pb.Operator.Attribute(key=key, bytes_=value)
     if isinstance(value, bool):
         # NOTE: Check this before int (isinstance(False, int) is also True)
         return pb.Operator.Attribute(key=key, boolean=value)
@@ -587,6 +588,8 @@ def _attribute_from_proto(src: pb.Operator.Attribute) -> base.AttributeType:
         return src.integer_64
     if src.HasField("str"):
         return src.str
+    if src.HasField("bytes_"):
+        return src.bytes_
     if src.HasField("float_64"):
         return src.float_64
     if src.HasField("list_str"):

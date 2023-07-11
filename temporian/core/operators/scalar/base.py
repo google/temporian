@@ -34,10 +34,13 @@ class BaseScalarOperator(Operator):
     def __init__(
         self,
         input: EventSetNode,
-        value: Union[float, int, str, bool],
+        value: Union[float, int, str, bytes, bool],
         is_value_first: bool = False,  # useful for non-commutative operators
     ):
         super().__init__()
+
+        if isinstance(value, str):
+            value = value.encode()
 
         self.value = value
         self.is_value_first = is_value_first
@@ -69,6 +72,7 @@ class BaseScalarOperator(Operator):
             float: [DType.FLOAT32, DType.FLOAT64],
             int: [DType.INT32, DType.INT64, DType.FLOAT32, DType.FLOAT64],
             str: [DType.STRING],
+            bytes: [DType.STRING],
             bool: [
                 DType.BOOLEAN,
                 DType.INT32,

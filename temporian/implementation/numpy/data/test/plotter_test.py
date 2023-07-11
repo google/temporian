@@ -47,6 +47,29 @@ class PlotterTest(parameterized.TestCase):
             return_fig=True,
         )
 
+    def test_index_str(self):
+        try:
+            import IPython.display
+        except ImportError:
+            # IPython is not installed / supported
+            return
+
+        evset = event_set(
+            timestamps=[0.1, 0.2, 0.3],
+            features={
+                "a": [1, 2, 3],
+                "b": [4, 5, 6],
+                "c": ["X", "Y", "X"],
+                "x": [1, 1, 1],
+            },
+            indexes=["c"],
+        )
+
+        _ = plotter.plot(evset, indexes="X", return_fig=True)
+        _ = plotter.plot(evset, indexes=b"X", return_fig=True)
+        _ = plotter.plot(evset, indexes=["X", "Y"], return_fig=True)
+        _ = plotter.plot(evset, indexes=[("X",), ("Y",)], return_fig=True)
+
     def test_is_uniform(self):
         self.assertTrue(plotter.is_uniform([]))
         self.assertTrue(plotter.is_uniform([1]))

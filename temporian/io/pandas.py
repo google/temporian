@@ -19,6 +19,7 @@ import numpy as np
 from typing import List, Optional
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.io import event_set
+from temporian.core.data.dtype import DType
 
 
 # TODO: Rename argument `index_names` to `index_features`.
@@ -88,7 +89,7 @@ def from_pandas(
 
 
 def to_pandas(
-    evset: EventSet,
+    evset: EventSet, tp_string_to_pd_string: bool = True
 ) -> "pandas.DataFrame":
     """Converts an [`EventSet`][temporian.EventSet] to a pandas DataFrame.
 
@@ -122,6 +123,11 @@ def to_pandas(
 
         ```
 
+    Args:
+        evset: Input event set.
+        tp_string_to_pd_string: If true, cast Temporian strings (equivalent to
+            np.string_ or np.bytes) to Pandas strings (equivalent to np.str_).
+
     Returns:
         DataFrame created from EventSet.
     """
@@ -151,4 +157,13 @@ def to_pandas(
             dst[index_name].append(np.repeat(index_item, num_timestamps))
 
     dst = {k: np.concatenate(v) for k, v in dst.items()}
+
+    if tp_string_to_pd_string:
+        for feature in evset.schema.features:
+            if feature.dtype == DType.STRING:
+                dst[feature.name] = dst[feature.name].astype(str)
+        for index in evset.schema.indexes:
+            if index.dtype == DType.STRING:
+                dst[index.name] = dst[index.name].astype(str)
+
     return pd.DataFrame(dst)

@@ -43,7 +43,7 @@ class DType(Enum):
     def is_integer(self) -> bool:
         return self in (DType.INT64, DType.INT32)
 
-    def missing_value(self) -> Union[float, int, str]:
+    def missing_value(self) -> Union[float, int, bytes]:
         """
         Returns missing value for specific dtype.
 
@@ -58,7 +58,7 @@ class DType(Enum):
             return 0
 
         if self == DType.STRING:
-            return ""
+            return b""
 
         raise ValueError(f"Non-implemented type {self}")
 
@@ -84,6 +84,9 @@ class DType(Enum):
             return DType.INT64
 
         if python_type is str:
+            return DType.STRING
+
+        if python_type is bytes:
             return DType.STRING
 
         if python_type is bool:
@@ -124,5 +127,6 @@ int64 = DType.INT64
 bool_ = DType.BOOLEAN
 """Boolean value."""
 
-str_ = DType.STRING
+bytes_ = DType.STRING
+str_ = bytes_
 """String value."""

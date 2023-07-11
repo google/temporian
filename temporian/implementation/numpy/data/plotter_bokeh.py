@@ -5,7 +5,7 @@ from typing import Optional, List, Any, Set
 
 import numpy as np
 
-from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.event_set import EventSet, IndexType
 from temporian.implementation.numpy.data.plotter import (
     Options,
     Style,
@@ -17,7 +17,7 @@ from temporian.implementation.numpy.data.plotter import (
 
 def plot_bokeh(
     evsets: List[EventSet],
-    indexes: List[tuple],
+    indexes: List[IndexType],
     features: Set[str],
     options: Options,
 ):
@@ -206,8 +206,9 @@ def _bokeh_sub_plot(
     if title:
         fig_args["title"] = title
 
-    is_string = ys.dtype.type is np.str_ or ys.dtype.type is np.string_
+    is_string = ys.dtype.type is np.str_ or ys.dtype.type is np.bytes_
     if is_string:
+        ys = ys.astype(np.str_)
         unique_ys_values = list(set(ys))
         fig_args["y_range"] = unique_ys_values
     else:
