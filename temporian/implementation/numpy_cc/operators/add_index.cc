@@ -142,6 +142,14 @@ void process_feature_int(const py::array_t<Feature> &feature,
   }
 }
 
+std::string_view remove_tailing_zeros(std::string_view src) {
+  int i = static_cast<int>(src.size()) - 1;
+  while (i >= 0 && src[i] == 0) {
+    i--;
+  }
+  return src.substr(0, i + 1);
+}
+
 // Builds the index of a given feature and recursively call
 // "recursive_build_index" on the remaining features.
 void process_feature_string(const py::array &feature, const py::list &features,
@@ -165,13 +173,14 @@ void process_feature_string(const py::array &feature, const py::list &features,
     for (Idx row_idx = 0; row_idx < num_rows; row_idx++) {
       const char *begin = ((char *)info.ptr) + row_idx * stride;
       std::string_view value(begin, itemsize);
-      local_groups[value].push_back(row_idx);
+      local_groups[remove_tailing_zeros(value)].push_back(row_idx);
     }
   } else {
     for (const auto row_idx : selected_rows) {
       const char *begin = ((char *)info.ptr) + row_idx * stride;
       std::string_view value(begin, itemsize);
-      local_groups[value].push_back(row_idx);
+      // DO NOT SUBMIT -> Remove extra 0s
+      local_groups[remove_tailing_zeros(value)].push_back(row_idx);
     }
   }
 
