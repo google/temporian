@@ -44,15 +44,15 @@ MAX_NUM_PRINTED_FEATURES = 10
 #
 # Remarks:
 #   - np.object_ is not automatically converted into DType.STRING.
-#   - Strings are always represented internally as np.str_ for features and str
-#     for index groups.
+#   - Strings are always represented internally as np.bytes_ for features and
+#       bytes for index groups.
 _DTYPE_MAPPING = {
     np.float64: DType.FLOAT64,
     np.float32: DType.FLOAT32,
     np.int64: DType.INT64,
     np.int32: DType.INT32,
     np.str_: DType.STRING,
-    np.string_: DType.STRING,
+    np.bytes_: DType.STRING,
     np.bool_: DType.BOOLEAN,
     np.datetime64: DType.INT64,
 }
@@ -61,7 +61,7 @@ _DTYPE_REVERSE_MAPPING = {
     DType.FLOAT32: np.float32,
     DType.INT64: np.int64,
     DType.INT32: np.int32,
-    DType.STRING: np.str_,
+    DType.STRING: np.bytes_,
     DType.BOOLEAN: np.bool_,
 }
 
@@ -126,12 +126,12 @@ def normalize_features(
 
         if is_string:
             # All the values are python strings.
-            feature_values = np.array(feature_values, dtype=np.str_)
+            feature_values = np.array(feature_values, dtype=np.bytes_)
         else:
             feature_values = np.array(feature_values)
 
     if feature_values.dtype.type == np.string_:
-        feature_values = feature_values.astype(np.str_)
+        feature_values = feature_values.astype(np.bytes_)
 
     if feature_values.dtype.type == np.object_:
         logging.warning(
@@ -141,7 +141,7 @@ def normalize_features(
             ),
             name,
         )
-        feature_values = feature_values.astype(np.str_)
+        feature_values = feature_values.astype(np.bytes_)
 
     if feature_values.dtype.type == np.datetime64:
         feature_values = feature_values.astype("datetime64[s]").astype(np.int64)
@@ -176,7 +176,7 @@ def normalize_timestamps(
 
         return values, False
 
-    if values.dtype.type in [np.str_, np.string_]:
+    if values.dtype.type in [np.str_, np.bytes_]:
         values = values.astype("datetime64[ns]")
 
     if values.dtype.type == np.object_:

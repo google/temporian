@@ -99,7 +99,7 @@ class IOTest(absltest.TestCase):
             # Numpy
             [np.datetime64("1970-01-02")],
             np.array(["1970-01-02"], dtype=np.str_),
-            np.array(["1970-01-02"], dtype=np.string_),
+            np.array(["1970-01-02"], dtype=np.bytes_),
             np.array(["1970-01-02"], dtype=np.object_),
             # Pandas
             pd.Series([pd.Timestamp("1970-01-02")]),
