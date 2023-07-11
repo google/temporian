@@ -439,8 +439,6 @@ class SerializationTest(absltest.TestCase):
 
         self.assertEqual(result, loaded_result)
 
-    # TODO: test failure cases of load
-
     def test_load_signature(self):
         """Checks that help(loaded_f) shows the correct param spec."""
 
