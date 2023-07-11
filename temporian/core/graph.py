@@ -163,7 +163,7 @@ class Graph:
             p3("Output", self.outputs)
         return s
 
-    def replace_named_inputs(
+    def apply_on_inputs(
         self, named_inputs: Dict[str, EventSetNode]
     ) -> Dict[str, EventSetNode]:
         """Applies the operators in this graph to new inputs.

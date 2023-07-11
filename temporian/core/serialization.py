@@ -138,7 +138,7 @@ def load(
         **kwargs: EventSetNode,
     ) -> Dict[str, EventSetNode]:
         kwargs = _kwargs_from_args_and_kwargs(input_names, args, kwargs)
-        return g.replace_named_inputs(named_inputs=kwargs)
+        return g.apply_on_inputs(named_inputs=kwargs)
 
     fn.__signature__ = inspect.signature(fn).replace(
         parameters=[

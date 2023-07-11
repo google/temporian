@@ -181,6 +181,35 @@ class GraphTest(absltest.TestCase):
         self.assertLen(g.outputs, 1)
         self.assertEqual(g.inputs, g.outputs)
 
+    def test_apply_on_inputs(self):
+        i1 = utils.create_input_node("io_input_1")
+        o2 = utils.OpI1O1(i1)
+        i3 = utils.create_input_node("io_input_2")
+        o4 = utils.OpI2O1(o2.outputs["output"], i3)
+        o5 = utils.OpI1O2(o4.outputs["output"])
+
+        output_1 = o5.outputs["output_1"]
+        output_2 = o4.outputs["output"]
+        output_1.name = "io_output_1"
+        output_2.name = "io_output_2"
+
+        g = graph.infer_graph_named_nodes([i1, i3], [output_1, output_2])
+
+        # Apply same graph again to its own outputs
+        outputs = g.apply_on_inputs(
+            {"io_input_1": output_1, "io_input_2": output_2}
+        )
+        new_output_1 = outputs["io_output_1"]
+        new_output_2 = outputs["io_output_2"]
+        new_g = graph.infer_graph_named_nodes(
+            [i1, i3], [new_output_1, new_output_2]
+        )
+
+        self.assertLen(new_g.operators, 6)
+
+        internal_ids = [op._internal_ordered_id for op in new_g.operators]
+        self.assertEqual(len(internal_ids), len(set(internal_ids)))
+
 
 if __name__ == "__main__":
     absltest.main()
