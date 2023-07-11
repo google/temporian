@@ -208,6 +208,7 @@ def _bokeh_sub_plot(
 
     is_string = ys.dtype.type is np.str_ or ys.dtype.type is np.bytes_
     if is_string:
+        ys = ys.astype(np.str_)
         unique_ys_values = list(set(ys))
         fig_args["y_range"] = unique_ys_values
     else:

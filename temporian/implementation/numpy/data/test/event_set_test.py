@@ -20,7 +20,7 @@ class EventTest(absltest.TestCase):
         )
 
     def test_get_index_value(self):
-        index_data = self.evset.get_index_value((2, "world"))
+        index_data = self.evset.get_index_value((2, b"world"))
         self.assertTrue(isinstance(index_data, IndexData))
         self.assertTrue(
             (np.array(index_data.features) == [[7, 8], [9, 10]]).all()
@@ -28,13 +28,13 @@ class EventTest(absltest.TestCase):
         self.assertTrue((abs(index_data.timestamps - [0.4, 0.5]) < 1e-6).all())
 
     def test_set_index_value(self):
-        value = self.evset.get_index_value((1, "hello"))
+        value = self.evset.get_index_value((1, b"hello"))
         modified = IndexData(
             timestamps=value.timestamps,
             features=[f + 1 for f in value.features],
         )
-        self.evset.set_index_value((2, "world"), modified)
-        self.assertEqual(self.evset.get_index_value((2, "world")), modified)
+        self.evset.set_index_value((2, b"world"), modified)
+        self.assertEqual(self.evset.get_index_value((2, b"world")), modified)
 
     def test_data_access(self):
         self.assertEqual(
@@ -51,11 +51,11 @@ class EventTest(absltest.TestCase):
             """indexes: [('x', int64), ('y', str_)]
 features: [('a', int64), ('b', int64)]
 events:
-    x=1 y=hello (3 events):
+    x=1 y=b'hello' (3 events):
         timestamps: [0.1 0.2 0.3]
         'a': [1 2 3]
         'b': [4 5 6]
-    x=2 y=world (2 events):
+    x=2 y=b'world' (2 events):
         timestamps: [0.4 0.5]
         'a': [7 8]
         'b': [ 9 10]

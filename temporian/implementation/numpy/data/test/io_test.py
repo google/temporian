@@ -42,23 +42,23 @@ class IOTest(absltest.TestCase):
         )
         expected_evset = EventSet(
             data={
-                ("red",): IndexData(
+                (b"red",): IndexData(
                     features=[
                         np.array([0.5, math.nan]),
                         np.array([10, 5]),
-                        np.array(["a", "nan"]),
-                        np.array(["d", ""]),
+                        np.array([b"a", b"nan"]),
+                        np.array([b"d", b""]),
                         np.array([1, 3]),
                     ],
                     timestamps=np.array([1.0, 3.0], dtype=np.float64),
                     schema=expected_schema,
                 ),
-                ("blue",): IndexData(
+                (b"blue",): IndexData(
                     features=[
                         np.array([0.6, 0.9]),
                         np.array([-1, 5]),
-                        np.array(["b", "c"]),
-                        np.array(["e", "f"]),
+                        np.array([b"b", b"c"]),
+                        np.array([b"e", b"f"]),
                         np.array([2, 4]),
                     ],
                     timestamps=np.array([2.0, 4.0], dtype=np.float64),

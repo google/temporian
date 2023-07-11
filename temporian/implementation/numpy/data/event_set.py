@@ -137,7 +137,7 @@ def normalize_features(
         logging.warning(
             (
                 'Feature "%s" is an array of numpy.object_ and was casted to'
-                " numpy.str_."
+                " numpy.bytes_ == numpy.string_."
             ),
             name,
         )

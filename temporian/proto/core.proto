@@ -75,7 +75,7 @@ message Operator {
       bool boolean = 6;
       MapStrStr map_str_str = 7;
       ListDType list_dtype = 8;
-
+      bytes bytes_ = 9;
     }
     message ListString{
       repeated string values = 1;
@@ -205,6 +205,7 @@ message OperatorDef {
       MAP_STR_STR = 7;
       DTYPE = 8;
       LIST_DTYPE = 9;
+      BYTES = 10;
     }
   }
 }
