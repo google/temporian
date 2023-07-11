@@ -64,19 +64,20 @@ def enumerate(input: EventSetNode) -> EventSetNode:
 
     Usage:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...    timestamps=[-1, 2, 3, 5, 0],
-        ...    features={"a": ["A", "A", "A", "A", "B"]},
-        ...    indexes=["a"],
+        ...    features={"cat": ["A", "A", "A", "A", "B"]},
+        ...    indexes=["cat"],
         ... )
-        >>> tp.enumerate(evset.node()).run(evset)
-        indexes: [('a', str_)]
+        >>> b = tp.enumerate(a)
+        >>> b
+        indexes: [('cat', str_)]
         features: [('enumerate', int64)]
         events:
-            a=A (4 events):
+            cat=A (4 events):
                 timestamps: [-1.  2.  3.  5.]
                 'enumerate': [0 1 2 3]
-            a=B (1 events):
+            cat=B (1 events):
                 timestamps: [0.]
                 'enumerate': [0]
         ...

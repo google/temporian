@@ -46,9 +46,9 @@ def run_schedule(
     """
     data = {**inputs}
 
-    num_operators = len(schedule.ordered_operators)
-    for operator_idx, operator in enumerate(schedule.ordered_operators):
-        operator_def = operator.definition()
+    num_steps = len(schedule.steps)
+    for step_idx, step in enumerate(schedule.steps):
+        operator_def = step.op.definition()
 
         # Get implementation
         implementation_cls = implementation_lib.get_implementation_class(
@@ -56,28 +56,25 @@ def run_schedule(
         )
 
         # Instantiate implementation
-        implementation = implementation_cls(operator)
+        implementation = implementation_cls(step.op)
 
         if verbose == 1:
             print(
-                (
-                    f"    {operator_idx+1} / {num_operators}:"
-                    f" {operator.operator_key()}"
-                ),
+                f"    {step_idx+1} / {num_steps}: {step.op.operator_key()}",
                 file=sys.stderr,
                 end="",
             )
         elif verbose >= 2:
             print("=============================", file=sys.stderr)
             print(
-                f"{operator_idx+1} / {num_operators}: Run {operator}",
+                f"{step_idx+1} / {num_steps}: Run {step.op}",
                 file=sys.stderr,
             )
 
         # Construct operator inputs
         operator_inputs = {
             input_key: data[input_node]
-            for input_key, input_node in operator.inputs.items()
+            for input_key, input_node in step.op.inputs.items()
         }
 
         if verbose >= 2:
@@ -98,11 +95,14 @@ def run_schedule(
             print(f"Duration: {end_time - begin_time} s", file=sys.stderr)
 
         # materialize data in output nodes
-        for output_key, output_node in operator.outputs.items():
+        for output_key, output_node in step.op.outputs.items():
             output_evset = operator_outputs[output_key]
             output_evset._internal_node = output_node
             data[output_node] = output_evset
 
-    # TODO: Only return the required data.
-    # TODO: Un-allocate not used anymore object.
+        # Release unused memory
+        for node in step.released_nodes:
+            assert node in data
+            del data[node]
+
     return data

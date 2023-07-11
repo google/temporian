@@ -24,7 +24,7 @@ from temporian.core.operators.base import Operator
 from temporian.implementation.numpy import evaluation as np_eval
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core.graph import infer_graph
-from temporian.core.schedule import Schedule
+from temporian.core.schedule import Schedule, ScheduleStep
 from temporian.core.operators.leak import LeakOperator
 
 EvaluationQuery = Union[
@@ -143,7 +143,7 @@ def run(
 
     if verbose == 1:
         print(
-            f"Run {len(schedule.ordered_operators)} operators",
+            f"Run {len(schedule.steps)} operators",
             file=sys.stderr,
         )
 
@@ -208,7 +208,8 @@ def build_schedule(
     # Operators ready to be computed (i.e. ready to be added to "planned_ops")
     # as all their inputs are already computed by "planned_ops" or specified by
     # "inputs".
-    ready_ops: Set[Operator] = set()
+    ready_ops: List[Operator] = []
+    ready_ops_set: Set[Operator] = set()
 
     # "node_to_op[e]" is the list of operators with node "e" as input.
     node_to_op: Dict[EventSetNode, List[Operator]] = defaultdict(lambda: [])
@@ -222,25 +223,50 @@ def build_schedule(
     for op in graph.operators:
         num_pending_inputs = 0
         for input_node in op.inputs.values():
+            node_to_op[input_node].append(op)
             if input_node in graph.inputs:
                 # This input is already available
                 continue
-            node_to_op[input_node].append(op)
             num_pending_inputs += 1
         if num_pending_inputs == 0:
             # Ready to be scheduled
-            ready_ops.add(op)
+            ready_ops.append(op)
+            ready_ops_set.add(op)
         else:
             # Some of the inputs are missing.
             op_to_num_pending_inputs[op] = num_pending_inputs
+
+    # Make evaluation order deterministic.
+    #
+    # Execute the op with smallest internal ordered id first.
+    ready_ops.sort(key=lambda op: op._internal_ordered_id, reverse=True)
 
     # Compute the schedule
     while ready_ops:
         # Get an op ready to be scheduled
         op = ready_ops.pop()
+        ready_ops_set.remove(op)
+
+        # Nodes released after the op is executed
+        released_nodes = []
+        for input in op.inputs.values():
+            if input in outputs:
+                continue
+            if input not in node_to_op:
+                continue
+            # The list of ops that depends on this input (including the current
+            # op "op").
+            input_usage = node_to_op[input]
+            input_usage.remove(op)
+
+            if not input_usage:
+                released_nodes.append(input)
+                del node_to_op[input]
 
         # Schedule the op
-        schedule.ordered_operators.append(op)
+        schedule.steps.append(
+            ScheduleStep(op=op, released_nodes=released_nodes)
+        )
 
         # Update all the ops that depends on "op". Enlist the ones that are
         # ready to be computed
@@ -256,7 +282,8 @@ def build_schedule(
 
                 if num_missing_inputs == 0:
                     # "new_op" can be computed
-                    ready_ops.add(new_op)
+                    ready_ops.append(new_op)
+                    ready_ops_set.add(new_op)
                     del op_to_num_pending_inputs[new_op]
 
     assert not op_to_num_pending_inputs

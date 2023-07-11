@@ -50,7 +50,7 @@ class Join(Operator):
             self.add_attribute("on", on)
         self._on = on
 
-        left.schema.check_compatible_index(right.schema, "left and right")
+        left.schema.check_compatible_index(right.schema)
 
         if how not in [JOIN_LEFT]:
             raise ValueError(
@@ -144,10 +144,10 @@ def join(
     """Join [`EventSetNode`][temporian.EventSetNode]s with different samplings.
 
     Join features from two nodes based on timestamps. Optionally, join on
-    timestamps and an extra in64 feature. Joined nodes should have the the same
-    index and non overlapping feature names.
+    timestamps and an extra `int64` feature. Joined nodes should have the the
+    same index and non overlapping feature names.
 
-    To concatenates nodes with the same sampling, use
+    To concatenate nodes with the same sampling, use
     [`tp.glue`][temporian.glue] instead. [`tp.glue`][temporian.glue] is almost
     free while [`tp.join`][temporian.join] can be expensive.
     To resample a node according to another nodes's sampling,
@@ -156,11 +156,62 @@ def join(
     Example:
 
         ```python
-        >>> a = tp.input_node(features=[("f1", tp.float64)])
-        >>> b = tp.input_node(features=[("f2", tp.float64)])
+        >>> a = tp.event_set(timestamps=[0, 1, 2], features={"A": [0, 10, 20]})
+        >>> b = tp.event_set(timestamps=[0, 2, 4], features={"B": [0., 2., 4.]})
+
+        >>> # Left join
         >>> c = tp.join(a, b)
-        >>> c.features
-        [('f1', float64), ('f2', float64)]
+        >>> c
+        indexes: []
+        features: [('A', int64), ('B', float64)]
+        events:
+            (3 events):
+                timestamps: [0. 1. 2.]
+                'A': [ 0 10 20]
+                'B': [ 0. nan 2.]
+        ...
+
+        ```
+
+    Example with an index and feature join:
+
+        ```python
+        >>> a = tp.event_set(
+        ...     timestamps=[0, 1, 1, 1],
+        ...     features={
+        ...         "idx": [1, 1, 2, 2],
+        ...         "match": [1, 2, 4, 5],
+        ...         "A": [10, 20, 40, 50],
+        ...     },
+        ...     indexes=["idx"]
+        ... )
+        >>> b = tp.event_set(
+        ...     timestamps=[0, 1, 0, 1, 1, 1],
+        ...     features={
+        ...         "idx": [1, 1, 2, 2, 2, 2],
+        ...         "match": [1, 2, 3, 4, 5, 6],
+        ...         "B": [10., 20., 30., 40., 50., 60.],
+        ...     },
+        ...     indexes=["idx"]
+        ... )
+
+        >>> # Join by index and 'match'
+        >>> c = tp.join(a, b, on="match")
+        >>> c
+        indexes: [('idx', int64)]
+        features: [('match', int64), ('A', int64), ('B', float64)]
+        events:
+            idx=1 (2 events):
+                timestamps: [0. 1.]
+                'match': [1 2]
+                'A': [10 20]
+                'B': [10. 20.]
+            idx=2 (2 events):
+                timestamps: [1. 1.]
+                'match': [4 5]
+                'A': [40 50]
+                'B': [40. 50.]
+        ...
 
         ```
 

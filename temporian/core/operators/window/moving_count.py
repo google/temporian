@@ -55,16 +55,15 @@ def moving_count(
     If the window does not contain any values (e.g., all the values are missing,
     or the window does not contain any sampling), outputs missing values.
 
-    Basic usage:
+    Basic example:
         ```python
-        >>> a_evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[0, 1, 2, 5, 6, 7],
         ...     features={"value": [np.nan, 1, 5, 10, 15, 20]},
         ... )
-        >>> a = a_evset.node()
 
-        >>> result = tp.moving_count(a, tp.duration.seconds(2))
-        >>> result.run({a: a_evset})
+        >>> b = tp.moving_count(a, tp.duration.seconds(2))
+        >>> b
         indexes: ...
             (6 events):
                 timestamps: [0. 1. 2. 5. 6. 7.]
@@ -75,18 +74,15 @@ def moving_count(
 
     Example with external sampling:
         ```python
-        >>> a_evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[0, 1, 2, 5],
         ...     features={"value": [np.nan, 1, 5, 10]},
         ... )
-        >>> sampling_evset= tp.event_set(
+        >>> b = tp.event_set(
         ...     timestamps=[-1, 0, 1, 2, 3, 4, 5, 6, 7],
         ... )
-        >>> a = a_evset.node()
-        >>> sampling = sampling_evset.node()
-
-        >>> result = tp.moving_count(a, tp.duration.seconds(2), sampling)
-        >>> result.run({a: a_evset, sampling: sampling_evset})
+        >>> c = tp.moving_count(a, tp.duration.seconds(2), sampling=b)
+        >>> c
         indexes: ...
             (9 events):
                 timestamps: [-1. 0. 1. 2. 3. 4. 5. 6. 7.]
@@ -97,7 +93,7 @@ def moving_count(
 
     Example with indices:
         ```python
-        >>> a_evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 3, 0, 1, 2],
         ...     features={
         ...         "value": [1, 1, 1, 1, 1, 1],
@@ -105,9 +101,8 @@ def moving_count(
         ...     },
         ...     indexes=["idx"],
         ... )
-        >>> a = a_evset.node()
-        >>> result = tp.moving_count(a, tp.duration.seconds(2))
-        >>> result.run({a: a_evset})
+        >>> b = tp.moving_count(a, tp.duration.seconds(2))
+        >>> b
         indexes: [('idx', str_)]
         features: [('value', int32)]
         events:

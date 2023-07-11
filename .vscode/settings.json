@@ -1,5 +1,5 @@
 {
-  "python.envFile": "${workspaceFolder}/.venv",
+  "python.envFile": "${workspaceFolder}/.env",
   // hide bazel-* directories from file viewer and search
   "files.exclude": {
     "**/.venv/": true,
@@ -28,6 +28,7 @@
   "files.trimFinalNewlines": true,
   "files.trimTrailingWhitespace": true,
   "prettier.tabWidth": 2,
+  "editor.detectIndentation": true,
   "files.associations": {
     "system_error": "cpp",
     "type_traits": "cpp",
@@ -92,5 +93,6 @@
     "string_view": "cpp",
     "numbers": "cpp"
   },
-  "python.analysis.typeCheckingMode": "basic"
+  "python.analysis.typeCheckingMode": "basic",
+  "jupyter.notebookFileRoot": "${fileDirname}"
 }

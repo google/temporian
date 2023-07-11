@@ -66,10 +66,9 @@ def timestamps(input: EventSetNode) -> EventSetNode:
     Integer timestamps example:
         ```python
         >>> from datetime import datetime
-        >>> evset = tp.event_set(
-        ...    timestamps=[1, 2, 3, 5],
-        ... )
-        >>> tp.timestamps(evset.node()).run(evset)
+        >>> a = tp.event_set(timestamps=[1, 2, 3, 5])
+        >>> b = tp.timestamps(a)
+        >>> b
         indexes: []
         features: [('timestamps', float64)]
         events:
@@ -83,24 +82,19 @@ def timestamps(input: EventSetNode) -> EventSetNode:
     Unix timestamps and filter example:
         ```python
         >>> from datetime import datetime
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...    timestamps=[datetime(1970,1,1,0,0,30), datetime(2023,1,1,1,0,0)],
         ... )
-        >>> node = evset.node()
-        >>> tstamps = tp.timestamps(node)
+        >>> b = tp.timestamps(a)
 
         >>> # Filter using the timestamps
-        >>> old_times = tp.filter(
-        ...     tstamps, tstamps < datetime(2020, 1, 1).timestamp()
-        ... )
+        >>> max_date = datetime(2020, 1, 1).timestamp()
+        >>> c = tp.filter(b, b < max_date)
 
         >>> # Operate like any other feature
-        >>> multiply = old_times * 5
-        >>> result = tp.glue(
-        ...     tp.rename(old_times, 'filtered'),
-        ...     tp.rename(multiply, 'multiplied')
-        ... )
-        >>> result.run(evset)
+        >>> d = c * 5
+        >>> e = tp.glue(tp.rename(c, 'filtered'), tp.rename(d, 'multiplied'))
+        >>> e
         indexes: []
         features: [('filtered', float64), ('multiplied', float64)]
         events:

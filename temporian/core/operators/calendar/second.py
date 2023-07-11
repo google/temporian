@@ -45,11 +45,12 @@ def calendar_second(sampling: EventSetNode) -> EventSetNode:
     Usage example:
         ```python
         >>> from datetime import datetime
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...    timestamps=[datetime(2020,1,1,18,30,55), datetime(2020,1,1,23,59,0)],
         ...    name='random_hours'
         ... )
-        >>> tp.calendar_second(evset.node()).run(evset)
+        >>> b = tp.calendar_second(a)
+        >>> b
         indexes: ...
         features: [('calendar_second', int32)]
         events:

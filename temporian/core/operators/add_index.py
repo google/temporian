@@ -148,7 +148,7 @@ def add_index(
 
     Usage example:
         ```python
-        >>> a_evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 1, 0, 1, 1],
         ...     features={
         ...         "f1": [1, 1, 1, 2, 2, 2],
@@ -158,7 +158,7 @@ def add_index(
         ... )
 
         >>> # No index
-        >>> a_evset
+        >>> a
         indexes: []
         features: [('f1', int64), ('f2', int64), ('f3', int64)]
         events:
@@ -170,9 +170,8 @@ def add_index(
         ...
 
         >>> # Add only "f1" as index
-        >>> a = a_evset.node()
-        >>> result = tp.add_index(a, "f1")
-        >>> result.run(a_evset)
+        >>> b = tp.add_index(a, "f1")
+        >>> b
         indexes: [('f1', int64)]
         features: [('f2', int64), ('f3', int64)]
         events:
@@ -187,8 +186,8 @@ def add_index(
         ...
 
         >>> # Add "f1" and "f2" as indices
-        >>> result = tp.add_index(a, ["f1", "f2"])
-        >>> result.run(a_evset)
+        >>> b = tp.add_index(a, ["f1", "f2"])
+        >>> b
         indexes: [('f1', int64), ('f2', int64)]
         features: [('f3', int64)]
         events:
@@ -235,7 +234,7 @@ def set_index(
 
     Usage example:
         ```python
-        >>> a_evset = tp.event_set(
+        >>> a = tp.event_set(
         ...     timestamps=[1, 2, 1, 0, 1, 1],
         ...     features={
         ...         "f1": [1, 1, 1, 2, 2, 2],
@@ -244,10 +243,9 @@ def set_index(
         ...     },
         ...     indexes=["f1"],
         ... )
-        >>> a = a_evset.node()
 
         >>> # "f1" is the current index
-        >>> a_evset
+        >>> a
         indexes: [('f1', int64)]
         features: [('f2', int64), ('f3', int64)]
         events:
@@ -262,8 +260,8 @@ def set_index(
         ...
 
         >>> # Set "f2" as the only index, remove "f1"
-        >>> result = tp.set_index(a, "f2")
-        >>> result.run(a_evset)
+        >>> b = tp.set_index(a, "f2")
+        >>> b
         indexes: [('f2', int64)]
         features: [('f3', int64), ('f1', int64)]
         events:
@@ -278,8 +276,8 @@ def set_index(
         ...
 
         >>> # Set both "f1" and "f2" as indices
-        >>> result = tp.set_index(a, ["f1", "f2"])
-        >>> result.run(a_evset)
+        >>> b = tp.set_index(a, ["f1", "f2"])
+        >>> b
         indexes: [('f1', int64), ('f2', int64)]
         features: [('f3', int64)]
         events:

@@ -134,10 +134,10 @@ class EventSetNode(EventSetOperationsMixin):
             raise ValueError(
                 "Arguments should have the same sampling."
                 f" {self.sampling_node} is different from"
-                f" {other.sampling_node}. To create input EventSetNodes with"
+                f" {other.sampling_node}. To create input EventSets with"
                 " the same sampling, use the argument `same_sampling_as` of"
-                " `tp.input_node` or `tp.event_set`. To align the sampling of"
-                " two EventSetNodes with same indexes but different sampling,"
+                " `tp.event_set` or `tp.input_node`. To align the sampling of"
+                " two EventSets with same indexes but different sampling,"
                 " use the operator `tp.resample`."
             )
 

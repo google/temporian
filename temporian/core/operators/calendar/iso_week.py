@@ -44,12 +44,12 @@ def calendar_iso_week(sampling: EventSetNode) -> EventSetNode:
 
     Usage example:
         ```python
-        >>> evset = tp.event_set(
+        >>> a = tp.event_set(
         ...    # Note: 2023-01-01 is Sunday in the same week as 2022-12-31
         ...    timestamps=["2022-12-31", "2023-01-01", "2023-01-02", "2023-12-20"],
-        ...    name='extreme_weeks'
         ... )
-        >>> tp.calendar_iso_week(evset.node()).run(evset)
+        >>> b = tp.calendar_iso_week(a)
+        >>> b
         indexes: ...
         features: [('calendar_iso_week', int32)]
         events:
