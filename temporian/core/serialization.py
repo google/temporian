@@ -92,13 +92,13 @@ def save(
         ValueError: If any of the received inputs is not of the specified types.
         ValueError: If the function doesn't return one of the specified types.
     """
-    if not hasattr(fn, "is_tp_compiled") or not fn.is_tp_compiled:
+    if not hasattr(fn, "is_tp_compiled"):
         raise ValueError(
             "Can only save a function that has been compiled with"
             " `@tp.compile`."
         )
 
-    merged_kwargs = _construct_kwargs_from_args_and_kwargs(
+    merged_kwargs = _kwargs_from_args_and_kwargs(
         list(inspect.signature(fn).parameters.keys()), args, kwargs
     )
     node_kwargs = {k: _process_fn_input(v) for k, v in merged_kwargs.items()}
@@ -125,23 +125,20 @@ def load(
     Returns:
         The loaded function.
     """
-    with open(path, "rb") as f:
-        proto = text_format.Parse(f.read(), pb.Graph())
+    g = _load_graph(path)
 
-    g: graph.Graph = _unserialize(proto)
+    inputs = g.named_inputs
+    assert inputs is not None
 
-    assert g.named_inputs is not None
-    assert g.named_outputs is not None
+    input_names = list(inputs.keys())
 
     @compile
     def fn(
         *args: EventSetNode,
         **kwargs: EventSetNode,
     ) -> Dict[str, EventSetNode]:
-        kwargs = _construct_kwargs_from_args_and_kwargs(
-            list(g.named_inputs.keys()), args, kwargs
-        )
-        return g.apply_on_inputs(named_inputs=kwargs)
+        kwargs = _kwargs_from_args_and_kwargs(input_names, args, kwargs)
+        return g.replace_named_inputs(named_inputs=kwargs)
 
     fn.__signature__ = inspect.signature(fn).replace(
         parameters=[
@@ -150,7 +147,7 @@ def load(
                 annotation=EventSetNode,
                 kind=inspect.Parameter.POSITIONAL_OR_KEYWORD,
             )
-            for k in g.named_inputs
+            for k in inputs
         ]
     )
 
@@ -248,10 +245,7 @@ def load_graph(
     Returns:
         Input and output EventSetNodes.
     """
-
-    with open(path, "rb") as f:
-        proto = text_format.Parse(f.read(), pb.Graph())
-    g = _unserialize(proto)
+    g = _load_graph(path=path)
 
     inputs = g.named_inputs
     outputs = g.named_outputs
@@ -266,6 +260,16 @@ def load_graph(
         outputs = list(outputs.values())[0]
 
     return inputs, outputs
+
+
+def _load_graph(
+    path: str,
+) -> graph.Graph:
+    with open(path, "rb") as f:
+        proto = text_format.Parse(f.read(), pb.Graph())
+    g = _unserialize(proto)
+
+    return g
 
 
 def _process_fn_input(input: Any) -> EventSetNode:
@@ -294,7 +298,7 @@ def _process_fn_outputs(output: Any):
     )
 
 
-def _construct_kwargs_from_args_and_kwargs(
+def _kwargs_from_args_and_kwargs(
     param_names: List[str],
     args: Tuple[Any],
     kwargs: Dict[str, Any],
@@ -305,12 +309,15 @@ def _construct_kwargs_from_args_and_kwargs(
             f"The function takes {len(param_names)} arguments, but"
             f" {len(args)} positional arguments were received."
         )
+
+    # zip stops at the shortest iterable, extra param names are ignored
     arg_kwargs = {k: v for k, v in zip(param_names, args)}
     for k in arg_kwargs:
         if k in kwargs:
             raise ValueError(
                 f"The function received multiple values for the argument {k}."
             )
+
     return {**arg_kwargs, **kwargs}
 
 

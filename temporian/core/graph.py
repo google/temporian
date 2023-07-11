@@ -15,7 +15,7 @@
 """Graph class definition and inference logic."""
 
 from __future__ import annotations
-from copy import copy, deepcopy
+from copy import deepcopy
 from typing import List, Set, Dict, Union, Optional
 
 from temporian.core.data.node import EventSetNode, Feature, Sampling
@@ -163,7 +163,7 @@ class Graph:
             p3("Output", self.outputs)
         return s
 
-    def apply_on_inputs(
+    def replace_named_inputs(
         self, named_inputs: Dict[str, EventSetNode]
     ) -> Dict[str, EventSetNode]:
         """Applies the operators in this graph to new inputs.
@@ -195,9 +195,11 @@ class Graph:
                 )
             old_node = g.named_inputs[name]
             # Replace node as input in all operators that depend on it
+            # TODO: create and maintain a mapping from named_input to operator
+            # to make this more efficient
             for operator in g.operators:
                 for name, inp in operator.inputs.items():
-                    if inp == old_node:
+                    if inp is old_node:
                         operator.inputs[name] = new_node
         return g.named_outputs
 
