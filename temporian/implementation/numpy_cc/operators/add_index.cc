@@ -8,6 +8,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "temporian/implementation/numpy_cc/operators/common.h"
@@ -18,97 +19,6 @@ namespace py = pybind11;
 // TODO: Check if absl map would be more efficient.
 template <typename K, typename V>
 using Map = std::unordered_map<K, V>;
-
-/*
-groups, group_indices, group_end_idx = cc_add_index(data=data)
-*/
-
-// std::tuple<py::list, py::array_t<int64_t>, py::array_t<int64_t>>
-// add_index_compute_index(const py::list &data) {
-//   py::print("data:", data);
-//   const int num_index = data.size();
-//   py::print("num_index:", num_index);
-
-//   for (const auto &sub_data : data) {
-//     if (py::isinstance<py::array_t<int64_t>>(sub_data)) {
-//       const py::array_t<int64_t> sub_data_np =
-//           py::cast<py::array_t<int64_t>>(sub_data);
-//       py::print("dtype:", sub_data_np.dtype());
-//     }
-//   }
-
-//   for (int index_idx = 0; index_idx < num_index; index_idx++) {
-//     const auto &sub_data = data[index_idx];
-//     py::print("sub_data:", sub_data);
-//     py::print("get_type:", sub_data.get_type());
-//     // py::print("isinstance array_t:",
-//     py::isinstance<py::array_t>(sub_data)); py::print("isinstance
-//     array_t<int64_t>:",
-//               py::isinstance<py::array_t<int64_t>>(sub_data));
-
-//     if (py::isinstance<py::array_t<int64_t>>(sub_data)) {
-//       const auto sub_data_np = py::cast<py::array_t<int64_t>>(sub_data);
-
-//       py::print("py::array_t<int64_t> dtype:", sub_data_np.dtype());
-//     }
-
-//     else if (py::isinstance<py::array>(sub_data)) {
-//       const auto sub_data_np = py::cast<py::array>(sub_data);
-//       print("py::array:", sub_data_np.dtype());
-//       py::print("dtype itemsize:", sub_data_np.dtype().itemsize());
-//       py::print("dtype kind:", sub_data_np.dtype().kind());
-//       py::print("dtype num:", sub_data_np.dtype().num());
-
-//       py::buffer_info info = sub_data_np.request();
-
-//       // py::print("info:", info);
-//       py::print("info.itemsize:", info.itemsize);
-//       py::print("info.format:", info.format);
-//       py::print("info.ndim:", info.ndim);
-//       py::print("info.shape:", info.shape[0]);
-//       py::print("info.strides:", info.strides[0]);
-
-//       const int num_items = info.shape[0];
-//       const int stride = info.strides[0];
-//       for (int i = 0; i < num_items; i++) {
-//         char *begin = ((char *)info.ptr) + i * stride;
-//         char *end = begin + stride;
-//         // py::print("begin:", begin);
-//         // py::print("end:", end);
-
-//         for (char *cur = begin; cur != end; cur++) {
-//           std::cout << "D:" << (size_t)cur << "   " << (int)(*cur) << "   "
-//                     << *cur << std::endl;
-//         }
-//       }
-//     }
-
-//     // if (py::isinstance<py::array_t<const char *>>(sub_data)) {
-//     //   py::print("AAAAAAAAAAAAAAAAAAAAAAAAA");
-//     // }
-
-//     // if (py::isinstance<py::array>(sub_data)) {
-//     //   py::print("BBBBBBBBBBBBBb");
-//     // }
-
-//     // else if (py::isinstance<py::array_t<std::string>>(sub_data)) {
-//     //   const auto sub_data_np =
-//     py::cast<py::array_t<std::string>>(sub_data);
-
-//     //   py::print("dtype:", sub_data_np.dtype());
-//     // }
-//   }
-
-//   py::list groups;
-
-//   groups.append(1);
-
-//   py::array_t<int64_t> indices(0);
-//   py::array_t<int64_t> grouped_data_index(0);
-
-//   // return py::make_tuple(groups, indices, grouped_data_index);
-//   return std::make_tuple(groups, indices, grouped_data_index);
-// }
 
 // Aggregates group data to be returned.
 struct GroupAccumulator {
@@ -192,17 +102,19 @@ void recursive_build_index(const py::list &features,
 
 // Builds the index of a given feature and recursively call
 // "recursive_build_index" on the remaining features.
-void process_feature(const py::array_t<int64_t> &feature,
-                     const py::list &features, const unsigned int feature_idx,
-                     const std::vector<Idx> &selected_rows,
-                     GroupAccumulator *index_acc,
-                     std::vector<py::object> *partial_group) {
+template <typename Feature>
+void process_feature_int(const py::array_t<Feature> &feature,
+                         const py::list &features,
+                         const unsigned int feature_idx,
+                         const std::vector<Idx> &selected_rows,
+                         GroupAccumulator *index_acc,
+                         std::vector<py::object> *partial_group) {
   assert(feature.ndim == 1);
 
-  const auto raw_feature = feature.unchecked<1>();
+  const auto raw_feature = feature.template unchecked<1>();
 
   // List the group and the row index in each group.
-  Map<int64_t, std::vector<Idx>> local_groups;
+  Map<Feature, std::vector<Idx>> local_groups;
   if (selected_rows.empty()) {
     // "selected_rows" is empty i.e. we use all the rows.
     const Idx num_rows = feature.shape(0);
@@ -211,21 +123,61 @@ void process_feature(const py::array_t<int64_t> &feature,
     }
 
     for (Idx row_idx = 0; row_idx < num_rows; row_idx++) {
-      const int64_t value = raw_feature[row_idx];
+      const Feature value = raw_feature[row_idx];
       local_groups[value].push_back(row_idx);
     }
   } else {
     for (const auto row_idx : selected_rows) {
-      const int64_t value = raw_feature[row_idx];
+      const Feature value = raw_feature[row_idx];
       local_groups[value].push_back(row_idx);
     }
   }
 
   // Continue building the index.
   for (auto &group : local_groups) {
-    py::print("Sub group for feature_idx:", feature_idx, " with value ",
-              group.first);
     partial_group->push_back(py::int_(group.first));
+    recursive_build_index(features, feature_idx + 1, group.second, index_acc,
+                          partial_group);
+    partial_group->pop_back();
+  }
+}
+
+// Builds the index of a given feature and recursively call
+// "recursive_build_index" on the remaining features.
+void process_feature_string(const py::array &feature, const py::list &features,
+                            const unsigned int feature_idx,
+                            const std::vector<Idx> &selected_rows,
+                            GroupAccumulator *index_acc,
+                            std::vector<py::object> *partial_group) {
+  assert(feature.ndim == 1);
+  py::buffer_info info = feature.request();
+
+  // List the group and the row index in each group.
+  Map<std::string_view, std::vector<Idx>> local_groups;
+  const int stride = info.strides[0];
+  const int itemsize = info.itemsize;
+  if (selected_rows.empty()) {
+    // "selected_rows" is empty i.e. we use all the rows.
+    const Idx num_rows = info.shape[0];
+    if (!index_acc->initialized) {
+      index_acc->Initialize(num_rows);
+    }
+    for (Idx row_idx = 0; row_idx < num_rows; row_idx++) {
+      const char *begin = ((char *)info.ptr) + row_idx * stride;
+      std::string_view value(begin, itemsize);
+      local_groups[value].push_back(row_idx);
+    }
+  } else {
+    for (const auto row_idx : selected_rows) {
+      const char *begin = ((char *)info.ptr) + row_idx * stride;
+      std::string_view value(begin, itemsize);
+      local_groups[value].push_back(row_idx);
+    }
+  }
+
+  // Continue building the index.
+  for (auto &group : local_groups) {
+    partial_group->push_back(py::bytes(group.first));
     recursive_build_index(features, feature_idx + 1, group.second, index_acc,
                           partial_group);
     partial_group->pop_back();
@@ -237,18 +189,33 @@ void recursive_build_index(const py::list &features,
                            const std::vector<Idx> &selected_rows,
                            GroupAccumulator *index_acc,
                            std::vector<py::object> *partial_group) {
-  py::print("recursive_build_index feature_idx:", feature_idx);
-
   if (feature_idx == features.size()) {
     index_acc->AddGroup(selected_rows, *partial_group);
     return;
   }
 
   const auto &feature = features[feature_idx];
+
   if (py::isinstance<py::array_t<int64_t>>(feature)) {
     const auto &casted_feature = py::cast<py::array_t<int64_t>>(feature);
-    process_feature(casted_feature, features, feature_idx, selected_rows,
-                    index_acc, partial_group);
+    process_feature_int<int64_t>(casted_feature, features, feature_idx,
+                                 selected_rows, index_acc, partial_group);
+    return;
+  }
+
+  if (py::isinstance<py::array_t<int32_t>>(feature)) {
+    const auto &casted_feature = py::cast<py::array_t<int32_t>>(feature);
+    process_feature_int<int32_t>(casted_feature, features, feature_idx,
+                                 selected_rows, index_acc, partial_group);
+    return;
+  }
+
+  if (py::isinstance<py::array>(feature)) {
+    const auto casted_feature = py::cast<py::array>(feature);
+    if (casted_feature.dtype().kind() == 'S') {
+      process_feature_string(casted_feature, features, feature_idx,
+                             selected_rows, index_acc, partial_group);
+    }
     return;
   }
 
