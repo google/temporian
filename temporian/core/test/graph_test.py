@@ -182,6 +182,9 @@ class GraphTest(absltest.TestCase):
         self.assertEqual(g.inputs, g.outputs)
 
     def test_apply_on_inputs(self):
+        """Ensures applying a graph on inputs works and doesn't cause repeated
+        ordered internal op ids when infer_graph is called again on the outputs.
+        """
         i1 = utils.create_input_node("io_input_1")
         o2 = utils.OpI1O1(i1)
         i3 = utils.create_input_node("io_input_2")
@@ -206,6 +209,14 @@ class GraphTest(absltest.TestCase):
         )
 
         self.assertLen(new_g.operators, 6)
+        self.assertLen(new_g.nodes, 10)  # 6 in the original graph + 4
+        # 2 in inputs + 2 * OpI101 which creates a new one
+        self.assertLen(new_g.samplings, 4)
+        # 4 in inputs + 2 created by each operator
+        self.assertLen(new_g.features, 16)
+
+        self.assertSetEqual(new_g.inputs, {i1, i3})
+        self.assertSetEqual(new_g.outputs, {new_output_1, new_output_2})
 
         internal_ids = [op._internal_ordered_id for op in new_g.operators]
         self.assertEqual(len(internal_ids), len(set(internal_ids)))

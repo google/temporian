@@ -14,7 +14,9 @@
 
 """Base operator class and auxiliary classes definition."""
 
+from __future__ import annotations
 from abc import ABC
+from copy import deepcopy
 from typing import Dict, List, Tuple, TypeVar, Union, Any
 from temporian.core.data.dtype import DType
 
@@ -70,7 +72,7 @@ class OperatorExceptionDecorator:
 class Operator(ABC):
     """Interface definition and common logic for operators."""
 
-    next_internal_id: int = 0
+    _next_internal_id: int = 0
 
     def __init__(self):
         self._inputs: Dict[str, EventSetNode] = {}
@@ -87,7 +89,13 @@ class Operator(ABC):
         # _internal_ordered_id is used to ensure the deterministic graph
         # evaluation.
         self._internal_ordered_id = Operator.next_internal_id
-        Operator.next_internal_id += 1
+
+    @classmethod
+    @property
+    def next_internal_id(cls) -> int:
+        id = cls._next_internal_id
+        cls._next_internal_id += 1
+        return id
 
     def __repr__(self):
         return (
@@ -319,3 +327,14 @@ class Operator(ABC):
         ):
             return bool(value)
         return value
+
+    def __deepcopy__(self, memo) -> Operator:
+        """Custom deepcopy implementation to avoid having repeated internal
+        ordered op ids."""
+        cls = self.__class__
+        op = cls.__new__(cls)
+        memo[id(self)] = op
+        for k, v in self.__dict__.items():
+            setattr(op, k, deepcopy(v, memo))
+        op._internal_ordered_id = Operator.next_internal_id
+        return op
