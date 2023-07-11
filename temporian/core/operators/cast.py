@@ -244,8 +244,8 @@ def cast(
         events:
             (2 events):
                 timestamps: [1. 2.]
-                'A': [False True]
-                'B': ['a' 'b']
+                'A': [False  True]
+                'B': [b'a' b'b']
                 'C': [5  5]
         ...
 
@@ -258,7 +258,7 @@ def cast(
             (2 events):
                 timestamps: [1. 2.]
                 'A': [0. 2.]
-                'B': ['a' 'b']
+                'B': [b'a' b'b']
                 'C': [5  5]
         ...
 

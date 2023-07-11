@@ -106,10 +106,10 @@ def moving_count(
         indexes: [('idx', str_)]
         features: [('value', int32)]
         events:
-            idx=i2 (3 events):
+            idx=b'i2' (3 events):
                 timestamps: [0. 1. 2.]
                 'value': [1 2 2]
-            idx=i1 (3 events):
+            idx=b'i1' (3 events):
                 timestamps: [1. 2. 3.]
                 'value': [1 2 2]
         ...
