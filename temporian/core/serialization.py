@@ -65,11 +65,12 @@ def save(
 ) -> None:
     """Saves a compiled Temporian function to a file.
 
-    The saved function must only take arguments of type EventSetNode, and return
-    either a single EventSetNode or a dictionary of names to EventSetNodes.
+    The saved function must only take [`EventSetNodes`][temporian.EventSetNode]
+    as arguments, return a dictionary of names to EventSetNodes, and be
+    decorated with [`@tp.compile`][temporian.compile].
 
     Temporian saves the graph built between the function's input and output
-    EventSets or EventSetNodes, not the function itself. Any arbitrary code that
+    nodes, not the function itself. Any arbitrary code that
     is executed in the function will not be ran when loading it back up and
     executing it.
 
@@ -90,7 +91,7 @@ def save(
     Raises:
         ValueError: If the received function is not compiled.
         ValueError: If any of the received inputs is not of the specified types.
-        ValueError: If the function doesn't return one of the specified types.
+        ValueError: If the function doesn't return the specified type.
     """
     if not hasattr(fn, "is_tp_compiled"):
         raise ValueError(
@@ -103,10 +104,9 @@ def save(
     )
     node_kwargs = {k: _process_fn_input(v) for k, v in merged_kwargs.items()}
 
-    # TODO: extensively check that returned types are the expected ones
     outputs = fn(**node_kwargs)
 
-    outputs = _process_fn_outputs(outputs)
+    _check_fn_outputs(outputs)
 
     save_graph(inputs=node_kwargs, outputs=outputs, path=path)
 
@@ -116,8 +116,8 @@ def load(
 ) -> Callable[..., Dict[str, EventSetNode]]:
     """Loads a compiled Temporian function from a file.
 
-    The loaded function receives the same arguments and applies the same
-    operator graph as when it was saved.
+    The loaded function receives the same positional and keyword arguments and
+    applies the same operator graph to its inputs as when it was saved.
 
     Args:
         path: The path to load the function from.
@@ -285,17 +285,14 @@ def _process_fn_input(input: Any) -> EventSetNode:
     )
 
 
-def _process_fn_outputs(output: Any):
-    if isinstance(output, EventSetNode):
-        # TODO: add metadata to graph to return a single output in fn instead of dict with single key in this case
-        return {"output": output}
-    if isinstance(output, dict):
-        if all(isinstance(v, EventSetNode) for v in output.values()):
-            return output
-    raise ValueError(
-        "The function must return a single EventSetNode or a dictionary"
-        " mapping output names to EventSetNodes."
-    )
+def _check_fn_outputs(output: Any):
+    if not isinstance(output, dict) or not all(
+        isinstance(v, EventSetNode) for v in output.values()
+    ):
+        raise ValueError(
+            "The function must return a single EventSetNode or a dictionary"
+            " mapping output names to EventSetNodes."
+        )
 
 
 def _kwargs_from_args_and_kwargs(
