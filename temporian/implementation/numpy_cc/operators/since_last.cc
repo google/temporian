@@ -6,10 +6,11 @@
 #include <string>
 #include <vector>
 
+#include "temporian/implementation/numpy_cc/operators/common.h"
+
 namespace {
 namespace py = pybind11;
 
-typedef size_t Idx;
 
 py::array_t<double> since_last(const py::array_t<double> &event_timestamps,
                                const py::array_t<double> &sampling_timestamps) {

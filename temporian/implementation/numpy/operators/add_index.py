@@ -5,6 +5,7 @@ from temporian.core.operators.add_index import AddIndexOperator
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.data.event_set import EventSet, IndexData
 from temporian.implementation.numpy.operators.base import OperatorImplementation
+from temporian.implementation.numpy_cc.operators import operators_cc
 
 
 class AddIndexNumpyImplementation(OperatorImplementation):

@@ -1,6 +1,11 @@
+from typing import List, Any, Tuple
+from dataclasses import dataclass
+
 from absl.testing import absltest
 
+import numpy as np
 import pandas as pd
+from numpy.testing import assert_array_equal
 
 from temporian.core.operators.add_index import (
     add_index,
@@ -9,12 +14,43 @@ from temporian.core.operators.add_index import (
 from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy.operators.add_index import (
     AddIndexNumpyImplementation,
+    operators_cc,
 )
 from temporian.io.pandas import from_pandas
 from temporian.core.evaluation import run
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
 )
+
+cc_add_index = operators_cc.add_index_compute_index
+
+
+@dataclass
+class SortedGroup:
+    """A single group.
+
+    Groups are intermediate results during the computation of a new index.
+    """
+
+    key: Tuple[Any]
+    row_idxs: List[int]
+
+
+def sort_groups(group_keys, row_idxs, group_begin_idx) -> List[SortedGroup]:
+    """Sorts groups for deterministic comparison."""
+
+    result = []
+    for group_idx, group_key in enumerate(group_keys):
+        result.append(
+            SortedGroup(
+                key=group_key,
+                row_idxs=row_idxs[
+                    group_begin_idx[group_idx] : group_begin_idx[group_idx + 1]
+                ].tolist(),
+            )
+        )
+    result.sort(key=lambda x: x.key)
+    return result
 
 
 class AddIndexNumpyImplementationTest(absltest.TestCase):
@@ -43,6 +79,51 @@ class AddIndexNumpyImplementationTest(absltest.TestCase):
         )
 
         self.input_node = self.input_evset.node()
+
+    def test_cc_empty(self):
+        data = [np.array([], np.int64)]
+        group_keys, row_idxs, group_begin_idx = cc_add_index(data)
+
+        self.assertEqual(group_keys, [])
+        assert_array_equal(row_idxs, np.array([], np.int64))
+        assert_array_equal(group_begin_idx, np.array([0], np.int64))
+
+    def test_cc_integer(self):
+        data = [
+            np.array([1, 1, 1, 2, 2, 3], np.int64),
+            np.array([5, 5, 7, 1, 1, 4], np.int64),
+        ]
+        group_keys, row_idxs, group_begin_idx = cc_add_index(data)
+
+        print("group_keys:", group_keys, flush=True)
+        print("row_idxs:", row_idxs, flush=True)
+        print("group_begin_idx:", group_begin_idx, flush=True)
+
+        self.assertEqual(
+            sort_groups(group_keys, row_idxs, group_begin_idx),
+            [
+                SortedGroup((1, 5), [0, 1]),
+                SortedGroup((1, 7), [2]),
+                SortedGroup((2, 1), [3, 4]),
+                SortedGroup((3, 4), [5]),
+            ],
+        )
+
+    def test_cc_string(self):
+        data = [
+            np.array(["A", "A", "A", "B", "B", "C"], np.bytes_),
+            np.array(["X", "X", "Y", "X", "X", "Z"], np.bytes_),
+        ]
+        group_keys, row_idxs, group_begin_idx = cc_add_index(data)
+
+        print("group_keys:", group_keys, flush=True)
+        print("row_idxs:", row_idxs, flush=True)
+        print("group_begin_idx:", group_begin_idx, flush=True)
+
+        self.assertEqual(
+            sort_groups(group_keys, row_idxs, group_begin_idx),
+            [],
+        )
 
     def test_add_index_single(self) -> None:
         expected_evset = from_pandas(

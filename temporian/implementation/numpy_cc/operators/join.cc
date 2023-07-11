@@ -7,10 +7,11 @@
 #include <string>
 #include <vector>
 
+#include "temporian/implementation/numpy_cc/operators/common.h"
+
 namespace {
 namespace py = pybind11;
 
-typedef int64_t Idx;
 typedef int64_t OnData;
 
 py::array_t<Idx> left_join_idxs(const py::array_t<double> &left_timestamps,
