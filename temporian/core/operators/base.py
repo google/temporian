@@ -88,10 +88,9 @@ class Operator(ABC):
         #
         # _internal_ordered_id is used to ensure the deterministic graph
         # evaluation.
-        self._internal_ordered_id = Operator.next_internal_id
+        self._internal_ordered_id = Operator.next_internal_id()
 
     @classmethod
-    @property
     def next_internal_id(cls) -> int:
         id = cls._next_internal_id
         cls._next_internal_id += 1
@@ -336,5 +335,5 @@ class Operator(ABC):
         memo[id(self)] = op
         for k, v in self.__dict__.items():
             setattr(op, k, deepcopy(v, memo))
-        op._internal_ordered_id = Operator.next_internal_id
+        op._internal_ordered_id = Operator.next_internal_id()
         return op
