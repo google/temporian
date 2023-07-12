@@ -120,7 +120,7 @@ class TFPTest(absltest.TestCase):
             path = os.path.join(tempdir, "my_graph.tem")
             tp.save_graph(inputs={"a": a}, outputs={"b": b}, path=path)
 
-            inputs, outputs = tp.load(path=path)
+            inputs, outputs = tp.load_graph(path=path)
 
         self.assertSetEqual(set(inputs.keys()), {"a"})
         self.assertSetEqual(set(outputs.keys()), {"b"})
@@ -140,7 +140,7 @@ class TFPTest(absltest.TestCase):
                 path=path,
             )
 
-            inputs, outputs = tp.load(path=path)
+            inputs, outputs = tp.load_graph(path=path)
 
         self.assertSetEqual(set(inputs.keys()), {"my_source_node"})
         self.assertSetEqual(set(outputs.keys()), {"my_output_node"})
@@ -161,7 +161,7 @@ class TFPTest(absltest.TestCase):
                 path=path,
             )
 
-            i, o = tp.load(path=path, squeeze=True)
+            i, o = tp.load_graph(path=path, squeeze=True)
 
         self.assertEqual(i.name, "my_source_node")
         self.assertEqual(o.name, "my_output_node")
@@ -178,7 +178,7 @@ class TFPTest(absltest.TestCase):
             path = os.path.join(tempdir, "my_graph.tem")
             tp.save_graph(inputs=None, outputs=b, path=path)
 
-            i, o = tp.load(path=path, squeeze=True)
+            i, o = tp.load_graph(path=path, squeeze=True)
 
         self.assertEqual(i.name, "my_source_node")
         self.assertEqual(o.name, "my_output_node")

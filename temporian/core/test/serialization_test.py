@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from functools import partial
+import os
+import pydoc
+import tempfile
+
 from absl import logging
 from absl.testing import absltest
-import os
-import tempfile
 import temporian as tp
 from temporian.core import serialization
 from temporian.core import graph
@@ -26,6 +29,15 @@ from temporian.implementation.numpy.data.io import event_set
 
 
 class SerializationTest(absltest.TestCase):
+    def setUp(self):
+        self.evset = tp.event_set(
+            timestamps=[1, 2, 3],
+            features={
+                "x": [1.0, 2.0, 3.0],
+                "y": [4.0, 5.0, 6.0],
+            },
+        )
+
     def test_serialize(self):
         i1 = utils.create_input_node()
         o2 = utils.OpI1O1(i1)
@@ -163,109 +175,347 @@ class SerializationTest(absltest.TestCase):
             & serialization._all_identifiers(restored.named_outputs.values())
         )
 
-    def test_save_graph_and_load(self):
-        input_data = tp.event_set(
-            timestamps=[1, 2, 3], features={"x": [1, 2, 3], "y": [4, 5, 6]}
-        )
-
-        input_node = input_data.node()
+    def test_save_graph_and_load_graph(self):
+        input_node = self.evset.node()
         x = input_node
         x = tp.cast(x, float)
         x = x["x"]
         x = 2 * x
         output_node = x
 
-        result = tp.run(output_node, {input_node: input_data})
+        result = tp.run(output_node, {input_node: self.evset})
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_graph.tem")
             tp.save_graph(
                 inputs={"a": input_node}, outputs={"b": output_node}, path=path
             )
-            loaded_inputs, loaded_outputs = tp.load(path=path, squeeze=True)
+            loaded_inputs, loaded_outputs = tp.load_graph(
+                path=path, squeeze=True
+            )
 
-        loaded_results = tp.run(loaded_outputs, {loaded_inputs: input_data})
+        loaded_results = tp.run(loaded_outputs, {loaded_inputs: self.evset})
 
         self.assertEqual(result, loaded_results)
 
-    def test_save_and_load(self):
+    def test_save(self):
         @tp.compile
         def f(x: EventSetNode):
-            return tp.prefix("a_", x)
+            return {"output": tp.prefix("a_", x)}
 
-        evset = tp.event_set(
-            timestamps=[1.0, 2.0, 3.0],
-            features={"f1": [100.0, 200.0, 300.0]},
-        )
-        result = f(evset)
+        result = f(self.evset)
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_fn.tem")
-            tp.save(f, inputs={"x": evset}, path=path)
-            input, output = tp.load(path=path, squeeze=True)
-            inputs, outputs = tp.load(path=path, squeeze=False)
+            tp.save(f, path, x=self.evset)
+            inputs, outputs = tp.load_graph(path=path)
 
         self.assertEqual(list(inputs.keys()), ["x"])
         self.assertEqual(list(outputs.keys()), ["output"])
 
-        loaded_result = tp.run(output, {input: evset})
+        loaded_result = tp.run(outputs, {inputs["x"]: self.evset})
+
+        self.assertEqual(result, loaded_result)
+
+    def test_save_and_load_node_input(self):
+        @tp.compile
+        def f(x: EventSetNode):
+            return {"output": tp.prefix("a_", x)}
+
+        node = self.evset.node()
+        result = tp.run(f(node), {node: self.evset})
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(f, path, x=node)
+            inputs, outputs = tp.load_graph(path=path)
+
+        loaded_result = tp.run(outputs, {inputs["x"]: self.evset})
+
+        self.assertEqual(result, loaded_result)
+
+    def test_save_and_load_schema_input(self):
+        @tp.compile
+        def f(x: EventSetNode):
+            return {"output": tp.prefix("a_", x)}
+
+        result = f(self.evset)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(f, path, x=self.evset.schema)
+            inputs, outputs = tp.load_graph(path=path)
+
+        loaded_result = tp.run(outputs, {inputs["x"]: self.evset})
 
         self.assertEqual(result, loaded_result)
 
     def test_save_and_load_many_inputs(self):
         @tp.compile
-        def f(x: EventSetNode, y: int, z: EventSetNode):
-            print(y)
-            return tp.glue(x, z)
+        def f(x: EventSetNode, y: EventSetNode, z: EventSetNode):
+            return {"output": tp.glue(x, y, z)}
 
         x = tp.event_set(
             timestamps=[1.0, 2.0, 3.0],
             features={"f1": [100.0, 200.0, 300.0]},
         )
-        y = 3
+        y = tp.event_set(
+            timestamps=[1.0, 2.0, 3.0],
+            features={"f2": [1.0, 2.0, 3.0]},
+            same_sampling_as=x,
+        )
         z = tp.event_set(
             timestamps=[1.0, 2.0, 3.0],
-            features={"f2": [3.0, 5.0, 2.0]},
+            features={"f3": [3.0, 5.0, 2.0]},
             same_sampling_as=x,
         )
         result = f(x, y, z)
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_fn.tem")
-            tp.save(f, inputs={"x": x, "y": y, "z": z}, path=path)
-            inputs, output = tp.load(path=path, squeeze=True)
+            tp.save(f, path, x, y, z=z)
+            inputs, outputs = tp.load_graph(path=path)
 
-        self.assertEqual(list(inputs.keys()), ["x", "z"])
+        self.assertEqual(list(inputs.keys()), ["x", "y", "z"])
 
-        loaded_result = tp.run(output, {inputs["x"]: x, inputs["z"]: z})
+        loaded_result = tp.run(
+            outputs, {inputs["x"]: x, inputs["y"]: y, inputs["z"]: z}
+        )
 
         self.assertEqual(result, loaded_result)
 
-    def test_save_and_load_dict_outputs(self):
+    def test_save_not_compiled(self):
+        def f(x: EventSetNode):
+            return tp.prefix("a_", x)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            with self.assertRaisesRegex(
+                ValueError, "Can only save a function that has been compiled"
+            ):
+                tp.save(f, path, x=self.evset)
+
+    def test_save_wrong_input_types(self):
+        def f(x: EventSetNode, y: int):
+            return tp.prefix("a_", x)
+
+        f.is_tp_compiled = True  # hack to pass compiled check
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            with self.assertRaisesRegex(
+                ValueError, "The function's parameters can only be"
+            ):
+                tp.save(f, path, self.evset, 3)
+
+    def test_load(self):
         @tp.compile
         def f(x: EventSetNode):
-            return {
-                "a": tp.abs(x),
-                "b": tp.log(x),
-            }
+            return {"output": tp.prefix("a_", x)}
+
+        result = f(self.evset)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(f, path, x=self.evset)
+            loaded_f = tp.load(path=path)
+
+        loaded_result = loaded_f(x=self.evset)
+
+        self.assertEqual(result, loaded_result)
+
+    def test_load_use_twice(self):
+        """Tests that the loaded fn can be used more than once, since the graph
+        is only loaded once but used on each call."""
+
+        @tp.compile
+        def f(x: EventSetNode):
+            return {"output": tp.prefix("a_", x)}
+
+        other_evset = tp.event_set(
+            timestamps=[1, 2, 3],
+            features={
+                "x": [10.0, 20.0, 30.0],
+                "y": [40.0, 50.0, 60.0],
+            },
+        )
+
+        result = f(self.evset)
+        other_result = f(other_evset)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(f, path, x=self.evset)
+            loaded_f = tp.load(path=path)
+
+        loaded_result = loaded_f(x=self.evset)
+        loaded_other_result = loaded_f(x=other_evset)
+
+        self.assertEqual(result, loaded_result)
+        self.assertEqual(other_result, loaded_other_result)
+
+    def test_load_many_kwargs(self):
+        @tp.compile
+        def f(x: EventSetNode, y: EventSetNode, z: EventSetNode):
+            return {"output": tp.glue(x, y, z)}
 
         x = tp.event_set(
             timestamps=[1.0, 2.0, 3.0],
             features={"f1": [100.0, 200.0, 300.0]},
         )
-        results = f(x)
+        y = tp.event_set(
+            timestamps=[1.0, 2.0, 3.0],
+            features={"f2": [1.0, 2.0, 3.0]},
+            same_sampling_as=x,
+        )
+        z = tp.event_set(
+            timestamps=[1.0, 2.0, 3.0],
+            features={"f3": [3.0, 5.0, 2.0]},
+            same_sampling_as=x,
+        )
+
+        result = f(x, y, z)
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_fn.tem")
-            tp.save(f, inputs={"x": x}, path=path)
-            input, outputs = tp.load(path=path, squeeze=True)
+            tp.save(f, path, x=x, y=y, z=z)
+            loaded_f = tp.load(path=path)
 
-        self.assertEqual(list(outputs.keys()), ["a", "b"])
+        loaded_result = loaded_f(x=x, y=y, z=z)
 
-        loaded_results = tp.run(outputs, {input: x})
+        self.assertEqual(result, loaded_result)
 
-        self.assertEqual(results["a"], loaded_results["a"])
-        self.assertEqual(results["b"], loaded_results["b"])
+    def test_load_args_and_kwargs(self):
+        @tp.compile
+        def f(x: EventSetNode, y: EventSetNode, z: EventSetNode):
+            return {"output": tp.glue(x, y, z)}
+
+        x = tp.event_set(
+            timestamps=[1.0, 2.0, 3.0],
+            features={"f1": [100.0, 200.0, 300.0]},
+        )
+        y = tp.event_set(
+            timestamps=[1.0, 2.0, 3.0],
+            features={"f2": [1.0, 2.0, 3.0]},
+            same_sampling_as=x,
+        )
+        z = tp.event_set(
+            timestamps=[1.0, 2.0, 3.0],
+            features={"f3": [3.0, 5.0, 2.0]},
+            same_sampling_as=x,
+        )
+
+        result = f(x, y, z)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(f, path, x=x, y=y, z=z)
+            loaded_f = tp.load(path=path)
+
+        loaded_result = loaded_f(x, y, z)
+
+        self.assertEqual(result, loaded_result)
+
+    def test_load_signature(self):
+        """Checks that help(loaded_f) shows the correct param spec."""
+
+        @tp.compile
+        def f(x: EventSetNode, y: EventSetNode, z: EventSetNode):
+            return {"output": tp.prefix("a_", x)}
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(f, path, x=self.evset, y=self.evset, z=self.evset)
+            loaded_f = tp.load(path=path)
+
+        doc = pydoc.render_doc(loaded_f)
+        self.assertTrue(
+            "x: temporian.core.data.node.EventSetNode, "
+            "y: temporian.core.data.node.EventSetNode, "
+            "z: temporian.core.data.node.EventSetNode"
+            in doc
+        )
+        self.assertTrue(
+            "-> Dict[str, temporian.core.data.node.EventSetNode]" in doc,
+        )
+
+    def test_save_function_composition(self):
+        @tp.compile
+        def f(x: EventSetNode):
+            return {"output": tp.prefix("f_", x)}
+
+        @tp.compile
+        def g(x: EventSetNode):
+            return {"output": tp.prefix("g_", x)}
+
+        @tp.compile
+        def h(x: EventSetNode):
+            return f(g(x)["output"])
+
+        result = h(self.evset)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(h, path, x=self.evset)
+            loaded_f = tp.load(path=path)
+
+        loaded_result = loaded_f(self.evset)
+
+        self.assertEqual(result, loaded_result)
+
+    def test_save_partial_function(self):
+        @tp.compile
+        def f(x: EventSetNode, b: bool):
+            if b:
+                return {"output": tp.prefix("true_", x)}
+            else:
+                return {"output": tp.prefix("false_", x)}
+
+        result = f(self.evset, b=True)
+        self.assertEqual(result["output"].schema.feature_names()[0], "true_x")
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(tp.compile(partial(f, b=True)), path, x=self.evset)
+            loaded_f = tp.load(path=path)
+
+        loaded_result = loaded_f(self.evset)
+
+        self.assertEqual(result, loaded_result)
+
+        result = f(self.evset, b=False)
+        self.assertEqual(result["output"].schema.feature_names()[0], "false_x")
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(tp.compile(partial(f, b=False)), path, x=self.evset)
+            loaded_f = tp.load(path=path)
+
+        loaded_result = loaded_f(self.evset)
+
+        self.assertEqual(result, loaded_result)
+
+    def test_save_recursive_function(self):
+        @tp.compile
+        def f(x: EventSetNode, n: int):
+            if n > 0:
+                return f(tp.prefix(f"{n}_", x), n=n - 1)
+            else:
+                return {"output": x}
+
+        result = f(self.evset, n=5)
+        self.assertEqual(
+            result["output"].schema.feature_names()[0], "1_2_3_4_5_x"
+        )
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(tp.compile(partial(f, n=5)), path, x=self.evset)
+            loaded_f = tp.load(path=path)
+
+        loaded_result = loaded_f(self.evset)
+
+        self.assertEqual(result, loaded_result)
 
 
 if __name__ == "__main__":
