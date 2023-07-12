@@ -28,7 +28,7 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="2.587745"
-     inkscape:cx="249.6382"
+     inkscape:cx="198.2421"
      inkscape:cy="56.41978"
      inkscape:window-width="2560"
      inkscape:window-height="1377"
@@ -38,6 +38,12 @@
      inkscape:current-layer="layer1" />
   <defs
      id="defs2">
+    <rect
+       x="144.90853"
+       y="62.329381"
+       width="105.74057"
+       height="48.503155"
+       id="rect6914" />
     <marker
        style="overflow:visible"
        id="TriangleStart"
@@ -454,5 +460,22 @@
        style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.529166, 0.264583;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#TriangleStart)"
        d="M 143.25522,60.718472 V 52.21311"
        id="path3922" />
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.264583;stroke-dasharray:none;stroke-dashoffset:0;stop-color:#000000"
+       id="rect7142"
+       width="2.9667702"
+       height="3.1477015"
+       x="52.040073"
+       y="52.973797"
+       rx="0"
+       ry="0" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,2.2113861,36.575336)"
+       id="text6912"
+       style="font-size:10.6667px;line-height:1.25;font-family:'Google Sans';-inkscape-font-specification:'Google Sans';font-variant-ligatures:none;white-space:pre;shape-inside:url(#rect6914);display:inline"><tspan
+         x="144.9082"
+         y="71.893474"
+         id="tspan7440">A Temporian program</tspan></text>
   </g>
 </svg>
