@@ -37,6 +37,7 @@ from temporian.core.data.node import (
     Sampling,
     Feature,
     create_node_with_new_reference,
+    input_node,
 )
 from temporian.core.data.schema import Schema
 from temporian.core.compilation import compile
@@ -275,7 +276,12 @@ def _load_graph(
 
 def _process_fn_input(input: Any) -> EventSetNode:
     if isinstance(input, Schema):
-        return create_node_with_new_reference(schema=input)
+        # TODO: Add support for receiving schema directly in input_node
+        return input_node(
+            features=[(f.name, f.dtype) for f in input.features],
+            indexes=[(i.name, i.dtype) for i in input.indexes],
+            is_unix_timestamp=input.is_unix_timestamp,
+        )
     if isinstance(input, EventSet):
         return input.node()
     if isinstance(input, EventSetNode):
