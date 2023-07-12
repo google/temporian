@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="122.72298mm"
+   height="49.381596mm"
+   viewBox="0 0 122.72298 49.381596"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   sodipodi:docname="eager_and_graph.svg"
+   inkscape:export-filename="eager_and_graph.png"
+   inkscape:export-xdpi="413.94043"
+   inkscape:export-ydpi="413.94043"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="2.587745"
+     inkscape:cx="198.2421"
+     inkscape:cy="56.41978"
+     inkscape:window-width="2560"
+     inkscape:window-height="1377"
+     inkscape:window-x="2560"
+     inkscape:window-y="26"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <rect
+       x="144.90853"
+       y="62.329381"
+       width="105.74057"
+       height="48.503155"
+       id="rect6914" />
+    <marker
+       style="overflow:visible"
+       id="TriangleStart"
+       refX="4"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="TriangleStart"
+       markerWidth="5.3244081"
+       markerHeight="6.155385"
+       viewBox="0 0 5.3244081 6.1553851"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Arrow1"
+       refX="1"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Arrow1"
+       markerWidth="4.0606604"
+       markerHeight="6.7071066"
+       viewBox="0 0 4.0606602 6.7071068"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:1;stroke-linecap:butt"
+         d="M 3,-3 0,0 3,3"
+         id="path5057"
+         transform="rotate(180,0.125,0)"
+         sodipodi:nodetypes="ccc" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Arrow1-6"
+       refX="1"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Arrow1"
+       markerWidth="4.0606604"
+       markerHeight="6.7071066"
+       viewBox="0 0 4.0606602 6.7071068"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:1;stroke-linecap:butt"
+         d="M 3,-3 0,0 3,3"
+         id="path5057-0"
+         transform="rotate(180,0.125,0)"
+         sodipodi:nodetypes="ccc" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Arrow1-9"
+       refX="1"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Arrow1"
+       markerWidth="4.0606604"
+       markerHeight="6.7071066"
+       viewBox="0 0 4.0606602 6.7071068"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:1;stroke-linecap:butt"
+         d="M 3,-3 0,0 3,3"
+         id="path5057-3"
+         transform="rotate(180,0.125,0)"
+         sodipodi:nodetypes="ccc" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Arrow1-6-1"
+       refX="1"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Arrow1"
+       markerWidth="4.0606604"
+       markerHeight="6.7071066"
+       viewBox="0 0 4.0606602 6.7071068"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:1;stroke-linecap:butt"
+         d="M 3,-3 0,0 3,3"
+         id="path5057-0-9"
+         transform="rotate(180,0.125,0)"
+         sodipodi:nodetypes="ccc" />
+    </marker>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-32.997315,-21.486285)">
+    <rect
+       style="fill:#f4ffe9;fill-opacity:1;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none;stroke-dashoffset:0;stop-color:#000000"
+       id="rect5156"
+       width="115.67079"
+       height="14.225955"
+       x="39.917213"
+       y="56.509636"
+       rx="2.4710052"
+       ry="2.2155344" />
+    <rect
+       style="fill:#ffe8b2;fill-opacity:1;stroke:#000000;stroke-width:0.264582;stroke-dasharray:none;stop-color:#000000"
+       id="rect294"
+       width="20.645937"
+       height="5.3913894"
+       x="88.259773"
+       y="60.813499"
+       rx="2.0803914"
+       ry="2.1476979" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.82223px;line-height:1.25;font-family:'Google Sans';-inkscape-font-specification:'Google Sans';font-variant-ligatures:none;stroke-width:0.264583"
+       x="89.693382"
+       y="64.347031"
+       id="text236"><tspan
+         sodipodi:role="line"
+         id="tspan234"
+         style="stroke-width:0.264583"
+         x="89.693382"
+         y="64.347031">EventSetNode</tspan></text>
+    <rect
+       style="fill:#ffe8b2;fill-opacity:1;stroke:#000000;stroke-width:0.264582;stroke-dasharray:none;stop-color:#000000"
+       id="rect294-7"
+       width="20.645937"
+       height="5.3913894"
+       x="133.24968"
+       y="60.771507"
+       rx="2.0803914"
+       ry="2.1476979" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.82223px;line-height:1.25;font-family:'Google Sans';-inkscape-font-specification:'Google Sans';font-variant-ligatures:none;stroke-width:0.264583"
+       x="134.68326"
+       y="64.305038"
+       id="text236-6"><tspan
+         sodipodi:role="line"
+         id="tspan234-56"
+         style="stroke-width:0.264583"
+         x="134.68326"
+         y="64.305038">EventSetNode</tspan></text>
+    <rect
+       style="fill:#ffe8b2;fill-opacity:1;stroke:#000000;stroke-width:0.264582;stroke-dasharray:none;stop-color:#000000"
+       id="rect294-9"
+       width="20.645937"
+       height="5.3913894"
+       x="43.320595"
+       y="60.636433"
+       rx="2.0803914"
+       ry="2.1476979" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.82223px;line-height:1.25;font-family:'Google Sans';-inkscape-font-specification:'Google Sans';font-variant-ligatures:none;stroke-width:0.264583"
+       x="44.754189"
+       y="64.16996"
+       id="text236-37"><tspan
+         sodipodi:role="line"
+         id="tspan234-4"
+         style="stroke-width:0.264583"
+         x="44.754189"
+         y="64.16996">EventSetNode</tspan></text>
+    <rect
+       style="fill:#ffa38c;fill-opacity:1;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none;stop-color:#000000"
+       id="rect1114-1"
+       width="14.069401"
+       height="5.0154057"
+       x="64.843361"
+       y="27.202272"
+       rx="0"
+       ry="0" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.82223px;line-height:1.25;font-family:'Google Sans';-inkscape-font-specification:'Google Sans';font-variant-ligatures:none;stroke-width:0.264583"
+       x="65.768761"
+       y="30.638697"
+       id="text240-2"><tspan
+         sodipodi:role="line"
+         id="tspan238-7"
+         style="stroke-width:0.264583"
+         x="65.768761"
+         y="30.638697">Operator</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:2.82223px;line-height:1.25;font-family:'Google Sans';-inkscape-font-specification:'Google Sans';font-variant-ligatures:none;stroke-width:0.264583"
+       x="32.875481"
+       y="23.507002"
+       id="text2750"><tspan
+         sodipodi:role="line"
+         id="tspan2748"
+         style="font-weight:bold;stroke-width:0.264583"
+         x="32.875481"
+         y="23.507002">Eager mode</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:2.82223px;line-height:1.25;font-family:'Google Sans';-inkscape-font-specification:'Google Sans';font-variant-ligatures:none;stroke-width:0.264583"
+       x="32.867493"
+       y="42.48365"
+       id="text2754"><tspan
+         sodipodi:role="line"
+         id="tspan2752"
+         style="font-weight:bold;stroke-width:0.264583"
+         x="32.867493"
+         y="42.48365">Graph mode</tspan></text>
+    <rect
+       style="fill:#b2d9ff;fill-opacity:1;stroke:#000000;stroke-width:0.264582;stroke-dasharray:none;stop-color:#000000"
+       id="rect294-5-6"
+       width="14.392852"
+       height="5.3913894"
+       x="45.304455"
+       y="26.884443"
+       rx="2.4710052"
+       ry="2.2155344" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.82223px;line-height:1.25;font-family:'Google Sans';-inkscape-font-specification:'Google Sans';font-variant-ligatures:none;stroke-width:0.264583"
+       x="46.738064"
+       y="30.417974"
+       id="text236-3-2"><tspan
+         sodipodi:role="line"
+         id="tspan234-5-9"
+         style="stroke-width:0.264583"
+         x="46.738064"
+         y="30.417974">EventSet</tspan></text>
+    <rect
+       style="fill:#b2d9ff;fill-opacity:1;stroke:#000000;stroke-width:0.264582;stroke-dasharray:none;stop-color:#000000"
+       id="rect294-5-6-0"
+       width="14.392852"
+       height="5.3913894"
+       x="84.009399"
+       y="27.018064"
+       rx="2.4710052"
+       ry="2.2155344" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.82223px;line-height:1.25;font-family:'Google Sans';-inkscape-font-specification:'Google Sans';font-variant-ligatures:none;stroke-width:0.264583"
+       x="85.443008"
+       y="30.551598"
+       id="text236-3-2-9"><tspan
+         sodipodi:role="line"
+         id="tspan234-5-9-3"
+         style="stroke-width:0.264583"
+         x="85.443008"
+         y="30.551598">EventSet</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1)"
+       d="m 59.758778,29.646586 h 5.061386"
+       id="path2936" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1)"
+       d="m 78.927374,29.740002 h 5.008108"
+       id="path2938" />
+    <rect
+       style="fill:#ffa38c;fill-opacity:1;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none;stop-color:#000000"
+       id="rect1114-1-6"
+       width="14.069401"
+       height="5.0154057"
+       x="103.47366"
+       y="27.292309"
+       rx="0"
+       ry="0" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.82223px;line-height:1.25;font-family:'Google Sans';-inkscape-font-specification:'Google Sans';font-variant-ligatures:none;stroke-width:0.264583"
+       x="104.39906"
+       y="30.728733"
+       id="text240-2-2"><tspan
+         sodipodi:role="line"
+         id="tspan238-7-6"
+         style="stroke-width:0.264583"
+         x="104.39906"
+         y="30.728733">Operator</tspan></text>
+    <rect
+       style="fill:#b2d9ff;fill-opacity:1;stroke:#000000;stroke-width:0.264582;stroke-dasharray:none;stop-color:#000000"
+       id="rect294-5-6-0-1"
+       width="14.392852"
+       height="5.3913894"
+       x="122.63969"
+       y="27.108101"
+       rx="2.4710052"
+       ry="2.2155344" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.82223px;line-height:1.25;font-family:'Google Sans';-inkscape-font-specification:'Google Sans';font-variant-ligatures:none;stroke-width:0.264583"
+       x="124.0733"
+       y="30.641632"
+       id="text236-3-2-9-8"><tspan
+         sodipodi:role="line"
+         id="tspan234-5-9-3-7"
+         style="stroke-width:0.264583"
+         x="124.0733"
+         y="30.641632">EventSet</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1-6)"
+       d="m 98.38907,29.736622 h 5.06139"
+       id="path2936-9" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1-6)"
+       d="m 117.55767,29.830038 h 5.0081"
+       id="path2938-2" />
+    <rect
+       style="fill:#ffa38c;fill-opacity:1;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none;stop-color:#000000"
+       id="rect1114-1-4"
+       width="14.069401"
+       height="5.0154057"
+       x="69.133873"
+       y="60.894939"
+       rx="0"
+       ry="0" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.82223px;line-height:1.25;font-family:'Google Sans';-inkscape-font-specification:'Google Sans';font-variant-ligatures:none;stroke-width:0.264583"
+       x="70.059273"
+       y="64.33136"
+       id="text240-2-7"><tspan
+         sodipodi:role="line"
+         id="tspan238-7-8"
+         style="stroke-width:0.264583"
+         x="70.059273"
+         y="64.33136">Operator</tspan></text>
+    <rect
+       style="fill:#b2d9ff;fill-opacity:1;stroke:#000000;stroke-width:0.264582;stroke-dasharray:none;stop-color:#000000"
+       id="rect294-5-6-4"
+       width="14.392852"
+       height="5.3913894"
+       x="46.575096"
+       y="45.900089"
+       rx="2.4710052"
+       ry="2.2155344" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.82223px;line-height:1.25;font-family:'Google Sans';-inkscape-font-specification:'Google Sans';font-variant-ligatures:none;stroke-width:0.264583"
+       x="48.008705"
+       y="49.43362"
+       id="text236-3-2-5"><tspan
+         sodipodi:role="line"
+         id="tspan234-5-9-0"
+         style="stroke-width:0.264583"
+         x="48.008705"
+         y="49.43362">EventSet</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1-9)"
+       d="m 64.049291,63.33925 h 5.061386"
+       id="path2936-0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1-9)"
+       d="m 83.217887,63.432666 h 5.008108"
+       id="path2938-6" />
+    <rect
+       style="fill:#ffa38c;fill-opacity:1;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none;stop-color:#000000"
+       id="rect1114-1-6-3"
+       width="14.069401"
+       height="5.0154057"
+       x="114.11414"
+       y="60.984974"
+       rx="0"
+       ry="0" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.82223px;line-height:1.25;font-family:'Google Sans';-inkscape-font-specification:'Google Sans';font-variant-ligatures:none;stroke-width:0.264583"
+       x="115.03954"
+       y="64.421394"
+       id="text240-2-2-2"><tspan
+         sodipodi:role="line"
+         id="tspan238-7-6-0"
+         style="stroke-width:0.264583"
+         x="115.03954"
+         y="64.421394">Operator</tspan></text>
+    <rect
+       style="fill:#b2d9ff;fill-opacity:1;stroke:#000000;stroke-width:0.264582;stroke-dasharray:none;stop-color:#000000"
+       id="rect294-5-6-0-1-6"
+       width="14.392852"
+       height="5.3913894"
+       x="136.13892"
+       y="46.900856"
+       rx="2.4710052"
+       ry="2.2155344" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.82223px;line-height:1.25;font-family:'Google Sans';-inkscape-font-specification:'Google Sans';font-variant-ligatures:none;stroke-width:0.264583"
+       x="137.57254"
+       y="50.434387"
+       id="text236-3-2-9-8-1"><tspan
+         sodipodi:role="line"
+         id="tspan234-5-9-3-7-5"
+         style="stroke-width:0.264583"
+         x="137.57254"
+         y="50.434387">EventSet</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1-6-1)"
+       d="m 109.02964,63.429286 h 5.06141"
+       id="path2936-9-5" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1-6-1)"
+       d="m 128.19827,63.522702 h 5.0081"
+       id="path2938-2-4" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.529165, 0.264583;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#TriangleStart)"
+       d="m 53.512285,51.204297 -0.0043,9.38519"
+       id="path3918" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.529166, 0.264583;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#TriangleStart)"
+       d="M 143.25522,60.718472 V 52.21311"
+       id="path3922" />
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.264583;stroke-dasharray:none;stroke-dashoffset:0;stop-color:#000000"
+       id="rect7142"
+       width="2.9667702"
+       height="3.1477015"
+       x="52.040073"
+       y="52.973797"
+       rx="0"
+       ry="0" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,2.2113861,36.575336)"
+       id="text6912"
+       style="font-size:10.6667px;line-height:1.25;font-family:'Google Sans';-inkscape-font-specification:'Google Sans';font-variant-ligatures:none;white-space:pre;shape-inside:url(#rect6914);display:inline"><tspan
+         x="144.9082"
+         y="71.893474"
+         id="tspan7440">A Temporian program</tspan></text>
+  </g>
+</svg>

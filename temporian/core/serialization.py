@@ -14,6 +14,7 @@
 
 """Serialization/unserialization of a graph and its components."""
 
+import inspect
 import logging
 from typing import (
     Callable,
@@ -36,13 +37,14 @@ from temporian.core.data.node import (
     Sampling,
     Feature,
     create_node_with_new_reference,
+    input_node,
 )
 from temporian.core.data.schema import Schema
+from temporian.core.compilation import compile
 from temporian.core.operators import base
 from temporian.core.data.dtype import DType
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.proto import core_pb2 as pb
-from temporian.core.operators.base import EventSetOrEventSetNode
 
 DTYPE_MAPPING = {
     DType.FLOAT64: pb.DType.DTYPE_FLOAT64,
@@ -55,86 +57,103 @@ DTYPE_MAPPING = {
 INV_DTYPE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
 
 
+# TODO: allow saved fn to return a single Node too
 def save(
-    fn: Callable[
-        ..., Union[EventSetOrEventSetNode, Dict[str, EventSetOrEventSetNode]]
-    ],
-    inputs: Dict[str, Any],
+    fn: Callable[..., Dict[str, EventSetNode]],
     path: str,
+    *args: Union[EventSetNode, EventSet, Schema],
+    **kwargs: Union[EventSetNode, EventSet, Schema],
 ) -> None:
     """Saves a compiled Temporian function to a file.
 
+    The saved function must only take [`EventSetNodes`][temporian.EventSetNode]
+    as arguments, return a dictionary of names to EventSetNodes, and be
+    decorated with [`@tp.compile`][temporian.compile].
+
     Temporian saves the graph built between the function's input and output
-    EventSets or EventSetNodes, not the function itself. Any arbitrary code that is
-    executed in the function will not be ran when loading it back up.
+    nodes, not the function itself. Any arbitrary code that
+    is executed in the function will not be ran when loading it back up and
+    executing it.
 
-    The function can receive and return other arbitrary parameters, which will
-    be used to trace the function while saving it, but will not be available
-    when loading it back up.
-
-    The function must return an EventSet or EventSetNode or a dictionary mapping output
-    names to EventSets or EventSetNodes. If it returns a single one, the output will be
-    saved under the name "output" by default.
+    If you need to save a function that additionally takes other types of
+    arguments, try using `functools.partial` to create a new function that takes
+    only EventSetNodes, and save that instead. Note that the partial function
+    needs to be compiled too, with `tp.compile(partial(...))`.
 
     Args:
         fn: The function to save.
-        inputs: The inputs to pass to the function to trace it, keyed by
-            parameter name. For EventSet/EventSetNode parameters, the passed value can
-            be either an EventSet, an EventSetNode, or a raw Schema.
         path: The path to save the function to.
+        args: Positional arguments to pass to the function to trace it. The
+            arguments can be either EventSets, EventSetNodes, or raw Schemas. In
+            all cases, the values will be converted to EventSetNodes before
+            being passed to the function to trace it.
+        kwargs: Keyword arguments to pass to the function to trace it. Same
+            restrictions as for `args`.
 
     Raises:
         ValueError: If the received function is not compiled.
+        ValueError: If any of the received inputs is not of the specified types.
+        ValueError: If the function doesn't return the specified type.
     """
-    if not fn.is_tp_compiled:
+    if not hasattr(fn, "is_tp_compiled"):
         raise ValueError(
             "Can only save a function that has been compiled with"
             " `@tp.compile`."
         )
 
-    if not isinstance(inputs, dict):
-        raise ValueError(
-            "`inputs` must be a dictionary mapping the function's parameter"
-            " names to their corresponding values."
-        )
+    merged_kwargs = _kwargs_from_args_and_kwargs(
+        list(inspect.signature(fn).parameters.keys()), args, kwargs
+    )
+    node_kwargs = {k: _process_fn_input(v) for k, v in merged_kwargs.items()}
 
-    node_inputs = {}
-    inputs = inputs.copy()
-    for k, v in inputs.items():
-        node_input = _process_fn_input(v)
-        if node_input is not None:
-            inputs[k] = node_input
-            node_inputs[k] = node_input
+    outputs = fn(**node_kwargs)
 
-    # TODO: extensively check that returned types are the expected ones
-    outputs = fn(**inputs)
+    _check_fn_outputs(outputs)
 
-    if isinstance(outputs, EventSetNode):
-        outputs = {"output": outputs}
+    save_graph(inputs=node_kwargs, outputs=outputs, path=path)
 
-    if isinstance(outputs, dict):
-        if not all(isinstance(v, EventSetNode) for v in outputs.values()):
-            raise ValueError(
-                "The function must return a single EventSet or EventSetNode or"
-                " adictionary mapping output names to EventSets or"
-                " EventSetNodes."
+
+def load(
+    path: str,
+) -> Callable[..., Dict[str, EventSetNode]]:
+    """Loads a compiled Temporian function from a file.
+
+    The loaded function receives the same positional and keyword arguments and
+    applies the same operator graph to its inputs as when it was saved.
+
+    Args:
+        path: The path to load the function from.
+
+    Returns:
+        The loaded function.
+    """
+    g = _load_graph(path)
+
+    inputs = g.named_inputs
+    assert inputs is not None
+
+    input_names = list(inputs.keys())
+
+    @compile
+    def fn(
+        *args: EventSetNode,
+        **kwargs: EventSetNode,
+    ) -> Dict[str, EventSetNode]:
+        kwargs = _kwargs_from_args_and_kwargs(input_names, args, kwargs)
+        return g.apply_on_inputs(named_inputs=kwargs)
+
+    fn.__signature__ = inspect.signature(fn).replace(
+        parameters=[
+            inspect.Parameter(
+                name=k,
+                annotation=EventSetNode,
+                kind=inspect.Parameter.POSITIONAL_OR_KEYWORD,
             )
+            for k in inputs
+        ]
+    )
 
-    save_graph(inputs=node_inputs, outputs=outputs, path=path)
-
-
-def _process_fn_input(input: Any) -> Optional[EventSetNode]:
-    # TODO: allow dicts and lists of stuff other than EventSet/EventSetNodes
-    if isinstance(input, (list, dict, tuple)):
-        raise ValueError(
-            "`tp.save` does not support collections in a function's input."
-        )
-    if isinstance(input, Schema):
-        return create_node_with_new_reference(schema=input)
-    if isinstance(input, EventSet):
-        return input.node()
-    if isinstance(input, EventSetNode):
-        return input
+    return fn
 
 
 def save_graph(
@@ -142,8 +161,8 @@ def save_graph(
     outputs: graph.NamedEventSetNodes,
     path: str,
 ) -> None:
-    """Saves the graph between `inputs` and `outputs` [`EventSetNodes`][temporian.EventSetNode]
-    to a file.
+    """Saves the graph between the `inputs` and `outputs`
+    [`EventSetNodes`][temporian.EventSetNode] to a file.
 
     Usage example:
         ```python
@@ -177,7 +196,7 @@ def save_graph(
         ... )
 
         >>> # Load the graph
-        >>> inputs, outputs = tp.load(path=file_path)
+        >>> inputs, outputs = tp.load_graph(path=file_path)
 
         >>> # Evaluate reloaded graph
         >>> a_reloaded = inputs["input_node"]
@@ -209,7 +228,7 @@ def save_graph(
         f.write(text_format.MessageToBytes(proto))
 
 
-def load(
+def load_graph(
     path: str, squeeze: bool = False
 ) -> Tuple[
     Union[EventSetNode, Dict[str, EventSetNode]],
@@ -228,10 +247,7 @@ def load(
     Returns:
         Input and output EventSetNodes.
     """
-
-    with open(path, "rb") as f:
-        proto = text_format.Parse(f.read(), pb.Graph())
-    g = _unserialize(proto)
+    g = _load_graph(path=path)
 
     inputs = g.named_inputs
     outputs = g.named_outputs
@@ -246,6 +262,67 @@ def load(
         outputs = list(outputs.values())[0]
 
     return inputs, outputs
+
+
+def _load_graph(
+    path: str,
+) -> graph.Graph:
+    with open(path, "rb") as f:
+        proto = text_format.Parse(f.read(), pb.Graph())
+    g = _unserialize(proto)
+
+    return g
+
+
+def _process_fn_input(input: Any) -> EventSetNode:
+    if isinstance(input, Schema):
+        # TODO: Add support for receiving schema directly in input_node
+        return input_node(
+            features=[(f.name, f.dtype) for f in input.features],
+            indexes=[(i.name, i.dtype) for i in input.indexes],
+            is_unix_timestamp=input.is_unix_timestamp,
+        )
+    if isinstance(input, EventSet):
+        return input.node()
+    if isinstance(input, EventSetNode):
+        return input
+    raise ValueError(
+        "The function's parameters can only be either EventSets, EventSetNodes,"
+        " or Schemas to save it."
+    )
+
+
+def _check_fn_outputs(output: Any):
+    if not isinstance(output, dict) or not all(
+        isinstance(v, EventSetNode) for v in output.values()
+    ):
+        raise ValueError(
+            "The function must return a single EventSetNode or a dictionary"
+            " mapping output names to EventSetNodes."
+        )
+
+
+def _kwargs_from_args_and_kwargs(
+    param_names: List[str],
+    args: Tuple[Any],
+    kwargs: Dict[str, Any],
+) -> Dict[str, Any]:
+    """Merges args and kwargs into a single name->value param dict."""
+    if len(args) > len(param_names):
+        raise ValueError(
+            f"The function takes {len(param_names)} arguments, but"
+            f" {len(args)} positional arguments were received."
+        )
+
+    # zip stops at the shortest iterable, extra param names are ignored
+    arg_kwargs = {k: v for k, v in zip(param_names, args)}
+    for k in arg_kwargs:
+        if k in kwargs:
+            raise ValueError(
+                f"The function received multiple values for the argument {k}."
+            )
+
+    return {**arg_kwargs, **kwargs}
 
 
 def _serialize(src: graph.Graph) -> pb.Graph:
@@ -350,7 +427,7 @@ def _identifier(item: Any) -> str:
 
 
 def _identifier_or_none(
-    item: Any, options: Optional[List[Any]] = None
+    item: Any, options: Optional[Set[Any]] = None
 ) -> Optional[str]:
     """Creates a unique identifier for an object within a graph."""
     if item is None:
