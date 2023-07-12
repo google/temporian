@@ -20,7 +20,15 @@ class EventTest(absltest.TestCase):
         )
 
     def test_get_index_value(self):
-        index_data = self.evset.get_index_value((2, b"world"))
+        index_data = self.evset.get_index_value((2, b"world"), normalize=False)
+        self.assertTrue(isinstance(index_data, IndexData))
+        self.assertTrue(
+            (np.array(index_data.features) == [[7, 8], [9, 10]]).all()
+        )
+        self.assertTrue((abs(index_data.timestamps - [0.4, 0.5]) < 1e-6).all())
+
+    def test_get_index_value_normalized(self):
+        index_data = self.evset.get_index_value((2, "world"))
         self.assertTrue(isinstance(index_data, IndexData))
         self.assertTrue(
             (np.array(index_data.features) == [[7, 8], [9, 10]]).all()

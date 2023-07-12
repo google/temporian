@@ -478,20 +478,30 @@ class EventSet(EventSetOperationsMixin):
             f"memory usage: {string.pretty_num_bytes(self.memory_usage())}\n"
         )
 
-    def get_index_value(self, index_key: Tuple) -> IndexData:
+    def get_index_value(
+        self, index_key: Tuple, normalize: bool = True
+    ) -> IndexData:
         """Gets the value for a specified index key.
 
         The index key must be a tuple of values corresponding to the indexes
         of the EventSet.
         """
+
+        if normalize:
+            index_key = normalize_index(index_key)
         return self.data[index_key]
 
-    def set_index_value(self, index_key: Tuple, value: IndexData) -> None:
+    def set_index_value(
+        self, index_key: Tuple, value: IndexData, normalize: bool = True
+    ) -> None:
         """Sets the value for a specified index key.
 
         The index key must be a tuple of values corresponding to the indexes
         of the EventSet.
         """
+
+        if normalize:
+            index_key = normalize_index(index_key)
         self.data[index_key] = value
 
     def __eq__(self, other) -> bool:

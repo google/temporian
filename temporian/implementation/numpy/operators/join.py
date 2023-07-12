@@ -121,6 +121,7 @@ class JoinNumpyImplementation(OperatorImplementation):
                     left_item.timestamps,
                     schema=output_schema,
                 ),
+                normalize=False,
             )
 
         return {"output": output_evset}

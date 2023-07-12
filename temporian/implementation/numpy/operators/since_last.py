@@ -53,6 +53,7 @@ class SinceLastNumpyImplementation(OperatorImplementation):
                         sampling_timestamps,
                         schema=output_schema,
                     ),
+                    normalize=False,
                 )
             else:
                 # TODO: Avoid memory copy.
@@ -66,6 +67,7 @@ class SinceLastNumpyImplementation(OperatorImplementation):
                         index_data.timestamps,
                         schema=output_schema,
                     ),
+                    normalize=False,
                 )
 
         return {"output": output_evset}
