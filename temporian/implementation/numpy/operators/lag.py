@@ -44,6 +44,7 @@ class LagNumpyImplementation(OperatorImplementation):
                     index_data.timestamps + duration,
                     schema=output_schema,
                 ),
+                normalize=False,
             )
 
         return {"output": output_evset}

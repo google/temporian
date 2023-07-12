@@ -20,7 +20,12 @@ from enum import Enum
 import numpy as np
 
 from temporian.core.data import duration_utils
-from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.event_set import (
+    EventSet,
+    normalize_index_key,
+    IndexItemType,
+    IndexType,
+)
 
 
 class Style(Enum):
@@ -52,7 +57,9 @@ class Options(NamedTuple):
 
 def plot(
     evsets: Union[List[EventSet], EventSet],
-    indexes: Optional[Union[Any, tuple, List[tuple]]] = None,
+    indexes: Optional[
+        Union[IndexItemType, IndexType, List[IndexItemType], List[IndexType]]
+    ] = None,
     features: Optional[Union[str, List[str], Set[str]]] = None,
     width_px: int = 1024,
     height_per_plot_px: int = 150,
@@ -141,6 +148,8 @@ def plot(
     else:
         # e.g. indexes="a"
         indexes = [(indexes,)]
+
+    indexes = [normalize_index_key(x) for x in indexes]
 
     for index in indexes:
         if not isinstance(index, tuple):

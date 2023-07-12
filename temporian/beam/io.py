@@ -1,6 +1,6 @@
 """Utilities to import/export Beam-Event-Set from/to dataset containers."""
 
-from typing import Iterable, Dict, Any, Tuple, Union, Optional
+from typing import Iterable, Dict, Any, Tuple, Union, Optional, List
 
 import csv
 import io
@@ -27,7 +27,7 @@ from temporian.implementation.numpy.data.event_set import tp_dtype_to_np_dtype
 # In the numpy backend, index are represented as numpy primitives. However,
 # Beam does not support numpy primitive as index. Therefore, all index are
 # converted to python primitive of type "BeamIndex".
-BeamIndex = Union[int, float, str, bool]
+BeamIndex = Union[int, float, str, bytes, bool]
 
 # Temporian index or Feature index in Beam.
 #
@@ -265,6 +265,10 @@ def read_csv(
     )
 
 
+def _bytes_to_strs(list: List) -> List:
+    return [x.decode() if isinstance(x, bytes) else x for x in list]
+
+
 def _convert_to_csv(
     item: Tuple[
         Tuple[BeamIndex, ...],
@@ -272,7 +276,7 @@ def _convert_to_csv(
     ]
 ) -> str:
     index, feature_blocks = item
-    index_data = list(index)
+    index_data = _bytes_to_strs(list(index))
 
     # Sort the feature by feature index.
     # The feature index is the last value (-1) of the key (first element of the
@@ -286,7 +290,9 @@ def _convert_to_csv(
     output = io.StringIO()
     writer = csv.writer(output)
     for event_idx, timestamp in enumerate(timestamps):
-        feature_data = [f[1][1][event_idx] for f in feature_blocks]
+        feature_data = _bytes_to_strs(
+            [f[1][1][event_idx] for f in feature_blocks]
+        )
         writer.writerow([timestamp] + index_data + feature_data)
 
     return output.getvalue()

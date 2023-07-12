@@ -74,10 +74,10 @@ def enumerate(input: EventSetNode) -> EventSetNode:
         indexes: [('cat', str_)]
         features: [('enumerate', int64)]
         events:
-            cat=A (4 events):
+            cat=b'A' (4 events):
                 timestamps: [-1.  2.  3.  5.]
                 'enumerate': [0 1 2 3]
-            cat=B (1 events):
+            cat=b'B' (1 events):
                 timestamps: [0.]
                 'enumerate': [0]
         ...

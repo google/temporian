@@ -52,6 +52,7 @@ class EndNumpyImplementation(OperatorImplementation):
                     dst_timestamps,
                     schema=output_schema,
                 ),
+                normalize=False,
             )
 
         return {"output": output_evset}

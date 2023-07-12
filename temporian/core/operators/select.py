@@ -117,7 +117,7 @@ def select(
         events:
             (2 events):
                 timestamps: [1. 2.]
-                'B': ['s' 'm']
+                'B': [b's' b'm']
         ...
 
         >>> # Select multiple features
@@ -130,7 +130,7 @@ def select(
         events:
             (2 events):
                 timestamps: [1. 2.]
-                'B': ['s' 'm']
+                'B': [b's' b'm']
                 'C': [5.  5.5]
         ...
 
