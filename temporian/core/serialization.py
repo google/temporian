@@ -76,7 +76,8 @@ def save(
 
     If you need to save a function that additionally takes other types of
     arguments, try using `functools.partial` to create a new function that takes
-    only EventSetNodes, and save that instead.
+    only EventSetNodes, and save that instead. Note that the partial function
+    needs to be compiled too, with `tp.compile(partial(...))`.
 
     Args:
         fn: The function to save.

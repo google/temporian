@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from functools import partial
 import os
 import pydoc
 import tempfile
-from typing import Dict
 
 from absl import logging
 from absl.testing import absltest
@@ -438,6 +438,84 @@ class SerializationTest(absltest.TestCase):
         self.assertTrue(
             "-> Dict[str, temporian.core.data.node.EventSetNode]" in doc,
         )
+
+    def test_save_function_composition(self):
+        @tp.compile
+        def f(x: EventSetNode):
+            return {"output": tp.prefix("f_", x)}
+
+        @tp.compile
+        def g(x: EventSetNode):
+            return {"output": tp.prefix("g_", x)}
+
+        @tp.compile
+        def h(x: EventSetNode):
+            return f(g(x)["output"])
+
+        result = h(self.evset)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(h, path, x=self.evset)
+            loaded_f = tp.load(path=path)
+
+        loaded_result = loaded_f(self.evset)
+
+        self.assertEqual(result, loaded_result)
+
+    def test_save_partial_function(self):
+        @tp.compile
+        def f(x: EventSetNode, b: bool):
+            if b:
+                return {"output": tp.prefix("true_", x)}
+            else:
+                return {"output": tp.prefix("false_", x)}
+
+        result = f(self.evset, b=True)
+        self.assertEqual(result["output"].schema.feature_names()[0], "true_x")
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(tp.compile(partial(f, b=True)), path, x=self.evset)
+            loaded_f = tp.load(path=path)
+
+        loaded_result = loaded_f(self.evset)
+
+        self.assertEqual(result, loaded_result)
+
+        result = f(self.evset, b=False)
+        self.assertEqual(result["output"].schema.feature_names()[0], "false_x")
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(tp.compile(partial(f, b=False)), path, x=self.evset)
+            loaded_f = tp.load(path=path)
+
+        loaded_result = loaded_f(self.evset)
+
+        self.assertEqual(result, loaded_result)
+
+    def test_save_recursive_function(self):
+        @tp.compile
+        def f(x: EventSetNode, n: int):
+            if n > 0:
+                return f(tp.prefix(f"{n}_", x), n=n - 1)
+            else:
+                return {"output": x}
+
+        result = f(self.evset, n=5)
+        self.assertEqual(
+            result["output"].schema.feature_names()[0], "1_2_3_4_5_x"
+        )
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            tp.save(tp.compile(partial(f, n=5)), path, x=self.evset)
+            loaded_f = tp.load(path=path)
+
+        loaded_result = loaded_f(self.evset)
+
+        self.assertEqual(result, loaded_result)
 
 
 if __name__ == "__main__":
