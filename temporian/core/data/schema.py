@@ -124,7 +124,7 @@ def _normalize_feature(x):
     return FeatureSchema(x[0], x[1])
 
 
-def _normalize_index(x):
+def _normalize_index_key(x):
     if isinstance(x, IndexSchema):
         return x
     assert len(x) == 2

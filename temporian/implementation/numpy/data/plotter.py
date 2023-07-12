@@ -149,7 +149,7 @@ def plot(
         # e.g. indexes="a"
         indexes = [(indexes,)]
 
-    indexes = [normalize_index(x) for x in indexes]
+    indexes = [normalize_index_key(x) for x in indexes]
 
     for index in indexes:
         if not isinstance(index, tuple):

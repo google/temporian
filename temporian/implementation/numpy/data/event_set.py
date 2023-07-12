@@ -75,7 +75,7 @@ def normalize_index_item(x: IndexItemType) -> IndexItemType:
     return x
 
 
-def normalize_index(
+def normalize_index_key(
     index: Optional[Union[IndexItemType, IndexType]]
 ) -> Optional[Union[IndexItemType, IndexType]]:
     if index is None:
@@ -156,7 +156,8 @@ def normalize_features(
         logging.warning(
             (
                 'Feature "%s" is an array of numpy.object_ and was casted to'
-                " numpy.string_ == numpy.bytes_."
+                " numpy.string_ (Note: numpy.string_ is equivalent to"
+                " numpy.bytes_)."
             ),
             name,
         )
@@ -488,7 +489,7 @@ class EventSet(EventSetOperationsMixin):
         """
 
         if normalize:
-            index_key = normalize_index(index_key)
+            index_key = normalize_index_key(index_key)
         return self.data[index_key]
 
     def set_index_value(
@@ -501,7 +502,7 @@ class EventSet(EventSetOperationsMixin):
         """
 
         if normalize:
-            index_key = normalize_index(index_key)
+            index_key = normalize_index_key(index_key)
         self.data[index_key] = value
 
     def __eq__(self, other) -> bool:
