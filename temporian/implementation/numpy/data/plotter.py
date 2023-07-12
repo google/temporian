@@ -22,7 +22,7 @@ import numpy as np
 from temporian.core.data import duration_utils
 from temporian.implementation.numpy.data.event_set import (
     EventSet,
-    normalize_index,
+    normalize_index_key,
     IndexItemType,
     IndexType,
 )
