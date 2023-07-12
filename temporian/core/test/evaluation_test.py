@@ -188,6 +188,7 @@ class EvaluationTest(absltest.TestCase):
         isinstance(result, list)
 
         self.assertIsInstance(result, list)
+        assert all([isinstance(x, EventSet) for x in result])
         self.assertTrue(result[0] is e3)
         self.assertTrue(result[1] is e1)
         self.assertTrue(result[2] is e2)
@@ -201,7 +202,7 @@ class EvaluationTest(absltest.TestCase):
             evaluation.run(i1, [evset_1, evset_2])
 
     def test_has_leak(self):
-        a = tp.input_node([("f", float)])
+        a = tp.input_node([("f", tp.float32)])
         b = tp.moving_sum(a, 5)
         c = tp.leak(b, 5)
         d = tp.prefix("something_", c)

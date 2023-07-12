@@ -14,6 +14,8 @@
 
 """Graph class definition and inference logic."""
 
+from __future__ import annotations
+from copy import deepcopy
 from typing import List, Set, Dict, Union, Optional
 
 from temporian.core.data.node import EventSetNode, Feature, Sampling
@@ -160,6 +162,46 @@ class Graph:
         else:
             p3("Output", self.outputs)
         return s
+
+    def apply_on_inputs(
+        self, named_inputs: Dict[str, EventSetNode]
+    ) -> Dict[str, EventSetNode]:
+        """Applies the operators in this graph to new inputs.
+
+        Note that the objects in the modified graph are very inconsistent, but
+        that's okay since we won't use it anymore. When running it or save it
+        the graph will be re-inferred.
+
+        Args:
+            named_inputs: The new inputs to the graph.
+
+        Returns:
+            The graph's named outputs.
+        """
+
+        # Avoid messing with the objects in the received graph
+        # Else each time we apply the graph on inputs it changes
+        # Might be possible to optimize by copying only what's necessary
+        g = deepcopy(self)
+
+        assert g.named_inputs is not None
+        assert g.named_outputs is not None
+
+        for name, new_node in named_inputs.items():
+            if name not in g.named_inputs:
+                raise ValueError(
+                    f"Input node {name} is not in the graph's inputs. Inputs:"
+                    f" {g.named_inputs}"
+                )
+            old_node = g.named_inputs[name]
+            # Replace node as input in all operators that depend on it
+            # TODO: create and maintain a mapping from named_input to operator
+            # to make this more efficient
+            for operator in g.operators:
+                for name, inp in operator.inputs.items():
+                    if inp is old_node:
+                        operator.inputs[name] = new_node
+        return g.named_outputs
 
 
 def infer_graph_named_nodes(

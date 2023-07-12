@@ -213,6 +213,7 @@ def input_node(
             same sampling as same_sampling_as`. In this case, `indexes` and
             `is_unix_timestamp` should not be provided. Some operators require
             for input EventSetNodes to have the same sampling.
+        name: Name for the EventSetNode.
 
     Returns:
         EventSetNode with the given specifications.

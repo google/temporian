@@ -6,3 +6,4 @@ A collection of tutorials that will help you see how Temporian can be used in pr
 - [Heart rate analysis](heart_rate_analysis.ipynb): Load, visualize and preprocess medical data to detect heartbeats and compute heart rate and heart rate variability from raw ECG signals.
 - [Loan outcomes prediction](loan_outcomes_prediction.ipynb): Use Temporian to prepare data to predict outcomes for finished loans.
 - [M5 Competition](m5_competition.ipynb): Feature engineering and model training on the M5 Makridakis Forecasting Competitions.
+- [Detecting payment card fraud](bank_fraud_detection_with_tfdf.ipynb): Feature augmentation to detect payment card fraud with Temporian and TensorFlow Decision Forests.

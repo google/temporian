@@ -69,6 +69,7 @@ class BaseScalarNumpyImplementation(OperatorImplementation, ABC):
                     index_data.timestamps,
                     schema=output_schema,
                 ),
+                normalize=False,
             )
 
         return {"output": dst_evset}

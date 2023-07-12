@@ -14,19 +14,17 @@
 
 from functools import wraps
 from copy import copy
-from typing import Any, Dict, Optional, Tuple, Callable, Union, List
+from typing import Any, Dict, Optional, Tuple, Callable, TypeVar
 from temporian.core.data.node import EventSetNode
 from temporian.implementation.numpy.data.event_set import EventSet
+
+T = TypeVar("T", bound=Callable)
 
 
 # TODO: unify the fn's output type with run's EvaluationQuery, and add it to the
 # public API so it shows in the docs.
 # TODO: make compile change the fn's annotations to EventSetOrNode
-def compile(
-    fn: Callable[
-        ..., Union[EventSetNode, List[EventSetNode], Dict[str, EventSetNode]]
-    ]
-) -> Callable[..., Union[EventSet, List[EventSet], Dict[str, EventSet]]]:
+def compile(fn: T) -> T:
     """Compiles a Temporian function.
 
     A Temporian function is a function that takes EventSetNodes as arguments and
@@ -62,7 +60,12 @@ def compile(
 
         outputs = fn(*args, **kwargs)
 
-        if is_eager:
+        if is_eager is None:
+            raise ValueError(
+                "Cannot compile a function without EventSet or EventSetNode"
+                " argument."
+            )
+        elif is_eager:
             from temporian.core.evaluation import run
 
             return run(query=outputs, input=inputs_map)
@@ -78,7 +81,7 @@ def _process_argument(
     obj: Any,
     is_eager: Optional[bool],
     inputs_map: Dict[EventSetNode, EventSet],
-) -> Tuple[Any, bool]:
+) -> Tuple[Any, Optional[bool]]:
     """Processes arguments to an operator by checking if its being used in eager
     mode and converting EventSets to EventSetNodes if so.
 

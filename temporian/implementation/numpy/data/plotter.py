@@ -22,7 +22,7 @@ import numpy as np
 from temporian.core.data import duration_utils
 from temporian.implementation.numpy.data.event_set import (
     EventSet,
-    normalize_index,
+    normalize_index_key,
     IndexItemType,
     IndexType,
 )
@@ -149,7 +149,7 @@ def plot(
         # e.g. indexes="a"
         indexes = [(indexes,)]
 
-    indexes = [normalize_index(x) for x in indexes]
+    indexes = [normalize_index_key(x) for x in indexes]
 
     for index in indexes:
         if not isinstance(index, tuple):

@@ -15,17 +15,20 @@
   },
   "python.formatting.provider": "black",
   "editor.tabSize": 4,
-  "editor.formatOnSave": false,
+  "editor.formatOnSave": true,
   "python.linting.flake8Enabled": false,
   "python.linting.pylintEnabled": true,
   "python.linting.enabled": true,
-  "editor.rulers": [80],
+  "editor.rulers": [
+    80
+  ],
   "editor.codeActionsOnSave": {
     "source.organizeImports": false
   },
   "files.trimFinalNewlines": true,
   "files.trimTrailingWhitespace": true,
   "prettier.tabWidth": 2,
+  "editor.detectIndentation": true,
   "files.associations": {
     "system_error": "cpp",
     "type_traits": "cpp",

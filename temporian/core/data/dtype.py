@@ -128,5 +128,7 @@ bool_ = DType.BOOLEAN
 """Boolean value."""
 
 bytes_ = DType.STRING
+"""String value (stored as bytes)."""
+
 str_ = bytes_
-"""String value."""
+"""String value (stored as bytes)."""
