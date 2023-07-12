@@ -6,9 +6,13 @@ This is a _very_ quick introduction to how Temporian works. For a complete tour 
 
 The most basic unit of data in Temporian is an **event**. An event consists of a timestamp and a set of feature values.
 
-Events are not handled individually. Instead, events are grouped together into an **[EventSet][temporian.EventSet]**.
+Events are not handled individually. Instead, events are grouped together into an **[`EventSet`][temporian.EventSet]**.
 
-[`EventSets`][temporian.EventSet] are the main data structure in Temporian, and represent **[multivariate time sequences](../user_guide/#what-is-temporal-data)**. Note that "multivariate" indicates that each event in the time sequence holds several feature values, and "sequence" indicates that the events are not necessarily sampled at a uniform rate (in which case we would call it a time "series").
+[`EventSets`][temporian.EventSet] are the main data structure in Temporian, and represent **[multivariate and multi-index time sequences](../user_guide/#what-is-temporal-data)**. Let's break that down:
+
+- "multivariate" indicates that each event in the time sequence holds several feature values.
+- "multi-index" indicates that the events can represent hierarchical data, and be therefore grouped by one or more of their features' values.
+- "sequence" indicates that the events are not necessarily sampled at a uniform rate (in which case we would call it a time "series").
 
 You can create an [`EventSet`][temporian.EventSet] from a pandas DataFrame, NumPy arrays, CSV files, and more. Here is an example of an [`EventSet`][temporian.EventSet] containing four events and three features:
 
@@ -27,40 +31,38 @@ You can create an [`EventSet`][temporian.EventSet] from a pandas DataFrame, NumP
 
 An [`EventSet`][temporian.EventSet] can hold one or several time sequences, depending on what its **[index](../user_guide/#index-horizontal-and-vertical-operators)** is.
 
-If the [`EventSet`][temporian.EventSet] has no index, it will hold a single time sequence, which means that all events will be considered part of the same group and will interact with each other when operators are applied to the [`EventSet`][temporian.EventSet].
+If the [`EventSet`][temporian.EventSet] has no index, it will hold a single multivariate time sequence, which means that all events will be considered part of the same group and will interact with each other when operators are applied to the [`EventSet`][temporian.EventSet].
 
-If the [`EventSet`][temporian.EventSet] has one (or many) indexes, it will hold one time sequence for each unique value (or unique combination of values) of the indexes, the events will be grouped by their index key, and operators applied to the [`EventSet`][temporian.EventSet] will be applied to each time sequence independently.
+If the [`EventSet`][temporian.EventSet] has one (or many) indexes its events will be grouped by their indexes' values, so it will hold one multivariate time sequence for each unique value (or unique combination of values) of its indexes, and operators applied to the [`EventSet`][temporian.EventSet] will be applied to each time sequence independently.
 
-## Graph, EventSetNodes, and Operators
+## Operators
 
-There are two big phases in any Temporian script: graph **definition** and **evaluation**. This is a common pattern in computing libraries, and it allows us to perform optimizations before the graph is run, share Temporian programs across different platforms, and more.
+Processing operations are performed by **operators**. For instance, the `tp.simple_moving_average()` operator computes the [simple moving average](https://en.wikipedia.org/wiki/Moving_average) of each feature in an [`EventSet`][temporian.EventSet].
 
-A graph is created by using **operators**. For example, the [`tp.simple_moving_average()`][temporian.simple_moving_average] operator computes the [simple moving average](https://en.wikipedia.org/wiki/Moving_average) of each feature in an [`EventSet`][temporian.EventSet]. You can find documentation for all available operators [here](../reference/).
-
-Note that when calling operators you are only defining the graph - i.e., you are telling Temporian what operations you want to perform on your data, but those operations are not yet being performed.
-
-Operators are not applied directly to [`EventSets`][temporian.EventSet], but to **[EventSetNodes][temporian.EventSetNode]**. You can think of an [`EventSetNode`][temporian.EventSetNode] as the placeholder for an [`EventSet`][temporian.EventSet] in the graph. When applying operators to [`EventSetNodes`][temporian.EventSetNode], you get back new [`EventSetNodes`][temporian.EventSetNode] that are placeholders for the results of those operations. You can create arbitrarily complex graphs by combining operators and [`EventSetNodes`][temporian.EventSetNode].
+The list of all available operators is available in the [API Reference](./reference/index.md).
 
 ```python
->>> # Obtain the EventSetNode corresponding to the EventSet we created above
->>> source = evset.node()
->>>
->>> # Apply operators to existing EventSetNodes to generate new EventSetNodes
->>> addition = source["feature_1"] + source["feature_3"]
->>> addition_lagged = tp.lag(addition, duration=tp.duration.days(7))
+>>> # Compute the 2-day simple moving average of the EventSet defined above
+>>> sma = tp.simple_moving_average(evset, window_length=tp.duration.days(2))
+
+>>> # Remove index to get a flat EventSet
+>>> reindexed = tp.drop_index(sma)
+
+>>> # Subtract feature_1 from feature_3
+>>> sub = reindexed["feature_3"] - reindexed["feature_1"]
+
+>>> # Plot the resulting EventSet
+>>> sub.plot()
 
 ```
 
-<!-- TODO: add image of the generated graph -->
+## Graph mode
 
-Your graph can now be run by calling [`.run()`][temporian.EventSetNode.run] on any [`EventSetNode`][temporian.EventSetNode] in the graph, which will perform all necessary operations and return the resulting [`EventSet`][temporian.EventSet].
+Temporian works in **eager mode** out of the box, which means that when you call an operator on an [`EventSet`][temporian.EventSet] you get back the result of that operation immediately as a new [`EventSet`][temporian.EventSet].
 
-```python
->>> result = addition_lagged.run(evset)
+Eager execution is easy to grasp, and fits most small data use cases. However, for big data, **graph mode** allows Temporian to perform optimizations on the computation graph that is defined when operators are applied on [`EventSets`][temporian.EventSet]. Graph mode also enables the serialization of Temporian programs, for later use in other platforms or distributed compute environments.
 
-```
-
-Note that you need to pass the [`EventSets`][temporian.EventSet] that correspond to the source [`EventSetNodes`][temporian.EventSetNode] in the graph to [`.run()`][temporian.EventSetNode.run] (since those are not part of the graph definition). Also, several [`EventSetNodes`][temporian.EventSetNode] can be run at the same time by calling [`tp.run()`][temporian.run] directly.
+To learn how graph mode works, check out **[Eager mode vs Graph mode](./user_guide.ipynb#eager-mode-vs-graph-mode)** in the User Guide.
 
 🥳 Congratulations! You're all set to write your first pieces of Temporian code.
 
