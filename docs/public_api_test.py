@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from absl.testing import absltest
 from pathlib import Path
 
+from absl.testing import absltest
+
 import temporian as tp
-from temporian.core.operator_lib import registered_operators
 
 PUBLIC_API_SYMBOLS = {
     "EventSet",
@@ -42,9 +42,10 @@ PUBLIC_API_SYMBOLS = {
     "bool_",
     "str_",
     # SERIALIZATION
-    "load",
     "save",
+    "load",
     "save_graph",
+    "load_graph",
     # OPERATORS
     "cast",
     "drop_index",

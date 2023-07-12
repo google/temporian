@@ -242,7 +242,7 @@ def isnan(
     always be `False` since those types don't support NaNs.
     It only makes actual sense to use on `float` (or `tp.float32`) features.
 
-    See also [`tp.notnan()`][tp.notnan].
+    See also [`tp.notnan()`][temporian.notnan].
 
     Example:
         ```python

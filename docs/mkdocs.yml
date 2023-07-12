@@ -35,6 +35,9 @@ theme:
 # Root dir for docs source
 docs_dir: src
 
+# Fail on warnings (e.g. broken links)
+strict: true
+
 # Extra CSS
 extra_css:
   # TODO: continue working on this css customization for temporian
