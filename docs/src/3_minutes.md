@@ -33,13 +33,13 @@ An [`EventSet`][temporian.EventSet] can hold one or several time sequences, depe
 
 If the [`EventSet`][temporian.EventSet] has no index, it will hold a single multivariate time sequence, which means that all events will be considered part of the same group and will interact with each other when operators are applied to the [`EventSet`][temporian.EventSet].
 
-If the [`EventSet`][temporian.EventSet] has one (or many) indexes its events will be grouped by their indexes' values, so it will hold one multivariate time sequence for each unique value (or unique combination of values) of its indexes, and operators applied to the [`EventSet`][temporian.EventSet] will be applied to each time sequence independently.
+If the [`EventSet`][temporian.EventSet] has one (or many) indexes, its events will be grouped by their indexes' values, so it will hold one multivariate time sequence for each unique value (or unique combination of values) of its indexes, and most operators applied to the [`EventSet`][temporian.EventSet] will be applied to each time sequence independently.
 
 ## Operators
 
 Processing operations are performed by **operators**. For instance, the `tp.simple_moving_average()` operator computes the [simple moving average](https://en.wikipedia.org/wiki/Moving_average) of each feature in an [`EventSet`][temporian.EventSet].
 
-The list of all available operators is available in the [API Reference](./reference/index.md).
+The list of all available operators is available in the [API Reference](./reference/).
 
 ```python
 >>> # Compute the 2-day simple moving average of the EventSet defined above
