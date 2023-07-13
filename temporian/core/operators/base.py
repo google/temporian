@@ -27,7 +27,7 @@ from temporian.proto import core_pb2 as pb
 
 # Valid types for operator attributes
 AttributeType = Union[
-    str, int, float, bool, List[str], Dict[str, str], List[DType]
+    str, int, float, bool, bytes, List[str], Dict[str, str], List[DType]
 ]
 
 # Generic type for defining the input/output types of operators.
@@ -254,6 +254,10 @@ class Operator(ABC):
             and not isinstance(value, str)
         ):
             raise ValueError(f"Attribute {value=} mismatch: string expected")
+        if attr_type == pb.OperatorDef.Attribute.Type.BYTES and not isinstance(
+            value, bytes
+        ):
+            raise ValueError(f"Attribute {value=} mismatch: string expected")
         if (
             attr_type == pb.OperatorDef.Attribute.Type.INTEGER_64
             and not isinstance(value, int)
@@ -294,6 +298,7 @@ class Operator(ABC):
         if (
             attr_type == pb.OperatorDef.Attribute.Type.ANY
             and not isinstance(value, str)
+            and not isinstance(value, bytes)
             and not isinstance(value, bool)
             and not isinstance(value, int)
             and not isinstance(value, float)

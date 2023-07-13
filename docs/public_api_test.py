@@ -41,6 +41,7 @@ PUBLIC_API_SYMBOLS = {
     "int64",
     "bool_",
     "str_",
+    "bytes_",
     # SERIALIZATION
     "save",
     "load",

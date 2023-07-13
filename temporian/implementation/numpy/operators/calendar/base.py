@@ -52,6 +52,7 @@ class BaseCalendarNumpyImplementation(OperatorImplementation):
             dst_evset.set_index_value(
                 index_key,
                 IndexData([value], index_data.timestamps, schema=output_schema),
+                normalize=False,
             )
 
         return {"output": dst_evset}

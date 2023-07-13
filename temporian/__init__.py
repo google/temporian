@@ -47,6 +47,7 @@ from temporian.core.data.dtype import int32
 from temporian.core.data.dtype import int64
 from temporian.core.data.dtype import bool_
 from temporian.core.data.dtype import str_
+from temporian.core.data.dtype import bytes_
 
 # Schema
 from temporian.core.data.schema import Schema

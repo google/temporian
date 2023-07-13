@@ -58,6 +58,7 @@ class GlueNumpyImplementation(OperatorImplementation):
                     features=features,
                     schema=output_schema,
                 ),
+                normalize=False,
             )
 
         return {"output": dst_evset}

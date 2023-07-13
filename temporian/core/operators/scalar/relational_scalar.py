@@ -76,7 +76,7 @@ class LessScalarOperator(RelationalScalarOperator):
 @compile
 def equal_scalar(
     input: EventSetNode,
-    value: Union[float, int, str, bool],
+    value: Union[float, int, str, bool, bytes],
 ) -> EventSetNode:
     """Checks for equality between a node and a scalar element-wise.
 
@@ -124,7 +124,7 @@ def equal_scalar(
 @compile
 def not_equal_scalar(
     input: EventSetNode,
-    value: Union[float, int, str, bool],
+    value: Union[float, int, str, bytes, bool],
 ) -> EventSetNode:
     """Checks for differences between a node and a scalar element-wise.
 
@@ -169,7 +169,7 @@ def not_equal_scalar(
 @compile
 def greater_equal_scalar(
     input: EventSetNode,
-    value: Union[float, int, str, bool],
+    value: Union[float, int, str, bytes, bool],
 ) -> EventSetNode:
     """Check if the input node is greater or equal than a scalar element-wise.
 
@@ -214,7 +214,7 @@ def greater_equal_scalar(
 @compile
 def less_equal_scalar(
     input: EventSetNode,
-    value: Union[float, int, str, bool],
+    value: Union[float, int, str, bytes, bool],
 ) -> EventSetNode:
     """Check if the input node is less or equal than a scalar element-wise.
 
@@ -259,7 +259,7 @@ def less_equal_scalar(
 @compile
 def greater_scalar(
     input: EventSetNode,
-    value: Union[float, int, str, bool],
+    value: Union[float, int, str, bytes, bool],
 ) -> EventSetNode:
     """Check if the input node is greater than a scalar element-wise.
 
@@ -304,7 +304,7 @@ def greater_scalar(
 @compile
 def less_scalar(
     input: EventSetNode,
-    value: Union[float, int, str, bool],
+    value: Union[float, int, str, bytes, bool],
 ) -> EventSetNode:
     """Check if the input node is less than a scalar element-wise.
 

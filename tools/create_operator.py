@@ -215,6 +215,7 @@ class {capitalized_op}NumpyImplementation(OperatorImplementation):
                     [],
                     np.array([1], dtype=np.float64),
                     schema=output_schema,
+                    normalize=False,
                 )
             )
 

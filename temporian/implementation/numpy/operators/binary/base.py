@@ -69,7 +69,7 @@ class BaseBinaryNumpyImplementation(OperatorImplementation):
         for index_key, index_data in input_1.data.items():
             # iterate over index key features
             input_1_features = index_data.features
-            input_2_features = input_2.get_index_value(index_key).features
+            input_2_features = input_2.data[index_key].features
             dst_features = []
 
             for feature_idx in range(num_features):
@@ -91,6 +91,7 @@ class BaseBinaryNumpyImplementation(OperatorImplementation):
                     timestamps=index_data.timestamps,
                     schema=output_schema,
                 ),
+                normalize=False,
             )
 
         return {"output": dst_evset}
