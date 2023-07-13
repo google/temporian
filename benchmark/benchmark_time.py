@@ -265,7 +265,7 @@ def benchmark_add_index(runner):
                     "feature_6": feature_6,
                 }
             ),
-            indexes=["index_1", "index_2"],
+            # indexes=["index_1", "index_2"], # DO NOT SUBMIT
         )
 
         node = evset.node()

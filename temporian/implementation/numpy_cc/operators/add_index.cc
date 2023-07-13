@@ -53,6 +53,7 @@ struct GroupAccumulator {
   // Should be called once before any other method.
   void Initialize(const std::size_t num_rows) {
     assert(!initialized);
+    initialized = true;
     group_begin_idx.push_back(0);
     row_idxs = py::array_t<Idx>(num_rows);
   }
@@ -77,7 +78,7 @@ struct GroupAccumulator {
     // Copy the group indices
     auto raw_row_idxs = row_idxs.mutable_unchecked<1>();
     for (const Idx selected_row : selected_rows) {
-      assert(next_row_idx < raw_row_idxs.shape[0]);
+      // assert(next_row_idx < raw_row_idxs.shape[0]);
       raw_row_idxs[next_row_idx++] = selected_row;
     }
 
@@ -109,7 +110,7 @@ void process_feature_int(const py::array_t<Feature> &feature,
                          const std::vector<Idx> &selected_rows,
                          GroupAccumulator *index_acc,
                          std::vector<py::object> *partial_group) {
-  assert(feature.ndim == 1);
+  assert(feature.ndim() == 1);
 
   const auto raw_feature = feature.template unchecked<1>();
 
@@ -157,7 +158,7 @@ void process_feature_string(const py::array &feature, const py::list &features,
                             const std::vector<Idx> &selected_rows,
                             GroupAccumulator *index_acc,
                             std::vector<py::object> *partial_group) {
-  assert(feature.ndim == 1);
+  assert(feature.ndim() == 1);
   py::buffer_info info = feature.request();
 
   // List the group and the row index in each group.

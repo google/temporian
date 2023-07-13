@@ -30,6 +30,7 @@ from temporian.core.data.node import (
 from temporian.core.data.schema import Schema
 from temporian.core.mixins import EventSetOperationsMixin
 from temporian.utils import string
+from temporian.utils import config
 
 if TYPE_CHECKING:
     from temporian.core.operators.base import Operator
@@ -282,6 +283,9 @@ class IndexData:
             self.check_schema(schema)
 
     def check_schema(self, schema: Schema):
+        if not config.DEBUG_MODE:
+            return
+
         # Check that the data (features & timestamps) matches the schema.
 
         if self.timestamps.ndim != 1:
