@@ -24,7 +24,7 @@ T = TypeVar("T", bound=Callable)
 # TODO: unify the fn's output type with run's EvaluationQuery, and add it to the
 # public API so it shows in the docs.
 # TODO: make compile change the fn's annotations to EventSetOrNode
-def compile(*args, **kwargs):
+def compile(*args: Callable, **kwargs: Any) -> Any:
     """Compiles a Temporian function.
 
     A Temporian function is a function that takes EventSetNodes as arguments and
@@ -32,12 +32,15 @@ def compile(*args, **kwargs):
     evaluation, i.e., receive and return EventSets instead of EventSetNodes.
 
     Args:
-        fn: The function to compile. The function must take EventSetNodes as arguments
-            (and may have other arguments of arbitrary types) and return EventSetNodes
-            as outputs.
-        verbose: If >0, prints details about the execution on the standard error
-            output when the wrapped function is applied eagerly on EventSets.
-            The larger the number, the more information is displayed.
+        *args: The function to compile. The function must take
+            EventSetNodes as arguments (and may have other arguments of
+            arbitrary types) and return EventSetNodes as outputs. No other
+            positional arguments should be passed.s
+        **kwargs: Optional keyword arguments.
+            verbose (int): If >0, prints details about the execution on the
+                standard error output when the wrapped function is applied
+                eagerly on EventSets. The larger the number, the more
+                information is displayed.
 
     Returns:
         The compiled function.
