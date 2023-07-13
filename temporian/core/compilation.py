@@ -84,10 +84,14 @@ def compile(*args, **kwargs):
         raise ValueError("@tp.compile() can only receive keyword arguments.")
 
     if not kwargs:
+        # If no kwargs, then the function is being called as a decorator, so we
+
         verbose = 0
         return _compile(args[0])
 
     else:
+        # If kwargs, then the function is being called as a function, so we
+        # return a decorator that will receive the function to compile.
         if len(kwargs) > 1:
             raise ValueError(
                 "@tp.compile() can only receive one keyword argument."
