@@ -175,13 +175,13 @@ def add_index(
         indexes: [('f1', int64)]
         features: [('f2', int64), ('f3', int64)]
         events:
-            f1=2 (3 events):
-                timestamps: [0. 1. 1.]
-                'f2': [1 1 2]
-                'f3': [1 1 1]
             f1=1 (3 events):
                 timestamps: [1. 1. 2.]
                 'f2': [1 2 1]
+                'f3': [1 1 1]
+            f1=2 (3 events):
+                timestamps: [0. 1. 1.]
+                'f2': [1 1 2]
                 'f3': [1 1 1]
         ...
 
@@ -191,15 +191,15 @@ def add_index(
         indexes: [('f1', int64), ('f2', int64)]
         features: [('f3', int64)]
         events:
-            f1=2 f2=1 (2 events):
-                timestamps: [0. 1.]
-                'f3': [1 1]
             f1=1 f2=1 (2 events):
                 timestamps: [1. 2.]
                 'f3': [1 1]
             f1=1 f2=2 (1 events):
                 timestamps: [1.]
                 'f3': [1]
+            f1=2 f2=1 (2 events):
+                timestamps: [0. 1.]
+                'f3': [1 1]
             f1=2 f2=2 (1 events):
                 timestamps: [1.]
                 'f3': [1]
@@ -249,13 +249,13 @@ def set_index(
         indexes: [('f1', int64)]
         features: [('f2', int64), ('f3', int64)]
         events:
-            f1=2 (3 events):
-                timestamps: [0. 1. 1.]
-                'f2': [1 1 2]
-                'f3': [1 1 1]
             f1=1 (3 events):
                 timestamps: [1. 1. 2.]
                 'f2': [1 2 1]
+                'f3': [1 1 1]
+            f1=2 (3 events):
+                timestamps: [0. 1. 1.]
+                'f2': [1 1 2]
                 'f3': [1 1 1]
         ...
 
@@ -268,11 +268,11 @@ def set_index(
             f2=1 (4 events):
                 timestamps: [0. 1. 1. 2.]
                 'f3': [1 1 1 1]
-                'f1': [2 2 1 1]
+                'f1': [2 1 2 1]
             f2=2 (2 events):
                 timestamps: [1. 1.]
                 'f3': [1 1]
-                'f1': [2 1]
+                'f1': [1 2]
         ...
 
         >>> # Set both "f1" and "f2" as indices
@@ -281,16 +281,16 @@ def set_index(
         indexes: [('f1', int64), ('f2', int64)]
         features: [('f3', int64)]
         events:
-            f1=2 f2=1 (2 events):
-                timestamps: [0. 1.]
-                'f3': [1 1]
-            f1=2 f2=2 (1 events):
-                timestamps: [1.]
-                'f3': [1]
             f1=1 f2=1 (2 events):
                 timestamps: [1. 2.]
                 'f3': [1 1]
             f1=1 f2=2 (1 events):
+                timestamps: [1.]
+                'f3': [1]
+            f1=2 f2=1 (2 events):
+                timestamps: [0. 1.]
+                'f3': [1 1]
+            f1=2 f2=2 (1 events):
                 timestamps: [1.]
                 'f3': [1]
         ...

@@ -454,7 +454,12 @@ class EventSet(EventSetOperationsMixin):
         # Representation of the "data" field
         with np.printoptions(precision=4, threshold=20):
             data_repr = []
-            for i, (index_key, index_data) in enumerate(self.data.items()):
+
+            # Sort index
+            sorted_index_keys = sorted(list(self.data.keys()))
+
+            for i, index_key in enumerate(sorted_index_keys):
+                index_data = self.data[index_key]
                 if i > MAX_NUM_PRINTED_INDEX:
                     data_repr.append(f"... ({len(self.data) - i} remaining)")
                     break

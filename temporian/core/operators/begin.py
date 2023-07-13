@@ -72,10 +72,10 @@ def begin(input: EventSetNode) -> EventSetNode:
         indexes: [('idx', int64)]
         features: []
         events:
-            idx=2 (1 events):
-                timestamps: [-1.]
             idx=1 (1 events):
                 timestamps: [5.]
+            idx=2 (1 events):
+                timestamps: [-1.]
         ...
 
         ```
