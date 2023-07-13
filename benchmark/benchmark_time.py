@@ -23,6 +23,9 @@ bazel run -c opt //benchmark:benchmark_time
 # Only run the "add_index" runs.
 bazel run -c opt //benchmark:benchmark_time -- -f=add_index
 
+# Run add_index and from_pandas
+bazel run -c opt //benchmark:benchmark_time -- --f add_index from_pandas
+
 """
 import argparse
 import time
