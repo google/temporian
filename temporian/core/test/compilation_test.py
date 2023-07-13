@@ -159,7 +159,7 @@ class CompileTest(absltest.TestCase):
         def f(x: EventSetNode) -> EventSetNode:
             return prefix("a", x)
 
-        result = f(self.evset)
+        f(self.evset)
 
         run_mock.assert_called_once_with(ANY, ANY, 1)
 
