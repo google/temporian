@@ -57,6 +57,7 @@ from temporian.core.data import duration
 
 # EventSets
 from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.event_set import EventSetOrNode
 from temporian.implementation.numpy.data.io import event_set
 
 # Serialization

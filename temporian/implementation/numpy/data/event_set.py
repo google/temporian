@@ -16,7 +16,16 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING, Union
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional,
+    Tuple,
+    TYPE_CHECKING,
+    TypeVar,
+    Union,
+)
 import datetime
 import sys
 
@@ -566,3 +575,15 @@ class EventSet(EventSetOperationsMixin):
         created EventSets have a `None` creator.
         """
         return self.node()._creator
+
+
+EventSetOrNode = TypeVar("EventSetOrNode", EventSet, EventSetNode)
+# EventSetOrNode = Union[EventSet, EventSetNode]
+"""Generic type for defining the input and output types of operators and
+Temporian functions.
+
+A function typed as `f(a: EventSetOrNode, ...) -> EventSetOrNode` indicates that
+the function receives either EventSets or EventSetNodes as input, and returns
+that same type as output. In other words, `f(evset)` returns an EventSet, and
+`f(node)` returns an EventSetNode.
+"""

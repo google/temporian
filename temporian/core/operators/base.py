@@ -17,11 +17,10 @@
 from __future__ import annotations
 from abc import ABC
 from copy import deepcopy
-from typing import Dict, List, Tuple, TypeVar, Union, Any
+from typing import Dict, List, Tuple, Union, Any
 from temporian.core.data.dtype import DType
 
 from temporian.core.data.node import EventSetNode
-from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.proto import core_pb2 as pb
 
 
@@ -29,9 +28,6 @@ from temporian.proto import core_pb2 as pb
 AttributeType = Union[
     str, int, float, bool, bytes, List[str], Dict[str, str], List[DType]
 ]
-
-# Generic type for defining the input/output types of operators.
-EventSetOrNode = TypeVar("EventSetOrNode", EventSet, EventSetNode)
 
 
 class OperatorExceptionDecorator:

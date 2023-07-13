@@ -36,14 +36,16 @@ from temporian.core.data.node import (
     EventSetNode,
     Sampling,
     Feature,
-    create_node_with_new_reference,
     input_node,
 )
 from temporian.core.data.schema import Schema
 from temporian.core.compilation import compile
 from temporian.core.operators import base
 from temporian.core.data.dtype import DType
-from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.event_set import (
+    EventSet,
+    EventSetOrNode,
+)
 from temporian.proto import core_pb2 as pb
 
 DTYPE_MAPPING = {
@@ -59,16 +61,17 @@ INV_DTYPE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
 
 # TODO: allow saved fn to return a single Node too
 def save(
-    fn: Callable[..., Dict[str, EventSetNode]],
+    fn: Callable[..., Dict[str, EventSetOrNode]],
     path: str,
     *args: Union[EventSetNode, EventSet, Schema],
     **kwargs: Union[EventSetNode, EventSet, Schema],
 ) -> None:
     """Saves a compiled Temporian function to a file.
 
-    The saved function must only take [`EventSetNodes`][temporian.EventSetNode]
-    as arguments, return a dictionary of names to EventSetNodes, and be
-    decorated with [`@tp.compile`][temporian.compile].
+    The saved function must only take
+    [`EventSetOrNodes`][temporian.EventSetOrNode] as arguments, return a
+    dictionary of names to EventSetOrNodes, and be decorated with
+    [`@tp.compile`][temporian.compile].
 
     Temporian saves the graph built between the function's input and output
     nodes, not the function itself. Any arbitrary code that

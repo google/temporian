@@ -19,6 +19,7 @@ from temporian.core.compilation import compile
 from temporian.core.data.node import EventSetNode
 from temporian.core.data.dtype import DType
 from temporian.core.operators.binary.base import BaseBinaryOperator
+from temporian.implementation.numpy.data.event_set import EventSetOrNode
 
 
 class BaseArithmeticOperator(BaseBinaryOperator):
@@ -88,10 +89,10 @@ class DivideOperator(BaseArithmeticOperator):
 
 @compile
 def add(
-    input_1: EventSetNode,
-    input_2: EventSetNode,
-) -> EventSetNode:
-    """Adds two nodes.
+    input_1: EventSetOrNode,
+    input_2: EventSetOrNode,
+) -> EventSetOrNode:
+    """Adds two [`EventSets`][temporian.EventSet].
 
     Each feature in `input_1` is added to the feature in `input_2` in the same
     position.
@@ -225,8 +226,8 @@ def add(
         ```
 
     Args:
-        input_1: First node.
-        input_2: Second node.
+        input_1: First EventSet.
+        input_2: Second EventSet.
 
     Returns:
         Sum of `input_1`'s and `input_2`'s features.

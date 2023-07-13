@@ -23,7 +23,6 @@ from temporian.core.operators.binary import (
     ModuloOperator,
     PowerOperator,
 )
-from temporian.core.data.dtype import DType
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.binary.base import (
     BaseBinaryNumpyImplementation,
