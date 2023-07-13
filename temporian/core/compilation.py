@@ -24,7 +24,7 @@ T = TypeVar("T", bound=Callable)
 # TODO: unify the fn's output type with run's EvaluationQuery, and add it to the
 # public API so it shows in the docs.
 # TODO: make compile change the fn's annotations to EventSetOrNode
-def compile(fn: T) -> T:
+def compile(*args, **kwargs):
     """Compiles a Temporian function.
 
     A Temporian function is a function that takes EventSetNodes as arguments and
@@ -35,46 +35,65 @@ def compile(fn: T) -> T:
         fn: The function to compile. The function must take EventSetNodes as arguments
             (and may have other arguments of arbitrary types) and return EventSetNodes
             as outputs.
+        verbose: If >0, prints details about the execution on the standard error
+            output when the wrapped function is applied eagerly on EventSets.
+            The larger the number, the more information is displayed.
 
     Returns:
         The compiled function.
     """
 
-    @wraps(fn)
-    def wrapper(*args, **kwargs):
-        is_eager = None
-        args = list(args)
+    def _compile(fn: T) -> T:
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            is_eager = None
+            args = list(args)
 
-        # EventSetNode -> EventSet mapping for eager evaluation
-        inputs_map = {}
+            # EventSetNode -> EventSet mapping for eager evaluation
+            inputs_map = {}
 
-        for i, arg in enumerate(args):
-            args[i], is_eager = _process_argument(
-                arg, is_eager=is_eager, inputs_map=inputs_map
-            )
+            for i, arg in enumerate(args):
+                args[i], is_eager = _process_argument(
+                    arg, is_eager=is_eager, inputs_map=inputs_map
+                )
 
-        for k, arg in kwargs.items():
-            kwargs[k], is_eager = _process_argument(
-                arg, is_eager=is_eager, inputs_map=inputs_map
-            )
+            for k, arg in kwargs.items():
+                kwargs[k], is_eager = _process_argument(
+                    arg, is_eager=is_eager, inputs_map=inputs_map
+                )
 
-        outputs = fn(*args, **kwargs)
+            outputs = fn(*args, **kwargs)
 
-        if is_eager is None:
+            if is_eager is None:
+                raise ValueError(
+                    "Cannot compile a function without EventSet or EventSetNode"
+                    " argument."
+                )
+            elif is_eager:
+                from temporian.core.evaluation import run
+
+                return run(query=outputs, input=inputs_map, verbose=verbose)
+
+            return outputs
+
+        wrapper.is_tp_compiled = True
+
+        return wrapper
+
+    if len(args) > 1:
+        raise ValueError("@tp.compile() can only receive keyword arguments.")
+
+    if not kwargs:
+        verbose = 0
+        return _compile(args[0])
+
+    else:
+        if len(kwargs) > 1:
             raise ValueError(
-                "Cannot compile a function without EventSet or EventSetNode"
-                " argument."
+                "@tp.compile() can only receive one keyword argument."
             )
-        elif is_eager:
-            from temporian.core.evaluation import run
-
-            return run(query=outputs, input=inputs_map)
-
-        return outputs
-
-    wrapper.is_tp_compiled = True
-
-    return wrapper
+        verbose = kwargs.get("verbose", 0)
+        return _compile
 
 
 def _process_argument(
