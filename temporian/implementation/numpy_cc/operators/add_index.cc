@@ -180,7 +180,6 @@ void process_feature_string(const py::array &feature, const py::list &features,
     for (const auto row_idx : selected_rows) {
       const char *begin = ((char *)info.ptr) + row_idx * stride;
       std::string_view value(begin, itemsize);
-      // DO NOT SUBMIT -> Remove extra 0s
       local_groups[remove_tailing_zeros(value)].push_back(row_idx);
     }
   }

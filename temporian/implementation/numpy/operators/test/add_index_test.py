@@ -36,7 +36,9 @@ class SortedGroup:
     row_idxs: List[int]
 
 
-def sort_groups(group_keys, row_idxs, group_begin_idx) -> List[SortedGroup]:
+def sort_groups(
+    group_keys: List[str], row_idxs: np.ndarray, group_begin_idx: np.ndarray
+) -> List[SortedGroup]:
     """Sorts groups for deterministic comparison."""
 
     result = []
