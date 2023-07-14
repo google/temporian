@@ -62,13 +62,12 @@ def compile(
     ```
 
     Args:
-        fn: The function to compile. The function must take
-            EventSetNodes as arguments (and may have other arguments of
-            arbitrary types) and return EventSetNodes as outputs. No other
-            positional arguments should be passed.s
-        verbose (int): If >0, prints details about the execution on the standard
-            error output when the wrapped function is applied eagerly on
-            EventSets. The larger the number, the more information is displayed.
+        fn: The function to compile. The function must take EventSetNodes as
+            arguments (and may have other arguments of arbitrary types) and
+            return EventSetNodes as outputs.
+        verbose: If >0, prints details about the execution on the standard error
+            output when the wrapped function is applied eagerly on EventSets.
+            The larger the number, the more information is displayed.
 
     Returns:
         The compiled function.
