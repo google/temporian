@@ -60,6 +60,7 @@ BUILT_IN_MODULES = {
     "copy",
     "tempfile",
     "logging",
+    "inspect",
     "google.protobuf.text_format",
 }
 
