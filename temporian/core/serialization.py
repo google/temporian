@@ -36,7 +36,6 @@ from temporian.core.data.node import (
     EventSetNode,
     Sampling,
     Feature,
-    create_node_with_new_reference,
     input_node,
 )
 from temporian.core.data.schema import Schema

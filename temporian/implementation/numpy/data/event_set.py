@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING, Union
+from typing import Any, Dict, List, Optional, Set, Tuple, TYPE_CHECKING, Union
 import datetime
 import sys
 
@@ -575,3 +575,23 @@ class EventSet(EventSetOperationsMixin):
         created EventSets have a `None` creator.
         """
         return self.node()._creator
+
+
+EventSetCollection = Union[EventSet, List[EventSet], Dict[str, EventSet]]
+"""A collection of [`EventSets`][temporian.EventSet].
+
+This can be a single EventSet, a list of EventSets, or a dictionary mapping
+names to EventSets."""
+
+NodeToEventSetMapping = Union[
+    Dict[EventSetNode, EventSet], EventSet, List[EventSet]
+]
+"""A mapping of [`EventSetNodes`][temporian.EventSetNode] to
+[`EventSets`][temporian.EventSet].
+
+If a dictionary, the mapping is defined by it.
+
+If a single EventSet or a list of EventSets, each EventSet is mapped to their
+own node using [`EventSet.node()`][temporian.EventSet.node], i.e., `[event_set]`
+is equivalent to `{event_set.node() : event_set}`.
+"""
