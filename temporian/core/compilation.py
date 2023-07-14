@@ -83,24 +83,21 @@ def compile(*args: Callable, **kwargs: Any) -> Any:
 
         return wrapper
 
-    if len(args) > 1:
-        raise ValueError("@tp.compile() can only receive keyword arguments.")
-
-    if not kwargs:
-        # If no kwargs, then the function is being called as a decorator, so we
-
+    # If no kwargs, then the function is being called as a decorator, so we
+    if not kwargs and len(args) == 1 and callable(args[0]):
         verbose = 0
         return _compile(args[0])
 
-    else:
-        # If kwargs, then the function is being called as a function, so we
-        # return a decorator that will receive the function to compile.
-        if len(kwargs) > 1:
-            raise ValueError(
-                "@tp.compile() can only receive one keyword argument."
-            )
-        verbose = kwargs.get("verbose", 0)
-        return _compile
+    if args:
+        raise ValueError("@tp.compile() can only receive keyword arguments.")
+
+    # Else the function is being called as a function, so we
+    # return a decorator that will receive the function to compile.
+    if len(kwargs) > 1:
+        raise ValueError("@tp.compile() can only receive one keyword argument.")
+
+    verbose = kwargs.get("verbose", 0)
+    return _compile
 
 
 def _process_argument(

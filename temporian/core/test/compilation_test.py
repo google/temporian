@@ -173,6 +173,13 @@ class CompileTest(absltest.TestCase):
 
         run_mock.assert_called_once_with(ANY, ANY, 0)
 
+    def test_call_no_args(self):
+        @compile()
+        def f(x: EventSetNode) -> EventSetNode:
+            return prefix("a", x)
+
+        f(self.evset)
+
 
 if __name__ == "__main__":
     absltest.main()
