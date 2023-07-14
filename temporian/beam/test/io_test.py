@@ -97,9 +97,6 @@ class IOTest(absltest.TestCase):
             self.assertEqual(
                 content,
                 """timestamp,b,e,a,c,d
-1.0,x,1,2,X,-1
-2.0,x,1,3,Y,-2
-3.0,x,1,4,Y,-3
 1.0,y,1,22,Z,-6
 2.0,y,1,23,Z,-7
 3.0,y,1,24,X,-8
@@ -107,6 +104,9 @@ class IOTest(absltest.TestCase):
 5.0,y,1,22,X,-10
 4.0,x,2,3,X,-4
 5.0,x,2,2,Z,-5
+1.0,x,1,2,X,-1
+2.0,x,1,3,Y,-2
+3.0,x,1,4,Y,-3
 """,
             )
 

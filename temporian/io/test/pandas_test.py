@@ -20,6 +20,9 @@ import numpy as np
 import pandas as pd
 from temporian.io.pandas import from_pandas, to_pandas
 from temporian.implementation.numpy.data.io import event_set
+from temporian.implementation.numpy.operators.test.test_util import (
+    assertEqualDFRandomRowOrder,
+)
 
 
 class DataFrameToEventTest(absltest.TestCase):
@@ -427,14 +430,14 @@ class DataFrameToEventTest(absltest.TestCase):
         expected_df = pd.DataFrame(
             [
                 [666964, 740.0, 1.0],
-                [666964, 508.0, 2.0],
                 [574016, 573.0, 3.0],
+                [666964, 508.0, 2.0],
             ],
             columns=["product_id", "costs", "timestamp"],
         )
         df = to_pandas(evset)
 
-        self.assertTrue(df.equals(expected_df))
+        assertEqualDFRandomRowOrder(self, df, expected_df)
 
     def test_evset_to_df_no_index(self) -> None:
         evset = event_set(
@@ -455,7 +458,7 @@ class DataFrameToEventTest(absltest.TestCase):
         )
         df = to_pandas(evset)
 
-        self.assertTrue(df.equals(expected_df))
+        assertEqualDFRandomRowOrder(self, df, expected_df)
 
     def test_evset_to_df_multiple_index(self) -> None:
         evset = event_set(
@@ -483,7 +486,7 @@ class DataFrameToEventTest(absltest.TestCase):
         )
         df = to_pandas(evset)
 
-        self.assertTrue(df.equals(expected_df))
+        assertEqualDFRandomRowOrder(self, df, expected_df)
 
     def test_evset_to_df_string_feature(self) -> None:
         evset = event_set(
@@ -504,7 +507,7 @@ class DataFrameToEventTest(absltest.TestCase):
         )
         df = to_pandas(evset)
 
-        self.assertTrue(df.equals(expected_df))
+        assertEqualDFRandomRowOrder(self, df, expected_df)
 
 
 if __name__ == "__main__":

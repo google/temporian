@@ -163,6 +163,7 @@ py_library(
         "//temporian/core/operators:add_index",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy_cc/operators:operators_cc",
     ],
 )
 

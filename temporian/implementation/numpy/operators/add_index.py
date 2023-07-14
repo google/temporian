@@ -5,6 +5,7 @@ from temporian.core.operators.add_index import AddIndexOperator
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.data.event_set import EventSet, IndexData
 from temporian.implementation.numpy.operators.base import OperatorImplementation
+from temporian.implementation.numpy_cc.operators import operators_cc
 
 
 class AddIndexNumpyImplementation(OperatorImplementation):
@@ -32,24 +33,20 @@ class AddIndexNumpyImplementation(OperatorImplementation):
 
         dst_data = {}
         for src_index, src_data in input.data.items():
-            # Maps, for each new index key, the indices of the events in
-            # src_data.
-            #
-            # TODO: Do more efficiently. E.g. with numpy masks.
+            index_features = [src_data.features[i] for i in new_index_idxs]
+            (
+                group_keys,
+                row_idxs,
+                group_begin_idx,
+            ) = operators_cc.add_index_compute_index(index_features)
 
-            new_index_to_value_idxs = defaultdict(list)
-            # TODO: This is slow. Speed-up.
-            for event_idx, new_index in enumerate(
-                zip(*[src_data.features[f_idx] for f_idx in new_index_idxs])
-            ):
-                new_index = tuple(new_index)
-                new_index_to_value_idxs[new_index].append(event_idx)
-
-            for new_index, example_idxs in new_index_to_value_idxs.items():
-                # Note: The new indexes added after the existing ones.
-                dst_index = src_index + new_index
+            for group_idx, group_key in enumerate(group_keys):
+                dst_index = src_index + group_key
                 assert isinstance(dst_index, tuple)
 
+                example_idxs = row_idxs[
+                    group_begin_idx[group_idx] : group_begin_idx[group_idx + 1]
+                ]
                 dst_data[dst_index] = IndexData(
                     features=[
                         src_data.features[f_idx][example_idxs]

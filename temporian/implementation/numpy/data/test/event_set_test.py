@@ -2,11 +2,12 @@ import numpy as np
 from absl.testing import absltest
 
 from temporian.implementation.numpy.data.io import event_set, IndexData
+from temporian.implementation.numpy.operators.test.test_util import (
+    assertEqualEventSet,
+)
 
-# TODO: Rename file to "event_set_test" and rename the following class to EventSetTest.
 
-
-class EventTest(absltest.TestCase):
+class EventSetTest(absltest.TestCase):
     def setUp(self):
         self.evset = event_set(
             timestamps=[0.1, 0.2, 0.3, 0.4, 0.5],

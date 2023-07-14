@@ -1,20 +1,20 @@
+#include <pybind11/numpy.h>
+#include <pybind11/pybind11.h>
+
 #include <cstdint>
 #include <iostream>
 #include <map>
-#include <pybind11/numpy.h>
-#include <pybind11/pybind11.h>
 #include <string>
 #include <vector>
+
+#include "temporian/implementation/numpy_cc/operators/common.h"
 
 namespace {
 namespace py = pybind11;
 
-typedef size_t Idx;
-
-std::tuple<py::array_t<Idx>, Idx>
-build_sampling_idxs(const py::array_t<double> &evset_timestamps,
-                    const py::array_t<double> &sampling_timestamps) {
-
+std::tuple<py::array_t<Idx>, Idx> build_sampling_idxs(
+    const py::array_t<double> &evset_timestamps,
+    const py::array_t<double> &sampling_timestamps) {
   // Input size
   const Idx n_event = evset_timestamps.shape(0);
   const Idx n_sampling = sampling_timestamps.shape(0);
@@ -46,7 +46,7 @@ build_sampling_idxs(const py::array_t<double> &evset_timestamps,
   return std::make_tuple(indices, first_valid_idx);
 }
 
-} // namespace
+}  // namespace
 
 void init_resample(py::module &m) {
   m.def("build_sampling_idxs", &build_sampling_idxs, "",
