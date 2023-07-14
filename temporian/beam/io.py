@@ -80,7 +80,7 @@ class UserEventSetFormat(Enum):
     Each event is represented as a dictionary of key to value for the features,
     the indexes and the timestamp. Values are python primitives matching the
     schema e.g. a `tp.int64` is feed as an `int`. Non-matching primitives are
-    casted e.g. a int is casted into a float.
+    casted e.g. a int is casted into a float permissively.
 
     For example:
         Schema
