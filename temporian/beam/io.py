@@ -102,6 +102,7 @@ def read_csv_raw(pipe, file_pattern: str) -> beam.PCollection[Dict[str, str]]:
     return (
         pipe
         | "List files" >> MatchFiles(file_pattern)
+        | "Shuffle" >> beam.Reshuffle()
         | "Parse file" >> beam.FlatMap(_parse_csv_file)
     )
 

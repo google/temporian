@@ -40,6 +40,7 @@ def check_beam_implementation(
     """Checks the result of the Numpy backend against the Beam backend.
 
     Args:
+        self: The absl's test self.
         input_data: An event set to feed to a graph.
         output_node: Output of the graph.
         input_node: Input of the graph. If not set, uses input_data.node()

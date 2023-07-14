@@ -50,6 +50,7 @@ implementation_lib.register_operator_implementation(
 )
 
 
+@beam.typehints.no_annotations
 def _run_item(pipe: IndexValue, feature_idxs: Set[int]):
     indexes, (timestamps, input_values) = pipe
     if indexes[-1] in feature_idxs:
