@@ -56,7 +56,7 @@ DTYPE_MAPPING = {
 INV_DTYPE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
 
 
-# TODO: allow saved fn to return a single Node too
+# TODO: allow saved fn to return a list or node too (EventSetNodeCollection)
 def save(
     fn: Callable[..., Dict[str, EventSetNode]],
     path: str,
