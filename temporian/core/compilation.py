@@ -14,17 +14,16 @@
 
 from functools import wraps
 from copy import copy
-from typing import Any, Dict, Optional, Tuple, Callable, TypeVar
-from temporian.core.data.node import EventSetNode
+from typing import Any, Dict, Optional, Tuple, Callable
+from temporian.core.data.node import EventSetNode, EventSetNodeCollection
 from temporian.implementation.numpy.data.event_set import EventSet
 
-T = TypeVar("T", bound=Callable)
 
-
-# TODO: unify the fn's output type with run's EvaluationQuery, and add it to the
-# public API so it shows in the docs.
-# TODO: make compile change the fn's annotations to EventSetOrNode
-def compile(fn: Optional[Callable] = None, *, verbose: int = 0) -> Any:
+def compile(
+    fn: Optional[Callable[..., EventSetNodeCollection]] = None,
+    *,
+    verbose: int = 0
+) -> Any:
     """Compiles a Temporian function.
 
     A Temporian function is a function that takes
@@ -74,7 +73,7 @@ def compile(fn: Optional[Callable] = None, *, verbose: int = 0) -> Any:
         The compiled function.
     """
 
-    def _compile(fn: T) -> T:
+    def _compile(fn):
         @wraps(fn)
         def wrapper(*args, **kwargs):
             is_eager = None

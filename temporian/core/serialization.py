@@ -36,7 +36,6 @@ from temporian.core.data.node import (
     EventSetNode,
     Sampling,
     Feature,
-    create_node_with_new_reference,
     input_node,
 )
 from temporian.core.data.schema import Schema
@@ -57,7 +56,7 @@ DTYPE_MAPPING = {
 INV_DTYPE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
 
 
-# TODO: allow saved fn to return a single Node too
+# TODO: allow saved fn to return a list or node too (EventSetNodeCollection)
 def save(
     fn: Callable[..., Dict[str, EventSetNode]],
     path: str,
