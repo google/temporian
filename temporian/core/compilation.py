@@ -24,23 +24,48 @@ T = TypeVar("T", bound=Callable)
 # TODO: unify the fn's output type with run's EvaluationQuery, and add it to the
 # public API so it shows in the docs.
 # TODO: make compile change the fn's annotations to EventSetOrNode
-def compile(*args: Callable, **kwargs: Any) -> Any:
+def compile(
+    fn: Optional[Callable] = None, *, verbose: Optional[int] = None
+) -> Any:
     """Compiles a Temporian function.
 
     A Temporian function is a function that takes EventSetNodes as arguments and
     returns EventSetNodes as outputs. Compiling it enables it to perform eager
     evaluation, i.e., receive and return EventSets instead of EventSetNodes.
 
+    Example usage:
+    ```python
+    >>> @tp.compile
+    ... def f(x: EventSetNode) -> EventSetNode:
+    ...     return tp.prefix("pre_", x)
+
+    >>> evset = tp.event_set(
+    ...     timestamps=[1, 2, 3],
+    ...     features={"value": [10, 20, 30]},
+    ... )
+
+    >>> result = f(evset)
+    >>> type(result)
+    <class 'temporian.implementation.numpy.data.event_set.EventSet'>
+
+    ```
+
+    Example usage with arguments:
+    ```python
+    >>> @tp.compile(verbose=1)
+    ... def f(x: EventSetNode) -> EventSetNode:
+    ...     return tp.prefix("pre_", x)
+
+    ```
+
     Args:
-        *args: The function to compile. The function must take
+        fn: The function to compile. The function must take
             EventSetNodes as arguments (and may have other arguments of
             arbitrary types) and return EventSetNodes as outputs. No other
             positional arguments should be passed.s
-        **kwargs: Optional keyword arguments.
-            verbose (int): If >0, prints details about the execution on the
-                standard error output when the wrapped function is applied
-                eagerly on EventSets. The larger the number, the more
-                information is displayed.
+        verbose (int): If >0, prints details about the execution on the standard
+            error output when the wrapped function is applied eagerly on
+            EventSets. The larger the number, the more information is displayed.
 
     Returns:
         The compiled function.
@@ -83,20 +108,16 @@ def compile(*args: Callable, **kwargs: Any) -> Any:
 
         return wrapper
 
-    # If no kwargs, then the function is being called as a decorator, so we
-    if not kwargs and len(args) == 1 and callable(args[0]):
+    # Function is being called as a decorator
+    if fn is not None:
+        # Set default values for kwargs
         verbose = 0
-        return _compile(args[0])
 
-    if args:
-        raise ValueError("@tp.compile() can only receive keyword arguments.")
+        return _compile(fn)
 
-    # Else the function is being called as a function, so we
-    # return a decorator that will receive the function to compile.
-    if len(kwargs) > 1:
-        raise ValueError("@tp.compile() can only receive one keyword argument.")
-
-    verbose = kwargs.get("verbose", 0)
+    # Else the function is being called as a function, so we return a decorator
+    # that will receive the function to compile.
+    verbose = verbose or 0
     return _compile
 
 
