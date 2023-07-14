@@ -24,9 +24,7 @@ T = TypeVar("T", bound=Callable)
 # TODO: unify the fn's output type with run's EvaluationQuery, and add it to the
 # public API so it shows in the docs.
 # TODO: make compile change the fn's annotations to EventSetOrNode
-def compile(
-    fn: Optional[Callable] = None, *, verbose: Optional[int] = None
-) -> Any:
+def compile(fn: Optional[Callable] = None, *, verbose: int = 0) -> Any:
     """Compiles a Temporian function.
 
     A Temporian function is a function that takes
@@ -34,20 +32,23 @@ def compile(
     [`EventSetNodes`][temporian.EventSetNode] as outputs. Compiling it enables
     it to perform eager evaluation, i.e., receive and return
     [`EventSets`][temporian.EventSet] instead of
-    [`EventSetNodes`][temporian.EventSetNode].
+    [`EventSetNodes`][temporian.EventSetNode], and allows Temporian to optimize
+    the underlying graph defined by the operators inside the function, making it
+    run on [`EventSets`][temporian.EventSet] more efficiently than if it weren't
+    compiled.
 
     Example usage:
     ```python
     >>> @tp.compile
-    ... def f(x: EventSetNode) -> EventSetNode:
-    ...     return tp.prefix("pre_", x)
+    ... def f(x: EventSetNode, y: EventSetNode) -> EventSetNode:
+    ...     return tp.cumsum(tp.prefix("pre_", x)) + y
 
     >>> evset = tp.event_set(
     ...     timestamps=[1, 2, 3],
     ...     features={"value": [10, 20, 30]},
     ... )
 
-    >>> result = f(evset)
+    >>> result = f(evset, evset)
     >>> type(result)
     <class 'temporian.implementation.numpy.data.event_set.EventSet'>
 
@@ -112,14 +113,10 @@ def compile(
 
     # Function is being called as a decorator
     if fn is not None:
-        # Set default values for kwargs
-        verbose = 0
-
         return _compile(fn)
 
     # Else the function is being called as a function, so we return a decorator
     # that will receive the function to compile.
-    verbose = verbose or 0
     return _compile
 
 
