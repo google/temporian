@@ -14,6 +14,8 @@
 
 """Data types declaration."""
 
+from typing import Any
+
 import math
 from enum import Enum
 from typing import Union
@@ -77,22 +79,29 @@ class DType(Enum):
             ValueError: If python_type is not implemented.
         """
 
-        if python_type is float:
-            return DType.FLOAT64
+        return _PY_TYPE_TO_DTYPE[python_type]
 
-        if python_type is int:
-            return DType.INT64
 
-        if python_type is str:
-            return DType.STRING
+_PY_TYPE_TO_DTYPE = {
+    float: DType.FLOAT64,
+    int: DType.INT64,
+    str: DType.STRING,
+    bytes: DType.STRING,
+    bool: DType.BOOLEAN,
+}
 
-        if python_type is bytes:
-            return DType.STRING
+_DTYPE_TO_PY_TYPES = {
+    DType.FLOAT64: float,
+    DType.FLOAT32: float,
+    DType.INT64: int,
+    DType.INT32: int,
+    DType.STRING: bytes,
+    DType.BOOLEAN: bool,
+}
 
-        if python_type is bool:
-            return DType.BOOLEAN
 
-        raise ValueError(f"Non-implemented type {python_type}")
+def tp_dtype_to_py_type(dtype: DType) -> Any:
+    return _DTYPE_TO_PY_TYPES[dtype]
 
 
 # The dtype of indexes.

@@ -58,8 +58,8 @@ class Schema:
     def __init__(
         self,
         features: Union[List[FeatureSchema], List[Tuple[str, DType]]],
-        indexes: Union[List[IndexSchema], List[Tuple[str, IndexDType]]],
-        is_unix_timestamp: bool,
+        indexes: Union[List[IndexSchema], List[Tuple[str, IndexDType]]] = [],
+        is_unix_timestamp: bool = False,
     ):
         self._features = list(map(_normalize_feature, features))
         self._indexes = list(map(_normalize_index, indexes))

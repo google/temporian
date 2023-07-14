@@ -1,14 +1,15 @@
 """Utilities to import/export Beam-Event-Set from/to dataset containers."""
 
-from typing import Iterable, Dict, Any, Tuple, Union, Optional, List
+from typing import Iterable, Dict, Any, Tuple, Union, Optional, List, Iterator
 
+from enum import Enum
 import csv
 import io
 import numpy as np
 import apache_beam as beam
 from apache_beam.io.fileio import MatchFiles
 from temporian.core.data.node import Schema
-from temporian.core.data.dtype import DType
+from temporian.core.data.dtype import DType, tp_dtype_to_py_type
 from temporian.implementation.numpy.data.event_set import tp_dtype_to_np_dtype
 
 # Remark: We use tuples instead of dataclasses or named tuples as it seems
@@ -67,6 +68,57 @@ IndexValue = Tuple[
 PEventSet = beam.PCollection[IndexValue]
 
 
+class UserEventSetFormat(Enum):
+    """Various representations of EventSets for user generation or consumption.
+
+    When combining Temporian program with your own beam stages, select the
+    most suited user event-set format compatible with your code.
+    """
+
+    eventKeyValue = "eventKeyValue"
+    """
+    Each event is represented as a dictionary of key to value for the features,
+    the indexes and the timestamp. Values are python primitives matching the
+    schema e.g. a `tp.int64` is feed as an `int`. Non-matching primitives are
+    casted e.g. a int is casted into a float.
+
+    For example:
+        Schema
+            features=[("f1", DType.INT64), ("f2", DType.STRING)]
+            indexes=[("i1", DType.INT64), ("i2", DType.STRING)]
+
+        Data:
+            {"timestamp": 100.0, "f1": 1, "f2": b"a", "i1": 10, "i2": b"x"}
+    """
+
+    eventSetKeyValue = "eventSetKeyValue"
+    """
+    All the events in the same index are represented together in a dictionary of
+    key to values for the features, the indexes and the timestamp. Timestamps
+    are sorted. Values, index and timestamps are stored in Numpy arrays.
+
+    Index values are python primitives matching the schema e.g. a `tp.int64` is
+    feed as an `int`. Timestamps are a numpy array of float64. Feature values
+    are numpy array matching the schema e.g. a `tp.int64` is feed as a numpy
+    array of np.int64.
+
+    For example:
+
+        Schema
+            features=[("f1", DType.INT64), ("f2", DType.STRING)]
+            indexes=[("i1", DType.INT64), ("i2", DType.STRING)]
+
+        Data:
+            {
+            "timestamp": np.array([100.0, 101.0, 102.0]),
+            "f1": np.array([1, 2, 3]),
+            "f2": np.array([b"a", b"b", b"c"]),
+            "i1": 10,
+            "i2": b"x",
+            }
+    """
+
+
 def _parse_csv_file(
     file: beam.io.filesystem.FileMetadata,
 ) -> Iterable[Dict[str, str]]:
@@ -121,7 +173,7 @@ def _cast_index_value(value: Any, dtype: DType) -> BeamIndex:
 
 
 def _reindex_by_integer(
-    row: Dict[str, str], schema: Schema, timestamp_key: str
+    row: Dict[str, Any], schema: Schema, timestamp_key: str
 ) -> StructuredRow:
     """Transforms a dict of key:value to a StructuredRow.
 
@@ -191,11 +243,67 @@ class _MergeTimestampsSplitFeatures(beam.DoFn):
             yield index + (feature_idx,), (timestamps, values)
 
 
+def _event_set_dict_to_event_set(
+    input: Dict[str, Any], schema: Schema, timestamp_key: str
+) -> Iterator[IndexValue]:
+    timestamps = input[timestamp_key]
+    if (
+        not isinstance(timestamps, np.ndarray)
+        or timestamps.dtype.type != np.float64
+    ):
+        raise ValueError(
+            f"Timestamp with value {timestamps} is expected to be np.float64"
+            f" numpy array, but has dtype {type(timestamps)} instead."
+        )
+
+    index = []
+    for index_schema in schema.indexes:
+        expected_type = tp_dtype_to_py_type(index_schema.dtype)
+        src_value = input[index_schema.name]
+
+        if not isinstance(src_value, expected_type):
+            raise ValueError(
+                f'Index "{index_schema.name}" with value "{src_value}" is'
+                f" expected to be of type {expected_type} (since the Temporian "
+                f" dtype is {index_schema.dtype}) but type"
+                f" {type(src_value)} was found."
+            )
+        index.append(src_value)
+    index_tuple = tuple(index)
+
+    for feature_idx, feature_schema in enumerate(schema.features):
+        expected_dtype = tp_dtype_to_np_dtype(feature_schema.dtype)
+        src_value = input[feature_schema.name]
+
+        if (
+            not isinstance(src_value, np.ndarray)
+            or src_value.dtype.type != expected_dtype
+        ):
+            if isinstance(src_value, np.ndarray):
+                effective_type = src_value.dtype.type
+            else:
+                effective_type = type(src_value)
+
+            raise ValueError(
+                f'Feature "{feature_schema.name}" with value "{src_value}" is'
+                " expected to by a numpy array with dtype"
+                f" {expected_dtype} (since the Temporian dtype is"
+                f" {feature_schema.dtype}) but numpy dtype"
+                f" {effective_type} was found."
+            )
+
+        yield index_tuple + (feature_idx,), (timestamps, src_value)
+
+    if len(schema.features) == 0:
+        yield index_tuple + (-1,), (timestamps, None)
+
+
 @beam.ptransform_fn
 def to_event_set(
     pipe: beam.PCollection[Dict[str, Any]],
     schema: Schema,
     timestamp_key: str = "timestamp",
+    format: UserEventSetFormat = UserEventSetFormat.eventKeyValue,
 ) -> PEventSet:
     """Converts a PCollection of key:value to a Beam EventSet.
 
@@ -214,6 +322,7 @@ def to_event_set(
         schema: Schema of the data. Note: The schema of a Temporian node is
             available with `node.schema`.
         timestamp_key: Key containing the timestamps.
+        format: Format of the input data to be converted into an event-set.
 
     Returns:
         PCollection of Beam EventSet.
@@ -221,15 +330,128 @@ def to_event_set(
 
     # TODO: Add support for datetime timestamps.
 
-    return (
-        pipe
-        | "Structure" >> beam.Map(_reindex_by_integer, schema, timestamp_key)
-        # Group by index values and feature index
-        | "Aggregate" >> beam.GroupByKey()
-        # Build feature and timestamps arrays.
-        | "Merge timestamps"
-        >> beam.ParDo(_MergeTimestampsSplitFeatures(len(schema.features)))
-    )
+    if format == UserEventSetFormat.eventKeyValue:
+        return (
+            pipe
+            | "Structure"
+            >> beam.Map(_reindex_by_integer, schema, timestamp_key)
+            # Group by index values and feature index
+            | "Aggregate" >> beam.GroupByKey()
+            # Build feature and timestamps arrays.
+            | "Merge timestamps"
+            >> beam.ParDo(_MergeTimestampsSplitFeatures(len(schema.features)))
+        )
+    elif format == UserEventSetFormat.eventSetKeyValue:
+        return pipe | "Parse dict" >> beam.FlatMap(
+            _event_set_dict_to_event_set, schema, timestamp_key
+        )
+    else:
+        raise ValueError(f"Unknown format {format}")
+
+
+def _convert_to_dict_event_key_value(
+    item: Tuple[
+        Tuple[BeamIndex, ...],
+        Iterable[IndexValue],
+    ],
+    schema: Schema,
+    timestamp_key: str,
+) -> Iterator[Dict[str, Any]]:
+    index, feature_blocks = item
+
+    # Sort the feature by feature index.
+    # The feature index is the last value (-1) of the key (first element of the
+    # tuple).
+    feature_blocks = sorted(feature_blocks, key=lambda x: x[0][-1])
+    assert len(feature_blocks) > 0
+
+    # All the feature blocks have the same timestamps. We use the first one.
+    common_item_dict = {}
+    for index_schema, index_value in zip(schema.indexes, index):
+        common_item_dict[index_schema.name] = index_value
+
+    timestamps = feature_blocks[0][1][0]
+    for event_idx, timestamp in enumerate(timestamps):
+        item_dict = common_item_dict.copy()
+        item_dict[timestamp_key] = timestamp
+        for feature_schema, feature in zip(schema.features, feature_blocks):
+            item_dict[feature_schema.name] = feature[1][1][event_idx]
+
+        yield item_dict
+
+
+def _convert_to_dict_event_set_key_value(
+    item: Tuple[
+        Tuple[BeamIndex, ...],
+        Iterable[IndexValue],
+    ],
+    schema: Schema,
+    timestamp_key: str,
+) -> Dict[str, Any]:
+    index, feature_blocks = item
+
+    # Sort the feature by feature index.
+    # The feature index is the last value (-1) of the key (first element of the
+    # tuple).
+    feature_blocks = sorted(feature_blocks, key=lambda x: x[0][-1])
+    assert len(feature_blocks) > 0
+
+    # All the feature blocks have the same timestamps. We use the first one.
+    item_dict = {}
+    for index_schema, index_value in zip(schema.indexes, index):
+        item_dict[index_schema.name] = index_value
+
+    item_dict[timestamp_key] = feature_blocks[0][1][0]
+    for feature_schema, feature in zip(schema.features, feature_blocks):
+        item_dict[feature_schema.name] = feature[1][1]
+
+    return item_dict
+
+
+@beam.ptransform_fn
+def to_dict(
+    pipe: PEventSet,
+    schema: Schema,
+    timestamp_key: str = "timestamp",
+    format: UserEventSetFormat = UserEventSetFormat.eventKeyValue,
+) -> beam.PCollection[Dict[str, Any]]:
+    """Converts a Beam EventSet to PCollection of key->value.
+
+    This method is compatible with the output of `read_csv_raw` and the
+    Official Beam IO connectors. This method is the inverse of `to_event_set`.
+
+    Args:
+        pipe: PCollection of Beam EventSet.
+        schema: Schema of the data.
+        timestamp_key: Key containing the timestamps.
+        format: Format of the output data.
+
+    Returns:
+        Beam pipe of key values.
+    """
+
+    # TODO: Add support for datetime timestamps.
+
+    if format == UserEventSetFormat.eventKeyValue:
+        return (
+            pipe
+            | "Group by features" >> beam.GroupBy(lambda x: x[0][0:-1])
+            | "Convert to dict"
+            >> beam.FlatMap(
+                _convert_to_dict_event_key_value, schema, timestamp_key
+            )
+        )
+    elif format == UserEventSetFormat.eventSetKeyValue:
+        return (
+            pipe
+            | "Group by features" >> beam.GroupBy(lambda x: x[0][0:-1])
+            | "Convert to dict"
+            >> beam.Map(
+                _convert_to_dict_event_set_key_value, schema, timestamp_key
+            )
+        )
+    else:
+        raise ValueError(f"Unknown format {format}")
 
 
 @beam.ptransform_fn
@@ -247,6 +469,8 @@ def read_csv(
     input_node: tp.EventSetNode = ...
     p | tpb.read_csv("/tmp/path.csv", input_node.schema) | ...
     ```
+
+    `read_csv` is equivalent to `read_csv_raw + to_event_set`.
 
     Args:
         pipe: Begin Beam pipe.
