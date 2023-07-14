@@ -29,9 +29,12 @@ def compile(
 ) -> Any:
     """Compiles a Temporian function.
 
-    A Temporian function is a function that takes EventSetNodes as arguments and
-    returns EventSetNodes as outputs. Compiling it enables it to perform eager
-    evaluation, i.e., receive and return EventSets instead of EventSetNodes.
+    A Temporian function is a function that takes
+    [`EventSetNodes`][temporian.EventSetNode] as arguments and returns
+    [`EventSetNodes`][temporian.EventSetNode] as outputs. Compiling it enables
+    it to perform eager evaluation, i.e., receive and return
+    [`EventSets`][temporian.EventSet] instead of
+    [`EventSetNodes`][temporian.EventSetNode].
 
     Example usage:
     ```python
