@@ -16,10 +16,7 @@ from typing import Dict, List, Tuple
 from unittest.mock import ANY, patch
 from absl.testing import absltest
 
-from temporian.implementation.numpy.data.event_set import (
-    EventSet,
-    EventSetOrNode,
-)
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core.data.node import EventSetNode
 from temporian.implementation.numpy.data.io import event_set
 from temporian.core.operators.prefix import prefix
@@ -129,7 +126,7 @@ class CompileTest(absltest.TestCase):
 
     def test_dict_return(self):
         @compile
-        def f(x: EventSetOrNode) -> Dict[str, EventSetOrNode]:
+        def f(x: EventSetNode) -> Dict[str, EventSetNode]:
             return {"a": prefix("a", x), "b": prefix("b", x)}
 
         result = f(self.evset)

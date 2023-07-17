@@ -587,7 +587,6 @@ class EventSet(EventSetOperationsMixin):
         return self.node()._creator
 
 
-# EventSetOrNode = Union[EventSet, EventSetNode]
 EventSetOrNode = TypeVar("EventSetOrNode", EventSet, EventSetNode)
 """Generic type for defining the input and output types of operators and
 Temporian functions.
@@ -617,18 +616,9 @@ own node using [`EventSet.node()`][temporian.EventSet.node], i.e., `[event_set]`
 is equivalent to `{event_set.node() : event_set}`.
 """
 
-EventSetOrNodeCollection = Union[
-    EventSetOrNode,
-    List[EventSetOrNode],
-    Set[EventSetOrNode],
-    Dict[str, EventSetOrNode],
-]
-"""A collection of [`EventSetOrNodes`][temporian.EventSetOrNode].
-
-This can be a single EventSetOrNode, a list or set of EventSetOrNodes, or a
-dictionary mapping names to EventSetOrNodes."""
-
 EventSetAndNode = Union[EventSet, EventSetNode]
+"""An [`EventSet`][temporian.EventSet] or
+[`EventSetNode`][temporian.EventSetNode]."""
 
 EventSetAndNodeCollection = Union[
     EventSetAndNode,
