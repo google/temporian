@@ -42,9 +42,9 @@ from temporian.core.data.schema import Schema
 from temporian.core.compilation import compile
 from temporian.core.operators import base
 from temporian.core.data.dtype import DType
+from temporian.core.typing import EventSetOrNode
 from temporian.implementation.numpy.data.event_set import (
     EventSet,
-    EventSetOrNode,
 )
 from temporian.proto import core_pb2 as pb
 

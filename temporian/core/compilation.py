@@ -16,10 +16,8 @@ from functools import wraps
 from copy import copy
 from typing import Any, Dict, Optional, Tuple, Callable, TypeVar
 from temporian.core.data.node import EventSetNode
-from temporian.implementation.numpy.data.event_set import (
-    EventSet,
-    EventSetAndNodeCollection,
-)
+from temporian.core.typing import EventSetAndNodeCollection
+from temporian.implementation.numpy.data.event_set import EventSet
 
 T = TypeVar("T", bound=Callable[..., EventSetAndNodeCollection])
 

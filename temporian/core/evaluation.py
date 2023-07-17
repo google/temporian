@@ -19,14 +19,15 @@ import sys
 from typing import Dict, List, Set, Optional
 from collections import defaultdict
 
-from temporian.core.data.node import EventSetNode, EventSetNodeCollection
+from temporian.core.data.node import EventSetNode
 from temporian.core.operators.base import Operator
-from temporian.implementation.numpy import evaluation as np_eval
-from temporian.implementation.numpy.data.event_set import (
-    EventSet,
+from temporian.core.typing import (
     EventSetCollection,
+    EventSetNodeCollection,
     NodeToEventSetMapping,
 )
+from temporian.implementation.numpy import evaluation as np_eval
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core.graph import infer_graph
 from temporian.core.schedule import Schedule, ScheduleStep
 from temporian.core.operators.leak import LeakOperator

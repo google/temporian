@@ -13,6 +13,7 @@ py_library(
     deps = [
         ":graph",
         ":schedule",
+        ":typing",
         "//temporian/core/data:node",
         "//temporian/core/operators:base",
         "//temporian/core/operators:leak",
@@ -52,6 +53,7 @@ py_library(
     srcs = ["serialization.py"],
     srcs_version = "PY3",
     deps = [
+        ":typing",
         "//temporian/core:graph",
         "//temporian/core:operator_lib",
         "//temporian/core/data:dtype",
@@ -68,6 +70,7 @@ py_library(
     srcs = ["compilation.py"],
     srcs_version = "PY3",
     deps = [
+        ":typing",
         "//temporian/core/data:node",
         "//temporian/implementation/numpy/data:event_set",
     ],
@@ -78,4 +81,14 @@ py_library(
     srcs = ["mixins.py"],
     srcs_version = "PY3",
     deps = [],
+)
+
+py_library(
+    name = "typing",
+    srcs = ["typing.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:node",
+        "//temporian/implementation/numpy/data:event_set",
+    ],
 )
