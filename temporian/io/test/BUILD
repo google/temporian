@@ -14,6 +14,7 @@ py_test(
         # already_there/numpy
         # already_there/pandas
         "//temporian/implementation/numpy/data:io",
-        "//temporian/io:pandas"
+        "//temporian/io:pandas",
+        "//temporian/implementation/numpy/operators/test:test_util",
     ],
 )

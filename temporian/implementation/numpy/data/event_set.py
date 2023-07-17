@@ -21,6 +21,7 @@ from typing import (
     Dict,
     List,
     Optional,
+    Set,
     Tuple,
     TYPE_CHECKING,
     TypeVar,
@@ -39,6 +40,7 @@ from temporian.core.data.node import (
 from temporian.core.data.schema import Schema
 from temporian.core.mixins import EventSetOperationsMixin
 from temporian.utils import string
+from temporian.utils import config
 
 if TYPE_CHECKING:
     from temporian.core.operators.base import Operator
@@ -291,6 +293,9 @@ class IndexData:
             self.check_schema(schema)
 
     def check_schema(self, schema: Schema):
+        if not config.DEBUG_MODE:
+            return
+
         # Check that the data (features & timestamps) matches the schema.
 
         if self.timestamps.ndim != 1:
@@ -463,7 +468,12 @@ class EventSet(EventSetOperationsMixin):
         # Representation of the "data" field
         with np.printoptions(precision=4, threshold=20):
             data_repr = []
-            for i, (index_key, index_data) in enumerate(self.data.items()):
+
+            # Sort index
+            sorted_index_keys = sorted(list(self.data.keys()))
+
+            for i, index_key in enumerate(sorted_index_keys):
+                index_data = self.data[index_key]
                 if i > MAX_NUM_PRINTED_INDEX:
                     data_repr.append(f"... ({len(self.data) - i} remaining)")
                     break
@@ -577,8 +587,8 @@ class EventSet(EventSetOperationsMixin):
         return self.node()._creator
 
 
-EventSetOrNode = TypeVar("EventSetOrNode", EventSet, EventSetNode)
 # EventSetOrNode = Union[EventSet, EventSetNode]
+EventSetOrNode = TypeVar("EventSetOrNode", EventSet, EventSetNode)
 """Generic type for defining the input and output types of operators and
 Temporian functions.
 
@@ -587,3 +597,46 @@ the function receives either EventSets or EventSetNodes as input, and returns
 that same type as output. In other words, `f(evset)` returns an EventSet, and
 `f(node)` returns an EventSetNode.
 """
+
+EventSetCollection = Union[EventSet, List[EventSet], Dict[str, EventSet]]
+"""A collection of [`EventSets`][temporian.EventSet].
+
+This can be a single EventSet, a list of EventSets, or a dictionary mapping
+names to EventSets."""
+
+NodeToEventSetMapping = Union[
+    Dict[EventSetNode, EventSet], EventSet, List[EventSet]
+]
+"""A mapping of [`EventSetNodes`][temporian.EventSetNode] to
+[`EventSets`][temporian.EventSet].
+
+If a dictionary, the mapping is defined by it.
+
+If a single EventSet or a list of EventSets, each EventSet is mapped to their
+own node using [`EventSet.node()`][temporian.EventSet.node], i.e., `[event_set]`
+is equivalent to `{event_set.node() : event_set}`.
+"""
+
+EventSetOrNodeCollection = Union[
+    EventSetOrNode,
+    List[EventSetOrNode],
+    Set[EventSetOrNode],
+    Dict[str, EventSetOrNode],
+]
+"""A collection of [`EventSetOrNodes`][temporian.EventSetOrNode].
+
+This can be a single EventSetOrNode, a list or set of EventSetOrNodes, or a
+dictionary mapping names to EventSetOrNodes."""
+
+EventSetAndNode = Union[EventSet, EventSetNode]
+
+EventSetAndNodeCollection = Union[
+    EventSetAndNode,
+    List[EventSetAndNode],
+    Set[EventSetAndNode],
+    Dict[str, EventSetAndNode],
+]
+"""A collection of [`EventSetAndNodes`][temporian.EventSetAndNode].
+
+This can be a single EventSetAndNode, a list or set of EventSetAndNodes, or a
+dictionary mapping names to EventSetAndNodes."""

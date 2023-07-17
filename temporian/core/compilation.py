@@ -16,65 +16,108 @@ from functools import wraps
 from copy import copy
 from typing import Any, Dict, Optional, Tuple, Callable, TypeVar
 from temporian.core.data.node import EventSetNode
-from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.event_set import (
+    EventSet,
+    EventSetAndNodeCollection,
+)
 
-T = TypeVar("T", bound=Callable)
+T = TypeVar("T", bound=Callable[..., EventSetAndNodeCollection])
 
 
-# TODO: unify the fn's output type with run's EvaluationQuery, and add it to the
-# public API so it shows in the docs.
-# TODO: make compile change the fn's annotations to EventSetOrNode
-def compile(fn: T) -> T:
+def compile(fn: Optional[T] = None, *, verbose: int = 0) -> T:
     """Compiles a Temporian function.
 
-    A Temporian function is a function that takes EventSetNodes as arguments and
-    returns EventSetNodes as outputs. Compiling it enables it to perform eager
-    evaluation, i.e., receive and return EventSets instead of EventSetNodes.
+    A Temporian function is a function that takes
+    [`EventSetNodes`][temporian.EventSetNode] as arguments and returns
+    [`EventSetNodes`][temporian.EventSetNode] as outputs. Compiling it enables
+    it to perform eager evaluation, i.e., receive and return
+    [`EventSets`][temporian.EventSet] instead of
+    [`EventSetNodes`][temporian.EventSetNode], and allows Temporian to optimize
+    the underlying graph defined by the operators inside the function, making it
+    run on [`EventSets`][temporian.EventSet] more efficiently than if it weren't
+    compiled.
+
+    Example usage:
+    ```python
+    >>> @tp.compile
+    ... def f(x: EventSetNode, y: EventSetNode) -> EventSetNode:
+    ...     return tp.cumsum(tp.prefix("pre_", x)) + y
+
+    >>> evset = tp.event_set(
+    ...     timestamps=[1, 2, 3],
+    ...     features={"value": [10, 20, 30]},
+    ... )
+
+    >>> result = f(evset, evset)
+    >>> type(result)
+    <class 'temporian.implementation.numpy.data.event_set.EventSet'>
+
+    ```
+
+    Example usage with arguments:
+    ```python
+    >>> @tp.compile(verbose=1)
+    ... def f(x: EventSetNode) -> EventSetNode:
+    ...     return tp.prefix("pre_", x)
+
+    ```
 
     Args:
-        fn: The function to compile. The function must take EventSetNodes as arguments
-            (and may have other arguments of arbitrary types) and return EventSetNodes
-            as outputs.
+        fn: The function to compile. The function must take EventSetNodes as
+            arguments (and may have other arguments of arbitrary types) and
+            return EventSetNodes as outputs.
+        verbose: If >0, prints details about the execution on the standard error
+            output when the wrapped function is applied eagerly on EventSets.
+            The larger the number, the more information is displayed.
 
     Returns:
         The compiled function.
     """
 
-    @wraps(fn)
-    def wrapper(*args, **kwargs):
-        is_eager = None
-        args = list(args)
+    def _compile(fn):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            is_eager = None
+            args = list(args)
 
-        # EventSetNode -> EventSet mapping for eager evaluation
-        inputs_map = {}
+            # EventSetNode -> EventSet mapping for eager evaluation
+            inputs_map = {}
 
-        for i, arg in enumerate(args):
-            args[i], is_eager = _process_argument(
-                arg, is_eager=is_eager, inputs_map=inputs_map
-            )
+            for i, arg in enumerate(args):
+                args[i], is_eager = _process_argument(
+                    arg, is_eager=is_eager, inputs_map=inputs_map
+                )
 
-        for k, arg in kwargs.items():
-            kwargs[k], is_eager = _process_argument(
-                arg, is_eager=is_eager, inputs_map=inputs_map
-            )
+            for k, arg in kwargs.items():
+                kwargs[k], is_eager = _process_argument(
+                    arg, is_eager=is_eager, inputs_map=inputs_map
+                )
 
-        outputs = fn(*args, **kwargs)
+            outputs = fn(*args, **kwargs)
 
-        if is_eager is None:
-            raise ValueError(
-                "Cannot compile a function without EventSet or EventSetNode"
-                " argument."
-            )
-        elif is_eager:
-            from temporian.core.evaluation import run
+            if is_eager is None:
+                raise ValueError(
+                    "Cannot compile a function without EventSet or EventSetNode"
+                    " argument."
+                )
+            elif is_eager:
+                from temporian.core.evaluation import run
 
-            return run(query=outputs, input=inputs_map)
+                return run(query=outputs, input=inputs_map, verbose=verbose)
 
-        return outputs
+            return outputs
 
-    wrapper.is_tp_compiled = True
+        wrapper.is_tp_compiled = True  # type: ignore
 
-    return wrapper
+        return wrapper
+
+    # Function is being called as a decorator
+    if fn is not None:
+        return _compile(fn)
+
+    # Else the function is being called as a function, so we return a decorator
+    # that will receive the function to compile.
+    return _compile  # type: ignore
 
 
 def _process_argument(

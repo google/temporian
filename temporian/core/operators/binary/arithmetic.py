@@ -20,6 +20,7 @@ from temporian.core.data.node import EventSetNode
 from temporian.core.data.dtype import DType
 from temporian.core.operators.binary.base import BaseBinaryOperator
 from temporian.implementation.numpy.data.event_set import EventSetOrNode
+from temporian.implementation.numpy.data.io import event_set
 
 
 class BaseArithmeticOperator(BaseBinaryOperator):
@@ -232,6 +233,12 @@ def add(
     Returns:
         Sum of `input_1`'s and `input_2`'s features.
     """
+    # TODO: create function to do this
+    if not isinstance(input_1, EventSetNode) or not isinstance(
+        input_2, EventSetNode
+    ):
+        raise TypeError("Operators should receive EventSetNodes.")
+
     return AddOperator(
         input_1=input_1,
         input_2=input_2,

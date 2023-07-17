@@ -36,6 +36,23 @@ def assertEqualEventSet(self, real: EventSet, expected: EventSet):
     )
 
 
+def assertEqualDFRandomRowOrder(
+    self, real: "pd.DataFrame", expected: "pd.DataFrame"
+):
+    row_real = set([str(row.to_dict()) for _, row in real.iterrows()])
+    row_expected = set([str(row.to_dict()) for _, row in expected.iterrows()])
+    self.assertEqual(
+        row_real,
+        row_expected,
+        (
+            "\n==========\nREAL:\n==========\n"
+            f"{real}"
+            "\n==========\nEXPECTED:\n==========\n"
+            f"{expected}"
+        ),
+    )
+
+
 def testOperatorAndImp(self, op: Operator, imp: OperatorImplementation):
     """Tests an operator and its implementation.
 
