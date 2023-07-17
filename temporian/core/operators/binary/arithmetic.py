@@ -20,7 +20,6 @@ from temporian.core.data.node import EventSetNode
 from temporian.core.data.dtype import DType
 from temporian.core.operators.binary.base import BaseBinaryOperator
 from temporian.implementation.numpy.data.event_set import EventSetOrNode
-from temporian.implementation.numpy.data.io import event_set
 
 
 class BaseArithmeticOperator(BaseBinaryOperator):

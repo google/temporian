@@ -21,6 +21,7 @@ import temporian as tp
 PUBLIC_API_SYMBOLS = {
     "EventSet",
     "EventSetNode",
+    "EventSetOrNode",
     "Schema",
     "duration",
     "run",
