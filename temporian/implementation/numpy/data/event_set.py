@@ -394,6 +394,10 @@ class EventSet(EventSetOperationsMixin):
     def name(self, name: Optional[str]) -> None:
         self._name = name
 
+    def get_index_keys(self, sort: bool = False) -> List[IndexType]:
+        idx_list = list(self.data.keys())
+        return sorted(idx_list) if sort else idx_list
+
     def get_arbitrary_index_key(self) -> Optional[IndexType]:
         """Gets an arbitrary index key.
 
@@ -470,10 +474,7 @@ class EventSet(EventSetOperationsMixin):
         with np.printoptions(precision=4, threshold=20):
             data_repr = []
 
-            # Sort index
-            sorted_index_keys = sorted(list(self.data.keys()))
-
-            for i, index_key in enumerate(sorted_index_keys):
+            for i, index_key in enumerate(self.get_index_keys(sort=True)):
                 index_data = self.data[index_key]
                 if i > MAX_NUM_PRINTED_INDEX:
                     data_repr.append(f"... ({len(self.data) - i} remaining)")

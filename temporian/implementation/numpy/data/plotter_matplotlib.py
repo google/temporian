@@ -43,7 +43,7 @@ def plot_matplotlib(
     plot_idx = 0
     for index in indexes:
         if plot_idx >= num_plots:
-            # Too much plots are displayed already.
+            # Too many plots are displayed already.
             break
 
         # Index of the next color to use in the plot.
