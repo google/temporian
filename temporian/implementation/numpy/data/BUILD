@@ -51,8 +51,8 @@ py_library(
     deps = [
         ":event_set",
         # already_there/numpy
-        # already_there/matplotlib
-        # already_there/bokeh
+        # force/matplotlib
+        # force/bokeh
         "//temporian/core/data:duration_utils",
     ],
 )
