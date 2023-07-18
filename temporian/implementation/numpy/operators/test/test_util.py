@@ -12,19 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from absl.testing import absltest
+
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 from temporian.core.operators.base import Operator
 from temporian.core import serialization
 
 
-def assertEqualEventSet(self, real: EventSet, expected: EventSet):
+def assertEqualEventSet(
+    test: absltest.TestCase, real: EventSet, expected: EventSet
+):
     """Asserts the equality between real and expected.
 
     Prints a nice message in case of error.
     """
 
-    self.assertEqual(
+    test.assertEqual(
         real,
         expected,
         (
@@ -37,11 +41,11 @@ def assertEqualEventSet(self, real: EventSet, expected: EventSet):
 
 
 def assertEqualDFRandomRowOrder(
-    self, real: "pd.DataFrame", expected: "pd.DataFrame"
+    test: absltest.TestCase, real: "pd.DataFrame", expected: "pd.DataFrame"
 ):
     row_real = set([str(row.to_dict()) for _, row in real.iterrows()])
     row_expected = set([str(row.to_dict()) for _, row in expected.iterrows()])
-    self.assertEqual(
+    test.assertEqual(
         row_real,
         row_expected,
         (
@@ -53,7 +57,9 @@ def assertEqualDFRandomRowOrder(
     )
 
 
-def testOperatorAndImp(self, op: Operator, imp: OperatorImplementation):
+def testOperatorAndImp(
+    test: absltest.TestCase, op: Operator, imp: OperatorImplementation
+):
     """Tests an operator and its implementation.
 
     Currently test:

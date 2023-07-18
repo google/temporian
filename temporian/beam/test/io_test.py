@@ -47,7 +47,6 @@ def structure_np_to_list(data):
     Apply a function to a recursive structure of dict and list.
 
     Args:
-      func: The function to apply.
       data: The data to apply the function to.
 
     Returns:
@@ -149,7 +148,7 @@ class IOTest(absltest.TestCase):
 """,
             )
 
-    def test_to_event_set_and_to_dict_eventKeyValue(self):
+    def test_to_event_set_and_to_dict_singleEvents(self):
         schema = Schema(
             [("f1", DType.INT32), ("f2", DType.STRING)],
             [("i1", DType.INT32), ("i2", DType.STRING)],
@@ -172,7 +171,7 @@ class IOTest(absltest.TestCase):
             )
             util.assert_that(output, util.equal_to(raw_data))
 
-    def test_to_event_set_and_to_dict_eventKeyValue_errors(self):
+    def test_to_event_set_and_to_dict_singleEvents_errors(self):
         def test(
             schema: Schema,
             data: Dict[str, Any],
@@ -201,7 +200,7 @@ class IOTest(absltest.TestCase):
             "could not convert string to float",
         )
 
-    def test_to_event_set_and_to_dict_eventSetKeyValue(self):
+    def test_to_event_set_and_to_dict_indexedEvents(self):
         schema = Schema(
             features=[("f1", DType.INT64), ("f2", DType.STRING)],
             indexes=[("i1", DType.INT64), ("i2", DType.STRING)],
@@ -235,17 +234,15 @@ class IOTest(absltest.TestCase):
             output = (
                 p
                 | beam.Create(raw_data)
-                | to_event_set(
-                    schema, format=UserEventSetFormat.eventSetKeyValue
-                )
-                | to_dict(schema, format=UserEventSetFormat.eventSetKeyValue)
+                | to_event_set(schema, format=UserEventSetFormat.indexedEvents)
+                | to_dict(schema, format=UserEventSetFormat.indexedEvents)
                 | beam.Map(structure_np_to_list)
             )
             util.assert_that(
                 output, util.equal_to(structure_np_to_list(raw_data))
             )
 
-    def test_to_event_set_and_to_dict_eventSetKeyValue_errors(self):
+    def test_to_event_set_and_to_dict_indexedEvents_errors(self):
         def test(
             schema: Schema,
             data: Dict[str, Any],
@@ -259,7 +256,7 @@ class IOTest(absltest.TestCase):
                         | beam.Create([data])
                         | to_event_set(
                             schema,
-                            format=UserEventSetFormat.eventSetKeyValue,
+                            format=UserEventSetFormat.indexedEvents,
                         )
                     )
 

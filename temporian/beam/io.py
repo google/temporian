@@ -75,7 +75,7 @@ class UserEventSetFormat(Enum):
     most suited user event-set format compatible with your code.
     """
 
-    eventKeyValue = "eventKeyValue"
+    singleEvents = "singleEvents"
     """
     Each event is represented as a dictionary of key to value for the features,
     the indexes and the timestamp. Values are python primitives matching the
@@ -87,11 +87,11 @@ class UserEventSetFormat(Enum):
             features=[("f1", DType.INT64), ("f2", DType.STRING)]
             indexes=[("i1", DType.INT64), ("i2", DType.STRING)]
 
-        Data:
+        Data (one item):
             {"timestamp": 100.0, "f1": 1, "f2": b"a", "i1": 10, "i2": b"x"}
     """
 
-    eventSetKeyValue = "eventSetKeyValue"
+    indexedEvents = "indexedEvents"
     """
     All the events in the same index are represented together in a dictionary of
     key to values for the features, the indexes and the timestamp. Timestamps
@@ -108,7 +108,7 @@ class UserEventSetFormat(Enum):
             features=[("f1", DType.INT64), ("f2", DType.STRING)]
             indexes=[("i1", DType.INT64), ("i2", DType.STRING)]
 
-        Data:
+        Data (one item):
             {
             "timestamp": np.array([100.0, 101.0, 102.0]),
             "f1": np.array([1, 2, 3]),
@@ -246,6 +246,30 @@ class _MergeTimestampsSplitFeatures(beam.DoFn):
 def _event_set_dict_to_event_set(
     input: Dict[str, Any], schema: Schema, timestamp_key: str
 ) -> Iterator[IndexValue]:
+    """Converts a `indexedEvents` event-set into an internal event-set.
+
+    Example:
+        Input
+            Schema
+                features=[("f1", DType.INT64), ("f2", DType.STRING)]
+                indexes=[("i1", DType.INT64), ("i2", DType.STRING)]
+
+            input (one item):
+                {
+                "timestamp": [100.0, 101.0, 102.0],
+                "f1": [1, 2, 3],
+                "f2": [b"a", b"b", b"c"],
+                "i1": 10,
+                "i2": b"x",
+                }
+
+        Output (two items)
+            # Feature "f1"
+            ((10, b"x", 0), ([100.0, 101.0, 102.0], [1, 2, 3])
+            # Feature "f2"
+            ((10, b"x", 1), ([100.0, 101.0, 102.0], [b"a", b"b", b"c"])
+    """
+
     timestamps = input[timestamp_key]
     if (
         not isinstance(timestamps, np.ndarray)
@@ -303,7 +327,7 @@ def to_event_set(
     pipe: beam.PCollection[Dict[str, Any]],
     schema: Schema,
     timestamp_key: str = "timestamp",
-    format: UserEventSetFormat = UserEventSetFormat.eventKeyValue,
+    format: UserEventSetFormat = UserEventSetFormat.singleEvents,
 ) -> PEventSet:
     """Converts a PCollection of key:value to a Beam EventSet.
 
@@ -330,7 +354,7 @@ def to_event_set(
 
     # TODO: Add support for datetime timestamps.
 
-    if format == UserEventSetFormat.eventKeyValue:
+    if format == UserEventSetFormat.singleEvents:
         return (
             pipe
             | "Structure"
@@ -341,7 +365,7 @@ def to_event_set(
             | "Merge timestamps"
             >> beam.ParDo(_MergeTimestampsSplitFeatures(len(schema.features)))
         )
-    elif format == UserEventSetFormat.eventSetKeyValue:
+    elif format == UserEventSetFormat.indexedEvents:
         return pipe | "Parse dict" >> beam.FlatMap(
             _event_set_dict_to_event_set, schema, timestamp_key
         )
@@ -413,7 +437,7 @@ def to_dict(
     pipe: PEventSet,
     schema: Schema,
     timestamp_key: str = "timestamp",
-    format: UserEventSetFormat = UserEventSetFormat.eventKeyValue,
+    format: UserEventSetFormat = UserEventSetFormat.singleEvents,
 ) -> beam.PCollection[Dict[str, Any]]:
     """Converts a Beam EventSet to PCollection of key->value.
 
@@ -432,7 +456,7 @@ def to_dict(
 
     # TODO: Add support for datetime timestamps.
 
-    if format == UserEventSetFormat.eventKeyValue:
+    if format == UserEventSetFormat.singleEvents:
         return (
             pipe
             | "Group by features" >> beam.GroupBy(lambda x: x[0][0:-1])
@@ -441,7 +465,7 @@ def to_dict(
                 _convert_to_dict_event_key_value, schema, timestamp_key
             )
         )
-    elif format == UserEventSetFormat.eventSetKeyValue:
+    elif format == UserEventSetFormat.indexedEvents:
         return (
             pipe
             | "Group by features" >> beam.GroupBy(lambda x: x[0][0:-1])
