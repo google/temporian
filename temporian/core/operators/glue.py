@@ -111,7 +111,9 @@ def glue(
 ) -> EventSetNode:
     """Concatenates [`EventSetNodes`][temporian.EventSetNode] with the same sampling.
 
-    Feature names cannot be duplicated across nodes.
+    Feature names cannot be duplicated.
+
+    See the examples below to workaround duplicated names or different samplings.
 
     Example:
 
@@ -139,11 +141,11 @@ def glue(
 
         ```
 
-    To glue nodes with duplicated feature names, add a prefix or rename before:
+    To glue duplicated feature names, add a prefix or rename before:
 
     Example with duplicated names:
 
-    ```python
+        ```python
         >>> a = tp.event_set(
         ...     timestamps=[0, 1, 5],
         ...     features={"M": [0, 10, 50], "N": [50, 100, 500]},
@@ -164,10 +166,10 @@ def glue(
 
         ```
 
-    To concatenate nodes with different samplings, use
+    To concatenate EventSets with different samplings, use
     [`tp.resample()`][temporian.resample] first.
 
-    Example:
+    Example with different samplings:
 
         ```python
         >>> a = tp.event_set(timestamps=[0, 2], features={"A": [0, 20]})
