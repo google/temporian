@@ -23,6 +23,7 @@ from temporian.core.data.duration_utils import Duration, normalize_duration
 from temporian.core.data.node import EventSetNode
 from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.window.base import BaseWindowOperator
+from temporian.core.typing import EventSetOrNode
 
 
 class MovingMinOperator(BaseWindowOperator):
@@ -39,11 +40,12 @@ operator_lib.register_operator(MovingMinOperator)
 
 @compile
 def moving_min(
-    input: EventSetNode,
+    input: EventSetOrNode,
     window_length: Duration,
-    sampling: Optional[EventSetNode] = None,
-) -> EventSetNode:
-    """Computes the minimum of values in a sliding window over the node.
+    sampling: Optional[EventSetOrNode] = None,
+) -> EventSetOrNode:
+    """Computes the minimum of values in a sliding window over an
+    [`EventSet`][temporian.EventSet].
 
     For each t in sampling, and for each index and feature independently,
     returns at time t the minimum of non-nan values for the feature in the window
@@ -76,14 +78,18 @@ def moving_min(
     operations with external sampling and indices.
 
     Args:
-        input: EventSetNode for which to count the number of values in each feature.
+        input: EventSet for which to count the number of values in each feature.
         window_length: Sliding window's length.
         sampling: Timestamps to sample the sliding window's value at. If not
             provided, timestamps in `input` are used.
 
     Returns:
-        EventSetNode containing the minimum of each feature in `input`.
+        EventSet containing the minimum of each feature in `input`.
     """
+    assert isinstance(input, EventSetNode)
+    if sampling is not None:
+        assert isinstance(sampling, EventSetNode)
+
     return MovingMinOperator(
         input=input,
         window_length=normalize_duration(window_length),

@@ -23,6 +23,7 @@ from temporian.core.data.duration_utils import Duration, normalize_duration
 from temporian.core.data.node import EventSetNode
 from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.window.base import BaseWindowOperator
+from temporian.core.typing import EventSetOrNode
 
 
 class SimpleMovingAverageOperator(BaseWindowOperator):
@@ -45,11 +46,12 @@ operator_lib.register_operator(SimpleMovingAverageOperator)
 
 @compile
 def simple_moving_average(
-    input: EventSetNode,
+    input: EventSetOrNode,
     window_length: Duration,
-    sampling: Optional[EventSetNode] = None,
-) -> EventSetNode:
-    """Computes the average of values in a sliding window over the node.
+    sampling: Optional[EventSetOrNode] = None,
+) -> EventSetOrNode:
+    """Computes the average of values in a sliding window over an
+    [`EventSet`][temporian.EventSet].
 
     For each t in sampling, and for each feature independently, returns at time
     t the average value of the feature in the window (t - window_length, t].
@@ -89,8 +91,12 @@ def simple_moving_average(
             provided, timestamps in `input` are used.
 
     Returns:
-        EventSetNode containing the moving average of each feature in `input`.
+        EventSet containing the moving average of each feature in `input`.
     """
+    assert isinstance(input, EventSetNode)
+    if sampling is not None:
+        assert isinstance(sampling, EventSetNode)
+
     return SimpleMovingAverageOperator(
         input=input,
         window_length=normalize_duration(window_length),
