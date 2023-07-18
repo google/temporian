@@ -127,7 +127,10 @@ def _broadcast_index_to_feature(
 def _add_index(
     items: Tuple[
         Tuple[BeamIndexOrFeature, ...],
-        Tuple[Iterable[IndexValue], Iterable[ExtractedIndex]],
+        Tuple[
+            Iterable[Tuple[np.ndarray, Optional[np.ndarray]]],
+            Iterable[ExtractedIndex],
+        ],
     ]
 ) -> IndexValue:
     """Adds the new index values to all remaining feature items."""
