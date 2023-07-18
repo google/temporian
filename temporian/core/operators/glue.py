@@ -114,6 +114,9 @@ def glue(
 
     Feature names cannot be duplicated across EventSets.
 
+    See the examples below for workarounds on gluing EventSets with duplicated
+    feature names or different samplings.
+
     Example:
 
         ```python
@@ -145,7 +148,7 @@ def glue(
 
     Example with duplicated names:
 
-    ```python
+        ```python
         >>> a = tp.event_set(
         ...     timestamps=[0, 1, 5],
         ...     features={"M": [0, 10, 50], "N": [50, 100, 500]},
@@ -169,7 +172,7 @@ def glue(
     To concatenate EventSets with different samplings, use
     [`tp.resample()`][temporian.resample] first.
 
-    Example:
+    Example with different samplings:
 
         ```python
         >>> a = tp.event_set(timestamps=[0, 2], features={"A": [0, 20]})

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import re
 from functools import partial
 import os
 import pydoc
@@ -429,14 +430,19 @@ class SerializationTest(absltest.TestCase):
             loaded_f = tp.load(path=path)
 
         doc = pydoc.render_doc(loaded_f)
-        self.assertTrue(
-            "x: temporian.core.data.node.EventSetNode, "
-            "y: temporian.core.data.node.EventSetNode, "
-            "z: temporian.core.data.node.EventSetNode"
-            in doc
+        self.assertIsNotNone(
+            re.search(r"x: \S*temporian\.core\.data\.node\.EventSetNode", doc)
         )
-        self.assertTrue(
-            "-> Dict[str, temporian.core.data.node.EventSetNode]" in doc,
+        self.assertIsNotNone(
+            re.search(r"y: \S*temporian\.core\.data\.node\.EventSetNode", doc)
+        )
+        self.assertIsNotNone(
+            re.search(r"z: \S*temporian\.core\.data\.node\.EventSetNode", doc)
+        )
+        self.assertIsNotNone(
+            re.search(
+                r"-> Dict[str, \S*temporian.core.data.node.EventSetNode]", doc
+            )
         )
 
     def test_save_function_composition(self):

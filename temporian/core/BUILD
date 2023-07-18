@@ -54,6 +54,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":typing",
+        "//temporian/core:compilation",
         "//temporian/core:graph",
         "//temporian/core:operator_lib",
         "//temporian/core/data:dtype",
