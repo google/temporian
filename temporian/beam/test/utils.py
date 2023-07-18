@@ -16,6 +16,7 @@
 import os
 from typing import Optional
 import tempfile
+from absl.testing import absltest
 
 import apache_beam as beam
 from apache_beam.testing.test_pipeline import TestPipeline
@@ -32,7 +33,7 @@ from temporian.implementation.numpy.data.event_set import EventSet
 
 
 def check_beam_implementation(
-    self,
+    test: absltest.TestCase,
     input_data: EventSet,
     output_node: EventSetNode,
     input_node: Optional[EventSetNode] = None,
@@ -40,7 +41,7 @@ def check_beam_implementation(
     """Checks the result of the Numpy backend against the Beam backend.
 
     Args:
-        self: The absl's test self.
+        test: The absl's test.
         input_data: An event set to feed to a graph.
         output_node: Output of the graph.
         input_node: Input of the graph. If not set, uses input_data.node()
@@ -84,4 +85,4 @@ def check_beam_implementation(
     # Run the Temporian program using the numpy backend
     expected_output = output_node.run(input_data)
 
-    assertEqualEventSet(self, beam_output, expected_output)
+    assertEqualEventSet(test, beam_output, expected_output)

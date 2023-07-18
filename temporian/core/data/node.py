@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import List, Optional, Tuple, TYPE_CHECKING, Union
+from typing import Dict, List, Optional, Set, Tuple, TYPE_CHECKING, Union
 
 from temporian.core.data.dtype import DType, IndexDType
 from temporian.core.data.schema import Schema, FeatureSchema, IndexSchema
@@ -24,20 +24,24 @@ from temporian.core.mixins import EventSetOperationsMixin
 from temporian.utils import string
 
 if TYPE_CHECKING:
-    from temporian.core.evaluation import EvaluationInput, EvaluationResult
     from temporian.core.operators.base import Operator
+    from temporian.implementation.numpy.data.event_set import EventSetCollection
+    from temporian.implementation.numpy.data.event_set import (
+        NodeToEventSetMapping,
+    )
 
 
 class EventSetNode(EventSetOperationsMixin):
-    """A EventSetNode is a reference to the input/output of ops in a compute graph.
+    """An EventSetNode is a reference to the input/output of ops in a compute
+    graph.
 
-    Use [`tp.input_node()`][temporian.input_node] to create an EventSetNode manually, or
-    use [`event_set.node()`][temporian.EventSet.node] to create an EventSetNode
-    compatible with a given [`EventSet`][temporian.EventSet].
+    Use [`tp.input_node()`][temporian.input_node] to create an EventSetNode
+    manually, or use [`event_set.node()`][temporian.EventSet.node] to create an
+    EventSetNode compatible with a given [`EventSet`][temporian.EventSet].
 
     A EventSetNode does not contain any data. Use
     [`node.run()`][temporian.EventSetNode.run] to get the
-    [`EventSet`][temporian.EventSet] resulting from an [`EventSetNodes`][temporian.EventSetNode].
+    [`EventSet`][temporian.EventSet] resulting from an EventSetNode.
     """
 
     def __init__(
@@ -143,10 +147,10 @@ class EventSetNode(EventSetOperationsMixin):
 
     def run(
         self,
-        input: EvaluationInput,
+        input: NodeToEventSetMapping,
         verbose: int = 0,
         check_execution: bool = True,
-    ) -> EvaluationResult:
+    ) -> EventSetCollection:
         """Evaluates the EventSetNode on the specified input.
 
         See [`tp.run()`][temporian.run] for details.
@@ -172,6 +176,15 @@ class EventSetNode(EventSetOperationsMixin):
             f"creator: {self._creator}\n"
             f"id:{id(self)}\n"
         )
+
+
+EventSetNodeCollection = Union[
+    EventSetNode, List[EventSetNode], Set[EventSetNode], Dict[str, EventSetNode]
+]
+"""A collection of [`EventSetNodes`][temporian.EventSetNode].
+
+This can be a single EventSetNode, a list or set of EventSetNodes, or a
+dictionary mapping names to EventSetNodes."""
 
 
 def input_node(

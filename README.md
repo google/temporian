@@ -1,4 +1,4 @@
-<img src="docs/src/assets/banner.png" width="100%" alt="Temporian logo">
+<img src="https://github.com/google/temporian/raw/main/docs/src/assets/banner.png" width="100%" alt="Temporian logo">
 
 [![pypi](https://img.shields.io/pypi/v/temporian?color=blue)](https://pypi.org/project/temporian/)
 [![docs](https://readthedocs.org/projects/temporian/badge/?version=stable)](https://temporian.readthedocs.io/en/stable/?badge=stable)
@@ -64,7 +64,7 @@ output_data = weekly_sum.run({input_node: input_data})
 output_data.plot()
 ```
 
-![](docs/src/assets/frontpage_plot.png)
+![](https://github.com/google/temporian/raw/main/docs/src/assets/frontpage_plot.png)
 
 Check the [Getting Started tutorial](https://temporian.readthedocs.io/en/stable/tutorials/getting_started/) to try it out!
 

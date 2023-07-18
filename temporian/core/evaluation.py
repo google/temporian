@@ -16,37 +16,28 @@
 
 import time
 import sys
-from typing import Dict, List, Set, Union, Optional
+from typing import Dict, List, Set, Optional
 from collections import defaultdict
 
-from temporian.core.data.node import EventSetNode
+from temporian.core.data.node import EventSetNode, EventSetNodeCollection
 from temporian.core.operators.base import Operator
 from temporian.implementation.numpy import evaluation as np_eval
-from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.event_set import (
+    EventSet,
+    EventSetCollection,
+    NodeToEventSetMapping,
+)
 from temporian.core.graph import infer_graph
 from temporian.core.schedule import Schedule, ScheduleStep
 from temporian.core.operators.leak import LeakOperator
 
-EvaluationQuery = Union[
-    EventSetNode, List[EventSetNode], Set[EventSetNode], Dict[str, EventSetNode]
-]
-EvaluationInput = Union[
-    # A dict of EventSetNodes to corresponding EventSet.
-    Dict[EventSetNode, EventSet],
-    # A single EventSet. Equivalent to {event_set.node() : event_set}.
-    EventSet,
-    # A list of EventSets. Feed each EventSet individually like EventSet.
-    List[EventSet],
-]
-EvaluationResult = Union[EventSet, List[EventSet], Dict[str, EventSet]]
-
 
 def run(
-    query: EvaluationQuery,
-    input: EvaluationInput,
+    query: EventSetNodeCollection,
+    input: NodeToEventSetMapping,
     verbose: int = 0,
     check_execution: bool = True,
-) -> EvaluationResult:
+) -> EventSetCollection:
     """Evaluates [`EventSetNodes`][temporian.EventSetNode] on [`EventSets`][temporian.EventSet].
 
     Performs all computation defined by the graph between the `query` EventSetNodes and
@@ -291,8 +282,8 @@ def build_schedule(
 
 
 def has_leak(
-    output: EvaluationQuery,
-    input: Optional[EvaluationQuery] = None,
+    output: EventSetNodeCollection,
+    input: Optional[EventSetNodeCollection] = None,
 ) -> bool:
     """Tests if a node depends on a leak operator.
 
@@ -346,7 +337,9 @@ def has_leak(
     return False
 
 
-def _normalize_input(input: EvaluationInput) -> Dict[EventSetNode, EventSet]:
+def _normalize_input(
+    input: NodeToEventSetMapping,
+) -> Dict[EventSetNode, EventSet]:
     """Normalizes an input into a dictionary of node to evsets."""
 
     if isinstance(input, dict):
@@ -374,7 +367,7 @@ def _normalize_input(input: EvaluationInput) -> Dict[EventSetNode, EventSet]:
     )
 
 
-def _normalize_query(query: EvaluationQuery) -> Set[EventSetNode]:
+def _normalize_query(query: EventSetNodeCollection) -> Set[EventSetNode]:
     """Normalizes a query into a list of query EventSetNodes."""
 
     if isinstance(query, EventSetNode):
@@ -390,14 +383,14 @@ def _normalize_query(query: EvaluationQuery) -> Set[EventSetNode]:
         return set(query.values())
 
     raise TypeError(
-        f"Evaluate query argument must be one of {EvaluationQuery}."
+        f"Evaluate query argument must be one of {EventSetNodeCollection}."
         f" Received {type(query)} instead."
     )
 
 
 def _denormalize_outputs(
-    outputs: Dict[EventSetNode, EventSet], query: EvaluationQuery
-) -> EvaluationResult:
+    outputs: Dict[EventSetNode, EventSet], query: EventSetNodeCollection
+) -> EventSetCollection:
     """Converts outputs into the same format as the query."""
 
     if isinstance(query, EventSetNode):
