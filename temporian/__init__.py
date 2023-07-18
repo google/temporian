@@ -74,6 +74,7 @@ from temporian.io.csv import to_csv
 from temporian.io.csv import from_csv
 from temporian.io.pandas import to_pandas
 from temporian.io.pandas import from_pandas
+from temporian.io.tensorflow import to_tensorflow
 
 # Plotting
 from temporian.implementation.numpy.data.plotter import plot

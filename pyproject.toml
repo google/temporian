@@ -63,6 +63,7 @@ apache-beam = "^2.48.0"
 pillow = "^9.5.0"
 cairosvg = "^2.7.0"
 colorama = "^0.4.6"
+tensorflow = "^2.13.0"
 
 [tool.poetry.extras]
 beam = ["apache-beam"]
