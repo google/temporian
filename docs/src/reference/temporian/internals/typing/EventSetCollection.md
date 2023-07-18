@@ -1,1 +1,1 @@
-::: temporian.implementation.numpy.data.event_set.EventSetCollection
+::: temporian.core.typing.EventSetCollection

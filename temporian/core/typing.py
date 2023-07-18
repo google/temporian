@@ -52,7 +52,7 @@ EventSetAndNodeCollection = Union[
     Set[EventSetAndNode],
     Dict[str, EventSetAndNode],
 ]
-"""A collection of [`EventSetAndNodes`][temporian.EventSetAndNode].
+"""A collection of [`EventSetAndNodes`][temporian.core.typing.EventSetAndNode].
 
 This can be a single EventSetAndNode, a list or set of EventSetAndNodes, or a
 dictionary mapping names to EventSetAndNodes."""

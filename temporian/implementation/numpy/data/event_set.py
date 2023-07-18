@@ -362,6 +362,9 @@ class EventSet(EventSetOperationsMixin):
     pandas DataFrame.
     """
 
+    # TODO: improve EventSet's docstring. Possibly link to Temporal data section
+    # user guide, or explain briefly what the data's structure is.
+
     def __init__(
         self,
         data: Dict[IndexType, IndexData],
