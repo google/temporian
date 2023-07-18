@@ -62,18 +62,3 @@ If a single EventSet or a list of EventSets, each EventSet is mapped to their
 own node using [`EventSet.node()`][temporian.EventSet.node], i.e., `[event_set]`
 is equivalent to `{event_set.node() : event_set}`.
 """
-
-EventSetAndNode = Union[EventSet, EventSetNode, EventSetOperationsMixin]
-"""An [`EventSet`][temporian.EventSet] or
-[`EventSetNode`][temporian.EventSetNode]."""
-
-EventSetAndNodeCollection = Union[
-    EventSetAndNode,
-    List[EventSetAndNode],
-    Set[EventSetAndNode],
-    Dict[str, EventSetAndNode],
-]
-"""A collection of [`EventSetAndNodes`][temporian.core.typing.EventSetAndNode].
-
-This can be a single EventSetAndNode, a list or set of EventSetAndNodes, or a
-dictionary mapping names to EventSetAndNodes."""

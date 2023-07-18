@@ -14,21 +14,29 @@
 
 from functools import wraps
 from copy import copy
-from typing import Any, Dict, Optional, Tuple, Callable, TypeVar
+from typing import (
+    Any,
+    Dict,
+    Optional,
+    Tuple,
+    Callable,
+    TypeVar,
+)
 from temporian.core.data.node import EventSetNode
-from temporian.core.typing import EventSetAndNodeCollection
 from temporian.implementation.numpy.data.event_set import EventSet
 
-T = TypeVar("T", bound=Callable[..., EventSetAndNodeCollection])
+
+F = TypeVar("F", bound=Callable)
 
 
-def compile(fn: Optional[T] = None, *, verbose: int = 0) -> T:
+def compile(fn: Optional[F] = None, *, verbose: int = 0) -> F:
     """Compiles a Temporian function.
 
     A Temporian function is a function that takes
-    [`EventSetNodes`][temporian.EventSetNode] as arguments and returns
-    [`EventSetNodes`][temporian.EventSetNode] as outputs. Compiling it enables
-    it to perform eager evaluation, i.e., receive and return
+    [`EventSetOrNodes`][temporian.EventSetOrNode] as arguments and returns
+    [`EventSetOrNodes`][temporian.EventSetOrNode] as outputs.
+
+    Compiling it enables it to perform eager evaluation, i.e., receive and return
     [`EventSets`][temporian.EventSet] instead of
     [`EventSetNodes`][temporian.EventSetNode], and allows Temporian to optimize
     the underlying graph defined by the operators inside the function, making it

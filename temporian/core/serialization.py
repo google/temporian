@@ -19,6 +19,7 @@ import logging
 from typing import (
     Callable,
     List,
+    Protocol,
     Set,
     Any,
     Dict,
@@ -42,7 +43,7 @@ from temporian.core.data.schema import Schema
 from temporian.core.compilation import compile
 from temporian.core.operators import base
 from temporian.core.data.dtype import DType
-from temporian.core.typing import EventSetOrNode
+from temporian.core.typing import EventSetOrNode, EventSetOrNodeCollection
 from temporian.implementation.numpy.data.event_set import (
     EventSet,
 )
@@ -59,7 +60,7 @@ DTYPE_MAPPING = {
 INV_DTYPE_MAPPING = {v: k for k, v in DTYPE_MAPPING.items()}
 
 
-# TODO: allow saved fn to return a list or node too (EventSetNodeCollection)
+# TODO: allow saved fn to return a list or single node too
 def save(
     fn: Callable[..., Dict[str, EventSetOrNode]],
     path: str,
@@ -113,7 +114,7 @@ def save(
 
     _check_fn_outputs(outputs)
 
-    save_graph(inputs=node_kwargs, outputs=outputs, path=path)
+    save_graph(inputs=node_kwargs, outputs=outputs, path=path)  # type: ignore
 
 
 def load(
