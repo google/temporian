@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from typing import Dict, List, Tuple
+from unittest.mock import ANY, patch
 from absl.testing import absltest
 
 from temporian.implementation.numpy.data.event_set import EventSet
@@ -21,6 +22,7 @@ from temporian.implementation.numpy.data.io import event_set
 from temporian.core.operators.prefix import prefix
 from temporian.core.operators.glue import glue
 from temporian.core.compilation import compile
+from temporian.core import evaluation
 
 
 # TODO: add more extensive tests
@@ -144,12 +146,39 @@ class CompileTest(absltest.TestCase):
         with self.assertRaisesRegex(
             ValueError, "Cannot mix EventSets and EventSetNodes"
         ):
-            f({"a": self.evset, "b": self.other_evset.node()})
+            f(self.evset, self.other_evset.node())
 
         with self.assertRaisesRegex(
             ValueError, "Cannot mix EventSets and EventSetNodes"
         ):
-            f({"a": self.evset.node(), "b": self.other_evset})
+            f(self.evset.node(), self.other_evset)
+
+    @patch.object(evaluation, "run", autospec=True)
+    def test_verbose_1(self, run_mock):
+        @compile(verbose=1)
+        def f(x: EventSetNode) -> EventSetNode:
+            return prefix("a", x)
+
+        f(self.evset)
+
+        run_mock.assert_called_once_with(ANY, ANY, 1)
+
+    @patch.object(evaluation, "run", autospec=True)
+    def test_verbose_0(self, run_mock):
+        @compile(verbose=0)
+        def f(x: EventSetNode) -> EventSetNode:
+            return prefix("a", x)
+
+        f(self.evset)
+
+        run_mock.assert_called_once_with(ANY, ANY, 0)
+
+    def test_call_no_args(self):
+        @compile()
+        def f(x: EventSetNode) -> EventSetNode:
+            return prefix("a", x)
+
+        f(self.evset)
 
 
 if __name__ == "__main__":
