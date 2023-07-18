@@ -23,6 +23,7 @@ from temporian.core.data.node import (
     create_node_new_features_existing_sampling,
 )
 from temporian.core.operators.base import Operator
+from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
 from temporian.core.data.dtype import DType
 
@@ -79,10 +80,15 @@ operator_lib.register_operator(SinceLast)
 
 @compile
 def since_last(
-    input: EventSetNode,
-    sampling: Optional[EventSetNode] = None,
-) -> EventSetNode:
-    """Computes the amount of time since the last distinct timestamp.
+    input: EventSetOrNode,
+    sampling: Optional[EventSetOrNode] = None,
+) -> EventSetOrNode:
+    """Computes the amount of time since the last distinct timestamp in an
+    [`EventSet`][temporian.EventSet].
+
+    If `sampling` is provided, the output will correspond to the time elapsed
+    between each timestamp in `sampling` and the latest previous timestamp in
+    `input`. Else, the timestamps of `input` will be used as `sampling`.
 
     Example 1:
         ```python
@@ -113,11 +119,15 @@ def since_last(
         ```
 
     Args:
-        input: Event to sample.
-        sampling: Event to use the sampling of.
+        input: EventSet to sample.
+        sampling: EventSet to use the sampling of.
 
     Returns:
-        Resampled event, with same sampling as `sampling`.
+        Resulting EventSet, with same sampling as `sampling` if provided, or as
+            `input` if not.
     """
+    assert isinstance(input, EventSetNode)
+    if sampling is not None:
+        assert isinstance(sampling, EventSetNode)
 
     return SinceLast(input=input, sampling=sampling).outputs["output"]

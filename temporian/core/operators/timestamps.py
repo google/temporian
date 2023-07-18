@@ -22,6 +22,7 @@ from temporian.core.data.node import (
 )
 from temporian.core.compilation import compile
 from temporian.core.operators.base import Operator
+from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
 from temporian.core.data import dtype
 
@@ -57,10 +58,12 @@ operator_lib.register_operator(Timestamps)
 
 
 @compile
-def timestamps(input: EventSetNode) -> EventSetNode:
-    """Converts the event timestamps into a `float64` feature.
+def timestamps(input: EventSetOrNode) -> EventSetOrNode:
+    """Converts an [`EventSet`][temporian.EventSet]'s timestamps into a
+    `float64` feature.
 
-    Features in the input node are ignored, only the timestamps are used.
+    Features in the input EventSet are ignored, only the timestamps are used.
+
     Datetime timestamps are converted to unix timestamps.
 
     Integer timestamps example:
@@ -107,10 +110,12 @@ def timestamps(input: EventSetNode) -> EventSetNode:
         ```
 
     Args:
-        input: EventSetNode to get the timestamps from.
+        input: EventSet to get the timestamps from.
 
     Returns:
-        Single feature `timestamps` with each event's timestamp value.
+        EventSet with a single feature named `timestamps` with each event's
+        timestamp.
     """
+    assert isinstance(input, EventSetNode)
 
     return Timestamps(input=input).outputs["output"]

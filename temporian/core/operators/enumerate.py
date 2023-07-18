@@ -22,6 +22,7 @@ from temporian.core.data.node import (
 )
 from temporian.core.compilation import compile
 from temporian.core.operators.base import Operator
+from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
 from temporian.core.data import dtype
 
@@ -57,10 +58,11 @@ operator_lib.register_operator(Enumerate)
 
 
 @compile
-def enumerate(input: EventSetNode) -> EventSetNode:
-    """Create an `int64` feature with the ordinal position of each event.
+def enumerate(input: EventSetOrNode) -> EventSetOrNode:
+    """Create an `int64` feature with the ordinal position of each event in an
+    [`EventSet`][temporian.EventSet].
 
-    Each index is enumerated independently.
+    Each index group is enumerated independently.
 
     Usage:
         ```python
@@ -85,10 +87,12 @@ def enumerate(input: EventSetNode) -> EventSetNode:
         ```
 
     Args:
-        input: EventSetNode to enumerate.
+        input: EventSet to enumerate.
 
     Returns:
-        Single feature with each event's ordinal position in index.
+        EventSet with a single feature with each event's ordinal position in
+        its index group.
     """
+    assert isinstance(input, EventSetNode)
 
     return Enumerate(input=input).outputs["output"]

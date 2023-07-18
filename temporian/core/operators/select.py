@@ -24,6 +24,7 @@ from temporian.core.data.node import (
 )
 from temporian.core.operators.base import Operator
 from temporian.core.data.schema import Schema
+from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
 
 
@@ -90,13 +91,13 @@ operator_lib.register_operator(SelectOperator)
 
 @compile
 def select(
-    input: EventSetNode,
+    input: EventSetOrNode,
     feature_names: Union[str, List[str]],
-) -> EventSetNode:
-    """Selects a subset of features from an EventSetNode.
+) -> EventSetOrNode:
+    """Selects a subset of features from an [`EventSet`][temporian.EventSet].
 
     Args:
-        input: EventSetNode to select features from.
+        input: EventSet to select features from.
         feature_names: Name or list of names of the features to select from the
             input.
 
@@ -138,8 +139,10 @@ def select(
 
 
     Returns:
-        EventSetNode containing only the selected features.
+        EventSet containing only the selected features.
     """
+    assert isinstance(input, EventSetNode)
+
     if isinstance(feature_names, list) and all(
         isinstance(f, str) for f in feature_names
     ):

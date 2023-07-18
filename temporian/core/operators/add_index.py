@@ -24,6 +24,7 @@ from temporian.core.data.node import (
 )
 from temporian.core.data.schema import FeatureSchema, IndexSchema
 from temporian.core.operators.base import Operator
+from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
 from temporian.core.operators.drop_index import drop_index
 
@@ -142,9 +143,9 @@ def _normalize_indexes_to_set(
 
 @compile
 def add_index(
-    input: EventSetNode, indexes: Union[str, List[str]]
-) -> EventSetNode:
-    """Adds indexes to an [`EventSetNode`][temporian.EventSetNode].
+    input: EventSetOrNode, indexes: Union[str, List[str]]
+) -> EventSetOrNode:
+    """Adds indexes to an [`EventSet`][temporian.EventSet].
 
     Usage example:
         ```python
@@ -208,16 +209,17 @@ def add_index(
         ```
 
     Args:
-        input: EventSetNode for which the indexes are to be set or updated.
+        input: EventSet for which the indexes are to be set or updated.
         indexes: List of feature names (strings) that should be added to the
             indexes. These feature names should already exist in `input`.
 
     Returns:
-        New EventSetNode with the extended index.
+        EventSet with the extended index.
 
     Raises:
         KeyError: If any of the specified `indexes` are not found in `input`.
     """
+    assert isinstance(input, EventSetNode)
 
     indexes = _normalize_indexes(indexes)
     return AddIndexOperator(input, indexes).outputs["output"]
@@ -227,10 +229,7 @@ def add_index(
 def set_index(
     input: EventSetNode, indexes: Union[str, List[str]]
 ) -> EventSetNode:
-    """Replaces the index in an [`EventSetNode`][temporian.EventSetNode].
-
-    This function is implemented as [`tp.drop_index()`](../drop_index)
-    + [`tp.add_index()`](../add_index).
+    """Replaces the index in an [`EventSet`][temporian.EventSet].
 
     Usage example:
         ```python
@@ -298,13 +297,13 @@ def set_index(
         ```
 
     Args:
-        input: EventSetNode for which the indexes are to be set.
+        input: EventSet for which the indexes are to be set.
         indexes: List of index / feature names (strings) used as
             the new indexes. These names should be either indexes or features in
             `input`.
 
     Returns:
-        New `EventSetNode` with the updated indexes.
+        EventSet with the updated indexes.
 
     Raises:
         KeyError: If any of the specified `indexes` are not found in `input`.

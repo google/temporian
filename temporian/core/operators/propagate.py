@@ -24,6 +24,7 @@ from temporian.core.data.node import (
 )
 from temporian.core.operators.base import Operator
 from temporian.core.operators.resample import Resample
+from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
 
 
@@ -99,9 +100,10 @@ operator_lib.register_operator(Propagate)
 # (like add_index) instead?
 @compile
 def propagate(
-    input: EventSetNode, sampling: EventSetNode, resample: bool = False
-) -> EventSetNode:
-    """Propagates feature values over a sub index.
+    input: EventSetOrNode, sampling: EventSetOrNode, resample: bool = False
+) -> EventSetOrNode:
+    """Propagates feature values over another [`EventSet`][temporian.EventSet]'s
+    index.
 
     Given `input` and `sampling` where `input`'s indexes are a superset of
     `sampling`'s (e.g., the indexes of `input` are `["x"]`, and the indexes of
@@ -156,14 +158,16 @@ def propagate(
         ```
 
     Args:
-        input: EventSetNode to propagate.
+        input: EventSet to propagate.
         sampling: Index to propagate over.
         resample: If true, apply a [`tp.resample()`][temporian.resample] before
             propagating, for the output to have the same sampling as `sampling`.
 
     Returns:
-        EventSetNode propagated over `sampling`'s index.
+        EventSet propagated over `sampling`'s index.
     """
+    assert isinstance(input, EventSetNode)
+    assert isinstance(sampling, EventSetNode)
 
     result = Propagate(
         input=input,

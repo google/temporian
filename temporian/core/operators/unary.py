@@ -25,6 +25,7 @@ from temporian.core.data.node import (
     create_node_new_features_existing_sampling,
 )
 from temporian.core.operators.base import Operator
+from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
 
 
@@ -190,12 +191,15 @@ operator_lib.register_operator(LogOperator)
 
 @compile
 def invert(
-    input: EventSetNode,
-) -> EventSetNode:
-    """Inverts a boolean node (~node).
+    input: EventSetOrNode,
+) -> EventSetOrNode:
+    """Inverts a boolean [`EventSet`][temporian.EventSet] (~EventSet).
 
-    Swaps False<->True element-wise.
-    Does not work on integers, they should be cast to BOOLEAN beforehand.
+    Swaps False <-> True element-wise.
+
+    Does not work on integers, they should be cast to
+    [`tp.bool_`][temporian.bool_] beforehand, using
+    [`tp.cast()`][temporian.cast].
 
     Example:
         ```python
@@ -222,11 +226,13 @@ def invert(
         ```
 
     Args:
-        input: EventSetNode to invert.
+        input: EventSet to invert.
 
     Returns:
-        Negated node.
+        Inverted EventSet.
     """
+    assert isinstance(input, EventSetNode)
+
     return InvertOperator(
         input=input,
     ).outputs["output"]
@@ -234,13 +240,14 @@ def invert(
 
 @compile
 def isnan(
-    input: EventSetNode,
-) -> EventSetNode:
-    """Returns boolean features, `True` in the NaN elements of the input.
+    input: EventSetOrNode,
+) -> EventSetOrNode:
+    """Returns boolean features, `True` in the NaN elements of an
+    [`EventSet`][temporian.EventSet].
 
-    Note that for `int` and `bool` this will
-    always be `False` since those types don't support NaNs.
-    It only makes actual sense to use on `float` (or `tp.float32`) features.
+    Note that for `int` and `bool` this will always be `False` since those types
+    don't support NaNs. It only makes actual sense to use on `float` (or
+    `tp.float32`) features.
 
     See also [`tp.notnan()`][temporian.notnan].
 
@@ -267,11 +274,13 @@ def isnan(
         ```
 
     Args:
-        input: EventSetNode to check for NaNs.
+        input: EventSet to check for NaNs.
 
     Returns:
-        EventSetNode with `bool` features.
+        EventSet with boolean features.
     """
+    assert isinstance(input, EventSetNode)
+
     return IsNanOperator(
         input=input,
     ).outputs["output"]
@@ -279,14 +288,18 @@ def isnan(
 
 @compile
 def notnan(
-    input: EventSetNode,
-) -> EventSetNode:
-    """Opposite of `isnan()`, being `True` in the elements that are not NaN.
+    input: EventSetOrNode,
+) -> EventSetOrNode:
+    """Returns boolean features, `False` in the NaN elements of an
+    [`EventSet`][temporian.EventSet].
 
-    Equivalent to `invert(isnan())`. Note that for `int` and `bool` this will
-    always be `True` since those types don't support NaNs.
-    It only makes actual sense to use on `float` (or `tp.float32`) features.
+    Equivalent to `tp.invert(tp.isnan(...))`.
 
+    Note that for `int` and `bool` this will always be `True` since those types
+    don't support NaNs. It only makes actual sense to use on `float` (or
+    `tp.float32`) features.
+
+    See also [`tp.isnan()`][temporian.isnan].
 
     Example:
         ```python
@@ -317,11 +330,13 @@ def notnan(
         ```
 
     Args:
-        input: EventSetNode to check for NaNs.
+        input: EventSet to check for NaNs.
 
     Returns:
-        EventSetNode with `bool` features.
+        EventSet with boolean features.
     """
+    assert isinstance(input, EventSetNode)
+
     return NotNanOperator(
         input=input,
     ).outputs["output"]
@@ -329,9 +344,10 @@ def notnan(
 
 @compile
 def abs(
-    input: EventSetNode,
-) -> EventSetNode:
-    """Gets the absolute value of the input features.
+    input: EventSetOrNode,
+) -> EventSetOrNode:
+    """Gets the absolute value of an [`EventSet`][temporian.EventSet]'s
+    features.
 
     Example:
         ```python
@@ -349,11 +365,13 @@ def abs(
         ```
 
     Args:
-        input: EventSetNode calculate absolute value.
+        input: EventSetOr calculate absolute value.
 
     Returns:
-        EventSetNode with positive valued features.
+        EventSetOr with positive valued features.
     """
+    assert isinstance(input, EventSetNode)
+
     return AbsOperator(
         input=input,
     ).outputs["output"]
@@ -361,10 +379,12 @@ def abs(
 
 @compile
 def log(
-    input: EventSetNode,
-) -> EventSetNode:
-    """Calculates the natural logarithm of the features. Can only be used
-    on floating point feature types.
+    input: EventSetOrNode,
+) -> EventSetOrNode:
+    """Calculates the natural logarithm of an [`EventSet`][temporian.EventSet]'s
+    features.
+
+    Can only be used on floating point features.
 
     Example:
         ```python
@@ -382,11 +402,13 @@ def log(
         ```
 
     Args:
-        input: EventSetNode to calculate natural logarithm.
+        input: EventSetOr to calculate natural logarithm.
 
     Returns:
-        EventSetNode with logarithm of input features.
+        EventSetOr with logarithm of input features.
     """
+    assert isinstance(input, EventSetNode)
+
     return LogOperator(
         input=input,
     ).outputs["output"]

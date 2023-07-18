@@ -21,6 +21,7 @@ from temporian.core.data.node import (
     create_node_new_features_new_sampling,
 )
 from temporian.core.operators.base import Operator
+from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
 
 
@@ -55,9 +56,9 @@ operator_lib.register_operator(BeginOperator)
 
 
 @compile
-def begin(input: EventSetNode) -> EventSetNode:
-    """Generates a single timestamp at the beginning of the input, per index.
-
+def begin(input: EventSetOrNode) -> EventSetOrNode:
+    """Generates a single timestamp at the beginning of the
+    [`EventSet`][temporian.EventSet], per index group.
 
     Usage example:
         ```python
@@ -81,9 +82,11 @@ def begin(input: EventSetNode) -> EventSetNode:
         ```
 
     Args:
-        input: Guide input
+        input: Guide EventSet.
 
     Returns:
-        A feature-less node with a single timestamp.
+        A feature-less EventSet with a single timestamp per index group.
     """
+    assert isinstance(input, EventSetNode)
+
     return BeginOperator(input=input).outputs["output"]
