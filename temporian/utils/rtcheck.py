@@ -1,18 +1,4 @@
-"""Minimal runtime check of typing.
-
-Usage example:
-
-    @rtcheck
-    def f(a, b: int, c: str = "aze") -> List[str]:
-        del a
-        del b
-        del c
-        return ["a", "b"]
-
-    f(1, 2, "a") # Ok
-    f(1, 2, 3) # Fails
-
-"""
+"""Runtime checking."""
 
 from __future__ import annotations
 
@@ -25,11 +11,12 @@ import inspect
 import typing
 
 from temporian.implementation.numpy.data.event_set import EventSet
-from temporian.core.data.node import EventSetNode, input_node
+from temporian.core.data.node import EventSetNode
 
 # Number of elements to check in a structure e.g. a list.
 _NUM_CHECK_STRUCT = 3
 
+# If true, print details during runtime checking.
 _DEBUG = False
 
 
@@ -46,19 +33,19 @@ class _Trace:
     """
 
     def __init__(self):
-        self._context = []
+        self.context = []
 
     def exception(self, value: str):
         """Raises an exception with the current context and the value."""
 
-        raise ValueError(" ".join(self._context + [value]))
+        raise ValueError(" ".join(self.context + [value]))
 
     def add_context(self, value: str) -> "_Trace":
         """Creates a new trace with the current's trace context and value."""
 
         n = _Trace()
-        n._context.extend(self._context)
-        n._context.append(value)
+        n.context.extend(self.context)
+        n.context.append(value)
         return n
 
 
@@ -101,7 +88,6 @@ def _check_annotation(trace: _Trace, is_compiled: bool, value, annotation):
         # No annotation information
         return None
 
-    origin = typing.get_origin(annotation)
     annotation_args = typing.get_args(annotation)
 
     if isinstance(annotation, typing._UnionGenericAlias):
@@ -109,6 +95,9 @@ def _check_annotation(trace: _Trace, is_compiled: bool, value, annotation):
 
     elif isinstance(annotation, (typing._GenericAlias, typing.GenericAlias)):
         # The annotation is a possibly composed type e.g. List, List[int]
+
+        origin = typing.get_origin(annotation)
+        assert origin is not None
 
         if not isinstance(value, origin):
             # The origin (e.g. "list" in "list[int]") is wrong.
@@ -189,7 +178,7 @@ def _check_annotation_union(
                 value,
                 arg,
             )
-        except:
+        except ValueError:
             match = False
         if match:
             return
@@ -243,6 +232,30 @@ def _check_annotation_dict(
 
 
 def rtcheck(fn):
+    """Checks the input arguments and output value of a function.
+
+    Usage example:
+
+        @rtcheck
+        def f(a, b: int, c: str = "aze") -> List[str]:
+            del a
+            del b
+            del c
+            return ["a", "b"]
+
+        f(1, 2, "a") # Ok
+        f(1, 2, 3) # Fails
+
+    If combined with @compile, @rtcheck should be put before @compile.
+
+    Note: This code only support what is required by Temporian API.
+
+    Args:
+        fn: Function to instrument.
+
+    Returns:
+        Instrumented function.
+    """
     is_compiled = False
 
     if hasattr(fn, "__wrapped__"):
@@ -320,5 +333,4 @@ def rtcheck(fn):
         return output
 
     setattr(wrapper, "_rtcheck", True)
-
     return wrapper
