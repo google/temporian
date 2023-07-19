@@ -43,7 +43,7 @@ class CompileTest(absltest.TestCase):
         @compile
         def f(x: EventSetOrNode) -> EventSetOrNode:
             assert isinstance(x, EventSetNode)
-            return prefix("a", x)
+            return prefix(x, "a")
 
         result = f(self.evset)
 
@@ -55,8 +55,8 @@ class CompileTest(absltest.TestCase):
         def f(x: EventSetOrNode) -> EventSetOrNode:
             assert isinstance(x, EventSetNode)
             return glue(
-                prefix("a", x),
-                prefix("b", x),
+                prefix(x, "a"),
+                prefix(x, "b"),
             )
 
         result = f(self.evset)
@@ -68,7 +68,7 @@ class CompileTest(absltest.TestCase):
         @compile
         def f(a: int, x: EventSetOrNode, b: str) -> EventSetOrNode:
             assert isinstance(x, EventSetNode)
-            return prefix(f"{a}_{b}_", x)
+            return prefix(x, f"{a}_{b}_")
 
         result = f(1, self.evset, "a")
 
@@ -80,7 +80,7 @@ class CompileTest(absltest.TestCase):
         def f(x: Tuple[EventSetOrNode, ...]) -> EventSetOrNode:
             assert isinstance(x, tuple)
             assert all(isinstance(n, EventSetNode) for n in x)
-            return prefix("a", x[0])
+            return prefix(x[0], "a")
 
         result = f((self.evset, self.other_evset))
 
@@ -92,7 +92,7 @@ class CompileTest(absltest.TestCase):
         def f(x: List[EventSetOrNode]) -> EventSetOrNode:
             assert isinstance(x, list)
             assert all(isinstance(n, EventSetNode) for n in x)
-            return prefix("a", x[0])
+            return prefix(x[0], "a")
 
         result = f([self.evset, self.other_evset])
 
@@ -104,7 +104,7 @@ class CompileTest(absltest.TestCase):
         def f(x: Dict[str, EventSetOrNode]) -> EventSetOrNode:
             assert isinstance(x, dict)
             assert all(isinstance(n, EventSetNode) for n in x.values())
-            return prefix("a", list(x.values())[0])
+            return prefix(list(x.values())[0], "a")
 
         result = f({"a": self.evset, "b": self.other_evset})
 
@@ -114,7 +114,7 @@ class CompileTest(absltest.TestCase):
     def test_list_return(self):
         @compile
         def f(x: EventSetOrNode) -> List[EventSetOrNode]:
-            return [prefix("a", x), prefix("b", x)]
+            return [prefix(x, "a"), prefix(x, "b")]
 
         result = f(self.evset)
 
@@ -128,7 +128,7 @@ class CompileTest(absltest.TestCase):
     def test_dict_return(self):
         @compile
         def f(x: EventSetOrNode) -> Dict[str, EventSetOrNode]:
-            return {"a": prefix("a", x), "b": prefix("b", x)}
+            return {"a": prefix(x, "a"), "b": prefix(x, "b")}
 
         result = f(self.evset)
 
@@ -158,7 +158,7 @@ class CompileTest(absltest.TestCase):
     def test_verbose_1(self, run_mock):
         @compile(verbose=1)
         def f(x: EventSetOrNode) -> EventSetOrNode:
-            return prefix("a", x)
+            return prefix(x, "a")
 
         f(self.evset)
 
@@ -168,7 +168,7 @@ class CompileTest(absltest.TestCase):
     def test_verbose_0(self, run_mock):
         @compile(verbose=0)
         def f(x: EventSetOrNode) -> EventSetOrNode:
-            return prefix("a", x)
+            return prefix(x, "a")
 
         f(self.evset)
 
@@ -177,7 +177,7 @@ class CompileTest(absltest.TestCase):
     def test_call_no_args(self):
         @compile()
         def f(x: EventSetOrNode) -> EventSetOrNode:
-            return prefix("a", x)
+            return prefix(x, "a")
 
         f(self.evset)
 
