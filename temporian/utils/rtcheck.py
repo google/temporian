@@ -90,18 +90,16 @@ def _check_annotation(trace: _Trace, is_compiled: bool, value, annotation):
 
     annotation_args = typing.get_args(annotation)
 
-    if isinstance(annotation, typing._UnionGenericAlias):
-        _check_annotation_union(trace, is_compiled, value, annotation_args)
-
-    elif isinstance(annotation, (typing._GenericAlias, typing.GenericAlias)):
+    if isinstance(annotation, (typing._GenericAlias, typing.GenericAlias)):
         # The annotation is a possibly composed type e.g. List, List[int]
 
         origin = typing.get_origin(annotation)
         assert origin is not None
 
-        if not isinstance(value, origin):
-            # The origin (e.g. "list" in "list[int]") is wrong.
-            trace.exception(_base_error(value, annotation))
+        if origin is not Union:
+            if not isinstance(value, origin):
+                # The origin (e.g. "list" in "list[int]") is wrong.
+                trace.exception(_base_error(value, annotation))
 
         # Check the sub-argument in composed types.
 
