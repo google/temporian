@@ -4,6 +4,10 @@ import datetime
 from typing import Optional, List, Any, Set
 
 import numpy as np
+from temporian.core.data.duration_utils import (
+    convert_timestamp_to_datetime,
+    convert_timestamps_to_datetimes,
+)
 
 from temporian.implementation.numpy.data.event_set import EventSet, IndexType
 from temporian.implementation.numpy.data.plotter import (
@@ -69,10 +73,7 @@ def plot_bokeh(
 
             if evset.schema.is_unix_timestamp:
                 # Matplotlib understands datetimes.
-                xs = [
-                    datetime.datetime.fromtimestamp(x, tz=datetime.timezone.utc)
-                    for x in xs
-                ]
+                xs = convert_timestamps_to_datetimes(xs)
 
             if len(display_features) == 0:
                 # There is not features to plot. Instead, plot the timestamps.
@@ -225,17 +226,13 @@ def _bokeh_sub_plot(
         args = {}
         if options.min_time is not None:
             args["start"] = (
-                datetime.datetime.fromtimestamp(
-                    options.min_time, tz=datetime.timezone.utc
-                )
+                convert_timestamp_to_datetime(options.min_time)
                 if is_unix_timestamp
                 else options.min_time
             )
         if options.max_time is not None:
             args["end"] = (
-                datetime.datetime.fromtimestamp(
-                    options.max_time, tz=datetime.timezone.utc
-                )
+                convert_timestamp_to_datetime(options.max_time)
                 if is_unix_timestamp
                 else options.max_time
             )
