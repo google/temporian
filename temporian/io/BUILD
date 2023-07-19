@@ -35,6 +35,7 @@ py_library(
     deps = [
         # already_there/numpy
         # force/pandas
+        "//temporian/core/data:dtype",
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
     ],

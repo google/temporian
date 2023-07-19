@@ -52,6 +52,7 @@ py_library(
     srcs = ["serialization.py"],
     srcs_version = "PY3",
     deps = [
+        "//temporian/core:compilation",
         "//temporian/core:graph",
         "//temporian/core:operator_lib",
         "//temporian/core/data:dtype",
