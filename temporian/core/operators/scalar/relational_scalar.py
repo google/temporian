@@ -24,6 +24,7 @@ from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.scalar.base import (
     BaseScalarOperator,
 )
+from temporian.core.typing import EventSetOrNode
 
 
 class RelationalScalarOperator(BaseScalarOperator):
@@ -75,10 +76,11 @@ class LessScalarOperator(RelationalScalarOperator):
 
 @compile
 def equal_scalar(
-    input: EventSetNode,
+    input: EventSetOrNode,
     value: Union[float, int, str, bool, bytes],
-) -> EventSetNode:
-    """Checks for equality between a node and a scalar element-wise.
+) -> EventSetOrNode:
+    """Checks for equality between an [`EventSet`][temporian.EventSet] and a
+    scalar element-wise.
 
     Each item in each feature in `input` is compared to `value`.
     Note that if both elements are NaNs, returns False.
@@ -109,12 +111,14 @@ def equal_scalar(
         ```
 
     Args:
-        input: EventSetNode to compare the value to.
+        input: EventSet to compare the value to.
         value: Scalar value to compare to the input.
 
     Returns:
-        EventSetNode containing the result of the comparison.
+        EventSet containing the result of the comparison.
     """
+    assert isinstance(input, EventSetNode)
+
     return EqualScalarOperator(
         input=input,
         value=value,
@@ -123,10 +127,11 @@ def equal_scalar(
 
 @compile
 def not_equal_scalar(
-    input: EventSetNode,
+    input: EventSetOrNode,
     value: Union[float, int, str, bytes, bool],
-) -> EventSetNode:
-    """Checks for differences between a node and a scalar element-wise.
+) -> EventSetOrNode:
+    """Checks for differences between an [`EventSet`][temporian.EventSet] and a
+    scalar element-wise.
 
     Each item in each feature in `input` is compared to `value`.
     Note that if both elements are NaNs, returns True.
@@ -154,12 +159,14 @@ def not_equal_scalar(
         ```
 
     Args:
-        input: EventSetNode to compare the value to.
+        input: EventSet to compare the value to.
         value: Scalar value to compare to the input.
 
     Returns:
-        EventSetNode containing the result of the comparison.
+        EventSet containing the result of the comparison.
     """
+    assert isinstance(input, EventSetNode)
+
     return NotEqualScalarOperator(
         input=input,
         value=value,
@@ -168,10 +175,11 @@ def not_equal_scalar(
 
 @compile
 def greater_equal_scalar(
-    input: EventSetNode,
+    input: EventSetOrNode,
     value: Union[float, int, str, bytes, bool],
-) -> EventSetNode:
-    """Check if the input node is greater or equal than a scalar element-wise.
+) -> EventSetOrNode:
+    """Check if the input [`EventSet`][temporian.EventSet] is greater or equal
+    than a scalar element-wise.
 
     Each item in each feature in `input` is compared to `value`.
     Note that it will always return False on NaN elements.
@@ -199,12 +207,14 @@ def greater_equal_scalar(
         ```
 
     Args:
-        input: EventSetNode to compare the value to.
+        input: EventSet to compare the value to.
         value: Scalar value to compare to the input.
 
     Returns:
-        EventSetNode containing the result of the comparison.
+        EventSet containing the result of the comparison.
     """
+    assert isinstance(input, EventSetNode)
+
     return GreaterEqualScalarOperator(
         input=input,
         value=value,
@@ -213,10 +223,11 @@ def greater_equal_scalar(
 
 @compile
 def less_equal_scalar(
-    input: EventSetNode,
+    input: EventSetOrNode,
     value: Union[float, int, str, bytes, bool],
-) -> EventSetNode:
-    """Check if the input node is less or equal than a scalar element-wise.
+) -> EventSetOrNode:
+    """Check if the input [`EventSet`][temporian.EventSet] is less or equal than
+    a scalar element-wise.
 
     Each item in each feature in `input` is compared to `value`.
     Note that it will always return False on NaN elements.
@@ -244,12 +255,14 @@ def less_equal_scalar(
         ```
 
     Args:
-        input: EventSetNode to compare the value to.
+        input: EventSet to compare the value to.
         value: Scalar value to compare to the input.
 
     Returns:
-        EventSetNode containing the result of the comparison.
+        EventSet containing the result of the comparison.
     """
+    assert isinstance(input, EventSetNode)
+
     return LessEqualScalarOperator(
         input=input,
         value=value,
@@ -258,10 +271,11 @@ def less_equal_scalar(
 
 @compile
 def greater_scalar(
-    input: EventSetNode,
+    input: EventSetOrNode,
     value: Union[float, int, str, bytes, bool],
-) -> EventSetNode:
-    """Check if the input node is greater than a scalar element-wise.
+) -> EventSetOrNode:
+    """Check if the input [`EventSet`][temporian.EventSet] is greater than a
+    scalar element-wise.
 
     Each item in each feature in `input` is compared to `value`.
     Note that it will always return False on NaN elements.
@@ -289,12 +303,14 @@ def greater_scalar(
         ```
 
     Args:
-        input: EventSetNode to compare the value to.
+        input: EventSet to compare the value to.
         value: Scalar value to compare to the input.
 
     Returns:
-        EventSetNode containing the result of the comparison.
+        EventSet containing the result of the comparison.
     """
+    assert isinstance(input, EventSetNode)
+
     return GreaterScalarOperator(
         input=input,
         value=value,
@@ -303,10 +319,11 @@ def greater_scalar(
 
 @compile
 def less_scalar(
-    input: EventSetNode,
+    input: EventSetOrNode,
     value: Union[float, int, str, bytes, bool],
-) -> EventSetNode:
-    """Check if the input node is less than a scalar element-wise.
+) -> EventSetOrNode:
+    """Check if the input [`EventSet`][temporian.EventSet] is less than a scalar
+    element-wise.
 
     Each item in each feature in `input` is compared to `value`.
     Note that it will always return False on NaN elements.
@@ -334,12 +351,14 @@ def less_scalar(
         ```
 
     Args:
-        input: EventSetNode to compare the value to.
+        input: EventSet to compare the value to.
         value: Scalar value to compare to the input.
 
     Returns:
-        EventSetNode containing the result of the comparison.
+        EventSet containing the result of the comparison.
     """
+    assert isinstance(input, EventSetNode)
+
     return LessScalarOperator(
         input=input,
         value=value,

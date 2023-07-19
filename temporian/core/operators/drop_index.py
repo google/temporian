@@ -24,6 +24,7 @@ from temporian.core.data.node import (
 )
 from temporian.core.data.schema import FeatureSchema, IndexSchema
 from temporian.core.operators.base import Operator
+from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
 
 
@@ -158,11 +159,11 @@ def _normalize_indexes(
 
 @compile
 def drop_index(
-    input: EventSetNode,
+    input: EventSetOrNode,
     indexes: Optional[Union[str, List[str]]] = None,
     keep: bool = True,
-) -> EventSetNode:
-    """Removes indexes from an [`EventSetNode`][temporian.EventSetNode].
+) -> EventSetOrNode:
+    """Removes indexes from an [`EventSet`][temporian.EventSet].
 
     Usage example:
         ```python
@@ -225,16 +226,16 @@ def drop_index(
         ```
 
     Args:
-        input: EventSetNode from which the specified indexes should be removed.
+        input: EventSet from which the specified indexes should be removed.
         indexes: Index column(s) to be removed from `input`. This can be a
             single column name (`str`) or a list of column names (`List[str]`).
             If not specified or set to `None`, all indexes in `input` will
             be removed. Defaults to `None`.
         keep: Flag indicating whether the removed indexes should be kept
-            as features in the output `EventSetNode`. Defaults to `True`.
+            as features in the output EventSet. Defaults to `True`.
 
     Returns:
-        New `EventSetNode` with the specified indexes removed. If `keep` is set to
+        EventSet with the specified indexes removed. If `keep` is set to
         `True`, the removed indexes will be included as features in it.
 
     Raises:
@@ -244,5 +245,7 @@ def drop_index(
         ValueError: If a feature name coming from the indexes already exists in
             `input`, and the `keep` flag is set to `True`.
     """
+    assert isinstance(input, EventSetNode)
+
     indexes = _normalize_indexes(input, indexes)
     return DropIndexOperator(input, indexes, keep).outputs["output"]

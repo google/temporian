@@ -19,6 +19,7 @@ from temporian.core.compilation import compile
 from temporian.core.data.node import EventSetNode
 from temporian.core.data.dtype import DType
 from temporian.core.operators.binary.base import BaseBinaryOperator
+from temporian.core.typing import EventSetOrNode
 
 
 class BaseArithmeticOperator(BaseBinaryOperator):
@@ -88,10 +89,10 @@ class DivideOperator(BaseArithmeticOperator):
 
 @compile
 def add(
-    input_1: EventSetNode,
-    input_2: EventSetNode,
-) -> EventSetNode:
-    """Adds two nodes.
+    input_1: EventSetOrNode,
+    input_2: EventSetOrNode,
+) -> EventSetOrNode:
+    """Adds two [`EventSets`][temporian.EventSet].
 
     Each feature in `input_1` is added to the feature in `input_2` in the same
     position.
@@ -225,12 +226,15 @@ def add(
         ```
 
     Args:
-        input_1: First node.
-        input_2: Second node.
+        input_1: First EventSet.
+        input_2: Second EventSet.
 
     Returns:
         Sum of `input_1`'s and `input_2`'s features.
     """
+    assert isinstance(input_1, EventSetNode)
+    assert isinstance(input_2, EventSetNode)
+
     return AddOperator(
         input_1=input_1,
         input_2=input_2,
@@ -239,10 +243,10 @@ def add(
 
 @compile
 def subtract(
-    input_1: EventSetNode,
-    input_2: EventSetNode,
-) -> EventSetNode:
-    """Subtracts two nodes.
+    input_1: EventSetOrNode,
+    input_2: EventSetOrNode,
+) -> EventSetOrNode:
+    """Subtracts two [`EventSets`][temporian.EventSet].
 
     Each feature in `input_2` is subtracted from the feature in `input_1` in the
     same position.
@@ -277,15 +281,18 @@ def subtract(
         ```
 
     See [`tp.add()`](../add) examples to see how to match samplings, dtypes and
-    index, in order to apply arithmetic operators in different nodes.
+    index, in order to apply arithmetic operators in different EventSets.
 
     Args:
-        input_1: First node.
-        input_2: Second node.
+        input_1: First EventSet.
+        input_2: Second EventSet.
 
     Returns:
         Subtraction of `input_2`'s features from `input_1`'s.
     """
+    assert isinstance(input_1, EventSetNode)
+    assert isinstance(input_2, EventSetNode)
+
     return SubtractOperator(
         input_1=input_1,
         input_2=input_2,
@@ -294,10 +301,10 @@ def subtract(
 
 @compile
 def multiply(
-    input_1: EventSetNode,
-    input_2: EventSetNode,
-) -> EventSetNode:
-    """Multiplies two nodes.
+    input_1: EventSetOrNode,
+    input_2: EventSetOrNode,
+) -> EventSetOrNode:
+    """Multiplies two [`EventSets`][temporian.EventSet].
 
     Each feature in `input_1` is multiplied by the feature in `input_2` in the
     same position.
@@ -332,15 +339,18 @@ def multiply(
         ```
 
     See [`tp.add()`](../add) examples to see how to match samplings, dtypes and
-    index, in order to apply arithmetic operators in different nodes.
+    index, in order to apply arithmetic operators in different EventSets.
 
     Args:
-        input_1: First node.
-        input_2: Second node.
+        input_1: First EventSet.
+        input_2: Second EventSet.
 
     Returns:
         Multiplication of `input_1`'s and `input_2`'s features.
     """
+    assert isinstance(input_1, EventSetNode)
+    assert isinstance(input_2, EventSetNode)
+
     return MultiplyOperator(
         input_1=input_1,
         input_2=input_2,
@@ -349,10 +359,10 @@ def multiply(
 
 @compile
 def divide(
-    numerator: EventSetNode,
-    denominator: EventSetNode,
-) -> EventSetNode:
-    """Divides two nodes.
+    numerator: EventSetOrNode,
+    denominator: EventSetOrNode,
+) -> EventSetOrNode:
+    """Divides two [`EventSets`][temporian.EventSet].
 
     Each feature in `numerator` is divided by the feature in `denominator` in
     the same position.
@@ -422,16 +432,19 @@ def divide(
         ```
 
     See [`tp.add()`](../add) examples to see how to match samplings, dtypes and
-    index, in order to apply arithmetic operators in different nodes.
+    index, in order to apply arithmetic operators in different EventSets.
 
 
     Args:
-        numerator: Numerator node.
-        denominator: Denominator node.
+        numerator: Numerator EventSet.
+        denominator: Denominator EventSet.
 
     Returns:
         Division of `numerator`'s features by `denominator`'s features.
     """
+    assert isinstance(numerator, EventSetNode)
+    assert isinstance(denominator, EventSetNode)
+
     return DivideOperator(
         input_1=numerator,
         input_2=denominator,
@@ -440,12 +453,13 @@ def divide(
 
 @compile
 def floordiv(
-    numerator: EventSetNode,
-    denominator: EventSetNode,
-) -> EventSetNode:
-    """Divides two nodes and takes the floor of the result.
+    numerator: EventSetOrNode,
+    denominator: EventSetOrNode,
+) -> EventSetOrNode:
+    """Divides two [`EventSets`][temporian.EventSet] and takes the floor of the
+    result.
 
-    I.e. computes numerator//denominator.
+    I.e. computes `numerator // denominator`.
 
     Each feature in `numerator` is divided by the feature in `denominator` in
     the same position.
@@ -480,15 +494,18 @@ def floordiv(
         ```
 
     See [`tp.add()`](../add) examples to see how to match samplings, dtypes and
-    index, in order to apply arithmetic operators in different nodes.
+    index, in order to apply arithmetic operators in different EventSets.
 
     Args:
-        numerator: Numerator node.
-        denominator: Denominator node.
+        numerator: Numerator EventSet.
+        denominator: Denominator EventSet.
 
     Returns:
         Integer division of `numerator`'s features by `denominator`'s features.
     """
+    assert isinstance(numerator, EventSetNode)
+    assert isinstance(denominator, EventSetNode)
+
     return FloorDivOperator(
         input_1=numerator,
         input_2=denominator,
@@ -497,11 +514,11 @@ def floordiv(
 
 @compile
 def modulo(
-    numerator: EventSetNode,
-    denominator: EventSetNode,
-) -> EventSetNode:
+    numerator: EventSetOrNode,
+    denominator: EventSetOrNode,
+) -> EventSetOrNode:
     """Computes modulo or remainder of division between two
-    nodes.
+    [`EventSets`][temporian.EventSet].
 
     `numerator` and `denominator` must have the same sampling, index,
     number of features and dtype for the features in the same positions.
@@ -533,15 +550,18 @@ def modulo(
         ```
 
     See [`tp.add()`](../add) examples to see how to match samplings, dtypes and
-    index, in order to apply arithmetic operators in different nodes.
+    index, in order to apply arithmetic operators in different EventSets.
 
     Args:
-        numerator: First node.
-        denominator: Second node.
+        numerator: First EventSet.
+        denominator: Second EventSet.
 
     Returns:
-        New node with the remainder of the integer division
+        New EventSet with the remainder of the integer division.
     """
+    assert isinstance(numerator, EventSetNode)
+    assert isinstance(denominator, EventSetNode)
+
     return ModuloOperator(
         input_1=numerator,
         input_2=denominator,
@@ -550,10 +570,11 @@ def modulo(
 
 @compile
 def power(
-    base: EventSetNode,
-    exponent: EventSetNode,
-) -> EventSetNode:
-    """Computes elements of the base raised to the elements of the exponent.
+    base: EventSetOrNode,
+    exponent: EventSetOrNode,
+) -> EventSetOrNode:
+    """Computes elements of the base raised to the elements of the exponent
+    [`EventSets`][temporian.EventSet].
 
     `base` and `exponent` must have the same sampling and the same number of
     features.
@@ -588,15 +609,18 @@ def power(
         ```
 
     See [`tp.add()`](../add) examples to see how to match samplings, dtypes and
-    index, in order to apply arithmetic operators in different nodes.
+    index, in order to apply arithmetic operators in different EventSets.
 
     Args:
-        base: First node.
-        exponent: Second node.
+        base: First EventSet.
+        exponent: Second EventSet.
 
     Returns:
-        New node with the remainder of the integer division
+        New EventSet with the result of the power operation.
     """
+    assert isinstance(base, EventSetNode)
+    assert isinstance(exponent, EventSetNode)
+
     return PowerOperator(
         input_1=base,
         input_2=exponent,

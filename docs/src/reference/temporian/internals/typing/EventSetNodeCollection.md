@@ -1,1 +1,1 @@
-::: temporian.core.data.node.EventSetNodeCollection
+::: temporian.core.typing.EventSetNodeCollection

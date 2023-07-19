@@ -1,1 +1,1 @@
-::: temporian.implementation.numpy.data.event_set.NodeToEventSetMapping
+::: temporian.core.typing.NodeToEventSetMapping

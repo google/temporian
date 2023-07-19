@@ -20,6 +20,7 @@ from temporian.core.data.dtype import DType
 from temporian.core.data.node import EventSetNode
 from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.binary.base import BaseBinaryOperator
+from temporian.core.typing import EventSetOrNode
 
 
 class BaseLogicalOperator(BaseBinaryOperator):
@@ -65,10 +66,11 @@ class LogicalXorOperator(BaseLogicalOperator):
 
 @compile
 def logical_and(
-    input_1: EventSetNode,
-    input_2: EventSetNode,
-) -> EventSetNode:
-    """Gets the logical AND (`&`) between boolean features, element-wise.
+    input_1: EventSetOrNode,
+    input_2: EventSetOrNode,
+) -> EventSetOrNode:
+    """Gets the logical AND (`&`) between boolean features in two
+    [`EventSets`][temporian.EventSet], element-wise.
 
     Each feature in `input_1` is compared element-wise to the feature in
     `input_2` in the same position.
@@ -118,12 +120,15 @@ def logical_and(
         ```
 
     Args:
-        input_1: First node, with only boolean features.
-        input_2: Second node, with only boolean features.
+        input_1: First EventSet, with only boolean features.
+        input_2: Second EventSet, with only boolean features.
 
     Returns:
-        EventSetNode with boolean features.
+        EventSet with boolean features.
     """
+    assert isinstance(input_1, EventSetNode)
+    assert isinstance(input_2, EventSetNode)
+
     return LogicalAndOperator(
         input_1=input_1,
         input_2=input_2,
@@ -132,10 +137,11 @@ def logical_and(
 
 @compile
 def logical_or(
-    input_1: EventSetNode,
-    input_2: EventSetNode,
-) -> EventSetNode:
-    """Gets the logical OR (`|`) between boolean features, element-wise.
+    input_1: EventSetOrNode,
+    input_2: EventSetOrNode,
+) -> EventSetOrNode:
+    """Gets the logical OR (`|`) between boolean features in two
+    [`EventSets`][temporian.EventSet], element-wise.
 
     Each feature in `input_1` is compared element-wise to the feature in
     `input_2` in the same position.
@@ -167,12 +173,15 @@ def logical_or(
         ```
 
     Args:
-        input_1: First node, with only boolean features.
-        input_2: Second node, with only boolean features.
+        input_1: First EventSet, with only boolean features.
+        input_2: Second EventSet, with only boolean features.
 
     Returns:
-        EventSetNode with boolean features.
+        EventSet with boolean features.
     """
+    assert isinstance(input_1, EventSetNode)
+    assert isinstance(input_2, EventSetNode)
+
     return LogicalOrOperator(
         input_1=input_1,
         input_2=input_2,
@@ -181,10 +190,11 @@ def logical_or(
 
 @compile
 def logical_xor(
-    input_1: EventSetNode,
-    input_2: EventSetNode,
-) -> EventSetNode:
-    """Gets the logical XOR (`^`) between boolean features, element-wise.
+    input_1: EventSetOrNode,
+    input_2: EventSetOrNode,
+) -> EventSetOrNode:
+    """Gets the logical XOR (`^`) between boolean features in two
+    [`EventSets`][temporian.EventSet], element-wise.
 
     Each feature in `input_1` is compared element-wise to the feature in
     `input_2` in the same position.
@@ -216,12 +226,15 @@ def logical_xor(
         ```
 
     Args:
-        input_1: First node, with only boolean features.
-        input_2: Second node, with only boolean features.
+        input_1: First EventSet, with only boolean features.
+        input_2: Second EventSet, with only boolean features.
 
     Returns:
-        EventSetNode with boolean features.
+        EventSet with boolean features.
     """
+    assert isinstance(input_1, EventSetNode)
+    assert isinstance(input_2, EventSetNode)
+
     return LogicalXorOperator(
         input_1=input_1,
         input_2=input_2,

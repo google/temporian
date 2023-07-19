@@ -26,6 +26,7 @@ from temporian.core.data.node import (
     Feature,
 )
 from temporian.core.operators.base import Operator
+from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
 from temporian.core.data.schema import Schema
 
@@ -136,22 +137,23 @@ operator_lib.register_operator(Join)
 
 @compile
 def join(
-    left: EventSetNode,
-    right: EventSetNode,
+    left: EventSetOrNode,
+    right: EventSetOrNode,
     how: str = "left",
     on: Optional[str] = None,
-) -> EventSetNode:
-    """Join [`EventSetNode`][temporian.EventSetNode]s with different samplings.
+) -> EventSetOrNode:
+    """Join [`EventSets`][temporian.EventSet] with different samplings.
 
-    Join features from two nodes based on timestamps. Optionally, join on
-    timestamps and an extra `int64` feature. Joined nodes should have the the
-    same index and non overlapping feature names.
+    Join features from two EventSets based on timestamps. Optionally, join on
+    timestamps and an extra `int64` feature. Joined EventSets should have the
+    same index and non-overlapping feature names.
 
-    To concatenate nodes with the same sampling, use
-    [`tp.glue`][temporian.glue] instead. [`tp.glue`][temporian.glue] is almost
-    free while [`tp.join`][temporian.join] can be expensive.
-    To resample a node according to another nodes's sampling,
-    [`tp.resample`][temporian.resample] instead.
+    To concatenate EventSets with the same sampling, use
+    [`tp.glue()`][temporian.glue] instead. [`tp.glue()`][temporian.glue] is
+    almost free while [`tp.join()`][temporian.join] can be expensive.
+
+    To resample an EventSets according to another EventSets's sampling, use
+    [`tp.resample()`][temporian.resample] instead.
 
     Example:
 
@@ -216,11 +218,13 @@ def join(
         ```
 
     Args:
-        left: Left node to join.
-        right: Right node to join.
-        how: Should this be a "left", "inner", or "outer" join. Currently, only
-            "left" join is supported.
+        left: Left EventSet to join.
+        right: Right EventSet to join.
+        how: Whether to perform a `"left"`, `"inner"`, or `"outer"` join.
+            Currently, only `"left"` join is supported.
     """
+    assert isinstance(left, EventSetNode)
+    assert isinstance(right, EventSetNode)
 
     if left.sampling_node is right.sampling_node:
         raise ValueError(

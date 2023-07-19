@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Set, Tuple, TYPE_CHECKING, Union
+from typing import List, Optional, Tuple, TYPE_CHECKING, Union
 
 from temporian.core.data.dtype import DType, IndexDType
 from temporian.core.data.schema import Schema, FeatureSchema, IndexSchema
@@ -25,10 +25,7 @@ from temporian.utils import string
 
 if TYPE_CHECKING:
     from temporian.core.operators.base import Operator
-    from temporian.implementation.numpy.data.event_set import EventSetCollection
-    from temporian.implementation.numpy.data.event_set import (
-        NodeToEventSetMapping,
-    )
+    from temporian.core.typing import EventSetCollection, NodeToEventSetMapping
 
 
 class EventSetNode(EventSetOperationsMixin):
@@ -176,15 +173,6 @@ class EventSetNode(EventSetOperationsMixin):
             f"creator: {self._creator}\n"
             f"id:{id(self)}\n"
         )
-
-
-EventSetNodeCollection = Union[
-    EventSetNode, List[EventSetNode], Set[EventSetNode], Dict[str, EventSetNode]
-]
-"""A collection of [`EventSetNodes`][temporian.EventSetNode].
-
-This can be a single EventSetNode, a list or set of EventSetNodes, or a
-dictionary mapping names to EventSetNodes."""
 
 
 def input_node(

@@ -46,13 +46,5 @@ for path in paths:
     else:
         non_empty_files.append(str(ref_path))
 
-print(
-    (
-        "These md files in docs/src/reference are not empty and will be"
-        " rendered my mkdocs as-is:"
-    ),
-    non_empty_files,
-)
-
 with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
     nav_file.writelines(nav.build_literate_nav())

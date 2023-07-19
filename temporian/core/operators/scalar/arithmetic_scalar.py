@@ -23,6 +23,7 @@ from temporian.core.data.node import EventSetNode
 from temporian.core.operators.scalar.base import (
     BaseScalarOperator,
 )
+from temporian.core.typing import EventSetOrNode
 
 SCALAR = Union[float, int]
 
@@ -73,10 +74,10 @@ class DivideScalarOperator(BaseScalarOperator):
 
 @compile
 def add_scalar(
-    input: EventSetNode,
+    input: EventSetOrNode,
     value: Union[float, int],
-) -> EventSetNode:
-    """Adds a scalar value to a node.
+) -> EventSetOrNode:
+    """Adds a scalar value to an [`EventSet`][temporian.EventSet].
 
     `value` is added to each item in each feature in `input`.
 
@@ -106,6 +107,8 @@ def add_scalar(
     Returns:
         Addition of `input` and `value`.
     """
+    assert isinstance(input, EventSetNode)
+
     return AddScalarOperator(
         input=input,
         value=value,
@@ -114,15 +117,17 @@ def add_scalar(
 
 @compile
 def subtract_scalar(
-    minuend: Union[EventSetNode, SCALAR],
-    subtrahend: Union[EventSetNode, SCALAR],
-) -> EventSetNode:
-    """Subtracts a node and a scalar value.
+    minuend: Union[EventSetOrNode, SCALAR],
+    subtrahend: Union[EventSetOrNode, SCALAR],
+) -> EventSetOrNode:
+    """Subtracts an [`EventSet`][temporian.EventSet] and a scalar value.
 
-    Each item in each feature in the node is subtracted with the scalar value.
+    Each item in each feature in the EventSet is subtracted with the scalar
+    value.
 
     Either `minuend` or `subtrahend` should be a scalar value, but not both. If
-    looking to subtract two nodes, use the `subtract` operator instead.
+    looking to subtract two EventSets, use the
+    [`tp.subtract()`][temporian.subtract] operator instead.
 
     Usage example:
         ```python
@@ -154,17 +159,19 @@ def subtract_scalar(
         ```
 
     Args:
-        minuend: EventSetNode or scalar value being subtracted from.
-        subtrahend: EventSetNode or scalar number being subtracted.
+        minuend: EventSet or scalar value being subtracted from.
+        subtrahend: EventSet or scalar number being subtracted.
 
     Returns:
-        EventSetNode with the difference between the minuend and subtrahend.
+        EventSet with the difference between the minuend and subtrahend.
     """
     scalars_types = (float, int)
 
     if isinstance(minuend, EventSetNode) and isinstance(
         subtrahend, scalars_types
     ):
+        assert isinstance(minuend, EventSetNode)
+
         return SubtractScalarOperator(
             input=minuend,
             value=subtrahend,
@@ -174,6 +181,8 @@ def subtract_scalar(
     if isinstance(minuend, scalars_types) and isinstance(
         subtrahend, EventSetNode
     ):
+        assert isinstance(subtrahend, EventSetNode)
+
         return SubtractScalarOperator(
             input=subtrahend,
             value=minuend,
@@ -182,17 +191,17 @@ def subtract_scalar(
 
     raise ValueError(
         "Invalid input types for subtract_scalar. "
-        "Expected (EventSetNode, SCALAR) or (SCALAR, EventSetNode), "
+        "Expected (EventSetOrNode, SCALAR) or (SCALAR, EventSetOrNode), "
         f"got ({type(minuend)}, {type(subtrahend)})."
     )
 
 
 @compile
 def multiply_scalar(
-    input: EventSetNode,
+    input: EventSetOrNode,
     value: Union[float, int],
-) -> EventSetNode:
-    """Multiplies a node by a scalar value.
+) -> EventSetOrNode:
+    """Multiplies an [`EventSet`][temporian.EventSet] by a scalar value.
 
     Each item in each feature in `input` is multiplied by `value`.
 
@@ -216,12 +225,14 @@ def multiply_scalar(
         ```
 
     Args:
-        input: EventSetNode to multiply.
+        input: EventSet to multiply.
         value: Scalar value to multiply the input by.
 
     Returns:
         Integer division of `input` and `value`.
     """
+    assert isinstance(input, EventSetNode)
+
     return MultiplyScalarOperator(
         input=input,
         value=value,
@@ -230,15 +241,16 @@ def multiply_scalar(
 
 @compile
 def divide_scalar(
-    numerator: Union[EventSetNode, SCALAR],
-    denominator: Union[EventSetNode, SCALAR],
-) -> EventSetNode:
-    """Divides a node and a scalar value.
+    numerator: Union[EventSetOrNode, SCALAR],
+    denominator: Union[EventSetOrNode, SCALAR],
+) -> EventSetOrNode:
+    """Divides an [`EventSet`][temporian.EventSet] and a scalar value.
 
-    Each item in each feature in the node is divided with the scalar value.
+    Each item in each feature in the EventSet is divided with the scalar value.
 
     Either `numerator` or `denominator` should be a scalar value, but not both.
-    If looking to divide two nodes, use the `divide` operator instead.
+    If looking to divide two EventSets, use the
+    [`tp.divide()`][temporian.divide] operator instead.
 
     Usage example:
         ```python
@@ -270,8 +282,8 @@ def divide_scalar(
         ```
 
     Args:
-        numerator: Numerator node or value.
-        denominator: Denominator node or value.
+        numerator: Numerator EventSet or value.
+        denominator: Denominator EventSet or value.
 
     Returns:
         Division of `numerator` and `denominator`.
@@ -281,6 +293,8 @@ def divide_scalar(
     if isinstance(numerator, EventSetNode) and isinstance(
         denominator, scalars_types
     ):
+        assert isinstance(numerator, EventSetNode)
+
         return DivideScalarOperator(
             input=numerator,
             value=denominator,
@@ -290,6 +304,8 @@ def divide_scalar(
     if isinstance(numerator, scalars_types) and isinstance(
         denominator, EventSetNode
     ):
+        assert isinstance(denominator, EventSetNode)
+
         return DivideScalarOperator(
             input=denominator,
             value=numerator,
@@ -298,22 +314,24 @@ def divide_scalar(
 
     raise ValueError(
         "Invalid input types for divide_scalar. "
-        "Expected (EventSetNode, SCALAR) or (SCALAR, EventSetNode), "
+        "Expected (EventSetOrNode, SCALAR) or (SCALAR, EventSetOrNode), "
         f"got ({type(numerator)}, {type(denominator)})."
     )
 
 
 @compile
 def floordiv_scalar(
-    numerator: Union[EventSetNode, SCALAR],
-    denominator: Union[EventSetNode, SCALAR],
-) -> EventSetNode:
-    """Divides a node and a scalar and takes the result's floor.
+    numerator: Union[EventSetOrNode, SCALAR],
+    denominator: Union[EventSetOrNode, SCALAR],
+) -> EventSetOrNode:
+    """Divides an [`EventSet`][temporian.EventSet] and a scalar and takes the
+    result's floor.
 
-    Each item in each feature in the node is divided with the scalar value.
+    Each item in each feature in the EventSet is divided with the scalar value.
 
     Either `numerator` or `denominator` should be a scalar value, but not both.
-    If looking to floordiv two nodes, use the `floordiv` operator instead.
+    If looking to floordiv two EventSet, use the
+    [`tp.floordiv()`][temporian.floordiv] operator instead.
 
     Usage example:
         ```python
@@ -345,8 +363,8 @@ def floordiv_scalar(
         ```
 
     Args:
-        numerator: Numerator node or value.
-        denominator: Denominator node or value.
+        numerator: Numerator EventSet or value.
+        denominator: Denominator EventSet or value.
 
     Returns:
         Integer division of `numerator` and `denominator`.
@@ -356,6 +374,8 @@ def floordiv_scalar(
     if isinstance(numerator, EventSetNode) and isinstance(
         denominator, scalars_types
     ):
+        assert isinstance(numerator, EventSetNode)
+
         return FloorDivScalarOperator(
             input=numerator,
             value=denominator,
@@ -365,6 +385,8 @@ def floordiv_scalar(
     if isinstance(numerator, scalars_types) and isinstance(
         denominator, EventSetNode
     ):
+        assert isinstance(denominator, EventSetNode)
+
         return FloorDivScalarOperator(
             input=denominator,
             value=numerator,
@@ -373,20 +395,22 @@ def floordiv_scalar(
 
     raise ValueError(
         "Invalid input types for floordiv_scalar. "
-        "Expected (EventSetNode, SCALAR) or (SCALAR, EventSetNode), "
+        "Expected (EventSetOrNode, SCALAR) or (SCALAR, EventSetOrNode), "
         f"got ({type(numerator)}, {type(denominator)})."
     )
 
 
 @compile
 def modulo_scalar(
-    numerator: Union[EventSetNode, SCALAR],
-    denominator: Union[EventSetNode, SCALAR],
-) -> EventSetNode:
-    """Remainder of the division of numerator by denominator.
+    numerator: Union[EventSetOrNode, SCALAR],
+    denominator: Union[EventSetOrNode, SCALAR],
+) -> EventSetOrNode:
+    """Remainder of the division of numerator by denominator
+    [`EventSets`][temporian.EventSet].
 
     Either `numerator` or `denominator` should be a scalar value, but not both.
-    For the operation between two nodes, use the `modulo` operator instead.
+    For the operation between two EventSets, use the
+    [`tp.modulo()`][temporian.modulo] operator instead.
 
     Usage example:
         ```python
@@ -418,8 +442,8 @@ def modulo_scalar(
         ```
 
     Args:
-        numerator: EventSetNode or scalar to divide.
-        denominator: EventSetNode or scalar to divide by.
+        numerator: EventSet or scalar to divide.
+        denominator: EventSet or scalar to divide by.
 
     Returns:
         Remainder of the integer division.
@@ -429,6 +453,8 @@ def modulo_scalar(
     if isinstance(numerator, EventSetNode) and isinstance(
         denominator, scalar_types
     ):
+        assert isinstance(numerator, EventSetNode)
+
         return ModuloScalarOperator(
             input=numerator,
             value=denominator,
@@ -438,6 +464,8 @@ def modulo_scalar(
     if isinstance(numerator, scalar_types) and isinstance(
         denominator, EventSetNode
     ):
+        assert isinstance(denominator, EventSetNode)
+
         return ModuloScalarOperator(
             input=denominator,
             value=numerator,
@@ -446,20 +474,22 @@ def modulo_scalar(
 
     raise ValueError(
         "Invalid input types for modulo_scalar. "
-        "Expected (EventSetNode, SCALAR) or (SCALAR, EventSetNode), "
+        "Expected (EventSetOrNode, SCALAR) or (SCALAR, EventSetOrNode), "
         f"got ({type(numerator)}, {type(denominator)})."
     )
 
 
 @compile
 def power_scalar(
-    base: Union[EventSetNode, SCALAR],
-    exponent: Union[EventSetNode, SCALAR],
-) -> EventSetNode:
+    base: Union[EventSetOrNode, SCALAR],
+    exponent: Union[EventSetOrNode, SCALAR],
+) -> EventSetOrNode:
     """Raise the base to the exponent (`base ** exponent`)
+    [`EventSets`][temporian.EventSet].
 
     Either `base` or `exponent` should be a scalar value, but not both.
-    For the operation between two nodes, use the `power` operator instead.
+    For the operation between two EventSets, use the
+    [`tp.power()`][temporian.power] operator instead.
 
     Usage example:
         ```python
@@ -491,15 +521,17 @@ def power_scalar(
         ```
 
     Args:
-        base: EventSetNode or scalar to raise to the exponent
-        exponent: EventSetNode or scalar for the exponent
+        base: EventSet or scalar to raise to the exponent.
+        exponent: EventSet or scalar for the exponent.
 
     Returns:
-        base values raised to the exponent
+        Base values raised to the exponent.
     """
     scalar_types = (float, int)
 
     if isinstance(base, EventSetNode) and isinstance(exponent, scalar_types):
+        assert isinstance(base, EventSetNode)
+
         return PowerScalarOperator(
             input=base,
             value=exponent,
@@ -507,6 +539,8 @@ def power_scalar(
         ).outputs["output"]
 
     if isinstance(base, scalar_types) and isinstance(exponent, EventSetNode):
+        assert isinstance(exponent, EventSetNode)
+
         return PowerScalarOperator(
             input=exponent,
             value=base,
@@ -515,7 +549,7 @@ def power_scalar(
 
     raise ValueError(
         "Invalid input types for power_scalar. "
-        "Expected (EventSetNode, SCALAR) or (SCALAR, EventSetNode), "
+        "Expected (EventSetOrNode, SCALAR) or (SCALAR, EventSetOrNode), "
         f"got ({type(base)}, {type(exponent)})."
     )
 

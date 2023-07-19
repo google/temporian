@@ -14,27 +14,38 @@
 
 from functools import wraps
 from copy import copy
-from typing import Any, Dict, Optional, Tuple, Callable
-from temporian.core.data.node import EventSetNode, EventSetNodeCollection
+from typing import (
+    Any,
+    Dict,
+    Optional,
+    Tuple,
+    Callable,
+    TypeVar,
+)
+from temporian.core.data.node import EventSetNode
 from temporian.implementation.numpy.data.event_set import EventSet
 
 
-def compile(
-    fn: Optional[Callable[..., EventSetNodeCollection]] = None,
-    *,
-    verbose: int = 0
-) -> Any:
+F = TypeVar("F", bound=Callable)
+
+
+def compile(fn: Optional[F] = None, *, verbose: int = 0) -> F:
     """Compiles a Temporian function.
 
     A Temporian function is a function that takes
-    [`EventSetNodes`][temporian.EventSetNode] as arguments and returns
-    [`EventSetNodes`][temporian.EventSetNode] as outputs. Compiling it enables
-    it to perform eager evaluation, i.e., receive and return
-    [`EventSets`][temporian.EventSet] instead of
-    [`EventSetNodes`][temporian.EventSetNode], and allows Temporian to optimize
-    the underlying graph defined by the operators inside the function, making it
-    run on [`EventSets`][temporian.EventSet] more efficiently than if it weren't
-    compiled.
+    [`EventSetOrNodes`][temporian.EventSetOrNode] as arguments and returns
+    [`EventSetOrNodes`][temporian.EventSetOrNode] as outputs.
+
+    Compiling a function allows Temporian to optimize the underlying graph
+    defined by the operators used inside the function, making it run on
+    [`EventSets`][temporian.EventSet] more efficiently than if it weren't
+    compiled, both in terms of memory and speed.
+
+    Compiling a function is a necessary step before saving it to a file with
+    [`tp.save()`][temporian.save].
+
+    The output can be a single EventSetOrNode, a list of EventSetOrNodes, or a
+    dictionary of names to EventSetOrNodes.
 
     Example usage:
     ```python
@@ -106,7 +117,7 @@ def compile(
 
             return outputs
 
-        wrapper.is_tp_compiled = True
+        wrapper.is_tp_compiled = True  # type: ignore
 
         return wrapper
 
@@ -116,7 +127,7 @@ def compile(
 
     # Else the function is being called as a function, so we return a decorator
     # that will receive the function to compile.
-    return _compile
+    return _compile  # type: ignore
 
 
 def _process_argument(

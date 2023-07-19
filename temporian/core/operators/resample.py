@@ -21,6 +21,7 @@ from temporian.core.data.node import (
     create_node_new_features_existing_sampling,
 )
 from temporian.core.operators.base import Operator
+from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
 
 
@@ -65,10 +66,11 @@ operator_lib.register_operator(Resample)
 
 @compile
 def resample(
-    input: EventSetNode,
-    sampling: EventSetNode,
-) -> EventSetNode:
-    """Resamples an EventSetNode at each timestamp of another EventSetNode.
+    input: EventSetOrNode,
+    sampling: EventSetOrNode,
+) -> EventSetOrNode:
+    """Resamples an [`EventSet`][temporian.EventSet] at each timestamp of
+    another [`EventSet`][temporian.EventSet].
 
     If a timestamp in `sampling` does not have a corresponding timestamp in
     `input`, the last timestamp in `input` is used instead. If this timestamp
@@ -93,11 +95,13 @@ def resample(
         ```
 
     Args:
-        input: EventSetNode to sample.
-        sampling: EventSetNode to use the sampling of.
+        input: EventSet to sample.
+        sampling: EventSet to use the sampling of.
 
     Returns:
-        Resampled node, with same sampling as `sampling`.
+        Resampled EventSet, with same sampling as `sampling`.
     """
+    assert isinstance(input, EventSetNode)
+    assert isinstance(sampling, EventSetNode)
 
     return Resample(input=input, sampling=sampling).outputs["output"]

@@ -17,6 +17,7 @@ from functools import partial
 import os
 import pydoc
 import tempfile
+from typing import Dict
 
 from absl import logging
 from absl.testing import absltest
@@ -26,6 +27,7 @@ from temporian.core import graph
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import EventSetNode
 from temporian.core.test import utils
+from temporian.core.typing import EventSetOrNode
 from temporian.implementation.numpy.data.io import event_set
 
 
@@ -201,7 +203,7 @@ class SerializationTest(absltest.TestCase):
 
     def test_save(self):
         @tp.compile
-        def f(x: EventSetNode):
+        def f(x: EventSetOrNode) -> Dict[str, EventSetOrNode]:
             return {"output": tp.prefix("a_", x)}
 
         result = f(self.evset)
@@ -220,7 +222,7 @@ class SerializationTest(absltest.TestCase):
 
     def test_save_and_load_node_input(self):
         @tp.compile
-        def f(x: EventSetNode):
+        def f(x: EventSetOrNode):
             return {"output": tp.prefix("a_", x)}
 
         node = self.evset.node()
@@ -237,7 +239,7 @@ class SerializationTest(absltest.TestCase):
 
     def test_save_and_load_schema_input(self):
         @tp.compile
-        def f(x: EventSetNode):
+        def f(x: EventSetOrNode):
             return {"output": tp.prefix("a_", x)}
 
         result = f(self.evset)
@@ -253,7 +255,7 @@ class SerializationTest(absltest.TestCase):
 
     def test_save_and_load_many_inputs(self):
         @tp.compile
-        def f(x: EventSetNode, y: EventSetNode, z: EventSetNode):
+        def f(x: EventSetOrNode, y: EventSetOrNode, z: EventSetOrNode):
             return {"output": tp.glue(x, y, z)}
 
         x = tp.event_set(
@@ -286,8 +288,8 @@ class SerializationTest(absltest.TestCase):
         self.assertEqual(result, loaded_result)
 
     def test_save_not_compiled(self):
-        def f(x: EventSetNode):
-            return tp.prefix("a_", x)
+        def f(x: EventSetOrNode):
+            return {"output": tp.prefix("a_", x)}
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_fn.tem")
@@ -297,8 +299,8 @@ class SerializationTest(absltest.TestCase):
                 tp.save(f, path, x=self.evset)
 
     def test_save_wrong_input_types(self):
-        def f(x: EventSetNode, y: int):
-            return tp.prefix("a_", x)
+        def f(x: EventSetOrNode, y: int):
+            return {"output": tp.prefix("a_", x)}
 
         f.is_tp_compiled = True  # hack to pass compiled check
 
@@ -311,7 +313,7 @@ class SerializationTest(absltest.TestCase):
 
     def test_load(self):
         @tp.compile
-        def f(x: EventSetNode):
+        def f(x: EventSetOrNode) -> Dict[str, EventSetOrNode]:
             return {"output": tp.prefix("a_", x)}
 
         result = f(self.evset)
@@ -330,7 +332,7 @@ class SerializationTest(absltest.TestCase):
         is only loaded once but used on each call."""
 
         @tp.compile
-        def f(x: EventSetNode):
+        def f(x: EventSetOrNode):
             return {"output": tp.prefix("a_", x)}
 
         other_evset = tp.event_set(
@@ -357,7 +359,7 @@ class SerializationTest(absltest.TestCase):
 
     def test_load_many_kwargs(self):
         @tp.compile
-        def f(x: EventSetNode, y: EventSetNode, z: EventSetNode):
+        def f(x: EventSetOrNode, y: EventSetOrNode, z: EventSetOrNode):
             return {"output": tp.glue(x, y, z)}
 
         x = tp.event_set(
@@ -388,7 +390,7 @@ class SerializationTest(absltest.TestCase):
 
     def test_load_args_and_kwargs(self):
         @tp.compile
-        def f(x: EventSetNode, y: EventSetNode, z: EventSetNode):
+        def f(x: EventSetOrNode, y: EventSetOrNode, z: EventSetOrNode):
             return {"output": tp.glue(x, y, z)}
 
         x = tp.event_set(
@@ -421,7 +423,7 @@ class SerializationTest(absltest.TestCase):
         """Checks that help(loaded_f) shows the correct param spec."""
 
         @tp.compile
-        def f(x: EventSetNode, y: EventSetNode, z: EventSetNode):
+        def f(x: EventSetOrNode, y: EventSetOrNode, z: EventSetOrNode):
             return {"output": tp.prefix("a_", x)}
 
         with tempfile.TemporaryDirectory() as tempdir:
@@ -447,15 +449,15 @@ class SerializationTest(absltest.TestCase):
 
     def test_save_function_composition(self):
         @tp.compile
-        def f(x: EventSetNode):
+        def f(x: EventSetOrNode):
             return {"output": tp.prefix("f_", x)}
 
         @tp.compile
-        def g(x: EventSetNode):
+        def g(x: EventSetOrNode):
             return {"output": tp.prefix("g_", x)}
 
         @tp.compile
-        def h(x: EventSetNode):
+        def h(x: EventSetOrNode):
             return f(g(x)["output"])
 
         result = h(self.evset)
@@ -471,7 +473,7 @@ class SerializationTest(absltest.TestCase):
 
     def test_save_partial_function(self):
         @tp.compile
-        def f(x: EventSetNode, b: bool):
+        def f(x: EventSetOrNode, b: bool):
             if b:
                 return {"output": tp.prefix("true_", x)}
             else:
@@ -503,7 +505,7 @@ class SerializationTest(absltest.TestCase):
 
     def test_save_recursive_function(self):
         @tp.compile
-        def f(x: EventSetNode, n: int):
+        def f(x: EventSetOrNode, n: int):
             if n > 0:
                 return f(tp.prefix(f"{n}_", x), n=n - 1)
             else:

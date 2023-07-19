@@ -18,6 +18,7 @@ from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.node import EventSetNode
 from temporian.core.operators.calendar.base import BaseCalendarOperator
+from temporian.core.typing import EventSetOrNode
 
 
 class CalendarISOWeekOperator(BaseCalendarOperator):
@@ -34,10 +35,11 @@ operator_lib.register_operator(CalendarISOWeekOperator)
 
 
 @compile
-def calendar_iso_week(sampling: EventSetNode) -> EventSetNode:
-    """Obtains the ISO week the timestamps in a node's sampling are in.
+def calendar_iso_week(sampling: EventSetOrNode) -> EventSetOrNode:
+    """Obtains the ISO week the timestamps in an
+    [`EventSet`][temporian.EventSet]'s sampling are in.
 
-    Features in the input node are ignored, only the timestamps are used and
+    Features in `input` are ignored, only the timestamps are used and
     they must be unix timestamps (`is_unix_timestamp=True`).
 
     Output feature contains numbers between 1 and 53.
@@ -60,9 +62,12 @@ def calendar_iso_week(sampling: EventSetNode) -> EventSetNode:
 
         ```
     Args:
-        sampling: EventSetNode to get the ISO weeks from.
+        sampling: EventSet to get the ISO weeks from.
 
     Returns:
-        Single feature with the week each timestamp in `sampling` belongs to.
+        EventSet with a single feature with the ISO week each timestamp in
+        `sampling` belongs to.
     """
+    assert isinstance(sampling, EventSetNode)
+
     return CalendarISOWeekOperator(sampling).outputs["output"]

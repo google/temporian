@@ -15,6 +15,7 @@
 from typing import Dict, List, Tuple
 from unittest.mock import ANY, patch
 from absl.testing import absltest
+from temporian.core.typing import EventSetOrNode
 
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core.data.node import EventSetNode
@@ -40,7 +41,7 @@ class CompileTest(absltest.TestCase):
 
     def test_basic(self):
         @compile
-        def f(x: EventSetNode) -> EventSetNode:
+        def f(x: EventSetOrNode) -> EventSetOrNode:
             assert isinstance(x, EventSetNode)
             return prefix("a", x)
 
@@ -51,7 +52,7 @@ class CompileTest(absltest.TestCase):
 
     def test_composed(self):
         @compile
-        def f(x: EventSetNode) -> EventSetNode:
+        def f(x: EventSetOrNode) -> EventSetOrNode:
             assert isinstance(x, EventSetNode)
             return glue(
                 prefix("a", x),
@@ -65,7 +66,7 @@ class CompileTest(absltest.TestCase):
 
     def test_other_args(self):
         @compile
-        def f(a: int, x: EventSetNode, b: str) -> EventSetNode:
+        def f(a: int, x: EventSetOrNode, b: str) -> EventSetOrNode:
             assert isinstance(x, EventSetNode)
             return prefix(f"{a}_{b}_", x)
 
@@ -76,7 +77,7 @@ class CompileTest(absltest.TestCase):
 
     def test_tuple_arg(self):
         @compile
-        def f(x: Tuple[EventSetNode]) -> EventSetNode:
+        def f(x: Tuple[EventSetOrNode, ...]) -> EventSetOrNode:
             assert isinstance(x, tuple)
             assert all(isinstance(n, EventSetNode) for n in x)
             return prefix("a", x[0])
@@ -88,7 +89,7 @@ class CompileTest(absltest.TestCase):
 
     def test_list_arg(self):
         @compile
-        def f(x: List[EventSetNode]) -> EventSetNode:
+        def f(x: List[EventSetOrNode]) -> EventSetOrNode:
             assert isinstance(x, list)
             assert all(isinstance(n, EventSetNode) for n in x)
             return prefix("a", x[0])
@@ -100,7 +101,7 @@ class CompileTest(absltest.TestCase):
 
     def test_dict_arg(self):
         @compile
-        def f(x: Dict[str, EventSetNode]) -> EventSetNode:
+        def f(x: Dict[str, EventSetOrNode]) -> EventSetOrNode:
             assert isinstance(x, dict)
             assert all(isinstance(n, EventSetNode) for n in x.values())
             return prefix("a", list(x.values())[0])
@@ -112,7 +113,7 @@ class CompileTest(absltest.TestCase):
 
     def test_list_return(self):
         @compile
-        def f(x: EventSetNode) -> List[EventSetNode]:
+        def f(x: EventSetOrNode) -> List[EventSetOrNode]:
             return [prefix("a", x), prefix("b", x)]
 
         result = f(self.evset)
@@ -126,7 +127,7 @@ class CompileTest(absltest.TestCase):
 
     def test_dict_return(self):
         @compile
-        def f(x: EventSetNode) -> Dict[str, EventSetNode]:
+        def f(x: EventSetOrNode) -> Dict[str, EventSetOrNode]:
             return {"a": prefix("a", x), "b": prefix("b", x)}
 
         result = f(self.evset)
@@ -140,7 +141,7 @@ class CompileTest(absltest.TestCase):
 
     def test_mixed_args(self):
         @compile
-        def f(x: EventSetNode, y: EventSetNode) -> EventSetNode:
+        def f(x: EventSetOrNode, y: EventSetOrNode) -> EventSetOrNode:
             return glue(x, y)
 
         with self.assertRaisesRegex(
@@ -156,7 +157,7 @@ class CompileTest(absltest.TestCase):
     @patch.object(evaluation, "run", autospec=True)
     def test_verbose_1(self, run_mock):
         @compile(verbose=1)
-        def f(x: EventSetNode) -> EventSetNode:
+        def f(x: EventSetOrNode) -> EventSetOrNode:
             return prefix("a", x)
 
         f(self.evset)
@@ -166,7 +167,7 @@ class CompileTest(absltest.TestCase):
     @patch.object(evaluation, "run", autospec=True)
     def test_verbose_0(self, run_mock):
         @compile(verbose=0)
-        def f(x: EventSetNode) -> EventSetNode:
+        def f(x: EventSetOrNode) -> EventSetOrNode:
             return prefix("a", x)
 
         f(self.evset)
@@ -175,7 +176,7 @@ class CompileTest(absltest.TestCase):
 
     def test_call_no_args(self):
         @compile()
-        def f(x: EventSetNode) -> EventSetNode:
+        def f(x: EventSetOrNode) -> EventSetOrNode:
             return prefix("a", x)
 
         f(self.evset)
