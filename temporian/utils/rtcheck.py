@@ -19,6 +19,16 @@ _NUM_CHECK_STRUCT = 3
 # If true, print details during runtime checking.
 _DEBUG = False
 
+# Generic alias have been introduced in py3.9
+_HAS_GENERIC_ALIAS = "GenericAlias" in dir(typing)
+
+if _HAS_GENERIC_ALIAS:
+    # e.g. support List[int] and list[int]
+    GENERIC_ALIAS = (typing._GenericAlias, typing.GenericAlias)
+else:
+    # e.g. support List[int]
+    GENERIC_ALIAS = typing._GenericAlias
+
 
 class _Trace:
     """A trace collects a description of the unfolding of a value.
@@ -90,7 +100,7 @@ def _check_annotation(trace: _Trace, is_compiled: bool, value, annotation):
 
     annotation_args = typing.get_args(annotation)
 
-    if isinstance(annotation, (typing._GenericAlias, typing.GenericAlias)):
+    if isinstance(annotation, GENERIC_ALIAS):
         # The annotation is a possibly composed type e.g. List, List[int]
 
         origin = typing.get_origin(annotation)
