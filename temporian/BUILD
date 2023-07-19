@@ -66,5 +66,6 @@ py_library(
         "//temporian/io:csv",
         "//temporian/io:pandas",
         "//temporian/io:tensorflow",
+        "//temporian/utils:rtcheck",
     ],
 )

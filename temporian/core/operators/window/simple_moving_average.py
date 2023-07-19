@@ -23,6 +23,7 @@ from temporian.core.data.duration_utils import Duration, normalize_duration
 from temporian.core.data.node import EventSetNode
 from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.window.base import BaseWindowOperator
+from temporian.utils.rtcheck import rtcheck
 
 
 class SimpleMovingAverageOperator(BaseWindowOperator):
@@ -43,6 +44,7 @@ class SimpleMovingAverageOperator(BaseWindowOperator):
 operator_lib.register_operator(SimpleMovingAverageOperator)
 
 
+@rtcheck
 @compile
 def simple_moving_average(
     input: EventSetNode,

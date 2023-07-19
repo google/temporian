@@ -17,6 +17,7 @@ from absl.testing import absltest
 import os
 import tempfile
 import math
+import re
 
 import temporian as tp
 
@@ -193,6 +194,16 @@ class TFPTest(absltest.TestCase):
             },
             indexes=["feature_2"],
         )
+
+    def test_wrong_type(self):
+        with self.assertRaisesRegex(
+            ValueError,
+            re.escape(
+                'When checking function "event_set". When checking argument'
+                ' "features". Cannot match any item of the union'
+            ),
+        ):
+            tp.event_set(timestamps=[1, 2], features=[])
 
 
 if __name__ == "__main__":

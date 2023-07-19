@@ -17,8 +17,10 @@
 from typing import List, Optional
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.io.pandas import from_pandas, to_pandas
+from temporian.utils.rtcheck import rtcheck
 
 
+@rtcheck
 def from_csv(
     path: str,
     timestamps: str = "timestamp",
@@ -30,7 +32,7 @@ def from_csv(
     Example:
         ```python
         >>> # Example CSV
-        >>> temp_file = tmp_dir / "temporal_data.csv"
+        >>> temp_file = str(tmp_dir / "temporal_data.csv")
         >>> _ = open(temp_file, "w").write(
         ...     "date,feature_1,feature_2\\n"
         ...     "2023-01-01,10.0,3.0\\n"
@@ -72,6 +74,7 @@ def from_csv(
     return from_pandas(df, indexes=indexes, timestamps=timestamps)
 
 
+@rtcheck
 def to_csv(
     evset: EventSet,
     path: str,
@@ -83,7 +86,7 @@ def to_csv(
 
     Example:
         ```python
-        >>> output_path = tmp_dir / "output_data.csv"
+        >>> output_path = str(tmp_dir / "output_data.csv")
         >>> evset = tp.event_set(timestamps=[1,], features={"f1": [0.1]})
         >>> tp.to_csv(evset, output_path)
 

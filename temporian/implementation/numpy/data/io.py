@@ -1,8 +1,8 @@
-from __future__ import annotations
 from typing import Any, List, Optional, Union, Dict
 
 import numpy as np
 
+from temporian.utils.rtcheck import rtcheck
 from temporian.implementation.numpy.data.event_set import (
     EventSet,
     IndexData,
@@ -20,6 +20,7 @@ DataArray = Union[List[Any], np.ndarray, "pandas.Series"]
 
 # Note: Keep the documentation about supported types in sync with
 # "normalize_timestamp" and "normalize_features".
+@rtcheck
 def event_set(
     timestamps: DataArray,
     features: Optional[Dict[str, DataArray]] = None,

@@ -74,6 +74,9 @@ def compile(
     """
 
     def _compile(fn):
+        if hasattr(fn, "_rtcheck"):
+            raise ValueError("Apply @rtcheck before @compile")
+
         @wraps(fn)
         def wrapper(*args, **kwargs):
             is_eager = None
