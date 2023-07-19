@@ -95,11 +95,9 @@ class RTCheckTest(absltest.TestCase):
         self.assertFalse(_m(SomeClass(), float))
 
     def test_m_list(self):
-        self.assertTrue(_m([], list))
         self.assertTrue(_m([], List))
-        self.assertTrue(_m([1, 2], list))
         self.assertTrue(_m(["a", 1], List))
-        self.assertTrue(_m([1, 2], list))
+        self.assertTrue(_m([1, 2], List))
         self.assertTrue(_m([1, 2], List[int]))
         self.assertTrue(_m(["a", "b"], List[str]))
 
@@ -108,15 +106,13 @@ class RTCheckTest(absltest.TestCase):
         self.assertFalse(_m({}, List))
         self.assertFalse(_m(SomeClass(), List))
 
-        self.assertFalse(_m([1, 2], list[str]))
+        self.assertFalse(_m([1, 2], List[str]))
         self.assertFalse(_m(["a", 2], List[int]))
         self.assertFalse(_m(["a", 1], List[str]))
         self.assertFalse(_m([[], [1, 2]], List[str]))
 
     def test_m_dict(self):
-        self.assertTrue(_m({}, dict))
         self.assertTrue(_m({}, Dict))
-        self.assertTrue(_m({1: 2, 3: 4}, dict))
         self.assertTrue(_m({1: 2, 3: 4}, Dict))
         self.assertTrue(_m({"a": 2, "b": 4}, Dict[str, int]))
 
@@ -138,11 +134,9 @@ class RTCheckTest(absltest.TestCase):
         self.assertFalse(_m(SomeClass(), np.ndarray))
 
     def test_m_set(self):
-        self.assertTrue(_m(set(), set))
         self.assertTrue(_m(set(), Set))
-        self.assertTrue(_m({1, 2}, set))
         self.assertTrue(_m({"a", 1}, Set))
-        self.assertTrue(_m({1, 2}, set))
+        self.assertTrue(_m({1, 2}, Set))
         self.assertTrue(_m({1, 2}, Set[int]))
         self.assertTrue(_m({"a", "b"}, Set[str]))
 

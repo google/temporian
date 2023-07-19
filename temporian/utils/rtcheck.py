@@ -17,17 +17,7 @@ from temporian.core.data.node import EventSetNode
 _NUM_CHECK_STRUCT = 3
 
 # If true, print details during runtime checking.
-_DEBUG = False
-
-# Generic alias have been introduced in py3.9
-_HAS_GENERIC_ALIAS = "GenericAlias" in dir(typing)
-
-if _HAS_GENERIC_ALIAS:
-    # e.g. support List[int] and list[int]
-    GENERIC_ALIAS = (typing._GenericAlias, typing.GenericAlias)
-else:
-    # e.g. support List[int]
-    GENERIC_ALIAS = typing._GenericAlias
+_DEBUG = True
 
 
 class _Trace:
@@ -100,7 +90,7 @@ def _check_annotation(trace: _Trace, is_compiled: bool, value, annotation):
 
     annotation_args = typing.get_args(annotation)
 
-    if isinstance(annotation, GENERIC_ALIAS):
+    if isinstance(annotation, typing._GenericAlias):
         # The annotation is a possibly composed type e.g. List, List[int]
 
         origin = typing.get_origin(annotation)
@@ -108,24 +98,32 @@ def _check_annotation(trace: _Trace, is_compiled: bool, value, annotation):
 
         if origin is not Union:
             if not isinstance(value, origin):
-                # The origin (e.g. "list" in "list[int]") is wrong.
+                # The origin (e.g. "list" in "List[int]") is wrong.
                 trace.exception(_base_error(value, annotation))
 
         # Check the sub-argument in composed types.
 
-        if origin in [list, List, set, Set]:
+        if origin in [List, Set, list, set]:
             _check_annotation_list_or_set_or_uniform_tuple(
                 trace, is_compiled, value, annotation_args
             )
 
-        if origin in [dict, Dict]:
+        elif origin in [dict, Dict]:
             _check_annotation_dict(trace, is_compiled, value, annotation_args)
 
-        if origin is Union:
+        elif origin is Union:
             _check_annotation_union(trace, is_compiled, value, annotation_args)
 
-        if origin in [Tuple, tuple]:
+        elif origin in [tuple, Tuple]:
             _check_annotation_tuple(trace, is_compiled, value, annotation_args)
+        else:
+            if _DEBUG:
+                logging.warning(
+                    "Unknown generic alias annotation %s (%s) with origin=%s",
+                    annotation,
+                    type(annotation),
+                    origin,
+                )
 
     else:
         try:
@@ -256,7 +254,9 @@ def rtcheck(fn):
 
     If combined with @compile, @rtcheck should be put before @compile.
 
-    Note: This code only support what is required by Temporian API.
+    This code only support what is required by Temporian API.
+
+    Does not typing.GenericTypeAlias e.g. list[int]. Use List[int] instead.
 
     Args:
         fn: Function to instrument.
