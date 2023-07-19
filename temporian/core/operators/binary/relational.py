@@ -21,6 +21,7 @@ from temporian.core.data.node import EventSetNode
 from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.binary.base import BaseBinaryOperator
 from temporian.core.operators.scalar.relational_scalar import equal_scalar
+from temporian.core.typing import EventSetOrNode
 
 
 class BaseRelationalOperator(BaseBinaryOperator):
@@ -74,10 +75,10 @@ class LessEqualOperator(BaseRelationalOperator):
 
 @compile
 def equal(
-    input_1: EventSetNode,
-    input_2: EventSetNode,
-) -> EventSetNode:
-    """Checks (element-wise) for equality between two nodes.
+    input_1: EventSetOrNode,
+    input_2: EventSetOrNode,
+) -> EventSetOrNode:
+    """Checks (element-wise) for equality between two [`EventSets`][temporian.EventSet].
 
     Each feature in `input_1` is compared element-wise to the feature in
     `input_2` in the same position.
@@ -116,15 +117,16 @@ def equal(
         ```
 
     Args:
-        input_1: First node.
-        input_2: Second node.
+        input_1: First EventSet.
+        input_2: Second EventSet.
 
     Returns:
-        EventSetNode containing the result of the comparison.
+        Result of the comparison.
     """
+    assert isinstance(input_1, EventSetNode)
 
     if not isinstance(input_2, EventSetNode):
-        return equal_scalar(input=input_1, value=input_2)
+        return equal_scalar(input=input_1, value=input_2)  # type: ignore
 
     return EqualOperator(
         input_1=input_1,
@@ -134,10 +136,10 @@ def equal(
 
 @compile
 def not_equal(
-    input_1: EventSetNode,
-    input_2: EventSetNode,
-) -> EventSetNode:
-    """Checks (element-wise) for differences between two nodes.
+    input_1: EventSetOrNode,
+    input_2: EventSetOrNode,
+) -> EventSetOrNode:
+    """Checks (element-wise) for differences between two [`EventSets`][temporian.EventSet].
 
     Each feature in `input_1` is compared element-wise to the feature in
     `input_2` in the same position.
@@ -173,12 +175,15 @@ def not_equal(
         ```
 
     Args:
-        input_1: First node.
-        input_2: Second node.
+        input_1: First EventSet.
+        input_2: Second EventSet.
 
     Returns:
-        EventSetNode containing the result of the comparison.
+        Result of the comparison.
     """
+    assert isinstance(input_1, EventSetNode)
+    assert isinstance(input_2, EventSetNode)
+
     return NotEqualOperator(
         input_1=input_1,
         input_2=input_2,
@@ -187,9 +192,9 @@ def not_equal(
 
 @compile
 def greater(
-    input_left: EventSetNode,
-    input_right: EventSetNode,
-) -> EventSetNode:
+    input_left: EventSetOrNode,
+    input_right: EventSetOrNode,
+) -> EventSetOrNode:
     """Checks (element-wise) if input_left > input_right.
 
     Each feature in `input_left` is compared element-wise to the feature in
@@ -226,12 +231,15 @@ def greater(
         ```
 
     Args:
-        input_left: node to the left of the operator
-        input_right: node to the right of the operator
+        input_left: EventSet to the left of the operator.
+        input_right: EventSet to the right of the operator.
 
     Returns:
-        EventSetNode with the result of the comparison.
+        Result of the comparison.
     """
+    assert isinstance(input_left, EventSetNode)
+    assert isinstance(input_right, EventSetNode)
+
     return GreaterOperator(
         input_1=input_left,
         input_2=input_right,
@@ -240,9 +248,9 @@ def greater(
 
 @compile
 def greater_equal(
-    input_left: EventSetNode,
-    input_right: EventSetNode,
-) -> EventSetNode:
+    input_left: EventSetOrNode,
+    input_right: EventSetOrNode,
+) -> EventSetOrNode:
     """Checks (element-wise) if input_left >= input_right.
 
     Each feature in `input_left` is compared element-wise to the feature in
@@ -279,12 +287,15 @@ def greater_equal(
         ```
 
     Args:
-        input_left: node to the left of the operator
-        input_right: node to the right of the operator
+        input_left: EventSet to the left of the operator.
+        input_right: EventSet to the right of the operator.
 
     Returns:
-        EventSetNode with the result of the comparison.
+        Result of the comparison.
     """
+    assert isinstance(input_left, EventSetNode)
+    assert isinstance(input_right, EventSetNode)
+
     return GreaterEqualOperator(
         input_1=input_left,
         input_2=input_right,
@@ -293,9 +304,9 @@ def greater_equal(
 
 @compile
 def less(
-    input_left: EventSetNode,
-    input_right: EventSetNode,
-) -> EventSetNode:
+    input_left: EventSetOrNode,
+    input_right: EventSetOrNode,
+) -> EventSetOrNode:
     """Checks (element-wise) if input_left < input_right.
 
     Each feature in `input_left` is compared element-wise to the feature in
@@ -332,12 +343,15 @@ def less(
         ```
 
     Args:
-        input_left: node to the left of the operator
-        input_right: node to the right of the operator
+        input_left: EventSet to the left of the operator.
+        input_right: EventSet to the right of the operator.
 
     Returns:
-        EventSetNode with the result of the comparison.
+        Result of the comparison.
     """
+    assert isinstance(input_left, EventSetNode)
+    assert isinstance(input_right, EventSetNode)
+
     return LessOperator(
         input_1=input_left,
         input_2=input_right,
@@ -346,9 +360,9 @@ def less(
 
 @compile
 def less_equal(
-    input_left: EventSetNode,
-    input_right: EventSetNode,
-) -> EventSetNode:
+    input_left: EventSetOrNode,
+    input_right: EventSetOrNode,
+) -> EventSetOrNode:
     """Checks (element-wise) if input_left <= input_right.
 
     Each feature in `input_left` is compared element-wise to the feature in
@@ -385,12 +399,15 @@ def less_equal(
         ```
 
     Args:
-        input_left: node to the left of the operator
-        input_right: node to the right of the operator
+        input_left: EventSet to the left of the operator.
+        input_right: EventSet to the right of the operator.
 
     Returns:
-        EventSetNode with the result of the comparison.
+        Result of the comparison.
     """
+    assert isinstance(input_left, EventSetNode)
+    assert isinstance(input_right, EventSetNode)
+
     return LessEqualOperator(
         input_1=input_left,
         input_2=input_right,

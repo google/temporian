@@ -26,6 +26,7 @@ from temporian.core.data.node import (
     create_node_new_features_new_sampling,
 )
 from temporian.core.operators.base import Operator
+from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
 
 
@@ -77,8 +78,8 @@ operator_lib.register_operator(LagOperator)
 
 
 @compile
-def lag(input: EventSetNode, duration: Duration) -> EventSetNode:
-    """Adds a delay to an EventSetNode's timestamps.
+def lag(input: EventSetOrNode, duration: Duration) -> EventSetOrNode:
+    """Adds a delay to an [`EventSet`][temporian.EventSet]'s timestamps.
 
     In other words, shifts the timestamp values forwards in time.
 
@@ -100,12 +101,13 @@ def lag(input: EventSetNode, duration: Duration) -> EventSetNode:
         ```
 
     Args:
-        input: node to lag.
+        input: EventSet to lag.
         duration: Duration to lag by.
 
     Returns:
-        Lagged node.
+        Lagged EventSet.
     """
+    assert isinstance(input, EventSetNode)
 
     normalized_duration = normalize_duration(duration)
 

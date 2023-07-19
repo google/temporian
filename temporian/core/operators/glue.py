@@ -22,6 +22,7 @@ from temporian.core.data.node import (
 )
 from temporian.core.data.schema import Schema
 from temporian.core.operators.base import Operator
+from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
 from temporian.utils.rtcheck import rtcheck
 
@@ -109,13 +110,14 @@ operator_lib.register_operator(GlueOperator)
 @rtcheck
 @compile
 def glue(
-    *inputs: EventSetNode,
-) -> EventSetNode:
-    """Concatenates [`EventSetNodes`][temporian.EventSetNode] with the same sampling.
+    *inputs: EventSetOrNode,
+) -> EventSetOrNode:
+    """Concatenates [`EventSets`][temporian.EventSet] with the same sampling.
 
-    Feature names cannot be duplicated.
+    Feature names cannot be duplicated across EventSets.
 
-    See the examples below to workaround duplicated names or different samplings.
+    See the examples below for workarounds on gluing EventSets with duplicated
+    feature names or different samplings.
 
     Example:
 
@@ -143,7 +145,8 @@ def glue(
 
         ```
 
-    To glue duplicated feature names, add a prefix or rename before:
+    To glue EventSets with duplicated feature names, add a prefix or rename them
+    before.
 
     Example with duplicated names:
 
@@ -195,14 +198,15 @@ def glue(
         ```
 
     Args:
-        *inputs: EventSetNodes to concatenate.
+        *inputs: EventSets to concatenate.
 
     Returns:
-        Concatenated nodes.
+        Concatenated EventSets.
     """
     if len(inputs) == 1:
         return inputs[0]
 
     # Note: The node should be called "input_{idx}" with idx in [0, MAX_NUM_ARGUMENTS).
     inputs_dict = {f"input_{idx}": input for idx, input in enumerate(inputs)}
-    return GlueOperator(**inputs_dict).outputs["output"]
+
+    return GlueOperator(**inputs_dict).outputs["output"]  # type: ignore

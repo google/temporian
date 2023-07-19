@@ -25,6 +25,7 @@ from temporian.core.data.dtype import DType
 from temporian.core.data.node import EventSetNode
 from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.window.base import BaseWindowOperator
+from temporian.core.typing import EventSetOrNode
 
 
 class MovingSumOperator(BaseWindowOperator):
@@ -41,11 +42,12 @@ operator_lib.register_operator(MovingSumOperator)
 
 @compile
 def moving_sum(
-    input: EventSetNode,
+    input: EventSetOrNode,
     window_length: Duration,
-    sampling: Optional[EventSetNode] = None,
-) -> EventSetNode:
-    """Computes the sum of values in a sliding window over the node.
+    sampling: Optional[EventSetOrNode] = None,
+) -> EventSetOrNode:
+    """Computes the sum of values in a sliding window over an
+    [`EventSet`][temporian.EventSet].
 
     For each t in sampling, and for each feature independently, returns at time
     t the sum of the feature in the window (t - window_length, t].
@@ -85,8 +87,12 @@ def moving_sum(
             provided, timestamps in `input` are used.
 
     Returns:
-        EventSetNode containing the moving sum of each feature in `input`.
+        EventSet containing the moving sum of each feature in `input`.
     """
+    assert isinstance(input, EventSetNode)
+    if sampling is not None:
+        assert isinstance(sampling, EventSetNode)
+
     return MovingSumOperator(
         input=input,
         window_length=normalize_duration(window_length),
@@ -96,12 +102,13 @@ def moving_sum(
 
 @compile
 def cumsum(
-    input: EventSetNode,
-) -> EventSetNode:
-    """Cumulative Sum.
+    input: EventSetOrNode,
+) -> EventSetOrNode:
+    """Computes the cumulative sum of values over each feature in an
+    [`EventSet`][temporian.EventSet].
 
     Foreach timestamp, calculate the sum of the feature from the beginning.
-    It's a shorthand for `moving_sum(event, window_length=np.inf)`.
+    Shorthand for `moving_sum(event, window_length=np.inf)`.
 
     Missing values are ignored.
 
@@ -126,11 +133,13 @@ def cumsum(
         ```
 
     Args:
-        input: The node with features to accumulate.
+        input: EventSet with features to accumulate.
 
     Returns:
-        A node containing the cumulative sum of each feature in `node`.
+        Cumulative sum of each feature in `node`.
     """
+    assert isinstance(input, EventSetNode)
+
     return MovingSumOperator(
         input=input,
         window_length=normalize_duration(np.inf),

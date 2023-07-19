@@ -18,6 +18,7 @@ from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.node import EventSetNode
 from temporian.core.operators.calendar.base import BaseCalendarOperator
+from temporian.core.typing import EventSetOrNode
 
 
 class CalendarDayOfMonthOperator(BaseCalendarOperator):
@@ -34,10 +35,11 @@ operator_lib.register_operator(CalendarDayOfMonthOperator)
 
 
 @compile
-def calendar_day_of_month(sampling: EventSetNode) -> EventSetNode:
-    """Obtains the day of month the timestamps in a node's sampling are in.
+def calendar_day_of_month(sampling: EventSetOrNode) -> EventSetOrNode:
+    """Obtains the day of month the timestamps in an
+    [`EventSet`][temporian.EventSet]'s sampling are in.
 
-    Features in the input node are ignored, only the timestamps are used and
+    Features in `input` are ignored, only the timestamps are used and
     they must be unix timestamps (`is_unix_timestamp=True`).
 
     Output feature contains numbers between 1 and 31.
@@ -60,9 +62,12 @@ def calendar_day_of_month(sampling: EventSetNode) -> EventSetNode:
         ```
 
     Args:
-        sampling: EventSetNode to get the days of month from.
+        sampling: EventSet to get the days of month from.
 
     Returns:
-        Single feature with the day each timestamp in `sampling` belongs to.
+        EventSet with a single feature with the day of the month each timestamp
+        in `sampling` belongs to.
     """
+    assert isinstance(sampling, EventSetNode)
+
     return CalendarDayOfMonthOperator(sampling).outputs["output"]

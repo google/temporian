@@ -18,13 +18,10 @@ from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.node import EventSetNode
 from temporian.core.operators.calendar.base import BaseCalendarOperator
+from temporian.core.typing import EventSetOrNode
 
 
 class CalendarMonthOperator(BaseCalendarOperator):
-    """
-    Calendar operator to obtain the month each timestamp belongs to.
-    """
-
     @classmethod
     def operator_def_key(cls) -> str:
         return "CALENDAR_MONTH"
@@ -38,14 +35,14 @@ operator_lib.register_operator(CalendarMonthOperator)
 
 
 @compile
-def calendar_month(sampling: EventSetNode) -> EventSetNode:
-    """Obtains the month the timestamps in a node's sampling are in.
+def calendar_month(sampling: EventSetOrNode) -> EventSetOrNode:
+    """Obtains the month the timestamps in an
+    [`EventSet`][temporian.EventSet]'s sampling are in.
 
-    Features in the input node are ignored, only the timestamps are used and
+    Features in `input` are ignored, only the timestamps are used and
     they must be unix timestamps (`is_unix_timestamp=True`).
 
-    Output feature contains numbers between
-    1 and 12.
+    Output feature contains numbers between 1 and 12.
 
     Usage example:
         ```python
@@ -66,9 +63,12 @@ def calendar_month(sampling: EventSetNode) -> EventSetNode:
         ```
 
     Args:
-        sampling: EventSetNode with unix timestamp sampling.
+        sampling: EventSet with unix timestamp sampling.
 
     Returns:
-        Single feature with the month each timestamp in `sampling` belongs to.
+        EventSet with a single feature with the month each timestamp in
+        `sampling` belongs to.
     """
+    assert isinstance(sampling, EventSetNode)
+
     return CalendarMonthOperator(sampling).outputs["output"]

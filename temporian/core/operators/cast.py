@@ -27,6 +27,7 @@ from temporian.core.data.node import (
     create_node_with_new_reference,
 )
 from temporian.core.operators.base import Operator
+from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
 
 TypeOrDType = Union[DType, Type[float], Type[int], Type[str], Type[bool]]
@@ -203,18 +204,17 @@ operator_lib.register_operator(CastOperator)
 
 @compile
 def cast(
-    input: EventSetNode,
+    input: EventSetOrNode,
     target: Union[
         TypeOrDType,
         Dict[str, TypeOrDType],
         Dict[TypeOrDType, TypeOrDType],
     ],
     check_overflow: bool = True,
-) -> EventSetNode:
-    """Casts the dtype of features to the dtype(s) specified in `target`.
+) -> EventSetOrNode:
+    """Casts the data types of an [`EventSet`][temporian.EventSet]'s features.
 
     Features not impacted by cast are kept.
-
 
     Usage example:
         ```python
@@ -265,20 +265,20 @@ def cast(
         ```
 
     Args:
-        input: Input `EventSetNode` object to cast the columns from.
+        input: Input EventSet object to cast the columns from.
         target: Single dtype or a map. Providing a single dtype will cast all
             columns to it. The mapping keys can be either feature names or the
             original dtypes (and not both types mixed), and the values are the
-            target dtypes for them. All dtypes must be temporian types (see
+            target dtypes for them. All dtypes must be Temporian types (see
             `dtype.py`).
         check_overflow: Flag to check overflow when casting to a dtype with a
             shorter range (e.g: `INT64`->`INT32`). Note that this check adds
             some computation overhead. Defaults to `True`.
 
     Returns:
-        New `EventSetNode` (or the same if no features actually changed dtype), with
-        the same feature names as the input one, but with the new dtypes as
-        specified in `target`.
+        New EventSet (or the same if no features actually changed dtype),
+            with the same feature names as the input one, but with the new
+            dtypes as specified in `target`.
 
     Raises:
         ValueError: If `check_overflow=True` and some value is out of the range
@@ -289,6 +289,8 @@ def cast(
             dtype nor a feature in `input.feature_names`, or if those types are
             mixed.
     """
+    assert isinstance(input, EventSetNode)
+
     # Convert 'target' to one of these:
     dtype: Optional[DType] = None
     feature_name_to_dtype: Optional[Dict[str, DType]] = None
@@ -336,6 +338,8 @@ def cast(
             " equivalent to cast(..., target=tp.float64).\nInstead got,"
             f" `target` = {target!r}."
         )
+
+    assert isinstance(input, EventSetNode)
 
     return CastOperator(
         input,

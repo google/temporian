@@ -21,6 +21,7 @@ from temporian.core.data.node import (
     create_node_new_features_existing_sampling,
 )
 from temporian.core.operators.base import Operator
+from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
 
 
@@ -72,12 +73,14 @@ class Prefix(Operator):
 operator_lib.register_operator(Prefix)
 
 
+# TODO: make input be the first argument
 @compile
 def prefix(
     prefix: str,
-    input: EventSetNode,
-) -> EventSetNode:
-    """Adds a prefix to the names of the features in an EventSetNode.
+    input: EventSetOrNode,
+) -> EventSetOrNode:
+    """Adds a prefix to the names of the features in an
+    [`EventSet`][temporian.EventSet].
 
     Usage example:
         ```python
@@ -101,9 +104,11 @@ def prefix(
 
     Args:
         prefix: Prefix to add in front of the feature names.
-        input: EventSetNode to prefix.
+        input: EventSet to prefix.
 
     Returns:
-        Prefixed node.
+        Prefixed EventSet.
     """
+    assert isinstance(input, EventSetNode)
+
     return Prefix(prefix=prefix, input=input).outputs["output"]

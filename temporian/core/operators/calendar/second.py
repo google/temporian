@@ -18,6 +18,7 @@ from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.node import EventSetNode
 from temporian.core.operators.calendar.base import BaseCalendarOperator
+from temporian.core.typing import EventSetOrNode
 
 
 class CalendarSecondOperator(BaseCalendarOperator):
@@ -34,10 +35,11 @@ operator_lib.register_operator(CalendarSecondOperator)
 
 
 @compile
-def calendar_second(sampling: EventSetNode) -> EventSetNode:
-    """Obtains the second the timestamps in a node's sampling are in.
+def calendar_second(sampling: EventSetOrNode) -> EventSetOrNode:
+    """Obtains the second the timestamps in an
+    [`EventSet`][temporian.EventSet]'s sampling are in.
 
-    Features in the input node are ignored, only the timestamps are used and
+    Features in `input` are ignored, only the timestamps are used and
     they must be unix timestamps (`is_unix_timestamp=True`).
 
     Output feature contains numbers between 0 and 59.
@@ -62,9 +64,12 @@ def calendar_second(sampling: EventSetNode) -> EventSetNode:
         ```
 
     Args:
-        sampling: EventSetNode to get the seconds from.
+        sampling: EventSet to get the seconds from.
 
     Returns:
-        Single feature with the second each timestamp in `sampling` belongs to.
+        EventSet with a single feature with the second each timestamp in
+        `sampling` belongs to.
     """
+    assert isinstance(sampling, EventSetNode)
+
     return CalendarSecondOperator(sampling).outputs["output"]

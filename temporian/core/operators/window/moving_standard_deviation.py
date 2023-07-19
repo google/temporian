@@ -22,6 +22,7 @@ from temporian.core.data.duration_utils import Duration, normalize_duration
 from temporian.core.data.node import EventSetNode
 from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.window.base import BaseWindowOperator
+from temporian.core.typing import EventSetOrNode
 
 
 class MovingStandardDeviationOperator(BaseWindowOperator):
@@ -40,12 +41,12 @@ operator_lib.register_operator(MovingStandardDeviationOperator)
 
 @compile
 def moving_standard_deviation(
-    input: EventSetNode,
+    input: EventSetOrNode,
     window_length: Duration,
-    sampling: Optional[EventSetNode] = None,
-) -> EventSetNode:
-    """Computes the standard deviation of values in a sliding window over the
-    node.
+    sampling: Optional[EventSetOrNode] = None,
+) -> EventSetOrNode:
+    """Computes the standard deviation of values in a sliding window over an
+    [`EventSet`][temporian.EventSet].
 
     For each t in sampling, and for each feature independently, returns at time
     t the standard deviation for the feature in the window
@@ -86,9 +87,13 @@ def moving_standard_deviation(
             provided, timestamps in `input` are used.
 
     Returns:
-        EventSetNode containing the moving standard deviation of each feature in
+        EventSet containing the moving standard deviation of each feature in
         `input`.
     """
+    assert isinstance(input, EventSetNode)
+    if sampling is not None:
+        assert isinstance(sampling, EventSetNode)
+
     return MovingStandardDeviationOperator(
         input=input,
         window_length=normalize_duration(window_length),

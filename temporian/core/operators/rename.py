@@ -24,6 +24,7 @@ from temporian.core.data.node import (
 )
 from temporian.core.data.schema import Schema
 from temporian.core.operators.base import Operator
+from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
 
 
@@ -166,11 +167,11 @@ def _normalize_rename_indexes(
 
 @compile
 def rename(
-    input: EventSetNode,
+    input: EventSetOrNode,
     features: Optional[Union[str, Dict[str, str]]] = None,
     indexes: Optional[Union[str, Dict[str, str]]] = None,
-) -> EventSetNode:
-    """Renames an EventSetNode's features and index.
+) -> EventSetOrNode:
+    """Renames an [`EventSet`][temporian.EventSet]'s features and index.
 
     If the input has a single feature, then the `features` can be a
     single string with the new name.
@@ -215,14 +216,14 @@ def rename(
         ```
 
     Args:
-        input: EventSetNode to rename.
-
+        input: EventSet to rename.
         features: New feature name or mapping from old names to new names.
         indexes: New index name or mapping from old names to new names.
 
     Returns:
-        EventSetNode with renamed features and index.
+        EventSet with renamed features and index.
     """
+    assert isinstance(input, EventSetNode)
 
     features = _normalize_rename_features(input.schema, features)
     indexes = _normalize_rename_indexes(input.schema, indexes)

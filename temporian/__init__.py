@@ -82,6 +82,9 @@ from temporian.implementation.numpy.data.plotter import plot
 # Compilation
 from temporian.core.compilation import compile
 
+# Types
+from temporian.core.typing import EventSetOrNode
+
 
 # --- OPERATORS ---
 

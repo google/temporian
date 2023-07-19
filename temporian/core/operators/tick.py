@@ -22,6 +22,7 @@ from temporian.core.data.node import (
     create_node_new_features_new_sampling,
 )
 from temporian.core.operators.base import Operator
+from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
 from temporian.core.data.duration_utils import (
     Duration,
@@ -88,9 +89,10 @@ operator_lib.register_operator(Tick)
 # TODO: Add support for begin/end arguments.
 @compile
 def tick(
-    input: EventSetNode, interval: Duration, align: bool = True
-) -> EventSetNode:
-    """Generates timestamps at regular intervals in the range of a guide.
+    input: EventSetOrNode, interval: Duration, align: bool = True
+) -> EventSetOrNode:
+    """Generates timestamps at regular intervals in the range of a guide
+    [`EventSet`][temporian.EventSet].
 
     Example with align:
         ```python
@@ -115,16 +117,17 @@ def tick(
         ```
 
     Args:
-        input: Guide node. The start and end time boundaries to generate the new
-            timestamps are defined by the range of timestamps in `input`.
+        input: Guide EventSet. The start and end time boundaries to generate the
+            new timestamps are defined by the range of timestamps in `input`.
         interval: Tick interval.
         align: If false, the first tick is generated at the first timestamp
             (similar to [`tp.begin()`][temporian.begin]). If true (default),
             ticks are generated on timestamps that are multiple of `interval`.
 
     Returns:
-        A feature-less node with regular timestamps.
+        A feature-less EventSet with regular timestamps.
     """
+    assert isinstance(input, EventSetNode)
 
     return Tick(
         input=input, interval=normalize_duration(interval), align=align

@@ -14,6 +14,7 @@ py_library(
         "//temporian/core:compilation",
         "//temporian/core:evaluation",
         "//temporian/core:serialization",
+        "//temporian/core:typing",
         "//temporian/core/data:dtype",
         "//temporian/core/data:duration",
         "//temporian/core/data:node",
