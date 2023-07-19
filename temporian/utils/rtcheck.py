@@ -17,7 +17,7 @@ from temporian.core.data.node import EventSetNode
 _NUM_CHECK_STRUCT = 3
 
 # If true, print details during runtime checking.
-_DEBUG = True
+_DEBUG = False
 
 
 class _Trace:
@@ -107,13 +107,10 @@ def _check_annotation(trace: _Trace, is_compiled: bool, value, annotation):
             _check_annotation_list_or_set_or_uniform_tuple(
                 trace, is_compiled, value, annotation_args
             )
-
         elif origin in [dict, Dict]:
             _check_annotation_dict(trace, is_compiled, value, annotation_args)
-
         elif origin is Union:
             _check_annotation_union(trace, is_compiled, value, annotation_args)
-
         elif origin in [tuple, Tuple]:
             _check_annotation_tuple(trace, is_compiled, value, annotation_args)
         else:
@@ -124,7 +121,6 @@ def _check_annotation(trace: _Trace, is_compiled: bool, value, annotation):
                     type(annotation),
                     origin,
                 )
-
     else:
         try:
             is_instance_result = isinstance(value, annotation)
