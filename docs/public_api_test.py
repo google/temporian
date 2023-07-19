@@ -66,7 +66,6 @@ PUBLIC_API_SYMBOLS = {
     "select",
     "rename",
     "since_last",
-    "begin",
     "end",
     "tick",
     "timestamps",

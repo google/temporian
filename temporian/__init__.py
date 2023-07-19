@@ -90,7 +90,6 @@ from temporian.core.typing import EventSetOrNode
 
 from temporian.core.operators.add_index import add_index
 from temporian.core.operators.add_index import set_index
-from temporian.core.operators.begin import begin
 from temporian.core.operators.cast import cast
 from temporian.core.operators.drop_index import drop_index
 from temporian.core.operators.end import end
