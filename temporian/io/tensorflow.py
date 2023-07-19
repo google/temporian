@@ -14,6 +14,8 @@
 
 """Utilities for converting EventSets to TensorFlow dataset."""
 
+import logging
+
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core.operators.drop_index import drop_index
 
@@ -53,7 +55,14 @@ def to_tensorflow(
         TensorFlow dataset created from EventSet.
     """
 
-    import tensorflow as tf
+    try:
+        import tensorflow as tf
+    except ImportError:
+        logging.warning(
+            "`tp.to_tensorflow` requires for TensorFlow to be installed."
+            " Install TensorFlow with pip using `pip install tensorflow`"
+        )
+        raise
 
     if len(evset.schema.indexes) != 0:
         evset = drop_index(evset)

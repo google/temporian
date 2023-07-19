@@ -67,6 +67,7 @@ tensorflow = "^2.12.0"
 
 [tool.poetry.extras]
 beam = ["apache-beam"]
+tensorflow = ["tensorflow"]
 
 [tool.black]
 line-length = 80
