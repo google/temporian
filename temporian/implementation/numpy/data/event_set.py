@@ -371,7 +371,6 @@ class EventSet(EventSetOperationsMixin):
         schema: Schema,
         name: Optional[str] = None,
     ) -> None:
-        super().__init__()
         self._data = data
         self._schema = schema
         self._name = name
