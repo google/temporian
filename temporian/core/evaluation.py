@@ -297,7 +297,7 @@ def has_leak(
         >>> a = tp.input_node([("f", float)])
         >>> b = tp.moving_sum(a, 5)
         >>> c = tp.leak(b, 6)
-        >>> d = tp.prefix("my_prefix_", c)
+        >>> d = tp.prefix(c, "my_prefix_")
         >>> e = tp.moving_sum(d, 7)
         >>> # The computation of "e" contains a leak.
         >>> tp.has_leak(e)
