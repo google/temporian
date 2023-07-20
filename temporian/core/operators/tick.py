@@ -121,7 +121,7 @@ def tick(
             new timestamps are defined by the range of timestamps in `input`.
         interval: Tick interval.
         align: If false, the first tick is generated at the first timestamp
-            (similar to [`EventSet.begin()`][temporian.core.mixins.EventSetOperationsMixin.begin]).
+            (similar to [`EventSet.begin()`][temporian.EventSet.begin]).
             If true (default), ticks are generated on timestamps that are
             multiple of `interval`.
 

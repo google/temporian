@@ -33,7 +33,7 @@ class EventSetNode(EventSetOperationsMixin):
     graph.
 
     Use [`tp.input_node()`][temporian.input_node] to create an EventSetNode
-    manually, or use [`event_set.node()`][temporian.EventSet.node] to create an
+    manually, or use [`EventSet.node()`][temporian.EventSet.node] to create an
     EventSetNode compatible with a given [`EventSet`][temporian.EventSet].
 
     A EventSetNode does not contain any data. Use

@@ -24,6 +24,7 @@ if TYPE_CHECKING:
 T_SCALAR = (int, float)
 
 
+# TODO: rename to EventSetOperations
 class EventSetOperationsMixin:
     """Mixin class for EventSet-like classes.
 
@@ -66,7 +67,7 @@ class EventSetOperationsMixin:
     # def __init__(self):
     #     from temporian.core.operators.begin import begin as _begin
 
-    #     EventSetOperationsMixin.begin = _begin
+    #     setattr(EventSetOperationsMixin, "begin",  _begin
 
     @property
     def _clsname(self) -> str:

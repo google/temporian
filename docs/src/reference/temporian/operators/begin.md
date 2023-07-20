@@ -1,1 +1,1 @@
-::: temporian.core.mixins.EventSetOperationsMixin.begin
+::: temporian.EventSet.begin
