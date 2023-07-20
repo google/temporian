@@ -57,24 +57,25 @@ class BaseWindowOperator(Operator, ABC):
 
         self.add_input("input", input)
 
-        feature_schemas = [  # pylint: disable=g-complex-comprehension
-            FeatureSchema(
-                name=f.name,
-                dtype=self.get_feature_dtype(f),
-            )
-            for f in input.schema.features
-        ]
-
         self.add_output(
             "output",
             create_node_new_features_existing_sampling(
-                features=feature_schemas,
+                features=self.feature_schema(input),
                 sampling_node=effective_sampling_node,
                 creator=self,
             ),
         )
 
         self.check()
+
+    def feature_schema(self, input: EventSetNode):
+        return [  # pylint: disable=g-complex-comprehension
+            FeatureSchema(
+                name=f.name,
+                dtype=self.get_feature_dtype(f),
+            )
+            for f in input.schema.features
+        ]
 
     @property
     def window_length(self) -> NormalizedDuration:
