@@ -445,13 +445,13 @@ class EventSetOperations:
 
         Args:
             indexes: List of feature names (strings) that should be added to the
-                indexes. These feature names should already exist in `input`.
+                indexes. These feature names should already exist in the input.
 
         Returns:
             EventSet with the extended index.
 
         Raises:
-            KeyError: If any of the specified `indexes` are not found in `input`.
+            KeyError: If any of the specified `indexes` are not found in the input.
         """
         from temporian.core.operators.add_index import add_index
 
@@ -493,7 +493,7 @@ class EventSetOperations:
         """Obtains the day of month the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
-        Features in `input` are ignored, only the timestamps are used and
+        Features in the input are ignored, only the timestamps are used and
         they must be unix timestamps (`is_unix_timestamp=True`).
 
         Output feature contains numbers between 1 and 31.
@@ -529,7 +529,7 @@ class EventSetOperations:
         """Obtains the day of the week the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
-        Features in `input` are ignored, only the timestamps are used and
+        Features in the input are ignored, only the timestamps are used and
         they must be unix timestamps (`is_unix_timestamp=True`).
 
         Output feature contains numbers from 0 (Monday) to 6 (Sunday).
@@ -565,7 +565,7 @@ class EventSetOperations:
         """Obtains the hour the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
-        Features in `input` are ignored, only the timestamps are used and
+        Features in the input are ignored, only the timestamps are used and
         they must be unix timestamps (`is_unix_timestamp=True`).
 
         Output feature contains numbers between 0 and 23.
@@ -600,7 +600,7 @@ class EventSetOperations:
         """Obtains the ISO week the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
-        Features in `input` are ignored, only the timestamps are used and
+        Features in the input are ignored, only the timestamps are used and
         they must be unix timestamps (`is_unix_timestamp=True`).
 
         Output feature contains numbers between 1 and 53.
@@ -635,7 +635,7 @@ class EventSetOperations:
         """Obtains the day of year the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
-        Features in `input` are ignored, only the timestamps are used and
+        Features in the input are ignored, only the timestamps are used and
         they must be unix timestamps (`is_unix_timestamp=True`).
 
         Output feature contains numbers between 1 and 366.
@@ -671,7 +671,7 @@ class EventSetOperations:
         """Obtain the minute the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
-        Features in `input` are ignored, only the timestamps are used and
+        Features in the input are ignored, only the timestamps are used and
         they must be unix timestamps (`is_unix_timestamp=True`).
 
         Output feature contains numbers between
@@ -708,7 +708,7 @@ class EventSetOperations:
         """Obtains the month the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
-        Features in `input` are ignored, only the timestamps are used and
+        Features in the input are ignored, only the timestamps are used and
         they must be unix timestamps (`is_unix_timestamp=True`).
 
         Output feature contains numbers between 1 and 12.
@@ -743,7 +743,7 @@ class EventSetOperations:
         """Obtains the second the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
-        Features in `input` are ignored, only the timestamps are used and
+        Features in the input are ignored, only the timestamps are used and
         they must be unix timestamps (`is_unix_timestamp=True`).
 
         Output feature contains numbers between 0 and 59.
@@ -779,7 +779,7 @@ class EventSetOperations:
         """Obtains the year the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
-        Features in `input` are ignored, only the timestamps are used and
+        Features in the input are ignored, only the timestamps are used and
         they must be unix timestamps (`is_unix_timestamp=True`).
 
         Usage example:
@@ -1003,9 +1003,9 @@ class EventSetOperations:
             ```
 
         Args:
-            indexes: Index column(s) to be removed from `input`. This can be a
+            indexes: Index column(s) to be removed from the input. This can be a
                 single column name (`str`) or a list of column names (`List[str]`).
-                If not specified or set to `None`, all indexes in `input` will
+                If not specified or set to `None`, all indexes in the input will
                 be removed. Defaults to `None`.
             keep: Flag indicating whether the removed indexes should be kept
                 as features in the output EventSet. Defaults to `True`.
@@ -1017,9 +1017,9 @@ class EventSetOperations:
         Raises:
             ValueError: If an empty list is provided as the `index_names` argument.
             KeyError: If any of the specified `index_names` are missing from
-                `input`'s index.
+                the input's index.
             ValueError: If a feature name coming from the indexes already exists in
-                `input`, and the `keep` flag is set to `True`.
+                the input, and the `keep` flag is set to `True`.
         """
         from temporian.core.operators.drop_index import drop_index
 
@@ -1100,10 +1100,10 @@ class EventSetOperations:
         """Filters out events in an [`EventSet`][temporian.EventSet] for which a
         condition is false.
 
-        Each timestamp in `input` is only kept if the corresponding value for that
+        Each timestamp in the input is only kept if the corresponding value for that
         timestamp in `condition` is `True`.
 
-        `input` and `condition` must have the same sampling, and `condition` must
+        the input and `condition` must have the same sampling, and `condition` must
         have one single feature, of boolean type.
 
         filter(x) is equivalent to filter(x,x). filter(x) can be used to convert
@@ -1320,7 +1320,7 @@ class EventSetOperations:
         (t - window_length, t].
 
         If `sampling` is provided samples the moving window's value at each
-        timestamp in `sampling`, else samples it at each timestamp in `input`.
+        timestamp in `sampling`, else samples it at each timestamp in the input.
 
         If the window does not contain any values (e.g., all the values are missing,
         or the window does not contain any sampling), outputs missing values.
@@ -1389,10 +1389,10 @@ class EventSetOperations:
         Args:
             window_length: Sliding window's length.
             sampling: Timestamps to sample the sliding window's value at. If not
-                provided, timestamps in `input` are used.
+                provided, timestamps in the input are used.
 
         Returns:
-            EventSet containing the non-nan count of each feature in `input`.
+            EventSet containing the non-nan count of each feature in the input.
         """
         from temporian.core.operators.window.moving_count import moving_count
 
@@ -1413,7 +1413,7 @@ class EventSetOperations:
         (t - window_length, t].
 
         If `sampling` is provided samples the moving window's value at each
-        timestamp in `sampling`, else samples it at each timestamp in `input`.
+        timestamp in `sampling`, else samples it at each timestamp in the input.
 
         If the window does not contain any values (e.g., all the values are missing,
         or the window does not contain any sampling), outputs missing values.
@@ -1441,10 +1441,10 @@ class EventSetOperations:
         Args:
             window_length: Sliding window's length.
             sampling: Timestamps to sample the sliding window's value at. If not
-                provided, timestamps in `input` are used.
+                provided, timestamps in the input are used.
 
         Returns:
-            EventSet containing the max of each feature in `input`.
+            EventSet containing the max of each feature in the input.
         """
         from temporian.core.operators.window.moving_max import moving_max
 
@@ -1463,7 +1463,7 @@ class EventSetOperations:
         (t - window_length, t].
 
         If `sampling` is provided samples the moving window's value at each
-        timestamp in `sampling`, else samples it at each timestamp in `input`.
+        timestamp in `sampling`, else samples it at each timestamp in the input.
 
         If the window does not contain any values (e.g., all the values are missing,
         or the window does not contain any sampling), outputs missing values.
@@ -1491,10 +1491,10 @@ class EventSetOperations:
         Args:
             window_length: Sliding window's length.
             sampling: Timestamps to sample the sliding window's value at. If not
-                provided, timestamps in `input` are used.
+                provided, timestamps in the input are used.
 
         Returns:
-            EventSet containing the minimum of each feature in `input`.
+            EventSet containing the minimum of each feature in the input.
         """
         from temporian.core.operators.window.moving_min import moving_min
 
@@ -1513,7 +1513,7 @@ class EventSetOperations:
         (t - window_length, t].
 
         If `sampling` is provided samples the moving window's value at each
-        timestamp in `sampling`, else samples it at each timestamp in `input`.
+        timestamp in `sampling`, else samples it at each timestamp in the input.
 
         Missing values (such as NaNs) are ignored.
 
@@ -1543,11 +1543,11 @@ class EventSetOperations:
         Args:
             window_length: Sliding window's length.
             sampling: Timestamps to sample the sliding window's value at. If not
-                provided, timestamps in `input` are used.
+                provided, timestamps in the input are used.
 
         Returns:
             EventSet containing the moving standard deviation of each feature in
-            `input`.
+            the input.
         """
         from temporian.core.operators.window.moving_standard_deviation import (
             moving_standard_deviation,
@@ -1569,7 +1569,7 @@ class EventSetOperations:
         t the sum of the feature in the window (t - window_length, t].
 
         If `sampling` is provided samples the moving window's value at each
-        timestamp in `sampling`, else samples it at each timestamp in `input`.
+        timestamp in `sampling`, else samples it at each timestamp in the input.
 
         Missing values (such as NaNs) are ignored.
 
@@ -1599,10 +1599,10 @@ class EventSetOperations:
         Args:
             window_length: Sliding window's length.
             sampling: Timestamps to sample the sliding window's value at. If not
-                provided, timestamps in `input` are used.
+                provided, timestamps in the input are used.
 
         Returns:
-            EventSet containing the moving sum of each feature in `input`.
+            EventSet containing the moving sum of each feature in the input.
         """
         from temporian.core.operators.window.moving_sum import moving_sum
 
@@ -1651,9 +1651,9 @@ class EventSetOperations:
         """Propagates feature values over another [`EventSet`][temporian.EventSet]'s
         index.
 
-        Given `input` and `sampling` where `input`'s indexes are a subset of
-        `sampling`'s (e.g., the indexes of `input` are `["x"]`, and the indexes of
-        `sampling` are `["x","y"]`), duplicates the features of `input` over the
+        Given the input and `sampling` where the input's indexes are a subset of
+        `sampling`'s (e.g., the indexes of the input are `["x"]`, and the indexes of
+        `sampling` are `["x","y"]`), duplicates the features of the input over the
         indexes of `sampling`.
 
         Example use case:
@@ -1784,8 +1784,8 @@ class EventSetOperations:
         another [`EventSet`][temporian.EventSet].
 
         If a timestamp in `sampling` does not have a corresponding timestamp in
-        `input`, the last timestamp in `input` is used instead. If this timestamp
-        is anterior to an value in `input`, the value is replaced by
+        the input, the last timestamp in the input is used instead. If this timestamp
+        is anterior to an value in the input, the value is replaced by
         `dtype.MissingValue(...)`.
 
         Example:
@@ -1941,13 +1941,13 @@ class EventSetOperations:
         Args:
             indexes: List of index / feature names (strings) used as
                 the new indexes. These names should be either indexes or features in
-                `input`.
+                the input.
 
         Returns:
             EventSet with the updated indexes.
 
         Raises:
-            KeyError: If any of the specified `indexes` are not found in `input`.
+            KeyError: If any of the specified `indexes` are not found in the input.
         """
         from temporian.core.operators.add_index import set_index
 
@@ -1965,7 +1965,7 @@ class EventSetOperations:
         t the average value of the feature in the window (t - window_length, t].
 
         If `sampling` is provided samples the moving window's value at each
-        timestamp in `sampling`, else samples it at each timestamp in `input`.
+        timestamp in `sampling`, else samples it at each timestamp in the input.
 
         Missing values (such as NaNs) are ignored.
 
@@ -1995,10 +1995,10 @@ class EventSetOperations:
         Args:
             window_length: Sliding window's length.
             sampling: Timestamps to sample the sliding window's value at. If not
-                provided, timestamps in `input` are used.
+                provided, timestamps in the input are used.
 
         Returns:
-            EventSet containing the moving average of each feature in `input`.
+            EventSet containing the moving average of each feature in the input.
         """
         from temporian.core.operators.window.simple_moving_average import (
             simple_moving_average,
@@ -2017,7 +2017,7 @@ class EventSetOperations:
 
         If `sampling` is provided, the output will correspond to the time elapsed
         between each timestamp in `sampling` and the latest previous timestamp in
-        `input`. Else, the timestamps of `input` will be used as `sampling`.
+        the input. Else, the timestamps of the input will be used as `sampling`.
 
         Example 1:
             ```python
@@ -2052,7 +2052,7 @@ class EventSetOperations:
 
         Returns:
             Resulting EventSet, with same sampling as `sampling` if provided, or as
-                `input` if not.
+                the input if not.
         """
         from temporian.core.operators.since_last import since_last
 
@@ -2180,7 +2180,7 @@ class EventSetOperations:
             ...
 
         Returns:
-            EventSet without features with unique timestamps in `input`.
+            EventSet without features with unique timestamps in the input.
         """
         from temporian.core.operators.unique_timestamps import unique_timestamps
 
