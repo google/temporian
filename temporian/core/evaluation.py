@@ -290,13 +290,13 @@ def has_leak(
 
     Tests if a [`EventSetNode`][temporian.EventSetNode] or collection of nodes
     depends on the only operator that can introduce future leakage:
-    [`tp.leak()`][temporian.leak].
+    [`EventSet.leak()`][temporian.EventSet.leak].
 
     Single input output example:
         ```python
         >>> a = tp.input_node([("f", float)])
         >>> b = tp.moving_sum(a, 5)
-        >>> c = tp.leak(b, 6)
+        >>> c = b.leak(6)
         >>> d = tp.prefix(c, "my_prefix_")
         >>> e = tp.moving_sum(d, 7)
         >>> # The computation of "e" contains a leak.
@@ -318,7 +318,7 @@ def has_leak(
 
     Returns:
         True if and only if the computation of `output` from `inputs` depends
-        on a [`tp.leak()`][temporian.leak] operator.
+        on a [`EventSet.leak()`][temporian.EventSet.leak] operator.
     """
 
     if input is None:

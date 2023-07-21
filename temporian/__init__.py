@@ -88,8 +88,6 @@ from temporian.core.typing import EventSetOrNode
 # --- OPERATORS ---
 
 from temporian.core.operators.glue import glue
-from temporian.core.operators.lag import lag
-from temporian.core.operators.leak import leak
 from temporian.core.operators.prefix import prefix
 from temporian.core.operators.propagate import propagate
 from temporian.core.operators.rename import rename

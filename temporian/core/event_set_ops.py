@@ -18,6 +18,8 @@
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING
 
+from temporian.core.data.duration import Duration
+
 
 if TYPE_CHECKING:
     from temporian.core.typing import EventSetOrNode, TypeOrDType
@@ -453,7 +455,7 @@ class EventSetOperations:
         """
         from temporian.core.operators.add_index import add_index
 
-        return add_index(self, indexes)
+        return add_index(self, indexes=indexes)
 
     def begin(self: EventSetOrNode) -> EventSetOrNode:
         """Generates a single timestamp at the beginning of the
@@ -574,7 +576,7 @@ class EventSetOperations:
         """
         from temporian.core.operators.cast import cast
 
-        return cast(self, target, check_overflow)
+        return cast(self, target=target, check_overflow=check_overflow)
 
     def drop_index(
         self: EventSetOrNode,
@@ -664,7 +666,7 @@ class EventSetOperations:
         """
         from temporian.core.operators.drop_index import drop_index
 
-        return drop_index(self, indexes, keep)
+        return drop_index(self, indexes=indexes, keep=keep)
 
     def end(self: EventSetOrNode) -> EventSetOrNode:
         """Generates a single timestamp at the end of an
@@ -784,7 +786,7 @@ class EventSetOperations:
         """
         from temporian.core.operators.filter import filter
 
-        return filter(self, condition)
+        return filter(self, condition=condition)
 
     def join(
         self: EventSetOrNode,
@@ -879,6 +881,75 @@ class EventSetOperations:
 
         return join(left=self, right=other, how=how, on=on)
 
+    def lag(self: EventSetOrNode, duration: Duration) -> EventSetOrNode:
+        """Adds a delay to an [`EventSet`][temporian.EventSet]'s timestamps.
+
+        In other words, shifts the timestamp values forwards in time.
+
+        Usage example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 5, 6],
+            ...     features={"value": [0, 1, 5, 6]},
+            ... )
+
+            >>> b = a.lag(tp.duration.seconds(2))
+            >>> b
+            indexes: ...
+                (4 events):
+                    timestamps: [2. 3. 7. 8.]
+                    'value': [0 1 5 6]
+            ...
+
+            ```
+
+        Args:
+            duration: Duration to lag by.
+
+        Returns:
+            Lagged EventSet.
+        """
+        from temporian.core.operators.lag import lag
+
+        return lag(self, duration=duration)
+
+    def leak(self: EventSetOrNode, duration: Duration) -> EventSetOrNode:
+        """Subtracts a duration from an [`EventSet`][temporian.EventSet]'s
+        timestamps.
+
+        In other words, shifts the timestamp values backward in time.
+
+        Note that this operator moves future data into the past, and should be used
+        with caution to prevent unwanted future leakage. For instance, this op
+        should generally not be used to compute the input features of a model.
+
+        Usage example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 5, 6],
+            ...     features={"value": [0, 1, 5, 6]},
+            ... )
+
+            >>> b = a.leak(tp.duration.seconds(2))
+            >>> b
+            indexes: ...
+                (4 events):
+                    timestamps: [-2. -1. 3. 4.]
+                    'value': [0 1 5 6]
+            ...
+
+            ```
+
+        Args:
+            duration: Duration to leak by.
+
+        Returns:
+            Leaked EventSet.
+        """
+        from temporian.core.operators.leak import leak
+
+        return leak(self, duration=duration)
+
     def set_index(
         self: EventSetOrNode, indexes: Union[str, List[str]]
     ) -> EventSetOrNode:
@@ -962,4 +1033,4 @@ class EventSetOperations:
         """
         from temporian.core.operators.add_index import set_index
 
-        return set_index(self, indexes)
+        return set_index(self, indexes=indexes)

@@ -80,39 +80,6 @@ operator_lib.register_operator(LeakOperator)
 
 @compile
 def leak(input: EventSetOrNode, duration: Duration) -> EventSetOrNode:
-    """Subtracts a duration from an [`EventSet`][temporian.EventSet]'s
-    timestamps.
-
-    In other words, shifts the timestamp values backward in time.
-
-    Note that this operator moves future data into the past, and should be used
-    with caution to prevent unwanted future leakage. For instance, this op
-    should generally not be used to compute the input features of a model.
-
-    Usage example:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[0, 1, 5, 6],
-        ...     features={"value": [0, 1, 5, 6]},
-        ... )
-
-        >>> b = tp.leak(a, tp.duration.seconds(2))
-        >>> b
-        indexes: ...
-            (4 events):
-                timestamps: [-2. -1. 3. 4.]
-                'value': [0 1 5 6]
-        ...
-
-        ```
-
-    Args:
-        input: EventSet to leak.
-        duration: Duration to leak by.
-
-    Returns:
-        Leaked EventSet.
-    """
     assert isinstance(input, EventSetNode)
 
     normalized_duration = normalize_duration(duration)

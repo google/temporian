@@ -56,7 +56,7 @@ operator_lib.register_operator(BeginOperator)
 
 
 @compile
-def begin(self: EventSetOrNode) -> EventSetOrNode:
-    assert isinstance(self, EventSetNode)
+def begin(input: EventSetOrNode) -> EventSetOrNode:
+    assert isinstance(input, EventSetNode)
 
-    return BeginOperator(input=self).outputs["output"]
+    return BeginOperator(input=input).outputs["output"]

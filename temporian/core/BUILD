@@ -81,7 +81,9 @@ py_library(
     name = "event_set_ops",
     srcs = ["event_set_ops.py"],
     srcs_version = "PY3",
-    deps = [],
+    deps = [
+        "//temporian/core/data:duration",
+    ],
 )
 
 py_library(

@@ -63,6 +63,14 @@ class EventSetOpsTest(absltest.TestCase):
             isinstance(self.node.join(self.other_node), EventSetNode)
         )
 
+    def test_lag(self):
+        self.assertTrue(isinstance(self.evset.lag(3), EventSet))
+        self.assertTrue(isinstance(self.node.lag(3), EventSetNode))
+
+    def test_leak(self):
+        self.assertTrue(isinstance(self.evset.leak(3), EventSet))
+        self.assertTrue(isinstance(self.node.leak(3), EventSetNode))
+
     def test_drop_index(self):
         self.assertTrue(isinstance(self.evset.drop_index("x"), EventSet))
         self.assertTrue(isinstance(self.node.drop_index("x"), EventSetNode))

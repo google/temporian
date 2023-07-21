@@ -204,7 +204,7 @@ class EvaluationTest(absltest.TestCase):
     def test_has_leak(self):
         a = tp.input_node([("f", tp.float32)])
         b = tp.moving_sum(a, 5)
-        c = tp.leak(b, 5)
+        c = b.leak(5)
         d = tp.prefix(c, "something_")
         e = tp.moving_sum(d, 2)
 

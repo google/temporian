@@ -51,8 +51,6 @@ PUBLIC_API_SYMBOLS = {
     "load_graph",
     # OPERATORS
     "glue",
-    "lag",
-    "leak",
     "prefix",
     "propagate",
     "resample",
