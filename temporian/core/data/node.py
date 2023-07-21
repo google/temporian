@@ -20,7 +20,7 @@ from typing import List, Optional, Tuple, TYPE_CHECKING, Union
 
 from temporian.core.data.dtype import DType, IndexDType
 from temporian.core.data.schema import Schema, FeatureSchema, IndexSchema
-from temporian.core.mixins import EventSetOperationsMixin
+from temporian.core.mixins import EventSetOperations
 from temporian.utils import string
 
 if TYPE_CHECKING:
@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     from temporian.core.typing import EventSetCollection, NodeToEventSetMapping
 
 
-class EventSetNode(EventSetOperationsMixin):
+class EventSetNode(EventSetOperations):
     """An EventSetNode is a reference to the input/output of ops in a compute
     graph.
 

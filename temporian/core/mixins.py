@@ -25,63 +25,17 @@ T_SCALAR = (int, float)
 
 
 # TODO: rename to EventSetOperations
-class EventSetOperationsMixin:
+class EventSetOperations:
     """Mixin class for EventSet-like classes.
 
     Defines the methods that can be called on both EventSets and EventSetNodes
     interchangeably.
     """
 
-    def begin(self: EventSetOrNode) -> EventSetOrNode:
-        """Generates a single timestamp at the beginning of the
-        [`EventSet`][temporian.EventSet], per index group.
-
-        Usage example:
-            ```python
-            >>> a = tp.event_set(
-            ...     timestamps=[5, 6, 7, -1],
-            ...     features={"f": [50, 60, 70, -10], "idx": [1, 1, 1, 2]},
-            ...     indexes=["idx"]
-            ... )
-
-            >>> a_ini = a.begin()
-            >>> a_ini
-            indexes: [('idx', int64)]
-            features: []
-            events:
-                idx=1 (1 events):
-                    timestamps: [5.]
-                idx=2 (1 events):
-                    timestamps: [-1.]
-            ...
-
-            ```
-
-        Returns:
-            A feature-less EventSet with a single timestamp per index group.
-        """
-        from temporian.core.operators.begin import begin
-
-        return begin(self)
-
-    # def __init__(self):
-    #     from temporian.core.operators.begin import begin as _begin
-
-    #     setattr(EventSetOperationsMixin, "begin",  _begin
-
     @property
     def _clsname(self) -> str:
         """Shortcut that returns the class' name."""
         return self.__class__.__name__
-
-    #############
-    # OPERATORS #
-    #############
-
-    # def begin(self):
-    #     from temporian.core.operators.begin import begin
-
-    #     return begin(self)
 
     #################
     # MAGIC METHODS #
@@ -416,3 +370,39 @@ class EventSetOperationsMixin:
 
         self._raise_bool_error("^", other)
         assert False
+
+    #############
+    # OPERATORS #
+    #############
+
+    def begin(self: EventSetOrNode) -> EventSetOrNode:
+        """Generates a single timestamp at the beginning of the
+        [`EventSet`][temporian.EventSet], per index group.
+
+        Usage example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[5, 6, 7, -1],
+            ...     features={"f": [50, 60, 70, -10], "idx": [1, 1, 1, 2]},
+            ...     indexes=["idx"]
+            ... )
+
+            >>> a_ini = a.begin()
+            >>> a_ini
+            indexes: [('idx', int64)]
+            features: []
+            events:
+                idx=1 (1 events):
+                    timestamps: [5.]
+                idx=2 (1 events):
+                    timestamps: [-1.]
+            ...
+
+            ```
+
+        Returns:
+            A feature-less EventSet with a single timestamp per index group.
+        """
+        from temporian.core.operators.begin import begin
+
+        return begin(self)

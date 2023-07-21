@@ -15,7 +15,7 @@
 from typing import Dict, List, Set, TypeVar, Union
 
 from temporian.core.data.node import EventSetNode
-from temporian.core.mixins import EventSetOperationsMixin
+from temporian.core.mixins import EventSetOperations
 from temporian.implementation.numpy.data.event_set import EventSet
 
 
@@ -30,7 +30,7 @@ dictionary mapping names to EventSetNodes."""
 
 # TODO: check why __doc__ (or help()) of EventSetOrNode shows TypeVar's doc
 EventSetOrNode = TypeVar(
-    "EventSetOrNode", EventSet, EventSetNode, EventSetOperationsMixin
+    "EventSetOrNode", EventSet, EventSetNode, EventSetOperations
 )
 """Generic type for an [`EventSet`][temporian.EventSet] or
 [`EventSetNode`][temporian.EventSetNode].
