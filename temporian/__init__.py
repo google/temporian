@@ -88,7 +88,6 @@ from temporian.core.typing import EventSetOrNode
 # --- OPERATORS ---
 
 from temporian.core.operators.glue import glue
-from temporian.core.operators.propagate import propagate
 from temporian.core.operators.rename import rename
 from temporian.core.operators.resample import resample
 from temporian.core.operators.select import select

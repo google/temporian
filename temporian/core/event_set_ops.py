@@ -987,6 +987,77 @@ class EventSetOperations:
 
         return _prefix(self, prefix=prefix)
 
+    def propagate(
+        self: EventSetOrNode, sampling: EventSetOrNode, resample: bool = False
+    ) -> EventSetOrNode:
+        """Propagates feature values over another [`EventSet`][temporian.EventSet]'s
+        index.
+
+        Given `input` and `sampling` where `input`'s indexes are a subset of
+        `sampling`'s (e.g., the indexes of `input` are `["x"]`, and the indexes of
+        `sampling` are `["x","y"]`), duplicates the features of `input` over the
+        indexes of `sampling`.
+
+        Example use case:
+            ```python
+            >>> products = tp.event_set(
+            ...     timestamps=[1, 2, 3, 1, 2, 3],
+            ...     features={
+            ...         "product": [1, 1, 1, 2, 2, 2],
+            ...         "sales": [100., 200., 500., 1000., 2000., 5000.]
+            ...     },
+            ...     indexes=["product"],
+            ... )
+            >>> store = tp.event_set(
+            ...     timestamps=[1, 2, 3, 4, 5],
+            ...     features={
+            ...         "sales": [10000., 20000., 30000., 5000., 1000.]
+            ...     },
+            ... )
+
+            >>> # First attempt: divide to calculate fraction of total store sales
+            >>> products / store
+            Traceback (most recent call last):
+                ...
+            ValueError: Arguments don't have the same index. ...
+
+            >>> # Second attempt: propagate index
+            >>> store_prop = store.propagate(products)
+            >>> products / store_prop
+            Traceback (most recent call last):
+                ...
+            ValueError: Arguments should have the same sampling. ...
+
+            >>> # Third attempt: propagate + resample
+            >>> store_resample = store.propagate(products, resample=True)
+            >>> div = products / store_resample
+            >>> div
+            indexes: [('product', int64)]
+            features: [('div_sales_sales', float64)]
+            events:
+                product=1 (3 events):
+                    timestamps: [1. 2. 3.]
+                    'div_sales_sales': [0.01   0.01   0.0167]
+                product=2 (3 events):
+                    timestamps: [1. 2. 3.]
+                    'div_sales_sales': [0.1    0.1    0.1667]
+            ...
+
+            ```
+
+        Args:
+            sampling: EventSet with the indexes to propagate to.
+            resample: If true, apply a [`tp.resample()`][temporian.resample]
+                before propagating, for the output to have the same sampling as
+                `sampling`.
+
+        Returns:
+            EventSet propagated over `sampling`'s index.
+        """
+        from temporian.core.operators.propagate import propagate
+
+        return propagate(self, sampling=sampling, resample=resample)
+
     def set_index(
         self: EventSetOrNode, indexes: Union[str, List[str]]
     ) -> EventSetOrNode:

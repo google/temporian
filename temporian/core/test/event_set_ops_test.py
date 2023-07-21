@@ -6,6 +6,9 @@ from temporian.implementation.numpy.data.io import event_set
 
 
 class EventSetOpsTest(absltest.TestCase):
+    """Tests that all expected operators are available and work on EventSet and
+    EventSetNode and that they return the correct type."""
+
     def setUp(self):
         self.evset = event_set(
             timestamps=[0.1, 0.2, 0.3, 0.4, 0.5],
@@ -78,6 +81,18 @@ class EventSetOpsTest(absltest.TestCase):
     def test_prefix(self):
         self.assertTrue(isinstance(self.evset.prefix("a"), EventSet))
         self.assertTrue(isinstance(self.node.prefix("a"), EventSetNode))
+
+    def test_propagate(self):
+        self.assertTrue(
+            isinstance(
+                self.evset.drop_index("x").propagate(self.evset), EventSet
+            )
+        )
+        self.assertTrue(
+            isinstance(
+                self.node.drop_index("x").propagate(self.node), EventSetNode
+            )
+        )
 
     def test_set_index(self):
         self.assertTrue(isinstance(self.evset.set_index("a"), EventSet))

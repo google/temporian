@@ -144,7 +144,7 @@ def benchmark_propagate(runner):
     for n in [100, 10_000, 1_000_000]:
         ds = _build_toy_dataset(n, data2_is_categorical_integer=True)
         node = ds.node()
-        output = tp.propagate(node["data_1"], node["data_2"])
+        output = node["data_1"].propagate(node["data_2"])
 
         runner.benchmark(
             f"propagate:{n:_}",
