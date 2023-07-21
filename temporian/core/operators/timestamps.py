@@ -92,7 +92,7 @@ def timestamps(input: EventSetOrNode) -> EventSetOrNode:
 
         >>> # Filter using the timestamps
         >>> max_date = datetime(2020, 1, 1).timestamp()
-        >>> c = tp.filter(b, b < max_date)
+        >>> c = b.filter(b < max_date)
 
         >>> # Operate like any other feature
         >>> d = c * 5

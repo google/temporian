@@ -321,7 +321,7 @@ def notnan(
                 'M': [False True False]
         ...
 
-        >>> tp.filter(a, not_nans)
+        >>> a.filter(not_nans)
         indexes: ...
                 'M': [5.]
                 'N': [0]

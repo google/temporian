@@ -39,6 +39,14 @@ class EventSetOpsTest(absltest.TestCase):
         self.assertTrue(isinstance(self.evset.enumerate(), EventSet))
         self.assertTrue(isinstance(self.node.enumerate(), EventSetNode))
 
+    def test_filter(self):
+        self.assertTrue(
+            isinstance(self.evset.filter(self.evset["a"] > 3), EventSet)
+        )
+        self.assertTrue(
+            isinstance(self.node.filter(self.node["a"] > 3), EventSetNode)
+        )
+
     def test_drop_index(self):
         self.assertTrue(isinstance(self.evset.drop_index("x"), EventSet))
         self.assertTrue(isinstance(self.node.drop_index("x"), EventSetNode))
