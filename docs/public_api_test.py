@@ -49,8 +49,6 @@ PUBLIC_API_SYMBOLS = {
     "load",
     "save_graph",
     "load_graph",
-    # UTILS
-    "convert_timestamps_to_datetimes",
     # OPERATORS
     "cast",
     "drop_index",

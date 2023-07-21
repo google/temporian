@@ -54,7 +54,6 @@ from temporian.core.data.schema import Schema
 
 # Durations
 from temporian.core.data import duration
-from temporian.core.data.duration_utils import convert_timestamps_to_datetimes
 
 # EventSets
 from temporian.implementation.numpy.data.event_set import EventSet
