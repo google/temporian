@@ -37,7 +37,7 @@ class TFPTest(absltest.TestCase):
         i2 = evset_2.node()
 
         h1 = tp.simple_moving_average(input=i1, window_length=7)
-        h2 = tp.resample(input=h1, sampling=i2)
+        h2 = h1.resample(i2)
         h3 = i1 * 2.0 + 3.0 > 10.0
 
         result = tp.glue(h2["f2"].prefix("sma_"), i2)
@@ -70,7 +70,7 @@ class TFPTest(absltest.TestCase):
         evset_2 = tp.event_set(timestamps=[1.0, 2.0, 2.0])
 
         h1 = tp.simple_moving_average(input=evset_1, window_length=7)
-        h2 = tp.resample(input=h1, sampling=evset_2)
+        h2 = h1.resample(evset_2)
 
         self.assertTrue(isinstance(h1, tp.EventSet))
         self.assertTrue(isinstance(h2, tp.EventSet))

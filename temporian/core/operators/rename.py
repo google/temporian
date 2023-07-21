@@ -191,7 +191,7 @@ def rename(
         >>> b = 5 * a
 
         >>> # Rename single feature
-        >>> b_1 = tp.rename(b["f1"], "f1_result")
+        >>> b_1 = b["f1"].rename("f1_result")
         >>> b_1
         indexes: []
         features: [('f1_result', int64)]
@@ -202,7 +202,7 @@ def rename(
         ...
 
         >>> # Rename multiple features
-        >>> b_rename = tp.rename(b, {"f1": "5xf1", "f2": "5xf2"})
+        >>> b_rename = b.rename({"f1": "5xf1", "f2": "5xf2"})
         >>> b_rename
         indexes: []
         features: [('5xf1', int64), ('5xf2', int64)]

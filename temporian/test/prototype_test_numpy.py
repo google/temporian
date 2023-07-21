@@ -99,7 +99,7 @@ class PrototypeTest(absltest.TestCase):
         # TODO: Restore when arithmetic operator is fixed.
         # b = tp.glue(a, self.node_1 + self.node_2)
         c = self.node_1.lag(duration=1).prefix("lag[1s]_")
-        d = tp.glue(a, tp.resample(c, a))
+        d = tp.glue(a, c.resample(a))
         sub_sales = (-self.node_1["sales"]).prefix("negated_")
         e = tp.glue(d, sub_sales)
         output_node = e

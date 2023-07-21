@@ -171,7 +171,7 @@ def add(
         ValueError: ... should have the same sampling. ...
 
         >>> # Resample a to match b timestamps
-        >>> c = tp.resample(a, sampling=b) + b
+        >>> c = a.resample(b) + b
         >>> c
         indexes: []
         features: [('add_fa_fb', int64)]
@@ -210,7 +210,7 @@ def add(
         >>> # Add index 'cat' to b
         >>> b = b.add_index("cat")
         >>> # Make explicit same samplings and add
-        >>> c = a + tp.resample(b, a)
+        >>> c = a + b.resample(a)
         >>> c
         indexes: [('cat', int64)]
         features: [('add_M_N', int64)]

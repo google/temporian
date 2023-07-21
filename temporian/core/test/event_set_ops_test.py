@@ -94,6 +94,18 @@ class EventSetOpsTest(absltest.TestCase):
             )
         )
 
+    def test_rename(self):
+        self.assertTrue(isinstance(self.other_evset.rename("d"), EventSet))
+        self.assertTrue(isinstance(self.other_node.rename("d"), EventSetNode))
+
+    def test_resample(self):
+        self.assertTrue(
+            isinstance(self.evset.resample(self.other_evset), EventSet)
+        )
+        self.assertTrue(
+            isinstance(self.node.resample(self.other_node), EventSetNode)
+        )
+
     def test_set_index(self):
         self.assertTrue(isinstance(self.evset.set_index("a"), EventSet))
         self.assertTrue(isinstance(self.node.set_index("a"), EventSetNode))

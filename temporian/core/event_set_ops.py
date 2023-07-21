@@ -805,7 +805,7 @@ class EventSetOperations:
         almost free while [`EventSet.join()`][temporian.EventSet.join] can be expensive.
 
         To resample an EventSets according to another EventSets's sampling, use
-        [`tp.resample()`][temporian.resample] instead.
+        [`EventSet.resample()`][temporian.EventSet.resample] instead.
 
         Example:
 
@@ -1047,7 +1047,7 @@ class EventSetOperations:
 
         Args:
             sampling: EventSet with the indexes to propagate to.
-            resample: If true, apply a [`tp.resample()`][temporian.resample]
+            resample: If true, apply a [`EventSet.resample()`][temporian.EventSet.resample]
                 before propagating, for the output to have the same sampling as
                 `sampling`.
 
@@ -1057,6 +1057,105 @@ class EventSetOperations:
         from temporian.core.operators.propagate import propagate
 
         return propagate(self, sampling=sampling, resample=resample)
+
+    def rename(
+        self: EventSetOrNode,
+        features: Optional[Union[str, Dict[str, str]]] = None,
+        indexes: Optional[Union[str, Dict[str, str]]] = None,
+    ) -> EventSetOrNode:
+        """Renames an [`EventSet`][temporian.EventSet]'s features and index.
+
+        If the input has a single feature, then the `features` can be a
+        single string with the new name.
+
+        If the input has multiple features, then `features` must be a mapping
+        with the old names as keys and the new names as values.
+
+        The indexes renaming follows the same criteria, accepting a single string or
+        a mapping for multiple indexes.
+
+        Usage example:
+            ```python
+            >>> a = tp.event_set(
+            ...    timestamps=[0, 1],
+            ...    features={"f1": [0, 2], "f2": [5, 6]}
+            ... )
+            >>> b = 5 * a
+
+            >>> # Rename single feature
+            >>> b_1 = b["f1"].rename("f1_result")
+            >>> b_1
+            indexes: []
+            features: [('f1_result', int64)]
+            events:
+                (2 events):
+                    timestamps: [0. 1.]
+                    'f1_result': [ 0 10]
+            ...
+
+            >>> # Rename multiple features
+            >>> b_rename = b.rename({"f1": "5xf1", "f2": "5xf2"})
+            >>> b_rename
+            indexes: []
+            features: [('5xf1', int64), ('5xf2', int64)]
+            events:
+                (2 events):
+                    timestamps: [0. 1.]
+                    '5xf1': [ 0 10]
+                    '5xf2': [25 30]
+            ...
+
+            ```
+
+        Args:
+            features: New feature name or mapping from old names to new names.
+            indexes: New index name or mapping from old names to new names.
+
+        Returns:
+            EventSet with renamed features and index.
+        """
+        from temporian.core.operators.rename import rename
+
+        return rename(self, features=features, indexes=indexes)
+
+    def resample(
+        self: EventSetOrNode,
+        sampling: EventSetOrNode,
+    ) -> EventSetOrNode:
+        """Resamples an [`EventSet`][temporian.EventSet] at each timestamp of
+        another [`EventSet`][temporian.EventSet].
+
+        If a timestamp in `sampling` does not have a corresponding timestamp in
+        `input`, the last timestamp in `input` is used instead. If this timestamp
+        is anterior to an value in `input`, the value is replaced by
+        `dtype.MissingValue(...)`.
+
+        Example:
+
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 5, 8, 9],
+            ...     features={"f1": [1.0, 2.0, 3.0, 4.0]}
+            ... )
+            >>> b = tp.event_set(timestamps=[-1, 1, 6, 10])
+            >>> c = a.resample(b)
+            >>> c
+            indexes: ...
+                    timestamps: [-1.  1.  6. 10.]
+                    'f1': [nan  1.  2.  4.]
+            ...
+
+            ```
+
+        Args:
+            sampling: EventSet to use the sampling of.
+
+        Returns:
+            Resampled EventSet, with same sampling as `sampling`.
+        """
+        from temporian.core.operators.resample import resample
+
+        return resample(self, sampling=sampling)
 
     def set_index(
         self: EventSetOrNode, indexes: Union[str, List[str]]

@@ -96,7 +96,7 @@ def timestamps(input: EventSetOrNode) -> EventSetOrNode:
 
         >>> # Operate like any other feature
         >>> d = c * 5
-        >>> e = tp.glue(tp.rename(c, 'filtered'), tp.rename(d, 'multiplied'))
+        >>> e = tp.glue(c.rename('filtered'), d.rename('multiplied'))
         >>> e
         indexes: []
         features: [('filtered', float64), ('multiplied', float64)]

@@ -139,7 +139,7 @@ class EventSetNode(EventSetOperations):
                 " the same sampling, use the argument `same_sampling_as` of"
                 " `tp.event_set` or `tp.input_node`. To align the sampling of"
                 " two EventSets with same indexes but different sampling,"
-                " use the operator `tp.resample`."
+                " use `EventSet.resample()`."
             )
 
     def run(

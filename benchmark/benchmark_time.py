@@ -131,7 +131,7 @@ def benchmark_sample(runner):
 
             node_1 = ds_1.node()
             node_2 = ds_2.node()
-            output = tp.resample(node_1, node_2)
+            output = node_1.resample(node_2)
 
             runner.benchmark(
                 f"sample:e{m:_}_s{n:_}",
