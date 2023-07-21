@@ -76,7 +76,7 @@ def main():
     node_2._sampling = node_1._sampling
 
     a = tp.glue(node_1, node_2)
-    b = tp.prefix(tp.simple_moving_average(a, window_length=10.0), "sma_")
+    b = tp.simple_moving_average(a, window_length=10.0).prefix("sma_")
     c = tp.glue(a, tp.resample(b, a))
 
     res: EventSet = tp.run(

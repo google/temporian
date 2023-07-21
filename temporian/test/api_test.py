@@ -40,9 +40,9 @@ class TFPTest(absltest.TestCase):
         h2 = tp.resample(input=h1, sampling=i2)
         h3 = i1 * 2.0 + 3.0 > 10.0
 
-        result = tp.glue(tp.prefix(h2["f2"], "sma_"), i2)
+        result = tp.glue(h2["f2"].prefix("sma_"), i2)
 
-        result2 = tp.glue(tp.prefix(h3, "toto."))
+        result2 = tp.glue(h3.prefix("toto."))
 
         result_data, result2_data = tp.run(
             query=[result, result2],
@@ -79,9 +79,9 @@ class TFPTest(absltest.TestCase):
 
         h3 = evset_1 * 2.0 + 3.0 > 10.0
 
-        result = tp.glue(tp.prefix(h2["f2"], "sma_"), evset_2)
+        result = tp.glue(h2["f2"].prefix("sma_"), evset_2)
 
-        result2 = tp.glue(tp.prefix(h3, "toto."))
+        result2 = tp.glue(h3.prefix("toto."))
 
         self.assertTrue(isinstance(result, tp.EventSet))
         self.assertTrue(isinstance(result2, tp.EventSet))

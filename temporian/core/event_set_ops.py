@@ -950,6 +950,43 @@ class EventSetOperations:
 
         return leak(self, duration=duration)
 
+    def prefix(
+        self: EventSetOrNode,
+        prefix: str,
+    ) -> EventSetOrNode:
+        """Adds a prefix to the names of the features in an
+        [`EventSet`][temporian.EventSet].
+
+        Usage example:
+            ```python
+            >>> a = tp.event_set(
+            ...    timestamps=[0, 1],
+            ...    features={"f1": [0, 2], "f2": [5, 6]}
+            ... )
+            >>> b = a * 5
+
+            >>> # Prefix before glue to avoid duplicated names
+            >>> c = tp.glue(a.prefix("original_"), b.prefix("result_"))
+            >>> c
+            indexes: ...
+                    'original_f1': [0 2]
+                    'original_f2': [5 6]
+                    'result_f1': [ 0 10]
+                    'result_f2': [25 30]
+            ...
+
+            ```
+
+        Args:
+            prefix: Prefix to add in front of the feature names.
+
+        Returns:
+            Prefixed EventSet.
+        """
+        from temporian.core.operators.prefix import prefix as _prefix
+
+        return _prefix(self, prefix=prefix)
+
     def set_index(
         self: EventSetOrNode, indexes: Union[str, List[str]]
     ) -> EventSetOrNode:

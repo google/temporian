@@ -51,7 +51,6 @@ PUBLIC_API_SYMBOLS = {
     "load_graph",
     # OPERATORS
     "glue",
-    "prefix",
     "propagate",
     "resample",
     "select",

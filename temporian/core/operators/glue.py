@@ -158,7 +158,7 @@ def glue(
         >>> b = 3 * a
 
         # Add a prefix before glue
-        >>> output = tp.glue(a, tp.prefix(b, "3x"))
+        >>> output = tp.glue(a, b.prefix("3x"))
         >>> output.schema.features
         [('M', int64), ('N', int64), ('3xM', int64), ('3xN', int64)]
 
