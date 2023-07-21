@@ -90,13 +90,15 @@ plugins:
             show_submodules: false
             merge_init_into_class: false
             show_signature: true
-            separate_signature: true
             show_signature_annotations: true
+            separate_signature: true
             show_if_no_docstring: false
             group_by_category: true
             show_category_heading: false
             show_root_heading: true
             inherited_members: true
+            show_bases: false
+            # show_root_full_path: false
             # show_root_toc_entry: false
             # show_symbol_type_heading: false
             # preload_modules: [temporian.core.operators]
