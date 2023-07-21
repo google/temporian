@@ -46,7 +46,7 @@ The list of all available operators is available in the [API Reference](./refere
 >>> sma = tp.simple_moving_average(evset, window_length=tp.duration.days(2))
 
 >>> # Remove index to get a flat EventSet
->>> reindexed = tp.drop_index(sma)
+>>> reindexed = sma.drop_index()
 
 >>> # Subtract feature_1 from feature_3
 >>> sub = reindexed["feature_3"] - reindexed["feature_1"]

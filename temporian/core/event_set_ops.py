@@ -16,7 +16,7 @@
 
 
 from __future__ import annotations
-from typing import Any, Dict, List, Union, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING
 
 
 if TYPE_CHECKING:
@@ -575,6 +575,164 @@ class EventSetOperations:
         from temporian.core.operators.cast import cast
 
         return cast(self, target, check_overflow)
+
+    def drop_index(
+        self: EventSetOrNode,
+        indexes: Optional[Union[str, List[str]]] = None,
+        keep: bool = True,
+    ) -> EventSetOrNode:
+        """Removes indexes from an [`EventSet`][temporian.EventSet].
+
+        Usage example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 1, 0, 1, 1],
+            ...     features={
+            ...         "f1": [1, 1, 1, 2, 2, 2],
+            ...         "f2": [1, 1, 2, 1, 1, 2],
+            ...         "f3": [1, 1, 1, 1, 1, 1]
+            ...     },
+            ...     indexes=["f1", "f2"]
+            ... )
+
+            >>> # Both f1 and f2 are indices
+            >>> a
+            indexes: [('f1', int64), ('f2', int64)]
+            features: [('f3', int64)]
+            events:
+                f1=1 f2=1 (2 events):
+                    timestamps: [1. 2.]
+                    'f3': [1 1]
+                f1=1 f2=2 (1 events):
+                    timestamps: [1.]
+                    'f3': [1]
+                f1=2 f2=1 (2 events):
+                    timestamps: [0. 1.]
+                    'f3': [1 1]
+                f1=2 f2=2 (1 events):
+                    timestamps: [1.]
+                    'f3': [1]
+            ...
+
+            >>> # Drop "f2", remove it from features
+            >>> b = a.drop_index("f2", keep=False)
+            >>> b
+            indexes: [('f1', int64)]
+            features: [('f3', int64)]
+            events:
+                f1=1 (3 events):
+                    timestamps: [1. 1. 2.]
+                    'f3': [1 1 1]
+                f1=2 (3 events):
+                    timestamps: [0. 1. 1.]
+                    'f3': [1 1 1]
+            ...
+
+            >>> # Drop both indices, keep them as features
+            >>> b = a.drop_index(["f2", "f1"])
+            >>> b
+            indexes: []
+            features: [('f3', int64), ('f2', int64), ('f1', int64)]
+            events:
+                (6 events):
+                    timestamps: [0. 1. 1. 1. 1. 2.]
+                    'f3': [1 1 1 1 1 1]
+                    'f2': [2 1 1 2 2 1]
+                    'f1': [1 2 1 2 1 1]
+            ...
+
+            ```
+
+        Args:
+            indexes: Index column(s) to be removed from `input`. This can be a
+                single column name (`str`) or a list of column names (`List[str]`).
+                If not specified or set to `None`, all indexes in `input` will
+                be removed. Defaults to `None`.
+            keep: Flag indicating whether the removed indexes should be kept
+                as features in the output EventSet. Defaults to `True`.
+
+        Returns:
+            EventSet with the specified indexes removed. If `keep` is set to
+            `True`, the removed indexes will be included as features in it.
+
+        Raises:
+            ValueError: If an empty list is provided as the `index_names` argument.
+            KeyError: If any of the specified `index_names` are missing from
+                `input`'s index.
+            ValueError: If a feature name coming from the indexes already exists in
+                `input`, and the `keep` flag is set to `True`.
+        """
+        from temporian.core.operators.drop_index import drop_index
+
+        return drop_index(self, indexes, keep)
+
+    def end(self: EventSetOrNode) -> EventSetOrNode:
+        """Generates a single timestamp at the end of an
+        [`EventSet`][temporian.EventSet], per index key.
+
+        Usage example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[5, 6, 7, 1],
+            ...     features={"f": [50, 60, 70, 10], "idx": [1, 1, 1, 2]},
+            ...     indexes=["idx"]
+            ... )
+
+            >>> a_end = tp.end(a)
+            >>> a_end
+            indexes: [('idx', int64)]
+            features: []
+            events:
+                idx=1 (1 events):
+                    timestamps: [7.]
+                idx=2 (1 events):
+                    timestamps: [1.]
+            ...
+
+            ```
+
+        Returns:
+            A feature-less EventSet with a single timestamp per index group.
+        """
+        from temporian.core.operators.end import end
+
+        return end(self)
+
+    def enumerate(self: EventSetOrNode) -> EventSetOrNode:
+        """Create an `int64` feature with the ordinal position of each event in an
+        [`EventSet`][temporian.EventSet].
+
+        Each index group is enumerated independently.
+
+        Usage:
+            ```python
+            >>> a = tp.event_set(
+            ...    timestamps=[-1, 2, 3, 5, 0],
+            ...    features={"cat": ["A", "A", "A", "A", "B"]},
+            ...    indexes=["cat"],
+            ... )
+            >>> b = a.enumerate()
+            >>> b
+            indexes: [('cat', str_)]
+            features: [('enumerate', int64)]
+            events:
+                cat=b'A' (4 events):
+                    timestamps: [-1.  2.  3.  5.]
+                    'enumerate': [0 1 2 3]
+                cat=b'B' (1 events):
+                    timestamps: [0.]
+                    'enumerate': [0]
+            ...
+
+            ```
+
+        Returns:
+            EventSet with a single feature with each event's ordinal position in
+            its index group.
+        """
+        from temporian.core.operators.enumerate import enumerate
+
+        return enumerate(self)
 
     def set_index(
         self: EventSetOrNode, indexes: Union[str, List[str]]
