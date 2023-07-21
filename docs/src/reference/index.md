@@ -44,7 +44,7 @@ Check the index on the left for a more detailed description of any symbol.
 | [`EventSet.begin()`][temporian.EventSet.begin]                         | Generates a single timestamp at the beginning of the input.                                                  |
 | [`EventSet.cast()`][temporian.EventSet.cast]                           | Casts the dtype of features.                                                                                 |
 | [`EventSet.drop_index()`][temporian.EventSet.drop_index]               | Removes indexes from an [`EventSet`][temporian.EventSet].                                                    |
-| [`tp.end()`][temporian.end]                                            | Generates a single timestamp at the end of the input.                                                        |
+| [`EventSet.end()`][temporian.EventSet.end]                             | Generates a single timestamp at the end of the input.                                                        |
 | [`EventSet.enumerate()`][temporian.EventSet.enumerate]                 | Creates an ordinal feature enumerating the events according to their timestamp.                              |
 | [`EventSet.filter()`][temporian.EventSet.filter]                       | Filters out events in an [`EventSet`][temporian.EventSet] for which a condition is false.                    |
 | [`tp.glue()`][temporian.glue]                                          | Concatenates [`EventSets`][temporian.EventSet] with the same sampling.                                       |

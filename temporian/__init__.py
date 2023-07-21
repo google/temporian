@@ -88,8 +88,6 @@ from temporian.core.typing import EventSetOrNode
 # --- OPERATORS ---
 
 from temporian.core.operators.glue import glue
-from temporian.core.operators.unique_timestamps import unique_timestamps
-from temporian.core.operators.timestamps import timestamps
 
 # Binary operators
 from temporian.core.operators.binary.arithmetic import add

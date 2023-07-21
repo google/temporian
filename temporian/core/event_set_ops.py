@@ -1386,3 +1386,89 @@ class EventSetOperations:
         from temporian.core.operators.tick import tick
 
         return tick(self, interval=interval, align=align)
+
+    def timestamps(self: EventSetOrNode) -> EventSetOrNode:
+        """Converts an [`EventSet`][temporian.EventSet]'s timestamps into a
+        `float64` feature.
+
+        Features in the input EventSet are ignored, only the timestamps are used.
+
+        Datetime timestamps are converted to unix timestamps.
+
+        Integer timestamps example:
+            ```python
+            >>> from datetime import datetime
+            >>> a = tp.event_set(timestamps=[1, 2, 3, 5])
+            >>> b = a.timestamps()
+            >>> b
+            indexes: []
+            features: [('timestamps', float64)]
+            events:
+                (4 events):
+                    timestamps: [1. 2. 3. 5.]
+                    'timestamps': [1. 2. 3. 5.]
+            ...
+
+            ```
+
+        Unix timestamps and filter example:
+            ```python
+            >>> from datetime import datetime
+            >>> a = tp.event_set(
+            ...    timestamps=[datetime(1970,1,1,0,0,30), datetime(2023,1,1,1,0,0)],
+            ... )
+            >>> b = a.timestamps()
+
+            >>> # Filter using the timestamps
+            >>> max_date = datetime(2020, 1, 1).timestamp()
+            >>> c = b.filter(b < max_date)
+
+            >>> # Operate like any other feature
+            >>> d = c * 5
+            >>> e = tp.glue(c.rename('filtered'), d.rename('multiplied'))
+            >>> e
+            indexes: []
+            features: [('filtered', float64), ('multiplied', float64)]
+            events:
+                (1 events):
+                    timestamps: [30.]
+                    'filtered': [30.]
+                    'multiplied': [150.]
+            ...
+
+            ```
+
+        Returns:
+            EventSet with a single feature named `timestamps` with each event's
+            timestamp.
+        """
+        from temporian.core.operators.timestamps import timestamps
+
+        return timestamps(self)
+
+    def unique_timestamps(self: EventSetOrNode) -> EventSetOrNode:
+        """Removes events with duplicated timestamps from an
+        [`EventSet`][temporian.EventSet].
+
+        Returns a feature-less EventSet where each timestamp from the original
+        one only appears once. If the input is indexed, the unique operation is
+        applied independently for each index.
+
+        Usage example:
+            ```python
+            >>> a = tp.event_set(timestamps=[5, 9, 9, 16], features={'f': [1,2,3,4]})
+            >>> b = a.unique_timestamps()
+            >>> b
+            indexes: []
+            features: []
+            events:
+                (3 events):
+                    timestamps: [ 5. 9. 16.]
+            ...
+
+        Returns:
+            EventSet without features with unique timestamps in `input`.
+        """
+        from temporian.core.operators.unique_timestamps import unique_timestamps
+
+        return unique_timestamps(self)

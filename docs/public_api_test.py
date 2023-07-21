@@ -51,14 +51,6 @@ PUBLIC_API_SYMBOLS = {
     "load_graph",
     # OPERATORS
     "glue",
-    "propagate",
-    "resample",
-    "select",
-    "rename",
-    "since_last",
-    "tick",
-    "timestamps",
-    "unique_timestamps",
     # BINARY OPERATORS
     "add",
     "subtract",

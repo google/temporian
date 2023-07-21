@@ -122,6 +122,14 @@ class EventSetOpsTest(absltest.TestCase):
         self.assertTrue(isinstance(self.evset.tick(1), EventSet))
         self.assertTrue(isinstance(self.node.tick(1), EventSetNode))
 
+    def test_timestamps(self):
+        self.assertTrue(isinstance(self.evset.timestamps(), EventSet))
+        self.assertTrue(isinstance(self.node.timestamps(), EventSetNode))
+
+    def test_unique_timestamps(self):
+        self.assertTrue(isinstance(self.evset.unique_timestamps(), EventSet))
+        self.assertTrue(isinstance(self.node.unique_timestamps(), EventSetNode))
+
 
 if __name__ == "__main__":
     absltest.main()

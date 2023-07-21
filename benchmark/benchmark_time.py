@@ -178,7 +178,7 @@ def benchmark_unique_timestamps(runner):
     for n in [100, 10_000, 1_000_000]:
         ds = _build_toy_dataset(n, data2_is_categorical_integer=True)
         node = ds.node()
-        output = tp.unique_timestamps(node["data_1"])
+        output = node["data_1"].unique_timestamps()
 
         runner.benchmark(
             f"unique_timestamps:{n}",
