@@ -141,7 +141,7 @@ def add(
         ValueError: ... corresponding features should have the same dtype. ...
 
         >>> # Cast f1 to float
-        >>> c = tp.cast(a["f1"], float) + a["f2"]
+        >>> c = a["f1"].cast(float) + a["f2"]
         >>> c
         indexes: []
         features: [('add_f1_f2', float64)]
@@ -419,7 +419,7 @@ def divide(
         ValueError: Cannot use the divide operator on feature f1 of type int64. ...
 
         >>> # Cast to tp.float64 or tp.float32 before
-        >>> c = tp.cast(a, float) / tp.cast(b, float)
+        >>> c = a.cast(float) / b.cast(float)
         >>> c
         indexes: []
         features: [('div_f1_f2', float64)]

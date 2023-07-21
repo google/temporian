@@ -159,8 +159,7 @@ def benchmark_cast(runner):
             ds = _build_toy_dataset(n)
 
             node = ds.node()
-            output = tp.cast(
-                node,
+            output = node.cast(
                 {
                     "data_1": tp.int32,
                     "data_2": tp.float32,

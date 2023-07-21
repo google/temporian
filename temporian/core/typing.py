@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, List, Set, TypeVar, Union
+from typing import Dict, List, Set, Type, TypeVar, Union
+from temporian.core.data.dtype import DType
 
 from temporian.core.data.node import EventSetNode
 from temporian.core.event_set_ops import EventSetOperations
@@ -62,3 +63,6 @@ If a single EventSet or a list of EventSets, each EventSet is mapped to their
 own node using [`EventSet.node()`][temporian.EventSet.node], i.e., `[event_set]`
 is equivalent to `{event_set.node() : event_set}`.
 """
+
+
+TypeOrDType = Union[DType, Type[float], Type[int], Type[str], Type[bool]]

@@ -181,7 +181,7 @@ class SerializationTest(absltest.TestCase):
     def test_save_graph_and_load_graph(self):
         input_node = self.evset.node()
         x = input_node
-        x = tp.cast(x, float)
+        x = x.cast(float)
         x = x["x"]
         x = 2 * x
         output_node = x

@@ -23,13 +23,17 @@ class EventSetOpsTest(absltest.TestCase):
         self.assertTrue(isinstance(self.evset.add_index("a"), EventSet))
         self.assertTrue(isinstance(self.node.add_index("a"), EventSetNode))
 
-    def test_set_index(self):
-        self.assertTrue(isinstance(self.evset.set_index("a"), EventSet))
-        self.assertTrue(isinstance(self.node.set_index("a"), EventSetNode))
-
     def test_begin(self):
         self.assertTrue(isinstance(self.evset.begin(), EventSet))
         self.assertTrue(isinstance(self.node.begin(), EventSetNode))
+
+    def test_cast(self):
+        self.assertTrue(isinstance(self.evset.cast({"a": float}), EventSet))
+        self.assertTrue(isinstance(self.node.cast({"a": float}), EventSetNode))
+
+    def test_set_index(self):
+        self.assertTrue(isinstance(self.evset.set_index("a"), EventSet))
+        self.assertTrue(isinstance(self.node.set_index("a"), EventSetNode))
 
 
 if __name__ == "__main__":
