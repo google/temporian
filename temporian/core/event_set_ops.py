@@ -786,6 +786,99 @@ class EventSetOperations:
 
         return filter(self, condition)
 
+    def join(
+        self: EventSetOrNode,
+        other: EventSetOrNode,
+        how: str = "left",
+        on: Optional[str] = None,
+    ) -> EventSetOrNode:
+        """Join [`EventSets`][temporian.EventSet] with different samplings.
+
+        Join features from two EventSets based on timestamps. Optionally, join on
+        timestamps and an extra `int64` feature. Joined EventSets should have the
+        same index and non-overlapping feature names.
+
+        To concatenate EventSets with the same sampling, use
+        [`tp.glue()`][temporian.glue] instead. [`tp.glue()`][temporian.glue] is
+        almost free while [`EventSet.join()`][temporian.EventSet.join] can be expensive.
+
+        To resample an EventSets according to another EventSets's sampling, use
+        [`tp.resample()`][temporian.resample] instead.
+
+        Example:
+
+            ```python
+            >>> a = tp.event_set(timestamps=[0, 1, 2], features={"A": [0, 10, 20]})
+            >>> b = tp.event_set(timestamps=[0, 2, 4], features={"B": [0., 2., 4.]})
+
+            >>> # Left join
+            >>> c = a.join(b)
+            >>> c
+            indexes: []
+            features: [('A', int64), ('B', float64)]
+            events:
+                (3 events):
+                    timestamps: [0. 1. 2.]
+                    'A': [ 0 10 20]
+                    'B': [ 0. nan 2.]
+            ...
+
+            ```
+
+        Example with an index and feature join:
+
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 1, 1],
+            ...     features={
+            ...         "idx": [1, 1, 2, 2],
+            ...         "match": [1, 2, 4, 5],
+            ...         "A": [10, 20, 40, 50],
+            ...     },
+            ...     indexes=["idx"]
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[0, 1, 0, 1, 1, 1],
+            ...     features={
+            ...         "idx": [1, 1, 2, 2, 2, 2],
+            ...         "match": [1, 2, 3, 4, 5, 6],
+            ...         "B": [10., 20., 30., 40., 50., 60.],
+            ...     },
+            ...     indexes=["idx"]
+            ... )
+
+            >>> # Join by index and 'match'
+            >>> c = a.join(b, on="match")
+            >>> c
+            indexes: [('idx', int64)]
+            features: [('match', int64), ('A', int64), ('B', float64)]
+            events:
+                idx=1 (2 events):
+                    timestamps: [0. 1.]
+                    'match': [1 2]
+                    'A': [10 20]
+                    'B': [10. 20.]
+                idx=2 (2 events):
+                    timestamps: [1. 1.]
+                    'match': [4 5]
+                    'A': [40 50]
+                    'B': [40. 50.]
+            ...
+
+            ```
+
+        Args:
+            other: Right EventSet to join.
+            how: Whether to perform a `"left"`, `"inner"`, or `"outer"` join.
+                Currently, only `"left"` join is supported.
+            on: Optional extra int64 feature name to join on.
+
+        Returns
+        """
+        from temporian.core.operators.join import join
+
+        return join(left=self, right=other, how=how, on=on)
+
     def set_index(
         self: EventSetOrNode, indexes: Union[str, List[str]]
     ) -> EventSetOrNode:

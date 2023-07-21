@@ -85,16 +85,9 @@ from temporian.core.compilation import compile
 # Types
 from temporian.core.typing import EventSetOrNode
 
-
 # --- OPERATORS ---
 
-from temporian.core.operators.add_index import set_index
-from temporian.core.operators.cast import cast
-from temporian.core.operators.drop_index import drop_index
-from temporian.core.operators.end import end
-from temporian.core.operators.filter import filter
 from temporian.core.operators.glue import glue
-from temporian.core.operators.join import join
 from temporian.core.operators.lag import lag
 from temporian.core.operators.leak import leak
 from temporian.core.operators.prefix import prefix
@@ -106,7 +99,6 @@ from temporian.core.operators.since_last import since_last
 from temporian.core.operators.tick import tick
 from temporian.core.operators.unique_timestamps import unique_timestamps
 from temporian.core.operators.timestamps import timestamps
-from temporian.core.operators.enumerate import enumerate
 
 # Binary operators
 from temporian.core.operators.binary.arithmetic import add

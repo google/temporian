@@ -17,7 +17,17 @@ class EventSetOpsTest(absltest.TestCase):
             },
             indexes=["x", "y"],
         )
+        self.other_evset = event_set(
+            timestamps=[0.4, 0.5, 0.6, 0.7],
+            features={
+                "c": [11, 12, 13, 14],
+                "x": [1, 1, 1, 2],
+                "y": ["hello", "hello", "hello", "world"],
+            },
+            indexes=["x", "y"],
+        )
         self.node = self.evset.node()
+        self.other_node = self.other_evset.node()
 
     def test_add_index(self):
         self.assertTrue(isinstance(self.evset.add_index("a"), EventSet))
@@ -45,6 +55,12 @@ class EventSetOpsTest(absltest.TestCase):
         )
         self.assertTrue(
             isinstance(self.node.filter(self.node["a"] > 3), EventSetNode)
+        )
+
+    def test_join(self):
+        self.assertTrue(isinstance(self.evset.join(self.other_evset), EventSet))
+        self.assertTrue(
+            isinstance(self.node.join(self.other_node), EventSetNode)
         )
 
     def test_drop_index(self):
