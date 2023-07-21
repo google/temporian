@@ -40,7 +40,7 @@ Check the index on the left for a more detailed description of any symbol.
 
 | Symbols                                                 | Description                                                                                                                  |
 | ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| [`tp.add_index()`][temporian.add_index]                 | Adds indexes to an [`EventSetNode`][temporian.EventSetNode].                                                                 |
+| [`EventSet.add_index()`][temporian.EventSet.add_index]  | Adds indexes to an [`EventSetNode`][temporian.EventSetNode].                                                                 |
 | [`EventSet.begin()`][temporian.EventSet.begin]          | Generates a single timestamp at the beginning of the input.                                                                  |
 | [`tp.cast()`][temporian.cast]                           | Casts the dtype of features.                                                                                                 |
 | [`tp.drop_index()`][temporian.drop_index]               | Removes indexes from an [`EventSetNode`][temporian.EventSetNode].                                                            |

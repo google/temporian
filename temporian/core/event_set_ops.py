@@ -18,13 +18,13 @@
 from __future__ import annotations
 from typing import Any, List, Union, TYPE_CHECKING
 
+
 if TYPE_CHECKING:
     from temporian.core.typing import EventSetOrNode
 
 T_SCALAR = (int, float)
 
 
-# TODO: rename to EventSetOperations
 class EventSetOperations:
     """Mixin class for EventSet-like classes.
 
@@ -375,6 +375,86 @@ class EventSetOperations:
     # OPERATORS #
     #############
 
+    def add_index(
+        self: EventSetOrNode, indexes: Union[str, List[str]]
+    ) -> EventSetOrNode:
+        """Adds indexes to an [`EventSet`][temporian.EventSet].
+
+        Usage example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 1, 0, 1, 1],
+            ...     features={
+            ...         "f1": [1, 1, 1, 2, 2, 2],
+            ...         "f2": [1, 1, 2, 1, 1, 2],
+            ...         "f3": [1, 1, 1, 1, 1, 1]
+            ...     },
+            ... )
+
+            >>> # No index
+            >>> a
+            indexes: []
+            features: [('f1', int64), ('f2', int64), ('f3', int64)]
+            events:
+                (6 events):
+                    timestamps: [0. 1. 1. 1. 1. 2.]
+                    'f1': [2 1 1 2 2 1]
+                    'f2': [1 1 2 1 2 1]
+                    'f3': [1 1 1 1 1 1]
+            ...
+
+            >>> # Add only "f1" as index
+            >>> b = a.add_index("f1")
+            >>> b
+            indexes: [('f1', int64)]
+            features: [('f2', int64), ('f3', int64)]
+            events:
+                f1=1 (3 events):
+                    timestamps: [1. 1. 2.]
+                    'f2': [1 2 1]
+                    'f3': [1 1 1]
+                f1=2 (3 events):
+                    timestamps: [0. 1. 1.]
+                    'f2': [1 1 2]
+                    'f3': [1 1 1]
+            ...
+
+            >>> # Add "f1" and "f2" as indices
+            >>> b = a.add_index(["f1", "f2"])
+            >>> b
+            indexes: [('f1', int64), ('f2', int64)]
+            features: [('f3', int64)]
+            events:
+                f1=1 f2=1 (2 events):
+                    timestamps: [1. 2.]
+                    'f3': [1 1]
+                f1=1 f2=2 (1 events):
+                    timestamps: [1.]
+                    'f3': [1]
+                f1=2 f2=1 (2 events):
+                    timestamps: [0. 1.]
+                    'f3': [1 1]
+                f1=2 f2=2 (1 events):
+                    timestamps: [1.]
+                    'f3': [1]
+            ...
+
+            ```
+
+        Args:
+            indexes: List of feature names (strings) that should be added to the
+                indexes. These feature names should already exist in `input`.
+
+        Returns:
+            EventSet with the extended index.
+
+        Raises:
+            KeyError: If any of the specified `indexes` are not found in `input`.
+        """
+        from temporian.core.operators.add_index import add_index
+
+        return add_index(self, indexes)
+
     def begin(self: EventSetOrNode) -> EventSetOrNode:
         """Generates a single timestamp at the beginning of the
         [`EventSet`][temporian.EventSet], per index group.
@@ -406,3 +486,88 @@ class EventSetOperations:
         from temporian.core.operators.begin import begin
 
         return begin(self)
+
+    def set_index(
+        self: EventSetOrNode, indexes: Union[str, List[str]]
+    ) -> EventSetOrNode:
+        """Replaces the index in an [`EventSet`][temporian.EventSet].
+
+        Usage example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 1, 0, 1, 1],
+            ...     features={
+            ...         "f1": [1, 1, 1, 2, 2, 2],
+            ...         "f2": [1, 1, 2, 1, 1, 2],
+            ...         "f3": [1, 1, 1, 1, 1, 1]
+            ...     },
+            ...     indexes=["f1"],
+            ... )
+
+            >>> # "f1" is the current index
+            >>> a
+            indexes: [('f1', int64)]
+            features: [('f2', int64), ('f3', int64)]
+            events:
+                f1=1 (3 events):
+                    timestamps: [1. 1. 2.]
+                    'f2': [1 2 1]
+                    'f3': [1 1 1]
+                f1=2 (3 events):
+                    timestamps: [0. 1. 1.]
+                    'f2': [1 1 2]
+                    'f3': [1 1 1]
+            ...
+
+            >>> # Set "f2" as the only index, remove "f1"
+            >>> b = a.set_index("f2")
+            >>> b
+            indexes: [('f2', int64)]
+            features: [('f3', int64), ('f1', int64)]
+            events:
+                f2=1 (4 events):
+                    timestamps: [0. 1. 1. 2.]
+                    'f3': [1 1 1 1]
+                    'f1': [2 1 2 1]
+                f2=2 (2 events):
+                    timestamps: [1. 1.]
+                    'f3': [1 1]
+                    'f1': [1 2]
+            ...
+
+            >>> # Set both "f1" and "f2" as indices
+            >>> b = a.set_index(["f1", "f2"])
+            >>> b
+            indexes: [('f1', int64), ('f2', int64)]
+            features: [('f3', int64)]
+            events:
+                f1=1 f2=1 (2 events):
+                    timestamps: [1. 2.]
+                    'f3': [1 1]
+                f1=1 f2=2 (1 events):
+                    timestamps: [1.]
+                    'f3': [1]
+                f1=2 f2=1 (2 events):
+                    timestamps: [0. 1.]
+                    'f3': [1 1]
+                f1=2 f2=2 (1 events):
+                    timestamps: [1.]
+                    'f3': [1]
+            ...
+
+            ```
+
+        Args:
+            indexes: List of index / feature names (strings) used as
+                the new indexes. These names should be either indexes or features in
+                `input`.
+
+        Returns:
+            EventSet with the updated indexes.
+
+        Raises:
+            KeyError: If any of the specified `indexes` are not found in `input`.
+        """
+        from temporian.core.operators.add_index import set_index
+
+        return set_index(self, indexes)

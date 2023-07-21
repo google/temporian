@@ -78,8 +78,8 @@ py_library(
 )
 
 py_library(
-    name = "mixins",
-    srcs = ["mixins.py"],
+    name = "event_set_ops",
+    srcs = ["event_set_ops.py"],
     srcs_version = "PY3",
     deps = [],
 )

@@ -279,7 +279,7 @@ def benchmark_add_index(runner):
         ]
 
         for index in possible_indexes:
-            output = tp.add_index(node, index)
+            output = node.add_index(index)
             runner.benchmark(
                 f"add_index:s:{number_timestamps:_}:num_idx:{len(index)}",
                 lambda: tp.run(output, input={node: evset}),

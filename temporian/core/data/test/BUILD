@@ -16,14 +16,3 @@ py_test(
         "//temporian/implementation/numpy/data:event_set",
     ],
 )
-
-py_test(
-    name = "node_ops_test",
-    srcs = ["node_ops_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        "//temporian",
-        "//temporian/implementation/numpy/data:event_set",
-    ],
-)

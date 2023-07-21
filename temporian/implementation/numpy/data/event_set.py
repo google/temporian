@@ -36,7 +36,7 @@ from temporian.core.data.node import (
     create_node_with_new_reference,
 )
 from temporian.core.data.schema import Schema
-from temporian.core.mixins import EventSetOperations
+from temporian.core.event_set_ops import EventSetOperations
 from temporian.utils import string
 from temporian.utils import config
 

@@ -15,7 +15,7 @@
 from typing import Dict, List, Set, TypeVar, Union
 
 from temporian.core.data.node import EventSetNode
-from temporian.core.mixins import EventSetOperations
+from temporian.core.event_set_ops import EventSetOperations
 from temporian.implementation.numpy.data.event_set import EventSet
 
 

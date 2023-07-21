@@ -56,7 +56,6 @@ PUBLIC_API_SYMBOLS = {
     "filter",
     "glue",
     "join",
-    "add_index",
     "set_index",
     "lag",
     "leak",

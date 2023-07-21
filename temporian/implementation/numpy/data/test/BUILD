@@ -18,16 +18,6 @@ py_test(
 )
 
 py_test(
-    name = "event_set_ops_test",
-    srcs = ["event_set_ops_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        "//temporian/implementation/numpy/data:io",
-    ],
-)
-
-py_test(
     name = "plotter_test",
     srcs = ["plotter_test.py"],
     srcs_version = "PY3",

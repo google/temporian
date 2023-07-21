@@ -208,7 +208,7 @@ def add(
         ValueError: Arguments don't have the same index. ...
 
         >>> # Add index 'cat' to b
-        >>> b = tp.add_index(b, "cat")
+        >>> b = b.add_index("cat")
         >>> # Make explicit same samplings and add
         >>> c = a + tp.resample(b, a)
         >>> c

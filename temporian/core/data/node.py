@@ -20,7 +20,7 @@ from typing import List, Optional, Tuple, TYPE_CHECKING, Union
 
 from temporian.core.data.dtype import DType, IndexDType
 from temporian.core.data.schema import Schema, FeatureSchema, IndexSchema
-from temporian.core.mixins import EventSetOperations
+from temporian.core.event_set_ops import EventSetOperations
 from temporian.utils import string
 
 if TYPE_CHECKING:

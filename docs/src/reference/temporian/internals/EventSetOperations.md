@@ -1,1 +1,1 @@
-::: temporian.core.mixins.EventSetOperations
+::: temporian.core.event_set_ops.EventSetOperations
