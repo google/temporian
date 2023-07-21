@@ -13,8 +13,8 @@ class EventSetOpsTest(absltest.TestCase):
         self.evset = event_set(
             timestamps=[0.1, 0.2, 0.3, 0.4, 0.5],
             features={
-                "a": [1, 2, 3, 7, 8],
-                "b": [4, 5, 6, 9, 10],
+                "a": [1.0, 2.0, 3.0, 7.0, 8.0],
+                "b": [4.0, 5.0, 6.0, 9.0, 10.0],
                 "x": [1, 1, 1, 2, 2],
                 "y": ["hello", "hello", "hello", "world", "world"],
             },
@@ -90,6 +90,10 @@ class EventSetOpsTest(absltest.TestCase):
         self.assertTrue(isinstance(self.evset.cast({"a": float}), EventSet))
         self.assertTrue(isinstance(self.node.cast({"a": float}), EventSetNode))
 
+    def test_cumsum(self):
+        self.assertTrue(isinstance(self.evset.cumsum(), EventSet))
+        self.assertTrue(isinstance(self.node.cumsum(), EventSetNode))
+
     def test_drop_index(self):
         self.assertTrue(isinstance(self.evset.drop_index("x"), EventSet))
         self.assertTrue(isinstance(self.node.drop_index("x"), EventSetNode))
@@ -123,6 +127,30 @@ class EventSetOpsTest(absltest.TestCase):
     def test_leak(self):
         self.assertTrue(isinstance(self.evset.leak(3), EventSet))
         self.assertTrue(isinstance(self.node.leak(3), EventSetNode))
+
+    def test_moving_count(self):
+        self.assertTrue(isinstance(self.evset.moving_count(1), EventSet))
+        self.assertTrue(isinstance(self.node.moving_count(1), EventSetNode))
+
+    def test_moving_max(self):
+        self.assertTrue(isinstance(self.evset.moving_max(1), EventSet))
+        self.assertTrue(isinstance(self.node.moving_max(1), EventSetNode))
+
+    def test_moving_min(self):
+        self.assertTrue(isinstance(self.evset.moving_min(1), EventSet))
+        self.assertTrue(isinstance(self.node.moving_min(1), EventSetNode))
+
+    def test_moving_standard_deviation(self):
+        self.assertTrue(
+            isinstance(self.evset.moving_standard_deviation(1), EventSet)
+        )
+        self.assertTrue(
+            isinstance(self.node.moving_standard_deviation(1), EventSetNode)
+        )
+
+    def test_moving_sum(self):
+        self.assertTrue(isinstance(self.evset.moving_sum(1), EventSet))
+        self.assertTrue(isinstance(self.node.moving_sum(1), EventSetNode))
 
     def test_prefix(self):
         self.assertTrue(isinstance(self.evset.prefix("a"), EventSet))
@@ -159,6 +187,14 @@ class EventSetOpsTest(absltest.TestCase):
     def test_set_index(self):
         self.assertTrue(isinstance(self.evset.set_index("a"), EventSet))
         self.assertTrue(isinstance(self.node.set_index("a"), EventSetNode))
+
+    def test_simple_moving_average(self):
+        self.assertTrue(
+            isinstance(self.evset.simple_moving_average(1.0), EventSet)
+        )
+        self.assertTrue(
+            isinstance(self.node.simple_moving_average(1.0), EventSetNode)
+        )
 
     def test_since_last(self):
         self.assertTrue(isinstance(self.evset.since_last(), EventSet))

@@ -36,7 +36,7 @@ class TFPTest(absltest.TestCase):
         i1 = evset_1.node()
         i2 = evset_2.node()
 
-        h1 = tp.simple_moving_average(input=i1, window_length=7)
+        h1 = i1.simple_moving_average(window_length=7)
         h2 = h1.resample(i2)
         h3 = i1 * 2.0 + 3.0 > 10.0
 
@@ -69,7 +69,7 @@ class TFPTest(absltest.TestCase):
 
         evset_2 = tp.event_set(timestamps=[1.0, 2.0, 2.0])
 
-        h1 = tp.simple_moving_average(input=evset_1, window_length=7)
+        h1 = evset_1.simple_moving_average(window_length=7)
         h2 = h1.resample(evset_2)
 
         self.assertTrue(isinstance(h1, tp.EventSet))
@@ -90,14 +90,10 @@ class TFPTest(absltest.TestCase):
         evset = tp.event_set(timestamps=[0.0])
 
         with self.assertRaises(ValueError):
-            tp.simple_moving_average(
-                evset, window_length=7, sampling=evset.node()
-            )
+            evset.simple_moving_average(window_length=7, sampling=evset.node())
 
         with self.assertRaises(ValueError):
-            tp.simple_moving_average(
-                evset.node(), window_length=7, sampling=evset
-            )
+            evset.node().simple_moving_average(window_length=7, sampling=evset)
 
     def test_pandas(self):
         evset = tp.event_set(
@@ -114,7 +110,7 @@ class TFPTest(absltest.TestCase):
 
     def test_serialization(self):
         a = tp.input_node([("f1", tp.float32), ("f2", tp.float32)])
-        b = tp.simple_moving_average(input=a, window_length=7)
+        b = a.simple_moving_average(window_length=7)
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_graph.tem")
@@ -129,7 +125,7 @@ class TFPTest(absltest.TestCase):
         a = tp.input_node(
             [("f1", tp.float32), ("f2", tp.float32)], name="my_source_node"
         )
-        b = tp.simple_moving_average(input=a, window_length=7)
+        b = a.simple_moving_average(window_length=7)
         b.name = "my_output_node"
 
         with tempfile.TemporaryDirectory() as tempdir:
@@ -150,7 +146,7 @@ class TFPTest(absltest.TestCase):
             [("f1", tp.float32), ("f2", tp.float32)],
             name="my_source_node",
         )
-        b = tp.simple_moving_average(input=a, window_length=7)
+        b = a.simple_moving_average(window_length=7)
         b.name = "my_output_node"
 
         with tempfile.TemporaryDirectory() as tempdir:
@@ -171,7 +167,7 @@ class TFPTest(absltest.TestCase):
             [("f1", tp.float32), ("f2", tp.float32)],
             name="my_source_node",
         )
-        b = tp.simple_moving_average(input=a, window_length=7)
+        b = a.simple_moving_average(window_length=7)
         b.name = "my_output_node"
 
         with tempfile.TemporaryDirectory() as tempdir:

@@ -55,7 +55,7 @@ input_data = tp.from_csv("sales.csv")
 # Define a Temporian program
 input_node = input_data.node()
 per_store = tp.set_index(input_node, "store")
-weekly_sum = tp.moving_sum(per_store["price"], window_length=tp.duration.days(7))
+weekly_sum = per_store["price"].moving_sum(window_length=tp.duration.days(7))
 
 # Execute Temporian program
 output_data = weekly_sum.run({input_node: input_data})

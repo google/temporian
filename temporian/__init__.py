@@ -132,15 +132,6 @@ from temporian.core.operators.unary import notnan
 from temporian.core.operators.unary import abs
 from temporian.core.operators.unary import log
 
-# Window operators
-from temporian.core.operators.window.simple_moving_average import simple_moving_average
-from temporian.core.operators.window.moving_standard_deviation import moving_standard_deviation
-from temporian.core.operators.window.moving_sum import cumsum
-from temporian.core.operators.window.moving_sum import moving_sum
-from temporian.core.operators.window.moving_count import moving_count
-from temporian.core.operators.window.moving_min import moving_min
-from temporian.core.operators.window.moving_max import moving_max
-
 # Remove automatic file tree symbols from public API
 # pylint: disable=undefined-variable
 del proto

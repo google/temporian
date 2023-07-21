@@ -61,7 +61,7 @@ def main():
 
     node = evset.node()
 
-    sma = tp.simple_moving_average(node, window_length=10)
+    sma = node.simple_moving_average(window_length=10)
 
     res: EventSet = tp.run(
         sma,

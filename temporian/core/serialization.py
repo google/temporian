@@ -177,7 +177,7 @@ def save_graph(
 
         >>> # Create a graph
         >>> a = evset.node()
-        >>> b = tp.moving_sum(a, 2)
+        >>> b = a.moving_sum(2)
         >>> b = b.rename("result_feature")
 
         >>> # Check evaluation

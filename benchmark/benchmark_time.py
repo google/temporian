@@ -82,7 +82,7 @@ def benchmark_simple_moving_average(runner):
         ds = _build_toy_dataset(n)
 
         node = ds.node()
-        output = tp.simple_moving_average(node, window_length=10.0)
+        output = node.simple_moving_average(window_length=10.0)
 
         runner.benchmark(
             f"simple_moving_average:{n:_}",

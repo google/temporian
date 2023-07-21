@@ -265,7 +265,7 @@ def isnan(
         ...
 
         >>> # Count nans
-        >>> tp.cumsum(b["M"].cast(int))
+        >>> b["M"].cast(int).cumsum()
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'M': [1 1 2]

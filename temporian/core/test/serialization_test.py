@@ -112,7 +112,7 @@ class SerializationTest(absltest.TestCase):
         )
 
         input_node = input_data.node()
-        output_node = tp.simple_moving_average(input_node, 2.0)
+        output_node = input_node.simple_moving_average(2.0)
 
         original = graph.infer_graph_named_nodes(
             {"i": input_node},

@@ -47,7 +47,7 @@ class TFPTest(absltest.TestCase):
 
         # Create a graph.
         input_node = tp.input_node([("a", tp.str_), ("b", tp.float32)])
-        output_node = tp.moving_sum(input_node["b"], 4)
+        output_node = input_node["b"].moving_sum(4)
 
         # Execute the graph in Beam and export the result in a csv file.
         with TestPipeline() as p:
@@ -91,8 +91,8 @@ class TFPTest(absltest.TestCase):
         # multi-IO op is implemented.
         input_node_1 = tp.input_node([("a", tp.float32)])
         input_node_2 = tp.input_node([("b", tp.float32)])
-        output_node_1 = tp.moving_sum(input_node_1, 4)
-        output_node_2 = tp.moving_sum(input_node_2, 4)
+        output_node_1 = input_node_1.moving_sum(4)
+        output_node_2 = input_node_2.moving_sum(4)
 
         # Execute the graph in Beam and export the result in a csv file.
         with TestPipeline() as p:

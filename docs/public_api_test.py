@@ -88,14 +88,6 @@ PUBLIC_API_SYMBOLS = {
     "invert",
     "isnan",
     "notnan",
-    # WINDOW OPERATORS
-    "simple_moving_average",
-    "moving_standard_deviation",
-    "cumsum",
-    "moving_sum",
-    "moving_count",
-    "moving_min",
-    "moving_max",
 }
 
 

@@ -897,6 +897,44 @@ class EventSetOperations:
 
         return cast(self, target=target, check_overflow=check_overflow)
 
+    def cumsum(
+        self: EventSetOrNode,
+    ) -> EventSetOrNode:
+        """Computes the cumulative sum of values over each feature in an
+        [`EventSet`][temporian.EventSet].
+
+        Foreach timestamp, calculate the sum of the feature from the beginning.
+        Shorthand for `moving_sum(event, window_length=np.inf)`.
+
+        Missing values are ignored.
+
+        While the feature does not have any values (e.g., missing initial values),
+        outputs missing values.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 5, 6, 7],
+            ...     features={"value": [np.nan, 1, 5, 10, 15, 20]},
+            ... )
+
+            >>> b = a.cumsum()
+            >>> b
+            indexes: ...
+                (6 events):
+                    timestamps: [0. 1. 2. 5. 6. 7.]
+                    'value': [ 0. 1.  6.  16.  31.  51.]
+            ...
+
+            ```
+
+        Returns:
+            Cumulative sum of each feature in `node`.
+        """
+        from temporian.core.operators.window.moving_sum import cumsum
+
+        return cumsum(self)
+
     def drop_index(
         self: EventSetOrNode,
         indexes: Optional[Union[str, List[str]]] = None,
@@ -1269,6 +1307,307 @@ class EventSetOperations:
 
         return leak(self, duration=duration)
 
+    def moving_count(
+        self: EventSetOrNode,
+        window_length: Duration,
+        sampling: Optional[EventSetOrNode] = None,
+    ) -> EventSetOrNode:
+        """Computes the number of values in a sliding window over an
+        [`EventSet`][temporian.EventSet].
+
+        For each t in sampling, and for each index and feature independently,
+        returns at time t the number of non-nan values for the feature in the window
+        (t - window_length, t].
+
+        If `sampling` is provided samples the moving window's value at each
+        timestamp in `sampling`, else samples it at each timestamp in `input`.
+
+        If the window does not contain any values (e.g., all the values are missing,
+        or the window does not contain any sampling), outputs missing values.
+
+        Basic example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 5, 6, 7],
+            ...     features={"value": [np.nan, 1, 5, 10, 15, 20]},
+            ... )
+
+            >>> b = a.moving_count(tp.duration.seconds(2))
+            >>> b
+            indexes: ...
+                (6 events):
+                    timestamps: [0. 1. 2. 5. 6. 7.]
+                    'value': [0 1 2 1 2 2]
+            ...
+
+            ```
+
+        Example with external sampling:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 5],
+            ...     features={"value": [np.nan, 1, 5, 10]},
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[-1, 0, 1, 2, 3, 4, 5, 6, 7],
+            ... )
+            >>> c = a.moving_count(tp.duration.seconds(2), sampling=b)
+            >>> c
+            indexes: ...
+                (9 events):
+                    timestamps: [-1. 0. 1. 2. 3. 4. 5. 6. 7.]
+                    'value': [0 0 1 2 1 0 1 1 0]
+            ...
+
+            ```
+
+        Example with indices:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3, 0, 1, 2],
+            ...     features={
+            ...         "value": [1, 1, 1, 1, 1, 1],
+            ...         "idx": ["i1", "i1", "i1", "i2", "i2", "i2"],
+            ...     },
+            ...     indexes=["idx"],
+            ... )
+            >>> b = a.moving_count(tp.duration.seconds(2))
+            >>> b
+            indexes: [('idx', str_)]
+            features: [('value', int32)]
+            events:
+                idx=b'i1' (3 events):
+                    timestamps: [1. 2. 3.]
+                    'value': [1 2 2]
+                idx=b'i2' (3 events):
+                    timestamps: [0. 1. 2.]
+                    'value': [1 2 2]
+            ...
+
+            ```
+
+        Args:
+            window_length: Sliding window's length.
+            sampling: Timestamps to sample the sliding window's value at. If not
+                provided, timestamps in `input` are used.
+
+        Returns:
+            EventSet containing the non-nan count of each feature in `input`.
+        """
+        from temporian.core.operators.window.moving_count import moving_count
+
+        return moving_count(
+            self, window_length=window_length, sampling=sampling
+        )
+
+    def moving_max(
+        self: EventSetOrNode,
+        window_length: Duration,
+        sampling: Optional[EventSetOrNode] = None,
+    ) -> EventSetOrNode:
+        """Computes the maximum in a sliding window over an
+        [`EventSet`][temporian.EventSet].
+
+        For each t in sampling, and for each index and feature independently,
+        returns at time t the max of non-nan values for the feature in the window
+        (t - window_length, t].
+
+        If `sampling` is provided samples the moving window's value at each
+        timestamp in `sampling`, else samples it at each timestamp in `input`.
+
+        If the window does not contain any values (e.g., all the values are missing,
+        or the window does not contain any sampling), outputs missing values.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 5, 6, 7],
+            ...     features={"value": [np.nan, 1, 5, 1, 15, 20]},
+            ... )
+
+            >>> b = a.moving_max(tp.duration.seconds(4))
+            >>> b
+            indexes: ...
+                (6 events):
+                    timestamps: [0. 1. 2. 5. 6. 7.]
+                    'value': [nan 1. 5. 5. 15. 20.]
+            ...
+
+            ```
+
+        See [`EventSet.moving_count()`][temporian.EventSet.moving_count] for
+        examples with external sampling and indices.
+
+        Args:
+            window_length: Sliding window's length.
+            sampling: Timestamps to sample the sliding window's value at. If not
+                provided, timestamps in `input` are used.
+
+        Returns:
+            EventSet containing the max of each feature in `input`.
+        """
+        from temporian.core.operators.window.moving_max import moving_max
+
+        return moving_max(self, window_length=window_length, sampling=sampling)
+
+    def moving_min(
+        self: EventSetOrNode,
+        window_length: Duration,
+        sampling: Optional[EventSetOrNode] = None,
+    ) -> EventSetOrNode:
+        """Computes the minimum of values in a sliding window over an
+        [`EventSet`][temporian.EventSet].
+
+        For each t in sampling, and for each index and feature independently,
+        returns at time t the minimum of non-nan values for the feature in the window
+        (t - window_length, t].
+
+        If `sampling` is provided samples the moving window's value at each
+        timestamp in `sampling`, else samples it at each timestamp in `input`.
+
+        If the window does not contain any values (e.g., all the values are missing,
+        or the window does not contain any sampling), outputs missing values.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 5, 6, 7],
+            ...     features={"value": [np.nan, 1, 5, 10, 15, 20]},
+            ... )
+
+            >>> b = a.moving_min(tp.duration.seconds(4))
+            >>> b
+            indexes: ...
+                (6 events):
+                    timestamps: [0. 1. 2. 5. 6. 7.]
+                    'value': [nan 1. 1. 5. 10. 10.]
+            ...
+
+            ```
+
+        See [`EventSet.moving_count()`][temporian.EventSet.moving_count] for examples
+        of moving window operations with external sampling and indices.
+
+        Args:
+            window_length: Sliding window's length.
+            sampling: Timestamps to sample the sliding window's value at. If not
+                provided, timestamps in `input` are used.
+
+        Returns:
+            EventSet containing the minimum of each feature in `input`.
+        """
+        from temporian.core.operators.window.moving_min import moving_min
+
+        return moving_min(self, window_length=window_length, sampling=sampling)
+
+    def moving_standard_deviation(
+        self: EventSetOrNode,
+        window_length: Duration,
+        sampling: Optional[EventSetOrNode] = None,
+    ) -> EventSetOrNode:
+        """Computes the standard deviation of values in a sliding window over an
+        [`EventSet`][temporian.EventSet].
+
+        For each t in sampling, and for each feature independently, returns at time
+        t the standard deviation for the feature in the window
+        (t - window_length, t].
+
+        If `sampling` is provided samples the moving window's value at each
+        timestamp in `sampling`, else samples it at each timestamp in `input`.
+
+        Missing values (such as NaNs) are ignored.
+
+        If the window does not contain any values (e.g., all the values are missing,
+        or the window does not contain any sampling), outputs missing values.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 5, 6, 7],
+            ...     features={"value": [np.nan, 1, 5, 10, 15, 20]},
+            ... )
+
+            >>> b = a.moving_standard_deviation(tp.duration.seconds(4))
+            >>> b
+            indexes: ...
+                (6 events):
+                    timestamps: [0. 1. 2. 5. 6. 7.]
+                    'value': [ nan 0.  2.  2.5  2.5  4.0825]
+            ...
+
+            ```
+
+        See [`EventSet.moving_count()`][temporian.EventSet.moving_count] for examples of moving window
+        operations with external sampling and indices.
+
+        Args:
+            window_length: Sliding window's length.
+            sampling: Timestamps to sample the sliding window's value at. If not
+                provided, timestamps in `input` are used.
+
+        Returns:
+            EventSet containing the moving standard deviation of each feature in
+            `input`.
+        """
+        from temporian.core.operators.window.moving_standard_deviation import (
+            moving_standard_deviation,
+        )
+
+        return moving_standard_deviation(
+            self, window_length=window_length, sampling=sampling
+        )
+
+    def moving_sum(
+        self: EventSetOrNode,
+        window_length: Duration,
+        sampling: Optional[EventSetOrNode] = None,
+    ) -> EventSetOrNode:
+        """Computes the sum of values in a sliding window over an
+        [`EventSet`][temporian.EventSet].
+
+        For each t in sampling, and for each feature independently, returns at time
+        t the sum of the feature in the window (t - window_length, t].
+
+        If `sampling` is provided samples the moving window's value at each
+        timestamp in `sampling`, else samples it at each timestamp in `input`.
+
+        Missing values (such as NaNs) are ignored.
+
+        If the window does not contain any values (e.g., all the values are missing,
+        or the window does not contain any sampling), outputs missing values.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 5, 6, 7],
+            ...     features={"value": [np.nan, 1, 5, 10, 15, 20]},
+            ... )
+
+            >>> b = a.moving_sum(tp.duration.seconds(4))
+            >>> b
+            indexes: ...
+                (6 events):
+                    timestamps: [0. 1. 2. 5. 6. 7.]
+                    'value': [ 0. 1.  6.  15.  25.  45.]
+            ...
+
+            ```
+
+        See [`EventSet.moving_count()`][temporian.EventSet.moving_count] for examples of moving window
+        operations with external sampling and indices.
+
+        Args:
+            window_length: Sliding window's length.
+            sampling: Timestamps to sample the sliding window's value at. If not
+                provided, timestamps in `input` are used.
+
+        Returns:
+            EventSet containing the moving sum of each feature in `input`.
+        """
+        from temporian.core.operators.window.moving_sum import moving_sum
+
+        return moving_sum(self, window_length=window_length, sampling=sampling)
+
     def prefix(
         self: EventSetOrNode,
         prefix: str,
@@ -1613,6 +1952,61 @@ class EventSetOperations:
         from temporian.core.operators.add_index import set_index
 
         return set_index(self, indexes=indexes)
+
+    def simple_moving_average(
+        self: EventSetOrNode,
+        window_length: Duration,
+        sampling: Optional[EventSetOrNode] = None,
+    ) -> EventSetOrNode:
+        """Computes the average of values in a sliding window over an
+        [`EventSet`][temporian.EventSet].
+
+        For each t in sampling, and for each feature independently, returns at time
+        t the average value of the feature in the window (t - window_length, t].
+
+        If `sampling` is provided samples the moving window's value at each
+        timestamp in `sampling`, else samples it at each timestamp in `input`.
+
+        Missing values (such as NaNs) are ignored.
+
+        If the window does not contain any values (e.g., all the values are missing,
+        or the window does not contain any sampling), outputs missing values.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 5, 6, 7],
+            ...     features={"value": [np.nan, 1, 5, 10, 15, 20]},
+            ... )
+
+            >>> b = a.simple_moving_average(tp.duration.seconds(4))
+            >>> b
+            indexes: ...
+                (6 events):
+                    timestamps: [0. 1. 2. 5. 6. 7.]
+                    'value': [ nan 1.  3. 7.5  12.5  15. ]
+            ...
+
+            ```
+
+        See [`EventSet.moving_count()`][temporian.EventSet.moving_count] for examples of moving window
+        operations with external sampling and indices.
+
+        Args:
+            window_length: Sliding window's length.
+            sampling: Timestamps to sample the sliding window's value at. If not
+                provided, timestamps in `input` are used.
+
+        Returns:
+            EventSet containing the moving average of each feature in `input`.
+        """
+        from temporian.core.operators.window.simple_moving_average import (
+            simple_moving_average,
+        )
+
+        return simple_moving_average(
+            self, window_length=window_length, sampling=sampling
+        )
 
     def since_last(
         self: EventSetOrNode,
