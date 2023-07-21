@@ -106,9 +106,21 @@ class EventSetOpsTest(absltest.TestCase):
             isinstance(self.node.resample(self.other_node), EventSetNode)
         )
 
+    def test_select(self):
+        self.assertTrue(isinstance(self.evset.select("a"), EventSet))
+        self.assertTrue(isinstance(self.node.select("a"), EventSetNode))
+
     def test_set_index(self):
         self.assertTrue(isinstance(self.evset.set_index("a"), EventSet))
         self.assertTrue(isinstance(self.node.set_index("a"), EventSetNode))
+
+    def test_since_last(self):
+        self.assertTrue(isinstance(self.evset.since_last(), EventSet))
+        self.assertTrue(isinstance(self.node.since_last(), EventSetNode))
+
+    def test_tick(self):
+        self.assertTrue(isinstance(self.evset.tick(1), EventSet))
+        self.assertTrue(isinstance(self.node.tick(1), EventSetNode))
 
 
 if __name__ == "__main__":

@@ -1157,6 +1157,59 @@ class EventSetOperations:
 
         return resample(self, sampling=sampling)
 
+    def select(
+        self: EventSetOrNode,
+        feature_names: Union[str, List[str]],
+    ) -> EventSetOrNode:
+        """Selects a subset of features from an [`EventSet`][temporian.EventSet].
+
+        Usage example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2],
+            ...     features={"A": [1, 2], "B": ['s', 'm'], "C": [5.0, 5.5]},
+            ... )
+
+            >>> # Select single feature
+            >>> b = a.select('B')
+            >>> # Equivalent
+            >>> b = a['B']
+            >>> b
+            indexes: []
+            features: [('B', str_)]
+            events:
+                (2 events):
+                    timestamps: [1. 2.]
+                    'B': [b's' b'm']
+            ...
+
+            >>> # Select multiple features
+            >>> bc = a.select(['B', 'C'])
+            >>> # Equivalent
+            >>> bc = a[['B', 'C']]
+            >>> bc
+            indexes: []
+            features: [('B', str_), ('C', float64)]
+            events:
+                (2 events):
+                    timestamps: [1. 2.]
+                    'B': [b's' b'm']
+                    'C': [5.  5.5]
+            ...
+
+            ```
+
+        Args:
+            feature_names: Name or list of names of the features to select from the
+                input.
+
+        Returns:
+            EventSet containing only the selected features.
+        """
+        from temporian.core.operators.select import select
+
+        return select(self, feature_names=feature_names)
+
     def set_index(
         self: EventSetOrNode, indexes: Union[str, List[str]]
     ) -> EventSetOrNode:
@@ -1241,3 +1294,95 @@ class EventSetOperations:
         from temporian.core.operators.add_index import set_index
 
         return set_index(self, indexes=indexes)
+
+    def since_last(
+        self: EventSetOrNode,
+        sampling: Optional[EventSetOrNode] = None,
+    ) -> EventSetOrNode:
+        """Computes the amount of time since the last distinct timestamp in an
+        [`EventSet`][temporian.EventSet].
+
+        If `sampling` is provided, the output will correspond to the time elapsed
+        between each timestamp in `sampling` and the latest previous timestamp in
+        `input`. Else, the timestamps of `input` will be used as `sampling`.
+
+        Example 1:
+            ```python
+            >>> a = tp.event_set(timestamps=[1, 5, 8, 8, 9])
+            >>> b = a.since_last()
+            >>> b
+            indexes: ...
+                    timestamps: [1. 5. 8. 8. 9.]
+                    'since_last': [nan  4.  3.  0.  1.]
+            ...
+
+            ```
+
+        Example 2:
+            ```python
+            >>> a = tp.event_set(timestamps=[2, 5, 7])
+            >>> b = tp.event_set(timestamps=[1, 4, 6, 10])
+
+            >>> # Time elapsed between each sampling event
+            >>> # and the latest previous event in a
+            >>> c = a.since_last(b)
+            >>> c
+            indexes: ...
+                    timestamps: [ 1. 4. 6. 10.]
+                    'since_last': [nan  2.  1.  3.]
+            ...
+
+            ```
+
+        Args:
+            sampling: EventSet to use the sampling of.
+
+        Returns:
+            Resulting EventSet, with same sampling as `sampling` if provided, or as
+                `input` if not.
+        """
+        from temporian.core.operators.since_last import since_last
+
+        return since_last(self, sampling=sampling)
+
+    def tick(
+        self: EventSetOrNode, interval: Duration, align: bool = True
+    ) -> EventSetOrNode:
+        """Generates timestamps at regular intervals in the range of a guide
+        [`EventSet`][temporian.EventSet].
+
+        Example with align:
+            ```python
+            >>> a = tp.event_set(timestamps=[5, 9, 16])
+            >>> b = a.tick(interval=tp.duration.seconds(3), align=True)
+            >>> b
+            indexes: ...
+                    timestamps: [ 6. 9. 12. 15.]
+            ...
+
+            ```
+
+        Example without align:
+            ```python
+            >>> a = tp.event_set(timestamps=[5, 9, 16])
+            >>> b = a.tick(interval=tp.duration.seconds(3), align=False)
+            >>> b
+            indexes: ...
+                    timestamps: [ 5. 8. 11. 14.]
+            ...
+
+            ```
+
+        Args:
+            interval: Tick interval.
+            align: If false, the first tick is generated at the first timestamp
+                (similar to [`EventSet.begin()`][temporian.EventSet.begin]).
+                If true (default), ticks are generated on timestamps that are
+                multiple of `interval`.
+
+        Returns:
+            A feature-less EventSet with regular timestamps.
+        """
+        from temporian.core.operators.tick import tick
+
+        return tick(self, interval=interval, align=align)

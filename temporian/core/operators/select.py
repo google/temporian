@@ -94,53 +94,6 @@ def select(
     input: EventSetOrNode,
     feature_names: Union[str, List[str]],
 ) -> EventSetOrNode:
-    """Selects a subset of features from an [`EventSet`][temporian.EventSet].
-
-    Args:
-        input: EventSet to select features from.
-        feature_names: Name or list of names of the features to select from the
-            input.
-
-    Usage example:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[1, 2],
-        ...     features={"A": [1, 2], "B": ['s', 'm'], "C": [5.0, 5.5]},
-        ... )
-
-        >>> # Select single feature
-        >>> b = tp.select(a, 'B')
-        >>> # Equivalent
-        >>> b = a['B']
-        >>> b
-        indexes: []
-        features: [('B', str_)]
-        events:
-            (2 events):
-                timestamps: [1. 2.]
-                'B': [b's' b'm']
-        ...
-
-        >>> # Select multiple features
-        >>> bc = tp.select(a, ['B', 'C'])
-        >>> # Equivalent
-        >>> bc = a[['B', 'C']]
-        >>> bc
-        indexes: []
-        features: [('B', str_), ('C', float64)]
-        events:
-            (2 events):
-                timestamps: [1. 2.]
-                'B': [b's' b'm']
-                'C': [5.  5.5]
-        ...
-
-        ```
-
-
-    Returns:
-        EventSet containing only the selected features.
-    """
     assert isinstance(input, EventSetNode)
 
     if isinstance(feature_names, list) and all(
