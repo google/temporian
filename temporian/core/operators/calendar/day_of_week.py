@@ -36,38 +36,6 @@ operator_lib.register_operator(CalendarDayOfWeekOperator)
 
 @compile
 def calendar_day_of_week(sampling: EventSetOrNode) -> EventSetOrNode:
-    """Obtains the day of the week the timestamps in an
-    [`EventSet`][temporian.EventSet]'s sampling are in.
-
-    Features in `input` are ignored, only the timestamps are used and
-    they must be unix timestamps (`is_unix_timestamp=True`).
-
-    Output feature contains numbers from 0 (Monday) to 6 (Sunday).
-
-    Usage example:
-        ```python
-        >>> a = tp.event_set(
-        ...    timestamps=["2023-06-19", "2023-06-21", "2023-06-25", "2023-07-03"],
-        ... )
-        >>> b = tp.calendar_day_of_week(a)
-        >>> b
-        indexes: ...
-        features: [('calendar_day_of_week', int32)]
-        events:
-            (4 events):
-                timestamps: [...]
-                'calendar_day_of_week': [0  2  6  0]
-        ...
-
-        ```
-
-    Args:
-        sampling: EventSet to get the days of week from.
-
-    Returns:
-        EventSet with a single feature with the day of the week each timestamp
-        in `sampling` belongs to.
-    """
     assert isinstance(sampling, EventSetNode)
 
     return CalendarDayOfWeekOperator(sampling).outputs["output"]

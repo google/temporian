@@ -109,17 +109,6 @@ from temporian.core.operators.binary.logical import logical_and
 from temporian.core.operators.binary.logical import logical_or
 from temporian.core.operators.binary.logical import logical_xor
 
-# Calendar operators
-from temporian.core.operators.calendar.day_of_month import calendar_day_of_month
-from temporian.core.operators.calendar.day_of_week import calendar_day_of_week
-from temporian.core.operators.calendar.day_of_year import calendar_day_of_year
-from temporian.core.operators.calendar.hour import calendar_hour
-from temporian.core.operators.calendar.iso_week import calendar_iso_week
-from temporian.core.operators.calendar.minute import calendar_minute
-from temporian.core.operators.calendar.month import calendar_month
-from temporian.core.operators.calendar.second import calendar_second
-from temporian.core.operators.calendar.year import calendar_year
-
 # Scalar operators
 from temporian.core.operators.scalar.arithmetic_scalar import add_scalar
 from temporian.core.operators.scalar.arithmetic_scalar import subtract_scalar

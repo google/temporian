@@ -114,7 +114,7 @@ def benchmark_calendar_day_of_month(runner):
         ds = tp.from_pandas(pd.DataFrame({"timestamp": timestamps}))
 
         node = ds.node()
-        output = tp.calendar_day_of_month(node)
+        output = node.calendar_day_of_month()
 
         runner.benchmark(
             f"calendar_day_of_month:{n:_}",

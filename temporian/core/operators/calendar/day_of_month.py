@@ -36,38 +36,6 @@ operator_lib.register_operator(CalendarDayOfMonthOperator)
 
 @compile
 def calendar_day_of_month(sampling: EventSetOrNode) -> EventSetOrNode:
-    """Obtains the day of month the timestamps in an
-    [`EventSet`][temporian.EventSet]'s sampling are in.
-
-    Features in `input` are ignored, only the timestamps are used and
-    they must be unix timestamps (`is_unix_timestamp=True`).
-
-    Output feature contains numbers between 1 and 31.
-
-    Usage example:
-        ```python
-        >>> a = tp.event_set(
-        ...    timestamps=["2023-02-04", "2023-02-20", "2023-03-01", "2023-05-07"],
-        ... )
-        >>> b = tp.calendar_day_of_month(a)
-        >>> b
-        indexes: ...
-        features: [('calendar_day_of_month', int32)]
-        events:
-            (4 events):
-                timestamps: [...]
-                'calendar_day_of_month': [ 4 20  1  7]
-        ...
-
-        ```
-
-    Args:
-        sampling: EventSet to get the days of month from.
-
-    Returns:
-        EventSet with a single feature with the day of the month each timestamp
-        in `sampling` belongs to.
-    """
     assert isinstance(sampling, EventSetNode)
 
     return CalendarDayOfMonthOperator(sampling).outputs["output"]

@@ -68,16 +68,6 @@ PUBLIC_API_SYMBOLS = {
     "logical_and",
     "logical_or",
     "logical_xor",
-    # CALENDAR OPERATORS
-    "calendar_day_of_month",
-    "calendar_day_of_week",
-    "calendar_day_of_year",
-    "calendar_hour",
-    "calendar_iso_week",
-    "calendar_minute",
-    "calendar_month",
-    "calendar_second",
-    "calendar_year",
     # SCALAR OPERATORS
     "add_scalar",
     "subtract_scalar",

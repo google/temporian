@@ -489,6 +489,325 @@ class EventSetOperations:
 
         return begin(self)
 
+    def calendar_day_of_month(self: EventSetOrNode) -> EventSetOrNode:
+        """Obtains the day of month the timestamps in an
+        [`EventSet`][temporian.EventSet]'s sampling are in.
+
+        Features in `input` are ignored, only the timestamps are used and
+        they must be unix timestamps (`is_unix_timestamp=True`).
+
+        Output feature contains numbers between 1 and 31.
+
+        Usage example:
+            ```python
+            >>> a = tp.event_set(
+            ...    timestamps=["2023-02-04", "2023-02-20", "2023-03-01", "2023-05-07"],
+            ... )
+            >>> b = a.calendar_day_of_month()
+            >>> b
+            indexes: ...
+            features: [('calendar_day_of_month', int32)]
+            events:
+                (4 events):
+                    timestamps: [...]
+                    'calendar_day_of_month': [ 4 20  1  7]
+            ...
+
+            ```
+
+        Returns:
+            EventSet with a single feature with the day of the month each timestamp
+            in `sampling` belongs to.
+        """
+        from temporian.core.operators.calendar.day_of_month import (
+            calendar_day_of_month,
+        )
+
+        return calendar_day_of_month(self)
+
+    def calendar_day_of_week(self: EventSetOrNode) -> EventSetOrNode:
+        """Obtains the day of the week the timestamps in an
+        [`EventSet`][temporian.EventSet]'s sampling are in.
+
+        Features in `input` are ignored, only the timestamps are used and
+        they must be unix timestamps (`is_unix_timestamp=True`).
+
+        Output feature contains numbers from 0 (Monday) to 6 (Sunday).
+
+        Usage example:
+            ```python
+            >>> a = tp.event_set(
+            ...    timestamps=["2023-06-19", "2023-06-21", "2023-06-25", "2023-07-03"],
+            ... )
+            >>> b = a.calendar_day_of_week()
+            >>> b
+            indexes: ...
+            features: [('calendar_day_of_week', int32)]
+            events:
+                (4 events):
+                    timestamps: [...]
+                    'calendar_day_of_week': [0  2  6  0]
+            ...
+
+            ```
+
+        Returns:
+            EventSet with a single feature with the day of the week each timestamp
+            in `sampling` belongs to.
+        """
+        from temporian.core.operators.calendar.day_of_week import (
+            calendar_day_of_week,
+        )
+
+        return calendar_day_of_week(self)
+
+    def calendar_hour(self: EventSetOrNode) -> EventSetOrNode:
+        """Obtains the hour the timestamps in an
+        [`EventSet`][temporian.EventSet]'s sampling are in.
+
+        Features in `input` are ignored, only the timestamps are used and
+        they must be unix timestamps (`is_unix_timestamp=True`).
+
+        Output feature contains numbers between 0 and 23.
+
+        Usage example:
+            ```python
+            >>> from datetime import datetime
+            >>> a = tp.event_set(
+            ...    timestamps=[datetime(2020,1,1,18,30), datetime(2020,1,1,23,59)],
+            ... )
+            >>> b = a.calendar_hour()
+            >>> b
+            indexes: ...
+            features: [('calendar_hour', int32)]
+            events:
+                (2 events):
+                    timestamps: [...]
+                    'calendar_hour': [18 23]
+            ...
+
+            ```
+
+        Returns:
+            EventSet with a single feature with the hour each timestamp in `sampling`
+            belongs to.
+        """
+        from temporian.core.operators.calendar.hour import calendar_hour
+
+        return calendar_hour(self)
+
+    def calendar_iso_week(self: EventSetOrNode) -> EventSetOrNode:
+        """Obtains the ISO week the timestamps in an
+        [`EventSet`][temporian.EventSet]'s sampling are in.
+
+        Features in `input` are ignored, only the timestamps are used and
+        they must be unix timestamps (`is_unix_timestamp=True`).
+
+        Output feature contains numbers between 1 and 53.
+
+        Usage example:
+            ```python
+            >>> a = tp.event_set(
+            ...    # Note: 2023-01-01 is Sunday in the same week as 2022-12-31
+            ...    timestamps=["2022-12-31", "2023-01-01", "2023-01-02", "2023-12-20"],
+            ... )
+            >>> b = a.calendar_iso_week()
+            >>> b
+            indexes: ...
+            features: [('calendar_iso_week', int32)]
+            events:
+                (4 events):
+                    timestamps: [...]
+                    'calendar_iso_week': [52 52 1 51]
+            ...
+
+            ```
+
+        Returns:
+            EventSet with a single feature with the ISO week each timestamp in
+            `sampling` belongs to.
+        """
+        from temporian.core.operators.calendar.iso_week import calendar_iso_week
+
+        return calendar_iso_week(self)
+
+    def calendar_day_of_year(self: EventSetOrNode) -> EventSetOrNode:
+        """Obtains the day of year the timestamps in an
+        [`EventSet`][temporian.EventSet]'s sampling are in.
+
+        Features in `input` are ignored, only the timestamps are used and
+        they must be unix timestamps (`is_unix_timestamp=True`).
+
+        Output feature contains numbers between 1 and 366.
+
+        Usage example:
+            ```python
+            >>> a = tp.event_set(
+            ...    timestamps=["2020-01-01", "2021-06-01", "2022-12-31", "2024-12-31"],
+            ... )
+            >>> b = a.calendar_day_of_year()
+            >>> b
+            indexes: ...
+            features: [('calendar_day_of_year', int32)]
+            events:
+                (4 events):
+                    timestamps: [...]
+                    'calendar_day_of_year': [ 1 152 365 366]
+            ...
+
+            ```
+
+        Returns:
+            EventSet with a single feature with the day of the year each timestamp
+            in `sampling` belongs to.
+        """
+        from temporian.core.operators.calendar.day_of_year import (
+            calendar_day_of_year,
+        )
+
+        return calendar_day_of_year(self)
+
+    def calendar_minute(self: EventSetOrNode) -> EventSetOrNode:
+        """Obtain the minute the timestamps in an
+        [`EventSet`][temporian.EventSet]'s sampling are in.
+
+        Features in `input` are ignored, only the timestamps are used and
+        they must be unix timestamps (`is_unix_timestamp=True`).
+
+        Output feature contains numbers between
+        0 and 59.
+
+        Usage example:
+            ```python
+            >>> from datetime import datetime
+            >>> a = tp.event_set(
+            ...    timestamps=[datetime(2020,1,1,18,30), datetime(2020,1,1,23,59)],
+            ...    name='random_hours'
+            ... )
+            >>> b = a.calendar_minute()
+            >>> b
+            indexes: ...
+            features: [('calendar_minute', int32)]
+            events:
+                (2 events):
+                    timestamps: [...]
+                    'calendar_minute': [30 59]
+            ...
+
+            ```
+
+        Returns:
+            EventSet with a single feature with the minute each timestamp in
+            `sampling` belongs to.
+        """
+        from temporian.core.operators.calendar.minute import calendar_minute
+
+        return calendar_minute(self)
+
+    def calendar_month(self: EventSetOrNode) -> EventSetOrNode:
+        """Obtains the month the timestamps in an
+        [`EventSet`][temporian.EventSet]'s sampling are in.
+
+        Features in `input` are ignored, only the timestamps are used and
+        they must be unix timestamps (`is_unix_timestamp=True`).
+
+        Output feature contains numbers between 1 and 12.
+
+        Usage example:
+            ```python
+            >>> a = tp.event_set(
+            ...    timestamps=["2023-02-04", "2023-02-20", "2023-03-01", "2023-05-07"],
+            ...    name='special_events'
+            ... )
+            >>> b = a.calendar_month()
+            >>> b
+            indexes: ...
+            features: [('calendar_month', int32)]
+            events:
+                (4 events):
+                    timestamps: [...]
+                    'calendar_month': [2 2 3 5]
+            ...
+
+            ```
+
+        Returns:
+            EventSet with a single feature with the month each timestamp in
+            `sampling` belongs to.
+        """
+        from temporian.core.operators.calendar.month import calendar_month
+
+        return calendar_month(self)
+
+    def calendar_second(self: EventSetOrNode) -> EventSetOrNode:
+        """Obtains the second the timestamps in an
+        [`EventSet`][temporian.EventSet]'s sampling are in.
+
+        Features in `input` are ignored, only the timestamps are used and
+        they must be unix timestamps (`is_unix_timestamp=True`).
+
+        Output feature contains numbers between 0 and 59.
+
+        Usage example:
+            ```python
+            >>> from datetime import datetime
+            >>> a = tp.event_set(
+            ...    timestamps=[datetime(2020,1,1,18,30,55), datetime(2020,1,1,23,59,0)],
+            ...    name='random_hours'
+            ... )
+            >>> b = a.calendar_second()
+            >>> b
+            indexes: ...
+            features: [('calendar_second', int32)]
+            events:
+                (2 events):
+                    timestamps: [...]
+                    'calendar_second': [55 0]
+            ...
+
+            ```
+
+        Returns:
+            EventSet with a single feature with the second each timestamp in
+            `sampling` belongs to.
+        """
+        from temporian.core.operators.calendar.second import calendar_second
+
+        return calendar_second(self)
+
+    def calendar_year(self: EventSetOrNode) -> EventSetOrNode:
+        """Obtains the year the timestamps in an
+        [`EventSet`][temporian.EventSet]'s sampling are in.
+
+        Features in `input` are ignored, only the timestamps are used and
+        they must be unix timestamps (`is_unix_timestamp=True`).
+
+        Usage example:
+            ```python
+            >>> a = tp.event_set(
+            ...    timestamps=["2021-02-04", "2022-02-20", "2023-03-01", "2023-05-07"],
+            ...    name='random_moments'
+            ... )
+            >>> b = a.calendar_year()
+            >>> b
+            indexes: ...
+            features: [('calendar_year', int32)]
+            events:
+                (4 events):
+                    timestamps: [...]
+                    'calendar_year': [2021 2022 2023 2023]
+            ...
+
+            ```
+
+        Returns:
+            EventSet with a single feature with the year each timestamp in
+            `sampling` belongs to.
+        """
+        from temporian.core.operators.calendar.year import calendar_year
+
+        return calendar_year(self)
+
     def cast(
         self: EventSetOrNode,
         target: Union[

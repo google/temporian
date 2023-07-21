@@ -36,39 +36,6 @@ operator_lib.register_operator(CalendarHourOperator)
 
 @compile
 def calendar_hour(sampling: EventSetOrNode) -> EventSetOrNode:
-    """Obtains the hour the timestamps in an
-    [`EventSet`][temporian.EventSet]'s sampling are in.
-
-    Features in `input` are ignored, only the timestamps are used and
-    they must be unix timestamps (`is_unix_timestamp=True`).
-
-    Output feature contains numbers between 0 and 23.
-
-    Usage example:
-        ```python
-        >>> from datetime import datetime
-        >>> a = tp.event_set(
-        ...    timestamps=[datetime(2020,1,1,18,30), datetime(2020,1,1,23,59)],
-        ... )
-        >>> b = tp.calendar_hour(a)
-        >>> b
-        indexes: ...
-        features: [('calendar_hour', int32)]
-        events:
-            (2 events):
-                timestamps: [...]
-                'calendar_hour': [18 23]
-        ...
-
-        ```
-
-    Args:
-        sampling: EventSet to get the hours from.
-
-    Returns:
-        EventSet with a single feature with the hour each timestamp in `sampling`
-        belongs to.
-    """
     assert isinstance(sampling, EventSetNode)
 
     return CalendarHourOperator(sampling).outputs["output"]
