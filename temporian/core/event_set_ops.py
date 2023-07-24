@@ -1037,7 +1037,7 @@ class EventSetOperations:
             ...     indexes=["idx"]
             ... )
 
-            >>> a_end = tp.end(a)
+            >>> a_end = a.end()
             >>> a_end
             indexes: [('idx', int64)]
             features: []
