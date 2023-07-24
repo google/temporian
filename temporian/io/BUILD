@@ -13,7 +13,6 @@ py_library(
     deps = [
         ":csv",
         ":pandas",
-        ":tensorflow",
     ],
 )
 
@@ -46,9 +45,8 @@ py_library(
     srcs = ["tensorflow.py"],
     srcs_version = "PY3",
     deps = [
-        # already_there/numpy
         # force/tensorflow
         "//temporian/implementation/numpy/data:event_set",
-        "//temporian/implementation/numpy/data:io",
+        "//temporian/core/operators:drop_index",
     ],
 )

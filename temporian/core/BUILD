@@ -71,7 +71,6 @@ py_library(
     srcs = ["compilation.py"],
     srcs_version = "PY3",
     deps = [
-        ":typing",
         "//temporian/core/data:node",
         "//temporian/implementation/numpy/data:event_set",
     ],
@@ -91,6 +90,8 @@ py_library(
     srcs = ["typing.py"],
     srcs_version = "PY3",
     deps = [
+        "//temporian/core:event_set_ops",
+        "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/implementation/numpy/data:event_set",
     ],
