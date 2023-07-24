@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from abc import abstractmethod
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Dict, Any
 
 import numpy as np
@@ -21,6 +21,7 @@ import numpy as np
 from temporian.core.operators.calendar.base import BaseCalendarOperator
 from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.implementation.numpy.operators.base import OperatorImplementation
+from temporian.core.data.duration_utils import convert_timestamp_to_datetime
 
 
 class BaseCalendarNumpyImplementation(OperatorImplementation):
@@ -41,7 +42,7 @@ class BaseCalendarNumpyImplementation(OperatorImplementation):
             value = np.array(
                 [
                     self._get_value_from_datetime(
-                        datetime.fromtimestamp(ts, tz=timezone.utc)
+                        convert_timestamp_to_datetime(ts)
                     )
                     for ts in index_data.timestamps
                 ]
