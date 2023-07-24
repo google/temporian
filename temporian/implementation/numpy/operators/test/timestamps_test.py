@@ -21,6 +21,7 @@ from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy.operators.timestamps import (
     TimestampsNumpyImplementation,
 )
+from temporian.core.data.duration_utils import convert_timestamps_to_datetimes
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
     testOperatorAndImp,
@@ -62,7 +63,7 @@ class TimestampsOperatorTest(absltest.TestCase):
     def test_unix_timestamps(self):
         t0 = 1688156488.0
         timestamps = [t0, t0 + 24 * 3600 * 5, t0 + 0.4]
-        dtimes = [datetime.fromtimestamp(t, timezone.utc) for t in timestamps]
+        dtimes = convert_timestamps_to_datetimes(timestamps)
 
         evset = event_set(
             timestamps=dtimes,
