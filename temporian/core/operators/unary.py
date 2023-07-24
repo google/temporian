@@ -199,7 +199,7 @@ def invert(
 
     Does not work on integers, they should be cast to
     [`tp.bool_`][temporian.bool_] beforehand, using
-    [`tp.cast()`][temporian.cast].
+    [`EventSet.cast()`][temporian.EventSet.cast].
 
     Example:
         ```python
@@ -265,7 +265,7 @@ def isnan(
         ...
 
         >>> # Count nans
-        >>> tp.cumsum(tp.cast(b["M"], int))
+        >>> b["M"].cast(int).cumsum()
         indexes: ...
                 timestamps: [1. 2. 3.]
                 'M': [1 1 2]
@@ -321,7 +321,7 @@ def notnan(
                 'M': [False True False]
         ...
 
-        >>> tp.filter(a, not_nans)
+        >>> a.filter(not_nans)
         indexes: ...
                 'M': [5.]
                 'N': [0]

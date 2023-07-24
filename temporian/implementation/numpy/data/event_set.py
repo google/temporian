@@ -36,7 +36,7 @@ from temporian.core.data.node import (
     create_node_with_new_reference,
 )
 from temporian.core.data.schema import Schema
-from temporian.core.mixins import EventSetOperationsMixin
+from temporian.core.event_set_ops import EventSetOperations
 from temporian.utils import string
 from temporian.utils import config
 
@@ -354,7 +354,7 @@ class IndexData:
         return len(self.timestamps)
 
 
-class EventSet(EventSetOperationsMixin):
+class EventSet(EventSetOperations):
     """Actual temporal data.
 
     Use [`tp.event_set()`][temporian.event_set] to create an EventSet manually,

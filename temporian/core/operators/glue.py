@@ -158,19 +158,19 @@ def glue(
         >>> b = 3 * a
 
         # Add a prefix before glue
-        >>> output = tp.glue(a, tp.prefix(b, "3x"))
+        >>> output = tp.glue(a, b.prefix("3x"))
         >>> output.schema.features
         [('M', int64), ('N', int64), ('3xM', int64), ('3xN', int64)]
 
         # Or rename before glue
-        >>> output = tp.glue(a["M"], tp.rename(b["M"], "M_new"))
+        >>> output = tp.glue(a["M"], b["M"].rename("M_new"))
         >>> output.schema.features
         [('M', int64), ('M_new', int64)]
 
         ```
 
     To concatenate EventSets with different samplings, use
-    [`tp.resample()`][temporian.resample] first.
+    [`EventSet.resample()`][temporian.EventSet.resample] first.
 
     Example with different samplings:
 
@@ -178,10 +178,7 @@ def glue(
         >>> a = tp.event_set(timestamps=[0, 2], features={"A": [0, 20]})
         >>> b = tp.event_set(timestamps=[0, 2], features={"B": [1, 21]})
         >>> c = tp.event_set(timestamps=[1, 4], features={"C": [10, 40]})
-        >>> output = tp.glue(a,
-        ...                  tp.resample(b, sampling=a),
-        ...                  tp.resample(c, sampling=a)
-        ...          )
+        >>> output = tp.glue(a, b.resample(a), c.resample(a))
         >>> output
         indexes: []
         features: [('A', int64), ('B', int64), ('C', int64)]

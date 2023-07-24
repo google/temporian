@@ -82,7 +82,7 @@ def benchmark_simple_moving_average(runner):
         ds = _build_toy_dataset(n)
 
         node = ds.node()
-        output = tp.simple_moving_average(node, window_length=10.0)
+        output = node.simple_moving_average(window_length=10.0)
 
         runner.benchmark(
             f"simple_moving_average:{n:_}",
@@ -114,7 +114,7 @@ def benchmark_calendar_day_of_month(runner):
         ds = tp.from_pandas(pd.DataFrame({"timestamp": timestamps}))
 
         node = ds.node()
-        output = tp.calendar_day_of_month(node)
+        output = node.calendar_day_of_month()
 
         runner.benchmark(
             f"calendar_day_of_month:{n:_}",
@@ -131,7 +131,7 @@ def benchmark_sample(runner):
 
             node_1 = ds_1.node()
             node_2 = ds_2.node()
-            output = tp.resample(node_1, node_2)
+            output = node_1.resample(node_2)
 
             runner.benchmark(
                 f"sample:e{m:_}_s{n:_}",
@@ -144,7 +144,7 @@ def benchmark_propagate(runner):
     for n in [100, 10_000, 1_000_000]:
         ds = _build_toy_dataset(n, data2_is_categorical_integer=True)
         node = ds.node()
-        output = tp.propagate(node["data_1"], node["data_2"])
+        output = node["data_1"].propagate(node["data_2"])
 
         runner.benchmark(
             f"propagate:{n:_}",
@@ -159,8 +159,7 @@ def benchmark_cast(runner):
             ds = _build_toy_dataset(n)
 
             node = ds.node()
-            output = tp.cast(
-                node,
+            output = node.cast(
                 {
                     "data_1": tp.int32,
                     "data_2": tp.float32,
@@ -179,7 +178,7 @@ def benchmark_unique_timestamps(runner):
     for n in [100, 10_000, 1_000_000]:
         ds = _build_toy_dataset(n, data2_is_categorical_integer=True)
         node = ds.node()
-        output = tp.unique_timestamps(node["data_1"])
+        output = node["data_1"].unique_timestamps()
 
         runner.benchmark(
             f"unique_timestamps:{n}",
@@ -279,7 +278,7 @@ def benchmark_add_index(runner):
         ]
 
         for index in possible_indexes:
-            output = tp.add_index(node, index)
+            output = node.add_index(index)
             runner.benchmark(
                 f"add_index:s:{number_timestamps:_}:num_idx:{len(index)}",
                 lambda: tp.run(output, input={node: evset}),

@@ -86,51 +86,6 @@ def filter(
     input: EventSetOrNode,
     condition: Optional[EventSetOrNode] = None,
 ) -> EventSetOrNode:
-    """Filters out events in an [`EventSet`][temporian.EventSet] for which a
-    condition is false.
-
-    Each timestamp in `input` is only kept if the corresponding value for that
-    timestamp in `condition` is `True`.
-
-    `input` and `condition` must have the same sampling, and `condition` must
-    have one single feature, of boolean type.
-
-    filter(x) is equivalent to filter(x,x). filter(x) can be used to convert
-    a boolean mask into a timestamps.
-
-    Usage example:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[0, 1, 5, 6],
-        ...     features={"f1": [0, 10, 50, 60], "f2": [50, 100, 500, 600]},
-        ... )
-
-        >>> # Example boolean condition
-        >>> condition = a["f1"] > 20
-        >>> condition
-        indexes: ...
-                timestamps: [0. 1. 5. 6.]
-                'f1': [False False  True  True]
-        ...
-
-        >>> # Filter only True timestamps
-        >>> filtered = tp.filter(a, condition)
-        >>> filtered
-        indexes: ...
-                timestamps: [5. 6.]
-                'f1': [50 60]
-                'f2': [500 600]
-        ...
-
-        ```
-
-    Args:
-        input: EventSet to filter.
-        condition: EventSet with a single boolean feature.
-
-    Returns:
-        Filtered EventSet.
-    """
     if condition is None:
         condition = input
 

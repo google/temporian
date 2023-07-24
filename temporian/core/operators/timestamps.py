@@ -59,63 +59,6 @@ operator_lib.register_operator(Timestamps)
 
 @compile
 def timestamps(input: EventSetOrNode) -> EventSetOrNode:
-    """Converts an [`EventSet`][temporian.EventSet]'s timestamps into a
-    `float64` feature.
-
-    Features in the input EventSet are ignored, only the timestamps are used.
-
-    Datetime timestamps are converted to unix timestamps.
-
-    Integer timestamps example:
-        ```python
-        >>> from datetime import datetime
-        >>> a = tp.event_set(timestamps=[1, 2, 3, 5])
-        >>> b = tp.timestamps(a)
-        >>> b
-        indexes: []
-        features: [('timestamps', float64)]
-        events:
-            (4 events):
-                timestamps: [1. 2. 3. 5.]
-                'timestamps': [1. 2. 3. 5.]
-        ...
-
-        ```
-
-    Unix timestamps and filter example:
-        ```python
-        >>> from datetime import datetime
-        >>> a = tp.event_set(
-        ...    timestamps=[datetime(1970,1,1,0,0,30), datetime(2023,1,1,1,0,0)],
-        ... )
-        >>> b = tp.timestamps(a)
-
-        >>> # Filter using the timestamps
-        >>> max_date = datetime(2020, 1, 1).timestamp()
-        >>> c = tp.filter(b, b < max_date)
-
-        >>> # Operate like any other feature
-        >>> d = c * 5
-        >>> e = tp.glue(tp.rename(c, 'filtered'), tp.rename(d, 'multiplied'))
-        >>> e
-        indexes: []
-        features: [('filtered', float64), ('multiplied', float64)]
-        events:
-            (1 events):
-                timestamps: [30.]
-                'filtered': [30.]
-                'multiplied': [150.]
-        ...
-
-        ```
-
-    Args:
-        input: EventSet to get the timestamps from.
-
-    Returns:
-        EventSet with a single feature named `timestamps` with each event's
-        timestamp.
-    """
     assert isinstance(input, EventSetNode)
 
     return Timestamps(input=input).outputs["output"]

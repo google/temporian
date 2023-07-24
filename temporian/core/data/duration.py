@@ -46,7 +46,7 @@ def milliseconds(value: Union[int, float]) -> Duration:
         ...     timestamps=[0.5, 1.0, 1.2],
         ...     features={"f1": [1, 5, -5]}
         ... )
-        >>> tp.moving_sum(a, window_length=duration)
+        >>> a.moving_sum(window_length=duration)
         indexes: ...
                 timestamps: [0.5 1.  1.2]
                 'f1': [1 5 0]
@@ -81,7 +81,7 @@ def seconds(value: Union[int, float]) -> Duration:
         ...     timestamps=[1, 2, 6],
         ...     features={"f1": [1, 5, -5]},
         ... )
-        >>> tp.moving_sum(a, window_length=duration)
+        >>> a.moving_sum(window_length=duration)
         indexes: ...
                 timestamps: [1. 2. 6.]
                 'f1': [ 1 6 -5]
@@ -109,7 +109,7 @@ def minutes(value: Union[int, float]) -> Duration:
 
         >>> # Usage in a window operation
         >>> a = tp.event_set(timestamps=timestamps, features={"f1": [1, 5, -5]})
-        >>> tp.moving_sum(a, window_length=tp.duration.minutes(6))
+        >>> a.moving_sum(window_length=tp.duration.minutes(6))
         indexes: ...
                 timestamps: [ 300. 600. 1800.]
                 'f1': [ 1 6 -5]
@@ -137,7 +137,7 @@ def hours(value: Union[int, float]) -> Duration:
 
         >>> # Usage in a window operation
         >>> a = tp.event_set(timestamps=timestamps, features={"f1": [1, 5, -5]})
-        >>> tp.moving_sum(a, window_length=tp.duration.hours(2))
+        >>> a.moving_sum(window_length=tp.duration.hours(2))
         indexes: ...
                 timestamps: [ 3600. 7200. 36000.]
                 'f1': [ 1 6 -5]
@@ -165,7 +165,7 @@ def days(value: Union[int, float]) -> Duration:
         ...    features={"f1": [1, 5, -5]}
         ... )
 
-        >>> tp.moving_sum(a, window_length=tp.duration.days(2))
+        >>> a.moving_sum(window_length=tp.duration.days(2))
         indexes: ...
                 timestamps: [1.5778e+09 1.5779e+09 1.5804e+09]
                 'f1': [ 1 6 -5]
@@ -192,7 +192,7 @@ def weeks(value: Union[int, float]) -> Duration:
         ...    features={"f1": [1, 5, -5]}
         ... )
 
-        >>> tp.moving_sum(a, window_length=tp.duration.weeks(2))
+        >>> a.moving_sum(window_length=tp.duration.weeks(2))
         indexes: ...
                 timestamps: [1.5778e+09 1.5784e+09 1.5804e+09]
                 'f1': [ 1 6 -5]

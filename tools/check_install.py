@@ -19,9 +19,7 @@ def check_install():
         pd.DataFrame({"timestamp": timestamps, "signal": np.sin(timestamps)})
     )
     source_node = source_evset.node()
-    sma = tp.simple_moving_average(
-        source_node["signal"], tp.duration.seconds(30)
-    )
+    sma = source_node["signal"].simple_moving_average(tp.duration.seconds(30))
 
     return tp.run(sma, {source_node: source_evset})
 

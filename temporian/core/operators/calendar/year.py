@@ -36,37 +36,6 @@ operator_lib.register_operator(CalendarYearOperator)
 
 @compile
 def calendar_year(sampling: EventSetOrNode) -> EventSetOrNode:
-    """Obtains the year the timestamps in an
-    [`EventSet`][temporian.EventSet]'s sampling are in.
-
-    Features in `input` are ignored, only the timestamps are used and
-    they must be unix timestamps (`is_unix_timestamp=True`).
-
-    Usage example:
-        ```python
-        >>> a = tp.event_set(
-        ...    timestamps=["2021-02-04", "2022-02-20", "2023-03-01", "2023-05-07"],
-        ...    name='random_moments'
-        ... )
-        >>> b = tp.calendar_year(a)
-        >>> b
-        indexes: ...
-        features: [('calendar_year', int32)]
-        events:
-            (4 events):
-                timestamps: [...]
-                'calendar_year': [2021 2022 2023 2023]
-        ...
-
-        ```
-
-    Args:
-        sampling: EventSet to get the years from.
-
-    Returns:
-        EventSet with a single feature with the year each timestamp in
-        `sampling` belongs to.
-    """
     assert isinstance(sampling, EventSetNode)
 
     return CalendarYearOperator(sampling).outputs["output"]

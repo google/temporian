@@ -36,39 +36,6 @@ operator_lib.register_operator(CalendarMonthOperator)
 
 @compile
 def calendar_month(sampling: EventSetOrNode) -> EventSetOrNode:
-    """Obtains the month the timestamps in an
-    [`EventSet`][temporian.EventSet]'s sampling are in.
-
-    Features in `input` are ignored, only the timestamps are used and
-    they must be unix timestamps (`is_unix_timestamp=True`).
-
-    Output feature contains numbers between 1 and 12.
-
-    Usage example:
-        ```python
-        >>> a = tp.event_set(
-        ...    timestamps=["2023-02-04", "2023-02-20", "2023-03-01", "2023-05-07"],
-        ...    name='special_events'
-        ... )
-        >>> b = tp.calendar_month(a)
-        >>> b
-        indexes: ...
-        features: [('calendar_month', int32)]
-        events:
-            (4 events):
-                timestamps: [...]
-                'calendar_month': [2 2 3 5]
-        ...
-
-        ```
-
-    Args:
-        sampling: EventSet with unix timestamp sampling.
-
-    Returns:
-        EventSet with a single feature with the month each timestamp in
-        `sampling` belongs to.
-    """
     assert isinstance(sampling, EventSetNode)
 
     return CalendarMonthOperator(sampling).outputs["output"]

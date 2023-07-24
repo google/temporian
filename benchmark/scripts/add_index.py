@@ -73,7 +73,7 @@ def main():
     indexes = ["feature_1", "feature_2", "feature_3", "feature_4", "feature_5"]
 
     input_node = input_data.node()
-    output_node = tp.add_index(input_node, indexes)
+    output_node = input_node.add_index(indexes)
 
     run(input_node, input_data, output_node)
 
