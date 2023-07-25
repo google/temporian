@@ -47,7 +47,7 @@ jobs:
         run: poetry install --no-interaction
 
       - name: Install notebook dependencies
-        run: pip install -r ./docs/src/tutorials/requirements.txt
+        run: poetry run pip install -r ./docs/src/tutorials/requirements.txt
 
       - name: Execute all notebooks
-        run: poetry run ./tools/run_notebooks.sh `ls docs/src/*.ipynb`" "`ls docs/src/tutorials/*.ipynb`
+        run: poetry run ./tools/run_notebooks.sh `ls docs/src/*.ipynb` `ls docs/src/tutorials/*.ipynb`
