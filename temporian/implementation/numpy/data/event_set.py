@@ -587,3 +587,37 @@ class EventSet(EventSetOperations):
         created EventSets have a `None` creator.
         """
         return self.node()._creator
+
+    def _repr_html_(self) -> str:
+        """HTML representation, mainly for IPython notebooks."""
+        features = self.schema.features
+        indexes = self.schema.indexes
+        repr = ""
+        for index_key in self.get_index_keys(sort=True):
+            repr += "<h3>("
+            repr += ", ".join(
+                [
+                    f"{f.name}={self._repr_value(val, idx.dtype)}"
+                    for f, val, idx in zip(features, index_key, indexes)
+                ]
+            )
+            repr += ")</h3>"
+            index_data = self.data[index_key]
+            repr += "<table>"
+            repr += "<tr><th><b>Timestamp</b></th>"
+            for timestamp in index_data.timestamps:
+                repr += f"<th>{timestamp}</th>"
+            repr += "</tr>"
+            for i, feature in enumerate(features):
+                repr += f"<tr><td><b>{feature.name}</b></td>"
+                for val in index_data.features[i]:
+                    repr += f"<td>{self._repr_value(val, feature.dtype)}</td>"
+                repr += "</tr>"
+            repr += "</table>"
+        return repr
+
+    def _repr_value(self, value, dtype: DType) -> str:
+        if dtype == DType.STRING:
+            assert isinstance(value, bytes)
+            return value.decode()
+        return value
