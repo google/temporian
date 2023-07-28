@@ -76,6 +76,23 @@ memory usage: 1.2 kB
         self.assertLessEqual(memory_usage, 1200 + 500)
         self.assertGreaterEqual(memory_usage, 1200 - 500)
 
+    def test_html_repr(self):
+        self.assertEqual(
+            self.evset._repr_html_(),
+            "<h3>(a=1, b=hello)</h3>"
+            + "<table>"
+            + "<tr><th><b>Timestamp</b></th><th><b>a</b></th><th><b>b</b></th></tr>"
+            + "<tr><td>0.1</td><td>1</td><td>4</td></tr>"
+            + "<tr><td>0.2</td><td>2</td><td>5</td></tr>"
+            + "<tr><td>0.3</td><td>3</td><td>6</td></tr>"
+            + "</table>"
+            + "<h3>(a=2, b=world)</h3>"
+            + "<table>"
+            + "<tr><th><b>Timestamp</b></th><th><b>a</b></th><th><b>b</b></th></tr>"
+            + "<tr><td>0.4</td><td>7</td><td>9</td></tr><tr><td>0.5</td><td>8</td><td>10</td></tr>"
+            + "</table>",
+        )
+
 
 if __name__ == "__main__":
     absltest.main()
