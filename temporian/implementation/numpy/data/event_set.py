@@ -589,21 +589,24 @@ class EventSet(EventSetOperations):
     def _repr_html_(self) -> str:
         """HTML representation, mainly for IPython notebooks."""
         features = self.schema.features[: config.max_display_features]
+        n_features = len(self.schema.features)
+        cut_features = n_features > config.max_display_features
         indexes = self.schema.indexes
         convert_datetime = self.schema.is_unix_timestamp
+        all_index_keys = self.get_index_keys(sort=True)
         repr = ""
-        for index_key in self.get_index_keys(sort=True)[
-            : config.max_display_indexes
-        ]:
-            repr += "<h3>("
+        for index_key in all_index_keys[: config.max_display_indexes]:
+            repr += "<h3>Index: ("
             repr += ", ".join(
                 [
-                    f"{f.name}={self._repr_value(val, idx.dtype)}"
-                    for f, val, idx in zip(features, index_key, indexes)
+                    f"{idx.name}={self._repr_value(val, idx.dtype)}"
+                    for val, idx in zip(index_key, indexes)
                 ]
             )
             repr += ")</h3>"
             index_data = self.data[index_key]
+            n_events = len(index_data.timestamps)
+            repr += f"{n_events} events × {n_features} features"
             repr += "<table><tr><th><b>Timestamp</b></th>"
             for feature in features:
                 repr += f"<th><b>{feature.name}</b></th>"
@@ -623,8 +626,20 @@ class EventSet(EventSetOperations):
                     repr += (
                         f"<td>{self._repr_value(val[i], feature.dtype)}</td>"
                     )
+                if cut_features:
+                    repr += "<td>...</td>"
                 repr += "</tr>"
+            if n_events > config.max_display_events:
+                empty_row = "<td>...</td>" * (
+                    len(features) + 1 + int(cut_features)
+                )
+                repr += f"<tr>{empty_row}</tr>"
             repr += "</table>"
+        if len(all_index_keys) > config.max_display_indexes:
+            repr += (
+                f"... (showing {config.max_display_indexes} of"
+                f" {len(all_index_keys)} indexes)"
+            )
         return repr
 
     def _repr_value(self, value, dtype: DType) -> str:

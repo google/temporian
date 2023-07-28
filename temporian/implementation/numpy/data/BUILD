@@ -21,6 +21,7 @@ py_library(
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
+        "//temporian/core/data:duration_utils",
         "//temporian/utils:string",
         "//temporian/utils:config",
         "//temporian/core:event_set_ops",
