@@ -603,15 +603,16 @@ class EventSet(EventSetOperations):
             )
             repr += ")</h3>"
             index_data = self.data[index_key]
-            repr += "<table>"
-            repr += "<tr><th><b>Timestamp</b></th>"
-            for timestamp in index_data.timestamps:
-                repr += f"<th>{timestamp}</th>"
+            repr += "<table><tr><th><b>Timestamp</b></th>"
+            for feature in features:
+                repr += f"<th><b>{feature.name}</b></th>"
             repr += "</tr>"
-            for i, feature in enumerate(features):
-                repr += f"<tr><td><b>{feature.name}</b></td>"
-                for val in index_data.features[i]:
-                    repr += f"<td>{self._repr_value(val, feature.dtype)}</td>"
+            for i, timestamp in enumerate(index_data.timestamps):
+                repr += f"<tr><td>{timestamp}</td>"
+                for val, feature in zip(index_data.features, features):
+                    repr += (
+                        f"<td>{self._repr_value(val[i], feature.dtype)}</td>"
+                    )
                 repr += "</tr>"
             repr += "</table>"
         return repr
