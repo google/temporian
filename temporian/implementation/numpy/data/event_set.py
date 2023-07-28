@@ -31,6 +31,7 @@ import sys
 import numpy as np
 
 from temporian.core.data.dtype import DType
+from temporian.core.data.duration_utils import convert_timestamp_to_datetime
 from temporian.core.data.node import (
     EventSetNode,
     create_node_with_new_reference,
@@ -589,6 +590,7 @@ class EventSet(EventSetOperations):
         """HTML representation, mainly for IPython notebooks."""
         features = self.schema.features[: config.max_display_features]
         indexes = self.schema.indexes
+        convert_datetime = self.schema.is_unix_timestamp
         repr = ""
         for index_key in self.get_index_keys(sort=True)[
             : config.max_display_indexes
@@ -609,7 +611,12 @@ class EventSet(EventSetOperations):
             for i, timestamp in enumerate(
                 index_data.timestamps[: config.max_display_events]
             ):
-                repr += f"<tr><td>{self._repr_float(timestamp)}</td>"
+                time_str = (
+                    convert_timestamp_to_datetime(timestamp)
+                    if convert_datetime
+                    else self._repr_float(timestamp)
+                )
+                repr += f"<tr><td>{time_str}</td>"
                 for val, feature in zip(
                     index_data.features[: config.max_display_features], features
                 ):
