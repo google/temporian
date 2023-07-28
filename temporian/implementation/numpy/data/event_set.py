@@ -43,19 +43,6 @@ from temporian.utils import config
 if TYPE_CHECKING:
     from temporian.core.operators.base import Operator
 
-# Maximum of printed index groups when calling repr(evset)
-MAX_NUM_PRINTED_INDEX = 5
-
-# Maximum of printed features when calling repr(evset)
-MAX_NUM_PRINTED_FEATURES = 10
-
-# Max values for HTML display
-# TODO: make these configurable
-MAX_HTML_DISPLAY_INDEXES = 5  # Indexes, or number of tables
-MAX_HTML_DISPLAY_FEATURES = 20  # Features (columns) in each indexes' table
-MAX_HTML_DISPLAY_EVENTS = 100  # Events (rows) in each indexes' table
-MAX_HTML_DISPLAY_CHARS = 50  # Chars inside each cell
-
 # Mapping of temporian types to and from numpy types.
 #
 # Remarks:
@@ -298,7 +285,7 @@ class IndexData:
             self.check_schema(schema)
 
     def check_schema(self, schema: Schema):
-        if not config.DEBUG_MODE:
+        if not config.debug_mode:
             return
 
         # Check that the data (features & timestamps) matches the schema.
@@ -470,7 +457,7 @@ class EventSet(EventSetOperations):
             for idx, (feature_schema, feature_data) in enumerate(
                 zip(self.schema.features, features)
             ):
-                if idx > MAX_NUM_PRINTED_FEATURES:
+                if idx > config.max_printed_features:
                     feature_repr.append("...")
                     break
 
@@ -483,7 +470,7 @@ class EventSet(EventSetOperations):
 
             for i, index_key in enumerate(self.get_index_keys(sort=True)):
                 index_data = self.data[index_key]
-                if i > MAX_NUM_PRINTED_INDEX:
+                if i > config.max_printed_indexes:
                     data_repr.append(f"... ({len(self.data) - i} remaining)")
                     break
                 index_key_repr = []
@@ -597,11 +584,11 @@ class EventSet(EventSetOperations):
 
     def _repr_html_(self) -> str:
         """HTML representation, mainly for IPython notebooks."""
-        features = self.schema.features[:MAX_HTML_DISPLAY_FEATURES]
+        features = self.schema.features[: config.max_display_features]
         indexes = self.schema.indexes
         repr = ""
         for index_key in self.get_index_keys(sort=True)[
-            :MAX_HTML_DISPLAY_INDEXES
+            : config.max_display_indexes
         ]:
             repr += "<h3>("
             repr += ", ".join(
@@ -617,11 +604,11 @@ class EventSet(EventSetOperations):
                 repr += f"<th><b>{feature.name}</b></th>"
             repr += "</tr>"
             for i, timestamp in enumerate(
-                index_data.timestamps[:MAX_HTML_DISPLAY_EVENTS]
+                index_data.timestamps[: config.max_display_events]
             ):
                 repr += f"<tr><td>{timestamp}</td>"
                 for val, feature in zip(
-                    index_data.features[:MAX_HTML_DISPLAY_FEATURES], features
+                    index_data.features[: config.max_display_features], features
                 ):
                     repr += (
                         f"<td>{self._repr_value(val[i], feature.dtype)}</td>"
@@ -636,6 +623,6 @@ class EventSet(EventSetOperations):
             repr = value.decode()
         else:
             repr = str(value)
-        if len(repr) > MAX_HTML_DISPLAY_CHARS:
-            repr = repr[:MAX_HTML_DISPLAY_CHARS] + "..."
+        if len(repr) > config.max_display_chars:
+            repr = repr[: config.max_display_chars] + "..."
         return repr
