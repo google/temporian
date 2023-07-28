@@ -132,6 +132,9 @@ from temporian.core.operators.unary import notnan
 from temporian.core.operators.unary import abs
 from temporian.core.operators.unary import log
 
+# Config
+from temporian.utils import config
+
 # Remove automatic file tree symbols from public API
 # pylint: disable=undefined-variable
 del proto

@@ -465,7 +465,10 @@ class EventSet(EventSetOperations):
             return "\n".join(feature_repr)
 
         # Representation of the "data" field
-        with np.printoptions(precision=4, threshold=20):
+        with np.printoptions(
+            precision=config.print_precision,
+            threshold=config.max_printed_events,
+        ):
             data_repr = []
 
             for i, index_key in enumerate(self.get_index_keys(sort=True)):
@@ -606,7 +609,7 @@ class EventSet(EventSetOperations):
             for i, timestamp in enumerate(
                 index_data.timestamps[: config.max_display_events]
             ):
-                repr += f"<tr><td>{timestamp}</td>"
+                repr += f"<tr><td>{self._repr_float(timestamp)}</td>"
                 for val, feature in zip(
                     index_data.features[: config.max_display_features], features
                 ):
@@ -621,8 +624,15 @@ class EventSet(EventSetOperations):
         if dtype == DType.STRING:
             assert isinstance(value, bytes)
             repr = value.decode()
+        elif dtype.is_float:
+            repr = self._repr_float(value)
         else:
             repr = str(value)
         if len(repr) > config.max_display_chars:
             repr = repr[: config.max_display_chars] + "..."
         return repr
+
+    def _repr_float(self, value):
+        # Create string format with precision, e.g "{:.6g}"
+        float_template = "{:.%d%s}" % (config.print_precision, "g")
+        return float_template.format(value)
