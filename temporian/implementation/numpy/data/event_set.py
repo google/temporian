@@ -49,6 +49,13 @@ MAX_NUM_PRINTED_INDEX = 5
 # Maximum of printed features when calling repr(evset)
 MAX_NUM_PRINTED_FEATURES = 10
 
+# Max values for HTML display
+# TODO: make these configurable
+MAX_HTML_DISPLAY_INDEXES = 5  # Indexes, or number of tables
+MAX_HTML_DISPLAY_FEATURES = 20  # Features (columns) in each indexes' table
+MAX_HTML_DISPLAY_EVENTS = 100  # Events (rows) in each indexes' table
+MAX_HTML_DISPLAY_CHARS = 50  # Chars inside each cell
+
 # Mapping of temporian types to and from numpy types.
 #
 # Remarks:
@@ -590,10 +597,12 @@ class EventSet(EventSetOperations):
 
     def _repr_html_(self) -> str:
         """HTML representation, mainly for IPython notebooks."""
-        features = self.schema.features
+        features = self.schema.features[:MAX_HTML_DISPLAY_FEATURES]
         indexes = self.schema.indexes
         repr = ""
-        for index_key in self.get_index_keys(sort=True):
+        for index_key in self.get_index_keys(sort=True)[
+            :MAX_HTML_DISPLAY_INDEXES
+        ]:
             repr += "<h3>("
             repr += ", ".join(
                 [
@@ -607,9 +616,13 @@ class EventSet(EventSetOperations):
             for feature in features:
                 repr += f"<th><b>{feature.name}</b></th>"
             repr += "</tr>"
-            for i, timestamp in enumerate(index_data.timestamps):
+            for i, timestamp in enumerate(
+                index_data.timestamps[:MAX_HTML_DISPLAY_EVENTS]
+            ):
                 repr += f"<tr><td>{timestamp}</td>"
-                for val, feature in zip(index_data.features, features):
+                for val, feature in zip(
+                    index_data.features[:MAX_HTML_DISPLAY_FEATURES], features
+                ):
                     repr += (
                         f"<td>{self._repr_value(val[i], feature.dtype)}</td>"
                     )
@@ -620,5 +633,9 @@ class EventSet(EventSetOperations):
     def _repr_value(self, value, dtype: DType) -> str:
         if dtype == DType.STRING:
             assert isinstance(value, bytes)
-            return value.decode()
-        return value
+            repr = value.decode()
+        else:
+            repr = str(value)
+        if len(repr) > MAX_HTML_DISPLAY_CHARS:
+            repr = repr[:MAX_HTML_DISPLAY_CHARS] + "..."
+        return repr
