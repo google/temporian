@@ -98,6 +98,8 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
         src_timestamps: np.ndarray,
         src_feature: np.ndarray,
     ) -> np.ndarray:
+        assert isinstance(self.operator, BaseWindowOperator)
+
         implementation = self._implementation()
         kwargs = {
             "evset_timestamps": src_timestamps,

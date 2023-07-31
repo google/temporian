@@ -34,6 +34,9 @@ class MovingCountOperator(BaseWindowOperator):
     def get_feature_dtype(self, feature: FeatureSchema) -> DType:
         return DType.INT32
 
+    def feature_schema(self, input: EventSetNode):
+        return [FeatureSchema(name="count", dtype=DType.INT32)]
+
 
 operator_lib.register_operator(MovingCountOperator)
 

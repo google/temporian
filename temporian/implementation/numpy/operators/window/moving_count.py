@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import List
+import numpy as np
 
 from temporian.core.operators.window.moving_count import (
     MovingCountOperator,
@@ -28,6 +30,26 @@ class MovingCountNumpyImplementation(BaseWindowNumpyImplementation):
 
     def _implementation(self):
         return operators_cc.moving_count
+
+    def _compute(
+        self,
+        src_timestamps: np.ndarray,
+        src_features: List[np.ndarray],
+        sampling_timestamps: np.ndarray,
+        dst_features: List[np.ndarray],
+    ) -> None:
+        assert isinstance(self.operator, MovingCountOperator)
+
+        del src_features  # Features are ignored
+
+        kwargs = {
+            "evset_timestamps": src_timestamps,
+            "window_length": self.operator.window_length,
+        }
+        if self.operator.has_sampling:
+            kwargs["sampling_timestamps"] = sampling_timestamps
+        dst_feature = operators_cc.moving_count(**kwargs)
+        dst_features.append(dst_feature)
 
 
 implementation_lib.register_operator_implementation(

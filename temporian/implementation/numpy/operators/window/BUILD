@@ -65,6 +65,7 @@ py_library(
     srcs = ["moving_count.py"],
     srcs_version = "PY3",
     deps = [
+        # already_there/numpy
         ":base",
         "//temporian/core/operators/window:moving_count",
         "//temporian/implementation/numpy:implementation_lib",
