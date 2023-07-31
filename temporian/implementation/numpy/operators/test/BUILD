@@ -8,7 +8,7 @@ py_library(
     srcs = ["test_util.py"],
     srcs_version = "PY3",
     deps = [
-        # already_there/absl/testing:absltest
+        # already_there/absl
         "//temporian/core:serialization",
         "//temporian/core/operators:base",
         "//temporian/implementation/numpy/data:event_set",

@@ -36,38 +36,6 @@ operator_lib.register_operator(CalendarDayOfYearOperator)
 
 @compile
 def calendar_day_of_year(sampling: EventSetOrNode) -> EventSetOrNode:
-    """Obtains the day of year the timestamps in an
-    [`EventSet`][temporian.EventSet]'s sampling are in.
-
-    Features in `input` are ignored, only the timestamps are used and
-    they must be unix timestamps (`is_unix_timestamp=True`).
-
-    Output feature contains numbers between 1 and 366.
-
-    Usage example:
-        ```python
-        >>> a = tp.event_set(
-        ...    timestamps=["2020-01-01", "2021-06-01", "2022-12-31", "2024-12-31"],
-        ... )
-        >>> b = tp.calendar_day_of_year(a)
-        >>> b
-        indexes: ...
-        features: [('calendar_day_of_year', int32)]
-        events:
-            (4 events):
-                timestamps: [...]
-                'calendar_day_of_year': [ 1 152 365 366]
-        ...
-
-        ```
-
-    Args:
-        sampling: EventSet to get the days of year from.
-
-    Returns:
-        EventSet with a single feature with the day of the year each timestamp
-        in `sampling` belongs to.
-    """
     assert isinstance(sampling, EventSetNode)
 
     return CalendarDayOfYearOperator(sampling).outputs["output"]

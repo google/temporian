@@ -13,10 +13,10 @@
 # limitations under the License.
 
 from absl.testing import absltest
-import tensorflow as tf
+from numpy.testing import assert_array_equal
+
 from temporian.io.tensorflow import to_tensorflow
 from temporian.implementation.numpy.data.io import event_set
-from numpy.testing import assert_array_equal
 
 
 class TensorFlowTest(absltest.TestCase):
@@ -29,12 +29,12 @@ class TensorFlowTest(absltest.TestCase):
             "i2": [b"x", b"x", b"x", b"y"],
         }
 
-        evtset = event_set(
+        evset = event_set(
             timestamps=[1, 2, 3, 4],
             features=data_dict,
             indexes=["i1", "i2"],
         )
-        tf_dataset = to_tensorflow(evtset).batch(4)
+        tf_dataset = to_tensorflow(evset).batch(4)
         num_rows = 0
         for row in tf_dataset:
             for key, value in data_dict.items():

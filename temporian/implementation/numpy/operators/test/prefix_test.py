@@ -56,7 +56,7 @@ class PrefixOperatorTest(absltest.TestCase):
         )
 
         # Run op
-        op = Prefix("hello_", input=node)
+        op = Prefix(node, "hello_")
         op.outputs["output"].check_same_sampling(node)
 
         instance = PrefixNumpyImplementation(op)

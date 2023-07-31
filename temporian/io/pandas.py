@@ -65,8 +65,8 @@ def from_pandas(
             graph serialization.
         same_sampling_as: If set, the new EventSet is cheched and tagged as
             having the same sampling as `same_sampling_as`. Some operators,
-            such as [`tp.filter()`][temporian.filter], require their inputs to
-            have the same sampling.
+            such as [`EventSet.filter()`][temporian.EventSet.filter], require
+            their inputs to have the same sampling.
 
     Returns:
         An EventSet.

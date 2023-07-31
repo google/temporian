@@ -27,7 +27,7 @@ def to_tensorflow(
 
     Usage example:
         ```python
-        evtset = event_set(
+        evset = event_set(
             timestamps=[1, 2, 3, 4],
             features={
                 "f1": [10, 11, 12, 13],
@@ -36,7 +36,7 @@ def to_tensorflow(
             },
         )
 
-        tf_dataset = tp.to_tensorflow(evtset)
+        tf_dataset = tp.to_tensorflow(evset)
 
         def extract_label(example):
             label = example.pop("label")
@@ -59,8 +59,9 @@ def to_tensorflow(
         import tensorflow as tf
     except ImportError:
         logging.warning(
-            "`tp.to_tensorflow` requires for TensorFlow to be installed."
-            " Install TensorFlow with pip using `pip install tensorflow`"
+            "`tp.to_tensorflow()` requires for TensorFlow to be installed."
+            " Install TensorFlow with pip using `pip install"
+            " temporian[tensorflow]` or `pip install tensorflow`."
         )
         raise
 

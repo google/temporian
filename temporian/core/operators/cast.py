@@ -14,7 +14,7 @@
 
 """Cast operator class and public API function definition."""
 
-from typing import Union, Dict, Optional, List, Any, Type
+from typing import Union, Dict, Optional, List, Any
 from temporian.core.data.schema import Schema, FeatureSchema
 
 
@@ -27,10 +27,8 @@ from temporian.core.data.node import (
     create_node_with_new_reference,
 )
 from temporian.core.operators.base import Operator
-from temporian.core.typing import EventSetOrNode
+from temporian.core.typing import EventSetOrNode, TypeOrDType
 from temporian.proto import core_pb2 as pb
-
-TypeOrDType = Union[DType, Type[float], Type[int], Type[str], Type[bool]]
 
 
 def _normalize_dtype(x: Any) -> DType:
@@ -212,83 +210,6 @@ def cast(
     ],
     check_overflow: bool = True,
 ) -> EventSetOrNode:
-    """Casts the data types of an [`EventSet`][temporian.EventSet]'s features.
-
-    Features not impacted by cast are kept.
-
-    Usage example:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[1, 2],
-        ...     features={"A": [0, 2], "B": ['a', 'b'], "C": [5.0, 5.5]},
-        ... )
-
-        >>> # Cast all input features to the same dtype
-        >>> b = tp.cast(a[["A", "C"]], tp.float32)
-        >>> b
-        indexes: []
-        features: [('A', float32), ('C', float32)]
-        events:
-            (2 events):
-                timestamps: [1. 2.]
-                'A': [0. 2.]
-                'C': [5.  5.5]
-        ...
-
-
-        >>> # Cast by feature name
-        >>> b = tp.cast(a, {'A': bool, 'C': int})
-        >>> b
-        indexes: []
-        features: [('A', bool_), ('B', str_), ('C', int64)]
-        events:
-            (2 events):
-                timestamps: [1. 2.]
-                'A': [False  True]
-                'B': [b'a' b'b']
-                'C': [5  5]
-        ...
-
-        >>> # Map original_dtype -> target_dtype
-        >>> b = tp.cast(a, {float: int, int: float})
-        >>> b
-        indexes: []
-        features: [('A', float64), ('B', str_), ('C', int64)]
-        events:
-            (2 events):
-                timestamps: [1. 2.]
-                'A': [0. 2.]
-                'B': [b'a' b'b']
-                'C': [5  5]
-        ...
-
-        ```
-
-    Args:
-        input: Input EventSet object to cast the columns from.
-        target: Single dtype or a map. Providing a single dtype will cast all
-            columns to it. The mapping keys can be either feature names or the
-            original dtypes (and not both types mixed), and the values are the
-            target dtypes for them. All dtypes must be Temporian types (see
-            `dtype.py`).
-        check_overflow: Flag to check overflow when casting to a dtype with a
-            shorter range (e.g: `INT64`->`INT32`). Note that this check adds
-            some computation overhead. Defaults to `True`.
-
-    Returns:
-        New EventSet (or the same if no features actually changed dtype),
-            with the same feature names as the input one, but with the new
-            dtypes as specified in `target`.
-
-    Raises:
-        ValueError: If `check_overflow=True` and some value is out of the range
-            of the `target` dtype.
-        ValueError: If trying to cast a non-numeric string to numeric dtype.
-        ValueError: If `target` is not a dtype nor a mapping.
-        ValueError: If `target` is a mapping, but some of the keys are not a
-            dtype nor a feature in `input.feature_names`, or if those types are
-            mixed.
-    """
     assert isinstance(input, EventSetNode)
 
     # Convert 'target' to one of these:

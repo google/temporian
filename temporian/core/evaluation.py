@@ -50,7 +50,7 @@ def run(
         ```python
         >>> input_evset = tp.event_set(timestamps=[1, 2, 3], features={"f": [0, 4, 10]})
         >>> input_node = input_evset.node()
-        >>> output_node = tp.moving_sum(input_node, 5)
+        >>> output_node = input_node.moving_sum(5)
         >>> output_evset = tp.run(output_node, input_evset)
 
         >>> # Equivalent
@@ -73,7 +73,7 @@ def run(
         >>> input_1 = evset_1.node()
         >>> input_2 = evset_2.node()
         >>> step_1 = input_1 + input_2
-        >>> step_2 = tp.simple_moving_average(step_1, 2)
+        >>> step_2 = step_1.simple_moving_average(2)
 
         >>> # Get step_1 and step_2 at once
         >>> evset_step_1, evset_step_2 = tp.run([step_1, step_2],
@@ -290,15 +290,15 @@ def has_leak(
 
     Tests if a [`EventSetNode`][temporian.EventSetNode] or collection of nodes
     depends on the only operator that can introduce future leakage:
-    [`tp.leak()`][temporian.leak].
+    [`EventSet.leak()`][temporian.EventSet.leak].
 
     Single input output example:
         ```python
         >>> a = tp.input_node([("f", float)])
-        >>> b = tp.moving_sum(a, 5)
-        >>> c = tp.leak(b, 6)
-        >>> d = tp.prefix("my_prefix_", c)
-        >>> e = tp.moving_sum(d, 7)
+        >>> b = a.moving_sum(5)
+        >>> c = b.leak(6)
+        >>> d = c.prefix("my_prefix_")
+        >>> e = d.moving_sum(7)
         >>> # The computation of "e" contains a leak.
         >>> tp.has_leak(e)
         True
@@ -318,7 +318,7 @@ def has_leak(
 
     Returns:
         True if and only if the computation of `output` from `inputs` depends
-        on a [`tp.leak()`][temporian.leak] operator.
+        on a [`EventSet.leak()`][temporian.EventSet.leak] operator.
     """
 
     if input is None:

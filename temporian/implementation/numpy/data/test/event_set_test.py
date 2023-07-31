@@ -2,9 +2,6 @@ import numpy as np
 from absl.testing import absltest
 
 from temporian.implementation.numpy.data.io import event_set, IndexData
-from temporian.implementation.numpy.operators.test.test_util import (
-    assertEqualEventSet,
-)
 
 
 class EventSetTest(absltest.TestCase):

@@ -91,42 +91,6 @@ operator_lib.register_operator(Tick)
 def tick(
     input: EventSetOrNode, interval: Duration, align: bool = True
 ) -> EventSetOrNode:
-    """Generates timestamps at regular intervals in the range of a guide
-    [`EventSet`][temporian.EventSet].
-
-    Example with align:
-        ```python
-        >>> a = tp.event_set(timestamps=[5, 9, 16])
-        >>> b = tp.tick(a, interval=tp.duration.seconds(3), align=True)
-        >>> b
-        indexes: ...
-                timestamps: [ 6. 9. 12. 15.]
-        ...
-
-        ```
-
-    Example without align:
-        ```python
-        >>> a = tp.event_set(timestamps=[5, 9, 16])
-        >>> b = tp.tick(a, interval=tp.duration.seconds(3), align=False)
-        >>> b
-        indexes: ...
-                timestamps: [ 5. 8. 11. 14.]
-        ...
-
-        ```
-
-    Args:
-        input: Guide EventSet. The start and end time boundaries to generate the
-            new timestamps are defined by the range of timestamps in `input`.
-        interval: Tick interval.
-        align: If false, the first tick is generated at the first timestamp
-            (similar to [`tp.begin()`][temporian.begin]). If true (default),
-            ticks are generated on timestamps that are multiple of `interval`.
-
-    Returns:
-        A feature-less EventSet with regular timestamps.
-    """
     assert isinstance(input, EventSetNode)
 
     return Tick(

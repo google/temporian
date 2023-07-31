@@ -58,36 +58,6 @@ operator_lib.register_operator(EndOperator)
 
 @compile
 def end(input: EventSetOrNode) -> EventSetOrNode:
-    """Generates a single timestamp at the end of an
-    [`EventSet`][temporian.EventSet], per index key.
-
-    Usage example:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[5, 6, 7, 1],
-        ...     features={"f": [50, 60, 70, 10], "idx": [1, 1, 1, 2]},
-        ...     indexes=["idx"]
-        ... )
-
-        >>> a_end = tp.end(a)
-        >>> a_end
-        indexes: [('idx', int64)]
-        features: []
-        events:
-            idx=1 (1 events):
-                timestamps: [7.]
-            idx=2 (1 events):
-                timestamps: [1.]
-        ...
-
-        ```
-
-    Args:
-        input: Guide EventSet.
-
-    Returns:
-        A feature-less EventSet with a single timestamp per index group.
-    """
     assert isinstance(input, EventSetNode)
 
     return EndOperator(input=input).outputs["output"]

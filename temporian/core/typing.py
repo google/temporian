@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, List, Set, TypeVar, Union
+from typing import Dict, List, Set, Type, TypeVar, Union
+from temporian.core.data.dtype import DType
 
 from temporian.core.data.node import EventSetNode
-from temporian.core.mixins import EventSetOperationsMixin
+from temporian.core.event_set_ops import EventSetOperations
 from temporian.implementation.numpy.data.event_set import EventSet
 
 
@@ -30,7 +31,7 @@ dictionary mapping names to EventSetNodes."""
 
 # TODO: check why __doc__ (or help()) of EventSetOrNode shows TypeVar's doc
 EventSetOrNode = TypeVar(
-    "EventSetOrNode", EventSet, EventSetNode, EventSetOperationsMixin
+    "EventSetOrNode", EventSet, EventSetNode, EventSetOperations
 )
 """Generic type for an [`EventSet`][temporian.EventSet] or
 [`EventSetNode`][temporian.EventSetNode].
@@ -62,3 +63,6 @@ If a single EventSet or a list of EventSets, each EventSet is mapped to their
 own node using [`EventSet.node()`][temporian.EventSet.node], i.e., `[event_set]`
 is equivalent to `{event_set.node() : event_set}`.
 """
+
+
+TypeOrDType = Union[DType, Type[float], Type[int], Type[str], Type[bool]]

@@ -13,7 +13,6 @@ py_library(
     deps = [
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
-        "//temporian/implementation/numpy/data:event_set",
         "//temporian/proto:core_py_proto",
     ],
 )

@@ -5,6 +5,10 @@ from typing import Optional, List, Set
 
 import numpy as np
 
+from temporian.core.data.duration_utils import (
+    convert_timestamp_to_datetime,
+    convert_timestamps_to_datetimes,
+)
 from temporian.implementation.numpy.data.event_set import EventSet, IndexType
 from temporian.implementation.numpy.data.plotter import (
     Options,
@@ -43,7 +47,7 @@ def plot_matplotlib(
     plot_idx = 0
     for index in indexes:
         if plot_idx >= num_plots:
-            # Too much plots are displayed already.
+            # Too many plots are displayed already.
             break
 
         # Index of the next color to use in the plot.
@@ -78,10 +82,7 @@ def plot_matplotlib(
 
             if evset.schema.is_unix_timestamp:
                 # Matplotlib understands datetimes.
-                xs = [
-                    datetime.datetime.fromtimestamp(x, tz=datetime.timezone.utc)
-                    for x in xs
-                ]
+                xs = convert_timestamps_to_datetimes(xs)
 
             if len(display_features) == 0:
                 # There is not features to plot. Instead, plot the timestamps.
@@ -167,17 +168,13 @@ def _matplotlib_sub_plot(
         args = {}
         if options.min_time is not None:
             args["left"] = (
-                datetime.datetime.fromtimestamp(
-                    options.min_time, tz=datetime.timezone.utc
-                )
+                convert_timestamp_to_datetime(options.min_time)
                 if is_unix_timestamp
                 else options.min_time
             )
         if options.max_time is not None:
             args["right"] = (
-                datetime.datetime.fromtimestamp(
-                    options.max_time, tz=datetime.timezone.utc
-                )
+                convert_timestamp_to_datetime(options.max_time)
                 if is_unix_timestamp
                 else options.max_time
             )

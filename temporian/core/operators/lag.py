@@ -79,34 +79,6 @@ operator_lib.register_operator(LagOperator)
 
 @compile
 def lag(input: EventSetOrNode, duration: Duration) -> EventSetOrNode:
-    """Adds a delay to an [`EventSet`][temporian.EventSet]'s timestamps.
-
-    In other words, shifts the timestamp values forwards in time.
-
-    Usage example:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[0, 1, 5, 6],
-        ...     features={"value": [0, 1, 5, 6]},
-        ... )
-
-        >>> b = tp.lag(a, tp.duration.seconds(2))
-        >>> b
-        indexes: ...
-            (4 events):
-                timestamps: [2. 3. 7. 8.]
-                'value': [0 1 5 6]
-        ...
-
-        ```
-
-    Args:
-        input: EventSet to lag.
-        duration: Duration to lag by.
-
-    Returns:
-        Lagged EventSet.
-    """
     assert isinstance(input, EventSetNode)
 
     normalized_duration = normalize_duration(duration)

@@ -52,27 +52,7 @@ PUBLIC_API_SYMBOLS = {
     # RUNTIME CHECKING
     "runtime_check_raise_exception",
     # OPERATORS
-    "cast",
-    "drop_index",
-    "enumerate",
-    "filter",
     "glue",
-    "join",
-    "add_index",
-    "set_index",
-    "lag",
-    "leak",
-    "prefix",
-    "propagate",
-    "resample",
-    "select",
-    "rename",
-    "since_last",
-    "begin",
-    "end",
-    "tick",
-    "timestamps",
-    "unique_timestamps",
     # BINARY OPERATORS
     "add",
     "subtract",
@@ -90,16 +70,6 @@ PUBLIC_API_SYMBOLS = {
     "logical_and",
     "logical_or",
     "logical_xor",
-    # CALENDAR OPERATORS
-    "calendar_day_of_month",
-    "calendar_day_of_week",
-    "calendar_day_of_year",
-    "calendar_hour",
-    "calendar_iso_week",
-    "calendar_minute",
-    "calendar_month",
-    "calendar_second",
-    "calendar_year",
     # SCALAR OPERATORS
     "add_scalar",
     "subtract_scalar",
@@ -120,14 +90,6 @@ PUBLIC_API_SYMBOLS = {
     "invert",
     "isnan",
     "notnan",
-    # WINDOW OPERATORS
-    "simple_moving_average",
-    "moving_standard_deviation",
-    "cumsum",
-    "moving_sum",
-    "moving_count",
-    "moving_min",
-    "moving_max",
 }
 
 

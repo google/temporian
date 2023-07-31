@@ -59,40 +59,6 @@ operator_lib.register_operator(Enumerate)
 
 @compile
 def enumerate(input: EventSetOrNode) -> EventSetOrNode:
-    """Create an `int64` feature with the ordinal position of each event in an
-    [`EventSet`][temporian.EventSet].
-
-    Each index group is enumerated independently.
-
-    Usage:
-        ```python
-        >>> a = tp.event_set(
-        ...    timestamps=[-1, 2, 3, 5, 0],
-        ...    features={"cat": ["A", "A", "A", "A", "B"]},
-        ...    indexes=["cat"],
-        ... )
-        >>> b = tp.enumerate(a)
-        >>> b
-        indexes: [('cat', str_)]
-        features: [('enumerate', int64)]
-        events:
-            cat=b'A' (4 events):
-                timestamps: [-1.  2.  3.  5.]
-                'enumerate': [0 1 2 3]
-            cat=b'B' (1 events):
-                timestamps: [0.]
-                'enumerate': [0]
-        ...
-
-        ```
-
-    Args:
-        input: EventSet to enumerate.
-
-    Returns:
-        EventSet with a single feature with each event's ordinal position in
-        its index group.
-    """
     assert isinstance(input, EventSetNode)
 
     return Enumerate(input=input).outputs["output"]

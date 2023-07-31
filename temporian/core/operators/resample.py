@@ -69,38 +69,6 @@ def resample(
     input: EventSetOrNode,
     sampling: EventSetOrNode,
 ) -> EventSetOrNode:
-    """Resamples an [`EventSet`][temporian.EventSet] at each timestamp of
-    another [`EventSet`][temporian.EventSet].
-
-    If a timestamp in `sampling` does not have a corresponding timestamp in
-    `input`, the last timestamp in `input` is used instead. If this timestamp
-    is anterior to an value in `input`, the value is replaced by
-    `dtype.MissingValue(...)`.
-
-    Example:
-
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[1, 5, 8, 9],
-        ...     features={"f1": [1.0, 2.0, 3.0, 4.0]}
-        ... )
-        >>> b = tp.event_set(timestamps=[-1, 1, 6, 10])
-        >>> c = tp.resample(a, sampling=b)
-        >>> c
-        indexes: ...
-                timestamps: [-1.  1.  6. 10.]
-                'f1': [nan  1.  2.  4.]
-        ...
-
-        ```
-
-    Args:
-        input: EventSet to sample.
-        sampling: EventSet to use the sampling of.
-
-    Returns:
-        Resampled EventSet, with same sampling as `sampling`.
-    """
     assert isinstance(input, EventSetNode)
     assert isinstance(sampling, EventSetNode)
 
