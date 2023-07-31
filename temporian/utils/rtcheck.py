@@ -20,6 +20,7 @@ _NUM_CHECK_STRUCT = 3
 # If true, print details during runtime checking.
 _DEBUG = False
 
+# Move to "config".
 _ERROR_RAISES_EXCEPTION = True
 
 
