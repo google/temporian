@@ -1373,8 +1373,6 @@ class EventSetOperations:
             ```
 
         Args:
-            input: EventSet for which to count the number of values in each
-                feature.
             window_length: Sliding window's length.
             sampling: Timestamps to sample the sliding window's value at. If not
                 provided, timestamps in `input` are used.
