@@ -141,7 +141,7 @@ def add(
         ValueError: ... corresponding features should have the same dtype. ...
 
         >>> # Cast f1 to float
-        >>> c = tp.cast(a["f1"], float) + a["f2"]
+        >>> c = a["f1"].cast(tp.float64) + a["f2"]
         >>> c
         indexes: []
         features: [('add_f1_f2', float64)]
@@ -171,7 +171,7 @@ def add(
         ValueError: ... should have the same sampling. ...
 
         >>> # Resample a to match b timestamps
-        >>> c = tp.resample(a, sampling=b) + b
+        >>> c = a.resample(b) + b
         >>> c
         indexes: []
         features: [('add_fa_fb', int64)]
@@ -208,9 +208,9 @@ def add(
         ValueError: Arguments don't have the same index. ...
 
         >>> # Add index 'cat' to b
-        >>> b = tp.add_index(b, "cat")
+        >>> b = b.add_index("cat")
         >>> # Make explicit same samplings and add
-        >>> c = a + tp.resample(b, a)
+        >>> c = a + b.resample(a)
         >>> c
         indexes: [('cat', int64)]
         features: [('add_M_N', int64)]
@@ -419,7 +419,7 @@ def divide(
         ValueError: Cannot use the divide operator on feature f1 of type int64. ...
 
         >>> # Cast to tp.float64 or tp.float32 before
-        >>> c = tp.cast(a, float) / tp.cast(b, float)
+        >>> c = a.cast(tp.float64) / b.cast(tp.float64)
         >>> c
         indexes: []
         features: [('div_f1_f2', float64)]

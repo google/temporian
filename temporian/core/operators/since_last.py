@@ -83,49 +83,6 @@ def since_last(
     input: EventSetOrNode,
     sampling: Optional[EventSetOrNode] = None,
 ) -> EventSetOrNode:
-    """Computes the amount of time since the last distinct timestamp in an
-    [`EventSet`][temporian.EventSet].
-
-    If `sampling` is provided, the output will correspond to the time elapsed
-    between each timestamp in `sampling` and the latest previous timestamp in
-    `input`. Else, the timestamps of `input` will be used as `sampling`.
-
-    Example 1:
-        ```python
-        >>> a = tp.event_set(timestamps=[1, 5, 8, 8, 9])
-        >>> b = tp.since_last(a)
-        >>> b
-        indexes: ...
-                timestamps: [1. 5. 8. 8. 9.]
-                'since_last': [nan  4.  3.  0.  1.]
-        ...
-
-        ```
-
-    Example 2:
-        ```python
-        >>> a = tp.event_set(timestamps=[2, 5, 7])
-        >>> b = tp.event_set(timestamps=[1, 4, 6, 10])
-
-        >>> # Time elapsed between each sampling event
-        >>> # and the latest previous event in a
-        >>> c = tp.since_last(a, sampling=b)
-        >>> c
-        indexes: ...
-                timestamps: [ 1. 4. 6. 10.]
-                'since_last': [nan  2.  1.  3.]
-        ...
-
-        ```
-
-    Args:
-        input: EventSet to sample.
-        sampling: EventSet to use the sampling of.
-
-    Returns:
-        Resulting EventSet, with same sampling as `sampling` if provided, or as
-            `input` if not.
-    """
     assert isinstance(input, EventSetNode)
     if sampling is not None:
         assert isinstance(sampling, EventSetNode)

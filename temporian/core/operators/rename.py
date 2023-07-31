@@ -171,58 +171,6 @@ def rename(
     features: Optional[Union[str, Dict[str, str]]] = None,
     indexes: Optional[Union[str, Dict[str, str]]] = None,
 ) -> EventSetOrNode:
-    """Renames an [`EventSet`][temporian.EventSet]'s features and index.
-
-    If the input has a single feature, then the `features` can be a
-    single string with the new name.
-
-    If the input has multiple features, then `features` must be a mapping
-    with the old names as keys and the new names as values.
-
-    The indexes renaming follows the same criteria, accepting a single string or
-    a mapping for multiple indexes.
-
-    Usage example:
-        ```python
-        >>> a = tp.event_set(
-        ...    timestamps=[0, 1],
-        ...    features={"f1": [0, 2], "f2": [5, 6]}
-        ... )
-        >>> b = 5 * a
-
-        >>> # Rename single feature
-        >>> b_1 = tp.rename(b["f1"], "f1_result")
-        >>> b_1
-        indexes: []
-        features: [('f1_result', int64)]
-        events:
-             (2 events):
-                timestamps: [0. 1.]
-                'f1_result': [ 0 10]
-        ...
-
-        >>> # Rename multiple features
-        >>> b_rename = tp.rename(b, {"f1": "5xf1", "f2": "5xf2"})
-        >>> b_rename
-        indexes: []
-        features: [('5xf1', int64), ('5xf2', int64)]
-        events:
-             (2 events):
-                timestamps: [0. 1.]
-                '5xf1': [ 0 10]
-                '5xf2': [25 30]
-        ...
-
-        ```
-
-    Args:
-        input: EventSet to rename.
-        features: New feature name or mapping from old names to new names.
-        indexes: New index name or mapping from old names to new names.
-
-    Returns:
-        EventSet with renamed features and index.
-    """
     assert isinstance(input, EventSetNode)
 
     features = _normalize_rename_features(input.schema, features)

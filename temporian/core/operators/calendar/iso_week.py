@@ -36,38 +36,6 @@ operator_lib.register_operator(CalendarISOWeekOperator)
 
 @compile
 def calendar_iso_week(sampling: EventSetOrNode) -> EventSetOrNode:
-    """Obtains the ISO week the timestamps in an
-    [`EventSet`][temporian.EventSet]'s sampling are in.
-
-    Features in `input` are ignored, only the timestamps are used and
-    they must be unix timestamps (`is_unix_timestamp=True`).
-
-    Output feature contains numbers between 1 and 53.
-
-    Usage example:
-        ```python
-        >>> a = tp.event_set(
-        ...    # Note: 2023-01-01 is Sunday in the same week as 2022-12-31
-        ...    timestamps=["2022-12-31", "2023-01-01", "2023-01-02", "2023-12-20"],
-        ... )
-        >>> b = tp.calendar_iso_week(a)
-        >>> b
-        indexes: ...
-        features: [('calendar_iso_week', int32)]
-        events:
-            (4 events):
-                timestamps: [...]
-                'calendar_iso_week': [52 52 1 51]
-        ...
-
-        ```
-    Args:
-        sampling: EventSet to get the ISO weeks from.
-
-    Returns:
-        EventSet with a single feature with the ISO week each timestamp in
-        `sampling` belongs to.
-    """
     assert isinstance(sampling, EventSetNode)
 
     return CalendarISOWeekOperator(sampling).outputs["output"]

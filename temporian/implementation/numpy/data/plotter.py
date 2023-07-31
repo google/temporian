@@ -135,7 +135,7 @@ def plot(
 
     if indexes is None:
         # All the indexes
-        indexes = list(evsets[0].data.keys())
+        indexes = list(evsets[0].get_index_keys(sort=True))
 
     elif isinstance(indexes, tuple):
         # e.g. indexes=("a",)

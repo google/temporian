@@ -106,7 +106,7 @@ def logical_and(
         ...     timestamps=[1, 2, 3],
         ...     features={"f1": [0, 1, 1], "f2": [1, 1, 0]}
         ... )
-        >>> b = tp.cast(a, bool)
+        >>> b = a.cast(bool)
         >>> c = b["f1"] & b["f2"]
         >>> c
         indexes: []

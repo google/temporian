@@ -20,7 +20,7 @@ This datatype is equivalent to a double in C.
 """
 import datetime
 from enum import Enum
-from typing import Union
+from typing import Union, Iterable, List
 
 import numpy as np
 
@@ -69,6 +69,41 @@ def normalize_timestamp(x: Timestamp) -> NormalizedTimestamp:
         return x
 
     raise ValueError(f"Invalid timestamp {x!r} of type {type(x)}.")
+
+
+def convert_timestamp_to_datetime(timestamp: Timestamp) -> datetime.datetime:
+    """Converts a unix timestamp in seconds to datetime (UTC).
+
+    Args:
+        timestamp: Single timestamp in seconds.
+
+    Returns:
+        Single UTC datetime.
+    """
+    norm_timestamp = normalize_timestamp(timestamp)
+    return datetime.datetime.fromtimestamp(
+        norm_timestamp, tz=datetime.timezone.utc
+    )
+
+
+def convert_timestamps_to_datetimes(
+    ts: Iterable[Timestamp],
+) -> List[datetime.datetime]:
+    """Converts unix timestamps in seconds to a list of datetimes (UTC).
+
+    Example:
+    ```python
+    >>> convert_timestamps_to_datetimes([0, 1689791856])
+    [datetime.datetime(1970, 1, 1, 0, 0, tzinfo=datetime.timezone.utc),
+     datetime.datetime(2023, 7, 19, 18, 37, 36, tzinfo=datetime.timezone.utc)]
+
+    Args:
+        ts: Iterable of timestamps, in seconds.
+
+    Returns:
+        List of UTC datetimes.
+    """
+    return [convert_timestamp_to_datetime(t) for t in ts]
 
 
 def convert_date_to_duration(date: Timestamp) -> NormalizedDuration:

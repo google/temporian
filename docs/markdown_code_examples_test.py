@@ -35,6 +35,8 @@ class MarkdownCodeExamplesTest(absltest.TestCase):
         tmp_dir_handle = tempfile.TemporaryDirectory()
         tmp_dir = Path(tmp_dir_handle.name)
         for path in Path("docs").rglob("*.md"):
+            if "ipynb_checkpoints" in str(path):
+                continue
             print(f"Testing code examples in {path}")
             try:
                 # Run with pd,np,tp already loaded

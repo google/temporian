@@ -36,40 +36,6 @@ operator_lib.register_operator(CalendarSecondOperator)
 
 @compile
 def calendar_second(sampling: EventSetOrNode) -> EventSetOrNode:
-    """Obtains the second the timestamps in an
-    [`EventSet`][temporian.EventSet]'s sampling are in.
-
-    Features in `input` are ignored, only the timestamps are used and
-    they must be unix timestamps (`is_unix_timestamp=True`).
-
-    Output feature contains numbers between 0 and 59.
-
-    Usage example:
-        ```python
-        >>> from datetime import datetime
-        >>> a = tp.event_set(
-        ...    timestamps=[datetime(2020,1,1,18,30,55), datetime(2020,1,1,23,59,0)],
-        ...    name='random_hours'
-        ... )
-        >>> b = tp.calendar_second(a)
-        >>> b
-        indexes: ...
-        features: [('calendar_second', int32)]
-        events:
-            (2 events):
-                timestamps: [...]
-                'calendar_second': [55 0]
-        ...
-
-        ```
-
-    Args:
-        sampling: EventSet to get the seconds from.
-
-    Returns:
-        EventSet with a single feature with the second each timestamp in
-        `sampling` belongs to.
-    """
     assert isinstance(sampling, EventSetNode)
 
     return CalendarSecondOperator(sampling).outputs["output"]

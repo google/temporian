@@ -36,13 +36,13 @@ class TFPTest(absltest.TestCase):
         i1 = evset_1.node()
         i2 = evset_2.node()
 
-        h1 = tp.simple_moving_average(input=i1, window_length=7)
-        h2 = tp.resample(input=h1, sampling=i2)
+        h1 = i1.simple_moving_average(window_length=7)
+        h2 = h1.resample(i2)
         h3 = i1 * 2.0 + 3.0 > 10.0
 
-        result = tp.glue(tp.prefix(h2["f2"], "sma_"), i2)
+        result = tp.glue(h2["f2"].prefix("sma_"), i2)
 
-        result2 = tp.glue(tp.prefix(h3, "toto."))
+        result2 = tp.glue(h3.prefix("toto."))
 
         result_data, result2_data = tp.run(
             query=[result, result2],
@@ -69,8 +69,8 @@ class TFPTest(absltest.TestCase):
 
         evset_2 = tp.event_set(timestamps=[1.0, 2.0, 2.0])
 
-        h1 = tp.simple_moving_average(input=evset_1, window_length=7)
-        h2 = tp.resample(input=h1, sampling=evset_2)
+        h1 = evset_1.simple_moving_average(window_length=7)
+        h2 = h1.resample(evset_2)
 
         self.assertTrue(isinstance(h1, tp.EventSet))
         self.assertTrue(isinstance(h2, tp.EventSet))
@@ -79,9 +79,9 @@ class TFPTest(absltest.TestCase):
 
         h3 = evset_1 * 2.0 + 3.0 > 10.0
 
-        result = tp.glue(tp.prefix(h2["f2"], "sma_"), evset_2)
+        result = tp.glue(h2["f2"].prefix("sma_"), evset_2)
 
-        result2 = tp.glue(tp.prefix(h3, "toto."))
+        result2 = tp.glue(h3.prefix("toto."))
 
         self.assertTrue(isinstance(result, tp.EventSet))
         self.assertTrue(isinstance(result2, tp.EventSet))
@@ -90,14 +90,10 @@ class TFPTest(absltest.TestCase):
         evset = tp.event_set(timestamps=[0.0])
 
         with self.assertRaises(ValueError):
-            tp.simple_moving_average(
-                evset, window_length=7, sampling=evset.node()
-            )
+            evset.simple_moving_average(window_length=7, sampling=evset.node())
 
         with self.assertRaises(ValueError):
-            tp.simple_moving_average(
-                evset.node(), window_length=7, sampling=evset
-            )
+            evset.node().simple_moving_average(window_length=7, sampling=evset)
 
     def test_pandas(self):
         evset = tp.event_set(
@@ -114,7 +110,7 @@ class TFPTest(absltest.TestCase):
 
     def test_serialization(self):
         a = tp.input_node([("f1", tp.float32), ("f2", tp.float32)])
-        b = tp.simple_moving_average(input=a, window_length=7)
+        b = a.simple_moving_average(window_length=7)
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_graph.tem")
@@ -129,7 +125,7 @@ class TFPTest(absltest.TestCase):
         a = tp.input_node(
             [("f1", tp.float32), ("f2", tp.float32)], name="my_source_node"
         )
-        b = tp.simple_moving_average(input=a, window_length=7)
+        b = a.simple_moving_average(window_length=7)
         b.name = "my_output_node"
 
         with tempfile.TemporaryDirectory() as tempdir:
@@ -150,7 +146,7 @@ class TFPTest(absltest.TestCase):
             [("f1", tp.float32), ("f2", tp.float32)],
             name="my_source_node",
         )
-        b = tp.simple_moving_average(input=a, window_length=7)
+        b = a.simple_moving_average(window_length=7)
         b.name = "my_output_node"
 
         with tempfile.TemporaryDirectory() as tempdir:
@@ -171,7 +167,7 @@ class TFPTest(absltest.TestCase):
             [("f1", tp.float32), ("f2", tp.float32)],
             name="my_source_node",
         )
-        b = tp.simple_moving_average(input=a, window_length=7)
+        b = a.simple_moving_average(window_length=7)
         b.name = "my_output_node"
 
         with tempfile.TemporaryDirectory() as tempdir:

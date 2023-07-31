@@ -20,7 +20,7 @@ from typing import List, Optional, Tuple, TYPE_CHECKING, Union
 
 from temporian.core.data.dtype import DType, IndexDType
 from temporian.core.data.schema import Schema, FeatureSchema, IndexSchema
-from temporian.core.mixins import EventSetOperationsMixin
+from temporian.core.event_set_ops import EventSetOperations
 from temporian.utils import string
 
 if TYPE_CHECKING:
@@ -28,12 +28,12 @@ if TYPE_CHECKING:
     from temporian.core.typing import EventSetCollection, NodeToEventSetMapping
 
 
-class EventSetNode(EventSetOperationsMixin):
+class EventSetNode(EventSetOperations):
     """An EventSetNode is a reference to the input/output of ops in a compute
     graph.
 
     Use [`tp.input_node()`][temporian.input_node] to create an EventSetNode
-    manually, or use [`event_set.node()`][temporian.EventSet.node] to create an
+    manually, or use [`EventSet.node()`][temporian.EventSet.node] to create an
     EventSetNode compatible with a given [`EventSet`][temporian.EventSet].
 
     A EventSetNode does not contain any data. Use
@@ -139,7 +139,7 @@ class EventSetNode(EventSetOperationsMixin):
                 " the same sampling, use the argument `same_sampling_as` of"
                 " `tp.event_set` or `tp.input_node`. To align the sampling of"
                 " two EventSets with same indexes but different sampling,"
-                " use the operator `tp.resample`."
+                " use `EventSet.resample()`."
             )
 
     def run(

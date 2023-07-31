@@ -57,36 +57,6 @@ operator_lib.register_operator(BeginOperator)
 
 @compile
 def begin(input: EventSetOrNode) -> EventSetOrNode:
-    """Generates a single timestamp at the beginning of the
-    [`EventSet`][temporian.EventSet], per index group.
-
-    Usage example:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[5, 6, 7, -1],
-        ...     features={"f": [50, 60, 70, -10], "idx": [1, 1, 1, 2]},
-        ...     indexes=["idx"]
-        ... )
-
-        >>> a_ini = tp.begin(a)
-        >>> a_ini
-        indexes: [('idx', int64)]
-        features: []
-        events:
-            idx=1 (1 events):
-                timestamps: [5.]
-            idx=2 (1 events):
-                timestamps: [-1.]
-        ...
-
-        ```
-
-    Args:
-        input: Guide EventSet.
-
-    Returns:
-        A feature-less EventSet with a single timestamp per index group.
-    """
     assert isinstance(input, EventSetNode)
 
     return BeginOperator(input=input).outputs["output"]

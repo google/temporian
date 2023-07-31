@@ -37,16 +37,16 @@ If the [`EventSet`][temporian.EventSet] has one (or many) indexes, its events wi
 
 ## Operators
 
-Processing operations are performed by **operators**. For instance, the `tp.simple_moving_average()` operator computes the [simple moving average](https://en.wikipedia.org/wiki/Moving_average) of each feature in an [`EventSet`][temporian.EventSet].
+Processing operations are performed by **operators**. For instance, the [`EventSet.simple_moving_average()`][temporian.EventSet.simple_moving_average] operator computes the [simple moving average](https://en.wikipedia.org/wiki/Moving_average) of each feature in an [`EventSet`][temporian.EventSet].
 
 The list of all available operators is available in the [API Reference](./reference/).
 
 ```python
 >>> # Compute the 2-day simple moving average of the EventSet defined above
->>> sma = tp.simple_moving_average(evset, window_length=tp.duration.days(2))
+>>> sma = evset.simple_moving_average(window_length=tp.duration.days(2))
 
 >>> # Remove index to get a flat EventSet
->>> reindexed = tp.drop_index(sma)
+>>> reindexed = sma.drop_index()
 
 >>> # Subtract feature_1 from feature_3
 >>> sub = reindexed["feature_3"] - reindexed["feature_1"]

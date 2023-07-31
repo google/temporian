@@ -73,42 +73,11 @@ class Prefix(Operator):
 operator_lib.register_operator(Prefix)
 
 
-# TODO: make input be the first argument
 @compile
 def prefix(
     input: EventSetOrNode,
     prefix: str,
 ) -> EventSetOrNode:
-    """Adds a prefix to the names of the features in an
-    [`EventSet`][temporian.EventSet].
-
-    Usage example:
-        ```python
-        >>> a = tp.event_set(
-        ...    timestamps=[0, 1],
-        ...    features={"f1": [0, 2], "f2": [5, 6]}
-        ... )
-        >>> b = a * 5
-
-        >>> # Prefix before glue to avoid duplicated names
-        >>> c = tp.glue(tp.prefix(a, "original_"), tp.prefix(b, "result_"))
-        >>> c
-        indexes: ...
-                'original_f1': [0 2]
-                'original_f2': [5 6]
-                'result_f1': [ 0 10]
-                'result_f2': [25 30]
-        ...
-
-        ```
-
-    Args:
-        input: EventSet to prefix.
-        prefix: Prefix to add in front of the feature names.
-
-    Returns:
-        Prefixed EventSet.
-    """
     assert isinstance(input, EventSetNode)
 
     return Prefix(input=input, prefix=prefix).outputs["output"]

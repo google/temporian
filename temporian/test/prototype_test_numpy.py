@@ -98,9 +98,9 @@ class PrototypeTest(absltest.TestCase):
         # create and glue sum feature
         # TODO: Restore when arithmetic operator is fixed.
         # b = tp.glue(a, self.node_1 + self.node_2)
-        c = tp.prefix(tp.lag(self.node_1, duration=1), "lag[1s]_")
-        d = tp.glue(a, tp.resample(c, a))
-        sub_sales = tp.prefix(-self.node_1["sales"], "negated_")
+        c = self.node_1.lag(duration=1).prefix("lag[1s]_")
+        d = tp.glue(a, c.resample(a))
+        sub_sales = (-self.node_1["sales"]).prefix("negated_")
         e = tp.glue(d, sub_sales)
         output_node = e
 

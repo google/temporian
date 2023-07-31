@@ -42,7 +42,7 @@ py_library(
     srcs = ["utils.py"],
     srcs_version = "PY3",
     deps = [
-        # already_there/absl/testing:absltest
+        # already_there/absl
         # already_there/apache_beam
         "//temporian/beam:io",
         "//temporian/beam:evaluation",

@@ -44,48 +44,6 @@ def moving_max(
     window_length: Duration,
     sampling: Optional[EventSetOrNode] = None,
 ) -> EventSetOrNode:
-    """Computes the maximum in a sliding window over an
-    [`EventSet`][temporian.EventSet].
-
-    For each t in sampling, and for each index and feature independently,
-    returns at time t the max of non-nan values for the feature in the window
-    (t - window_length, t].
-
-    If `sampling` is provided samples the moving window's value at each
-    timestamp in `sampling`, else samples it at each timestamp in `input`.
-
-    If the window does not contain any values (e.g., all the values are missing,
-    or the window does not contain any sampling), outputs missing values.
-
-    Example:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[0, 1, 2, 5, 6, 7],
-        ...     features={"value": [np.nan, 1, 5, 1, 15, 20]},
-        ... )
-
-        >>> b = tp.moving_max(a, tp.duration.seconds(4))
-        >>> b
-        indexes: ...
-            (6 events):
-                timestamps: [0. 1. 2. 5. 6. 7.]
-                'value': [nan 1. 5. 5. 15. 20.]
-        ...
-
-        ```
-
-    See [`tp.moving_count()`](../moving_count) for examples with external
-    sampling and indices.
-
-    Args:
-        input: EventSet for which to count the number of values in each feature.
-        window_length: Sliding window's length.
-        sampling: Timestamps to sample the sliding window's value at. If not
-            provided, timestamps in `input` are used.
-
-    Returns:
-        EventSet containing the max of each feature in `input`.
-    """
     assert isinstance(input, EventSetNode)
     if sampling is not None:
         assert isinstance(sampling, EventSetNode)
