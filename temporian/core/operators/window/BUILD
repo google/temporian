@@ -47,6 +47,7 @@ py_library(
         "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
+        "//temporian/utils:rtcheck",
     ],
 )
 

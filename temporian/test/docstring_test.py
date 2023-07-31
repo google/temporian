@@ -25,6 +25,12 @@ import pandas as pd
 import temporian as tp
 
 
+def or_zero(v):
+    if v is None:
+        return 0
+    return v
+
+
 class DocstringsTest(absltest.TestCase):
     """
     Tests all code examples included in docstrings, using builtin doctest module.
@@ -73,7 +79,7 @@ class DocstringsTest(absltest.TestCase):
             except doctest.DocTestFailure as e:
                 test = e.test
                 ex = e.example
-                lineno = test.lineno + ex.lineno
+                lineno = or_zero(test.lineno) + ex.lineno
                 path = inspect.getfile(module)
                 # Re-raise as bazel assertion
                 self.assertEqual(
@@ -90,7 +96,7 @@ class DocstringsTest(absltest.TestCase):
             except doctest.UnexpectedException as e:
                 test = e.test
                 ex = e.example
-                lineno = test.lineno + ex.lineno
+                lineno = or_zero(test.lineno) + ex.lineno
                 path = inspect.getfile(module)
                 print("\n\nTraceback:")
                 traceback.print_tb(e.exc_info[2], file=sys.stdout)

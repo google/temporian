@@ -54,7 +54,7 @@ class MarkdownCodeExamplesTest(absltest.TestCase):
             except doctest.DocTestFailure as e:
                 test = e.test
                 ex = e.example
-                lineno = test.lineno + ex.lineno
+                lineno = (test.lineno or 0) + ex.lineno
                 # Re-raise as bazel assertion
                 self.assertEqual(
                     ex.want,
@@ -69,7 +69,7 @@ class MarkdownCodeExamplesTest(absltest.TestCase):
             except doctest.UnexpectedException as e:
                 test = e.test
                 ex = e.example
-                lineno = test.lineno + ex.lineno
+                lineno = (test.lineno or 0) + ex.lineno
                 # pylint: disable=raise-missing-from
                 raise AssertionError(
                     "Exception running docstring example starting at line "

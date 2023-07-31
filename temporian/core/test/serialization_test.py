@@ -302,7 +302,7 @@ class SerializationTest(absltest.TestCase):
         def f(x: EventSetOrNode, y: int):
             return {"output": x.prefix("a_")}
 
-        f.is_tp_compiled = True  # hack to pass compiled check
+        setattr(f, "is_tp_compiled", True)  # hack to pass compiled check
 
         with tempfile.TemporaryDirectory() as tempdir:
             path = os.path.join(tempdir, "my_fn.tem")

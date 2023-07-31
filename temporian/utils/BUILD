@@ -27,3 +27,9 @@ py_library(
     srcs = ["config.py"],
     srcs_version = "PY3",
 )
+
+py_library(
+    name = "rtcheck",
+    srcs = ["rtcheck.py"],
+    srcs_version = "PY3",
+)

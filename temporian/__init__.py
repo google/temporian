@@ -85,6 +85,9 @@ from temporian.core.compilation import compile
 # Types
 from temporian.core.typing import EventSetOrNode
 
+# Runtime check
+from temporian.utils.rtcheck import runtime_check_raise_exception
+
 # --- OPERATORS ---
 
 from temporian.core.operators.glue import glue
