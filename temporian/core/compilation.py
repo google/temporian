@@ -59,8 +59,8 @@ def compile(fn: Optional[F] = None, *, verbose: int = 0) -> F:
     ... )
 
     >>> result = f(evset, evset)
-    >>> type(result)
-    <class 'temporian.implementation.numpy.data.event_set.EventSet'>
+    >>> isinstance(result, tp.EventSet)
+    True
 
     ```
 
