@@ -4,7 +4,12 @@ from absl.testing import absltest
 import re
 import numpy as np
 
-from temporian.utils.rtcheck import rtcheck, _check_annotation, _Trace
+from temporian.utils.rtcheck import (
+    rtcheck,
+    _check_annotation,
+    _Trace,
+    runtime_check_raise_exception,
+)
 from temporian.core.compilation import compile
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core.data.node import EventSetNode, input_node
@@ -73,6 +78,13 @@ class RTCheckTest(absltest.TestCase):
             @rtcheck
             def h(a: EventSetNode) -> EventSetNode:
                 return a
+
+    def test_disable_rt_check(self):
+        runtime_check_raise_exception(False)
+        f(1, 2, 3)
+        runtime_check_raise_exception(True)
+        with self.assertRaises(ValueError):
+            f(1, 2, 3)
 
     def test_m_int(self):
         self.assertTrue(check(1, int))

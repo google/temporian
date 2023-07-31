@@ -339,9 +339,12 @@ def rtcheck(fn):
                             param.annotation,
                         )
         except ValueError as e:
-            # Reset the stack trace of the exception.
-            e.__traceback__ = None
-            raise e
+            if _ERROR_RAISES_EXCEPTION:
+                # Reset the stack trace of the exception.
+                e.__traceback__ = None
+                raise e
+            else:
+                logging.warning("%s", str(e))
 
         output = fn(*args, **kwargs)
 
