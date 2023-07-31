@@ -41,7 +41,7 @@ class RTCheckTest(absltest.TestCase):
             ValueError,
             re.escape(
                 "Expecting value of type <class 'str'> but received value of"
-                " type <class 'int'>. The value is 3"
+                " type <class 'int'>. The value is \"3\""
             ),
         ):
             f(1, 2, 3)
@@ -50,7 +50,7 @@ class RTCheckTest(absltest.TestCase):
             ValueError,
             re.escape(
                 "Expecting value of type <class 'int'> but received value of"
-                " type <class 'str'>. The value is aze."
+                " type <class 'str'>. The value is \"aze\"."
             ),
         ):
             f(1, "aze")

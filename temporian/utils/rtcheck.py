@@ -12,6 +12,7 @@ import typing
 
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core.data.node import EventSetNode
+from temporian.core.event_set_ops import EventSetOperations
 
 # Number of elements to check in a structure e.g. a list.
 _NUM_CHECK_STRUCT = 3
@@ -75,7 +76,7 @@ def _base_error(value, annotation):
 
     return (
         f"Expecting value of type {annotation} but received value of type"
-        f" {type(value)}. The value is {value}."
+        f' {type(value)}. The value is "{value}".'
     )
 
 
@@ -98,11 +99,11 @@ def _check_annotation(trace: _Trace, is_compiled: bool, value, annotation):
         except ValueError:
             logging.warning("Cannot unfold annotation %s", annotation)
 
-    # TODO: The current codes allow EventSet and Node to be used
-    # interchangeably. Update code when EventSetOrNode is available.
-    if annotation in (EventSet, EventSetNode) and isinstance(
-        value, (EventSet, EventSetNode)
-    ):
+    if annotation in (
+        EventSet,
+        EventSetNode,
+        EventSetOperations,
+    ) and isinstance(value, (EventSet, EventSetNode, EventSetOperations)):
         return
 
     if annotation in [inspect._empty, Any, Optional]:
