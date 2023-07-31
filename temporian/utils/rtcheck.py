@@ -19,6 +19,20 @@ _NUM_CHECK_STRUCT = 3
 # If true, print details during runtime checking.
 _DEBUG = False
 
+_ERROR_RAISES_EXCEPTION = True
+
+
+def runtime_check_raise_exception(value: bool) -> None:
+    """Sets the behavior when RT Check finds an issue.
+
+    Arg:
+        value: If True, a RT check error will raise an exception. If False, a RT
+          check error will print a warning.
+    """
+
+    global _ERROR_RAISES_EXCEPTION
+    _ERROR_RAISES_EXCEPTION = value
+
 
 class _Trace:
     """A trace collects a description of the unfolding of a value.
@@ -38,9 +52,16 @@ class _Trace:
     def exception(self, value: str):
         """Raises an exception with the current context and the value."""
 
-        raise ValueError(" ".join(self.context + [value]))
+        disable_error_info = (
+            "Note: You can disable runtime checking with"
+            " tp.runtime_check_raise_exception(False)."
+        )
 
-    def add_context(self, value: str) -> "_Trace":
+        raise ValueError(
+            " ".join([value, "\n"] + self.context + ["\n", disable_error_info])
+        )
+
+    def add_context(self, value: str) -> _Trace:
         """Creates a new trace with the current's trace context and value."""
 
         n = _Trace()
@@ -53,8 +74,8 @@ def _base_error(value, annotation):
     """Text of a type mismatch error."""
 
     return (
-        f"Found value of type {type(value)} when type {annotation} was"
-        f" expected. The exact value is {value}."
+        f"Expecting value of type {annotation} but received value of type"
+        f" {type(value)}. The value is {value}."
     )
 
 
@@ -172,7 +193,6 @@ def _check_annotation_union(
     trace: _Trace, is_compiled: bool, value, annotation_args
 ):
     for arg in annotation_args:
-        match = True
         try:
             _check_annotation(
                 trace.add_context("When checking the content of a union."),
@@ -180,19 +200,20 @@ def _check_annotation_union(
                 value,
                 arg,
             )
-        except ValueError:
-            match = False
-        if match:
             return
+        except ValueError:
+            pass
 
-    trace.exception(f"Cannot match any item of the union {annotation_args}.")
+    trace.exception(
+        f'Non matching type for "{type(value)}" in the union {annotation_args}.'
+    )
 
 
 def _check_annotation_tuple(
     trace: _Trace, is_compiled: bool, value, annotation_args
 ):
     if len(annotation_args) != len(value):
-        trace.add_context("Wrong number of items in tuple")
+        trace.add_context("Wrong number of items in tuple.")
 
     for val, arg in zip(value, annotation_args):
         _check_annotation(
@@ -234,25 +255,28 @@ def _check_annotation_dict(
 
 
 def rtcheck(fn):
-    """Checks the input arguments and output value of a function.
+    """Annotation that check the arguments and outputs of a function at runtime.
+
+    @rtcheck checks, at runtime, that the type hints of the arguments and output
+    of a function are satisfied.
 
     Usage example:
-
+        ```python
         @rtcheck
         def f(a, b: int, c: str = "aze") -> List[str]:
-            del a
-            del b
-            del c
-            return ["a", "b"]
+            return ["hello", "world"]
 
         f(1, 2, "a") # Ok
         f(1, 2, 3) # Fails
+        ```
 
-    If combined with @compile, @rtcheck should be put before @compile.
+    If combined with @compile, @rtcheck should be applied after @compile (i.e.
+    place @compile just below @rtcheck in the code).
 
     This code only support what is required by Temporian API.
 
-    Does not typing.GenericTypeAlias e.g. list[int]. Use List[int] instead.
+    Does not support typing.GenericTypeAlias e.g. list[int]. Use List[int]
+    instead.
 
     Args:
         fn: Function to instrument.
@@ -272,12 +296,15 @@ def rtcheck(fn):
 
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        trace = _Trace().add_context(f'When checking function "{fn.__name__}".')
-
         try:
             # Check inputs
             all_args = signature.bind(*args, **kwargs)
             for arg_key, arg_value in all_args.arguments.items():
+                trace = _Trace().add_context(
+                    f'When checking the argument "{arg_key}" of function'
+                    f' "{fn.__name__}".'
+                )
+
                 if arg_key not in signature.parameters:
                     raise ValueError(f'Unexpected argument "{arg_key}"')
                 param = signature.parameters[arg_key]
@@ -287,18 +314,14 @@ def rtcheck(fn):
                     inspect.Parameter.POSITIONAL_OR_KEYWORD,
                 ]:
                     _check_annotation(
-                        trace.add_context(
-                            f'When checking argument "{arg_key}".'
-                        ),
+                        trace,
                         is_compiled,
                         arg_value,
                         param.annotation,
                     )
                 elif param.kind is inspect.Parameter.VAR_POSITIONAL:
                     _check_annotation_list_or_set_or_uniform_tuple(
-                        trace.add_context(
-                            f'When checking argument "{arg_key}".'
-                        ),
+                        trace,
                         is_compiled,
                         arg_value,
                         [param.annotation],
@@ -306,9 +329,9 @@ def rtcheck(fn):
                 elif param.kind is inspect.Parameter.VAR_KEYWORD:
                     for sub_key, sub_value in arg_value.items():
                         _check_annotation(
-                            trace.add_context(
-                                f'When checking key "{sub_key}" of argument'
-                                f' "{arg_key}".'
+                            _Trace().add_context(
+                                f'When checking the key "{sub_key}" of argument'
+                                f' "{arg_key}" of function "{fn.__name__}".'
                             ),
                             is_compiled,
                             sub_value,
@@ -323,16 +346,22 @@ def rtcheck(fn):
 
         try:
             # Check outputs
+            trace = _Trace().add_context(
+                f'When checking the returned value of function "{fn.__name__}".'
+            )
             _check_annotation(
-                trace.add_context("When checking returned value."),
+                trace,
                 is_compiled,
                 output,
                 signature.return_annotation,
             )
         except ValueError as e:
-            # Reset the stack trace of the exception.
-            e.__traceback__ = None
-            raise e
+            if _ERROR_RAISES_EXCEPTION:
+                # Reset the stack trace of the exception.
+                e.__traceback__ = None
+                raise e
+            else:
+                logging.warning("%s", str(e))
 
         return output
 

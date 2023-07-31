@@ -198,10 +198,7 @@ class TFPTest(absltest.TestCase):
     def test_wrong_type(self):
         with self.assertRaisesRegex(
             ValueError,
-            re.escape(
-                'When checking function "event_set". When checking argument'
-                ' "features". Cannot match any item of the union'
-            ),
+            re.escape("Non matching type for \"<class 'list'>\" in the union"),
         ):
             tp.event_set(timestamps=[1, 2], features=[])
 

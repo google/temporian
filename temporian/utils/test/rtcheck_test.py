@@ -11,7 +11,7 @@ from temporian.core.data.node import EventSetNode, input_node
 from temporian.implementation.numpy.data.io import event_set
 
 
-def _m(v, a):
+def check(v, a):
     try:
         _check_annotation(_Trace(), False, v, a)
     except Exception as e:
@@ -40,9 +40,8 @@ class RTCheckTest(absltest.TestCase):
         with self.assertRaisesRegex(
             ValueError,
             re.escape(
-                'When checking function "f". When checking argument "c".'
-                " Found value of type <class 'int'> when type <class 'str'> was"
-                " expected. The exact value is 3."
+                "Expecting value of type <class 'str'> but received value of"
+                " type <class 'int'>. The value is 3"
             ),
         ):
             f(1, 2, 3)
@@ -50,9 +49,8 @@ class RTCheckTest(absltest.TestCase):
         with self.assertRaisesRegex(
             ValueError,
             re.escape(
-                'When checking function "f". When checking argument "b".'
-                " Found value of type <class 'str'> when type <class 'int'> was"
-                " expected. The exact value is aze."
+                "Expecting value of type <class 'int'> but received value of"
+                " type <class 'str'>. The value is aze."
             ),
         ):
             f(1, "aze")
@@ -68,7 +66,7 @@ class RTCheckTest(absltest.TestCase):
 
     def test_wrong_compile_order(self):
         with self.assertRaisesRegex(
-            ValueError, "Apply @rtcheck before @compile"
+            ValueError, "Apply @compile before @rtcheck"
         ):
 
             @compile
@@ -77,95 +75,95 @@ class RTCheckTest(absltest.TestCase):
                 return a
 
     def test_m_int(self):
-        self.assertTrue(_m(1, int))
+        self.assertTrue(check(1, int))
 
-        self.assertFalse(_m(1.5, int))
-        self.assertFalse(_m("hello", int))
-        self.assertFalse(_m([], int))
-        self.assertFalse(_m({}, int))
-        self.assertFalse(_m(SomeClass(), int))
+        self.assertFalse(check(1.5, int))
+        self.assertFalse(check("hello", int))
+        self.assertFalse(check([], int))
+        self.assertFalse(check({}, int))
+        self.assertFalse(check(SomeClass(), int))
 
     def test_m_float(self):
-        self.assertTrue(_m(1.5, float))
+        self.assertTrue(check(1.5, float))
 
-        self.assertFalse(_m(1, float))
-        self.assertFalse(_m("hello", float))
-        self.assertFalse(_m([], float))
-        self.assertFalse(_m({}, float))
-        self.assertFalse(_m(SomeClass(), float))
+        self.assertFalse(check(1, float))
+        self.assertFalse(check("hello", float))
+        self.assertFalse(check([], float))
+        self.assertFalse(check({}, float))
+        self.assertFalse(check(SomeClass(), float))
 
     def test_m_list(self):
-        self.assertTrue(_m([], List))
-        self.assertTrue(_m(["a", 1], List))
-        self.assertTrue(_m([1, 2], List))
-        self.assertTrue(_m([1, 2], List[int]))
-        self.assertTrue(_m(["a", "b"], List[str]))
+        self.assertTrue(check([], List))
+        self.assertTrue(check(["a", 1], List))
+        self.assertTrue(check([1, 2], List))
+        self.assertTrue(check([1, 2], List[int]))
+        self.assertTrue(check(["a", "b"], List[str]))
 
-        self.assertFalse(_m(1.5, List))
-        self.assertFalse(_m("hello", List))
-        self.assertFalse(_m({}, List))
-        self.assertFalse(_m(SomeClass(), List))
+        self.assertFalse(check(1.5, List))
+        self.assertFalse(check("hello", List))
+        self.assertFalse(check({}, List))
+        self.assertFalse(check(SomeClass(), List))
 
-        self.assertFalse(_m([1, 2], List[str]))
-        self.assertFalse(_m(["a", 2], List[int]))
-        self.assertFalse(_m(["a", 1], List[str]))
-        self.assertFalse(_m([[], [1, 2]], List[str]))
+        self.assertFalse(check([1, 2], List[str]))
+        self.assertFalse(check(["a", 2], List[int]))
+        self.assertFalse(check(["a", 1], List[str]))
+        self.assertFalse(check([[], [1, 2]], List[str]))
 
     def test_m_dict(self):
-        self.assertTrue(_m({}, Dict))
-        self.assertTrue(_m({1: 2, 3: 4}, Dict))
-        self.assertTrue(_m({"a": 2, "b": 4}, Dict[str, int]))
+        self.assertTrue(check({}, Dict))
+        self.assertTrue(check({1: 2, 3: 4}, Dict))
+        self.assertTrue(check({"a": 2, "b": 4}, Dict[str, int]))
 
-        self.assertFalse(_m(1.5, Dict))
-        self.assertFalse(_m("hello", Dict))
-        self.assertFalse(_m([], Dict))
-        self.assertFalse(_m(SomeClass(), Dict))
+        self.assertFalse(check(1.5, Dict))
+        self.assertFalse(check("hello", Dict))
+        self.assertFalse(check([], Dict))
+        self.assertFalse(check(SomeClass(), Dict))
 
-        self.assertFalse(_m({"a": 2, "b": 4}, Dict[int, str]))
-        self.assertFalse(_m({1: 2, 3: 4}, Dict[str, int]))
+        self.assertFalse(check({"a": 2, "b": 4}, Dict[int, str]))
+        self.assertFalse(check({1: 2, 3: 4}, Dict[str, int]))
 
     def test_m_numpy(self):
-        self.assertTrue(_m(np.array(1), np.ndarray))
+        self.assertTrue(check(np.array(1), np.ndarray))
 
-        self.assertFalse(_m(1.5, np.ndarray))
-        self.assertFalse(_m("hello", np.ndarray))
-        self.assertFalse(_m([], np.ndarray))
-        self.assertFalse(_m({}, np.ndarray))
-        self.assertFalse(_m(SomeClass(), np.ndarray))
+        self.assertFalse(check(1.5, np.ndarray))
+        self.assertFalse(check("hello", np.ndarray))
+        self.assertFalse(check([], np.ndarray))
+        self.assertFalse(check({}, np.ndarray))
+        self.assertFalse(check(SomeClass(), np.ndarray))
 
     def test_m_set(self):
-        self.assertTrue(_m(set(), Set))
-        self.assertTrue(_m({"a", 1}, Set))
-        self.assertTrue(_m({1, 2}, Set))
-        self.assertTrue(_m({1, 2}, Set[int]))
-        self.assertTrue(_m({"a", "b"}, Set[str]))
+        self.assertTrue(check(set(), Set))
+        self.assertTrue(check({"a", 1}, Set))
+        self.assertTrue(check({1, 2}, Set))
+        self.assertTrue(check({1, 2}, Set[int]))
+        self.assertTrue(check({"a", "b"}, Set[str]))
 
-        self.assertFalse(_m(1.5, Set))
-        self.assertFalse(_m("hello", Set))
-        self.assertFalse(_m([], Set))
-        self.assertFalse(_m(SomeClass(), Set))
+        self.assertFalse(check(1.5, Set))
+        self.assertFalse(check("hello", Set))
+        self.assertFalse(check([], Set))
+        self.assertFalse(check(SomeClass(), Set))
 
-        self.assertFalse(_m({1, 2}, Set[str]))
-        self.assertFalse(_m({"a", 2}, Set[int]))
-        self.assertFalse(_m({"a", 1}, Set[str]))
+        self.assertFalse(check({1, 2}, Set[str]))
+        self.assertFalse(check({"a", 2}, Set[int]))
+        self.assertFalse(check({"a", 1}, Set[str]))
 
     def test_m_union(self):
-        self.assertTrue(_m(1, Union[int, str]))
+        self.assertTrue(check(1, Union[int, str]))
 
-        self.assertFalse(_m([], Union[int, str]))
+        self.assertFalse(check([], Union[int, str]))
 
     def test_m_optional(self):
-        self.assertTrue(_m(1, Optional[int]))
-        self.assertTrue(_m(None, Optional[int]))
-        self.assertTrue(_m(1, Optional))
+        self.assertTrue(check(1, Optional[int]))
+        self.assertTrue(check(None, Optional[int]))
+        self.assertTrue(check(1, Optional))
 
-        self.assertFalse(_m("hello", Optional[int]))
+        self.assertFalse(check("hello", Optional[int]))
 
     def test_m_tuple(self):
-        self.assertTrue(_m((1, "aze"), Tuple[int, str]))
-        self.assertTrue(_m((1, "aze"), Tuple))
+        self.assertTrue(check((1, "aze"), Tuple[int, str]))
+        self.assertTrue(check((1, "aze"), Tuple))
 
-        self.assertFalse(_m((1, 2), Tuple[int, str]))
+        self.assertFalse(check((1, 2), Tuple[int, str]))
 
     def test_args(self):
         @rtcheck
@@ -179,8 +177,8 @@ class RTCheckTest(absltest.TestCase):
         with self.assertRaisesRegex(
             ValueError,
             re.escape(
-                "Found value of type <class 'str'> when type <class 'int'> was"
-                " expected."
+                "Expecting value of type <class 'int'> but received value of"
+                " type <class 'str'>."
             ),
         ):
             a("a", "b")
@@ -197,8 +195,8 @@ class RTCheckTest(absltest.TestCase):
         with self.assertRaisesRegex(
             ValueError,
             re.escape(
-                "Found value of type <class 'str'> when type <class 'int'> was"
-                " expected."
+                "Expecting value of type <class 'int'> but received value of"
+                " type <class 'str'>."
             ),
         ):
             a(x="1", y="2")

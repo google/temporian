@@ -86,7 +86,11 @@ def compile(fn: Optional[F] = None, *, verbose: int = 0) -> F:
 
     def _compile(fn):
         if hasattr(fn, "_rtcheck"):
-            raise ValueError("Apply @rtcheck before @compile")
+            raise ValueError(
+                "Apply @compile before @rtcheck if using both (i.e. if using"
+                " them as decorators, place @compile just below @rtcheck in the"
+                " code)."
+            )
 
         @wraps(fn)
         def wrapper(*args, **kwargs):
@@ -120,7 +124,7 @@ def compile(fn: Optional[F] = None, *, verbose: int = 0) -> F:
 
             return outputs
 
-        wrapper.is_tp_compiled = True  # type: ignore
+        setattr(wrapper, "is_tp_compiled", True)
 
         return wrapper
 

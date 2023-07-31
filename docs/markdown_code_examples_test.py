@@ -22,12 +22,6 @@ import pandas as pd
 import temporian as tp
 
 
-def or_zero(v):
-    if v is None:
-        return 0
-    return v
-
-
 class MarkdownCodeExamplesTest(absltest.TestCase):
     """
     Tests all code examples in markdown files, using builtin doctest module.
@@ -58,7 +52,7 @@ class MarkdownCodeExamplesTest(absltest.TestCase):
             except doctest.DocTestFailure as e:
                 test = e.test
                 ex = e.example
-                lineno = or_zero(test.lineno) + ex.lineno
+                lineno = (test.lineno or 0) + ex.lineno
                 # Re-raise as bazel assertion
                 self.assertEqual(
                     ex.want,
@@ -73,7 +67,7 @@ class MarkdownCodeExamplesTest(absltest.TestCase):
             except doctest.UnexpectedException as e:
                 test = e.test
                 ex = e.example
-                lineno = or_zero(test.lineno) + ex.lineno
+                lineno = (test.lineno or 0) + ex.lineno
                 # pylint: disable=raise-missing-from
                 raise AssertionError(
                     "Exception running docstring example starting at line "
