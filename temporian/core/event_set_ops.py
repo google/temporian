@@ -1312,76 +1312,62 @@ class EventSetOperations:
         window_length: Duration,
         sampling: Optional[EventSetOrNode] = None,
     ) -> EventSetOrNode:
-        """Computes the number of values in a sliding window over an
-        [`EventSet`][temporian.EventSet].
+        """Gets the number of events in a sliding window.
 
-        For each t in sampling, and for each index and feature independently,
-        returns at time t the number of non-nan values for the feature in the window
-        (t - window_length, t].
+        Create a tp.int32 feature containing the number of events in the time
+        window (t - window_length, t].
 
-        If `sampling` is provided samples the moving window's value at each
-        timestamp in `sampling`, else samples it at each timestamp in the input.
+        If the `sampling` argument is not provided, outputs a timestamp for
+        each timestamp in `input`. If the `sampling` argument is provided,
+        outputs a timestamp for each timestamp in `sampling`.
 
-        If the window does not contain any values (e.g., all the values are missing,
-        or the window does not contain any sampling), outputs missing values.
-
-        Basic example:
+        Example without sampling:
             ```python
-            >>> a = tp.event_set(
-            ...     timestamps=[0, 1, 2, 5, 6, 7],
-            ...     features={"value": [np.nan, 1, 5, 10, 15, 20]},
-            ... )
-
-            >>> b = a.moving_count(tp.duration.seconds(2))
+            >>> a = tp.event_set(timestamps=[0, 1, 2, 5, 6, 7])
+            >>> b = tp.moving_count(a, tp.duration.seconds(2))
             >>> b
             indexes: ...
                 (6 events):
                     timestamps: [0. 1. 2. 5. 6. 7.]
-                    'value': [0 1 2 1 2 2]
+                    'count': [1 2 2 1 2 2]
             ...
 
             ```
 
-        Example with external sampling:
+        Example with sampling:
             ```python
-            >>> a = tp.event_set(
-            ...     timestamps=[0, 1, 2, 5],
-            ...     features={"value": [np.nan, 1, 5, 10]},
-            ... )
-            >>> b = tp.event_set(
-            ...     timestamps=[-1, 0, 1, 2, 3, 4, 5, 6, 7],
-            ... )
-            >>> c = a.moving_count(tp.duration.seconds(2), sampling=b)
+            >>> a = tp.event_set(timestamps=[0, 1, 2, 5])
+            >>> b = tp.event_set(timestamps=[-1, 0, 1, 2, 3, 4, 5, 6, 7])
+            >>> c = tp.moving_count(a, tp.duration.seconds(2), sampling=b)
             >>> c
             indexes: ...
                 (9 events):
                     timestamps: [-1. 0. 1. 2. 3. 4. 5. 6. 7.]
-                    'value': [0 0 1 2 1 0 1 1 0]
+                    'count': [0 1 2 2 1 0 1 1 0]
             ...
 
             ```
 
-        Example with indices:
+        Example with index:
             ```python
             >>> a = tp.event_set(
             ...     timestamps=[1, 2, 3, 0, 1, 2],
             ...     features={
-            ...         "value": [1, 1, 1, 1, 1, 1],
             ...         "idx": ["i1", "i1", "i1", "i2", "i2", "i2"],
             ...     },
             ...     indexes=["idx"],
             ... )
-            >>> b = a.moving_count(tp.duration.seconds(2))
+            >>> b = tp.moving_count(a, tp.duration.seconds(2))
             >>> b
             indexes: [('idx', str_)]
-            features: [('value', int32)]
+            features: [('count', int32)]
             events:
                 idx=b'i1' (3 events):
                     timestamps: [1. 2. 3.]
-                    'value': [1 2 2]
+                    'count': [1 2 2]
                 idx=b'i2' (3 events):
                     timestamps: [0. 1. 2.]
-                    'value': [1 2 2]
+                    'count': [1 2 2]
             ...
 
             ```
@@ -1389,10 +1375,11 @@ class EventSetOperations:
         Args:
             window_length: Sliding window's length.
             sampling: Timestamps to sample the sliding window's value at. If not
-                provided, timestamps in the input are used.
+                provided, timestamps in `input` are used.
 
         Returns:
-            EventSet containing the non-nan count of each feature in the input.
+            EventSet containing the count of events in `input` in a moving
+                window.
         """
         from temporian.core.operators.window.moving_count import moving_count
 

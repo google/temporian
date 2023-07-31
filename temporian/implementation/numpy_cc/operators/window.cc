@@ -48,10 +48,8 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
     accumulator.Add(v_values[end_idx]);
     const auto current_ts = v_timestamps[end_idx];
     size_t first_diff_ts_idx = end_idx + 1;
-    while (
-      first_diff_ts_idx < n_event &&
-      v_timestamps[first_diff_ts_idx] == current_ts
-    ) {
+    while (first_diff_ts_idx < n_event &&
+           v_timestamps[first_diff_ts_idx] == current_ts) {
       accumulator.Add(v_values[first_diff_ts_idx]);
       first_diff_ts_idx++;
     }
@@ -203,28 +201,15 @@ struct MovingStandardDeviationAccumulator : Accumulator<INPUT, OUTPUT> {
   int num_values = 0;
 };
 
-template <typename INPUT, typename OUTPUT>
-struct MovingCountAccumulator : Accumulator<INPUT, OUTPUT> {
-  void Add(INPUT value) override {
+template <typename OUTPUT>
+struct MovingCountAccumulator : Accumulator<double, OUTPUT> {
+  void Add(double value) override {
     static_assert(std::is_same<OUTPUT, int32_t>::value,
                   "OUTPUT must be int32_t");
-
-    if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
-      if (std::isnan(value)) {
-        return;
-      }
-    }
     num_values++;
   }
 
-  void Remove(INPUT value) override {
-    if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
-      if (std::isnan(value)) {
-        return;
-      }
-    }
-    num_values--;
-  }
+  void Remove(double value) override { num_values--; }
 
   OUTPUT Result() override { return num_values; }
 
@@ -346,6 +331,23 @@ struct MovingMaxAccumulator : MovingExtremumAccumulator<INPUT, OUTPUT> {
         evset_timestamps, evset_values, sampling_timestamps, window_length);  \
   }
 
+// Similar to REGISTER_CC_FUNC, but without inputs
+#define REGISTER_CC_FUNC_NO_INPUT(NAME, OUTPUT, ACCUMULATOR)     \
+                                                                 \
+  py::array_t<OUTPUT> NAME(const ArrayD &evset_timestamps,       \
+                           const double window_length) {         \
+    return accumulate<double, OUTPUT, ACCUMULATOR<OUTPUT>>(      \
+        evset_timestamps, evset_timestamps, window_length);      \
+  }                                                              \
+                                                                 \
+  py::array_t<OUTPUT> NAME(const ArrayD &evset_timestamps,       \
+                           const ArrayD &sampling_timestamps,    \
+                           const double window_length) {         \
+    return accumulate<double, OUTPUT, ACCUMULATOR<OUTPUT>>(      \
+        evset_timestamps, evset_timestamps, sampling_timestamps, \
+        window_length);                                          \
+  }
+
 // Note: ";" are not needed for the code, but are required for our code
 // formatter.
 
@@ -374,11 +376,7 @@ REGISTER_CC_FUNC(moving_max, double, double, MovingMaxAccumulator);
 REGISTER_CC_FUNC(moving_max, int32_t, int32_t, MovingMaxAccumulator);
 REGISTER_CC_FUNC(moving_max, int64_t, int64_t, MovingMaxAccumulator);
 
-REGISTER_CC_FUNC(moving_count, float, int32_t, MovingCountAccumulator);
-REGISTER_CC_FUNC(moving_count, double, int32_t, MovingCountAccumulator);
-REGISTER_CC_FUNC(moving_count, int32_t, int32_t, MovingCountAccumulator);
-REGISTER_CC_FUNC(moving_count, int64_t, int32_t, MovingCountAccumulator);
-REGISTER_CC_FUNC(moving_count, bool, int32_t, MovingCountAccumulator);
+REGISTER_CC_FUNC_NO_INPUT(moving_count, int32_t, MovingCountAccumulator);
 }  // namespace
 
 // Register c++ functions to pybind with and without sampling.
@@ -402,6 +400,16 @@ REGISTER_CC_FUNC(moving_count, bool, int32_t, MovingCountAccumulator);
         "", py::arg("evset_timestamps").noconvert(),                           \
         py::arg("evset_values").noconvert(), py::arg("window_length"));
 
+// Similar to ADD_PY_DEF, but without inputs.
+#define ADD_PY_DEF_NO_INPUT(NAME, OUTPUT)                                      \
+  m.def(#NAME,                                                                 \
+        py::overload_cast<const ArrayD &, const ArrayD &, double>(&NAME), "",  \
+        py::arg("evset_timestamps").noconvert(),                               \
+        py::arg("sampling_timestamps").noconvert(), py::arg("window_length")); \
+                                                                               \
+  m.def(#NAME, py::overload_cast<const ArrayD &, double>(&NAME), "",           \
+        py::arg("evset_timestamps").noconvert(), py::arg("window_length"));
+
 void init_window(py::module &m) {
   ADD_PY_DEF(simple_moving_average, float, float)
   ADD_PY_DEF(simple_moving_average, double, double)
@@ -424,9 +432,5 @@ void init_window(py::module &m) {
   ADD_PY_DEF(moving_max, int32_t, int32_t)
   ADD_PY_DEF(moving_max, int64_t, int64_t)
 
-  ADD_PY_DEF(moving_count, float, int32_t)
-  ADD_PY_DEF(moving_count, double, int32_t)
-  ADD_PY_DEF(moving_count, int32_t, int32_t)
-  ADD_PY_DEF(moving_count, int64_t, int32_t)
-  ADD_PY_DEF(moving_count, bool, int32_t)
+  ADD_PY_DEF_NO_INPUT(moving_count, int32_t)
 }

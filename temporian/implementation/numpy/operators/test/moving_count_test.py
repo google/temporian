@@ -49,10 +49,9 @@ class MovingCountOperatorTest(absltest.TestCase):
         assert_array_equal(
             operators_cc.moving_count(
                 _f64([1, 2, 3, 5, 20]),
-                _f32([10, nan, 12, 13, 14]),
                 5.0,
             ),
-            _i32([1, 1, 2, 3, 1]),
+            _i32([1, 2, 3, 4, 1]),
         )
 
     def test_flat(self):
@@ -84,14 +83,14 @@ class MovingCountOperatorTest(absltest.TestCase):
         expected_output = from_pandas(
             pd.DataFrame(
                 [
-                    [1, 1, 1],
-                    [2, 2, 2],
-                    [3, 3, 3],
-                    [4, 4, 5],
-                    [1, 1, 20],
+                    [1, 1],
+                    [2, 2],
+                    [3, 3],
+                    [4, 5],
+                    [1, 20],
                 ],
-                columns=["a", "b", "timestamp"],
-            ).astype({"a": np.int32, "b": np.int32})
+                columns=["count", "timestamp"],
+            ).astype({"count": np.int32})
         )
 
         self.assertEqual(repr(output), repr({"output": expected_output}))
@@ -102,17 +101,17 @@ class MovingCountOperatorTest(absltest.TestCase):
         evset = from_pandas(
             pd.DataFrame(
                 [
-                    ["X1", "Y1", 10.0, 1],
-                    ["X1", "Y1", 11.0, 2],
-                    ["X1", "Y1", 12.0, 3],
-                    ["X2", "Y1", 13.0, 1.1],
-                    ["X2", "Y1", 14.0, 2.1],
-                    ["X2", "Y1", 15.0, 3.1],
-                    ["X2", "Y2", 16.0, 1.2],
-                    ["X2", "Y2", 17.0, 2.2],
-                    ["X2", "Y2", 18.0, 3.2],
+                    ["X1", "Y1", 1],
+                    ["X1", "Y1", 2],
+                    ["X1", "Y1", 3],
+                    ["X2", "Y1", 1.1],
+                    ["X2", "Y1", 2.1],
+                    ["X2", "Y1", 3.1],
+                    ["X2", "Y2", 1.2],
+                    ["X2", "Y2", 2.2],
+                    ["X2", "Y2", 3.2],
                 ],
-                columns=["x", "y", "a", "timestamp"],
+                columns=["x", "y", "timestamp"],
             ),
             indexes=["x", "y"],
         )
@@ -140,8 +139,8 @@ class MovingCountOperatorTest(absltest.TestCase):
                     ["X2", "Y2", 2, 2.2],
                     ["X2", "Y2", 3, 3.2],
                 ],
-                columns=["x", "y", "a", "timestamp"],
-            ).astype({"a": np.int32}),
+                columns=["x", "y", "count", "timestamp"],
+            ).astype({"count": np.int32}),
             indexes=["x", "y"],
         )
 
@@ -153,13 +152,13 @@ class MovingCountOperatorTest(absltest.TestCase):
         evset = from_pandas(
             pd.DataFrame(
                 [
-                    [10.0, 1],
-                    [11.0, 2],
-                    [12.0, 3],
-                    [13.0, 5],
-                    [14.0, 6],
+                    [1],
+                    [2],
+                    [3],
+                    [5],
+                    [6],
                 ],
-                columns=["a", "timestamp"],
+                columns=["timestamp"],
             )
         )
 
@@ -201,67 +200,8 @@ class MovingCountOperatorTest(absltest.TestCase):
                     [3, 6.0],
                     [0, 10.0],
                 ],
-                columns=["a", "timestamp"],
-            ).astype({"a": np.int32})
-        )
-
-        self.assertEqual(output["output"], expected_output)
-
-    def test_with_nan(self):
-        """The input features contains nan values."""
-
-        evset = from_pandas(
-            pd.DataFrame(
-                [
-                    [math.nan, 1],
-                    [11.0, 2],
-                    [math.nan, 3],
-                    [13.0, 5],
-                    [14.0, 6],
-                ],
-                columns=["a", "timestamp"],
-            )
-        )
-
-        op = MovingCountOperator(
-            input=evset.node(),
-            window_length=1.1,
-            sampling=node_lib.input_node([]),
-        )
-        instance = MovingCountNumpyImplementation(op)
-
-        sampling_data = from_pandas(
-            pd.DataFrame(
-                [
-                    [1],
-                    [2],
-                    [2.5],
-                    [3],
-                    [3.5],
-                    [4],
-                    [5],
-                    [6],
-                ],
-                columns=["timestamp"],
-            )
-        )
-
-        output = instance(input=evset, sampling=sampling_data)
-
-        expected_output = from_pandas(
-            pd.DataFrame(
-                [
-                    [0, 1],
-                    [1, 2],
-                    [1, 2.5],
-                    [1, 3],
-                    [0, 3.5],
-                    [0, 4],
-                    [1, 5],
-                    [2, 6],
-                ],
-                columns=["a", "timestamp"],
-            ).astype({"a": np.int32})
+                columns=["count", "timestamp"],
+            ).astype({"count": np.int32})
         )
 
         self.assertEqual(output["output"], expected_output)
