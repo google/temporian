@@ -720,3 +720,20 @@ py_test(
         "//temporian/implementation/numpy/operators:enumerate",
     ],
 )
+
+py_test(
+    name = "combine_test",
+    srcs = ["combine_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        ":test_util",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:node",
+        "//temporian/core/data:schema",
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/core/operators:combine",
+        "//temporian/implementation/numpy/operators:combine",
+    ],
+)
+    

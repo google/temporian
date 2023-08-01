@@ -336,3 +336,20 @@ py_library(
         "//temporian/implementation/numpy/data:event_set",
     ],
 )
+
+py_library(
+    name = "combine",
+    srcs = ["combine.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/numpy
+        ":base",
+        "//temporian/core/data:duration_utils",
+        "//temporian/core/operators:combine",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy:utils",
+        "//temporian/implementation/numpy/data:event_set",
+    ],
+)
+
+    
