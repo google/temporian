@@ -41,6 +41,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "CALENDAR_SECOND",
             "CALENDAR_YEAR",
             "CAST",
+            "COMBINE",
             "DIVISION",
             "DIVISION_SCALAR",
             "DROP_INDEX",

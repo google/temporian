@@ -47,7 +47,8 @@ Check the index on the left for a more detailed description of any symbol.
 | [`EventSet.end()`][temporian.EventSet.end]                             | Generates a single timestamp at the end of the input.                                                        |
 | [`EventSet.enumerate()`][temporian.EventSet.enumerate]                 | Creates an ordinal feature enumerating the events according to their timestamp.                              |
 | [`EventSet.filter()`][temporian.EventSet.filter]                       | Filters out events in an [`EventSet`][temporian.EventSet] for which a condition is false.                    |
-| [`tp.glue()`][temporian.glue]                                          | Concatenates [`EventSets`][temporian.EventSet] with the same sampling.                                       |
+| [`tp.glue()`][temporian.glue]                                          | Concatenates features from [`EventSets`][temporian.EventSet] with the same sampling.                         |
+| [`tp.combine()`][temporian.combine]                                    | Combines events from [`EventSets`][temporian.EventSet] with different samplings.                             |
 | [`EventSet.join()`][temporian.EventSet.join]                           | Join [`EventSets`][temporian.EventSet] with different samplings but the same index together.                 |
 | [`EventSet.lag()`][temporian.EventSet.lag]                             | Adds a delay to an [`EventSet`][temporian.EventSet]'s timestamps.                                            |
 | [`EventSet.leak()`][temporian.EventSet.leak]                           | Subtracts a duration from an [`EventSet`][temporian.EventSet]'s timestamps.                                  |

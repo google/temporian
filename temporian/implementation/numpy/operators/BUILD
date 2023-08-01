@@ -14,6 +14,7 @@ py_library(
         ":add_index",
         ":begin",
         ":cast",
+        ":combine",
         ":drop_index",
         ":end",
         ":enumerate",
@@ -351,5 +352,3 @@ py_library(
         "//temporian/implementation/numpy/data:event_set",
     ],
 )
-
-    

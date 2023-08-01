@@ -53,6 +53,7 @@ PUBLIC_API_SYMBOLS = {
     "runtime_check_raise_exception",
     # OPERATORS
     "glue",
+    "combine",
     # BINARY OPERATORS
     "add",
     "subtract",

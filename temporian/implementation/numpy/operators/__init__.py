@@ -18,6 +18,7 @@
 # pylint: disable=line-too-long
 # fmt: off
 from temporian.implementation.numpy.operators import cast
+from temporian.implementation.numpy.operators import combine
 from temporian.implementation.numpy.operators import drop_index
 from temporian.implementation.numpy.operators import filter
 from temporian.implementation.numpy.operators import glue
