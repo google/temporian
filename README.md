@@ -12,7 +12,7 @@
 Temporian is an open-source Python library for preprocessing ⚡ and feature engineering 🛠 temporal data 📈 for machine learning applications 🤖. It is a library tailor-made to address the unique characteristics and complexities of time-related data, such as time-series and transactional data.
 
 > Temporal data is any form of data that represents a state in time. In
-> Temporian, temporal datasets contain [events], which consists of
+> Temporian, temporal datasets contain [events](https://temporian.readthedocs.io/en/stable/user_guide/#events-and-eventsets), which consists of
 > values for one or more attributes at a given timestamp. Common
 > examples of temporal data are transaction logs, sensor signals, and
 > weather patterns. For more, see 
