@@ -119,6 +119,18 @@ class Schema:
                 f" {other.indexes}"
             )
 
+    def check_compatible_features(self, other: Schema, check_order: bool):
+        if set(self.features) != set(other.features):
+            raise ValueError(
+                "Some features are different between inputs: "
+                f"{set(self.features) ^ set(other.features)}."
+            )
+        if check_order and (self.features != other.features):
+            raise ValueError(
+                "Features should be in the same order, but got:"
+                f"{self.feature_names} and {other.feature_names}."
+            )
+
 
 def _normalize_feature(x):
     if isinstance(x, FeatureSchema):
