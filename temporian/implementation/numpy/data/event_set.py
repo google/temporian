@@ -30,16 +30,14 @@ import sys
 
 import numpy as np
 
+from temporian.utils import config
 from temporian.core.data.dtype import DType
-from temporian.core.data.duration_utils import convert_timestamp_to_datetime
 from temporian.core.data.node import (
     EventSetNode,
     create_node_with_new_reference,
 )
 from temporian.core.data.schema import Schema
 from temporian.core.event_set_ops import EventSetOperations
-from temporian.utils import string
-from temporian.utils import config
 
 if TYPE_CHECKING:
     from temporian.core.operators.base import Operator
@@ -450,54 +448,6 @@ class EventSet(EventSetOperations):
         )
         return self._internal_node
 
-    def __repr__(self) -> str:
-        def repr_features(features: List[np.ndarray]) -> str:
-            """Repr for a list of features."""
-
-            feature_repr = []
-            for idx, (feature_schema, feature_data) in enumerate(
-                zip(self.schema.features, features)
-            ):
-                if idx > config.max_printed_features:
-                    feature_repr.append("...")
-                    break
-
-                feature_repr.append(f"'{feature_schema.name}': {feature_data}")
-            return "\n".join(feature_repr)
-
-        # Representation of the "data" field
-        with np.printoptions(
-            precision=config.print_precision,
-            threshold=config.max_printed_events,
-        ):
-            data_repr = []
-
-            for i, index_key in enumerate(self.get_index_keys(sort=True)):
-                index_data = self.data[index_key]
-                if i > config.max_printed_indexes:
-                    data_repr.append(f"... ({len(self.data) - i} remaining)")
-                    break
-                index_key_repr = []
-                for index_value, index_name in zip(
-                    index_key, self.schema.index_names()
-                ):
-                    index_key_repr.append(f"{index_name}={index_value}")
-                index_key_repr = " ".join(index_key_repr)
-                data_repr.append(
-                    f"{index_key_repr} ({len(index_data.timestamps)} events):\n"
-                    f"    timestamps: {index_data.timestamps}\n"
-                    f"{string.indent(repr_features(index_data.features))}"
-                )
-            data_repr = string.indent("\n".join(data_repr))
-
-        return (
-            f"indexes: {self.schema.indexes}\n"
-            f"features: {self.schema.features}\n"
-            "events:\n"
-            f"{data_repr}\n"
-            f"memory usage: {string.pretty_num_bytes(self.memory_usage())}\n"
-        )
-
     def get_index_value(
         self, index_key: Tuple, normalize: bool = True
     ) -> IndexData:
@@ -586,75 +536,18 @@ class EventSet(EventSetOperations):
         """
         return self.node()._creator
 
+    def __repr__(self) -> str:
+        """Text representation, showing schema and data"""
+        from temporian.implementation.numpy.data.display_utils import (
+            display_text,
+        )
+
+        return display_text(self)
+
     def _repr_html_(self) -> str:
         """HTML representation, mainly for IPython notebooks."""
-        features = self.schema.features[: config.max_display_features]
-        n_features = len(self.schema.features)
-        cut_features = n_features > config.max_display_features
-        indexes = self.schema.indexes
-        convert_datetime = self.schema.is_unix_timestamp
-        all_index_keys = self.get_index_keys(sort=True)
-        repr = ""
-        for index_key in all_index_keys[: config.max_display_indexes]:
-            repr += "<h3>Index: ("
-            repr += ", ".join(
-                [
-                    f"{idx.name}={self._repr_value(val, idx.dtype)}"
-                    for val, idx in zip(index_key, indexes)
-                ]
-            )
-            repr += ")</h3>"
-            index_data = self.data[index_key]
-            n_events = len(index_data.timestamps)
-            repr += f"{n_events} events × {n_features} features"
-            repr += "<table><tr><th><b>Timestamp</b></th>"
-            for feature in features:
-                repr += f"<th><b>{feature.name}</b></th>"
-            repr += "</tr>"
-            for i, timestamp in enumerate(
-                index_data.timestamps[: config.max_display_events]
-            ):
-                time_str = (
-                    convert_timestamp_to_datetime(timestamp)
-                    if convert_datetime
-                    else self._repr_float(timestamp)
-                )
-                repr += f"<tr><td>{time_str}</td>"
-                for val, feature in zip(
-                    index_data.features[: config.max_display_features], features
-                ):
-                    repr += (
-                        f"<td>{self._repr_value(val[i], feature.dtype)}</td>"
-                    )
-                if cut_features:
-                    repr += "<td>...</td>"
-                repr += "</tr>"
-            if n_events > config.max_display_events:
-                empty_row = "<td>...</td>" * (
-                    len(features) + 1 + int(cut_features)
-                )
-                repr += f"<tr>{empty_row}</tr>"
-            repr += "</table>"
-        if len(all_index_keys) > config.max_display_indexes:
-            repr += (
-                f"... (showing {config.max_display_indexes} of"
-                f" {len(all_index_keys)} indexes)"
-            )
-        return repr
+        from temporian.implementation.numpy.data.display_utils import (
+            display_html,
+        )
 
-    def _repr_value(self, value, dtype: DType) -> str:
-        if dtype == DType.STRING:
-            assert isinstance(value, bytes)
-            repr = value.decode()
-        elif dtype.is_float:
-            repr = self._repr_float(value)
-        else:
-            repr = str(value)
-        if len(repr) > config.max_display_chars:
-            repr = repr[: config.max_display_chars] + "..."
-        return repr
-
-    def _repr_float(self, value):
-        # Create string format with precision, e.g "{:.6g}"
-        float_template = "{:.%d%s}" % (config.print_precision, "g")
-        return float_template.format(value)
+        return display_html(self)

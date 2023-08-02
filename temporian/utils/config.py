@@ -9,13 +9,13 @@ max_printed_events = int(os.environ.get("TEMPORIAN_MAX_PRINTED_EVENTS", 20))
 
 # Limits for html display of evsets (notebooks)
 # Indexes (number of tables)
-max_display_indexes = int(os.environ.get("TEMPORIAN_MAX_DISPLAY_INDEXES", 10))
+max_display_indexes = int(os.environ.get("TEMPORIAN_MAX_DISPLAY_INDEXES", 5))
 # Features (columns) per table
 max_display_features = int(os.environ.get("TEMPORIAN_MAX_DISPLAY_FEATURES", 20))
 # Events (rows) per table
-max_display_events = int(os.environ.get("TEMPORIAN_MAX_DISPLAY_EVENTS", 100))
+max_display_events = int(os.environ.get("TEMPORIAN_MAX_DISPLAY_EVENTS", 20))
 # Chars per table cell
-max_display_chars = int(os.environ.get("TEMPORIAN_MAX_DISPLAY_CHARS", 50))
+max_display_chars = int(os.environ.get("TEMPORIAN_MAX_DISPLAY_CHARS", 32))
 
 # Configs for both repr and html
 # Decimal numbers precision
