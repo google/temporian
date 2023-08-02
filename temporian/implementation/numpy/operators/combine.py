@@ -75,6 +75,7 @@ class CombineNumpyImplementation(OperatorImplementation):
                     timestamps=timestamps,
                     schema=output_schema,
                 ),
+                normalize=False,
             )
 
         return {"output": output_evset}

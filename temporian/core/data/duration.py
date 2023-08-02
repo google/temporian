@@ -14,6 +14,8 @@
 
 from typing import Union
 
+import numpy as np
+
 # NOTE: this module is shown in the docs and so will any symbol in this file
 # with a docstring and a non-private name.
 
@@ -29,6 +31,15 @@ this module, calendar operators, plotting functions, and more) and assume that
 durations are expressed in seconds (see
 [Time units](https://temporian.readthedocs.io/en/latest/user_guide/#time-units)),
 so it is recommended to use seconds as timestamps where possible.
+"""
+
+eps = np.finfo(float).eps
+"""Round-off error for timestamp durations (machine epsilon for floating point).
+
+This number can be used as the smallest window length to unify events with the
+same timestamp. If the difference between two timestamps is below this threshold,
+they can be considered instantaneous, since the difference could be due to
+numeric errors.
 """
 
 

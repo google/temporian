@@ -116,7 +116,7 @@ def combine(
         ...                  features={"A": [0, 10, 30], "B": [0, -10, -30]}
         ...                 )
         >>> b = tp.event_set(timestamps=[1, 4],
-        ...                  features={"B": [-10, -40], "A": [10, 40]}
+        ...                  features={"A": [10, 40], "B": [-10, -40]}
         ...                 )
         >>> c = tp.combine(a, b)
         >>> c
@@ -131,7 +131,8 @@ def combine(
 
         >>> # Unify events with the same timestamp (add their values).
         >>> unique_t = c.unique_timestamps()
-        >>> d = c.moving_sum(window_length=0, sampling=unique_t)
+        >>> d = c.moving_sum(window_length=1, sampling=unique_t)
+        >>> d
         indexes: []
         features: [('A', int64), ('B', int64)]
         events:
