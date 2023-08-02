@@ -22,7 +22,7 @@ from dataclasses import dataclass
 from temporian.core.data.dtype import DType, IndexDType
 
 
-@dataclass
+@dataclass(frozen=True)
 class FeatureSchema:
     name: str
     dtype: DType
@@ -31,7 +31,7 @@ class FeatureSchema:
         return f"({self.name!r}, {self.dtype})"
 
 
-@dataclass
+@dataclass(frozen=True)
 class IndexSchema:
     name: str
     dtype: IndexDType

@@ -54,6 +54,7 @@ class Combine(Operator):
             first_input.schema.check_compatible_features(
                 input.schema, check_order=False
             )
+            first_input.schema.check_compatible_index(input.schema)
 
             # Output is unix if all inputs are
             all_unix_timestamp &= input.schema.is_unix_timestamp
@@ -149,4 +150,6 @@ def combine(
     if len(inputs) == 1:
         return inputs[0]
 
-    return Combine(inputs).outputs["output"]  # type: ignore
+    # NOTE: input name must match op. definition name
+    inputs_dict = {f"input_{idx}": input for idx, input in enumerate(inputs)}
+    return Combine(**inputs_dict).outputs["output"]  # type: ignore
