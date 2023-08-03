@@ -29,7 +29,128 @@ from temporian.implementation.numpy.operators.test.test_util import (
 
 class CombineOperatorTest(absltest.TestCase):
     def setUp(self):
-        pass
+        # Indexes: a, b, c
+        self.evset_1 = event_set(
+            timestamps=[0, 1, 2, 3, 4, 5],
+            features={
+                "a": [0, 1, 2, 3, 4, 5],
+                "idx": ["a", "a", "b", "b", "c", "c"],
+            },
+            indexes=["idx"],
+        )
+        # Indexes: b, c, d
+        self.evset_2 = event_set(
+            timestamps=[0, 1, 2, 3, 4, 5],
+            features={
+                "a": [0, 1, 2, 3, 4, 5],
+                "idx": ["b", "b", "c", "c", "d", "d"],
+            },
+            indexes=["idx"],
+        )
+        # Indexes: c, d, e
+        self.evset_3 = event_set(
+            timestamps=[0, 1, 2, 3, 4, 5],
+            features={
+                "a": [0, 1, 2, 3, 4, 5],
+                "idx": ["c", "c", "d", "d", "e", "e"],
+            },
+            indexes=["idx"],
+        )
+
+        self.node_1 = self.evset_1.node()
+        self.node_2 = self.evset_2.node()
+        self.node_3 = self.evset_3.node()
+
+    def test_combine_first(self):
+        # FIRST mode (only use index values from first input -> a,b,c)
+        expected_output = event_set(
+            timestamps=[0, 1, 0, 1, 2, 3, 0, 1, 2, 3, 4, 5],
+            features={
+                "a": [0, 1, 0, 1, 2, 3, 0, 1, 2, 3, 4, 5],
+                "idx": [
+                    # a is only present in input 1
+                    "a",
+                    "a",
+                    # b is present in inputs 1,2
+                    "b",
+                    "b",
+                    "b",
+                    "b",
+                    # c is present in inputs 1,2,3
+                    "c",
+                    "c",
+                    "c",
+                    "c",
+                    "c",
+                    "c",
+                ],
+            },
+            indexes=["idx"],
+        )
+        # Run op
+        op = Combine(
+            input_0=self.node_1,
+            input_1=self.node_2,
+            input_2=self.node_3,
+            index_from="first",
+        )
+        instance = CombineNumpyImplementation(op)
+        testOperatorAndImp(self, op, instance)
+        output = instance.call(
+            input_0=self.evset_1, input_1=self.evset_2, input_2=self.evset_3
+        )["output"]
+        assertEqualEventSet(self, output, expected_output)
+
+    def test_combine_intersect(self):
+        # INTERSECT mode (only c indexes survive)
+        expected_output = event_set(
+            timestamps=[0, 1, 2, 3, 4, 5],
+            features={
+                "a": [0, 1, 2, 3, 4, 5],
+                "idx": ["c", "c", "c", "c", "c", "c"],
+            },
+            indexes=["idx"],
+        )
+        # Run op
+        op = Combine(
+            input_0=self.node_1,
+            input_1=self.node_2,
+            input_2=self.node_3,
+            index_from="intersect",
+        )
+        instance = CombineNumpyImplementation(op)
+        testOperatorAndImp(self, op, instance)
+        output = instance.call(
+            input_0=self.evset_1, input_1=self.evset_2, input_2=self.evset_3
+        )["output"]
+        assertEqualEventSet(self, output, expected_output)
+
+    def test_combine_union(self):
+        # UNION mode
+        expected_output = event_set(
+            timestamps=[0, 1, 2, 3, 4, 5] * 3,
+            features={
+                "a": [0, 1, 2, 3, 4, 5] * 3,
+                "idx": ["a", "a", "b", "b", "c", "c"]  # input 1
+                + ["b", "b", "c", "c", "d", "d"]  # input 2
+                + ["c", "c", "d", "d", "e", "e"],  # input 3
+            },
+            indexes=["idx"],
+        )
+
+        # Run op
+        op = Combine(
+            input_0=self.node_1,
+            input_1=self.node_2,
+            input_2=self.node_3,
+            index_from="union",
+        )
+        instance = CombineNumpyImplementation(op)
+        testOperatorAndImp(self, op, instance)
+        output = instance.call(
+            input_0=self.evset_1, input_1=self.evset_2, input_2=self.evset_3
+        )["output"]
+        assertEqualEventSet(self, output, expected_output)
 
     def test_combine_two_noindex(self):
         evset_1 = event_set(
@@ -39,6 +160,7 @@ class CombineOperatorTest(absltest.TestCase):
                 "b": [0, 10, 20, 25, 30, 40],
             },
         )
+        # Features are in different order (should use first input's order)
         evset_2 = event_set(
             timestamps=[-2, -1, 0, 3, 8],
             features={
@@ -58,7 +180,7 @@ class CombineOperatorTest(absltest.TestCase):
         )
 
         # Run op
-        op = Combine(input_0=node_1, input_1=node_2)
+        op = Combine(input_0=node_1, input_1=node_2, index_from="union")
         instance = CombineNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
         output = instance.call(input_0=evset_1, input_1=evset_2)["output"]
@@ -97,13 +219,13 @@ class CombineOperatorTest(absltest.TestCase):
         )
 
         # Run op
-        op = Combine(**nodes_dict)
+        op = Combine(index_from="union", **nodes_dict)
         instance = CombineNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
         output = instance.call(**evsets_dict)["output"]
         assertEqualEventSet(self, output, expected_output)
 
-    def test_combine_different_feature_names(self):
+    def test_combine_error_different_feature_names(self):
         # Test error msg when two events have different feature names
         evset_1 = event_set(
             timestamps=[1.0],
@@ -124,9 +246,9 @@ class CombineOperatorTest(absltest.TestCase):
 
         # Run op
         with self.assertRaisesRegex(ValueError, "features are different"):
-            Combine(input_0=node_1, input_1=node_2)
+            Combine(input_0=node_1, input_1=node_2, index_from="union")
 
-    def test_combine_different_dtypes(self):
+    def test_combine_error_different_dtypes(self):
         # Same feature names, but second evset has a float feature
         evset_1 = event_set(
             timestamps=[1.0],
@@ -147,9 +269,9 @@ class CombineOperatorTest(absltest.TestCase):
 
         # Run op
         with self.assertRaisesRegex(ValueError, "features are different"):
-            Combine(input_0=node_1, input_1=node_2)
+            Combine(input_0=node_1, input_1=node_2, index_from="union")
 
-    def test_combine_noncompatible_indexes(self):
+    def test_combine_error_noncompatible_indexes(self):
         # Different index names
         evset_1 = event_set(
             timestamps=[1.0, 1.0],
@@ -168,7 +290,7 @@ class CombineOperatorTest(absltest.TestCase):
         with self.assertRaisesRegex(
             ValueError, "Arguments don't have the same index"
         ):
-            Combine(input_0=node_1, input_1=node_2)
+            Combine(input_0=node_1, input_1=node_2, index_from="union")
 
 
 if __name__ == "__main__":
