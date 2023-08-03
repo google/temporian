@@ -27,10 +27,13 @@ from temporian.proto import core_pb2 as pb
 from temporian.utils.rtcheck import rtcheck
 
 MAX_NUM_ARGUMENTS = 30
+FROM_INTERSECT = "intersect"
+FROM_UNION = "union"
+FROM_FIRST = "first"
 
 
 class Combine(Operator):
-    def __init__(self, **inputs: EventSetNode):
+    def __init__(self, index_from: str, **inputs: EventSetNode):
         super().__init__()
 
         # Note: Support for dictionaries of nodes is required for
@@ -43,6 +46,10 @@ class Combine(Operator):
             raise ValueError(
                 f"Too many (>{MAX_NUM_ARGUMENTS}) arguments provided"
             )
+
+        # Attributes
+        self._index_from = index_from
+        self.add_attribute("index_from", index_from)
 
         # inputs
         first_input = None
@@ -72,10 +79,20 @@ class Combine(Operator):
         )
         self.check()
 
+    @property
+    def index_from(self) -> str:
+        return self._index_from
+
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
             key="COMBINE",
+            attributes=[
+                pb.OperatorDef.Attribute(
+                    key="index_from",
+                    type=pb.OperatorDef.Attribute.Type.STRING,
+                ),
+            ],
             inputs=[
                 pb.OperatorDef.Input(key=f"input_{idx}", is_optional=idx >= 2)
                 for idx in range(MAX_NUM_ARGUMENTS)
@@ -91,8 +108,9 @@ operator_lib.register_operator(Combine)
 @compile
 def combine(
     *inputs: EventSetOrNode,
+    index_from: str = "union",
 ) -> EventSetOrNode:
-    """Combines all events from multiple EventSets with the same features and index.
+    """Combines all events from multiple EventSets with the same features.
 
     Input events must have the same feature names and dtypes, and the order of the first
     input's features is used for the output feature list.
@@ -108,6 +126,8 @@ def combine(
 
     Args:
         *inputs: EventSets to combine their events.
+        index_from: Whether to use the index values from "union" (any input),
+                    "intersect" (present in all inputs) or "first" (first input).
 
     Example combining duplicated timestamps:
 
@@ -118,6 +138,8 @@ def combine(
         >>> b = tp.event_set(timestamps=[1, 4],
         ...                  features={"A": [10, 40], "B": [-10, -40]}
         ...                 )
+
+        >>> # The operator doesn't combine duplicated timestamps
         >>> c = tp.combine(a, b)
         >>> c
         indexes: []
@@ -129,7 +151,7 @@ def combine(
                 'B': [ 0 -10 -10 -30 -40]
         ...
 
-        >>> # Unify events with the same timestamp (add their values).
+        >>> # Duplicated timestamps can be combined afterwards
         >>> unique_t = c.unique_timestamps()
         >>> d = c.moving_sum(window_length=1, sampling=unique_t)
         >>> d
@@ -144,6 +166,33 @@ def combine(
 
         ```
 
+    Example combining different indexes
+
+        ```python
+        # Index "a" is only in left, "c" in both, "d" only right
+        >>> a = tp.event_set(timestamps=[0, 1, 3],
+        ...                  features={"A": [0, 10, 30],
+        ...                            "B": ["a", "a", "c"]}
+        ...                  indexes=["B"],
+        ...                 )
+        >>> b = tp.event_set(timestamps=[1, 4, 5],
+        ...                  features={"A": [10, 40, 50],
+        ...                            "B": ["c", "d", "d"]},
+        ...                  indexes=["B"]
+        ...                 )
+
+        >>> # By default, "union" combines both inputs' indexes
+        >>> c = tp.combine(a, b)
+        >>> c
+        indexes: [('B', int64)]
+        features: [('A', int64)]
+
+        >>> # Use "intersect" to use only index values present in all inputs
+        >>> c = tp.combine(a, b, index_from="intersect")
+
+        >>> # Use "first" to use only index values from the first input a
+        >>> c = tp.combine(a, b, index_from="first")
+        ```
 
     Returns:
         An EventSet with events from all inputs combined.
@@ -153,4 +202,4 @@ def combine(
 
     # NOTE: input name must match op. definition name
     inputs_dict = {f"input_{idx}": input for idx, input in enumerate(inputs)}
-    return Combine(**inputs_dict).outputs["output"]  # type: ignore
+    return Combine(index_from=index_from, **inputs_dict).outputs["output"]  # type: ignore

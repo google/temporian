@@ -16,11 +16,20 @@
 """Implementation for the Combine operator."""
 
 
-from typing import Dict, List
+from typing import Dict, List, Set
 import numpy as np
 
-from temporian.implementation.numpy.data.event_set import IndexData, EventSet
+from temporian.implementation.numpy.data.event_set import (
+    IndexData,
+    EventSet,
+    IndexType,
+)
 from temporian.core.operators.combine import Combine
+from temporian.core.operators.combine import (
+    FROM_FIRST,
+    FROM_INTERSECT,
+    FROM_UNION,
+)
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
@@ -34,13 +43,28 @@ class CombineNumpyImplementation(OperatorImplementation):
         assert isinstance(self.operator, Combine)
         output_schema = self.output_schema("output")
         output_evset = EventSet(data={}, schema=output_schema)
+        index_from = self.operator.index_from
 
         input_evsets = list(inputs.values())
         first_input = input_evsets[0]
         first_features = first_input.schema.feature_names()
 
+        # What index values to use
+        if index_from == FROM_FIRST:
+            combined_keys = first_input.data.keys()
+        elif index_from == FROM_UNION:
+            combined_keys = set()
+            for evset in input_evsets:
+                combined_keys |= set(evset.data.keys())
+        elif index_from == FROM_INTERSECT:
+            combined_keys = set(first_input.data.keys())
+            for evset in input_evsets[1:]:
+                combined_keys &= set(evset.data.keys())
+        else:
+            raise ValueError(f"Unknown parameter for combine: {index_from=}")
+
         # Concatenate timestamps and features for each index, and sort
-        for index_key, index_data in first_input.data.items():
+        for index_key in combined_keys:
             all_timestamps: List[np.ndarray] = []
             all_feats: Dict[str, List[np.ndarray]] = {
                 name: [] for name in first_features
@@ -48,7 +72,9 @@ class CombineNumpyImplementation(OperatorImplementation):
 
             # Get timestamps and features from all input EventSets
             for evset in input_evsets:
-                index_data = evset.get_index_value(index_key)
+                if index_key not in evset.data:
+                    continue
+                index_data = evset.get_index_value(index_key, normalize=False)
                 evset_feats = evset.schema.feature_names()
                 all_timestamps.append(index_data.timestamps)
                 # Access feature data by name, since position in IndexData may vary
