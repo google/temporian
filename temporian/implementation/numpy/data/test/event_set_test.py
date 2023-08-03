@@ -79,10 +79,10 @@ memory usage: 1.2 kB
     def test_html_repr(self):
         self.assertEqual(
             self.evset._repr_html_(),
-            "<h3>Index: (x=1, y=hello)</h3>"
+            "<div><h3>Index: (x=1, y=hello)</h3>"
             + "3 events × 2 features"
             + "<table>"
-            + "<tr><th><b>Timestamp</b></th><th><b>a</b></th><th><b>b</b></th></tr>"
+            + "<tr><th><b>timestamp</b></th><th><b>a</b></th><th><b>b</b></th></tr>"
             + "<tr><td>0.1</td><td>1</td><td>4</td></tr>"
             + "<tr><td>0.2</td><td>2</td><td>5</td></tr>"
             + "<tr><td>0.3</td><td>3</td><td>6</td></tr>"
@@ -90,10 +90,10 @@ memory usage: 1.2 kB
             + "<h3>Index: (x=2, y=world)</h3>"
             + "2 events × 2 features"
             + "<table>"
-            + "<tr><th><b>Timestamp</b></th><th><b>a</b></th><th><b>b</b></th></tr>"
+            + "<tr><th><b>timestamp</b></th><th><b>a</b></th><th><b>b</b></th></tr>"
             + "<tr><td>0.4</td><td>7</td><td>9</td></tr>"
             + "<tr><td>0.5</td><td>8</td><td>10</td></tr>"
-            + "</table>",
+            + "</table></div>",
         )
 
 
