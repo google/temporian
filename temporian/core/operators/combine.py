@@ -153,7 +153,7 @@ def combine(
 
         >>> # Duplicated timestamps can be combined afterwards
         >>> unique_t = c.unique_timestamps()
-        >>> d = c.moving_sum(window_length=1, sampling=unique_t)
+        >>> d = c.moving_sum(window_length=tp.duration.shortest, sampling=unique_t)
         >>> d
         indexes: []
         features: [('A', int64), ('B', int64)]

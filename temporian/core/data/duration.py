@@ -33,13 +33,11 @@ durations are expressed in seconds (see
 so it is recommended to use seconds as timestamps where possible.
 """
 
-eps = np.finfo(float).eps
-"""Round-off error for timestamp durations (machine epsilon for floating point).
+shortest = np.nextafter(0, 1)
+"""Shortest interval between events that can be represented using float64.
 
-This number can be used as the smallest window length to unify events with the
-same timestamp. If the difference between two timestamps is below this threshold,
-they can be considered instantaneous, since the difference could be due to
-numeric errors.
+This number can be used as the shortest window length to unify events with the
+same timestamp, ensuring that two different timestamps will never be aggregated.
 """
 
 
