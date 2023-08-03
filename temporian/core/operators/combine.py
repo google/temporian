@@ -172,26 +172,57 @@ def combine(
         # Index "a" is only in left, "c" in both, "d" only right
         >>> a = tp.event_set(timestamps=[0, 1, 3],
         ...                  features={"A": [0, 10, 30],
-        ...                            "B": ["a", "a", "c"]}
-        ...                  indexes=["B"],
+        ...                            "idx": ["a", "a", "b"]},
+        ...                  indexes=["idx"],
         ...                 )
-        >>> b = tp.event_set(timestamps=[1, 4, 5],
-        ...                  features={"A": [10, 40, 50],
-        ...                            "B": ["c", "d", "d"]},
-        ...                  indexes=["B"]
+        >>> b = tp.event_set(timestamps=[1.5, 4.5, 5.5],
+        ...                  features={"A": [15, 45, 55],
+        ...                            "idx": ["b", "c", "c"]},
+        ...                  indexes=["idx"]
         ...                 )
 
-        >>> # By default, "union" combines both inputs' indexes
+        >>> # By default, "union" uses index values from all inputs (a,b,c)
         >>> c = tp.combine(a, b)
         >>> c
-        indexes: [('B', int64)]
+        indexes: [('idx', str_)]
         features: [('A', int64)]
-
-        >>> # Use "intersect" to use only index values present in all inputs
-        >>> c = tp.combine(a, b, index_from="intersect")
+        events:
+            idx=b'a' (2 events):
+                timestamps: [0. 1.]
+                'A': [ 0 10]
+            idx=b'b' (2 events):
+                timestamps: [1.5 3. ]
+                'A': [15 30]
+            idx=b'c' (2 events):
+                timestamps: [4.5 5.5]
+                'A': [45 55]
+        ...
 
         >>> # Use "first" to use only index values from the first input a
         >>> c = tp.combine(a, b, index_from="first")
+        >>> c
+        indexes: [('idx', str_)]
+        features: [('A', int64)]
+        events:
+            idx=b'a' (2 events):
+                timestamps: [0. 1.]
+                'A': [ 0 10]
+            idx=b'b' (2 events):
+                timestamps: [1.5 3. ]
+                'A': [15 30]
+        ...
+
+        >>> # Use "intersect" to use only index values in all inputs (only "b")
+        >>> c = tp.combine(a, b, index_from="intersect")
+        >>> c
+        indexes: [('idx', str_)]
+        features: [('A', int64)]
+        events:
+            idx=b'b' (2 events):
+                timestamps: [1.5 3. ]
+                'A': [15 30]
+        ...
+
         ```
 
     Returns:
