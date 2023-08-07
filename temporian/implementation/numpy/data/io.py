@@ -108,9 +108,14 @@ def event_set(
     Returns:
         An EventSet.
     """
-
     if features is None:
         features = {}
+
+    # Check timestamps and all features are of same length
+    if not all(len(f) == len(timestamps) for f in features.values()):
+        raise ValueError(
+            "Timestamps and all features must have the same length."
+        )
 
     features = {
         name: normalize_features(value, name)

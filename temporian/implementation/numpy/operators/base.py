@@ -168,7 +168,7 @@ def _is_same_sampling(evset_1: EventSet, evset_2: EventSet) -> Tuple[bool, str]:
 
     # Number of index keys to ensure that the numpy array containing
     # timestamps is the same for both evset_1 and evset_2.
-    num_checks = 1 if config.DEBUG_MODE else len(evset_1.data)
+    num_checks = 1 if config.debug_mode else len(evset_1.data)
 
     for i, (index_key, index_data_1) in enumerate(evset_1.data.items()):
         if i >= num_checks:
@@ -192,7 +192,7 @@ def _is_same_sampling(evset_1: EventSet, evset_2: EventSet) -> Tuple[bool, str]:
                 ),
             )
 
-    if config.DEBUG_MODE:
+    if config.debug_mode:
         # Compare index keys.
         # TODO: is there a way to avoid checking all keys here (keys might come
         # in different orders, can't compare top num_check keys in each evset)

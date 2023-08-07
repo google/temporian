@@ -30,6 +30,7 @@ PUBLIC_API_SYMBOLS = {
     "input_node",
     "plot",
     "compile",
+    "config",
     # IO
     "to_csv",
     "from_csv",

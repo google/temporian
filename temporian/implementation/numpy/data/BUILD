@@ -18,9 +18,11 @@ py_library(
     srcs_version = "PY3",
     deps = [
         # already_there/numpy
+        ":display_utils",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
+        "//temporian/core/data:duration_utils",
         "//temporian/utils:string",
         "//temporian/utils:config",
         "//temporian/core:event_set_ops",
@@ -55,5 +57,16 @@ py_library(
         # force/matplotlib
         # force/bokeh
         "//temporian/core/data:duration_utils",
+    ],
+)
+
+py_library(
+    name = "display_utils",
+    srcs = ["display_utils.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:duration_utils",
+        "//temporian/utils:config",
     ],
 )

@@ -30,6 +30,7 @@ import sys
 
 import numpy as np
 
+from temporian.utils import config
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import (
     EventSetNode,
@@ -37,17 +38,9 @@ from temporian.core.data.node import (
 )
 from temporian.core.data.schema import Schema
 from temporian.core.event_set_ops import EventSetOperations
-from temporian.utils import string
-from temporian.utils import config
 
 if TYPE_CHECKING:
     from temporian.core.operators.base import Operator
-
-# Maximum of printed index groups when calling repr(evset)
-MAX_NUM_PRINTED_INDEX = 5
-
-# Maximum of printed features when calling repr(evset)
-MAX_NUM_PRINTED_FEATURES = 10
 
 # Mapping of temporian types to and from numpy types.
 #
@@ -291,7 +284,7 @@ class IndexData:
             self.check_schema(schema)
 
     def check_schema(self, schema: Schema):
-        if not config.DEBUG_MODE:
+        if not config.debug_mode:
             return
 
         # Check that the data (features & timestamps) matches the schema.
@@ -455,51 +448,6 @@ class EventSet(EventSetOperations):
         )
         return self._internal_node
 
-    def __repr__(self) -> str:
-        def repr_features(features: List[np.ndarray]) -> str:
-            """Repr for a list of features."""
-
-            feature_repr = []
-            for idx, (feature_schema, feature_data) in enumerate(
-                zip(self.schema.features, features)
-            ):
-                if idx > MAX_NUM_PRINTED_FEATURES:
-                    feature_repr.append("...")
-                    break
-
-                feature_repr.append(f"'{feature_schema.name}': {feature_data}")
-            return "\n".join(feature_repr)
-
-        # Representation of the "data" field
-        with np.printoptions(precision=4, threshold=20):
-            data_repr = []
-
-            for i, index_key in enumerate(self.get_index_keys(sort=True)):
-                index_data = self.data[index_key]
-                if i > MAX_NUM_PRINTED_INDEX:
-                    data_repr.append(f"... ({len(self.data) - i} remaining)")
-                    break
-                index_key_repr = []
-                for index_value, index_name in zip(
-                    index_key, self.schema.index_names()
-                ):
-                    index_key_repr.append(f"{index_name}={index_value}")
-                index_key_repr = " ".join(index_key_repr)
-                data_repr.append(
-                    f"{index_key_repr} ({len(index_data.timestamps)} events):\n"
-                    f"    timestamps: {index_data.timestamps}\n"
-                    f"{string.indent(repr_features(index_data.features))}"
-                )
-            data_repr = string.indent("\n".join(data_repr))
-
-        return (
-            f"indexes: {self.schema.indexes}\n"
-            f"features: {self.schema.features}\n"
-            "events:\n"
-            f"{data_repr}\n"
-            f"memory usage: {string.pretty_num_bytes(self.memory_usage())}\n"
-        )
-
     def get_index_value(
         self, index_key: Tuple, normalize: bool = True
     ) -> IndexData:
@@ -587,3 +535,19 @@ class EventSet(EventSetOperations):
         created EventSets have a `None` creator.
         """
         return self.node()._creator
+
+    def __repr__(self) -> str:
+        """Text representation, showing schema and data"""
+        from temporian.implementation.numpy.data.display_utils import (
+            display_text,
+        )
+
+        return display_text(self)
+
+    def _repr_html_(self) -> str:
+        """HTML representation, mainly for IPython notebooks."""
+        from temporian.implementation.numpy.data.display_utils import (
+            display_html,
+        )
+
+        return display_html(self)

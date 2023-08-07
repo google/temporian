@@ -113,6 +113,41 @@ class IOTest(absltest.TestCase):
             )
             self.assertTrue(evset.schema.is_unix_timestamp)
 
+    def test_arrays_not_same_length(self):
+        with self.assertRaisesRegex(
+            ValueError, "Timestamps and all features must have the same length."
+        ):
+            event_set(
+                timestamps=[1, 2],
+                features={
+                    "feature_1": [0.59],
+                },
+            )
+
+        with self.assertRaisesRegex(
+            ValueError, "Timestamps and all features must have the same length."
+        ):
+            event_set(
+                timestamps=[1],
+                features={
+                    "feature_1": [0.59, 0.5],
+                },
+            )
+
+        with self.assertRaisesRegex(
+            ValueError, "Timestamps and all features must have the same length."
+        ):
+            event_set(
+                timestamps=[1, 2],
+                features={
+                    "feature_1": [0.59, 0.5],
+                    "feature_2": [0.59, 0.5, 0.5],
+                },
+            )
+
+        # Shouldn't raise
+        event_set(timestamps=[1])
+
 
 if __name__ == "__main__":
     absltest.main()
