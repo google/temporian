@@ -61,8 +61,8 @@ class CombineOperatorTest(absltest.TestCase):
         self.node_2 = self.evset_2.node()
         self.node_3 = self.evset_3.node()
 
-    def test_combine_first(self):
-        # FIRST mode (only use index values from first input -> a,b,c)
+    def test_combine_left(self):
+        # left mode (only use index values from left input -> a,b,c)
         expected_output = event_set(
             timestamps=[0, 1, 0, 1, 2, 3, 0, 1, 2, 3, 4, 5],
             features={
@@ -92,7 +92,7 @@ class CombineOperatorTest(absltest.TestCase):
             input_0=self.node_1,
             input_1=self.node_2,
             input_2=self.node_3,
-            index_from="first",
+            how="left",
         )
         instance = CombineNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
@@ -101,8 +101,8 @@ class CombineOperatorTest(absltest.TestCase):
         )["output"]
         assertEqualEventSet(self, output, expected_output)
 
-    def test_combine_intersect(self):
-        # INTERSECT mode (only c indexes survive)
+    def test_combine_inner(self):
+        # inner mode (only c indexes survive)
         expected_output = event_set(
             timestamps=[0, 1, 2, 3, 4, 5],
             features={
@@ -116,7 +116,7 @@ class CombineOperatorTest(absltest.TestCase):
             input_0=self.node_1,
             input_1=self.node_2,
             input_2=self.node_3,
-            index_from="intersect",
+            how="inner",
         )
         instance = CombineNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
@@ -125,8 +125,8 @@ class CombineOperatorTest(absltest.TestCase):
         )["output"]
         assertEqualEventSet(self, output, expected_output)
 
-    def test_combine_union(self):
-        # UNION mode
+    def test_combine_outer(self):
+        # outer mode
         expected_output = event_set(
             timestamps=[0, 1, 2, 3, 4, 5] * 3,
             features={
@@ -143,7 +143,7 @@ class CombineOperatorTest(absltest.TestCase):
             input_0=self.node_1,
             input_1=self.node_2,
             input_2=self.node_3,
-            index_from="union",
+            how="outer",
         )
         instance = CombineNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
@@ -180,7 +180,7 @@ class CombineOperatorTest(absltest.TestCase):
         )
 
         # Run op
-        op = Combine(input_0=node_1, input_1=node_2, index_from="union")
+        op = Combine(input_0=node_1, input_1=node_2, how="outer")
         instance = CombineNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
         output = instance.call(input_0=evset_1, input_1=evset_2)["output"]
@@ -219,7 +219,7 @@ class CombineOperatorTest(absltest.TestCase):
         )
 
         # Run op
-        op = Combine(index_from="union", **nodes_dict)
+        op = Combine(how="outer", **nodes_dict)
         instance = CombineNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
         output = instance.call(**evsets_dict)["output"]
@@ -246,7 +246,7 @@ class CombineOperatorTest(absltest.TestCase):
 
         # Run op
         with self.assertRaisesRegex(ValueError, "features are different"):
-            Combine(input_0=node_1, input_1=node_2, index_from="union")
+            Combine(input_0=node_1, input_1=node_2, how="outer")
 
     def test_combine_error_different_dtypes(self):
         # Same feature names, but second evset has a float feature
@@ -269,7 +269,7 @@ class CombineOperatorTest(absltest.TestCase):
 
         # Run op
         with self.assertRaisesRegex(ValueError, "features are different"):
-            Combine(input_0=node_1, input_1=node_2, index_from="union")
+            Combine(input_0=node_1, input_1=node_2, how="outer")
 
     def test_combine_error_noncompatible_indexes(self):
         # Different index names
@@ -290,7 +290,7 @@ class CombineOperatorTest(absltest.TestCase):
         with self.assertRaisesRegex(
             ValueError, "Arguments don't have the same index"
         ):
-            Combine(input_0=node_1, input_1=node_2, index_from="union")
+            Combine(input_0=node_1, input_1=node_2, how="outer")
 
 
 if __name__ == "__main__":

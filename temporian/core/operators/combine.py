@@ -108,7 +108,7 @@ operator_lib.register_operator(Combine)
 @compile
 def combine(
     *inputs: EventSetOrNode,
-    how: str = "union",
+    how: str = "outer",
 ) -> EventSetOrNode:
     """
     Combines events from multiple EventSets together.
