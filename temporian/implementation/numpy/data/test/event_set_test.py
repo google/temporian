@@ -116,8 +116,9 @@ memory usage: 1.2 kB
 
         self.assertEqual(
             self.evset._repr_html_(),
-            "<div><h3>Index: (x=1, y=hello)</h3>"
-            + "3 events × 2 features"
+            "<div>2 indexes × 2 features (memory usage: 1.2 kB)"
+            + "<h3>Index: (x=1, y=hello)</h3>"
+            + "3 events"
             + "<table>"
             + "<tr><th><b>timestamp</b></th><th><b>a</b></th><th><b>b</b></th></tr>"
             + "<tr><td>0.1</td><td>1</td><td>4</td></tr>"
@@ -125,7 +126,7 @@ memory usage: 1.2 kB
             + "<tr><td>0.3</td><td>3</td><td>6</td></tr>"
             + "</table>"
             + "<h3>Index: (x=2, y=world)</h3>"
-            + "2 events × 2 features"
+            + "2 events"
             + "<table>"
             + "<tr><th><b>timestamp</b></th><th><b>a</b></th><th><b>b</b></th></tr>"
             + "<tr><td>0.4</td><td>7</td><td>9</td></tr>"
@@ -137,18 +138,20 @@ memory usage: 1.2 kB
         config.max_display_indexes = 1
         config.max_display_features = 1
         config.max_display_events = 2
+        dots = "…"  # (ellipsis)
 
         self.assertEqual(
             self.evset._repr_html_(),
-            "<div><h3>Index: (x=1, y=hello)</h3>"
-            + "3 events × 2 features"
+            "<div>2 indexes × 2 features (memory usage: 1.2 kB)"
+            + "<h3>Index: (x=1, y=hello)</h3>"
+            + "3 events"
             + "<table>"
-            + "<tr><th><b>timestamp</b></th><th><b>a</b></th><th><b>...</b></th></tr>"
-            + "<tr><td>0.1</td><td>1</td><td>...</td></tr>"
-            + "<tr><td>0.2</td><td>2</td><td>...</td></tr>"
-            + "<tr><td>...</td><td>...</td><td>...</td></tr>"
+            + f"<tr><th><b>timestamp</b></th><th><b>a</b></th><th><b>{dots}</b></th></tr>"
+            + f"<tr><td>0.1</td><td>1</td><td>{dots}</td></tr>"
+            + f"<tr><td>0.2</td><td>2</td><td>{dots}</td></tr>"
+            + f"<tr><td>{dots}</td><td>{dots}</td><td>{dots}</td></tr>"
             + "</table>"
-            + "... (showing 1 of 2 indexes)</div>",
+            + f"{dots} (1 more indexes not shown)</div>",
         )
 
 

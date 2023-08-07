@@ -9,6 +9,126 @@ from temporian.core.data.dtype import DType
 from temporian.core.data.duration_utils import convert_timestamp_to_datetime
 from temporian.implementation.numpy.data.event_set import EventSet
 
+ELLIPSIS = "…"
+
+
+def display_html(evset: EventSet) -> str:
+    """HTML representation, mainly for IPython notebooks."""
+    from xml.dom import minidom
+
+    def create_table_row(
+        columns: List[str], header: bool = False
+    ) -> minidom.Element:
+        tr = dom.createElement("tr")
+        for col in columns:
+            if header:
+                td = dom.createElement("th")
+                text = dom.createElement("b")
+                text.appendChild(dom.createTextNode(col))
+            else:
+                td = dom.createElement("td")
+                text = dom.createTextNode(col)
+            td.appendChild(text)
+            tr.appendChild(td)
+        return tr
+
+    # Create DOM
+    impl = minidom.getDOMImplementation()
+    assert impl is not None
+    dom = impl.createDocument(None, "div", None)
+    top = dom.documentElement
+
+    # Other configs
+    convert_datetime = evset.schema.is_unix_timestamp
+    index_schemas = evset.schema.indexes
+    feature_schemas = evset.schema.features
+    all_index_keys = evset.get_index_keys(sort=True)
+    num_indexes = len(all_index_keys)
+    num_features = len(evset.schema.features)
+
+    # If limit=0, set limit=len
+    max_indexes = config.max_display_indexes or num_indexes
+    max_features = config.max_display_features or num_features
+    has_hidden_feats = num_features > max_features
+    visible_feats = feature_schemas[:max_features]
+
+    # Index and features schemas
+    evset_info = (
+        f"{num_indexes} indexes × {num_features} features"
+        f" (memory usage: {string.pretty_num_bytes(evset.memory_usage())})"
+    )
+    top.appendChild(dom.createTextNode(evset_info))
+
+    # Create one table and header per index value
+    for index_key in all_index_keys[:max_indexes]:
+        # Index header text (n events x n features)
+        index_text = ", ".join(
+            [
+                f"{idx.name}={repr_value_html(val, idx.dtype)}"
+                for val, idx in zip(index_key, index_schemas)
+            ]
+        )
+        index_data = evset.data[index_key]
+        num_timestamps = len(index_data.timestamps)
+        max_timestamps = config.max_display_events or num_timestamps
+        title = dom.createElement("h3")
+        title.appendChild(dom.createTextNode(f"Index: ({index_text})"))
+        descript = dom.createTextNode(f"{num_timestamps} events")
+        top.appendChild(title)
+        top.appendChild(descript)
+
+        # Table with column names
+        table = dom.createElement("table")
+        col_names = ["timestamp"] + [feature.name for feature in visible_feats]
+        if has_hidden_feats:
+            col_names += [ELLIPSIS]
+        table.appendChild(create_table_row(col_names, header=True))
+
+        # Rows with events
+        for timestamp_idx, timestamp in enumerate(
+            index_data.timestamps[:max_timestamps]
+        ):
+            row = []
+
+            # Timestamp column
+            timestamp_repr = (
+                convert_timestamp_to_datetime(timestamp)
+                if convert_datetime
+                else repr_float_html(timestamp)
+            )
+            row.append(f"{timestamp_repr}")
+
+            # Feature values
+            for val, feature in zip(
+                index_data.features[:max_features], visible_feats
+            ):
+                row.append(repr_value_html(val[timestamp_idx], feature.dtype))
+
+            # Add ... column on the right
+            if has_hidden_feats:
+                row.append(ELLIPSIS)
+
+            # Create row and add
+            table.appendChild(create_table_row(row))
+
+        # Add ... row at the bottom
+        if num_timestamps > max_timestamps:
+            # Timestamp + features + <... column if was added>
+            row = [ELLIPSIS] * (1 + len(visible_feats) + int(has_hidden_feats))
+            table.appendChild(create_table_row(row))
+
+        top.appendChild(table)
+
+    # If there are hidden indexes, show how many
+    if num_indexes > max_indexes:
+        hidden_indexes = num_indexes - max_indexes
+        top.appendChild(
+            dom.createTextNode(
+                f"{ELLIPSIS} ({hidden_indexes} more indexes not shown)"
+            )
+        )
+    return top.toxml()
+
 
 def display_text(evset: EventSet) -> str:
     # Configs and defaults
@@ -38,7 +158,7 @@ def display_text(evset: EventSet) -> str:
             data_repr.append(
                 f"{index_key_repr} ({len(index_data.timestamps)} events):\n"
                 f"    timestamps: {index_data.timestamps}\n"
-                f"{string.indent(repr_features(evset, index_data.features))}"
+                f"{string.indent(repr_features_text(evset, index_data.features))}"
             )
         data_repr = string.indent("\n".join(data_repr))
 
@@ -51,139 +171,27 @@ def display_text(evset: EventSet) -> str:
     )
 
 
-def display_html(evset: EventSet) -> str:
-    """HTML representation, mainly for IPython notebooks."""
-    from xml.dom import minidom
-
-    def create_table_row(
-        columns: List[str], header: bool = False
-    ) -> minidom.Element:
-        tr = dom.createElement("tr")
-        for col in columns:
-            if header:
-                td = dom.createElement("th")
-                text = dom.createElement("b")
-                text.appendChild(dom.createTextNode(col))
-            else:
-                td = dom.createElement("td")
-                text = dom.createTextNode(col)
-            td.appendChild(text)
-            tr.appendChild(td)
-        return tr
-
-    # Create DOM
-    impl = minidom.getDOMImplementation()
-    assert impl is not None
-    dom = impl.createDocument(None, "div", None)
-    top = dom.documentElement
-
-    # Set 0 -> None to disable slice limits (show all)
-    max_indexes = config.max_display_indexes or None
-    max_events = config.max_display_events or None
-    max_features = config.max_display_features or None
-
-    # Other configs
-    convert_datetime = evset.schema.is_unix_timestamp
-    visible_features = evset.schema.features[:max_features]
-    index_schemas = evset.schema.indexes
-    all_index_keys = evset.get_index_keys(sort=True)
-    total_indexes = len(all_index_keys)
-    total_features = len(evset.schema.features)
-    hiding_feats = max_features is not None and total_features > max_features
-
-    # Create one table and header per index value
-    for index_key in all_index_keys[:max_indexes]:
-        # Index header text (n events x n features)
-        index_text = ", ".join(
-            [
-                f"{idx.name}={repr_value(val, idx.dtype)}"
-                for val, idx in zip(index_key, index_schemas)
-            ]
-        )
-        index_data = evset.data[index_key]
-        index_n_events = len(index_data.timestamps)
-        title = dom.createElement("h3")
-        title.appendChild(dom.createTextNode(f"Index: ({index_text})"))
-        descript = dom.createTextNode(
-            f"{index_n_events} events × {total_features} features"
-        )
-        top.appendChild(title)
-        top.appendChild(descript)
-
-        # Table with column names
-        table = dom.createElement("table")
-        col_names = ["timestamp"]
-        col_names += [feature.name for feature in visible_features]
-        if hiding_feats:
-            col_names += ["..."]
-        table.appendChild(create_table_row(col_names, header=True))
-
-        # Rows with events
-        for i, timestamp in enumerate(index_data.timestamps[:max_events]):
-            row = []
-
-            # Timestamp column
-            timestamp = (
-                convert_timestamp_to_datetime(timestamp)
-                if convert_datetime
-                else repr_float(timestamp)
-            )
-            row.append(f"{timestamp}")
-
-            # Feature values
-            for val, feature in zip(
-                index_data.features[:max_features], visible_features
-            ):
-                row.append(repr_value(val[i], feature.dtype))
-
-            # Add ... column on the right
-            if hiding_feats:
-                row.append("...")
-
-            # Create row and add
-            table.appendChild(create_table_row(row))
-
-        # Add ... row at the bottom
-        if max_events is not None and index_n_events > max_events:
-            # Timestamp + features + <... column if was added>
-            empty_row = ["..."] * (
-                1 + len(visible_features) + int(hiding_feats)
-            )
-            table.appendChild(create_table_row(empty_row))
-
-        top.appendChild(table)
-
-    # If there are hidden indexes, show how many
-    if max_indexes is not None and total_indexes > max_indexes:
-        top.appendChild(
-            dom.createTextNode(
-                f"... (showing {max_indexes} of {total_indexes} indexes)"
-            )
-        )
-    return top.toxml()
-
-
-def repr_value(value: Any, dtype: DType) -> str:
+def repr_value_html(value: Any, dtype: DType) -> str:
     if dtype == DType.STRING:
         assert isinstance(value, bytes)
         repr = value.decode()
     elif dtype.is_float:
-        repr = repr_float(value)
+        repr = repr_float_html(value)
     else:
         repr = str(value)
     max_chars = config.max_display_chars or None
     if max_chars is not None and len(repr) > max_chars:
-        repr = repr[:max_chars] + "..."
+        repr = repr[:max_chars] + ELLIPSIS
     return repr
 
 
-def repr_float(value: float) -> str:
+def repr_float_html(value: float) -> str:
     # Create string format with precision, e.g "{:.6g}"
     float_template = "{:.%d%s}" % (config.print_precision, "g")
     return float_template.format(value)
 
 
-def repr_features(evset: EventSet, features: List[np.ndarray]) -> str:
+def repr_features_text(evset: EventSet, features: List[np.ndarray]) -> str:
     """Repr for a list of features."""
 
     max_features = config.max_printed_features  # 0 will print all
