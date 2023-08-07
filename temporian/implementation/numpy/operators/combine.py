@@ -26,9 +26,9 @@ from temporian.implementation.numpy.data.event_set import (
 )
 from temporian.core.operators.combine import Combine
 from temporian.core.operators.combine import (
-    FROM_FIRST,
-    FROM_INTERSECT,
-    FROM_UNION,
+    FROM_LEFT,
+    FROM_INNER,
+    FROM_OUTER,
 )
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.base import OperatorImplementation
@@ -43,25 +43,25 @@ class CombineNumpyImplementation(OperatorImplementation):
         assert isinstance(self.operator, Combine)
         output_schema = self.output_schema("output")
         output_evset = EventSet(data={}, schema=output_schema)
-        index_from = self.operator.index_from
+        how = self.operator.how
 
         input_evsets = list(inputs.values())
         first_input = input_evsets[0]
         first_features = first_input.schema.feature_names()
 
         # What index values to use
-        if index_from == FROM_FIRST:
+        if how == FROM_LEFT:
             combined_keys = first_input.data.keys()
-        elif index_from == FROM_UNION:
+        elif how == FROM_OUTER:
             combined_keys = set()
             for evset in input_evsets:
                 combined_keys |= set(evset.data.keys())
-        elif index_from == FROM_INTERSECT:
+        elif how == FROM_INNER:
             combined_keys = set(first_input.data.keys())
             for evset in input_evsets[1:]:
                 combined_keys &= set(evset.data.keys())
         else:
-            raise ValueError(f"Unknown parameter for combine: {index_from=}")
+            raise ValueError(f"Unknown parameter for combine: {how=}")
 
         # Concatenate timestamps and features for each index, and sort
         for index_key in combined_keys:

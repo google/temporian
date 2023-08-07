@@ -27,13 +27,13 @@ from temporian.proto import core_pb2 as pb
 from temporian.utils.rtcheck import rtcheck
 
 MAX_NUM_ARGUMENTS = 30
-FROM_INTERSECT = "intersect"
-FROM_UNION = "union"
-FROM_FIRST = "first"
+FROM_INNER = "inner"
+FROM_OUTER = "outer"
+FROM_LEFT = "left"
 
 
 class Combine(Operator):
-    def __init__(self, index_from: str, **inputs: EventSetNode):
+    def __init__(self, how: str, **inputs: EventSetNode):
         super().__init__()
 
         # Note: Support for dictionaries of nodes is required for
@@ -48,8 +48,8 @@ class Combine(Operator):
             )
 
         # Attributes
-        self._index_from = index_from
-        self.add_attribute("index_from", index_from)
+        self._how = how
+        self.add_attribute("how", how)
 
         # inputs
         first_input = None
@@ -80,8 +80,8 @@ class Combine(Operator):
         self.check()
 
     @property
-    def index_from(self) -> str:
-        return self._index_from
+    def how(self) -> str:
+        return self._how
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
@@ -89,7 +89,7 @@ class Combine(Operator):
             key="COMBINE",
             attributes=[
                 pb.OperatorDef.Attribute(
-                    key="index_from",
+                    key="how",
                     type=pb.OperatorDef.Attribute.Type.STRING,
                 ),
             ],
@@ -108,28 +108,24 @@ operator_lib.register_operator(Combine)
 @compile
 def combine(
     *inputs: EventSetOrNode,
-    index_from: str = "union",
+    how: str = "union",
 ) -> EventSetOrNode:
-    """Combines all events from multiple EventSets with the same features.
+    """
+    Combines events from multiple EventSets together.
 
-    Input events must have the same feature names and dtypes, and the order of the first
-    input's features is used for the output feature list.
+    Input events must have the same features (i.e. same feature names and dtypes)
+    and index schemas (i.e. same index names and dtypes).
 
-    Since the input timestamps may overlap at some points, the result may contain
-    multiple events for the same timestamp. Duplicated events are not unified or
-    aggregated in any way.
-    Check the second part of the example below to see how to unify
-    events with the same timestamp, in this case adding their values.
-
-    If all inputs contain unix timestamps (i.e., datetimes), the output will also
-    be unix timestamps.
+    Combine is different from `glue` and `join`, since those append together
+    different features.
 
     Args:
         *inputs: EventSets to combine their events.
-        index_from: Whether to use the index values from "union" (any input),
-                    "intersect" (present in all inputs) or "first" (first input).
+        how: Whether to use the indexes from "outer" (union of all inputs' index
+             values), "inner" (only those present in all inputs) or "left"
+             (only use index values from the first input).
 
-    Example combining duplicated timestamps:
+    Basic example:
 
         ```python
         >>> a = tp.event_set(timestamps=[0, 1, 3],
@@ -139,7 +135,7 @@ def combine(
         ...                  features={"A": [10, 40], "B": [-10, -40]}
         ...                 )
 
-        >>> # The operator doesn't combine duplicated timestamps
+        >>> # Inputs a and b have some duplicated timestamps
         >>> c = tp.combine(a, b)
         >>> c
         indexes: []
@@ -151,7 +147,7 @@ def combine(
                 'B': [ 0 -10 -10 -30 -40]
         ...
 
-        >>> # Duplicated timestamps can be combined afterwards
+        >>> # Events with duplicated timestamps can be unified afterwards
         >>> unique_t = c.unique_timestamps()
         >>> d = c.moving_sum(window_length=tp.duration.shortest, sampling=unique_t)
         >>> d
@@ -166,10 +162,10 @@ def combine(
 
         ```
 
-    Example combining different indexes
+    Example with different index values
 
         ```python
-        # Index "a" is only in left, "c" in both, "d" only right
+        # Index "idx=a" is only in a, "idx=b" in both, "idx=c" only in b
         >>> a = tp.event_set(timestamps=[0, 1, 3],
         ...                  features={"A": [0, 10, 30],
         ...                            "idx": ["a", "a", "b"]},
@@ -181,7 +177,7 @@ def combine(
         ...                  indexes=["idx"]
         ...                 )
 
-        >>> # By default, "union" uses index values from all inputs (a,b,c)
+        >>> # By default, "outer" uses index values from all inputs
         >>> c = tp.combine(a, b)
         >>> c
         indexes: [('idx', str_)]
@@ -198,8 +194,8 @@ def combine(
                 'A': [45 55]
         ...
 
-        >>> # Use "first" to use only index values from the first input a
-        >>> c = tp.combine(a, b, index_from="first")
+        >>> # Use "left" to use only index values from the first input a
+        >>> c = tp.combine(a, b, how="left")
         >>> c
         indexes: [('idx', str_)]
         features: [('A', int64)]
@@ -212,8 +208,8 @@ def combine(
                 'A': [15 30]
         ...
 
-        >>> # Use "intersect" to use only index values in all inputs (only "b")
-        >>> c = tp.combine(a, b, index_from="intersect")
+        >>> # Use "inner" to use only index values that are present in all inputs
+        >>> c = tp.combine(a, b, how="inner")
         >>> c
         indexes: [('idx', str_)]
         features: [('A', int64)]
@@ -233,4 +229,4 @@ def combine(
 
     # NOTE: input name must match op. definition name
     inputs_dict = {f"input_{idx}": input for idx, input in enumerate(inputs)}
-    return Combine(index_from=index_from, **inputs_dict).outputs["output"]  # type: ignore
+    return Combine(how=how, **inputs_dict).outputs["output"]  # type: ignore
