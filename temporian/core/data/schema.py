@@ -22,7 +22,7 @@ from dataclasses import dataclass
 from temporian.core.data.dtype import DType, IndexDType
 
 
-@dataclass
+@dataclass(frozen=True)
 class FeatureSchema:
     name: str
     dtype: DType
@@ -31,7 +31,7 @@ class FeatureSchema:
         return f"({self.name!r}, {self.dtype})"
 
 
-@dataclass
+@dataclass(frozen=True)
 class IndexSchema:
     name: str
     dtype: IndexDType
@@ -117,6 +117,18 @@ class Schema:
             raise ValueError(
                 f"Arguments don't have the same index. {self.indexes} !="
                 f" {other.indexes}"
+            )
+
+    def check_compatible_features(self, other: Schema, check_order: bool):
+        if set(self.features) != set(other.features):
+            raise ValueError(
+                "Some features are different between inputs: "
+                f"{set(self.features) ^ set(other.features)}."
+            )
+        if check_order and (self.features != other.features):
+            raise ValueError(
+                "Features should be in the same order, but got:"
+                f"{self.feature_names} and {other.feature_names}."
             )
 
 

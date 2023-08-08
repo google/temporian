@@ -14,6 +14,8 @@
 
 from typing import Union
 
+import numpy as np
+
 # NOTE: this module is shown in the docs and so will any symbol in this file
 # with a docstring and a non-private name.
 
@@ -29,6 +31,13 @@ this module, calendar operators, plotting functions, and more) and assume that
 durations are expressed in seconds (see
 [Time units](https://temporian.readthedocs.io/en/latest/user_guide/#time-units)),
 so it is recommended to use seconds as timestamps where possible.
+"""
+
+shortest = np.nextafter(0, 1)
+"""Shortest interval between events that can be represented using float64.
+
+This number can be used as the shortest window length to unify events with the
+same timestamp, ensuring that two different timestamps will never be aggregated.
 """
 
 

@@ -82,7 +82,9 @@ from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.node import EventSetNode, create_node_new_features_new_sampling
 from temporian.core.operators.base import Operator
+from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
+from temporian.utils.rtcheck import rtcheck
 
 
 class {capitalized_op}(Operator):
@@ -123,8 +125,9 @@ class {capitalized_op}(Operator):
 operator_lib.register_operator({capitalized_op})
 
 
+@rtcheck
 @compile
-def {lower_op}(input: EventSetNode, param: float) -> EventSetNode:
+def {lower_op}(input: EventSetOrNode, param: float) -> EventSetOrNode:
     """<Text>
 
     Args:
@@ -132,13 +135,26 @@ def {lower_op}(input: EventSetNode, param: float) -> EventSetNode:
         param: <Text>
 
     Example:
-        <Text>
+
+        ```python
+        >>> a = tp.event_set(timestamps=[0, 1, 2], features={{"A": [0, 10, 20]}})
+        >>> b = tp.{lower_op}(a)
+        >>> b
+        indexes: []
+        features: [('A', int64)]
+        events:
+            (3 events):
+                timestamps: [0. 1. 2.]
+                'A': [ 0 10 20]
+        ...
+
+        ```
 
     Returns:
         <Text>
     """
 
-    return {capitalized_op}(input=input, param=param).outputs["output"]
+    return {capitalized_op}(input=input, param=param).outputs["output"]  # type: ignore
 
 '''
         )
@@ -212,10 +228,9 @@ class {capitalized_op}NumpyImplementation(OperatorImplementation):
             output_evset.set_index_value(
                 index_key,
                 IndexData(
-                    [],
-                    np.array([1], dtype=np.float64),
+                    features=[],
+                    timestamps=np.array([1], dtype=np.float64),
                     schema=output_schema,
-                    normalize=False,
                 )
             )
 

@@ -112,7 +112,8 @@ operator_lib.register_operator(GlueOperator)
 def glue(
     *inputs: EventSetOrNode,
 ) -> EventSetOrNode:
-    """Concatenates [`EventSets`][temporian.EventSet] with the same sampling.
+    """Concatenates features from [`EventSets`][temporian.EventSet] with the
+    same sampling.
 
     Feature names cannot be duplicated across EventSets.
 
@@ -195,10 +196,10 @@ def glue(
         ```
 
     Args:
-        *inputs: EventSets to concatenate.
+        *inputs: EventSets to concatenate the features of.
 
     Returns:
-        Concatenated EventSets.
+        EventSet with concatenated features.
     """
     if len(inputs) == 1:
         return inputs[0]

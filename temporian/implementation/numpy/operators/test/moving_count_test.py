@@ -24,7 +24,7 @@ from temporian.implementation.numpy.operators.window.moving_count import (
     MovingCountNumpyImplementation,
     operators_cc,
 )
-from temporian.core.data import node as node_lib
+from temporian.core.data import duration, node as node_lib
 from numpy.testing import assert_array_equal
 from temporian.io.pandas import from_pandas
 
@@ -205,6 +205,66 @@ class MovingCountOperatorTest(absltest.TestCase):
         )
 
         self.assertEqual(output["output"], expected_output)
+
+    def test_cc_max_resolution_wo_sampling(self):
+        assert_array_equal(
+            operators_cc.moving_count(
+                _f64(
+                    [
+                        -1,
+                        -1,
+                        np.nextafter(-1, 0),  # almost -1
+                        np.nextafter(0, -1),  # almost 0
+                        0,
+                        0,
+                        0,
+                        np.nextafter(0, 1),  # and so on...
+                        np.nextafter(1, 0),
+                        1,
+                        1,
+                        np.nextafter(1, 2),
+                        np.nextafter(1e6, 1e5),
+                        1e6,
+                        1e6,
+                        np.nextafter(1e6, 1e7),
+                    ]
+                ),
+                duration.shortest,
+            ),
+            # "almost" elements should be counted individually
+            _i32([2, 2, 1, 1, 3, 3, 3, 1, 1, 2, 2, 1, 1, 2, 2, 1]),
+        )
+
+    def test_cc_max_resolution_with_sampling(self):
+        assert_array_equal(
+            operators_cc.moving_count(
+                _f64(
+                    [
+                        -1,
+                        -1,
+                        np.nextafter(-1, 0),  # almost -1
+                        np.nextafter(0, -1),  # almost 0
+                        0,
+                        0,
+                        0,
+                        np.nextafter(0, 1),  # and so on...
+                        np.nextafter(1, 0),
+                        1,
+                        1,
+                        np.nextafter(1, 2),
+                        np.nextafter(1e6, 1e5),
+                        1e6,
+                        1e6,
+                        np.nextafter(1e6, 1e7),
+                    ]
+                ),
+                # Only sample at integers
+                _f64([-1, 0, 1, 1e6]),
+                duration.shortest,
+            ),
+            # "almost" elements should not be counted
+            _i32([2, 3, 2, 2]),
+        )
 
 
 if __name__ == "__main__":

@@ -91,6 +91,7 @@ from temporian.utils.rtcheck import runtime_check_raise_exception
 # --- OPERATORS ---
 
 from temporian.core.operators.glue import glue
+from temporian.core.operators.combine import combine
 
 # Binary operators
 from temporian.core.operators.binary.arithmetic import add
