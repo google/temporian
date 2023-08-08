@@ -14,6 +14,8 @@
 
 
 """Combine operator class and public API function definitions."""
+from enum import Enum
+from typing import Any, Union
 
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
@@ -27,13 +29,28 @@ from temporian.proto import core_pb2 as pb
 from temporian.utils.rtcheck import rtcheck
 
 MAX_NUM_ARGUMENTS = 30
-FROM_INNER = "inner"
-FROM_OUTER = "outer"
-FROM_LEFT = "left"
+
+
+class How(str, Enum):
+    outer = "outer"
+    inner = "inner"
+    left = "left"
+
+    def __str__(self) -> str:
+        return self.value
+
+    def __repr__(self) -> str:
+        return self.value
+
+    @staticmethod
+    def is_valid(value: Any) -> bool:
+        return isinstance(value, How) or (
+            isinstance(value, str) and value in [item.value for item in How]
+        )
 
 
 class Combine(Operator):
-    def __init__(self, how: str, **inputs: EventSetNode):
+    def __init__(self, how: How, **inputs: EventSetNode):
         super().__init__()
 
         # Note: Support for dictionaries of nodes is required for
@@ -108,10 +125,10 @@ operator_lib.register_operator(Combine)
 @compile
 def combine(
     *inputs: EventSetOrNode,
-    how: str = "outer",
+    how: Union[str, How] = How.outer,
 ) -> EventSetOrNode:
     """
-    Combines events from multiple EventSets together.
+    Combines events from multiple [`EventSets`][temporian.EventSet] together.
 
     Input events must have the same features (i.e. same feature names and dtypes)
     and index schemas (i.e. same index names and dtypes).
@@ -224,6 +241,10 @@ def combine(
     Returns:
         An EventSet with events from all inputs combined.
     """
+    if not How.is_valid(how):
+        raise ValueError(f"Invalid argument: {how=}. Options are {list(How)}")
+    how = How[how]
+
     if len(inputs) == 1:
         return inputs[0]
 

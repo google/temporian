@@ -25,11 +25,7 @@ from temporian.implementation.numpy.data.event_set import (
     IndexType,
 )
 from temporian.core.operators.combine import Combine
-from temporian.core.operators.combine import (
-    FROM_LEFT,
-    FROM_INNER,
-    FROM_OUTER,
-)
+from temporian.core.operators.combine import How
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
@@ -50,13 +46,13 @@ class CombineNumpyImplementation(OperatorImplementation):
         first_features = first_input.schema.feature_names()
 
         # What index values to use
-        if how == FROM_LEFT:
+        if how == How.left:
             combined_keys = first_input.data.keys()
-        elif how == FROM_OUTER:
+        elif how == How.outer:
             combined_keys = set()
             for evset in input_evsets:
                 combined_keys |= set(evset.data.keys())
-        elif how == FROM_INNER:
+        elif how == How.inner:
             combined_keys = set(first_input.data.keys())
             for evset in input_evsets[1:]:
                 combined_keys &= set(evset.data.keys())

@@ -20,7 +20,7 @@ This datatype is equivalent to a double in C.
 """
 import datetime
 from enum import Enum
-from typing import Union, Iterable, List
+from typing import Union, Iterable, List, Any
 
 import numpy as np
 
@@ -173,7 +173,7 @@ class TimeUnit(str, Enum):
     WEEKS = "weeks"
 
     @staticmethod
-    def is_valid(value: any) -> bool:
+    def is_valid(value: Any) -> bool:
         return isinstance(value, TimeUnit) or (
             isinstance(value, str)
             and value in [item.value for item in TimeUnit]
