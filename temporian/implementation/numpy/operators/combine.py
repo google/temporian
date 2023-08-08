@@ -62,32 +62,34 @@ class CombineNumpyImplementation(OperatorImplementation):
         # Concatenate timestamps and features for each index, and sort
         for index_key in combined_keys:
             all_timestamps: List[np.ndarray] = []
-            all_feats: Dict[str, List[np.ndarray]] = {
-                name: [] for name in first_features
-            }
+            # Outer list contains each feature, inner list each evset
+            all_feats: List[List[np.ndarray]] = [[] for _ in first_features]
 
             # Get timestamps and features from all input EventSets
             for evset in input_evsets:
                 if index_key not in evset.data:
                     continue
                 index_data = evset.get_index_value(index_key, normalize=False)
-                evset_feats = evset.schema.feature_names()
                 all_timestamps.append(index_data.timestamps)
-                # Access feature data by name, since position in IndexData may vary
-                for feat in first_features:
-                    feat_idx = evset_feats.index(feat)
-                    all_feats[feat].append(index_data.features[feat_idx])
+
+                # Find features by name and put them in the right position
+                source_feats = evset.schema.feature_names()
+                for target_idx, feat in enumerate(first_features):
+                    source_idx = source_feats.index(feat)
+                    all_feats[target_idx].append(
+                        index_data.features[source_idx]
+                    )
 
             # Concatenate and sort timestamps
             timestamps: np.ndarray = np.concatenate(all_timestamps)
-            order = np.argsort(timestamps, kind="mergesort")
-            timestamps = timestamps[order]
+            time_position = np.argsort(timestamps, kind="mergesort")
+            timestamps = timestamps[time_position]
 
             # Concatenate features and sort based on timestamps
             features: List[np.ndarray] = []
-            for feature in first_features:
-                feat = np.concatenate(all_feats[feature])
-                features.append(feat[order])
+            for idx in range(len(first_features)):
+                feat = np.concatenate(all_feats[idx])
+                features.append(feat[time_position])
 
             # Fill IndexData
             output_evset.set_index_value(
