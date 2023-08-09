@@ -20,18 +20,20 @@ theme:
     - navigation.instant
     - navigation.indexes
   palette:
-    # Palette toggle for dark mode
-    - scheme: slate
-      toggle:
-        icon: material/brightness-4
-        name: Switch to light mode
-      primary: black
-      accent: white
-    # Palette toggle for light mode
-    - scheme: default
+    # Palette toggle for light mode (default)
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
+      primary: black
+      accent: white
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
       primary: black
       accent: white
 
