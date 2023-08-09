@@ -8,8 +8,11 @@ edit_uri_template: tree/main/temporian/{path_noext}
 # Theme
 theme:
   name: material
+  logo: assets/logo.png
+  favicon: assets/favicon.png
   icon:
     repo: fontawesome/brands/github
+    logo: assets/favicon.png
   features:
     - navigation.tabs
     - navigation.tracking
@@ -17,18 +20,20 @@ theme:
     - navigation.instant
     - navigation.indexes
   palette:
-    # Palette toggle for dark mode
-    - scheme: slate
-      toggle:
-        icon: material/brightness-4
-        name: Switch to light mode
-      primary: black
-      accent: white
-    # Palette toggle for light mode
-    - scheme: default
+    # Palette toggle for light mode (default)
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
+      primary: black
+      accent: white
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
       primary: black
       accent: white
 
@@ -66,7 +71,9 @@ plugins:
         - gen_ref_pages.py
   - literate-nav:
       nav_file: SUMMARY.md
-  - social
+  - social:
+      cards_layout_options:
+        background_color: black
   - mkdocs-jupyter:
       # Execute notebooks when building docs (set to true when temporian runs in a notebook w/o the start_notebook script).
       execute: false
