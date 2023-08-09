@@ -8,8 +8,11 @@ edit_uri_template: tree/main/temporian/{path_noext}
 # Theme
 theme:
   name: material
+  logo: assets/logo.png
+  favicon: assets/favicon.png
   icon:
     repo: fontawesome/brands/github
+    logo: assets/favicon.png
   features:
     - navigation.tabs
     - navigation.tracking
@@ -66,7 +69,9 @@ plugins:
         - gen_ref_pages.py
   - literate-nav:
       nav_file: SUMMARY.md
-  - social
+  - social:
+      cards_layout_options:
+        background_color: "##131F43"
   - mkdocs-jupyter:
       # Execute notebooks when building docs (set to true when temporian runs in a notebook w/o the start_notebook script).
       execute: false
