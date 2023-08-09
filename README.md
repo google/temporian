@@ -1,4 +1,4 @@
-<img src="https://github.com/google/temporian/raw/main/docs/src/assets/banner.jpg" width="100%" alt="Temporian logo">
+<img src="https://github.com/google/temporian/raw/main/docs/src/assets/banner.png" width="100%" alt="Temporian logo">
 
 [![pypi](https://img.shields.io/pypi/v/temporian?color=blue)](https://pypi.org/project/temporian/)
 [![docs](https://readthedocs.org/projects/temporian/badge/?version=stable)](https://temporian.readthedocs.io/en/stable/?badge=stable)
