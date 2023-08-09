@@ -11,10 +11,10 @@
     --md-code-bg-color: #212121;
 }
 
-/* Hide header title */
+/* Hide Temporian text in header. Uncomment if we swap the logo in the header for the full-text one.
 div[class=md-header__title] {
     color: transparent;
 }
 .md-header__title--active .md-header__topic {
     transition: none;
-}
+} */
