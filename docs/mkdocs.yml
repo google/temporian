@@ -71,7 +71,7 @@ plugins:
       nav_file: SUMMARY.md
   - social:
       cards_layout_options:
-        background_color: "##131F43"
+        background_color: "#131F43"
   - mkdocs-jupyter:
       # Execute notebooks when building docs (set to true when temporian runs in a notebook w/o the start_notebook script).
       execute: false
