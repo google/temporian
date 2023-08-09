@@ -1,4 +1,4 @@
-<img src="https://github.com/google/temporian/raw/main/docs/src/assets/banner.png" width="100%" alt="Temporian logo">
+<img src="https://github.com/google/temporian/raw/main/docs/src/assets/banner.jpg" width="100%" alt="Temporian logo">
 
 [![pypi](https://img.shields.io/pypi/v/temporian?color=blue)](https://pypi.org/project/temporian/)
 [![docs](https://readthedocs.org/projects/temporian/badge/?version=stable)](https://temporian.readthedocs.io/en/stable/?badge=stable)
@@ -15,34 +15,34 @@ Temporian is an open-source Python library for preprocessing ⚡ and feature eng
 > Temporian, temporal datasets contain [events](https://temporian.readthedocs.io/en/stable/user_guide/#events-and-eventsets), which consists of
 > values for one or more attributes at a given timestamp. Common
 > examples of temporal data are transaction logs, sensor signals, and
-> weather patterns. For more, see 
+> weather patterns. For more, see
 > [What is Temporal data](https://temporian.readthedocs.io/en/stable/user_guide/#what-is-temporal-data).
 
 ## Key features
 
--  **Unified data processing** 📈: Temporian operates natively on many forms
-    of temporal data, including multivariate time-series, multi-index
-    time-series, and non-uniformly sampled data.
+- **Unified data processing** 📈: Temporian operates natively on many forms
+  of temporal data, including multivariate time-series, multi-index
+  time-series, and non-uniformly sampled data.
 
--  **Iterative and interactive development** 📊: Users can easily analyze
-    temporal data and visualize results in real-time with iterative tools like
-    notebooks. When prototyping, users can iteratively preprocess, analyze, and
-    visualize temporal data in real-time with notebooks. In production, users
-    can easily reuse, apply, and scale these implementations to larger datasets.
+- **Iterative and interactive development** 📊: Users can easily analyze
+  temporal data and visualize results in real-time with iterative tools like
+  notebooks. When prototyping, users can iteratively preprocess, analyze, and
+  visualize temporal data in real-time with notebooks. In production, users
+  can easily reuse, apply, and scale these implementations to larger datasets.
 
--  **Avoids future leakage** 😰: Future leakage occurs during model training
-    when a model is exposed to data from future events, which leaks information
-    that would otherwise not be available to the model and can result in
-    overfitting. Temporian operators do not create leakage by default. Users
-    can also use Temporian to programmatically detect whether specific signals
-    were exposed to future leakages.
+- **Avoids future leakage** 😰: Future leakage occurs during model training
+  when a model is exposed to data from future events, which leaks information
+  that would otherwise not be available to the model and can result in
+  overfitting. Temporian operators do not create leakage by default. Users
+  can also use Temporian to programmatically detect whether specific signals
+  were exposed to future leakages.
 
--  **Flexible runtime** ☁️: Temporian programs can run seamlessly in-process in
-    Python, on large datasets using [Apache Beam](https://beam.apache.org/).
+- **Flexible runtime** ☁️: Temporian programs can run seamlessly in-process in
+  Python, on large datasets using [Apache Beam](https://beam.apache.org/).
 
--  **Highly optimized** 🔥: Temporian's core is implemented and optimized in
-    C++, so large amounts of data can be handled in-process. In some cases,
-    Temporian is 1000x faster than other libraries.
+- **Highly optimized** 🔥: Temporian's core is implemented and optimized in
+  C++, so large amounts of data can be handled in-process. In some cases,
+  Temporian is 1000x faster than other libraries.
 
 ## QuickStart
 
@@ -56,7 +56,7 @@ pip install temporian
 
 ### Minimal example
 
-The following example uses a dataset, `sales.csv`, which contains transactional data. Here is a preview of the data: 
+The following example uses a dataset, `sales.csv`, which contains transactional data. Here is a preview of the data:
 
 ```shell
 $ head sales.csv
