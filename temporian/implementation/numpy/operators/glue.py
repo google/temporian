@@ -37,9 +37,7 @@ class GlueNumpyImplementation(OperatorImplementation):
         output_schema = self.output_schema("output")
 
         # convert input evest dict to list of evsets
-        evsets: List[EventSet] = list(
-            list(zip(*sorted(list(inputs.items()))))[1]
-        )
+        evsets: List[EventSet] = list(list(zip(*list(inputs.items())))[1])
         if len(evsets) < 2:
             raise ValueError(
                 f"Glue operator cannot be called on a {len(evsets)} EventSets."

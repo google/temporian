@@ -201,7 +201,7 @@ def glue(
     Returns:
         EventSet with concatenated features.
     """
-    if len(inputs) == 1:
+    if len(inputs) == 1 and isinstance(inputs[0], EventSetNode):
         return inputs[0]
 
     # Note: The node should be called "input_{idx}" with idx in [0, MAX_NUM_ARGUMENTS).
