@@ -737,3 +737,19 @@ py_test(
     ],
 )
     
+py_test(
+    name = "fft_test",
+    srcs = ["fft_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        ":test_util",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:node",
+        "//temporian/core/data:schema",
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/core/operators:fft",
+        "//temporian/implementation/numpy/operators:fft",
+    ],
+)
+    

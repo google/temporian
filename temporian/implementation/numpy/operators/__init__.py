@@ -61,3 +61,4 @@ from temporian.implementation.numpy.operators import end
 from temporian.implementation.numpy.operators import tick
 from temporian.implementation.numpy.operators import timestamps
 from temporian.implementation.numpy.operators import enumerate
+from temporian.implementation.numpy.operators import fft

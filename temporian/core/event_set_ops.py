@@ -1093,6 +1093,55 @@ class EventSetOperations:
 
         return enumerate(self)
 
+    def fft(
+        self: EventSetOrNode,
+        num_events: int,
+        window: Optional[str] = None,
+        num_spectral_lines: Optional[int] = None,
+    ) -> EventSetOrNode:
+        """Computes the Fast Fourier Transform of an
+        [`EventSet`][temporian.EventSet] with a single tp.float32 feature.
+
+        The window length is defined in number of events, instead of
+        timestamp duration like most other operators.
+
+        The operator returns the amplitude of each spectral line as
+        separate tp.float32 features named "a0", "a1", "a2", etc. By default,
+        `num_events // 2` spectral line are returned.
+
+        Usage:
+            ```python
+            >>> a = tp.event_set(
+            ...    timestamps=[1,2,3,4,5,6],
+            ...    features={"x": [4.,3.,2.,6.,2.,1.]},
+            ... )
+            >>> b = a.fft(4)
+            >>> b
+
+            ```
+
+        Args:
+            num_events: Size of the FFT expressed as a number of events.
+            window: Optional window function applied before the FFT. if None, no
+                window is applied. Supported values are: "hamming".
+            num_spectral_lines: Number of returned spectral lines. If set, the
+                operators returns the `num_spectral_lines` low frequency
+                spectral lines. `num_spectral_lines` should be between 1 and
+                `num_events`.
+
+        Returns:
+            EventSet containing the amplitude of each frequency band of the
+            Fourier Transform.
+        """
+        from temporian.core.operators.fft import fft
+
+        return fft(
+            self,
+            num_events=num_events,
+            window=window,
+            num_spectral_lines=num_spectral_lines,
+        )
+
     def filter(
         self: EventSetOrNode,
         condition: Optional[EventSetOrNode] = None,

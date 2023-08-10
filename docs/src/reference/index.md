@@ -48,6 +48,7 @@ Check the index on the left for a more detailed description of any symbol.
 | [`EventSet.drop_index()`][temporian.EventSet.drop_index]               | Removes indexes from an [`EventSet`][temporian.EventSet].                                                    |
 | [`EventSet.end()`][temporian.EventSet.end]                             | Generates a single timestamp at the end of the input.                                                        |
 | [`EventSet.enumerate()`][temporian.EventSet.enumerate]                 | Creates an ordinal feature enumerating the events according to their timestamp.                              |
+| [`EventSet.fft()`][temporian.EventSet.fft]                             | Apply a Fast Fourier Transform.                                                                              |
 | [`EventSet.filter()`][temporian.EventSet.filter]                       | Filters out events in an [`EventSet`][temporian.EventSet] for which a condition is false.                    |
 | [`EventSet.join()`][temporian.EventSet.join]                           | Join [`EventSets`][temporian.EventSet] with different samplings but the same index together.                 |
 | [`EventSet.lag()`][temporian.EventSet.lag]                             | Adds a delay to an [`EventSet`][temporian.EventSet]'s timestamps.                                            |
