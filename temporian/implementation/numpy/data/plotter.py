@@ -14,7 +14,7 @@
 
 """Plotting utility."""
 
-from typing import NamedTuple, Optional, Union, List, Any, Set
+from typing import NamedTuple, Optional, Union, List, Set
 from enum import Enum
 
 import numpy as np
