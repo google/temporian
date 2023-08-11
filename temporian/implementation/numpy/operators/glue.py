@@ -36,8 +36,7 @@ class GlueNumpyImplementation(OperatorImplementation):
         assert isinstance(self.operator, GlueOperator)
         output_schema = self.output_schema("output")
 
-        # convert input evest dict to list of evsets
-        evsets: List[EventSet] = list(list(zip(*list(inputs.items())))[1])
+        evsets = list(inputs.values())
         if len(evsets) < 2:
             raise ValueError(
                 f"Glue operator cannot be called on a {len(evsets)} EventSets."

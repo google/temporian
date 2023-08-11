@@ -140,7 +140,9 @@ class GlueNumpyImplementationTest(absltest.TestCase):
         evset_6 = evset_0.rename("f6")
         evset_7 = evset_0.rename("f7")
         evset_8 = evset_0.rename("f8")
-        evset_9 = evset_0.rename("f9")
+        evset_9 = evset_0.rename(
+            "a"
+        )  # Test that alphabetical order is not used.
 
         evset_10 = event_set(
             timestamps=[1],
