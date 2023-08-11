@@ -26,7 +26,7 @@ from temporian.core.data.node import (
 from temporian.core.operators.base import Operator
 from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
-from temporian.utils.rtcheck import rtcheck
+from temporian.utils.typecheck import typecheck
 
 MAX_NUM_ARGUMENTS = 30
 
@@ -121,7 +121,7 @@ class Combine(Operator):
 operator_lib.register_operator(Combine)
 
 
-@rtcheck
+@typecheck
 @compile
 def combine(
     *inputs: EventSetOrNode,

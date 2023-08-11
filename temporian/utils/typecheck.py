@@ -256,15 +256,15 @@ def _check_annotation_dict(
         trace.exception("Dict annotation require zero or two arguments.")
 
 
-def rtcheck(fn):
+def typecheck(fn):
     """Annotation that check the arguments and outputs of a function at runtime.
 
-    @rtcheck checks, at runtime, that the type hints of the arguments and output
+    @typecheck checks, at runtime, that the type hints of the arguments and output
     of a function are satisfied.
 
     Usage example:
         ```python
-        @rtcheck
+        @typecheck
         def f(a, b: int, c: str = "aze") -> List[str]:
             return ["hello", "world"]
 
@@ -272,8 +272,8 @@ def rtcheck(fn):
         f(1, 2, 3) # Fails
         ```
 
-    If combined with @compile, @rtcheck should be applied after @compile (i.e.
-    place @compile just below @rtcheck in the code).
+    If combined with @compile, @typecheck should be applied after @compile (i.e.
+    place @compile just below @typecheck in the code).
 
     This code only support what is required by Temporian API.
 
@@ -370,5 +370,5 @@ def rtcheck(fn):
 
         return output
 
-    setattr(wrapper, "_rtcheck", True)
+    setattr(wrapper, "_typecheck", True)
     return wrapper

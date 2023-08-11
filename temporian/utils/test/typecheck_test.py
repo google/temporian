@@ -4,8 +4,8 @@ from absl.testing import absltest
 import re
 import numpy as np
 
-from temporian.utils.rtcheck import (
-    rtcheck,
+from temporian.utils.typecheck import (
+    typecheck,
     _check_annotation,
     _Trace,
     runtime_check_raise_exception,
@@ -25,7 +25,7 @@ def check(v, a):
     return True
 
 
-@rtcheck
+@typecheck
 def f(a, b: int, c: str = "aze") -> List[str]:
     del a
     del b
@@ -61,7 +61,7 @@ class RTCheckTest(absltest.TestCase):
             f(1, "aze")
 
     def test_compile(self):
-        @rtcheck
+        @typecheck
         @compile
         def g(a: EventSetNode) -> EventSetNode:
             return a
@@ -71,11 +71,11 @@ class RTCheckTest(absltest.TestCase):
 
     def test_wrong_compile_order(self):
         with self.assertRaisesRegex(
-            ValueError, "Apply @compile before @rtcheck"
+            ValueError, "Apply @compile before @typecheck"
         ):
 
             @compile
-            @rtcheck
+            @typecheck
             def h(a: EventSetNode) -> EventSetNode:
                 return a
 
@@ -178,7 +178,7 @@ class RTCheckTest(absltest.TestCase):
         self.assertFalse(check((1, 2), Tuple[int, str]))
 
     def test_args(self):
-        @rtcheck
+        @typecheck
         def a(*x: int) -> int:
             return sum(x)
 
@@ -196,7 +196,7 @@ class RTCheckTest(absltest.TestCase):
             a("a", "b")
 
     def test_wargs(self):
-        @rtcheck
+        @typecheck
         def a(**x: int) -> int:
             return sum([v for _, v in x.items()])
 
