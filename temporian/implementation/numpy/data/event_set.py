@@ -131,9 +131,8 @@ def normalize_features(
         if feature_values.dtype == "object":
             feature_values = feature_values.fillna("")
         feature_values = feature_values.to_numpy(copy=True)
-
-    if not isinstance(feature_values, np.ndarray):
-        # The data is not a np.array
+    elif isinstance(feature_values, (tuple, list)):
+        # Convert list/tuple to array
 
         # Looks for an indication of a string or non-string array.
         is_string = False
@@ -150,6 +149,11 @@ def normalize_features(
             feature_values = np.array(feature_values, dtype=np.bytes_)
         else:
             feature_values = np.array(feature_values)
+    elif not isinstance(feature_values, np.ndarray):
+        raise ValueError(
+            "Feature values should be provided in a tuple, list, numpy array or"
+            f" pandas Series. Got type {type(feature_values)} instead."
+        )
 
     if feature_values.dtype.type == np.string_:
         feature_values = feature_values.astype(np.bytes_)
