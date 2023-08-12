@@ -34,97 +34,103 @@ def plot_bokeh(
 
     figs = []
 
+    index_names = groups[0].items[0].evtset.schema.index_names()
+
     # Actual plotting
     plot_idx = 0
     for index in indexes:
+        assert len(index_names) == len(index)
         if plot_idx >= num_plots:
             # Too much plots are displayed already.
             break
 
+        title = " ".join([f"{k}={v}" for k, v in zip(index_names, index)])
+
         # Index of the next color to use in the plot.
         color_idx = 0
 
-        for evset in evsets:
+        for group in groups:
             if plot_idx >= num_plots:
                 break
+            group_has_one_item = len(group.items) == 1
 
-            title = " ".join(
-                [f"{k}={v}" for k, v in zip(evset.schema.index_names(), index)]
-            )
+            for group_item in group.items:
+                xs = group_item.evtset.data[index].timestamps
+                uniform = is_uniform(xs)
 
-            evset_features = evset.schema.feature_names()
-            display_features = [f for f in evset_features if f in features]
-
-            xs = evset.data[index].timestamps
-            uniform = is_uniform(xs)
-
-            plot_mask = np.full(len(xs), True)
-            if options.min_time is not None:
-                plot_mask = plot_mask & (xs >= options.min_time)
-            if options.max_time is not None:
-                plot_mask = plot_mask & (xs <= options.max_time)
-            if options.max_points is not None and len(xs) > options.max_points:
-                # Too many timestamps. Only keep the fist ones.
-                plot_mask = plot_mask & (
-                    np.cumsum(plot_mask) <= options.max_points
-                )
-
-            xs = xs[plot_mask]
-
-            if evset.schema.is_unix_timestamp:
-                # Matplotlib understands datetimes.
-                xs = convert_timestamps_to_datetimes(xs)
-
-            if len(display_features) == 0:
-                # There is not features to plot. Instead, plot the timestamps.
-                figs.append(
-                    _bokeh_sub_plot(
-                        xs=xs,
-                        ys=np.zeros(len(xs)),
-                        options=options,
-                        color=colors[color_idx % len(colors)],
-                        name="[sampling]",
-                        is_unix_timestamp=evset.schema.is_unix_timestamp,
-                        title=title,
-                        style=Style.vline,
+                plot_mask = np.full(len(xs), True)
+                if options.min_time is not None:
+                    plot_mask = plot_mask & (xs >= options.min_time)
+                if options.max_time is not None:
+                    plot_mask = plot_mask & (xs <= options.max_time)
+                if (
+                    options.max_points is not None
+                    and len(xs) > options.max_points
+                ):
+                    # Too many timestamps. Only keep the fist ones.
+                    plot_mask = plot_mask & (
+                        np.cumsum(plot_mask) <= options.max_points
                     )
-                )
-                # Only print the index / title once
-                title = None
 
-                color_idx += 1
-                plot_idx += 1
+                xs = xs[plot_mask]
 
-            for display_feature in display_features:
-                feature_idx = evset_features.index(display_feature)
-                if plot_idx >= num_plots:
-                    # Too much plots are displayed already.
-                    break
+                if group_item.evtset.schema.is_unix_timestamp:
+                    # Matplotlib understands datetimes.
+                    xs = convert_timestamps_to_datetimes(xs)
 
-                ys = evset.data[index].features[feature_idx][plot_mask]
-                if options.style == Style.auto:
-                    effective_stype = auto_style(uniform, xs, ys)
+                if group_item.feature_idx == -1:
+                    # There is not features to plot. Instead, plot the timestamps.
+                    figs.append(
+                        _bokeh_sub_plot(
+                            xs=xs,
+                            ys=np.zeros(len(xs)),
+                            options=options,
+                            color=colors[color_idx % len(colors)],
+                            name="[sampling]",
+                            is_unix_timestamp=group_item.evtset.schema.is_unix_timestamp,
+                            title=title,
+                            style=Style.vline,
+                        )
+                    )
                 else:
-                    effective_stype = options.style
+                    feature_name = group_item.evtset.schema.features[
+                        group_item.feature_idx
+                    ].name
 
-                figs.append(
-                    _bokeh_sub_plot(
-                        xs=xs,
-                        ys=ys,
-                        options=options,
-                        color=colors[color_idx % len(colors)],
-                        name=display_feature,
-                        is_unix_timestamp=evset.schema.is_unix_timestamp,
-                        title=title,
-                        style=effective_stype,
+                    ys = group_item.evtset.data[index].features[
+                        group_item.feature_idx
+                    ]
+                    ys = ys[plot_mask]
+                    if options.style == Style.auto:
+                        effective_stype = auto_style(uniform, xs, ys)
+                    else:
+                        effective_stype = options.style
+
+                    figs.append(
+                        _bokeh_sub_plot(
+                            xs=xs,
+                            ys=ys,
+                            options=options,
+                            color=colors[color_idx % len(colors)],
+                            name=feature_name if group_has_one_item else None,
+                            legend=(
+                                feature_name if not group_has_one_item else None
+                            ),
+                            is_unix_timestamp=group_item.evtset.schema.is_unix_timestamp,
+                            title=title,
+                            style=effective_stype,
+                        )
                     )
-                )
 
                 # Only print the index / title once
                 title = None
 
                 color_idx += 1
-                plot_idx += 1
+
+            # if not group_has_one_item:
+            #     axs[plot_idx, 0].legend(fontsize=8)
+
+            plot_idx += 1
 
     if len(figs) > 1:
         # Sync x-axes
@@ -179,10 +185,11 @@ def _bokeh_sub_plot(
     ys,
     options: Options,
     color,
-    name: str,
+    name: Optional[str],
     is_unix_timestamp: bool,
     title: Optional[str],
     style: Style,
+    legend: Optional[str] = None,
 ) -> Any:
     """Plots "(xs, ys)" on the axis "ax"."""
 
@@ -251,6 +258,7 @@ def _bokeh_sub_plot(
     else:
         raise ValueError("Non implemented style")
 
-    fig.yaxis.axis_label = name
+    if name is not None:
+        fig.yaxis.axis_label = name
 
     return fig

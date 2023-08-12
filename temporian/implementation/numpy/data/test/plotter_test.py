@@ -99,8 +99,15 @@ class PlotterTest(parameterized.TestCase):
                 (evset_1[["b", "c"]], evset_2),
             ],
             return_fig=True,
+            interactive=True,
         )
-        plot.savefig("/tmp/fig.png")
+        # plot.savefig("/tmp/fig.png")
+
+        # plot.show()
+
+        # from bokeh.io import export_svg
+
+        # export_png(plot, filename="/tmp/fig.png")
 
 
 if __name__ == "__main__":

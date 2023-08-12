@@ -50,7 +50,6 @@ def plot_matplotlib(
     plot_idx = 0
     for index in indexes:
         assert len(index_names) == len(index)
-
         if plot_idx >= num_plots:
             # Too many plots are displayed already.
             break
@@ -102,9 +101,6 @@ def plot_matplotlib(
                         title=title,
                         style=Style.vline,
                     )
-                    # Only print the index / title once
-                    title = None
-
                 else:
                     feature_name = group_item.evtset.schema.features[
                         group_item.feature_idx
