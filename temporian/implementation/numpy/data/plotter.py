@@ -14,7 +14,9 @@
 
 """Plotting utility."""
 
-from typing import NamedTuple, Optional, Union, List, Any, Set
+from dataclasses import dataclass
+
+from typing import NamedTuple, Optional, Union, List, Any, Set, Tuple
 from enum import Enum
 
 import numpy as np
@@ -26,6 +28,32 @@ from temporian.implementation.numpy.data.event_set import (
     IndexItemType,
     IndexType,
 )
+
+# How to input event sets in the plotter.
+InputEventSet = Union[
+    EventSet,
+    List[EventSet],
+    Tuple[EventSet, ...],
+    List[Tuple[EventSet, ...]],
+]
+
+# How to input indexes in the plotter.
+InputIndex = Optional[
+    Union[
+        IndexItemType,
+        IndexType,
+        List[IndexItemType],
+        List[IndexType],
+    ]
+]
+
+InputFeatures = Optional[
+    Union[
+        str,
+        List[str],
+        Set[str],
+    ]
+]
 
 
 class Style(Enum):
@@ -55,12 +83,117 @@ class Options(NamedTuple):
     interactive: bool
 
 
+@dataclass
+class GroupItem:
+    evtset: EventSet
+    feature_idx: int  # Index of the feature. If -1, plots the timestamp.
+
+
+@dataclass
+class Group:
+    """Features / timestaps that get plotted together."""
+
+    items: List[GroupItem]
+
+
+Groups = List[Group]
+
+
+def build_groups(
+    evsets: InputEventSet, features: Optional[Set[str]], allow_list: bool = True
+) -> Groups:
+    if isinstance(evsets, EventSet):
+        # Plot each feature individually
+        groups = []
+        for feature_idx, feature in enumerate(evsets.schema.features):
+            if features is not None and feature.name not in features:
+                continue
+            groups.append(Group([GroupItem(evsets, feature_idx)]))
+        if len(groups) == 0:
+            # Plot the timestamps
+            groups.append(Group([GroupItem(evsets, -1)]))
+        return groups
+
+    if isinstance(evsets, tuple):
+        # Plot all the event sets and their features together
+        group_items = []
+        for evset in evsets:
+            if not isinstance(evset, EventSet):
+                raise ValueError(
+                    f"Expecting tuple of eventsets. Got {type(evset)} instead."
+                )
+            plot_for_current_evtset = False
+            for feature_idx, feature in enumerate(evset.schema.features):
+                if features is not None and feature.name not in features:
+                    continue
+                group_items.append(GroupItem(evset, feature_idx))
+                plot_for_current_evtset = True
+            if not plot_for_current_evtset:
+                group_items.append(GroupItem(evset, -1))
+
+        return [Group(group_items)]
+
+    if allow_list and isinstance(evsets, list):
+        groups = []
+        for x in evsets:
+            groups.extend(build_groups(x, features, allow_list=False))
+        return groups
+    raise ValueError("Non supported evsets input")
+
+
+def normalize_features(features: InputFeatures) -> Optional[Set[str]]:
+    if features is None:
+        return None
+    if isinstance(features, str):
+        return {features}
+    if isinstance(features, list):
+        return set(features)
+    if isinstance(features, set):
+        return features
+    raise ValueError(f"Non supported feature type {features}")
+
+
+def normalize_indexes(indexes: InputIndex, groups: Groups) -> List[IndexType]:
+    if indexes is None:
+        # All the available index
+        normalized_indexes = list(
+            groups[0].items[0].evtset.get_index_keys(sort=True)
+        )
+
+    elif isinstance(indexes, list):
+        # e.g. indexes=["a", ("b",)]
+        normalized_indexes = [
+            v if isinstance(v, tuple) else (v,) for v in indexes
+        ]
+
+    elif isinstance(indexes, tuple):
+        # e.g. indexes=("a",)
+        normalized_indexes = [indexes]
+
+    else:
+        # e.g. indexes="a"
+        normalized_indexes = [(indexes,)]
+
+    normalized_indexes = [normalize_index_key(x) for x in normalized_indexes]
+    validate_indexes(normalized_indexes, groups)
+    return normalized_indexes
+
+
+def validate_indexes(indexes: List[IndexType], groups: Groups):
+    for g in groups:
+        for item in g.items:
+            for index in indexes:
+                if index not in item.evtset.data:
+                    raise ValueError(
+                        f"Index {index!r} does not exist in event set:"
+                        f" {item.evtset}"
+                    )
+
+
 def plot(
-    evsets: Union[List[EventSet], EventSet],
-    indexes: Optional[
-        Union[IndexItemType, IndexType, List[IndexItemType], List[IndexType]]
-    ] = None,
-    features: Optional[Union[str, List[str], Set[str]]] = None,
+    evsets: InputEventSet,
+    indexes: InputIndex = None,
+    features: InputFeatures = None,
     width_px: int = 1024,
     height_per_plot_px: int = 150,
     max_points: Optional[int] = None,
@@ -73,6 +206,11 @@ def plot(
     backend: Optional[str] = None,
 ):
     """Plots [`EventSets`][temporian.EventSet].
+
+    Plots one or several event sets. If multiple eventsets are provided, they
+    should all have the same index. If plotting an eventset without features,
+    the timestamps are plotted with vertical bars. The time axis (i.e.,
+    horizontal axis) is shared among all the plots.
 
     This method can also be called from
     [`EventSet.plot()`][temporian.EventSet.plot] with the same args (except
@@ -125,56 +263,16 @@ def plot(
             bokeh. If set, overrides the "interactive" argument.
     """
 
-    original_indexes = indexes
+    normalized_features = normalize_features(features)
+    groups = build_groups(evsets, normalized_features)
+    normalized_indexes = normalize_indexes(indexes, groups)
 
-    if not isinstance(evsets, list):
-        evsets = [evsets]
-
-    if len(evsets) == 0:
-        raise ValueError("Events is empty")
-
-    if indexes is None:
-        # All the indexes
-        indexes = list(evsets[0].get_index_keys(sort=True))
-
-    elif isinstance(indexes, tuple):
-        # e.g. indexes=("a",)
-        indexes = [indexes]
-
-    elif isinstance(indexes, list):
-        # e.g. indexes=["a", ("b",)]
-        indexes = [v if isinstance(v, tuple) else (v,) for v in indexes]
-
-    else:
-        # e.g. indexes="a"
-        indexes = [(indexes,)]
-
-    indexes = [normalize_index_key(x) for x in indexes]
-
-    for index in indexes:
-        if not isinstance(index, tuple):
-            raise ValueError(
-                "Indexes should be tuples or lists of tuples. Instead"
-                f' received "indexes={original_indexes}"'
-            )
+    if len(groups) == 0:
+        raise ValueError("Not input eventsets")
 
     if isinstance(style, str):
         style = Style[style]
     assert isinstance(style, Style)
-
-    if features is None:
-        # Don't filter anything: use all features from all events
-        features = set().union(*[e.schema.feature_names() for e in evsets])
-    elif isinstance(features, str):
-        features = {features}
-    elif isinstance(features, list):
-        features = set(features)
-    elif not isinstance(features, set):
-        raise ValueError("Features argument must be a str, list or set.")
-
-    for feature in features:
-        if not isinstance(feature, str):
-            raise ValueError("All feature names should be strings")
 
     options = Options(
         interactive=interactive,
@@ -207,7 +305,9 @@ def plot(
 
     try:
         fig = BACKENDS[backend](
-            evsets=evsets, indexes=indexes, features=features, options=options
+            groups=groups,
+            indexes=normalized_indexes,
+            options=options,
         )
     except ImportError:
         print(error_message_import_backend(backend))
@@ -217,31 +317,13 @@ def plot(
 
 
 def get_num_plots(
-    evsets: List[EventSet],
+    groups: Groups,
     indexes: List[tuple],
-    features: Set[str],
     options: Options,
 ):
     """Computes the number of sub-plots."""
 
-    num_plots = 0
-    for index in indexes:
-        for evset in evsets:
-            if index not in evset.data:
-                raise ValueError(
-                    f"Index key '{index}' does not exist in the EventSet. Check"
-                    " the available indexes with 'evset.indexes' and provide"
-                    " one of those to the 'indexes' argument of 'plot'."
-                    " Alternatively, set 'indexes=None' to select a random"
-                    f" index key (e.g., {evset.get_arbitrary_index_key()}."
-                )
-            candidate_features = set(evset.schema.feature_names())
-            num_features = len(candidate_features.intersection(features))
-            if num_features == 0:
-                # We plot the sampling
-                num_features = 1
-            num_plots += num_features
-
+    num_plots = len(indexes) * len(groups)
     if num_plots == 0:
         raise ValueError("There is nothing to plot.")
 

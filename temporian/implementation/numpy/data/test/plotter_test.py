@@ -1,6 +1,7 @@
 from absl.testing import parameterized, absltest
 
 import matplotlib
+import numpy as np
 
 from temporian.implementation.numpy.data import plotter
 from temporian.implementation.numpy.data.io import event_set
@@ -75,6 +76,31 @@ class PlotterTest(parameterized.TestCase):
         self.assertTrue(plotter.is_uniform([1]))
         self.assertTrue(plotter.is_uniform([1, 2, 3]))
         self.assertFalse(plotter.is_uniform([1, 2, 2.5]))
+
+    def test_merged_plots(self):
+        x1 = np.arange(200)
+        evset_1 = event_set(
+            timestamps=x1,
+            features={
+                "a": np.sin(x1 / 4),
+                "b": np.sin(x1 / 2),
+                "c": np.sin(x1 / 6),
+            },
+        )
+
+        x2 = np.arange(200, 300)
+        evset_2 = event_set(timestamps=x2, features={"d": np.sin(x2 / 8)})
+
+        plot = plotter.plot(
+            [
+                evset_1["a"],
+                (evset_1["a"],),
+                evset_1[[]],
+                (evset_1[["b", "c"]], evset_2),
+            ],
+            return_fig=True,
+        )
+        plot.savefig("/tmp/fig.png")
 
 
 if __name__ == "__main__":

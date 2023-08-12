@@ -16,13 +16,13 @@ from temporian.implementation.numpy.data.plotter import (
     is_uniform,
     get_num_plots,
     auto_style,
+    Groups,
 )
 
 
 def plot_bokeh(
-    evsets: List[EventSet],
+    groups: Groups,
     indexes: List[IndexType],
-    features: Set[str],
     options: Options,
 ):
     from bokeh.io import output_notebook, show
@@ -30,7 +30,7 @@ def plot_bokeh(
     from bokeh.models import CustomJS
     from bokeh.palettes import Dark2_5 as colors
 
-    num_plots = get_num_plots(evsets, indexes, features, options)
+    num_plots = get_num_plots(groups, indexes, options)
 
     figs = []
 

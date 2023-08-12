@@ -74,7 +74,9 @@ IndexType = Tuple[IndexItemType, ...]
 def normalize_index_item(x: IndexItemType) -> IndexItemType:
     if isinstance(x, str):
         return x.encode()
-    return x
+    elif isinstance(x, (int, str, bytes)):
+        return x
+    raise ValueError(f"Non supported index item {x}")
 
 
 def normalize_index_key(
