@@ -1,145 +1,106 @@
 """Matplotlib plotting backend."""
 
-import datetime
-from typing import Optional, List, Set
+from typing import Optional
 
+import matplotlib.pyplot as plt
+from matplotlib.cm import get_cmap
+import matplotlib.ticker as ticker
 import numpy as np
+
 
 from temporian.core.data.duration_utils import (
     convert_timestamp_to_datetime,
-    convert_timestamps_to_datetimes,
 )
-from temporian.implementation.numpy.data.event_set import EventSet, IndexType
-from temporian.implementation.numpy.data.plotter import (
+from temporian.implementation.numpy.data.plotter_base import (
     Options,
     Style,
-    is_uniform,
-    get_num_plots,
-    auto_style,
-    Groups,
+    PlotterBackend,
 )
 
 
-def plot_matplotlib(
-    groups: Groups,
-    indexes: List[IndexType],
-    options: Options,
-):
-    import matplotlib.pyplot as plt
-    from matplotlib.cm import get_cmap
+class Plotter(PlotterBackend):
+    def __init__(self, num_plots: int, options: Options):
+        super().__init__(num_plots, options)
 
-    colors = get_cmap("tab10").colors
+        self.colors = get_cmap("tab10").colors
+        px = 1 / plt.rcParams["figure.dpi"]
 
-    px = 1 / plt.rcParams["figure.dpi"]
+        self.fig, self.axs = plt.subplots(
+            num_plots,
+            figsize=(
+                options.width_px * px,
+                options.height_per_plot_px * num_plots * px,
+            ),
+            squeeze=False,
+            sharex=True,
+        )
 
-    num_plots = get_num_plots(groups, indexes, options)
+        self.fig_idx = 0
+        self.options = options
 
-    fig, axs = plt.subplots(
-        num_plots,
-        figsize=(
-            options.width_px * px,
-            options.height_per_plot_px * num_plots * px,
-        ),
-        squeeze=False,
-        sharex=True,
-    )
+    def ax(self):
+        return self.axs[self.fig_idx, 0]
 
-    index_names = groups[0].items[0].evtset.schema.index_names()
+    def new_subplot(
+        self,
+        title: Optional[str],
+        num_items: int,
+        is_unix_timestamp: bool,
+    ):
+        self.cur_num_items = num_items
+        self.cur_is_unix_timestamp = is_unix_timestamp
 
-    # Actual plotting
-    plot_idx = 0
-    for index in indexes:
-        assert len(index_names) == len(index)
-        if plot_idx >= num_plots:
-            # Too many plots are displayed already.
-            break
+        if title is not None:
+            self.ax().set_title(title, fontsize=8)
 
-        title = " ".join([f"{k}={v}" for k, v in zip(index_names, index)])
+    def finalize_subplot(
+        self,
+    ):
+        if self.cur_num_items > 1:
+            self.ax().legend(fontsize=8)
+        self.fig_idx += 1
 
-        # Index of the next color to use in the plot.
-        color_idx = 0
+    def plot_feature(
+        self,
+        xs: np.ndarray,
+        ys: np.ndarray,
+        name: Optional[str],
+        style: Style,
+        color_idx: int,
+    ):
+        _matplotlib_sub_plot(
+            ax=self.ax(),
+            xs=xs,
+            ys=ys,
+            options=self.options,
+            color=self.colors[color_idx % len(self.colors)],
+            name=name if self.cur_num_items == 1 else None,
+            legend=name if self.cur_num_items != 1 else None,
+            is_unix_timestamp=self.cur_is_unix_timestamp,
+            style=style,
+        )
 
-        for group in groups:
-            if plot_idx >= num_plots:
-                break
-            group_has_one_item = len(group.items) == 1
+    def plot_sampling(
+        self,
+        xs: np.ndarray,
+        color_idx: int,
+    ):
+        name = "[sampling]"
+        _matplotlib_sub_plot(
+            ax=self.ax(),
+            xs=xs,
+            ys=np.zeros(len(xs)),
+            options=self.options,
+            color=self.colors[color_idx % len(self.colors)],
+            name=name if self.cur_num_items == 1 else None,
+            legend=name if self.cur_num_items != 1 else None,
+            is_unix_timestamp=self.cur_is_unix_timestamp,
+            style=Style.vline,
+        )
 
-            for group_item in group.items:
-                xs = group_item.evtset.data[index].timestamps
-                uniform = is_uniform(xs)
-
-                plot_mask = np.full(len(xs), True)
-                if options.min_time is not None:
-                    plot_mask = plot_mask & (xs >= options.min_time)
-                if options.max_time is not None:
-                    plot_mask = plot_mask & (xs <= options.max_time)
-                if (
-                    options.max_points is not None
-                    and len(xs) > options.max_points
-                ):
-                    # Too many timestamps. Only keep the fist ones.
-                    plot_mask = plot_mask & (
-                        np.cumsum(plot_mask) <= options.max_points
-                    )
-
-                xs = xs[plot_mask]
-
-                if group_item.evtset.schema.is_unix_timestamp:
-                    # Matplotlib understands datetimes.
-                    xs = convert_timestamps_to_datetimes(xs)
-
-                if group_item.feature_idx == -1:
-                    # Plot the timestamps.
-                    _matplotlib_sub_plot(
-                        ax=axs[plot_idx, 0],
-                        xs=xs,
-                        ys=np.zeros(len(xs)),
-                        options=options,
-                        color=colors[color_idx % len(colors)],
-                        name="[sampling]",
-                        is_unix_timestamp=group_item.evtset.schema.is_unix_timestamp,
-                        title=title,
-                        style=Style.vline,
-                    )
-                else:
-                    feature_name = group_item.evtset.schema.features[
-                        group_item.feature_idx
-                    ].name
-
-                    ys = group_item.evtset.data[index].features[
-                        group_item.feature_idx
-                    ]
-                    ys = ys[plot_mask]
-                    if options.style == Style.auto:
-                        effective_stype = auto_style(uniform, xs, ys)
-                    else:
-                        effective_stype = options.style
-
-                    _matplotlib_sub_plot(
-                        ax=axs[plot_idx, 0],
-                        xs=xs,
-                        ys=ys,
-                        options=options,
-                        color=colors[color_idx % len(colors)],
-                        name=feature_name if group_has_one_item else None,
-                        legend=feature_name if not group_has_one_item else None,
-                        is_unix_timestamp=group_item.evtset.schema.is_unix_timestamp,
-                        title=title,
-                        style=effective_stype,
-                    )
-
-                # Only print the index / title once
-                title = None
-
-                color_idx += 1
-
-            if not group_has_one_item:
-                axs[plot_idx, 0].legend(fontsize=8)
-
-            plot_idx += 1
-
-    fig.tight_layout()
-    return fig
+    def finalize(self):
+        self.fig.tight_layout()
+        return self.fig
 
 
 def _matplotlib_sub_plot(
@@ -150,14 +111,11 @@ def _matplotlib_sub_plot(
     color,
     name: Optional[str],
     is_unix_timestamp: bool,
-    title: Optional[str],
     style: Style,
     legend: Optional[str] = None,
     **wargs,
 ):
     """Plots "(xs, ys)" on the axis "ax"."""
-
-    import matplotlib.ticker as ticker
 
     if style == Style.line:
         mat_style = {}  # Default
@@ -199,5 +157,3 @@ def _matplotlib_sub_plot(
     ax.yaxis.set_minor_locator(ticker.NullLocator())
 
     ax.grid(lw=0.4, ls="--", axis="x")
-    if title:
-        ax.set_title(title, fontsize=8)

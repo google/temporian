@@ -14,13 +14,15 @@
 
 """Plotting utility."""
 
+from typing import Optional, Union, List, Set, Tuple, Dict, Callable, Type
+
 from dataclasses import dataclass
-
-from typing import NamedTuple, Optional, Union, List, Any, Set, Tuple
-from enum import Enum
-
 import numpy as np
 
+from temporian.core.data.duration_utils import (
+    convert_timestamps_to_datetimes,
+)
+from temporian.implementation.numpy.data.plotter_base import Options, Style
 from temporian.core.data import duration_utils
 from temporian.implementation.numpy.data.event_set import (
     EventSet,
@@ -28,8 +30,13 @@ from temporian.implementation.numpy.data.event_set import (
     IndexItemType,
     IndexType,
 )
+from temporian.implementation.numpy.data.plotter_base import (
+    Options,
+    Style,
+    PlotterBackend,
+)
 
-# How to input event sets in the plotter.
+# "evtset" argument in tp.plot.
 InputEventSet = Union[
     EventSet,
     List[EventSet],
@@ -37,7 +44,7 @@ InputEventSet = Union[
     List[Tuple[EventSet, ...]],
 ]
 
-# How to input indexes in the plotter.
+# "indexes" argument in tp.plot.
 InputIndex = Optional[
     Union[
         IndexItemType,
@@ -47,6 +54,7 @@ InputIndex = Optional[
     ]
 ]
 
+# "features" argument in tp.plot.
 InputFeatures = Optional[
     Union[
         str,
@@ -56,37 +64,12 @@ InputFeatures = Optional[
 ]
 
 
-class Style(Enum):
-    """Plotting style."""
-
-    # Determine the style according to the data.
-    auto = "auto"
-    # Connect numerical values with a line.
-    line = "line"
-    # A discreet marker showing a feature value.
-    marker = "marker"
-    # A discreet marker not showing a feature value.
-    vline = "vline"
-
-
-class Options(NamedTuple):
-    """Options for plotting."""
-
-    backend: Optional[str]
-    height_per_plot_px: int
-    width_px: int
-    max_points: Optional[int]
-    min_time: Optional[duration_utils.Timestamp]
-    max_time: Optional[duration_utils.Timestamp]
-    max_num_plots: int
-    style: Style
-    interactive: bool
-
-
 @dataclass
 class GroupItem:
     evtset: EventSet
-    feature_idx: int  # Index of the feature. If -1, plots the timestamp.
+
+    # Index of the feature in "evtset". If -1, plots the timestamp.
+    feature_idx: int
 
 
 @dataclass
@@ -99,9 +82,38 @@ class Group:
 Groups = List[Group]
 
 
+def matplotlib_backend():
+    from temporian.implementation.numpy.data import plotter_matplotlib
+
+    return plotter_matplotlib.Plotter
+
+
+def bokeh_backend():
+    from temporian.implementation.numpy.data import plotter_bokeh
+
+    return plotter_bokeh.Plotter
+
+
+BACKENDS: Dict[str, Callable] = {
+    "matplotlib": matplotlib_backend,
+    "bokeh": bokeh_backend,
+}
+
+
+def error_message_import_backend(backend: str) -> str:
+    return (
+        f"Cannot plot with selected backend={backend}. Solutions: (1) Install"
+        f" {backend} e.g. 'pip install {backend}', or (2) use a different"
+        " plotting backen, for example with 'plot(..., backend=\"<other"
+        f' backend>"). The supported backends are: {list(BACKENDS.keys())}.'
+    )
+
+
 def build_groups(
     evsets: InputEventSet, features: Optional[Set[str]], allow_list: bool = True
 ) -> Groups:
+    """Sort user inputs into groups of features to plot together."""
+
     if isinstance(evsets, EventSet):
         # Plot each feature individually
         groups = []
@@ -142,6 +154,8 @@ def build_groups(
 
 
 def normalize_features(features: InputFeatures) -> Optional[Set[str]]:
+    """Normalizes the "features" argument of plot."""
+
     if features is None:
         return None
     if isinstance(features, str):
@@ -154,6 +168,8 @@ def normalize_features(features: InputFeatures) -> Optional[Set[str]]:
 
 
 def normalize_indexes(indexes: InputIndex, groups: Groups) -> List[IndexType]:
+    """Normalizes the "indexes" argument of plot."""
+
     if indexes is None:
         # All the available index
         normalized_indexes = list(
@@ -180,6 +196,8 @@ def normalize_indexes(indexes: InputIndex, groups: Groups) -> List[IndexType]:
 
 
 def validate_indexes(indexes: List[IndexType], groups: Groups):
+    """Ensures that indexes are valid i.e. available in all event-sets."""
+
     for g in groups:
         for item in g.items:
             for index in indexes:
@@ -205,32 +223,37 @@ def plot(
     interactive: bool = False,
     backend: Optional[str] = None,
 ):
-    """Plots [`EventSets`][temporian.EventSet].
+    """Plots one or several [`EventSets`][temporian.EventSet].
 
-    Plots one or several event sets. If multiple eventsets are provided, they
-    should all have the same index. If plotting an eventset without features,
-    the timestamps are plotted with vertical bars. The time axis (i.e.,
-    horizontal axis) is shared among all the plots.
 
-    This method can also be called from
-    [`EventSet.plot()`][temporian.EventSet.plot] with the same args (except
-    `evsets`).
+    If multiple eventsets are provided, they should all have the same index.
+    The time axis (i.e., horizontal axis) is shared among all the plots.
+    Different features can be plotted independently or on the same plots.
+    Plotting an eventset without features plots timestamps instead.
+
+    When plotting a single eventset, this function is equivalent to
+    [`EventSet.plot()`][temporian.EventSet.plot].
 
     Examples:
         ```python
         >>> evset = tp.event_set(timestamps=[1, 2, 4],
         ...     features={"f1": [0, 42, 10], "f2": [10, -10, 20]})
 
-        # Default
+        # Plot each feature individually
         >>> tp.plot(evset)
 
-        # Lines instead of markers, only f2, limit x-axis to t=2
-        >>> tp.plot(evset, style="line", features="f2", max_time=2)
+        # Plots multiple features in the same sub-plot.
+        >>> tp.plot((evset,), interactive=True)
 
-        # Access figure and axes
+        # Make the plot interractive
+        >>> tp.plot(evset, interactive=True)
+
+        # Save figure to file
         >>> fig = tp.plot(evset, return_fig=True)
-        >>> fig.tight_layout(pad=3.0)
-        >>> _ = fig.axes[0].set_ylim([-50, 50])
+        >>> fig.savefig("/tmp/fig.png")
+
+        # Change drawing style
+        >>> tp.plot(evset, style="line")
 
         ```
 
@@ -304,16 +327,113 @@ def plot(
         )
 
     try:
-        fig = BACKENDS[backend](
+        plotter_class = BACKENDS[backend]()
+        fig = plot_with_plotter(
+            plotter_class=plotter_class,
             groups=groups,
             indexes=normalized_indexes,
             options=options,
         )
+
     except ImportError:
         print(error_message_import_backend(backend))
         raise
 
     return fig if return_fig else None
+
+
+def plot_with_plotter(
+    plotter_class: Type[PlotterBackend],
+    groups: Groups,
+    indexes: List[IndexType],
+    options: Options,
+):
+    num_plots = get_num_plots(groups, indexes, options)
+    plotter: PlotterBackend = plotter_class(num_plots, options)
+
+    index_names = groups[0].items[0].evtset.schema.index_names()
+
+    plot_idx = 0
+    for index in indexes:
+        assert len(index_names) == len(index)
+        if plot_idx >= num_plots:
+            # Too many plots are displayed already.
+            break
+
+        title = " ".join([f"{k}={v}" for k, v in zip(index_names, index)])
+
+        # Index of the next color to use in the plot.
+        color_idx = 0
+
+        for group in groups:
+            if plot_idx >= num_plots:
+                break
+
+            plotter.new_subplot(
+                title=title,
+                num_items=len(group.items),
+                is_unix_timestamp=group.items[
+                    0
+                ].evtset.schema.is_unix_timestamp,
+            )
+
+            # Only print the index / title once
+            title = None
+
+            for group_item in group.items:
+                xs = group_item.evtset.data[index].timestamps
+                uniform = is_uniform(xs)
+
+                plot_mask = np.full(len(xs), True)
+                if options.min_time is not None:
+                    plot_mask = plot_mask & (xs >= options.min_time)
+                if options.max_time is not None:
+                    plot_mask = plot_mask & (xs <= options.max_time)
+                if (
+                    options.max_points is not None
+                    and len(xs) > options.max_points
+                ):
+                    # Too many timestamps. Only keep the fist ones.
+                    plot_mask = plot_mask & (
+                        np.cumsum(plot_mask) <= options.max_points
+                    )
+
+                xs = xs[plot_mask]
+
+                if group_item.evtset.schema.is_unix_timestamp:
+                    xs = convert_timestamps_to_datetimes(xs)
+
+                if group_item.feature_idx == -1:
+                    # Plot the timestamps.
+                    plotter.plot_sampling(xs=xs, color_idx=color_idx)
+                else:
+                    feature_name = group_item.evtset.schema.features[
+                        group_item.feature_idx
+                    ].name
+
+                    ys = group_item.evtset.data[index].features[
+                        group_item.feature_idx
+                    ]
+                    ys = ys[plot_mask]
+                    if options.style == Style.auto:
+                        effective_stype = auto_style(uniform, xs, ys)
+                    else:
+                        effective_stype = options.style
+
+                    plotter.plot_feature(
+                        xs=xs,
+                        ys=ys,
+                        name=feature_name,
+                        style=effective_stype,
+                        color_idx=color_idx,
+                    )
+                color_idx += 1
+
+            plotter.finalize_subplot()
+
+            plot_idx += 1
+
+    return plotter.finalize()
 
 
 def get_num_plots(
@@ -362,20 +482,3 @@ def is_uniform(xs) -> bool:
     if len(diff) == 0:
         return True
     return np.allclose(diff, diff[0])
-
-
-from temporian.implementation.numpy.data.plotter_bokeh import plot_bokeh
-from temporian.implementation.numpy.data.plotter_matplotlib import (
-    plot_matplotlib,
-)
-
-BACKENDS = {"matplotlib": plot_matplotlib, "bokeh": plot_bokeh}
-
-
-def error_message_import_backend(backend: str) -> str:
-    return (
-        f"Cannot plot with selected backend={backend}. Solutions: (1) Install"
-        f" {backend} e.g. 'pip install {backend}', or (2) use a different"
-        " plotting backen, for example with 'plot(..., backend=\"<other"
-        f' backend>"). The supported backends are: {list(BACKENDS.keys())}.'
-    )

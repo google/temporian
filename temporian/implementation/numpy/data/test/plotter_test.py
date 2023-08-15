@@ -1,6 +1,7 @@
 from absl.testing import parameterized, absltest
 
 import matplotlib
+from bokeh.io import export_png as bokeh_export_png
 import numpy as np
 
 from temporian.implementation.numpy.data import plotter
@@ -77,7 +78,8 @@ class PlotterTest(parameterized.TestCase):
         self.assertTrue(plotter.is_uniform([1, 2, 3]))
         self.assertFalse(plotter.is_uniform([1, 2, 2.5]))
 
-    def test_merged_plots(self):
+    @parameterized.parameters((True,), (False,))
+    def test_merged_plots(self, interactive):
         x1 = np.arange(200)
         evset_1 = event_set(
             timestamps=x1,
@@ -91,23 +93,27 @@ class PlotterTest(parameterized.TestCase):
         x2 = np.arange(200, 300)
         evset_2 = event_set(timestamps=x2, features={"d": np.sin(x2 / 8)})
 
+        x3 = np.arange(200, 300, 10)
+        evset_3 = event_set(
+            timestamps=x3,
+            features={"d": [f"f{x % 40}" for x in x3]},
+        )
+
         plot = plotter.plot(
             [
                 evset_1["a"],
                 (evset_1["a"],),
+                evset_3,
                 evset_1[[]],
                 (evset_1[["b", "c"]], evset_2),
             ],
             return_fig=True,
-            interactive=True,
+            interactive=interactive,
         )
-        # plot.savefig("/tmp/fig.png")
-
-        # plot.show()
-
-        # from bokeh.io import export_svg
-
-        # export_png(plot, filename="/tmp/fig.png")
+        if interactive:
+            bokeh_export_png(plot, filename="fig.png")
+        else:
+            plot.savefig("fig.png")
 
 
 if __name__ == "__main__":
