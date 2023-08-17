@@ -27,7 +27,7 @@ from temporian.proto import core_pb2 as pb
 from temporian.utils.rtcheck import rtcheck
 
 # Maximum number of arguments taken by the glue operator
-MAX_NUM_ARGUMENTS = 30
+MAX_NUM_ARGUMENTS = 100
 
 
 class GlueOperator(Operator):
