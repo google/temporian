@@ -345,8 +345,8 @@ py_library(
 )
 
 py_library(
-    name = "fft",
-    srcs = ["fft.py"],
+    name = "fast_fourier_transform",
+    srcs = ["fast_fourier_transform.py"],
     srcs_version = "PY3",
     deps = [
         ":base",

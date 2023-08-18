@@ -1093,9 +1093,11 @@ class EventSetOperations:
 
         return enumerate(self)
 
-    def fft(
+    def fast_fourier_transform(
         self: EventSetOrNode,
+        *,
         num_events: int,
+        hop_size: Optional[int] = None,
         window: Optional[str] = None,
         num_spectral_lines: Optional[int] = None,
     ) -> EventSetOrNode:
@@ -1103,7 +1105,9 @@ class EventSetOperations:
         [`EventSet`][temporian.EventSet] with a single tp.float32 feature.
 
         The window length is defined in number of events, instead of
-        timestamp duration like most other operators.
+        timestamp duration like most other operators. The 'num_events' argument
+        needs to be specified by warg i.e. fast_fourier_transform(num_events=5)
+        instead of fast_fourier_transform(5).
 
         The operator returns the amplitude of each spectral line as
         separate tp.float32 features named "a0", "a1", "a2", etc. By default,
@@ -1115,7 +1119,7 @@ class EventSetOperations:
             ...    timestamps=[1,2,3,4,5,6],
             ...    features={"x": [4.,3.,2.,6.,2.,1.]},
             ... )
-            >>> b = a.fft(num_events=4, window="hamming")
+            >>> b = a.fast_fourier_transform(num_events=4, window="hamming")
             >>> b
 
             ```
@@ -1124,6 +1128,8 @@ class EventSetOperations:
             num_events: Size of the FFT expressed as a number of events.
             window: Optional window function applied before the FFT. if None, no
                 window is applied. Supported values are: "hamming".
+            hop_size: Step, in number of events, between consecutive outputs.
+                Default to num_events//2.
             num_spectral_lines: Number of returned spectral lines. If set, the
                 operators returns the `num_spectral_lines` low frequency
                 spectral lines. `num_spectral_lines` should be between 1 and
@@ -1133,11 +1139,14 @@ class EventSetOperations:
             EventSet containing the amplitude of each frequency band of the
             Fourier Transform.
         """
-        from temporian.core.operators.fft import fft
+        from temporian.core.operators.fast_fourier_transform import (
+            fast_fourier_transform,
+        )
 
-        return fft(
+        return fast_fourier_transform(
             self,
             num_events=num_events,
+            hop_size=hop_size,
             window=window,
             num_spectral_lines=num_spectral_lines,
         )

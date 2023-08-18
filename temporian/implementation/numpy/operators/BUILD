@@ -18,7 +18,7 @@ py_library(
         ":drop_index",
         ":end",
         ":enumerate",
-        ":fft",
+        ":fast_fourier_transform",
         ":filter",
         ":glue",
         ":join",
@@ -355,13 +355,13 @@ py_library(
 )
 
 py_library(
-    name = "fft",
-    srcs = ["fft.py"],
+    name = "fast_fourier_transform",
+    srcs = ["fast_fourier_transform.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/numpy
         ":base",
-        "//temporian/core/operators:fft",
+        "//temporian/core/operators:fast_fourier_transform",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",

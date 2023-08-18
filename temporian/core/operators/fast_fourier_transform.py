@@ -32,11 +32,12 @@ from temporian.core.data.dtype import DType
 _WINDOWS = {"hamming"}
 
 
-class FFT(Operator):
+class FastFourierTransform(Operator):
     def __init__(
         self,
         input: EventSetNode,
         num_events: int,
+        hop_size: int,
         window: Optional[str] = None,
         num_spectral_lines: Optional[int] = None,
     ):
@@ -46,8 +47,11 @@ class FFT(Operator):
         self._num_events = num_events
         self._window = window
         self._num_spectral_lines = num_spectral_lines
+        self._hop_size = hop_size
 
         self.add_attribute("num_events", num_events)
+        self.add_attribute("hop_size", hop_size)
+
         if window is not None:
             self.add_attribute("window", window)
         if num_spectral_lines is not None:
@@ -64,9 +68,9 @@ class FFT(Operator):
                 "FFT input needs to be a single feature. Got"
                 f" {len(input.features)} features instead."
             )
-        if input.features[0].dtype != DType.FLOAT32:
+        if input.features[0].dtype not in [DType.FLOAT32, DType.FLOAT64]:
             raise ValueError(
-                "FFT input feature should be tp.float32. Got"
+                "FFT input feature should be tp.float32 or tp.float64. Got"
                 f" {input.features[0].dtype} instead."
             )
         if window is not None and window not in _WINDOWS:
@@ -90,7 +94,7 @@ class FFT(Operator):
             "output",
             create_node_new_features_new_sampling(
                 features=[
-                    (f"a{i}", DType.FLOAT32)
+                    (f"a{i}", input.schema.features[0].dtype)
                     for i in range(self.num_output_features)
                 ],
                 indexes=input.schema.indexes,
@@ -120,6 +124,10 @@ class FFT(Operator):
     def window(self) -> Optional[str]:
         return self._window
 
+    @property
+    def hop_size(self) -> int:
+        return self._hop_size
+
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
@@ -127,6 +135,10 @@ class FFT(Operator):
             attributes=[
                 pb.OperatorDef.Attribute(
                     key="num_events",
+                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="hop_size",
                     type=pb.OperatorDef.Attribute.Type.INTEGER_64,
                 ),
                 pb.OperatorDef.Attribute(
@@ -145,15 +157,24 @@ class FFT(Operator):
         )
 
 
-operator_lib.register_operator(FFT)
+operator_lib.register_operator(FastFourierTransform)
 
 
-@rtcheck
 @compile
-def fft(
+def fast_fourier_transform(
     input: EventSetOrNode,
+    *,
     num_events: int,
+    hop_size: Optional[int] = None,
     window: Optional[str] = None,
     num_spectral_lines: Optional[int] = None,
 ) -> EventSetOrNode:
-    return FFT(input=input, num_events=num_events, window=window, num_spectral_lines=num_spectral_lines).outputs["output"]  # type: ignore
+    return FastFourierTransform(
+        input=input,
+        num_events=num_events,
+        hop_size=hop_size if hop_size is not None else num_events // 2,
+        window=window,
+        num_spectral_lines=num_spectral_lines,
+    ).outputs[
+        "output"
+    ]  # type: ignore

@@ -37,6 +37,6 @@ py_test(
         # already_there/absl/testing:absltest
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
-        "//temporian/core/operators:fft",
+        "//temporian/core/operators:fast_fourier_transform",
     ],
 )

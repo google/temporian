@@ -20,18 +20,18 @@ from typing import Dict
 import numpy as np
 
 from temporian.implementation.numpy.data.event_set import IndexData, EventSet
-from temporian.core.operators.fft import FFT
+from temporian.core.operators.fast_fourier_transform import FastFourierTransform
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
-class FFTNumpyImplementation(OperatorImplementation):
-    def __init__(self, operator: FFT) -> None:
-        assert isinstance(operator, FFT)
+class FastFourierTransformNumpyImplementation(OperatorImplementation):
+    def __init__(self, operator: FastFourierTransform) -> None:
+        assert isinstance(operator, FastFourierTransform)
         super().__init__(operator)
 
     def __call__(self, input: EventSet) -> Dict[str, EventSet]:
-        assert isinstance(self.operator, FFT)
+        assert isinstance(self.operator, FastFourierTransform)
 
         output_schema = self.output_schema("output")
 
@@ -41,6 +41,7 @@ class FFTNumpyImplementation(OperatorImplementation):
         num_events = self.operator.num_events
         num_output_features = self.operator.num_output_features
         num_spectral_lines = self.operator.num_spectral_lines
+        hop_size = self.operator.hop_size
 
         if num_spectral_lines is None:
             num_spectral_lines = num_output_features
@@ -62,14 +63,14 @@ class FFTNumpyImplementation(OperatorImplementation):
             # TODO: Implement in c++.
 
             dst_values = []
-            for evt_idx in range(num_events - 1, len(src_values)):
+            for evt_idx in range(num_events - 1, len(src_values), hop_size):
                 start_idx = evt_idx - num_events + 1
                 end_idx = evt_idx + 1
                 selected_src_values = src_values[start_idx:end_idx]
                 if window is not None:
                     selected_src_values = selected_src_values * window
                 fft_res = np.fft.fft(selected_src_values)[:num_spectral_lines]
-                ft_ampl = np.abs(fft_res).astype(np.float32)
+                ft_ampl = np.abs(fft_res).astype(src_values.dtype)
                 dst_values.append(ft_ampl)
             dst_values = np.stack(dst_values, axis=1)
 
@@ -85,4 +86,6 @@ class FFTNumpyImplementation(OperatorImplementation):
         return {"output": output_evset}
 
 
-implementation_lib.register_operator_implementation(FFT, FFTNumpyImplementation)
+implementation_lib.register_operator_implementation(
+    FastFourierTransform, FastFourierTransformNumpyImplementation
+)

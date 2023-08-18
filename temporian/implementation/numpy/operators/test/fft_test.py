@@ -16,10 +16,10 @@
 from absl.testing import parameterized, absltest
 
 import numpy as np
-from temporian.core.operators.fft import FFT
+from temporian.core.operators.fast_fourier_transform import FastFourierTransform
 from temporian.implementation.numpy.data.io import event_set
-from temporian.implementation.numpy.operators.fft import (
-    FFTNumpyImplementation,
+from temporian.implementation.numpy.operators.fast_fourier_transform import (
+    FastFourierTransformNumpyImplementation,
 )
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
@@ -27,7 +27,7 @@ from temporian.implementation.numpy.operators.test.test_util import (
 )
 
 
-class FFTOperatorTest(parameterized.TestCase):
+class FastFourierTransformOperatorTest(parameterized.TestCase):
     def setUp(self):
         pass
 
@@ -67,13 +67,14 @@ class FFTOperatorTest(parameterized.TestCase):
         )
 
         # Run op
-        op = FFT(
+        op = FastFourierTransform(
             input=node,
             num_events=4,
+            hop_size=1,
             window=window,
             num_spectral_lines=num_spectral_lines,
         )
-        instance = FFTNumpyImplementation(op)
+        instance = FastFourierTransformNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
         output = instance.call(input=evset)["output"]
 

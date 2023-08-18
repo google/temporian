@@ -736,7 +736,7 @@ py_test(
         "//temporian/implementation/numpy/operators:combine",
     ],
 )
-    
+
 py_test(
     name = "fft_test",
     srcs = ["fft_test.py"],
@@ -748,8 +748,7 @@ py_test(
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/implementation/numpy/data:io",
-        "//temporian/core/operators:fft",
-        "//temporian/implementation/numpy/operators:fft",
+        "//temporian/core/operators:fast_fourier_transform",
+        "//temporian/implementation/numpy/operators:fast_fourier_transform",
     ],
 )
-    
