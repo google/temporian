@@ -17,12 +17,12 @@ py_test(
 )
 
 py_test(
-    name = "rtcheck_test",
-    srcs = ["rtcheck_test.py"],
+    name = "typecheck_test",
+    srcs = ["typecheck_test.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
-        "//temporian/utils:rtcheck",
+        "//temporian/utils:typecheck",
         "//temporian/core:compilation",
         "//temporian/implementation/numpy/data:io",
     ],

@@ -26,7 +26,7 @@ from temporian.core.data.node import (
 from temporian.core.operators.base import Operator
 from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
-from temporian.utils.rtcheck import rtcheck
+from temporian.utils.typecheck import typecheck
 
 MAX_NUM_ARGUMENTS = 30
 
@@ -121,7 +121,7 @@ class Combine(Operator):
 operator_lib.register_operator(Combine)
 
 
-@rtcheck
+@typecheck
 @compile
 def combine(
     *inputs: EventSetOrNode,
@@ -245,7 +245,7 @@ def combine(
         raise ValueError(f"Invalid argument: {how=}. Options are {list(How)}")
     how = How[how]
 
-    if len(inputs) == 1:
+    if len(inputs) == 1 and isinstance(inputs[0], EventSetNode):
         return inputs[0]
 
     # NOTE: input name must match op. definition name

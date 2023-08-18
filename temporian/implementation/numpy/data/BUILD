@@ -35,7 +35,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         # already_there/numpy
-        "//temporian/utils:rtcheck",
+        "//temporian/utils:typecheck",
         ":event_set",
         "//temporian/core:evaluation",
         "//temporian/core/data:schema",

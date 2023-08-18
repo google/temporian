@@ -60,40 +60,38 @@ def _check_value_to_schema(
 
         if value.schema != node.schema:
             raise RuntimeError(
-                "Unexpected EventSet set schema.\n"
-                f"actual schema =\n{value.schema}\n"
-                f"expected schema =\n{node.schema}"
+                "Unexpected EventSet schema.\n"
+                f"Actual schema:\n{value.schema}\n"
+                f"Expected schema:\n{node.schema}"
             )
 
-        index_key = value.get_arbitrary_index_key()
-        if index_key is not None:
-            index_data = value.data[index_key]
-
+        index_data = value.get_arbitrary_index_data()
+        if index_data is not None:
             if len(index_data.features) != len(value.schema.features):
                 raise RuntimeError(
                     "Invalid internal number of input features for argument"
-                    f" {label!r}.\nexpected ="
-                    f" {len(value.schema.features)}\neffective ="
-                    f" {len(index_data.features)}.\n\nSchema:\n{value.schema}"
+                    f" {label!r}.\nExpected {len(value.schema.features)}, but"
+                    f" got {len(index_data.features)}.\nSchema:\n{value.schema}"
                 )
 
             for feature_value, feature_schema in zip(
                 index_data.features, value.schema.features
             ):
-                expecterd_tdtype = numpy_array_to_tp_dtype(
+                expected_dtype = numpy_array_to_tp_dtype(
                     feature_schema.name, feature_value
                 )
-                if feature_schema.dtype != expecterd_tdtype:
+                if feature_schema.dtype != expected_dtype:
                     raise RuntimeError(
-                        f"Non matching {label} feature dtype. "
-                        f"expected={expecterd_tdtype} vs "
-                        f"effective={feature_schema.dtype}"
+                        f"Feature dtypes in {label} don't match the expected"
+                        f" ones. Expected dtype {expected_dtype} for feature"
+                        f" {feature_schema.name}, but got"
+                        f" {feature_schema.dtype} instead."
                     )
 
                 if len(index_data.timestamps) != len(feature_value):
                     raise RuntimeError(
-                        "Number of timstamps does not match number of feature"
-                        " values"
+                        "Number of timestamps does not match the number of"
+                        f" values in feature {feature_schema.name}."
                     )
 
 
