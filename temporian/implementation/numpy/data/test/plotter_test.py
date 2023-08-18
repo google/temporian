@@ -80,7 +80,7 @@ class PlotterTest(parameterized.TestCase):
 
     @parameterized.parameters((True,), (False,))
     def test_merged_plots(self, interactive):
-        x1 = np.arange(200)
+        x1 = np.arange(100)
         evset_1 = event_set(
             timestamps=x1,
             features={
@@ -90,10 +90,10 @@ class PlotterTest(parameterized.TestCase):
             },
         )
 
-        x2 = np.arange(200, 300)
+        x2 = np.arange(100, 200)
         evset_2 = event_set(timestamps=x2, features={"d": np.sin(x2 / 8)})
 
-        x3 = np.arange(200, 300, 10)
+        x3 = np.arange(100, 200, 10)
         evset_3 = event_set(
             timestamps=x3,
             features={"d": [f"f{x % 40}" for x in x3]},
@@ -114,6 +114,68 @@ class PlotterTest(parameterized.TestCase):
             bokeh_export_png(plot, filename="fig.png")
         else:
             plot.savefig("fig.png")
+
+    def test_merged_plots_simple(self):
+        evset_1 = event_set(
+            timestamps=[0.1, 0.2, 0.3],
+            features={"a": [1, 2, 3], "b": [4, 5, 6]},
+        )
+
+        evset_2 = event_set(
+            timestamps=[0.4, 0.5],
+            features={"c": [7, 8]},
+        )
+
+        plotter.plot(evset_1, merge=True)
+        plotter.plot([evset_1, evset_2], merge=True)
+
+        with self.assertRaisesRegex(
+            ValueError, "should be an EventSet or a list"
+        ):
+            plotter.plot((evset_1, evset_2), merge=True)
+
+    def test_build_groups(self):
+        evset_1 = event_set(
+            timestamps=[0.1, 0.2, 0.3],
+            features={"a": [1, 2, 3], "b": [4, 5, 6]},
+        )
+
+        evset_2 = event_set(
+            timestamps=[0.4, 0.5],
+            features={"c": [7, 8]},
+        )
+
+        Group = plotter.Group
+        GroupItem = plotter.GroupItem
+
+        self.assertEqual(
+            plotter.build_groups(evset_1, None),
+            [Group([GroupItem(evset_1, 0)]), Group([GroupItem(evset_1, 1)])],
+        )
+        self.assertEqual(
+            plotter.build_groups(evset_1[[]], None),
+            [Group([GroupItem(evset_1[[]], -1)])],
+        )
+        self.assertEqual(
+            plotter.build_groups([evset_1, evset_2], None),
+            [
+                Group([GroupItem(evset_1, 0)]),
+                Group([GroupItem(evset_1, 1)]),
+                Group([GroupItem(evset_2, 0)]),
+            ],
+        )
+        self.assertEqual(
+            plotter.build_groups((evset_1, evset_2), None),
+            [
+                Group(
+                    [
+                        GroupItem(evset_1, 0),
+                        GroupItem(evset_1, 1),
+                        GroupItem(evset_2, 0),
+                    ]
+                )
+            ],
+        )
 
 
 if __name__ == "__main__":

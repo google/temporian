@@ -110,7 +110,9 @@ def error_message_import_backend(backend: str) -> str:
 
 
 def build_groups(
-    evsets: InputEventSet, features: Optional[Set[str]], allow_list: bool = True
+    evsets: InputEventSet,
+    features: Optional[Set[str]],
+    allow_list: bool = True,
 ) -> Groups:
     """Sort user inputs into groups of features to plot together."""
 
@@ -222,6 +224,7 @@ def plot(
     return_fig: bool = False,
     interactive: bool = False,
     backend: Optional[str] = None,
+    merge: bool = False,
 ):
     """Plots one or several [`EventSets`][temporian.EventSet].
 
@@ -242,8 +245,12 @@ def plot(
         # Plot each feature individually
         >>> tp.plot(evset)
 
-        # Plots multiple features in the same sub-plot.
-        >>> tp.plot((evset,), interactive=True)
+        # Plots multiple features in the same sub-plot (equivalent).
+        >>> tp.plot(evset, merge=True)
+
+        >>> evset_2 = tp.event_set([5, 6])
+        >>> tp.plot([evset, evset_2], merge=True)
+        >>> tp.plot((evset, evset_2))
 
         # Make the plot interractive
         >>> tp.plot(evset, interactive=True)
@@ -258,7 +265,11 @@ def plot(
         ```
 
     Args:
-        evsets: Single or list of EventSets to plot.
+        evsets: EventSet, list of EventSets, tuple of EventSets, or list of
+            tuple of EventSets to plot. If feeding individual EventSets and list
+            of EventSets, individual features are plotted in different
+            sub-plots. If feeding tuple of EventSets, all features are plotted
+            together in a same plot.
         indexes: The index keys or list of indexes keys to plot. If
             indexes=None, plots all the available indexes. Indexes should be
             provided as single value (e.g. string) or tuple of values. Example:
@@ -284,7 +295,21 @@ def plot(
             Ignored if "backend" is set.
         backend: Plotting library to use. Possible values are: matplotlib,
             bokeh. If set, overrides the "interactive" argument.
+        merge: If true, plots all features in the same plots. If false, plots
+            features in separate plots. merge=True on event-sets [e1, e2] is
+            equivalent to plotting (e1, e2).
     """
+
+    if merge:
+        if isinstance(evsets, EventSet):
+            evsets = (evsets,)
+        elif isinstance(evsets, List):
+            evsets = tuple(evsets)
+        else:
+            raise ValueError(
+                "If merge=True, 'evsets' should be an EventSet or a list of"
+                f" EventSets. Got {type(evsets)} instead."
+            )
 
     normalized_features = normalize_features(features)
     groups = build_groups(evsets, normalized_features)
