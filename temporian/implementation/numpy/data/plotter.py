@@ -134,7 +134,7 @@ def build_groups(
         for evset in evsets:
             if not isinstance(evset, EventSet):
                 raise ValueError(
-                    f"Expecting tuple of eventsets. Got {type(evset)} instead."
+                    f"Expecting tuple of EventSets. Got {type(evset)} instead."
                 )
             plot_for_current_evtset = False
             for feature_idx, feature in enumerate(evset.schema.features):
@@ -245,10 +245,11 @@ def plot(
         # Plot each feature individually
         >>> tp.plot(evset)
 
-        # Plots multiple features in the same sub-plot (equivalent).
+        # Plots multiple features in the same sub-plot
         >>> tp.plot(evset, merge=True)
 
         >>> evset_2 = tp.event_set([5, 6])
+        # Equivalent
         >>> tp.plot([evset, evset_2], merge=True)
         >>> tp.plot((evset, evset_2))
 
@@ -265,11 +266,9 @@ def plot(
         ```
 
     Args:
-        evsets: EventSet, list of EventSets, tuple of EventSets, or list of
-            tuple of EventSets to plot. If feeding individual EventSets and list
-            of EventSets, individual features are plotted in different
-            sub-plots. If feeding tuple of EventSets, all features are plotted
-            together in a same plot.
+        evsets: Single or list of EventSets to plot. Also, tuples can be used to
+            group multiple EventSets in the same sub-plot. Otherwise, all
+            EventSets and features are plotted in separate sub-plots.
         indexes: The index keys or list of indexes keys to plot. If
             indexes=None, plots all the available indexes. Indexes should be
             provided as single value (e.g. string) or tuple of values. Example:
