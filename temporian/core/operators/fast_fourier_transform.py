@@ -25,7 +25,6 @@ from temporian.core.data.node import (
 from temporian.core.operators.base import Operator
 from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
-from temporian.utils.rtcheck import rtcheck
 from temporian.core.data.dtype import DType
 
 
