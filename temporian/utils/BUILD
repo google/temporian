@@ -29,7 +29,7 @@ py_library(
 )
 
 py_library(
-    name = "rtcheck",
-    srcs = ["rtcheck.py"],
+    name = "typecheck",
+    srcs = ["typecheck.py"],
     srcs_version = "PY3",
 )

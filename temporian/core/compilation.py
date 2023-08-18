@@ -85,11 +85,11 @@ def compile(fn: Optional[F] = None, *, verbose: int = 0) -> F:
     """
 
     def _compile(fn):
-        if hasattr(fn, "_rtcheck"):
+        if hasattr(fn, "_typecheck"):
             raise ValueError(
-                "Apply @compile before @rtcheck if using both (i.e. if using"
-                " them as decorators, place @compile just below @rtcheck in the"
-                " code)."
+                "Apply @compile before @typecheck if using both (i.e. if using"
+                " them as decorators, place @compile just below @typecheck in"
+                " the code)."
             )
 
         @wraps(fn)

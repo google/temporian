@@ -86,7 +86,7 @@ from temporian.core.compilation import compile
 from temporian.core.typing import EventSetOrNode
 
 # Runtime check
-from temporian.utils.rtcheck import runtime_check_raise_exception
+from temporian.utils.typecheck import runtime_check_raise_exception
 
 # --- OPERATORS ---
 
