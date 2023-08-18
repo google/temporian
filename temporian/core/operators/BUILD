@@ -45,7 +45,7 @@ py_library(
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
-        "//temporian/utils:rtcheck",
+        "//temporian/utils:typecheck",
     ],
 )
 
@@ -356,6 +356,5 @@ py_library(
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
-        "//temporian/utils:rtcheck",
     ],
 )
