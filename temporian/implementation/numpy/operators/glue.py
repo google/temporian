@@ -36,6 +36,7 @@ class GlueNumpyImplementation(OperatorImplementation):
         assert isinstance(self.operator, GlueOperator)
         output_schema = self.output_schema("output")
 
+        # Dictionary order is guaranteed
         evsets = list(inputs.values())
         if len(evsets) < 2:
             raise ValueError(
