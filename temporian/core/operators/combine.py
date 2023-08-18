@@ -245,7 +245,7 @@ def combine(
         raise ValueError(f"Invalid argument: {how=}. Options are {list(How)}")
     how = How[how]
 
-    if len(inputs) == 1:
+    if len(inputs) == 1 and isinstance(inputs[0], EventSetNode):
         return inputs[0]
 
     # NOTE: input name must match op. definition name
