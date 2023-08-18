@@ -248,8 +248,8 @@ def plot(
         # Plots multiple features in the same sub-plot
         >>> tp.plot(evset, merge=True)
 
-        >>> evset_2 = tp.event_set([5, 6])
         # Equivalent
+        >>> evset_2 = tp.event_set([5, 6])
         >>> tp.plot([evset, evset_2], merge=True)
         >>> tp.plot((evset, evset_2))
 
