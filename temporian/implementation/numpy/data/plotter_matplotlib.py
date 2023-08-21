@@ -1,141 +1,106 @@
 """Matplotlib plotting backend."""
 
-import datetime
-from typing import Optional, List, Set
+from typing import Optional
 
+import matplotlib.pyplot as plt
+from matplotlib.cm import get_cmap
+import matplotlib.ticker as ticker
 import numpy as np
+
 
 from temporian.core.data.duration_utils import (
     convert_timestamp_to_datetime,
-    convert_timestamps_to_datetimes,
 )
-from temporian.implementation.numpy.data.event_set import EventSet, IndexType
-from temporian.implementation.numpy.data.plotter import (
+from temporian.implementation.numpy.data.plotter_base import (
     Options,
     Style,
-    is_uniform,
-    get_num_plots,
-    auto_style,
+    PlotterBackend,
 )
 
 
-def plot_matplotlib(
-    evsets: List[EventSet],
-    indexes: List[IndexType],
-    features: Set[str],
-    options: Options,
-):
-    import matplotlib.pyplot as plt
-    from matplotlib.cm import get_cmap
+class Plotter(PlotterBackend):
+    def __init__(self, num_plots: int, options: Options):
+        super().__init__(num_plots, options)
 
-    colors = get_cmap("tab10").colors
+        self.colors = get_cmap("tab10").colors
+        px = 1 / plt.rcParams["figure.dpi"]
 
-    px = 1 / plt.rcParams["figure.dpi"]
+        self.fig, self.axs = plt.subplots(
+            num_plots,
+            figsize=(
+                options.width_px * px,
+                options.height_per_plot_px * num_plots * px,
+            ),
+            squeeze=False,
+            sharex=True,
+        )
 
-    num_plots = get_num_plots(evsets, indexes, features, options)
+        self.fig_idx = 0
+        self.options = options
 
-    fig, axs = plt.subplots(
-        num_plots,
-        figsize=(
-            options.width_px * px,
-            options.height_per_plot_px * num_plots * px,
-        ),
-        squeeze=False,
-    )
+    def ax(self):
+        return self.axs[self.fig_idx, 0]
 
-    # Actual plotting
-    plot_idx = 0
-    for index in indexes:
-        if plot_idx >= num_plots:
-            # Too many plots are displayed already.
-            break
+    def new_subplot(
+        self,
+        title: Optional[str],
+        num_items: int,
+        is_unix_timestamp: bool,
+    ):
+        self.cur_num_items = num_items
+        self.cur_is_unix_timestamp = is_unix_timestamp
 
-        # Index of the next color to use in the plot.
-        color_idx = 0
+        if title is not None:
+            self.ax().set_title(title, fontsize=8)
 
-        for evset in evsets:
-            if plot_idx >= num_plots:
-                break
+    def finalize_subplot(
+        self,
+    ):
+        if self.cur_num_items > 1:
+            self.ax().legend(fontsize=8)
+        self.fig_idx += 1
 
-            title = " ".join(
-                [f"{k}={v}" for k, v in zip(evset.schema.index_names(), index)]
-            )
+    def plot_feature(
+        self,
+        xs: np.ndarray,
+        ys: np.ndarray,
+        name: Optional[str],
+        style: Style,
+        color_idx: int,
+    ):
+        _matplotlib_sub_plot(
+            ax=self.ax(),
+            xs=xs,
+            ys=ys,
+            options=self.options,
+            color=self.colors[color_idx % len(self.colors)],
+            name=name if self.cur_num_items == 1 else None,
+            legend=name if self.cur_num_items != 1 else None,
+            is_unix_timestamp=self.cur_is_unix_timestamp,
+            style=style,
+        )
 
-            evset_features = evset.schema.feature_names()
-            display_features = [f for f in evset_features if f in features]
+    def plot_sampling(
+        self,
+        xs: np.ndarray,
+        color_idx: int,
+    ):
+        name = "[sampling]"
+        _matplotlib_sub_plot(
+            ax=self.ax(),
+            xs=xs,
+            ys=np.zeros(len(xs)),
+            options=self.options,
+            color=self.colors[color_idx % len(self.colors)],
+            name=name if self.cur_num_items == 1 else None,
+            legend=name if self.cur_num_items != 1 else None,
+            is_unix_timestamp=self.cur_is_unix_timestamp,
+            style=Style.vline,
+        )
 
-            xs = evset.data[index].timestamps
-            uniform = is_uniform(xs)
-
-            plot_mask = np.full(len(xs), True)
-            if options.min_time is not None:
-                plot_mask = plot_mask & (xs >= options.min_time)
-            if options.max_time is not None:
-                plot_mask = plot_mask & (xs <= options.max_time)
-            if options.max_points is not None and len(xs) > options.max_points:
-                # Too many timestamps. Only keep the fist ones.
-                plot_mask = plot_mask & (
-                    np.cumsum(plot_mask) <= options.max_points
-                )
-
-            xs = xs[plot_mask]
-
-            if evset.schema.is_unix_timestamp:
-                # Matplotlib understands datetimes.
-                xs = convert_timestamps_to_datetimes(xs)
-
-            if len(display_features) == 0:
-                # There is not features to plot. Instead, plot the timestamps.
-                _matplotlib_sub_plot(
-                    ax=axs[plot_idx, 0],
-                    xs=xs,
-                    ys=np.zeros(len(xs)),
-                    options=options,
-                    color=colors[color_idx % len(colors)],
-                    name="[sampling]",
-                    is_unix_timestamp=evset.schema.is_unix_timestamp,
-                    title=title,
-                    style=Style.vline,
-                )
-                # Only print the index / title once
-                title = None
-
-                color_idx += 1
-                plot_idx += 1
-
-            for display_feature in display_features:
-                feature_idx = evset_features.index(display_feature)
-
-                if plot_idx >= num_plots:
-                    # Too much plots are displayed already.
-                    break
-
-                ys = evset.data[index].features[feature_idx][plot_mask]
-                if options.style == Style.auto:
-                    effective_stype = auto_style(uniform, xs, ys)
-                else:
-                    effective_stype = options.style
-
-                _matplotlib_sub_plot(
-                    ax=axs[plot_idx, 0],
-                    xs=xs,
-                    ys=ys,
-                    options=options,
-                    color=colors[color_idx % len(colors)],
-                    name=display_feature,
-                    is_unix_timestamp=evset.schema.is_unix_timestamp,
-                    title=title,
-                    style=effective_stype,
-                )
-
-                # Only print the index / title once
-                title = None
-
-                color_idx += 1
-                plot_idx += 1
-
-    fig.tight_layout()
-    return fig
+    def finalize(self):
+        self.fig.tight_layout()
+        return self.fig
 
 
 def _matplotlib_sub_plot(
@@ -144,15 +109,13 @@ def _matplotlib_sub_plot(
     ys,
     options: Options,
     color,
-    name: str,
+    name: Optional[str],
     is_unix_timestamp: bool,
-    title: Optional[str],
     style: Style,
+    legend: Optional[str] = None,
     **wargs,
 ):
     """Plots "(xs, ys)" on the axis "ax"."""
-
-    import matplotlib.ticker as ticker
 
     if style == Style.line:
         mat_style = {}  # Default
@@ -162,6 +125,9 @@ def _matplotlib_sub_plot(
         mat_style = {"marker": "|", "linestyle": "None"}
     else:
         raise ValueError("Non implemented style")
+
+    if legend is not None:
+        wargs["label"] = legend
 
     ax.plot(xs, ys, lw=0.5, color=color, **mat_style, **wargs)
     if options.min_time is not None or options.max_time is not None:
@@ -184,11 +150,10 @@ def _matplotlib_sub_plot(
     ax.xaxis.set_major_locator(ticker.MaxNLocator(10))
     ax.xaxis.set_minor_locator(ticker.NullLocator())
 
-    ax.set_ylabel(name, size=8)
+    if name is not None:
+        ax.set_ylabel(name, size=8)
     ax.yaxis.set_tick_params(labelsize=8)
     ax.yaxis.set_major_locator(ticker.MaxNLocator(5))
     ax.yaxis.set_minor_locator(ticker.NullLocator())
 
     ax.grid(lw=0.4, ls="--", axis="x")
-    if title:
-        ax.set_title(title, fontsize=8)
