@@ -1123,7 +1123,7 @@ class EventSetOperations:
             ...    timestamps=[1,2,3,4,5,6],
             ...    features={"x": [4.,3.,2.,6.,2.,1.]},
             ... )
-            >>> b = a.fast_fourier_transform(num_events=4, window="hamming")
+            >>> b = a.experimental_fast_fourier_transform(num_events=4, window="hamming")
             >>> b
 
             ```
