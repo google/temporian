@@ -14,11 +14,15 @@
 
 """Plotting utility."""
 
-from typing import NamedTuple, Optional, Union, List, Any, Set
-from enum import Enum
+from typing import Optional, Union, List, Set, Tuple, Dict, Callable, Type
 
+from dataclasses import dataclass
 import numpy as np
 
+from temporian.core.data.duration_utils import (
+    convert_timestamps_to_datetimes,
+)
+from temporian.implementation.numpy.data.plotter_base import Options, Style
 from temporian.core.data import duration_utils
 from temporian.implementation.numpy.data.event_set import (
     EventSet,
@@ -26,41 +30,190 @@ from temporian.implementation.numpy.data.event_set import (
     IndexItemType,
     IndexType,
 )
+from temporian.implementation.numpy.data.plotter_base import (
+    Options,
+    Style,
+    PlotterBackend,
+)
+
+# "evtset" argument in tp.plot.
+InputEventSet = Union[
+    EventSet,
+    List[EventSet],
+    Tuple[EventSet, ...],
+    List[Tuple[EventSet, ...]],
+]
+
+# "indexes" argument in tp.plot.
+InputIndex = Optional[
+    Union[
+        IndexItemType,
+        IndexType,
+        List[IndexItemType],
+        List[IndexType],
+    ]
+]
+
+# "features" argument in tp.plot.
+InputFeatures = Optional[
+    Union[
+        str,
+        List[str],
+        Set[str],
+    ]
+]
 
 
-class Style(Enum):
-    """Plotting style."""
+@dataclass
+class GroupItem:
+    evtset: EventSet
 
-    # Determine the style according to the data.
-    auto = "auto"
-    # Connect numerical values with a line.
-    line = "line"
-    # A discreet marker showing a feature value.
-    marker = "marker"
-    # A discreet marker not showing a feature value.
-    vline = "vline"
+    # Index of the feature in "evtset". If -1, plots the timestamp.
+    feature_idx: int
 
 
-class Options(NamedTuple):
-    """Options for plotting."""
+@dataclass
+class Group:
+    """Features / timestaps that get plotted together."""
 
-    backend: Optional[str]
-    height_per_plot_px: int
-    width_px: int
-    max_points: Optional[int]
-    min_time: Optional[duration_utils.Timestamp]
-    max_time: Optional[duration_utils.Timestamp]
-    max_num_plots: int
-    style: Style
-    interactive: bool
+    items: List[GroupItem]
+
+
+Groups = List[Group]
+
+
+def matplotlib_backend():
+    from temporian.implementation.numpy.data import plotter_matplotlib
+
+    return plotter_matplotlib.Plotter
+
+
+def bokeh_backend():
+    from temporian.implementation.numpy.data import plotter_bokeh
+
+    return plotter_bokeh.Plotter
+
+
+BACKENDS: Dict[str, Callable] = {
+    "matplotlib": matplotlib_backend,
+    "bokeh": bokeh_backend,
+}
+
+
+def error_message_import_backend(backend: str) -> str:
+    return (
+        f"Cannot plot with selected backend={backend}. Solutions: (1) Install"
+        f" {backend} e.g. 'pip install {backend}', or (2) use a different"
+        " plotting backen, for example with 'plot(..., backend=\"<other"
+        f' backend>"). The supported backends are: {list(BACKENDS.keys())}.'
+    )
+
+
+def build_groups(
+    evsets: InputEventSet,
+    features: Optional[Set[str]],
+    allow_list: bool = True,
+) -> Groups:
+    """Sort user inputs into groups of features to plot together."""
+
+    if isinstance(evsets, EventSet):
+        # Plot each feature individually
+        groups = []
+        for feature_idx, feature in enumerate(evsets.schema.features):
+            if features is not None and feature.name not in features:
+                continue
+            groups.append(Group([GroupItem(evsets, feature_idx)]))
+        if len(groups) == 0:
+            # Plot the timestamps
+            groups.append(Group([GroupItem(evsets, -1)]))
+        return groups
+
+    if isinstance(evsets, tuple):
+        # Plot all the event sets and their features together
+        group_items = []
+        for evset in evsets:
+            if not isinstance(evset, EventSet):
+                raise ValueError(
+                    f"Expecting tuple of EventSets. Got {type(evset)} instead."
+                )
+            plot_for_current_evtset = False
+            for feature_idx, feature in enumerate(evset.schema.features):
+                if features is not None and feature.name not in features:
+                    continue
+                group_items.append(GroupItem(evset, feature_idx))
+                plot_for_current_evtset = True
+            if not plot_for_current_evtset:
+                group_items.append(GroupItem(evset, -1))
+
+        return [Group(group_items)]
+
+    if allow_list and isinstance(evsets, list):
+        groups = []
+        for x in evsets:
+            groups.extend(build_groups(x, features, allow_list=False))
+        return groups
+    raise ValueError("Non supported evsets input")
+
+
+def normalize_features(features: InputFeatures) -> Optional[Set[str]]:
+    """Normalizes the "features" argument of plot."""
+
+    if features is None:
+        return None
+    if isinstance(features, str):
+        return {features}
+    if isinstance(features, list):
+        return set(features)
+    if isinstance(features, set):
+        return features
+    raise ValueError(f"Non supported feature type {features}")
+
+
+def normalize_indexes(indexes: InputIndex, groups: Groups) -> List[IndexType]:
+    """Normalizes the "indexes" argument of plot."""
+
+    if indexes is None:
+        # All the available index
+        normalized_indexes = list(
+            groups[0].items[0].evtset.get_index_keys(sort=True)
+        )
+
+    elif isinstance(indexes, list):
+        # e.g. indexes=["a", ("b",)]
+        normalized_indexes = [
+            v if isinstance(v, tuple) else (v,) for v in indexes
+        ]
+
+    elif isinstance(indexes, tuple):
+        # e.g. indexes=("a",)
+        normalized_indexes = [indexes]
+
+    else:
+        # e.g. indexes="a"
+        normalized_indexes = [(indexes,)]
+
+    normalized_indexes = [normalize_index_key(x) for x in normalized_indexes]
+    validate_indexes(normalized_indexes, groups)
+    return normalized_indexes
+
+
+def validate_indexes(indexes: List[IndexType], groups: Groups):
+    """Ensures that indexes are valid i.e. available in all event-sets."""
+
+    for g in groups:
+        for item in g.items:
+            for index in indexes:
+                if index not in item.evtset.data:
+                    raise ValueError(
+                        f"Index {index!r} does not exist in event set:"
+                        f" {item.evtset}"
+                    )
 
 
 def plot(
-    evsets: Union[List[EventSet], EventSet],
-    indexes: Optional[
-        Union[IndexItemType, IndexType, List[IndexItemType], List[IndexType]]
-    ] = None,
-    features: Optional[Union[str, List[str], Set[str]]] = None,
+    evsets: InputEventSet,
+    indexes: InputIndex = None,
+    features: InputFeatures = None,
     width_px: int = 1024,
     height_per_plot_px: int = 150,
     max_points: Optional[int] = None,
@@ -71,33 +224,51 @@ def plot(
     return_fig: bool = False,
     interactive: bool = False,
     backend: Optional[str] = None,
+    merge: bool = False,
 ):
-    """Plots [`EventSets`][temporian.EventSet].
+    """Plots one or several [`EventSets`][temporian.EventSet].
 
-    This method can also be called from
-    [`EventSet.plot()`][temporian.EventSet.plot] with the same args (except
-    `evsets`).
+
+    If multiple eventsets are provided, they should all have the same index.
+    The time axis (i.e., horizontal axis) is shared among all the plots.
+    Different features can be plotted independently or on the same plots.
+    Plotting an eventset without features plots timestamps instead.
+
+    When plotting a single eventset, this function is equivalent to
+    [`EventSet.plot()`][temporian.EventSet.plot].
 
     Examples:
         ```python
         >>> evset = tp.event_set(timestamps=[1, 2, 4],
         ...     features={"f1": [0, 42, 10], "f2": [10, -10, 20]})
 
-        # Default
+        # Plot each feature individually
         >>> tp.plot(evset)
 
-        # Lines instead of markers, only f2, limit x-axis to t=2
-        >>> tp.plot(evset, style="line", features="f2", max_time=2)
+        # Plots multiple features in the same sub-plot
+        >>> tp.plot(evset, merge=True)
 
-        # Access figure and axes
+        # Equivalent
+        >>> evset_2 = tp.event_set([5, 6])
+        >>> tp.plot([evset, evset_2], merge=True)
+        >>> tp.plot((evset, evset_2))
+
+        # Make the plot interractive
+        >>> tp.plot(evset, interactive=True)
+
+        # Save figure to file
         >>> fig = tp.plot(evset, return_fig=True)
-        >>> fig.tight_layout(pad=3.0)
-        >>> _ = fig.axes[0].set_ylim([-50, 50])
+        >>> fig.savefig("/tmp/fig.png")
+
+        # Change drawing style
+        >>> tp.plot(evset, style="line")
 
         ```
 
     Args:
-        evsets: Single or list of EventSets to plot.
+        evsets: Single or list of EventSets to plot. Also, tuples can be used to
+            group multiple EventSets in the same sub-plot. Otherwise, all
+            EventSets and features are plotted in separate sub-plots.
         indexes: The index keys or list of indexes keys to plot. If
             indexes=None, plots all the available indexes. Indexes should be
             provided as single value (e.g. string) or tuple of values. Example:
@@ -123,58 +294,32 @@ def plot(
             Ignored if "backend" is set.
         backend: Plotting library to use. Possible values are: matplotlib,
             bokeh. If set, overrides the "interactive" argument.
+        merge: If true, plots all features in the same plots. If false, plots
+            features in separate plots. merge=True on event-sets [e1, e2] is
+            equivalent to plotting (e1, e2).
     """
 
-    original_indexes = indexes
-
-    if not isinstance(evsets, list):
-        evsets = [evsets]
-
-    if len(evsets) == 0:
-        raise ValueError("Events is empty")
-
-    if indexes is None:
-        # All the indexes
-        indexes = list(evsets[0].get_index_keys(sort=True))
-
-    elif isinstance(indexes, tuple):
-        # e.g. indexes=("a",)
-        indexes = [indexes]
-
-    elif isinstance(indexes, list):
-        # e.g. indexes=["a", ("b",)]
-        indexes = [v if isinstance(v, tuple) else (v,) for v in indexes]
-
-    else:
-        # e.g. indexes="a"
-        indexes = [(indexes,)]
-
-    indexes = [normalize_index_key(x) for x in indexes]
-
-    for index in indexes:
-        if not isinstance(index, tuple):
+    if merge:
+        if isinstance(evsets, EventSet):
+            evsets = (evsets,)
+        elif isinstance(evsets, List):
+            evsets = tuple(evsets)
+        else:
             raise ValueError(
-                "Indexes should be tuples or lists of tuples. Instead"
-                f' received "indexes={original_indexes}"'
+                "If merge=True, 'evsets' should be an EventSet or a list of"
+                f" EventSets. Got {type(evsets)} instead."
             )
+
+    normalized_features = normalize_features(features)
+    groups = build_groups(evsets, normalized_features)
+    normalized_indexes = normalize_indexes(indexes, groups)
+
+    if len(groups) == 0:
+        raise ValueError("Not input eventsets")
 
     if isinstance(style, str):
         style = Style[style]
     assert isinstance(style, Style)
-
-    if features is None:
-        # Don't filter anything: use all features from all events
-        features = set().union(*[e.schema.feature_names() for e in evsets])
-    elif isinstance(features, str):
-        features = {features}
-    elif isinstance(features, list):
-        features = set(features)
-    elif not isinstance(features, set):
-        raise ValueError("Features argument must be a str, list or set.")
-
-    for feature in features:
-        if not isinstance(feature, str):
-            raise ValueError("All feature names should be strings")
 
     options = Options(
         interactive=interactive,
@@ -206,9 +351,14 @@ def plot(
         )
 
     try:
-        fig = BACKENDS[backend](
-            evsets=evsets, indexes=indexes, features=features, options=options
+        plotter_class = BACKENDS[backend]()
+        fig = plot_with_plotter(
+            plotter_class=plotter_class,
+            groups=groups,
+            indexes=normalized_indexes,
+            options=options,
         )
+
     except ImportError:
         print(error_message_import_backend(backend))
         raise
@@ -216,32 +366,108 @@ def plot(
     return fig if return_fig else None
 
 
+def plot_with_plotter(
+    plotter_class: Type[PlotterBackend],
+    groups: Groups,
+    indexes: List[IndexType],
+    options: Options,
+):
+    num_plots = get_num_plots(groups, indexes, options)
+    plotter: PlotterBackend = plotter_class(num_plots, options)
+
+    index_names = groups[0].items[0].evtset.schema.index_names()
+
+    plot_idx = 0
+    for index in indexes:
+        assert len(index_names) == len(index)
+        if plot_idx >= num_plots:
+            # Too many plots are displayed already.
+            break
+
+        title = " ".join([f"{k}={v}" for k, v in zip(index_names, index)])
+
+        # Index of the next color to use in the plot.
+        color_idx = 0
+
+        for group in groups:
+            if plot_idx >= num_plots:
+                break
+
+            plotter.new_subplot(
+                title=title,
+                num_items=len(group.items),
+                is_unix_timestamp=group.items[
+                    0
+                ].evtset.schema.is_unix_timestamp,
+            )
+
+            # Only print the index / title once
+            title = None
+
+            for group_item in group.items:
+                xs = group_item.evtset.data[index].timestamps
+                uniform = is_uniform(xs)
+
+                plot_mask = np.full(len(xs), True)
+                if options.min_time is not None:
+                    plot_mask = plot_mask & (xs >= options.min_time)
+                if options.max_time is not None:
+                    plot_mask = plot_mask & (xs <= options.max_time)
+                if (
+                    options.max_points is not None
+                    and len(xs) > options.max_points
+                ):
+                    # Too many timestamps. Only keep the fist ones.
+                    plot_mask = plot_mask & (
+                        np.cumsum(plot_mask) <= options.max_points
+                    )
+
+                xs = xs[plot_mask]
+
+                if group_item.evtset.schema.is_unix_timestamp:
+                    xs = convert_timestamps_to_datetimes(xs)
+
+                if group_item.feature_idx == -1:
+                    # Plot the timestamps.
+                    plotter.plot_sampling(xs=xs, color_idx=color_idx)
+                else:
+                    feature_name = group_item.evtset.schema.features[
+                        group_item.feature_idx
+                    ].name
+
+                    ys = group_item.evtset.data[index].features[
+                        group_item.feature_idx
+                    ]
+                    ys = ys[plot_mask]
+                    if options.style == Style.auto:
+                        effective_stype = auto_style(uniform, xs, ys)
+                    else:
+                        effective_stype = options.style
+
+                    plotter.plot_feature(
+                        xs=xs,
+                        ys=ys,
+                        name=feature_name,
+                        style=effective_stype,
+                        color_idx=color_idx,
+                    )
+                color_idx += 1
+
+            plotter.finalize_subplot()
+
+            plot_idx += 1
+
+    return plotter.finalize()
+
+
 def get_num_plots(
-    evsets: List[EventSet],
+    groups: Groups,
     indexes: List[tuple],
-    features: Set[str],
     options: Options,
 ):
     """Computes the number of sub-plots."""
 
-    num_plots = 0
-    for index in indexes:
-        for evset in evsets:
-            if index not in evset.data:
-                raise ValueError(
-                    f"Index key '{index}' does not exist in the EventSet. Check"
-                    " the available indexes with 'evset.indexes' and provide"
-                    " one of those to the 'indexes' argument of 'plot'."
-                    " Alternatively, set 'indexes=None' to select a random"
-                    f" index key (e.g., {evset.get_arbitrary_index_key()}."
-                )
-            candidate_features = set(evset.schema.feature_names())
-            num_features = len(candidate_features.intersection(features))
-            if num_features == 0:
-                # We plot the sampling
-                num_features = 1
-            num_plots += num_features
-
+    num_plots = len(indexes) * len(groups)
     if num_plots == 0:
         raise ValueError("There is nothing to plot.")
 
@@ -280,20 +506,3 @@ def is_uniform(xs) -> bool:
     if len(diff) == 0:
         return True
     return np.allclose(diff, diff[0])
-
-
-from temporian.implementation.numpy.data.plotter_bokeh import plot_bokeh
-from temporian.implementation.numpy.data.plotter_matplotlib import (
-    plot_matplotlib,
-)
-
-BACKENDS = {"matplotlib": plot_matplotlib, "bokeh": plot_bokeh}
-
-
-def error_message_import_backend(backend: str) -> str:
-    return (
-        f"Cannot plot with selected backend={backend}. Solutions: (1) Install"
-        f" {backend} e.g. 'pip install {backend}', or (2) use a different"
-        " plotting backen, for example with 'plot(..., backend=\"<other"
-        f' backend>"). The supported backends are: {list(BACKENDS.keys())}.'
-    )
