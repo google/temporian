@@ -42,7 +42,6 @@ jobs:
             poetry.lock
             ./docs/src/tutorials/requirements.txt
 
-
       - name: Install poetry dependencies
         run: poetry install --no-interaction
 

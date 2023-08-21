@@ -22,7 +22,6 @@ import numpy as np
 from temporian.core.data.duration_utils import (
     convert_timestamps_to_datetimes,
 )
-from temporian.implementation.numpy.data.plotter_base import Options, Style
 from temporian.core.data import duration_utils
 from temporian.implementation.numpy.data.event_set import (
     EventSet,
