@@ -32,10 +32,12 @@ class SinceLast(Operator):
     def __init__(
         self,
         input: EventSetNode,
+        steps: int = 1,
         sampling: Optional[EventSetNode] = None,
     ):
         super().__init__()
 
+        self.add_attribute("steps", steps)
         self.add_input("input", input)
 
         if sampling is not None:
@@ -62,7 +64,12 @@ class SinceLast(Operator):
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
             key="SINCE_LAST",
-            attributes=[],
+            attributes=[
+                pb.OperatorDef.Attribute(
+                    key="steps",
+                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
+                )
+            ],
             inputs=[
                 pb.OperatorDef.Input(key="input"),
                 pb.OperatorDef.Input(key="sampling", is_optional=True),
@@ -74,6 +81,12 @@ class SinceLast(Operator):
     def has_sampling(self) -> bool:
         return self._has_sampling
 
+    @property
+    def steps(self) -> int:
+        steps = self.attributes["steps"]
+        assert type(steps) is int  # linter typecheck
+        return steps
+
 
 operator_lib.register_operator(SinceLast)
 
@@ -81,10 +94,13 @@ operator_lib.register_operator(SinceLast)
 @compile
 def since_last(
     input: EventSetOrNode,
+    steps: int = 1,
     sampling: Optional[EventSetOrNode] = None,
 ) -> EventSetOrNode:
     assert isinstance(input, EventSetNode)
     if sampling is not None:
         assert isinstance(sampling, EventSetNode)
 
-    return SinceLast(input=input, sampling=sampling).outputs["output"]
+    return SinceLast(input=input, steps=steps, sampling=sampling).outputs[
+        "output"
+    ]
