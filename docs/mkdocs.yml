@@ -14,7 +14,7 @@ theme:
     repo: fontawesome/brands/github
     logo: assets/favicon.png
   font:
-    text: Public Sans
+    text: Archivo
   features:
     - navigation.tabs
     - navigation.tracking
