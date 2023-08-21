@@ -13,6 +13,8 @@ theme:
   icon:
     repo: fontawesome/brands/github
     logo: assets/favicon.png
+  font:
+    text: Lato
   features:
     - navigation.tabs
     - navigation.tracking
