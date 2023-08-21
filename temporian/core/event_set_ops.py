@@ -1093,7 +1093,7 @@ class EventSetOperations:
 
         return enumerate(self)
 
-    def fast_fourier_transform(
+    def experimental_fast_fourier_transform(
         self: EventSetOrNode,
         *,
         num_events: int,
@@ -1103,6 +1103,10 @@ class EventSetOperations:
     ) -> EventSetOrNode:
         """Computes the Fast Fourier Transform of an
         [`EventSet`][temporian.EventSet] with a single tp.float32 feature.
+
+        WARNING: This operator is experimental. The implementation is not yet
+        optimized for speed, and the operator signature might change in the
+        future.
 
         The window length is defined in number of events, instead of
         timestamp duration like most other operators. The 'num_events' argument
