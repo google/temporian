@@ -35,7 +35,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         # already_there/numpy
-        "//temporian/utils:rtcheck",
+        "//temporian/utils:typecheck",
         ":event_set",
         "//temporian/core:evaluation",
         "//temporian/core/data:schema",
@@ -44,17 +44,49 @@ py_library(
 )
 
 py_library(
-    name = "plotter",
-    srcs = [
-        "plotter.py",
-        "plotter_bokeh.py",
-        "plotter_matplotlib.py",
+    name = "plotter_base",
+    srcs = ["plotter_base.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":event_set",
+        "//temporian/core/data:duration_utils",
+        # already_there/numpy
     ],
+)
+
+py_library(
+    name = "plotter",
+    srcs = ["plotter.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":plotter_base",
+        ":plotter_matplotlib",
+        ":plotter_bokeh",
+        ":event_set",
+        "//temporian/core/data:duration_utils",
+        # already_there/numpy
+    ],
+)
+
+py_library(
+    name = "plotter_matplotlib",
+    srcs = ["plotter_matplotlib.py"],
     srcs_version = "PY3",
     deps = [
         ":event_set",
         # already_there/numpy
         # force/matplotlib
+        "//temporian/core/data:duration_utils",
+    ],
+)
+
+py_library(
+    name = "plotter_bokeh",
+    srcs = ["plotter_bokeh.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":event_set",
+        # already_there/numpy
         # force/bokeh
         "//temporian/core/data:duration_utils",
     ],

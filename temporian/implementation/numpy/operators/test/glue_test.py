@@ -13,8 +13,9 @@
 # limitations under the License.
 
 from absl.testing import absltest
+import numpy as np
 
-from temporian.core.operators.glue import GlueOperator
+from temporian.core.operators.glue import GlueOperator, glue
 from temporian.core.data.node import input_node
 from temporian.core.data.dtype import DType
 from temporian.implementation.numpy.operators.glue import (
@@ -117,6 +118,53 @@ class GlueNumpyImplementationTest(absltest.TestCase):
                 features=[("a", DType.FLOAT64)], same_sampling_as=n1
             )
             _ = GlueOperator(input_0=n1, input_1=n2)
+
+    def test_order_unchanged(self):
+        """Tests that input evsets' order is kept.
+
+        Regression test for failing case where glue misordered its inputs when
+        more than 10, because of sorted() being called over a list where
+        "input_10"  was interpreted as less than "input_2".
+        """
+        evset_0 = event_set(
+            timestamps=[1],
+            features={
+                "f0": np.asarray([1], dtype=np.int64),
+            },
+        )
+        evset_1 = evset_0.rename("f1")
+        evset_2 = evset_0.rename("f2")
+        evset_3 = evset_0.rename("f3")
+        evset_4 = evset_0.rename("f4")
+        evset_5 = evset_0.rename("f5")
+        evset_6 = evset_0.rename("f6")
+        evset_7 = evset_0.rename("f7")
+        evset_8 = evset_0.rename("f8")
+        evset_9 = evset_0.rename(
+            "a"
+        )  # Test that alphabetical order is not used.
+
+        evset_10 = event_set(
+            timestamps=[1],
+            features={
+                "f10": np.asarray([1], dtype=np.int32),
+            },
+            same_sampling_as=evset_0,
+        )
+
+        glue(
+            evset_0,
+            evset_1,
+            evset_2,
+            evset_3,
+            evset_4,
+            evset_5,
+            evset_6,
+            evset_7,
+            evset_8,
+            evset_9,
+            evset_10,
+        )
 
 
 if __name__ == "__main__":

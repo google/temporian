@@ -17,10 +17,10 @@
 from typing import List, Optional
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.io.pandas import from_pandas, to_pandas
-from temporian.utils.rtcheck import rtcheck
+from temporian.utils.typecheck import typecheck
 
 
-@rtcheck
+@typecheck
 def from_csv(
     path: str,
     timestamps: str = "timestamp",
@@ -74,7 +74,7 @@ def from_csv(
     return from_pandas(df, indexes=indexes, timestamps=timestamps)
 
 
-@rtcheck
+@typecheck
 def to_csv(
     evset: EventSet,
     path: str,

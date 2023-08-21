@@ -84,7 +84,7 @@ from temporian.core.data.node import EventSetNode, create_node_new_features_new_
 from temporian.core.operators.base import Operator
 from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
-from temporian.utils.rtcheck import rtcheck
+from temporian.utils.typecheck import typecheck
 
 
 class {capitalized_op}(Operator):
@@ -125,7 +125,7 @@ class {capitalized_op}(Operator):
 operator_lib.register_operator({capitalized_op})
 
 
-@rtcheck
+@typecheck
 @compile
 def {lower_op}(input: EventSetOrNode, param: float) -> EventSetOrNode:
     """<Text>
