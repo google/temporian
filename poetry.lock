@@ -398,6 +398,17 @@ tornado = ">=5.1"
 xyzservices = ">=2021.09.1"
 
 [[package]]
+name = "bracex"
+version = "2.3.post1"
+description = "Bash style brace expander."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "bracex-2.3.post1-py3-none-any.whl", hash = "sha256:351b7f20d56fb9ea91f9b9e9e7664db466eb234188c175fd943f8f755c807e73"},
+    {file = "bracex-2.3.post1.tar.gz", hash = "sha256:e7b23fc8b2cd06d3dec0692baabecb249dda94e06a617901ff03a6c56fd71693"},
+]
+
+[[package]]
 name = "cachetools"
 version = "5.3.1"
 description = "Extensible memoizing collections and decorators"
@@ -2370,6 +2381,23 @@ files = [
 
 [package.dependencies]
 mkdocs = ">=1.0.3,<2.0.0"
+
+[[package]]
+name = "mkdocs-include-markdown-plugin"
+version = "6.0.0"
+description = "Mkdocs Markdown includer plugin."
+optional = false
+python-versions = "<3.13,>=3.8"
+files = [
+    {file = "mkdocs_include_markdown_plugin-6.0.0-py3-none-any.whl", hash = "sha256:098a3abbebcd72c9081bdc2348f38e400d6a9f340e99b58c006ec54b14ecb1c7"},
+    {file = "mkdocs_include_markdown_plugin-6.0.0.tar.gz", hash = "sha256:3b84820d0805a94f9a8767c7a204d8e83d2ee7fc433fb4779dd21001826e20bf"},
+]
+
+[package.dependencies]
+wcmatch = ">=8,<9"
+
+[package.extras]
+cache = ["platformdirs"]
 
 [[package]]
 name = "mkdocs-jupyter"
@@ -4490,6 +4518,20 @@ files = [
 watchmedo = ["PyYAML (>=3.10)"]
 
 [[package]]
+name = "wcmatch"
+version = "8.4.1"
+description = "Wildcard/glob file name matcher."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "wcmatch-8.4.1-py3-none-any.whl", hash = "sha256:3476cd107aba7b25ba1d59406938a47dc7eec6cfd0ad09ff77193f21a964dee7"},
+    {file = "wcmatch-8.4.1.tar.gz", hash = "sha256:b1f042a899ea4c458b7321da1b5e3331e3e0ec781583434de1301946ceadb943"},
+]
+
+[package.dependencies]
+bracex = ">=2.1.1"
+
+[[package]]
 name = "wcwidth"
 version = "0.2.6"
 description = "Measures the displayed width of unicode strings in a terminal"
@@ -4762,4 +4804,4 @@ tensorflow = []
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8,<3.12"
-content-hash = "c8a05bfee13dc0886f76ef0b223f57a940bf69f564247e25468622ac8c0b1084"
+content-hash = "63cae637b888824370cb08777da6308a5553640cc98e796d3660b76b572e8660"
