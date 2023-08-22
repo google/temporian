@@ -29,6 +29,14 @@ To create a new release, follow these steps:
 
 ### Environment Setup
 
+After cloning the repository, please manually install the git hooks:
+
+```shell
+git clone git@github.com:google/temporian.git
+
+cp .git-hooks/* .git/hooks
+```
+
 Install [Poetry](https://python-poetry.org/), which we use to manage Python dependencies and virtual environments.
 
 Temporian requires Python `3.9.0` or greater. We recommend using [PyEnv](https://github.com/pyenv/pyenv#installation) to install and manage multiple Python versions. Once PyEnv is available, install a supported Python version (e.g. 3.9.6) by running:

@@ -2217,6 +2217,7 @@ class EventSetOperations:
         applied independently for each index.
 
         Usage example:
+
             ```python
             >>> a = tp.event_set(timestamps=[5, 9, 9, 16], features={'f': [1,2,3,4]})
             >>> b = a.unique_timestamps()
@@ -2227,6 +2228,8 @@ class EventSetOperations:
                 (3 events):
                     timestamps: [ 5. 9. 16.]
             ...
+
+            ```
 
         Returns:
             EventSet without features with unique timestamps in the input.
