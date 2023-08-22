@@ -5,7 +5,7 @@ package(
     licenses = ["notice"],
 )
 
-cc_library(
+pybind_library(
     name = "common",
     hdrs = ["common.h"],
 )
