@@ -111,16 +111,16 @@ def event_set(
     if features is None:
         features = {}
 
+    features = {
+        name: normalize_features(value, name)
+        for name, value in features.items()
+    }
+
     # Check timestamps and all features are of same length
     if not all(len(f) == len(timestamps) for f in features.values()):
         raise ValueError(
             "Timestamps and all features must have the same length."
         )
-
-    features = {
-        name: normalize_features(value, name)
-        for name, value in features.items()
-    }
 
     # Convert timestamps to expected type.
     timestamps, auto_is_unix_timestamp = normalize_timestamps(timestamps)

@@ -148,6 +148,18 @@ class IOTest(absltest.TestCase):
         # Shouldn't raise
         event_set(timestamps=[1])
 
+    def test_feature_wrong_type(self):
+        with self.assertRaisesRegex(
+            ValueError, "Feature values should be provided in a tuple, list"
+        ):
+            event_set(
+                timestamps=[1, 2],
+                features={
+                    # np.array({1, 2}) would produce a single-item value
+                    "y": {1, 2},
+                },
+            )
+
 
 if __name__ == "__main__":
     absltest.main()
