@@ -148,7 +148,7 @@ def logical_or(
 
     `input_1` and `input_2` must have the same sampling, the same number of
     features, and all feature types must be `bool`
-    (see cast example in [`tp.logical_and()`](../logical_and)).
+    (see cast example in [`tp.logical_and()`][temporian.logical_and]).
 
     Usage example:
         ```python
@@ -201,7 +201,7 @@ def logical_xor(
 
     `input_1` and `input_2` must have the same sampling, the same number of
     features, and all feature types must be `bool`
-    (see cast example in [`tp.logical_and()`](../logical_and)).
+    (see cast example in [`tp.logical_and()`][temporian.logical_and]).
 
     Usage example:
         ```python
