@@ -13,6 +13,8 @@ theme:
   icon:
     repo: fontawesome/brands/github
     logo: assets/favicon.png
+  font:
+    text: Archivo
   features:
     - navigation.tabs
     - navigation.tracking
@@ -76,9 +78,9 @@ plugins:
       cards_layout_options:
         background_color: black
   - mkdocs-jupyter:
-      # Execute notebooks when building docs (set to true when temporian runs in a notebook w/o the start_notebook script).
       execute: false
       include: ["*.ipynb"] # Use ["*.py", "*.ipynb"] to render jupytext too.
+      ignore: ["**/.ipynb_checkpoints/*"]
       allow_errors: false # Cancel build if cell execution fails.
       theme: dark
   # Configuration to generate the reference pages from the docstrings.
