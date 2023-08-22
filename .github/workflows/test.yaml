@@ -12,12 +12,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      # - name: Bazel cache
-      #   id: bazel-cache
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: ~/.cache/bazel
-      #     key: ${{ runner.os }}-${{ matrix.python-version }}-bazel-cache
+      - name: Bazel cache
+        id: bazel-cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/bazel
+          key: ${{ runner.os }}-${{ matrix.python-version }}-bazel-cache
 
       - name: Install poetry
         run: pipx install poetry
@@ -26,10 +26,13 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          # cache: "poetry"
+          cache: "poetry"
 
       - name: Install dependencies
         run: poetry install --no-interaction
 
       - name: Run tests
-        run: poetry run bazel test //...:all --test_output=errors
+        run: poetry run bazel test //temporian/...:all //docs/...:all //tools/...:all --test_output=errors
+        # Note: Since mid-August 23, using "//...:all" incorrectly try to
+        # compile the directory "build" created during the installation of one
+        # of the dependency during "poetry install".
