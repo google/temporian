@@ -280,8 +280,9 @@ def subtract(
 
         ```
 
-    See [`tp.add()`](../add) examples to see how to match samplings, dtypes and
-    index, in order to apply arithmetic operators in different EventSets.
+    See [`tp.add()`][temporian.add] examples to see how to match samplings,
+    dtypes and index, in order to apply arithmetic operators in different
+    EventSets.
 
     Args:
         input_1: First EventSet.
@@ -338,8 +339,9 @@ def multiply(
 
         ```
 
-    See [`tp.add()`](../add) examples to see how to match samplings, dtypes and
-    index, in order to apply arithmetic operators in different EventSets.
+    See [`tp.add()`][temporian.add] examples to see how to match samplings,
+    dtypes and index, in order to apply arithmetic operators in different
+    EventSets.
 
     Args:
         input_1: First EventSet.
@@ -368,8 +370,8 @@ def divide(
     the same position.
 
     This operator cannot be used in features with dtypes `int32` or `int64`.
-    Cast to float before (see example) or use the [`tp.floordiv`](../floordiv)
-    operator instead.
+    Cast to float before (see example) or use the
+    [`tp.floordiv()`][temporian.floordiv] operator instead.
 
     `numerator` and `denominator` must have the same sampling, index,
     number of features and dtype for the features in the same positions.
@@ -431,8 +433,9 @@ def divide(
 
         ```
 
-    See [`tp.add()`](../add) examples to see how to match samplings, dtypes and
-    index, in order to apply arithmetic operators in different EventSets.
+    See [`tp.add()`][temporian.add] examples to see how to match samplings,
+    dtypes and index, in order to apply arithmetic operators in different
+    EventSets.
 
 
     Args:
@@ -493,8 +496,9 @@ def floordiv(
 
         ```
 
-    See [`tp.add()`](../add) examples to see how to match samplings, dtypes and
-    index, in order to apply arithmetic operators in different EventSets.
+    See [`tp.add()`][temporian.add] examples to see how to match samplings,
+    dtypes and index, in order to apply arithmetic operators in different
+    EventSets.
 
     Args:
         numerator: Numerator EventSet.
@@ -549,8 +553,9 @@ def modulo(
 
         ```
 
-    See [`tp.add()`](../add) examples to see how to match samplings, dtypes and
-    index, in order to apply arithmetic operators in different EventSets.
+    See [`tp.add()`][temporian.add] examples to see how to match samplings,
+    dtypes and index, in order to apply arithmetic operators in different
+    EventSets.
 
     Args:
         numerator: First EventSet.
@@ -608,8 +613,9 @@ def power(
 
         ```
 
-    See [`tp.add()`](../add) examples to see how to match samplings, dtypes and
-    index, in order to apply arithmetic operators in different EventSets.
+    See [`tp.add()`][temporian.add] examples to see how to match samplings,
+    dtypes and index, in order to apply arithmetic operators in different
+    EventSets.
 
     Args:
         base: First EventSet.

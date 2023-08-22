@@ -39,7 +39,7 @@ If the [`EventSet`][temporian.EventSet] has one (or many) indexes, its events wi
 
 Processing operations are performed by **operators**. For instance, the [`EventSet.simple_moving_average()`][temporian.EventSet.simple_moving_average] operator computes the [simple moving average](https://en.wikipedia.org/wiki/Moving_average) of each feature in an [`EventSet`][temporian.EventSet].
 
-The list of all available operators is available in the [API Reference](./reference/).
+The list of all available operators is available in the [API Reference](../reference).
 
 ```python
 >>> # Compute the 2-day simple moving average of the EventSet defined above
