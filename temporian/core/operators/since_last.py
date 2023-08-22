@@ -37,6 +37,8 @@ class SinceLast(Operator):
     ):
         super().__init__()
 
+        if steps <= 0:
+            raise ValueError("Invalid value received: {steps=}")
         self.add_attribute("steps", steps)
         self.add_input("input", input)
 
