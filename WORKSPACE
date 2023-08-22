@@ -24,15 +24,15 @@ bazel_skylib_workspace()
 
 http_archive(
     name = "pybind11_bazel",
-    strip_prefix = "pybind11_bazel-master",
-    urls = ["https://github.com/pybind/pybind11_bazel/archive/refs/heads/master.zip"],
+    strip_prefix = "pybind11_bazel-2.11.1",
+    urls = ["https://github.com/pybind/pybind11_bazel/releases/download/v2.11.1/pybind11_bazel-2.11.1.zip"],
 )
 
 http_archive(
     name = "pybind11",
     build_file = "@pybind11_bazel//:pybind11.BUILD",
-    strip_prefix = "pybind11-master",
-    urls = ["https://github.com/pybind/pybind11/archive/refs/heads/master.zip"],
+    strip_prefix = "pybind11-2.11.0",
+    urls = ["https://github.com/pybind/pybind11/archive/refs/tags/v2.11.0.zip"],
 )
 
 load("@pybind11_bazel//:python_configure.bzl", "python_configure")
