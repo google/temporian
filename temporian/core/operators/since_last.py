@@ -32,7 +32,7 @@ class SinceLast(Operator):
     def __init__(
         self,
         input: EventSetNode,
-        steps: int = 1,
+        steps: int,
         sampling: Optional[EventSetNode] = None,
     ):
         super().__init__()
@@ -96,13 +96,13 @@ operator_lib.register_operator(SinceLast)
 @compile
 def since_last(
     input: EventSetOrNode,
-    steps: int = 1,
+    steps: int,
     sampling: Optional[EventSetOrNode] = None,
 ) -> EventSetOrNode:
     assert isinstance(input, EventSetNode)
     if sampling is not None:
         assert isinstance(sampling, EventSetNode)
 
-    return SinceLast(input=input, steps=steps, sampling=sampling).outputs[
+    return SinceLast(input=input, sampling=sampling, steps=steps).outputs[
         "output"
     ]

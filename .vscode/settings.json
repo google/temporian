@@ -95,5 +95,6 @@
     "any": "cpp"
   },
   "python.analysis.typeCheckingMode": "basic",
-  "jupyter.notebookFileRoot": "${fileDirname}"
+  "jupyter.notebookFileRoot": "${fileDirname}",
+  "C_Cpp.clang_format_fallbackStyle": "Google"
 }

@@ -54,7 +54,7 @@ class SinceLastOperatorTest(absltest.TestCase):
         )
 
         # Run op
-        op = SinceLast(input=event)
+        op = SinceLast(input=event, steps=1)
         op.outputs["output"].check_same_sampling(event)
 
         instance = SinceLastNumpyImplementation(op)
@@ -116,7 +116,7 @@ class SinceLastOperatorTest(absltest.TestCase):
         )
 
         # Run op
-        op = SinceLast(input=event, sampling=sampling)
+        op = SinceLast(input=event, steps=1, sampling=sampling)
         op.outputs["output"].check_same_sampling(sampling)
 
         instance = SinceLastNumpyImplementation(op)
