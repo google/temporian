@@ -42,8 +42,8 @@ class How(str, Enum):
     def __repr__(self) -> str:
         return self.value
 
-    @staticmethod
-    def is_valid(value: Any) -> bool:
+    @classmethod
+    def is_valid(cls, value: Any) -> bool:
         return isinstance(value, How) or (
             isinstance(value, str) and value in [item.value for item in How]
         )
