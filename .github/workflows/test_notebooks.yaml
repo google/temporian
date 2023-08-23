@@ -7,7 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9"]
         # Paths relative to docs/src/, without the .ipynb extension
         # * can be used and all .ipynb files in that dir will be tested sequentially
         path:
@@ -28,8 +27,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.cache/bazel
-          key: ${{ runner.os }}-${{ matrix.python-version }}-bazel-cache-${{ hashFiles('**/BUILD', '.bazelrc', '.bazelversion', 'WORKSPACE') }}
-          restore-keys: ${{ runner.os }}-${{ matrix.python-version }}-bazel-cache-
+          key: ${{ runner.os }}-3.9-bazel-cache-${{ hashFiles('**/BUILD', '.bazelrc', '.bazelversion', 'WORKSPACE') }}
+          restore-keys: ${{ runner.os }}-3.9-bazel-cache-
 
       - name: Notebooks cache
         id: notebooks-cache
@@ -46,8 +45,8 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
-          cache: "poetry"
+          python-version: "3.9"
+          cache: poetry
           cache-dependency-path: |
             poetry.lock
             ./docs/src/tutorials/requirements.txt
