@@ -33,3 +33,9 @@ py_library(
     srcs = ["typecheck.py"],
     srcs_version = "PY3",
 )
+
+py_library(
+    name = "golden",
+    srcs = ["golden.py"],
+    srcs_version = "PY3",
+)

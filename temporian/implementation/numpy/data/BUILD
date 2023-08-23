@@ -18,14 +18,12 @@ py_library(
     srcs_version = "PY3",
     deps = [
         # already_there/numpy
-        ":display_utils",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
-        "//temporian/core/data:duration_utils",
-        "//temporian/utils:string",
         "//temporian/utils:config",
         "//temporian/core:event_set_ops",
+        ":display_utils",
     ],
 )
 
