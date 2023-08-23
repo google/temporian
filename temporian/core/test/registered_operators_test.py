@@ -49,6 +49,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "ENUMERATE",
             "EQUAL",
             "EQUAL_SCALAR",
+            "FFT",
             "FILTER",
             "FLOORDIV",
             "FLOORDIV_SCALAR",

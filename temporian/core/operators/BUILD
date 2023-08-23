@@ -343,3 +343,18 @@ py_library(
         "//temporian/proto:core_py_proto",
     ],
 )
+
+py_library(
+    name = "fast_fourier_transform",
+    srcs = ["fast_fourier_transform.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:compilation",
+        "//temporian/core:operator_lib",
+        "//temporian/core:typing",
+        "//temporian/core/data:node",
+        "//temporian/core/data:schema",
+        "//temporian/proto:core_py_proto",
+    ],
+)

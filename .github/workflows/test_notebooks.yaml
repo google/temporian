@@ -48,5 +48,11 @@ jobs:
       - name: Install notebook dependencies
         run: poetry run pip install -r ./docs/src/tutorials/requirements.txt
 
-      - name: Execute all notebooks
-        run: poetry run ./tools/run_notebooks.sh `ls docs/src/*.ipynb` `ls docs/src/tutorials/*.ipynb`
+      - name: Execute User Guide
+        run: poetry run ./tools/run_notebooks.sh `ls docs/src/*.ipynb`
+
+      - name: Execute all recipes
+        run: poetry run ./tools/run_notebooks.sh `ls docs/src/recipes/*.ipynb`
+
+      - name: Execute all tutorials
+        run: poetry run ./tools/run_notebooks.sh `ls docs/src/tutorials/*.ipynb`

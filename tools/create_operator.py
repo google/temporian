@@ -368,15 +368,17 @@ py_test(
         )
 
     print(
-        """Don't forget to register the new operators in:
-- The imports in the top-level init file temporian/__init__.py
+        """Don't forget to update the following code:
+- The imports in the top-level init file temporian/__init__.py (if global)
 - The imports in temporian/implementation/numpy/operators/__init__.py
 - The "operators" py_library in temporian/implementation/numpy/operators/BUILD
 - The "test_base" function in temporian/core/test/registered_operators_test.py
 - The "test_base" function in temporian/implementation/numpy/test/registered_operators_test.py
-- The PUBLIC_API_SYMBOLS set in temporian/test/public_symbols_test.py
-- The docs docs/src/reference/path/to/operator.md
+- The PUBLIC_API_SYMBOLS set in temporian/test/public_symbols_test.py (if global)
+- The .md file in docs/src/reference/temporian/operators
 - The docs API ref's home page docs/reference/index.md
+- The class EventSetOperations in temporian/core/event_set_ops.py (if not global)
+- The unit test in temporian/core/operators/test
 """
     )
 

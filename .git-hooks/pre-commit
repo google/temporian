@@ -1,0 +1,13 @@
+#!/bin/bash
+#
+files_to_check="docs/src/recipes/*.ipynb"
+files_to_check+=" docs/src/user_guide.ipynb"
+files_to_check+=" docs/src/tutorials/getting_started.ipynb"
+
+
+for path in `git diff --name-only --staged $files_to_check`
+do
+    echo "Pre-commit: Clearing outputs for $path"
+    jupyter nbconvert --clear-output "$path" --to notebook --inplace
+    git add $path
+done
