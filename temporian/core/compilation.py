@@ -50,7 +50,7 @@ def compile(fn: Optional[F] = None, *, verbose: int = 0) -> F:
     Example usage:
     ```python
     >>> @tp.compile
-    ... def f(x: EventSetNode, y: EventSetNode) -> EventSetNode:
+    ... def f(x: tp.EventSetNode, y: tp.EventSetNode) -> tp.EventSetNode:
     ...     return x.prefix("pre_").cumsum() + y
 
     >>> evset = tp.event_set(
@@ -67,7 +67,7 @@ def compile(fn: Optional[F] = None, *, verbose: int = 0) -> F:
     Example usage with arguments:
     ```python
     >>> @tp.compile(verbose=1)
-    ... def f(x: EventSetNode) -> EventSetNode:
+    ... def f(x: tp.EventSetNode) -> tp.EventSetNode:
     ...     return x.prefix("pre_")
 
     ```

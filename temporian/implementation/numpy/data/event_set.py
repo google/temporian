@@ -258,7 +258,7 @@ class IndexData:
         ```
         >>> features = [np.array([1, 2, 3]), np.array([4, 5, 6])]
         >>> timestamps = np.array([0, 1, 2])
-        >>> index_data = IndexData(features, timestamps)
+        >>> index_data = tp.IndexData(features, timestamps)
         >>> len(index_data)
         3
 
