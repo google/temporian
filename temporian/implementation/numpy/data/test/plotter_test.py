@@ -113,13 +113,17 @@ class PlotterTest(parameterized.TestCase):
             interactive=interactive,
         )
 
-        tmp_handle = tempfile.TemporaryDirectory()
-        tmp_path = os.path.join(tmp_handle.name, "fig.png")
+        try:
+            tmp_handle = tempfile.TemporaryDirectory()
+            tmp_path = os.path.join(tmp_handle.name, "fig.png")
 
-        if interactive:
-            bokeh_export_png(plot, filename=tmp_path)
-        else:
-            plot.savefig(tmp_path)
+            if interactive:
+                bokeh_export_png(plot, filename=tmp_path)
+            else:
+                plot.savefig(tmp_path)
+        except RuntimeError:
+            # Fails if chromedriver is not available.
+            pass
 
     def test_merged_plots_simple(self):
         evset_1 = event_set(
