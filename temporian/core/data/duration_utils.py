@@ -172,8 +172,8 @@ class TimeUnit(str, Enum):
     DAYS = "days"
     WEEKS = "weeks"
 
-    @staticmethod
-    def is_valid(value: Any) -> bool:
+    @classmethod
+    def is_valid(cls, value: Any) -> bool:
         return isinstance(value, TimeUnit) or (
             isinstance(value, str)
             and value in [item.value for item in TimeUnit]

@@ -24,6 +24,7 @@ py_library(
         # force/pandas
         ":pandas",
         "//temporian/implementation/numpy/data:event_set",
+        "//temporian/utils:typecheck",
     ],
 )
 
