@@ -1125,6 +1125,14 @@ class EventSetOperations:
             ... )
             >>> b = a.experimental_fast_fourier_transform(num_events=4, window="hamming")
             >>> b
+            indexes: []
+            features: [('a0', float64), ('a1', float64)]
+            events:
+                 (2 events):
+                    timestamps: [4. 6.]
+                    'a0': [4.65 6.4 ]
+                    'a1': [2.1994 4.7451]
+            ...
 
             ```
 
