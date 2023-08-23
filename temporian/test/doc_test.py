@@ -91,13 +91,11 @@ class DocTest(absltest.TestCase):
                     test = e.test
                     ex = e.example
                     lineno = (test.lineno or 0) + ex.lineno
-                    # pylint: disable=raise-missing-from
                     raise AssertionError(
                         "Exception running docstring example starting at line "
                         f"{lineno} on file {path}\n"
                         f">>> {ex.source}{e.exc_info[0]}: {e.exc_info[1]}"
-                    )
-                    # pylint: enable=raise-missing-from
+                    ) from None  # Avoid traceback "During handling..."
 
 
 if __name__ == "__main__":
