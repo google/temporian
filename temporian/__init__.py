@@ -25,7 +25,7 @@
 # from temporian.module import submodule as _submodule
 # del _submodule
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 
 # Register all operator implementations
 from temporian.implementation.numpy import operators as _impls
