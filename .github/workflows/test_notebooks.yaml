@@ -35,7 +35,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ./docs/src/tutorials/tmp
-          key: ${{ runner.os }}-notebooks-${{ matrix.path }}-${{ hashFiles('docs/src/${{ matrix.path }}.ipynb') }}
+          key: ${{ runner.os }}-notebooks-${{ matrix.path }}-${{ hashFiles(format('docs/src/{0}.ipynb', matrix.path)) }}
           restore-keys: |
             ${{ runner.os }}-notebooks-${{ matrix.path }}-
 
