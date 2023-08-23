@@ -30,7 +30,7 @@ def test_data() -> str:
 
 
 class TFPTest(absltest.TestCase):
-    def test_run(self):
+    def test_run_base(self):
         tmp_dir = tempfile.mkdtemp()
         input_path = os.path.join(tmp_dir, "input.csv")
         output_path = os.path.join(tmp_dir, "output.csv")
@@ -47,7 +47,7 @@ class TFPTest(absltest.TestCase):
 
         # Create a graph.
         input_node = tp.input_node([("a", tp.str_), ("b", tp.float32)])
-        output_node = input_node["b"].moving_sum(4)
+        output_node = input_node.add_index("a")["b"].moving_sum(4)
 
         # Execute the graph in Beam and export the result in a csv file.
         with TestPipeline() as p:
