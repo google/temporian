@@ -346,10 +346,8 @@ py_library(
     deps = [
         # already_there/numpy
         ":base",
-        "//temporian/core/data:duration_utils",
         "//temporian/core/operators:combine",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",
     ],
 )
@@ -363,7 +361,6 @@ py_library(
         ":base",
         "//temporian/core/operators:fast_fourier_transform",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",
     ],
 )

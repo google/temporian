@@ -19,6 +19,7 @@ py_library(
         "//temporian/core/data:duration",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
+        "//temporian/core/operators:combine",
         "//temporian/core/operators:glue",
         "//temporian/core/operators:unary",
         "//temporian/core/operators/binary:arithmetic",
@@ -33,6 +34,7 @@ py_library(
         "//temporian/io:csv",
         "//temporian/io:pandas",
         "//temporian/io:tensorflow",
+        "//temporian/utils:config",
         "//temporian/utils:typecheck",
     ],
 )
