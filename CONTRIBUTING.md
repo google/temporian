@@ -112,7 +112,7 @@ mkdocs serve -f docs/mkdocs.yml
 
 ### Adding code examples
 
-Any code examples that are included in the docstrings of members of the public API, or in markdown files under the [docs/](docs/) directory,will be executed and tested using the python's built-in [doctest](https://docs.python.org/3/library/doctest.html) module.
+Any doctest code examples in `temporian/*.py` or `docs/*.md`, will be executed and tested using the python's built-in [doctest](https://docs.python.org/3/library/doctest.html) module.
 
 For example, the following piece of code would be executed, and the outputs must match the expected result indicated:
 
@@ -136,7 +136,7 @@ Note from this example:
 - Multi-line statements need a preceding `...` instead of `>>>`.
 - All the lines immediately following `>>>` or `...` and before a blank line, are the expected outputs.
 - You should always leave a blank line before closing the code block, to indicate the end of the test.
-- The `...` inside the expected result is used to match anything. Here, the exact timestamps and the latest line (which includes memory usage information).
+- The `...` inside the expected result is used to match anything. Here, the exact timestamps and the latest line (which includes memory usage information) don't need exact match.
 
 You cannot use `...` in the first matching line to ignore the whole output (it's ambiguous with multi-lines).
 In that case, you may use the `SKIP` flag as follows:
@@ -161,11 +161,8 @@ Finally, note that globals like `tp`, `pd` and `np` are always included in the e
 To check if your examples are correct, you may run:
 
 ```shell
-# Test all examples in code docstrings (only api-facing modules)
-bazel test //temporian/test:docstring_test --test_output=streamed
-
-# Test all examples in /docs/*.md
-bazel test //docs/code_examples_test --test_output=streamed
+# Test anything in temporian/*.py and docs/*.md
+bazel test //temporian/test:doc_test --test_output=streamed
 ```
 
 In case of unexpected outputs, the result is printed and compared to the expected values, so that they can be fixed.
