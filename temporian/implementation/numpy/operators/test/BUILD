@@ -743,6 +743,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         ":test_util",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
