@@ -1,6 +1,12 @@
 name: tests
 
-on: [push, pull_request, workflow_call]
+on:
+  push:
+    branches: # Specifying branches makes it not run on pushed tags
+      - "*"
+  workflow_call: # Allow being ran from other actions
+  # Enable when we start receiving PRs from forks
+  # pull_request: # Run on PRs from forks (push doesn't cover those)
 
 jobs:
   test:
@@ -17,7 +23,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.cache/bazel
-          key: ${{ runner.os }}-${{ matrix.python-version }}-bazel-cache
+          key: ${{ runner.os }}-${{ matrix.python-version }}-bazel-cache-${{ hashFiles('**/BUILD', '.bazelrc', '.bazelversion', 'WORKSPACE') }}
+          restore-keys: ${{ runner.os }}-${{ matrix.python-version }}-bazel-cache-
 
       - name: Install poetry
         run: pipx install poetry
@@ -26,7 +33,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          cache: "poetry"
+          cache: poetry
 
       - name: Install dependencies
         run: poetry install --no-interaction
