@@ -18,19 +18,18 @@ StyleHtml = Union[Html, str]
 
 _HTML_STYLE_FEATURE_KEY = {"color": "#D81B60"}
 _HTML_STYLE_INDEX_KEY = {"color": "#d55e00"}
-_HTML_STYLE_DTYPE = {"color": "#0072b2"}
+_HTML_STYLE_DTYPE = {"color": "#4c9041"}
 _HTML_STYLE_INDEX_VALUE = {"color": "#1E88E5"}
 _HTML_STYLE_HEADER_DIV = {
-    "background-color": "beige",
     "margin-bottom": "11px",
     "padding": "5px",
     "font-size": "small",
     "line-height": "120%",
-    "border": "1px solid #E5E5DC",
+    "border": "1px solid rgba(127, 127, 127, 0.2)",
 }
 _HTML_STYLE_TABLE = {
     "margin-left": "20px",
-    "border": "1px solid #ddd",
+    "border": "1px solid rgba(127, 127, 127, 0.2)",
 }
 
 
