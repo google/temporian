@@ -529,6 +529,14 @@ class EventSet(EventSetOperations):
 
         return sys.getsizeof(self)
 
+    def num_events(self) -> int:
+        """Total number of events."""
+
+        count = 0
+        for data in self.data.values():
+            count += len(data.timestamps)
+        return count
+
     def check_same_sampling(self, other: EventSet):
         """Checks if two EventSets have the same sampling."""
         self.node().check_same_sampling(other.node())
