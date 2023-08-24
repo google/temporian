@@ -26,7 +26,6 @@ py_library(
         "//temporian/core/data:schema",
         "//temporian/utils:config",
         "//temporian/core:event_set_ops",
-        ":display_utils",
     ],
 )
 
