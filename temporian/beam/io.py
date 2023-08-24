@@ -364,10 +364,14 @@ def to_event_set(
             # Build feature and timestamps arrays.
             | "Merge timestamps"
             >> beam.ParDo(_MergeTimestampsSplitFeatures(len(schema.features)))
+            | "Shuffle" >> beam.Reshuffle()
         )
     elif format == UserEventSetFormat.indexedEvents:
-        return pipe | "Parse dict" >> beam.FlatMap(
-            _event_set_dict_to_event_set, schema, timestamp_key
+        return (
+            pipe
+            | "Parse dict"
+            >> beam.FlatMap(_event_set_dict_to_event_set, schema, timestamp_key)
+            | "Shuffle" >> beam.Reshuffle()
         )
     else:
         raise ValueError(f"Unknown format {format}")

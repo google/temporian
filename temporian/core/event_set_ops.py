@@ -2059,18 +2059,20 @@ class EventSetOperations:
 
     def since_last(
         self: EventSetOrNode,
+        steps: int = 1,
         sampling: Optional[EventSetOrNode] = None,
     ) -> EventSetOrNode:
-        """Computes the amount of time since the last distinct timestamp in an
+        """Computes the amount of time since the last previous timestamp in an
         [`EventSet`][temporian.EventSet].
 
-        If `sampling` is provided, the output will correspond to the time elapsed
-        between each timestamp in `sampling` and the latest previous timestamp in
-        the input. Else, the timestamps of the input will be used as `sampling`.
+        If a number of `steps` is provided, compute elapsed time after moving
+        back that number of previous events.
 
-        Example 1:
+        Basic example with 1 and 2 steps:
             ```python
             >>> a = tp.event_set(timestamps=[1, 5, 8, 8, 9])
+
+            >>> # Default: time since previous event
             >>> b = a.since_last()
             >>> b
             indexes: ...
@@ -2078,25 +2080,46 @@ class EventSetOperations:
                     'since_last': [nan  4.  3.  0.  1.]
             ...
 
+            >>> # Time since 2 previous events
+            >>> b = a.since_last(steps=2)
+            >>> b
+            indexes: ...
+                    timestamps: [1. 5. 8. 8. 9.]
+                    'since_last': [nan  nan  7.  3.  1.]
+            ...
+
             ```
 
-        Example 2:
+        If `sampling` is provided, the output will correspond to the time elapsed
+        between each timestamp in `sampling` and the latest previous or equal
+        timestamp in the input.
+
+        Example with sampling:
             ```python
-            >>> a = tp.event_set(timestamps=[2, 5, 7])
-            >>> b = tp.event_set(timestamps=[1, 4, 6, 10])
+            >>> a = tp.event_set(timestamps=[1, 4, 5, 7])
+            >>> b = tp.event_set(timestamps=[-1, 2, 4, 6, 10])
 
             >>> # Time elapsed between each sampling event
             >>> # and the latest previous event in a
-            >>> c = a.since_last(b)
+            >>> c = a.since_last(sampling=b)
             >>> c
             indexes: ...
-                    timestamps: [ 1. 4. 6. 10.]
-                    'since_last': [nan  2.  1.  3.]
+                    timestamps: [-1. 2. 4. 6. 10.]
+                    'since_last': [nan  1.  0.  1. 3.]
+            ...
+
+            >>> # 2 steps with sampling
+            >>> c = a.since_last(steps=2, sampling=b)
+            >>> c
+            indexes: ...
+                    timestamps: [-1. 2. 4. 6. 10.]
+                    'since_last': [nan  nan  1.  2. 5.]
             ...
 
             ```
 
         Args:
+            steps: Number of previous events to compute elapsed time with.
             sampling: EventSet to use the sampling of.
 
         Returns:
@@ -2105,7 +2128,7 @@ class EventSetOperations:
         """
         from temporian.core.operators.since_last import since_last
 
-        return since_last(self, sampling=sampling)
+        return since_last(self, steps=steps, sampling=sampling)
 
     def tick(
         self: EventSetOrNode, interval: Duration, align: bool = True

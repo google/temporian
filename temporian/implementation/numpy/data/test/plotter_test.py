@@ -1,8 +1,10 @@
 from absl.testing import parameterized, absltest
-
+import os
 import matplotlib
 from bokeh.io import export_png as bokeh_export_png
 import numpy as np
+import tempfile
+from pathlib import Path
 
 from temporian.implementation.numpy.data import plotter
 from temporian.implementation.numpy.data.io import event_set
@@ -110,10 +112,18 @@ class PlotterTest(parameterized.TestCase):
             return_fig=True,
             interactive=interactive,
         )
-        if interactive:
-            bokeh_export_png(plot, filename="fig.png")
-        else:
-            plot.savefig("fig.png")
+
+        try:
+            tmp_handle = tempfile.TemporaryDirectory()
+            tmp_path = os.path.join(tmp_handle.name, "fig.png")
+
+            if interactive:
+                bokeh_export_png(plot, filename=tmp_path)
+            else:
+                plot.savefig(tmp_path)
+        except RuntimeError:
+            # Fails if chromedriver is not available.
+            pass
 
     def test_merged_plots_simple(self):
         evset_1 = event_set(

@@ -1,8 +1,9 @@
+#include <pybind11/numpy.h>
+#include <pybind11/pybind11.h>
+
 #include <cstdint>
 #include <iostream>
 #include <map>
-#include <pybind11/numpy.h>
-#include <pybind11/pybind11.h>
 #include <string>
 #include <vector>
 
@@ -11,10 +12,9 @@
 namespace {
 namespace py = pybind11;
 
-
 py::array_t<double> since_last(const py::array_t<double> &event_timestamps,
-                               const py::array_t<double> &sampling_timestamps) {
-
+                               const py::array_t<double> &sampling_timestamps,
+                               const int steps) {
   // Input size
   const Idx n_event = event_timestamps.shape(0);
   const Idx n_sampling = sampling_timestamps.shape(0);
@@ -34,10 +34,11 @@ py::array_t<double> since_last(const py::array_t<double> &event_timestamps,
       next_event_idx++;
     }
     double value;
-    if (next_event_idx == 0) {
+    Idx since_last_idx = next_event_idx - steps;
+    if (since_last_idx < 0) {
       value = std::numeric_limits<double>::quiet_NaN();
     } else {
-      value = t - v_event[next_event_idx - 1];
+      value = t - v_event[since_last_idx];
     }
     v_since_last[sampling_idx] = value;
   }
@@ -45,9 +46,9 @@ py::array_t<double> since_last(const py::array_t<double> &event_timestamps,
   return since_last;
 }
 
-} // namespace
+}  // namespace
 
 void init_since_last(py::module &m) {
   m.def("since_last", &since_last, "", py::arg("event_timestamps").noconvert(),
-        py::arg("sampling_timestamps").noconvert());
+        py::arg("sampling_timestamps").noconvert(), py::arg("steps"));
 }

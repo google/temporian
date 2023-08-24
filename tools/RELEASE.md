@@ -16,4 +16,4 @@ To create a new release, follow these steps:
 
 6. Publish the Release. This will trigger the GitHub Action that builds and publishes the package to PyPI, and will point the /stable docs to this new version.
 
-7. Pull `main`, tag the latest commit as the new stable version with `git tag stable -f`, and push it with `git push origin stable -f`. This gives us a way to easily find the latest stable version of the code in the GitHub tree (used for example by the tutorial notebooks to not open an unreleased version of the notebooks).
+7. Pull `main`, tag the latest commit as the new stable version with `git tag last-release -f`, and push it with `git push origin last-release -f`. This gives us a way to easily find the latest stable version of the code in the GitHub tree (used for example by the tutorial notebooks to not open an unreleased version of the notebooks).
