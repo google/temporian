@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from typing import Dict, List, Tuple, Optional, Iterable
+from typing import Dict, List, Tuple, Optional, Iterable, Generator
 
 from collections import defaultdict
 import apache_beam as beam
@@ -85,7 +85,7 @@ class AddIndexBeamImplementation(BeamOperatorImplementation):
             (input, extract_index)
             | f"Join feature and new index {self.operator}"
             >> beam.CoGroupByKey()
-            | f"Reindex {self.operator}" >> beam.ParDo(_add_index)
+            | f"Reindex {self.operator}" >> beam.FlatMap(_add_index)
         )
 
         return {"output": output}
@@ -132,7 +132,7 @@ def _add_index(
             Iterable[ExtractedIndex],
         ],
     ]
-) -> IndexValue:
+) -> Generator[IndexValue, None, None]:
     """Adds the new index values to all remaining feature items."""
 
     indexes_and_feature_idx, (features, new_index) = items

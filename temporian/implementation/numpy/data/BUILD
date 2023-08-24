@@ -14,7 +14,10 @@ py_library(
 
 py_library(
     name = "event_set",
-    srcs = ["event_set.py"],
+    srcs = [
+        "display_utils.py",
+        "event_set.py",
+    ],
     srcs_version = "PY3",
     deps = [
         # already_there/numpy
@@ -46,7 +49,6 @@ py_library(
     srcs = ["plotter_base.py"],
     srcs_version = "PY3",
     deps = [
-        ":event_set",
         "//temporian/core/data:duration_utils",
         # already_there/numpy
     ],
@@ -71,9 +73,9 @@ py_library(
     srcs = ["plotter_matplotlib.py"],
     srcs_version = "PY3",
     deps = [
-        ":event_set",
         # already_there/numpy
         # force/matplotlib
+        ":plotter_base",
         "//temporian/core/data:duration_utils",
     ],
 )
@@ -83,20 +85,9 @@ py_library(
     srcs = ["plotter_bokeh.py"],
     srcs_version = "PY3",
     deps = [
-        ":event_set",
         # already_there/numpy
         # force/bokeh
+        ":plotter_base",
         "//temporian/core/data:duration_utils",
-    ],
-)
-
-py_library(
-    name = "display_utils",
-    srcs = ["display_utils.py"],
-    srcs_version = "PY3",
-    deps = [
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:duration_utils",
-        "//temporian/utils:config",
     ],
 )
