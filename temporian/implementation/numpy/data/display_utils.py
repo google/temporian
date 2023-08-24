@@ -96,6 +96,8 @@ def display_html(evset: EventSet) -> str:
                 html_style(dom, item_schema.name, _HTML_STYLE_INDEX_KEY)
             )
             html_index_value.appendChild(dom.createTextNode("="))
+            if isinstance(item_value, bytes):
+                item_value = item_value.decode()
             html_index_value.appendChild(
                 html_style(dom, str(item_value), _HTML_STYLE_INDEX_VALUE)
             )
