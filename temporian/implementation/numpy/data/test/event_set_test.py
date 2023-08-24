@@ -3,6 +3,7 @@ from absl.testing import absltest
 
 from temporian.implementation.numpy.data.io import event_set, IndexData
 from temporian.utils import config
+from temporian.utils import golden
 
 
 class EventSetTest(absltest.TestCase):
@@ -114,44 +115,21 @@ memory usage: 1.2 kB
         config.max_display_features = 0
         config.max_display_events = 0
 
-        self.assertEqual(
+        golden.check_string(
+            self,
             self.evset._repr_html_(),
-            "<div>2 indexes × 2 features (memory usage: 1.2 kB)"
-            + "<h3>Index: (x=1, y=hello)</h3>"
-            + "3 events"
-            + "<table>"
-            + "<tr><th><b>timestamp</b></th><th><b>a</b></th><th><b>b</b></th></tr>"
-            + "<tr><td>0.1</td><td>1</td><td>4</td></tr>"
-            + "<tr><td>0.2</td><td>2</td><td>5</td></tr>"
-            + "<tr><td>0.3</td><td>3</td><td>6</td></tr>"
-            + "</table>"
-            + "<h3>Index: (x=2, y=world)</h3>"
-            + "2 events"
-            + "<table>"
-            + "<tr><th><b>timestamp</b></th><th><b>a</b></th><th><b>b</b></th></tr>"
-            + "<tr><td>0.4</td><td>7</td><td>9</td></tr>"
-            + "<tr><td>0.5</td><td>8</td><td>10</td></tr>"
-            + "</table></div>",
+            "temporian/implementation/numpy/data/test/test_data/test_html_repr_no_limits_golden.html",
         )
 
     def test_html_repr_limits(self):
         config.max_display_indexes = 1
         config.max_display_features = 1
         config.max_display_events = 2
-        dots = "…"  # (ellipsis)
 
-        self.assertEqual(
+        golden.check_string(
+            self,
             self.evset._repr_html_(),
-            "<div>2 indexes × 2 features (memory usage: 1.2 kB)"
-            + "<h3>Index: (x=1, y=hello)</h3>"
-            + "3 events"
-            + "<table>"
-            + f"<tr><th><b>timestamp</b></th><th><b>a</b></th><th><b>{dots}</b></th></tr>"
-            + f"<tr><td>0.1</td><td>1</td><td>{dots}</td></tr>"
-            + f"<tr><td>0.2</td><td>2</td><td>{dots}</td></tr>"
-            + f"<tr><td>{dots}</td><td>{dots}</td><td>{dots}</td></tr>"
-            + "</table>"
-            + f"{dots} (1 more indexes not shown)</div>",
+            "temporian/implementation/numpy/data/test/test_data/test_html_repr_limits_golden.html",
         )
 
 

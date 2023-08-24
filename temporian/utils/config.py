@@ -34,21 +34,23 @@ debug_mode = bool(os.environ.get("TEMPORIAN_DEBUG_MODE", False))
 checks and logging, which may slow down execution."""
 
 # Limits for repr(evset), print(evset)
-max_printed_indexes = int(os.environ.get("TEMPORIAN_MAX_PRINTED_INDEXES", 5))
+max_printed_indexes = int(os.environ.get("TEMPORIAN_MAX_PRINTED_INDEXES", 4))
 """Maximum number of index values to show when printing an EventSet."""
 max_printed_features = int(os.environ.get("TEMPORIAN_MAX_PRINTED_FEATURES", 10))
 """Maximum number of features to show when printing an EventSet."""
-max_printed_events = int(os.environ.get("TEMPORIAN_MAX_PRINTED_EVENTS", 20))
+max_printed_events = int(os.environ.get("TEMPORIAN_MAX_PRINTED_EVENTS", 10))
 """Maximum number of events to show when printing an EventSet."""
 
 # Limits for html display of evsets (notebooks)
-max_display_indexes = int(os.environ.get("TEMPORIAN_MAX_DISPLAY_INDEXES", 5))
+#
+# Keep in sync with: temporian/implementation/numpy/data/test/event_set_test.py
+max_display_indexes = int(os.environ.get("TEMPORIAN_MAX_DISPLAY_INDEXES", 4))
 """Maximum number of index values to show when displaying an EventSet in a
 notebook."""
-max_display_features = int(os.environ.get("TEMPORIAN_MAX_DISPLAY_FEATURES", 20))
+max_display_features = int(os.environ.get("TEMPORIAN_MAX_DISPLAY_FEATURES", 16))
 """Maximum number of features to show when displaying an EventSet in a
 notebook."""
-max_display_events = int(os.environ.get("TEMPORIAN_MAX_DISPLAY_EVENTS", 20))
+max_display_events = int(os.environ.get("TEMPORIAN_MAX_DISPLAY_EVENTS", 5))
 """Maximum number of events to show per index value when displaying an EventSet
 in a notebook."""
 max_display_chars = int(os.environ.get("TEMPORIAN_MAX_DISPLAY_CHARS", 32))

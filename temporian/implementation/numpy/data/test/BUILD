@@ -9,11 +9,14 @@ package(
 py_test(
     name = "event_set_test",
     srcs = ["event_set_test.py"],
+    data = ["//temporian/implementation/numpy/data/test/test_data"],
     srcs_version = "PY3",
     deps = [
+        # already_there/numpy
         # already_there/absl/testing:absltest
         "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators/test:test_util",
+        "//temporian/utils:golden",
+        "//temporian/utils:config",
     ],
 )
 

@@ -736,4 +736,20 @@ py_test(
         "//temporian/implementation/numpy/operators:combine",
     ],
 )
-    
+
+py_test(
+    name = "fft_test",
+    srcs = ["fft_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
+        ":test_util",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:node",
+        "//temporian/core/data:schema",
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/core/operators:fast_fourier_transform",
+        "//temporian/implementation/numpy/operators:fast_fourier_transform",
+    ],
+)

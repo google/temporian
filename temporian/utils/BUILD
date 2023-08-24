@@ -32,4 +32,15 @@ py_library(
     name = "typecheck",
     srcs = ["typecheck.py"],
     srcs_version = "PY3",
+    deps = [
+        "//temporian/core:event_set_ops",
+        "//temporian/core/data:node",
+        "//temporian/implementation/numpy/data:event_set",
+    ],
+)
+
+py_library(
+    name = "golden",
+    srcs = ["golden.py"],
+    srcs_version = "PY3",
 )

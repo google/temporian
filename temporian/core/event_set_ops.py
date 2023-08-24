@@ -1093,6 +1093,68 @@ class EventSetOperations:
 
         return enumerate(self)
 
+    def experimental_fast_fourier_transform(
+        self: EventSetOrNode,
+        *,
+        num_events: int,
+        hop_size: Optional[int] = None,
+        window: Optional[str] = None,
+        num_spectral_lines: Optional[int] = None,
+    ) -> EventSetOrNode:
+        """Computes the Fast Fourier Transform of an
+        [`EventSet`][temporian.EventSet] with a single tp.float32 feature.
+
+        WARNING: This operator is experimental. The implementation is not yet
+        optimized for speed, and the operator signature might change in the
+        future.
+
+        The window length is defined in number of events, instead of
+        timestamp duration like most other operators. The 'num_events' argument
+        needs to be specified by warg i.e. fast_fourier_transform(num_events=5)
+        instead of fast_fourier_transform(5).
+
+        The operator returns the amplitude of each spectral line as
+        separate tp.float32 features named "a0", "a1", "a2", etc. By default,
+        `num_events // 2` spectral line are returned.
+
+        Usage:
+            ```python
+            >>> a = tp.event_set(
+            ...    timestamps=[1,2,3,4,5,6],
+            ...    features={"x": [4.,3.,2.,6.,2.,1.]},
+            ... )
+            >>> b = a.experimental_fast_fourier_transform(num_events=4, window="hamming")
+            >>> b
+
+            ```
+
+        Args:
+            num_events: Size of the FFT expressed as a number of events.
+            window: Optional window function applied before the FFT. if None, no
+                window is applied. Supported values are: "hamming".
+            hop_size: Step, in number of events, between consecutive outputs.
+                Default to num_events//2.
+            num_spectral_lines: Number of returned spectral lines. If set, the
+                operators returns the `num_spectral_lines` low frequency
+                spectral lines. `num_spectral_lines` should be between 1 and
+                `num_events`.
+
+        Returns:
+            EventSet containing the amplitude of each frequency band of the
+            Fourier Transform.
+        """
+        from temporian.core.operators.fast_fourier_transform import (
+            fast_fourier_transform,
+        )
+
+        return fast_fourier_transform(
+            self,
+            num_events=num_events,
+            hop_size=hop_size,
+            window=window,
+            num_spectral_lines=num_spectral_lines,
+        )
+
     def filter(
         self: EventSetOrNode,
         condition: Optional[EventSetOrNode] = None,
@@ -1997,18 +2059,20 @@ class EventSetOperations:
 
     def since_last(
         self: EventSetOrNode,
+        steps: int = 1,
         sampling: Optional[EventSetOrNode] = None,
     ) -> EventSetOrNode:
-        """Computes the amount of time since the last distinct timestamp in an
+        """Computes the amount of time since the last previous timestamp in an
         [`EventSet`][temporian.EventSet].
 
-        If `sampling` is provided, the output will correspond to the time elapsed
-        between each timestamp in `sampling` and the latest previous timestamp in
-        the input. Else, the timestamps of the input will be used as `sampling`.
+        If a number of `steps` is provided, compute elapsed time after moving
+        back that number of previous events.
 
-        Example 1:
+        Basic example with 1 and 2 steps:
             ```python
             >>> a = tp.event_set(timestamps=[1, 5, 8, 8, 9])
+
+            >>> # Default: time since previous event
             >>> b = a.since_last()
             >>> b
             indexes: ...
@@ -2016,25 +2080,46 @@ class EventSetOperations:
                     'since_last': [nan  4.  3.  0.  1.]
             ...
 
+            >>> # Time since 2 previous events
+            >>> b = a.since_last(steps=2)
+            >>> b
+            indexes: ...
+                    timestamps: [1. 5. 8. 8. 9.]
+                    'since_last': [nan  nan  7.  3.  1.]
+            ...
+
             ```
 
-        Example 2:
+        If `sampling` is provided, the output will correspond to the time elapsed
+        between each timestamp in `sampling` and the latest previous or equal
+        timestamp in the input.
+
+        Example with sampling:
             ```python
-            >>> a = tp.event_set(timestamps=[2, 5, 7])
-            >>> b = tp.event_set(timestamps=[1, 4, 6, 10])
+            >>> a = tp.event_set(timestamps=[1, 4, 5, 7])
+            >>> b = tp.event_set(timestamps=[-1, 2, 4, 6, 10])
 
             >>> # Time elapsed between each sampling event
             >>> # and the latest previous event in a
-            >>> c = a.since_last(b)
+            >>> c = a.since_last(sampling=b)
             >>> c
             indexes: ...
-                    timestamps: [ 1. 4. 6. 10.]
-                    'since_last': [nan  2.  1.  3.]
+                    timestamps: [-1. 2. 4. 6. 10.]
+                    'since_last': [nan  1.  0.  1. 3.]
+            ...
+
+            >>> # 2 steps with sampling
+            >>> c = a.since_last(steps=2, sampling=b)
+            >>> c
+            indexes: ...
+                    timestamps: [-1. 2. 4. 6. 10.]
+                    'since_last': [nan  nan  1.  2. 5.]
             ...
 
             ```
 
         Args:
+            steps: Number of previous events to compute elapsed time with.
             sampling: EventSet to use the sampling of.
 
         Returns:
@@ -2043,7 +2128,7 @@ class EventSetOperations:
         """
         from temporian.core.operators.since_last import since_last
 
-        return since_last(self, sampling=sampling)
+        return since_last(self, steps=steps, sampling=sampling)
 
     def tick(
         self: EventSetOrNode, interval: Duration, align: bool = True
@@ -2155,6 +2240,7 @@ class EventSetOperations:
         applied independently for each index.
 
         Usage example:
+
             ```python
             >>> a = tp.event_set(timestamps=[5, 9, 9, 16], features={'f': [1,2,3,4]})
             >>> b = a.unique_timestamps()
@@ -2165,6 +2251,8 @@ class EventSetOperations:
                 (3 events):
                     timestamps: [ 5. 9. 16.]
             ...
+
+            ```
 
         Returns:
             EventSet without features with unique timestamps in the input.
