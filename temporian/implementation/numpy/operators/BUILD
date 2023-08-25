@@ -29,6 +29,7 @@ py_library(
         ":rename",
         ":resample",
         ":select",
+        ":select_index_values",
         ":since_last",
         ":tick",
         ":timestamps",

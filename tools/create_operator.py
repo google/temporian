@@ -366,6 +366,7 @@ py_test(
 - The PUBLIC_API_SYMBOLS set in temporian/test/public_symbols_test.py (if global)
 - The .md file in docs/src/reference/temporian/operators
 - The docs API ref's home page docs/reference/index.md
+- The tests in temporian/core/test/event_set_ops_test.py
 - The unit test in temporian/core/operators/test
 """)
 

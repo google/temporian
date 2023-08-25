@@ -42,6 +42,11 @@ class SelectIndexValuesNumpyImplementation(OperatorImplementation):
         # Create output EventSet
         output_evset = EventSet(data={}, schema=output_schema)
 
+        # TODO: remove this behavior when adding number/fraction params
+        # and force one of the params to not be None
+        if keys is None:
+            keys = []
+
         # Fill output EventSet's data
         for key in keys:
             key = normalize_index_key(key)
