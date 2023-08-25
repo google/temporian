@@ -17,9 +17,9 @@
 
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Tuple, Union, TYPE_CHECKING
-from temporian.core.data.dtype import IndexValue
 
 from temporian.core.data.duration import Duration
+from temporian.implementation.numpy.data.event_set import IndexKey
 
 
 if TYPE_CHECKING:
@@ -1954,7 +1954,7 @@ class EventSetOperations:
         return select_index_values(self, keys=keys)
 
     def set_index(
-        self: EventSetOrNode, indexes: Union[IndexValue, List[IndexValue]]
+        self: EventSetOrNode, indexes: Union[IndexKey, List[IndexKey]]
     ) -> EventSetOrNode:
         """Replaces the index in an [`EventSet`][temporian.EventSet].
 

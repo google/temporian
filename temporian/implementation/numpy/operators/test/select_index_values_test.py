@@ -44,15 +44,16 @@ class SelectIndexValuesOperatorTest(absltest.TestCase):
         node = evset.node()
 
         expected_output = event_set(
-            timestamps=[1, 1],
+            timestamps=[1, 2, 3, 4],
             features={
-                "c": ["A", "B"],
+                "a": [1.0, 2.0],
+                "b": [5, 6],
             },
             indexes=["c"],
         )
 
         # Run op
-        op = SelectIndexValues(input=node, param=1.0)
+        op = SelectIndexValues(input=node, keys=[("A",)])
         instance = SelectIndexValuesNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
         output = instance.call(input=evset)["output"]

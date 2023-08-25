@@ -35,18 +35,24 @@ class SelectIndexValuesNumpyImplementation(OperatorImplementation):
 
         output_schema = self.output_schema("output")
 
+        keys = self.operator.keys
+
         # Create output EventSet
         output_evset = EventSet(data={}, schema=output_schema)
 
         # Fill output EventSet's data
-        for index_key, index_data in input.data.items():
+        for key in keys:
+            index_data = input.data[key]
+
+            # for index_key, index_data in input.data.items():
             output_evset.set_index_value(
-                index_key,
+                key,
                 IndexData(
-                    features=[],
-                    timestamps=np.array([1], dtype=np.float64),
+                    features=index_data.features,
+                    timestamps=index_data.timestamps,
                     schema=output_schema,
                 ),
+                normalize=False,
             )
 
         return {"output": output_evset}

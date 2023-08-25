@@ -18,19 +18,19 @@
 from typing import List, Optional, Union
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
-from temporian.core.data.dtype import IndexValue
 from temporian.core.data.node import (
     EventSetNode,
     create_node_new_features_new_sampling,
 )
 from temporian.core.operators.base import Operator
 from temporian.core.typing import EventSetOrNode
+from temporian.implementation.numpy.data.event_set import IndexKey
 from temporian.proto import core_pb2 as pb
 from temporian.utils.typecheck import typecheck
 
 
 class SelectIndexValues(Operator):
-    def __init__(self, input: EventSetNode, keys: Optional[List[IndexValue]]):
+    def __init__(self, input: EventSetNode, keys: Optional[List[IndexKey]]):
         super().__init__()
 
         self.add_input("input", input)
@@ -78,7 +78,7 @@ operator_lib.register_operator(SelectIndexValues)
 @compile
 def select_index_values(
     input: EventSetOrNode,
-    keys: Optional[Union[IndexValue, List[IndexValue]]] = None,
+    keys: Optional[Union[IndexKey, List[IndexKey]]] = None,
 ) -> EventSetOrNode:
     assert isinstance(input, EventSetNode)
 

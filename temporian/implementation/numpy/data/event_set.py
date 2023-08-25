@@ -31,7 +31,7 @@ import sys
 import numpy as np
 
 from temporian.utils import config
-from temporian.core.data.dtype import DType
+from temporian.core.data.dtype import DType, IndexKey, IndexKeyType
 from temporian.core.data.node import (
     EventSetNode,
     create_node_with_new_reference,
@@ -67,11 +67,8 @@ _DTYPE_REVERSE_MAPPING = {
     DType.BOOLEAN: np.bool_,
 }
 
-IndexItemType = Union[int, str, bytes]
-IndexType = Tuple[IndexItemType, ...]
 
-
-def normalize_index_item(x: IndexItemType) -> IndexItemType:
+def normalize_index_item(x: IndexKeyType) -> IndexKeyType:
     if isinstance(x, str):
         return x.encode()
     elif isinstance(x, (int, str, bytes)):
@@ -80,8 +77,8 @@ def normalize_index_item(x: IndexItemType) -> IndexItemType:
 
 
 def normalize_index_key(
-    index: Optional[Union[IndexItemType, IndexType]]
-) -> Optional[Union[IndexItemType, IndexType]]:
+    index: Optional[Union[IndexKeyType, IndexKey]]
+) -> Optional[Union[IndexKeyType, IndexKey]]:
     if index is None:
         return None
     if isinstance(index, tuple):
@@ -366,7 +363,7 @@ class EventSet(EventSetOperations):
 
     def __init__(
         self,
-        data: Dict[IndexType, IndexData],
+        data: Dict[IndexKey, IndexData],
         schema: Schema,
         name: Optional[str] = None,
     ) -> None:
@@ -378,7 +375,7 @@ class EventSet(EventSetOperations):
         self._internal_node: Optional[EventSetNode] = None
 
     @property
-    def data(self) -> Dict[IndexType, IndexData]:
+    def data(self) -> Dict[IndexKey, IndexData]:
         return self._data
 
     @property
@@ -393,11 +390,11 @@ class EventSet(EventSetOperations):
     def name(self, name: Optional[str]) -> None:
         self._name = name
 
-    def get_index_keys(self, sort: bool = False) -> List[IndexType]:
+    def get_index_keys(self, sort: bool = False) -> List[IndexKey]:
         idx_list = list(self.data.keys())
         return sorted(idx_list) if sort else idx_list
 
-    def get_arbitrary_index_key(self) -> Optional[IndexType]:
+    def get_arbitrary_index_key(self) -> Optional[IndexKey]:
         """Gets an arbitrary index key.
 
         If the EventSet is empty, return None.
@@ -456,7 +453,7 @@ class EventSet(EventSetOperations):
         return self._internal_node
 
     def get_index_value(
-        self, index_key: Tuple, normalize: bool = True
+        self, index_key: IndexKey, normalize: bool = True
     ) -> IndexData:
         """Gets the value for a specified index key.
 
@@ -469,7 +466,7 @@ class EventSet(EventSetOperations):
         return self.data[index_key]
 
     def set_index_value(
-        self, index_key: Tuple, value: IndexData, normalize: bool = True
+        self, index_key: IndexKey, value: IndexData, normalize: bool = True
     ) -> None:
         """Sets the value for a specified index key.
 

@@ -26,8 +26,8 @@ from temporian.core.data import duration_utils
 from temporian.implementation.numpy.data.event_set import (
     EventSet,
     normalize_index_key,
-    IndexItemType,
-    IndexType,
+    IndexValueType,
+    IndexValue,
 )
 from temporian.implementation.numpy.data.plotter_base import (
     Options,
@@ -46,10 +46,10 @@ InputEventSet = Union[
 # "indexes" argument in tp.plot.
 InputIndex = Optional[
     Union[
-        IndexItemType,
-        IndexType,
-        List[IndexItemType],
-        List[IndexType],
+        IndexValueType,
+        IndexValue,
+        List[IndexValueType],
+        List[IndexValue],
     ]
 ]
 
@@ -168,7 +168,7 @@ def normalize_features(features: InputFeatures) -> Optional[Set[str]]:
     raise ValueError(f"Non supported feature type {features}")
 
 
-def normalize_indexes(indexes: InputIndex, groups: Groups) -> List[IndexType]:
+def normalize_indexes(indexes: InputIndex, groups: Groups) -> List[IndexValue]:
     """Normalizes the "indexes" argument of plot."""
 
     if indexes is None:
@@ -196,7 +196,7 @@ def normalize_indexes(indexes: InputIndex, groups: Groups) -> List[IndexType]:
     return normalized_indexes
 
 
-def validate_indexes(indexes: List[IndexType], groups: Groups):
+def validate_indexes(indexes: List[IndexValue], groups: Groups):
     """Ensures that indexes are valid i.e. available in all event-sets."""
 
     for g in groups:
@@ -368,7 +368,7 @@ def plot(
 def plot_with_plotter(
     plotter_class: Type[PlotterBackend],
     groups: Groups,
-    indexes: List[IndexType],
+    indexes: List[IndexValue],
     options: Options,
 ):
     num_plots = get_num_plots(groups, indexes, options)
