@@ -14,7 +14,7 @@
 
 """Data types declaration."""
 
-from typing import Any
+from typing import Any, Tuple
 
 import math
 from enum import Enum
@@ -109,6 +109,8 @@ def tp_dtype_to_py_type(dtype: DType) -> Any:
 # TODO: IndexDType should only be the integer and str types in DType. Let's
 # find a way for IndexDType to only represent those types.
 IndexDType = DType
+
+IndexValue = Tuple[IndexDType, ...]
 
 
 def check_is_valid_index_dtype(dtype: DType):

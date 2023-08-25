@@ -362,8 +362,8 @@ py_library(
 )
 
 py_library(
-    name = "select_index_value",
-    srcs = ["select_index_value.py"],
+    name = "select_index_values",
+    srcs = ["select_index_values.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
@@ -373,4 +373,3 @@ py_library(
         "//temporian/proto:core_py_proto",
     ],
 )
-    

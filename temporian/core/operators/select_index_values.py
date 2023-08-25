@@ -13,28 +13,36 @@
 # limitations under the License.
 
 
-"""SelectIndexValue operator class and public API function definitions."""
+"""SelectIndexValues operator class and public API function definitions."""
 
+from typing import List, Optional, Union
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
-from temporian.core.data.node import EventSetNode, create_node_new_features_new_sampling
+from temporian.core.data.dtype import IndexValue
+from temporian.core.data.node import (
+    EventSetNode,
+    create_node_new_features_new_sampling,
+)
 from temporian.core.operators.base import Operator
 from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
 from temporian.utils.typecheck import typecheck
 
 
-class SelectIndexValue(Operator):
-    def __init__(self, input: EventSetNode, param: float):
+class SelectIndexValues(Operator):
+    def __init__(self, input: EventSetNode, keys: Optional[List[IndexValue]]):
         super().__init__()
 
         self.add_input("input", input)
-        self.add_attribute("param", param)
+
+        self._keys = keys
+        if keys:
+            self.add_attribute("keys", keys)
 
         self.add_output(
             "output",
             create_node_new_features_new_sampling(
-                features=[],
+                features=input.schema.features,
                 indexes=input.schema.indexes,
                 is_unix_timestamp=input.schema.is_unix_timestamp,
                 creator=self,
@@ -46,50 +54,42 @@ class SelectIndexValue(Operator):
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
-            key="SELECT_INDEX_VALUE",
+            key="SELECT_INDEX_VALUES",
             attributes=[
                 pb.OperatorDef.Attribute(
-                    key="param",
-                    type=pb.OperatorDef.Attribute.Type.FLOAT_64,
-                    is_optional=False,
+                    key="keys",
+                    type=pb.OperatorDef.Attribute.Type.LIST_INDEX_VALUES,
+                    is_optional=True,
                 ),
             ],
             inputs=[pb.OperatorDef.Input(key="input")],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
 
+    @property
+    def keys(self) -> Optional[List[IndexValue]]:
+        return self._keys
 
-operator_lib.register_operator(SelectIndexValue)
+
+operator_lib.register_operator(SelectIndexValues)
 
 
 @typecheck
 @compile
-def select_index_value(input: EventSetOrNode, param: float) -> EventSetOrNode:
-    """<Text>
+def select_index_values(
+    input: EventSetOrNode,
+    keys: Optional[Union[IndexValue, List[IndexValue]]] = None,
+) -> EventSetOrNode:
+    assert isinstance(input, EventSetNode)
 
-    Args:
-        input: <Text>
-        param: <Text>
+    if isinstance(keys, list) and all(isinstance(k, tuple) for k in keys):
+        pass
+    elif isinstance(keys, tuple):
+        keys = [keys]
+    else:
+        raise TypeError(
+            "Unexpected type for keys. Expect a tuple or list of"
+            f" tuples. Got '{keys}' instead."
+        )
 
-    Example:
-
-        ```python
-        >>> a = tp.event_set(timestamps=[0, 1, 2], features={"A": [0, 10, 20]})
-        >>> b = tp.select_index_value(a)
-        >>> b
-        indexes: []
-        features: [('A', int64)]
-        events:
-            (3 events):
-                timestamps: [0. 1. 2.]
-                'A': [ 0 10 20]
-        ...
-
-        ```
-
-    Returns:
-        <Text>
-    """
-
-    return SelectIndexValue(input=input, param=param).outputs["output"]  # type: ignore
-
+    return SelectIndexValues(input=input, keys=keys).outputs["output"]

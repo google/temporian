@@ -755,8 +755,8 @@ py_test(
 )
 
 py_test(
-    name = "select_index_value_test",
-    srcs = ["select_index_value_test.py"],
+    name = "select_index_values_test",
+    srcs = ["select_index_values_test.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
@@ -765,8 +765,7 @@ py_test(
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/implementation/numpy/data:io",
-        "//temporian/core/operators:select_index_value",
-        "//temporian/implementation/numpy/operators:select_index_value",
+        "//temporian/core/operators:select_index_values",
+        "//temporian/implementation/numpy/operators:select_index_values",
     ],
 )
-    

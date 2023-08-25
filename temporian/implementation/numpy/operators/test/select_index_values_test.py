@@ -16,27 +16,28 @@
 from absl.testing import absltest
 
 import numpy as np
-from temporian.core.operators.select_index_value import SelectIndexValue
+from temporian.core.operators.select_index_values import SelectIndexValues
 from temporian.implementation.numpy.data.io import event_set
-from temporian.implementation.numpy.operators.select_index_value import (
-    SelectIndexValueNumpyImplementation,
+from temporian.implementation.numpy.operators.select_index_values import (
+    SelectIndexValuesNumpyImplementation,
 )
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
     testOperatorAndImp,
 )
 
-class SelectIndexValueOperatorTest(absltest.TestCase):
+
+class SelectIndexValuesOperatorTest(absltest.TestCase):
     def setUp(self):
         pass
 
     def test_base(self):
         evset = event_set(
-            timestamps=[1,2,3,4],
+            timestamps=[1, 2, 3, 4],
             features={
-                    "a": [1.0, 2.0, 3.0, 4.0],
-                    "b": [5, 6, 7, 8],
-                    "c": ["A", "A", "B", "B"],
+                "a": [1.0, 2.0, 3.0, 4.0],
+                "b": [5, 6, 7, 8],
+                "c": ["A", "A", "B", "B"],
             },
             indexes=["c"],
         )
@@ -45,14 +46,14 @@ class SelectIndexValueOperatorTest(absltest.TestCase):
         expected_output = event_set(
             timestamps=[1, 1],
             features={
-                    "c": ["A", "B"],
+                "c": ["A", "B"],
             },
             indexes=["c"],
         )
 
         # Run op
-        op = SelectIndexValue(input=node, param=1.0)
-        instance = SelectIndexValueNumpyImplementation(op)
+        op = SelectIndexValues(input=node, param=1.0)
+        instance = SelectIndexValuesNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
         output = instance.call(input=evset)["output"]
 
@@ -61,4 +62,3 @@ class SelectIndexValueOperatorTest(absltest.TestCase):
 
 if __name__ == "__main__":
     absltest.main()
-

@@ -13,26 +13,25 @@
 # limitations under the License.
 
 
-"""Implementation for the SelectIndexValue operator."""
+"""Implementation for the SelectIndexValues operator."""
 
 
 from typing import Dict
 import numpy as np
 
 from temporian.implementation.numpy.data.event_set import IndexData, EventSet
-from temporian.core.operators.select_index_value import SelectIndexValue
+from temporian.core.operators.select_index_values import SelectIndexValues
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
-class SelectIndexValueNumpyImplementation(OperatorImplementation):
 
-    def __init__(self, operator: SelectIndexValue) -> None:
-        assert isinstance(operator, SelectIndexValue)
+class SelectIndexValuesNumpyImplementation(OperatorImplementation):
+    def __init__(self, operator: SelectIndexValues) -> None:
+        assert isinstance(operator, SelectIndexValues)
         super().__init__(operator)
 
-    def __call__(
-        self, input: EventSet) -> Dict[str, EventSet]:
-        assert isinstance(self.operator, SelectIndexValue)
+    def __call__(self, input: EventSet) -> Dict[str, EventSet]:
+        assert isinstance(self.operator, SelectIndexValues)
 
         output_schema = self.output_schema("output")
 
@@ -47,12 +46,12 @@ class SelectIndexValueNumpyImplementation(OperatorImplementation):
                     features=[],
                     timestamps=np.array([1], dtype=np.float64),
                     schema=output_schema,
-                )
+                ),
             )
 
         return {"output": output_evset}
 
 
 implementation_lib.register_operator_implementation(
-    SelectIndexValue, SelectIndexValueNumpyImplementation
+    SelectIndexValues, SelectIndexValuesNumpyImplementation
 )

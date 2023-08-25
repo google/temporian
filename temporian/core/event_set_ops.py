@@ -16,7 +16,8 @@
 
 
 from __future__ import annotations
-from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, Tuple, Union, TYPE_CHECKING
+from temporian.core.data.dtype import IndexValue
 
 from temporian.core.data.duration import Duration
 
@@ -1917,8 +1918,43 @@ class EventSetOperations:
 
         return select(self, feature_names=feature_names)
 
+    def select_index_values(
+        self: EventSetOrNode,
+        keys: Optional[Union[Tuple, List[Tuple]]] = None,
+    ) -> EventSetOrNode:
+        """Selects a subset of index values from an
+        [`EventSet`][temporian.EventSet].
+
+        Args:
+            keys: index key or list of index keys to select from the EventSet.
+
+        Example:
+
+            ```python
+            >>> a = tp.event_set(timestamps=[0, 1, 2], features={"A": [0, 10, 20]})
+            >>> b = tp.select_index_values(a)
+            >>> b
+            indexes: []
+            features: [('A', int64)]
+            events:
+                (3 events):
+                    timestamps: [0. 1. 2.]
+                    'A': [ 0 10 20]
+            ...
+
+            ```
+
+        Returns:
+            EventSet with a subset of the index values.
+        """
+        from temporian.core.operators.select_index_values import (
+            select_index_values,
+        )
+
+        return select_index_values(self, keys=keys)
+
     def set_index(
-        self: EventSetOrNode, indexes: Union[str, List[str]]
+        self: EventSetOrNode, indexes: Union[IndexValue, List[IndexValue]]
     ) -> EventSetOrNode:
         """Replaces the index in an [`EventSet`][temporian.EventSet].
 

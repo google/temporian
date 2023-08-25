@@ -18,7 +18,7 @@ from __future__ import annotations
 from abc import ABC
 from copy import deepcopy
 from typing import Dict, List, Tuple, Union, Any
-from temporian.core.data.dtype import DType
+from temporian.core.data.dtype import DType, IndexValue
 
 from temporian.core.data.node import EventSetNode
 from temporian.proto import core_pb2 as pb
@@ -26,7 +26,15 @@ from temporian.proto import core_pb2 as pb
 
 # Valid types for operator attributes
 AttributeType = Union[
-    str, int, float, bool, bytes, List[str], Dict[str, str], List[DType]
+    str,
+    int,
+    float,
+    bool,
+    bytes,
+    List[str],
+    Dict[str, str],
+    List[DType],
+    List[IndexValue],
 ]
 
 

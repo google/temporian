@@ -152,8 +152,9 @@ def {lower_op}(input: EventSetOrNode, param: float) -> EventSetOrNode:
     Returns:
         <Text>
     """
+    assert isinstance(input, EventSetNode)
 
-    return {capitalized_op}(input=input, param=param).outputs["output"]  # type: ignore
+    return {capitalized_op}(input=input, param=param).outputs["output"]
 
 ''')
 
@@ -357,6 +358,7 @@ py_test(
 
     print("""Don't forget to update the following code:
 - The imports in the top-level init file temporian/__init__.py (if global)
+- The EventSetOperations class in temporian/core/event_set_ops.py (if not global)
 - The imports in temporian/implementation/numpy/operators/__init__.py
 - The "operators" py_library in temporian/implementation/numpy/operators/BUILD
 - The "test_base" function in temporian/core/test/registered_operators_test.py
@@ -364,7 +366,6 @@ py_test(
 - The PUBLIC_API_SYMBOLS set in temporian/test/public_symbols_test.py (if global)
 - The .md file in docs/src/reference/temporian/operators
 - The docs API ref's home page docs/reference/index.md
-- The class EventSetOperations in temporian/core/event_set_ops.py (if not global)
 - The unit test in temporian/core/operators/test
 """)
 

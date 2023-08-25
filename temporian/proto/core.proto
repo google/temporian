@@ -206,6 +206,7 @@ message OperatorDef {
       DTYPE = 8;
       LIST_DTYPE = 9;
       BYTES = 10;
+      LIST_INDEX_VALUES = 11;
     }
   }
 }
