@@ -20,7 +20,7 @@ from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core.operators.drop_index import drop_index
 
 
-def to_tensorflow(
+def to_tensorflow_dataset(
     evset: EventSet, timestamps: str = "timestamp"
 ) -> "tensorflow.data.Dataset":
     """Converts an [`EventSet`][temporian.EventSet] to a tensorflow Dataset.
@@ -36,7 +36,7 @@ def to_tensorflow(
             },
         )
 
-        tf_dataset = tp.to_tensorflow(evset)
+        tf_dataset = tp.to_tensorflow_dataset(evset)
 
         def extract_label(example):
             label = example.pop("label")
@@ -59,8 +59,8 @@ def to_tensorflow(
         import tensorflow as tf
     except ImportError:
         logging.warning(
-            "`tp.to_tensorflow()` requires for TensorFlow to be installed."
-            " Install TensorFlow with pip using `pip install"
+            "`tp.to_tensorflow_dataset()` requires for TensorFlow to be"
+            " installed. Install TensorFlow with pip using `pip install"
             " temporian[tensorflow]` or `pip install tensorflow`."
         )
         raise
@@ -76,3 +76,25 @@ def to_tensorflow(
         dict_data[feature.name] = data.features[feature_idx]
 
     return tf.data.Dataset.from_tensor_slices(dict_data)
+
+
+def to_tensorflow_record(
+    evset: EventSet,
+    path: str,
+    timestamps: str = "timestamp",
+    grouped_by_index: bool = True,
+):
+    """Exports an EventSet into TF.Records of TF.Examples.
+
+    TF.Records of TF.Examples is one of the standard solution to store data
+    for TensorFlow models.
+    https://www.tensorflow.org/tutorials/load_data/tfrecord
+
+    Args:
+        evset: Event set to export.
+        path: Path to output TF.Record.
+        timestamps: Name of the output column containing timestamps.
+        grouped_by_index: Are events groupped by index. Run
+            `tp.help.grouped_by_index()` for the documentation.
+    """
+    pass
