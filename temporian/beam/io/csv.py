@@ -85,7 +85,7 @@ def from_csv(
         timestamp_key: Key containing the timestamps.
 
     Returns:
-        A PCollection of dictionary of key:value.
+        A PCollection of event-set compatible with tpb.run.
     """
     return (
         pipe
