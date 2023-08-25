@@ -22,7 +22,7 @@ from temporian.core.operators.select import (
 )
 from temporian.beam import implementation_lib
 from temporian.beam.operators.base import BeamOperatorImplementation
-from temporian.beam.io import IndexValue, PEventSet
+from temporian.beam.io.dict import IndexValue, PEventSet
 
 
 class SelectBeamImplementation(BeamOperatorImplementation):

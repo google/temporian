@@ -25,8 +25,8 @@ from apache_beam.testing.util import assert_that, equal_to
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
 )
-from temporian.beam.io import from_csv as beam_from_csv
-from temporian.beam.io import to_csv as beam_to_csv
+from temporian.beam.io.csv import from_csv as beam_from_csv
+from temporian.beam.io.csv import to_csv as beam_to_csv
 from temporian.beam.evaluation import run
 from temporian.io.csv import to_csv, from_csv
 from temporian.core.data.node import EventSetNode
