@@ -418,7 +418,8 @@ class EventSet(EventSetOperations):
         return None
 
     def node(self, force_new_node: bool = False) -> EventSetNode:
-        """Creates an [`EventSetNode`][temporian.EventSetNode] able to consume the the EventSet.
+        """Creates an [`EventSetNode`][temporian.EventSetNode] able to consume
+        this EventSet.
 
         If called multiple times with `force_new_node=False` (default), the same
         node is returned.
@@ -441,7 +442,7 @@ class EventSet(EventSetOperations):
                 `node` is called. If true, a new node is created each time.
 
         Returns:
-            A EventSetNode able to consume the content of the EventSet.
+            An EventSetNode able to consume this EventSet.
         """
 
         if self._internal_node is not None and not force_new_node:

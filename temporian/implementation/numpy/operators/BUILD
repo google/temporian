@@ -364,3 +364,20 @@ py_library(
         "//temporian/implementation/numpy/data:event_set",
     ],
 )
+
+py_library(
+    name = "select_index_value",
+    srcs = ["select_index_value.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/numpy
+        ":base",
+        "//temporian/core/data:duration_utils",
+        "//temporian/core/operators:select_index_value",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy:utils",
+        "//temporian/implementation/numpy/data:event_set",
+    ],
+)
+
+    
