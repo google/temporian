@@ -25,7 +25,8 @@ from apache_beam.testing.util import assert_that, equal_to
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
 )
-from temporian.beam.io import read_csv, write_csv
+from temporian.beam.io import from_csv as beam_from_csv
+from temporian.beam.io import to_csv as beam_to_csv
 from temporian.beam.evaluation import run
 from temporian.io.csv import to_csv, from_csv
 from temporian.core.data.node import EventSetNode
@@ -67,11 +68,13 @@ def check_beam_implementation(
     with TestPipeline() as p:
         output = (
             p
-            | read_csv(input_path, input_node.schema)
+            | beam_from_csv(input_path, input_node.schema)
             | "Raw input" >> beam.Map(my_print, "input")
             | run(input=input_node, output=output_node)
             | "Raw output" >> beam.Map(my_print, "output")
-            | write_csv(output_path, output_node.schema, shard_name_template="")
+            | beam_to_csv(
+                output_path, output_node.schema, shard_name_template=""
+            )
         )
         assert_that(
             output,

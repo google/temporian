@@ -26,15 +26,14 @@ from apache_beam.testing.test_pipeline import TestPipeline
 from apache_beam.testing.util import assert_that
 from apache_beam.testing.util import equal_to
 from temporian.beam.io import (
-    read_csv_raw,
-    read_csv,
-    write_csv,
+    from_csv_raw,
+    from_csv,
+    to_csv,
     to_event_set,
     to_dict,
-    UserEventSetFormat,
 )
 from temporian.implementation.numpy.data.io import event_set, Schema
-from temporian.io.csv import to_csv
+from temporian.io.csv import to_csv as in_process_to_csv
 from temporian.core.data.dtype import DType
 
 
@@ -68,12 +67,12 @@ def structure_np_to_list(data):
 
 
 class IOTest(absltest.TestCase):
-    def test_read_csv_raw(self):
+    def test_from_csv_raw(self):
         input_csv_path = os.path.join(
             test_data(), "temporian/test/test_data/io/input.csv"
         )
         with TestPipeline() as p:
-            output = p | read_csv_raw(input_csv_path)
+            output = p | from_csv_raw(input_csv_path)
             assert_that(
                 output,
                 equal_to(
@@ -113,17 +112,15 @@ class IOTest(absltest.TestCase):
             },
             indexes=["b", "e"],
         )
-        to_csv(input_data, path=input_path)
+        in_process_to_csv(input_data, path=input_path)
 
         # Note: It is not clear how to check values of PCollection that contains
         # numpy arrays. assert_that + equal_to does not work.
         with TestPipeline() as p:
             output = (
                 p
-                | read_csv(input_path, input_data.schema)
-                | write_csv(
-                    output_path, input_data.schema, shard_name_template=""
-                )
+                | from_csv(input_path, input_data.schema)
+                | to_csv(output_path, input_data.schema, shard_name_template="")
             )
             assert_that(
                 output,
@@ -166,8 +163,8 @@ class IOTest(absltest.TestCase):
             output = (
                 p
                 | beam.Create(raw_data)
-                | to_event_set(schema)
-                | to_dict(schema)
+                | to_event_set(schema, grouped_by_index=False)
+                | to_dict(schema, grouped_by_index=False)
             )
             util.assert_that(output, util.equal_to(raw_data))
 
@@ -180,7 +177,11 @@ class IOTest(absltest.TestCase):
         ):
             with self.assertRaisesRegex(exception, regexp_error):
                 with TestPipeline() as p:
-                    _ = p | beam.Create([data]) | to_event_set(schema)
+                    _ = (
+                        p
+                        | beam.Create([data])
+                        | to_event_set(schema, grouped_by_index=False)
+                    )
 
         test(
             Schema([("f1", DType.INT32)], [("i1", DType.INT64)]),
@@ -234,8 +235,8 @@ class IOTest(absltest.TestCase):
             output = (
                 p
                 | beam.Create(raw_data)
-                | to_event_set(schema, format=UserEventSetFormat.indexedEvents)
-                | to_dict(schema, format=UserEventSetFormat.indexedEvents)
+                | to_event_set(schema, grouped_by_index=True)
+                | to_dict(schema, grouped_by_index=True)
                 | beam.Map(structure_np_to_list)
             )
             util.assert_that(
@@ -254,10 +255,7 @@ class IOTest(absltest.TestCase):
                     _ = (
                         p
                         | beam.Create([data])
-                        | to_event_set(
-                            schema,
-                            format=UserEventSetFormat.indexedEvents,
-                        )
+                        | to_event_set(schema, grouped_by_index=True)
                     )
 
         test(
