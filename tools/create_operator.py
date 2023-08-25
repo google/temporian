@@ -129,10 +129,6 @@ operator_lib.register_operator({capitalized_op})
 def {lower_op}(input: EventSetOrNode, param: float) -> EventSetOrNode:
     """<Text>
 
-    Args:
-        input: <Text>
-        param: <Text>
-
     Example:
 
         ```python
@@ -148,6 +144,10 @@ def {lower_op}(input: EventSetOrNode, param: float) -> EventSetOrNode:
         ...
 
         ```
+
+    Args:
+        input: <Text>
+        param: <Text>
 
     Returns:
         <Text>
@@ -359,6 +359,7 @@ py_test(
     print("""Don't forget to update the following code:
 - The imports in the top-level init file temporian/__init__.py (if global)
 - The EventSetOperations class in temporian/core/event_set_ops.py (if not global)
+- Move the docstring from the operator's .py file to the EventSetOperations class (if not global)
 - The imports in temporian/implementation/numpy/operators/__init__.py
 - The "operators" py_library in temporian/implementation/numpy/operators/BUILD
 - The "test_base" function in temporian/core/test/registered_operators_test.py

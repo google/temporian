@@ -1925,24 +1925,32 @@ class EventSetOperations:
         """Selects a subset of index values from an
         [`EventSet`][temporian.EventSet].
 
-        Args:
-            keys: index key or list of index keys to select from the EventSet.
-
         Example:
 
             ```python
-            >>> a = tp.event_set(timestamps=[0, 1, 2], features={"A": [0, 10, 20]})
-            >>> b = tp.select_index_values(a)
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 3],
+            ...     features={
+            ...         "f": [0, 10, 20],
+            ...         "x": [1, 1, 2, 2],
+            ...         "y": ["A", "B", "A", "B"],
+            ...     },
+            ...     indexes=["x", "y"],
+            ... )
+            >>> b = a.select_index_values([(1, "A"), (2, "B")])
             >>> b
-            indexes: []
-            features: [('A', int64)]
+            indexes: [('x', int64)), ('y', str_)]
+            features: [('f', int64)]
             events:
-                (3 events):
-                    timestamps: [0. 1. 2.]
+                (2 events):
+                    timestamps: [1. 2.]
                     'A': [ 0 10 20]
             ...
 
             ```
+
+        Args:
+            keys: index key or list of index keys to select from the EventSet.
 
         Returns:
             EventSet with a subset of the index values.
