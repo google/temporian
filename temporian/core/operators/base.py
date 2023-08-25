@@ -18,7 +18,7 @@ from __future__ import annotations
 from abc import ABC
 from copy import deepcopy
 from typing import Dict, List, Tuple, Union, Any
-from temporian.core.data.dtype import DType, IndexValue
+from temporian.core.data.dtype import DType, IndexKey
 
 from temporian.core.data.node import EventSetNode
 from temporian.proto import core_pb2 as pb
@@ -34,7 +34,7 @@ AttributeType = Union[
     List[str],
     Dict[str, str],
     List[DType],
-    List[IndexValue],
+    List[IndexKey],
 ]
 
 

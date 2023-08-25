@@ -17,7 +17,9 @@
 
 
 from typing import Dict
-import numpy as np
+from temporian.implementation.numpy.data.dtype_normalization import (
+    normalize_index_key,
+)
 
 from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.core.operators.select_index_values import SelectIndexValues
@@ -42,9 +44,9 @@ class SelectIndexValuesNumpyImplementation(OperatorImplementation):
 
         # Fill output EventSet's data
         for key in keys:
+            key = normalize_index_key(key)
             index_data = input.data[key]
 
-            # for index_key, index_data in input.data.items():
             output_evset.set_index_value(
                 key,
                 IndexData(

@@ -15,7 +15,6 @@
 
 from absl.testing import absltest
 
-import numpy as np
 from temporian.core.operators.select_index_values import SelectIndexValues
 from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy.operators.select_index_values import (
@@ -44,10 +43,11 @@ class SelectIndexValuesOperatorTest(absltest.TestCase):
         node = evset.node()
 
         expected_output = event_set(
-            timestamps=[1, 2, 3, 4],
+            timestamps=[1, 2],
             features={
                 "a": [1.0, 2.0],
                 "b": [5, 6],
+                "c": ["A", "A"],
             },
             indexes=["c"],
         )

@@ -18,11 +18,10 @@ import numpy as np
 
 from temporian.core.operators.resample import Resample
 from temporian.implementation.numpy import implementation_lib
-from temporian.implementation.numpy.data.event_set import (
-    IndexData,
-    EventSet,
+from temporian.implementation.numpy.data.dtype_normalization import (
     tp_dtype_to_np_dtype,
 )
+from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.implementation.numpy_cc.operators import operators_cc
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 

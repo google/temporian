@@ -24,6 +24,7 @@ py_library(
         # already_there/apache_beam
         # already_there/numpy
         "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy/data:dtype_normalization",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
     ],

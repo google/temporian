@@ -68,6 +68,7 @@ py_library(
         "//temporian/core/data:schema",
         "//temporian/core/data:node",
         "//temporian/core/operators:base",
+        "//temporian/implementation/numpy/data:dtype_normalization",
     ],
 )
 

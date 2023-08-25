@@ -18,17 +18,16 @@ from typing import Optional, Union, List, Set, Tuple, Dict, Callable, Type
 
 from dataclasses import dataclass
 import numpy as np
+from temporian.core.data.dtype import IndexKey, IndexKeyItem
 
 from temporian.core.data.duration_utils import (
     convert_timestamps_to_datetimes,
 )
 from temporian.core.data import duration_utils
-from temporian.implementation.numpy.data.event_set import (
-    EventSet,
+from temporian.implementation.numpy.data.dtype_normalization import (
     normalize_index_key,
-    IndexValueType,
-    IndexValue,
 )
+from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.plotter_base import (
     Options,
     Style,
@@ -46,10 +45,10 @@ InputEventSet = Union[
 # "indexes" argument in tp.plot.
 InputIndex = Optional[
     Union[
-        IndexValueType,
-        IndexValue,
-        List[IndexValueType],
-        List[IndexValue],
+        IndexKeyItem,  # allow receiving a single value instead of tuple when there is a single index
+        IndexKey,
+        List[IndexKeyItem],
+        List[IndexKey],
     ]
 ]
 
@@ -168,7 +167,7 @@ def normalize_features(features: InputFeatures) -> Optional[Set[str]]:
     raise ValueError(f"Non supported feature type {features}")
 
 
-def normalize_indexes(indexes: InputIndex, groups: Groups) -> List[IndexValue]:
+def normalize_indexes(indexes: InputIndex, groups: Groups) -> List[IndexKey]:
     """Normalizes the "indexes" argument of plot."""
 
     if indexes is None:
@@ -196,7 +195,7 @@ def normalize_indexes(indexes: InputIndex, groups: Groups) -> List[IndexValue]:
     return normalized_indexes
 
 
-def validate_indexes(indexes: List[IndexValue], groups: Groups):
+def validate_indexes(indexes: List[IndexKey], groups: Groups):
     """Ensures that indexes are valid i.e. available in all event-sets."""
 
     for g in groups:
@@ -368,7 +367,7 @@ def plot(
 def plot_with_plotter(
     plotter_class: Type[PlotterBackend],
     groups: Groups,
-    indexes: List[IndexValue],
+    indexes: List[IndexKey],
     options: Options,
 ):
     num_plots = get_num_plots(groups, indexes, options)

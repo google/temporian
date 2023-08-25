@@ -58,7 +58,7 @@ class SelectIndexValues(Operator):
             attributes=[
                 pb.OperatorDef.Attribute(
                     key="keys",
-                    type=pb.OperatorDef.Attribute.Type.LIST_INDEX_VALUES,
+                    type=pb.OperatorDef.Attribute.Type.LIST_INDEX_KEYS,
                     is_optional=True,
                 ),
             ],
@@ -67,7 +67,7 @@ class SelectIndexValues(Operator):
         )
 
     @property
-    def keys(self) -> Optional[List[IndexValue]]:
+    def keys(self) -> Optional[List[IndexKey]]:
         return self._keys
 
 

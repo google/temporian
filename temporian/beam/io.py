@@ -10,7 +10,9 @@ import apache_beam as beam
 from apache_beam.io.fileio import MatchFiles
 from temporian.core.data.node import Schema
 from temporian.core.data.dtype import DType, tp_dtype_to_py_type
-from temporian.implementation.numpy.data.event_set import tp_dtype_to_np_dtype
+from temporian.implementation.numpy.data.dtype_normalization import (
+    tp_dtype_to_np_dtype,
+)
 
 # Remark: We use tuples instead of dataclasses or named tuples as it seems
 # to be the most efficient solution for beam.

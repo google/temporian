@@ -76,6 +76,7 @@ message Operator {
       MapStrStr map_str_str = 7;
       ListDType list_dtype = 8;
       bytes bytes_ = 9;
+      ListIndexKeys list_index_keys = 10;
     }
     message ListString{
       repeated string values = 1;
@@ -85,6 +86,21 @@ message Operator {
     }
     message ListDType{
       repeated DType values = 1 [packed = true];
+    }
+    message ListIndexKeys{
+      repeated IndexKey values = 1;
+
+      message IndexKey {
+        repeated IndexKeyItem values = 1;
+
+        message IndexKeyItem {
+          oneof types {
+            string str = 1;
+            bytes bytes_ = 2;
+            int64 integer_64 = 3;
+          }
+        }
+      }
     }
   }
 }
@@ -206,7 +222,7 @@ message OperatorDef {
       DTYPE = 8;
       LIST_DTYPE = 9;
       BYTES = 10;
-      LIST_INDEX_VALUES = 11;
+      LIST_INDEX_KEYS = 11;
     }
   }
 }

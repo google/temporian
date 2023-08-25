@@ -1,15 +1,15 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Tuple
+from temporian.implementation.numpy.data.dtype_normalization import (
+    numpy_array_to_tp_dtype,
+)
 
 from temporian.utils import config
 from temporian.core.data.node import EventSetNode
 from temporian.core.data.schema import Schema
 from temporian.core.operators.base import Operator
 from temporian.core.operators.base import OperatorExceptionDecorator
-from temporian.implementation.numpy.data.event_set import (
-    EventSet,
-    numpy_array_to_tp_dtype,
-)
+from temporian.implementation.numpy.data.event_set import EventSet
 import numpy as np
 
 
