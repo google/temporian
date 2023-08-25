@@ -22,6 +22,7 @@ py_test(
 py_test(
     name = "api_beam_test",
     srcs = ["api_beam_test.py"],
+    data = ["//temporian/test/test_data"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/logging
@@ -31,12 +32,12 @@ py_test(
         "//temporian",
         "//temporian/beam",
     ],
-    data = ["//temporian/test/test_data"],
 )
 
 py_test(
-    name = "docstring_test",
-    srcs = ["docstring_test.py"],
+    name = "doc_test",
+    srcs = ["doc_test.py"],
+    data = glob(["**/*.md"]),
     srcs_version = "PY3",
     deps = [
         "//temporian",
