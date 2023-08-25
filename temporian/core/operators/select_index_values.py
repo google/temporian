@@ -23,8 +23,7 @@ from temporian.core.data.node import (
     create_node_new_features_new_sampling,
 )
 from temporian.core.operators.base import Operator
-from temporian.core.typing import EventSetOrNode
-from temporian.implementation.numpy.data.event_set import IndexKey
+from temporian.core.typing import EventSetOrNode, IndexKey
 from temporian.proto import core_pb2 as pb
 from temporian.utils.typecheck import typecheck
 
@@ -78,7 +77,7 @@ operator_lib.register_operator(SelectIndexValues)
 @compile
 def select_index_values(
     input: EventSetOrNode,
-    keys: Optional[Union[IndexKey, List[IndexKey]]] = None,
+    keys: Optional[Union[IndexKey, List[IndexKey]]],
 ) -> EventSetOrNode:
     assert isinstance(input, EventSetNode)
 

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, List, Set, Type, TypeVar, Union
+from typing import Dict, List, Set, Tuple, Type, TypeVar, Union
 from temporian.core.data.dtype import DType
 
 from temporian.core.data.node import EventSetNode
@@ -64,5 +64,18 @@ own node using [`EventSet.node()`][temporian.EventSet.node], i.e., `[event_set]`
 is equivalent to `{event_set.node() : event_set}`.
 """
 
-
 TypeOrDType = Union[DType, Type[float], Type[int], Type[str], Type[bool]]
+
+
+IndexKeyItem = Union[int, str, bytes]
+"""One of the values inside an [IndexKey][temporian.core.typing.IndexKey]."""
+
+IndexKey = Tuple[IndexKeyItem, ...]
+"""An index key is a tuple of values that identifies a single time sequence
+inside an [`EventSet`][temporian.EventSet].
+
+If, for example, your EventSet is indexed by `"name"` and `"number"`, with the
+values on those being [`"Mark", "Sarah"]` and `[1, 2, 3]` respectively, the
+possible index keys would be `("Mark", 1)`, `("Mark", 2)`, `("Mark", 3)`,
+`("Sarah", 1)`, `("Sarah", 2)`, and `("Sarah", 3)`.
+"""

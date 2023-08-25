@@ -41,12 +41,8 @@ from temporian.core.data.node import (
 from temporian.core.data.schema import Schema
 from temporian.core.compilation import compile
 from temporian.core.operators import base
-from temporian.core.data.dtype import (
-    DType,
-    IndexKey,
-    IndexKeyItem,
-)
-from temporian.core.typing import EventSetOrNode
+from temporian.core.data.dtype import DType
+from temporian.core.typing import EventSetOrNode, IndexKey, IndexKeyItem
 from temporian.implementation.numpy.data.event_set import (
     EventSet,
 )

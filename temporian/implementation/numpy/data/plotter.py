@@ -18,12 +18,12 @@ from typing import Optional, Union, List, Set, Tuple, Dict, Callable, Type
 
 from dataclasses import dataclass
 import numpy as np
-from temporian.core.data.dtype import IndexKey, IndexKeyItem
 
 from temporian.core.data.duration_utils import (
     convert_timestamps_to_datetimes,
 )
 from temporian.core.data import duration_utils
+from temporian.core.typing import IndexKey, IndexKeyItem
 from temporian.implementation.numpy.data.dtype_normalization import (
     normalize_index_key,
 )

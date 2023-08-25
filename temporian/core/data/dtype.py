@@ -110,9 +110,6 @@ def tp_dtype_to_py_type(dtype: DType) -> Any:
 # find a way for IndexDType to only represent those types.
 IndexDType = DType
 
-IndexKeyItem = Union[int, str, bytes]
-IndexKey = Tuple[IndexKeyItem, ...]
-
 
 def check_is_valid_index_dtype(dtype: DType):
     if dtype not in [DType.INT32, DType.INT64, DType.STRING]:

@@ -14,13 +14,17 @@
 
 """Shared data type normalization functions."""
 
+from __future__ import annotations
 import datetime
 import logging
-from typing import Any, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Optional, Tuple, Union
 
 import numpy as np
 
-from temporian.core.data.dtype import DType, IndexKey, IndexKeyItem
+from temporian.core.data.dtype import DType
+
+if TYPE_CHECKING:
+    from temporian.core.typing import IndexKey, IndexKeyItem
 
 # Mapping of temporian types to and from numpy types.
 #

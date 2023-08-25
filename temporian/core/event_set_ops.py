@@ -16,14 +16,13 @@
 
 
 from __future__ import annotations
-from typing import Any, Dict, List, Optional, Tuple, Union, TYPE_CHECKING
-from temporian.core.data.dtype import IndexKey
+from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING
 
 from temporian.core.data.duration import Duration
 
 
 if TYPE_CHECKING:
-    from temporian.core.typing import EventSetOrNode, TypeOrDType
+    from temporian.core.typing import EventSetOrNode, TypeOrDType, IndexKey
 
 T_SCALAR = (int, float)
 
@@ -1928,7 +1927,7 @@ class EventSetOperations:
 
     def select_index_values(
         self: EventSetOrNode,
-        keys: Optional[Union[Tuple, List[Tuple]]] = None,
+        keys: Optional[Union[IndexKey, List[IndexKey]]] = None,
     ) -> EventSetOrNode:
         """Selects a subset of index values from an
         [`EventSet`][temporian.EventSet].

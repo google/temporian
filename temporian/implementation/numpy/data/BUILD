@@ -65,6 +65,7 @@ py_library(
         ":plotter_bokeh",
         ":event_set",
         ":dtype_normalization",
+        "//temporian/core:typing",
         "//temporian/core/data:duration_utils",
         # already_there/numpy
     ],

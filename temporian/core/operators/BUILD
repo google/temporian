@@ -11,6 +11,7 @@ py_library(
     srcs = ["base.py"],
     srcs_version = "PY3",
     deps = [
+        "//temporian/core:typing",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/proto:core_py_proto",

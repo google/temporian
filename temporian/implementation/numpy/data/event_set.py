@@ -31,7 +31,6 @@ from temporian.implementation.numpy.data.dtype_normalization import (
 )
 
 from temporian.utils import config
-from temporian.core.data.dtype import IndexKey
 from temporian.core.data.node import (
     EventSetNode,
     create_node_with_new_reference,
@@ -40,6 +39,7 @@ from temporian.core.data.schema import Schema
 from temporian.core.event_set_ops import EventSetOperations
 
 if TYPE_CHECKING:
+    from temporian.core.typing import IndexKey
     from temporian.core.operators.base import Operator
 
 
