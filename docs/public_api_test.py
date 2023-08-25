@@ -52,6 +52,8 @@ PUBLIC_API_SYMBOLS = {
     "load_graph",
     # RUNTIME CHECKING
     "runtime_check_raise_exception",
+    # Help
+    "help",
     # OPERATORS
     "glue",
     "combine",
