@@ -1939,7 +1939,7 @@ class EventSetOperations:
             >>> a = tp.event_set(
             ...     timestamps=[0, 1, 2, 3],
             ...     features={
-            ...         "f": [0, 10, 20],
+            ...         "f": [10, 20, 30, 40],
             ...         "x": [1, 1, 2, 2],
             ...         "y": ["A", "B", "A", "B"],
             ...     },
@@ -1947,12 +1947,15 @@ class EventSetOperations:
             ... )
             >>> b = a.select_index_values([(1, "A"), (2, "B")])
             >>> b
-            indexes: [('x', int64)), ('y', str_)]
+            indexes: [('x', int64), ('y', str_)]
             features: [('f', int64)]
             events:
-                (2 events):
-                    timestamps: [1. 2.]
-                    'A': [ 0 10 20]
+                x=1 y=b'A' (1 events):
+                    timestamps: [0.]
+                    'f': [10]
+                x=2 y=b'B' (1 events):
+                    timestamps: [3.]
+                    'f': [40]
             ...
 
             ```
