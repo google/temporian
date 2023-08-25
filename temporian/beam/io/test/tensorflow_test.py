@@ -33,6 +33,10 @@ from temporian.io.tensorflow import (
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
 )
+from temporian.beam.io.csv import (
+    to_csv,
+)
+from temporian.io.csv import from_csv as in_process_from_csv
 
 
 def test_data() -> str:
@@ -40,7 +44,7 @@ def test_data() -> str:
 
 
 class IOTest(absltest.TestCase):
-    def test_from_and_to_tensorflow_record(self):
+    def test_to_and_from_tensorflow_record(self):
         tmp_dir_handle = tempfile.TemporaryDirectory()
         input_file = os.path.join(tmp_dir_handle.name, "input")
         output_file = os.path.join(tmp_dir_handle.name, "output")
@@ -62,7 +66,9 @@ class IOTest(absltest.TestCase):
             (
                 p
                 | from_tensorflow_record(input_file, evset.schema)
-                | to_tensorflow_record(output_file, evset.schema)
+                | to_tensorflow_record(
+                    output_file, evset.schema, shard_name_template=""
+                )
             )
             p.run()
 

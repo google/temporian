@@ -207,6 +207,8 @@ def from_tensorflow_record(
         Imported EventSet.
     """
 
+    # TODO(gbm): Automatic schema
+
     if not grouped_by_index:
         raise ValueError("grouped_by_index=False is not implemented")
 

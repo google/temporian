@@ -34,6 +34,7 @@ py_test(
         "//temporian/core/data:dtype",
         "//temporian/implementation/numpy/data:io",
         "//temporian/io:csv",
+        "//temporian/beam/io:csv",
         "//temporian/io:tensorflow",
         "//temporian/implementation/numpy/operators/test:test_util",
     ],
