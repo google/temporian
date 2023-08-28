@@ -295,7 +295,7 @@ def to_event_set(
         schema: Schema of the data. Note: The schema of a Temporian node is
             available with `node.schema`.
         timestamp_key: Key containing the timestamps.
-        grouped_by_index: Are events groupped by index. Run
+        grouped_by_index: Whether events are grouped by index. Run
             `tp.help.grouped_by_index()` for the documentation.
 
     Returns:
@@ -399,7 +399,7 @@ def to_dict(
         pipe: PCollection of Beam EventSet.
         schema: Schema of the data.
         timestamp_key: Key containing the timestamps.
-        grouped_by_index: Are events groupped by index. Run
+        grouped_by_index: Whether events are grouped by index. Run
             `tp.help.grouped_by_index()` for the documentation.
 
     Returns:
