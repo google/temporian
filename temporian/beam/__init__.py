@@ -30,19 +30,12 @@ Solutions:
 """
     )
 
-from temporian.beam.io import dict as _dict
-from temporian.beam.io import csv as _csv
-from temporian.beam.io import tensorflow as _tensorflow
-
-from_csv_raw = _csv.from_csv_raw
-from_csv = _csv.from_csv
-to_csv = _csv.to_csv
-
-to_event_set = _dict.to_event_set
-to_dict = _dict.to_dict
-
-to_tensorflow_record = _tensorflow.to_tensorflow_record
-from_tensorflow_record = _tensorflow.from_tensorflow_record
+from temporian.beam.io.dict import to_event_set, to_dict
+from temporian.beam.io.csv import from_csv_raw, from_csv, to_csv
+from temporian.beam.io.tensorflow import (
+    to_tensorflow_record,
+    from_tensorflow_record,
+)
 
 from temporian.beam import evaluation as _evaluation
 
