@@ -65,7 +65,7 @@ def display_html(evset: EventSet) -> str:
     num_indexes = len(all_index_keys)
     num_features = len(evset.schema.features)
 
-    # If limit=0, set limit=len
+    # If limit=0 or None, set limit=len
     max_indexes = config.max_display_indexes or num_indexes
     max_features = config.max_display_features or num_features
     has_hidden_feats = num_features > max_features
@@ -232,7 +232,11 @@ def display_html_header(dom: Dom, evset: EventSet) -> Html:
     if len(evset.schema.features) == 0:
         html_features.appendChild(html_style_italic(dom, "none"))
 
-    for idx, feature in enumerate(evset.schema.features):
+    # If limit=0 or None, set limit=len
+    num_features = len(evset.schema.features)
+    max_features = config.max_display_feature_dtypes or num_features
+
+    for idx, feature in enumerate(evset.schema.features[:max_features]):
         if idx != 0:
             html_features.appendChild(dom.createTextNode(", "))
 
@@ -247,6 +251,9 @@ def display_html_header(dom: Dom, evset: EventSet) -> Html:
         )
         html_feature.appendChild(dom.createTextNode(")"))
         html_features.appendChild(html_feature)
+
+    if max_features < num_features:
+        html_features.appendChild(dom.createTextNode(f", ..."))
 
     # Indexes
 
@@ -265,7 +272,11 @@ def display_html_header(dom: Dom, evset: EventSet) -> Html:
     if len(evset.schema.indexes) == 0:
         html_indexes.appendChild(html_style_italic(dom, "none"))
 
-    for idx, index in enumerate(evset.schema.indexes):
+    # If limit=0 or None, set limit=len
+    num_indexes = len(evset.schema.indexes)
+    max_indexes = config.max_display_index_dtypes or num_indexes
+
+    for idx, index in enumerate(evset.schema.indexes[:max_indexes]):
         if idx != 0:
             html_indexes.appendChild(dom.createTextNode(", "))
 
@@ -280,6 +291,9 @@ def display_html_header(dom: Dom, evset: EventSet) -> Html:
         )
         html_index.appendChild(dom.createTextNode(")"))
         html_indexes.appendChild(html_index)
+
+    if max_indexes < num_indexes:
+        html_indexes.appendChild(dom.createTextNode(f", ..."))
 
     # Number of events
     html_num_examples = dom.createElement("div")
