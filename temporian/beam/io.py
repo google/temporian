@@ -68,57 +68,6 @@ IndexValue = Tuple[
 PEventSet = beam.PCollection[IndexValue]
 
 
-class UserEventSetFormat(Enum):
-    """Various representations of EventSets for user generation or consumption.
-
-    When combining Temporian program with your own beam stages, select the
-    most suited user event-set format compatible with your code.
-    """
-
-    singleEvents = "singleEvents"
-    """
-    Each event is represented as a dictionary of key to value for the features,
-    the indexes and the timestamp. Values are python primitives matching the
-    schema e.g. a `tp.int64` is feed as an `int`. Non-matching primitives are
-    casted e.g. a int is casted into a float permissively.
-
-    For example:
-        Schema
-            features=[("f1", DType.INT64), ("f2", DType.STRING)]
-            indexes=[("i1", DType.INT64), ("i2", DType.STRING)]
-
-        Data (one item):
-            {"timestamp": 100.0, "f1": 1, "f2": b"a", "i1": 10, "i2": b"x"}
-    """
-
-    indexedEvents = "indexedEvents"
-    """
-    All the events in the same index are represented together in a dictionary of
-    key to values for the features, the indexes and the timestamp. Timestamps
-    are sorted. Values, index and timestamps are stored in Numpy arrays.
-
-    Index values are python primitives matching the schema e.g. a `tp.int64` is
-    feed as an `int`. Timestamps are a numpy array of float64. Feature values
-    are numpy array matching the schema e.g. a `tp.int64` is feed as a numpy
-    array of np.int64.
-
-    For example:
-
-        Schema
-            features=[("f1", DType.INT64), ("f2", DType.STRING)]
-            indexes=[("i1", DType.INT64), ("i2", DType.STRING)]
-
-        Data (one item):
-            {
-            "timestamp": np.array([100.0, 101.0, 102.0]),
-            "f1": np.array([1, 2, 3]),
-            "f2": np.array([b"a", b"b", b"c"]),
-            "i1": 10,
-            "i2": b"x",
-            }
-    """
-
-
 def _parse_csv_file(
     file: beam.io.filesystem.FileMetadata,
 ) -> Iterable[Dict[str, str]]:
@@ -131,15 +80,15 @@ def _parse_csv_file(
 
 
 @beam.ptransform_fn
-def read_csv_raw(pipe, file_pattern: str) -> beam.PCollection[Dict[str, str]]:
+def from_csv_raw(pipe, file_pattern: str) -> beam.PCollection[Dict[str, str]]:
     """Reads a file or set of csv files into a PCollection of key->values.
 
     This format is similar to output of the official beam IO connectors:
     https://beam.apache.org/documentation/io/connectors/
 
-    CSV values are always string, so the output of `read_csv_raw` is always
+    CSV values are always string, so the output of `from_csv_raw` is always
     a dictionary of string to string. Use `to_event_set` (or better, use
-    `read_csv` instead of `read_csv_raw`) to cast values to the expected
+    `from_csv` instead of `from_csv_raw`) to cast values to the expected
     pipeline input dtype.
 
     Args:
@@ -327,14 +276,14 @@ def to_event_set(
     pipe: beam.PCollection[Dict[str, Any]],
     schema: Schema,
     timestamp_key: str = "timestamp",
-    format: UserEventSetFormat = UserEventSetFormat.singleEvents,
+    grouped_by_index: bool = True,
 ) -> PEventSet:
     """Converts a PCollection of key:value to a Beam EventSet.
 
-    This method is compatible with the output of `read_csv_raw` and the
+    This method is compatible with the output of `from_csv_raw` and the
     Official Beam IO connectors.
 
-    When importing data from csv files, use `read_csv` to convert csv files
+    When importing data from csv files, use `from_csv` to convert csv files
     directly into EventSets.
 
     Unlike Temporian in-process EventSet import method (
@@ -346,15 +295,22 @@ def to_event_set(
         schema: Schema of the data. Note: The schema of a Temporian node is
             available with `node.schema`.
         timestamp_key: Key containing the timestamps.
-        format: Format of the input data to be converted into an event-set.
+        grouped_by_index: Whether events are grouped by index. Run
+            `tp.help.grouped_by_index()` for the documentation.
 
     Returns:
         PCollection of Beam EventSet.
     """
 
     # TODO: Add support for datetime timestamps.
-
-    if format == UserEventSetFormat.singleEvents:
+    if grouped_by_index:
+        return (
+            pipe
+            | "Parse dict"
+            >> beam.FlatMap(_event_set_dict_to_event_set, schema, timestamp_key)
+            | "Shuffle" >> beam.Reshuffle()
+        )
+    else:
         return (
             pipe
             | "Structure"
@@ -366,15 +322,6 @@ def to_event_set(
             >> beam.ParDo(_MergeTimestampsSplitFeatures(len(schema.features)))
             | "Shuffle" >> beam.Reshuffle()
         )
-    elif format == UserEventSetFormat.indexedEvents:
-        return (
-            pipe
-            | "Parse dict"
-            >> beam.FlatMap(_event_set_dict_to_event_set, schema, timestamp_key)
-            | "Shuffle" >> beam.Reshuffle()
-        )
-    else:
-        raise ValueError(f"Unknown format {format}")
 
 
 def _convert_to_dict_event_key_value(
@@ -441,18 +388,19 @@ def to_dict(
     pipe: PEventSet,
     schema: Schema,
     timestamp_key: str = "timestamp",
-    format: UserEventSetFormat = UserEventSetFormat.singleEvents,
+    grouped_by_index: bool = True,
 ) -> beam.PCollection[Dict[str, Any]]:
     """Converts a Beam EventSet to PCollection of key->value.
 
-    This method is compatible with the output of `read_csv_raw` and the
+    This method is compatible with the output of `from_csv_raw` and the
     Official Beam IO connectors. This method is the inverse of `to_event_set`.
 
     Args:
         pipe: PCollection of Beam EventSet.
         schema: Schema of the data.
         timestamp_key: Key containing the timestamps.
-        format: Format of the output data.
+        grouped_by_index: Whether events are grouped by index. Run
+            `tp.help.grouped_by_index()` for the documentation.
 
     Returns:
         Beam pipe of key values.
@@ -460,16 +408,7 @@ def to_dict(
 
     # TODO: Add support for datetime timestamps.
 
-    if format == UserEventSetFormat.singleEvents:
-        return (
-            pipe
-            | "Group by features" >> beam.GroupBy(lambda x: x[0][0:-1])
-            | "Convert to dict"
-            >> beam.FlatMap(
-                _convert_to_dict_event_key_value, schema, timestamp_key
-            )
-        )
-    elif format == UserEventSetFormat.indexedEvents:
+    if grouped_by_index:
         return (
             pipe
             | "Group by features" >> beam.GroupBy(lambda x: x[0][0:-1])
@@ -479,11 +418,18 @@ def to_dict(
             )
         )
     else:
-        raise ValueError(f"Unknown format {format}")
+        return (
+            pipe
+            | "Group by features" >> beam.GroupBy(lambda x: x[0][0:-1])
+            | "Convert to dict"
+            >> beam.FlatMap(
+                _convert_to_dict_event_key_value, schema, timestamp_key
+            )
+        )
 
 
 @beam.ptransform_fn
-def read_csv(
+def from_csv(
     pipe, file_pattern: str, schema: Schema, timestamp_key: str = "timestamp"
 ) -> PEventSet:
     """Reads a file or set of csv files into a Beam EventSet.
@@ -495,10 +441,10 @@ def read_csv(
 
     ```
     input_node: tp.EventSetNode = ...
-    p | tpb.read_csv("/tmp/path.csv", input_node.schema) | ...
+    p | tpb.from_csv("/tmp/path.csv", input_node.schema) | ...
     ```
 
-    `read_csv` is equivalent to `read_csv_raw + to_event_set`.
+    `from_csv` is equivalent to `from_csv_raw + to_event_set`.
 
     Args:
         pipe: Begin Beam pipe.
@@ -513,8 +459,9 @@ def read_csv(
     """
     return (
         pipe
-        | "Read csv" >> read_csv_raw(file_pattern)
-        | "Convert to Event Set" >> to_event_set(schema, timestamp_key)
+        | "Read csv" >> from_csv_raw(file_pattern)
+        | "Convert to Event Set"
+        >> to_event_set(schema, timestamp_key, grouped_by_index=False)
     )
 
 
@@ -552,7 +499,7 @@ def _convert_to_csv(
 
 
 @beam.ptransform_fn
-def write_csv(
+def to_csv(
     pipe: PEventSet,
     file_path_prefix: str,
     schema: Schema,
@@ -569,9 +516,9 @@ def write_csv(
     ```
     input_node: tp.EventSetNode = ...
     ( p
-      | tpb.read_csv("/input.csv", input_node.schema)
+      | tpb.from_csv("/input.csv", input_node.schema)
       | ... # processing
-      | tpb.write_csv("/output.csv", output_node.schema)
+      | tpb.to_csv("/output.csv", output_node.schema)
     )
     ```
 

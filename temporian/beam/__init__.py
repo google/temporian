@@ -32,12 +32,11 @@ Solutions:
 
 from temporian.beam import io as _io
 
-read_csv_raw = _io.read_csv_raw
-read_csv = _io.read_csv
-write_csv = _io.write_csv
+from_csv_raw = _io.from_csv_raw
+from_csv = _io.from_csv
+to_csv = _io.to_csv
 to_event_set = _io.to_event_set
 to_dict = _io.to_dict
-UserEventSetFormat = _io.UserEventSetFormat
 
 from temporian.beam import evaluation as _evaluation
 

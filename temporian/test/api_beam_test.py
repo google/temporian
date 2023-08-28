@@ -53,9 +53,9 @@ class TFPTest(absltest.TestCase):
         with TestPipeline() as p:
             output = (
                 p
-                | tpb.read_csv(input_path, input_node.schema)
+                | tpb.from_csv(input_path, input_node.schema)
                 | tpb.run(input=input_node, output=output_node)
-                | tpb.write_csv(
+                | tpb.to_csv(
                     output_path, output_node.schema, shard_name_template=""
                 )
             )
@@ -96,8 +96,8 @@ class TFPTest(absltest.TestCase):
 
         # Execute the graph in Beam and export the result in a csv file.
         with TestPipeline() as p:
-            input_beam_1 = p | tpb.read_csv(input_path_1, input_node_1.schema)
-            input_beam_2 = p | tpb.read_csv(input_path_2, input_node_2.schema)
+            input_beam_1 = p | tpb.from_csv(input_path_1, input_node_1.schema)
+            input_beam_2 = p | tpb.from_csv(input_path_2, input_node_2.schema)
 
             outputs = tpb.run_multi_io(
                 inputs={
@@ -106,10 +106,10 @@ class TFPTest(absltest.TestCase):
                 },
                 outputs=[output_node_1, output_node_2],
             )
-            outputs[output_node_1] | tpb.write_csv(
+            outputs[output_node_1] | tpb.to_csv(
                 output_path_1, output_node_1.schema, shard_name_template=""
             )
-            outputs[output_node_2] | tpb.write_csv(
+            outputs[output_node_2] | tpb.to_csv(
                 output_path_2, output_node_2.schema, shard_name_template=""
             )
             p.run()
