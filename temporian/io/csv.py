@@ -34,9 +34,9 @@ def from_csv(
         >>> # Example CSV
         >>> temp_file = str(tmp_dir / "temporal_data.csv")
         >>> _ = open(temp_file, "w").write(
-        ...     "date,feature_1,feature_2\\n"
-        ...     "2023-01-01,10.0,3.0\\n"
-        ...     "2023-01-02,20.0,4.0\\n"
+        ...     "date,feature_1,feature_2\n"
+        ...     "2023-01-01,10.0,3.0\n"
+        ...     "2023-01-02,20.0,4.0\n"
         ...     "2023-02-01,30.0,5.0"
         ... )
         >>> # Load CSV

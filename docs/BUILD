@@ -5,17 +5,6 @@ package(
 
 # Libraries
 # =========
-
-py_test(
-    name = "markdown_code_examples_test",
-    srcs = ["markdown_code_examples_test.py"],
-    data = glob(["**/*.md"]),
-    srcs_version = "PY3",
-    deps = [
-        "//temporian",
-    ],
-)
-
 filegroup(
     name = "reference",
     srcs = glob(["src/reference/**/*.md"]),

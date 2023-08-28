@@ -1,5 +1,6 @@
 import sys
-from typing import Any, List
+from typing import Any, List, Dict, Union
+from xml.dom import minidom
 
 import numpy as np
 
@@ -11,10 +12,29 @@ from temporian.implementation.numpy.data.event_set import EventSet
 
 ELLIPSIS = "…"
 
+Html = Any
+Dom = Any
+StyleHtml = Union[Html, str]
+
+_HTML_STYLE_FEATURE_KEY = {"color": "#D81B60"}
+_HTML_STYLE_INDEX_KEY = {"color": "#d55e00"}
+_HTML_STYLE_DTYPE = {"color": "#4c9041"}
+_HTML_STYLE_INDEX_VALUE = {"color": "#1E88E5"}
+_HTML_STYLE_HEADER_DIV = {
+    "margin-bottom": "11px",
+    "padding": "5px",
+    "font-size": "small",
+    "line-height": "120%",
+    "border": "1px solid rgba(127, 127, 127, 0.2)",
+}
+_HTML_STYLE_TABLE = {
+    "margin-left": "20px",
+    "border": "1px solid rgba(127, 127, 127, 0.2)",
+}
+
 
 def display_html(evset: EventSet) -> str:
     """HTML representation, mainly for IPython notebooks."""
-    from xml.dom import minidom
 
     def create_table_row(
         columns: List[str], header: bool = False
@@ -40,7 +60,6 @@ def display_html(evset: EventSet) -> str:
 
     # Other configs
     convert_datetime = evset.schema.is_unix_timestamp
-    index_schemas = evset.schema.indexes
     feature_schemas = evset.schema.features
     all_index_keys = evset.get_index_keys(sort=True)
     num_indexes = len(all_index_keys)
@@ -52,33 +71,43 @@ def display_html(evset: EventSet) -> str:
     has_hidden_feats = num_features > max_features
     visible_feats = feature_schemas[:max_features]
 
-    # Index and features schemas
-    evset_info = (
-        f"{num_indexes} indexes × {num_features} features"
-        f" (memory usage: {string.pretty_num_bytes(evset.memory_usage())})"
-    )
-    top.appendChild(dom.createTextNode(evset_info))
+    # Header with features and indexes.
+    top.appendChild(display_html_header(dom, evset))
 
     # Create one table and header per index value
     for index_key in all_index_keys[:max_indexes]:
-        # Index header text (n events x n features)
-        index_text = ", ".join(
-            [
-                f"{idx.name}={repr_value_html(val, idx.dtype)}"
-                for val, idx in zip(index_key, index_schemas)
-            ]
-        )
         index_data = evset.data[index_key]
         num_timestamps = len(index_data.timestamps)
         max_timestamps = config.max_display_events or num_timestamps
-        title = dom.createElement("h3")
-        title.appendChild(dom.createTextNode(f"Index: ({index_text})"))
-        descript = dom.createTextNode(f"{num_timestamps} events")
-        top.appendChild(title)
-        top.appendChild(descript)
+
+        # Display index values
+        html_index_value = dom.createElement("div")
+        top.appendChild(html_index_value)
+        html_index_value.appendChild(html_style_bold(dom, "index"))
+        html_index_value.appendChild(dom.createTextNode(" ("))
+
+        for idx, (item_value, item_schema) in enumerate(
+            zip(index_key, evset.schema.indexes)
+        ):
+            if idx != 0:
+                html_index_value.appendChild(dom.createTextNode(", "))
+
+            html_index_value.appendChild(
+                html_style(dom, item_schema.name, _HTML_STYLE_INDEX_KEY)
+            )
+            html_index_value.appendChild(dom.createTextNode("="))
+            if isinstance(item_value, bytes):
+                item_value = item_value.decode()
+            html_index_value.appendChild(
+                html_style(dom, str(item_value), _HTML_STYLE_INDEX_VALUE)
+            )
+
+        html_index_value.appendChild(
+            dom.createTextNode(f") with {num_timestamps} events")
+        )
 
         # Table with column names
-        table = dom.createElement("table")
+        table = html_style(dom, dom.createElement("table"), _HTML_STYLE_TABLE)
         col_names = ["timestamp"] + [feature.name for feature in visible_feats]
         if has_hidden_feats:
             col_names += [ELLIPSIS]
@@ -127,7 +156,147 @@ def display_html(evset: EventSet) -> str:
                 f"{ELLIPSIS} ({hidden_indexes} more indexes not shown)"
             )
         )
-    return top.toxml()
+
+    return top.toprettyxml(indent="  ")
+
+
+def html_style(
+    dom: Dom, item: StyleHtml, style_attributes: Dict[str, Any]
+) -> Html:
+    if isinstance(item, minidom.Text):
+        raw_item = item
+        item = dom.createElement("span")
+        item.appendChild(raw_item)
+    elif isinstance(item, str):
+        raw_item = item
+        item = dom.createElement("span")
+        item.appendChild(dom.createTextNode(raw_item))
+
+    style_key = "style"
+
+    # Get existing style, if any.
+    style = (
+        item.getAttribute(style_key) + "; "
+        if item.hasAttribute(style_key)
+        else ""
+    )
+
+    # Add new style
+    style += "; ".join([f"{k}:{v}" for k, v in style_attributes.items()])
+
+    item.setAttribute("style", style)
+    return item
+
+
+def html_style_bold(dom: Dom, item: StyleHtml) -> Html:
+    return html_style(dom, item, {"font-weight": "bold"})
+
+
+def html_style_italic(dom: Dom, item: StyleHtml) -> Html:
+    return html_style(dom, item, {"font-style": "italic"})
+
+
+def display_html_vertical_space(dom: Dom, px: int) -> Html:
+    root = dom.createElement("div")
+    root.setAttribute("style", f"padding-bottom: {px}px")
+    root.appendChild(dom.createTextNode(""))
+    return root
+
+
+def display_html_memory_usage(dom: Dom, evset: EventSet) -> Html:
+    root = dom.createElement("div")
+    root.appendChild(html_style_bold(dom, "memory usage: "))
+    root.appendChild(
+        dom.createTextNode(string.pretty_num_bytes(evset.memory_usage()))
+    )
+    return root
+
+
+def display_html_header(dom: Dom, evset: EventSet) -> Html:
+    root = html_style(dom, dom.createElement("div"), _HTML_STYLE_HEADER_DIV)
+
+    # Features
+
+    html_features = dom.createElement("div")
+    root.appendChild(html_features)
+
+    html_features_header = dom.createElement("span")
+    html_features.appendChild(html_features_header)
+    html_features_header.appendChild(html_style_bold(dom, "features"))
+    html_features_header.appendChild(dom.createTextNode(" ["))
+    html_features_header.appendChild(
+        dom.createTextNode(str(len(evset.schema.features)))
+    )
+    html_features_header.appendChild(dom.createTextNode("]: "))
+
+    if len(evset.schema.features) == 0:
+        html_features.appendChild(html_style_italic(dom, "none"))
+
+    for idx, feature in enumerate(evset.schema.features):
+        if idx != 0:
+            html_features.appendChild(dom.createTextNode(", "))
+
+        html_feature = dom.createElement("span")
+        html_feature.appendChild(dom.createTextNode("("))
+        html_feature.appendChild(
+            html_style(dom, feature.name, _HTML_STYLE_FEATURE_KEY)
+        )
+        html_feature.appendChild(dom.createTextNode(", "))
+        html_feature.appendChild(
+            html_style(dom, str(feature.dtype), _HTML_STYLE_DTYPE)
+        )
+        html_feature.appendChild(dom.createTextNode(")"))
+        html_features.appendChild(html_feature)
+
+    # Indexes
+
+    html_indexes = dom.createElement("div")
+    root.appendChild(html_indexes)
+
+    html_indexes_header = dom.createElement("span")
+    html_indexes.appendChild(html_indexes_header)
+    html_indexes_header.appendChild(html_style_bold(dom, "indexes"))
+    html_indexes_header.appendChild(dom.createTextNode(" ["))
+    html_indexes_header.appendChild(
+        dom.createTextNode(str(len(evset.schema.indexes)))
+    )
+    html_indexes_header.appendChild(dom.createTextNode("]: "))
+
+    if len(evset.schema.indexes) == 0:
+        html_indexes.appendChild(html_style_italic(dom, "none"))
+
+    for idx, index in enumerate(evset.schema.indexes):
+        if idx != 0:
+            html_indexes.appendChild(dom.createTextNode(", "))
+
+        html_index = dom.createElement("span")
+        html_index.appendChild(dom.createTextNode("("))
+        html_index.appendChild(
+            html_style(dom, index.name, _HTML_STYLE_INDEX_KEY)
+        )
+        html_index.appendChild(dom.createTextNode(", "))
+        html_index.appendChild(
+            html_style(dom, str(index.dtype), _HTML_STYLE_DTYPE)
+        )
+        html_index.appendChild(dom.createTextNode(")"))
+        html_indexes.appendChild(html_index)
+
+    # Number of events
+    html_num_examples = dom.createElement("div")
+    html_num_examples.appendChild(html_style_bold(dom, "events: "))
+    html_num_examples.appendChild(dom.createTextNode(str(evset.num_events())))
+    root.appendChild(html_num_examples)
+
+    # Number of indexes
+    html_num_examples = dom.createElement("div")
+    html_num_examples.appendChild(html_style_bold(dom, "index values: "))
+    html_num_examples.appendChild(dom.createTextNode(str(len(evset.data))))
+    root.appendChild(html_num_examples)
+
+    # Memory usage
+    root.appendChild(display_html_memory_usage(dom, evset))
+
+    return root
 
 
 def display_text(evset: EventSet) -> str:

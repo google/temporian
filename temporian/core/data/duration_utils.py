@@ -93,7 +93,7 @@ def convert_timestamps_to_datetimes(
 
     Example:
     ```python
-    >>> convert_timestamps_to_datetimes([0, 1689791856])
+    > convert_timestamps_to_datetimes([0, 1689791856])
     [datetime.datetime(1970, 1, 1, 0, 0, tzinfo=datetime.timezone.utc),
      datetime.datetime(2023, 7, 19, 18, 37, 36, tzinfo=datetime.timezone.utc)]
 

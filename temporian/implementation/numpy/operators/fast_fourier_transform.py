@@ -58,7 +58,7 @@ class FastFourierTransformNumpyImplementation(OperatorImplementation):
         # Fill output EventSet's data
         for index_key, index_data in input.data.items():
             src_values = index_data.features[0]
-            dst_timestamps = index_data.timestamps[(num_events - 1) :]
+            dst_timestamps = index_data.timestamps[(num_events - 1) :: hop_size]
 
             # TODO: Implement in c++.
 

@@ -1125,6 +1125,14 @@ class EventSetOperations:
             ... )
             >>> b = a.experimental_fast_fourier_transform(num_events=4, window="hamming")
             >>> b
+            indexes: []
+            features: [('a0', float64), ('a1', float64)]
+            events:
+                 (2 events):
+                    timestamps: [4. 6.]
+                    'a0': [4.65 6.4 ]
+                    'a1': [2.1994 4.7451]
+            ...
 
             ```
 
@@ -1386,7 +1394,7 @@ class EventSetOperations:
         Example without sampling:
             ```python
             >>> a = tp.event_set(timestamps=[0, 1, 2, 5, 6, 7])
-            >>> b = tp.moving_count(a, tp.duration.seconds(2))
+            >>> b = a.moving_count(tp.duration.seconds(2))
             >>> b
             indexes: ...
                 (6 events):
@@ -1400,7 +1408,7 @@ class EventSetOperations:
             ```python
             >>> a = tp.event_set(timestamps=[0, 1, 2, 5])
             >>> b = tp.event_set(timestamps=[-1, 0, 1, 2, 3, 4, 5, 6, 7])
-            >>> c = tp.moving_count(a, tp.duration.seconds(2), sampling=b)
+            >>> c = a.moving_count(tp.duration.seconds(2), sampling=b)
             >>> c
             indexes: ...
                 (9 events):
@@ -1419,7 +1427,7 @@ class EventSetOperations:
             ...     },
             ...     indexes=["idx"],
             ... )
-            >>> b = tp.moving_count(a, tp.duration.seconds(2))
+            >>> b = a.moving_count(tp.duration.seconds(2))
             >>> b
             indexes: [('idx', str_)]
             features: [('count', int32)]
@@ -2113,7 +2121,7 @@ class EventSetOperations:
             >>> c
             indexes: ...
                     timestamps: [-1. 2. 4. 6. 10.]
-                    'since_last': [nan  nan  1.  2. 5.]
+                    'since_last': [nan  nan  3.  2. 5.]
             ...
 
             ```
