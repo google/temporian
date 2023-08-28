@@ -20,7 +20,7 @@ from typing import Dict, List
 import apache_beam as beam
 
 from temporian.core.data.node import EventSetNode
-from temporian.beam.io import PEventSet
+from temporian.beam.io.dict import PEventSet
 from temporian.core.evaluation import build_schedule
 from temporian.beam import implementation_lib
 from temporian.beam import operators as _  # Implementations

@@ -24,7 +24,7 @@ from temporian.core.operators.add_index import (
 )
 from temporian.beam import implementation_lib
 from temporian.beam.operators.base import BeamOperatorImplementation
-from temporian.beam.io import (
+from temporian.beam.io.dict import (
     IndexValue,
     PEventSet,
     BeamIndexOrFeature,

@@ -37,7 +37,9 @@ PUBLIC_API_SYMBOLS = {
     "from_csv",
     "to_pandas",
     "from_pandas",
-    "to_tensorflow",
+    "to_tensorflow_dataset",
+    "from_tensorflow_record",
+    "to_tensorflow_record",
     # DTYPES
     "float64",
     "float32",
