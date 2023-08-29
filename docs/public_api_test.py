@@ -37,7 +37,9 @@ PUBLIC_API_SYMBOLS = {
     "from_csv",
     "to_pandas",
     "from_pandas",
-    "to_tensorflow",
+    "to_tensorflow_dataset",
+    "from_tensorflow_record",
+    "to_tensorflow_record",
     # DTYPES
     "float64",
     "float32",
@@ -53,6 +55,8 @@ PUBLIC_API_SYMBOLS = {
     "load_graph",
     # RUNTIME CHECKING
     "runtime_check_raise_exception",
+    # Help
+    "help",
     # OPERATORS
     "glue",
     "combine",

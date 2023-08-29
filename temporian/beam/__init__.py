@@ -30,14 +30,12 @@ Solutions:
 """
     )
 
-from temporian.beam import io as _io
-
-read_csv_raw = _io.read_csv_raw
-read_csv = _io.read_csv
-write_csv = _io.write_csv
-to_event_set = _io.to_event_set
-to_dict = _io.to_dict
-UserEventSetFormat = _io.UserEventSetFormat
+from temporian.beam.io.dict import to_event_set, to_dict
+from temporian.beam.io.csv import from_csv_raw, from_csv, to_csv
+from temporian.beam.io.tensorflow import (
+    to_tensorflow_record,
+    from_tensorflow_record,
+)
 
 from temporian.beam import evaluation as _evaluation
 

@@ -20,7 +20,7 @@ from typing import Dict, List
 import apache_beam as beam
 
 from temporian.core.data.node import EventSetNode
-from temporian.beam.io import PEventSet
+from temporian.beam.io.dict import PEventSet
 from temporian.core.evaluation import build_schedule
 from temporian.beam import implementation_lib
 from temporian.beam import operators as _  # Implementations
@@ -28,7 +28,10 @@ from temporian.beam import operators as _  # Implementations
 
 @beam.ptransform_fn
 def run(
-    pipe: PEventSet, input: EventSetNode, output: EventSetNode
+    pipe: PEventSet,
+    input: EventSetNode,
+    output: EventSetNode,
+    verbose: int = 0,
 ) -> PEventSet:
     """Runs a single-input, single-output Temporian graph in Beam.
 
@@ -44,9 +47,9 @@ def run(
 
     with beam.Pipeline() as pipeline:
         (pipeline
-        | "Read input" >> tpb.read_csv(input_path, input_node.schema)
+        | "Read input" >> tpb.from_csv(input_path, input_node.schema)
         | "Process data" >> tpb.run(input=input_node, output=output_node)
-        | "Save result" >> tpb.write_csv(output_path, output_node.schema)
+        | "Save result" >> tpb.to_csv(output_path, output_node.schema)
         )
         pipeline.run()
     ```
@@ -56,23 +59,29 @@ def run(
 
     Args:
         pipe: A Beam PCollection containing the input event set. Use
-            `tpb.read_csv` to read data from csv files, or use
+            `tpb.from_csv` to read data from csv files, or use
             `tpb.to_event_set` to import an event set from a dictionary of
             key/values such as the output of Beam IO connectors
             (https://beam.apache.org/documentation/io/connectors/).
         input: Input node of a Temporian graph.
         output: Output node of a Temporian graph.
+        verbose: If >0, prints details about the execution on the standard error
+            output. The larger the number, the more information is displayed.
 
     Returns:
         A Beam PCollection containing the output event set.
     """
 
-    output_pipe = run_multi_io(inputs={input: pipe}, outputs=[output])
+    output_pipe = run_multi_io(
+        inputs={input: pipe}, outputs=[output], verbose=verbose
+    )
     return output_pipe[output]
 
 
 def run_multi_io(
-    inputs: Dict[EventSetNode, PEventSet], outputs: List[EventSetNode]
+    inputs: Dict[EventSetNode, PEventSet],
+    outputs: List[EventSetNode],
+    verbose: int = 0,
 ) -> Dict[EventSetNode, PEventSet]:
     """Runs a multi-input, multi-output Temporian graph in Beam.
 
@@ -89,8 +98,8 @@ def run_multi_io(
     output_node_2 = input_node_2.moving_sum(4)
 
     with beam.Pipeline() as p:
-        input_beam_1 = p | tpb.read_csv(input_path_1, input_node_1.schema)
-        input_beam_2 = p | tpb.read_csv(input_path_2, input_node_2.schema)
+        input_beam_1 = p | tpb.from_csv(input_path_1, input_node_1.schema)
+        input_beam_2 = p | tpb.from_csv(input_path_2, input_node_2.schema)
 
         outputs = tpb.run_multi_io(
             inputs={
@@ -99,10 +108,10 @@ def run_multi_io(
             },
             outputs=[output_node_1, output_node_2],
         )
-        outputs[output_node_1] | tpb.write_csv(
+        outputs[output_node_1] | tpb.to_csv(
             output_path_1, output_node_1.schema, shard_name_template=""
         )
-        outputs[output_node_2] | tpb.write_csv(
+        outputs[output_node_2] | tpb.to_csv(
             output_path_2, output_node_2.schema, shard_name_template=""
         )
         pipeline.run()
@@ -114,6 +123,8 @@ def run_multi_io(
         inputs: EventSetNode indexed dictionary of input Beam event-sets for all the
             inputs of the Temporian graph.
         outputs: List of output nodes to compute.
+        verbose: If >0, prints details about the execution on the standard error
+            output. The larger the number, the more information is displayed.
 
     Returns:
         A output node indexed dictionary of output beam event-sets. Each item
@@ -121,7 +132,7 @@ def run_multi_io(
     """
 
     schedule = build_schedule(
-        inputs=set(inputs.keys()), outputs=set(outputs), verbose=2
+        inputs=set(inputs.keys()), outputs=set(outputs), verbose=verbose
     )
 
     data = {**inputs}
@@ -130,11 +141,12 @@ def run_multi_io(
     for step_idx, step in enumerate(schedule.steps):
         operator_def = step.op.definition()
 
-        print("=============================", file=sys.stderr)
-        print(
-            f"{step_idx+1} / {num_steps}: Run {step.op}",
-            file=sys.stderr,
-        )
+        if verbose > 0:
+            print("=============================", file=sys.stderr)
+            print(
+                f"{step_idx+1} / {num_steps}: Run {step.op}",
+                file=sys.stderr,
+            )
 
         # Construct operator inputs
         operator_inputs = {

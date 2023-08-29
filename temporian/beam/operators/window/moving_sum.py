@@ -24,7 +24,7 @@ from temporian.implementation.numpy.operators.window.moving_sum import (
     MovingSumNumpyImplementation as CurrentOperatorImplementation,
 )
 from temporian.beam.operators.base import BeamOperatorImplementation
-from temporian.beam.io import IndexValue, PEventSet
+from temporian.beam.io.dict import IndexValue, PEventSet
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 

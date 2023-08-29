@@ -17,7 +17,7 @@ from typing import Dict
 from abc import ABC, abstractmethod
 
 from temporian.core.operators.base import Operator
-from temporian.beam.io import PEventSet
+from temporian.beam.io.dict import PEventSet
 
 
 class BeamOperatorImplementation(ABC):
