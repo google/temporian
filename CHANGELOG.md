@@ -4,6 +4,8 @@
 
 ### Features
 
+- Added unsupervised anomaly detection tutorial.
+
 ### Fixes
 
 ## 0.1.3
