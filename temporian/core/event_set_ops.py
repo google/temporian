@@ -1927,10 +1927,14 @@ class EventSetOperations:
 
     def select_index_values(
         self: EventSetOrNode,
-        keys: Optional[Union[IndexKey, List[IndexKey]]] = None,
+        keys: Union[IndexKey, List[IndexKey]],
     ) -> EventSetOrNode:
         """Selects a subset of index values from an
         [`EventSet`][temporian.EventSet].
+
+        If used in compiled or graph mode, the specified keys are compiled as-is
+        along with the operator, which means that they must be available when
+        loading and running the graph on new data.
 
         Example:
 

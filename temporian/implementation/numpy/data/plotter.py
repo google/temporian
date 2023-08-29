@@ -23,9 +23,12 @@ from temporian.core.data.duration_utils import (
     convert_timestamps_to_datetimes,
 )
 from temporian.core.data import duration_utils
-from temporian.core.typing import IndexKey, IndexKeyItem
+from temporian.core.typing import (
+    IndexKeyList,
+    NormalizedIndexKey,
+)
 from temporian.implementation.numpy.data.dtype_normalization import (
-    normalize_index_key,
+    normalize_index_key_list,
 )
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.plotter_base import (
@@ -34,22 +37,12 @@ from temporian.implementation.numpy.data.plotter_base import (
     PlotterBackend,
 )
 
-# "evtset" argument in tp.plot.
+# "evset" argument in tp.plot.
 InputEventSet = Union[
     EventSet,
     List[EventSet],
     Tuple[EventSet, ...],
     List[Tuple[EventSet, ...]],
-]
-
-# "indexes" argument in tp.plot.
-InputIndex = Optional[
-    Union[
-        IndexKeyItem,  # allow receiving a single value instead of tuple when there is a single index
-        IndexKey,
-        List[IndexKeyItem],
-        List[IndexKey],
-    ]
 ]
 
 # "features" argument in tp.plot.
@@ -64,15 +57,15 @@ InputFeatures = Optional[
 
 @dataclass
 class GroupItem:
-    evtset: EventSet
+    evset: EventSet
 
-    # Index of the feature in "evtset". If -1, plots the timestamp.
+    # Index of the feature in "evset". If -1, plots the timestamp.
     feature_idx: int
 
 
 @dataclass
 class Group:
-    """Features / timestaps that get plotted together."""
+    """Features / timestamps that get plotted together."""
 
     items: List[GroupItem]
 
@@ -134,13 +127,13 @@ def build_groups(
                 raise ValueError(
                     f"Expecting tuple of EventSets. Got {type(evset)} instead."
                 )
-            plot_for_current_evtset = False
+            plot_for_current_evset = False
             for feature_idx, feature in enumerate(evset.schema.features):
                 if features is not None and feature.name not in features:
                     continue
                 group_items.append(GroupItem(evset, feature_idx))
-                plot_for_current_evtset = True
-            if not plot_for_current_evtset:
+                plot_for_current_evset = True
+            if not plot_for_current_evset:
                 group_items.append(GroupItem(evset, -1))
 
         return [Group(group_items)]
@@ -167,50 +160,22 @@ def normalize_features(features: InputFeatures) -> Optional[Set[str]]:
     raise ValueError(f"Non supported feature type {features}")
 
 
-def normalize_indexes(indexes: InputIndex, groups: Groups) -> List[IndexKey]:
-    """Normalizes the "indexes" argument of plot."""
-
-    if indexes is None:
-        # All the available index
-        normalized_indexes = list(
-            groups[0].items[0].evtset.get_index_keys(sort=True)
-        )
-
-    elif isinstance(indexes, list):
-        # e.g. indexes=["a", ("b",)]
-        normalized_indexes = [
-            v if isinstance(v, tuple) else (v,) for v in indexes
-        ]
-
-    elif isinstance(indexes, tuple):
-        # e.g. indexes=("a",)
-        normalized_indexes = [indexes]
-
-    else:
-        # e.g. indexes="a"
-        normalized_indexes = [(indexes,)]
-
-    normalized_indexes = [normalize_index_key(x) for x in normalized_indexes]
-    validate_indexes(normalized_indexes, groups)
-    return normalized_indexes
-
-
-def validate_indexes(indexes: List[IndexKey], groups: Groups):
+def validate_indexes(indexes: List[NormalizedIndexKey], groups: Groups):
     """Ensures that indexes are valid i.e. available in all event-sets."""
 
     for g in groups:
         for item in g.items:
             for index in indexes:
-                if index not in item.evtset.data:
+                if index not in item.evset.data:
                     raise ValueError(
                         f"Index {index!r} does not exist in event set:"
-                        f" {item.evtset}"
+                        f" {item.evset}"
                     )
 
 
 def plot(
     evsets: InputEventSet,
-    indexes: InputIndex = None,
+    indexes: Optional[IndexKeyList] = None,
     features: InputFeatures = None,
     width_px: int = 1024,
     height_per_plot_px: int = 150,
@@ -310,7 +275,13 @@ def plot(
 
     normalized_features = normalize_features(features)
     groups = build_groups(evsets, normalized_features)
-    normalized_indexes = normalize_indexes(indexes, groups)
+    normalized_indexes = normalize_index_key_list(
+        indexes,
+        available_indexes=list(
+            groups[0].items[0].evset.get_index_keys(sort=True)
+        ),
+    )
+    validate_indexes(normalized_indexes, groups)
 
     if len(groups) == 0:
         raise ValueError("Not input eventsets")
@@ -367,13 +338,13 @@ def plot(
 def plot_with_plotter(
     plotter_class: Type[PlotterBackend],
     groups: Groups,
-    indexes: List[IndexKey],
+    indexes: List[NormalizedIndexKey],
     options: Options,
 ):
     num_plots = get_num_plots(groups, indexes, options)
     plotter: PlotterBackend = plotter_class(num_plots, options)
 
-    index_names = groups[0].items[0].evtset.schema.index_names()
+    index_names = groups[0].items[0].evset.schema.index_names()
 
     plot_idx = 0
     for index in indexes:
@@ -394,16 +365,14 @@ def plot_with_plotter(
             plotter.new_subplot(
                 title=title,
                 num_items=len(group.items),
-                is_unix_timestamp=group.items[
-                    0
-                ].evtset.schema.is_unix_timestamp,
+                is_unix_timestamp=group.items[0].evset.schema.is_unix_timestamp,
             )
 
             # Only print the index / title once
             title = None
 
             for group_item in group.items:
-                xs = group_item.evtset.data[index].timestamps
+                xs = group_item.evset.data[index].timestamps
                 uniform = is_uniform(xs)
 
                 plot_mask = np.full(len(xs), True)
@@ -422,18 +391,18 @@ def plot_with_plotter(
 
                 xs = xs[plot_mask]
 
-                if group_item.evtset.schema.is_unix_timestamp:
+                if group_item.evset.schema.is_unix_timestamp:
                     xs = convert_timestamps_to_datetimes(xs)
 
                 if group_item.feature_idx == -1:
                     # Plot the timestamps.
                     plotter.plot_sampling(xs=xs, color_idx=color_idx)
                 else:
-                    feature_name = group_item.evtset.schema.features[
+                    feature_name = group_item.evset.schema.features[
                         group_item.feature_idx
                     ].name
 
-                    ys = group_item.evtset.data[index].features[
+                    ys = group_item.evset.data[index].features[
                         group_item.feature_idx
                     ]
                     ys = ys[plot_mask]

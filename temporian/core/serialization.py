@@ -42,7 +42,11 @@ from temporian.core.data.schema import Schema
 from temporian.core.compilation import compile
 from temporian.core.operators import base
 from temporian.core.data.dtype import DType
-from temporian.core.typing import EventSetOrNode, IndexKey, IndexKeyItem
+from temporian.core.typing import (
+    EventSetOrNode,
+    NormalizedIndexKey,
+    NormalizedIndexKeyItem,
+)
 from temporian.implementation.numpy.data.event_set import (
     EventSet,
 )
@@ -623,12 +627,8 @@ def _unserialize_dtype(dtype: pb.DType):
 
 
 def _serialize_index_key_item(
-    item,
+    item: NormalizedIndexKeyItem,
 ) -> pb.Operator.Attribute.ListIndexKeys.IndexKey.IndexKeyItem:
-    if isinstance(item, str):
-        return pb.Operator.Attribute.ListIndexKeys.IndexKey.IndexKeyItem(
-            str=item
-        )
     if isinstance(item, bytes):
         return pb.Operator.Attribute.ListIndexKeys.IndexKey.IndexKeyItem(
             bytes_=item
@@ -637,15 +637,12 @@ def _serialize_index_key_item(
         return pb.Operator.Attribute.ListIndexKeys.IndexKey.IndexKeyItem(
             integer_64=item
         )
-    else:
-        raise ValueError(f"Non supported index key item: {item}")
+    raise ValueError(f"Non supported index key item: {item}")
 
 
 def _unserialize_index_key_item(
     item: pb.Operator.Attribute.ListIndexKeys.IndexKey.IndexKeyItem,
-) -> IndexKeyItem:
-    if item.HasField("str"):
-        return item.str
+) -> NormalizedIndexKeyItem:
     if item.HasField("bytes_"):
         return item.bytes_
     if item.HasField("integer_64"):
@@ -654,7 +651,7 @@ def _unserialize_index_key_item(
 
 
 def _serialize_index_key(
-    key: tuple,
+    key: NormalizedIndexKey,
 ) -> pb.Operator.Attribute.ListIndexKeys.IndexKey:
     return pb.Operator.Attribute.ListIndexKeys.IndexKey(
         values=[_serialize_index_key_item(x) for x in key]
@@ -663,7 +660,7 @@ def _serialize_index_key(
 
 def _unserialize_index_key(
     key: pb.Operator.Attribute.ListIndexKeys.IndexKey,
-) -> IndexKey:
+) -> NormalizedIndexKey:
     return tuple(_unserialize_index_key_item(x) for x in key.values)
 
 

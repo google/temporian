@@ -17,14 +17,20 @@
 from __future__ import annotations
 import datetime
 import logging
-from typing import TYPE_CHECKING, Any, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, List, Optional, Tuple
 
 import numpy as np
 
 from temporian.core.data.dtype import DType
 
 if TYPE_CHECKING:
-    from temporian.core.typing import IndexKey, IndexKeyItem
+    from temporian.core.typing import (
+        IndexKey,
+        IndexKeyItem,
+        NormalizedIndexKey,
+        NormalizedIndexKeyItem,
+        IndexKeyList,
+    )
 
 # Mapping of temporian types to and from numpy types.
 #
@@ -52,7 +58,7 @@ _DTYPE_REVERSE_MAPPING = {
 }
 
 
-def normalize_index_item(x: IndexKeyItem) -> IndexKeyItem:
+def normalize_index_item(x: IndexKeyItem) -> NormalizedIndexKeyItem:
     if isinstance(x, str):
         return x.encode()
     elif isinstance(x, (int, str, bytes)):
@@ -60,9 +66,7 @@ def normalize_index_item(x: IndexKeyItem) -> IndexKeyItem:
     raise ValueError(f"Non supported index item {x}")
 
 
-def normalize_index_key(
-    index: Optional[Union[IndexKeyItem, IndexKey]]
-) -> IndexKey:
+def normalize_index_key(index: Optional[IndexKey]) -> NormalizedIndexKey:
     if index is None:
         return tuple()
     if isinstance(index, tuple):
@@ -220,3 +224,38 @@ def normalize_timestamps(
         " list of supported timestamp types. Instead, got"
         f" {object_description}."
     )
+
+
+def normalize_index_key_list(
+    indexes: Optional[IndexKeyList],
+    available_indexes: Optional[List[IndexKey]] = None,
+) -> List[NormalizedIndexKey]:
+    """Normalizes a list of index keys.
+
+    If `indexes` is None: if available_indexes is not None it returns those,
+    else returns an empty list."""
+
+    if indexes is None:
+        if available_indexes is not None:
+            # All available indexes
+            normalized_indexes = available_indexes
+        else:
+            normalized_indexes = []
+
+    elif isinstance(indexes, list):
+        # e.g. indexes=["a", ("b",)]
+        normalized_indexes = [
+            v if isinstance(v, tuple) else (v,) for v in indexes
+        ]
+
+    elif isinstance(indexes, tuple):
+        # e.g. indexes=("a",)
+        normalized_indexes = [indexes]
+
+    else:
+        # e.g. indexes="a"
+        normalized_indexes = [(indexes,)]
+
+    normalized_indexes = [normalize_index_key(x) for x in normalized_indexes]
+
+    return normalized_indexes

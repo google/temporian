@@ -15,7 +15,7 @@
 
 """SelectIndexValues operator class and public API function definitions."""
 
-from typing import List, Optional, Union
+from typing import List
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.node import (
@@ -23,20 +23,27 @@ from temporian.core.data.node import (
     create_node_new_features_new_sampling,
 )
 from temporian.core.operators.base import Operator
-from temporian.core.typing import EventSetOrNode, IndexKey
+from temporian.core.typing import (
+    EventSetOrNode,
+    IndexKeyList,
+    NormalizedIndexKey,
+)
+from temporian.implementation.numpy.data.dtype_normalization import (
+    normalize_index_key_list,
+)
 from temporian.proto import core_pb2 as pb
 from temporian.utils.typecheck import typecheck
 
 
 class SelectIndexValues(Operator):
-    def __init__(self, input: EventSetNode, keys: Optional[List[IndexKey]]):
+    def __init__(self, input: EventSetNode, keys: IndexKeyList):
         super().__init__()
 
         self.add_input("input", input)
 
-        self._keys = keys
-        if keys:
-            self.add_attribute("keys", keys)
+        normalized_keys = normalize_index_key_list(keys)
+        self._keys = normalized_keys
+        self.add_attribute("keys", normalized_keys)
 
         self.add_output(
             "output",
@@ -66,7 +73,7 @@ class SelectIndexValues(Operator):
         )
 
     @property
-    def keys(self) -> Optional[List[IndexKey]]:
+    def keys(self) -> List[NormalizedIndexKey]:
         return self._keys
 
 
@@ -77,18 +84,8 @@ operator_lib.register_operator(SelectIndexValues)
 @compile
 def select_index_values(
     input: EventSetOrNode,
-    keys: Optional[Union[IndexKey, List[IndexKey]]],
+    keys: IndexKeyList,
 ) -> EventSetOrNode:
     assert isinstance(input, EventSetNode)
-
-    if isinstance(keys, list) and all(isinstance(k, tuple) for k in keys):
-        pass
-    elif isinstance(keys, tuple):
-        keys = [keys]
-    else:
-        raise TypeError(
-            "Unexpected type for keys. Expect a tuple or list of"
-            f" tuples. Got '{keys}' instead."
-        )
 
     return SelectIndexValues(input=input, keys=keys).outputs["output"]

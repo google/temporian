@@ -17,9 +17,6 @@
 
 
 from typing import Dict
-from temporian.implementation.numpy.data.dtype_normalization import (
-    normalize_index_key,
-)
 
 from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.core.operators.select_index_values import SelectIndexValues
@@ -42,14 +39,8 @@ class SelectIndexValuesNumpyImplementation(OperatorImplementation):
         # Create output EventSet
         output_evset = EventSet(data={}, schema=output_schema)
 
-        # TODO: remove this behavior when adding number/fraction params
-        # and force one of the params to not be None
-        if keys is None:
-            keys = []
-
         # Fill output EventSet's data
         for key in keys:
-            key = normalize_index_key(key)
             index_data = input.data[key]
 
             output_evset.set_index_value(

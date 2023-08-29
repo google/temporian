@@ -95,9 +95,8 @@ message Operator {
 
         message IndexKeyItem {
           oneof types {
-            string str = 1;
-            bytes bytes_ = 2;
-            int64 integer_64 = 3;
+            bytes bytes_ = 1;
+            int64 integer_64 = 2;
           }
         }
       }
