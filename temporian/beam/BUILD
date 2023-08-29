@@ -37,3 +37,10 @@ py_library(
     srcs = ["implementation_lib.py"],
     srcs_version = "PY3",
 )
+
+py_library(
+    name = "typing",
+    srcs = ["typing.py"],
+    srcs_version = "PY3",
+    deps = ["//temporian/core:typing"],
+)

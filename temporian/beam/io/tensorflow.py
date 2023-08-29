@@ -5,13 +5,14 @@ from typing import Iterable, Dict, Any
 import numpy as np
 import apache_beam as beam
 
-from temporian.beam.io.dict import PEventSet, to_event_set, to_dict
+from temporian.beam.io.dict import to_event_set, to_dict
 from temporian.core.data.dtype import DType, tp_dtype_to_py_type
 from temporian.core.data.node import Schema
 from temporian.implementation.numpy.data.dtype_normalization import (
     tp_dtype_to_np_dtype,
 )
 from temporian.io.tensorflow import import_tf
+from temporian.beam.typing import BeamEventSet
 
 
 class _TFExampleToDict(beam.DoFn):
@@ -144,7 +145,7 @@ def from_tensorflow_record(
     schema: Schema,
     timestamp_key: str = "timestamp",
     grouped_by_index: bool = True,
-) -> PEventSet:
+) -> BeamEventSet:
     """Imports an EventSet from a TF.Records of TF.Examples.
 
     TF.Records of TF.Examples is one of the standard solution to store data
@@ -210,7 +211,7 @@ def from_tensorflow_record(
 
 @beam.ptransform_fn
 def to_tensorflow_record(
-    pipe: PEventSet,
+    pipe: BeamEventSet,
     file_path_prefix: str,
     schema: Schema,
     timestamp_key: str = "timestamp",

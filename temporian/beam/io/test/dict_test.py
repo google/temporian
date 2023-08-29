@@ -79,6 +79,29 @@ class IOTest(absltest.TestCase):
             )
             util.assert_that(output, util.equal_to(raw_data))
 
+    def test_to_event_set_and_to_dict_singleEvents_no_features(self):
+        schema = Schema(
+            [],
+            [("i1", DType.INT32), ("i2", DType.STRING)],
+        )
+
+        raw_data = [
+            {"timestamp": 100.0, "i1": 10, "i2": b"x"},
+            {"timestamp": 101.0, "i1": 10, "i2": b"x"},
+            {"timestamp": 102.0, "i1": 10, "i2": b"y"},
+            {"timestamp": 103.0, "i1": 11, "i2": b"y"},
+            {"timestamp": 104.0, "i1": 11, "i2": b"y"},
+        ]
+
+        with TestPipeline() as p:
+            output = (
+                p
+                | beam.Create(raw_data)
+                | to_event_set(schema, grouped_by_index=False)
+                | to_dict(schema, grouped_by_index=False)
+            )
+            util.assert_that(output, util.equal_to(raw_data))
+
     def test_to_event_set_and_to_dict_singleEvents_errors(self):
         def test(
             schema: Schema,
@@ -137,6 +160,42 @@ class IOTest(absltest.TestCase):
                 "timestamp": np.array([104.0]),
                 "f1": np.array([5]),
                 "f2": np.array([b"e"]),
+                "i1": 11,
+                "i2": b"x",
+            },
+        ]
+
+        with TestPipeline() as p:
+            output = (
+                p
+                | beam.Create(raw_data)
+                | to_event_set(schema, grouped_by_index=True)
+                | to_dict(schema, grouped_by_index=True)
+                | beam.Map(structure_np_to_list)
+            )
+            util.assert_that(
+                output, util.equal_to(structure_np_to_list(raw_data))
+            )
+
+    def test_to_event_set_and_to_dict_indexedEvents_no_features(self):
+        schema = Schema(
+            features=[],
+            indexes=[("i1", DType.INT64), ("i2", DType.STRING)],
+        )
+
+        raw_data = [
+            {
+                "timestamp": np.array([100.0, 101.0, 102.0]),
+                "i1": 10,
+                "i2": b"x",
+            },
+            {
+                "timestamp": np.array([103.0]),
+                "i1": 10,
+                "i2": b"y",
+            },
+            {
+                "timestamp": np.array([104.0]),
                 "i1": 11,
                 "i2": b"x",
             },

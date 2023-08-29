@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict
+from typing import Dict, Optional
 
 import apache_beam as beam
 
@@ -29,16 +29,33 @@ from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
 class MovingSumBeamImplementation(BeamOperatorImplementation):
-    def call(self, input: PEventSet) -> Dict[str, PEventSet]:
+    def call(
+        self, input: PEventSet, sampling: Optional[PEventSet] = None
+    ) -> Dict[str, PEventSet]:
         assert isinstance(self.operator, CurrentOperator)
-
-        assert not self.operator.has_sampling
 
         numpy_implementation = CurrentOperatorImplementation(self.operator)
 
-        output = input | f"Apply operator {self.operator}" >> beam.Map(
-            _run_item, numpy_implementation
-        )
+        if self.operator.has_sampling:
+            if len(self.operator.inputs["sampling"].features) == 0:
+                # The sampling does not contain features.
+                sampling_feature_idx = -1
+            else:
+                # The sampling contains at least one feature.
+                sampling_feature_idx = 0
+
+            num_input_features = len(self.operator.inputs["input"].features)
+
+            output = (
+                (input, sampling)
+                | f"Join input and sampling index {self.operator}"
+                >> beam.CoGroupByKey()
+                | f"Reindex {self.operator}" >> beam.FlatMap(_add_index)
+            )
+        else:
+            output = input | f"Apply operator {self.operator}" >> beam.Map(
+                _run_without_sampling, numpy_implementation
+            )
 
         return {"output": output}
 
@@ -48,7 +65,16 @@ implementation_lib.register_operator_implementation(
 )
 
 
-def _run_item(pipe: IndexValue, imp: OperatorImplementation):
+def _run_without_sampling(pipe: IndexValue, imp: OperatorImplementation):
+    indexes, (timestamps, input_values) = pipe
+    output_values = imp.apply_feature_wise(
+        src_timestamps=timestamps,
+        src_feature=input_values,
+    )
+    return indexes, (timestamps, output_values)
+
+
+def _run_with_sampling(pipe: IndexValue, imp: OperatorImplementation):
     indexes, (timestamps, input_values) = pipe
     output_values = imp.apply_feature_wise(
         src_timestamps=timestamps,

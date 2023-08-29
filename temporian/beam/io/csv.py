@@ -2,19 +2,23 @@
 
 from typing import Iterable, Dict, Tuple, List
 
-from enum import Enum
 import csv
 import io
-import numpy as np
 import apache_beam as beam
 from apache_beam.io.fileio import MatchFiles
 
 from temporian.core.data.node import Schema
 from temporian.beam.io.dict import (
     to_event_set,
-    PEventSet,
-    BeamIndex,
-    IndexValue,
+)
+from temporian.beam.typing import (
+    BeamEventSet,
+    BeamIndexKey,
+    PosFeatureIdx,
+    PosTimestampValues,
+    PosFeatureValues,
+    BeamIndexKey,
+    BeamFeatureAndTimestampsValue,
 )
 
 
@@ -61,7 +65,7 @@ def from_csv_raw(pipe, file_pattern: str) -> beam.PCollection[Dict[str, str]]:
 @beam.ptransform_fn
 def from_csv(
     pipe, file_pattern: str, schema: Schema, timestamp_key: str = "timestamp"
-) -> PEventSet:
+) -> BeamEventSet:
     """Reads a file or set of csv files into a Beam EventSet.
 
     Limitation: Timestamps have to be numerical values. See documentation of
@@ -101,8 +105,8 @@ def _bytes_to_strs(list: List) -> List:
 
 def _convert_to_csv(
     item: Tuple[
-        Tuple[BeamIndex, ...],
-        Iterable[IndexValue],
+        BeamIndexKey,
+        Iterable[BeamFeatureAndTimestampsValue],
     ]
 ) -> str:
     index, feature_blocks = item
@@ -111,17 +115,17 @@ def _convert_to_csv(
     # Sort the feature by feature index.
     # The feature index is the last value (-1) of the key (first element of the
     # tuple).
-    feature_blocks = sorted(feature_blocks, key=lambda x: x[0][-1])
+    feature_blocks = sorted(feature_blocks, key=lambda x: x[PosFeatureIdx])
     assert len(feature_blocks) > 0
 
     # All the feature blocks have the same timestamps. We use the first one.
-    timestamps = feature_blocks[0][1][0]
+    timestamps = feature_blocks[0][PosTimestampValues]
 
     output = io.StringIO()
     writer = csv.writer(output)
     for event_idx, timestamp in enumerate(timestamps):
         feature_data = _bytes_to_strs(
-            [f[1][1][event_idx] for f in feature_blocks]
+            [f[PosFeatureValues][event_idx] for f in feature_blocks]
         )
         writer.writerow([timestamp] + index_data + feature_data)
 
@@ -130,7 +134,7 @@ def _convert_to_csv(
 
 @beam.ptransform_fn
 def to_csv(
-    pipe: PEventSet,
+    pipe: BeamEventSet,
     file_path_prefix: str,
     schema: Schema,
     timestamp_key: str = "timestamp",
@@ -171,7 +175,8 @@ def to_csv(
 
     return (
         pipe
-        | "Group by features" >> beam.GroupBy(lambda x: x[0][0:-1])
+        | "Flatten" >> beam.Flatten()
+        | "Group by features" >> beam.GroupByKey()
         | "Convert to csv" >> beam.Map(_convert_to_csv)
         | "Write csv"
         >> beam.io.textio.WriteToText(
