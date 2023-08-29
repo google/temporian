@@ -1,6 +1,6 @@
 """Utilities to import/export Beam-Event-Set from/to dataset containers."""
 
-from typing import Iterable, Dict, Any, Tuple, Union, Optional, List, Iterator
+from typing import Iterable, Dict, Any, Tuple, Union, Optional, Iterator
 
 import numpy as np
 import apache_beam as beam
