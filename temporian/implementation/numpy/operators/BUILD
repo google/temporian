@@ -364,3 +364,20 @@ py_library(
         "//temporian/implementation/numpy/data:event_set",
     ],
 )
+
+py_library(
+    name = "tick_calendar",
+    srcs = ["tick_calendar.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/numpy
+        ":base",
+        "//temporian/core/data:duration_utils",
+        "//temporian/core/operators:tick_calendar",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy:utils",
+        "//temporian/implementation/numpy/data:event_set",
+    ],
+)
+
+    
