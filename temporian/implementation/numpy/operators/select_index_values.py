@@ -41,7 +41,12 @@ class SelectIndexValuesNumpyImplementation(OperatorImplementation):
 
         # Fill output EventSet's data
         for key in keys:
-            index_data = input.data[key]
+            try:
+                index_data = input.data[key]
+            except KeyError as e:
+                raise ValueError(
+                    f"Index key '{key}' not found in input EventSet."
+                ) from e
 
             output_evset.set_index_value(
                 key,

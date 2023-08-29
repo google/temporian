@@ -28,10 +28,7 @@ from temporian.implementation.numpy.operators.test.test_util import (
 
 class SelectIndexValuesOperatorTest(absltest.TestCase):
     def setUp(self):
-        pass
-
-    def test_basic(self):
-        evset = event_set(
+        self.evset = event_set(
             timestamps=[1, 2, 3],
             features={
                 "a": [1.0, 2.0, 3.0],
@@ -40,8 +37,9 @@ class SelectIndexValuesOperatorTest(absltest.TestCase):
             },
             indexes=["c"],
         )
-        node = evset.node()
+        self.node = self.evset.node()
 
+    def test_basic(self):
         expected_output = event_set(
             timestamps=[1, 2],
             features={
@@ -53,10 +51,10 @@ class SelectIndexValuesOperatorTest(absltest.TestCase):
         )
 
         # Run op
-        op = SelectIndexValues(input=node, keys=[("A",)])
+        op = SelectIndexValues(input=self.node, keys=[("A",)])
         instance = SelectIndexValuesNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
-        output = instance.call(input=evset)["output"]
+        output = instance.call(input=self.evset)["output"]
 
         assertEqualEventSet(self, output, expected_output)
 
@@ -91,6 +89,33 @@ class SelectIndexValuesOperatorTest(absltest.TestCase):
         output = instance.call(input=evset)["output"]
 
         assertEqualEventSet(self, output, expected_output)
+
+    def test_single_index_key_value(self):
+        expected_output = event_set(
+            timestamps=[3],
+            features={
+                "a": [3.0],
+                "b": [7],
+                "c": ["B"],
+            },
+            indexes=["c"],
+        )
+
+        # Run op
+        op = SelectIndexValues(input=self.node, keys="B")
+        instance = SelectIndexValuesNumpyImplementation(op)
+        testOperatorAndImp(self, op, instance)
+        output = instance.call(input=self.evset)["output"]
+
+        assertEqualEventSet(self, output, expected_output)
+
+    def test_wrong_index_key(self):
+        with self.assertRaisesRegex(
+            ValueError, r"Index key '\(b'D',\)' not found in input EventSet."
+        ):
+            op = SelectIndexValues(input=self.node, keys="D")
+            instance = SelectIndexValuesNumpyImplementation(op)
+            instance.call(input=self.evset)
 
 
 if __name__ == "__main__":
