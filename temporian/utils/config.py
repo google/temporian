@@ -56,6 +56,16 @@ in a notebook."""
 max_display_chars = int(os.environ.get("TEMPORIAN_MAX_DISPLAY_CHARS", 32))
 """Maximum number of characters to show per cell when displaying an EventSet in
 a notebook."""
+max_display_feature_dtypes = int(
+    os.environ.get("TEMPORIAN_MAX_DISPLAY_FEATURE_DTYPES", 100)
+)
+"""Maximum number of (feature name, feature dtype) pairs to show in the summary
+section when displaying an EventSet in a notebook."""
+max_display_index_dtypes = int(
+    os.environ.get("TEMPORIAN_MAX_DISPLAY_INDEX_DTYPES", 100)
+)
+"""Maximum number of (index name, index dtype) pairs to show in the summary
+section when displaying an EventSet in a notebook."""
 
 # Configs for both repr and html
 # Decimal numbers precision
