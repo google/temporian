@@ -106,6 +106,24 @@ class EventSetOpsTest(absltest.TestCase):
         self.assertTrue(isinstance(self.evset.enumerate(), EventSet))
         self.assertTrue(isinstance(self.node.enumerate(), EventSetNode))
 
+    def test_fast_fourier_transform(self):
+        self.assertTrue(
+            isinstance(
+                self.evset["a"].experimental_fast_fourier_transform(
+                    num_events=2
+                ),
+                EventSet,
+            )
+        )
+        self.assertTrue(
+            isinstance(
+                self.node["a"].experimental_fast_fourier_transform(
+                    num_events=2
+                ),
+                EventSetNode,
+            )
+        )
+
     def test_filter(self):
         self.assertTrue(
             isinstance(self.evset.filter(self.evset["a"] > 3), EventSet)
@@ -183,6 +201,16 @@ class EventSetOpsTest(absltest.TestCase):
     def test_select(self):
         self.assertTrue(isinstance(self.evset.select("a"), EventSet))
         self.assertTrue(isinstance(self.node.select("a"), EventSetNode))
+
+    def test_select_index_values(self):
+        self.assertTrue(
+            isinstance(self.evset.select_index_values((1, "hello")), EventSet)
+        )
+        self.assertTrue(
+            isinstance(
+                self.node.select_index_values((1, "hello")), EventSetNode
+            )
+        )
 
     def test_set_index(self):
         self.assertTrue(isinstance(self.evset.set_index("a"), EventSet))

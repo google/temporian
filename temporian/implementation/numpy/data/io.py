@@ -1,15 +1,14 @@
 from typing import Any, List, Optional, Union, Dict
 
 import numpy as np
+from temporian.implementation.numpy.data.dtype_normalization import (
+    normalize_features,
+    normalize_timestamps,
+    numpy_array_to_tp_dtype,
+)
 
 from temporian.utils.typecheck import typecheck
-from temporian.implementation.numpy.data.event_set import (
-    EventSet,
-    IndexData,
-    numpy_array_to_tp_dtype,
-    normalize_timestamps,
-    normalize_features,
-)
+from temporian.implementation.numpy.data.event_set import EventSet, IndexData
 from temporian.core.evaluation import run
 from temporian.core.operators.add_index import add_index
 from temporian.core.data.schema import Schema

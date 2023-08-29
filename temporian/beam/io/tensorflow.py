@@ -1,18 +1,16 @@
 """Utilities to import/export Beam-Event-Set from/to dataset containers."""
 
-from typing import Iterable, Dict, Any, Tuple, Union, Optional, List, Iterator
+from typing import Iterable, Dict, Any
 
-from enum import Enum
-import csv
-import io
 import numpy as np
 import apache_beam as beam
-from apache_beam.io.fileio import MatchFiles
 
-from temporian.core.data.node import Schema
+from temporian.beam.io.dict import PEventSet, to_event_set, to_dict
 from temporian.core.data.dtype import DType, tp_dtype_to_py_type
-from temporian.implementation.numpy.data.event_set import tp_dtype_to_np_dtype
-from temporian.beam.io.dict import PEventSet, BeamIndex, to_event_set, to_dict
+from temporian.core.data.node import Schema
+from temporian.implementation.numpy.data.dtype_normalization import (
+    tp_dtype_to_np_dtype,
+)
 from temporian.io.tensorflow import import_tf
 
 

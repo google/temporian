@@ -14,7 +14,7 @@
 
 """Data types declaration."""
 
-from typing import Any
+from typing import Any, Tuple
 
 import math
 from enum import Enum

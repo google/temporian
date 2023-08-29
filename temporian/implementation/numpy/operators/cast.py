@@ -5,11 +5,10 @@ import numpy as np
 from temporian.core.data.dtype import DType
 from temporian.core.operators.cast import CastOperator
 from temporian.implementation.numpy import implementation_lib
-from temporian.implementation.numpy.data.event_set import (
-    EventSet,
-    IndexData,
+from temporian.implementation.numpy.data.dtype_normalization import (
     tp_dtype_to_np_dtype,
 )
+from temporian.implementation.numpy.data.event_set import EventSet, IndexData
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 _DTYPE_LIMITS = {
