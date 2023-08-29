@@ -6,6 +6,11 @@
 
 - Added unsupervised anomaly detection tutorial.
 
+### Improvements
+
+- Added `max_display_feature_dtypes` and `max_display_index_dtypes` options to
+  `tp.config`.
+
 ### Fixes
 
 ## 0.1.3
