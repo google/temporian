@@ -14,18 +14,21 @@
 
 """Utilities for converting EventSets to TensorFlow dataset."""
 
-import logging
 from copy import deepcopy
+import logging
+
 import numpy as np
 
+from temporian.core.data.dtype import DType, tp_dtype_to_py_type
+from temporian.core.operators.drop_index import drop_index
+from temporian.implementation.numpy.data.dtype_normalization import (
+    tp_dtype_to_np_dtype,
+)
 from temporian.implementation.numpy.data.event_set import (
     EventSet,
     Schema,
     IndexData,
-    tp_dtype_to_np_dtype,
 )
-from temporian.core.operators.drop_index import drop_index
-from temporian.core.data.dtype import DType, tp_dtype_to_py_type
 
 
 def import_tf():

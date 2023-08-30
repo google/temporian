@@ -21,6 +21,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         # already_there/numpy
+        ":dtype_normalization",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
@@ -37,6 +38,7 @@ py_library(
         # already_there/numpy
         "//temporian/utils:typecheck",
         ":event_set",
+        ":dtype_normalization",
         "//temporian/core:evaluation",
         "//temporian/core/data:schema",
         "//temporian/core/operators:add_index",
@@ -62,6 +64,8 @@ py_library(
         ":plotter_matplotlib",
         ":plotter_bokeh",
         ":event_set",
+        ":dtype_normalization",
+        "//temporian/core:typing",
         "//temporian/core/data:duration_utils",
         # already_there/numpy
     ],
@@ -88,5 +92,15 @@ py_library(
         # force/bokeh
         ":plotter_base",
         "//temporian/core/data:duration_utils",
+    ],
+)
+
+py_library(
+    name = "dtype_normalization",
+    srcs = ["dtype_normalization.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/numpy
+        "//temporian/core/data:dtype",
     ],
 )

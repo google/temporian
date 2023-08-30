@@ -4,6 +4,7 @@
 
 ### Features
 
+- Added `EventSet.select_index_values()` operator.
 - Added unsupervised anomaly detection tutorial.
 
 ### Improvements

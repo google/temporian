@@ -16,13 +16,12 @@
 """Implementation for the Combine operator."""
 
 
-from typing import Dict, List, Set
+from typing import Dict, List
 import numpy as np
 
 from temporian.implementation.numpy.data.event_set import (
     IndexData,
     EventSet,
-    IndexType,
 )
 from temporian.core.operators.combine import Combine
 from temporian.core.operators.combine import How

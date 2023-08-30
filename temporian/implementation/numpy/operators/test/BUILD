@@ -753,3 +753,19 @@ py_test(
         "//temporian/implementation/numpy/operators:fast_fourier_transform",
     ],
 )
+
+py_test(
+    name = "select_index_values_test",
+    srcs = ["select_index_values_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        ":test_util",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:node",
+        "//temporian/core/data:schema",
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/core/operators:select_index_values",
+        "//temporian/implementation/numpy/operators:select_index_values",
+    ],
+)
