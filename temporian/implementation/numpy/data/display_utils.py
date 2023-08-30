@@ -16,10 +16,6 @@ Html = Any
 Dom = Any
 StyleHtml = Union[Html, str]
 
-_HTML_STYLE_FEATURE_KEY = {"color": "#D81B60"}
-_HTML_STYLE_INDEX_KEY = {"color": "#d55e00"}
-_HTML_STYLE_DTYPE = {"color": "#4c9041"}
-_HTML_STYLE_INDEX_VALUE = {"color": "#1E88E5"}
 _HTML_STYLE_HEADER_DIV = {
     "margin-bottom": "11px",
     "padding": "5px",
@@ -86,20 +82,20 @@ def display_html(evset: EventSet) -> str:
         html_index_value.appendChild(html_style_bold(dom, "index"))
         html_index_value.appendChild(dom.createTextNode(" ("))
 
+        last_index_key_idx = len(index_key) - 1
+
         for idx, (item_value, item_schema) in enumerate(
             zip(index_key, evset.schema.indexes)
         ):
-            if idx != 0:
-                html_index_value.appendChild(dom.createTextNode(", "))
-
             html_index_value.appendChild(
-                html_style(dom, item_schema.name, _HTML_STYLE_INDEX_KEY)
+                html_style_bold(dom, f"{item_schema.name}:")
             )
-            html_index_value.appendChild(dom.createTextNode("="))
             if isinstance(item_value, bytes):
                 item_value = item_value.decode()
             html_index_value.appendChild(
-                html_style(dom, str(item_value), _HTML_STYLE_INDEX_VALUE)
+                dom.createTextNode(
+                    f"{item_value}{',' if idx != last_index_key_idx else ''}"
+                )
             )
 
         html_index_value.appendChild(
@@ -223,11 +219,9 @@ def display_html_header(dom: Dom, evset: EventSet) -> Html:
     html_features_header = dom.createElement("span")
     html_features.appendChild(html_features_header)
     html_features_header.appendChild(html_style_bold(dom, "features"))
-    html_features_header.appendChild(dom.createTextNode(" ["))
     html_features_header.appendChild(
-        dom.createTextNode(str(len(evset.schema.features)))
+        dom.createTextNode(f" [{str(len(evset.schema.features))}]:")
     )
-    html_features_header.appendChild(dom.createTextNode("]: "))
 
     if len(evset.schema.features) == 0:
         html_features.appendChild(html_style_italic(dom, "none"))
@@ -236,20 +230,21 @@ def display_html_header(dom: Dom, evset: EventSet) -> Html:
     num_features = len(evset.schema.features)
     max_features = config.max_display_feature_dtypes or num_features
 
-    for idx, feature in enumerate(evset.schema.features[:max_features]):
-        if idx != 0:
-            html_features.appendChild(dom.createTextNode(", "))
+    last_feature_idx = num_features - 1
 
+    for idx, feature in enumerate(evset.schema.features[:max_features]):
         html_feature = dom.createElement("span")
+        html_feature.appendChild(html_style_bold(dom, feature.name))
         html_feature.appendChild(dom.createTextNode("("))
         html_feature.appendChild(
-            html_style(dom, feature.name, _HTML_STYLE_FEATURE_KEY)
+            html_style_italic(
+                dom,
+                str(feature.dtype),
+            )
         )
-        html_feature.appendChild(dom.createTextNode(", "))
         html_feature.appendChild(
-            html_style(dom, str(feature.dtype), _HTML_STYLE_DTYPE)
+            dom.createTextNode(f"){', 'if idx != last_feature_idx else ''}")
         )
-        html_feature.appendChild(dom.createTextNode(")"))
         html_features.appendChild(html_feature)
 
     if max_features < num_features:
@@ -263,11 +258,9 @@ def display_html_header(dom: Dom, evset: EventSet) -> Html:
     html_indexes_header = dom.createElement("span")
     html_indexes.appendChild(html_indexes_header)
     html_indexes_header.appendChild(html_style_bold(dom, "indexes"))
-    html_indexes_header.appendChild(dom.createTextNode(" ["))
     html_indexes_header.appendChild(
-        dom.createTextNode(str(len(evset.schema.indexes)))
+        dom.createTextNode(f" [{str(len(evset.schema.indexes))}]:")
     )
-    html_indexes_header.appendChild(dom.createTextNode("]: "))
 
     if len(evset.schema.indexes) == 0:
         html_indexes.appendChild(html_style_italic(dom, "none"))
@@ -276,20 +269,21 @@ def display_html_header(dom: Dom, evset: EventSet) -> Html:
     num_indexes = len(evset.schema.indexes)
     max_indexes = config.max_display_index_dtypes or num_indexes
 
-    for idx, index in enumerate(evset.schema.indexes[:max_indexes]):
-        if idx != 0:
-            html_indexes.appendChild(dom.createTextNode(", "))
+    last_index_idx = num_indexes - 1
 
+    for idx, index in enumerate(evset.schema.indexes[:max_indexes]):
         html_index = dom.createElement("span")
+        html_index.appendChild(html_style_bold(dom, index.name))
         html_index.appendChild(dom.createTextNode("("))
         html_index.appendChild(
-            html_style(dom, index.name, _HTML_STYLE_INDEX_KEY)
+            html_style_italic(
+                dom,
+                str(index.dtype),
+            )
         )
-        html_index.appendChild(dom.createTextNode(", "))
         html_index.appendChild(
-            html_style(dom, str(index.dtype), _HTML_STYLE_DTYPE)
+            dom.createTextNode(f"){', 'if idx != last_index_idx else ''}")
         )
-        html_index.appendChild(dom.createTextNode(")"))
         html_indexes.appendChild(html_index)
 
     if max_indexes < num_indexes:
