@@ -15,13 +15,15 @@ from temporian.beam.typing import (
     BeamIndexKeyItem,
     StructuredRow,
     BeamEventSet,
-    BeamFeatureAndTimestamps,
+    FeatureItem,
     BeamIndexKey,
     StructuredRowValue,
     PosFeatureIdx,
     PosTimestampValues,
     PosFeatureValues,
-    BeamFeatureAndTimestampsValue,
+    FeatureItemValue,
+    FeatureItemWithIdxValue,
+    FeatureItemWithIdx,
 )
 
 
@@ -55,7 +57,7 @@ def _parse_and_index(
             (13, ), (10, (11, 12))
 
     This function is used during the conversion of key:value features feed by
-    the user into PEventSet, the working format used by Temporian.
+    the user into BeamEventSet, the working format used by Temporian.
     """
 
     index_values = [
@@ -89,7 +91,7 @@ class _MergeTimestamps(beam.DoFn):
             (21, ), (1, (102,), (16,))
 
     This function is used during the conversion of key:value features feed by
-    the user into PEventSet, the working format used by Temporian.
+    the user into BeamEventSet, the working format used by Temporian.
     """
 
     def __init__(self, num_features: int):
@@ -98,33 +100,27 @@ class _MergeTimestamps(beam.DoFn):
     def process(
         self,
         item: Tuple[BeamIndexKey, Iterable[StructuredRowValue]],
-    ) -> Iterable[BeamFeatureAndTimestamps]:
+    ) -> Iterable[FeatureItemWithIdx]:
         index, feat_and_ts = item
         timestamps = np.array([v[0] for v in feat_and_ts], dtype=np.float64)
         for feature_idx in range(self._num_features):
             values = np.array([v[1][feature_idx] for v in feat_and_ts])
-            yield index, (feature_idx, timestamps, values)
-
-
-def _extract_feature_idx(
-    item: BeamFeatureAndTimestamps, *unused_args, **unused_kwargs
-) -> int:
-    return item[1][PosFeatureIdx]
+            yield index, (timestamps, values, feature_idx)
 
 
 def _merge_timestamps_no_features(
     item: Tuple[BeamIndexKey, Iterable[StructuredRowValue]],
-) -> BeamFeatureAndTimestamps:
+) -> FeatureItem:
     """Same as _MergeTimestamps, but when there are no features."""
 
     index, feat_and_ts = item
     timestamps = np.array([v[0] for v in feat_and_ts], dtype=np.float64)
-    return index, (-1, timestamps, None)
+    return index, (timestamps, None)
 
 
 def _event_set_dict_to_event_set(
     input: Dict[str, Any], schema: Schema, timestamp_key: str
-) -> Iterator[BeamFeatureAndTimestamps]:
+) -> Iterator[FeatureItemWithIdx]:
     """Converts a `indexedEvents` event-set into an internal event-set.
 
     Example:
@@ -195,12 +191,12 @@ def _event_set_dict_to_event_set(
                 f" {effective_type} was found."
             )
 
-        yield index_tuple, (feature_idx, timestamps, src_value)
+        yield index_tuple, (timestamps, src_value, feature_idx)
 
 
 def _event_set_dict_to_event_set_no_features(
     input: Dict[str, Any], schema: Schema, timestamp_key: str
-) -> BeamFeatureAndTimestamps:
+) -> FeatureItem:
     """Same as _event_set_dict_to_event_set, but without features"""
 
     timestamps = input[timestamp_key]
@@ -228,7 +224,7 @@ def _event_set_dict_to_event_set_no_features(
         index.append(src_value)
     index_tuple = tuple(index)
 
-    return index_tuple, (-1, timestamps, None)
+    return index_tuple, (timestamps, None)
 
 
 def _reshuffle_item_in_tuples(items: tuple) -> tuple:
@@ -272,14 +268,14 @@ def to_event_set(
     num_features = len(schema.features)
     if grouped_by_index:
         if num_features != 0:
-            return _reshuffle_item_in_tuples(
+            return partition_by_feature_idx(
                 pipe
                 | "Parse dict"
                 >> beam.FlatMap(
                     _event_set_dict_to_event_set, schema, timestamp_key
-                )
-                | "Partition by features"
-                >> beam.Partition(_extract_feature_idx, num_features)
+                ),
+                num_features=num_features,
+                reshuffle=True,
             )
         else:
             return _reshuffle_item_in_tuples(
@@ -303,13 +299,13 @@ def to_event_set(
             # Build feature and timestamps arrays.
         )
         if num_features != 0:
-            return _reshuffle_item_in_tuples(
+            return partition_by_feature_idx(
                 indexed
                 # Build feature and timestamps arrays.
                 | "Merge by timestamps"
-                >> beam.ParDo(_MergeTimestamps(num_features))
-                | "Partition by features"
-                >> beam.Partition(_extract_feature_idx, num_features)
+                >> beam.ParDo(_MergeTimestamps(num_features)),
+                num_features=num_features,
+                reshuffle=True,
             )
         else:
             return _reshuffle_item_in_tuples(
@@ -325,7 +321,7 @@ def to_event_set(
 def _convert_to_dict_event_key_value(
     item: Tuple[
         BeamIndexKey,
-        Iterable[BeamFeatureAndTimestampsValue],
+        Iterable[FeatureItemWithIdxValue],
     ],
     schema: Schema,
     timestamp_key: str,
@@ -356,7 +352,7 @@ def _convert_to_dict_event_key_value(
 def _convert_to_dict_event_set_key_value(
     item: Tuple[
         BeamIndexKey,
-        Iterable[BeamFeatureAndTimestampsValue],
+        Iterable[FeatureItemWithIdxValue],
     ],
     schema: Schema,
     timestamp_key: str,
@@ -377,6 +373,60 @@ def _convert_to_dict_event_set_key_value(
         item_dict[feature_schema.name] = feature[PosFeatureValues]
 
     return item_dict
+
+
+def _add_feature_idx(src: FeatureItem, feature_idx: int) -> FeatureItemWithIdx:
+    index, (timestamps, features) = src
+    return index, (timestamps, features, feature_idx)
+
+
+def _extract_feature_idx(item: FeatureItemWithIdx, num_features: int) -> int:
+    return item[1][PosFeatureIdx]
+
+
+def _remove_feature_idx(src: FeatureItemWithIdx) -> FeatureItem:
+    index, (timestamps, features, feature_idx) = src
+    del feature_idx
+    return index, (timestamps, features)
+
+
+def add_feature_idx_and_flatten(
+    pipe: BeamEventSet,
+) -> beam.PCollection[FeatureItemWithIdx]:
+    """Groups a tuple of PCollection of features into a single PCollection."""
+
+    with_idx = []
+    for feature_idx, feature in enumerate(pipe):
+        with_idx.append(
+            feature
+            | f"Add feature idx {feature_idx}"
+            >> beam.Map(_add_feature_idx, feature_idx)
+        )
+    return tuple(with_idx) | "Flatten features" >> beam.Flatten()
+
+
+def partition_by_feature_idx(
+    pipe: beam.PCollection[FeatureItemWithIdx],
+    num_features: int,
+    reshuffle: bool,
+) -> BeamEventSet:
+    """Splits a PCollection of features into a tuple of PCollections.
+
+    The inverse of add_feature_idx_and_flatten.
+    """
+
+    paritions = pipe | "Partition by features" >> beam.Partition(
+        _extract_feature_idx, num_features
+    )
+    without_idx = []
+    for feature_idx, feature in enumerate(paritions):
+        item = feature | f"Remove feature idx {feature_idx}" >> beam.Map(
+            _remove_feature_idx
+        )
+        if reshuffle:
+            item = item | f"Shuffle feature {feature_idx}" >> beam.Reshuffle()
+        without_idx.append(item)
+    return tuple(without_idx)
 
 
 @beam.ptransform_fn
@@ -403,7 +453,10 @@ def to_dict(
     """
 
     # TODO: Add support for datetime timestamps.
-    grouped_by_features = pipe | "Flatten" >> beam.Flatten() | beam.GroupByKey()
+    grouped_by_features = (
+        add_feature_idx_and_flatten(pipe)
+        | "Group by index " >> beam.GroupByKey()
+    )
 
     if grouped_by_index:
         return grouped_by_features | "Convert to dict" >> beam.Map(

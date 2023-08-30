@@ -45,21 +45,32 @@ SingleFeatureValue = Any  # np.generic
 StructuredRowValue = Tuple[TimestampsPyType, Tuple[SingleFeatureValue, ...]]
 StructuredRow = Tuple[BeamIndexKey, StructuredRowValue]
 
-# A BeamFeatureAndTimestamps contains the values of a features + timestamps for
+# A FeatureItem contains the values of a features + timestamps for
 # an index. This is the internal representation used during the op computation.
 #
 # If no feature is available (i.e. event-set without features), the
 # "FeatureValues" is set to None and the FeatureIdx is set to -1.
 FeatureValues = np.ndarray
 FeatureIdx = int
-PosFeatureIdx = 0
-PosTimestampValues = 1
-PosFeatureValues = 2
-BeamFeatureAndTimestampsValue = Tuple[
-    FeatureIdx, TimestampValues, Optional[FeatureValues]
+
+# Index of the timestamps, feature and feature idx in the "FeatureItem" and
+# "FeatureItemWithIdx" tuples.
+PosTimestampValues = 0
+PosFeatureValues = 1
+PosFeatureIdx = 2
+
+# A list of timestamps and optionnally feature values.
+FeatureItemValue = Tuple[TimestampValues, Optional[FeatureValues]]
+# "FeatureItemValue" with an index.
+FeatureItem = Tuple[BeamIndexKey, FeatureItemValue]
+
+# Same as "FeatureItem", but with the idx of the feature. Used during import and
+# export.
+FeatureItemWithIdxValue = Tuple[
+    TimestampValues, Optional[FeatureValues], FeatureIdx
 ]
-BeamFeatureAndTimestamps = Tuple[BeamIndexKey, BeamFeatureAndTimestampsValue]
+FeatureItemWithIdx = Tuple[BeamIndexKey, FeatureItemWithIdxValue]
 
 # From the point of view of the user, a BeamEventSet play the same role as
 # and EventSet with Temporian in-process.
-BeamEventSet = tuple[beam.PCollection[BeamFeatureAndTimestamps]]
+BeamEventSet = tuple[beam.PCollection[FeatureItem]]

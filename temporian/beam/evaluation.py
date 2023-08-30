@@ -20,19 +20,19 @@ from typing import Dict, List
 import apache_beam as beam
 
 from temporian.core.data.node import EventSetNode
-from temporian.beam.io.dict import PEventSet
 from temporian.core.evaluation import build_schedule
 from temporian.beam import implementation_lib
 from temporian.beam import operators as _  # Implementations
+from temporian.beam.typing import BeamEventSet
 
 
 @beam.ptransform_fn
 def run(
-    pipe: PEventSet,
+    pipe: BeamEventSet,
     input: EventSetNode,
     output: EventSetNode,
     verbose: int = 0,
-) -> PEventSet:
+) -> BeamEventSet:
     """Runs a single-input, single-output Temporian graph in Beam.
 
     Usage example:
@@ -79,10 +79,10 @@ def run(
 
 
 def run_multi_io(
-    inputs: Dict[EventSetNode, PEventSet],
+    inputs: Dict[EventSetNode, BeamEventSet],
     outputs: List[EventSetNode],
     verbose: int = 0,
-) -> Dict[EventSetNode, PEventSet]:
+) -> Dict[EventSetNode, BeamEventSet]:
     """Runs a multi-input, multi-output Temporian graph in Beam.
 
     Usage example:

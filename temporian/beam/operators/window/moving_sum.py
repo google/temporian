@@ -24,14 +24,14 @@ from temporian.implementation.numpy.operators.window.moving_sum import (
     MovingSumNumpyImplementation as CurrentOperatorImplementation,
 )
 from temporian.beam.operators.base import BeamOperatorImplementation
-from temporian.beam.io.dict import IndexValue, PEventSet
+from temporian.beam.typing import BeamEventSet
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
 class MovingSumBeamImplementation(BeamOperatorImplementation):
     def call(
-        self, input: PEventSet, sampling: Optional[PEventSet] = None
-    ) -> Dict[str, PEventSet]:
+        self, input: BeamEventSet, sampling: Optional[BeamEventSet] = None
+    ) -> Dict[str, BeamEventSet]:
         assert isinstance(self.operator, CurrentOperator)
 
         numpy_implementation = CurrentOperatorImplementation(self.operator)

@@ -17,7 +17,7 @@ from typing import Dict
 from abc import ABC, abstractmethod
 
 from temporian.core.operators.base import Operator
-from temporian.beam.io.dict import PEventSet
+from temporian.beam.typing import BeamEventSet
 
 
 class BeamOperatorImplementation(ABC):
@@ -30,9 +30,9 @@ class BeamOperatorImplementation(ABC):
         return self._operator
 
     @abstractmethod
-    def call(self, **inputs: PEventSet) -> Dict[str, PEventSet]:
+    def call(self, **inputs: BeamEventSet) -> Dict[str, BeamEventSet]:
         pass
 
-    def __call__(self, **inputs: PEventSet) -> Dict[str, PEventSet]:
+    def __call__(self, **inputs: BeamEventSet) -> Dict[str, BeamEventSet]:
         outputs = self.call(**inputs)
         return outputs

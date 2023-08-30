@@ -10,6 +10,7 @@ from apache_beam.io.fileio import MatchFiles
 from temporian.core.data.node import Schema
 from temporian.beam.io.dict import (
     to_event_set,
+    add_feature_idx_and_flatten,
 )
 from temporian.beam.typing import (
     BeamEventSet,
@@ -18,7 +19,8 @@ from temporian.beam.typing import (
     PosTimestampValues,
     PosFeatureValues,
     BeamIndexKey,
-    BeamFeatureAndTimestampsValue,
+    FeatureItemValue,
+    FeatureItemWithIdxValue,
 )
 
 
@@ -106,7 +108,7 @@ def _bytes_to_strs(list: List) -> List:
 def _convert_to_csv(
     item: Tuple[
         BeamIndexKey,
-        Iterable[BeamFeatureAndTimestampsValue],
+        Iterable[FeatureItemWithIdxValue],
     ]
 ) -> str:
     index, feature_blocks = item
@@ -124,9 +126,12 @@ def _convert_to_csv(
     output = io.StringIO()
     writer = csv.writer(output)
     for event_idx, timestamp in enumerate(timestamps):
-        feature_data = _bytes_to_strs(
-            [f[PosFeatureValues][event_idx] for f in feature_blocks]
-        )
+        if len(feature_blocks) == 1 and feature_blocks[0][PosFeatureIdx] == -1:
+            feature_data = []
+        else:
+            feature_data = _bytes_to_strs(
+                [f[PosFeatureValues][event_idx] for f in feature_blocks]
+            )
         writer.writerow([timestamp] + index_data + feature_data)
 
     return output.getvalue()
@@ -174,8 +179,7 @@ def to_csv(
     header_writer.writerow(header_values)
 
     return (
-        pipe
-        | "Flatten" >> beam.Flatten()
+        add_feature_idx_and_flatten(pipe)
         | "Group by features" >> beam.GroupByKey()
         | "Convert to csv" >> beam.Map(_convert_to_csv)
         | "Write csv"

@@ -24,11 +24,7 @@ from temporian.core.operators.add_index import (
 )
 from temporian.beam import implementation_lib
 from temporian.beam.operators.base import BeamOperatorImplementation
-from temporian.beam.io.dict import (
-    IndexValue,
-    PEventSet,
-    BeamIndexOrFeature,
-)
+from temporian.beam.typing import BeamEventSet
 
 ExtractedIndex = Tuple[
     Tuple[BeamIndexOrFeature, ...], Tuple[int, Optional[np.ndarray]]
@@ -36,7 +32,7 @@ ExtractedIndex = Tuple[
 
 
 class AddIndexBeamImplementation(BeamOperatorImplementation):
-    def call(self, input: PEventSet) -> Dict[str, PEventSet]:
+    def call(self, input: BeamEventSet) -> Dict[str, BeamEventSet]:
         """AddIndex implementation.
 
         Example:
@@ -153,7 +149,7 @@ def _add_index(
 
     # The objective is now to combine the new index and the timestamp/feature
     # values. Note that different index items will be emitted as different items
-    # in PEventSet.
+    # in BeamEventSet.
 
     # Compute the example idxs for each unique index value.
     #
@@ -168,5 +164,5 @@ def _add_index(
         # Note: The new index is added after the existing index items.
         dst_indexes = indexes + new_index + (feature_idx,)
         assert isinstance(dst_indexes, tuple)
-        # This is the "PEventSet" format.
+        # This is the "BeamEventSet" format.
         yield dst_indexes, (timestamps[example_idxs], values[example_idxs])

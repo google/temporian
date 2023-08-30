@@ -29,6 +29,7 @@ py_library(
         ":implementation_lib",
         "//temporian/beam/operators",
         "//temporian/core/data:node",
+        ":typing",
     ],
 )
 
