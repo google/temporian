@@ -23,8 +23,17 @@ from temporian.beam import implementation_lib
 from temporian.implementation.numpy.operators.window.moving_sum import (
     MovingSumNumpyImplementation as CurrentOperatorImplementation,
 )
-from temporian.beam.operators.base import BeamOperatorImplementation
-from temporian.beam.typing import BeamEventSet
+from temporian.beam.operators.base import (
+    BeamOperatorImplementation,
+    beam_eventset_map,
+    beam_eventset_map_with_sampling,
+)
+from temporian.beam.typing import (
+    BeamEventSet,
+    FeatureItem,
+    BeamIndexKey,
+    FeatureItemValue,
+)
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -37,24 +46,50 @@ class MovingSumBeamImplementation(BeamOperatorImplementation):
         numpy_implementation = CurrentOperatorImplementation(self.operator)
 
         if self.operator.has_sampling:
-            if len(self.operator.inputs["sampling"].features) == 0:
-                # The sampling does not contain features.
-                sampling_feature_idx = -1
-            else:
-                # The sampling contains at least one feature.
-                sampling_feature_idx = 0
 
-            num_input_features = len(self.operator.inputs["input"].features)
+            def _run_with_sampling(
+                index: BeamIndexKey,
+                feature: Optional[FeatureItemValue],
+                sampling: FeatureItemValue,
+                feature_idx: int,
+            ) -> FeatureItem:
+                sampling_timestamps, _ = sampling
+                output_values = (
+                    numpy_implementation.apply_feature_wise_with_sampling(
+                        src_timestamps=(
+                            feature[0] if feature is not None else None
+                        ),
+                        src_feature=feature[1] if feature is not None else None,
+                        sampling_timestamps=sampling_timestamps,
+                        feature_idx=feature_idx,
+                    )
+                )
+                return index, (sampling_timestamps, output_values)
 
-            output = (
-                (input, sampling)
-                | f"Join input and sampling index {self.operator}"
-                >> beam.CoGroupByKey()
-                | f"Reindex {self.operator}" >> beam.FlatMap(_add_index)
+            assert sampling is not None
+            output = beam_eventset_map_with_sampling(
+                input,
+                sampling,
+                name=f"{self.operator}",
+                fn=_run_with_sampling,
             )
+
         else:
-            output = input | f"Apply operator {self.operator}" >> beam.Map(
-                _run_without_sampling, numpy_implementation
+
+            def _run_without_sampling(
+                item: FeatureItem,
+                feature_idx: int,
+            ) -> FeatureItem:
+                indexes, (timestamps, input_values) = item
+                output_values = numpy_implementation.apply_feature_wise(
+                    src_timestamps=timestamps,
+                    src_feature=input_values,
+                    feature_idx=feature_idx,
+                )
+                return indexes, (timestamps, output_values)
+
+            output = beam_eventset_map(
+                input, name=f"{self.operator}", fn=_run_without_sampling
             )
 
         return {"output": output}
@@ -63,21 +98,3 @@ class MovingSumBeamImplementation(BeamOperatorImplementation):
 implementation_lib.register_operator_implementation(
     CurrentOperator, MovingSumBeamImplementation
 )
-
-
-def _run_without_sampling(pipe: IndexValue, imp: OperatorImplementation):
-    indexes, (timestamps, input_values) = pipe
-    output_values = imp.apply_feature_wise(
-        src_timestamps=timestamps,
-        src_feature=input_values,
-    )
-    return indexes, (timestamps, output_values)
-
-
-def _run_with_sampling(pipe: IndexValue, imp: OperatorImplementation):
-    indexes, (timestamps, input_values) = pipe
-    output_values = imp.apply_feature_wise(
-        src_timestamps=timestamps,
-        src_feature=input_values,
-    )
-    return indexes, (timestamps, output_values)

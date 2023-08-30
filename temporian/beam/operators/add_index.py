@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from typing import Dict, List, Tuple, Optional, Iterable, Generator
+from typing import Dict, List, Tuple, Iterable, Iterator
 
 from collections import defaultdict
 import apache_beam as beam
@@ -24,11 +24,13 @@ from temporian.core.operators.add_index import (
 )
 from temporian.beam import implementation_lib
 from temporian.beam.operators.base import BeamOperatorImplementation
-from temporian.beam.typing import BeamEventSet
-
-ExtractedIndex = Tuple[
-    Tuple[BeamIndexOrFeature, ...], Tuple[int, Optional[np.ndarray]]
-]
+from temporian.beam.typing import (
+    BeamEventSet,
+    BeamIndexKey,
+    FeatureItem,
+    FeatureItemValue,
+    PosFeatureValues,
+)
 
 
 class AddIndexBeamImplementation(BeamOperatorImplementation):
@@ -38,18 +40,21 @@ class AddIndexBeamImplementation(BeamOperatorImplementation):
         Example:
             pipe
                 # Two features, one index
-                (20, 0), ( (100, 101), (11, 13))
-                (20, 1), ( (100, 101), (12, 14))
+                Feature #0
+                    (20,), ((100, 101), (11, 13))
+                Feature #1
+                    (20,), ((100, 101), (12, 14))
 
-            # Adding feature #0 to the index
-            indexes: [0]
+            # Adding feature #1 to the index
+            indexes: [1]
 
-            new_index_idxs: [0]
-            kept_feature_idxs: [1]
+            new_index_idxs: [1]
+            kept_feature_idxs: [0]
 
             Output
-                (20, 0, 11), ( (100,), (12))
-                (20, 0, 13), ( (101,), (14))
+                Feature #0
+                    (20, 12), ((100,), (11))
+                    (20, 14), ((101,), (13))
         """
         assert isinstance(self.operator, CurrentOperator)
 
@@ -66,25 +71,28 @@ class AddIndexBeamImplementation(BeamOperatorImplementation):
             if f_name not in self.operator.indexes
         ]
 
-        # Broadcast the data of each new index to each remaining feature.
-        extract_index = (
-            input
-            | f"Broadcast index to feature {self.operator}"
-            >> beam.ParDo(
-                _broadcast_index_to_feature, new_index_idxs, kept_feature_idxs
+        # Tuple of index features
+        index_pipes = []
+        for new_index_idx in new_index_idxs:
+            index_pipes.append(input[new_index_idx])
+        index_pipes = tuple(index_pipes)
+
+        output = []
+        for kept_feature_idx in kept_feature_idxs:
+            # A features + all the indexes
+            single_feature_and_index_pipes = (
+                input[kept_feature_idx],
+            ) + index_pipes
+
+            output.append(
+                single_feature_and_index_pipes
+                | f"Join feature #{kept_feature_idx} with index {self.operator}"
+                >> beam.CoGroupByKey()
+                | f"Reindex feature #{kept_feature_idx} {self.operator}"
+                >> beam.FlatMap(_add_index_to_feature)
             )
-        )
 
-        # Join the new index and the remaining feature data, and compute the
-        # new event set.
-        output = (
-            (input, extract_index)
-            | f"Join feature and new index {self.operator}"
-            >> beam.CoGroupByKey()
-            | f"Reindex {self.operator}" >> beam.FlatMap(_add_index)
-        )
-
-        return {"output": output}
+        return {"output": tuple(output)}
 
 
 implementation_lib.register_operator_implementation(
@@ -92,77 +100,38 @@ implementation_lib.register_operator_implementation(
 )
 
 
-def _broadcast_index_to_feature(
-    pipe: IndexValue, new_index_idxs: List[int], kept_feature_idxs: List[int]
-) -> ExtractedIndex:
-    """Broadcast of each index-converted-feature to all other features.
-
-    Input
-        index + feature_index, (timestamps, feature_values)
-    Output
-        index + other_feature_index, (local_feature_index, feature_values)
-
-    Note
-        feature_index is a feature converted into a index.
-        local_feature_index is the index idx (if the schema) of the newly added
-            index (previously a feature).
-    """
-
-    indexes, (_, input_values) = pipe
-    feature_idx = indexes[-1]
-
-    if feature_idx not in new_index_idxs:
-        # This is not the data of a new index.
-        return
-
-    local_idx = new_index_idxs.index(feature_idx)
-    for kept_feature_idx in kept_feature_idxs:
-        yield indexes[:-1] + (kept_feature_idx,), (local_idx, input_values)
-
-
-def _add_index(
+def _add_index_to_feature(
     items: Tuple[
-        Tuple[BeamIndexOrFeature, ...],
-        Tuple[
-            Iterable[Tuple[np.ndarray, Optional[np.ndarray]]],
-            Iterable[ExtractedIndex],
-        ],
+        BeamIndexKey,
+        Tuple[Iterable[FeatureItemValue], ...],
     ]
-) -> Generator[IndexValue, None, None]:
+) -> Iterator[FeatureItem]:
     """Adds the new index values to all remaining feature items."""
 
-    indexes_and_feature_idx, (features, new_index) = items
-    indexes = indexes_and_feature_idx[:-1]
-    feature_idx = indexes_and_feature_idx[-1]
+    old_index, mess = items
 
-    # Extract the new index
-    new_index = list(new_index)
-    if len(new_index) == 0:
-        # This feature is dropped
-        return
-    sorted(new_index, key=lambda x: x[0])
+    # Note: "mess" contains exactly one value in each "Iterable".
+    feature = next(iter(mess[0]))
+    indexes_values = [next(iter(item))[PosFeatureValues] for item in mess[1:]]
 
-    # Extract the existing timestamps and feature values
-    features = list(features)
-    assert len(features) == 1
-    timestamps, values = features[0]
-
-    # The objective is now to combine the new index and the timestamp/feature
-    # values. Note that different index items will be emitted as different items
-    # in BeamEventSet.
+    timestamps, feature_values = feature
+    assert feature_values is not None
 
     # Compute the example idxs for each unique index value.
     #
     # Note: This solution is very slow. This is the same used in the in-process
     # implementation.
     new_index_to_value_idxs = defaultdict(list)
-    for event_idx, new_index in enumerate(zip(*[x[1] for x in new_index])):
+    for event_idx, new_index in enumerate(zip(*indexes_values)):
         new_index = tuple([v.item() for v in new_index])
         new_index_to_value_idxs[new_index].append(event_idx)
 
     for new_index, example_idxs in new_index_to_value_idxs.items():
         # Note: The new index is added after the existing index items.
-        dst_indexes = indexes + new_index + (feature_idx,)
+        dst_indexes = old_index + new_index
         assert isinstance(dst_indexes, tuple)
         # This is the "BeamEventSet" format.
-        yield dst_indexes, (timestamps[example_idxs], values[example_idxs])
+        yield dst_indexes, (
+            timestamps[example_idxs],
+            feature_values[example_idxs],
+        )

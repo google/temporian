@@ -13,11 +13,18 @@
 # limitations under the License.
 
 
-from typing import Dict
+from typing import Dict, Callable, Tuple, Iterable, Optional, Iterator
 from abc import ABC, abstractmethod
 
+import apache_beam as beam
+
 from temporian.core.operators.base import Operator
-from temporian.beam.typing import BeamEventSet
+from temporian.beam.typing import (
+    BeamEventSet,
+    FeatureItem,
+    BeamIndexKey,
+    FeatureItemValue,
+)
 
 
 class BeamOperatorImplementation(ABC):
@@ -36,3 +43,60 @@ class BeamOperatorImplementation(ABC):
     def __call__(self, **inputs: BeamEventSet) -> Dict[str, BeamEventSet]:
         outputs = self.call(**inputs)
         return outputs
+
+
+def beam_eventset_map(
+    src: BeamEventSet, name: str, fn: Callable[[FeatureItem, int], FeatureItem]
+) -> BeamEventSet:
+    """Applies a function on each feature of a Beam eventset."""
+
+    def apply(idx, item):
+        return item | f"Map on feature #{idx} {name}" >> beam.Map(fn, idx)
+
+    return tuple([apply(idx, item) for idx, item in enumerate(src)])
+
+
+def _extract_from_iterable(
+    src: Iterable[FeatureItemValue],
+) -> Optional[FeatureItemValue]:
+    for x in src:
+        return x
+    return None
+
+
+def beam_eventset_map_with_sampling(
+    input: BeamEventSet,
+    sampling: BeamEventSet,
+    name: str,
+    fn: Callable[
+        [BeamIndexKey, Optional[FeatureItemValue], FeatureItemValue, int],
+        FeatureItem,
+    ],
+) -> BeamEventSet:
+    """Applies a function on each feature of a Beam eventset."""
+
+    assert len(sampling) >= 1
+
+    def fn_on_cogroup(
+        item: Tuple[
+            BeamIndexKey,
+            Tuple[Iterable[FeatureItemValue], Iterable[FeatureItemValue]],
+        ],
+        idx: int,
+    ) -> Iterator[FeatureItem]:
+        index, (it_feature, it_sampling) = item
+        feature = _extract_from_iterable(it_feature)
+        sampling = _extract_from_iterable(it_sampling)
+        if sampling is not None:
+            yield fn(index, feature, sampling, idx)
+
+    def apply(idx, item):
+        return (
+            (item, sampling[0])
+            | f"Join feature and sampling on feature #{idx} {name}"
+            >> beam.CoGroupByKey()
+            | f"Map on feature #{idx} {name}"
+            >> beam.FlatMap(fn_on_cogroup, idx)
+        )
+
+    return tuple([apply(idx, item) for idx, item in enumerate(input)])

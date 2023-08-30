@@ -42,8 +42,20 @@ class OperatorImplementation(ABC):
         self,
         src_timestamps: np.ndarray,
         src_feature: np.ndarray,
+        feature_idx: int,
     ) -> np.ndarray:
         """Executes the op on a single feature. Optionally implemented."""
+
+        raise NotImplementedError()
+
+    def apply_feature_wise_with_sampling(
+        self,
+        src_timestamps: np.ndarray,
+        src_feature: np.ndarray,
+        sampling_timestamps: np.ndarray,
+        feature_idx: int,
+    ) -> np.ndarray:
+        """Executes the op on a single feature with sampling. Optional"""
 
         raise NotImplementedError()
 

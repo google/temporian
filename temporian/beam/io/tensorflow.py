@@ -1,6 +1,6 @@
 """Utilities to import/export Beam-Event-Set from/to dataset containers."""
 
-from typing import Iterable, Dict, Any
+from typing import Iterable, Dict, Any, Iterator
 
 import numpy as np
 import apache_beam as beam
@@ -22,7 +22,7 @@ class _TFExampleToDict(beam.DoFn):
 
     def process(
         self, example: "example_pb2.Example"
-    ) -> Iterable[Dict[str, Any]]:
+    ) -> Iterator[Dict[str, Any]]:
         dict_example = {}
 
         def get_value(key):
@@ -77,7 +77,7 @@ class _DictToTFExample(beam.DoFn):
 
     def process(
         self, dict_example: Dict[str, Any]
-    ) -> Iterable["example_pb2.Example"]:
+    ) -> Iterator["example_pb2.Example"]:
         ex = self._tf.train.Example()
 
         def f(example: "tf.train.Example", key: str):

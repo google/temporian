@@ -1,6 +1,6 @@
 """Utilities to import/export Beam-Event-Set from/to dataset containers."""
 
-from typing import Iterable, Dict, Tuple, List
+from typing import Iterable, Dict, Tuple, List, Iterator
 
 import csv
 import io
@@ -19,14 +19,13 @@ from temporian.beam.typing import (
     PosTimestampValues,
     PosFeatureValues,
     BeamIndexKey,
-    FeatureItemValue,
     FeatureItemWithIdxValue,
 )
 
 
 def _parse_csv_file(
     file: beam.io.filesystem.FileMetadata,
-) -> Iterable[Dict[str, str]]:
+) -> Iterator[Dict[str, str]]:
     """Parse a csv file into dictionary of key -> value."""
 
     with beam.io.filesystems.FileSystems.open(file.path) as byte_stream:

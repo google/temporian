@@ -21,7 +21,6 @@ from temporian.beam.typing import (
     PosFeatureIdx,
     PosTimestampValues,
     PosFeatureValues,
-    FeatureItemValue,
     FeatureItemWithIdxValue,
     FeatureItemWithIdx,
 )
@@ -100,7 +99,7 @@ class _MergeTimestamps(beam.DoFn):
     def process(
         self,
         item: Tuple[BeamIndexKey, Iterable[StructuredRowValue]],
-    ) -> Iterable[FeatureItemWithIdx]:
+    ) -> Iterator[FeatureItemWithIdx]:
         index, feat_and_ts = item
         timestamps = np.array([v[0] for v in feat_and_ts], dtype=np.float64)
         for feature_idx in range(self._num_features):

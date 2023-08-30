@@ -13,9 +13,8 @@
 # limitations under the License.
 
 
-from typing import Dict, Set
+from typing import Dict
 
-import apache_beam as beam
 
 from temporian.core.operators.select import (
     SelectOperator as CurrentOperator,
@@ -29,7 +28,7 @@ class SelectBeamImplementation(BeamOperatorImplementation):
     def call(self, input: BeamEventSet) -> Dict[str, BeamEventSet]:
         assert isinstance(self.operator, CurrentOperator)
 
-        # Index of the features to keep.
+        # Index of the features to keep in "input".
         src_feature_names = self.operator.inputs["input"].schema.feature_names()
         feature_idxs = set(
             [
@@ -38,19 +37,10 @@ class SelectBeamImplementation(BeamOperatorImplementation):
             ]
         )
 
-        output = input | f"Apply operator {self.operator}" >> beam.ParDo(
-            _run_item, feature_idxs
-        )
-
+        output = tuple([input[feature_idx] for feature_idx in feature_idxs])
         return {"output": output}
 
 
 implementation_lib.register_operator_implementation(
     CurrentOperator, SelectBeamImplementation
 )
-
-
-def _run_item(pipe: IndexValue, feature_idxs: Set[int]):
-    indexes, (timestamps, input_values) = pipe
-    if indexes[-1] in feature_idxs:
-        yield indexes, (timestamps, input_values)

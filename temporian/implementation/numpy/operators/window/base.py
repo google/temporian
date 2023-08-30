@@ -118,7 +118,10 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
         self,
         src_timestamps: np.ndarray,
         src_feature: np.ndarray,
+        feature_idx: int,
     ) -> np.ndarray:
+        """Applies the operator on a single feature."""
+
         assert isinstance(self.operator, BaseWindowOperator)
 
         implementation = self._implementation()
@@ -128,3 +131,39 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
             "window_length": self.operator.window_length,
         }
         return implementation(**kwargs)
+
+    def apply_feature_wise_with_sampling(
+        self,
+        src_timestamps: Optional[np.ndarray],
+        src_feature: Optional[np.ndarray],
+        sampling_timestamps: np.ndarray,
+        feature_idx: int,
+    ) -> np.ndarray:
+        """Applies the operator on a single feature with a sampling."""
+
+        assert isinstance(self.operator, BaseWindowOperator)
+        implementation = self._implementation()
+
+        if src_feature is not None:
+            kwargs = {
+                "evset_timestamps": src_timestamps,
+                "evset_values": src_feature,
+                "window_length": self.operator.window_length,
+                "sampling_timestamps": sampling_timestamps,
+            }
+            return implementation(**kwargs)
+        else:
+            # Sets the feature data as missing.
+            output_schema = self.operator.outputs["output"].schema
+            output_dtype = output_schema.features[feature_idx].dtype
+            empty_features = np.empty(
+                (0,), dtype=tp_dtype_to_np_dtype(output_dtype)
+            )
+            empty_timestamps = np.empty((0,), dtype=np.float64)
+            kwargs = {
+                "evset_timestamps": empty_timestamps,
+                "evset_values": empty_features,
+                "window_length": self.operator.window_length,
+                "sampling_timestamps": sampling_timestamps,
+            }
+            return implementation(**kwargs)
