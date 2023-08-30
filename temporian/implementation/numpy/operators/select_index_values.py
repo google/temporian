@@ -16,6 +16,7 @@
 """Implementation for the SelectIndexValues operator."""
 
 
+import random
 from typing import Dict
 
 from temporian.implementation.numpy.data.event_set import IndexData, EventSet
@@ -35,9 +36,23 @@ class SelectIndexValuesNumpyImplementation(OperatorImplementation):
         output_schema = self.output_schema("output")
 
         keys = self.operator.keys
+        number = self.operator.number
+        fraction = self.operator.fraction
+
+        all_keys = list(input.data.keys())
 
         # Create output EventSet
         output_evset = EventSet(data={}, schema=output_schema)
+
+        if number is not None:
+            keys = random.choices(all_keys, k=number)
+
+        elif fraction is not None:
+            keys = random.choices(all_keys, k=int(len(all_keys) * fraction))
+
+        else:
+            # if number and fraction are None, keys must be not None
+            assert keys is not None
 
         # Fill output EventSet's data
         for key in keys:

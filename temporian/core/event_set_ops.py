@@ -19,6 +19,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING
 
 from temporian.core.data.duration import Duration
+from temporian.core.typing import IndexKeyList
 
 
 if TYPE_CHECKING:
@@ -1927,10 +1928,18 @@ class EventSetOperations:
 
     def select_index_values(
         self: EventSetOrNode,
-        keys: Union[IndexKey, List[IndexKey]],
+        keys: Optional[IndexKeyList] = None,
+        *,
+        number: Optional[int] = None,
+        fraction: Optional[float] = None,
     ) -> EventSetOrNode:
         """Selects a subset of index values from an
         [`EventSet`][temporian.EventSet].
+
+        Only one of `keys`, `number`, or `fraction` should be provided.
+
+        If `number` or `fraction` is specified, the index values are selected
+        randomly.
 
         If used in compiled or graph mode, the specified keys are compiled as-is
         along with the operator, which means that they must be available when
@@ -1965,6 +1974,9 @@ class EventSetOperations:
 
         Args:
             keys: index key or list of index keys to select from the EventSet.
+            number: number of index values to select.
+            fraction: fraction of index values to select, expressed as a float
+                between 0 and 1.
 
         Returns:
             EventSet with a subset of the index values.
@@ -1973,7 +1985,9 @@ class EventSetOperations:
             select_index_values,
         )
 
-        return select_index_values(self, keys=keys)
+        return select_index_values(
+            self, keys=keys, number=number, fraction=fraction
+        )
 
     def set_index(
         self: EventSetOrNode, indexes: Union[str, List[str]]
