@@ -19,7 +19,6 @@ import logging
 from typing import (
     Callable,
     List,
-    Protocol,
     Set,
     Any,
     Dict,
@@ -43,7 +42,11 @@ from temporian.core.data.schema import Schema
 from temporian.core.compilation import compile
 from temporian.core.operators import base
 from temporian.core.data.dtype import DType
-from temporian.core.typing import EventSetOrNode
+from temporian.core.typing import (
+    EventSetOrNode,
+    NormalizedIndexKey,
+    NormalizedIndexKeyItem,
+)
 from temporian.implementation.numpy.data.event_set import (
     EventSet,
 )
@@ -623,6 +626,44 @@ def _unserialize_dtype(dtype: pb.DType):
     return INV_DTYPE_MAPPING[dtype]
 
 
+def _serialize_index_key_item(
+    item: NormalizedIndexKeyItem,
+) -> pb.Operator.Attribute.ListIndexKeys.IndexKey.IndexKeyItem:
+    if isinstance(item, bytes):
+        return pb.Operator.Attribute.ListIndexKeys.IndexKey.IndexKeyItem(
+            bytes_=item
+        )
+    if isinstance(item, int):
+        return pb.Operator.Attribute.ListIndexKeys.IndexKey.IndexKeyItem(
+            integer_64=item
+        )
+    raise ValueError(f"Non supported index key item: {item}")
+
+
+def _unserialize_index_key_item(
+    item: pb.Operator.Attribute.ListIndexKeys.IndexKey.IndexKeyItem,
+) -> NormalizedIndexKeyItem:
+    if item.HasField("bytes_"):
+        return item.bytes_
+    if item.HasField("integer_64"):
+        return item.integer_64
+    raise ValueError(f"Non supported index key item: {item}")
+
+
+def _serialize_index_key(
+    key: NormalizedIndexKey,
+) -> pb.Operator.Attribute.ListIndexKeys.IndexKey:
+    return pb.Operator.Attribute.ListIndexKeys.IndexKey(
+        values=[_serialize_index_key_item(x) for x in key]
+    )
+
+
+def _unserialize_index_key(
+    key: pb.Operator.Attribute.ListIndexKeys.IndexKey,
+) -> NormalizedIndexKey:
+    return tuple(_unserialize_index_key_item(x) for x in key.values)
+
+
 def _attribute_to_proto(
     key: str, value: base.AttributeType
 ) -> pb.Operator.Attribute:
@@ -659,6 +700,15 @@ def _attribute_to_proto(
                 values=[_serialize_dtype(x) for x in value]
             ),
         )
+    # list of index keys
+    if isinstance(value, list) and all(isinstance(val, tuple) for val in value):
+        return pb.Operator.Attribute(
+            key=key,
+            list_index_keys=pb.Operator.Attribute.ListIndexKeys(
+                values=[_serialize_index_key(x) for x in value]
+            ),
+        )
+
     raise ValueError(
         f"Non supported type {type(value)} for attribute {key}={value}"
     )
@@ -681,6 +731,8 @@ def _attribute_from_proto(src: pb.Operator.Attribute) -> base.AttributeType:
         return dict(src.map_str_str.values)
     if src.HasField("list_dtype"):
         return [_unserialize_dtype(x) for x in src.list_dtype.values]
+    if src.HasField("list_index_keys"):
+        return [_unserialize_index_key(x) for x in src.list_index_keys.values]
     raise ValueError(f"Non supported proto attribute {src}")
 
 

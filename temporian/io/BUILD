@@ -48,6 +48,7 @@ py_library(
     deps = [
         # force/tensorflow
         "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy/data:dtype_normalization",
         "//temporian/core/operators:drop_index",
     ],
 )

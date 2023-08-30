@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-""" Creates the files for a new wrapper.
+"""Creates the files for a new wrapper.
 
 The changes are:
     - Create operator definition + add to build file
@@ -130,10 +130,6 @@ operator_lib.register_operator({capitalized_op})
 def {lower_op}(input: EventSetOrNode, param: float) -> EventSetOrNode:
     """<Text>
 
-    Args:
-        input: <Text>
-        param: <Text>
-
     Example:
 
         ```python
@@ -150,11 +146,16 @@ def {lower_op}(input: EventSetOrNode, param: float) -> EventSetOrNode:
 
         ```
 
+    Args:
+        input: <Text>
+        param: <Text>
+
     Returns:
         <Text>
     """
+    assert isinstance(input, EventSetNode)
 
-    return {capitalized_op}(input=input, param=param).outputs["output"]  # type: ignore
+    return {capitalized_op}(input=input, param=param).outputs["output"]
 
 '''
         )
@@ -370,6 +371,8 @@ py_test(
     print(
         """Don't forget to update the following code:
 - The imports in the top-level init file temporian/__init__.py (if global)
+- The EventSetOperations class in temporian/core/event_set_ops.py (if not global)
+- Move the docstring from the operator's .py file to the EventSetOperations class (if not global)
 - The imports in temporian/implementation/numpy/operators/__init__.py
 - The "operators" py_library in temporian/implementation/numpy/operators/BUILD
 - The "test_base" function in temporian/core/test/registered_operators_test.py
@@ -377,7 +380,7 @@ py_test(
 - The PUBLIC_API_SYMBOLS set in temporian/test/public_symbols_test.py (if global)
 - The .md file in docs/src/reference/temporian/operators
 - The docs API ref's home page docs/reference/index.md
-- The class EventSetOperations in temporian/core/event_set_ops.py (if not global)
+- The tests in temporian/core/test/event_set_ops_test.py
 - The unit test in temporian/core/operators/test
 """
     )

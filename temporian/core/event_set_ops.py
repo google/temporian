@@ -22,7 +22,7 @@ from temporian.core.data.duration import Duration
 
 
 if TYPE_CHECKING:
-    from temporian.core.typing import EventSetOrNode, TypeOrDType
+    from temporian.core.typing import EventSetOrNode, TypeOrDType, IndexKey
 
 T_SCALAR = (int, float)
 
@@ -1924,6 +1924,56 @@ class EventSetOperations:
         from temporian.core.operators.select import select
 
         return select(self, feature_names=feature_names)
+
+    def select_index_values(
+        self: EventSetOrNode,
+        keys: Union[IndexKey, List[IndexKey]],
+    ) -> EventSetOrNode:
+        """Selects a subset of index values from an
+        [`EventSet`][temporian.EventSet].
+
+        If used in compiled or graph mode, the specified keys are compiled as-is
+        along with the operator, which means that they must be available when
+        loading and running the graph on new data.
+
+        Example:
+
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 3],
+            ...     features={
+            ...         "f": [10, 20, 30, 40],
+            ...         "x": [1, 1, 2, 2],
+            ...         "y": ["A", "B", "A", "B"],
+            ...     },
+            ...     indexes=["x", "y"],
+            ... )
+            >>> b = a.select_index_values([(1, "A"), (2, "B")])
+            >>> b
+            indexes: [('x', int64), ('y', str_)]
+            features: [('f', int64)]
+            events:
+                x=1 y=b'A' (1 events):
+                    timestamps: [0.]
+                    'f': [10]
+                x=2 y=b'B' (1 events):
+                    timestamps: [3.]
+                    'f': [40]
+            ...
+
+            ```
+
+        Args:
+            keys: index key or list of index keys to select from the EventSet.
+
+        Returns:
+            EventSet with a subset of the index values.
+        """
+        from temporian.core.operators.select_index_values import (
+            select_index_values,
+        )
+
+        return select_index_values(self, keys=keys)
 
     def set_index(
         self: EventSetOrNode, indexes: Union[str, List[str]]
