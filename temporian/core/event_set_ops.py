@@ -1935,7 +1935,7 @@ class EventSetOperations:
         """Selects a subset of index values from an
         [`EventSet`][temporian.EventSet].
 
-        Only one of `keys`, `number`, or `fraction` should be provided.
+        Exactly one of `keys`, `number`, or `fraction` should be provided.
 
         If `number` or `fraction` is specified, the index values are selected
         randomly.
@@ -1944,7 +1944,30 @@ class EventSetOperations:
         along with the operator, which means that they must be available when
         loading and running the graph on new data.
 
-        Example:
+        Example with `keys` with a single index and a single key:
+
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 3],
+            ...     features={
+            ...         "f": [10, 20, 30, 40],
+            ...         "x": ["A", "B", "A", "B"],
+            ...     },
+            ...     indexes=["x"],
+            ... )
+            >>> b = a.select_index_values("A")
+            >>> b
+            indexes: [('x', str_)]
+            features: [('f', int64)]
+            events:
+                x=b'A' (2 events):
+                    timestamps: [0. 2.]
+                    'f': [10 30]
+            ...
+
+            ```
+
+        Example with `keys` with multiple indexes and keys:
 
             ```python
             >>> a = tp.event_set(
@@ -1967,6 +1990,66 @@ class EventSetOperations:
                 x=2 y=b'B' (1 events):
                     timestamps: [3.]
                     'f': [40]
+            ...
+
+            ```
+
+        Example with `number`:
+
+            ```python
+            >>> import random
+            >>> random.seed(0)
+
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 3],
+            ...     features={
+            ...         "f": [10, 20, 30, 40],
+            ...         "x": [1, 1, 2, 2],
+            ...         "y": ["A", "B", "A", "B"],
+            ...     },
+            ...     indexes=["x", "y"],
+            ... )
+            >>> b = a.select_index_values(number=2)
+            >>> b
+            indexes: [('x', int64), ('y', str_)]
+            features: [('f', int64)]
+            events:
+                x=1 y=b'A' (1 events):
+                    timestamps: [0.]
+                    'f': [10]
+                x=2 y=b'A' (1 events):
+                    timestamps: [2.]
+                    'f': [30]
+            ...
+
+            ```
+
+        Example with `fraction`:
+
+            ```python
+            >>> import random
+            >>> random.seed(0)
+
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 3],
+            ...     features={
+            ...         "f": [10, 20, 30, 40],
+            ...         "x": [1, 1, 2, 2],
+            ...         "y": ["A", "B", "A", "B"],
+            ...     },
+            ...     indexes=["x", "y"],
+            ... )
+            >>> b = a.select_index_values(fraction=0.75)
+            >>> b
+            indexes: [('x', int64), ('y', str_)]
+            features: [('f', int64)]
+            events:
+                x=1 y=b'A' (1 events):
+                    timestamps: [0.]
+                    'f': [10]
+                x=2 y=b'A' (1 events):
+                    timestamps: [2.]
+                    'f': [30]
             ...
 
             ```
