@@ -19,11 +19,10 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING
 
 from temporian.core.data.duration import Duration
-from temporian.core.typing import IndexKeyList
 
 
 if TYPE_CHECKING:
-    from temporian.core.typing import EventSetOrNode, TypeOrDType, IndexKey
+    from temporian.core.typing import EventSetOrNode, TypeOrDType, IndexKeyList
 
 T_SCALAR = (int, float)
 
@@ -1974,7 +1973,9 @@ class EventSetOperations:
 
         Args:
             keys: index key or list of index keys to select from the EventSet.
-            number: number of index values to select.
+            number: number of index values to select. If `number` is greater
+                than the number of index values, all the index values are
+                selected.
             fraction: fraction of index values to select, expressed as a float
                 between 0 and 1.
 

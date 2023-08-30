@@ -39,18 +39,17 @@ class SelectIndexValues(Operator):
     def __init__(
         self,
         input: EventSetNode,
-        keys: Optional[IndexKeyList],
-        number: Optional[int],
-        fraction: Optional[float],
+        keys: Optional[IndexKeyList] = None,
+        number: Optional[int] = None,
+        fraction: Optional[float] = None,
     ):
         super().__init__()
 
         self.add_input("input", input)
 
-        if (keys is None) == (number is None) == (fraction is None):
+        if len([x for x in [keys, number, fraction] if x is not None]) != 1:
             raise ValueError(
-                "Exactly one of the parameters keys, number or fraction must be"
-                " provided."
+                "Exactly one of keys, number or fraction must be provided."
             )
 
         if keys is not None:
@@ -66,6 +65,8 @@ class SelectIndexValues(Operator):
 
         self._fraction = fraction
         if fraction is not None:
+            if fraction < 0 or fraction > 1:
+                raise ValueError("fraction must be between 0 and 1.")
             self.add_attribute("fraction", fraction)
 
         self.add_output(

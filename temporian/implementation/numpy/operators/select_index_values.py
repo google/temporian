@@ -45,10 +45,12 @@ class SelectIndexValuesNumpyImplementation(OperatorImplementation):
         output_evset = EventSet(data={}, schema=output_schema)
 
         if number is not None:
-            keys = random.choices(all_keys, k=number)
+            if number > len(all_keys):
+                number = len(all_keys)
+            keys = random.sample(all_keys, k=number)
 
         elif fraction is not None:
-            keys = random.choices(all_keys, k=int(len(all_keys) * fraction))
+            keys = random.sample(all_keys, k=int(len(all_keys) * fraction))
 
         else:
             # if number and fraction are None, keys must be not None
