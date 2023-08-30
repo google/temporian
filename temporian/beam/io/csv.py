@@ -125,12 +125,13 @@ def _convert_to_csv(
     output = io.StringIO()
     writer = csv.writer(output)
     for event_idx, timestamp in enumerate(timestamps):
-        if len(feature_blocks) == 1 and feature_blocks[0][PosFeatureIdx] == -1:
-            feature_data = []
-        else:
-            feature_data = _bytes_to_strs(
-                [f[PosFeatureValues][event_idx] for f in feature_blocks]
-            )
+        feature_data = _bytes_to_strs(
+            [
+                f[PosFeatureValues][event_idx]
+                for f in feature_blocks
+                if f[PosFeatureValues] is not None
+            ]
+        )
         writer.writerow([timestamp] + index_data + feature_data)
 
     return output.getvalue()

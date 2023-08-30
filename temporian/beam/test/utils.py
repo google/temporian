@@ -72,10 +72,8 @@ def check_beam_implementation(
     with TestPipeline() as p:
         input_pcollection = {}
         for input_path, input_evtset in zip(input_paths, input_data):
-            input_pcollection[input_evtset.node()] = (
-                p
-                | beam_from_csv(input_path, input_evtset.node().schema)
-                # | f"Raw input {input_path}" >> beam.Map(my_print, "input")
+            input_pcollection[input_evtset.node()] = p | beam_from_csv(
+                input_path, input_evtset.node().schema
             )
 
         output_pcollection = run_multi_io(
@@ -84,12 +82,8 @@ def check_beam_implementation(
 
         assert len(output_pcollection) == 1
 
-        output = (
-            output_pcollection[output_node]
-            # | "Raw output" >> beam.Map(my_print, "output")
-            | beam_to_csv(
-                output_path, output_node.schema, shard_name_template=""
-            )
+        output = output_pcollection[output_node] | beam_to_csv(
+            output_path, output_node.schema, shard_name_template=""
         )
 
         assert_that(
