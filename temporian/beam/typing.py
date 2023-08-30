@@ -14,7 +14,6 @@
 
 from typing import Tuple, Union, Optional, List, Any
 
-import numpy.typing as npt
 import numpy as np
 import apache_beam as beam
 from temporian.core.typing import IndexKeyItem
@@ -34,7 +33,7 @@ BeamIndexKey = Tuple[BeamIndexKeyItem, ...]
 
 # Timestamp values
 TimestampsDType = np.float64
-TimestampValues = npt.NDArray[TimestampsDType]
+TimestampValues = np.ndarray  # npt.NDArray[TimestampsDType]
 TimestampsPyType = float
 
 # StructuredRow is a single event / row during the conversion from dict of
