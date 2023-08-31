@@ -15,9 +15,9 @@ from temporian.beam.io.dict import (
 from temporian.beam.typing import (
     BeamEventSet,
     BeamIndexKey,
-    PosFeatureIdx,
-    PosTimestampValues,
-    PosFeatureValues,
+    POS_FEATURE_IDX,
+    POS_TIMESTAMP_VALUES,
+    POS_FEATURE_VALUES,
     BeamIndexKey,
     FeatureItemWithIdxValue,
 )
@@ -116,20 +116,20 @@ def _convert_to_csv(
     # Sort the feature by feature index.
     # The feature index is the last value (-1) of the key (first element of the
     # tuple).
-    feature_blocks = sorted(feature_blocks, key=lambda x: x[PosFeatureIdx])
+    feature_blocks = sorted(feature_blocks, key=lambda x: x[POS_FEATURE_IDX])
     assert len(feature_blocks) > 0
 
     # All the feature blocks have the same timestamps. We use the first one.
-    timestamps = feature_blocks[0][PosTimestampValues]
+    timestamps = feature_blocks[0][POS_TIMESTAMP_VALUES]
 
     output = io.StringIO()
     writer = csv.writer(output)
     for event_idx, timestamp in enumerate(timestamps):
         feature_data = _bytes_to_strs(
             [
-                f[PosFeatureValues][event_idx]
+                f[POS_FEATURE_VALUES][event_idx]
                 for f in feature_blocks
-                if f[PosFeatureValues] is not None
+                if f[POS_FEATURE_VALUES] is not None
             ]
         )
         writer.writerow([timestamp] + index_data + feature_data)

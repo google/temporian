@@ -18,9 +18,9 @@ from temporian.beam.typing import (
     FeatureItem,
     BeamIndexKey,
     StructuredRowValue,
-    PosFeatureIdx,
-    PosTimestampValues,
-    PosFeatureValues,
+    POS_FEATURE_IDX,
+    POS_TIMESTAMP_VALUES,
+    POS_FEATURE_VALUES,
     FeatureItemWithIdxValue,
     FeatureItemWithIdx,
 )
@@ -328,7 +328,7 @@ def _convert_to_dict_event_key_value(
     index, feature_blocks = item
 
     # Sort the feature by feature index.
-    feature_blocks = sorted(feature_blocks, key=lambda x: x[PosFeatureIdx])
+    feature_blocks = sorted(feature_blocks, key=lambda x: x[POS_FEATURE_IDX])
     assert len(feature_blocks) > 0
 
     # All the feature blocks have the same timestamps. We use the first one.
@@ -336,12 +336,12 @@ def _convert_to_dict_event_key_value(
     for index_schema, index_value in zip(schema.indexes, index):
         common_item_dict[index_schema.name] = index_value
 
-    timestamps = feature_blocks[0][PosTimestampValues]
+    timestamps = feature_blocks[0][POS_TIMESTAMP_VALUES]
     for event_idx, timestamp in enumerate(timestamps):
         item_dict = common_item_dict.copy()
         item_dict[timestamp_key] = timestamp
         for feature_schema, feature in zip(schema.features, feature_blocks):
-            values = feature[PosFeatureValues]
+            values = feature[POS_FEATURE_VALUES]
             assert values is not None
             item_dict[feature_schema.name] = values[event_idx]
 
@@ -359,7 +359,7 @@ def _convert_to_dict_event_set_key_value(
     index, feature_blocks = item
 
     # Sort the feature by feature index.
-    feature_blocks = sorted(feature_blocks, key=lambda x: x[PosFeatureIdx])
+    feature_blocks = sorted(feature_blocks, key=lambda x: x[POS_FEATURE_IDX])
     assert len(feature_blocks) > 0
 
     item_dict = {}
@@ -367,9 +367,9 @@ def _convert_to_dict_event_set_key_value(
         item_dict[index_schema.name] = index_value
 
     # All the feature blocks have the same timestamps. We use the first one.
-    item_dict[timestamp_key] = feature_blocks[0][PosTimestampValues]
+    item_dict[timestamp_key] = feature_blocks[0][POS_TIMESTAMP_VALUES]
     for feature_schema, feature in zip(schema.features, feature_blocks):
-        item_dict[feature_schema.name] = feature[PosFeatureValues]
+        item_dict[feature_schema.name] = feature[POS_FEATURE_VALUES]
 
     return item_dict
 
@@ -380,7 +380,7 @@ def _add_feature_idx(src: FeatureItem, feature_idx: int) -> FeatureItemWithIdx:
 
 
 def _extract_feature_idx(item: FeatureItemWithIdx, num_features: int) -> int:
-    return item[1][PosFeatureIdx]
+    return item[1][POS_FEATURE_IDX]
 
 
 def _remove_feature_idx(src: FeatureItemWithIdx) -> FeatureItem:

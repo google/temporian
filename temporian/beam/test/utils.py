@@ -51,8 +51,6 @@ def check_beam_implementation(
     if isinstance(input_data, EventSet):
         input_data = [input_data]
 
-    # input_node = input_data.node()
-
     tmp_dir = tempfile.mkdtemp()
     output_path = os.path.join(tmp_dir, "output.csv")
     input_paths = []

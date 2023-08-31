@@ -16,7 +16,10 @@ from typing import Tuple, Union, Optional, List, Any
 
 import numpy as np
 import apache_beam as beam
-from temporian.core.typing import IndexKeyItem
+from temporian.core.typing import (
+    NormalizedIndexKeyItem,
+    NormalizedIndexKey,
+)
 
 # When applicable, follow the same naming convention as temporian/core/typing.py
 #
@@ -28,8 +31,8 @@ from temporian.core.typing import IndexKeyItem
 # each feature.
 
 # Temporian index in Beam.
-BeamIndexKeyItem = Union[int, bytes]
-BeamIndexKey = Tuple[BeamIndexKeyItem, ...]
+BeamIndexKeyItem = NormalizedIndexKeyItem
+BeamIndexKey = NormalizedIndexKey
 
 # Timestamp values
 TimestampsDType = np.float64
@@ -54,11 +57,11 @@ FeatureIdx = int
 
 # Index of the timestamps, feature and feature idx in the "FeatureItem" and
 # "FeatureItemWithIdx" tuples.
-PosTimestampValues = 0
-PosFeatureValues = 1
-PosFeatureIdx = 2
+POS_TIMESTAMP_VALUES = 0
+POS_FEATURE_VALUES = 1
+POS_FEATURE_IDX = 2
 
-# A list of timestamps and optionnally feature values.
+# A list of timestamps and optionally feature values.
 FeatureItemValue = Tuple[TimestampValues, Optional[FeatureValues]]
 # "FeatureItemValue" with an index.
 FeatureItem = Tuple[BeamIndexKey, FeatureItemValue]
@@ -71,5 +74,5 @@ FeatureItemWithIdxValue = Tuple[
 FeatureItemWithIdx = Tuple[BeamIndexKey, FeatureItemWithIdxValue]
 
 # From the point of view of the user, a BeamEventSet play the same role as
-# and EventSet with Temporian in-process.
+# an EventSet in Temporian in-process.
 BeamEventSet = Tuple[beam.PCollection[FeatureItem]]

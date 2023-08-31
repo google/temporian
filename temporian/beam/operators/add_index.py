@@ -29,7 +29,7 @@ from temporian.beam.typing import (
     BeamIndexKey,
     FeatureItem,
     FeatureItemValue,
-    PosFeatureValues,
+    POS_FEATURE_VALUES,
 )
 
 
@@ -112,7 +112,7 @@ def _add_index_to_feature(
 
     # Note: "mess" contains exactly one value in each "Iterable".
     feature = next(iter(mess[0]))
-    indexes_values = [next(iter(item))[PosFeatureValues] for item in mess[1:]]
+    indexes_values = [next(iter(item))[POS_FEATURE_VALUES] for item in mess[1:]]
 
     timestamps, feature_values = feature
     assert feature_values is not None
