@@ -100,10 +100,12 @@ def display_html(evset: EventSet) -> str:
             html_index_value.appendChild(
                 html_style(
                     dom,
-                    f"{item_value}{', ' if idx != last_index_key_idx else ''}",
+                    str(item_value),
                     _HTML_STYLE_INDEX_VALUE,
                 )
             )
+            if idx != last_index_key_idx:
+                html_index_value.appendChild(html_text(dom, ", "))
 
         html_index_value.appendChild(
             html_text(dom, f") with {num_timestamps} events")
