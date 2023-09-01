@@ -15,7 +15,7 @@
 
 """SelectIndexValues operator class and public API function definitions."""
 
-from typing import List
+from typing import List, Optional
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.node import (
@@ -36,14 +36,40 @@ from temporian.utils.typecheck import typecheck
 
 
 class SelectIndexValues(Operator):
-    def __init__(self, input: EventSetNode, keys: IndexKeyList):
+    def __init__(
+        self,
+        input: EventSetNode,
+        keys: Optional[IndexKeyList] = None,
+        number: Optional[int] = None,
+        fraction: Optional[float] = None,
+    ):
         super().__init__()
 
         self.add_input("input", input)
 
-        normalized_keys = normalize_index_key_list(keys)
-        self._keys = normalized_keys
-        self.add_attribute("keys", normalized_keys)
+        if len([x for x in [keys, number, fraction] if x is not None]) != 1:
+            raise ValueError(
+                "Exactly one of keys, number or fraction must be provided."
+            )
+
+        if keys is not None:
+            normalized_keys = normalize_index_key_list(keys)
+            self._keys = normalized_keys
+            self.add_attribute("keys", normalized_keys)
+        else:
+            self._keys = None
+
+        self._number = number
+        if number is not None:
+            if number < 1:
+                raise ValueError("number must be greater than 0.")
+            self.add_attribute("number", number)
+
+        self._fraction = fraction
+        if fraction is not None:
+            if fraction < 0 or fraction > 1:
+                raise ValueError("fraction must be between 0 and 1.")
+            self.add_attribute("fraction", fraction)
 
         self.add_output(
             "output",
@@ -67,14 +93,32 @@ class SelectIndexValues(Operator):
                     type=pb.OperatorDef.Attribute.Type.LIST_INDEX_KEYS,
                     is_optional=True,
                 ),
+                pb.OperatorDef.Attribute(
+                    key="number",
+                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
+                    is_optional=True,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="fraction",
+                    type=pb.OperatorDef.Attribute.Type.FLOAT_64,
+                    is_optional=True,
+                ),
             ],
             inputs=[pb.OperatorDef.Input(key="input")],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
 
     @property
-    def keys(self) -> List[NormalizedIndexKey]:
+    def keys(self) -> Optional[List[NormalizedIndexKey]]:
         return self._keys
+
+    @property
+    def number(self) -> Optional[int]:
+        return self._number
+
+    @property
+    def fraction(self) -> Optional[float]:
+        return self._fraction
 
 
 operator_lib.register_operator(SelectIndexValues)
@@ -84,8 +128,12 @@ operator_lib.register_operator(SelectIndexValues)
 @compile
 def select_index_values(
     input: EventSetOrNode,
-    keys: IndexKeyList,
+    keys: Optional[IndexKeyList],
+    number: Optional[int],
+    fraction: Optional[float],
 ) -> EventSetOrNode:
     assert isinstance(input, EventSetNode)
 
-    return SelectIndexValues(input=input, keys=keys).outputs["output"]
+    return SelectIndexValues(
+        input=input, keys=keys, number=number, fraction=fraction
+    ).outputs["output"]

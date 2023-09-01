@@ -22,7 +22,7 @@ from temporian.core.data.duration import Duration
 
 
 if TYPE_CHECKING:
-    from temporian.core.typing import EventSetOrNode, TypeOrDType, IndexKey
+    from temporian.core.typing import EventSetOrNode, TypeOrDType, IndexKeyList
 
 T_SCALAR = (int, float)
 
@@ -1927,16 +1927,51 @@ class EventSetOperations:
 
     def select_index_values(
         self: EventSetOrNode,
-        keys: Union[IndexKey, List[IndexKey]],
+        keys: Optional[IndexKeyList] = None,
+        *,
+        number: Optional[int] = None,
+        fraction: Optional[float] = None,
     ) -> EventSetOrNode:
         """Selects a subset of index values from an
         [`EventSet`][temporian.EventSet].
+
+        Exactly one of `keys`, `number`, or `fraction` should be provided.
+
+        If `number` or `fraction` is specified, the index values are selected
+        randomly.
+
+        If `fraction` is specified and `fraction * len(index keys)` doesn't
+        result in an integer, the number of index values selected is rounded
+        down.
 
         If used in compiled or graph mode, the specified keys are compiled as-is
         along with the operator, which means that they must be available when
         loading and running the graph on new data.
 
-        Example:
+        Example with `keys` with a single index and a single key:
+
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 3],
+            ...     features={
+            ...         "f": [10, 20, 30, 40],
+            ...         "x": ["A", "B", "A", "B"],
+            ...     },
+            ...     indexes=["x"],
+            ... )
+            >>> b = a.select_index_values("A")
+            >>> b
+            indexes: [('x', str_)]
+            features: [('f', int64)]
+            events:
+                x=b'A' (2 events):
+                    timestamps: [0. 2.]
+                    'f': [10 30]
+            ...
+
+            ```
+
+        Example with `keys` with multiple indexes and keys:
 
             ```python
             >>> a = tp.event_set(
@@ -1963,8 +1998,73 @@ class EventSetOperations:
 
             ```
 
+        Example with `number`:
+
+            ```python
+            >>> import random
+            >>> random.seed(0)
+
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 3],
+            ...     features={
+            ...         "f": [10, 20, 30, 40],
+            ...         "x": [1, 1, 2, 2],
+            ...         "y": ["A", "B", "A", "B"],
+            ...     },
+            ...     indexes=["x", "y"],
+            ... )
+            >>> b = a.select_index_values(number=2)
+            >>> b
+            indexes: [('x', int64), ('y', str_)]
+            features: [('f', int64)]
+            events:
+                x=1 y=b'A' (1 events):
+                    timestamps: [0.]
+                    'f': [10]
+                x=2 y=b'A' (1 events):
+                    timestamps: [2.]
+                    'f': [30]
+            ...
+
+            ```
+
+        Example with `fraction`:
+
+            ```python
+            >>> import random
+            >>> random.seed(0)
+
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 3],
+            ...     features={
+            ...         "f": [10, 20, 30, 40],
+            ...         "x": [1, 1, 2, 2],
+            ...         "y": ["A", "B", "A", "B"],
+            ...     },
+            ...     indexes=["x", "y"],
+            ... )
+            >>> b = a.select_index_values(fraction=0.75)
+            >>> b
+            indexes: [('x', int64), ('y', str_)]
+            features: [('f', int64)]
+            events:
+                x=1 y=b'A' (1 events):
+                    timestamps: [0.]
+                    'f': [10]
+                x=2 y=b'A' (1 events):
+                    timestamps: [2.]
+                    'f': [30]
+            ...
+
+            ```
+
         Args:
             keys: index key or list of index keys to select from the EventSet.
+            number: number of index values to select. If `number` is greater
+                than the number of index values, all the index values are
+                selected.
+            fraction: fraction of index values to select, expressed as a float
+                between 0 and 1.
 
         Returns:
             EventSet with a subset of the index values.
@@ -1973,7 +2073,9 @@ class EventSetOperations:
             select_index_values,
         )
 
-        return select_index_values(self, keys=keys)
+        return select_index_values(
+            self, keys=keys, number=number, fraction=fraction
+        )
 
     def set_index(
         self: EventSetOrNode, indexes: Union[str, List[str]]

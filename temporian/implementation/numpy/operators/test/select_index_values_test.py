@@ -109,6 +109,90 @@ class SelectIndexValuesOperatorTest(absltest.TestCase):
 
         assertEqualEventSet(self, output, expected_output)
 
+    def test_number(self):
+        evset = event_set(
+            timestamps=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            features={
+                "a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            },
+            indexes=["a"],
+        )
+        op = SelectIndexValues(input=evset.node(), number=3)
+        instance = SelectIndexValuesNumpyImplementation(op)
+        testOperatorAndImp(self, op, instance)
+        output = instance.call(input=evset)["output"]
+        self.assertEqual(len(output.data.keys()), 3)
+
+    def test_number_larger_than_total(self):
+        evset = event_set(
+            timestamps=[1, 2, 3],
+            features={
+                "a": [1, 2, 3],
+            },
+            indexes=["a"],
+        )
+        op = SelectIndexValues(input=evset.node(), number=4)
+        instance = SelectIndexValuesNumpyImplementation(op)
+        testOperatorAndImp(self, op, instance)
+        output = instance.call(input=evset)["output"]
+        self.assertEqual(len(output.data.keys()), 3)
+
+    def test_fraction(self):
+        evset = event_set(
+            timestamps=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            features={
+                "a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            },
+            indexes=["a"],
+        )
+        op = SelectIndexValues(input=evset.node(), fraction=0.7)
+        instance = SelectIndexValuesNumpyImplementation(op)
+        testOperatorAndImp(self, op, instance)
+        output = instance.call(input=evset)["output"]
+        self.assertEqual(len(output.data.keys()), 7)
+
+    def test_fraction_0(self):
+        evset = event_set(
+            timestamps=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            features={
+                "a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            },
+            indexes=["a"],
+        )
+        op = SelectIndexValues(input=evset.node(), fraction=0)
+        instance = SelectIndexValuesNumpyImplementation(op)
+        testOperatorAndImp(self, op, instance)
+        output = instance.call(input=evset)["output"]
+        self.assertEqual(len(output.data.keys()), 0)
+
+    def test_fraction_rounds_down(self):
+        evset = event_set(
+            timestamps=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            features={
+                "a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            },
+            indexes=["a"],
+        )
+        op = SelectIndexValues(input=evset.node(), fraction=0.79)
+        instance = SelectIndexValuesNumpyImplementation(op)
+        testOperatorAndImp(self, op, instance)
+        output = instance.call(input=evset)["output"]
+        self.assertEqual(len(output.data.keys()), 7)
+
+    def test_fraction_1(self):
+        evset = event_set(
+            timestamps=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            features={
+                "a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            },
+            indexes=["a"],
+        )
+        op = SelectIndexValues(input=evset.node(), fraction=1)
+        instance = SelectIndexValuesNumpyImplementation(op)
+        testOperatorAndImp(self, op, instance)
+        output = instance.call(input=evset)["output"]
+        self.assertEqual(len(output.data.keys()), 10)
+
     def test_wrong_index_key(self):
         with self.assertRaisesRegex(
             ValueError, r"Index key '\(b'D',\)' not found in input EventSet."
@@ -116,6 +200,46 @@ class SelectIndexValuesOperatorTest(absltest.TestCase):
             op = SelectIndexValues(input=self.node, keys="D")
             instance = SelectIndexValuesNumpyImplementation(op)
             instance.call(input=self.evset)
+
+    def test_more_than_one_param(self):
+        with self.assertRaisesRegex(
+            ValueError,
+            "Exactly one of keys, number or fraction must be provided.",
+        ):
+            SelectIndexValues(input=self.node, keys="D", number=1)
+
+    def test_no_params(self):
+        with self.assertRaisesRegex(
+            ValueError,
+            "Exactly one of keys, number or fraction must be provided.",
+        ):
+            SelectIndexValues(input=self.node)
+
+    def test_invalid_fraction(self):
+        with self.assertRaisesRegex(
+            ValueError,
+            "fraction must be between 0 and 1.",
+        ):
+            SelectIndexValues(input=self.node, fraction=-1)
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "fraction must be between 0 and 1.",
+        ):
+            SelectIndexValues(input=self.node, fraction=1.01)
+
+    def test_invalid_number(self):
+        with self.assertRaisesRegex(
+            ValueError,
+            "number must be greater than 0.",
+        ):
+            SelectIndexValues(input=self.node, number=0)
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "number must be greater than 0.",
+        ):
+            SelectIndexValues(input=self.node, number=-1)
 
 
 if __name__ == "__main__":
