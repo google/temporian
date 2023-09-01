@@ -21,17 +21,19 @@ def color(hex: str):
     return hex if not config.display_disable_color else None
 
 
-# IBM colorblind-safe palette
-BLUE = color("#648FFF")
-PINK = color("#DC267F")
-PURPLE = color("#785EF0")
-ORANGE = color("#FE6100")
-YELLOW = color("#FFB000")
+# Colorblind-safe palette (Paul Tol's vibrant)
+ORANGE = color("#EE7733")
+BLUE = color("#0077BB")
+CYAN = color("#33BBEE")
+MAGENTA = color("#EE3377")
+RED = color("#CC3311")
+TEAL = color("#009988")
+GRAY = color("#BBBBBB")
 
-_HTML_STYLE_FEATURE_KEY = {"color": PURPLE}
+_HTML_STYLE_DTYPE = {"color": TEAL}
+_HTML_STYLE_FEATURE_KEY = {"color": BLUE}
 _HTML_STYLE_INDEX_KEY = {"color": ORANGE}
-_HTML_STYLE_DTYPE = {"color": BLUE}
-_HTML_STYLE_INDEX_VALUE = {"color": YELLOW}
+_HTML_STYLE_INDEX_VALUE = {"color": RED}
 _HTML_STYLE_HEADER_DIV = {
     "margin-bottom": "11px",
     "padding": "5px",
