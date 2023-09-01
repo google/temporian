@@ -50,6 +50,7 @@ class SelectIndexValuesNumpyImplementation(OperatorImplementation):
             keys = random.sample(all_keys, k=number)
 
         elif fraction is not None:
+            # Note: int() rounds down
             keys = random.sample(all_keys, k=int(len(all_keys) * fraction))
 
         else:

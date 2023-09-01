@@ -165,6 +165,20 @@ class SelectIndexValuesOperatorTest(absltest.TestCase):
         output = instance.call(input=evset)["output"]
         self.assertEqual(len(output.data.keys()), 0)
 
+    def test_fraction_rounds_down(self):
+        evset = event_set(
+            timestamps=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            features={
+                "a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            },
+            indexes=["a"],
+        )
+        op = SelectIndexValues(input=evset.node(), fraction=0.79)
+        instance = SelectIndexValuesNumpyImplementation(op)
+        testOperatorAndImp(self, op, instance)
+        output = instance.call(input=evset)["output"]
+        self.assertEqual(len(output.data.keys()), 7)
+
     def test_fraction_1(self):
         evset = event_set(
             timestamps=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -213,6 +227,19 @@ class SelectIndexValuesOperatorTest(absltest.TestCase):
             "fraction must be between 0 and 1.",
         ):
             SelectIndexValues(input=self.node, fraction=1.01)
+
+    def test_invalid_number(self):
+        with self.assertRaisesRegex(
+            ValueError,
+            "number must be greater than 0.",
+        ):
+            SelectIndexValues(input=self.node, number=0)
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "number must be greater than 0.",
+        ):
+            SelectIndexValues(input=self.node, number=-1)
 
 
 if __name__ == "__main__":

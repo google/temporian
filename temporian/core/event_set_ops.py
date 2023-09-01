@@ -1940,6 +1940,10 @@ class EventSetOperations:
         If `number` or `fraction` is specified, the index values are selected
         randomly.
 
+        If `fraction` is specified and `fraction * len(index keys)` doesn't
+        result in an integer, the number of index values selected is rounded
+        down.
+
         If used in compiled or graph mode, the specified keys are compiled as-is
         along with the operator, which means that they must be available when
         loading and running the graph on new data.

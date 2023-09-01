@@ -61,6 +61,8 @@ class SelectIndexValues(Operator):
 
         self._number = number
         if number is not None:
+            if number < 1:
+                raise ValueError("number must be greater than 0.")
             self.add_attribute("number", number)
 
         self._fraction = fraction
