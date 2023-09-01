@@ -122,6 +122,52 @@ class IOTest(absltest.TestCase):
 """,
             )
 
+    def test_read_and_write_csv_without_features(self):
+        # Create csv dataset
+        tmp_dir = tempfile.mkdtemp()
+        input_path = os.path.join(tmp_dir, "input.csv")
+        output_path = os.path.join(tmp_dir, "output.csv")
+        input_data = event_set(
+            timestamps=[1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
+            features={
+                "b": ["x", "x", "x", "x", "x", "y", "y", "y", "y", "y"],
+                "e": [1, 1, 1, 2, 2, 1, 1, 1, 1, 1],
+            },
+            indexes=["b", "e"],
+        )
+        in_process_to_csv(input_data, path=input_path)
+
+        # Note: It is not clear how to check values of PCollection that contains
+        # numpy arrays. assert_that + equal_to does not work.
+        with TestPipeline() as p:
+            output = (
+                p
+                | from_csv(input_path, input_data.schema)
+                | to_csv(output_path, input_data.schema, shard_name_template="")
+            )
+            assert_that(
+                output,
+                equal_to([output_path]),
+            )
+
+        with open(output_path, "r", encoding="utf-8") as f:
+            content = f.read()
+            self.assertEqual(
+                content,
+                """timestamp,b,e
+1.0,y,1
+2.0,y,1
+3.0,y,1
+4.0,y,1
+5.0,y,1
+4.0,x,2
+5.0,x,2
+1.0,x,1
+2.0,x,1
+3.0,x,1
+""",
+            )
+
 
 if __name__ == "__main__":
     absltest.main()

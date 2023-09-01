@@ -17,6 +17,7 @@ py_library(
         "//temporian/implementation/numpy/data:dtype_normalization",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
+        "//temporian/beam:typing",
     ],
 )
 
@@ -30,6 +31,7 @@ py_library(
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
+        "//temporian/beam:typing",
     ],
 )
 
@@ -44,5 +46,6 @@ py_library(
         "//temporian/implementation/numpy/data:dtype_normalization",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
+        "//temporian/beam:typing",
     ],
 )

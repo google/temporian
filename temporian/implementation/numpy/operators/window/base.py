@@ -19,8 +19,13 @@ import numpy as np
 
 from temporian.core.operators.window.base import BaseWindowOperator
 from temporian.implementation.numpy.data.event_set import IndexData
-from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.implementation.numpy.data.event_set import (
+    EventSet,
+)
 from temporian.implementation.numpy.operators.base import OperatorImplementation
+from temporian.implementation.numpy.data.dtype_normalization import (
+    tp_dtype_to_np_dtype,
+)
 
 
 class BaseWindowNumpyImplementation(OperatorImplementation):
@@ -45,28 +50,44 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
 
         # create destination evset
         output_schema = self.operator.outputs["output"].schema
-        dst_evset = EventSet(data={}, schema=output_schema)
+        output_evset = EventSet(data={}, schema=output_schema)
         # For each index
-        for index_key, index_data in input.data.items():
-            dst_features = []
-            dst_timestamps = sampling.data[index_key].timestamps
-            dst_index_data = IndexData(
-                features=dst_features,
-                timestamps=dst_timestamps,
-                schema=None,
-            )
-            self._compute(
-                src_timestamps=index_data.timestamps,
-                src_features=index_data.features,
-                sampling_timestamps=dst_timestamps,
-                dst_features=dst_features,
-            )
-            dst_index_data.check_schema(output_schema)
-            dst_evset.set_index_value(
-                index_key, dst_index_data, normalize=False
+        for index_key, sampling_data in sampling.data.items():
+            output_data = IndexData(
+                features=[],
+                timestamps=sampling_data.timestamps,
+                schema=None,  # Checking is done later
             )
 
-        return {"output": dst_evset}
+            if index_key in input.data:
+                input_data = input.data[index_key]
+
+                self._compute(
+                    src_timestamps=input_data.timestamps,
+                    src_features=input_data.features,
+                    sampling_timestamps=sampling_data.timestamps,
+                    dst_features=output_data.features,
+                )
+            else:
+                # Sets the feature data as missing.
+                empty_features = [
+                    np.empty((0,), dtype=tp_dtype_to_np_dtype(f.dtype))
+                    for f in output_schema.features
+                ]
+                empty_timestamps = np.empty((0,), dtype=np.float64)
+                self._compute(
+                    src_timestamps=empty_timestamps,
+                    src_features=empty_features,
+                    sampling_timestamps=sampling_data.timestamps,
+                    dst_features=output_data.features,
+                )
+
+            output_data.check_schema(output_schema)
+            output_evset.set_index_value(
+                index_key, output_data, normalize=False
+            )
+
+        return {"output": output_evset}
 
     @abstractmethod
     def _implementation(self) -> Any:
@@ -97,7 +118,10 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
         self,
         src_timestamps: np.ndarray,
         src_feature: np.ndarray,
+        feature_idx: int,
     ) -> np.ndarray:
+        """Applies the operator on a single feature."""
+
         assert isinstance(self.operator, BaseWindowOperator)
 
         implementation = self._implementation()
@@ -107,3 +131,39 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
             "window_length": self.operator.window_length,
         }
         return implementation(**kwargs)
+
+    def apply_feature_wise_with_sampling(
+        self,
+        src_timestamps: Optional[np.ndarray],
+        src_feature: Optional[np.ndarray],
+        sampling_timestamps: np.ndarray,
+        feature_idx: int,
+    ) -> np.ndarray:
+        """Applies the operator on a single feature with a sampling."""
+
+        assert isinstance(self.operator, BaseWindowOperator)
+        implementation = self._implementation()
+
+        if src_feature is not None:
+            kwargs = {
+                "evset_timestamps": src_timestamps,
+                "evset_values": src_feature,
+                "window_length": self.operator.window_length,
+                "sampling_timestamps": sampling_timestamps,
+            }
+            return implementation(**kwargs)
+        else:
+            # Sets the feature data as missing.
+            output_schema = self.operator.outputs["output"].schema
+            output_dtype = output_schema.features[feature_idx].dtype
+            empty_features = np.empty(
+                (0,), dtype=tp_dtype_to_np_dtype(output_dtype)
+            )
+            empty_timestamps = np.empty((0,), dtype=np.float64)
+            kwargs = {
+                "evset_timestamps": empty_timestamps,
+                "evset_values": empty_features,
+                "window_length": self.operator.window_length,
+                "sampling_timestamps": sampling_timestamps,
+            }
+            return implementation(**kwargs)
