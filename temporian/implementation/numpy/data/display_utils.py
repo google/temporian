@@ -113,7 +113,10 @@ def display_html(evset: EventSet) -> str:
 
         # Table with column names
         table = html_style(dom, dom.createElement("table"), _HTML_STYLE_TABLE)
-        col_names = ["timestamp"] + [feature.name for feature in visible_feats]
+        col_names = ["timestamp"] + [
+            html_style(dom, feature.name, _HTML_STYLE_FEATURE_KEY)
+            for feature in visible_feats
+        ]
         if has_hidden_feats:
             col_names += [ELLIPSIS]
         table.appendChild(html_table_row(dom, col_names, header=True))
