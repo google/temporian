@@ -33,7 +33,7 @@ GRAY = color("#BBBBBB")
 _HTML_STYLE_DTYPE = {"color": TEAL}
 _HTML_STYLE_FEATURE_KEY = {"color": BLUE}
 _HTML_STYLE_INDEX_KEY = {"color": ORANGE}
-_HTML_STYLE_INDEX_VALUE = {"color": RED}
+_HTML_STYLE_INDEX_VALUE = {"color": MAGENTA}
 _HTML_STYLE_HEADER_DIV = {
     "margin-bottom": "11px",
     "padding": "5px",
