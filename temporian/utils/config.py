@@ -66,6 +66,10 @@ max_display_index_dtypes = int(
 )
 """Maximum number of (index name, index dtype) pairs to show in the summary
 section when displaying an EventSet in a notebook."""
+display_disable_color = bool(
+    os.environ.get("TEMPORIAN_DISPLAY_DISABLE_COLOR", False)
+)
+"""Whether to disable color when displaying an EventSet in a notebook."""
 
 # Configs for both repr and html
 # Decimal numbers precision

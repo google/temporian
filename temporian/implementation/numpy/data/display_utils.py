@@ -17,12 +17,16 @@ Dom = Any
 StyleHtml = Union[Html, str]
 
 
+def color(hex: str):
+    return hex if not config.display_disable_color else None
+
+
 # IBM colorblind-safe palette
-BLUE = "#648FFF"
-PINK = "#DC267F"
-PURPLE = "#785EF0"
-ORANGE = "#FE6100"
-YELLOW = "#FFB000"
+BLUE = color("#648FFF")
+PINK = color("#DC267F")
+PURPLE = color("#785EF0")
+ORANGE = color("#FE6100")
+YELLOW = color("#FFB000")
 
 _HTML_STYLE_FEATURE_KEY = {"color": PURPLE}
 _HTML_STYLE_INDEX_KEY = {"color": ORANGE}
