@@ -198,9 +198,6 @@ class TFPTest(absltest.TestCase):
         ):
             tp.event_set(timestamps=[1, 2], features=[])
 
-    def test_help(self):
-        tp.help.grouped_by_index()
-
 
 if __name__ == "__main__":
     absltest.main()
