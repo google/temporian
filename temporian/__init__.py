@@ -90,6 +90,9 @@ from temporian.core.typing import EventSetOrNode
 # Runtime check
 from temporian.utils.typecheck import runtime_check_raise_exception
 
+# Config
+from temporian.utils import config
+
 # --- OPERATORS ---
 
 from temporian.core.operators.glue import glue
@@ -137,9 +140,6 @@ from temporian.core.operators.unary import isnan
 from temporian.core.operators.unary import notnan
 from temporian.core.operators.unary import abs
 from temporian.core.operators.unary import log
-
-# Config
-from temporian.utils import config
 
 # Remove automatic file tree symbols from public API
 # pylint: disable=undefined-variable

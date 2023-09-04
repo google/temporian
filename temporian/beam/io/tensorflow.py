@@ -96,22 +96,22 @@ class _DictToTFExample(beam.DoFn):
                 DType.INT32,
                 DType.INT64,
             ]:
-                f(ex, feature_schema.name).int64_list.value[
-                    :
-                ] = src_value = dict_example[feature_schema.name]
+                f(ex, feature_schema.name).int64_list.value[:] = src_value = (
+                    dict_example[feature_schema.name]
+                )
 
             elif feature_schema.dtype in [
                 DType.FLOAT32,
                 DType.FLOAT64,
             ]:
-                f(ex, feature_schema.name).float_list.value[
-                    :
-                ] = src_value = dict_example[feature_schema.name]
+                f(ex, feature_schema.name).float_list.value[:] = src_value = (
+                    dict_example[feature_schema.name]
+                )
 
             elif feature_schema.dtype == DType.STRING:
-                f(ex, feature_schema.name).bytes_list.value[
-                    :
-                ] = src_value = dict_example[feature_schema.name]
+                f(ex, feature_schema.name).bytes_list.value[:] = src_value = (
+                    dict_example[feature_schema.name]
+                )
 
             else:
                 raise ValueError("Non supported feature dtype")
@@ -216,7 +216,7 @@ def to_tensorflow_record(
     schema: Schema,
     timestamp_key: str = "timestamp",
     grouped_by_index: bool = True,
-    **wargs,
+    **kwargs,
 ):
     """Export an EventSet to a TF.Records of TF.Examples.
 
@@ -267,6 +267,6 @@ def to_tensorflow_record(
             file_path_prefix=file_path_prefix,
             coder=beam.coders.ProtoCoder(tf.train.Example),
             compression_type=beam.io.filesystem.CompressionTypes.GZIP,
-            **wargs,
+            **kwargs,
         )
     )
