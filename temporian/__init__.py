@@ -90,9 +90,6 @@ from temporian.core.typing import EventSetOrNode
 # Runtime check
 from temporian.utils.typecheck import runtime_check_raise_exception
 
-# Help
-from temporian import help
-
 # --- OPERATORS ---
 
 from temporian.core.operators.glue import glue

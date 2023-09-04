@@ -52,10 +52,3 @@ py_library(
         "//temporian/core/operators:drop_index",
     ],
 )
-
-py_library(
-    name = "format",
-    srcs = ["format.py"],
-    srcs_version = "PY3",
-    deps = [],
-)
