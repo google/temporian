@@ -113,8 +113,9 @@ def to_tensorflow_record(
         evset: Event set to export.
         path: Path to output TF.Record.
         timestamps: Name of the output column containing timestamps.
-        grouped_by_index: Are events groupped by index. Run
-            `tp.help.grouped_by_index()` for the documentation.
+        grouped_by_index: Whether events are grouped by index. Check
+            [grouped_by_index](../../others/parameters/grouped_by_index)
+            for the documentation.
     """
 
     if not grouped_by_index:
@@ -140,20 +141,20 @@ def to_tensorflow_record(
                     DType.INT32,
                     DType.INT64,
                 ]:
-                    f(ex, feature_schema.name).int64_list.value[
-                        :
-                    ] = index_value.features[feature_idx]
+                    f(ex, feature_schema.name).int64_list.value[:] = (
+                        index_value.features[feature_idx]
+                    )
                 elif feature_schema.dtype in [
                     DType.FLOAT32,
                     DType.FLOAT64,
                 ]:
-                    f(ex, feature_schema.name).float_list.value[
-                        :
-                    ] = index_value.features[feature_idx]
+                    f(ex, feature_schema.name).float_list.value[:] = (
+                        index_value.features[feature_idx]
+                    )
                 elif feature_schema.dtype == DType.STRING:
-                    f(ex, feature_schema.name).bytes_list.value[
-                        :
-                    ] = index_value.features[feature_idx]
+                    f(ex, feature_schema.name).bytes_list.value[:] = (
+                        index_value.features[feature_idx]
+                    )
                 else:
                     raise ValueError("Non supported feature dtype")
 
@@ -203,8 +204,9 @@ def from_tensorflow_record(
     Args:
         path: Path to input TF.Record.
         timestamps: Name of the output column containing timestamps.
-        grouped_by_index: Are events groupped by index. Run
-            `tp.help.grouped_by_index()` for the documentation.
+        grouped_by_index: Whether events are grouped by index. Check
+            [grouped_by_index](../../others/parameters/grouped_by_index)
+            for the documentation.
 
     Returns:
         Imported EventSet.

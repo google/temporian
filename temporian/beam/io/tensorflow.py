@@ -172,9 +172,10 @@ def from_tensorflow_record(
         schema: Schema of the data. If you have a Temporian node, the schema is
             available with `node.schema`.
         timestamp_key: Key containing the timestamps.
-        grouped_by_index: Are events groupped by index. Run
-            `tp.help.grouped_by_index()` for the documentation. Currently, only
-            grouped_by_index=True is implemented.
+        grouped_by_index: Whether events are grouped by index. Check
+            [grouped_by_index](../../others/parameters/grouped_by_index)
+            for the documentation. Currently, only grouped_by_index=True is
+            implemented.
 
     Returns:
         A PCollection of event-set compatible with tpb.run.
@@ -244,9 +245,10 @@ def to_tensorflow_record(
         schema: Schema of the data. If you have a Temporian node, the schema is
             available with `node.schema`.
         timestamp_key: Key containing the timestamps.
-        grouped_by_index: Are events groupped by index. Run
-            `tp.help.grouped_by_index()` for the documentation. Currently, only
-            grouped_by_index=True is implemented.
+        grouped_by_index: Whether events are grouped by index. Check
+            [grouped_by_index](../../others/parameters/grouped_by_index)
+            for the documentation. Currently, only grouped_by_index=True is
+            implemented.
     """
 
     if not grouped_by_index:
