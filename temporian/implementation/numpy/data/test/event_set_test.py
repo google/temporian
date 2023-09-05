@@ -60,9 +60,9 @@ class EventSetTest(absltest.TestCase):
         self.assertGreaterEqual(memory_usage, 1200 - 500)
 
     def test_repr_nolimits(self):
-        config.max_printed_events = 0
-        config.max_printed_features = 0
-        config.max_printed_indexes = 0
+        config.print_max_events = 0
+        config.print_max_features = 0
+        config.print_max_indexes = 0
         print(self.evset)
         self.assertEqual(
             repr(self.evset),
@@ -82,10 +82,10 @@ memory usage: 1.2 kB
         )
 
     def test_repr_limits(self):
-        config.max_printed_features = 1
-        config.max_printed_indexes = 1
+        config.print_max_features = 1
+        config.print_max_indexes = 1
         # Numpy summarization only makes sense for limit >= 6
-        config.max_printed_events = 6
+        config.print_max_events = 6
         evset = event_set(
             timestamps=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8],
             features={
@@ -111,9 +111,9 @@ memory usage: 1.2 kB
         )
 
     def test_html_repr_no_limits(self):
-        config.max_display_indexes = 0
-        config.max_display_features = 0
-        config.max_display_events = 0
+        config.display_max_indexes = 0
+        config.display_max_features = 0
+        config.display_max_events = 0
 
         golden.check_string(
             self,
@@ -122,9 +122,9 @@ memory usage: 1.2 kB
         )
 
     def test_html_repr_limits(self):
-        config.max_display_indexes = 1
-        config.max_display_features = 1
-        config.max_display_events = 2
+        config.display_max_indexes = 1
+        config.display_max_features = 1
+        config.display_max_events = 2
 
         golden.check_string(
             self,

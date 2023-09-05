@@ -64,8 +64,8 @@ def display_html(evset: EventSet) -> str:
     num_features = len(evset.schema.features)
 
     # If limit=0 or None, set limit=len
-    max_indexes = config.max_display_indexes or num_indexes
-    max_features = config.max_display_features or num_features
+    max_indexes = config.display_max_indexes or num_indexes
+    max_features = config.display_max_features or num_features
     has_hidden_feats = num_features > max_features
     visible_feats = feature_schemas[:max_features]
 
@@ -76,7 +76,7 @@ def display_html(evset: EventSet) -> str:
     for index_key in all_index_keys[:max_indexes]:
         index_data = evset.data[index_key]
         num_timestamps = len(index_data.timestamps)
-        max_timestamps = config.max_display_events or num_timestamps
+        max_timestamps = config.display_max_events or num_timestamps
 
         # Display index values
         html_index_value = html_div(dom)
@@ -269,7 +269,7 @@ def display_html_header(dom: Dom, evset: EventSet) -> Html:
 
     # If limit=0 or None, set limit=len
     num_features = len(evset.schema.features)
-    max_features = config.max_display_feature_dtypes or num_features
+    max_features = config.display_max_feature_dtypes or num_features
 
     last_feature_idx = num_features - 1
 
@@ -305,7 +305,7 @@ def display_html_header(dom: Dom, evset: EventSet) -> Html:
 
     # If limit=0 or None, set limit=len
     num_indexes = len(evset.schema.indexes)
-    max_indexes = config.max_display_index_dtypes or num_indexes
+    max_indexes = config.display_max_index_dtypes or num_indexes
 
     last_index_idx = num_indexes - 1
 
@@ -344,8 +344,8 @@ def display_html_header(dom: Dom, evset: EventSet) -> Html:
 
 def display_text(evset: EventSet) -> str:
     # Configs and defaults
-    max_events = config.max_printed_events or sys.maxsize  # see np.printoptions
-    max_indexes = config.max_printed_indexes  # 0 will print all
+    max_events = config.print_max_events or sys.maxsize  # see np.printoptions
+    max_indexes = config.print_max_indexes  # 0 will print all
 
     # Representation of the "data" field
     with np.printoptions(
@@ -391,7 +391,7 @@ def repr_value_html(value: Any, dtype: DType) -> str:
         repr = repr_float_html(value)
     else:
         repr = str(value)
-    max_chars = config.max_display_chars or None
+    max_chars = config.display_max_chars or None
     if max_chars is not None and len(repr) > max_chars:
         repr = repr[:max_chars] + ELLIPSIS
     return repr
@@ -406,7 +406,7 @@ def repr_float_html(value: float) -> str:
 def repr_features_text(evset: EventSet, features: List[np.ndarray]) -> str:
     """Repr for a list of features."""
 
-    max_features = config.max_printed_features  # 0 will print all
+    max_features = config.print_max_features  # 0 will print all
     feature_repr = []
     for idx, (feature_schema, feature_data) in enumerate(
         zip(evset.schema.features, features)
