@@ -18,6 +18,7 @@ py_library(
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/beam:typing",
+        "//temporian/io:format",
     ],
 )
 
