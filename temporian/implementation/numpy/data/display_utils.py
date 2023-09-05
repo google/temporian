@@ -91,10 +91,13 @@ def display_html(evset: EventSet) -> str:
         ):
             html_index_value.appendChild(
                 html_style(
-                    dom, item_schema.name, _HTML_STYLE_INDEX_KEY, bold=True
+                    dom,
+                    f"{item_schema.name}: ",
+                    _HTML_STYLE_INDEX_KEY,
+                    bold=True,
                 )
             )
-            html_index_value.appendChild(html_text(dom, ": "))
+            # html_index_value.appendChild(html_text(dom, ": "))
             if isinstance(item_value, bytes):
                 item_value = item_value.decode()
             html_index_value.appendChild(
@@ -277,13 +280,11 @@ def display_html_header(dom: Dom, evset: EventSet) -> Html:
         html_features.appendChild(
             html_style(dom, feature.name, _HTML_STYLE_FEATURE_KEY, bold=True)
         )
-        html_features.appendChild(html_text(dom, " ("))
         html_features.appendChild(
-            html_style(dom, str(feature.dtype), _HTML_STYLE_DTYPE)
+            html_style(dom, f" ({feature.dtype})", _HTML_STYLE_DTYPE)
         )
-        html_features.appendChild(
-            html_text(dom, f"){', 'if idx != last_feature_idx else ''}")
-        )
+        if idx != last_feature_idx:
+            html_features.appendChild(html_text(dom, ", "))
 
     if max_features < num_features:
         html_features.appendChild(html_text(dom, f", ..."))
@@ -313,13 +314,11 @@ def display_html_header(dom: Dom, evset: EventSet) -> Html:
         html_indexes.appendChild(
             html_style(dom, index.name, _HTML_STYLE_INDEX_KEY, bold=True)
         )
-        html_indexes.appendChild(html_text(dom, " ("))
         html_indexes.appendChild(
-            html_style(dom, str(index.dtype), _HTML_STYLE_DTYPE)
+            html_style(dom, f" ({index.dtype})", _HTML_STYLE_DTYPE)
         )
-        html_indexes.appendChild(
-            html_text(dom, f"){', 'if idx != last_index_idx else ''}")
-        )
+        if idx != last_index_idx:
+            html_indexes.appendChild(html_text(dom, ", "))
 
     if max_indexes < num_indexes:
         html_indexes.appendChild(html_text(dom, f", ..."))
