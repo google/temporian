@@ -15,24 +15,31 @@
 
 """Implementation for the TickCalendar operator."""
 
+from datetime import datetime, timedelta
+from typing import Dict, List
 
-from typing import Dict
 import numpy as np
 
 from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.core.operators.tick_calendar import TickCalendar
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.base import OperatorImplementation
+from temporian.core.data import duration
+
 
 class TickCalendarNumpyImplementation(OperatorImplementation):
-
     def __init__(self, operator: TickCalendar) -> None:
         assert isinstance(operator, TickCalendar)
         super().__init__(operator)
 
-    def __call__(
-        self, input: EventSet) -> Dict[str, EventSet]:
+    def __call__(self, input: EventSet) -> Dict[str, EventSet]:
         assert isinstance(self.operator, TickCalendar)
+        second = self.operator.second
+        minute = self.operator.minute
+        hour = self.operator.hour
+        day_of_month = self.operator.day_of_month
+        month = self.operator.month
+        day_of_week = self.operator.day_of_week
 
         output_schema = self.output_schema("output")
 
@@ -41,13 +48,18 @@ class TickCalendarNumpyImplementation(OperatorImplementation):
 
         # Fill output EventSet's data
         for index_key, index_data in input.data.items():
+            if len(index_data.timestamps < 2):
+                dst_timestamps = np.array([], dtype=np.float64)
+            else:
+                begin = index_data.timestamps[0]
+                end = index_data.timestamps[-1]
             output_evset.set_index_value(
                 index_key,
                 IndexData(
                     features=[],
-                    timestamps=np.array([1], dtype=np.float64),
+                    timestamps=dst_timestamps,
                     schema=output_schema,
-                )
+                ),
             )
 
         return {"output": output_evset}

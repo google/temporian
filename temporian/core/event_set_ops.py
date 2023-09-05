@@ -2180,6 +2180,85 @@ class EventSetOperations:
 
         return tick(self, interval=interval, align=align)
 
+    def tick_calendar(
+        self: EventSetOrNode,
+        second: Union[int, str, None] = None,
+        minute: Union[int, str, None] = None,
+        hour: Union[int, str, None] = None,
+        day_of_month: Union[int, str, None] = None,
+        month: Union[int, str, None] = None,
+        day_of_week: Union[int, str, None] = None,
+    ) -> EventSetOrNode:
+        """Generates timestamps at specified datetimes, in the range of a guide
+        [`EventSet`][temporian.EventSet].
+
+        The usability is inspired in the crontab format, where arguments can
+        take a value of `'*'` to tick at all values, or a fixed integer to
+        tick only at that precise value.
+
+        Non-specified values (`None`), are set to `*` if a finer
+        resolution argument is specified, or fixed to the first valid value if
+        a lower resolution is specified. For example, setting only
+        `tick_calendar(hour='*')`
+        is equivalent to:
+        `tick_calendar(second=0, minute=0, hour='*', day_of_month='*', month='*')`
+        , resulting in one tick at every exact hour of every day/month/year in
+        the input guide range.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(timestamps=["2020-01-01", "2021-01-01"])
+            >>> # Every day in the period
+            >>> b = a.tick_calendar()
+            >>> b
+
+            >>> # Every day at 2:30am
+            >>> b = a.tick_calendar(hour=2, minute=30)
+            >>> b
+
+            >>> # Day 5 of every month
+            >>> b = a.tick_calendar(day_of_month=5)
+            >>> b
+
+            >>> a = tp.event_set(timestamps=["2020-01-01", "2023-01-01"])
+            >>> # 1st of February of every year
+            >>> b = a.tick_calendar(month=2)
+            >>> b
+
+            ```
+
+        Args:
+            second: '*' (any second), None (auto) or number in range `[0-59]`
+                    to tick at specific second of each minute.
+            minute: '*' (any minute), None (auto) or number in range `[0-59]`
+                    to tick at specific minute of each hour.
+            hour: '*' (any hour), None (auto), or number in range `[0-23]` to
+                    tick at specific hour of each day.
+            day_of_month: '*' (any day), None (auto) or number in range `[1-31]`
+                        to tick at specific day of each month. Note that months
+                        without some particular day may not have any tick
+                        (e.g: day 31 on February).
+            month: '*' (any month), None (auto) or number in range `[1-12]` to
+                    tick at one particular month of each year.
+            day_of_week: '*' (any day), None (auto) or number in range `[0-6]`
+                    (Sun-Sat) to tick at particular day of week. Can only be
+                    specified if `day_of_month` is `None`.
+
+        Returns:
+            A feature-less EventSet with timestamps at specified interval.
+        """
+        from temporian.core.operators.tick_calendar import tick_calendar
+
+        return tick_calendar(
+            self,
+            second=second,
+            minute=minute,
+            hour=hour,
+            day_of_month=day_of_month,
+            month=month,
+            day_of_week=day_of_week,
+        )
+
     def timestamps(self: EventSetOrNode) -> EventSetOrNode:
         """Converts an [`EventSet`][temporian.EventSet]'s timestamps into a
         `float64` feature.

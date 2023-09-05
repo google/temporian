@@ -26,7 +26,7 @@ from temporian.proto import core_pb2 as pb
 
 # Valid types for operator attributes
 AttributeType = Union[
-    str, int, float, bool, bytes, List[str], Dict[str, str], List[DType]
+    None, str, int, float, bool, bytes, List[str], Dict[str, str], List[DType]
 ]
 
 

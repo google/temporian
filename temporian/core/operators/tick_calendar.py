@@ -14,7 +14,7 @@
 
 
 """TickCalendar operator class and public API function definitions."""
-from typing import Optional
+from typing import Union
 
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
@@ -29,11 +29,33 @@ from temporian.utils.typecheck import typecheck
 
 
 class TickCalendar(Operator):
-    def __init__(self, input: EventSetNode, param: float):
+    def __init__(
+        self,
+        input: EventSetNode,
+        second: Union[int, str],
+        minute: Union[int, str],
+        hour: Union[int, str],
+        day_of_month: Union[int, str],
+        month: Union[int, str],
+        day_of_week: Union[int, str],
+    ):
         super().__init__()
 
+        # Attributes
+        self._second = second
+        self._minute = minute
+        self._hour = hour
+        self._day_of_month = day_of_month
+        self._month = month
+        self._day_of_week = day_of_week
+        self.add_attribute("second", second)
+        self.add_attribute("minute", minute)
+        self.add_attribute("hour", hour)
+        self.add_attribute("day_of_month", day_of_month)
+        self.add_attribute("month", month)
+        self.add_attribute("day_of_week", day_of_week)
+
         self.add_input("input", input)
-        self.add_attribute("param", param)
 
         self.add_output(
             "output",
@@ -47,10 +69,35 @@ class TickCalendar(Operator):
 
         self.check()
 
+    @property
+    def second(self) -> Union[int, str]:
+        return self._second
+
+    @property
+    def minute(self) -> Union[int, str]:
+        return self._minute
+
+    @property
+    def hour(self) -> Union[int, str]:
+        return self._hour
+
+    @property
+    def day_of_month(self) -> Union[int, str]:
+        return self._day_of_month
+
+    @property
+    def month(self) -> Union[int, str]:
+        return self._month
+
+    @property
+    def day_of_week(self) -> Union[int, str]:
+        return self._day_of_week
+
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
             key="TICK_CALENDAR",
+            # TODO: add attributes
             attributes=[
                 pb.OperatorDef.Attribute(
                     key="param",
@@ -70,11 +117,18 @@ operator_lib.register_operator(TickCalendar)
 @compile
 def tick_calendar(
     input: EventSetOrNode,
-    second: Optional[int],
-    minute: Optional[int],
-    hour: Optional[int],
-    day_of_month: Optional[int],
-    month: Optional[int],
-    day_of_week=Optional[int],
+    second: Union[int, str, None],
+    minute: Union[int, str, None],
+    hour: Union[int, str, None],
+    day_of_month: Union[int, str, None],
+    month: Union[int, str, None],
+    day_of_week: Union[int, str, None],
 ) -> EventSetOrNode:
-    return TickCalendar(input=input, param=param).outputs["output"]  # type: ignore
+    # TODO: Logic for auto arguments (None)
+    assert second is not None
+    assert minute is not None
+    assert hour is not None
+    assert day_of_month is not None
+    assert month is not None
+    assert day_of_week is not None
+    return TickCalendar(input=input, second=second, minute=minute, hour=hour, day_of_month=day_of_month, month=month, day_of_week=day_of_week).outputs["output"]  # type: ignore
