@@ -4,6 +4,7 @@ from enum import Enum
 from typing import Literal, Union
 
 
+# NOTE: DictEventSetFormatChoices' values in sync with enum (below)
 class DictEventSetFormat(str, Enum):
     """Format choices for converting dictionaries to and from EventSets.
 
