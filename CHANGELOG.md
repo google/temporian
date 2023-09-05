@@ -9,10 +9,14 @@
 
 ### Improvements
 
-- Added `max_display_feature_dtypes` and `max_display_index_dtypes` options to
+- Added `display_max_feature_dtypes` and `display_max_index_dtypes` options to
   `tp.config`.
 
 ### Fixes
+
+### Breaking changes
+
+- Renamed config vars for printing and display limits.
 
 ## 0.1.3
 
