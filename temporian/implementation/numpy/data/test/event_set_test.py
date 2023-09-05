@@ -126,6 +126,8 @@ memory usage: 1.2 kB
         config.display_max_features = 1
         config.display_max_events = 2
 
+        print(self.evset._repr_html_())
+
         golden.check_string(
             self,
             self.evset._repr_html_(),

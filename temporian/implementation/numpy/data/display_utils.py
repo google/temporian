@@ -97,7 +97,6 @@ def display_html(evset: EventSet) -> str:
                     bold=True,
                 )
             )
-            # html_index_value.appendChild(html_text(dom, ": "))
             if isinstance(item_value, bytes):
                 item_value = item_value.decode()
             html_index_value.appendChild(
