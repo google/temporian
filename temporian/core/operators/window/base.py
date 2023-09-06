@@ -16,6 +16,7 @@
 
 from abc import ABC, abstractmethod
 from typing import Optional
+from temporian.core.data.duration_utils import normalize_duration
 
 
 from temporian.core.data.duration_utils import NormalizedDuration
@@ -26,6 +27,7 @@ from temporian.core.data.node import (
 )
 from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.base import Operator
+from temporian.core.typing import WindowLength
 from temporian.proto import core_pb2 as pb
 
 
@@ -35,13 +37,10 @@ class BaseWindowOperator(Operator, ABC):
     def __init__(
         self,
         input: EventSetNode,
-        window_length: NormalizedDuration,
+        window_length: WindowLength,
         sampling: Optional[EventSetNode] = None,
     ):
         super().__init__()
-
-        self._window_length = window_length
-        self.add_attribute("window_length", window_length)
 
         self._has_sampling = sampling is not None
         if self._has_sampling:
@@ -54,6 +53,19 @@ class BaseWindowOperator(Operator, ABC):
 
         else:
             effective_sampling_node = input
+
+        if isinstance(window_length, EventSetNode):
+            effective_sampling_node.schema.check_compatible_index(
+                window_length.schema
+            )
+            self.add_input("variable_window_length", window_length)
+            self._variable_window_length = window_length
+            self._window_length = None
+        else:
+            window_length = normalize_duration(window_length)
+            self.add_attribute("window_length", window_length)
+            self._window_length = window_length
+            self._variable_window_length = None
 
         self.add_input("input", input)
 
@@ -78,8 +90,12 @@ class BaseWindowOperator(Operator, ABC):
         ]
 
     @property
-    def window_length(self) -> NormalizedDuration:
+    def window_length(self) -> Optional[NormalizedDuration]:
         return self._window_length
+
+    @property
+    def variable_window_length(self) -> Optional[EventSetNode]:
+        return self._variable_window_length
 
     @property
     def has_sampling(self) -> bool:
@@ -93,11 +109,15 @@ class BaseWindowOperator(Operator, ABC):
                 pb.OperatorDef.Attribute(
                     key="window_length",
                     type=pb.OperatorDef.Attribute.Type.FLOAT_64,
+                    is_optional=True,
                 ),
             ],
             inputs=[
                 pb.OperatorDef.Input(key="input"),
                 pb.OperatorDef.Input(key="sampling", is_optional=True),
+                pb.OperatorDef.Input(
+                    key="variable_window_length", is_optional=True
+                ),
             ],
             outputs=[pb.OperatorDef.Output(key="output")],
         )

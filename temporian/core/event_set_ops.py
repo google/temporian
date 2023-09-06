@@ -14,7 +14,6 @@
 
 # pylint: disable=import-outside-toplevel
 
-
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING
 
@@ -22,7 +21,12 @@ from temporian.core.data.duration import Duration
 
 
 if TYPE_CHECKING:
-    from temporian.core.typing import EventSetOrNode, TypeOrDType, IndexKeyList
+    from temporian.core.typing import (
+        EventSetOrNode,
+        TypeOrDType,
+        IndexKeyList,
+        WindowLength,
+    )
 
 T_SCALAR = (int, float)
 
@@ -1379,7 +1383,7 @@ class EventSetOperations:
 
     def moving_count(
         self: EventSetOrNode,
-        window_length: Duration,
+        window_length: WindowLength,
         sampling: Optional[EventSetOrNode] = None,
     ) -> EventSetOrNode:
         """Gets the number of events in a sliding window.
@@ -1387,9 +1391,8 @@ class EventSetOperations:
         Create a tp.int32 feature containing the number of events in the time
         window (t - window_length, t].
 
-        If the `sampling` argument is not provided, outputs a timestamp for
-        each timestamp in `input`. If the `sampling` argument is provided,
-        outputs a timestamp for each timestamp in `sampling`.
+        If `sampling` is provided samples the moving window's value at each
+        timestamp in `sampling`, else samples it at each timestamp in the input.
 
         Example without sampling:
             ```python
@@ -1459,7 +1462,7 @@ class EventSetOperations:
 
     def moving_max(
         self: EventSetOrNode,
-        window_length: Duration,
+        window_length: WindowLength,
         sampling: Optional[EventSetOrNode] = None,
     ) -> EventSetOrNode:
         """Computes the maximum in a sliding window over an
@@ -1472,8 +1475,9 @@ class EventSetOperations:
         If `sampling` is provided samples the moving window's value at each
         timestamp in `sampling`, else samples it at each timestamp in the input.
 
-        If the window does not contain any values (e.g., all the values are missing,
-        or the window does not contain any sampling), outputs missing values.
+        If the window does not contain any values (e.g., all the values are
+        missing, or the window does not contain any sampling), outputs missing
+        values.
 
         Example:
             ```python
@@ -1509,7 +1513,7 @@ class EventSetOperations:
 
     def moving_min(
         self: EventSetOrNode,
-        window_length: Duration,
+        window_length: WindowLength,
         sampling: Optional[EventSetOrNode] = None,
     ) -> EventSetOrNode:
         """Computes the minimum of values in a sliding window over an
@@ -1522,8 +1526,9 @@ class EventSetOperations:
         If `sampling` is provided samples the moving window's value at each
         timestamp in `sampling`, else samples it at each timestamp in the input.
 
-        If the window does not contain any values (e.g., all the values are missing,
-        or the window does not contain any sampling), outputs missing values.
+        If the window does not contain any values (e.g., all the values are
+        missing, or the window does not contain any sampling), outputs missing
+        values.
 
         Example:
             ```python
@@ -1559,14 +1564,14 @@ class EventSetOperations:
 
     def moving_standard_deviation(
         self: EventSetOrNode,
-        window_length: Duration,
+        window_length: WindowLength,
         sampling: Optional[EventSetOrNode] = None,
     ) -> EventSetOrNode:
         """Computes the standard deviation of values in a sliding window over an
         [`EventSet`][temporian.EventSet].
 
-        For each t in sampling, and for each feature independently, returns at time
-        t the standard deviation for the feature in the window
+        For each t in sampling, and for each feature independently, returns at
+        time t the standard deviation for the feature in the window
         (t - window_length, t].
 
         If `sampling` is provided samples the moving window's value at each
@@ -1574,8 +1579,9 @@ class EventSetOperations:
 
         Missing values (such as NaNs) are ignored.
 
-        If the window does not contain any values (e.g., all the values are missing,
-        or the window does not contain any sampling), outputs missing values.
+        If the window does not contain any values (e.g., all the values are
+        missing, or the window does not contain any sampling), outputs missing
+        values.
 
         Example:
             ```python
@@ -1616,22 +1622,23 @@ class EventSetOperations:
 
     def moving_sum(
         self: EventSetOrNode,
-        window_length: Duration,
+        window_length: WindowLength,
         sampling: Optional[EventSetOrNode] = None,
     ) -> EventSetOrNode:
         """Computes the sum of values in a sliding window over an
         [`EventSet`][temporian.EventSet].
 
-        For each t in sampling, and for each feature independently, returns at time
-        t the sum of the feature in the window (t - window_length, t].
+        For each t in sampling, and for each feature independently, returns at
+        time t the sum of the feature in the window (t - window_length, t].
 
         If `sampling` is provided samples the moving window's value at each
         timestamp in `sampling`, else samples it at each timestamp in the input.
 
         Missing values (such as NaNs) are ignored.
 
-        If the window does not contain any values (e.g., all the values are missing,
-        or the window does not contain any sampling), outputs missing values.
+        If the window does not contain any values (e.g., all the values are
+        missing, or the window does not contain any sampling), outputs missing
+        values.
 
         Example:
             ```python
@@ -2164,22 +2171,24 @@ class EventSetOperations:
 
     def simple_moving_average(
         self: EventSetOrNode,
-        window_length: Duration,
+        window_length: WindowLength,
         sampling: Optional[EventSetOrNode] = None,
     ) -> EventSetOrNode:
         """Computes the average of values in a sliding window over an
         [`EventSet`][temporian.EventSet].
 
-        For each t in sampling, and for each feature independently, returns at time
-        t the average value of the feature in the window (t - window_length, t].
+        For each t in sampling, and for each feature independently, returns at
+        time t the average value of the feature in the window
+        (t - window_length, t].
 
         If `sampling` is provided samples the moving window's value at each
         timestamp in `sampling`, else samples it at each timestamp in the input.
 
         Missing values (such as NaNs) are ignored.
 
-        If the window does not contain any values (e.g., all the values are missing,
-        or the window does not contain any sampling), outputs missing values.
+        If the window does not contain any values (e.g., all the values are
+        missing, or the window does not contain any sampling), outputs missing
+        values.
 
         Example:
             ```python
