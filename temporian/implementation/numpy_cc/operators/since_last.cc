@@ -46,7 +46,7 @@ py::array_t<double> since_last(const py::array_t<double> &event_timestamps,
   return since_last;
 }
 
-}  // namespace
+} // namespace
 
 void init_since_last(py::module &m) {
   m.def("since_last", &since_last, "", py::arg("event_timestamps").noconvert(),
