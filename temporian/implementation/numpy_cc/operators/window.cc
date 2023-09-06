@@ -17,7 +17,7 @@ typedef py::array_t<double> ArrayD;
 typedef py::array_t<float> ArrayF;
 
 // Apply TAccumulator over the data sequentially and get aggregated results
-// Use evset's timestamps
+// Use evset's timestamps and a fixed window_length
 template <typename INPUT, typename OUTPUT, typename TAccumulator>
 py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
                                const py::array_t<INPUT> &evset_values,
@@ -76,7 +76,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
 }
 
 // Apply TAccumulator over the data sequentially and get aggregated results
-// Use external sampling_timestamps
+// Use external sampling_timestamps and a fixed window_length
 template <typename INPUT, typename OUTPUT, typename TAccumulator>
 py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
                                const py::array_t<INPUT> &evset_values,
@@ -121,7 +121,106 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
   return output;
 }
 
-// Note: We only use inheritence to compile check the code.
+// Apply TAccumulator over the data sequentially and get aggregated results
+// Use evset's timestamps and a variable window_length
+template <typename INPUT, typename OUTPUT, typename TAccumulator>
+py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
+                               const py::array_t<INPUT> &evset_values,
+                               const ArrayD &window_length) {
+  // Input size
+  const size_t n_event = evset_timestamps.shape(0);
+
+  // Allocate output array
+  auto output = py::array_t<OUTPUT>(n_event);
+
+  auto v_output = output.template mutable_unchecked<1>();
+  auto v_timestamps = evset_timestamps.unchecked<1>();
+  auto v_values = evset_values.template unchecked<1>();
+  auto v_window_length = window_length.unchecked<1>();
+
+  TAccumulator accumulator;
+
+  // Index of the first value in the window.
+  size_t begin_idx = 0;
+  // Index of the first value outside the window.
+  size_t end_idx = 0;
+
+  double curr_window_length = 0;
+  double curr_ts = 0;
+  double prev_window_length;
+  double prev_ts;
+  double begin_diff;
+
+  while (end_idx < n_event) {
+    // Note: We accumulate values in (t-window_length, t] with t=
+    // v_timestamps[end_idx], and there may be several contiguous equal
+    // values in v_timestamps.
+
+    prev_ts = curr_ts;
+    prev_window_length = curr_window_length;
+    curr_ts = v_timestamps[end_idx];
+    curr_window_length = v_window_length[end_idx];
+    begin_diff = curr_ts - prev_ts - (curr_window_length - prev_window_length);
+
+    // Add all values with same timestamp as the current one.
+    accumulator.Add(v_values[end_idx]);
+    size_t first_diff_ts_idx = end_idx + 1;
+    while (first_diff_ts_idx < n_event &&
+           v_timestamps[first_diff_ts_idx] == curr_ts) {
+      accumulator.Add(v_values[first_diff_ts_idx]);
+      first_diff_ts_idx++;
+    }
+
+    // Move begin_idx forward or backwards depending on begin_diff.
+    if (begin_diff >= 0) {
+      // Window's beginning moved forward.
+      while (begin_idx < n_event &&
+             v_timestamps[end_idx] - v_timestamps[begin_idx] >=
+                 curr_window_length) {
+        accumulator.Remove(v_values[begin_idx]);
+        begin_idx++;
+      }
+    } else {
+      // Window's beginning moved backwards.
+      // Note < instead of <= to respect (] window boundaries.
+      while (begin_idx >= 0 && v_timestamps[end_idx] - v_timestamps[begin_idx] <
+                                   curr_window_length) {
+        accumulator.Add(v_values[begin_idx]);
+        begin_idx--;
+      }
+    }
+
+    // Set current value of window to all values with the same timestamp.
+    const auto result = accumulator.Result();
+    for (size_t i = end_idx; i < first_diff_ts_idx; i++) {
+      v_output[i] = result;
+    }
+
+    // Move pointer to the index of the last value with the same timestamp.
+    end_idx = first_diff_ts_idx;
+  }
+
+  return output;
+}
+
+// TODO
+// Apply TAccumulator over the data sequentially and get aggregated results
+// Use evset's timestamps and a variable window_length
+template <typename INPUT, typename OUTPUT, typename TAccumulator>
+py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
+                               const py::array_t<INPUT> &evset_values,
+                               const ArrayD &sampling_timestamps,
+                               const ArrayD &window_length) {
+  // Input size
+  const size_t n_event = evset_timestamps.shape(0);
+
+  // Allocate output array
+  auto output = py::array_t<OUTPUT>(n_event);
+
+  return output;
+}
+
+// Note: We only use inheritance to compile check the code.
 template <typename INPUT, typename OUTPUT> struct Accumulator {
   virtual ~Accumulator() = default;
   virtual void Add(INPUT value) = 0;
@@ -309,8 +408,8 @@ struct MovingMaxAccumulator : MovingExtremumAccumulator<INPUT, OUTPUT> {
   bool Compare(INPUT a, INPUT b) { return a > b; }
 };
 
-// Instantiate the "accumulate" function with an accumulator for both float32
-// and float64 precision.
+// Instantiate the "accumulate" function with and without sampling,
+// and with and without variable window length.
 //
 // Args:
 //   NAME: Name of the python and c++ function.
@@ -331,6 +430,20 @@ struct MovingMaxAccumulator : MovingExtremumAccumulator<INPUT, OUTPUT> {
       const ArrayD &sampling_timestamps, const double window_length) {         \
     return accumulate<INPUT, OUTPUT, ACCUMULATOR<INPUT, OUTPUT>>(              \
         evset_timestamps, evset_values, sampling_timestamps, window_length);   \
+  }                                                                            \
+                                                                               \
+  py::array_t<OUTPUT> NAME(const ArrayD &evset_timestamps,                     \
+                           const py::array_t<INPUT> &evset_values,             \
+                           const ArrayD &window_length) {                      \
+    return accumulate<INPUT, OUTPUT, ACCUMULATOR<INPUT, OUTPUT>>(              \
+        evset_timestamps, evset_values, window_length);                        \
+  }                                                                            \
+                                                                               \
+  py::array_t<OUTPUT> NAME(                                                    \
+      const ArrayD &evset_timestamps, const py::array_t<INPUT> &evset_values,  \
+      const ArrayD &sampling_timestamps, const ArrayD &window_length) {        \
+    return accumulate<INPUT, OUTPUT, ACCUMULATOR<INPUT, OUTPUT>>(              \
+        evset_timestamps, evset_values, sampling_timestamps, window_length);   \
   }
 
 // Similar to REGISTER_CC_FUNC, but without inputs
@@ -345,6 +458,20 @@ struct MovingMaxAccumulator : MovingExtremumAccumulator<INPUT, OUTPUT> {
   py::array_t<OUTPUT> NAME(const ArrayD &evset_timestamps,                     \
                            const ArrayD &sampling_timestamps,                  \
                            const double window_length) {                       \
+    return accumulate<double, OUTPUT, ACCUMULATOR<OUTPUT>>(                    \
+        evset_timestamps, evset_timestamps, sampling_timestamps,               \
+        window_length);                                                        \
+  }                                                                            \
+                                                                               \
+  py::array_t<OUTPUT> NAME(const ArrayD &evset_timestamps,                     \
+                           const ArrayD &window_length) {                      \
+    return accumulate<double, OUTPUT, ACCUMULATOR<OUTPUT>>(                    \
+        evset_timestamps, evset_timestamps, window_length);                    \
+  }                                                                            \
+                                                                               \
+  py::array_t<OUTPUT> NAME(const ArrayD &evset_timestamps,                     \
+                           const ArrayD &sampling_timestamps,                  \
+                           const ArrayD &window_length) {                      \
     return accumulate<double, OUTPUT, ACCUMULATOR<OUTPUT>>(                    \
         evset_timestamps, evset_timestamps, sampling_timestamps,               \
         window_length);                                                        \
@@ -381,7 +508,8 @@ REGISTER_CC_FUNC(moving_max, int64_t, int64_t, MovingMaxAccumulator);
 REGISTER_CC_FUNC_NO_INPUT(moving_count, int32_t, MovingCountAccumulator);
 } // namespace
 
-// Register c++ functions to pybind with and without sampling.
+// Register c++ functions to pybind with and without sampling,
+// and with and without variable window length.
 //
 // Args:
 //   NAME: Name of the python and c++ function.
@@ -400,6 +528,19 @@ REGISTER_CC_FUNC_NO_INPUT(moving_count, int32_t, MovingCountAccumulator);
         py::overload_cast<const ArrayD &, const py::array_t<INPUT> &, double>( \
             &NAME),                                                            \
         "", py::arg("evset_timestamps").noconvert(),                           \
+        py::arg("evset_values").noconvert(), py::arg("window_length"));        \
+                                                                               \
+  m.def(#NAME,                                                                 \
+        py::overload_cast<const ArrayD &, const py::array_t<INPUT> &,          \
+                          const ArrayD &, const ArrayD &>(&NAME),              \
+        "", py::arg("evset_timestamps").noconvert(),                           \
+        py::arg("evset_values").noconvert(),                                   \
+        py::arg("sampling_timestamps").noconvert(), py::arg("window_length")); \
+                                                                               \
+  m.def(#NAME,                                                                 \
+        py::overload_cast<const ArrayD &, const py::array_t<INPUT> &,          \
+                          const ArrayD &>(&NAME),                              \
+        "", py::arg("evset_timestamps").noconvert(),                           \
         py::arg("evset_values").noconvert(), py::arg("window_length"));
 
 // Similar to ADD_PY_DEF, but without inputs.
@@ -410,6 +551,15 @@ REGISTER_CC_FUNC_NO_INPUT(moving_count, int32_t, MovingCountAccumulator);
         py::arg("sampling_timestamps").noconvert(), py::arg("window_length")); \
                                                                                \
   m.def(#NAME, py::overload_cast<const ArrayD &, double>(&NAME), "",           \
+        py::arg("evset_timestamps").noconvert(), py::arg("window_length"));    \
+                                                                               \
+  m.def(#NAME,                                                                 \
+        py::overload_cast<const ArrayD &, const ArrayD &, const ArrayD &>(     \
+            &NAME),                                                            \
+        "", py::arg("evset_timestamps").noconvert(),                           \
+        py::arg("sampling_timestamps").noconvert(), py::arg("window_length")); \
+                                                                               \
+  m.def(#NAME, py::overload_cast<const ArrayD &, const ArrayD &>(&NAME), "",   \
         py::arg("evset_timestamps").noconvert(), py::arg("window_length"));
 
 void init_window(py::module &m) {

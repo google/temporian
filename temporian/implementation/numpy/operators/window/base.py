@@ -40,6 +40,7 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
         self,
         input: EventSet,
         sampling: Optional[EventSet] = None,
+        window_length: Optional[EventSet] = None,
     ) -> Dict[str, EventSet]:
         assert isinstance(self.operator, BaseWindowOperator)
 
@@ -62,11 +63,18 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
             if index_key in input.data:
                 input_data = input.data[index_key]
 
+                window_length_data = None
+                if window_length is not None:
+                    window_length_data = window_length.data[index_key].features[
+                        0
+                    ]
+
                 self._compute(
                     src_timestamps=input_data.timestamps,
                     src_features=input_data.features,
                     sampling_timestamps=sampling_data.timestamps,
                     dst_features=output_data.features,
+                    window_length=window_length_data,
                 )
             else:
                 # Sets the feature data as missing.
@@ -99,6 +107,7 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
         src_features: List[np.ndarray],
         sampling_timestamps: np.ndarray,
         dst_features: List[np.ndarray],
+        window_length: Optional[np.ndarray] = None,
     ) -> None:
         assert isinstance(self.operator, BaseWindowOperator)
 
@@ -107,7 +116,7 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
             kwargs = {
                 "evset_timestamps": src_timestamps,
                 "evset_values": src_ts,
-                "window_length": self.operator.window_length,
+                "window_length": window_length or self.operator.window_length,
             }
             if self.operator.has_sampling:
                 kwargs["sampling_timestamps"] = sampling_timestamps

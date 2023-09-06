@@ -63,14 +63,11 @@ class BaseWindowOperator(Operator, ABC):
             effective_sampling_node.schema.check_compatible_index(
                 window_length.schema
             )
-            self.add_input("variable_window_length", window_length)
-            self._variable_window_length = window_length
-            self._window_length = None
+            self.add_input("window_length", window_length)
         else:
             window_length = normalize_duration(window_length)
             self.add_attribute("window_length", window_length)
             self._window_length = window_length
-            self._variable_window_length = None
 
         self.add_input("input", input)
 
@@ -99,10 +96,6 @@ class BaseWindowOperator(Operator, ABC):
         return self._window_length
 
     @property
-    def variable_window_length(self) -> Optional[EventSetNode]:
-        return self._variable_window_length
-
-    @property
     def has_sampling(self) -> bool:
         return self._has_sampling
 
@@ -120,9 +113,7 @@ class BaseWindowOperator(Operator, ABC):
             inputs=[
                 pb.OperatorDef.Input(key="input"),
                 pb.OperatorDef.Input(key="sampling", is_optional=True),
-                pb.OperatorDef.Input(
-                    key="variable_window_length", is_optional=True
-                ),
+                pb.OperatorDef.Input(key="window_length", is_optional=True),
             ],
             outputs=[pb.OperatorDef.Output(key="output")],
         )

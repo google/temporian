@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List
+from typing import List, Optional
 import numpy as np
 
 from temporian.core.operators.window.moving_count import (
@@ -37,6 +37,7 @@ class MovingCountNumpyImplementation(BaseWindowNumpyImplementation):
         src_features: List[np.ndarray],
         sampling_timestamps: np.ndarray,
         dst_features: List[np.ndarray],
+        window_length: Optional[np.ndarray] = None,
     ) -> None:
         assert isinstance(self.operator, MovingCountOperator)
 
@@ -44,7 +45,7 @@ class MovingCountNumpyImplementation(BaseWindowNumpyImplementation):
 
         kwargs = {
             "evset_timestamps": src_timestamps,
-            "window_length": self.operator.window_length,
+            "window_length": window_length or self.operator.window_length,
         }
         if self.operator.has_sampling:
             kwargs["sampling_timestamps"] = sampling_timestamps
