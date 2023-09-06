@@ -74,7 +74,7 @@ class TensorFlowTest(absltest.TestCase):
         tmp_dir_handle = tempfile.TemporaryDirectory()
         tmp_file = os.path.join(tmp_dir_handle.name, "data")
 
-        to_tensorflow_record(evset, path=tmp_file, grouped_by_index=True)
+        to_tensorflow_record(evset, path=tmp_file, format="grouped_by_index")
 
         self.assertEqual(
             str(_extract_tfrecord(tmp_file)),
@@ -207,7 +207,7 @@ class TensorFlowTest(absltest.TestCase):
         tmp_dir_handle = tempfile.TemporaryDirectory()
         tmp_file = os.path.join(tmp_dir_handle.name, "data")
 
-        to_tensorflow_record(evset, path=tmp_file, grouped_by_index=True)
+        to_tensorflow_record(evset, path=tmp_file, format="grouped_by_index")
         loaded_evtset = from_tensorflow_record(
             path=tmp_file, schema=evset.schema
         )

@@ -29,6 +29,10 @@ from temporian.implementation.numpy.data.event_set import (
     Schema,
     IndexData,
 )
+from temporian.io.format import (
+    TFRecordEventSetFormat,
+    TFRecordEventSetFormatChoices,
+)
 
 
 def import_tf():
@@ -99,7 +103,7 @@ def to_tensorflow_record(
     evset: EventSet,
     path: str,
     timestamps: str = "timestamp",
-    grouped_by_index: bool = True,
+    format: TFRecordEventSetFormatChoices = TFRecordEventSetFormat.GROUPED_BY_INDEX,
 ):
     """Exports an EventSet into TF.Records of TF.Examples.
 
@@ -113,13 +117,18 @@ def to_tensorflow_record(
         evset: Event set to export.
         path: Path to output TF.Record.
         timestamps: Name of the output column containing timestamps.
-        grouped_by_index: Whether events are grouped by index. Check
-            [grouped_by_index](../../others/parameters/grouped_by_index)
-            for the documentation.
+        format: Format of the events inside the received record. At the moment
+            only TFRecordEventSetFormat.GROUPED_BY_INDEX is supported. See
+            [TFRecordEventSetFormat][temporian.io.format.TFRecordEventSetFormat]
+            for more.
     """
 
-    if not grouped_by_index:
-        raise ValueError("grouped_by_index=False is not implemented")
+    if format == TFRecordEventSetFormat.SINGLE_EVENTS:
+        raise ValueError(
+            "format=TFRecordEventSetFormat.SINGLE_EVENTS is not implemented"
+        )
+    if format != TFRecordEventSetFormat.GROUPED_BY_INDEX:
+        raise ValueError(f"Unknown format {format}")
 
     tf = import_tf()
 
@@ -141,20 +150,20 @@ def to_tensorflow_record(
                     DType.INT32,
                     DType.INT64,
                 ]:
-                    f(ex, feature_schema.name).int64_list.value[:] = (
-                        index_value.features[feature_idx]
-                    )
+                    f(ex, feature_schema.name).int64_list.value[
+                        :
+                    ] = index_value.features[feature_idx]
                 elif feature_schema.dtype in [
                     DType.FLOAT32,
                     DType.FLOAT64,
                 ]:
-                    f(ex, feature_schema.name).float_list.value[:] = (
-                        index_value.features[feature_idx]
-                    )
+                    f(ex, feature_schema.name).float_list.value[
+                        :
+                    ] = index_value.features[feature_idx]
                 elif feature_schema.dtype == DType.STRING:
-                    f(ex, feature_schema.name).bytes_list.value[:] = (
-                        index_value.features[feature_idx]
-                    )
+                    f(ex, feature_schema.name).bytes_list.value[
+                        :
+                    ] = index_value.features[feature_idx]
                 else:
                     raise ValueError("Non supported feature dtype")
 
@@ -191,7 +200,7 @@ def from_tensorflow_record(
     path: str,
     schema: Schema,
     timestamps: str = "timestamp",
-    grouped_by_index: bool = True,
+    format: TFRecordEventSetFormatChoices = TFRecordEventSetFormat.GROUPED_BY_INDEX,
 ) -> EventSet:
     """Imports an EventSet from a TF.Records of TF.Examples.
 
@@ -204,9 +213,10 @@ def from_tensorflow_record(
     Args:
         path: Path to input TF.Record.
         timestamps: Name of the output column containing timestamps.
-        grouped_by_index: Whether events are grouped by index. Check
-            [grouped_by_index](../../others/parameters/grouped_by_index)
-            for the documentation.
+        format: Format of the events inside the received record. At the moment
+            only TFRecordEventSetFormat.GROUPED_BY_INDEX is supported. See
+            [TFRecordEventSetFormat][temporian.io.format.TFRecordEventSetFormat]
+            for more.
 
     Returns:
         Imported EventSet.
@@ -214,8 +224,12 @@ def from_tensorflow_record(
 
     # TODO(gbm): Automatic schema
 
-    if not grouped_by_index:
-        raise ValueError("grouped_by_index=False is not implemented")
+    if format == TFRecordEventSetFormat.SINGLE_EVENTS:
+        raise ValueError(
+            "format=TFRecordEventSetFormat.SINGLE_EVENTS is not implemented"
+        )
+    if format != TFRecordEventSetFormat.GROUPED_BY_INDEX:
+        raise ValueError(f"Unknown format {format}")
 
     tf = import_tf()
     evtset = EventSet(data={}, schema=deepcopy(schema))

@@ -448,7 +448,7 @@ def to_dict(
         pipe: PCollection of Beam EventSet.
         schema: Schema of the data.
         timestamp_key: Key containing the timestamps.
-        format: Format of the events inside the received dictionary. See
+        format: Format of the events inside the output dictionary. See
             [DictEventSetFormat][temporian.io.format.DictEventSetFormat] for
             more.
 

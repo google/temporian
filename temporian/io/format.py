@@ -1,11 +1,25 @@
+# Copyright 2021 Google LLC.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """Format choices definitions and documentation for I/O functions."""
 
 from enum import Enum
 from typing import Literal, Union
 
 
-# NOTE: DictEventSetFormatChoices' values in sync with enum (below)
-class DictEventSetFormat(str, Enum):
+# NOTE: GroupedOrSingleEventSetFormatChoices' values in sync with enum (below)
+class GroupedOrSingleEventSetFormat(str, Enum):
     """Format choices for converting dictionaries to and from EventSets.
 
     The GROUPED_BY_INDEX value is generally recommended as it is more efficient
@@ -66,6 +80,15 @@ class DictEventSetFormat(str, Enum):
     """
 
 
-DictEventSetFormatChoices = Union[
-    DictEventSetFormat, Literal["grouped_by_index", "single_events"]
+GroupedOrSingleEventSetFormatChoices = Union[
+    GroupedOrSingleEventSetFormat, Literal["grouped_by_index", "single_events"]
 ]
+
+
+DictEventSetFormat = GroupedOrSingleEventSetFormat
+"""See [GroupedOrSingleEventSetFormat][temporian.io.format.GroupedOrSingleEventSetFormat]."""
+DictEventSetFormatChoices = GroupedOrSingleEventSetFormatChoices
+
+TFRecordEventSetFormat = GroupedOrSingleEventSetFormat
+"""See [GroupedOrSingleEventSetFormat][temporian.io.format.GroupedOrSingleEventSetFormat]."""
+TFRecordEventSetFormatChoices = GroupedOrSingleEventSetFormatChoices
