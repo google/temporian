@@ -10,6 +10,8 @@
 #include <type_traits>
 #include <vector>
 
+using namespace std; // TODO: REMOVE + REMOVE ALL APPEARANCES OF cout <<
+
 namespace {
 namespace py = pybind11;
 
@@ -127,6 +129,9 @@ template <typename INPUT, typename OUTPUT, typename TAccumulator>
 py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
                                const py::array_t<INPUT> &evset_values,
                                const ArrayD &window_length) {
+
+  cout << "variable window length\n";
+
   // Input size
   const size_t n_event = evset_timestamps.shape(0);
 
@@ -138,6 +143,18 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
   auto v_values = evset_values.template unchecked<1>();
   auto v_window_length = window_length.unchecked<1>();
 
+  cout << "window length shape: " + to_string(v_window_length.shape(0)) + "\n";
+  cout << "window length first element: " + to_string(v_window_length[0]) +
+              "\n";
+  cout << "window length last element: " +
+              to_string(v_window_length[v_window_length.shape(0) - 1]) + "\n";
+
+  // same for v_values
+  cout << "values shape: " + to_string(v_values.shape(0)) + "\n";
+  cout << "values first element: " + to_string(v_values[0]) + "\n";
+  cout << "values last element: " + to_string(v_values[v_values.shape(0) - 1]) +
+              "\n";
+
   TAccumulator accumulator;
 
   // Index of the first value in the window.
@@ -145,22 +162,19 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
   // Index of the first value outside the window.
   size_t end_idx = 0;
 
-  double curr_window_length = 0;
-  double curr_ts = 0;
-  double prev_window_length;
-  double prev_ts;
-  double begin_diff;
+  double curr_ts;
+  double curr_window_length;
 
   while (end_idx < n_event) {
     // Note: We accumulate values in (t-window_length, t] with t=
     // v_timestamps[end_idx], and there may be several contiguous equal
     // values in v_timestamps.
 
-    prev_ts = curr_ts;
-    prev_window_length = curr_window_length;
     curr_ts = v_timestamps[end_idx];
     curr_window_length = v_window_length[end_idx];
-    begin_diff = curr_ts - prev_ts - (curr_window_length - prev_window_length);
+
+    cout << "curr_ts: " + to_string(curr_ts) + "\n";
+    cout << "curr_window_length: " + to_string(curr_window_length) + "\n";
 
     // Add all values with same timestamp as the current one.
     accumulator.Add(v_values[end_idx]);
@@ -171,12 +185,21 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
       first_diff_ts_idx++;
     }
 
+    bool begin_moved_forward =
+        end_idx > 0 &&
+        curr_ts - v_timestamps[end_idx - 1] -
+                (curr_window_length - v_window_length[end_idx - 1]) >
+            0;
+    cout << "begin_moved_forward: " + to_string(begin_moved_forward) + "\n";
+
     // Move begin_idx forward or backwards depending on begin_diff.
-    if (begin_diff >= 0) {
-      // Window's beginning moved forward.
+    if (begin_moved_forward) {
+      // Window's beginning moved forward
       while (begin_idx < n_event &&
              v_timestamps[end_idx] - v_timestamps[begin_idx] >=
                  curr_window_length) {
+        // cout << "Removing value from accumulator: " +
+        //             to_string(v_values[begin_idx]) + "\n";
         accumulator.Remove(v_values[begin_idx]);
         begin_idx++;
       }
@@ -185,6 +208,8 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
       // Note < instead of <= to respect (] window boundaries.
       while (begin_idx >= 0 && v_timestamps[end_idx] - v_timestamps[begin_idx] <
                                    curr_window_length) {
+        // cout << "Adding value to accumulator: " +
+        //             to_string(v_values[begin_idx]) + "\n";
         accumulator.Add(v_values[begin_idx]);
         begin_idx--;
       }
@@ -198,6 +223,8 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
 
     // Move pointer to the index of the last value with the same timestamp.
     end_idx = first_diff_ts_idx;
+
+    cout << "\n\n";
   }
 
   return output;

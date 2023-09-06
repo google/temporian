@@ -22,6 +22,7 @@ from numpy.testing import assert_array_equal
 from temporian.core.operators.window.moving_max import (
     MovingMaxOperator,
 )
+from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy.operators.window.moving_max import (
     MovingMaxNumpyImplementation,
     operators_cc,
@@ -48,8 +49,8 @@ class MovingMaxOperatorTest(absltest.TestCase):
     def test_cc_wo_sampling(self):
         assert_array_equal(
             operators_cc.moving_max(
-                _f64([0, 1, 2, 3, 5, 20]),
-                _f32([nan, 10, nan, 12, 13, 14]),
+                _f64([0, 1, 2, 3, 5, 20]),  # timestamps
+                _f32([nan, 10, nan, 12, 13, 14]),  # feature
                 3.5,
             ),
             _f32([nan, 10, 10, 12, 13, 14]),
@@ -58,12 +59,22 @@ class MovingMaxOperatorTest(absltest.TestCase):
     def test_cc_w_sampling(self):
         assert_array_equal(
             operators_cc.moving_max(
-                _f64([0, 1, 2, 3, 5, 20]),
-                _f32([nan, 10, nan, 12, 13, 14]),
-                _f64([-1, 3, 40]),
+                _f64([0, 1, 2, 3, 5, 20]),  # timestamps
+                _f32([nan, 10, nan, 12, 13, 14]),  # feature
+                _f64([-1, 3, 40]),  # sampling
                 3.5,
             ),
             _f32([nan, 12, nan]),
+        )
+
+    def test_cc_wo_sampling_w_variable_winlength(self):
+        assert_array_equal(
+            operators_cc.moving_max(
+                _f64([0, 1, 2, 3, 5, 20]),  # timestamps
+                _f32([nan, 10, 11, 12, 13, 14]),  # feature
+                _f64([1, 1, 1.5, 0.5, 3.5, 20]),  # window length
+            ),
+            _f32([nan, 10, 21, 12, 36, 60]),
         )
 
     def test_flat(self):
