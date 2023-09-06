@@ -39,7 +39,7 @@ from temporian.core.data.schema import Schema
 from temporian.core.event_set_ops import EventSetOperations
 
 if TYPE_CHECKING:
-    from temporian.core.typing import IndexKey
+    from temporian.core.typing import IndexKey, NormalizedIndexKey
     from temporian.core.operators.base import Operator
 
 
@@ -168,7 +168,7 @@ class EventSet(EventSetOperations):
 
     def __init__(
         self,
-        data: Dict[IndexKey, IndexData],
+        data: Dict[NormalizedIndexKey, IndexData],
         schema: Schema,
         name: Optional[str] = None,
     ) -> None:
@@ -180,7 +180,7 @@ class EventSet(EventSetOperations):
         self._internal_node: Optional[EventSetNode] = None
 
     @property
-    def data(self) -> Dict[IndexKey, IndexData]:
+    def data(self) -> Dict[NormalizedIndexKey, IndexData]:
         return self._data
 
     @property
@@ -195,7 +195,7 @@ class EventSet(EventSetOperations):
     def name(self, name: Optional[str]) -> None:
         self._name = name
 
-    def get_index_keys(self, sort: bool = False) -> List[IndexKey]:
+    def get_index_keys(self, sort: bool = False) -> List[NormalizedIndexKey]:
         idx_list = list(self.data.keys())
         return sorted(idx_list) if sort else idx_list
 
