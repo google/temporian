@@ -32,28 +32,46 @@ class TickCalendar(Operator):
     def __init__(
         self,
         input: EventSetNode,
-        second: Union[int, str],
-        minute: Union[int, str],
-        hour: Union[int, str],
-        day_of_month: Union[int, str],
-        month: Union[int, str],
-        day_of_week: Union[int, str],
+        min_second: int,
+        min_minute: int,
+        min_hour: int,
+        min_day_of_month: int,
+        min_month: int,
+        min_day_of_week: int,
+        max_second: int,
+        max_minute: int,
+        max_hour: int,
+        max_day_of_month: int,
+        max_month: int,
+        max_day_of_week: int,
     ):
         super().__init__()
 
         # Attributes
-        self._second = second
-        self._minute = minute
-        self._hour = hour
-        self._day_of_month = day_of_month
-        self._month = month
-        self._day_of_week = day_of_week
-        self.add_attribute("second", second)
-        self.add_attribute("minute", minute)
-        self.add_attribute("hour", hour)
-        self.add_attribute("day_of_month", day_of_month)
-        self.add_attribute("month", month)
-        self.add_attribute("day_of_week", day_of_week)
+        self._min_second = min_second
+        self._max_second = max_second
+        self._min_minute = min_minute
+        self._max_minute = max_minute
+        self._min_hour = min_hour
+        self._max_hour = max_hour
+        self._min_day_of_month = min_day_of_month
+        self._max_day_of_month = max_day_of_month
+        self._min_month = min_month
+        self._max_month = max_month
+        self._min_day_of_week = min_day_of_week
+        self._max_day_of_week = max_day_of_week
+        self.add_attribute("min_second", min_second)
+        self.add_attribute("max_second", max_second)
+        self.add_attribute("min_minute", min_minute)
+        self.add_attribute("max_minute", max_minute)
+        self.add_attribute("min_hour", min_hour)
+        self.add_attribute("max_hour", max_hour)
+        self.add_attribute("min_day_of_month", min_day_of_month)
+        self.add_attribute("max_day_of_month", max_day_of_month)
+        self.add_attribute("min_month", min_month)
+        self.add_attribute("max_month", max_month)
+        self.add_attribute("min_day_of_week", min_day_of_week)
+        self.add_attribute("max_day_of_week", max_day_of_week)
 
         self.add_input("input", input)
 
@@ -70,39 +88,105 @@ class TickCalendar(Operator):
         self.check()
 
     @property
-    def second(self) -> Union[int, str]:
-        return self._second
+    def min_second(self) -> int:
+        return self._min_second
 
     @property
-    def minute(self) -> Union[int, str]:
-        return self._minute
+    def max_second(self) -> int:
+        return self._max_second
 
     @property
-    def hour(self) -> Union[int, str]:
-        return self._hour
+    def min_minute(self) -> int:
+        return self._min_minute
 
     @property
-    def day_of_month(self) -> Union[int, str]:
-        return self._day_of_month
+    def max_minute(self) -> int:
+        return self._max_minute
 
     @property
-    def month(self) -> Union[int, str]:
-        return self._month
+    def min_hour(self) -> int:
+        return self._min_hour
 
     @property
-    def day_of_week(self) -> Union[int, str]:
-        return self._day_of_week
+    def max_hour(self) -> int:
+        return self._max_hour
+
+    @property
+    def min_day_of_month(self) -> int:
+        return self._min_day_of_month
+
+    @property
+    def max_day_of_month(self) -> int:
+        return self._max_day_of_month
+
+    @property
+    def min_month(self) -> int:
+        return self._min_month
+
+    @property
+    def max_month(self) -> int:
+        return self._max_month
+
+    @property
+    def min_day_of_week(self) -> int:
+        return self._min_day_of_week
+
+    @property
+    def max_day_of_week(self) -> int:
+        return self._max_day_of_week
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
             key="TICK_CALENDAR",
-            # TODO: add attributes
             attributes=[
                 pb.OperatorDef.Attribute(
-                    key="param",
-                    type=pb.OperatorDef.Attribute.Type.FLOAT_64,
-                    is_optional=False,
+                    key="min_second",
+                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="max_second",
+                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="min_minute",
+                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="max_minute",
+                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="min_hour",
+                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="max_hour",
+                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="min_day_of_month",
+                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="max_day_of_month",
+                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="min_month",
+                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="max_month",
+                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="min_day_of_week",
+                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="max_day_of_week",
+                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
                 ),
             ],
             inputs=[pb.OperatorDef.Input(key="input")],
@@ -124,11 +208,51 @@ def tick_calendar(
     month: Union[int, str, None],
     day_of_week: Union[int, str, None],
 ) -> EventSetOrNode:
-    # TODO: Logic for auto arguments (None)
-    assert second is not None
-    assert minute is not None
-    assert hour is not None
-    assert day_of_month is not None
-    assert month is not None
-    assert day_of_week is not None
-    return TickCalendar(input=input, second=second, minute=minute, hour=hour, day_of_month=day_of_month, month=month, day_of_week=day_of_week).outputs["output"]  # type: ignore
+    args = [second, minute, hour, day_of_month, month, day_of_week]
+
+    # Default for empty args
+    if all(arg is None for arg in args):
+        day_of_month = "*"
+        month = "*"
+
+    if second == "*":
+        min_second = 0
+        max_second = 59
+    else:
+        min_second = max_second = 0 if second is None else int(second)
+
+    if minute == "*":
+        min_minute = 0
+        max_minute = 59
+    elif minute is not None:
+        min_minute = max_minute = int(minute)
+    else:  # None (auto set): only if adjacent values are specified
+        raise ValueError()  # TODO
+
+    # TODO
+    min_hour = 0
+    max_hour = 23
+    min_day_of_month = 1
+    max_day_of_month = 31
+    min_month = 1
+    max_month = 12
+    min_day_of_week = 0
+    max_day_of_week = 6
+
+    return TickCalendar(
+        input=input,
+        min_second=min_second,
+        max_second=max_second,
+        min_minute=min_minute,
+        max_minute=max_minute,
+        min_hour=min_hour,
+        max_hour=max_hour,
+        min_day_of_month=min_day_of_month,
+        max_day_of_month=max_day_of_month,
+        min_month=min_month,
+        max_month=max_month,
+        min_day_of_week=min_day_of_week,
+        max_day_of_week=max_day_of_week,
+    ).outputs[
+        "output"
+    ]  # type: ignore
