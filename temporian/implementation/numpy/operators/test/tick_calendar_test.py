@@ -26,17 +26,18 @@ from temporian.implementation.numpy.operators.test.test_util import (
     testOperatorAndImp,
 )
 
+
 class TickCalendarOperatorTest(absltest.TestCase):
     def setUp(self):
         pass
 
     def test_base(self):
         evset = event_set(
-            timestamps=[1,2,3,4],
+            timestamps=[1, 2, 3, 4],
             features={
-                    "a": [1.0, 2.0, 3.0, 4.0],
-                    "b": [5, 6, 7, 8],
-                    "c": ["A", "A", "B", "B"],
+                "a": [1.0, 2.0, 3.0, 4.0],
+                "b": [5, 6, 7, 8],
+                "c": ["A", "A", "B", "B"],
             },
             indexes=["c"],
         )
@@ -45,13 +46,27 @@ class TickCalendarOperatorTest(absltest.TestCase):
         expected_output = event_set(
             timestamps=[1, 1],
             features={
-                    "c": ["A", "B"],
+                "c": ["A", "B"],
             },
             indexes=["c"],
         )
 
         # Run op
-        op = TickCalendar(input=node, param=1.0)
+        op = TickCalendar(
+            input=node,
+            min_second=1,
+            max_second=10,
+            min_minute=1,
+            max_minute=1,
+            min_hour=1,
+            max_hour=1,
+            min_day_of_month=1,
+            max_day_of_month=1,
+            min_month=1,
+            max_month=1,
+            min_day_of_week=1,
+            max_day_of_week=1,
+        )
         instance = TickCalendarNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
         output = instance.call(input=evset)["output"]
@@ -61,4 +76,3 @@ class TickCalendarOperatorTest(absltest.TestCase):
 
 if __name__ == "__main__":
     absltest.main()
-

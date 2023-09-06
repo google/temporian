@@ -42,7 +42,7 @@ class TickCalendarNumpyImplementation(OperatorImplementation):
 
         # Fill output EventSet's data
         for index_key, index_data in input.data.items():
-            if len(index_data.timestamps < 2):
+            if len(index_data.timestamps) < 2:
                 dst_timestamps = np.array([], dtype=np.float64)
             else:
                 begin = index_data.timestamps[0]
@@ -63,6 +63,7 @@ class TickCalendarNumpyImplementation(OperatorImplementation):
                     min_wday=self.operator.min_day_of_week,
                     max_wday=self.operator.max_day_of_week,
                 )
+                print(f"Result: {dst_timestamps}")
             output_evset.set_index_value(
                 index_key,
                 IndexData(

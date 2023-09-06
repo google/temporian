@@ -45,6 +45,13 @@ pybind_library(
     deps = [":common"],
 )
 
+pybind_library(
+    name = "tick_calendar",
+    srcs = ["tick_calendar.cc"],
+    hdrs = ["tick_calendar.h"],
+    deps = [":common"],
+)
+
 pybind_extension(
     name = "operators_cc",
     srcs = ["pyinit.cc"],
@@ -53,6 +60,7 @@ pybind_extension(
         ":join",
         ":resample",
         ":since_last",
+        ":tick_calendar",
         ":window",
     ],
 )
