@@ -46,6 +46,10 @@ class TickCalendar(Operator):
         max_day_of_week: int,
     ):
         super().__init__()
+        if not input.schema.is_unix_timestamp:
+            raise ValueError(
+                "Can only use tick_calendar on unix timestamp samplings"
+            )
 
         # Attributes
         self._min_second = min_second

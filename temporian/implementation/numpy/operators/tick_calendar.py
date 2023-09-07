@@ -45,8 +45,8 @@ class TickCalendarNumpyImplementation(OperatorImplementation):
             if len(index_data.timestamps) < 2:
                 dst_timestamps = np.array([], dtype=np.float64)
             else:
-                begin = index_data.timestamps[0]
-                end = index_data.timestamps[-1]
+                begin = int(index_data.timestamps[0])  # discard sub-second info
+                end = int(index_data.timestamps[-1])
                 dst_timestamps = operators_cc.tick_calendar(
                     start_timestamp=begin,
                     end_timestamp=end,

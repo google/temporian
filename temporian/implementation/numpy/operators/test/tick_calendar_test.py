@@ -13,9 +13,11 @@
 # limitations under the License.
 
 
+from datetime import datetime
 from absl.testing import absltest
 
 import numpy as np
+from temporian.core.data.duration_utils import convert_timestamps_to_datetimes
 from temporian.core.operators.tick_calendar import TickCalendar
 from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy.operators.tick_calendar import (
@@ -33,13 +35,10 @@ class TickCalendarOperatorTest(absltest.TestCase):
 
     def test_base(self):
         evset = event_set(
-            timestamps=[1, 2, 3, 4],
-            features={
-                "a": [1.0, 2.0, 3.0, 4.0],
-                "b": [5, 6, 7, 8],
-                "c": ["A", "A", "B", "B"],
-            },
-            indexes=["c"],
+            timestamps=[
+                datetime(2020, 1, 1, 0, 0, 0),
+                datetime(2020, 4, 1, 0, 0, 0),
+            ],
         )
         node = evset.node()
 
@@ -54,8 +53,8 @@ class TickCalendarOperatorTest(absltest.TestCase):
         # Run op
         op = TickCalendar(
             input=node,
-            min_second=1,
-            max_second=10,
+            min_second=0,
+            max_second=5,
             min_minute=1,
             max_minute=1,
             min_hour=1,
@@ -63,13 +62,18 @@ class TickCalendarOperatorTest(absltest.TestCase):
             min_day_of_month=1,
             max_day_of_month=1,
             min_month=1,
-            max_month=1,
-            min_day_of_week=1,
-            max_day_of_week=1,
+            max_month=12,
+            min_day_of_week=0,
+            max_day_of_week=6,
         )
         instance = TickCalendarNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
         output = instance.call(input=evset)["output"]
+
+        print(
+            "Result:"
+            f" {convert_timestamps_to_datetimes(output.get_arbitrary_index_data().timestamps)}"
+        )
 
         assertEqualEventSet(self, output, expected_output)
 
