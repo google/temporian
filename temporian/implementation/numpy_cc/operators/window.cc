@@ -150,6 +150,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
 
   double curr_ts;
   double curr_window_length;
+  size_t first_diff_ts_idx;
 
   while (end_idx < n_event) {
     // Note: We accumulate values in (t-window_length, t] with t=
@@ -161,7 +162,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
 
     // Add all values with same timestamp as the current one.
     accumulator.Add(v_values[end_idx]);
-    size_t first_diff_ts_idx = end_idx + 1;
+    first_diff_ts_idx = end_idx + 1;
     while (first_diff_ts_idx < n_event &&
            v_timestamps[first_diff_ts_idx] == curr_ts) {
       accumulator.Add(v_values[first_diff_ts_idx]);
@@ -169,13 +170,10 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
     }
 
     if (end_idx > 0) {
-      bool begin_moved_forward =
-          curr_ts - v_timestamps[end_idx - 1] -
-              (curr_window_length - v_window_length[end_idx - 1]) >
-          0;
-
       // Move begin_idx forward or backwards depending on begin_diff.
-      if (begin_moved_forward) {
+      if (curr_ts - v_timestamps[end_idx - 1] -
+              (curr_window_length - v_window_length[end_idx - 1]) >
+          0) {
         // Window's beginning moved forward
         while (begin_idx < n_event &&
                v_timestamps[end_idx] - v_timestamps[begin_idx] >=
@@ -186,16 +184,12 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
       } else {
         // Window's beginning moved backwards.
         // Note < instead of <= to respect (] window boundaries.
-        // Value at current begin_idx is already in the accumulator so we need
-        // to move begin_idx one step left, and then back one step right.
-        begin_idx--;
-        while (begin_idx >= 0 &&
-               v_timestamps[end_idx] - v_timestamps[begin_idx] <
+        while (begin_idx > 0 &&
+               v_timestamps[end_idx] - v_timestamps[begin_idx - 1] <
                    curr_window_length) {
-          accumulator.Add(v_values[begin_idx]);
           begin_idx--;
+          accumulator.Add(v_values[begin_idx]);
         }
-        begin_idx++;
       }
     }
 
@@ -220,11 +214,55 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
                                const ArrayD &window_length) {
   // Input size
   const size_t n_event = evset_timestamps.shape(0);
+  const size_t n_sampling = sampling_timestamps.shape(0);
 
   // Allocate output array
   auto output = py::array_t<OUTPUT>(n_event);
 
-  // TODO (ian): implement
+  auto v_output = output.template mutable_unchecked<1>();
+  auto v_timestamps = evset_timestamps.unchecked<1>();
+  auto v_values = evset_values.template unchecked<1>();
+  auto v_sampling = sampling_timestamps.unchecked<1>();
+  auto v_window_length = window_length.unchecked<1>();
+
+  TAccumulator accumulator;
+
+  size_t begin_idx = 0;
+  size_t end_idx = 0;
+
+  for (size_t sampling_idx = 0; sampling_idx < n_sampling; sampling_idx++) {
+    const auto right_limit = v_sampling[sampling_idx];
+    const auto curr_window_length = v_window_length[sampling_idx];
+
+    while (end_idx < n_event && v_timestamps[end_idx] <= right_limit) {
+      accumulator.Add(v_values[end_idx]);
+      end_idx++;
+    }
+
+    if (end_idx > 0) {
+      // Move begin_idx forward or backwards depending on begin_diff.
+      if (right_limit - v_sampling[sampling_idx - 1] -
+              (curr_window_length - v_window_length[sampling_idx - 1]) >
+          0) {
+        // Window's beginning moved forward
+        while (begin_idx < n_event &&
+               right_limit - v_timestamps[begin_idx] >= curr_window_length) {
+          accumulator.Remove(v_values[begin_idx]);
+          begin_idx++;
+        }
+      } else {
+        // Window's beginning moved backwards.
+        // Note < instead of <= to respect (] window boundaries.
+        while (begin_idx > 0 &&
+               right_limit - v_timestamps[begin_idx - 1] < curr_window_length) {
+          begin_idx--;
+          accumulator.Add(v_values[begin_idx]);
+        }
+      }
+    }
+
+    v_output[sampling_idx] = accumulator.Result();
+  }
 
   return output;
 }
