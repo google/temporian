@@ -126,7 +126,6 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
             }
             if self.operator.has_sampling:
                 kwargs["sampling_timestamps"] = sampling_timestamps
-            print(kwargs)
             dst_feature = implementation(**kwargs)
             dst_features.append(dst_feature)
 
