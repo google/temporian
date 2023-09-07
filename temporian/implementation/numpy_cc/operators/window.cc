@@ -13,6 +13,8 @@
 namespace {
 namespace py = pybind11;
 
+using namespace std; // REMOVE
+
 typedef py::array_t<double> ArrayD;
 typedef py::array_t<float> ArrayF;
 
@@ -27,6 +29,7 @@ template <typename INPUT, typename OUTPUT, typename TAccumulator>
 py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
                                const py::array_t<INPUT> &evset_values,
                                const double window_length) {
+  cout << "No external sampling, constant window length\n";
   // Input size
   const size_t n_event = evset_timestamps.shape(0);
 
@@ -86,6 +89,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
                                const py::array_t<INPUT> &evset_values,
                                const ArrayD &sampling_timestamps,
                                const double window_length) {
+  cout << "External sampling, constant window length\n";
   // Input size
   const size_t n_event = evset_timestamps.shape(0);
   const size_t n_sampling = sampling_timestamps.shape(0);
@@ -130,6 +134,7 @@ template <typename INPUT, typename OUTPUT, typename TAccumulator>
 py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
                                const py::array_t<INPUT> &evset_values,
                                const ArrayD &window_length) {
+  cout << "No external sampling, variable window length\n";
   // Input size
   const size_t n_event = evset_timestamps.shape(0);
 
@@ -212,12 +217,13 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
                                const py::array_t<INPUT> &evset_values,
                                const ArrayD &sampling_timestamps,
                                const ArrayD &window_length) {
+  cout << "External sampling, variable window length\n";
   // Input size
   const size_t n_event = evset_timestamps.shape(0);
   const size_t n_sampling = sampling_timestamps.shape(0);
 
   // Allocate output array
-  auto output = py::array_t<OUTPUT>(n_event);
+  auto output = py::array_t<OUTPUT>(n_sampling);
 
   auto v_output = output.template mutable_unchecked<1>();
   auto v_timestamps = evset_timestamps.unchecked<1>();

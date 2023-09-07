@@ -63,11 +63,11 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
             if index_key in input.data:
                 input_data = input.data[index_key]
 
-                window_length_data = None
-                if window_length is not None:
-                    window_length_data = window_length.data[index_key].features[
-                        0
-                    ]
+                window_length_data = (
+                    window_length.data[index_key].features[0]
+                    if window_length is not None
+                    else None
+                )
 
                 self._compute(
                     src_timestamps=input_data.timestamps,
@@ -111,15 +111,22 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
     ) -> None:
         assert isinstance(self.operator, BaseWindowOperator)
 
+        effective_window_length = (
+            window_length
+            if window_length is not None
+            else self.operator.window_length
+        )
+
         implementation = self._implementation()
         for src_ts in src_features:
             kwargs = {
                 "evset_timestamps": src_timestamps,
                 "evset_values": src_ts,
-                "window_length": window_length or self.operator.window_length,
+                "window_length": effective_window_length,
             }
             if self.operator.has_sampling:
                 kwargs["sampling_timestamps"] = sampling_timestamps
+            print(kwargs)
             dst_feature = implementation(**kwargs)
             dst_features.append(dst_feature)
 

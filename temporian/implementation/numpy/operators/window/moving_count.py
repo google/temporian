@@ -41,11 +41,17 @@ class MovingCountNumpyImplementation(BaseWindowNumpyImplementation):
     ) -> None:
         assert isinstance(self.operator, MovingCountOperator)
 
+        effective_window_length = (
+            window_length
+            if window_length is not None
+            else self.operator.window_length
+        )
+
         del src_features  # Features are ignored
 
         kwargs = {
             "evset_timestamps": src_timestamps,
-            "window_length": window_length or self.operator.window_length,
+            "window_length": effective_window_length,
         }
         if self.operator.has_sampling:
             kwargs["sampling_timestamps"] = sampling_timestamps

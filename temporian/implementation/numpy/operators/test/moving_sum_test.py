@@ -225,6 +225,62 @@ class MovingSumOperatorTest(absltest.TestCase):
 
         self.assertEqual(output["output"], expected_output)
 
+    def test_with_sampling_and_variable_winlength(self):
+        evset = from_pandas(
+            pd.DataFrame(
+                [
+                    [1, 10.0],
+                    [2, 11.0],
+                    [3, 12.0],
+                    [5, 13.0],
+                    [6, 14.0],
+                ],
+                columns=["timestamp", "a"],
+            )
+        )
+        sampling = from_pandas(
+            pd.DataFrame(
+                [[2], [5.5], [10]],
+                columns=["timestamp"],
+            )
+        )
+        window_length = from_pandas(
+            pd.DataFrame(
+                [
+                    [2, 0.5],
+                    [5.5, 3],
+                    [10, 8.5],
+                ],
+                columns=["timestamp", "length"],
+            ),
+            same_sampling_as=sampling,
+        )
+
+        op = MovingSumOperator(
+            input=evset.node(),
+            window_length=window_length.node(),
+            sampling=sampling.node(),
+        )
+        instance = MovingSumNumpyImplementation(op)
+
+        output = instance(
+            input=evset, sampling=sampling, window_length=window_length
+        )
+
+        expected_output = from_pandas(
+            pd.DataFrame(
+                [
+                    [2, 11.0],
+                    [5.5, 25.0],
+                    [10, 50],
+                ],
+                columns=["timestamp", "a"],
+            )
+        )
+        print(output["output"])
+
+        self.assertEqual(output["output"], expected_output)
+
     def test_with_nan(self):
         """The input features contains nan values."""
 
