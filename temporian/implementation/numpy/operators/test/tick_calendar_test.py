@@ -37,30 +37,36 @@ class TickCalendarOperatorTest(absltest.TestCase):
         evset = event_set(
             timestamps=[
                 datetime(2020, 1, 1, 0, 0, 0),
-                datetime(2020, 4, 1, 0, 0, 0),
+                datetime(2020, 6, 1, 0, 0, 0),
             ],
         )
         node = evset.node()
 
         expected_output = event_set(
-            timestamps=[1, 1],
-            features={
-                "c": ["A", "B"],
-            },
-            indexes=["c"],
+            timestamps=[
+                datetime(2020, 1, 31, 1, 1, 0),
+                datetime(2020, 1, 31, 1, 1, 1),
+                datetime(2020, 1, 31, 1, 1, 2),
+                datetime(2020, 3, 31, 1, 1, 0),
+                datetime(2020, 3, 31, 1, 1, 1),
+                datetime(2020, 3, 31, 1, 1, 2),
+                datetime(2020, 5, 31, 1, 1, 0),
+                datetime(2020, 5, 31, 1, 1, 1),
+                datetime(2020, 5, 31, 1, 1, 2),
+            ],
         )
 
         # Run op
         op = TickCalendar(
             input=node,
             min_second=0,
-            max_second=5,
+            max_second=2,
             min_minute=1,
             max_minute=1,
             min_hour=1,
             max_hour=1,
-            min_day_of_month=1,
-            max_day_of_month=1,
+            min_day_of_month=31,
+            max_day_of_month=31,
             min_month=1,
             max_month=12,
             min_day_of_week=0,
@@ -70,9 +76,11 @@ class TickCalendarOperatorTest(absltest.TestCase):
         testOperatorAndImp(self, op, instance)
         output = instance.call(input=evset)["output"]
 
+        print("Result:")
         print(
-            "Result:"
-            f" {convert_timestamps_to_datetimes(output.get_arbitrary_index_data().timestamps)}"
+            convert_timestamps_to_datetimes(
+                output.get_arbitrary_index_data().timestamps
+            )
         )
 
         assertEqualEventSet(self, output, expected_output)

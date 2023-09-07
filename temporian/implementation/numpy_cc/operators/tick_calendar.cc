@@ -52,12 +52,14 @@ py::array_t<double> tick_calendar(
               tm_struct.tm_min = minute;
               tm_struct.tm_sec = second;
 
-              // Check valid date
               std::time_t time = std::mktime(&tm_struct);
-              if (time != -1) {
+
+              // Valid date
+              if (time != -1 && tm_struct.tm_mday == mday) {
                 // Finish condition
                 if (time > end_timestamp) {
                   in_range = false;
+                  break;
                 }
 
                 // Check weekday match
@@ -65,6 +67,11 @@ py::array_t<double> tick_calendar(
                     tm_struct.tm_wday <= max_wday) {
                   ticks.push_back(time);
                 }
+              } else {
+                // Invalid date (end of month)
+                second = max_second;  // avoid unnecessary loops
+                minute = max_minute;
+                hour = max_hour;
               }
               second++;
             }
