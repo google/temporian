@@ -69,6 +69,13 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
                     else None
                 )
 
+                # Check all window length values are positive
+                if window_length_data is not None:
+                    if not np.all(window_length_data >= 0):
+                        raise ValueError(
+                            "All values in `window_length` must be positive."
+                        )
+
                 self._compute(
                     src_timestamps=input_data.timestamps,
                     src_features=input_data.features,

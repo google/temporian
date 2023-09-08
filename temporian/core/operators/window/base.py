@@ -57,7 +57,7 @@ class BaseWindowOperator(Operator, ABC):
         if isinstance(window_length, EventSetNode):
             if len(window_length.schema.features) != 1:
                 raise ValueError(
-                    "The window_length EventSet must have a single feature."
+                    "`window_length` must have exactly one feature."
                 )
             # TODO: check the feature is float64 (and try to cast if not?)
             effective_sampling_node.schema.check_compatible_index(

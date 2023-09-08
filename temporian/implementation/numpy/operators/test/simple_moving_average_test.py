@@ -332,6 +332,60 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
 
         self.assertEqual(output["output"], expected_output)
 
+    def test_negative_window_length(self):
+        evset = from_pandas(pd.DataFrame([[0, 1]], columns=["a", "timestamp"]))
+        sampling = from_pandas(pd.DataFrame([[1], [2]], columns=["timestamp"]))
+        window_length = from_pandas(
+            pd.DataFrame([[1, 1], [2, -1]], columns=["timestamp", "b"]),
+            same_sampling_as=sampling,
+        )
+
+        op = SimpleMovingAverageOperator(
+            input=evset.node(),
+            window_length=window_length.node(),
+            sampling=sampling.node(),
+        )
+        instance = SimpleMovingAverageNumpyImplementation(op)
+
+        with self.assertRaisesRegex(
+            ValueError, "All values in `window_length` must be positive"
+        ):
+            instance.call(
+                input=evset, sampling=sampling, window_length=window_length
+            )
+
+    def test_window_length_not_1_feature(self):
+        evset = from_pandas(pd.DataFrame([[0, 1]], columns=["a", "timestamp"]))
+        sampling = from_pandas(pd.DataFrame([[1], [2]], columns=["timestamp"]))
+
+        window_length = from_pandas(
+            pd.DataFrame([[1], [2]], columns=["timestamp"]),
+            same_sampling_as=sampling,
+        )
+        with self.assertRaisesRegex(
+            ValueError, "`window_length` must have exactly one feature"
+        ):
+            SimpleMovingAverageOperator(
+                input=evset.node(),
+                window_length=window_length.node(),
+                sampling=sampling.node(),
+            )
+
+        window_length = from_pandas(
+            pd.DataFrame(
+                [[1, 1, 1], [2, 2, 2]], columns=["timestamp", "b", "c"]
+            ),
+            same_sampling_as=sampling,
+        )
+        with self.assertRaisesRegex(
+            ValueError, "`window_length` must have exactly one feature"
+        ):
+            SimpleMovingAverageOperator(
+                input=evset.node(),
+                window_length=window_length.node(),
+                sampling=sampling.node(),
+            )
+
 
 if __name__ == "__main__":
     absltest.main()
