@@ -189,7 +189,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
                v_timestamps[end_idx] - v_timestamps[begin_idx - 1] <
                    curr_window_length) {
           begin_idx--;
-          accumulator.Add(v_values[begin_idx]);
+          accumulator.AddLeft(v_values[begin_idx]);
         }
       }
     }
@@ -258,7 +258,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
         while (begin_idx > 0 &&
                right_limit - v_timestamps[begin_idx - 1] < curr_window_length) {
           begin_idx--;
-          accumulator.Add(v_values[begin_idx]);
+          accumulator.AddLeft(v_values[begin_idx]);
         }
       }
     }
@@ -275,6 +275,9 @@ template <typename INPUT, typename OUTPUT> struct Accumulator {
   virtual void Add(INPUT value) = 0;
   virtual void Remove(INPUT value) = 0;
   virtual OUTPUT Result() = 0;
+
+  // // Add a value to left of the window. Relevant in deque-based accumulators.
+  virtual void AddLeft(INPUT value) { return Add(value); }
 };
 
 template <typename INPUT, typename OUTPUT>
@@ -404,12 +407,22 @@ struct MovingExtremumAccumulator : Accumulator<INPUT, OUTPUT> {
         return;
       }
     }
-
     if (values.empty() || Compare(value, current_extremum)) {
-      // The value is the new
       current_extremum = value;
     }
     values.push_back(value);
+  }
+
+  void AddLeft(INPUT value) override {
+    if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
+      if (std::isnan(value)) {
+        return;
+      }
+    }
+    if (values.empty() || Compare(value, current_extremum)) {
+      current_extremum = value;
+    }
+    values.push_front(value);
   }
 
   void Remove(INPUT value) override {
@@ -419,11 +432,11 @@ struct MovingExtremumAccumulator : Accumulator<INPUT, OUTPUT> {
       }
     }
 
+    assert(values.front() == value);
     if (values.size() == 1) {
       values.clear();
     } else {
       assert(!values.empty());
-      assert(values.front() == value);
       values.pop_front();
       if (value == current_extremum) {
         // Compute the extremum on the remaining items.
