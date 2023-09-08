@@ -67,6 +67,27 @@ class MovingMaxOperatorTest(absltest.TestCase):
             _f32([nan, 12, nan]),
         )
 
+    def test_cc_wo_sampling_w_variable_winlength(self):
+        assert_array_equal(
+            operators_cc.moving_max(
+                _f64([0, 1, 2, 3, 5, 20]),  # timestamps
+                _f64([nan, 0, 10, 5, 1, 2]),  # feature
+                _f64([1, 1, 1.5, 0.5, 3.5, 20]),  # window length
+            ),
+            _f64([nan, 0, 10, 5, 10, 10]),
+        )
+
+    def test_cc_w_sampling_w_variable_winlength(self):
+        assert_array_equal(
+            operators_cc.moving_max(
+                _f64([0, 1, 2, 3, 5, 20]),  # timestamps
+                _f64([nan, 0, 10, 5, 1, 2]),  # feature
+                _f64([-1, 1, 4, 19, 20, 20]),  # sampling
+                _f64([10, 10, 2.5, 19, 16, np.inf]),  # window length
+            ),
+            _f64([nan, 0, 10, 10, 2, 10]),
+        )
+
     def test_flat(self):
         """A simple time sequence."""
 
