@@ -1,12 +1,13 @@
 """Utilities to import/export Beam-Event-Set from/to dataset containers."""
 
-from typing import Iterable, Dict, Any, Tuple, Iterator, List
+from typing import Iterable, Dict, Any, Tuple, Iterator
 
 import numpy as np
 import apache_beam as beam
 
 from temporian.core.data.node import Schema
 from temporian.core.data.dtype import DType, tp_dtype_to_py_type
+from temporian.io.format import DictEventSetFormat, DictEventSetFormatChoices
 from temporian.implementation.numpy.data.dtype_normalization import (
     tp_dtype_to_np_dtype,
 )
@@ -237,7 +238,7 @@ def to_event_set(
     pipe: beam.PCollection[Dict[str, Any]],
     schema: Schema,
     timestamp_key: str = "timestamp",
-    grouped_by_index: bool = True,
+    format: DictEventSetFormatChoices = DictEventSetFormat.GROUPED_BY_INDEX,
 ) -> BeamEventSet:
     """Converts a PCollection of key:value to a Beam EventSet.
 
@@ -256,8 +257,9 @@ def to_event_set(
         schema: Schema of the data. Note: The schema of a Temporian node is
             available with `node.schema`.
         timestamp_key: Key containing the timestamps.
-        grouped_by_index: Whether events are grouped by index. Run
-            `tp.help.grouped_by_index()` for the documentation.
+        format: Format of the events inside the received dictionary. See
+            [DictEventSetFormat][temporian.io.format.DictEventSetFormat] for
+            more.
 
     Returns:
         PCollection of Beam EventSet.
@@ -265,7 +267,7 @@ def to_event_set(
 
     # TODO: Add support for datetime timestamps.
     num_features = len(schema.features)
-    if grouped_by_index:
+    if format == DictEventSetFormat.GROUPED_BY_INDEX:
         if num_features != 0:
             return partition_by_feature_idx(
                 pipe
@@ -288,7 +290,7 @@ def to_event_set(
                     ),
                 )
             )
-    else:
+    elif format == DictEventSetFormat.SINGLE_EVENTS:
         indexed = (
             pipe
             | "Parse and index"
@@ -315,6 +317,8 @@ def to_event_set(
                     >> beam.Map(_merge_timestamps_no_features),
                 )
             )
+    else:
+        raise ValueError(f"Unknown format {format}")
 
 
 def _convert_to_dict_event_key_value(
@@ -414,11 +418,11 @@ def partition_by_feature_idx(
     The inverse of add_feature_idx_and_flatten.
     """
 
-    paritions = pipe | "Partition by features" >> beam.Partition(
+    partitions = pipe | "Partition by features" >> beam.Partition(
         _extract_feature_idx, num_features
     )
     without_idx = []
-    for feature_idx, feature in enumerate(paritions):
+    for feature_idx, feature in enumerate(partitions):
         item = feature | f"Remove feature idx {feature_idx}" >> beam.Map(
             _remove_feature_idx
         )
@@ -433,7 +437,7 @@ def to_dict(
     pipe: BeamEventSet,
     schema: Schema,
     timestamp_key: str = "timestamp",
-    grouped_by_index: bool = True,
+    format: DictEventSetFormatChoices = DictEventSetFormat.GROUPED_BY_INDEX,
 ) -> beam.PCollection[Dict[str, Any]]:
     """Converts a Beam EventSet to PCollection of key->value.
 
@@ -444,8 +448,9 @@ def to_dict(
         pipe: PCollection of Beam EventSet.
         schema: Schema of the data.
         timestamp_key: Key containing the timestamps.
-        grouped_by_index: Whether events are grouped by index. Run
-            `tp.help.grouped_by_index()` for the documentation.
+        format: Format of the events inside the output dictionary. See
+            [DictEventSetFormat][temporian.io.format.DictEventSetFormat] for
+            more.
 
     Returns:
         Beam pipe of key values.
@@ -457,11 +462,13 @@ def to_dict(
         | "Group by index " >> beam.GroupByKey()
     )
 
-    if grouped_by_index:
+    if format == DictEventSetFormat.GROUPED_BY_INDEX:
         return grouped_by_features | "Convert to dict" >> beam.Map(
             _convert_to_dict_event_set_key_value, schema, timestamp_key
         )
-    else:
+    elif format == DictEventSetFormat.SINGLE_EVENTS:
         return grouped_by_features | "Convert to dict" >> beam.FlatMap(
             _convert_to_dict_event_key_value, schema, timestamp_key
         )
+    else:
+        raise ValueError(f"Unknown format {format}")
