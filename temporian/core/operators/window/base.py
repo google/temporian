@@ -55,11 +55,13 @@ class BaseWindowOperator(Operator, ABC):
             effective_sampling_node = input
 
         if isinstance(window_length, EventSetNode):
-            if len(window_length.schema.features) != 1:
+            if (
+                len(window_length.schema.features) != 1
+                or window_length.schema.features[0].dtype != DType.FLOAT64
+            ):
                 raise ValueError(
-                    "`window_length` must have exactly one feature."
+                    "`window_length` must have exactly one float64 feature."
                 )
-            # TODO: check the feature is float64 (and try to cast if not?)
             effective_sampling_node.schema.check_compatible_index(
                 window_length.schema
             )

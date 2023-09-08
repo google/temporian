@@ -63,14 +63,12 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
             if index_key in input.data:
                 input_data = input.data[index_key]
 
-                window_length_data = (
-                    window_length.data[index_key].features[0]
-                    if window_length is not None
-                    else None
-                )
-
-                # Check all window length values are positive
-                if window_length_data is not None:
+                window_length_data = None
+                if window_length is not None:
+                    window_length_data = window_length.data[index_key].features[
+                        0
+                    ]
+                    # Check all window length values are positive
                     if not np.all(window_length_data >= 0):
                         raise ValueError(
                             "All values in `window_length` must be positive."
