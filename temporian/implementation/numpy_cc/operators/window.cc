@@ -158,6 +158,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
     // values in v_timestamps.
 
     curr_ts = v_timestamps[end_idx];
+    // TODO: raise if negative
     curr_window_length = v_window_length[end_idx];
 
     // Add all values with same timestamp as the current one.
@@ -232,6 +233,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
 
   for (size_t sampling_idx = 0; sampling_idx < n_sampling; sampling_idx++) {
     const auto right_limit = v_sampling[sampling_idx];
+    // TODO: raise if negative
     const auto curr_window_length = v_window_length[sampling_idx];
 
     while (end_idx < n_event && v_timestamps[end_idx] <= right_limit) {

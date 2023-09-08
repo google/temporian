@@ -104,10 +104,10 @@ If an [EventSet][temporian.EventSet], the window length will vary for each
 timestamp in the effective sampling (i.e., `sampling` if it was provided or the
 input otherwise).
 
-In this case, the `window_length` `EventSet` must have a single feature and the
-same sampling as the effective sampling, and the window length for each
-timestamp in the effective sampling will be the feature value at that timestamp
-in `window_length`.
+In this case, the `window_length` `EventSet` must have a single positive float64
+feature, and the same sampling as the effective sampling, and the window length
+for each timestamp in the effective sampling will be the feature value at that
+timestamp in `window_length`.
 """
 
 
