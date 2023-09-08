@@ -64,6 +64,7 @@ Check the index on the left for a more detailed description of any symbol.
 | [`EventSet.tick()`][temporian.EventSet.tick]                                                               | Generates timestamps at regular intervals in the range of a guide.                                           |
 | [`EventSet.timestamps()`][temporian.EventSet.timestamps]                                                   | Creates a feature from the events timestamps (`float64`).                                                    |
 | [`EventSet.unique_timestamps()`][temporian.EventSet.unique_timestamps]                                     | Removes events with duplicated timestamps from an [`EventSet`][temporian.EventSet].                          |
+| [`EventSet.until_next()`][temporian.EventSet.until_next]                                                   | Duration until the next sampling event.                                                                      |
 
 ### Binary operators
 

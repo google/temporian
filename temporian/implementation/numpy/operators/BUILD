@@ -35,6 +35,7 @@ py_library(
         ":timestamps",
         ":unary",
         ":unique_timestamps",
+        ":until_next",
         "//temporian/implementation/numpy/operators/binary:arithmetic",
         "//temporian/implementation/numpy/operators/binary:logical",
         "//temporian/implementation/numpy/operators/binary:relational",
@@ -376,6 +377,21 @@ py_library(
         ":base",
         "//temporian/core/data:duration_utils",
         "//temporian/core/operators:select_index_values",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy:utils",
+        "//temporian/implementation/numpy/data:event_set",
+    ],
+)
+
+py_library(
+    name = "until_next",
+    srcs = ["until_next.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/numpy
+        ":base",
+        "//temporian/core/data:duration_utils",
+        "//temporian/core/operators:until_next",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",
