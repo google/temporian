@@ -351,7 +351,8 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
         instance = SimpleMovingAverageNumpyImplementation(op)
 
         with self.assertRaisesRegex(
-            ValueError, "All values in `window_length` must be positive"
+            ValueError,
+            "All values in `window_length` must be strictly positive",
         ):
             instance.call(
                 input=evset, sampling=sampling, window_length=window_length
