@@ -56,12 +56,12 @@ class TickCalendarNumpyImplementation(OperatorImplementation):
                     max_minute=self.operator.max_minute,
                     min_hour=self.operator.min_hour,
                     max_hour=self.operator.max_hour,
-                    min_mday=self.operator.min_day_of_month,
-                    max_mday=self.operator.max_day_of_month,
+                    min_mday=self.operator.min_mday,
+                    max_mday=self.operator.max_mday,
                     min_month=self.operator.min_month,
                     max_month=self.operator.max_month,
-                    min_wday=self.operator.min_day_of_week,
-                    max_wday=self.operator.max_day_of_week,
+                    min_wday=self.operator.min_wday,
+                    max_wday=self.operator.max_wday,
                 )
                 print(f"Result: {dst_timestamps}")
             output_evset.set_index_value(

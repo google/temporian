@@ -2254,9 +2254,9 @@ class EventSetOperations:
             second=second,
             minute=minute,
             hour=hour,
-            day_of_month=day_of_month,
+            mday=day_of_month,
             month=month,
-            day_of_week=day_of_week,
+            wday=day_of_week,
         )
 
     def timestamps(self: EventSetOrNode) -> EventSetOrNode:
