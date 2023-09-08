@@ -59,6 +59,7 @@ from temporian.implementation.numpy.operators import unique_timestamps
 from temporian.implementation.numpy.operators import begin
 from temporian.implementation.numpy.operators import end
 from temporian.implementation.numpy.operators import tick
+from temporian.implementation.numpy.operators import tick_calendar
 from temporian.implementation.numpy.operators import timestamps
 from temporian.implementation.numpy.operators import enumerate
 from temporian.implementation.numpy.operators import fast_fourier_transform

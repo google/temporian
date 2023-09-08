@@ -31,6 +31,7 @@ py_library(
         ":select",
         ":since_last",
         ":tick",
+        ":tick_calendar",
         ":timestamps",
         ":unary",
         ":unique_timestamps",

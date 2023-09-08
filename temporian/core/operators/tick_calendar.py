@@ -248,11 +248,11 @@ def tick_calendar(
                 " integer value instead"
             )
 
-    prefer_free = False
-    min_second, max_second = set_arg_range(second, (0, 59), prefer_free)
+    # Always set second=0 by default
+    min_second, max_second = set_arg_range(second, (0, 59), prefer_free=False)
 
-    # prefer_free becomes True when next None args should be set to '*'
-    # e.g: only hour=1 -> second=0,minute=0, mday='*', month='*'
+    # prefer_free becomes True when next args should be set to '*' by default
+    # e.g: user sets only hour=1 -> second=0,minute=0, mday='*', month='*'
     prefer_free = second is not None
     min_minute, max_minute = set_arg_range(minute, (0, 59), prefer_free)
 
@@ -262,11 +262,11 @@ def tick_calendar(
     prefer_free = prefer_free or hour is not None
     min_mday, max_mday = set_arg_range(mday, (1, 31), prefer_free)
 
-    prefer_free = prefer_free or mday is not None
-    min_month, max_month = set_arg_range(month, (1, 12), prefer_free)
+    # Always free month range by default
+    min_month, max_month = set_arg_range(month, (1, 12), prefer_free=True)
 
-    prefer_free = True  # Always free wday by default
-    min_wday, max_wday = set_arg_range(wday, (0, 6), True)
+    # Always free wday range by default
+    min_wday, max_wday = set_arg_range(wday, (0, 6), prefer_free=True)
 
     return TickCalendar(
         input=input,
