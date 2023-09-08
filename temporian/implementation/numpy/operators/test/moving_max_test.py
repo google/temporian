@@ -72,9 +72,9 @@ class MovingMaxOperatorTest(absltest.TestCase):
             operators_cc.moving_max(
                 _f64([0, 1, 2, 3, 5, 20]),  # timestamps
                 _f64([nan, 0, 10, 5, 1, 2]),  # feature
-                _f64([1, 1, 1.5, 0.5, 3.5, 20]),  # window length
+                _f64([1, 1, 1.5, 0.5, 3.5, 0]),  # window length
             ),
-            _f64([nan, 0, 10, 5, 10, 10]),
+            _f64([nan, 0, 10, 5, 10, np.nan]),
         )
 
     def test_cc_w_sampling_w_variable_winlength(self):
