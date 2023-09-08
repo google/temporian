@@ -14,10 +14,10 @@
 
 import math
 
-from absl.testing import absltest
 import numpy as np
-from numpy.testing import assert_almost_equal
 import pandas as pd
+from absl.testing import absltest
+from numpy.testing import assert_almost_equal
 
 from temporian.core.operators.window.moving_standard_deviation import (
     MovingStandardDeviationOperator,
@@ -27,8 +27,6 @@ from temporian.implementation.numpy.operators.window.moving_standard_deviation i
     operators_cc,
 )
 from temporian.core.data import node as node_lib
-import math
-from numpy.testing import assert_almost_equal
 from temporian.io.pandas import from_pandas
 
 
@@ -52,6 +50,27 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
                 5.0,
             ),
             _f32([0.0, 0.0, 1.0, 1.247219, 0.0]),
+        )
+
+    def test_cc_wo_sampling_w_variable_winlength(self):
+        assert_almost_equal(
+            operators_cc.moving_standard_deviation(
+                _f64([0, 1, 2, 3, 5, 20]),  # timestamps
+                _f32([nan, 10, 11, 12, 13, 14]),  # feature
+                _f64([1, 1, 1.5, 0.5, 3.5, 20]),  # window length
+            ),
+            _f32([nan, 0, 0.5, 0, 0.8164965, 1.4142135]),
+        )
+
+    def test_cc_w_sampling_w_variable_winlength(self):
+        assert_almost_equal(
+            operators_cc.moving_standard_deviation(
+                _f64([0, 1, 2, 3, 5, 20]),  # timestamps
+                _f32([nan, 10, 11, 12, 13, 14]),  # feature
+                _f64([-1, 1, 4, 19, 20, 20]),  # sampling
+                _f64([10, 0.5, 2.5, 19, 16, np.inf]),  # window length
+            ),
+            _f32([nan, 0, 0.5, 1.1180339, 0.5, 1.4142135]),
         )
 
     def test_flat(self):
