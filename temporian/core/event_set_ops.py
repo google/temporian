@@ -2185,9 +2185,9 @@ class EventSetOperations:
         second: Union[int, str, None] = None,
         minute: Union[int, str, None] = None,
         hour: Union[int, str, None] = None,
-        day_of_month: Union[int, str, None] = None,
+        mday: Union[int, str, None] = None,
         month: Union[int, str, None] = None,
-        day_of_week: Union[int, str, None] = None,
+        wday: Union[int, str, None] = None,
     ) -> EventSetOrNode:
         """Generates timestamps at specified datetimes, in the range of a guide
         [`EventSet`][temporian.EventSet].
@@ -2205,25 +2205,82 @@ class EventSetOperations:
         , resulting in one tick at every exact hour of every day/month/year in
         the input guide range.
 
-        Example:
+        Examples:
             ```python
-            >>> a = tp.event_set(timestamps=["2020-01-01", "2021-01-01"])
-            >>> # Every day in the period
+            >>> # Every day in the period (exactly one year)
+            >>> a = tp.event_set(timestamps=["2021-01-01", "2021-12-31 23:59:59"])
             >>> b = a.tick_calendar()
             >>> b
+            indexes: ...
+            events:
+                (365 events):
+                    timestamps: [...]
+            ...
+
 
             >>> # Every day at 2:30am
             >>> b = a.tick_calendar(hour=2, minute=30)
-            >>> b
+            >>> tp.glue(b.calendar_hour(), b.calendar_minute())
+            indexes: ...
+            events:
+                (365 events):
+                    timestamps: [...]
+                    'calendar_hour': [2 2 2 ... 2 2 2]
+                    'calendar_minute': [30 30 30 ... 30 30 30]
+            ...
+
 
             >>> # Day 5 of every month
-            >>> b = a.tick_calendar(day_of_month=5)
-            >>> b
+            >>> b = a.tick_calendar(mday=5)
+            >>> b.calendar_day_of_month()
+            indexes: ...
+            events:
+                (12 events):
+                    timestamps: [...]
+                    'calendar_day_of_month': [5 5 5 ... 5 5 5]
+            ...
 
-            >>> a = tp.event_set(timestamps=["2020-01-01", "2023-01-01"])
+
             >>> # 1st of February of every year
+            >>> a = tp.event_set(timestamps=["2020-01-01", "2021-12-31"])
             >>> b = a.tick_calendar(month=2)
+            >>> tp.glue(b.calendar_day_of_month(), b.calendar_month())
+            indexes: ...
+            events:
+                (2 events):
+                    timestamps: [...]
+                    'calendar_day_of_month': [1 1]
+                    'calendar_month': [2 2]
+            ...
+
+            >>> # Every second in the period  (2 hours -> 7200 seconds)
+            >>> a = tp.event_set(timestamps=["2020-01-01 00:00:00",
+            ...                              "2020-01-01 01:59:59"])
+            >>> b = a.tick_calendar(second='*')
             >>> b
+            indexes: ...
+            events:
+                (7200 events):
+                    timestamps: [...]
+            ...
+
+            >>> # Every second of the minute 30 of every hour (00:30 and 01:30)
+            >>> a = tp.event_set(timestamps=["2020-01-01 00:00",
+            ...                              "2020-01-01 02:00"])
+            >>> b = a.tick_calendar(second='*', minute=30)
+            >>> b
+            indexes: ...
+            events:
+                (120 events):
+                    timestamps: [...]
+            ...
+
+            >>> # Not allowed: intermediate arguments (minute, hour) not specified
+            >>> b = a.tick_calendar(second='1', mday=1)  # ambiguous meaning
+            Traceback (most recent call last):
+                ...
+            ValueError: Can't set argument to None because previous and
+            following arguments were specified. Set to '*' or an integer ...
 
             ```
 
@@ -2254,9 +2311,9 @@ class EventSetOperations:
             second=second,
             minute=minute,
             hour=hour,
-            mday=day_of_month,
+            mday=mday,
             month=month,
-            wday=day_of_week,
+            wday=wday,
         )
 
     def timestamps(self: EventSetOrNode) -> EventSetOrNode:
