@@ -95,6 +95,8 @@ class BaseWindowOperator(Operator, ABC):
 
     @property
     def window_length(self) -> Optional[NormalizedDuration]:
+        """Return None if window_length is variable (i.e. an EventSet was passed
+        as `window_length` to the operator)."""
         return self._window_length
 
     @property

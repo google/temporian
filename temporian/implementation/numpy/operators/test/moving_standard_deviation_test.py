@@ -55,9 +55,9 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
     def test_cc_wo_sampling_w_variable_winlength(self):
         assert_almost_equal(
             operators_cc.moving_standard_deviation(
-                _f64([0, 1, 2, 3, 5, 20]),  # timestamps
-                _f32([nan, 10, 11, 12, 13, 14]),  # feature
-                _f64([1, 1, 1.5, 0.5, 3.5, 20]),  # window length
+                evset_timestamps=_f64([0, 1, 2, 3, 5, 20]),
+                evset_values=_f32([nan, 10, 11, 12, 13, 14]),
+                window_length=_f64([1, 1, 1.5, 0.5, 3.5, 20]),
             ),
             _f32([nan, 0, 0.5, 0, 0.8164965, 1.4142135]),
         )
@@ -65,10 +65,10 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
     def test_cc_w_sampling_w_variable_winlength(self):
         assert_almost_equal(
             operators_cc.moving_standard_deviation(
-                _f64([0, 1, 2, 3, 5, 20]),  # timestamps
-                _f32([nan, 10, 11, 12, 13, 14]),  # feature
-                _f64([-1, 1, 4, 19, 20, 20]),  # sampling
-                _f64([10, 0.5, 2.5, 19, 16, np.inf]),  # window length
+                evset_timestamps=_f64([0, 1, 2, 3, 5, 20]),
+                evset_values=_f32([nan, 10, 11, 12, 13, 14]),
+                sampling_timestamps=_f64([-1, 1, 4, 19, 20, 20]),
+                window_length=_f64([10, 0.5, 2.5, 19, 16, np.inf]),
             ),
             _f32([nan, 0, 0.5, 1.1180339, 0.5, 1.4142135]),
         )

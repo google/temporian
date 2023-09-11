@@ -67,9 +67,9 @@ class MovingMinOperatorTest(absltest.TestCase):
     def test_cc_wo_sampling_w_variable_winlength(self):
         assert_array_equal(
             operators_cc.moving_min(
-                _f64([0, 1, 2, 3, 5, 20]),  # timestamps
-                _f64([nan, 0, 10, 5, 1, 2]),  # feature
-                _f64([1, 1, 1.5, 0.5, 3.5, 0]),  # window length
+                evset_timestamps=_f64([0, 1, 2, 3, 5, 20]),
+                evset_values=_f64([nan, 0, 10, 5, 1, 2]),
+                window_length=_f64([1, 1, 1.5, 0.5, 3.5, 0]),
             ),
             _f64([nan, 0, 0, 5, 1, np.nan]),
         )
@@ -77,10 +77,10 @@ class MovingMinOperatorTest(absltest.TestCase):
     def test_cc_w_sampling_w_variable_winlength(self):
         assert_array_equal(
             operators_cc.moving_min(
-                _f64([0, 1, 2, 3, 5, 20]),  # timestamps
-                _f64([nan, 0, 10, 5, 1, 2]),  # feature
-                _f64([-1, 1, 4, 19, 20, 20]),  # sampling
-                _f64([10, 10, 2.5, 19, 0.001, np.inf]),  # window length
+                evset_timestamps=_f64([0, 1, 2, 3, 5, 20]),
+                evset_values=_f64([nan, 0, 10, 5, 1, 2]),
+                sampling_timestamps=_f64([-1, 1, 4, 19, 20, 20]),
+                window_length=_f64([10, 10, 2.5, 19, 0.001, np.inf]),
             ),
             _f64([nan, 0, 5, 0, 2, 0]),
         )

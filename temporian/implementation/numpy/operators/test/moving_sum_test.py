@@ -45,9 +45,9 @@ class MovingSumOperatorTest(absltest.TestCase):
     def test_cc_wo_sampling(self):
         assert_array_equal(
             operators_cc.moving_sum(
-                _f64([1, 2, 3, 5, 20]),  # timestamps
-                _f32([10, nan, 12, 13, 14]),  # feature
-                5.0,
+                evset_timestamps=_f64([1, 2, 3, 5, 20]),
+                evset_values=_f32([10, nan, 12, 13, 14]),
+                window_length=5.0,
             ),
             _f32([10.0, 10.0, 22.0, 35.0, 14.0]),
         )
@@ -55,9 +55,9 @@ class MovingSumOperatorTest(absltest.TestCase):
     def test_cc_wo_sampling_w_variable_winlength(self):
         assert_array_equal(
             operators_cc.moving_sum(
-                _f64([0, 1, 2, 3, 5, 20]),  # timestamps
-                _f32([nan, 10, 11, 12, 13, 14]),  # feature
-                _f64([1, 1, 1.5, 0.5, 3.5, 20]),  # window length
+                evset_timestamps=_f64([0, 1, 2, 3, 5, 20]),
+                evset_values=_f32([nan, 10, 11, 12, 13, 14]),
+                window_length=_f64([1, 1, 1.5, 0.5, 3.5, 20]),
             ),
             _f32([0, 10, 21, 12, 36, 60]),
         )
@@ -65,10 +65,10 @@ class MovingSumOperatorTest(absltest.TestCase):
     def test_cc_w_sampling_w_variable_winlength(self):
         assert_array_equal(
             operators_cc.moving_sum(
-                _f64([0, 1, 2, 3, 5, 20]),  # timestamps
-                _f32([nan, 10, 11, 12, 13, 14]),  # feature
-                _f64([-1, 1, 4, 19, 20, 20]),  # sampling
-                _f64([10, 0.5, 2.5, 19, 16, np.inf]),  # window length
+                evset_timestamps=_f64([0, 1, 2, 3, 5, 20]),
+                evset_values=_f32([nan, 10, 11, 12, 13, 14]),
+                sampling_timestamps=_f64([-1, 1, 4, 19, 20, 20]),
+                window_length=_f64([10, 0.5, 2.5, 19, 16, np.inf]),
             ),
             _f32([0, 10, 23, 46, 27, 60]),
         )
