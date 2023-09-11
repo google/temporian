@@ -355,32 +355,6 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
         self.assertEqual(output["output"], expected_output)
 
     # TODO: move to a separate file that tests the base class
-    def test_negative_window_length(self):
-        evset = from_pandas(pd.DataFrame([[0, 1]], columns=["a", "timestamp"]))
-        sampling = from_pandas(pd.DataFrame([[1], [2]], columns=["timestamp"]))
-        window_length = from_pandas(
-            pd.DataFrame(
-                [[1, 1], [2, -1]], columns=["timestamp", "b"], dtype=np.float64
-            ),
-            same_sampling_as=sampling,
-        )
-
-        op = SimpleMovingAverageOperator(
-            input=evset.node(),
-            window_length=window_length.node(),
-            sampling=sampling.node(),
-        )
-        instance = SimpleMovingAverageNumpyImplementation(op)
-
-        with self.assertRaisesRegex(
-            ValueError,
-            "All values in `window_length` must be strictly positive",
-        ):
-            instance.call(
-                input=evset, sampling=sampling, window_length=window_length
-            )
-
-    # TODO: move to a separate file that tests the base class
     def test_variable_window_length_invalid(self):
         evset = from_pandas(pd.DataFrame([[0, 1]], columns=["a", "timestamp"]))
         sampling = from_pandas(pd.DataFrame([[1], [2]], columns=["timestamp"]))
