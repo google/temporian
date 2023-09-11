@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from unittest.mock import patch
 from absl.testing import absltest
 import math
 
@@ -353,6 +354,37 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
         )
 
         self.assertEqual(output["output"], expected_output)
+
+    # TODO: move to a separate file that tests the base class
+    @patch("temporian.implementation.numpy.operators.window.base.logging")
+    def test_negative_window_length(self, logging_mock):
+        """Tests that warning is shown when receiving non strictly positive
+        values in window_length."""
+        evset = from_pandas(
+            pd.DataFrame([[0, 1]], columns=["a", "timestamp"], dtype=np.float64)
+        )
+        sampling = from_pandas(pd.DataFrame([[1], [2]], columns=["timestamp"]))
+        window_length = from_pandas(
+            pd.DataFrame(
+                [[1, 1], [2, -1]], columns=["timestamp", "b"], dtype=np.float64
+            ),
+            same_sampling_as=sampling,
+        )
+
+        op = SimpleMovingAverageOperator(
+            input=evset.node(),
+            window_length=window_length.node(),
+            sampling=sampling.node(),
+        )
+        instance = SimpleMovingAverageNumpyImplementation(op)
+
+        instance.call(
+            input=evset, sampling=sampling, window_length=window_length
+        )
+        logging_mock.warning.assert_called_with(
+            "`window_length`'s values should be strictly positive. 0 and"
+            " negative window lengths will output missing values."
+        )
 
     # TODO: move to a separate file that tests the base class
     def test_variable_window_length_invalid(self):

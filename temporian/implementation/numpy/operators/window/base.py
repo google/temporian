@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from abc import abstractmethod
+import logging
 from typing import Dict, Optional, List, Any
 
 import numpy as np
@@ -68,6 +69,13 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
                     window_length_data = window_length.data[index_key].features[
                         0
                     ]
+                    # Check all window length values are positive, else warn
+                    if not np.all(window_length_data > 0):
+                        logging.warning(
+                            "`window_length`'s values should be strictly"
+                            " positive. 0 and negative window lengths will"
+                            " output missing values."
+                        )
 
                 self._compute(
                     src_timestamps=input_data.timestamps,
