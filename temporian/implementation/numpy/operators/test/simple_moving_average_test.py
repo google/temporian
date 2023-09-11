@@ -143,14 +143,25 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             _f64([10.5, 10.5, 11, nan]),
         )
 
-    def test_cc_variable_winlength_0_or_negative(self):
+    def test_cc_wo_sampling_w_variable_winlength_0_or_negative(self):
         assert_array_equal(
             cc_sma(
                 evset_timestamps=_f64([0, 1, 2, 3, 5, 20]),
                 evset_values=_f64([nan, 10, 11, 12, 13, 14]),
-                window_length=_f64([1, 2, 0, -3, 6, -10]),
+                window_length=_f64([1, 2, -20, 0, 5, -10]),
             ),
-            _f64([nan, 10, nan, nan, 12, nan]),
+            _f64([nan, 10, nan, nan, 11.5, nan]),
+        )
+
+    def test_cc_w_sampling_w_variable_winlength_0_or_negative(self):
+        assert_array_equal(
+            cc_sma(
+                evset_timestamps=_f64([0, 1, 2, 3, 5, 20]),
+                evset_values=_f64([nan, 10, 11, 12, 13, 14]),
+                sampling_timestamps=_f64([2, 2, 5, 5, 20, 20]),
+                window_length=_f64([1, -10, 3, 0, -1000, 19]),
+            ),
+            _f64([11, nan, 12.5, nan, nan, 12.5]),
         )
 
     def test_flat(self):
