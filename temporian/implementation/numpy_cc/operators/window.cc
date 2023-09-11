@@ -173,28 +173,25 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
       first_diff_ts_idx++;
     }
 
-    if (end_idx > 0) {
-      const auto prev_end_idx = end_idx - 1;
-      // Move begin_idx forward or backwards depending on begin_diff.
-      if (begin_moved_forward(curr_ts, v_timestamps[prev_end_idx],
-                              curr_window_length,
-                              v_window_length[prev_end_idx])) {
-        // Window's beginning moved forward
-        while (begin_idx < n_event &&
-               v_timestamps[end_idx] - v_timestamps[begin_idx] >=
-                   curr_window_length) {
-          accumulator.Remove(v_values[begin_idx]);
-          begin_idx++;
-        }
-      } else {
-        // Window's beginning moved backwards.
-        // Note < instead of <= to respect (] window boundaries.
-        while (begin_idx > 0 &&
-               v_timestamps[end_idx] - v_timestamps[begin_idx - 1] <
-                   curr_window_length) {
-          begin_idx--;
-          accumulator.AddLeft(v_values[begin_idx]);
-        }
+    // Move window's left limit forwards or backwards.
+    if (end_idx == 0 ||
+        begin_moved_forward(curr_ts, v_timestamps[end_idx - 1],
+                            curr_window_length, v_window_length[end_idx - 1])) {
+      // Window's beginning moved forward
+      while (begin_idx < n_event &&
+             v_timestamps[end_idx] - v_timestamps[begin_idx] >=
+                 curr_window_length) {
+        accumulator.Remove(v_values[begin_idx]);
+        begin_idx++;
+      }
+    } else {
+      // Window's beginning moved backwards.
+      // Note < instead of <= to respect (] window boundaries.
+      while (begin_idx > 0 &&
+             v_timestamps[end_idx] - v_timestamps[begin_idx - 1] <
+                 curr_window_length) {
+        begin_idx--;
+        accumulator.AddLeft(v_values[begin_idx]);
       }
     }
 
@@ -247,25 +244,24 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
       end_idx++;
     }
 
-    if (end_idx > 0) {
-      const auto prev_end_idx = sampling_idx - 1;
-      // Move begin_idx forward or backwards depending on begin_diff.
-      if (begin_moved_forward(right_limit, v_sampling[prev_end_idx],
-                              curr_window_length,
-                              v_window_length[prev_end_idx])) {
-        while (begin_idx < n_event &&
-               right_limit - v_timestamps[begin_idx] >= curr_window_length) {
-          accumulator.Remove(v_values[begin_idx]);
-          begin_idx++;
-        }
-      } else {
-        // Window's beginning moved backwards.
-        // Note < instead of <= to respect (] window boundaries.
-        while (begin_idx > 0 &&
-               right_limit - v_timestamps[begin_idx - 1] < curr_window_length) {
-          begin_idx--;
-          accumulator.AddLeft(v_values[begin_idx]);
-        }
+    // Move window's left limit forwards or backwards.
+    if (sampling_idx == 0 ||
+        begin_moved_forward(right_limit, v_sampling[sampling_idx - 1],
+                            curr_window_length,
+                            v_window_length[sampling_idx - 1])) {
+      // Window's beginning moved forward
+      while (begin_idx < n_event &&
+             right_limit - v_timestamps[begin_idx] >= curr_window_length) {
+        accumulator.Remove(v_values[begin_idx]);
+        begin_idx++;
+      }
+    } else {
+      // Window's beginning moved backwards.
+      // Note < instead of <= to respect (] window boundaries.
+      while (begin_idx > 0 &&
+             right_limit - v_timestamps[begin_idx - 1] < curr_window_length) {
+        begin_idx--;
+        accumulator.AddLeft(v_values[begin_idx]);
       }
     }
 
