@@ -26,7 +26,7 @@ from temporian.implementation.numpy.operators.window.simple_moving_average impor
     SimpleMovingAverageNumpyImplementation,
     operators_cc,
 )
-from temporian.core.data import node as node_lib
+from temporian.core.data import duration, node as node_lib
 from temporian.io.pandas import from_pandas
 
 
@@ -118,6 +118,17 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
                 _f64([10, 0.5, 2.5, 19, 16, np.inf]),  # window length
             ),
             _f64([nan, 10, 11.5, 11.5, 13.5, 12]),
+        )
+
+    def test_cc_variable_winlength_repeated_ts(self):
+        assert_array_equal(
+            cc_sma(
+                _f64([0, 1, 2, 3, 5, 20]),  # timestamps
+                _f64([nan, 10, 11, 12, 13, 14]),  # feature
+                _f64([20, 20, 20, 20, 20, 20]),  # sampling
+                _f64([16, 0.001, np.inf, 0, 1, 19]),  # window length
+            ),
+            _f64([13.5, 14, 12, nan, 14, 12.5]),
         )
 
     def test_flat(self):
