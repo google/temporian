@@ -1392,7 +1392,10 @@ class EventSetOperations:
         window (t - window_length, t].
 
         If `sampling` is provided samples the moving window's value at each
-        timestamp in `sampling`, else samples it at each timestamp in the input.
+        timestamp in `sampling`, else samples it at each timestamp in
+        `window_length` if it is an `EventSet`, else in the input. If both
+        `sampling` and `window_length` are provided as `EventSets`, their
+        sampling must be the same.
 
         Example without sampling:
             ```python
@@ -1473,7 +1476,10 @@ class EventSetOperations:
         (t - window_length, t].
 
         If `sampling` is provided samples the moving window's value at each
-        timestamp in `sampling`, else samples it at each timestamp in the input.
+        timestamp in `sampling`, else samples it at each timestamp in
+        `window_length` if it is an `EventSet`, else in the input. If both
+        `sampling` and `window_length` are provided as `EventSets`, their
+        sampling must be the same.
 
         If the window does not contain any values (e.g., all the values are
         missing, or the window does not contain any sampling), outputs missing
@@ -1524,7 +1530,10 @@ class EventSetOperations:
         (t - window_length, t].
 
         If `sampling` is provided samples the moving window's value at each
-        timestamp in `sampling`, else samples it at each timestamp in the input.
+        timestamp in `sampling`, else samples it at each timestamp in
+        `window_length` if it is an `EventSet`, else in the input. If both
+        `sampling` and `window_length` are provided as `EventSets`, their
+        sampling must be the same.
 
         If the window does not contain any values (e.g., all the values are
         missing, or the window does not contain any sampling), outputs missing
@@ -1547,8 +1556,8 @@ class EventSetOperations:
 
             ```
 
-        See [`EventSet.moving_count()`][temporian.EventSet.moving_count] for examples
-        of moving window operations with external sampling and indices.
+        See [`EventSet.moving_count()`][temporian.EventSet.moving_count] for
+        examples of moving window operations with external sampling and indices.
 
         Args:
             window_length: Sliding window's length.
@@ -1575,7 +1584,10 @@ class EventSetOperations:
         (t - window_length, t].
 
         If `sampling` is provided samples the moving window's value at each
-        timestamp in `sampling`, else samples it at each timestamp in the input.
+        timestamp in `sampling`, else samples it at each timestamp in
+        `window_length` if it is an `EventSet`, else in the input. If both
+        `sampling` and `window_length` are provided as `EventSets`, their
+        sampling must be the same.
 
         Missing values (such as NaNs) are ignored.
 
@@ -1600,8 +1612,8 @@ class EventSetOperations:
 
             ```
 
-        See [`EventSet.moving_count()`][temporian.EventSet.moving_count] for examples of moving window
-        operations with external sampling and indices.
+        See [`EventSet.moving_count()`][temporian.EventSet.moving_count] for
+        examples of moving window operations with external sampling and indices.
 
         Args:
             window_length: Sliding window's length.
@@ -1632,7 +1644,10 @@ class EventSetOperations:
         time t the sum of the feature in the window (t - window_length, t].
 
         If `sampling` is provided samples the moving window's value at each
-        timestamp in `sampling`, else samples it at each timestamp in the input.
+        timestamp in `sampling`, else samples it at each timestamp in
+        `window_length` if it is an `EventSet`, else in the input. If both
+        `sampling` and `window_length` are provided as `EventSets`, their
+        sampling must be the same.
 
         Missing values (such as NaNs) are ignored.
 
@@ -1657,8 +1672,8 @@ class EventSetOperations:
 
             ```
 
-        See [`EventSet.moving_count()`][temporian.EventSet.moving_count] for examples of moving window
-        operations with external sampling and indices.
+        See [`EventSet.moving_count()`][temporian.EventSet.moving_count] for
+        examples of moving window operations with external sampling and indices.
 
         Args:
             window_length: Sliding window's length.
@@ -2182,12 +2197,15 @@ class EventSetOperations:
         (t - window_length, t].
 
         If `sampling` is provided samples the moving window's value at each
-        timestamp in `sampling`, else samples it at each timestamp in the input.
+        timestamp in `sampling`, else samples it at each timestamp in
+        `window_length` if it is an `EventSet`, else in the input. If both
+        `sampling` and `window_length` are provided as `EventSets`, their
+        sampling must be the same.
 
         Missing values (such as NaNs) are ignored.
 
         If the window does not contain any values (e.g., all the values are
-        missing, or the window does not contain any sampling), outputs missing
+        missing, or the window does not contain any timestamp), outputs missing
         values.
 
         Example:
