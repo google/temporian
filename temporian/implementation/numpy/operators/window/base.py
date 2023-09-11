@@ -69,11 +69,11 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
                     window_length_data = window_length.data[index_key].features[
                         0
                     ]
-                    # Check all window length values are positive, else warn
+                    # Warn if not all window length values are positive
                     if not np.all(window_length_data > 0):
                         logging.warning(
                             "`window_length`'s values should be strictly"
-                            " positive. 0 and negative window lengths will"
+                            " positive. 0, NaN and negative window lengths will"
                             " output missing values."
                         )
 

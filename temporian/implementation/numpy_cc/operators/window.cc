@@ -13,6 +13,8 @@
 namespace {
 namespace py = pybind11;
 
+using namespace std;
+
 typedef py::array_t<double> ArrayD;
 typedef py::array_t<float> ArrayF;
 
@@ -166,7 +168,11 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
     // v_timestamps[end_idx], and there may be several contiguous equal
     // values in v_timestamps.
     const auto curr_ts = v_timestamps[idx];
-    const auto curr_window_length = v_window_length[idx];
+    auto curr_window_length = v_window_length[idx];
+
+    if (std::isnan(curr_window_length)) {
+      curr_window_length = 0;
+    }
 
     while (end_idx < n_event && v_timestamps[end_idx] <= curr_ts) {
       accumulator.Add(v_values[end_idx]);
@@ -177,7 +183,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
     if (idx == 0 ||
         begin_moved_forward(curr_ts, v_timestamps[idx - 1], curr_window_length,
                             v_window_length[idx - 1])) {
-      // Window's beginning moved forward
+      // Window's beginning moved forwards.
       while (begin_idx < n_event &&
              v_timestamps[idx] - v_timestamps[begin_idx] >=
                  curr_window_length) {
@@ -229,7 +235,11 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
 
   for (size_t sampling_idx = 0; sampling_idx < n_sampling; sampling_idx++) {
     const auto right_limit = v_sampling[sampling_idx];
-    const auto curr_window_length = v_window_length[sampling_idx];
+    auto curr_window_length = v_window_length[sampling_idx];
+
+    if (std::isnan(curr_window_length)) {
+      curr_window_length = 0;
+    }
 
     while (end_idx < n_event && v_timestamps[end_idx] <= right_limit) {
       accumulator.Add(v_values[end_idx]);
@@ -241,7 +251,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
         begin_moved_forward(right_limit, v_sampling[sampling_idx - 1],
                             curr_window_length,
                             v_window_length[sampling_idx - 1])) {
-      // Window's beginning moved forward
+      // Window's beginning moved forwards.
       while (begin_idx < n_event &&
              right_limit - v_timestamps[begin_idx] >= curr_window_length) {
         accumulator.Remove(v_values[begin_idx]);

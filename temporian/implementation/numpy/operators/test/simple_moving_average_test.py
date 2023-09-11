@@ -143,23 +143,23 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             _f64([10.5, 10.5, 11, nan]),
         )
 
-    def test_cc_wo_sampling_w_variable_winlength_0_or_negative(self):
+    def test_cc_wo_sampling_w_variable_winlength_invalid_values(self):
         assert_array_equal(
             cc_sma(
-                evset_timestamps=_f64([0, 1, 2, 3, 5, 20]),
-                evset_values=_f64([nan, 10, 11, 12, 13, 14]),
-                window_length=_f64([1, 2, -20, 0, 5, -10]),
+                evset_timestamps=_f64([0, 1, 2, 3, 5, 6, 20]),
+                evset_values=_f64([nan, 10, 11, 12, 13, 14, 15]),
+                window_length=_f64([1, -20, 3, 0, 10, nan, 19]),
             ),
-            _f64([nan, 10, nan, nan, 11.5, nan]),
+            _f64([nan, nan, 10.5, nan, 11.5, nan, 13]),
         )
 
-    def test_cc_w_sampling_w_variable_winlength_0_or_negative(self):
+    def test_cc_w_sampling_variable_winlength_invalid_values(self):
         assert_array_equal(
             cc_sma(
                 evset_timestamps=_f64([0, 1, 2, 3, 5, 20]),
                 evset_values=_f64([nan, 10, 11, 12, 13, 14]),
                 sampling_timestamps=_f64([2, 2, 5, 5, 20, 20]),
-                window_length=_f64([1, -10, 3, 0, -1000, 19]),
+                window_length=_f64([1, -10, 3, 0, nan, 19]),
             ),
             _f64([11, nan, 12.5, nan, nan, 12.5]),
         )
@@ -309,13 +309,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
 
         evset = from_pandas(
             pd.DataFrame(
-                [
-                    [10.0, 1],
-                    [11.0, 2],
-                    [12.0, 3],
-                    [13.0, 5],
-                    [14.0, 6],
-                ],
+                [[10.0, 1], [11.0, 2], [12.0, 3], [13.0, 5], [14.0, 6]],
                 columns=["a", "timestamp"],
             )
         )
@@ -335,15 +329,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
 
         sampling_data = from_pandas(
             pd.DataFrame(
-                [
-                    [-1.0],
-                    [1.0],
-                    [1.1],
-                    [3.0],
-                    [3.5],
-                    [6.0],
-                    [10.0],
-                ],
+                [[-1.0], [1.0], [1.1], [3.0], [3.5], [6.0], [10.0]],
                 columns=["timestamp"],
             )
         )
@@ -371,13 +357,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
 
         evset = from_pandas(
             pd.DataFrame(
-                [
-                    [nan, 1],
-                    [11.0, 2],
-                    [nan, 3],
-                    [13.0, 5],
-                    [14.0, 6],
-                ],
+                [[nan, 1], [11.0, 2], [nan, 3], [13.0, 5], [14.0, 6]],
                 columns=["a", "timestamp"],
             )
         )
@@ -391,16 +371,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
 
         sampling_data = from_pandas(
             pd.DataFrame(
-                [
-                    [1],
-                    [2],
-                    [2.5],
-                    [3],
-                    [3.5],
-                    [4],
-                    [5],
-                    [6],
-                ],
+                [[1], [2], [2.5], [3], [3.5], [4], [5], [6]],
                 columns=["timestamp"],
             )
         )
@@ -451,7 +422,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             input=evset, sampling=sampling, window_length=window_length
         )
         logging_mock.warning.assert_called_with(
-            "`window_length`'s values should be strictly positive. 0 and"
+            "`window_length`'s values should be strictly positive. 0, NaN and"
             " negative window lengths will output missing values."
         )
 

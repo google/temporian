@@ -108,8 +108,8 @@ must have a single float64 feature and the same sampling as the effective
 sampling. The window length for each timestamp in the effective sampling will be
 the feature value at that timestamp in `window_length`.
 
-If an `EventSet`, it should contain strictly positive values. If receiving 0 or
-negative values, the operator will treat the window as empty.
+If an `EventSet`, it should contain strictly positive values. If receiving 0,
+negative values, or missing values, the operator will treat the window as empty.
 """
 
 
