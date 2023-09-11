@@ -13,8 +13,6 @@
 namespace {
 namespace py = pybind11;
 
-using namespace std;
-
 typedef py::array_t<double> ArrayD;
 typedef py::array_t<float> ArrayF;
 
