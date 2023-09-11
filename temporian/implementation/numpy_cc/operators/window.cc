@@ -125,6 +125,12 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
   return output;
 }
 
+bool begin_moved_forward(const double ts, const double prev_ts,
+                         const double window_length,
+                         const double prev_window_length) {
+  return ts - prev_ts - (window_length - prev_window_length) > 0;
+}
+
 // No external sampling, variable window length
 template <typename INPUT, typename OUTPUT, typename TAccumulator>
 py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
@@ -168,10 +174,11 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
     }
 
     if (end_idx > 0) {
+      const auto prev_end_idx = end_idx - 1;
       // Move begin_idx forward or backwards depending on begin_diff.
-      if (curr_ts - v_timestamps[end_idx - 1] -
-              (curr_window_length - v_window_length[end_idx - 1]) >
-          0) {
+      if (begin_moved_forward(curr_ts, v_timestamps[prev_end_idx],
+                              curr_window_length,
+                              v_window_length[prev_end_idx])) {
         // Window's beginning moved forward
         while (begin_idx < n_event &&
                v_timestamps[end_idx] - v_timestamps[begin_idx] >=
@@ -241,11 +248,11 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
     }
 
     if (end_idx > 0) {
+      const auto prev_end_idx = sampling_idx - 1;
       // Move begin_idx forward or backwards depending on begin_diff.
-      if (right_limit - v_sampling[sampling_idx - 1] -
-              (curr_window_length - v_window_length[sampling_idx - 1]) >
-          0) {
-        // Window's beginning moved forward
+      if (begin_moved_forward(right_limit, v_sampling[prev_end_idx],
+                              curr_window_length,
+                              v_window_length[prev_end_idx])) {
         while (begin_idx < n_event &&
                right_limit - v_timestamps[begin_idx] >= curr_window_length) {
           accumulator.Remove(v_values[begin_idx]);
@@ -432,10 +439,11 @@ struct MovingExtremumAccumulator : Accumulator<INPUT, OUTPUT> {
     }
 
     assert(values.front() == value);
+    assert(!values.empty());
+
     if (values.size() == 1) {
       values.clear();
     } else {
-      assert(!values.empty());
       values.pop_front();
       if (value == current_extremum) {
         // Compute the extremum on the remaining items.
