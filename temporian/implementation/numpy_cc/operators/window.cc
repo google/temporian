@@ -141,6 +141,9 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
   auto v_values = evset_values.template unchecked<1>();
   auto v_window_length = window_length.unchecked<1>();
 
+  assert(v_timestamps.shape(0) == v_window_length.shape(0));
+  assert(v_timestamps.shape(0) == v_values.shape(0));
+
   TAccumulator accumulator;
 
   // Index of the first value in the window.
@@ -148,21 +151,16 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
   // Index of the first value outside the window.
   size_t end_idx = 0;
 
-  double curr_ts;
-  double curr_window_length;
-  size_t first_diff_ts_idx;
-
   while (end_idx < n_event) {
     // Note: We accumulate values in (t-window_length, t] with t=
     // v_timestamps[end_idx], and there may be several contiguous equal
     // values in v_timestamps.
-
-    curr_ts = v_timestamps[end_idx];
-    curr_window_length = v_window_length[end_idx];
+    const auto curr_ts = v_timestamps[end_idx];
+    const auto curr_window_length = v_window_length[end_idx];
 
     // Add all values with same timestamp as the current one.
     accumulator.Add(v_values[end_idx]);
-    first_diff_ts_idx = end_idx + 1;
+    auto first_diff_ts_idx = end_idx + 1;
     while (first_diff_ts_idx < n_event &&
            v_timestamps[first_diff_ts_idx] == curr_ts) {
       accumulator.Add(v_values[first_diff_ts_idx]);
@@ -224,6 +222,9 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
   auto v_values = evset_values.template unchecked<1>();
   auto v_sampling = sampling_timestamps.unchecked<1>();
   auto v_window_length = window_length.unchecked<1>();
+
+  assert(v_timestamps.shape(0) == v_values.shape(0));
+  assert(v_sampling.shape(0) == v_window_length.shape(0));
 
   TAccumulator accumulator;
 
