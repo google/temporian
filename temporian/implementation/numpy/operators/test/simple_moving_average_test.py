@@ -164,7 +164,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             _f64([11, nan, 12.5, nan, nan, 12.5]),
         )
 
-    def test_cc_w0_sampling_repeated_ts(self):
+    def test_cc_wo_sampling_repeated_ts(self):
         assert_array_equal(
             cc_sma(
                 evset_timestamps=_f64([0, 2, 2, 2, 2, 5]),
@@ -172,6 +172,25 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
                 window_length=_f64([1, 3, 0.5, np.inf, -1, 5]),
             ),
             _f64([10, 12, 12.5, 12, nan, 13]),
+        )
+
+    def test_variable_winlength_duped_ts_same_winlength(self):
+        assert_array_equal(
+            cc_sma(
+                evset_timestamps=_f64([2, 2, 2, 2]),
+                evset_values=_f64([10, 11, 12, 13]),
+                window_length=_f64([0, 1, 1, 2]),
+            ),
+            _f64([nan, 11.5, 11.5, 11.5]),
+        )
+        assert_array_equal(
+            cc_sma(
+                evset_timestamps=_f64([0, 1, 2, 3]),
+                evset_values=_f64([10, 11, 12, 13]),
+                sampling_timestamps=_f64([2, 2, 2, 2]),
+                window_length=_f64([0, 1, 1, 2]),
+            ),
+            _f64([nan, 12, 12, 11.5]),
         )
 
     def test_flat(self):
