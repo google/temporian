@@ -193,6 +193,25 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             _f64([nan, 12, 12, 11.5]),
         )
 
+    def test_variable_winlength_empty_arrays(self):
+        assert_array_equal(
+            cc_sma(
+                evset_timestamps=_f64([1]),
+                evset_values=_f64([10]),
+                sampling_timestamps=_f64([]),
+                window_length=_f64([]),
+            ),
+            _f64([]),
+        )
+        assert_array_equal(
+            cc_sma(
+                evset_timestamps=_f64([]),
+                evset_values=_f64([]),
+                window_length=_f64([]),
+            ),
+            _f64([]),
+        )
+
     def test_flat(self):
         """A simple event set."""
 
