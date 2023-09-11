@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Optional
+from typing import List, Optional, Union
 import numpy as np
+from temporian.core.data.duration_utils import NormalizedDuration
 
 from temporian.core.operators.window.moving_count import (
     MovingCountOperator,
@@ -35,26 +36,19 @@ class MovingCountNumpyImplementation(BaseWindowNumpyImplementation):
         self,
         src_timestamps: np.ndarray,
         src_features: List[np.ndarray],
-        sampling_timestamps: np.ndarray,
+        sampling_timestamps: Optional[np.ndarray],
         dst_features: List[np.ndarray],
-        window_length: Optional[np.ndarray] = None,
+        window_length: Union[NormalizedDuration, np.ndarray],
     ) -> None:
         assert isinstance(self.operator, MovingCountOperator)
-
-        # TODO (ian): unify this with the logic in base class
-        effective_window_length = (
-            window_length
-            if self.operator.has_variable_winlen
-            else self.operator.window_length
-        )
 
         del src_features  # Features are ignored
 
         kwargs = {
             "evset_timestamps": src_timestamps,
-            "window_length": effective_window_length,
+            "window_length": window_length,
         }
-        if self.operator.has_sampling or self.operator.has_variable_winlen:
+        if sampling_timestamps is not None:
             kwargs["sampling_timestamps"] = sampling_timestamps
         dst_feature = operators_cc.moving_count(**kwargs)
         dst_features.append(dst_feature)
