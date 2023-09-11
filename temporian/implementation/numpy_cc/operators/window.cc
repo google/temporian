@@ -157,29 +157,29 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
   // Index of the first value outside the window.
   size_t end_idx = 0;
 
-  while (end_idx < n_event) {
+  // Note that end_idx might get ahead of idx if there are several values with
+  // same timestamp in v_timestamps. We can't group these all together like we
+  // do in the constant window case because they might have different window
+  // lengths and therefore different output values.
+  for (size_t idx = 0; idx < n_event; idx++) {
     // Note: We accumulate values in (t-window_length, t] with t=
     // v_timestamps[end_idx], and there may be several contiguous equal
     // values in v_timestamps.
-    const auto curr_ts = v_timestamps[end_idx];
-    const auto curr_window_length = v_window_length[end_idx];
+    const auto curr_ts = v_timestamps[idx];
+    const auto curr_window_length = v_window_length[idx];
 
-    // Add all values with same timestamp as the current one.
-    accumulator.Add(v_values[end_idx]);
-    auto first_diff_ts_idx = end_idx + 1;
-    while (first_diff_ts_idx < n_event &&
-           v_timestamps[first_diff_ts_idx] == curr_ts) {
-      accumulator.Add(v_values[first_diff_ts_idx]);
-      first_diff_ts_idx++;
+    while (end_idx < n_event && v_timestamps[end_idx] <= curr_ts) {
+      accumulator.Add(v_values[end_idx]);
+      end_idx++;
     }
 
     // Move window's left limit forwards or backwards.
-    if (end_idx == 0 ||
-        begin_moved_forward(curr_ts, v_timestamps[end_idx - 1],
-                            curr_window_length, v_window_length[end_idx - 1])) {
+    if (idx == 0 ||
+        begin_moved_forward(curr_ts, v_timestamps[idx - 1], curr_window_length,
+                            v_window_length[idx - 1])) {
       // Window's beginning moved forward
       while (begin_idx < n_event &&
-             v_timestamps[end_idx] - v_timestamps[begin_idx] >=
+             v_timestamps[idx] - v_timestamps[begin_idx] >=
                  curr_window_length) {
         accumulator.Remove(v_values[begin_idx]);
         begin_idx++;
@@ -187,22 +187,14 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
     } else {
       // Window's beginning moved backwards.
       // Note < instead of <= to respect (] window boundaries.
-      while (begin_idx > 0 &&
-             v_timestamps[end_idx] - v_timestamps[begin_idx - 1] <
-                 curr_window_length) {
+      while (begin_idx > 0 && v_timestamps[idx] - v_timestamps[begin_idx - 1] <
+                                  curr_window_length) {
         begin_idx--;
         accumulator.AddLeft(v_values[begin_idx]);
       }
     }
 
-    // Set current value of window to all values with the same timestamp.
-    const auto result = accumulator.Result();
-    for (size_t i = end_idx; i < first_diff_ts_idx; i++) {
-      v_output[i] = result;
-    }
-
-    // Move pointer to the index of the last value with the same timestamp.
-    end_idx = first_diff_ts_idx;
+    v_output[idx] = accumulator.Result();
   }
 
   return output;
