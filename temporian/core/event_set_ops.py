@@ -16,7 +16,7 @@
 
 
 from __future__ import annotations
-from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING
+from typing import Any, Dict, List, Literal, Optional, Union, TYPE_CHECKING
 
 from temporian.core.data.duration import Duration
 
@@ -2182,21 +2182,23 @@ class EventSetOperations:
 
     def tick_calendar(
         self: EventSetOrNode,
-        second: Union[int, str, None] = None,
-        minute: Union[int, str, None] = None,
-        hour: Union[int, str, None] = None,
-        mday: Union[int, str, None] = None,
-        month: Union[int, str, None] = None,
-        wday: Union[int, str, None] = None,
+        second: Union[int, Literal["*"], None],
+        minute: Union[int, Literal["*"], None],
+        hour: Union[int, Literal["*"], None],
+        mday: Union[int, Literal["*"], None],
+        month: Union[int, Literal["*"], None],
+        wday: Union[int, Literal["*"], None],
     ) -> EventSetOrNode:
-        """Generates timestamps at specified datetimes, in the range of a guide
-        [`EventSet`][temporian.EventSet].
+        """Generates events periodically at fixed times or dates e.g. each month.
+
+        Events are generated in the range of the input
+        [`EventSet`][temporian.EventSet] independently for each index.
 
         The usability is inspired in the crontab format, where arguments can
         take a value of `'*'` to tick at all values, or a fixed integer to
         tick only at that precise value.
 
-        Non-specified values (`None`), are set to `*` if a finer
+        Non-specified values (`None`), are set to `'*'` if a finer
         resolution argument is specified, or fixed to the first valid value if
         a lower resolution is specified. For example, setting only
         `tick_calendar(hour='*')`
@@ -2205,11 +2207,13 @@ class EventSetOperations:
         , resulting in one tick at every exact hour of every day/month/year in
         the input guide range.
 
+        The datetime timezone is always assumed to be UTC.
+
         Examples:
             ```python
-            >>> # Every day in the period (exactly one year)
+            >>> # Every day (at 00:00:00) in the period (exactly one year)
             >>> a = tp.event_set(timestamps=["2021-01-01", "2021-12-31 23:59:59"])
-            >>> b = a.tick_calendar()
+            >>> b = a.tick_calendar(hour=0)
             >>> b
             indexes: ...
             events:
@@ -2230,7 +2234,7 @@ class EventSetOperations:
             ...
 
 
-            >>> # Day 5 of every month
+            >>> # Day 5 of every month (at 00:00)
             >>> b = a.tick_calendar(mday=5)
             >>> b.calendar_day_of_month()
             indexes: ...

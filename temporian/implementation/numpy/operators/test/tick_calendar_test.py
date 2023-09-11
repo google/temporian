@@ -28,9 +28,6 @@ from temporian.implementation.numpy.operators.test.test_util import (
 
 
 class TickCalendarOperatorTest(absltest.TestCase):
-    def setUp(self):
-        pass
-
     def test_end_of_month_seconds(self):
         # All seconds at mday=31, should only be valid for months 1, 3, 5
 

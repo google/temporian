@@ -2,6 +2,7 @@
 #include <pybind11/pybind11.h>
 
 #include <chrono>
+#include <cmath>
 #include <cstdint>
 #include <ctime>
 #include <iostream>
@@ -14,8 +15,8 @@ namespace {
 namespace py = pybind11;
 
 py::array_t<double> tick_calendar(
-    const long start_timestamp,                  // min date
-    const long end_timestamp,                    // max date
+    const double start_timestamp,                // min date
+    const double end_timestamp,                  // max date
     const int min_second, const int max_second,  // second range
     const int min_minute, const int max_minute,  // minute range
     const int min_hour, const int max_hour,      // hours range
@@ -27,9 +28,10 @@ py::array_t<double> tick_calendar(
   std::vector<double> ticks;
 
   // Date range
-  std::tm start_utc = *std::gmtime(&start_timestamp);
-  std::tm end_utc = *std::gmtime(&end_timestamp);
+  const long start_t = (long)std::floor(start_timestamp);
+  const long end_t = (long)std::floor(end_timestamp);
 
+  std::tm start_utc = *std::gmtime(&start_t);
   int year = start_utc.tm_year;                           // from 1900
   int month = std::max(start_utc.tm_mon + 1, min_month);  // zero-based tm_mon
   int mday = std::max(start_utc.tm_mday, min_mday);       // 1-31
@@ -57,7 +59,7 @@ py::array_t<double> tick_calendar(
               // Valid date
               if (time != -1 && tm_struct.tm_mday == mday) {
                 // Finish condition
-                if (time > end_timestamp) {
+                if (time > end_t) {
                   in_range = false;
                   break;
                 }
@@ -68,7 +70,7 @@ py::array_t<double> tick_calendar(
                   ticks.push_back(time);
                 }
               } else {
-                // Invalid date (end of month)
+                // Invalid date (e.g: 31/4)
                 second = max_second;  // avoid unnecessary loops
                 minute = max_minute;
                 hour = max_hour;

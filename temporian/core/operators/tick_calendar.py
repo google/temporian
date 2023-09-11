@@ -14,7 +14,9 @@
 
 
 """TickCalendar operator class and public API function definitions."""
-from typing import Union
+from typing import Union, Literal, Tuple
+
+import numpy as np
 
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
@@ -84,7 +86,7 @@ class TickCalendar(Operator):
             create_node_new_features_new_sampling(
                 features=[],
                 indexes=input.schema.indexes,
-                is_unix_timestamp=input.schema.is_unix_timestamp,
+                is_unix_timestamp=True,
                 creator=self,
             ),
         )
@@ -201,11 +203,25 @@ class TickCalendar(Operator):
 operator_lib.register_operator(TickCalendar)
 
 
-def set_arg_range(arg_value, val_range, prefer_free):
+def set_arg_range(
+    arg_value: Union[int, Literal["*"], None],
+    val_range: Tuple[int, int],
+    prefer_free: bool,
+):
     if arg_value == "*":
         range_ini, range_end = val_range
     elif arg_value is not None:
-        range_ini = range_end = int(arg_value)
+        if (
+            not isinstance(arg_value, (int, np.integer))
+            or arg_value < val_range[0]
+            or arg_value > val_range[1]
+        ):
+            raise ValueError(
+                f"Value should be '*' or integer in range {val_range}, got:"
+                f" {arg_value} (type {type(arg_value)})"
+            )
+
+        range_ini = range_end = arg_value
     else:  # None (auto setup)
         if prefer_free:  # Don't restrict the range
             range_ini, range_end = val_range
@@ -219,17 +235,16 @@ def set_arg_range(arg_value, val_range, prefer_free):
 @compile
 def tick_calendar(
     input: EventSetOrNode,
-    second: Union[int, str, None],
-    minute: Union[int, str, None],
-    hour: Union[int, str, None],
-    mday: Union[int, str, None],
-    month: Union[int, str, None],
-    wday: Union[int, str, None],
+    second: Union[int, Literal["*"], None],
+    minute: Union[int, Literal["*"], None],
+    hour: Union[int, Literal["*"], None],
+    mday: Union[int, Literal["*"], None],
+    month: Union[int, Literal["*"], None],
+    wday: Union[int, Literal["*"], None],
 ) -> EventSetOrNode:
-    # Default for empty args
+    # Don't allow empty args
     if all(arg is None for arg in (second, minute, hour, mday, month, wday)):
-        mday = "*"
-        month = "*"
+        raise ValueError("At least one argument must be provided (not None).")
 
     # All defined values must be consecutive (no gaps with None)
     if wday is not None:
@@ -256,10 +271,10 @@ def tick_calendar(
     prefer_free = second is not None
     min_minute, max_minute = set_arg_range(minute, (0, 59), prefer_free)
 
-    prefer_free = prefer_free or minute is not None
+    prefer_free |= minute is not None
     min_hour, max_hour = set_arg_range(hour, (0, 23), prefer_free)
 
-    prefer_free = prefer_free or hour is not None
+    prefer_free |= hour is not None
     min_mday, max_mday = set_arg_range(mday, (1, 31), prefer_free)
 
     # Always free month range by default

@@ -42,14 +42,12 @@ class TickCalendarNumpyImplementation(OperatorImplementation):
 
         # Fill output EventSet's data
         for index_key, index_data in input.data.items():
-            if len(index_data.timestamps) < 2:
+            if len(index_data.timestamps) == 0:
                 dst_timestamps = np.array([], dtype=np.float64)
             else:
-                begin = int(index_data.timestamps[0])  # discard sub-second info
-                end = int(index_data.timestamps[-1])
                 dst_timestamps = operators_cc.tick_calendar(
-                    start_timestamp=begin,
-                    end_timestamp=end,
+                    start_timestamp=index_data.timestamps[0],
+                    end_timestamp=index_data.timestamps[-1],
                     min_second=self.operator.min_second,
                     max_second=self.operator.max_second,
                     min_minute=self.operator.min_minute,
