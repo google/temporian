@@ -100,7 +100,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             _f32([nan, 11.0, 11.0, nan, nan, nan, 13.0, 14]),
         )
 
-    def test_cc_wo_sampling_w_variable_winlength(self):
+    def test_cc_wo_sampling_w_variable_winlen(self):
         assert_array_equal(
             cc_sma(
                 evset_timestamps=_f64([0, 1, 2, 3, 5, 20]),
@@ -110,7 +110,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             _f32([nan, 10, 10.5, 12, 12, 12]),
         )
 
-    def test_cc_w_sampling_w_variable_winlength(self):
+    def test_cc_w_sampling_w_variable_winlen(self):
         assert_array_equal(
             cc_sma(
                 evset_timestamps=_f64([0, 1, 2, 3, 5, 20]),
@@ -121,7 +121,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             _f64([nan, 10, 11.5, 11.5, 13.5, 12]),
         )
 
-    def test_cc_variable_winlength_repeated_ts(self):
+    def test_cc_variable_winlen_repeated_ts(self):
         assert_array_equal(
             cc_sma(
                 evset_timestamps=_f64([0, 1, 2, 3, 5, 20]),
@@ -132,7 +132,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             _f64([13.5, 14, 12, nan, 14, 12.5]),
         )
 
-    def test_cc_variable_winlength_shortest_duration(self):
+    def test_cc_variable_winlen_shortest_duration(self):
         assert_array_equal(
             cc_sma(
                 evset_timestamps=_f64([1.999999, 2]),
@@ -143,7 +143,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             _f64([10.5, 10.5, 11, nan]),
         )
 
-    def test_cc_wo_sampling_w_variable_winlength_invalid_values(self):
+    def test_cc_wo_sampling_w_variable_winlen_invalid_values(self):
         assert_array_equal(
             cc_sma(
                 evset_timestamps=_f64([0, 1, 2, 3, 5, 6, 20]),
@@ -153,7 +153,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             _f64([nan, nan, 10.5, nan, 11.5, nan, 13]),
         )
 
-    def test_cc_w_sampling_variable_winlength_invalid_values(self):
+    def test_cc_w_sampling_variable_winlen_invalid_values(self):
         assert_array_equal(
             cc_sma(
                 evset_timestamps=_f64([0, 1, 2, 3, 5, 20]),
@@ -174,7 +174,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             _f64([10, 12, 12.5, 12, nan, 13]),
         )
 
-    def test_variable_winlength_duped_ts_same_winlength(self):
+    def test_variable_winlen_duped_ts_same_winlength(self):
         assert_array_equal(
             cc_sma(
                 evset_timestamps=_f64([2, 2, 2, 2]),
@@ -193,7 +193,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             _f64([nan, 12, 12, 11.5]),
         )
 
-    def test_variable_winlength_empty_arrays(self):
+    def test_variable_winlen_empty_arrays(self):
         assert_array_equal(
             cc_sma(
                 evset_timestamps=_f64([1]),
@@ -397,7 +397,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
 
     # TODO: move to a separate file that tests the base class
     @patch("temporian.implementation.numpy.operators.window.base.logging")
-    def test_negative_window_length(self, logging_mock):
+    def test_invalid_window_length_warning(self, logging_mock):
         """Tests that warning is shown when receiving non strictly positive
         values in window_length."""
         evset = from_pandas(

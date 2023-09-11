@@ -53,16 +53,16 @@ class MovingCountOperatorTest(absltest.TestCase):
             _i32([1, 2, 3, 4, 1]),
         )
 
-    def test_cc_wo_sampling_w_variable_winlength(self):
+    def test_cc_wo_sampling_w_variable_winlen(self):
         assert_array_equal(
             operators_cc.moving_count(
                 _f64([1, 2, 3, 5, 20]),
                 _f64([0, np.inf, 1.001, 5, 0.00001]),
             ),
-            _i32([1, 2, 2, 4, 1]),
+            _i32([0, 2, 2, 4, 1]),
         )
 
-    def test_cc_w_sampling_w_variable_winlength(self):
+    def test_cc_w_sampling_w_variable_winlen(self):
         assert_array_equal(
             operators_cc.moving_count(
                 _f64([1, 2, 3, 5, 20]),

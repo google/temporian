@@ -45,14 +45,17 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
     ) -> Dict[str, EventSet]:
         assert isinstance(self.operator, BaseWindowOperator)
 
-        # if no sampling is provided, apply operator to the evset's own
-        # timestamps
+        # pick effective sampling
         if sampling is None:
-            sampling = input
+            if window_length is not None:
+                sampling = window_length
+            else:
+                sampling = input
 
         # create destination evset
         output_schema = self.operator.outputs["output"].schema
         output_evset = EventSet(data={}, schema=output_schema)
+
         # For each index
         for index_key, sampling_data in sampling.data.items():
             output_data = IndexData(
@@ -60,22 +63,19 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
                 timestamps=sampling_data.timestamps,
                 schema=None,  # Checking is done later
             )
+            window_length_data = None
+            if window_length is not None:
+                window_length_data = window_length.data[index_key].features[0]
+                # Warn if not all window length values are positive
+                if not np.all(window_length_data > 0):
+                    logging.warning(
+                        "`window_length`'s values should be strictly"
+                        " positive. 0, NaN and negative window lengths will"
+                        " output missing values."
+                    )
 
             if index_key in input.data:
                 input_data = input.data[index_key]
-
-                window_length_data = None
-                if window_length is not None:
-                    window_length_data = window_length.data[index_key].features[
-                        0
-                    ]
-                    # Warn if not all window length values are positive
-                    if not np.all(window_length_data > 0):
-                        logging.warning(
-                            "`window_length`'s values should be strictly"
-                            " positive. 0, NaN and negative window lengths will"
-                            " output missing values."
-                        )
 
                 self._compute(
                     src_timestamps=input_data.timestamps,
@@ -96,6 +96,7 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
                     src_features=empty_features,
                     sampling_timestamps=sampling_data.timestamps,
                     dst_features=output_data.features,
+                    window_length=window_length_data,
                 )
 
             output_data.check_schema(output_schema)
@@ -121,7 +122,7 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
 
         effective_window_length = (
             window_length
-            if window_length is not None
+            if self.operator.has_variable_winlen
             else self.operator.window_length
         )
 
@@ -132,7 +133,7 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
                 "evset_values": src_ts,
                 "window_length": effective_window_length,
             }
-            if self.operator.has_sampling:
+            if self.operator.has_sampling or self.operator.has_variable_winlen:
                 kwargs["sampling_timestamps"] = sampling_timestamps
             dst_feature = implementation(**kwargs)
             dst_features.append(dst_feature)

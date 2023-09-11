@@ -42,19 +42,19 @@ class BaseWindowOperator(Operator, ABC):
     ):
         super().__init__()
 
-        self._has_sampling = sampling is not None
-        if self._has_sampling:
-            assert sampling is not None
+        has_variable_winlen = isinstance(window_length, EventSetNode)
+        self._has_variable_winlen = has_variable_winlen
 
-            self.add_input("sampling", sampling)
-            effective_sampling_node = sampling
+        has_sampling = sampling is not None
+        self._has_sampling = has_sampling
 
+        if has_sampling:
             input.schema.check_compatible_index(sampling.schema)
+            if has_variable_winlen:
+                sampling.check_same_sampling(window_length)
+            self.add_input("sampling", sampling)
 
-        else:
-            effective_sampling_node = input
-
-        if isinstance(window_length, EventSetNode):
+        if has_variable_winlen:
             if (
                 len(window_length.schema.features) != 1
                 or window_length.schema.features[0].dtype != DType.FLOAT64
@@ -62,9 +62,6 @@ class BaseWindowOperator(Operator, ABC):
                 raise ValueError(
                     "`window_length` must have exactly one float64 feature."
                 )
-            effective_sampling_node.schema.check_compatible_index(
-                window_length.schema
-            )
             self.add_input("window_length", window_length)
         else:
             window_length = normalize_duration(window_length)
@@ -72,6 +69,15 @@ class BaseWindowOperator(Operator, ABC):
             self._window_length = window_length
 
         self.add_input("input", input)
+
+        # Note: effective_sampling_node can be either the received sampling,
+        # window_length, or input
+        effective_sampling_node = (
+            sampling
+            if has_sampling
+            else (window_length if has_variable_winlen else input)
+        )
+        assert isinstance(effective_sampling_node, EventSetNode)
 
         self.add_output(
             "output",
@@ -95,13 +101,17 @@ class BaseWindowOperator(Operator, ABC):
 
     @property
     def window_length(self) -> Optional[NormalizedDuration]:
-        """Return None if window_length is variable (i.e. an EventSet was passed
-        as `window_length` to the operator)."""
+        """Returns None if window_length is variable (i.e. an EventSet was
+        passed as `window_length` to the operator)."""
         return self._window_length
 
     @property
     def has_sampling(self) -> bool:
         return self._has_sampling
+
+    @property
+    def has_variable_winlen(self) -> bool:
+        return self._has_variable_winlen
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:

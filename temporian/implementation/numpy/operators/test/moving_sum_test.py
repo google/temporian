@@ -52,7 +52,7 @@ class MovingSumOperatorTest(absltest.TestCase):
             _f32([10.0, 10.0, 22.0, 35.0, 14.0]),
         )
 
-    def test_cc_wo_sampling_w_variable_winlength(self):
+    def test_cc_wo_sampling_w_variable_winlen(self):
         assert_array_equal(
             operators_cc.moving_sum(
                 evset_timestamps=_f64([0, 1, 2, 3, 5, 20]),
@@ -62,7 +62,7 @@ class MovingSumOperatorTest(absltest.TestCase):
             _f32([0, 10, 21, 12, 36, 60]),
         )
 
-    def test_cc_w_sampling_w_variable_winlength(self):
+    def test_cc_w_sampling_w_variable_winlen(self):
         assert_array_equal(
             operators_cc.moving_sum(
                 evset_timestamps=_f64([0, 1, 2, 3, 5, 20]),
@@ -225,7 +225,7 @@ class MovingSumOperatorTest(absltest.TestCase):
 
         self.assertEqual(output["output"], expected_output)
 
-    def test_with_sampling_and_variable_winlength(self):
+    def test_with_sampling_and_variable_winlen(self):
         evset = from_pandas(
             pd.DataFrame(
                 [
@@ -277,7 +277,71 @@ class MovingSumOperatorTest(absltest.TestCase):
                 columns=["timestamp", "a"],
             )
         )
-        print(output["output"])
+
+        self.assertEqual(output["output"], expected_output)
+
+    def test_with_sampling_and_variable_winlen_different_samplings(self):
+        evset = from_pandas(
+            pd.DataFrame([[1, 10.0]], columns=["timestamp", "a"])
+        )
+        sampling = from_pandas(
+            pd.DataFrame([[2], [5.5], [10]], columns=["timestamp"])
+        )
+        window_length = from_pandas(
+            pd.DataFrame([[2, 0.5]], columns=["timestamp", "length"]),
+        )
+
+        with self.assertRaisesRegex(
+            ValueError, "Arguments should have the same sampling"
+        ):
+            MovingSumOperator(
+                input=evset.node(),
+                window_length=window_length.node(),
+                sampling=sampling.node(),
+            )
+
+    def test_wo_sampling_w_variable_winlen(self):
+        evset = from_pandas(
+            pd.DataFrame(
+                [
+                    [1, 10.0],
+                    [2, 11.0],
+                    [3, 12.0],
+                    [5, 13.0],
+                    [6, 14.0],
+                ],
+                columns=["timestamp", "a"],
+            )
+        )
+        window_length = from_pandas(
+            pd.DataFrame(
+                [
+                    [2, 0.5],
+                    [5.5, 3],
+                    [10, 8.5],
+                ],
+                columns=["timestamp", "length"],
+            ),
+        )
+
+        op = MovingSumOperator(
+            input=evset.node(),
+            window_length=window_length.node(),
+        )
+        instance = MovingSumNumpyImplementation(op)
+
+        output = instance(input=evset, window_length=window_length)
+
+        expected_output = from_pandas(
+            pd.DataFrame(
+                [
+                    [2, 11.0],
+                    [5.5, 25.0],
+                    [10, 50],
+                ],
+                columns=["timestamp", "a"],
+            )
+        )
 
         self.assertEqual(output["output"], expected_output)
 

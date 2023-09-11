@@ -52,7 +52,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
             _f32([0.0, 0.0, 1.0, 1.247219, 0.0]),
         )
 
-    def test_cc_wo_sampling_w_variable_winlength(self):
+    def test_cc_wo_sampling_w_variable_winlen(self):
         assert_almost_equal(
             operators_cc.moving_standard_deviation(
                 evset_timestamps=_f64([0, 1, 2, 3, 5, 20]),
@@ -62,7 +62,7 @@ class MovingStandardDeviationOperatorTest(absltest.TestCase):
             _f32([nan, 0, 0.5, 0, 0.8164965, 1.4142135]),
         )
 
-    def test_cc_w_sampling_w_variable_winlength(self):
+    def test_cc_w_sampling_w_variable_winlen(self):
         assert_almost_equal(
             operators_cc.moving_standard_deviation(
                 evset_timestamps=_f64([0, 1, 2, 3, 5, 20]),
