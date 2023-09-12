@@ -1391,11 +1391,12 @@ class EventSetOperations:
         Create a tp.int32 feature containing the number of events in the time
         window (t - window_length, t].
 
-        If `sampling` is provided samples the moving window's value at each
-        timestamp in `sampling`, else samples it at each timestamp in
-        `window_length` if it is an `EventSet`, else in the input. If both
-        `sampling` and `window_length` are provided as `EventSets`, their
-        sampling must be the same.
+        `sampling` can't be  specified if a variable `window_length` is
+        specified (i.e. if `window_length` is an EventSet).
+
+        If `sampling` is specified or `window_length` is an EventSet, the moving
+        window is sampled at each timestamp in them, else it is sampled on the
+        input's.
 
         Example without sampling:
             ```python
@@ -1420,6 +1421,27 @@ class EventSetOperations:
                 (9 events):
                     timestamps: [-1. 0. 1. 2. 3. 4. 5. 6. 7.]
                     'count': [0 1 2 2 1 0 1 1 0]
+            ...
+
+            ```
+
+        Example with variable window length:
+            ```python
+            >>> a = tp.event_set(timestamps=[0, 1, 2, 5])
+            >>> b = tp.event_set(
+            ...     timestamps=[0, 3, 3, 3, 9],
+            ...     features={
+            ...         "w": [1, 0.5, 3.5, 2.5, 5],
+            ...     },
+            ... )
+            >>> c = a.moving_count(window_length=b)
+            >>> c
+            indexes: []
+            features: [('count', int32)]
+            events:
+                (5 events):
+                    timestamps: [0. 3. 3. 3. 9.]
+                    'count': [1 0 3 2 1]
             ...
 
             ```
@@ -1475,11 +1497,12 @@ class EventSetOperations:
         returns at time t the max of non-nan values for the feature in the window
         (t - window_length, t].
 
-        If `sampling` is provided samples the moving window's value at each
-        timestamp in `sampling`, else samples it at each timestamp in
-        `window_length` if it is an `EventSet`, else in the input. If both
-        `sampling` and `window_length` are provided as `EventSets`, their
-        sampling must be the same.
+        `sampling` can't be  specified if a variable `window_length` is
+        specified (i.e. if `window_length` is an EventSet).
+
+        If `sampling` is specified or `window_length` is an EventSet, the moving
+        window is sampled at each timestamp in them, else it is sampled on the
+        input's.
 
         If the window does not contain any values (e.g., all the values are
         missing, or the window does not contain any sampling), outputs missing
@@ -1529,11 +1552,12 @@ class EventSetOperations:
         returns at time t the minimum of non-nan values for the feature in the window
         (t - window_length, t].
 
-        If `sampling` is provided samples the moving window's value at each
-        timestamp in `sampling`, else samples it at each timestamp in
-        `window_length` if it is an `EventSet`, else in the input. If both
-        `sampling` and `window_length` are provided as `EventSets`, their
-        sampling must be the same.
+        `sampling` can't be  specified if a variable `window_length` is
+        specified (i.e. if `window_length` is an EventSet).
+
+        If `sampling` is specified or `window_length` is an EventSet, the moving
+        window is sampled at each timestamp in them, else it is sampled on the
+        input's.
 
         If the window does not contain any values (e.g., all the values are
         missing, or the window does not contain any sampling), outputs missing
@@ -1583,11 +1607,12 @@ class EventSetOperations:
         time t the standard deviation for the feature in the window
         (t - window_length, t].
 
-        If `sampling` is provided samples the moving window's value at each
-        timestamp in `sampling`, else samples it at each timestamp in
-        `window_length` if it is an `EventSet`, else in the input. If both
-        `sampling` and `window_length` are provided as `EventSets`, their
-        sampling must be the same.
+        `sampling` can't be  specified if a variable `window_length` is
+        specified (i.e. if `window_length` is an EventSet).
+
+        If `sampling` is specified or `window_length` is an EventSet, the moving
+        window is sampled at each timestamp in them, else it is sampled on the
+        input's.
 
         Missing values (such as NaNs) are ignored.
 
@@ -1641,13 +1666,14 @@ class EventSetOperations:
         [`EventSet`][temporian.EventSet].
 
         For each t in sampling, and for each feature independently, returns at
-        time t the sum of the feature in the window (t - window_length, t].
+        time t the sum of the feature in the window (
 
-        If `sampling` is provided samples the moving window's value at each
-        timestamp in `sampling`, else samples it at each timestamp in
-        `window_length` if it is an `EventSet`, else in the input. If both
-        `sampling` and `window_length` are provided as `EventSets`, their
-        sampling must be the same.
+            in them. `sampling` can't be specified if `window_length` is  an EventSet.ta variable  - window_length
+            specified, (i.e. if `window_length` is an EventSet).
+
+        If `sampling` is specified or `window_length` is an EventSet, the moving
+        window is sampled at each timesta, else it is sampled on the
+        input's.p
 
         Missing values (such as NaNs) are ignored.
 
@@ -2196,11 +2222,12 @@ class EventSetOperations:
         time t the average value of the feature in the window
         (t - window_length, t].
 
-        If `sampling` is provided samples the moving window's value at each
-        timestamp in `sampling`, else samples it at each timestamp in
-        `window_length` if it is an `EventSet`, else in the input. If both
-        `sampling` and `window_length` are provided as `EventSets`, their
-        sampling must be the same.
+        `sampling` can't be  specified if a variable `window_length` is
+        specified (i.e. if `window_length` is an EventSet).
+
+        If `sampling` is specified or `window_length` is an EventSet, the moving
+        window is sampled at each timestamp in them, else it is sampled on the
+        input's.
 
         Missing values (such as NaNs) are ignored.
 
