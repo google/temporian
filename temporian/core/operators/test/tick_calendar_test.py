@@ -98,6 +98,57 @@ class TickCalendarOperatorTest(absltest.TestCase):
         self.assertEqual(op.month, "*")
         self.assertEqual(op.wday, 6)
 
+    def test_invalid_ranges(self):
+        for kwargs in (
+            {"second": -1},
+            {"second": 60},
+            {"minute": -1},
+            {"minute": 60},
+            {"hour": -1},
+            {"hour": 24},
+            {"mday": 0},
+            {"mday": 32},
+            {"mday": -1},  # may be supported in the future
+            {"month": -1},
+            {"month": 13},
+            {"wday": -1},
+            {"wday": 7},
+        ):
+            with self.assertRaisesRegex(
+                ValueError, "Value should be '\*' or integer in range"
+            ):
+                _ = tick_calendar(self._in, **kwargs)  # type: ignore
+
+    def test_invalid_types(self):
+        for kwargs in (
+            {"second": "1"},
+            {"minute": "00"},
+            {"hour": "00:00"},
+            {"month": "January"},
+            {"wday": "Sat"},
+        ):
+            with self.assertRaisesRegex(ValueError, "Non matching type"):
+                _ = tick_calendar(self._in, **kwargs)  # type: ignore
+
+    def test_undefined_args(self):
+        with self.assertRaisesRegex(
+            ValueError,
+            "Can't set argument to None because previous and following",
+        ):
+            _ = tick_calendar(self._in, second=1, hour=1)  # undefined min
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "Can't set argument to None because previous and following",
+        ):
+            _ = tick_calendar(self._in, second=1, month=1)
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "Can't set argument to None because previous and following",
+        ):
+            _ = tick_calendar(self._in, hour=0, month=1)
+
 
 if __name__ == "__main__":
     absltest.main()
