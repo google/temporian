@@ -39,35 +39,25 @@ class TickCalendarOperatorTest(absltest.TestCase):
         )
         node = evset.node()
 
+        # Expected output
+        def seconds_at_01_01(day, month):
+            return [datetime(2020, day, month, 1, 1, sec) for sec in range(60)]
+
         expected_output = event_set(
-            timestamps=[
-                datetime(2020, 1, 31, 1, 1, 0),
-                datetime(2020, 1, 31, 1, 1, 1),
-                datetime(2020, 1, 31, 1, 1, 2),
-                datetime(2020, 3, 31, 1, 1, 0),
-                datetime(2020, 3, 31, 1, 1, 1),
-                datetime(2020, 3, 31, 1, 1, 2),
-                datetime(2020, 5, 31, 1, 1, 0),
-                datetime(2020, 5, 31, 1, 1, 1),
-                datetime(2020, 5, 31, 1, 1, 2),
-            ],
+            timestamps=seconds_at_01_01(1, 31)
+            + seconds_at_01_01(3, 31)
+            + seconds_at_01_01(5, 31),
         )
 
         # Run op
         op = TickCalendar(
             input=node,
-            min_second=0,
-            max_second=2,
-            min_minute=1,
-            max_minute=1,
-            min_hour=1,
-            max_hour=1,
-            min_mday=31,
-            max_mday=31,
-            min_month=1,
-            max_month=12,
-            min_wday=0,
-            max_wday=6,
+            second="*",
+            minute=1,
+            hour=1,
+            mday=31,
+            month="*",
+            wday="*",
         )
         instance = TickCalendarNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
@@ -105,18 +95,12 @@ class TickCalendarOperatorTest(absltest.TestCase):
         # Run op
         op = TickCalendar(
             input=node,
-            min_second=0,
-            max_second=0,
-            min_minute=0,
-            max_minute=59,
-            min_hour=0,
-            max_hour=23,
-            min_mday=1,  # any day
-            max_mday=31,
-            min_month=1,  # any month
-            max_month=12,
-            min_wday=0,
-            max_wday=6,
+            second=0,
+            minute="*",
+            hour="*",
+            mday="*",
+            month="*",
+            wday="*",
         )
         instance = TickCalendarNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
@@ -150,18 +134,12 @@ class TickCalendarOperatorTest(absltest.TestCase):
         # Run op
         op = TickCalendar(
             input=node,
-            min_second=0,
-            max_second=0,
-            min_minute=0,
-            max_minute=0,
-            min_hour=0,
-            max_hour=23,  # all hours
-            min_mday=1,  # any month day
-            max_mday=31,
-            min_month=1,  # any month
-            max_month=12,
-            min_wday=6,  # saturday
-            max_wday=6,  # saturday
+            second=0,
+            minute=0,
+            hour="*",
+            wday=6,
+            mday="*",
+            month="*",
         )
         instance = TickCalendarNumpyImplementation(op)
         testOperatorAndImp(self, op, instance)
