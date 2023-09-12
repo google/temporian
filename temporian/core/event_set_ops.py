@@ -2410,7 +2410,7 @@ class EventSetOperations:
         a lower resolution is specified. For example, setting only
         `tick_calendar(hour='*')`
         is equivalent to:
-        `tick_calendar(second=0, minute=0, hour='*', day_of_month='*', month='*')`
+        `tick_calendar(second=0, minute=0, hour='*', mday='*', month='*')`
         , resulting in one tick at every exact hour of every day/month/year in
         the input guide range.
 
@@ -2502,13 +2502,13 @@ class EventSetOperations:
                     to tick at specific minute of each hour.
             hour: '*' (any hour), None (auto), or number in range `[0-23]` to
                     tick at specific hour of each day.
-            day_of_month: '*' (any day), None (auto) or number in range `[1-31]`
+            mday: '*' (any day), None (auto) or number in range `[1-31]`
                         to tick at specific day of each month. Note that months
                         without some particular day may not have any tick
                         (e.g: day 31 on February).
             month: '*' (any month), None (auto) or number in range `[1-12]` to
                     tick at one particular month of each year.
-            day_of_week: '*' (any day), None (auto) or number in range `[0-6]`
+            wday: '*' (any day), None (auto) or number in range `[0-6]`
                     (Sun-Sat) to tick at particular day of week. Can only be
                     specified if `day_of_month` is `None`.
 
