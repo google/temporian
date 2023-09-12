@@ -49,9 +49,14 @@ class BaseWindowOperator(Operator, ABC):
         self._has_sampling = has_sampling
 
         if has_sampling:
-            input.schema.check_compatible_index(sampling.schema)
             if has_variable_winlen:
-                sampling.check_same_sampling(window_length)
+                raise ValueError(
+                    "`sampling` cannot be specified if a variable"
+                    " `window_length` is specified with an EventSet. If"
+                    " specifying `window_length` with an EventSet, that"
+                    " EventSet's sampling will be used."
+                )
+            input.schema.check_compatible_index(sampling.schema)
             self.add_input("sampling", sampling)
 
         if has_variable_winlen:
@@ -71,11 +76,11 @@ class BaseWindowOperator(Operator, ABC):
         self.add_input("input", input)
 
         # Note: effective_sampling_node can be either the received sampling,
-        # window_length, or input
+        # window_length, or the input
         effective_sampling_node = (
-            sampling
-            if has_sampling
-            else (window_length if has_variable_winlen else input)
+            window_length
+            if has_variable_winlen
+            else (sampling if has_sampling else input)
         )
         assert isinstance(effective_sampling_node, EventSetNode)
 

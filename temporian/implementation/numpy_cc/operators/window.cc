@@ -434,8 +434,8 @@ struct MovingExtremumAccumulator : Accumulator<INPUT, OUTPUT> {
       }
     }
 
-    assert(values.front() == value);
     assert(!values.empty());
+    assert(values.front() == value);
 
     if (values.size() == 1) {
       values.clear();

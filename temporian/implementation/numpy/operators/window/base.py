@@ -47,20 +47,20 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
         assert isinstance(self.operator, BaseWindowOperator)
 
         # pick effective sampling
-        has_sampling = True
-        if sampling is None:
-            if window_length is not None:
-                sampling = window_length
-            else:
-                sampling = input
-                has_sampling = False
+        effective_sampling = input
+        if self.operator.has_variable_winlen:
+            assert window_length is not None
+            effective_sampling = window_length
+        elif self.operator.has_sampling:
+            assert sampling is not None
+            effective_sampling = sampling
 
         # create destination evset
         output_schema = self.operator.outputs["output"].schema
         output_evset = EventSet(data={}, schema=output_schema)
 
         # For each index
-        for index_key, sampling_data in sampling.data.items():
+        for index_key, sampling_data in effective_sampling.data.items():
             output_data = IndexData(
                 features=[],
                 timestamps=sampling_data.timestamps,
@@ -82,15 +82,19 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
                 assert self.operator.window_length is not None
                 effective_window_length = self.operator.window_length
 
+            sampling_timestamps = (
+                sampling_data.timestamps
+                if effective_sampling is not input
+                else None
+            )
+
             if index_key in input.data:
                 input_data = input.data[index_key]
 
                 self._compute(
                     src_timestamps=input_data.timestamps,
                     src_features=input_data.features,
-                    sampling_timestamps=(
-                        sampling_data.timestamps if has_sampling else None
-                    ),
+                    sampling_timestamps=sampling_timestamps,
                     dst_features=output_data.features,
                     window_length=effective_window_length,
                 )
@@ -104,9 +108,7 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
                 self._compute(
                     src_timestamps=empty_timestamps,
                     src_features=empty_features,
-                    sampling_timestamps=(
-                        sampling_data.timestamps if has_sampling else None
-                    ),
+                    sampling_timestamps=sampling_timestamps,
                     dst_features=output_data.features,
                     window_length=effective_window_length,
                 )

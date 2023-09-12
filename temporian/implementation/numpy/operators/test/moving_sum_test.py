@@ -225,7 +225,7 @@ class MovingSumOperatorTest(absltest.TestCase):
 
         self.assertEqual(output["output"], expected_output)
 
-    def test_with_sampling_and_variable_winlen(self):
+    def test_with_variable_winlen_different_sampling(self):
         evset = from_pandas(
             pd.DataFrame(
                 [
@@ -238,12 +238,6 @@ class MovingSumOperatorTest(absltest.TestCase):
                 columns=["timestamp", "a"],
             )
         )
-        sampling = from_pandas(
-            pd.DataFrame(
-                [[2], [5.5], [10]],
-                columns=["timestamp"],
-            )
-        )
         window_length = from_pandas(
             pd.DataFrame(
                 [
@@ -253,19 +247,15 @@ class MovingSumOperatorTest(absltest.TestCase):
                 ],
                 columns=["timestamp", "length"],
             ),
-            same_sampling_as=sampling,
         )
 
         op = MovingSumOperator(
             input=evset.node(),
             window_length=window_length.node(),
-            sampling=sampling.node(),
         )
         instance = MovingSumNumpyImplementation(op)
 
-        output = instance(
-            input=evset, sampling=sampling, window_length=window_length
-        )
+        output = instance(input=evset, window_length=window_length)
 
         expected_output = from_pandas(
             pd.DataFrame(
@@ -280,24 +270,25 @@ class MovingSumOperatorTest(absltest.TestCase):
 
         self.assertEqual(output["output"], expected_output)
 
-    def test_with_sampling_and_variable_winlen_different_samplings(self):
+    def test_with_sampling_and_variable_winlen_error(self):
         evset = from_pandas(
             pd.DataFrame([[1, 10.0]], columns=["timestamp", "a"])
-        )
-        sampling = from_pandas(
-            pd.DataFrame([[2], [5.5], [10]], columns=["timestamp"])
         )
         window_length = from_pandas(
             pd.DataFrame([[2, 0.5]], columns=["timestamp", "length"]),
         )
 
         with self.assertRaisesRegex(
-            ValueError, "Arguments should have the same sampling"
+            ValueError,
+            (
+                "`sampling` cannot be specified if a variable `window_length`"
+                " is specified"
+            ),
         ):
             MovingSumOperator(
                 input=evset.node(),
                 window_length=window_length.node(),
-                sampling=sampling.node(),
+                sampling=window_length[[]].node(),
             )
 
     def test_wo_sampling_w_variable_winlen(self):

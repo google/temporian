@@ -98,15 +98,17 @@ single IndexKey.
 WindowLength = Union[Duration, EventSetOrNode]
 """Window length of a moving window operator.
 
-If a [Duration][temporian.duration.Duration], the window length is fixed, and
-will be the same for each timestamp in the effective sampling (the effective
-sampling being the `sampling` if it was provided, or the input otherwise).
+A window length can be either constant or variable.
 
-If an [EventSet][temporian.EventSet], the window length will vary for each
-timestamp in the effective sampling. In this case, the `window_length` EventSet
-must have a single float64 feature and the same sampling as the effective
-sampling. The window length for each timestamp in the effective sampling will be
-the feature value at that timestamp in `window_length`.
+A constant window length is specified with a
+[Duration][temporian.duration.Duration]. For example, `window_length=5.0` or
+`window_length=tp.duration.days(4)`.
+
+A variable window length is specified with an [EventSet][temporian.EventSet]
+containing a single float64 feature. This EventSet can have the same sampling as
+the input EventSet or a different one, in which case the output will have the
+same sampling as the `window_length` EventSet. In both cases the feature value
+on each timestamp will dictate the length of the window in that timestamp.
 
 If an `EventSet`, it should contain strictly positive values. If receiving 0,
 negative values, or missing values, the operator will treat the window as empty.

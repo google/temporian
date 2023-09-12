@@ -403,24 +403,19 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
         evset = from_pandas(
             pd.DataFrame([[0, 1]], columns=["a", "timestamp"], dtype=np.float64)
         )
-        sampling = from_pandas(pd.DataFrame([[1], [2]], columns=["timestamp"]))
         window_length = from_pandas(
             pd.DataFrame(
                 [[1, 1], [2, -1]], columns=["timestamp", "b"], dtype=np.float64
             ),
-            same_sampling_as=sampling,
         )
 
         op = SimpleMovingAverageOperator(
             input=evset.node(),
             window_length=window_length.node(),
-            sampling=sampling.node(),
         )
         instance = SimpleMovingAverageNumpyImplementation(op)
 
-        instance.call(
-            input=evset, sampling=sampling, window_length=window_length
-        )
+        instance.call(input=evset, window_length=window_length)
         logging_mock.warning.assert_called_with(
             "`window_length`'s values should be strictly positive. 0, NaN and"
             " negative window lengths will output missing values."
@@ -429,11 +424,9 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
     # TODO: move to a separate file that tests the base class
     def test_variable_window_length_invalid(self):
         evset = from_pandas(pd.DataFrame([[0, 1]], columns=["a", "timestamp"]))
-        sampling = from_pandas(pd.DataFrame([[1], [2]], columns=["timestamp"]))
 
         window_length = from_pandas(
-            pd.DataFrame([[1], [2]], columns=["timestamp"]),
-            same_sampling_as=sampling,
+            pd.DataFrame([[1], [2]], columns=["timestamp"])
         )
         with self.assertRaisesRegex(
             ValueError, "`window_length` must have exactly one float64 feature"
@@ -441,14 +434,12 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             SimpleMovingAverageOperator(
                 input=evset.node(),
                 window_length=window_length.node(),
-                sampling=sampling.node(),
             )
 
         window_length = from_pandas(
             pd.DataFrame(
                 [[1, 1, 1], [2, 2, 2]], columns=["timestamp", "b", "c"]
             ),
-            same_sampling_as=sampling,
         )
         with self.assertRaisesRegex(
             ValueError, "`window_length` must have exactly one float64 feature"
@@ -456,7 +447,6 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             SimpleMovingAverageOperator(
                 input=evset.node(),
                 window_length=window_length.node(),
-                sampling=sampling.node(),
             )
 
         window_length = from_pandas(
@@ -465,7 +455,6 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
                 columns=["timestamp", "b", "c"],
                 dtype=np.float32,
             ),
-            same_sampling_as=sampling,
         )
         with self.assertRaisesRegex(
             ValueError, "`window_length` must have exactly one float64 feature"
@@ -473,7 +462,6 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
             SimpleMovingAverageOperator(
                 input=evset.node(),
                 window_length=window_length.node(),
-                sampling=sampling.node(),
             )
 
 
