@@ -2205,7 +2205,7 @@ class EventSetOperations:
 
         Raises:
             KeyError: If any of the specified `indexes` are not found in the
-            input.
+                input.
         """
         from temporian.core.operators.add_index import set_index
 
