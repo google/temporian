@@ -2280,7 +2280,7 @@ class EventSetOperations:
             ...
 
             >>> # Not allowed: intermediate arguments (minute, hour) not specified
-            >>> b = a.tick_calendar(second='1', mday=1)  # ambiguous meaning
+            >>> b = a.tick_calendar(second=1, mday=1)  # ambiguous meaning
             Traceback (most recent call last):
                 ...
             ValueError: Can't set argument to None because previous and

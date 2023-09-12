@@ -215,6 +215,7 @@ def _check_annotation_union(
 
     trace.exception(
         f'Non matching type for "{type(value)}" in the union {annotation_args}.'
+        f' The value is "{value}".'
     )
 
 
