@@ -29,23 +29,19 @@ from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
 from temporian.utils.typecheck import typecheck
 
+TypeWildCard = Literal["*"]
+
 
 class TickCalendar(Operator):
     def __init__(
         self,
         input: EventSetNode,
-        min_second: int,
-        min_minute: int,
-        min_hour: int,
-        min_mday: int,
-        min_month: int,
-        min_wday: int,
-        max_second: int,
-        max_minute: int,
-        max_hour: int,
-        max_mday: int,
-        max_month: int,
-        max_wday: int,
+        second: Union[int, TypeWildCard],
+        minute: Union[int, TypeWildCard],
+        hour: Union[int, TypeWildCard],
+        mday: Union[int, TypeWildCard],
+        month: Union[int, TypeWildCard],
+        wday: Union[int, TypeWildCard],
     ):
         super().__init__()
         if not input.schema.is_unix_timestamp:
@@ -54,30 +50,18 @@ class TickCalendar(Operator):
             )
 
         # Attributes
-        self._min_second = min_second
-        self._max_second = max_second
-        self._min_minute = min_minute
-        self._max_minute = max_minute
-        self._min_hour = min_hour
-        self._max_hour = max_hour
-        self._min_mday = min_mday
-        self._max_mday = max_mday
-        self._min_month = min_month
-        self._max_month = max_month
-        self._min_wday = min_wday
-        self._max_wday = max_wday
-        self.add_attribute("min_second", min_second)
-        self.add_attribute("max_second", max_second)
-        self.add_attribute("min_minute", min_minute)
-        self.add_attribute("max_minute", max_minute)
-        self.add_attribute("min_hour", min_hour)
-        self.add_attribute("max_hour", max_hour)
-        self.add_attribute("min_mday", min_mday)
-        self.add_attribute("max_mday", max_mday)
-        self.add_attribute("min_month", min_month)
-        self.add_attribute("max_month", max_month)
-        self.add_attribute("min_wday", min_wday)
-        self.add_attribute("max_wday", max_wday)
+        self._second = self._check_arg(second, self.seconds_max_range())
+        self._minute = self._check_arg(minute, self.minutes_max_range())
+        self._hour = self._check_arg(hour, self.hours_max_range())
+        self._mday = self._check_arg(mday, self.mday_max_range())
+        self._month = self._check_arg(month, self.month_max_range())
+        self._wday = self._check_arg(wday, self.wday_max_range())
+        self.add_attribute("second", second)
+        self.add_attribute("minute", minute)
+        self.add_attribute("hour", hour)
+        self.add_attribute("mday", mday)
+        self.add_attribute("month", month)
+        self.add_attribute("wday", wday)
 
         self.add_input("input", input)
 
@@ -93,53 +77,77 @@ class TickCalendar(Operator):
 
         self.check()
 
-    @property
-    def min_second(self) -> int:
-        return self._min_second
+    def _check_arg(self, arg_value, val_range):
+        if arg_value == "*" or (
+            isinstance(arg_value, (int, np.integer))
+            and arg_value >= val_range[0]
+            and arg_value <= val_range[1]
+        ):
+            return arg_value
+        raise ValueError(
+            f"Value should be '*' or integer in range {val_range}, got:"
+            f" {arg_value} (type {type(arg_value)})"
+        )
 
     @property
-    def max_second(self) -> int:
-        return self._max_second
+    def second(self) -> Union[int, TypeWildCard]:
+        # assert for typecheck
+        assert self._second == "*" or not isinstance(self._second, str)
+        return self._second
 
     @property
-    def min_minute(self) -> int:
-        return self._min_minute
+    def minute(self) -> Union[int, TypeWildCard]:
+        # assert for typecheck
+        assert self._minute == "*" or not isinstance(self._minute, str)
+        return self._minute
 
     @property
-    def max_minute(self) -> int:
-        return self._max_minute
+    def hour(self) -> Union[int, TypeWildCard]:
+        # assert for typecheck
+        assert self._hour == "*" or not isinstance(self._hour, str)
+        return self._hour
 
     @property
-    def min_hour(self) -> int:
-        return self._min_hour
+    def mday(self) -> Union[int, TypeWildCard]:
+        # assert for typecheck
+        assert self._mday == "*" or not isinstance(self._mday, str)
+        return self._mday
 
     @property
-    def max_hour(self) -> int:
-        return self._max_hour
+    def month(self) -> Union[int, TypeWildCard]:
+        # assert for typecheck
+        assert self._month == "*" or not isinstance(self._month, str)
+        return self._month
 
     @property
-    def min_mday(self) -> int:
-        return self._min_mday
+    def wday(self) -> Union[int, TypeWildCard]:
+        # assert for typecheck
+        assert self._wday == "*" or not isinstance(self._wday, str)
+        return self._wday
 
-    @property
-    def max_mday(self) -> int:
-        return self._max_mday
+    @classmethod
+    def seconds_max_range(cls) -> Tuple[int, int]:
+        return (0, 59)
 
-    @property
-    def min_month(self) -> int:
-        return self._min_month
+    @classmethod
+    def minutes_max_range(cls) -> Tuple[int, int]:
+        return (0, 59)
 
-    @property
-    def max_month(self) -> int:
-        return self._max_month
+    @classmethod
+    def hours_max_range(cls) -> Tuple[int, int]:
+        return (0, 23)
 
-    @property
-    def min_wday(self) -> int:
-        return self._min_wday
+    @classmethod
+    def mday_max_range(cls) -> Tuple[int, int]:
+        return (1, 31)
 
-    @property
-    def max_wday(self) -> int:
-        return self._max_wday
+    @classmethod
+    def month_max_range(cls) -> Tuple[int, int]:
+        return (1, 12)
+
+    @classmethod
+    def wday_max_range(cls) -> Tuple[int, int]:
+        return (0, 6)
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
@@ -147,52 +155,28 @@ class TickCalendar(Operator):
             key="TICK_CALENDAR",
             attributes=[
                 pb.OperatorDef.Attribute(
-                    key="min_second",
-                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
+                    key="second",
+                    type=pb.OperatorDef.Attribute.Type.ANY,
                 ),
                 pb.OperatorDef.Attribute(
-                    key="max_second",
-                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
+                    key="minute",
+                    type=pb.OperatorDef.Attribute.Type.ANY,
                 ),
                 pb.OperatorDef.Attribute(
-                    key="min_minute",
-                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
+                    key="hour",
+                    type=pb.OperatorDef.Attribute.Type.ANY,
                 ),
                 pb.OperatorDef.Attribute(
-                    key="max_minute",
-                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
+                    key="mday",
+                    type=pb.OperatorDef.Attribute.Type.ANY,
                 ),
                 pb.OperatorDef.Attribute(
-                    key="min_hour",
-                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
+                    key="month",
+                    type=pb.OperatorDef.Attribute.Type.ANY,
                 ),
                 pb.OperatorDef.Attribute(
-                    key="max_hour",
-                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
-                ),
-                pb.OperatorDef.Attribute(
-                    key="min_mday",
-                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
-                ),
-                pb.OperatorDef.Attribute(
-                    key="max_mday",
-                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
-                ),
-                pb.OperatorDef.Attribute(
-                    key="min_month",
-                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
-                ),
-                pb.OperatorDef.Attribute(
-                    key="max_month",
-                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
-                ),
-                pb.OperatorDef.Attribute(
-                    key="min_wday",
-                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
-                ),
-                pb.OperatorDef.Attribute(
-                    key="max_wday",
-                    type=pb.OperatorDef.Attribute.Type.INTEGER_64,
+                    key="wday",
+                    type=pb.OperatorDef.Attribute.Type.ANY,
                 ),
             ],
             inputs=[pb.OperatorDef.Input(key="input")],
@@ -203,44 +187,16 @@ class TickCalendar(Operator):
 operator_lib.register_operator(TickCalendar)
 
 
-def set_arg_range(
-    arg_value: Union[int, Literal["*"], None],
-    val_range: Tuple[int, int],
-    prefer_free: bool,
-):
-    if arg_value == "*":
-        range_ini, range_end = val_range
-    elif arg_value is not None:
-        if (
-            not isinstance(arg_value, (int, np.integer))
-            or arg_value < val_range[0]
-            or arg_value > val_range[1]
-        ):
-            raise ValueError(
-                f"Value should be '*' or integer in range {val_range}, got:"
-                f" {arg_value} (type {type(arg_value)})"
-            )
-
-        range_ini = range_end = arg_value
-    else:  # None (auto setup)
-        if prefer_free:  # Don't restrict the range
-            range_ini, range_end = val_range
-        else:  # Fix to first value
-            range_ini = range_end = val_range[0]
-
-    return range_ini, range_end
-
-
 @typecheck
 @compile
 def tick_calendar(
     input: EventSetOrNode,
-    second: Union[int, Literal["*"], None],
-    minute: Union[int, Literal["*"], None],
-    hour: Union[int, Literal["*"], None],
-    mday: Union[int, Literal["*"], None],
-    month: Union[int, Literal["*"], None],
-    wday: Union[int, Literal["*"], None],
+    second: Union[int, TypeWildCard, None] = None,
+    minute: Union[int, TypeWildCard, None] = None,
+    hour: Union[int, TypeWildCard, None] = None,
+    mday: Union[int, TypeWildCard, None] = None,
+    month: Union[int, TypeWildCard, None] = None,
+    wday: Union[int, TypeWildCard, None] = None,
 ) -> EventSetOrNode:
     # Don't allow empty args
     if all(arg is None for arg in (second, minute, hour, mday, month, wday)):
@@ -264,39 +220,32 @@ def tick_calendar(
             )
 
     # Always set second=0 by default
-    min_second, max_second = set_arg_range(second, (0, 59), prefer_free=False)
+    second = 0 if second is None else second
 
     # prefer_free becomes True when next args should be set to '*' by default
     # e.g: user sets only hour=1 -> second=0,minute=0, mday='*', month='*'
     prefer_free = second is not None
-    min_minute, max_minute = set_arg_range(minute, (0, 59), prefer_free)
+    if minute is None:
+        minute = "*" if prefer_free else 0
 
     prefer_free |= minute is not None
-    min_hour, max_hour = set_arg_range(hour, (0, 23), prefer_free)
+    if hour is None:
+        hour = "*" if prefer_free else 0
 
     prefer_free |= hour is not None
-    min_mday, max_mday = set_arg_range(mday, (1, 31), prefer_free)
+    if mday is None:
+        mday = "*" if prefer_free else 1
 
-    # Always free month range by default
-    min_month, max_month = set_arg_range(month, (1, 12), prefer_free=True)
-
-    # Always free wday range by default
-    min_wday, max_wday = set_arg_range(wday, (0, 6), prefer_free=True)
+    # Always free range by default
+    month = "*" if month is None else month
+    wday = "*" if wday is None else wday
 
     return TickCalendar(
-        input=input,
-        min_second=min_second,
-        max_second=max_second,
-        min_minute=min_minute,
-        max_minute=max_minute,
-        min_hour=min_hour,
-        max_hour=max_hour,
-        min_mday=min_mday,
-        max_mday=max_mday,
-        min_month=min_month,
-        max_month=max_month,
-        min_wday=min_wday,
-        max_wday=max_wday,
-    ).outputs[
-        "output"
-    ]  # type: ignore
+        input=input,  # type: ignore
+        second=second,
+        minute=minute,
+        hour=hour,
+        mday=mday,
+        month=month,
+        wday=wday,
+    ).outputs["output"]
