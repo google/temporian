@@ -30,6 +30,8 @@
   "prettier.tabWidth": 2,
   "editor.detectIndentation": true,
   "files.associations": {
+    "*.excalidraw": "json",
+    "*.excalidrawlib": "json",
     "system_error": "cpp",
     "type_traits": "cpp",
     "xtr1common": "cpp",
@@ -92,7 +94,8 @@
     "random": "cpp",
     "string_view": "cpp",
     "numbers": "cpp",
-    "any": "cpp"
+    "any": "cpp",
+    "bitset": "cpp"
   },
   "python.analysis.typeCheckingMode": "basic",
   "jupyter.notebookFileRoot": "${fileDirname}",

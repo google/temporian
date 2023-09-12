@@ -88,6 +88,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "RENAME",
             "RESAMPLE",
             "SELECT",
+            "SELECT_INDEX_VALUES",
             "SIMPLE_MOVING_AVERAGE",
             "SINCE_LAST",
             "SUBTRACTION",

@@ -7,4 +7,5 @@ A collection of tutorials that will help you see how Temporian can be used in pr
 - [Loan outcomes prediction](loan_outcomes_prediction.ipynb): Use Temporian to prepare data to predict outcomes for finished loans.
 - [M5 Competition](m5_competition.ipynb): Feature engineering and model training on the M5 Makridakis Forecasting Competitions.
 - [Detecting payment card fraud](bank_fraud_detection_with_tfdf.ipynb): Feature augmentation to detect payment card fraud with Temporian and TensorFlow Decision Forests.
-- [Anomaly Detection](anomaly_detection.ipynb): Data visualization and feature engineering for detecting anomalies in time series data.
+- [Temporian with Apache Beam](temporian_with_beam.ipynb): How to execute Temporian on large datasets using Apache Beam.
+- [Supervised](anomaly_detection_supervised.ipynb) and [unsupervised](anomaly_detection_unsupervised.ipynb) anomaly detection: Data visualization and feature engineering for detecting anomalies in time series data.

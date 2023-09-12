@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, List, Set, Type, TypeVar, Union
+from typing import Dict, List, Set, Tuple, Type, TypeVar, Union
 from temporian.core.data.dtype import DType
+from temporian.core.data.duration import Duration
 
 from temporian.core.data.node import EventSetNode
 from temporian.core.event_set_ops import EventSetOperations
@@ -60,9 +61,64 @@ NodeToEventSetMapping = Union[
 If a dictionary, the mapping is defined by it.
 
 If a single EventSet or a list of EventSets, each EventSet is mapped to their
-own node using [`EventSet.node()`][temporian.EventSet.node], i.e., `[event_set]`
-is equivalent to `{event_set.node() : event_set}`.
+own node using [`EventSet.node()`][temporian.EventSet.node], i.e., `[evset]`
+is equivalent to `{evset.node() : evset}`.
+"""
+
+TypeOrDType = Union[DType, Type[float], Type[int], Type[str], Type[bool]]
+
+
+IndexKeyItem = Union[int, str, bytes]
+"""One of the values inside an [IndexKey][temporian.core.typing.IndexKey]."""
+
+
+IndexKey = Union[Tuple[IndexKeyItem, ...], IndexKeyItem]
+"""An index key is a tuple of values that identifies a single time sequence
+inside an [`EventSet`][temporian.EventSet].
+
+If, for example, your EventSet is indexed by `"name"` and `"number"`, with the
+values on those being [`"Mark", "Sarah"]` and `[1, 2, 3]` respectively, the
+possible index keys would be `("Mark", 1)`, `("Mark", 2)`, `("Mark", 3)`,
+`("Sarah", 1)`, `("Sarah", 2)`, and `("Sarah", 3)`.
+
+An index key can take the form of a single value (e.g. `"Mark"`) if it is being
+used with an EventSet with a single index. In this case, using `"Mark"` is
+equivalent to using `("Mark",)`.
+"""
+
+IndexKeyList = Union[IndexKey, List[IndexKey]]
+"""A list of [`IndexKeys`][temporian.core.typing.IndexKey].
+
+Auxiliary type to allow receiving a single IndexKey or a list of IndexKeys.
+
+If receiving a single IndexKey, it is equivalent to receiving a list with a
+single IndexKey.
+"""
+
+WindowLength = Union[Duration, EventSetOrNode]
+"""Window length of a moving window operator.
+
+A window length can be either constant or variable.
+
+A constant window length is specified with a
+[Duration][temporian.duration.Duration]. For example, `window_length=5.0` or
+`window_length=tp.duration.days(4)`.
+
+A variable window length is specified with an [EventSet][temporian.EventSet]
+containing a single float64 feature. This EventSet can have the same sampling as
+the input EventSet or a different one, in which case the output will have the
+same sampling as the `window_length` EventSet. In both cases the feature value
+on each timestamp will dictate the length of the window in that timestamp.
+
+If an `EventSet`, it should contain strictly positive values. If receiving 0,
+negative values, or missing values, the operator will treat the window as empty.
 """
 
 
-TypeOrDType = Union[DType, Type[float], Type[int], Type[str], Type[bool]]
+# Internal
+
+# Internally we only allow normalized index keys, i.e., tuples of bytes and ints
+# IndexKeyItem and IndexKey are user-facing and are normalized before being
+# passed to implementations/serialized/etc.
+NormalizedIndexKeyItem = Union[int, bytes]
+NormalizedIndexKey = Tuple[NormalizedIndexKeyItem, ...]

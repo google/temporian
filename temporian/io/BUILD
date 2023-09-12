@@ -47,7 +47,9 @@ py_library(
     srcs_version = "PY3",
     deps = [
         # force/tensorflow
+        ":format",
         "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy/data:dtype_normalization",
         "//temporian/core/operators:drop_index",
     ],
 )

@@ -14,7 +14,7 @@
 """Utilities for beam unit tests."""
 
 import os
-from typing import Optional
+from typing import Optional, Union, List
 import tempfile
 from absl.testing import absltest
 
@@ -25,9 +25,9 @@ from apache_beam.testing.util import assert_that, equal_to
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
 )
-from temporian.beam.io import from_csv as beam_from_csv
-from temporian.beam.io import to_csv as beam_to_csv
-from temporian.beam.evaluation import run
+from temporian.beam.io.csv import from_csv as beam_from_csv
+from temporian.beam.io.csv import to_csv as beam_to_csv
+from temporian.beam.evaluation import run_multi_io
 from temporian.io.csv import to_csv, from_csv
 from temporian.core.data.node import EventSetNode
 from temporian.implementation.numpy.data.event_set import EventSet
@@ -35,9 +35,8 @@ from temporian.implementation.numpy.data.event_set import EventSet
 
 def check_beam_implementation(
     test: absltest.TestCase,
-    input_data: EventSet,
+    input_data: Union[EventSet, List[EventSet]],
     output_node: EventSetNode,
-    input_node: Optional[EventSetNode] = None,
 ):
     """Checks the result of the Numpy backend against the Beam backend.
 
@@ -49,15 +48,18 @@ def check_beam_implementation(
             instead.
     """
 
-    if input_node is None:
-        input_node = input_data.node()
+    if isinstance(input_data, EventSet):
+        input_data = [input_data]
 
     tmp_dir = tempfile.mkdtemp()
-    input_path = os.path.join(tmp_dir, "input.csv")
     output_path = os.path.join(tmp_dir, "output.csv")
+    input_paths = []
 
     # Export input data to csv
-    to_csv(input_data, path=input_path)
+    for input_idx, input_evtset in enumerate(input_data):
+        input_path = os.path.join(tmp_dir, f"input_{input_idx}.csv")
+        input_paths.append(input_path)
+        to_csv(input_evtset, path=input_path)
 
     # Utility to print the intermediate results
     def my_print(x, tag):
@@ -66,16 +68,22 @@ def check_beam_implementation(
 
     # Run the Temporian program using the Beam backend
     with TestPipeline() as p:
-        output = (
-            p
-            | beam_from_csv(input_path, input_node.schema)
-            | "Raw input" >> beam.Map(my_print, "input")
-            | run(input=input_node, output=output_node)
-            | "Raw output" >> beam.Map(my_print, "output")
-            | beam_to_csv(
-                output_path, output_node.schema, shard_name_template=""
+        input_pcollection = {}
+        for input_path, input_evtset in zip(input_paths, input_data):
+            input_pcollection[input_evtset.node()] = p | beam_from_csv(
+                input_path, input_evtset.node().schema
             )
+
+        output_pcollection = run_multi_io(
+            inputs=input_pcollection, outputs=[output_node]
         )
+
+        assert len(output_pcollection) == 1
+
+        output = output_pcollection[output_node] | beam_to_csv(
+            output_path, output_node.schema, shard_name_template=""
+        )
+
         assert_that(
             output,
             equal_to([output_path]),

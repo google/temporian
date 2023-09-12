@@ -29,6 +29,7 @@ py_library(
         ":rename",
         ":resample",
         ":select",
+        ":select_index_values",
         ":since_last",
         ":tick",
         ":tick_calendar",
@@ -69,6 +70,7 @@ py_library(
         "//temporian/core/data:schema",
         "//temporian/core/data:node",
         "//temporian/core/operators:base",
+        "//temporian/implementation/numpy/data:dtype_normalization",
     ],
 )
 
@@ -362,6 +364,20 @@ py_library(
         ":base",
         "//temporian/core/operators:fast_fourier_transform",
         "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event_set",
+    ],
+)
+
+py_library(
+    name = "select_index_values",
+    srcs = ["select_index_values.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/numpy
+        ":base",
+        "//temporian/core/operators:select_index_values",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",
     ],
 )

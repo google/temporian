@@ -13,13 +13,13 @@
 # limitations under the License.
 
 import math
+from unittest.mock import patch
 
-from absl.testing import absltest
 import numpy as np
-from numpy.testing import assert_array_equal
 import pandas as pd
-
 from absl.testing import absltest
+from numpy.testing import assert_array_equal
+
 from temporian.core.operators.window.moving_sum import (
     MovingSumOperator,
 )
@@ -28,8 +28,6 @@ from temporian.implementation.numpy.operators.window.moving_sum import (
     operators_cc,
 )
 from temporian.core.data import node as node_lib
-import math
-from numpy.testing import assert_array_equal
 from temporian.io.pandas import from_pandas
 
 
@@ -48,11 +46,32 @@ class MovingSumOperatorTest(absltest.TestCase):
     def test_cc_wo_sampling(self):
         assert_array_equal(
             operators_cc.moving_sum(
-                _f64([1, 2, 3, 5, 20]),
-                _f32([10, nan, 12, 13, 14]),
-                5.0,
+                evset_timestamps=_f64([1, 2, 3, 5, 20]),
+                evset_values=_f32([10, nan, 12, 13, 14]),
+                window_length=5.0,
             ),
             _f32([10.0, 10.0, 22.0, 35.0, 14.0]),
+        )
+
+    def test_cc_wo_sampling_w_variable_winlen(self):
+        assert_array_equal(
+            operators_cc.moving_sum(
+                evset_timestamps=_f64([0, 1, 2, 3, 5, 20]),
+                evset_values=_f32([nan, 10, 11, 12, 13, 14]),
+                window_length=_f64([1, 1, 1.5, 0.5, 3.5, 20]),
+            ),
+            _f32([0, 10, 21, 12, 36, 60]),
+        )
+
+    def test_cc_w_sampling_w_variable_winlen(self):
+        assert_array_equal(
+            operators_cc.moving_sum(
+                evset_timestamps=_f64([0, 1, 2, 3, 5, 20]),
+                evset_values=_f32([nan, 10, 11, 12, 13, 14]),
+                sampling_timestamps=_f64([-1, 1, 4, 19, 20, 20]),
+                window_length=_f64([10, 0.5, 2.5, 19, 16, np.inf]),
+            ),
+            _f32([0, 10, 23, 46, 27, 60]),
         )
 
     def test_flat(self):
@@ -202,6 +221,148 @@ class MovingSumOperatorTest(absltest.TestCase):
                     [0, 10.0],
                 ],
                 columns=["a", "timestamp"],
+            )
+        )
+
+        self.assertEqual(output["output"], expected_output)
+
+    def test_with_variable_winlen_different_sampling(self):
+        evset = from_pandas(
+            pd.DataFrame(
+                [
+                    [1, 10.0],
+                    [2, 11.0],
+                    [3, 12.0],
+                    [5, 13.0],
+                    [6, 14.0],
+                ],
+                columns=["timestamp", "a"],
+            )
+        )
+        window_length = from_pandas(
+            pd.DataFrame(
+                [
+                    [2, 0.5],
+                    [5.5, 3],
+                    [10, 8.5],
+                ],
+                columns=["timestamp", "length"],
+            ),
+        )
+
+        op = MovingSumOperator(
+            input=evset.node(),
+            window_length=window_length.node(),
+        )
+        instance = MovingSumNumpyImplementation(op)
+
+        output = instance(input=evset, window_length=window_length)
+
+        expected_output = from_pandas(
+            pd.DataFrame(
+                [
+                    [2, 11.0],
+                    [5.5, 25.0],
+                    [10, 50],
+                ],
+                columns=["timestamp", "a"],
+            )
+        )
+
+        self.assertEqual(output["output"], expected_output)
+
+    @patch(
+        "temporian.implementation.numpy.operators.window.moving_sum.operators_cc.moving_sum"
+    )
+    def test_with_variable_winlen_same_sampling_uses_correct_cpp_impl(
+        self, cpp_moving_sum_mock
+    ):
+        """Checks that the no-sampling version of cpp code is called when
+        passing a variable window_length with same sampling as the input."""
+        evset = from_pandas(
+            pd.DataFrame([[1, 10.0]], columns=["timestamp", "a"])
+        )
+        window_length = from_pandas(
+            pd.DataFrame([[1, 1.0]], columns=["timestamp", "length"]),
+            same_sampling_as=evset,
+        )
+
+        op = MovingSumOperator(
+            input=evset.node(),
+            window_length=window_length.node(),
+        )
+        instance = MovingSumNumpyImplementation(op)
+
+        instance(input=evset, window_length=window_length)
+
+        # sampling_timestamps not passed
+        cpp_moving_sum_mock.assert_called_once_with(
+            evset_timestamps=evset.data[()].timestamps,
+            evset_values=evset.data[()].features[0],
+            window_length=window_length.data[()].features[0],
+        )
+
+    def test_with_sampling_and_variable_winlen_error(self):
+        evset = from_pandas(
+            pd.DataFrame([[1, 10.0]], columns=["timestamp", "a"])
+        )
+        window_length = from_pandas(
+            pd.DataFrame([[2, 0.5]], columns=["timestamp", "length"]),
+        )
+
+        with self.assertRaisesRegex(
+            ValueError,
+            (
+                "`sampling` cannot be specified if a variable `window_length`"
+                " is specified"
+            ),
+        ):
+            MovingSumOperator(
+                input=evset.node(),
+                window_length=window_length.node(),
+                sampling=window_length[[]].node(),
+            )
+
+    def test_wo_sampling_w_variable_winlen(self):
+        evset = from_pandas(
+            pd.DataFrame(
+                [
+                    [1, 10.0],
+                    [2, 11.0],
+                    [3, 12.0],
+                    [5, 13.0],
+                    [6, 14.0],
+                ],
+                columns=["timestamp", "a"],
+            )
+        )
+        window_length = from_pandas(
+            pd.DataFrame(
+                [
+                    [2, 0.5],
+                    [5.5, 3],
+                    [10, 8.5],
+                ],
+                columns=["timestamp", "length"],
+            ),
+        )
+
+        op = MovingSumOperator(
+            input=evset.node(),
+            window_length=window_length.node(),
+        )
+        instance = MovingSumNumpyImplementation(op)
+
+        output = instance(input=evset, window_length=window_length)
+
+        expected_output = from_pandas(
+            pd.DataFrame(
+                [
+                    [2, 11.0],
+                    [5.5, 25.0],
+                    [10, 50],
+                ],
+                columns=["timestamp", "a"],
             )
         )
 

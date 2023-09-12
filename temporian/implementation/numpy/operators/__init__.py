@@ -54,12 +54,14 @@ from temporian.implementation.numpy.operators.calendar import iso_week
 from temporian.implementation.numpy.operators.calendar import hour
 from temporian.implementation.numpy.operators.calendar import minute
 from temporian.implementation.numpy.operators.calendar import second
-from temporian.implementation.numpy.operators import since_last
-from temporian.implementation.numpy.operators import unique_timestamps
+
 from temporian.implementation.numpy.operators import begin
 from temporian.implementation.numpy.operators import end
+from temporian.implementation.numpy.operators import enumerate
+from temporian.implementation.numpy.operators import fast_fourier_transform
+from temporian.implementation.numpy.operators import select_index_values
+from temporian.implementation.numpy.operators import since_last
 from temporian.implementation.numpy.operators import tick
 from temporian.implementation.numpy.operators import tick_calendar
 from temporian.implementation.numpy.operators import timestamps
-from temporian.implementation.numpy.operators import enumerate
-from temporian.implementation.numpy.operators import fast_fourier_transform
+from temporian.implementation.numpy.operators import unique_timestamps

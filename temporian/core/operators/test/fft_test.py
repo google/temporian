@@ -15,8 +15,6 @@
 
 from absl.testing import absltest
 
-import numpy as np
-
 from temporian.core.data.node import input_node
 from temporian.core.data.dtype import DType
 from temporian.core.operators.fast_fourier_transform import (

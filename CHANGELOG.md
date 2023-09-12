@@ -4,7 +4,32 @@
 
 ### Features
 
+### Improvements
+
 ### Fixes
+
+## 0.1.4
+
+### Features
+
+- Added `EventSet.select_index_values()` operator.
+- Added `steps` argument to `EventSet.since_last()` operator.
+- Added variable `window_length` option to moving window operators.
+- Added unsupervised anomaly detection tutorial.
+- Added Beam execution tutorial.
+- Added changelog to docs site.
+
+### Improvements
+
+- Added `display_max_feature_dtypes` and `display_max_index_dtypes` options to
+  `tp.config`.
+- Improved HTML display of an `EventSet`.
+- Improvements in Beam execution backend.
+
+### Fixes
+
+- Fixed tutorials opening unreleased versions of the notebooks.
+-
 
 ## 0.1.3
 

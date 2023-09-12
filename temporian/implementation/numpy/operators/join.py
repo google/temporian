@@ -20,17 +20,15 @@ from typing import Dict, Any
 from dataclasses import dataclass
 
 import numpy as np
+from temporian.implementation.numpy.data.dtype_normalization import (
+    tp_dtype_to_np_dtype,
+)
 
 from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.core.operators.join import Join
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 from temporian.implementation.numpy_cc.operators import operators_cc
-from temporian.implementation.numpy.data.event_set import (
-    IndexData,
-    EventSet,
-    tp_dtype_to_np_dtype,
-)
 
 
 @dataclass

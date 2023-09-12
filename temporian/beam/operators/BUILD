@@ -11,7 +11,7 @@ py_library(
     srcs = ["base.py"],
     srcs_version = "PY3",
     deps = [
-        "//temporian/beam:io",
+        "//temporian/beam/io:dict",
         "//temporian/core/operators:base",
     ],
 )
@@ -33,7 +33,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         # already_there/apache_beam
-        "//temporian/beam:io",
+        "//temporian/beam/io:dict",
         "//temporian/beam/operators:base",
         "//temporian/core/operators:select",
         "//temporian/beam:implementation_lib",
@@ -48,7 +48,7 @@ py_library(
         # already_there/apache_beam
         # already_there/numpy
         "//temporian/beam:implementation_lib",
-        "//temporian/beam:io",
+        "//temporian/beam/io:dict",
         "//temporian/beam/operators:base",
         "//temporian/core/operators:add_index",
     ],

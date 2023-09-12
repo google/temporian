@@ -14,7 +14,6 @@
 
 # pylint: disable=import-outside-toplevel
 
-
 from __future__ import annotations
 from typing import Any, Dict, List, Literal, Optional, Union, TYPE_CHECKING
 
@@ -22,7 +21,12 @@ from temporian.core.data.duration import Duration
 
 
 if TYPE_CHECKING:
-    from temporian.core.typing import EventSetOrNode, TypeOrDType
+    from temporian.core.typing import (
+        EventSetOrNode,
+        TypeOrDType,
+        IndexKeyList,
+        WindowLength,
+    )
 
 T_SCALAR = (int, float)
 
@@ -1379,7 +1383,7 @@ class EventSetOperations:
 
     def moving_count(
         self: EventSetOrNode,
-        window_length: Duration,
+        window_length: WindowLength,
         sampling: Optional[EventSetOrNode] = None,
     ) -> EventSetOrNode:
         """Gets the number of events in a sliding window.
@@ -1387,9 +1391,12 @@ class EventSetOperations:
         Create a tp.int32 feature containing the number of events in the time
         window (t - window_length, t].
 
-        If the `sampling` argument is not provided, outputs a timestamp for
-        each timestamp in `input`. If the `sampling` argument is provided,
-        outputs a timestamp for each timestamp in `sampling`.
+        `sampling` can't be  specified if a variable `window_length` is
+        specified (i.e. if `window_length` is an EventSet).
+
+        If `sampling` is specified or `window_length` is an EventSet, the moving
+        window is sampled at each timestamp in them, else it is sampled on the
+        input's.
 
         Example without sampling:
             ```python
@@ -1414,6 +1421,27 @@ class EventSetOperations:
                 (9 events):
                     timestamps: [-1. 0. 1. 2. 3. 4. 5. 6. 7.]
                     'count': [0 1 2 2 1 0 1 1 0]
+            ...
+
+            ```
+
+        Example with variable window length:
+            ```python
+            >>> a = tp.event_set(timestamps=[0, 1, 2, 5])
+            >>> b = tp.event_set(
+            ...     timestamps=[0, 3, 3, 3, 9],
+            ...     features={
+            ...         "w": [1, 0.5, 3.5, 2.5, 5],
+            ...     },
+            ... )
+            >>> c = a.moving_count(window_length=b)
+            >>> c
+            indexes: []
+            features: [('count', int32)]
+            events:
+                (5 events):
+                    timestamps: [0. 3. 3. 3. 9.]
+                    'count': [1 0 3 2 1]
             ...
 
             ```
@@ -1459,7 +1487,7 @@ class EventSetOperations:
 
     def moving_max(
         self: EventSetOrNode,
-        window_length: Duration,
+        window_length: WindowLength,
         sampling: Optional[EventSetOrNode] = None,
     ) -> EventSetOrNode:
         """Computes the maximum in a sliding window over an
@@ -1469,11 +1497,16 @@ class EventSetOperations:
         returns at time t the max of non-nan values for the feature in the window
         (t - window_length, t].
 
-        If `sampling` is provided samples the moving window's value at each
-        timestamp in `sampling`, else samples it at each timestamp in the input.
+        `sampling` can't be  specified if a variable `window_length` is
+        specified (i.e. if `window_length` is an EventSet).
 
-        If the window does not contain any values (e.g., all the values are missing,
-        or the window does not contain any sampling), outputs missing values.
+        If `sampling` is specified or `window_length` is an EventSet, the moving
+        window is sampled at each timestamp in them, else it is sampled on the
+        input's.
+
+        If the window does not contain any values (e.g., all the values are
+        missing, or the window does not contain any sampling), outputs missing
+        values.
 
         Example:
             ```python
@@ -1509,7 +1542,7 @@ class EventSetOperations:
 
     def moving_min(
         self: EventSetOrNode,
-        window_length: Duration,
+        window_length: WindowLength,
         sampling: Optional[EventSetOrNode] = None,
     ) -> EventSetOrNode:
         """Computes the minimum of values in a sliding window over an
@@ -1519,11 +1552,16 @@ class EventSetOperations:
         returns at time t the minimum of non-nan values for the feature in the window
         (t - window_length, t].
 
-        If `sampling` is provided samples the moving window's value at each
-        timestamp in `sampling`, else samples it at each timestamp in the input.
+        `sampling` can't be  specified if a variable `window_length` is
+        specified (i.e. if `window_length` is an EventSet).
 
-        If the window does not contain any values (e.g., all the values are missing,
-        or the window does not contain any sampling), outputs missing values.
+        If `sampling` is specified or `window_length` is an EventSet, the moving
+        window is sampled at each timestamp in them, else it is sampled on the
+        input's.
+
+        If the window does not contain any values (e.g., all the values are
+        missing, or the window does not contain any sampling), outputs missing
+        values.
 
         Example:
             ```python
@@ -1542,8 +1580,8 @@ class EventSetOperations:
 
             ```
 
-        See [`EventSet.moving_count()`][temporian.EventSet.moving_count] for examples
-        of moving window operations with external sampling and indices.
+        See [`EventSet.moving_count()`][temporian.EventSet.moving_count] for
+        examples of moving window operations with external sampling and indices.
 
         Args:
             window_length: Sliding window's length.
@@ -1559,23 +1597,28 @@ class EventSetOperations:
 
     def moving_standard_deviation(
         self: EventSetOrNode,
-        window_length: Duration,
+        window_length: WindowLength,
         sampling: Optional[EventSetOrNode] = None,
     ) -> EventSetOrNode:
         """Computes the standard deviation of values in a sliding window over an
         [`EventSet`][temporian.EventSet].
 
-        For each t in sampling, and for each feature independently, returns at time
-        t the standard deviation for the feature in the window
+        For each t in sampling, and for each feature independently, returns at
+        time t the standard deviation for the feature in the window
         (t - window_length, t].
 
-        If `sampling` is provided samples the moving window's value at each
-        timestamp in `sampling`, else samples it at each timestamp in the input.
+        `sampling` can't be  specified if a variable `window_length` is
+        specified (i.e. if `window_length` is an EventSet).
+
+        If `sampling` is specified or `window_length` is an EventSet, the moving
+        window is sampled at each timestamp in them, else it is sampled on the
+        input's.
 
         Missing values (such as NaNs) are ignored.
 
-        If the window does not contain any values (e.g., all the values are missing,
-        or the window does not contain any sampling), outputs missing values.
+        If the window does not contain any values (e.g., all the values are
+        missing, or the window does not contain any sampling), outputs missing
+        values.
 
         Example:
             ```python
@@ -1594,8 +1637,8 @@ class EventSetOperations:
 
             ```
 
-        See [`EventSet.moving_count()`][temporian.EventSet.moving_count] for examples of moving window
-        operations with external sampling and indices.
+        See [`EventSet.moving_count()`][temporian.EventSet.moving_count] for
+        examples of moving window operations with external sampling and indices.
 
         Args:
             window_length: Sliding window's length.
@@ -1616,22 +1659,27 @@ class EventSetOperations:
 
     def moving_sum(
         self: EventSetOrNode,
-        window_length: Duration,
+        window_length: WindowLength,
         sampling: Optional[EventSetOrNode] = None,
     ) -> EventSetOrNode:
         """Computes the sum of values in a sliding window over an
         [`EventSet`][temporian.EventSet].
 
-        For each t in sampling, and for each feature independently, returns at time
-        t the sum of the feature in the window (t - window_length, t].
+        For each t in sampling, and for each feature independently, returns at
+        time t the sum of the feature in the window (
 
-        If `sampling` is provided samples the moving window's value at each
-        timestamp in `sampling`, else samples it at each timestamp in the input.
+            in them. `sampling` can't be specified if `window_length` is  an EventSet.ta variable  - window_length
+            specified, (i.e. if `window_length` is an EventSet).
+
+        If `sampling` is specified or `window_length` is an EventSet, the moving
+        window is sampled at each timesta, else it is sampled on the
+        input's.p
 
         Missing values (such as NaNs) are ignored.
 
-        If the window does not contain any values (e.g., all the values are missing,
-        or the window does not contain any sampling), outputs missing values.
+        If the window does not contain any values (e.g., all the values are
+        missing, or the window does not contain any sampling), outputs missing
+        values.
 
         Example:
             ```python
@@ -1650,8 +1698,8 @@ class EventSetOperations:
 
             ```
 
-        See [`EventSet.moving_count()`][temporian.EventSet.moving_count] for examples of moving window
-        operations with external sampling and indices.
+        See [`EventSet.moving_count()`][temporian.EventSet.moving_count] for
+        examples of moving window operations with external sampling and indices.
 
         Args:
             window_length: Sliding window's length.
@@ -1925,6 +1973,158 @@ class EventSetOperations:
 
         return select(self, feature_names=feature_names)
 
+    def select_index_values(
+        self: EventSetOrNode,
+        keys: Optional[IndexKeyList] = None,
+        *,
+        number: Optional[int] = None,
+        fraction: Optional[float] = None,
+    ) -> EventSetOrNode:
+        """Selects a subset of index values from an
+        [`EventSet`][temporian.EventSet].
+
+        Exactly one of `keys`, `number`, or `fraction` should be provided.
+
+        If `number` or `fraction` is specified, the index values are selected
+        randomly.
+
+        If `fraction` is specified and `fraction * len(index keys)` doesn't
+        result in an integer, the number of index values selected is rounded
+        down.
+
+        If used in compiled or graph mode, the specified keys are compiled as-is
+        along with the operator, which means that they must be available when
+        loading and running the graph on new data.
+
+        Example with `keys` with a single index and a single key:
+
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 3],
+            ...     features={
+            ...         "f": [10, 20, 30, 40],
+            ...         "x": ["A", "B", "A", "B"],
+            ...     },
+            ...     indexes=["x"],
+            ... )
+            >>> b = a.select_index_values("A")
+            >>> b
+            indexes: [('x', str_)]
+            features: [('f', int64)]
+            events:
+                x=b'A' (2 events):
+                    timestamps: [0. 2.]
+                    'f': [10 30]
+            ...
+
+            ```
+
+        Example with `keys` with multiple indexes and keys:
+
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 3],
+            ...     features={
+            ...         "f": [10, 20, 30, 40],
+            ...         "x": [1, 1, 2, 2],
+            ...         "y": ["A", "B", "A", "B"],
+            ...     },
+            ...     indexes=["x", "y"],
+            ... )
+            >>> b = a.select_index_values([(1, "A"), (2, "B")])
+            >>> b
+            indexes: [('x', int64), ('y', str_)]
+            features: [('f', int64)]
+            events:
+                x=1 y=b'A' (1 events):
+                    timestamps: [0.]
+                    'f': [10]
+                x=2 y=b'B' (1 events):
+                    timestamps: [3.]
+                    'f': [40]
+            ...
+
+            ```
+
+        Example with `number`:
+
+            ```python
+            >>> import random
+            >>> random.seed(0)
+
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 3],
+            ...     features={
+            ...         "f": [10, 20, 30, 40],
+            ...         "x": [1, 1, 2, 2],
+            ...         "y": ["A", "B", "A", "B"],
+            ...     },
+            ...     indexes=["x", "y"],
+            ... )
+            >>> b = a.select_index_values(number=2)
+            >>> b
+            indexes: [('x', int64), ('y', str_)]
+            features: [('f', int64)]
+            events:
+                x=1 y=b'A' (1 events):
+                    timestamps: [0.]
+                    'f': [10]
+                x=2 y=b'A' (1 events):
+                    timestamps: [2.]
+                    'f': [30]
+            ...
+
+            ```
+
+        Example with `fraction`:
+
+            ```python
+            >>> import random
+            >>> random.seed(0)
+
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 3],
+            ...     features={
+            ...         "f": [10, 20, 30, 40],
+            ...         "x": [1, 1, 2, 2],
+            ...         "y": ["A", "B", "A", "B"],
+            ...     },
+            ...     indexes=["x", "y"],
+            ... )
+            >>> b = a.select_index_values(fraction=0.75)
+            >>> b
+            indexes: [('x', int64), ('y', str_)]
+            features: [('f', int64)]
+            events:
+                x=1 y=b'A' (1 events):
+                    timestamps: [0.]
+                    'f': [10]
+                x=2 y=b'A' (1 events):
+                    timestamps: [2.]
+                    'f': [30]
+            ...
+
+            ```
+
+        Args:
+            keys: index key or list of index keys to select from the EventSet.
+            number: number of index values to select. If `number` is greater
+                than the number of index values, all the index values are
+                selected.
+            fraction: fraction of index values to select, expressed as a float
+                between 0 and 1.
+
+        Returns:
+            EventSet with a subset of the index values.
+        """
+        from temporian.core.operators.select_index_values import (
+            select_index_values,
+        )
+
+        return select_index_values(
+            self, keys=keys, number=number, fraction=fraction
+        )
+
     def set_index(
         self: EventSetOrNode, indexes: Union[str, List[str]]
     ) -> EventSetOrNode:
@@ -1997,14 +2197,15 @@ class EventSetOperations:
 
         Args:
             indexes: List of index / feature names (strings) used as
-                the new indexes. These names should be either indexes or features in
-                the input.
+                the new indexes. These names should be either indexes or
+                features in the input.
 
         Returns:
             EventSet with the updated indexes.
 
         Raises:
-            KeyError: If any of the specified `indexes` are not found in the input.
+            KeyError: If any of the specified `indexes` are not found in the
+                input.
         """
         from temporian.core.operators.add_index import set_index
 
@@ -2012,22 +2213,28 @@ class EventSetOperations:
 
     def simple_moving_average(
         self: EventSetOrNode,
-        window_length: Duration,
+        window_length: WindowLength,
         sampling: Optional[EventSetOrNode] = None,
     ) -> EventSetOrNode:
         """Computes the average of values in a sliding window over an
         [`EventSet`][temporian.EventSet].
 
-        For each t in sampling, and for each feature independently, returns at time
-        t the average value of the feature in the window (t - window_length, t].
+        For each t in sampling, and for each feature independently, returns at
+        time t the average value of the feature in the window
+        (t - window_length, t].
 
-        If `sampling` is provided samples the moving window's value at each
-        timestamp in `sampling`, else samples it at each timestamp in the input.
+        `sampling` can't be  specified if a variable `window_length` is
+        specified (i.e. if `window_length` is an EventSet).
+
+        If `sampling` is specified or `window_length` is an EventSet, the moving
+        window is sampled at each timestamp in them, else it is sampled on the
+        input's.
 
         Missing values (such as NaNs) are ignored.
 
-        If the window does not contain any values (e.g., all the values are missing,
-        or the window does not contain any sampling), outputs missing values.
+        If the window does not contain any values (e.g., all the values are
+        missing, or the window does not contain any timestamp), outputs missing
+        values.
 
         Example:
             ```python
@@ -2046,8 +2253,8 @@ class EventSetOperations:
 
             ```
 
-        See [`EventSet.moving_count()`][temporian.EventSet.moving_count] for examples of moving window
-        operations with external sampling and indices.
+        See [`EventSet.moving_count()`][temporian.EventSet.moving_count] for
+        examples of moving window operations with external sampling and indices.
 
         Args:
             window_length: Sliding window's length.

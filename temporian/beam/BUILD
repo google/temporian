@@ -12,20 +12,9 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":evaluation",
-        ":io",
-    ],
-)
-
-py_library(
-    name = "io",
-    srcs = ["io.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/apache_beam
-        # already_there/numpy
-        "//temporian/implementation/numpy/data:event_set",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
+        "//temporian/beam/io:csv",
+        "//temporian/beam/io:dict",
+        "//temporian/beam/io:tensorflow",
     ],
 )
 
@@ -36,10 +25,11 @@ py_library(
     deps = [
         # already_there/apache_beam
         "//temporian/core:evaluation",
-        "//temporian/beam:io",
+        "//temporian/beam/io:dict",
         ":implementation_lib",
         "//temporian/beam/operators",
         "//temporian/core/data:node",
+        ":typing",
     ],
 )
 
@@ -47,4 +37,11 @@ py_library(
     name = "implementation_lib",
     srcs = ["implementation_lib.py"],
     srcs_version = "PY3",
+)
+
+py_library(
+    name = "typing",
+    srcs = ["typing.py"],
+    srcs_version = "PY3",
+    deps = ["//temporian/core:typing"],
 )

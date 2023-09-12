@@ -1,15 +1,15 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Tuple
+from temporian.implementation.numpy.data.dtype_normalization import (
+    numpy_array_to_tp_dtype,
+)
 
 from temporian.utils import config
 from temporian.core.data.node import EventSetNode
 from temporian.core.data.schema import Schema
 from temporian.core.operators.base import Operator
 from temporian.core.operators.base import OperatorExceptionDecorator
-from temporian.implementation.numpy.data.event_set import (
-    EventSet,
-    numpy_array_to_tp_dtype,
-)
+from temporian.implementation.numpy.data.event_set import EventSet
 import numpy as np
 
 
@@ -42,8 +42,20 @@ class OperatorImplementation(ABC):
         self,
         src_timestamps: np.ndarray,
         src_feature: np.ndarray,
+        feature_idx: int,
     ) -> np.ndarray:
         """Executes the op on a single feature. Optionally implemented."""
+
+        raise NotImplementedError()
+
+    def apply_feature_wise_with_sampling(
+        self,
+        src_timestamps: np.ndarray,
+        src_feature: np.ndarray,
+        sampling_timestamps: np.ndarray,
+        feature_idx: int,
+    ) -> np.ndarray:
+        """Executes the op on a single feature with sampling. Optional"""
 
         raise NotImplementedError()
 

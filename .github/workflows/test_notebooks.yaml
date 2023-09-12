@@ -12,7 +12,8 @@ jobs:
         path:
           - user_guide
           - recipes/*
-          - tutorials/anomaly_detection
+          - tutorials/anomaly_detection_supervised
+          - tutorials/anomaly_detection_unsupervised
           - tutorials/bank_fraud_detection_with_tfdf
           - tutorials/getting_started
           - tutorials/heart_rate_analysis
