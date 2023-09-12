@@ -219,22 +219,30 @@ def tick_calendar(
                 " integer value instead"
             )
 
-    # Always set second=0 by default
-    second = 0 if second is None else second
-
     # prefer_free becomes True when next args should be set to '*' by default
     # e.g: user sets only hour=1 -> second=0,minute=0, mday='*', month='*'
-    prefer_free = second is not None
+    release_ranges = False
+
+    # Always set second=0 by default
+    if second is None:
+        second = 0
+    else:
+        release_ranges = True  # fixed seconds, free minute, hour
+
     if minute is None:
-        minute = "*" if prefer_free else 0
+        minute = "*" if release_ranges else 0
+    else:
+        release_ranges = True  # fixed minutes, free hour, day, month
 
-    prefer_free |= minute is not None
     if hour is None:
-        hour = "*" if prefer_free else 0
+        hour = "*" if release_ranges else 0
+    else:
+        release_ranges = True
 
-    prefer_free |= hour is not None
     if mday is None:
-        mday = "*" if prefer_free else 1
+        # If wday is specified, always leave mday free by default
+        free_mday = release_ranges or wday is not None
+        mday = "*" if free_mday else 1
 
     # Always free range by default
     month = "*" if month is None else month
