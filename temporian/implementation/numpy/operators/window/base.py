@@ -55,6 +55,13 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
             assert sampling is not None
             effective_sampling = sampling
 
+        # check that sampling isn't the input's, in which case we don't pass it
+        # to cpp impl to use the more efficient sampling-less version
+        has_sampling = (
+            effective_sampling.node().sampling_node
+            is not input.node().sampling_node
+        )
+
         # create destination evset
         output_schema = self.operator.outputs["output"].schema
         output_evset = EventSet(data={}, schema=output_schema)
@@ -83,9 +90,7 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
                 effective_window_length = self.operator.window_length
 
             sampling_timestamps = (
-                sampling_data.timestamps
-                if effective_sampling is not input
-                else None
+                sampling_data.timestamps if has_sampling else None
             )
 
             if index_key in input.data:

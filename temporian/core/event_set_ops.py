@@ -2197,14 +2197,15 @@ class EventSetOperations:
 
         Args:
             indexes: List of index / feature names (strings) used as
-                the new indexes. These names should be either indexes or features in
-                the input.
+                the new indexes. These names should be either indexes or
+                features in the input.
 
         Returns:
             EventSet with the updated indexes.
 
         Raises:
-            KeyError: If any of the specified `indexes` are not found in the input.
+            KeyError: If any of the specified `indexes` are not found in the
+            input.
         """
         from temporian.core.operators.add_index import set_index
 
@@ -2252,8 +2253,8 @@ class EventSetOperations:
 
             ```
 
-        See [`EventSet.moving_count()`][temporian.EventSet.moving_count] for examples of moving window
-        operations with external sampling and indices.
+        See [`EventSet.moving_count()`][temporian.EventSet.moving_count] for
+        examples of moving window operations with external sampling and indices.
 
         Args:
             window_length: Sliding window's length.

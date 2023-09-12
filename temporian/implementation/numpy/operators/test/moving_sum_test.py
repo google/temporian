@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import math
+from unittest.mock import patch
 
 import numpy as np
 import pandas as pd
@@ -269,6 +270,37 @@ class MovingSumOperatorTest(absltest.TestCase):
         )
 
         self.assertEqual(output["output"], expected_output)
+
+    @patch(
+        "temporian.implementation.numpy.operators.window.moving_sum.operators_cc.moving_sum"
+    )
+    def test_with_variable_winlen_same_sampling_uses_correct_cpp_impl(
+        self, cpp_moving_sum_mock
+    ):
+        """Checks that the no-sampling version of cpp code is called when
+        passing a variable window_length with same sampling as the input."""
+        evset = from_pandas(
+            pd.DataFrame([[1, 10.0]], columns=["timestamp", "a"])
+        )
+        window_length = from_pandas(
+            pd.DataFrame([[1, 1.0]], columns=["timestamp", "length"]),
+            same_sampling_as=evset,
+        )
+
+        op = MovingSumOperator(
+            input=evset.node(),
+            window_length=window_length.node(),
+        )
+        instance = MovingSumNumpyImplementation(op)
+
+        instance(input=evset, window_length=window_length)
+
+        # sampling_timestamps not passed
+        cpp_moving_sum_mock.assert_called_once_with(
+            evset_timestamps=evset.data[()].timestamps,
+            evset_values=evset.data[()].features[0],
+            window_length=window_length.data[()].features[0],
+        )
 
     def test_with_sampling_and_variable_winlen_error(self):
         evset = from_pandas(
