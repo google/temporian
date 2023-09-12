@@ -15,7 +15,8 @@
 
 from absl.testing import absltest
 
-import math
+import numpy as np
+
 from temporian.core.operators.filter_max_moving_count import (
     FilterMaxMovingCount,
 )
@@ -64,7 +65,8 @@ class FilterMaxMovingCountOperatorTest(absltest.TestCase):
         assertEqualEventSet(self, output, expected_output)
 
     def test_like_unique(self):
-        na = math.nextafter(0, 1)
+        # TODO: Use "math.nextafter" after drop of python 3.8.
+        na = np.nextafter(0, 1)
         evset = event_set([1, 1, na, 2, 3])
         expected_output = event_set([1, na, 2, 3])
 
