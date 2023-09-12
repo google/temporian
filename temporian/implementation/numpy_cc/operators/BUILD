@@ -45,11 +45,19 @@ pybind_library(
     deps = [":common"],
 )
 
+pybind_library(
+    name = "filter_max_moving_count",
+    srcs = ["filter_max_moving_count.cc"],
+    hdrs = ["filter_max_moving_count.h"],
+    deps = [":common"],
+)
+
 pybind_extension(
     name = "operators_cc",
     srcs = ["pyinit.cc"],
     deps = [
         ":add_index",
+        ":filter_max_moving_count",
         ":join",
         ":resample",
         ":since_last",

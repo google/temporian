@@ -20,6 +20,7 @@ py_library(
         ":enumerate",
         ":fast_fourier_transform",
         ":filter",
+        ":filter_max_moving_count",
         ":glue",
         ":join",
         ":lag",
@@ -376,6 +377,21 @@ py_library(
         ":base",
         "//temporian/core/data:duration_utils",
         "//temporian/core/operators:select_index_values",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy:utils",
+        "//temporian/implementation/numpy/data:event_set",
+    ],
+)
+
+py_library(
+    name = "filter_max_moving_count",
+    srcs = ["filter_max_moving_count.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/numpy
+        ":base",
+        "//temporian/core/data:duration_utils",
+        "//temporian/core/operators:filter_max_moving_count",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",
