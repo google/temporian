@@ -13,9 +13,11 @@
 # limitations under the License.
 
 from abc import abstractmethod
-from typing import Dict, Optional, List, Any
+import logging
+from typing import Dict, Optional, List, Any, Union
 
 import numpy as np
+from temporian.core.data.duration_utils import NormalizedDuration
 
 from temporian.core.operators.window.base import BaseWindowOperator
 from temporian.implementation.numpy.data.event_set import IndexData
@@ -40,23 +42,55 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
         self,
         input: EventSet,
         sampling: Optional[EventSet] = None,
+        window_length: Optional[EventSet] = None,
     ) -> Dict[str, EventSet]:
         assert isinstance(self.operator, BaseWindowOperator)
 
-        # if no sampling is provided, apply operator to the evset's own
-        # timestamps
-        if sampling is None:
-            sampling = input
+        # pick effective sampling
+        effective_sampling = input
+        if self.operator.has_variable_winlen:
+            assert window_length is not None
+            effective_sampling = window_length
+        elif self.operator.has_sampling:
+            assert sampling is not None
+            effective_sampling = sampling
+
+        # check that sampling isn't the input's, in which case we don't pass it
+        # to cpp impl to use the more efficient sampling-less version
+        has_sampling = (
+            effective_sampling.node().sampling_node
+            is not input.node().sampling_node
+        )
 
         # create destination evset
         output_schema = self.operator.outputs["output"].schema
         output_evset = EventSet(data={}, schema=output_schema)
+
         # For each index
-        for index_key, sampling_data in sampling.data.items():
+        for index_key, sampling_data in effective_sampling.data.items():
             output_data = IndexData(
                 features=[],
                 timestamps=sampling_data.timestamps,
                 schema=None,  # Checking is done later
+            )
+
+            if window_length is not None:
+                effective_window_length = window_length.data[
+                    index_key
+                ].features[0]
+                # Warn if not all window length values are positive
+                if not np.all(effective_window_length > 0):
+                    logging.warning(
+                        "`window_length`'s values should be strictly"
+                        " positive. 0, NaN and negative window lengths will"
+                        " output missing values."
+                    )
+            else:
+                assert self.operator.window_length is not None
+                effective_window_length = self.operator.window_length
+
+            sampling_timestamps = (
+                sampling_data.timestamps if has_sampling else None
             )
 
             if index_key in input.data:
@@ -65,8 +99,9 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
                 self._compute(
                     src_timestamps=input_data.timestamps,
                     src_features=input_data.features,
-                    sampling_timestamps=sampling_data.timestamps,
+                    sampling_timestamps=sampling_timestamps,
                     dst_features=output_data.features,
+                    window_length=effective_window_length,
                 )
             else:
                 # Sets the feature data as missing.
@@ -78,8 +113,9 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
                 self._compute(
                     src_timestamps=empty_timestamps,
                     src_features=empty_features,
-                    sampling_timestamps=sampling_data.timestamps,
+                    sampling_timestamps=sampling_timestamps,
                     dst_features=output_data.features,
+                    window_length=effective_window_length,
                 )
 
             output_data.check_schema(output_schema)
@@ -97,8 +133,9 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
         self,
         src_timestamps: np.ndarray,
         src_features: List[np.ndarray],
-        sampling_timestamps: np.ndarray,
+        sampling_timestamps: Optional[np.ndarray],
         dst_features: List[np.ndarray],
+        window_length: Union[NormalizedDuration, np.ndarray],
     ) -> None:
         assert isinstance(self.operator, BaseWindowOperator)
 
@@ -107,9 +144,9 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
             kwargs = {
                 "evset_timestamps": src_timestamps,
                 "evset_values": src_ts,
-                "window_length": self.operator.window_length,
+                "window_length": window_length,
             }
-            if self.operator.has_sampling:
+            if sampling_timestamps is not None:
                 kwargs["sampling_timestamps"] = sampling_timestamps
             dst_feature = implementation(**kwargs)
             dst_features.append(dst_feature)

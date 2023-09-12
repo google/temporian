@@ -76,6 +76,8 @@ bazel test //...:all
 
 You can use the Bazel test flag `--test_output=streamed` to see the test logs in realtime.
 
+If developing and testing C++ code, the `--compilation_mode=dbg` flag enables additional assertions that are otherwise disabled.
+
 Note that these tests also include docstring examples, using the builtin `doctest` module.
 See the [Adding code examples](#adding-code-examples) section for more information.
 
