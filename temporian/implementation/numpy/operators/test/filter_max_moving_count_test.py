@@ -76,6 +76,30 @@ class FilterMaxMovingCountOperatorTest(absltest.TestCase):
         output = instance.call(input=evset)["output"]
         assertEqualEventSet(self, output, expected_output)
 
+    def test_like_one_exclusive(self):
+        # TODO: Use "math.nextafter" after drop of python 3.8.
+        evset = event_set([1, 2, 3])
+        expected_output = event_set([1, 2, 3])
+
+        op = FilterMaxMovingCount(input=evset.node(), window_length=1)
+        instance = FilterMaxMovingCountNumpyImplementation(op)
+        testOperatorAndImp(self, op, instance)
+        output = instance.call(input=evset)["output"]
+        assertEqualEventSet(self, output, expected_output)
+
+    def test_like_one_inclusive(self):
+        # TODO: Use "math.nextafter" after drop of python 3.8.
+        evset = event_set([1, 2, 3])
+        expected_output = event_set([1, 3])
+
+        op = FilterMaxMovingCount(
+            input=evset.node(), window_length=np.nextafter(1, 2)
+        )
+        instance = FilterMaxMovingCountNumpyImplementation(op)
+        testOperatorAndImp(self, op, instance)
+        output = instance.call(input=evset)["output"]
+        assertEqualEventSet(self, output, expected_output)
+
 
 if __name__ == "__main__":
     absltest.main()

@@ -2424,15 +2424,15 @@ class EventSetOperations:
     def filter_max_moving_count(
         self: EventSetOrNode, window_length: Duration
     ) -> EventSetOrNode:
-        """Filter out events such that no more than one output event is within a
-        tailing time window of `window_length`.
+        """Filters out events such that no more than one output event is within
+        a tailing time window of `window_length`.
 
         Filtering is applied in chronological order: An event received at time t
         is filtered out if there is a non-filtered out event in
         (t-window_length, t].
 
         This operator is different from `(evtset.moving_count(window_length)
-        == 0).filter()`. In `filter_max_moving_count` a filtered event is not
+        == 0).filter()`. In `filter_max_moving_count` a filtered event does not
         block following events.
 
         Usage example:
@@ -2451,7 +2451,7 @@ class EventSetOperations:
             ```
 
         Returns:
-            EventSet without features with unique timestamps in the input.
+            EventSet without features with the filtered events.
         """
         from temporian.core.operators.filter_max_moving_count import (
             filter_max_moving_count,
