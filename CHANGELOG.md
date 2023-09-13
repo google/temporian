@@ -6,6 +6,7 @@
 
 - Added `EventSet.select_index_values()` operator.
 - Added unsupervised anomaly detection tutorial.
+- Add `until_next` operator.
 
 ### Improvements
 

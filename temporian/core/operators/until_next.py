@@ -55,11 +55,6 @@ class UntilNext(Operator):
                 f"Timeout should be finite. Instead, got {timeout}"
             )
 
-        if timeout <= 0:
-            raise ValueError(
-                f"Timeout should be strictly positive. Instead, got {timeout}"
-            )
-
         self.add_output(
             "output",
             create_node_new_features_new_sampling(
@@ -73,7 +68,7 @@ class UntilNext(Operator):
         self.check()
 
     @property
-    def timeout(self) -> float:
+    def timeout(self) -> NormalizedDuration:
         return self._timeout
 
     @classmethod

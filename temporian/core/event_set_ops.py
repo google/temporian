@@ -2436,11 +2436,10 @@ class EventSetOperations:
         while `until_next` returns one value for each input value (here again,
         sampling events are after input events).
 
-        In addition, while  the output [`EventSet`][temporian.EventSet] of
-        `until_next` has the same sampling as the `sampling` argument (i.e.,
-        same number of events, aligned timestamps). In `until_next`, the output
-        [`EventSet`][temporian.EventSet] as the same number of events as the
-        `input` argument but with a different sampling.
+        The output [EventSet][temporian.EventSet] has one event for each event
+        in input, but with its timestamp moved forward to the nearest future
+        event in `sampling`. If no timestamp in sampling is closer than timeout,
+        it is moved by `timeout` into the future instead.
 
         `until_next` is useful to measure the time it takes for an issue
         (`input`) to be detected by an alert (`sampling`).
@@ -2457,13 +2456,13 @@ class EventSetOperations:
                 (5 events):
                     timestamps: [ 1. 12. 12. 21. 35.]
                     'until_next': [ 1.  2.  1.  1. nan]
-            memory usage: 0.6 kB
+            ...
 
             ```
 
         Args:
             sampling: EventSet to use the sampling of.
-            timeout: Maximum amount of time to wait. If not sampling is observed
+            timeout: Maximum amount of time to wait. If no sampling is observed
                 before the timeout expires, the output feature value is NaN.
 
         Returns:
