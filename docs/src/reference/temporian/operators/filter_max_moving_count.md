@@ -1,1 +1,1 @@
-::: temporian.EventSet.filter_max_moving_count
+::: temporian.EventSet.filter_moving_count

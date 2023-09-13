@@ -81,7 +81,7 @@ operator_lib.register_operator(FilterMaxMovingCount)
 
 @typecheck
 @compile
-def filter_max_moving_count(
+def filter_moving_count(
     input: EventSetOrNode, window_length: Duration
 ) -> EventSetOrNode:
     return FilterMaxMovingCount(

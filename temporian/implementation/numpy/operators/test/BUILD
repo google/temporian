@@ -771,8 +771,8 @@ py_test(
 )
 
 py_test(
-    name = "filter_max_moving_count_test",
-    srcs = ["filter_max_moving_count_test.py"],
+    name = "filter_moving_count_test",
+    srcs = ["filter_moving_count_test.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
@@ -781,8 +781,7 @@ py_test(
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/implementation/numpy/data:io",
-        "//temporian/core/operators:filter_max_moving_count",
-        "//temporian/implementation/numpy/operators:filter_max_moving_count",
+        "//temporian/core/operators:filter_moving_count",
+        "//temporian/implementation/numpy/operators:filter_moving_count",
     ],
 )
-    

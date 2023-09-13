@@ -12,7 +12,7 @@
 namespace {
 namespace py = pybind11;
 
-py::array_t<double> filter_max_moving_count(
+py::array_t<double> filter_moving_count(
     const py::array_t<double> &event_timestamps, const double window_length) {
   // Input size
   const Idx n_event = event_timestamps.shape(0);
@@ -40,7 +40,7 @@ py::array_t<double> filter_max_moving_count(
 
 }  // namespace
 
-void init_filter_max_moving_count(py::module &m) {
-  m.def("filter_max_moving_count", &filter_max_moving_count, "",
+void init_filter_moving_count(py::module &m) {
+  m.def("filter_moving_count", &filter_moving_count, "",
         py::arg("event_timestamps").noconvert(), py::arg("window_length"));
 }

@@ -20,7 +20,7 @@ from typing import Dict
 import numpy as np
 
 from temporian.implementation.numpy.data.event_set import IndexData, EventSet
-from temporian.core.operators.filter_max_moving_count import (
+from temporian.core.operators.filter_moving_count import (
     FilterMaxMovingCount,
 )
 from temporian.implementation.numpy import implementation_lib
@@ -45,7 +45,7 @@ class FilterMaxMovingCountNumpyImplementation(OperatorImplementation):
 
         # Fill output EventSet's data
         for index_key, index_data in input.data.items():
-            dst_timestamps = operators_cc.filter_max_moving_count(
+            dst_timestamps = operators_cc.filter_moving_count(
                 index_data.timestamps,
                 window_length=window_length,
             )

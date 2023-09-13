@@ -2476,7 +2476,7 @@ class EventSetOperations:
 
         return unique_timestamps(self)
 
-    def filter_max_moving_count(
+    def filter_moving_count(
         self: EventSetOrNode, window_length: Duration
     ) -> EventSetOrNode:
         """Filters out events such that no more than one output event is within
@@ -2487,14 +2487,14 @@ class EventSetOperations:
         (t-window_length, t].
 
         This operator is different from `(evtset.moving_count(window_length)
-        == 0).filter()`. In `filter_max_moving_count` a filtered event does not
+        == 0).filter()`. In `filter_moving_count` a filtered event does not
         block following events.
 
         Usage example:
 
             ```python
             >>> a = tp.event_set(timestamps=[1, 2, 3])
-            >>> b = a.filter_max_moving_count(window_length=1.5)
+            >>> b = a.filter_moving_count(window_length=1.5)
             >>> b
             indexes: []
             features: []
@@ -2508,8 +2508,8 @@ class EventSetOperations:
         Returns:
             EventSet without features with the filtered events.
         """
-        from temporian.core.operators.filter_max_moving_count import (
-            filter_max_moving_count,
+        from temporian.core.operators.filter_moving_count import (
+            filter_moving_count,
         )
 
-        return filter_max_moving_count(self, window_length=window_length)
+        return filter_moving_count(self, window_length=window_length)

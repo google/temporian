@@ -17,11 +17,11 @@ from absl.testing import absltest
 
 import numpy as np
 
-from temporian.core.operators.filter_max_moving_count import (
+from temporian.core.operators.filter_moving_count import (
     FilterMaxMovingCount,
 )
 from temporian.implementation.numpy.data.io import event_set
-from temporian.implementation.numpy.operators.filter_max_moving_count import (
+from temporian.implementation.numpy.operators.filter_moving_count import (
     FilterMaxMovingCountNumpyImplementation,
 )
 from temporian.implementation.numpy.operators.test.test_util import (

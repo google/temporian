@@ -64,4 +64,4 @@ from temporian.implementation.numpy.operators import since_last
 from temporian.implementation.numpy.operators import tick
 from temporian.implementation.numpy.operators import timestamps
 from temporian.implementation.numpy.operators import unique_timestamps
-from temporian.implementation.numpy.operators import filter_max_moving_count
+from temporian.implementation.numpy.operators import filter_moving_count

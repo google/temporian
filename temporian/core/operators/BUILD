@@ -376,8 +376,8 @@ py_library(
 )
 
 py_library(
-    name = "filter_max_moving_count",
-    srcs = ["filter_max_moving_count.py"],
+    name = "filter_moving_count",
+    srcs = ["filter_moving_count.py"],
     srcs_version = "PY3",
     deps = [
         ":base",
@@ -387,4 +387,3 @@ py_library(
         "//temporian/proto:core_py_proto",
     ],
 )
-    
