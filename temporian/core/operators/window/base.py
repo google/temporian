@@ -16,6 +16,7 @@
 
 from abc import ABC, abstractmethod
 from typing import Optional
+from temporian.core.data.duration_utils import normalize_duration
 
 
 from temporian.core.data.duration_utils import NormalizedDuration
@@ -26,6 +27,7 @@ from temporian.core.data.node import (
 )
 from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.base import Operator
+from temporian.core.typing import WindowLength
 from temporian.proto import core_pb2 as pb
 
 
@@ -35,27 +37,52 @@ class BaseWindowOperator(Operator, ABC):
     def __init__(
         self,
         input: EventSetNode,
-        window_length: NormalizedDuration,
+        window_length: WindowLength,
         sampling: Optional[EventSetNode] = None,
     ):
         super().__init__()
 
-        self._window_length = window_length
-        self.add_attribute("window_length", window_length)
+        has_variable_winlen = isinstance(window_length, EventSetNode)
+        self._has_variable_winlen = has_variable_winlen
 
-        self._has_sampling = sampling is not None
-        if self._has_sampling:
-            assert sampling is not None
+        has_sampling = sampling is not None
+        self._has_sampling = has_sampling
 
-            self.add_input("sampling", sampling)
-            effective_sampling_node = sampling
-
+        if has_sampling:
+            if has_variable_winlen:
+                raise ValueError(
+                    "`sampling` cannot be specified if a variable"
+                    " `window_length` is specified with an EventSet. If"
+                    " specifying `window_length` with an EventSet, that"
+                    " EventSet's sampling will be used."
+                )
             input.schema.check_compatible_index(sampling.schema)
+            self.add_input("sampling", sampling)
 
+        if has_variable_winlen:
+            if (
+                len(window_length.schema.features) != 1
+                or window_length.schema.features[0].dtype != DType.FLOAT64
+            ):
+                raise ValueError(
+                    "`window_length` must have exactly one float64 feature."
+                )
+            self.add_input("window_length", window_length)
         else:
-            effective_sampling_node = input
+            window_length = normalize_duration(window_length)
+            self.add_attribute("window_length", window_length)
+            self._window_length = window_length
 
         self.add_input("input", input)
+
+        # Note: effective_sampling_node can be either the received sampling,
+        # window_length, or the input
+        effective_sampling_node = (
+            window_length
+            if has_variable_winlen
+            else (sampling if has_sampling else input)
+        )
+        assert isinstance(effective_sampling_node, EventSetNode)
 
         self.add_output(
             "output",
@@ -78,12 +105,18 @@ class BaseWindowOperator(Operator, ABC):
         ]
 
     @property
-    def window_length(self) -> NormalizedDuration:
+    def window_length(self) -> Optional[NormalizedDuration]:
+        """Returns None if window_length is variable (i.e. an EventSet was
+        passed as `window_length` to the operator)."""
         return self._window_length
 
     @property
     def has_sampling(self) -> bool:
         return self._has_sampling
+
+    @property
+    def has_variable_winlen(self) -> bool:
+        return self._has_variable_winlen
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
@@ -93,11 +126,13 @@ class BaseWindowOperator(Operator, ABC):
                 pb.OperatorDef.Attribute(
                     key="window_length",
                     type=pb.OperatorDef.Attribute.Type.FLOAT_64,
+                    is_optional=True,
                 ),
             ],
             inputs=[
                 pb.OperatorDef.Input(key="input"),
                 pb.OperatorDef.Input(key="sampling", is_optional=True),
+                pb.OperatorDef.Input(key="window_length", is_optional=True),
             ],
             outputs=[pb.OperatorDef.Output(key="output")],
         )

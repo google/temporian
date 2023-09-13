@@ -14,6 +14,7 @@
 
 from typing import Dict, List, Set, Tuple, Type, TypeVar, Union
 from temporian.core.data.dtype import DType
+from temporian.core.data.duration import Duration
 
 from temporian.core.data.node import EventSetNode
 from temporian.core.event_set_ops import EventSetOperations
@@ -93,6 +94,26 @@ Auxiliary type to allow receiving a single IndexKey or a list of IndexKeys.
 If receiving a single IndexKey, it is equivalent to receiving a list with a
 single IndexKey.
 """
+
+WindowLength = Union[Duration, EventSetOrNode]
+"""Window length of a moving window operator.
+
+A window length can be either constant or variable.
+
+A constant window length is specified with a
+[Duration][temporian.duration.Duration]. For example, `window_length=5.0` or
+`window_length=tp.duration.days(4)`.
+
+A variable window length is specified with an [EventSet][temporian.EventSet]
+containing a single float64 feature. This EventSet can have the same sampling as
+the input EventSet or a different one, in which case the output will have the
+same sampling as the `window_length` EventSet. In both cases the feature value
+on each timestamp will dictate the length of the window in that timestamp.
+
+If an `EventSet`, it should contain strictly positive values. If receiving 0,
+negative values, or missing values, the operator will treat the window as empty.
+"""
+
 
 # Internal
 

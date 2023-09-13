@@ -19,11 +19,10 @@ from typing import Optional
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
-from temporian.core.data.duration_utils import Duration, normalize_duration
 from temporian.core.data.node import EventSetNode
 from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.window.base import BaseWindowOperator
-from temporian.core.typing import EventSetOrNode
+from temporian.core.typing import EventSetOrNode, WindowLength
 
 
 class MovingMaxOperator(BaseWindowOperator):
@@ -41,7 +40,7 @@ operator_lib.register_operator(MovingMaxOperator)
 @compile
 def moving_max(
     input: EventSetOrNode,
-    window_length: Duration,
+    window_length: WindowLength,
     sampling: Optional[EventSetOrNode] = None,
 ) -> EventSetOrNode:
     assert isinstance(input, EventSetNode)
@@ -50,6 +49,6 @@ def moving_max(
 
     return MovingMaxOperator(
         input=input,
-        window_length=normalize_duration(window_length),
+        window_length=window_length,
         sampling=sampling,
     ).outputs["output"]
