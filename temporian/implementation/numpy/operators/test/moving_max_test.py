@@ -22,6 +22,7 @@ from numpy.testing import assert_array_equal
 from temporian.core.operators.window.moving_max import (
     MovingMaxOperator,
 )
+from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy.operators.window.moving_max import (
     MovingMaxNumpyImplementation,
     operators_cc,
@@ -48,9 +49,9 @@ class MovingMaxOperatorTest(absltest.TestCase):
     def test_cc_wo_sampling(self):
         assert_array_equal(
             operators_cc.moving_max(
-                _f64([0, 1, 2, 3, 5, 20]),
-                _f32([nan, 10, nan, 12, 13, 14]),
-                3.5,
+                evset_timestamps=_f64([0, 1, 2, 3, 5, 20]),
+                evset_values=_f32([nan, 10, nan, 12, 13, 14]),
+                window_length=3.5,
             ),
             _f32([nan, 10, 10, 12, 13, 14]),
         )
@@ -58,12 +59,33 @@ class MovingMaxOperatorTest(absltest.TestCase):
     def test_cc_w_sampling(self):
         assert_array_equal(
             operators_cc.moving_max(
-                _f64([0, 1, 2, 3, 5, 20]),
-                _f32([nan, 10, nan, 12, 13, 14]),
-                _f64([-1, 3, 40]),
-                3.5,
+                evset_timestamps=_f64([0, 1, 2, 3, 5, 20]),
+                evset_values=_f32([nan, 10, nan, 12, 13, 14]),
+                sampling_timestamps=_f64([-1, 3, 40]),
+                window_length=3.5,
             ),
             _f32([nan, 12, nan]),
+        )
+
+    def test_cc_wo_sampling_w_variable_winlen(self):
+        assert_array_equal(
+            operators_cc.moving_max(
+                evset_timestamps=_f64([0, 1, 2, 3, 5, 20]),
+                evset_values=_f64([nan, 0, 10, 5, 1, 2]),
+                window_length=_f64([1, 1, 1.5, 0.5, 3.5, 0]),
+            ),
+            _f64([nan, 0, 10, 5, 10, np.nan]),
+        )
+
+    def test_cc_w_sampling_w_variable_winlen(self):
+        assert_array_equal(
+            operators_cc.moving_max(
+                evset_timestamps=_f64([0, 1, 2, 3, 5, 20]),
+                evset_values=_f64([nan, 0, 10, 5, 1, 2]),
+                sampling_timestamps=_f64([-1, 1, 4, 19, 20, 20]),
+                window_length=_f64([10, 10, 2.5, 19, 16, np.inf]),
+            ),
+            _f64([nan, 0, 10, 10, 2, 10]),
         )
 
     def test_flat(self):

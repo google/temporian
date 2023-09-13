@@ -96,7 +96,7 @@ def from_csv(
         pipe
         | "Read csv" >> from_csv_raw(file_pattern)
         | "Convert to Event Set"
-        >> to_event_set(schema, timestamp_key, grouped_by_index=False)
+        >> to_event_set(schema, timestamp_key, format="single_events")
     )
 
 

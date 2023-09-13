@@ -29,8 +29,8 @@ if TYPE_CHECKING:
 
 
 class EventSetNode(EventSetOperations):
-    """An EventSetNode is a reference to the input/output of ops in a compute
-    graph.
+    """An EventSetNode is a reference to the input/output of operators in a
+    compute graph.
 
     Use [`tp.input_node()`][temporian.input_node] to create an EventSetNode
     manually, or use [`EventSet.node()`][temporian.EventSet.node] to create an

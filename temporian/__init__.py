@@ -25,7 +25,7 @@
 # from temporian.module import submodule as _submodule
 # del _submodule
 
-__version__ = "0.1.3"
+__version__ = "0.1.4"
 
 # Register all operator implementations
 from temporian.implementation.numpy import operators as _impls
@@ -90,8 +90,8 @@ from temporian.core.typing import EventSetOrNode
 # Runtime check
 from temporian.utils.typecheck import runtime_check_raise_exception
 
-# Help
-from temporian import help
+# Config
+from temporian.utils import config
 
 # --- OPERATORS ---
 
@@ -140,9 +140,6 @@ from temporian.core.operators.unary import isnan
 from temporian.core.operators.unary import notnan
 from temporian.core.operators.unary import abs
 from temporian.core.operators.unary import log
-
-# Config
-from temporian.utils import config
 
 # Remove automatic file tree symbols from public API
 # pylint: disable=undefined-variable

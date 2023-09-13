@@ -14,10 +14,10 @@
 
 import math
 
-from absl.testing import absltest
 import numpy as np
-from numpy.testing import assert_array_equal
 import pandas as pd
+from absl.testing import absltest
+from numpy.testing import assert_array_equal
 
 from temporian.core.operators.window.moving_count import MovingCountOperator
 from temporian.implementation.numpy.operators.window.moving_count import (
@@ -25,7 +25,6 @@ from temporian.implementation.numpy.operators.window.moving_count import (
     operators_cc,
 )
 from temporian.core.data import duration, node as node_lib
-from numpy.testing import assert_array_equal
 from temporian.io.pandas import from_pandas
 
 
@@ -52,6 +51,25 @@ class MovingCountOperatorTest(absltest.TestCase):
                 5.0,
             ),
             _i32([1, 2, 3, 4, 1]),
+        )
+
+    def test_cc_wo_sampling_w_variable_winlen(self):
+        assert_array_equal(
+            operators_cc.moving_count(
+                _f64([1, 2, 3, 5, 20]),
+                _f64([0, np.inf, 1.001, 5, 0.00001]),
+            ),
+            _i32([0, 2, 2, 4, 1]),
+        )
+
+    def test_cc_w_sampling_w_variable_winlen(self):
+        assert_array_equal(
+            operators_cc.moving_count(
+                _f64([1, 2, 3, 5, 20]),
+                _f64([0, 1.5, 3.5, 3.5, 3.5, 20]),
+                _f64([1, 1, 1, 3, 0.5, 19.5]),
+            ),
+            _i32([0, 1, 1, 3, 0, 5]),
         )
 
     def test_flat(self):

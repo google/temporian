@@ -16,15 +16,6 @@ All submissions, including submissions by project members, require review. We us
 
 All new contributions must pass all the tests and checks performed by GitHub actions, and any changes to docstrings must respect the [docstring guidelines](docs/docstring_guidelines.md).
 
-## Release to PyPI
-
-The Python package is built and published to PyPI when a new release is created in GitHub.
-
-To create a new release, follow these steps:
-
-1. Push a new commit to `main` updating the version number in `pyproject.toml` and `temporian/__init__.py` to the new version number (e.g. `1.3.2`).
-2. Create a new [GitHub release](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository#creating-a-release) with the new version's name prepended with `v`, e.g. `v1.3.2`.
-
 ## Development
 
 ### Environment Setup
@@ -75,6 +66,8 @@ bazel test //...:all
 ```
 
 You can use the Bazel test flag `--test_output=streamed` to see the test logs in realtime.
+
+If developing and testing C++ code, the `--compilation_mode=dbg` flag enables additional assertions that are otherwise disabled.
 
 Note that these tests also include docstring examples, using the builtin `doctest` module.
 See the [Adding code examples](#adding-code-examples) section for more information.

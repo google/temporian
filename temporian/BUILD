@@ -10,7 +10,6 @@ py_library(
     name = "temporian",
     srcs = [
         "__init__.py",
-        "help.py",
     ],
     srcs_version = "PY3",
     deps = [
@@ -35,7 +34,6 @@ py_library(
         "//temporian/implementation/numpy/data:plotter",
         "//temporian/implementation/numpy/operators",
         "//temporian/io:csv",
-        "//temporian/io:format",
         "//temporian/io:pandas",
         "//temporian/io:tensorflow",
         "//temporian/utils:config",

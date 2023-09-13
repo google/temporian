@@ -56,7 +56,7 @@ def structure_np_to_list(data):
 
 
 class IOTest(absltest.TestCase):
-    def test_to_event_set_and_to_dict_singleEvents(self):
+    def test_to_event_set_and_to_dict_single_events(self):
         schema = Schema(
             [("f1", DType.INT32), ("f2", DType.STRING)],
             [("i1", DType.INT32), ("i2", DType.STRING)],
@@ -74,12 +74,12 @@ class IOTest(absltest.TestCase):
             output = (
                 p
                 | beam.Create(raw_data)
-                | to_event_set(schema, grouped_by_index=False)
-                | to_dict(schema, grouped_by_index=False)
+                | to_event_set(schema, format="single_events")
+                | to_dict(schema, format="single_events")
             )
             util.assert_that(output, util.equal_to(raw_data))
 
-    def test_to_event_set_and_to_dict_singleEvents_no_features(self):
+    def test_to_event_set_and_to_dict_single_events_no_features(self):
         schema = Schema(
             [],
             [("i1", DType.INT32), ("i2", DType.STRING)],
@@ -97,12 +97,12 @@ class IOTest(absltest.TestCase):
             output = (
                 p
                 | beam.Create(raw_data)
-                | to_event_set(schema, grouped_by_index=False)
-                | to_dict(schema, grouped_by_index=False)
+                | to_event_set(schema, format="single_events")
+                | to_dict(schema, format="single_events")
             )
             util.assert_that(output, util.equal_to(raw_data))
 
-    def test_to_event_set_and_to_dict_singleEvents_errors(self):
+    def test_to_event_set_and_to_dict_single_events_errors(self):
         def test(
             schema: Schema,
             data: Dict[str, Any],
@@ -114,7 +114,7 @@ class IOTest(absltest.TestCase):
                     _ = (
                         p
                         | beam.Create([data])
-                        | to_event_set(schema, grouped_by_index=False)
+                        | to_event_set(schema, format="single_events")
                     )
 
         test(
@@ -135,7 +135,7 @@ class IOTest(absltest.TestCase):
             "could not convert string to float",
         )
 
-    def test_to_event_set_and_to_dict_indexedEvents(self):
+    def test_to_event_set_and_to_dict_grouped_by_index(self):
         schema = Schema(
             features=[("f1", DType.INT64), ("f2", DType.STRING)],
             indexes=[("i1", DType.INT64), ("i2", DType.STRING)],
@@ -169,15 +169,15 @@ class IOTest(absltest.TestCase):
             output = (
                 p
                 | beam.Create(raw_data)
-                | to_event_set(schema, grouped_by_index=True)
-                | to_dict(schema, grouped_by_index=True)
+                | to_event_set(schema, format="grouped_by_index")
+                | to_dict(schema, format="grouped_by_index")
                 | beam.Map(structure_np_to_list)
             )
             util.assert_that(
                 output, util.equal_to(structure_np_to_list(raw_data))
             )
 
-    def test_to_event_set_and_to_dict_indexedEvents_no_features(self):
+    def test_to_event_set_and_to_dict_grouped_by_index_no_features(self):
         schema = Schema(
             features=[],
             indexes=[("i1", DType.INT64), ("i2", DType.STRING)],
@@ -205,15 +205,15 @@ class IOTest(absltest.TestCase):
             output = (
                 p
                 | beam.Create(raw_data)
-                | to_event_set(schema, grouped_by_index=True)
-                | to_dict(schema, grouped_by_index=True)
+                | to_event_set(schema, format="grouped_by_index")
+                | to_dict(schema, format="grouped_by_index")
                 | beam.Map(structure_np_to_list)
             )
             util.assert_that(
                 output, util.equal_to(structure_np_to_list(raw_data))
             )
 
-    def test_to_event_set_and_to_dict_indexedEvents_errors(self):
+    def test_to_event_set_and_to_dict_grouped_by_index_errors(self):
         def test(
             schema: Schema,
             data: Dict[str, Any],
@@ -225,7 +225,7 @@ class IOTest(absltest.TestCase):
                     _ = (
                         p
                         | beam.Create([data])
-                        | to_event_set(schema, grouped_by_index=True)
+                        | to_event_set(schema, format="grouped_by_index")
                     )
 
         test(
