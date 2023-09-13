@@ -2431,7 +2431,7 @@ class EventSetOperations:
             features: [('filtered', float64), ('multiplied', float64)]
             events:
                 (1 events):
-                    timestamps: [30.]
+                    timestamps: ['1970-01-01T00:00:30']
                     'filtered': [30.]
                     'multiplied': [150.]
             ...
