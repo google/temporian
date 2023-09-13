@@ -2389,12 +2389,12 @@ class EventSetOperations:
 
     def tick_calendar(
         self: EventSetOrNode,
-        second: Union[int, Literal["*"], None] = None,
-        minute: Union[int, Literal["*"], None] = None,
-        hour: Union[int, Literal["*"], None] = None,
-        mday: Union[int, Literal["*"], None] = None,
-        month: Union[int, Literal["*"], None] = None,
-        wday: Union[int, Literal["*"], None] = None,
+        second: Optional[Union[int, Literal["*"]]] = None,
+        minute: Optional[Union[int, Literal["*"]]] = None,
+        hour: Optional[Union[int, Literal["*"]]] = None,
+        mday: Optional[Union[int, Literal["*"]]] = None,
+        month: Optional[Union[int, Literal["*"]]] = None,
+        wday: Optional[Union[int, Literal["*"]]] = None,
     ) -> EventSetOrNode:
         """Generates events periodically at fixed times or dates e.g. each month.
 

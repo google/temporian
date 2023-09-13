@@ -14,7 +14,7 @@
 
 
 """TickCalendar operator class and public API function definitions."""
-from typing import Union, Literal, Tuple
+from typing import Literal, Tuple, Optional, Union
 
 import numpy as np
 
@@ -191,12 +191,12 @@ operator_lib.register_operator(TickCalendar)
 @compile
 def tick_calendar(
     input: EventSetOrNode,
-    second: Union[int, TypeWildCard, None] = None,
-    minute: Union[int, TypeWildCard, None] = None,
-    hour: Union[int, TypeWildCard, None] = None,
-    mday: Union[int, TypeWildCard, None] = None,
-    month: Union[int, TypeWildCard, None] = None,
-    wday: Union[int, TypeWildCard, None] = None,
+    second: Optional[Union[int, TypeWildCard]] = None,
+    minute: Optional[Union[int, TypeWildCard]] = None,
+    hour: Optional[Union[int, TypeWildCard]] = None,
+    mday: Optional[Union[int, TypeWildCard]] = None,
+    month: Optional[Union[int, TypeWildCard]] = None,
+    wday: Optional[Union[int, TypeWildCard]] = None,
 ) -> EventSetOrNode:
     # Don't allow empty args
     if all(arg is None for arg in (second, minute, hour, mday, month, wday)):
