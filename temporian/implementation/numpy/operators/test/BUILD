@@ -769,3 +769,20 @@ py_test(
         "//temporian/implementation/numpy/operators:select_index_values",
     ],
 )
+
+py_test(
+    name = "where_test",
+    srcs = ["where_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        ":test_util",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:node",
+        "//temporian/core/data:schema",
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/core/operators:where",
+        "//temporian/implementation/numpy/operators:where",
+    ],
+)
+    
