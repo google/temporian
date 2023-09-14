@@ -2475,3 +2475,84 @@ class EventSetOperations:
         from temporian.core.operators.unique_timestamps import unique_timestamps
 
         return unique_timestamps(self)
+
+    def where(
+        self: EventSetOrNode,
+        on_true: Union[EventSetOrNode, Any],
+        on_false: Union[EventSetOrNode, Any],
+    ) -> EventSetOrNode:
+        """Pick events from two possible sources, based on boolean conditions.
+
+        Given an input [`EventSet`][temporian.EventSet] with a single boolean
+        feature, create a new one using the same sampling, and choosing values
+        from `on_true` when the input is `True`, otherwise take value from
+        `on_false`.
+
+        Both `on_true` and `on_false` can be single values or
+        [`EventSets`][temporian.EventSet] with the same sampling as the boolean
+        input and one single feature. In any case, both sources must have the
+        same data type, or be explicitly casted to the same type beforehand.
+
+        Example with single values:
+
+            ```python
+            >>> a = tp.event_set(timestamps=[5, 9, 9],
+            ...                  features={'f': [True, True, False]})
+            >>> b = a.where(on_true='hello', on_false='goodbye')
+            >>> b
+            indexes: ...
+            events:
+                (3 events):
+                    timestamps: [ 5. 9. 9.]
+                    'f': ['hello', 'hello', 'goodbye']
+            ...
+
+            ```
+
+        Example with EventSets:
+
+            ```python
+            >>> a = tp.event_set(timestamps=[5, 9, 10],
+            ...                  features={'condition': [True, True, False],
+            ...                            'yes': [1, 2, 3],
+            ...                            'no': [-1, -2, -3])})
+
+            >>> b = a['condition'].where(a['yes'], a['no'])
+            >>> b
+            indexes: ...
+            events:
+                (3 events):
+                    timestamps: [ 5. 9. 10.]
+                    'f': [1, 2, -3]
+            ...
+
+            ```
+
+        Example setting to NaN based on condition:
+
+            ```python
+            >>> a = tp.event_set(timestamps=[5, 6, 7, 8, 9],
+            ...                  features={'f': [1, 2, -3, -4, 5],
+
+            >>> # Set values < 0 to nan (cast to float to support nan)
+            >>> b = (a['f'] >= 0).where(a['f'].cast(float), np.nan)
+            >>> b
+            indexes: ...
+            events:
+                (5 events):
+                    timestamps: [ 5. 6. 7. 8. 9.]
+                    'f': [ 1., 2., nan, nan, 5.]
+            ...
+
+            ```
+
+        Args:
+            on_true: Source of values from when the condition is True.
+            on_false: Source of values from when the condition is False.
+
+        Returns:
+            EventSet with a single feature and same sampling as input.
+        """
+        from temporian.core.operators.where import where
+
+        return where(self, on_true, on_false)
