@@ -911,8 +911,8 @@ class EventSetOperations:
         Foreach timestamp, calculate the sum of the feature from the beginning.
         Shorthand for `moving_sum(event, window_length=np.inf)`.
 
-        Missing (NaN) values don't change the sum. While the feature does not
-        have any values (e.g., NaN values at the beginning), outputs NaN values.
+        Missing (NaN) values are not accounted for. The output will be NaN until
+        the input contains at least one numeric value.
 
         If `sampling` is specified or `window_length` is an EventSet, the moving
         window is sampled at each timestamp in them, else it is sampled on the
