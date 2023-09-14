@@ -903,6 +903,7 @@ class EventSetOperations:
 
     def cumsum(
         self: EventSetOrNode,
+        sampling: Optional[EventSetOrNode] = None,
     ) -> EventSetOrNode:
         """Computes the cumulative sum of values over each feature in an
         [`EventSet`][temporian.EventSet].
@@ -910,10 +911,12 @@ class EventSetOperations:
         Foreach timestamp, calculate the sum of the feature from the beginning.
         Shorthand for `moving_sum(event, window_length=np.inf)`.
 
-        Missing values are ignored.
+        Missing (NaN) values are not accounted for. The output will be NaN until
+        the input contains at least one numeric value.
 
-        While the feature does not have any values (e.g., missing initial values),
-        outputs missing values.
+        If `sampling` is specified or `window_length` is an EventSet, the moving
+        window is sampled at each timestamp in them, else it is sampled on the
+        input's.
 
         Example:
             ```python
@@ -932,12 +935,44 @@ class EventSetOperations:
 
             ```
 
+        Examples with sampling:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 5, 6, 7],
+            ...     features={"value": [np.nan, 1, 5, 10, 15, 20]},
+            ... )
+
+            >>> # Cumulative sum at 5 and 10
+            >>> b = tp.event_set(timestamps=[5, 10])
+            >>> c = a.cumsum(sampling=b)
+            >>> c
+            indexes: ...
+                (2 events):
+                    timestamps: [ 5. 10.]
+                    'value': [16. 51.]
+            ...
+
+            >>> # Sum all values in the EventSet
+            >>> c = a.cumsum(sampling=a.end())
+            >>> c
+            indexes: ...
+                (1 events):
+                    timestamps: [7.]
+                    'value': [51.]
+            ...
+
+            ```
+
+        Args:
+            sampling: Timestamps to sample the sliding window's value at. If not
+                provided, timestamps in the input are used.
+
         Returns:
-            Cumulative sum of each feature in `node`.
+            Cumulative sum of each feature.
         """
         from temporian.core.operators.window.moving_sum import cumsum
 
-        return cumsum(self)
+        return cumsum(self, sampling=sampling)
 
     def drop_index(
         self: EventSetOrNode,
@@ -1666,14 +1701,15 @@ class EventSetOperations:
         [`EventSet`][temporian.EventSet].
 
         For each t in sampling, and for each feature independently, returns at
-        time t the sum of the feature in the window (
+        time t the sum of values for the feature in the window
+        (t - window_length, t].
 
-            in them. `sampling` can't be specified if `window_length` is  an EventSet.ta variable  - window_length
-            specified, (i.e. if `window_length` is an EventSet).
+        `sampling` can't be  specified if a variable `window_length` is
+        specified (i.e. if `window_length` is an EventSet).
 
         If `sampling` is specified or `window_length` is an EventSet, the moving
-        window is sampled at each timesta, else it is sampled on the
-        input's.p
+        window is sampled at each timestamp in them, else it is sampled on the
+        input's.
 
         Missing values (such as NaNs) are ignored.
 
