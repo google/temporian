@@ -68,6 +68,7 @@ class BaseWindowOperator(Operator, ABC):
                     "`window_length` must have exactly one float64 feature."
                 )
             self.add_input("window_length", window_length)
+            self._window_length = None
         else:
             window_length = normalize_duration(window_length)
             self.add_attribute("window_length", window_length)
