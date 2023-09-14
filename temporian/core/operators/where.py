@@ -14,7 +14,7 @@
 
 
 """Where operator class and public API function definitions."""
-from typing import Union, Any
+from typing import Union, Any, Tuple
 
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
@@ -47,9 +47,10 @@ class Where(Operator):
             )
         self.add_input("input", input)
 
-        # Check on_true
-        true_dtype = self._add_argument(on_true, "on_true")
-        false_dtype = self._add_argument(on_false, "on_false")
+        # Inputs or attributes: on_true and on_false
+        self._on_attributes = {}
+        true_dtype = self._add_argument(on_true, "on_true", input)
+        false_dtype = self._add_argument(on_false, "on_false", input)
         if true_dtype != false_dtype:
             raise ValueError(
                 f"Arguments 'on_true' (dtype={true_dtype}) and 'on_false'"
@@ -69,10 +70,14 @@ class Where(Operator):
         self.check()
 
     def _add_argument(
-        self, arg_value: Union[EventSetNode, Any], arg_name: str
-    ) -> DType:
+        self,
+        arg_value: Union[EventSetNode, Any],
+        arg_name: str,
+        input: EventSetNode,
+    ) -> Tuple[DType, bool]:
         # Argument is another node (input)
         if isinstance(arg_value, EventSetNode):
+            input.check_same_sampling(arg_value)
             dtypes = arg_value.schema.feature_dtypes()
             if len(dtypes) != 1:
                 raise ValueError(
@@ -80,12 +85,13 @@ class Where(Operator):
                     f" an EventSet with {len(dtypes)} features."
                 )
             self.add_input(arg_name, arg_value)
-            return dtypes[0]
+            return dtypes[0], False
 
         # Argument is a single value (attribute)
         dtype = DType.infer_from_value(arg_value)  # check dtype before adding
+        self._on_attributes[arg_name] = arg_value
         self.add_attribute(arg_name, arg_value)
-        return dtype
+        return dtype, True
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
@@ -101,6 +107,16 @@ class Where(Operator):
             inputs=[pb.OperatorDef.Input(key="input")],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
+
+    @property
+    def on_true(self) -> Any:
+        """Returns None if 'on_true' is EventSet instead of a single value"""
+        return self._on_attributes.get("on_true", None)
+
+    @property
+    def on_false(self) -> Any:
+        """Returns None if 'on_false' is EventSet instead of a single value"""
+        return self._on_attributes.get("on_false", None)
 
 
 operator_lib.register_operator(Where)

@@ -16,7 +16,7 @@
 """Implementation for the Where operator."""
 
 
-from typing import Dict
+from typing import Dict, Optional
 import numpy as np
 
 from temporian.implementation.numpy.data.event_set import IndexData, EventSet
@@ -24,30 +24,49 @@ from temporian.core.operators.where import Where
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
-class WhereNumpyImplementation(OperatorImplementation):
 
+class WhereNumpyImplementation(OperatorImplementation):
     def __init__(self, operator: Where) -> None:
         assert isinstance(operator, Where)
         super().__init__(operator)
 
     def __call__(
-        self, input: EventSet) -> Dict[str, EventSet]:
+        self,
+        input: EventSet,
+        on_true: Optional[EventSet] = None,
+        on_false: Optional[EventSet] = None,
+    ) -> Dict[str, EventSet]:
         assert isinstance(self.operator, Where)
 
-        output_schema = self.output_schema("output")
-
         # Create output EventSet
+        output_schema = self.output_schema("output")
         output_evset = EventSet(data={}, schema=output_schema)
+
+        # Single value sources, None if EventSets are provided.
+        on_true_source = self.operator.on_true
+        on_false_source = self.operator.on_false
 
         # Fill output EventSet's data
         for index_key, index_data in input.data.items():
+            # EventSet sources instead of single values
+            if on_true is not None:
+                on_true_source = on_true.data[index_key].features[0]
+            if on_false is not None:
+                on_false_source = on_false.data[index_key].features[0]
+
             output_evset.set_index_value(
                 index_key,
                 IndexData(
-                    features=[],
-                    timestamps=np.array([1], dtype=np.float64),
+                    features=[
+                        np.where(
+                            index_data.features[0],
+                            on_true_source,
+                            on_false_source,
+                        )
+                    ],
+                    timestamps=index_data.timestamps,
                     schema=output_schema,
-                )
+                ),
             )
 
         return {"output": output_evset}
