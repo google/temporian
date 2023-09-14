@@ -57,7 +57,7 @@ class BaseScalarOperator(Operator):
             )
 
         # check that every dtype of input feature is equal to value dtype
-        value_dtype = DType.from_python_type(type(value))
+        value_dtype = DType.infer_from_value(value)
 
         # check that value dtype is in self.dtypes_to_check
         if value_dtype not in self.supported_value_dtypes:

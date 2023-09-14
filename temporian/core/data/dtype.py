@@ -14,7 +14,7 @@
 
 """Data types declaration."""
 
-from typing import Any, Tuple
+from typing import Any
 
 import math
 from enum import Enum
@@ -65,21 +65,27 @@ class DType(Enum):
         raise ValueError(f"Non-implemented type {self}")
 
     @classmethod
-    def from_python_type(cls, python_type: type) -> "DType":
+    def infer_from_value(cls, value: Any) -> "DType":
         """
-        Returns DType from python type.
+        Returns the corresponding DType for the given value.
 
         Args:
-            python_type: Python type.
+            value: A python variable to infer DType from.
 
         Returns:
             The corresponding DType.
 
         Raises:
-            ValueError: If python_type is not implemented.
+            ValueError: If there's no DType implemented for this type of value.
         """
 
-        return _PY_TYPE_TO_DTYPE[python_type]
+        try:
+            return _PY_TYPE_TO_DTYPE[type(value)]
+        except KeyError as e:
+            raise ValueError(
+                f"Couldn't find a dtype to store a value of type {type(value)}."
+                f" Value is: {value}"
+            ) from e
 
 
 _PY_TYPE_TO_DTYPE = {
