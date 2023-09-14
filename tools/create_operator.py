@@ -286,7 +286,8 @@ py_library(
         encoding="utf-8",
     ) as file:
         file.write(
-            f"""{license_content()}
+            f"""\
+{license_content()}
 
 from absl.testing import absltest
 
@@ -369,7 +370,8 @@ py_test(
         )
 
     print(
-        """Don't forget to update the following code:
+        """\
+Don't forget to update the following code:
 - The imports in the top-level init file temporian/__init__.py (if global)
 - The EventSetOperations class in temporian/core/event_set_ops.py (if not global)
 - Move the docstring from the operator's .py file to the EventSetOperations class (if not global)
@@ -382,6 +384,7 @@ py_test(
 - The docs API ref's home page docs/reference/index.md
 - The tests in temporian/core/test/event_set_ops_test.py
 - The unit test in temporian/core/operators/test
+- Once your op is implemented, run `python tools/build_cleaner.py` and fix Bazel dependencies.
 """
     )
 

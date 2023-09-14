@@ -43,4 +43,7 @@ py_library(
     name = "golden",
     srcs = ["golden.py"],
     srcs_version = "PY3",
+    deps = [
+        # already_there/absl/flags
+    ],
 )

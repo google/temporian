@@ -92,6 +92,7 @@ py_library(
     deps = [
         "//temporian/core:event_set_ops",
         "//temporian/core/data:dtype",
+        "//temporian/core/data:duration",
         "//temporian/core/data:node",
         "//temporian/implementation/numpy/data:event_set",
     ],
