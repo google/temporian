@@ -7,10 +7,7 @@ import numpy as np
 from temporian.utils import string
 from temporian.utils import config
 from temporian.core.data.dtype import DType
-from temporian.core.data.duration_utils import (
-    convert_timestamps_to_datetimes,
-    convert_timestamp_to_datetime,
-)
+from temporian.core.data.duration_utils import convert_timestamp_to_datetime
 from temporian.implementation.numpy.data.event_set import EventSet
 
 ELLIPSIS = "…"
@@ -367,7 +364,6 @@ def display_text(evset: EventSet) -> str:
     # Configs and defaults
     max_events = config.print_max_events or sys.maxsize  # see np.printoptions
     max_indexes = config.print_max_indexes  # 0 will print all
-    is_datetime = evset.schema.is_unix_timestamp
 
     # Representation of the "data" field
     with np.printoptions(
@@ -390,11 +386,9 @@ def display_text(evset: EventSet) -> str:
                 index_key_repr.append(f"{index_name}={index_value}")
             index_key_repr = " ".join(index_key_repr)
             timestamps = index_data.timestamps
-            if is_datetime:
-                timestamps = np.array(
-                    convert_timestamps_to_datetimes(timestamps),
-                    dtype="datetime64[s]",
-                )
+            if evset.schema.is_unix_timestamp:
+                # Print datetimes
+                timestamps = timestamps.astype("datetime64[s]")
             data_repr.append(
                 f"{index_key_repr} ({len(timestamps)} events):\n"
                 "    timestamps:"
