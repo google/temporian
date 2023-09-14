@@ -18,7 +18,6 @@ import tempfile
 from absl.testing import absltest
 from numpy.testing import assert_array_equal
 import tensorflow as tf
-from tensorflow.core.example import example_pb2
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
 )
@@ -76,118 +75,57 @@ class TensorFlowTest(absltest.TestCase):
 
         to_tensorflow_record(evset, path=tmp_file, format="grouped_by_index")
 
-        self.assertEqual(
-            str(_extract_tfrecord(tmp_file)),
-            """[features {
-  feature {
-    key: "timestamp"
-    value {
-      float_list {
-        value: 3
-        value: 4
-      }
-    }
-  }
-  feature {
-    key: "i2"
-    value {
-      bytes_list {
-        value: "y"
-      }
-    }
-  }
-  feature {
-    key: "i1"
-    value {
-      int64_list {
-        value: 2
-      }
-    }
-  }
-  feature {
-    key: "f3"
-    value {
-      bytes_list {
-        value: "c"
-        value: "d"
-      }
-    }
-  }
-  feature {
-    key: "f2"
-    value {
-      float_list {
-        value: 0.3
-        value: 0.4
-      }
-    }
-  }
-  feature {
-    key: "f1"
-    value {
-      int64_list {
-        value: 12
-        value: 13
-      }
-    }
-  }
-}
-, features {
-  feature {
-    key: "timestamp"
-    value {
-      float_list {
-        value: 1
-        value: 2
-      }
-    }
-  }
-  feature {
-    key: "i2"
-    value {
-      bytes_list {
-        value: "x"
-      }
-    }
-  }
-  feature {
-    key: "i1"
-    value {
-      int64_list {
-        value: 1
-      }
-    }
-  }
-  feature {
-    key: "f3"
-    value {
-      bytes_list {
-        value: "a"
-        value: "b"
-      }
-    }
-  }
-  feature {
-    key: "f2"
-    value {
-      float_list {
-        value: 0.1
-        value: 0.2
-      }
-    }
-  }
-  feature {
-    key: "f1"
-    value {
-      int64_list {
-        value: 10
-        value: 11
-      }
-    }
-  }
-}
-]""",
+        expected_1 = tf.train.Example(
+            features=tf.train.Features(
+                feature={
+                    "timestamp": tf.train.Feature(
+                        float_list=tf.train.FloatList(value=[3, 4])
+                    ),
+                    "i1": tf.train.Feature(
+                        int64_list=tf.train.Int64List(value=[2])
+                    ),
+                    "i2": tf.train.Feature(
+                        bytes_list=tf.train.BytesList(value=[b"y"])
+                    ),
+                    "f1": tf.train.Feature(
+                        int64_list=tf.train.Int64List(value=[12, 13])
+                    ),
+                    "f2": tf.train.Feature(
+                        float_list=tf.train.FloatList(value=[0.3, 0.4])
+                    ),
+                    "f3": tf.train.Feature(
+                        bytes_list=tf.train.BytesList(value=[b"c", b"d"])
+                    ),
+                }
+            )
         )
+
+        expected_2 = tf.train.Example(
+            features=tf.train.Features(
+                feature={
+                    "timestamp": tf.train.Feature(
+                        float_list=tf.train.FloatList(value=[1, 2])
+                    ),
+                    "i1": tf.train.Feature(
+                        int64_list=tf.train.Int64List(value=[1])
+                    ),
+                    "i2": tf.train.Feature(
+                        bytes_list=tf.train.BytesList(value=[b"x"])
+                    ),
+                    "f1": tf.train.Feature(
+                        int64_list=tf.train.Int64List(value=[10, 11])
+                    ),
+                    "f2": tf.train.Feature(
+                        float_list=tf.train.FloatList(value=[0.1, 0.2])
+                    ),
+                    "f3": tf.train.Feature(
+                        bytes_list=tf.train.BytesList(value=[b"a", b"b"])
+                    ),
+                }
+            )
+        )
+
+        self.assertEqual(_extract_tfrecord(tmp_file), [expected_1, expected_2])
 
     def test_from_tensorflow_record(self) -> None:
         data_dict = {
