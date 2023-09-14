@@ -13,7 +13,6 @@ py_library(
     deps = [
         # already_there/apache_beam
         # already_there/numpy
-        "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:dtype_normalization",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
@@ -28,9 +27,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         # already_there/apache_beam
-        # already_there/numpy
-        "//temporian/implementation/numpy/data:event_set",
-        "//temporian/core/data:dtype",
+        "//temporian/beam/io:dict",
         "//temporian/core/data:node",
         "//temporian/beam:typing",
     ],
@@ -43,7 +40,8 @@ py_library(
     deps = [
         # already_there/apache_beam
         # already_there/numpy
-        "//temporian/implementation/numpy/data:event_set",
+        "//temporian/io:tensorflow",
+        "//temporian/beam/io:dict",
         "//temporian/implementation/numpy/data:dtype_normalization",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
