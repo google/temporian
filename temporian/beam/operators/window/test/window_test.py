@@ -13,29 +13,34 @@
 # limitations under the License.
 
 
+from absl.testing.parameterized import parameters
 from temporian.core.operators.window.moving_sum import moving_sum
+from temporian.core.operators.window.simple_moving_average import (
+    simple_moving_average,
+)
 from absl.testing import absltest
 from temporian.implementation.numpy.data.io import event_set
 from temporian.beam.test.utils import check_beam_implementation
 
 
-class IOTest(absltest.TestCase):
-    def test_base(self):
+@parameters(moving_sum, simple_moving_average)
+class BeamMovingSumTest(absltest.TestCase):
+    def test_base(self, operator):
         # Create input data
         input_data = event_set(
-            timestamps=[1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
+            timestamps=[1, 2, 3, 4, 5, 1, 2, 3, 4],
             features={
-                "a": ["x", "x", "x", "x", "x", "y", "y", "y", "y", "y"],
-                "b": [1, 1, 1, 2, 2, 1, 1, 1, 1, 1],
-                "c": [2, 3, 4, 3, 2, 22, 23, 24, 23, 22],
-                "d": [100, 101, 102, 103, 104, 105, 106, 106, 107, 108],
-                "e": [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10],
+                "a": ["x", "x", "x", "x", "x", "y", "y", "y", "y"],
+                "b": [1, 1, 1, 2, 2, 1, 1, 1, 1],
+                "c": [2.0, 3.0, 4.0, 3.0, 2.0, 22.0, 23.0, 24.0, 23.0],
+                "d": [10.0, 11.0, 12.0, 13.0, 14.0, 105.0, 106.0, 106.0, 107.0],
+                "e": [-1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -8.0, -9.0],
             },
             indexes=["a", "b"],
         )
 
         # Define computation
-        output_node = moving_sum(input_data.node(), 3)
+        output_node = operator(input_data.node(), 3)
 
         check_beam_implementation(
             self,
@@ -43,16 +48,16 @@ class IOTest(absltest.TestCase):
             output_node=output_node,
         )
 
-    def test_with_sampling(self):
+    def test_with_sampling(self, operator):
         # Create input data
         input_data = event_set(
-            timestamps=[1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
+            timestamps=[1, 2, 3, 4, 5, 1, 2, 3, 4],
             features={
-                "a": ["x", "x", "x", "x", "x", "y", "y", "y", "y", "y"],
-                "b": [1, 1, 1, 2, 2, 1, 1, 1, 1, 1],
-                "c": [2, 3, 4, 3, 2, 22, 23, 24, 23, 22],
-                "d": [100, 101, 102, 103, 104, 105, 106, 106, 107, 108],
-                "e": [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10],
+                "a": ["x", "x", "x", "x", "x", "y", "y", "y", "y"],
+                "b": [1, 1, 1, 2, 2, 1, 1, 1, 1],
+                "c": [2.0, 3.0, 4.0, 3.0, 2.0, 22.0, 23.0, 24.0, 23.0],
+                "d": [10.0, 11.0, 12.0, 13.0, 14.0, 105.0, 106.0, 106.0, 107.0],
+                "e": [-1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -8.0, -9.0],
             },
             indexes=["a", "b"],
         )
@@ -67,7 +72,7 @@ class IOTest(absltest.TestCase):
         )
 
         # Define computation
-        output_node = moving_sum(
+        output_node = operator(
             input_data.node(), 3, sampling=sampling_data.node()
         )
 
