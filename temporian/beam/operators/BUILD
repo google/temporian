@@ -23,6 +23,10 @@ py_library(
     deps = [
         ":add_index",
         ":select",
+        "//temporian/beam/operators/window:moving_count",
+        "//temporian/beam/operators/window:moving_max",
+        "//temporian/beam/operators/window:moving_min",
+        "//temporian/beam/operators/window:moving_standard_deviation",
         "//temporian/beam/operators/window:moving_sum",
         "//temporian/beam/operators/window:simple_moving_average",
     ],

@@ -17,6 +17,10 @@
 # pylint: disable=unused-import
 # pylint: disable=line-too-long
 # fmt: off
+from temporian.beam.operators.window import moving_count
+from temporian.beam.operators.window import moving_max
+from temporian.beam.operators.window import moving_min
+from temporian.beam.operators.window import moving_standard_deviation
 from temporian.beam.operators.window import moving_sum
 from temporian.beam.operators.window import simple_moving_average
 from temporian.beam.operators import select

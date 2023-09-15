@@ -14,11 +14,10 @@
 """Utilities for beam unit tests."""
 
 import os
-from typing import Optional, Union, List
+from typing import Union, List
 import tempfile
 from absl.testing import absltest
 
-import apache_beam as beam
 from apache_beam.testing.test_pipeline import TestPipeline
 from apache_beam.testing.util import assert_that, equal_to
 
@@ -60,11 +59,6 @@ def check_beam_implementation(
         input_path = os.path.join(tmp_dir, f"input_{input_idx}.csv")
         input_paths.append(input_path)
         to_csv(input_evtset, path=input_path)
-
-    # Utility to print the intermediate results
-    def my_print(x, tag):
-        print(f"[{tag}] {x}")
-        return x
 
     # Run the Temporian program using the Beam backend
     with TestPipeline() as p:

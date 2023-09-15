@@ -20,6 +20,9 @@ from temporian.core.operators.window.moving_count import (
     MovingCountOperator,
 )
 from temporian.implementation.numpy import implementation_lib
+from temporian.implementation.numpy.data.dtype_normalization import (
+    tp_dtype_to_np_dtype,
+)
 from temporian.implementation.numpy.operators.window.base import (
     BaseWindowNumpyImplementation,
 )
@@ -44,14 +47,67 @@ class MovingCountNumpyImplementation(BaseWindowNumpyImplementation):
 
         del src_features  # Features are ignored
 
+        implementation = self._implementation()
+
         kwargs = {
             "evset_timestamps": src_timestamps,
             "window_length": window_length,
         }
         if sampling_timestamps is not None:
             kwargs["sampling_timestamps"] = sampling_timestamps
-        dst_feature = operators_cc.moving_count(**kwargs)
+        dst_feature = implementation(**kwargs)
         dst_features.append(dst_feature)
+
+    def apply_feature_wise(
+        self,
+        src_timestamps: np.ndarray,
+        src_feature: np.ndarray,
+        feature_idx: int,
+    ) -> np.ndarray:
+        """Applies the operator on a single feature."""
+
+        assert isinstance(self.operator, MovingCountOperator)
+        print("calling apply_feature_wise")
+
+        implementation = self._implementation()
+        kwargs = {
+            "evset_timestamps": src_timestamps,
+            "window_length": self.operator.window_length,
+        }
+        print("aaa input:", kwargs)
+        output = implementation(**kwargs)
+        print("aaa output:", output)
+        return output
+        # return implementation(**kwargs)
+
+    def apply_feature_wise_with_sampling(
+        self,
+        src_timestamps: Optional[np.ndarray],
+        src_feature: Optional[np.ndarray],
+        sampling_timestamps: np.ndarray,
+        feature_idx: int,
+    ) -> np.ndarray:
+        """Applies the operator on a single feature with a sampling."""
+
+        assert isinstance(self.operator, MovingCountOperator)
+        implementation = self._implementation()
+
+        if src_feature is not None:
+            kwargs = {
+                "evset_timestamps": src_timestamps,
+                "window_length": self.operator.window_length,
+                "sampling_timestamps": sampling_timestamps,
+            }
+            return implementation(**kwargs)
+        else:
+            # Sets the feature data as missing.
+            empty_timestamps = np.empty((0,), dtype=np.float64)
+            kwargs = {
+                "evset_timestamps": empty_timestamps,
+                "window_length": self.operator.window_length,
+                "sampling_timestamps": sampling_timestamps,
+            }
+            return implementation(**kwargs)
 
 
 implementation_lib.register_operator_implementation(
