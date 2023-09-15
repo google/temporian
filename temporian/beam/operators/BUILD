@@ -24,6 +24,7 @@ py_library(
         ":add_index",
         ":select",
         "//temporian/beam/operators/window:moving_sum",
+        "//temporian/beam/operators/window:simple_moving_average",
     ],
 )
 
