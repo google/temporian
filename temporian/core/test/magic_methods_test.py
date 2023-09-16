@@ -266,7 +266,7 @@ class MagicMethodsTest(absltest.TestCase):
     def _check_boolean(
         self, out: EventSetNodeOrEvset, inp: EventSetNodeOrEvset
     ):
-        # Auxiliar function to check arithmetic outputs
+        # Auxiliary function to check arithmetic outputs
         out.check_same_sampling(inp)
         self.assertTrue(out.schema.features[0].dtype == DType.BOOLEAN)
         self.assertTrue(out.schema.features[1].dtype == DType.BOOLEAN)
@@ -411,7 +411,7 @@ class MagicMethodsTest(absltest.TestCase):
     def _check_node_same_dtype(
         self, inp: EventSetNodeOrEvset, out: EventSetNodeOrEvset
     ):
-        # Auxiliar function to check arithmetic outputs
+        # Auxiliary function to check arithmetic outputs
         out.check_same_sampling(inp)
         self.assertTrue(
             (out.schema.features[0].dtype == inp.schema.features[0].dtype)

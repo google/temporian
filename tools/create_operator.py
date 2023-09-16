@@ -61,7 +61,7 @@ def main(argv):
 
     # Example:
     # raw_op = lower_op = "hello_world"
-    # upper_op = "HELLO_WOLRD"
+    # upper_op = "HELLO_WORLD"
     # capitalized_op = "HelloWorld"
     lower_op = raw_op.lower()
     upper_op = lower_op.upper()

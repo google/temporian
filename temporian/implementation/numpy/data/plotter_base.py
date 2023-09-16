@@ -12,9 +12,9 @@ class Style(Enum):
     auto = "auto"
     # Connect numerical values with a line.
     line = "line"
-    # A discreet marker showing a feature value.
+    # A discrete marker showing a feature value.
     marker = "marker"
-    # A discreet marker not showing a feature value.
+    # A discrete marker not showing a feature value.
     vline = "vline"
 
 

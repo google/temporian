@@ -300,7 +300,7 @@ class BenchmarkResult(NamedTuple):
 
 class Runner:
     def __init__(self):
-        # Name and tunning time (in seconds) of each benchmarks.
+        # Name and running time (in seconds) of each benchmarks.
         self._results: List[Union[BenchmarkResult, None]] = []
 
     def benchmark(self, name, callback, warmup_repetitions=1, repetitions=5):

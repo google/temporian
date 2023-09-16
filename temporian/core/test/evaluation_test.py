@@ -103,7 +103,7 @@ class EvaluationTest(absltest.TestCase):
             ],
         )
 
-    def test_schedule_interm_results(self):
+    def test_schedule_interim_results(self):
         i1 = utils.create_input_node()
         o2 = utils.OpI1O1(i1)
         o3 = utils.OpI1O1(o2.outputs["output"])
