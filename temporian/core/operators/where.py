@@ -39,10 +39,10 @@ class Where(Operator):
         super().__init__()
 
         # Check input
-        dtypes = on_true.schema.feature_dtypes()
+        dtypes = input.schema.feature_dtypes()
         if len(dtypes) != 1 or dtypes[0] != DType.BOOLEAN:
             raise ValueError(
-                "Input should have only one boolean feature but got"
+                "Input should have only 1 boolean feature but got"
                 f" {len(dtypes)} features ({dtypes=})"
             )
         self.add_input("input", input)
@@ -61,7 +61,7 @@ class Where(Operator):
         self.add_output(
             "output",
             create_node_new_features_existing_sampling(
-                features=[(input.schema.feature_names()[0], true_dtype)],
+                features=[(self.output_feature_name, true_dtype)],
                 sampling_node=input,
                 creator=self,
             ),
@@ -74,7 +74,7 @@ class Where(Operator):
         arg_value: Union[EventSetNode, Any],
         arg_name: str,
         input: EventSetNode,
-    ) -> Tuple[DType, bool]:
+    ) -> DType:
         # Argument is another node (input)
         if isinstance(arg_value, EventSetNode):
             input.check_same_sampling(arg_value)
@@ -85,13 +85,13 @@ class Where(Operator):
                     f" an EventSet with {len(dtypes)} features."
                 )
             self.add_input(arg_name, arg_value)
-            return dtypes[0], False
+            return dtypes[0]
 
         # Argument is a single value (attribute)
         dtype = DType.infer_from_value(arg_value)  # check dtype before adding
         self._on_attributes[arg_name] = arg_value
         self.add_attribute(arg_name, arg_value)
-        return dtype, True
+        return dtype
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
@@ -99,12 +99,21 @@ class Where(Operator):
             key="WHERE",
             attributes=[
                 pb.OperatorDef.Attribute(
-                    key="param",
-                    type=pb.OperatorDef.Attribute.Type.FLOAT_64,
-                    is_optional=False,
+                    key="on_true",
+                    type=pb.OperatorDef.Attribute.Type.ANY,
+                    is_optional=True,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="on_false",
+                    type=pb.OperatorDef.Attribute.Type.ANY,
+                    is_optional=True,
                 ),
             ],
-            inputs=[pb.OperatorDef.Input(key="input")],
+            inputs=[
+                pb.OperatorDef.Input(key="input"),
+                pb.OperatorDef.Input(key="on_true", is_optional=True),
+                pb.OperatorDef.Input(key="on_false", is_optional=True),
+            ],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
 
@@ -117,6 +126,10 @@ class Where(Operator):
     def on_false(self) -> Any:
         """Returns None if 'on_false' is EventSet instead of a single value"""
         return self._on_attributes.get("on_false", None)
+
+    @property
+    def output_feature_name(self) -> str:
+        return self.inputs["input"].schema.feature_names()[0]
 
 
 operator_lib.register_operator(Where)

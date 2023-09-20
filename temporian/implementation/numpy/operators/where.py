@@ -18,6 +18,9 @@
 
 from typing import Dict, Optional
 import numpy as np
+from temporian.implementation.numpy.data.dtype_normalization import (
+    normalize_features,
+)
 
 from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.core.operators.where import Where
@@ -54,16 +57,18 @@ class WhereNumpyImplementation(OperatorImplementation):
             if on_false is not None:
                 on_false_source = on_false.data[index_key].features[0]
 
+            feature_values = np.where(
+                index_data.features[0], on_true_source, on_false_source
+            )
+            normalized_features = normalize_features(
+                feature_values,
+                self.operator.output_feature_name,
+            )
+
             output_evset.set_index_value(
                 index_key,
                 IndexData(
-                    features=[
-                        np.where(
-                            index_data.features[0],
-                            on_true_source,
-                            on_false_source,
-                        )
-                    ],
+                    features=[normalized_features],
                     timestamps=index_data.timestamps,
                     schema=output_schema,
                 ),
