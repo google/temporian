@@ -14,7 +14,7 @@
 
 
 """Where operator class and public API function definitions."""
-from typing import Union, Any, Tuple
+from typing import Union, Any
 
 from temporian.core import operator_lib
 from temporian.core.compilation import compile

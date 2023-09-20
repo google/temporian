@@ -35,6 +35,7 @@ py_library(
         ":timestamps",
         ":unary",
         ":unique_timestamps",
+        ":where",
         "//temporian/implementation/numpy/operators/binary:arithmetic",
         "//temporian/implementation/numpy/operators/binary:logical",
         "//temporian/implementation/numpy/operators/binary:relational",
@@ -396,5 +397,3 @@ py_library(
         "//temporian/implementation/numpy/data:event_set",
     ],
 )
-
-    

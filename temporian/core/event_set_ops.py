@@ -2503,8 +2503,8 @@ class EventSetOperations:
             indexes: ...
             events:
                 (3 events):
-                    timestamps: [ 5. 9. 9.]
-                    'f': ['hello', 'hello', 'goodbye']
+                    timestamps: [5. 9. 9.]
+                    'f': [b'hello' b'hello' b'goodbye']
             ...
 
             ```
@@ -2515,7 +2515,7 @@ class EventSetOperations:
             >>> a = tp.event_set(timestamps=[5, 9, 10],
             ...                  features={'condition': [True, True, False],
             ...                            'yes': [1, 2, 3],
-            ...                            'no': [-1, -2, -3])})
+            ...                            'no': [-1, -2, -3]})
 
             >>> b = a['condition'].where(a['yes'], a['no'])
             >>> b
@@ -2523,7 +2523,7 @@ class EventSetOperations:
             events:
                 (3 events):
                     timestamps: [ 5. 9. 10.]
-                    'f': [1, 2, -3]
+                    'condition': [ 1 2 -3]
             ...
 
             ```
@@ -2532,7 +2532,7 @@ class EventSetOperations:
 
             ```python
             >>> a = tp.event_set(timestamps=[5, 6, 7, 8, 9],
-            ...                  features={'f': [1, 2, -3, -4, 5],
+            ...                  features={'f': [1, 2, -3, -4, 5]})
 
             >>> # Set values < 0 to nan (cast to float to support nan)
             >>> b = (a['f'] >= 0).where(a['f'].cast(float), np.nan)
@@ -2540,8 +2540,8 @@ class EventSetOperations:
             indexes: ...
             events:
                 (5 events):
-                    timestamps: [ 5. 6. 7. 8. 9.]
-                    'f': [ 1., 2., nan, nan, 5.]
+                    timestamps: [5. 6. 7. 8. 9.]
+                    'f': [ 1. 2. nan nan 5.]
             ...
 
             ```
