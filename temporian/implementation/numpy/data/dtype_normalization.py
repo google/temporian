@@ -17,7 +17,7 @@
 from __future__ import annotations
 import datetime
 import logging
-from typing import TYPE_CHECKING, Any, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Union
 
 import numpy as np
 
@@ -114,6 +114,21 @@ def normalize_features(
     `normalize_features` should match `_DTYPE_MAPPING`.
     """
 
+    def _to_bytes_array(
+        feat_array: Union[Tuple, List, np.ndarray]
+    ) -> np.ndarray:
+        """Try to convert string/object array to np.bytes or fail"""
+        try:
+            if isinstance(feat_array, np.ndarray):
+                return feat_array.astype(np.bytes_)
+            return np.array(feat_array, dtype=np.bytes_)
+        except UnicodeEncodeError as e:
+            raise ValueError(
+                f"Feature {name} contains non-supported unicode characters."
+                " Temporian cannot convert the values to numpy.bytes_."
+            ) from e
+
+    # Convert pandas, list, tuples -> np.ndarray
     if str(type(feature_values)) == "<class 'pandas.core.series.Series'>":
         if feature_values.dtype == "object":
             feature_values = feature_values.fillna("")
@@ -122,18 +137,17 @@ def normalize_features(
         # Convert list/tuple to array
 
         # Looks for an indication of a string or non-string array.
-        is_string = False
+        encode_bytes = False
         for x in feature_values:
             if isinstance(x, (str, bytes)):
-                is_string = True
+                encode_bytes = True
                 break
             if isinstance(x, (int, bool, float)):
-                is_string = False
+                encode_bytes = False
                 break
 
-        if is_string:
-            # All the values are python strings.
-            feature_values = np.array(feature_values, dtype=np.bytes_)
+        if encode_bytes:
+            feature_values = _to_bytes_array(feature_values)
         else:
             feature_values = np.array(feature_values)
     elif not isinstance(feature_values, np.ndarray):
@@ -142,22 +156,30 @@ def normalize_features(
             f" pandas Series. Got type {type(feature_values)} instead."
         )
 
-    if feature_values.dtype.type == np.string_:
-        feature_values = feature_values.astype(np.bytes_)
+    # Next steps: Assume np.ndarray, normalize dtype
+    assert isinstance(feature_values, np.ndarray)
 
-    if feature_values.dtype.type == np.object_:
+    array_dtype = feature_values.dtype.type
+
+    # Convert np.datetime -> np.float64
+    if array_dtype == np.datetime64:
+        feature_values = (
+            feature_values.astype("datetime64[ns]").astype(np.float64) / 1e9
+        )
+
+    # Convert np.object_, np.str_ -> np.bytes_
+    elif array_dtype == np.str_:
+        feature_values = _to_bytes_array(feature_values)
+    elif array_dtype == np.object_:
         logging.warning(
             (
-                'Feature "%s" is an array of numpy.object_ and was casted to'
-                " numpy.string_ (Note: numpy.string_ is equivalent to"
-                " numpy.bytes_)."
+                'Feature "%s" is an array of numpy.object_ and will be'
+                " casted to numpy.string_ (Note: numpy.string_ is"
+                " equivalent to numpy.bytes_)."
             ),
             name,
         )
-        feature_values = feature_values.astype(np.bytes_)
-
-    if feature_values.dtype.type == np.datetime64:
-        feature_values = feature_values.astype("datetime64[s]").astype(np.int64)
+        feature_values = _to_bytes_array(feature_values)
 
     return feature_values
 
