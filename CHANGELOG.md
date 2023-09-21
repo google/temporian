@@ -4,7 +4,12 @@
 
 ### Features
 
+- Added `EventSet.where()` operator.
+
 ### Improvements
+
+- Print `EventSet` timestamps as datetimes instead of float.
+- Support `sampling` argument in `EventSet.cumsum()` operator.
 
 ### Fixes
 

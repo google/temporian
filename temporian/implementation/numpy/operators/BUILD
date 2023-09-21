@@ -378,7 +378,6 @@ py_library(
         "//temporian/core/data:duration_utils",
         "//temporian/core/operators:select_index_values",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",
     ],
 )
@@ -393,7 +392,6 @@ py_library(
         "//temporian/core/data:duration_utils",
         "//temporian/core/operators:where",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",
     ],
 )
