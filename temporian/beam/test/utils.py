@@ -14,12 +14,13 @@
 """Utilities for beam unit tests."""
 
 import os
-from typing import Union, List
+from typing import Optional, Union, List
 import tempfile
 from absl.testing import absltest
 
 from apache_beam.testing.test_pipeline import TestPipeline
 from apache_beam.testing.util import assert_that, equal_to
+from temporian.core.data.dtype import DType
 
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
@@ -36,6 +37,7 @@ def check_beam_implementation(
     test: absltest.TestCase,
     input_data: Union[EventSet, List[EventSet]],
     output_node: EventSetNode,
+    cast: Optional[DType] = None,
 ):
     """Checks the result of the Numpy backend against the Beam backend.
 
@@ -86,6 +88,9 @@ def check_beam_implementation(
     beam_output = from_csv(
         output_path, indexes=output_node.schema.index_names()
     )
+
+    if cast:
+        beam_output = beam_output.cast(cast)
 
     # Run the Temporian program using the numpy backend
     expected_output = output_node.run(input_data)

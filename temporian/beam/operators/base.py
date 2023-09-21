@@ -53,12 +53,7 @@ def beam_eventset_map(
     def apply(idx, item):
         return item | f"Map on feature #{idx} {name}" >> beam.Map(fn, idx)
 
-    print(f"{src=}")
-    print(f"{src[0]=}")
-    res = tuple([apply(idx, item) for idx, item in enumerate(src)])
-    print(f"{res=}")
-    print(f"{res[0]=}")
-    return res
+    return tuple([apply(idx, item) for idx, item in enumerate(src)])
 
 
 def _extract_from_iterable(

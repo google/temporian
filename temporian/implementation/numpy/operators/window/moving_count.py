@@ -67,18 +67,13 @@ class MovingCountNumpyImplementation(BaseWindowNumpyImplementation):
         """Applies the operator on a single feature."""
 
         assert isinstance(self.operator, MovingCountOperator)
-        print("calling apply_feature_wise")
 
         implementation = self._implementation()
         kwargs = {
             "evset_timestamps": src_timestamps,
             "window_length": self.operator.window_length,
         }
-        print("aaa input:", kwargs)
-        output = implementation(**kwargs)
-        print("aaa output:", output)
-        return output
-        # return implementation(**kwargs)
+        return implementation(**kwargs)
 
     def apply_feature_wise_with_sampling(
         self,

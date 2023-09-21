@@ -84,12 +84,6 @@ class BaseWindowBeamImplementation(BeamOperatorImplementation):
                 feature_idx: int,
             ) -> FeatureItem:
                 indexes, (timestamps, input_values) = item
-                print(
-                    "calling _run_without_sampling with indexes",
-                    indexes,
-                    "feature_idx",
-                    feature_idx,
-                )
                 output_values = numpy_implementation.apply_feature_wise(
                     src_timestamps=timestamps,
                     src_feature=input_values,
@@ -100,7 +94,5 @@ class BaseWindowBeamImplementation(BeamOperatorImplementation):
             output = beam_eventset_map(
                 input, name=f"{self.operator}", fn=_run_without_sampling
             )
-
-        print("bbb output:", output)
 
         return {"output": output}
