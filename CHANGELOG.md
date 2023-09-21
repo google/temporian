@@ -4,6 +4,8 @@
 
 ### Features
 
+- Added `EventSet.tick_calendar()` operator.
+
 ### Improvements
 
 ### Fixes
@@ -29,7 +31,6 @@
 ### Fixes
 
 - Fixed tutorials opening unreleased versions of the notebooks.
--
 
 ## 0.1.3
 
