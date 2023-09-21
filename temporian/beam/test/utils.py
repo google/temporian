@@ -47,6 +47,9 @@ def check_beam_implementation(
         output_node: Output of the graph.
         input_node: Input of the graph. If not set, uses input_data.node()
             instead.
+        cast: DType to cast beam's output to after loading it from csv. Useful
+            for comparing outputs that are expected to be int32 for example,
+            since when written to CSV those will be loaded back up as int64.
     """
 
     if isinstance(input_data, EventSet):
