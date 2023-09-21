@@ -23,7 +23,6 @@ from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.core.operators.tick_calendar import TickCalendar
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.base import OperatorImplementation
-from temporian.core.data import duration
 from temporian.implementation.numpy_cc.operators import operators_cc
 
 

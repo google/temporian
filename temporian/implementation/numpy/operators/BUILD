@@ -377,7 +377,6 @@ py_library(
         ":base",
         "//temporian/core/operators:select_index_values",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",
     ],
 )
@@ -392,7 +391,6 @@ py_library(
         "//temporian/core/data:duration_utils",
         "//temporian/core/operators:tick_calendar",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy_cc/operators:operators_cc",
     ],
