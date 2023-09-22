@@ -20,9 +20,6 @@ from temporian.core.operators.window.moving_count import (
     MovingCountOperator,
 )
 from temporian.implementation.numpy import implementation_lib
-from temporian.implementation.numpy.data.dtype_normalization import (
-    tp_dtype_to_np_dtype,
-)
 from temporian.implementation.numpy.operators.window.base import (
     BaseWindowNumpyImplementation,
 )
@@ -55,6 +52,7 @@ class MovingCountNumpyImplementation(BaseWindowNumpyImplementation):
         }
         if sampling_timestamps is not None:
             kwargs["sampling_timestamps"] = sampling_timestamps
+
         dst_feature = implementation(**kwargs)
         dst_features.append(dst_feature)
 
