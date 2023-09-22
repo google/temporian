@@ -12,12 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from functools import partial
 from typing import Dict, Optional, Type
 
 import apache_beam as beam
 
 from temporian.beam import implementation_lib
-from temporian.beam.operators.window.base import BaseWindowBeamImplementation
+from temporian.beam.operators.window.base import (
+    BaseWindowBeamImplementation,
+    _run_with_sampling,
+    _run_without_sampling,
+)
 from temporian.beam.operators.base import (
     beam_eventset_map,
     beam_eventset_map_with_sampling,
@@ -52,28 +57,7 @@ class MovingCountBeamImplementation(BaseWindowBeamImplementation):
         numpy_implementation = self._implementation()(self.operator)
 
         if self.operator.has_sampling:
-
-            def _run_with_sampling(
-                index: BeamIndexKey,
-                feature: Optional[FeatureItemValue],
-                sampling: FeatureItemValue,
-                feature_idx: int,
-            ) -> FeatureItem:
-                sampling_timestamps, _ = sampling
-                output_values = (
-                    numpy_implementation.apply_feature_wise_with_sampling(
-                        src_timestamps=(
-                            feature[0] if feature is not None else None
-                        ),
-                        src_feature=feature[1] if feature is not None else None,
-                        sampling_timestamps=sampling_timestamps,
-                        feature_idx=feature_idx,
-                    )
-                )
-                return index, (sampling_timestamps, output_values)
-
             assert sampling is not None
-
             # Run on first feature only since only timestamps are used
             input = (input[0],)
 
@@ -81,27 +65,17 @@ class MovingCountBeamImplementation(BaseWindowBeamImplementation):
                 input,
                 sampling,
                 name=f"{self.operator}",
-                fn=_run_with_sampling,
+                fn=partial(_run_with_sampling, numpy_implementation),
             )
 
         else:
-
-            def _run_without_sampling(
-                item: FeatureItem, feature_idx: int
-            ) -> FeatureItem:
-                indexes, (timestamps, input_values) = item
-                output_values = numpy_implementation.apply_feature_wise(
-                    src_timestamps=timestamps,
-                    src_feature=input_values,
-                    feature_idx=feature_idx,
-                )
-                return indexes, (timestamps, output_values)
-
             # Run on first feature only since only timestamps are used
             input = (input[0],)
 
             output = beam_eventset_map(
-                input, name=f"{self.operator}", fn=_run_without_sampling
+                input,
+                name=f"{self.operator}",
+                fn=partial(_run_without_sampling, numpy_implementation),
             )
 
         return {"output": output}
