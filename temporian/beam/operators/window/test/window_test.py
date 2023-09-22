@@ -31,17 +31,16 @@ from temporian.implementation.numpy.data.io import event_set
 from temporian.beam.test.utils import check_beam_implementation
 
 
-# @parameters(
-#     moving_count,
-#     moving_max,
-#     moving_min,
-#     moving_standard_deviation,
-#     moving_sum,
-#     simple_moving_average,
-# )
+@parameters(
+    (moving_max, None),
+    (moving_min, None),
+    (moving_standard_deviation, None),
+    (moving_sum, None),
+    (simple_moving_average, None),
+    (moving_count, DType.INT32),
+)
 class BeamWindowImplementationsTest(absltest.TestCase):
-    # def test_base(self, operator):
-    def test_base(self):
+    def test_base(self, operator, output_dtype):
         # Create input data
         input_data = event_set(
             timestamps=[1, 2, 3, 4, 5, 1, 2, 3, 4],
@@ -56,17 +55,16 @@ class BeamWindowImplementationsTest(absltest.TestCase):
         )
 
         # Define computation
-        output_node = moving_count(input_data.node(), 3)
+        output_node = operator(input_data.node(), 3)
 
         check_beam_implementation(
             self,
             input_data=input_data,
             output_node=output_node,
-            cast=DType.INT32,
+            cast=output_dtype,
         )
 
-    # def test_with_sampling(self, operator):
-    def test_with_sampling(self):
+    def test_with_sampling(self, operator, output_dtype):
         # Create input data
         input_data = event_set(
             timestamps=[1, 2, 3, 4, 5, 1, 2, 3, 4],
@@ -90,7 +88,7 @@ class BeamWindowImplementationsTest(absltest.TestCase):
         )
 
         # Define computation
-        output_node = moving_count(
+        output_node = operator(
             input_data.node(), 3, sampling=sampling_data.node()
         )
 
@@ -98,7 +96,7 @@ class BeamWindowImplementationsTest(absltest.TestCase):
             self,
             input_data=[input_data, sampling_data],
             output_node=output_node,
-            cast=DType.INT32,
+            cast=output_dtype,
         )
 
 
