@@ -340,6 +340,26 @@ def display_html_header(dom: Dom, evset: EventSet) -> Html:
     return root
 
 
+def repr_value_html(value: Any, dtype: DType) -> str:
+    if dtype == DType.STRING:
+        assert isinstance(value, bytes)
+        repr = value.decode()
+    elif dtype.is_float:
+        repr = repr_float_html(value)
+    else:
+        repr = str(value)
+    max_chars = config.display_max_chars or None
+    if max_chars is not None and len(repr) > max_chars:
+        repr = repr[:max_chars] + ELLIPSIS
+    return repr
+
+
+def repr_float_html(value: float) -> str:
+    # Create string format with precision, e.g "{:.6g}"
+    float_template = "{:.%d%s}" % (config.print_precision, "g")
+    return float_template.format(value)
+
+
 def display_text(evset: EventSet) -> str:
     # Configs and defaults
     max_events = config.print_max_events or sys.maxsize  # see np.printoptions
@@ -365,9 +385,14 @@ def display_text(evset: EventSet) -> str:
             ):
                 index_key_repr.append(f"{index_name}={index_value}")
             index_key_repr = " ".join(index_key_repr)
+            timestamps = index_data.timestamps
+            if evset.schema.is_unix_timestamp:
+                # Print datetimes
+                timestamps = timestamps.astype("datetime64[s]")
             data_repr.append(
-                f"{index_key_repr} ({len(index_data.timestamps)} events):\n"
-                f"    timestamps: {index_data.timestamps}\n"
+                f"{index_key_repr} ({len(timestamps)} events):\n"
+                "    timestamps:"
+                f" {timestamps}\n"
                 f"{string.indent(repr_features_text(evset, index_data.features))}"
             )
         data_repr = string.indent("\n".join(data_repr))
@@ -379,26 +404,6 @@ def display_text(evset: EventSet) -> str:
         f"{data_repr}\n"
         f"memory usage: {string.pretty_num_bytes(evset.memory_usage())}\n"
     )
-
-
-def repr_value_html(value: Any, dtype: DType) -> str:
-    if dtype == DType.STRING:
-        assert isinstance(value, bytes)
-        repr = value.decode()
-    elif dtype.is_float:
-        repr = repr_float_html(value)
-    else:
-        repr = str(value)
-    max_chars = config.display_max_chars or None
-    if max_chars is not None and len(repr) > max_chars:
-        repr = repr[:max_chars] + ELLIPSIS
-    return repr
-
-
-def repr_float_html(value: float) -> str:
-    # Create string format with precision, e.g "{:.6g}"
-    float_template = "{:.%d%s}" % (config.print_precision, "g")
-    return float_template.format(value)
 
 
 def repr_features_text(evset: EventSet, features: List[np.ndarray]) -> str:

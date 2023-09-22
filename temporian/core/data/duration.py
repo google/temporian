@@ -176,7 +176,8 @@ def days(value: Union[int, float]) -> Duration:
 
         >>> a.moving_sum(window_length=tp.duration.days(2))
         indexes: ...
-                timestamps: [1.5778e+09 1.5779e+09 1.5804e+09]
+                timestamps: ['2020-01-01T00:00:00' '2020-01-02T00:00:00'
+                             '2020-01-31T00:00:00']
                 'f1': [ 1 6 -5]
         ...
 
@@ -203,7 +204,8 @@ def weeks(value: Union[int, float]) -> Duration:
 
         >>> a.moving_sum(window_length=tp.duration.weeks(2))
         indexes: ...
-                timestamps: [1.5778e+09 1.5784e+09 1.5804e+09]
+                timestamps: ['2020-01-01T00:00:00' '2020-01-07T00:00:00'
+                             '2020-01-31T00:00:00']
                 'f1': [ 1 6 -5]
         ...
 

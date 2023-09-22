@@ -206,6 +206,7 @@ py_library(
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy_cc/operators:operators_cc",
+        "//temporian/implementation/numpy/data:dtype_normalization",
     ],
 )
 
@@ -234,6 +235,7 @@ py_library(
         "//temporian/core/operators:cast",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy/data:dtype_normalization",
     ],
 )
 
@@ -312,6 +314,7 @@ py_library(
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy_cc/operators:operators_cc",
+        "//temporian/implementation/numpy/data:dtype_normalization",
     ],
 )
 
@@ -372,12 +375,9 @@ py_library(
     srcs = ["select_index_values.py"],
     srcs_version = "PY3",
     deps = [
-        # already_there/numpy
         ":base",
-        "//temporian/core/data:duration_utils",
         "//temporian/core/operators:select_index_values",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",
     ],
 )

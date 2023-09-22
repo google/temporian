@@ -12,6 +12,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         # already_there/apache_beam
+        "//temporian/beam:typing",
         "//temporian/beam:implementation_lib",
         "//temporian/beam/operators:base",
         "//temporian/beam/io:dict",

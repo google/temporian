@@ -24,9 +24,7 @@ class _TFExampleToDict(beam.DoFn):
         self._schema = schema
         self._timestamp_key = timestamp_key
 
-    def process(
-        self, example: "example_pb2.Example"
-    ) -> Iterator[Dict[str, Any]]:
+    def process(self, example: "tf.train.Example") -> Iterator[Dict[str, Any]]:
         dict_example = {}
 
         def get_value(key):
@@ -81,10 +79,10 @@ class _DictToTFExample(beam.DoFn):
 
     def process(
         self, dict_example: Dict[str, Any]
-    ) -> Iterator["example_pb2.Example"]:
+    ) -> Iterator["tensorflow.train.Example"]:
         ex = self._tf.train.Example()
 
-        def f(example: "tf.train.Example", key: str):
+        def f(example: "tensorflow.train.Example", key: str):
             return example.features.feature[key]
 
         # Timestamps

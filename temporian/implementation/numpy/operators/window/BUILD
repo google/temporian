@@ -21,6 +21,8 @@ py_library(
         "//temporian/core/operators/window:base",
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/operators:base",
+        "//temporian/core/data:duration_utils",
+        "//temporian/implementation/numpy/data:dtype_normalization",
     ],
 )
 
@@ -70,6 +72,7 @@ py_library(
         "//temporian/core/operators/window:moving_count",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy_cc/operators:operators_cc",
+        "//temporian/core/data:duration_utils",
     ],
 )
 
