@@ -30,7 +30,6 @@ py_library(
         # already_there/absl/testing:absltest
         # already_there/apache_beam
         "//temporian/beam/io:csv",
-        "//temporian/beam/io:dict",
         "//temporian/beam:evaluation",
         "//temporian/io:csv",
         "//temporian/core/data:node",

@@ -46,7 +46,8 @@ def from_csv(
         features: [('feature_1', float64), ('feature_2', float64)]
         events:
             (3 events):
-                timestamps: [1.6725e+09 1.6726e+09 1.6752e+09]
+                timestamps: ['2023-01-01T00:00:00' '2023-01-02T00:00:00'
+                             '2023-02-01T00:00:00']
                 'feature_1': [10. 20. 30.]
                 'feature_2': [3. 4. 5.]
         ...

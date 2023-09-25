@@ -59,10 +59,12 @@ def moving_sum(
 @compile
 def cumsum(
     input: EventSetOrNode,
+    sampling: Optional[EventSetOrNode] = None,
 ) -> EventSetOrNode:
     assert isinstance(input, EventSetNode)
+    if sampling is not None:
+        assert isinstance(sampling, EventSetNode)
 
     return MovingSumOperator(
-        input=input,
-        window_length=np.inf,
+        input=input, window_length=np.inf, sampling=sampling
     ).outputs["output"]

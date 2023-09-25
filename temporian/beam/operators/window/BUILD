@@ -12,11 +12,11 @@ py_library(
     srcs_version = "PY3",
     deps = [
         # already_there/apache_beam
+        "//temporian/beam:typing",
         "//temporian/beam:implementation_lib",
         "//temporian/beam/operators:base",
         "//temporian/core/operators/window:moving_sum",
         "//temporian/implementation/numpy/operators/window:moving_sum",
-        "//temporian/beam/io:dict",
         "//temporian/implementation/numpy/operators:base",
     ],
 )
