@@ -29,7 +29,6 @@
 ### Fixes
 
 - Fixed tutorials opening unreleased versions of the notebooks.
--
 
 ## 0.1.3
 

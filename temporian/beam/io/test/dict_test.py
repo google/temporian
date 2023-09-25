@@ -235,7 +235,7 @@ class IOTest(absltest.TestCase):
                 "f1": np.array([1, 2], np.int32),  # Wrong
                 "i1": 10,
             },
-            "expected to by a numpy array with dtype",
+            "expected to be a numpy array with dtype",
         )
 
         test(

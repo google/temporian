@@ -286,7 +286,7 @@ def display_html_header(dom: Dom, evset: EventSet) -> Html:
             html_features.appendChild(html_text(dom, ", "))
 
     if max_features < num_features:
-        html_features.appendChild(html_text(dom, f", ..."))
+        html_features.appendChild(html_text(dom, "..."))
 
     # Indexes
 

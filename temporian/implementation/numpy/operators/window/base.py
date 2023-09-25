@@ -158,7 +158,6 @@ class BaseWindowNumpyImplementation(OperatorImplementation):
         feature_idx: int,
     ) -> np.ndarray:
         """Applies the operator on a single feature."""
-
         assert isinstance(self.operator, BaseWindowOperator)
 
         implementation = self._implementation()
