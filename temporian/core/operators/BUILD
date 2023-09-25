@@ -368,10 +368,13 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":base",
+        "//temporian/core:compilation",
         "//temporian/core:operator_lib",
+        "//temporian/core:typing",
         "//temporian/core/data:node",
-        "//temporian/core/data:schema",
+        "//temporian/implementation/numpy/data:dtype_normalization",
         "//temporian/proto:core_py_proto",
+        "//temporian/utils:typecheck",
     ],
 )
 
