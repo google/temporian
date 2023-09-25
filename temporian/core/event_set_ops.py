@@ -2512,6 +2512,57 @@ class EventSetOperations:
 
         return unique_timestamps(self)
 
+    def until_next(
+        self: EventSetOrNode,
+        sampling: EventSetOrNode,
+        timeout: Duration,
+    ) -> EventSetOrNode:
+        """Gets the duration until the next sampling event for each input event.
+
+        If no sampling event is observed before `timeout` time-units, returns
+        NaN.
+
+        `until_next` is different from `since_last` in that `since_last` returns
+        one value for each sampling (sampling events are after input events),
+        while `until_next` returns one value for each input value (here again,
+        sampling events are after input events).
+
+        The output [EventSet][temporian.EventSet] has one event for each event
+        in input, but with its timestamp moved forward to the nearest future
+        event in `sampling`. If no timestamp in sampling is closer than timeout,
+        it is moved by `timeout` into the future instead.
+
+        `until_next` is useful to measure the time it takes for an issue
+        (`input`) to be detected by an alert (`sampling`).
+
+        Basic example with 1 and 2 steps:
+            ```python
+            >>> a = tp.event_set(timestamps=[0, 10, 11, 20, 30])
+            >>> b = tp.event_set(timestamps=[1, 12, 21, 22, 42])
+            >>> c = a.until_next(sampling=b, timeout=5)
+            >>> c
+            indexes: []
+            features: [('until_next', float64)]
+            events:
+                (5 events):
+                    timestamps: [ 1. 12. 12. 21. 35.]
+                    'until_next': [ 1.  2.  1.  1. nan]
+            ...
+
+            ```
+
+        Args:
+            sampling: EventSet to use the sampling of.
+            timeout: Maximum amount of time to wait. If no sampling is observed
+                before the timeout expires, the output feature value is NaN.
+
+        Returns:
+            Resulting EventSet.
+        """
+        from temporian.core.operators.until_next import until_next
+
+        return until_next(self, timeout=timeout, sampling=sampling)
+
     def filter_moving_count(
         self: EventSetOrNode, window_length: Duration
     ) -> EventSetOrNode:

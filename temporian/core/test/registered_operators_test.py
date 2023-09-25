@@ -97,6 +97,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "TICK",
             "TIMESTAMPS",
             "UNIQUE_TIMESTAMPS",
+            "UNTIL_NEXT",
             "XOR",
         ]
 

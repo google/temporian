@@ -185,7 +185,7 @@ def _event_set_dict_to_event_set(
 
             raise ValueError(
                 f'Feature "{feature_schema.name}" with value "{src_value}" is'
-                " expected to by a numpy array with dtype"
+                " expected to be a numpy array with dtype"
                 f" {expected_dtype} (since the Temporian dtype is"
                 f" {feature_schema.dtype}) but numpy dtype"
                 f" {effective_type} was found."
@@ -262,7 +262,7 @@ def to_event_set(
             more.
 
     Returns:
-        PCollection of Beam EventSet.
+        Beam EventSet.
     """
 
     # TODO: Add support for datetime timestamps.
