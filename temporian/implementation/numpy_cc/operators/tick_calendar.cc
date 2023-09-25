@@ -54,7 +54,7 @@ py::array_t<double> tick_calendar(
               tm_struct.tm_min = minute;
               tm_struct.tm_sec = second;
 
-              std::time_t time = std::mktime(&tm_struct);
+              const std::time_t time = std::mktime(&tm_struct);
 
               // Valid date
               if (time != -1 && tm_struct.tm_mday == mday) {
