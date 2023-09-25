@@ -45,6 +45,13 @@ pybind_library(
     deps = [":common"],
 )
 
+pybind_library(
+    name = "until_next",
+    srcs = ["until_next.cc"],
+    hdrs = ["until_next.h"],
+    deps = [":common"],
+)
+
 pybind_extension(
     name = "operators_cc",
     srcs = ["pyinit.cc"],
@@ -53,6 +60,7 @@ pybind_extension(
         ":join",
         ":resample",
         ":since_last",
+        ":until_next",
         ":window",
     ],
 )

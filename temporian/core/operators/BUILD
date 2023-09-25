@@ -377,3 +377,19 @@ py_library(
         "//temporian/utils:typecheck",
     ],
 )
+
+py_library(
+    name = "until_next",
+    srcs = ["until_next.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:compilation",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:duration_utils",
+        "//temporian/core/data:node",
+        "//temporian/core/data:schema",
+        "//temporian/proto:core_py_proto",
+        "//temporian/utils:typecheck",
+    ],
+)

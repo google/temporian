@@ -16,6 +16,7 @@
 - Added `steps` argument to `EventSet.since_last()` operator.
 - Added variable `window_length` option to moving window operators.
 - Added unsupervised anomaly detection tutorial.
+- Add `until_next` operator.
 - Added Beam execution tutorial.
 - Added changelog to docs site.
 
