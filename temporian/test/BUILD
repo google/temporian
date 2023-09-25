@@ -68,3 +68,12 @@ py_test(
         "//temporian",
     ],
 )
+
+py_test(
+    name = "utils",
+    srcs = ["utils.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/numpy
+    ],
+)

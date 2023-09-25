@@ -417,26 +417,6 @@ py_test(
 )
 
 py_test(
-    name = "simple_moving_average_test",
-    srcs = ["simple_moving_average_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/pandas
-        # already_there/numpy
-        "//temporian/io:pandas",
-        ":test_util",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/core/operators/window:simple_moving_average",
-        "//temporian/implementation/numpy:evaluation",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators/window:simple_moving_average",
-    ],
-)
-
-py_test(
     name = "moving_standard_deviation_test",
     srcs = ["moving_standard_deviation_test.py"],
     srcs_version = "PY3",
@@ -785,4 +765,3 @@ py_test(
         "//temporian/implementation/numpy/operators:until_next",
     ],
 )
-    

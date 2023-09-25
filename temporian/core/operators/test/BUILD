@@ -5,6 +5,7 @@ package(
 
 # Tests
 # =====
+
 py_test(
     name = "propagate_test",
     srcs = ["propagate_test.py"],
@@ -50,25 +51,5 @@ py_test(
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/operators:until_next",
-    ],
-)
-
-py_test(
-    name = "test_simple_moving_average",
-    srcs = ["test_simple_moving_average.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        "//temporian/implementation/numpy/data:io",
-        ":utils",
-    ],
-)
-
-py_test(
-    name = "utils",
-    srcs = ["utils.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/numpy
     ],
 )
