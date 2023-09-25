@@ -52,3 +52,23 @@ py_test(
         "//temporian/core/operators:until_next",
     ],
 )
+
+py_test(
+    name = "test_simple_moving_average",
+    srcs = ["test_simple_moving_average.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        ":utils",
+    ],
+)
+
+py_test(
+    name = "utils",
+    srcs = ["utils.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/numpy
+    ],
+)
