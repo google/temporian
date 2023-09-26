@@ -2481,7 +2481,8 @@ class EventSetOperations:
         on_true: Union[EventSetOrNode, Any],
         on_false: Union[EventSetOrNode, Any],
     ) -> EventSetOrNode:
-        """Choose events from two possible sources, based on boolean conditions.
+        """Choose event-wise feature values from `on_true` or `on_false`
+        depending on the boolean value of `self`.
 
         Given an input [`EventSet`][temporian.EventSet] with a single boolean
         feature, create a new one using the same sampling, and choosing values

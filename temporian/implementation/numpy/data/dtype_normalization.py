@@ -120,6 +120,8 @@ def normalize_features(
         """Try to convert string/object array to np.bytes or fail"""
         try:
             if isinstance(feat_array, np.ndarray):
+                if feat_array.dtype.type == np.bytes_:
+                    return feat_array  # avoid copy
                 return feat_array.astype(np.bytes_)
             return np.array(feat_array, dtype=np.bytes_)
         except UnicodeEncodeError as e:

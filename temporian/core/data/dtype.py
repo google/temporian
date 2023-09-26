@@ -65,12 +65,12 @@ class DType(Enum):
         raise ValueError(f"Non-implemented type {self}")
 
     @classmethod
-    def infer_from_value(cls, value: Any) -> "DType":
+    def from_python_value(cls, value: Any) -> "DType":
         """
-        Returns the corresponding DType for the given value.
+        Returns the corresponding DType for the given python-native value.
 
         Args:
-            value: A python variable to infer DType from.
+            value: A python variable to infer DType from (e.g: str, float).
 
         Returns:
             The corresponding DType.
