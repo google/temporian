@@ -2562,3 +2562,41 @@ class EventSetOperations:
         from temporian.core.operators.until_next import until_next
 
         return until_next(self, timeout=timeout, sampling=sampling)
+
+    def filter_moving_count(
+        self: EventSetOrNode, window_length: Duration
+    ) -> EventSetOrNode:
+        """Filters out events such that no more than one output event is within
+        a tailing time window of `window_length`.
+
+        Filtering is applied in chronological order: An event received at time t
+        is filtered out if there is a non-filtered out event in
+        (t-window_length, t].
+
+        This operator is different from `(evtset.moving_count(window_length)
+        == 0).filter()`. In `filter_moving_count` a filtered event does not
+        block following events.
+
+        Usage example:
+
+            ```python
+            >>> a = tp.event_set(timestamps=[1, 2, 3])
+            >>> b = a.filter_moving_count(window_length=1.5)
+            >>> b
+            indexes: []
+            features: []
+            events:
+                 (2 events):
+                    timestamps: [1. 3.]
+            ...
+
+            ```
+
+        Returns:
+            EventSet without features with the filtered events.
+        """
+        from temporian.core.operators.filter_moving_count import (
+            filter_moving_count,
+        )
+
+        return filter_moving_count(self, window_length=window_length)

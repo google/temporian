@@ -240,6 +240,12 @@ class EventSetOpsTest(absltest.TestCase):
         self.assertTrue(isinstance(self.evset.unique_timestamps(), EventSet))
         self.assertTrue(isinstance(self.node.unique_timestamps(), EventSetNode))
 
+    def test_filter_moving_count(self):
+        self.assertTrue(isinstance(self.evset.filter_moving_count(5), EventSet))
+        self.assertTrue(
+            isinstance(self.node.filter_moving_count(5), EventSetNode)
+        )
+
     def test_until_next(self):
         self.assertTrue(
             isinstance(self.evset.until_next(self.other_evset, 5), EventSet)

@@ -4,6 +4,8 @@
 
 ### Features
 
+- Add `filter_moving_count` operator.
+
 ### Improvements
 
 ### Fixes
