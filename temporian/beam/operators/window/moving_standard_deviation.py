@@ -15,21 +15,23 @@
 from typing import Type
 from temporian.beam.operators.window.base import BaseWindowBeamImplementation
 
-from temporian.core.operators.window.moving_sum import MovingSumOperator
+from temporian.core.operators.window.moving_standard_deviation import (
+    MovingStandardDeviationOperator,
+)
 from temporian.beam import implementation_lib
 from temporian.implementation.numpy.operators.window.base import (
     BaseWindowNumpyImplementation,
 )
-from temporian.implementation.numpy.operators.window.moving_sum import (
-    MovingSumNumpyImplementation,
+from temporian.implementation.numpy.operators.window.moving_standard_deviation import (
+    MovingStandardDeviationNumpyImplementation,
 )
 
 
-class MovingSumBeamImplementation(BaseWindowBeamImplementation):
+class MovingStandardDeviationBeamImplementation(BaseWindowBeamImplementation):
     def _implementation(self) -> Type[BaseWindowNumpyImplementation]:
-        return MovingSumNumpyImplementation
+        return MovingStandardDeviationNumpyImplementation
 
 
 implementation_lib.register_operator_implementation(
-    MovingSumOperator, MovingSumBeamImplementation
+    MovingStandardDeviationOperator, MovingStandardDeviationBeamImplementation
 )

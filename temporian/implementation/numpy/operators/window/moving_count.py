@@ -44,14 +44,63 @@ class MovingCountNumpyImplementation(BaseWindowNumpyImplementation):
 
         del src_features  # Features are ignored
 
+        implementation = self._implementation()
+
         kwargs = {
             "evset_timestamps": src_timestamps,
             "window_length": window_length,
         }
         if sampling_timestamps is not None:
             kwargs["sampling_timestamps"] = sampling_timestamps
-        dst_feature = operators_cc.moving_count(**kwargs)
+
+        dst_feature = implementation(**kwargs)
         dst_features.append(dst_feature)
+
+    def apply_feature_wise(
+        self,
+        src_timestamps: np.ndarray,
+        src_feature: np.ndarray,
+        feature_idx: int,
+    ) -> np.ndarray:
+        """Applies the operator on a single feature."""
+
+        assert isinstance(self.operator, MovingCountOperator)
+
+        implementation = self._implementation()
+        kwargs = {
+            "evset_timestamps": src_timestamps,
+            "window_length": self.operator.window_length,
+        }
+        return implementation(**kwargs)
+
+    def apply_feature_wise_with_sampling(
+        self,
+        src_timestamps: Optional[np.ndarray],
+        src_feature: Optional[np.ndarray],
+        sampling_timestamps: np.ndarray,
+        feature_idx: int,
+    ) -> np.ndarray:
+        """Applies the operator on a single feature with a sampling."""
+
+        assert isinstance(self.operator, MovingCountOperator)
+        implementation = self._implementation()
+
+        if src_feature is not None:
+            kwargs = {
+                "evset_timestamps": src_timestamps,
+                "window_length": self.operator.window_length,
+                "sampling_timestamps": sampling_timestamps,
+            }
+            return implementation(**kwargs)
+        else:
+            # Sets the feature data as missing.
+            empty_timestamps = np.empty((0,), dtype=np.float64)
+            kwargs = {
+                "evset_timestamps": empty_timestamps,
+                "window_length": self.operator.window_length,
+                "sampling_timestamps": sampling_timestamps,
+            }
+            return implementation(**kwargs)
 
 
 implementation_lib.register_operator_implementation(

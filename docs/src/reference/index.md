@@ -50,6 +50,7 @@ Check the index on the left for a more detailed description of any symbol.
 | [`EventSet.enumerate()`][temporian.EventSet.enumerate]                                                     | Creates an ordinal feature enumerating the events according to their timestamp.                              |
 | [`EventSet.experimental_fast_fourier_transform()`][temporian.EventSet.experimental_fast_fourier_transform] | Apply a Fast Fourier Transform.                                                                              |
 | [`EventSet.filter()`][temporian.EventSet.filter]                                                           | Filters out events in an [`EventSet`][temporian.EventSet] for which a condition is false.                    |
+| [`EventSet.filter_moving_count()`][temporian.EventSet.filter_moving_count]                                 | Skips events such that no more than one event is within a time window of `window_length`.                    |
 | [`EventSet.join()`][temporian.EventSet.join]                                                               | Join [`EventSets`][temporian.EventSet] with different samplings but the same index together.                 |
 | [`EventSet.lag()`][temporian.EventSet.lag]                                                                 | Adds a delay to an [`EventSet`][temporian.EventSet]'s timestamps.                                            |
 | [`EventSet.leak()`][temporian.EventSet.leak]                                                               | Subtracts a duration from an [`EventSet`][temporian.EventSet]'s timestamps.                                  |
@@ -64,6 +65,7 @@ Check the index on the left for a more detailed description of any symbol.
 | [`EventSet.tick()`][temporian.EventSet.tick]                                                               | Generates timestamps at regular intervals in the range of a guide.                                           |
 | [`EventSet.timestamps()`][temporian.EventSet.timestamps]                                                   | Creates a feature from the events timestamps (`float64`).                                                    |
 | [`EventSet.unique_timestamps()`][temporian.EventSet.unique_timestamps]                                     | Removes events with duplicated timestamps from an [`EventSet`][temporian.EventSet].                          |
+| [`EventSet.until_next()`][temporian.EventSet.until_next]                                                   | Duration until the next sampling event.                                                                      |
 | [`EventSet.where()`][temporian.EventSet.where]                                                             | Choose events from two possible sources, based on boolean conditions.                                        |
 
 ### Binary operators

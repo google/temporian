@@ -903,6 +903,7 @@ class EventSetOperations:
 
     def cumsum(
         self: EventSetOrNode,
+        sampling: Optional[EventSetOrNode] = None,
     ) -> EventSetOrNode:
         """Computes the cumulative sum of values over each feature in an
         [`EventSet`][temporian.EventSet].
@@ -910,10 +911,12 @@ class EventSetOperations:
         Foreach timestamp, calculate the sum of the feature from the beginning.
         Shorthand for `moving_sum(event, window_length=np.inf)`.
 
-        Missing values are ignored.
+        Missing (NaN) values are not accounted for. The output will be NaN until
+        the input contains at least one numeric value.
 
-        While the feature does not have any values (e.g., missing initial values),
-        outputs missing values.
+        If `sampling` is specified or `window_length` is an EventSet, the moving
+        window is sampled at each timestamp in them, else it is sampled on the
+        input's.
 
         Example:
             ```python
@@ -932,12 +935,44 @@ class EventSetOperations:
 
             ```
 
+        Examples with sampling:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 5, 6, 7],
+            ...     features={"value": [np.nan, 1, 5, 10, 15, 20]},
+            ... )
+
+            >>> # Cumulative sum at 5 and 10
+            >>> b = tp.event_set(timestamps=[5, 10])
+            >>> c = a.cumsum(sampling=b)
+            >>> c
+            indexes: ...
+                (2 events):
+                    timestamps: [ 5. 10.]
+                    'value': [16. 51.]
+            ...
+
+            >>> # Sum all values in the EventSet
+            >>> c = a.cumsum(sampling=a.end())
+            >>> c
+            indexes: ...
+                (1 events):
+                    timestamps: [7.]
+                    'value': [51.]
+            ...
+
+            ```
+
+        Args:
+            sampling: Timestamps to sample the sliding window's value at. If not
+                provided, timestamps in the input are used.
+
         Returns:
-            Cumulative sum of each feature in `node`.
+            Cumulative sum of each feature.
         """
         from temporian.core.operators.window.moving_sum import cumsum
 
-        return cumsum(self)
+        return cumsum(self, sampling=sampling)
 
     def drop_index(
         self: EventSetOrNode,
@@ -1666,14 +1701,15 @@ class EventSetOperations:
         [`EventSet`][temporian.EventSet].
 
         For each t in sampling, and for each feature independently, returns at
-        time t the sum of the feature in the window (
+        time t the sum of values for the feature in the window
+        (t - window_length, t].
 
-            in them. `sampling` can't be specified if `window_length` is  an EventSet.ta variable  - window_length
-            specified, (i.e. if `window_length` is an EventSet).
+        `sampling` can't be  specified if a variable `window_length` is
+        specified (i.e. if `window_length` is an EventSet).
 
         If `sampling` is specified or `window_length` is an EventSet, the moving
-        window is sampled at each timesta, else it is sampled on the
-        input's.p
+        window is sampled at each timestamp in them, else it is sampled on the
+        input's.
 
         Missing values (such as NaNs) are ignored.
 
@@ -2431,7 +2467,7 @@ class EventSetOperations:
             features: [('filtered', float64), ('multiplied', float64)]
             events:
                 (1 events):
-                    timestamps: [30.]
+                    timestamps: ['1970-01-01T00:00:30']
                     'filtered': [30.]
                     'multiplied': [150.]
             ...
@@ -2475,6 +2511,95 @@ class EventSetOperations:
         from temporian.core.operators.unique_timestamps import unique_timestamps
 
         return unique_timestamps(self)
+
+    def until_next(
+        self: EventSetOrNode,
+        sampling: EventSetOrNode,
+        timeout: Duration,
+    ) -> EventSetOrNode:
+        """Gets the duration until the next sampling event for each input event.
+
+        If no sampling event is observed before `timeout` time-units, returns
+        NaN.
+
+        `until_next` is different from `since_last` in that `since_last` returns
+        one value for each sampling (sampling events are after input events),
+        while `until_next` returns one value for each input value (here again,
+        sampling events are after input events).
+
+        The output [EventSet][temporian.EventSet] has one event for each event
+        in input, but with its timestamp moved forward to the nearest future
+        event in `sampling`. If no timestamp in sampling is closer than timeout,
+        it is moved by `timeout` into the future instead.
+
+        `until_next` is useful to measure the time it takes for an issue
+        (`input`) to be detected by an alert (`sampling`).
+
+        Basic example with 1 and 2 steps:
+            ```python
+            >>> a = tp.event_set(timestamps=[0, 10, 11, 20, 30])
+            >>> b = tp.event_set(timestamps=[1, 12, 21, 22, 42])
+            >>> c = a.until_next(sampling=b, timeout=5)
+            >>> c
+            indexes: []
+            features: [('until_next', float64)]
+            events:
+                (5 events):
+                    timestamps: [ 1. 12. 12. 21. 35.]
+                    'until_next': [ 1.  2.  1.  1. nan]
+            ...
+
+            ```
+
+        Args:
+            sampling: EventSet to use the sampling of.
+            timeout: Maximum amount of time to wait. If no sampling is observed
+                before the timeout expires, the output feature value is NaN.
+
+        Returns:
+            Resulting EventSet.
+        """
+        from temporian.core.operators.until_next import until_next
+
+        return until_next(self, timeout=timeout, sampling=sampling)
+
+    def filter_moving_count(
+        self: EventSetOrNode, window_length: Duration
+    ) -> EventSetOrNode:
+        """Filters out events such that no more than one output event is within
+        a tailing time window of `window_length`.
+
+        Filtering is applied in chronological order: An event received at time t
+        is filtered out if there is a non-filtered out event in
+        (t-window_length, t].
+
+        This operator is different from `(evtset.moving_count(window_length)
+        == 0).filter()`. In `filter_moving_count` a filtered event does not
+        block following events.
+
+        Usage example:
+
+            ```python
+            >>> a = tp.event_set(timestamps=[1, 2, 3])
+            >>> b = a.filter_moving_count(window_length=1.5)
+            >>> b
+            indexes: []
+            features: []
+            events:
+                 (2 events):
+                    timestamps: [1. 3.]
+            ...
+
+            ```
+
+        Returns:
+            EventSet without features with the filtered events.
+        """
+        from temporian.core.operators.filter_moving_count import (
+            filter_moving_count,
+        )
+
+        return filter_moving_count(self, window_length=window_length)
 
     def where(
         self: EventSetOrNode,
