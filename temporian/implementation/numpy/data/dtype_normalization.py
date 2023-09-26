@@ -114,21 +114,11 @@ def normalize_features(
     `normalize_features` should match `_DTYPE_MAPPING`.
     """
 
-    def _to_bytes_array(
+    def _encode_bytes_utf8(
         feat_array: Union[Tuple, List, np.ndarray]
     ) -> np.ndarray:
-        """Try to convert string/object array to np.bytes or fail"""
-        try:
-            if isinstance(feat_array, np.ndarray):
-                if feat_array.dtype.type == np.bytes_:
-                    return feat_array  # avoid copy
-                return feat_array.astype(np.bytes_)
-            return np.array(feat_array, dtype=np.bytes_)
-        except UnicodeEncodeError as e:
-            raise ValueError(
-                f"Feature {name} contains non-supported unicode characters."
-                " Temporian cannot convert the values to numpy.bytes_."
-            ) from e
+        """Encode string/object list to np.bytes, using UTF-8 encoding"""
+        return np.char.encode(feat_array, "UTF-8")
 
     # Convert pandas, list, tuples -> np.ndarray
     if str(type(feature_values)) == "<class 'pandas.core.series.Series'>":
@@ -149,7 +139,7 @@ def normalize_features(
                 break
 
         if encode_bytes:
-            feature_values = _to_bytes_array(feature_values)
+            feature_values = _encode_bytes_utf8(feature_values)
         else:
             feature_values = np.array(feature_values)
     elif not isinstance(feature_values, np.ndarray):
@@ -166,12 +156,15 @@ def normalize_features(
     # Convert np.datetime -> np.float64
     if array_dtype == np.datetime64:
         feature_values = (
-            feature_values.astype("datetime64[ns]").astype(np.float64) / 1e9
+            feature_values.astype("datetime64[ns]", copy=False).astype(
+                np.float64, copy=False
+            )
+            / 1e9
         )
 
     # Convert np.object_, np.str_ -> np.bytes_
     elif array_dtype == np.str_:
-        feature_values = _to_bytes_array(feature_values)
+        feature_values = _encode_bytes_utf8(feature_values)
     elif array_dtype == np.object_:
         logging.warning(
             (
@@ -181,7 +174,9 @@ def normalize_features(
             ),
             name,
         )
-        feature_values = _to_bytes_array(feature_values)
+        feature_values = _encode_bytes_utf8(
+            feature_values.astype(str, copy=False)
+        )
 
     return feature_values
 
