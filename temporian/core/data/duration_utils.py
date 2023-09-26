@@ -71,6 +71,12 @@ def normalize_timestamp(x: Timestamp) -> NormalizedTimestamp:
     raise ValueError(f"Invalid timestamp {x!r} of type {type(x)}.")
 
 
+def datetime64_array_to_float64(array_datetimes: np.ndarray) -> np.ndarray:
+    # Avoid copying, already done in last division by 1e9
+    features_ns = array_datetimes.astype("datetime64[ns]", copy=False)
+    return features_ns.astype(np.float64, copy=False) / 1e9
+
+
 def convert_timestamp_to_datetime(timestamp: Timestamp) -> datetime.datetime:
     """Converts a unix timestamp in seconds to datetime (UTC).
 

@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Union
 import numpy as np
 
 from temporian.core.data.dtype import DType
+from temporian.core.data.duration_utils import datetime64_array_to_float64
 
 if TYPE_CHECKING:
     from temporian.core.typing import (
@@ -114,10 +115,8 @@ def normalize_features(
     `normalize_features` should match `_DTYPE_MAPPING`.
     """
 
-    def _encode_bytes_utf8(
-        feat_array: Union[Tuple, List, np.ndarray]
-    ) -> np.ndarray:
-        """Encode string/object list to np.bytes, using UTF-8 encoding"""
+    def _str_to_bytes(feat_array: np.ndarray) -> np.ndarray:
+        """Encode string/object/bytes to np.bytes, using UTF-8 encoding"""
         return np.char.encode(feat_array, "UTF-8")
 
     # Convert pandas, list, tuples -> np.ndarray
@@ -127,21 +126,7 @@ def normalize_features(
         feature_values = feature_values.to_numpy(copy=True)
     elif isinstance(feature_values, (tuple, list)):
         # Convert list/tuple to array
-
-        # Looks for an indication of a string or non-string array.
-        encode_bytes = False
-        for x in feature_values:
-            if isinstance(x, (str, bytes)):
-                encode_bytes = True
-                break
-            if isinstance(x, (int, bool, float)):
-                encode_bytes = False
-                break
-
-        if encode_bytes:
-            feature_values = _encode_bytes_utf8(feature_values)
-        else:
-            feature_values = np.array(feature_values)
+        feature_values = np.array(feature_values)
     elif not isinstance(feature_values, np.ndarray):
         raise ValueError(
             "Feature values should be provided in a tuple, list, numpy array or"
@@ -155,16 +140,12 @@ def normalize_features(
 
     # Convert np.datetime -> np.float64
     if array_dtype == np.datetime64:
-        feature_values = (
-            feature_values.astype("datetime64[ns]", copy=False).astype(
-                np.float64, copy=False
-            )
-            / 1e9
-        )
+        # nanosecond resolution as in timestamps
+        feature_values = datetime64_array_to_float64(feature_values)
 
     # Convert np.object_, np.str_ -> np.bytes_
     elif array_dtype == np.str_:
-        feature_values = _encode_bytes_utf8(feature_values)
+        feature_values = _str_to_bytes(feature_values)
     elif array_dtype == np.object_:
         logging.warning(
             (
@@ -174,9 +155,7 @@ def normalize_features(
             ),
             name,
         )
-        feature_values = _encode_bytes_utf8(
-            feature_values.astype(str, copy=False)
-        )
+        feature_values = _str_to_bytes(feature_values.astype(str, copy=False))
 
     return feature_values
 
@@ -226,7 +205,7 @@ def normalize_timestamps(
 
     if values.dtype.type == np.datetime64:
         # values is a date. Cast to unix epoch in float64 seconds.
-        values = values.astype("datetime64[ns]").astype(np.float64) / 1e9
+        values = datetime64_array_to_float64(values)
         return values, True
 
     object_description = f"{values!r}.\nDetails: type={type(values)}"
