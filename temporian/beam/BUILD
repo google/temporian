@@ -25,7 +25,6 @@ py_library(
     deps = [
         # already_there/apache_beam
         "//temporian/core:evaluation",
-        "//temporian/beam/io:dict",
         ":implementation_lib",
         "//temporian/beam/operators",
         "//temporian/core/data:node",
@@ -43,5 +42,9 @@ py_library(
     name = "typing",
     srcs = ["typing.py"],
     srcs_version = "PY3",
-    deps = ["//temporian/core:typing"],
+    deps = [
+        # already_there/apache_beam
+        # already_there/numpy
+        "//temporian/core:typing",
+    ],
 )

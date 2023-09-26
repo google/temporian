@@ -18,9 +18,9 @@ from typing import Optional, Union, List
 import tempfile
 from absl.testing import absltest
 
-import apache_beam as beam
 from apache_beam.testing.test_pipeline import TestPipeline
 from apache_beam.testing.util import assert_that, equal_to
+from temporian.core.data.dtype import DType
 
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
@@ -37,6 +37,7 @@ def check_beam_implementation(
     test: absltest.TestCase,
     input_data: Union[EventSet, List[EventSet]],
     output_node: EventSetNode,
+    cast: Optional[DType] = None,
 ):
     """Checks the result of the Numpy backend against the Beam backend.
 
@@ -46,6 +47,9 @@ def check_beam_implementation(
         output_node: Output of the graph.
         input_node: Input of the graph. If not set, uses input_data.node()
             instead.
+        cast: DType to cast beam's output to after loading it from csv. Useful
+            for comparing outputs that are expected to be int32 for example,
+            since when written to CSV those will be loaded back up as int64.
     """
 
     if isinstance(input_data, EventSet):
@@ -60,11 +64,6 @@ def check_beam_implementation(
         input_path = os.path.join(tmp_dir, f"input_{input_idx}.csv")
         input_paths.append(input_path)
         to_csv(input_evtset, path=input_path)
-
-    # Utility to print the intermediate results
-    def my_print(x, tag):
-        print(f"[{tag}] {x}")
-        return x
 
     # Run the Temporian program using the Beam backend
     with TestPipeline() as p:
@@ -92,6 +91,9 @@ def check_beam_implementation(
     beam_output = from_csv(
         output_path, indexes=output_node.schema.index_names()
     )
+
+    if cast:
+        beam_output = beam_output.cast(cast)
 
     # Run the Temporian program using the numpy backend
     expected_output = output_node.run(input_data)

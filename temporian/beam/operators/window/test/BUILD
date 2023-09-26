@@ -4,8 +4,8 @@ package(
 )
 
 py_test(
-    name = "moving_sum_test",
-    srcs = ["moving_sum_test.py"],
+    name = "window_test",
+    srcs = ["window_test.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest

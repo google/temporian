@@ -51,6 +51,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "EQUAL_SCALAR",
             "FFT",
             "FILTER",
+            "FILTER_MAX_MOVING_COUNT",
             "FLOORDIV",
             "FLOORDIV_SCALAR",
             "GLUE",
@@ -97,6 +98,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "TICK_CALENDAR",
             "TIMESTAMPS",
             "UNIQUE_TIMESTAMPS",
+            "UNTIL_NEXT",
             "XOR",
         ]
 

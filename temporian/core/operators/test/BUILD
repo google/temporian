@@ -42,6 +42,18 @@ py_test(
 )
 
 py_test(
+    name = "until_next_test",
+    srcs = ["until_next_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:node",
+        "//temporian/core/operators:until_next",
+    ],
+)
+
+py_test(
     name = "tick_calendar_test",
     srcs = ["tick_calendar_test.py"],
     srcs_version = "PY3",
