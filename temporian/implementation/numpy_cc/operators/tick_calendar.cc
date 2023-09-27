@@ -53,6 +53,8 @@ py::array_t<double> tick_calendar(
               tm_struct.tm_hour = hour;
               tm_struct.tm_min = minute;
               tm_struct.tm_sec = second;
+              tm_struct.tm_gmtoff = 0;  // set UTC
+              tm_struct.tm_isdst = 0;
 
               const std::time_t time = std::mktime(&tm_struct);
 
