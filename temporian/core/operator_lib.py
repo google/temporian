@@ -14,12 +14,14 @@
 
 """Registering mechanism for operator classes."""
 
-from typing import Any, Dict
+from typing import Any, Dict, Type
+
+from temporian.core.operators.base import Operator
 
 _OPERATORS = {}
 
 
-def register_operator(operator_class):
+def register_operator(operator_class: Type[Operator]):
     """Registers an operator."""
 
     op_key = operator_class.operator_key()
@@ -43,3 +45,10 @@ def registered_operators() -> Dict[str, Any]:
     """Lists the registered operators."""
 
     return _OPERATORS
+
+
+def _unregister_operator(operator_class: Type[Operator]):
+    """(For test operators purposes only) Unregisters an operator."""
+    op_key = operator_class.operator_key()
+    if op_key in _OPERATORS:
+        _OPERATORS.pop(op_key)
