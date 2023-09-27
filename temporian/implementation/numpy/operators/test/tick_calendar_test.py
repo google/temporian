@@ -28,6 +28,73 @@ from temporian.implementation.numpy.operators.test.test_util import (
 
 
 class TickCalendarOperatorTest(absltest.TestCase):
+    def test_start_end_00_00(self):
+        evset = event_set(
+            timestamps=[
+                "2020-01-01 00:00",
+                "2020-03-01 00:00",
+            ],
+        )
+        node = evset.node()
+
+        # Expected output
+        expected_output = event_set(
+            timestamps=[
+                "2020-01-01 00:00",
+                "2020-02-01 00:00",
+                "2020-03-01 00:00",
+            ],
+        )
+
+        # Run op
+        op = TickCalendar(
+            input=node,
+            second=0,
+            minute=0,
+            hour=0,
+            mday=1,
+            month="*",
+            wday="*",
+        )
+        instance = TickCalendarNumpyImplementation(op)
+        testOperatorAndImp(self, op, instance)
+        output = instance.call(input=evset)["output"]
+
+        assertEqualEventSet(self, output, expected_output)
+
+    def test_start_end_offset(self):
+        evset = event_set(
+            timestamps=[
+                "2020-01-01 13:04",
+                "2020-03-06 19:35",
+            ],
+        )
+        node = evset.node()
+
+        # Expected output
+        expected_output = event_set(
+            timestamps=[
+                "2020-02-01 00:00",
+                "2020-03-01 00:00",
+            ],
+        )
+
+        # Run op
+        op = TickCalendar(
+            input=node,
+            second=0,
+            minute=0,
+            hour=0,
+            mday=1,
+            month="*",
+            wday="*",
+        )
+        instance = TickCalendarNumpyImplementation(op)
+        testOperatorAndImp(self, op, instance)
+        output = instance.call(input=evset)["output"]
+
+        assertEqualEventSet(self, output, expected_output)
+
     def test_end_of_month_seconds(self):
         # All seconds at mday=31, should only be valid for months 1, 3, 5
 

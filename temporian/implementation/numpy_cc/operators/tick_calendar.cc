@@ -80,15 +80,25 @@ py::array_t<double> tick_calendar(
             second = min_second;
             minute++;
           }
+          second = min_second;
           minute = min_minute;
           hour++;
         }
+        second = min_second;
+        minute = min_minute;
         hour = min_hour;
         mday++;
       }
+      second = min_second;
+      minute = min_minute;
+      hour = min_hour;
       mday = min_mday;
       month++;
     }
+    second = min_second;
+    minute = min_minute;
+    hour = min_hour;
+    mday = min_mday;
     month = min_month;
     year++;
   }
