@@ -271,9 +271,7 @@ class MovingSumOperatorTest(absltest.TestCase):
 
         self.assertEqual(output["output"], expected_output)
 
-    @patch(
-        "temporian.implementation.numpy.operators.window.moving_sum.operators_cc.moving_sum"
-    )
+    @patch.object(operators_cc, "moving_sum")
     def test_with_variable_winlen_same_sampling_uses_correct_cpp_impl(
         self, cpp_moving_sum_mock
     ):

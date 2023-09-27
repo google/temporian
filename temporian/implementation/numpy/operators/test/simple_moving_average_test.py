@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from unittest.mock import patch
-from absl.testing import absltest
 import math
 
 import numpy as np
-from numpy.testing import assert_array_equal
 import pandas as pd
+from absl.testing import absltest
+from numpy.testing import assert_array_equal
+from unittest.mock import patch
 
 from temporian.core.operators.window.simple_moving_average import (
     SimpleMovingAverageOperator,
@@ -29,6 +29,9 @@ from temporian.implementation.numpy.operators.window.simple_moving_average impor
 )
 from temporian.core.data import duration, node as node_lib
 from temporian.io.pandas import from_pandas
+from temporian.implementation.numpy.operators.window import (
+    base as base_window_impl,
+)
 
 
 def _f64(l):
@@ -396,7 +399,7 @@ class SimpleMovingAverageOperatorTest(absltest.TestCase):
         self.assertEqual(output["output"], expected_output)
 
     # TODO: move to a separate file that tests the base class
-    @patch("temporian.implementation.numpy.operators.window.base.logging")
+    @patch.object(base_window_impl, "logging")
     def test_invalid_window_length_warning(self, logging_mock):
         """Tests that warning is shown when receiving non strictly positive
         values in window_length."""

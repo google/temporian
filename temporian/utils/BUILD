@@ -45,5 +45,6 @@ py_library(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/flags
+        "//temporian/test:utils",
     ],
 )
