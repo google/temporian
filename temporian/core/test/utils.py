@@ -72,9 +72,6 @@ class OpI1O1(base.Operator):
         self.check()
 
 
-operator_lib.register_operator(OpI1O1)
-
-
 class OpI1O1NotCreator(base.Operator):
     """Unlike OpI1O1, OpI1O1NotCreator only passes the features/sampling."""
 
@@ -99,9 +96,6 @@ class OpI1O1NotCreator(base.Operator):
             ),
         )
         self.check()
-
-
-operator_lib.register_operator(OpI1O1NotCreator)
 
 
 class OpI2O1(base.Operator):
@@ -132,9 +126,6 @@ class OpI2O1(base.Operator):
             ),
         )
         self.check()
-
-
-operator_lib.register_operator(OpI2O1)
 
 
 class OpI1O2(base.Operator):
@@ -171,9 +162,6 @@ class OpI1O2(base.Operator):
             ),
         )
         self.check()
-
-
-operator_lib.register_operator(OpI1O2)
 
 
 class OpWithAttributes(base.Operator):
@@ -251,4 +239,26 @@ class OpWithAttributes(base.Operator):
         self.check()
 
 
-operator_lib.register_operator(OpWithAttributes)
+TEST_OPERATORS = [
+    OpI1O1,
+    OpI1O1NotCreator,
+    OpI2O1,
+    OpI1O2,
+    OpWithAttributes,
+]
+
+# Utilities to register and unregister test operators.
+# Needed because the operators are left registered in follow up tests when
+# running them with unittest directly for coverage.
+# Call these in the setUp and tearDown methods of your test class if you want to
+# use any of test ops.
+
+
+def register_test_operators():
+    for op in TEST_OPERATORS:
+        operator_lib.register_operator(op)
+
+
+def unregister_test_operators():
+    for op in TEST_OPERATORS:
+        operator_lib._unregister_operator(op)

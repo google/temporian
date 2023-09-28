@@ -19,6 +19,12 @@ from temporian.core.test import utils
 
 
 class GraphTest(absltest.TestCase):
+    def setUp(self):
+        utils.register_test_operators()
+
+    def tearDown(self):
+        utils.unregister_test_operators()
+
     def test_infer_graph_no_names(self):
         """Lists all the objects in a graph."""
 

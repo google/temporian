@@ -15,38 +15,24 @@
 import os
 import tempfile
 
-from typing import Any, Dict
-
-import numpy as np
-from apache_beam.testing import util
-import apache_beam as beam
 from absl.testing import absltest
-from absl import flags
 from apache_beam.testing.test_pipeline import TestPipeline
 from apache_beam.testing.util import assert_that
 from apache_beam.testing.util import equal_to
-from temporian.beam.io.dict import (
-    to_event_set,
-    to_dict,
-)
 from temporian.beam.io.csv import (
     from_csv_raw,
     from_csv,
     to_csv,
 )
-from temporian.implementation.numpy.data.io import event_set, Schema
+from temporian.implementation.numpy.data.io import event_set
 from temporian.io.csv import to_csv as in_process_to_csv
-from temporian.core.data.dtype import DType
-
-
-def test_data() -> str:
-    return os.path.join(flags.FLAGS.test_srcdir, "temporian")
+from temporian.test.utils import get_test_data_path
 
 
 class IOTest(absltest.TestCase):
     def test_from_csv_raw(self):
-        input_csv_path = os.path.join(
-            test_data(), "temporian/test/test_data/io/input.csv"
+        input_csv_path = get_test_data_path(
+            "temporian/test/test_data/io/input.csv"
         )
         with TestPipeline() as p:
             output = p | from_csv_raw(input_csv_path)

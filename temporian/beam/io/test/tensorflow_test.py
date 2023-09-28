@@ -15,10 +15,9 @@
 import os
 import tempfile
 
-import apache_beam as beam
 from absl.testing import absltest
-from absl import flags
 from apache_beam.testing.test_pipeline import TestPipeline
+
 from temporian.beam.io.tensorflow import (
     to_tensorflow_record,
     from_tensorflow_record,
@@ -33,14 +32,6 @@ from temporian.io.tensorflow import (
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
 )
-from temporian.beam.io.csv import (
-    to_csv,
-)
-from temporian.io.csv import from_csv as in_process_from_csv
-
-
-def test_data() -> str:
-    return os.path.join(flags.FLAGS.test_srcdir, "temporian")
 
 
 class IOTest(absltest.TestCase):

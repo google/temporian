@@ -16,17 +16,12 @@ import os
 import tempfile
 
 from absl.testing import absltest
-from absl import flags
-import temporian as tp
-
-import temporian.beam as tpb
 from apache_beam.testing.test_pipeline import TestPipeline
 from apache_beam.testing.util import assert_that
 from apache_beam.testing.util import equal_to
 
-
-def test_data() -> str:
-    return os.path.join(flags.FLAGS.test_srcdir, "temporian")
+import temporian as tp
+import temporian.beam as tpb
 
 
 class TFPTest(absltest.TestCase):

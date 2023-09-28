@@ -1,23 +1,17 @@
 import os
+import tempfile
 from pathlib import Path
 
-from absl import flags
-from absl.testing import absltest
 import pandas as pd
-import tempfile
+from absl.testing import absltest
 
 import temporian as tp
-
-
-def test_data() -> str:
-    return os.path.join(flags.FLAGS.test_srcdir, "temporian")
+from temporian.test.utils import get_test_data_path
 
 
 class IOTest(absltest.TestCase):
     def test_from_csv(self) -> None:
-        path = os.path.join(
-            test_data(), "temporian/test/test_data/io/input.csv"
-        )
+        path = get_test_data_path("temporian/test/test_data/io/input.csv")
         evset = tp.from_csv(
             path=path,
             timestamps="timestamp",
