@@ -66,5 +66,13 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/pandas
         "//temporian",
+        ":utils",
     ],
+)
+
+py_library(
+    name = "utils",
+    srcs = ["utils.py"],
+    srcs_version = "PY3",
+    deps = [],
 )

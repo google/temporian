@@ -14,7 +14,6 @@
 
 
 """Unique timestamps operator class and public API function definitions."""
-
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.node import (
@@ -23,6 +22,7 @@ from temporian.core.data.node import (
 )
 from temporian.core.operators.base import Operator
 from temporian.core.typing import EventSetOrNode
+from temporian.utils.typecheck import typecheck
 from temporian.proto import core_pb2 as pb
 
 
@@ -56,6 +56,7 @@ class UniqueTimestamps(Operator):
 operator_lib.register_operator(UniqueTimestamps)
 
 
+@typecheck
 @compile
 def unique_timestamps(input: EventSetOrNode) -> EventSetOrNode:
     assert isinstance(input, EventSetNode)

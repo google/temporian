@@ -1,16 +1,12 @@
 """Utility to compare generated and golden unit test data."""
 
-import os
-from absl import flags
 import logging
 
-
-def test_data() -> str:
-    return os.path.join(flags.FLAGS.test_srcdir, "temporian")
+from temporian.test.utils import get_test_data_path
 
 
 def check_string(test, value: str, golden_path: str):
-    effective_golden_path = os.path.join(test_data(), golden_path)
+    effective_golden_path = get_test_data_path(golden_path)
     golden_data = open(effective_golden_path).read()
 
     if value != golden_data:

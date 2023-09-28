@@ -5,9 +5,14 @@
 ### Features
 
 - Added `EventSet.tick_calendar()` operator.
+- Added `EventSet.where()` operator.
 - Add `filter_moving_count` operator.
 
 ### Improvements
+
+- Print `EventSet` timestamps as datetimes instead of float.
+- Support `sampling` argument in `EventSet.cumsum()` operator.
+- Using utf-8 codec to support non-ascii in string values.
 
 ### Fixes
 

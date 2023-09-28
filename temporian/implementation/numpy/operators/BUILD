@@ -38,6 +38,7 @@ py_library(
         ":unary",
         ":unique_timestamps",
         ":until_next",
+        ":where",
         "//temporian/implementation/numpy/operators/binary:arithmetic",
         "//temporian/implementation/numpy/operators/binary:logical",
         "//temporian/implementation/numpy/operators/binary:relational",
@@ -410,6 +411,21 @@ py_library(
         "//temporian/core/operators:filter_moving_count",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
+    ],
+)
+
+py_library(
+    name = "where",
+    srcs = ["where.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/numpy
+        ":base",
+        "//temporian/core/data:duration_utils",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy_cc/operators:operators_cc",
+        "//temporian/core/operators:where",
     ],
 )
 
