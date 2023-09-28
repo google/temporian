@@ -406,3 +406,17 @@ py_library(
         "//temporian/proto:core_py_proto",
     ],
 )
+
+py_library(
+    name = "where",
+    srcs = ["where.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:node",
+        "//temporian/core/data:schema",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+    

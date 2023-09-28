@@ -98,6 +98,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "TIMESTAMPS",
             "UNIQUE_TIMESTAMPS",
             "UNTIL_NEXT",
+            "WHERE",
             "XOR",
         ]
 
