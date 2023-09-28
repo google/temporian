@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import os, time
 from datetime import datetime, timedelta
 from absl.testing import absltest
 
@@ -24,6 +24,7 @@ from temporian.implementation.numpy.operators.tick_calendar import (
 from temporian.implementation.numpy.operators.test.test_util import (
     assertEqualEventSet,
     testOperatorAndImp,
+    SetTimezone,
 )
 
 
@@ -61,6 +62,14 @@ class TickCalendarOperatorTest(absltest.TestCase):
         output = instance.call(input=evset)["output"]
 
         assertEqualEventSet(self, output, expected_output)
+
+        # Check that it's exactly the same with env TZ!=UTC defined
+        with SetTimezone():
+            instance = TickCalendarNumpyImplementation(op)
+            testOperatorAndImp(self, op, instance)
+            output = instance.call(input=evset)["output"]
+
+            assertEqualEventSet(self, output, expected_output)
 
     def test_start_end_offset(self):
         evset = event_set(
