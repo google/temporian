@@ -60,10 +60,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: `### Coverage report
-
-              **Main**: ${main.toFixed(2)}%
-              **PR**: ${pr.toFixed(2)}%
-
-              **Diff: ${diff.toFixed(2)} ${diff >= 0 ? '✅' : '⚠️'}**
-              `
+              **Main**: ${main.toFixed(2)}% | **PR**: ${pr.toFixed(2)}% | **Diff: ${diff.toFixed(2)} ${diff >= 0 ? '✅' : '⚠️'}**`
             })
