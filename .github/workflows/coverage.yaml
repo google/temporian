@@ -73,6 +73,7 @@ jobs:
 
   comment:
     runs-on: ubuntu-latest
+    needs: [coverage, coverage-main]
     steps:
       - uses: actions/github-script@v6
         with:
