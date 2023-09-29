@@ -1,45 +1,45 @@
-# name: tests
+name: tests
 
-# on:
-#   push:
-#     branches: # Specifying branches makes it not run on pushed tags
-#       - "*"
-#   workflow_call: # Allow being ran from other actions
-#   # Enable when we start receiving PRs from forks
-#   # pull_request: # Run on PRs from forks (push doesn't cover those)
+on:
+  push:
+    branches: # Specifying branches makes it not run on pushed tags
+      - "*"
+  workflow_call: # Allow being ran from other actions
+  # Enable when we start receiving PRs from forks
+  # pull_request: # Run on PRs from forks (push doesn't cover those)
 
-# jobs:
-#   test:
-#     runs-on: ubuntu-latest
-#     strategy:
-#       matrix:
-#         python-version: ["3.8", "3.9", "3.10", "3.11"]
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v3
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
-#       - name: Bazel cache
-#         id: bazel-cache
-#         uses: actions/cache@v3
-#         with:
-#           path: ~/.cache/bazel
-#           key: ${{ runner.os }}-${{ matrix.python-version }}-bazel-cache-${{ hashFiles('**/BUILD', '.bazelrc', '.bazelversion', 'WORKSPACE') }}
-#           restore-keys: ${{ runner.os }}-${{ matrix.python-version }}-bazel-cache-
+      - name: Bazel cache
+        id: bazel-cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/bazel
+          key: ${{ runner.os }}-${{ matrix.python-version }}-bazel-cache-${{ hashFiles('**/BUILD', '.bazelrc', '.bazelversion', 'WORKSPACE') }}
+          restore-keys: ${{ runner.os }}-${{ matrix.python-version }}-bazel-cache-
 
-#       - name: Install poetry
-#         run: pipx install poetry
+      - name: Install poetry
+        run: pipx install poetry
 
-#       - name: Setup Python
-#         uses: actions/setup-python@v4
-#         with:
-#           python-version: ${{ matrix.python-version }}
-#           cache: poetry
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: poetry
 
-#       - name: Install dependencies
-#         run: poetry install --no-interaction
+      - name: Install dependencies
+        run: poetry install --no-interaction
 
-#       - name: Run tests
-#         run: poetry run bazel test //temporian/...:all //docs/...:all //tools/...:all --test_output=errors --compilation_mode=dbg
-#         # Note: Since mid-August 23, using "//...:all" incorrectly try to
-#         # compile the directory "build" created during the installation of one
-#         # of the dependency during "poetry install".
+      - name: Run tests
+        run: poetry run bazel test //temporian/...:all //docs/...:all //tools/...:all --test_output=errors --compilation_mode=dbg
+        # Note: Since mid-August 23, using "//...:all" incorrectly try to
+        # compile the directory "build" created during the installation of one
+        # of the dependency during "poetry install".
