@@ -85,18 +85,21 @@ jobs:
 
   comment:
     runs-on: ubuntu-latest
-    needs: [coverage, coverage-main]
+    needs: [coverage]
     steps:
       - uses: actions/github-script@v6
         with:
           script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `### Coverage report
+            const pr = ${{fromJson(needs.coverage.outputs.cov-main).totals.percent_covered}};
+            console.log(pr);
+            console.log(pr.toFixed(2));
+            # github.rest.issues.createComment({
+            #   issue_number: context.issue.number,
+            #   owner: context.repo.owner,
+            #   repo: context.repo.repo,
+            #   body: `### Coverage report
 
-              Main: ${{fromJson(needs.coverage.outputs.cov-main).totals.percent_covered}}
-              PR: ${{fromJson(needs.coverage.outputs.cov-pr).totals.percent_covered}}
-              `
-            })
+            #   Main: ${{fromJson(needs.coverage.outputs.cov-main).totals.percent_covered}}
+            #   PR: ${{fromJson(needs.coverage.outputs.cov-pr).totals.percent_covered}}
+            #   `
+            # })
