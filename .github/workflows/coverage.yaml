@@ -5,11 +5,17 @@ on: [pull_request]
 jobs:
   coverage:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        branch: [pr, main]
     outputs:
-      cov: ${{ steps.coverage.outputs.cov }}
+      cov-pr: ${{ steps.coverage.outputs.cov-pr }}
+      cov-main: ${{ steps.coverage.outputs.cov-main }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: ${{ matrix.branch == 'main' && 'main' || '' }}
 
       - name: Bazel cache
         id: bazel-cache
@@ -37,45 +43,45 @@ jobs:
           poetry run ./tools/coverage.sh
           poetry run coverage json
           content=$(cat ./coverage.json)
-          echo "cov=$content" >> $GITHUB_OUTPUT
+          echo "cov-${{ matrix.branch }}=$content" >> $GITHUB_OUTPUT
 
-  coverage-main:
-    runs-on: ubuntu-latest
-    outputs:
-      cov: ${{ steps.coverage.outputs.cov }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: main
+  # coverage-main:
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     cov: ${{ steps.coverage.outputs.cov }}
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+  #       with:
+  #         ref: main
 
-      - name: Bazel cache
-        id: bazel-cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/bazel
-          key: ${{ runner.os }}-3.10-bazel-cache-${{ hashFiles('**/BUILD', '.bazelrc', '.bazelversion', 'WORKSPACE') }}
-          restore-keys: ${{ runner.os }}-3.10-bazel-cache-
+  #     - name: Bazel cache
+  #       id: bazel-cache
+  #       uses: actions/cache@v3
+  #       with:
+  #         path: ~/.cache/bazel
+  #         key: ${{ runner.os }}-3.10-bazel-cache-${{ hashFiles('**/BUILD', '.bazelrc', '.bazelversion', 'WORKSPACE') }}
+  #         restore-keys: ${{ runner.os }}-3.10-bazel-cache-
 
-      - name: Install poetry
-        run: pipx install poetry
+  #     - name: Install poetry
+  #       run: pipx install poetry
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-          cache: poetry
+  #     - name: Setup Python
+  #       uses: actions/setup-python@v4
+  #       with:
+  #         python-version: "3.10"
+  #         cache: poetry
 
-      - name: Install dependencies
-        run: poetry install --no-interaction
+  #     - name: Install dependencies
+  #       run: poetry install --no-interaction
 
-      - name: Run coverage
-        id: coverage
-        run: |
-          poetry run ./tools/coverage.sh
-          poetry run coverage json
-          content=$(cat ./coverage.json)
-          echo "cov=$content" >> $GITHUB_OUTPUT
+  #     - name: Run coverage
+  #       id: coverage
+  #       run: |
+  #         poetry run ./tools/coverage.sh
+  #         poetry run coverage json
+  #         content=$(cat ./coverage.json)
+  #         echo "cov=$content" >> $GITHUB_OUTPUT
 
   comment:
     runs-on: ubuntu-latest
@@ -90,7 +96,7 @@ jobs:
               repo: context.repo.repo,
               body: `### Coverage report
 
-              Main: ${{fromJson(needs.coverage-main.outputs.cov).totals.percent_covered}}
-              PR: ${{fromJson(needs.coverage.outputs.cov).totals.percent_covered}}
+              Main: ${{fromJson(needs.coverage.outputs.cov-main).totals.percent_covered}}
+              PR: ${{fromJson(needs.coverage.outputs.cov-pr).totals.percent_covered}}
               `
             })
