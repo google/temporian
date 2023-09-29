@@ -1,36 +1,42 @@
 name: coverage
 
-on:
-  push:
-    branches: # Specifying branches makes it not run on pushed tags
-      - "*"
+on: [pull_request]
 
 jobs:
   coverage:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Bazel cache
-        id: bazel-cache
-        uses: actions/cache@v3
+      - uses: actions/github-script@v6
         with:
-          path: ~/.cache/bazel
-          key: ${{ runner.os }}-3.10-bazel-cache-${{ hashFiles('**/BUILD', '.bazelrc', '.bazelversion', 'WORKSPACE') }}
-          restore-keys: ${{ runner.os }}-3.10-bazel-cache-
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '👋 Comment test'
+            })
+      # - name: Checkout
+      #   uses: actions/checkout@v3
 
-      - name: Install poetry
-        run: pipx install poetry
+      # - name: Bazel cache
+      #   id: bazel-cache
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ~/.cache/bazel
+      #     key: ${{ runner.os }}-3.10-bazel-cache-${{ hashFiles('**/BUILD', '.bazelrc', '.bazelversion', 'WORKSPACE') }}
+      #     restore-keys: ${{ runner.os }}-3.10-bazel-cache-
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-          cache: poetry
+      # - name: Install poetry
+      #   run: pipx install poetry
 
-      - name: Install dependencies
-        run: poetry install --no-interaction
+      # - name: Setup Python
+      #   uses: actions/setup-python@v4
+      #   with:
+      #     python-version: "3.10"
+      #     cache: poetry
 
-      - name: Run coverage
-        run: poetry run ./tools/coverage.sh
+      # - name: Install dependencies
+      #   run: poetry install --no-interaction
+
+      # - name: Run coverage
+      #   run: poetry run ./tools/coverage.sh
