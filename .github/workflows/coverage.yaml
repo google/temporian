@@ -90,7 +90,7 @@ jobs:
               repo: context.repo.repo,
               body: `### Coverage report
 
-                Main: ${{fromJson(needs.coverage-main.outputs.cov).totals.percent_covered}}
-                PR: ${{fromJson(needs.coverage.outputs.cov).totals.percent_covered}}
+              Main: ${{fromJson(needs.coverage-main.outputs.cov).totals.percent_covered}}
+              PR: ${{fromJson(needs.coverage.outputs.cov).totals.percent_covered}}
               `
             })
