@@ -17,5 +17,5 @@ rsync -r --safe-links --exclude='*/*.runfiles/' --include='*/' --include='*.py' 
 
 # Run coverage
 PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python PYTHONPATH="${PKDIR}/:$PYTHONPATH" coverage run --omit "*test.py,*/test/*" -m unittest discover --pattern '*test.py'
-# Generate coverage.json report from .coverage file
-coverage json
+# Print coverage results
+coverage report -m

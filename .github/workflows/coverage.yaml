@@ -33,6 +33,7 @@ jobs:
         id: coverage
         run: |
           poetry run ./tools/coverage.sh
+          poetry run coverage json
           content=$(cat ./coverage.json)
           echo "::set-output name=cov::$content"
 
@@ -68,6 +69,7 @@ jobs:
         id: coverage
         run: |
           poetry run ./tools/coverage.sh
+          poetry run coverage json
           content=$(cat ./coverage.json)
           echo "::set-output name=cov::$content"
 
