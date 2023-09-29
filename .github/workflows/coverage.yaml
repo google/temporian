@@ -30,6 +30,7 @@ jobs:
         run: poetry install --no-interaction
 
       - name: Run coverage
+        id: coverage
         run: |
           poetry run ./tools/coverage.sh
           content=$(cat ./coverage.json)
@@ -42,5 +43,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '👋 Coverage pct: ${{fromJson(steps.set_var.outputs.cov).totals.percent_covered_display}}'
+              body: '👋 Coverage pct: ${{fromJson(steps.coverage.outputs.cov).totals.percent_covered_display}}'
             })
