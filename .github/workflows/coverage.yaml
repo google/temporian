@@ -5,6 +5,8 @@ on: [pull_request]
 jobs:
   coverage:
     runs-on: ubuntu-latest
+    outputs:
+      cov: ${{ steps.coverage.outputs.cov }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -39,6 +41,8 @@ jobs:
 
   coverage-main:
     runs-on: ubuntu-latest
+    outputs:
+      cov: ${{ steps.coverage.outputs.cov }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -84,5 +88,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '👋 Branch: ${{fromJson(steps.coverage.outputs.cov).totals.percent_covered}}, main: ${{fromJson(steps.coverage-main.outputs.cov).totals.percent_covered}}'
+              body: '👋 Branch: ${{fromJson(needs.coverage.outputs.cov).totals.percent_covered}}, main: ${{fromJson(needs.coverage-main.outputs.cov).totals.percent_covered}}'
             })
