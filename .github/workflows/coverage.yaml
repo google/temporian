@@ -6,6 +6,35 @@ jobs:
   coverage:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Bazel cache
+        id: bazel-cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/bazel
+          key: ${{ runner.os }}-3.10-bazel-cache-${{ hashFiles('**/BUILD', '.bazelrc', '.bazelversion', 'WORKSPACE') }}
+          restore-keys: ${{ runner.os }}-3.10-bazel-cache-
+
+      - name: Install poetry
+        run: pipx install poetry
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          cache: poetry
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Run coverage
+        run: |
+          poetry run ./tools/coverage.sh
+          content=$(cat ./coverage.json)
+          echo "::set-output name=cov::$content"
+
       - uses: actions/github-script@v6
         with:
           script: |
@@ -13,30 +42,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '👋 Comment test'
+              body: '👋 Coverage pct: ${{fromJson(steps.set_var.outputs.cov).totals.percent_covered_display}}'
             })
-      # - name: Checkout
-      #   uses: actions/checkout@v3
-
-      # - name: Bazel cache
-      #   id: bazel-cache
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: ~/.cache/bazel
-      #     key: ${{ runner.os }}-3.10-bazel-cache-${{ hashFiles('**/BUILD', '.bazelrc', '.bazelversion', 'WORKSPACE') }}
-      #     restore-keys: ${{ runner.os }}-3.10-bazel-cache-
-
-      # - name: Install poetry
-      #   run: pipx install poetry
-
-      # - name: Setup Python
-      #   uses: actions/setup-python@v4
-      #   with:
-      #     python-version: "3.10"
-      #     cache: poetry
-
-      # - name: Install dependencies
-      #   run: poetry install --no-interaction
-
-      # - name: Run coverage
-      #   run: poetry run ./tools/coverage.sh

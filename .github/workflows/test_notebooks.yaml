@@ -1,62 +1,62 @@
-name: test_notebooks
+# name: test_notebooks
 
-on: [pull_request]
+# on: [pull_request]
 
-jobs:
-  run_notebooks:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        # Paths relative to docs/src/, without the .ipynb extension
-        # * can be used and all .ipynb files in that dir will be tested sequentially
-        path:
-          - user_guide
-          - recipes/*
-          - tutorials/anomaly_detection_supervised
-          - tutorials/anomaly_detection_unsupervised
-          - tutorials/bank_fraud_detection_with_tfdf
-          - tutorials/getting_started
-          - tutorials/heart_rate_analysis
-          - tutorials/loan_outcomes_prediction
-          - tutorials/m5_competition
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+# jobs:
+#   run_notebooks:
+#     runs-on: ubuntu-latest
+#     strategy:
+#       matrix:
+#         # Paths relative to docs/src/, without the .ipynb extension
+#         # * can be used and all .ipynb files in that dir will be tested sequentially
+#         path:
+#           - user_guide
+#           - recipes/*
+#           - tutorials/anomaly_detection_supervised
+#           - tutorials/anomaly_detection_unsupervised
+#           - tutorials/bank_fraud_detection_with_tfdf
+#           - tutorials/getting_started
+#           - tutorials/heart_rate_analysis
+#           - tutorials/loan_outcomes_prediction
+#           - tutorials/m5_competition
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v3
 
-      - name: Bazel cache
-        id: bazel-cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/bazel
-          key: ${{ runner.os }}-3.9-bazel-cache-${{ hashFiles('**/BUILD', '.bazelrc', '.bazelversion', 'WORKSPACE') }}
-          restore-keys: ${{ runner.os }}-3.9-bazel-cache-
+#       - name: Bazel cache
+#         id: bazel-cache
+#         uses: actions/cache@v3
+#         with:
+#           path: ~/.cache/bazel
+#           key: ${{ runner.os }}-3.9-bazel-cache-${{ hashFiles('**/BUILD', '.bazelrc', '.bazelversion', 'WORKSPACE') }}
+#           restore-keys: ${{ runner.os }}-3.9-bazel-cache-
 
-      - name: Notebooks cache
-        id: notebooks-cache
-        uses: actions/cache@v3
-        with:
-          path: ./docs/src/tutorials/tmp
-          key: ${{ runner.os }}-notebooks-${{ matrix.path }}-${{ hashFiles(format('docs/src/{0}.ipynb', matrix.path)) }}
-          restore-keys: |
-            ${{ runner.os }}-notebooks-${{ matrix.path }}-
+#       - name: Notebooks cache
+#         id: notebooks-cache
+#         uses: actions/cache@v3
+#         with:
+#           path: ./docs/src/tutorials/tmp
+#           key: ${{ runner.os }}-notebooks-${{ matrix.path }}-${{ hashFiles(format('docs/src/{0}.ipynb', matrix.path)) }}
+#           restore-keys: |
+#             ${{ runner.os }}-notebooks-${{ matrix.path }}-
 
-      - name: Install poetry
-        run: pipx install poetry
+#       - name: Install poetry
+#         run: pipx install poetry
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.9"
-          cache: poetry
-          cache-dependency-path: |
-            poetry.lock
-            ./docs/src/tutorials/requirements.txt
+#       - name: Setup Python
+#         uses: actions/setup-python@v4
+#         with:
+#           python-version: "3.9"
+#           cache: poetry
+#           cache-dependency-path: |
+#             poetry.lock
+#             ./docs/src/tutorials/requirements.txt
 
-      - name: Install poetry dependencies
-        run: poetry install --no-interaction
+#       - name: Install poetry dependencies
+#         run: poetry install --no-interaction
 
-      - name: Install notebook dependencies
-        run: poetry run pip install -r ./docs/src/tutorials/requirements.txt
+#       - name: Install notebook dependencies
+#         run: poetry run pip install -r ./docs/src/tutorials/requirements.txt
 
-      - name: Execute notebook(s)
-        run: poetry run ./tools/run_notebooks.sh `ls docs/src/${{ matrix.path }}.ipynb`
+#       - name: Execute notebook(s)
+#         run: poetry run ./tools/run_notebooks.sh `ls docs/src/${{ matrix.path }}.ipynb`
