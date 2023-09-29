@@ -90,16 +90,18 @@ jobs:
       - uses: actions/github-script@v6
         with:
           script: |
-            const pr = ${{fromJson(needs.coverage.outputs.cov-main).totals.percent_covered}};
-            console.log(pr);
+            const pr = ${{fromJson(needs.coverage.outputs.cov-pr).totals.percent_covered}};
+            const main = ${{fromJson(needs.coverage.outputs.cov-main).totals.percent_covered}};
+            const diff = pr - main;
             console.log(pr.toFixed(2));
-            # github.rest.issues.createComment({
-            #   issue_number: context.issue.number,
-            #   owner: context.repo.owner,
-            #   repo: context.repo.repo,
-            #   body: `### Coverage report
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `### Coverage report
 
-            #   Main: ${{fromJson(needs.coverage.outputs.cov-main).totals.percent_covered}}
-            #   PR: ${{fromJson(needs.coverage.outputs.cov-pr).totals.percent_covered}}
-            #   `
-            # })
+              Main: ${main.toFixed(2)}
+              PR: ${pr.toFixed(2)}
+              Diff: ${diff.toFixed(2)} ${diff >= 0 ? '✅' : '⚠️'}
+              `
+            })
