@@ -239,7 +239,7 @@ def from_tensorflow_record(
         raise ValueError(f"Unknown format {format}")
 
     tf = import_tf()
-    evtset = EventSet(data={}, schema=deepcopy(schema))
+    evset = EventSet(data={}, schema=deepcopy(schema))
 
     def get_value(example: tf.train.Example, key: str):
         if key not in example.features.feature:
@@ -300,8 +300,8 @@ def from_tensorflow_record(
             np_type = tp_dtype_to_np_dtype(feature_schema.dtype)
             features.append(np.array(value, dtype=np_type))
 
-        evtset.data[tuple(indexes)] = IndexData(
+        evset.data[tuple(indexes)] = IndexData(
             timestamps=timestamp_values, features=features
         )
 
-    return evtset
+    return evset

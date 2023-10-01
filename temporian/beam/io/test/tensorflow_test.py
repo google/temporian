@@ -61,10 +61,10 @@ class IOTest(absltest.TestCase):
             )
             p.run()
 
-        loaded_evtset = in_process_from_tensorflow_record(
+        loaded_evset = in_process_from_tensorflow_record(
             output_file, evset.schema
         )
-        assertEqualEventSet(self, evset, loaded_evtset)
+        assertEqualEventSet(self, evset, loaded_evset)
 
 
 if __name__ == "__main__":

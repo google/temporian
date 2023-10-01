@@ -4246,7 +4246,7 @@ class EventSetOperations:
         is filtered out if there is a non-filtered out event in
         (t-window_length, t].
 
-        This operator is different from `(evtset.moving_count(window_length)
+        This operator is different from `(evset.moving_count(window_length)
         == 0).filter()`. In `filter_moving_count` a filtered event does not
         block following events.
 

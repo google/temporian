@@ -58,17 +58,17 @@ def check_beam_implementation(
     input_paths = []
 
     # Export input data to csv
-    for input_idx, input_evtset in enumerate(input_data):
+    for input_idx, input_evset in enumerate(input_data):
         input_path = os.path.join(tmp_dir, f"input_{input_idx}.csv")
         input_paths.append(input_path)
-        to_csv(input_evtset, path=input_path)
+        to_csv(input_evset, path=input_path)
 
     # Run the Temporian program using the Beam backend
     with TestPipeline() as p:
         input_pcollection = {}
-        for input_path, input_evtset in zip(input_paths, input_data):
-            input_pcollection[input_evtset.node()] = p | beam_from_csv(
-                input_path, input_evtset.node().schema
+        for input_path, input_evset in zip(input_paths, input_data):
+            input_pcollection[input_evset.node()] = p | beam_from_csv(
+                input_path, input_evset.node().schema
             )
 
         output_pcollection = run_multi_io(
