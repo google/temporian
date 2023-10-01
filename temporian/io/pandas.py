@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Utilities for converting EventSets to pandas DataFrames and viceversa."""
+"""Utilities for converting EventSets to pandas DataFrames and vice versa."""
 
 import numpy as np
 
