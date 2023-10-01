@@ -23,14 +23,14 @@ py::array_t<double> filter_moving_count(
   std::vector<double> output;
 
   // Index of the last emitted event. If -1, no event was emitted so far.
-  Idx last_emited_idx = -1;
+  Idx last_emitted_idx = -1;
 
   for (Idx event_idx = 0; event_idx < n_event; event_idx++) {
     const auto t = v_event[event_idx];
-    if (last_emited_idx == -1 ||
-        (t - v_event[last_emited_idx]) >= window_length) {
+    if (last_emitted_idx == -1 ||
+        (t - v_event[last_emitted_idx]) >= window_length) {
       // Emitting event.
-      last_emited_idx = event_idx;
+      last_emitted_idx = event_idx;
       output.push_back(t);
     }
   }
