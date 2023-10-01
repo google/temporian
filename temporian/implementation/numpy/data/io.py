@@ -100,7 +100,7 @@ def event_set(
             times are required for calendar operators. If `None` (default),
             timestamps are interpreted as unix times if the `timestamps`
             argument is an array of date or date-like object.
-        same_sampling_as: If set, the new EventSet is cheched and tagged as
+        same_sampling_as: If set, the new EventSet is checked and tagged as
             having the same sampling as `same_sampling_as`. Some operators,
             such as [`EventSet.filter()`][temporian.EventSet.filter], require
             their inputs to have the same sampling.

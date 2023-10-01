@@ -63,7 +63,7 @@ def from_pandas(
             timestamp types.
         name: Optional name of the EventSet. Used for debugging, and
             graph serialization.
-        same_sampling_as: If set, the new EventSet is cheched and tagged as
+        same_sampling_as: If set, the new EventSet is checked and tagged as
             having the same sampling as `same_sampling_as`. Some operators,
             such as [`EventSet.filter()`][temporian.EventSet.filter], require
             their inputs to have the same sampling.
