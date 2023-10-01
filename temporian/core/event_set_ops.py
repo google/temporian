@@ -2450,7 +2450,7 @@ class EventSetOperations:
 
         The window length is defined in number of events, instead of
         timestamp duration like most other operators. The 'num_events' argument
-        needs to be specified by warg i.e. fast_fourier_transform(num_events=5)
+        needs to be specified by kwarg i.e. fast_fourier_transform(num_events=5)
         instead of fast_fourier_transform(5).
 
         The operator returns the amplitude of each spectral line as
