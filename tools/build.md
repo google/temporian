@@ -13,7 +13,7 @@ Unfortunately, building non-pure packages through Poetry is still somewhat
 unstable. Notably, the build uses a custom build script located under
 `config/build.py`. The definition of these custom build scripts is being
 discussed in this
-[Github issue](https://github.com/python-poetry/poetry/issues/2740) on the
+[GitHub issue](https://github.com/python-poetry/poetry/issues/2740) on the
 Poetry repository.
 
 If needed, the `build.py` can also serve as the basis for a handcrafted
