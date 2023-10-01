@@ -2124,7 +2124,7 @@ class EventSetOperations:
             ValueError: If `check_overflow=True` and some value is out of the range
                 of the `target` dtype.
             ValueError: If trying to cast a non-numeric string to numeric dtype.
-            ValueError: If `target` is not a dtype nor a mapping.
+            ValueError: If `target` is neither a dtype nor a mapping.
             ValueError: If `target` is a mapping, but some of the keys are not a
                 dtype nor a feature in `input.feature_names`, or if those types are
                 mixed.
