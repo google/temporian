@@ -11,7 +11,7 @@ def check_string(test, value: str, golden_path: str):
 
     if value != golden_data:
         value_path = "/tmp/golden_test_value.html"
-        logging.info("Save effetive value of golden test in %s", value_path)
+        logging.info("Save effective value of golden test in %s", value_path)
         logging.info(
             "Update the golden file with: cp %s %s", value_path, golden_path
         )
