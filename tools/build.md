@@ -45,7 +45,7 @@ where `<version>` is one of `38`, `39`, `310`, `311`.
 This will place the manylinux package in the `dist/` directory under
 Temporian's root.
 
-## MacOS builds
+## macOS builds
 
 Simply activate the desired Python version (e.g. using Pyenv) install Poetry
 and run
