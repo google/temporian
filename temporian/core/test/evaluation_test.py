@@ -22,6 +22,12 @@ import temporian as tp
 
 
 class EvaluationTest(absltest.TestCase):
+    def setUp(self):
+        utils.register_test_operators()
+
+    def tearDown(self):
+        utils.unregister_test_operators()
+
     def test_schedule_trivial(self):
         a = utils.create_input_node()
         b = utils.OpI1O1(a)

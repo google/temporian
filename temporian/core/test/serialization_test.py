@@ -25,7 +25,6 @@ import temporian as tp
 from temporian.core import serialization
 from temporian.core import graph
 from temporian.core.data.dtype import DType
-from temporian.core.data.node import EventSetNode
 from temporian.core.test import utils
 from temporian.core.typing import EventSetOrNode
 from temporian.implementation.numpy.data.io import event_set
@@ -33,6 +32,7 @@ from temporian.implementation.numpy.data.io import event_set
 
 class SerializationTest(absltest.TestCase):
     def setUp(self):
+        utils.register_test_operators()
         self.evset = tp.event_set(
             timestamps=[1, 2, 3],
             features={
@@ -40,6 +40,9 @@ class SerializationTest(absltest.TestCase):
                 "y": [4.0, 5.0, 6.0],
             },
         )
+
+    def tearDown(self):
+        utils.unregister_test_operators()
 
     def test_serialize(self):
         i1 = utils.create_input_node()

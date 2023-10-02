@@ -53,5 +53,6 @@ py_test(
         "//temporian/core/data:dtype",
         "//temporian/implementation/numpy/data:io",
         "//temporian/io:csv",
+        "//temporian/test:utils",
     ],
 )

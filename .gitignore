@@ -27,3 +27,6 @@ temporian/proto/core_pb2.py
 
 # MacOS
 **/.DS_Store
+
+# Coverage
+.coverage

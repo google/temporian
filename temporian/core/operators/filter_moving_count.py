@@ -13,7 +13,8 @@
 # limitations under the License.
 
 
-"""Unique timestamps operator class and public API function definitions."""
+"""FilterMaxMovingCount operator class and public API function definitions."""
+
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.node import (
@@ -22,15 +23,27 @@ from temporian.core.data.node import (
 )
 from temporian.core.operators.base import Operator
 from temporian.core.typing import EventSetOrNode
-from temporian.utils.typecheck import typecheck
 from temporian.proto import core_pb2 as pb
+from temporian.utils.typecheck import typecheck
+from temporian.core.data.duration_utils import (
+    Duration,
+    normalize_duration,
+    NormalizedDuration,
+)
 
 
-class UniqueTimestamps(Operator):
-    def __init__(self, input: EventSetNode):
+class FilterMaxMovingCount(Operator):
+    def __init__(
+        self,
+        input: EventSetNode,
+        window_length: NormalizedDuration,
+    ):
         super().__init__()
 
         self.add_input("input", input)
+        self.add_attribute("window_length", window_length)
+
+        self._window_length = window_length
 
         self.add_output(
             "output",
@@ -41,24 +54,37 @@ class UniqueTimestamps(Operator):
                 creator=self,
             ),
         )
+
         self.check()
+
+    @property
+    def window_length(self) -> NormalizedDuration:
+        return self._window_length
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
-            key="UNIQUE_TIMESTAMPS",
-            attributes=[],
+            key="FILTER_MAX_MOVING_COUNT",
+            attributes=[
+                pb.OperatorDef.Attribute(
+                    key="window_length",
+                    type=pb.OperatorDef.Attribute.Type.FLOAT_64,
+                ),
+            ],
             inputs=[pb.OperatorDef.Input(key="input")],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
 
 
-operator_lib.register_operator(UniqueTimestamps)
+operator_lib.register_operator(FilterMaxMovingCount)
 
 
 @typecheck
 @compile
-def unique_timestamps(input: EventSetOrNode) -> EventSetOrNode:
-    assert isinstance(input, EventSetNode)
-
-    return UniqueTimestamps(input=input).outputs["output"]
+def filter_moving_count(
+    input: EventSetOrNode, window_length: Duration
+) -> EventSetOrNode:
+    return FilterMaxMovingCount(
+        input=input,
+        window_length=normalize_duration(window_length),
+    ).outputs["output"]

@@ -388,8 +388,9 @@ class DataFrameToEventTest(absltest.TestCase):
                 "product_id": [666964, 666964, 574016],
                 "costs": np.array(
                     ["2022-01-01", "2022-01-02", "2022-01-03"],
-                    dtype="datetime64[s]",
-                ).astype(np.int64),
+                    dtype="datetime64[ns]",
+                ).astype(np.float64)
+                / 1e9,
             },
         )
         evset = from_pandas(df, indexes=[], timestamps="timestamp")

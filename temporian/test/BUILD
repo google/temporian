@@ -66,6 +66,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/pandas
         "//temporian",
+        ":utils",
     ],
 )
 

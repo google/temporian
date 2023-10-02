@@ -26,6 +26,9 @@ py_library(
     name = "operator_lib",
     srcs = ["operator_lib.py"],
     srcs_version = "PY3",
+    deps = [
+        "//temporian/core/operators:base",
+    ],
 )
 
 py_library(
