@@ -6,6 +6,16 @@ package(
 # Tests
 # =====
 
+py_library(
+    name = "utils",
+    srcs = ["utils.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/numpy,
+        "//temporian/core:serialization",
+    ],
+)
+
 py_test(
     name = "api_test",
     srcs = ["api_test.py"],
@@ -67,15 +77,5 @@ py_test(
         # already_there/pandas
         "//temporian",
         ":utils",
-    ],
-)
-
-py_test(
-    name = "utils",
-    srcs = ["utils.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/numpy,
-        "//temporian/core:serialization",
     ],
 )
