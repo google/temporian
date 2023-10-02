@@ -6,9 +6,6 @@
 ![formatting](https://github.com/google/temporian/actions/workflows/formatting.yaml/badge.svg)
 ![publish](https://github.com/google/temporian/actions/workflows/publish.yaml/badge.svg)
 
-> **Note**
-> Temporian development is in alpha.
-
 Temporian is an open-source Python library for preprocessing ⚡ and feature engineering 🛠 temporal data 📈 for machine learning applications 🤖. It is a library tailor-made to address the unique characteristics and complexities of time-related data, such as time-series and transactional data.
 
 > Temporal data is any form of data that represents a state in time. In
@@ -43,6 +40,9 @@ Temporian is an open-source Python library for preprocessing ⚡ and feature eng
 - **Highly optimized** 🔥: Temporian's core is implemented and optimized in
   C++, so large amounts of data can be handled in-process. In some cases,
   Temporian is 1000x faster than other libraries.
+
+> **Note**
+> Temporian development is in alpha.
 
 ## QuickStart
 
