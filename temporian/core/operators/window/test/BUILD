@@ -7,8 +7,19 @@ package(
 # =====
 
 py_test(
-    name = "test_simple_moving_average",
-    srcs = ["test_simple_moving_average.py"],
+    name = "test_base",
+    srcs = ["test_base.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_cumsum",
+    srcs = ["test_cumsum.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
@@ -19,12 +30,25 @@ py_test(
 )
 
 py_test(
-    name = "test_base",
-    srcs = ["test_base.py"],
+    name = "test_moving_sum",
+    srcs = ["test_moving_sum.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
         "//temporian/implementation/numpy/data:io",
+        "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_simple_moving_average",
+    srcs = ["test_simple_moving_average.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/core/data:duration",
         "//temporian/test:utils",
     ],
 )

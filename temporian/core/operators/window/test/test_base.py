@@ -72,6 +72,20 @@ class SimpleMovingAverageTest(absltest.TestCase):
             " negative window lengths will output missing values."
         )
 
+    def test_sampling_and_variable_winlen(self):
+        evset = event_set(timestamps=[1], features={"a": [10.0]})
+        sampling = event_set(timestamps=[2])
+        window_length = event_set(timestamps=[2], features={"a": [0.5]})
+
+        with self.assertRaisesRegex(
+            ValueError,
+            (
+                "`sampling` cannot be specified if a variable `window_length`"
+                " is specified"
+            ),
+        ):
+            evset.moving_sum(window_length=window_length, sampling=sampling)
+
 
 if __name__ == "__main__":
     absltest.main()

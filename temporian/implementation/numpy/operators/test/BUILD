@@ -436,25 +436,6 @@ py_test(
 )
 
 py_test(
-    name = "moving_sum_test",
-    srcs = ["moving_sum_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/pandas
-        # already_there/numpy
-        "//temporian/io:pandas",
-        ":test_util",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/core/operators/window:moving_sum",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators/window:moving_sum",
-    ],
-)
-
-py_test(
     name = "moving_count_test",
     srcs = ["moving_count_test.py"],
     srcs_version = "PY3",
