@@ -74,6 +74,7 @@ py_test(
     srcs = ["utils.py"],
     srcs_version = "PY3",
     deps = [
-        # already_there/numpy
+        # already_there/numpy,
+        "//temporian/core:serialization",
     ],
 )

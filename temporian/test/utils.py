@@ -14,6 +14,10 @@
 
 
 import numpy as np
+from absl.testing import absltest
+
+from temporian.core import serialization
+from temporian.implementation.numpy.data.event_set import EventSet
 
 
 def _f64(l):
@@ -22,3 +26,38 @@ def _f64(l):
 
 def _f32(l):
     return np.array(l, np.float32)
+
+
+def assertOperatorResult(
+    test: absltest.TestCase, result: EventSet, expected: EventSet
+):
+    """Tests that the output of an operator is the expected one, and performs
+    tests that are common to all operators.
+
+    Extend with more checks as needed.
+
+    Currently tests:
+      - The result is the same as the expected output.
+      - The result has the same sampling as the expected output.
+      - Serialization / unserialization of the graph.
+    """
+    # Result is the expected one
+
+    test.assertEqual(result, expected)
+    result.check_same_sampling(expected)
+
+    # Graph can be serialized and deserialized
+
+    if result.creator is None:
+        raise ValueError("EventSet has no creator.")
+    op = result.creator
+
+    serialized_op = serialization._serialize_operator(op)
+
+    nodes = {}
+    for node in op.inputs.values():
+        nodes[serialization._identifier(node)] = node
+    for node in op.outputs.values():
+        nodes[serialization._identifier(node)] = node
+
+    _ = serialization._unserialize_operator(serialized_op, nodes)

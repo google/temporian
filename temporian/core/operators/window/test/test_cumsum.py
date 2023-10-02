@@ -12,15 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from math import nan
-
-import numpy as np
 from absl.testing import absltest
-from absl.testing.parameterized import TestCase, parameters
-from unittest.mock import patch
+from absl.testing.parameterized import TestCase
 
 from temporian.implementation.numpy.data.io import event_set
-from temporian.test.utils import _f32, _f64
+from temporian.test.utils import assertOperatorResult
 
 
 class CumsumTest(TestCase):
@@ -36,7 +32,7 @@ class CumsumTest(TestCase):
             indexes=["x", "y"],
         )
 
-        expected_output = event_set(
+        expected = event_set(
             timestamps=[1.0, 2.0, 3.0, 1.1, 2.1, 3.1, 1.2, 2.2, 3.2],
             features={
                 "x": ["X1", "X1", "X1", "X2", "X2", "X2", "X2", "X2", "X2"],
@@ -45,12 +41,11 @@ class CumsumTest(TestCase):
                 "b": [1.0, 0.0, 2.0, -3.0, -11.0, -11.0, 5.0, 8.0, 7.0],
             },
             indexes=["x", "y"],
+            same_sampling_as=evset,
         )
 
         result = evset.cumsum()
-
-        self.assertEqual(expected_output, result)
-        result.check_same_sampling(evset)
+        assertOperatorResult(self, result, expected)
 
 
 if __name__ == "__main__":

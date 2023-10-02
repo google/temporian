@@ -13,14 +13,14 @@
 # limitations under the License.
 
 from math import nan
+from unittest.mock import patch
 
 import numpy as np
 from absl.testing import absltest
 from absl.testing.parameterized import TestCase, parameters
-from unittest.mock import patch
 
 from temporian.implementation.numpy.data.io import event_set
-from temporian.test.utils import _f32, _f64
+from temporian.test.utils import _f32, _f64, assertOperatorResult
 
 
 class MovingSumTest(TestCase):
@@ -30,15 +30,14 @@ class MovingSumTest(TestCase):
             timestamps=timestamps, features={"a": _f32([10, nan, 12, 13, 14])}
         )
 
-        expected_output = event_set(
+        expected = event_set(
             timestamps=timestamps,
             features={"a": _f32([10.0, 10.0, 22.0, 35.0, 14.0])},
+            same_sampling_as=evset,
         )
 
         result = evset.moving_sum(window_length=5.0)
-
-        self.assertEqual(expected_output, result)
-        result.check_same_sampling(evset)
+        assertOperatorResult(self, result, expected)
 
     def test_without_sampling_many_features(self):
         timestamps = [1, 2, 3, 5, 20]
@@ -50,18 +49,17 @@ class MovingSumTest(TestCase):
             },
         )
 
-        expected_output = event_set(
+        expected = event_set(
             timestamps=timestamps,
             features={
                 "a": [10.0, 21.0, 33.0, 46.0, 14.0],
                 "b": [20.0, 41.0, 63.0, 86.0, 24.0],
             },
+            same_sampling_as=evset,
         )
 
         result = evset.moving_sum(window_length=5.0)
-
-        self.assertEqual(expected_output, result)
-        result.check_same_sampling(evset)
+        assertOperatorResult(self, result, expected)
 
     def test_without_sampling_with_index(self):
         timestamps = [1, 2, 3, 1.1, 2.1, 3.1, 1.2, 2.2, 3.2]
@@ -75,7 +73,7 @@ class MovingSumTest(TestCase):
             indexes=["x", "y"],
         )
 
-        expected_output = event_set(
+        expected = event_set(
             timestamps=timestamps,
             features={
                 "x": ["X1", "X1", "X1", "X2", "X2", "X2", "X2", "X2", "X2"],
@@ -83,12 +81,11 @@ class MovingSumTest(TestCase):
                 "a": [10.0, 21.0, 33.0, 13.0, 27.0, 42.0, 16.0, 33.0, 51.0],
             },
             indexes=["x", "y"],
+            same_sampling_as=evset,
         )
 
         result = evset.moving_sum(window_length=5.0)
-
-        self.assertEqual(expected_output, result)
-        result.check_same_sampling(evset)
+        assertOperatorResult(self, result, expected)
 
     @parameters(
         {  # normal
@@ -120,17 +117,16 @@ class MovingSumTest(TestCase):
         )
         sampling = event_set(timestamps=sampling_timestamps)
 
-        expected_output = event_set(
+        expected = event_set(
             timestamps=sampling_timestamps,
             features={"a": output_feature},
+            same_sampling_as=sampling,
         )
 
         result = evset.moving_sum(
             window_length=window_length, sampling=sampling
         )
-
-        self.assertEqual(expected_output, result)
-        result.check_same_sampling(sampling)
+        assertOperatorResult(self, result, expected)
 
     def test_with_variable_winlen_same_sampling(self):
         timestamps = _f64([0, 1, 2, 3, 5, 20])
@@ -142,17 +138,17 @@ class MovingSumTest(TestCase):
         window = event_set(
             timestamps=timestamps,
             features={"a": _f64([1, 1, 1.5, 0.5, 3.5, 20])},
+            same_sampling_as=evset,
         )
 
-        expected_output = event_set(
+        expected = event_set(
             timestamps=timestamps,
             features={"a": _f32([0, 10, 21, 12, 36, 60])},
+            same_sampling_as=evset,
         )
 
         result = evset.moving_sum(window_length=window)
-
-        self.assertEqual(expected_output, result)
-        result.check_same_sampling(window)
+        assertOperatorResult(self, result, expected)
 
     def test_with_variable_winlen_diff_sampling(self):
         window_timestamps = _f64([-1, 1, 4, 19, 20, 20])
@@ -168,15 +164,14 @@ class MovingSumTest(TestCase):
             features={"a": window_length},
         )
 
-        expected_output = event_set(
+        expected = event_set(
             timestamps=window_timestamps,
             features={"a": _f32([0, 10, 23, 46, 27, 60])},
+            same_sampling_as=window,
         )
 
         result = evset.moving_sum(window_length=window)
-
-        self.assertEqual(expected_output, result)
-        result.check_same_sampling(window)
+        assertOperatorResult(self, result, expected)
 
     @patch(
         "temporian.implementation.numpy.operators.window.moving_sum.operators_cc.moving_sum"

@@ -20,7 +20,7 @@ from absl.testing.parameterized import parameters
 from absl.testing.parameterized import TestCase
 
 from temporian.implementation.numpy.data.io import event_set
-from temporian.test.utils import _f32, _f64
+from temporian.test.utils import _f32, _f64, assertOperatorResult
 from temporian.core.data.duration import shortest
 
 
@@ -60,15 +60,14 @@ class SimpleMovingAverageTest(TestCase):
     ):
         evset = event_set(timestamps=timestamps, features={"a": feature})
 
-        expected_output = event_set(
+        expected = event_set(
             timestamps=timestamps,
             features={"a": output_feature},
+            same_sampling_as=evset,
         )
 
         result = evset.simple_moving_average(window_length=window)
-
-        self.assertEqual(expected_output, result)
-        result.check_same_sampling(evset)
+        assertOperatorResult(self, result, expected)
 
     @parameters(
         {  # empty f32
@@ -112,17 +111,16 @@ class SimpleMovingAverageTest(TestCase):
 
         sampling = event_set(timestamps=sampling_timestamps)
 
-        expected_output = event_set(
+        expected = event_set(
             timestamps=sampling_timestamps,
             features={"a": output_feature},
+            same_sampling_as=sampling,
         )
 
         result = evset.simple_moving_average(
             window_length=window, sampling=sampling
         )
-
-        self.assertEqual(expected_output, result)
-        result.check_same_sampling(sampling)
+        assertOperatorResult(self, result, expected)
 
     @parameters(
         {  # normal
@@ -168,17 +166,17 @@ class SimpleMovingAverageTest(TestCase):
         window = event_set(
             timestamps=timestamps,
             features={"a": variable_window},
+            same_sampling_as=evset,
         )
 
-        expected_output = event_set(
+        expected = event_set(
             timestamps=timestamps,
             features={"a": output_feature},
+            same_sampling_as=evset,
         )
 
         result = evset.simple_moving_average(window_length=window)
-
-        self.assertEqual(expected_output, result)
-        result.check_same_sampling(window)
+        assertOperatorResult(self, result, expected)
 
     @parameters(
         {  # normal
@@ -239,15 +237,14 @@ class SimpleMovingAverageTest(TestCase):
             features={"a": variable_window},
         )
 
-        expected_output = event_set(
+        expected = event_set(
             timestamps=window_timestamps,
             features={"a": output_feature},
+            same_sampling_as=window,
         )
 
         result = evset.simple_moving_average(window_length=window)
-
-        self.assertEqual(expected_output, result)
-        result.check_same_sampling(window)
+        assertOperatorResult(self, result, expected)
 
     def test_with_index(self):
         evset = event_set(
@@ -259,7 +256,7 @@ class SimpleMovingAverageTest(TestCase):
             },
             indexes=["x", "y"],
         )
-        expected_output = event_set(
+        expected = event_set(
             timestamps=[1, 2, 3, 1.1, 2.1, 3.1, 1.2, 2.2, 3.2],
             features={
                 "x": ["X1", "X1", "X1", "X2", "X2", "X2", "X2", "X2", "X2"],
@@ -267,9 +264,10 @@ class SimpleMovingAverageTest(TestCase):
                 "a": [10.0, 10.5, 11.0, 13.0, 13.5, 14.0, 16.0, 16.5, 17.0],
             },
             indexes=["x", "y"],
+            same_sampling_as=evset,
         )
         result = evset.simple_moving_average(window_length=5.0)
-        self.assertEqual(result, expected_output)
+        assertOperatorResult(self, result, expected)
 
 
 if __name__ == "__main__":
