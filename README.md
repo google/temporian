@@ -42,7 +42,7 @@ Temporian is an open-source Python library for preprocessing ⚡ and feature eng
   Temporian is 1000x faster than other libraries.
 
 > **Note**
-> Temporian development is in alpha.
+> Temporian's development is in alpha.
 
 ## QuickStart
 
