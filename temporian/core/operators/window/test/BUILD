@@ -7,8 +7,8 @@ package(
 # =====
 
 py_test(
-    name = "base_test",
-    srcs = ["base_test.py"],
+    name = "test_base",
+    srcs = ["test_base.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
@@ -42,8 +42,8 @@ py_test(
 )
 
 py_test(
-    name = "simple_moving_average_test",
-    srcs = ["simple_moving_average_test.py"],
+    name = "test_simple_moving_average",
+    srcs = ["test_simple_moving_average.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest

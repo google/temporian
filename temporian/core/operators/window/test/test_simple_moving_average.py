@@ -58,6 +58,7 @@ class SimpleMovingAverageTest(TestCase):
         window,
         output_feature,
     ):
+        raise "a"
         evset = event_set(timestamps=timestamps, features={"a": feature})
 
         expected = event_set(

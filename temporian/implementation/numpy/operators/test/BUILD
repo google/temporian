@@ -4,8 +4,8 @@ package(
 )
 
 py_library(
-    name = "test_util",
-    srcs = ["test_util.py"],
+    name = "utils",
+    srcs = ["utils.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
@@ -30,7 +30,7 @@ py_test(
         "//temporian/implementation/numpy/data:io",
         "//temporian/io:pandas",
         "//temporian/implementation/numpy/operators/binary",
-        ":test_util",
+        ":utils",
     ],
 )
 
@@ -46,7 +46,7 @@ py_test(
         "//temporian/core/operators/binary",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/binary",
-        ":test_util",
+        ":utils",
     ],
 )
 
@@ -61,7 +61,7 @@ py_test(
         "//temporian/core/operators/binary",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/binary",
-        ":test_util",
+        ":utils",
     ],
 )
 
@@ -77,7 +77,7 @@ py_test(
         "//temporian/core/operators/scalar",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/scalar",
-        ":test_util",
+        ":utils",
     ],
 )
 
@@ -93,7 +93,7 @@ py_test(
         "//temporian/core/operators/scalar",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/scalar",
-        ":test_util",
+        ":utils",
     ],
 )
 
@@ -112,7 +112,7 @@ py_test(
         "//temporian/core/operators/binary",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/binary",
-        ":test_util",
+        ":utils",
     ],
 )
 
@@ -121,7 +121,7 @@ py_test(
     srcs = ["cast_test.py"],
     srcs_version = "PY3",
     deps = [
-        ":test_util",
+        ":utils",
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
@@ -141,7 +141,7 @@ py_test(
     srcs = ["filter_test.py"],
     srcs_version = "PY3",
     deps = [
-        ":test_util",
+        ":utils",
         # already_there/absl/testing:absltest
         "//temporian/core/operators:filter",
         "//temporian/implementation/numpy/data:io",
@@ -154,7 +154,7 @@ py_test(
     srcs = ["glue_test.py"],
     srcs_version = "PY3",
     deps = [
-        ":test_util",
+        ":utils",
         # already_there/absl/testing:absltest
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
@@ -169,7 +169,7 @@ py_test(
     srcs = ["unary_test.py"],
     srcs_version = "PY3",
     deps = [
-        ":test_util",
+        ":utils",
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
@@ -186,7 +186,7 @@ py_test(
     srcs = ["calendar_day_of_month_test.py"],
     srcs_version = "PY3",
     deps = [
-        ":test_util",
+        ":utils",
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
@@ -203,7 +203,7 @@ py_test(
     srcs = ["calendar_day_of_week_test.py"],
     srcs_version = "PY3",
     deps = [
-        ":test_util",
+        ":utils",
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
@@ -219,7 +219,7 @@ py_test(
     srcs = ["calendar_day_of_year_test.py"],
     srcs_version = "PY3",
     deps = [
-        ":test_util",
+        ":utils",
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
@@ -235,7 +235,7 @@ py_test(
     srcs = ["calendar_hour_test.py"],
     srcs_version = "PY3",
     deps = [
-        ":test_util",
+        ":utils",
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
@@ -251,7 +251,7 @@ py_test(
     srcs = ["calendar_iso_week_test.py"],
     srcs_version = "PY3",
     deps = [
-        ":test_util",
+        ":utils",
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
@@ -267,7 +267,7 @@ py_test(
     srcs = ["calendar_minute_test.py"],
     srcs_version = "PY3",
     deps = [
-        ":test_util",
+        ":utils",
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
@@ -283,7 +283,7 @@ py_test(
     srcs = ["calendar_month_test.py"],
     srcs_version = "PY3",
     deps = [
-        ":test_util",
+        ":utils",
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
@@ -299,7 +299,7 @@ py_test(
     srcs = ["calendar_second_test.py"],
     srcs_version = "PY3",
     deps = [
-        ":test_util",
+        ":utils",
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
@@ -315,7 +315,7 @@ py_test(
     srcs = ["calendar_year_test.py"],
     srcs_version = "PY3",
     deps = [
-        ":test_util",
+        ":utils",
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
@@ -331,7 +331,7 @@ py_test(
     srcs = ["lag_test.py"],
     srcs_version = "PY3",
     deps = [
-        ":test_util",
+        ":utils",
         # already_there/absl/testing:absltest
         "//temporian/core/operators:lag",
         "//temporian/implementation/numpy/data:io",
@@ -345,7 +345,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
-        ":test_util",
+        ":utils",
         "//temporian/core:evaluation",
         "//temporian/core/operators:leak",
         "//temporian/implementation/numpy:evaluation",
@@ -359,7 +359,7 @@ py_test(
     srcs = ["drop_index_test.py"],
     srcs_version = "PY3",
     deps = [
-        ":test_util",
+        ":utils",
         # already_there/absl/testing:absltest
         # already_there/pandas
         "//temporian/io:pandas",
@@ -405,7 +405,7 @@ py_test(
     srcs = ["add_index_test.py"],
     srcs_version = "PY3",
     deps = [
-        ":test_util",
+        ":utils",
         # already_there/absl/testing:absltest
         # already_there/pandas
         "//temporian/io:pandas",
@@ -425,7 +425,7 @@ py_test(
         # already_there/pandas
         # already_there/numpy
         "//temporian/io:pandas",
-        ":test_util",
+        ":utils",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
@@ -444,7 +444,7 @@ py_test(
         # already_there/pandas
         # already_there/numpy
         "//temporian/io:pandas",
-        ":test_util",
+        ":utils",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
@@ -463,7 +463,7 @@ py_test(
         # already_there/pandas
         # already_there/numpy
         "//temporian/io:pandas",
-        ":test_util",
+        ":utils",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
@@ -482,7 +482,7 @@ py_test(
         # already_there/pandas
         # already_there/numpy
         "//temporian/io:pandas",
-        ":test_util",
+        ":utils",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
@@ -501,7 +501,7 @@ py_test(
         # already_there/pandas
         # already_there/numpy
         "//temporian/io:pandas",
-        ":test_util",
+        ":utils",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
@@ -521,7 +521,7 @@ py_test(
         # already_there/pandas
         # already_there/numpy
         "//temporian/io:pandas",
-        ":test_util",
+        ":utils",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
@@ -541,7 +541,7 @@ py_test(
         # already_there/pandas
         # already_there/numpy
         "//temporian/io:pandas",
-        ":test_util",
+        ":utils",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
@@ -576,7 +576,7 @@ py_test(
         # already_there/pandas
         # already_there/numpy
         "//temporian/io:pandas",
-        ":test_util",
+        ":utils",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
@@ -592,7 +592,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
-        ":test_util",
+        ":utils",
         "//temporian/implementation/numpy/data:io",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
@@ -608,7 +608,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
-        ":test_util",
+        ":utils",
         "//temporian/implementation/numpy/data:io",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
@@ -624,7 +624,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
-        ":test_util",
+        ":utils",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
@@ -640,7 +640,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
-        ":test_util",
+        ":utils",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
@@ -656,7 +656,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
-        ":test_util",
+        ":utils",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
@@ -672,7 +672,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
-        ":test_util",
+        ":utils",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
@@ -688,7 +688,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
-        ":test_util",
+        ":utils",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
@@ -705,7 +705,7 @@ py_test(
     deps = [
         # already_there/absl/testing:absltest
         # already_there/absl/testing:parameterized
-        ":test_util",
+        ":utils",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
@@ -721,7 +721,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
-        ":test_util",
+        ":utils",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
@@ -737,7 +737,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
-        ":test_util",
+        ":utils",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
@@ -753,7 +753,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
-        ":test_util",
+        ":utils",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
@@ -769,7 +769,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
-        ":test_util",
+        ":utils",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",

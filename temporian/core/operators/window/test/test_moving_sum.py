@@ -20,6 +20,7 @@ from absl.testing import absltest
 from absl.testing.parameterized import TestCase, parameters
 
 from temporian.implementation.numpy.data.io import event_set
+from temporian.implementation.numpy_cc.operators import operators_cc
 from temporian.test.utils import _f32, _f64, assertOperatorResult
 
 
@@ -173,9 +174,7 @@ class MovingSumTest(TestCase):
         result = evset.moving_sum(window_length=window)
         assertOperatorResult(self, result, expected)
 
-    @patch(
-        "temporian.implementation.numpy.operators.window.moving_sum.operators_cc.moving_sum"
-    )
+    @patch.object(operators_cc, "moving_sum")
     def test_with_variable_winlen_same_sampling_uses_correct_cpp_impl(
         self, cpp_moving_sum_mock
     ):

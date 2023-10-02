@@ -22,7 +22,7 @@ from temporian.implementation.numpy.operators.timestamps import (
     TimestampsNumpyImplementation,
 )
 from temporian.core.data.duration_utils import convert_timestamps_to_datetimes
-from temporian.implementation.numpy.operators.test.test_util import (
+from temporian.implementation.numpy.operators.test.utils import (
     assertEqualEventSet,
     testOperatorAndImp,
 )

@@ -26,7 +26,7 @@ from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy.operators.calendar.day_of_month import (
     CalendarDayOfMonthNumpyImplementation,
 )
-from temporian.implementation.numpy.operators.test.test_util import (
+from temporian.implementation.numpy.operators.test.utils import (
     assertEqualEventSet,
     testOperatorAndImp,
 )

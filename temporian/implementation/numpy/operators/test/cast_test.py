@@ -25,7 +25,7 @@ from temporian.core.data.dtype import DType
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.io.pandas import from_pandas
 from temporian.implementation.numpy.data.io import event_set
-from temporian.implementation.numpy.operators.test.test_util import (
+from temporian.implementation.numpy.operators.test.utils import (
     assertEqualEventSet,
     testOperatorAndImp,
 )

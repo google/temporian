@@ -18,7 +18,7 @@ from temporian.implementation.numpy.operators.add_index import (
 )
 from temporian.io.pandas import from_pandas
 from temporian.core.evaluation import run
-from temporian.implementation.numpy.operators.test.test_util import (
+from temporian.implementation.numpy.operators.test.utils import (
     assertEqualEventSet,
 )
 

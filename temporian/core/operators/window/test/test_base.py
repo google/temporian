@@ -22,6 +22,9 @@ from unittest.mock import patch
 from absl.testing import absltest
 
 from temporian.implementation.numpy.data.io import event_set
+from temporian.implementation.numpy.operators.window import (
+    base as base_window_impl,
+)
 from temporian.test.utils import _f32
 
 
@@ -54,7 +57,7 @@ class SimpleMovingAverageTest(absltest.TestCase):
         ):
             evset.simple_moving_average(window_length=window_length)
 
-    @patch("temporian.implementation.numpy.operators.window.base.logging")
+    @patch.object(base_window_impl, "logging")
     def test_invalid_window_length_warning(self, logging_mock):
         """Tests that warning is shown when receiving non strictly positive
         values in window_length."""

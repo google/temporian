@@ -22,7 +22,7 @@ from apache_beam.testing.test_pipeline import TestPipeline
 from apache_beam.testing.util import assert_that, equal_to
 from temporian.core.data.dtype import DType
 
-from temporian.implementation.numpy.operators.test.test_util import (
+from temporian.implementation.numpy.operators.test.utils import (
     assertEqualEventSet,
 )
 from temporian.beam.io.csv import from_csv as beam_from_csv
