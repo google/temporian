@@ -33,6 +33,7 @@ function temporian::setup_environment() {
 }
 
 function temporian::build_wheel() {
+    export PATH="${PYTHON_DIR}/bin:$PATH"
     "${PYTHON_BIN_PATH}" -m poetry build
 }
 
