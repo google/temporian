@@ -31,7 +31,7 @@ from temporian.implementation.numpy.operators.unary import (
 )
 from temporian.core.data.dtype import DType
 from temporian.io.pandas import from_pandas
-from temporian.implementation.numpy.operators.test.test_util import (
+from temporian.implementation.numpy.operators.test.utils import (
     assertEqualEventSet,
 )
 

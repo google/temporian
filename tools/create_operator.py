@@ -297,7 +297,7 @@ from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy.operators.{lower_op} import (
     {capitalized_op}NumpyImplementation,
 )
-from temporian.implementation.numpy.operators.test.test_util import (
+from temporian.implementation.numpy.operators.test.utils import (
     assertEqualEventSet,
     testOperatorAndImp,
 )
@@ -357,7 +357,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
-        ":test_util",
+        ":utils",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
