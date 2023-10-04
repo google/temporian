@@ -20,7 +20,7 @@ import numpy as np
 import pandas as pd
 from temporian.io.pandas import from_pandas, to_pandas
 from temporian.implementation.numpy.data.io import event_set
-from temporian.implementation.numpy.operators.test.test_util import (
+from temporian.implementation.numpy.operators.test.utils import (
     assertEqualDFRandomRowOrder,
 )
 
@@ -386,11 +386,13 @@ class DataFrameToEventTest(absltest.TestCase):
             timestamps=[740.0, 508.0, 573.0],
             features={
                 "product_id": [666964, 666964, 574016],
-                "costs": np.array(
-                    ["2022-01-01", "2022-01-02", "2022-01-03"],
-                    dtype="datetime64[ns]",
-                ).astype(np.float64)
-                / 1e9,
+                "costs": (
+                    np.array(
+                        ["2022-01-01", "2022-01-02", "2022-01-03"],
+                        dtype="datetime64[ns]",
+                    ).astype(np.float64)
+                    / 1e9
+                ),
             },
         )
         evset = from_pandas(df, indexes=[], timestamps="timestamp")

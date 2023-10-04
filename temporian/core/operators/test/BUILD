@@ -5,6 +5,7 @@ package(
 
 # Tests
 # =====
+
 py_test(
     name = "propagate_test",
     srcs = ["propagate_test.py"],
