@@ -21,7 +21,6 @@ from temporian.core.compilation import compile
 from temporian.core.data.node import (
     EventSetNode,
     create_node_new_features_existing_sampling,
-    create_node_new_features_new_sampling,
 )
 from temporian.core.operators.base import Operator
 from temporian.core.typing import EventSetOrNode

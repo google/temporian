@@ -15,16 +15,15 @@
 from absl.testing import absltest
 from absl.testing.parameterized import TestCase
 
+from temporian.core.compilation import compile
+from temporian.core.serialization import save
 from temporian.implementation.numpy.data.io import event_set
 from temporian.test.utils import assertOperatorResult
 
 
 class MapTest(TestCase):
     def test_basic(self):
-        evset = event_set(
-            timestamps=[1, 2, 3],
-            features={"x": [10, 20, 30]},
-        )
+        evset = event_set(timestamps=[1, 2, 3], features={"x": [10, 20, 30]})
 
         expected = event_set(
             timestamps=[1, 2, 3],
@@ -35,6 +34,22 @@ class MapTest(TestCase):
         result = evset.map(lambda x: x * 2)
 
         assertOperatorResult(self, result, expected)
+
+    def test_serialize_fails(self):
+        @compile
+        def f(e):
+            return {"output": e.map(lambda x: x * 2)}
+
+        evset = event_set([])
+
+        with self.assertRaisesRegex(
+            ValueError,
+            (
+                "Cannot serialize MAP operator since it takes a Python function"
+                " as attribute."
+            ),
+        ):
+            save(f, "path", evset)
 
 
 if __name__ == "__main__":
