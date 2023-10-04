@@ -16,8 +16,11 @@
 """Implementation for the Map operator."""
 
 
+from inspect import signature
 from typing import Dict
+
 import numpy as np
+from temporian.core.types import MapExtras
 
 from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.core.operators.map import Map
@@ -34,7 +37,9 @@ class MapNumpyImplementation(OperatorImplementation):
         assert isinstance(self.operator, Map)
 
         output_schema = self.output_schema("output")
+
         func = self.operator.func
+        receives_extras = len(signature(func).parameters) > 1
 
         # Create output EventSet
         output_evset = EventSet(data={}, schema=output_schema)
@@ -43,10 +48,21 @@ class MapNumpyImplementation(OperatorImplementation):
         for index_key, index_data in input.data.items():
             # Iterate over features and apply func
             features = []
-            for orig_feature in index_data.features:
+            for feature_schema, orig_feature in zip(
+                input.schema.features, index_data.features
+            ):
                 feature = np.empty_like(orig_feature)
                 for i, value in enumerate(orig_feature):
-                    feature[i] = func(value)
+                    args = [value]
+                    if receives_extras:
+                        args.append(
+                            MapExtras(
+                                index_key=index_key,
+                                timestamp=index_data.timestamps[i],
+                                feature_name=feature_schema.name,
+                            )
+                        )
+                    feature[i] = func(*args)
                 features.append(feature)
 
             output_evset.set_index_value(

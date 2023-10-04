@@ -15,6 +15,7 @@
 
 """Map operator class and public API function definitions."""
 
+from inspect import signature
 from typing import Any, Callable
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
@@ -36,10 +37,13 @@ class Map(Operator):
     ):
         super().__init__()
 
-        self.add_input("input", input)
+        if len(signature(func).parameters) > 2:
+            raise ValueError("`func` must receive at most 2 arguments.")
 
         self.add_attribute("func", func)
         self._func = func
+
+        self.add_input("input", input)
 
         self.add_output(
             "output",

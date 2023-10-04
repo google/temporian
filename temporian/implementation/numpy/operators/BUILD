@@ -439,5 +439,6 @@ py_library(
         "//temporian/core/operators:map",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
+        "//temporian/core:types",
     ],
 )

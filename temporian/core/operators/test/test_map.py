@@ -35,6 +35,27 @@ class MapTest(TestCase):
 
         assertOperatorResult(self, result, expected)
 
+    def test_with_extras(self):
+        evset = event_set(timestamps=[1, 2, 3], features={"x": [10, 20, 30]})
+
+        expected = event_set(
+            timestamps=[1, 2, 3],
+            features={"x": [11, 22, 33]},
+            same_sampling_as=evset,
+        )
+
+        result = evset.map(lambda v, e: v + e.timestamp)
+
+        assertOperatorResult(self, result, expected)
+
+    def test_too_many_args(self):
+        evset = event_set(timestamps=[1], features={"a": [2]})
+
+        with self.assertRaisesRegex(
+            ValueError, "`func` must receive at most 2 arguments."
+        ):
+            evset.map(lambda v, e, z: v + e.timestamp)
+
     def test_serialize_fails(self):
         @compile
         def f(e):

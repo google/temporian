@@ -100,3 +100,9 @@ py_library(
         "//temporian/implementation/numpy/data:event_set",
     ],
 )
+
+py_library(
+    name = "types",
+    srcs = ["types.py"],
+    srcs_version = "PY3",
+)
