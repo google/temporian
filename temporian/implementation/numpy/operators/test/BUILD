@@ -748,6 +748,22 @@ py_test(
 )
 
 py_test(
+    name = "tick_calendar_test",
+    srcs = ["tick_calendar_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        ":utils",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:node",
+        "//temporian/core/data:schema",
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/core/operators:tick_calendar",
+        "//temporian/implementation/numpy/operators:tick_calendar",
+    ],
+)
+
+py_test(
     name = "until_next_test",
     srcs = ["until_next_test.py"],
     srcs_version = "PY3",

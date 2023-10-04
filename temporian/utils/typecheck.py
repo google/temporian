@@ -6,7 +6,7 @@ from functools import wraps
 import logging
 
 
-from typing import List, Set, Dict, Optional, Union, Tuple, Any
+from typing import List, Set, Dict, Optional, Union, Tuple, Any, Literal
 import inspect
 import typing
 
@@ -119,6 +119,13 @@ def _check_annotation(trace: _Trace, is_compiled: bool, value, annotation):
         origin = typing.get_origin(annotation)
         assert origin is not None
 
+        # Literal values check (e.g: Literal['*'])
+        if origin is Literal:
+            # Check param value in the allowed literal values
+            if value not in typing.get_args(annotation):
+                trace.exception(_base_error(value, annotation))
+            return
+
         if origin is not Union:
             if not isinstance(value, origin):
                 # The origin (e.g. "list" in "List[int]") is wrong.
@@ -208,6 +215,7 @@ def _check_annotation_union(
 
     trace.exception(
         f'Non matching type for "{type(value)}" in the union {annotation_args}.'
+        f' The value is "{value}".'
     )
 
 

@@ -62,6 +62,7 @@ from temporian.implementation.numpy.operators import fast_fourier_transform
 from temporian.implementation.numpy.operators import select_index_values
 from temporian.implementation.numpy.operators import since_last
 from temporian.implementation.numpy.operators import tick
+from temporian.implementation.numpy.operators import tick_calendar
 from temporian.implementation.numpy.operators import timestamps
 from temporian.implementation.numpy.operators import unique_timestamps
 from temporian.implementation.numpy.operators import filter_moving_count

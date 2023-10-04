@@ -4,6 +4,7 @@
 
 ### Features
 
+- Added `EventSet.tick_calendar()` operator.
 - Added `EventSet.where()` operator.
 - Add `filter_moving_count` operator.
 

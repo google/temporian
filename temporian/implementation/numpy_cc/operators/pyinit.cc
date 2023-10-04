@@ -6,6 +6,7 @@
 #include "temporian/implementation/numpy_cc/operators/join.h"
 #include "temporian/implementation/numpy_cc/operators/resample.h"
 #include "temporian/implementation/numpy_cc/operators/since_last.h"
+#include "temporian/implementation/numpy_cc/operators/tick_calendar.h"
 #include "temporian/implementation/numpy_cc/operators/until_next.h"
 #include "temporian/implementation/numpy_cc/operators/window.h"
 
@@ -19,6 +20,7 @@ PYBIND11_MODULE(operators_cc, m) {
   init_window(m);
   init_join(m);
   init_add_index(m);
+  init_tick_calendar(m);
   init_filter_moving_count(m);
   init_until_next(m);
 }

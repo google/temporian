@@ -363,6 +363,22 @@ py_library(
 )
 
 py_library(
+    name = "tick_calendar",
+    srcs = ["tick_calendar.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:compilation",
+        "//temporian/core:operator_lib",
+        "//temporian/core:typing",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:node",
+        "//temporian/proto:core_py_proto",
+        "//temporian/utils:typecheck",
+    ],
+)
+
+py_library(
     name = "select_index_values",
     srcs = ["select_index_values.py"],
     srcs_version = "PY3",
