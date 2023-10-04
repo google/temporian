@@ -177,8 +177,10 @@ def normalize_timestamps(
         values = np.array(values)
 
     # values is represented as a number. Cast to float64.
-    if values.dtype.type in [np.float32, np.int64, np.int32]:
-        values = values.astype(np.float64)
+    if np.issubdtype(values.dtype, np.integer) or np.issubdtype(
+        values.dtype, np.floating
+    ):
+        values = values.astype(np.float64, copy=False)
 
     if values.dtype.type == np.float64:
         # Check NaN
@@ -187,40 +189,20 @@ def normalize_timestamps(
 
         return values, False
 
-    if values.dtype.type in [np.str_, np.bytes_]:
+    if values.dtype.type in [np.str_, np.bytes_, np.object_]:
+        # Raises ValueError if cannot parse a value
         values = values.astype("datetime64[ns]")
-
-    if values.dtype.type == np.object_:
-        if all(isinstance(x, str) for x in values) or all(
-            isinstance(x, datetime.datetime) for x in values
-        ):
-            # values is a date. Cast to unix epoch in float64 seconds.
-            values = values.astype("datetime64[ns]")
-
-        elif all(
-            str(type(x)) == "<class 'pandas._libs.tslibs.timestamps.Timestamp'>"
-            for x in values
-        ):
-            values = np.array([x.to_numpy() for x in values])
 
     if values.dtype.type == np.datetime64:
         # values is a date. Cast to unix epoch in float64 seconds.
         values = datetime64_array_to_float64(values)
+        if np.any(values < 0):
+            raise ValueError("Timestamps contains null or invalid values.")
         return values, True
 
-    object_description = f"{values!r}.\nDetails: type={type(values)}"
-    if isinstance(values, np.ndarray):
-        object_description += (
-            f" np.dtype={values.dtype} np.dtype.type={values.dtype.type}"
-        )
-        if values.dtype.type == np.object_:
-            object_description += f" type(value[0])={type(values[0])}"
-
-    # Keep this function in sync with the documentation of "io.event_set".
     raise ValueError(
-        "Invalid timestamps value. Check `tp.event_set` documentation for the"
-        " list of supported timestamp types. Instead, got"
-        f" {object_description}."
+        f"Invalid timestamps array dtype={values.dtype}."
+        " Supported types are: integers, floating point, strings or objects."
     )
 
 

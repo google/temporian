@@ -80,6 +80,12 @@ class IOTest(absltest.TestCase):
             np.array([2], dtype=np.int64),
             np.array([2], dtype=np.float32),
             np.array([2], dtype=np.float64),
+            np.array([2], dtype=np.byte),
+            np.array([2], dtype=np.short),
+            np.array([2], dtype=np.longlong),
+            np.array([2], dtype=np.ubyte),
+            np.array([2], dtype=np.ushort),
+            np.array([2], dtype=np.ulonglong),
             pd.Series([2]),
         ]:
             logging.info("Testing: %s (%s)", timestamps, type(timestamps))
@@ -103,6 +109,7 @@ class IOTest(absltest.TestCase):
             np.array(["1970-01-02"], dtype=np.object_),
             # Pandas
             pd.Series([pd.Timestamp("1970-01-02")]),
+            np.array([pd.Timestamp("1970-01-02")]),  # dtype object
             pd.Series(["1970-01-02"]),
         ]:
             logging.info("Testing: %s (%s)", timestamps, type(timestamps))
