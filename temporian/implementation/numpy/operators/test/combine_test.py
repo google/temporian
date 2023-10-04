@@ -21,7 +21,7 @@ from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy.operators.combine import (
     CombineNumpyImplementation,
 )
-from temporian.implementation.numpy.operators.test.test_util import (
+from temporian.implementation.numpy.operators.test.utils import (
     assertEqualEventSet,
     testOperatorAndImp,
 )
@@ -131,9 +131,11 @@ class CombineOperatorTest(absltest.TestCase):
             timestamps=[0, 1, 2, 3, 4, 5] * 3,
             features={
                 "a": [0, 1, 2, 3, 4, 5] * 3,
-                "idx": ["a", "a", "b", "b", "c", "c"]  # input 1
-                + ["b", "b", "c", "c", "d", "d"]  # input 2
-                + ["c", "c", "d", "d", "e", "e"],  # input 3
+                "idx": (
+                    ["a", "a", "b", "b", "c", "c"]  # input 1
+                    + ["b", "b", "c", "c", "d", "d"]  # input 2
+                    + ["c", "c", "d", "d", "e", "e"]
+                ),  # input 3
             },
             indexes=["idx"],
         )

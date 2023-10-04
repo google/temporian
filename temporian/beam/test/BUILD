@@ -34,6 +34,6 @@ py_library(
         "//temporian/io:csv",
         "//temporian/core/data:node",
         "//temporian/implementation/numpy/data:event_set",
-        "//temporian/implementation/numpy/operators/test:test_util",
+        "//temporian/implementation/numpy/operators/test:utils",
     ],
 )

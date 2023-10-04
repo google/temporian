@@ -6,6 +6,16 @@ package(
 # Tests
 # =====
 
+py_library(
+    name = "utils",
+    srcs = ["utils.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/numpy,
+        "//temporian/core:serialization",
+    ],
+)
+
 py_test(
     name = "api_test",
     srcs = ["api_test.py"],
@@ -46,18 +56,6 @@ py_test(
 )
 
 py_test(
-    name = "prototype_test_numpy",
-    srcs = ["prototype_test_numpy.py"],
-    data = ["//temporian/test/test_data"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/pandas
-        "//temporian",
-    ],
-)
-
-py_test(
     name = "io_test",
     srcs = ["io_test.py"],
     data = ["//temporian/test/test_data"],
@@ -68,11 +66,4 @@ py_test(
         "//temporian",
         ":utils",
     ],
-)
-
-py_library(
-    name = "utils",
-    srcs = ["utils.py"],
-    srcs_version = "PY3",
-    deps = [],
 )

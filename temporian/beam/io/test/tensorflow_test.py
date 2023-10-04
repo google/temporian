@@ -29,7 +29,7 @@ from temporian.io.tensorflow import (
 from temporian.io.tensorflow import (
     from_tensorflow_record as in_process_from_tensorflow_record,
 )
-from temporian.implementation.numpy.operators.test.test_util import (
+from temporian.implementation.numpy.operators.test.utils import (
     assertEqualEventSet,
 )
 

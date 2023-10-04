@@ -24,7 +24,7 @@ from temporian.implementation.numpy.operators.calendar.month import (
 )
 from temporian.io.pandas import from_pandas
 from temporian.implementation.numpy.data.io import event_set
-from temporian.implementation.numpy.operators.test.test_util import (
+from temporian.implementation.numpy.operators.test.utils import (
     assertEqualEventSet,
 )
 

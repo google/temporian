@@ -23,7 +23,7 @@ from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy.operators.until_next import (
     UntilNextNumpyImplementation,
 )
-from temporian.implementation.numpy.operators.test.test_util import (
+from temporian.implementation.numpy.operators.test.utils import (
     assertEqualEventSet,
     testOperatorAndImp,
 )

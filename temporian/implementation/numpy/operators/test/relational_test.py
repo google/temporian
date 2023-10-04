@@ -34,7 +34,7 @@ from temporian.implementation.numpy.operators.binary import (
     LessNumpyImplementation,
 )
 from temporian.io.pandas import from_pandas
-from temporian.implementation.numpy.operators.test.test_util import (
+from temporian.implementation.numpy.operators.test.utils import (
     assertEqualEventSet,
     testOperatorAndImp,
 )

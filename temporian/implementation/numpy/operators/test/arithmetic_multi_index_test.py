@@ -33,7 +33,7 @@ from temporian.implementation.numpy.operators.binary import (
     DivideNumpyImplementation,
     FloorDivNumpyImplementation,
 )
-from temporian.implementation.numpy.operators.test.test_util import (
+from temporian.implementation.numpy.operators.test.utils import (
     assertEqualEventSet,
     testOperatorAndImp,
 )
