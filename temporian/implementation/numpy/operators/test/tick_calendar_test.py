@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os, time
 from datetime import datetime, timedelta
 from absl.testing import absltest
 
@@ -21,7 +20,7 @@ from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy.operators.tick_calendar import (
     TickCalendarNumpyImplementation,
 )
-from temporian.implementation.numpy.operators.test.test_util import (
+from temporian.implementation.numpy.operators.test.utils import (
     assertEqualEventSet,
     testOperatorAndImp,
     SetTimezone,

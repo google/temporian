@@ -25,7 +25,8 @@ from temporian.implementation.numpy.operators.calendar.hour import (
 from temporian.io.pandas import from_pandas
 from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy.operators.test.utils import (
-    assertEqualEventSet, SetTimezone
+    assertEqualEventSet,
+    SetTimezone,
 )
 
 
