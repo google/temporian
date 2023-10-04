@@ -15,7 +15,7 @@
 # pylint: disable=import-outside-toplevel
 
 from __future__ import annotations
-from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING
+from typing import Any, Callable, Dict, List, Optional, Union, TYPE_CHECKING
 
 from temporian.core.data.duration import Duration
 
@@ -1415,6 +1415,37 @@ class EventSetOperations:
         from temporian.core.operators.leak import leak
 
         return leak(self, duration=duration)
+
+    def map(
+        self: EventSetOrNode,
+        func: Callable[[EventSetOrNode], EventSetOrNode],
+    ) -> EventSetOrNode:
+        """Applies a function on each of an [`EventSet`][temporian.EventSet]'s
+        values.
+
+        Example:
+
+            ```python
+            >>> a = tp.event_set(timestamps=[0, 1, 2], features={"A": [0, 10, 20]})
+            >>> b = tp.map(a)
+            >>> b
+            indexes: []
+            features: [('A', int64)]
+            events:
+                (3 events):
+                    timestamps: [0. 1. 2.]
+                    'A': [ 0 10 20]
+            ...
+
+            ```
+
+        Args:
+            input: <Text>
+            param: <Text>
+
+        Returns:
+            <Text>
+        """
 
     def moving_count(
         self: EventSetOrNode,

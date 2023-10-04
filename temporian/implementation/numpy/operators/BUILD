@@ -25,6 +25,7 @@ py_library(
         ":join",
         ":lag",
         ":leak",
+        ":map",
         ":prefix",
         ":propagate",
         ":rename",
@@ -423,6 +424,21 @@ py_library(
         "//temporian/core/data:duration_utils",
         "//temporian/core/operators:where",
         "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event_set",
+    ],
+)
+
+py_library(
+    name = "map",
+    srcs = ["map.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/numpy
+        ":base",
+        "//temporian/core/data:duration_utils",
+        "//temporian/core/operators:map",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",
     ],
 )

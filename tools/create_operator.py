@@ -379,12 +379,12 @@ Don't forget to update the following code:
 - The "operators" py_library in temporian/implementation/numpy/operators/BUILD
 - The "test_base" function in temporian/core/test/registered_operators_test.py
 - The "test_base" function in temporian/implementation/numpy/test/registered_operators_test.py
-- The PUBLIC_API_SYMBOLS set in temporian/test/public_symbols_test.py (if global)
+- The PUBLIC_API_SYMBOLS set in temporian/test/public_api_test.py (if global)
 - The .md file in docs/src/reference/temporian/operators
-- The docs API ref's home page docs/reference/index.md
+- The docs API ref's home page docs/src/reference/index.md
 - The tests in temporian/core/test/event_set_ops_test.py
-- The unit test in temporian/core/operators/test
-- Once your op is implemented, run `python tools/build_cleaner.py` and fix Bazel dependencies.
+- Write unit tests in temporian/core/operators/test
+- Once your op is implemented, run `python tools/build_cleaner.py` and fix Bazel dependencies
 """
     )
 
