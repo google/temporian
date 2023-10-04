@@ -44,6 +44,8 @@ NormalizedDuration = float
 Timestamp = Union[np.datetime64, datetime.datetime, int, float]
 NormalizedTimestamp = float
 
+MIN_TIMESTAMP_S = datetime.datetime(1900, 1, 1).timestamp()
+
 
 def normalize_duration(x: Duration) -> NormalizedDuration:
     if isinstance(x, (int, float)) and x > 0:

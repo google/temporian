@@ -22,7 +22,10 @@ from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Union
 import numpy as np
 
 from temporian.core.data.dtype import DType
-from temporian.core.data.duration_utils import datetime64_array_to_float64
+from temporian.core.data.duration_utils import (
+    MIN_TIMESTAMP_S,
+    datetime64_array_to_float64,
+)
 
 if TYPE_CHECKING:
     from temporian.core.typing import (
@@ -196,7 +199,7 @@ def normalize_timestamps(
     if values.dtype.type == np.datetime64:
         # values is a date. Cast to unix epoch in float64 seconds.
         values = datetime64_array_to_float64(values)
-        if np.any(values < 0):
+        if np.any(values < MIN_TIMESTAMP_S):
             raise ValueError("Timestamps contains null or invalid values.")
         return values, True
 
