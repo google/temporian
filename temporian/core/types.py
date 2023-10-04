@@ -12,6 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Class definitions.
+
+WARNING: everything in this file is part of the public API.
+"""
+
 from dataclasses import dataclass
 
 from temporian.core.typing import IndexKey

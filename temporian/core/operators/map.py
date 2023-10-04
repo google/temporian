@@ -16,7 +16,6 @@
 """Map operator class and public API function definitions."""
 
 from inspect import signature
-from typing import Any, Callable
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.node import (
@@ -24,17 +23,13 @@ from temporian.core.data.node import (
     create_node_new_features_existing_sampling,
 )
 from temporian.core.operators.base import Operator
-from temporian.core.typing import EventSetOrNode
+from temporian.core.typing import EventSetOrNode, MapFunction
 from temporian.proto import core_pb2 as pb
 from temporian.utils.typecheck import typecheck
 
 
 class Map(Operator):
-    def __init__(
-        self,
-        input: EventSetNode,
-        func: Callable[[Any], Any],
-    ):
+    def __init__(self, input: EventSetNode, func: MapFunction):
         super().__init__()
 
         if len(signature(func).parameters) > 2:
@@ -57,7 +52,7 @@ class Map(Operator):
         self.check()
 
     @property
-    def func(self) -> Callable[[Any], Any]:
+    def func(self) -> MapFunction:
         return self._func
 
     @classmethod
@@ -81,7 +76,7 @@ operator_lib.register_operator(Map)
 
 @typecheck
 @compile
-def map(input: EventSetOrNode, func: Callable[[Any], Any]) -> EventSetOrNode:
+def map(input: EventSetOrNode, func: MapFunction) -> EventSetOrNode:
     assert isinstance(input, EventSetNode)
 
     return Map(input=input, func=func).outputs["output"]

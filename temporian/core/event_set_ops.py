@@ -15,7 +15,7 @@
 # pylint: disable=import-outside-toplevel
 
 from __future__ import annotations
-from typing import Any, Callable, Dict, List, Optional, Union, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING
 
 from temporian.core.data.duration import Duration
 
@@ -23,8 +23,9 @@ from temporian.core.data.duration import Duration
 if TYPE_CHECKING:
     from temporian.core.typing import (
         EventSetOrNode,
-        TypeOrDType,
         IndexKeyList,
+        MapFunction,
+        TypeOrDType,
         WindowLength,
     )
 
@@ -1418,17 +1419,16 @@ class EventSetOperations:
 
     def map(
         self: EventSetOrNode,
-        func: Callable[[Any], Any],
+        func: MapFunction,
     ) -> EventSetOrNode:
         """Applies a function on each of an [`EventSet`][temporian.EventSet]'s
         values.
 
         Args:
-            input: <Text>
-            param: <Text>
+            func: The function to apply on each value.
 
         Returns:
-            <Text>
+            EventSet with the function applied on each value.
         """
         from temporian.core.operators.map import map
 
