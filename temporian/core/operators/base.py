@@ -17,7 +17,7 @@
 from __future__ import annotations
 from abc import ABC
 from copy import deepcopy
-from typing import Dict, List, Tuple, Union, Any
+from typing import Callable, Dict, List, Tuple, Union, Any
 from temporian.core.data.dtype import DType
 
 from temporian.core.data.node import EventSetNode
@@ -36,6 +36,7 @@ AttributeType = Union[
     Dict[str, str],
     List[DType],
     List[NormalizedIndexKey],
+    Callable,  # Non serializable
 ]
 
 
@@ -103,7 +104,7 @@ class Operator(ABC):
 
     def __repr__(self):
         return (
-            f"Operator(key={self.definition().key!r},"
+            f"Operator(key={self.definition.key!r},"
             f" id={self._internal_ordered_id}, attributes={self.attributes!r})"
         )
 
@@ -153,7 +154,7 @@ class Operator(ABC):
 
     def check(self) -> None:
         """Ensures that the operator is valid."""
-        definition = self.definition()
+        definition = self.definition
 
         with OperatorExceptionDecorator(self):
             # Check that expected inputs are present
@@ -203,6 +204,7 @@ class Operator(ABC):
     def build_op_definition(cls) -> pb.OperatorDef:
         raise NotImplementedError()
 
+    @property
     def definition(self) -> pb.OperatorDef:
         return self._definition
 

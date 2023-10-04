@@ -48,7 +48,7 @@ def run_schedule(
 
     num_steps = len(schedule.steps)
     for step_idx, step in enumerate(schedule.steps):
-        operator_def = step.op.definition()
+        operator_def = step.op.definition
 
         # Get implementation
         implementation_cls = implementation_lib.get_implementation_class(

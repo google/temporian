@@ -264,7 +264,6 @@ py_library(
         "//temporian/core/data:duration_utils",
         "//temporian/core/operators:{lower_op}",
         "//temporian/implementation/numpy:implementation_lib",
-        "//temporian/implementation/numpy:utils",
         "//temporian/implementation/numpy/data:event_set",
     ],
 )

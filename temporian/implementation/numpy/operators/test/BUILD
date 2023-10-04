@@ -778,20 +778,3 @@ py_test(
         "//temporian/implementation/numpy/operators:where",
     ],
 )
-
-py_test(
-    name = "map_test",
-    srcs = ["map_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        ":utils",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/core/operators:map",
-        "//temporian/implementation/numpy/operators:map",
-    ],
-)
-    

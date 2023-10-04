@@ -1418,26 +1418,10 @@ class EventSetOperations:
 
     def map(
         self: EventSetOrNode,
-        func: Callable[[EventSetOrNode], EventSetOrNode],
+        func: Callable[[Any], Any],
     ) -> EventSetOrNode:
         """Applies a function on each of an [`EventSet`][temporian.EventSet]'s
         values.
-
-        Example:
-
-            ```python
-            >>> a = tp.event_set(timestamps=[0, 1, 2], features={"A": [0, 10, 20]})
-            >>> b = tp.map(a)
-            >>> b
-            indexes: []
-            features: [('A', int64)]
-            events:
-                (3 events):
-                    timestamps: [0. 1. 2.]
-                    'A': [ 0 10 20]
-            ...
-
-            ```
 
         Args:
             input: <Text>
@@ -1446,6 +1430,9 @@ class EventSetOperations:
         Returns:
             <Text>
         """
+        from temporian.core.operators.map import map
+
+        return map(self, func=func)
 
     def moving_count(
         self: EventSetOrNode,

@@ -222,6 +222,7 @@ message OperatorDef {
       LIST_DTYPE = 9;
       BYTES = 10;
       LIST_INDEX_KEYS = 11;
+      CALLABLE = 12; // Non serializable
     }
   }
 }

@@ -450,9 +450,15 @@ def _all_identifiers(collection: Any) -> Set[str]:
 
 
 def _serialize_operator(src: base.Operator) -> pb.Operator:
+    if any(callable(item) for item in src.attributes.values()):
+        raise ValueError(
+            f"Cannot serialize {src.definition.key} operator since it takes a"
+            " Python function as attribute."
+        )
+
     return pb.Operator(
         id=_identifier(src),
-        operator_def_key=src.definition().key,
+        operator_def_key=src.definition.key,
         inputs=[
             pb.Operator.EventSetNodeArgument(key=k, node_id=_identifier(v))
             for k, v in src.inputs.items()

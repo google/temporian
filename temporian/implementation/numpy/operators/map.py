@@ -34,17 +34,26 @@ class MapNumpyImplementation(OperatorImplementation):
         assert isinstance(self.operator, Map)
 
         output_schema = self.output_schema("output")
+        func = self.operator.func
 
         # Create output EventSet
         output_evset = EventSet(data={}, schema=output_schema)
 
         # Fill output EventSet's data
         for index_key, index_data in input.data.items():
+            # Iterate over features and apply func
+            features = []
+            for orig_feature in index_data.features:
+                feature = np.empty_like(orig_feature)
+                for i, value in enumerate(orig_feature):
+                    feature[i] = func(value)
+                features.append(feature)
+
             output_evset.set_index_value(
                 index_key,
                 IndexData(
-                    features=[],
-                    timestamps=np.array([1], dtype=np.float64),
+                    features=features,
+                    timestamps=index_data.timestamps,
                     schema=output_schema,
                 ),
             )

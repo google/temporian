@@ -139,7 +139,7 @@ def run_multi_io(
 
     num_steps = len(schedule.steps)
     for step_idx, step in enumerate(schedule.steps):
-        operator_def = step.op.definition()
+        operator_def = step.op.definition
 
         if verbose > 0:
             print("=============================", file=sys.stderr)
