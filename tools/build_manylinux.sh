@@ -30,8 +30,9 @@ function temporian::setup_environment() {
     pip install poetry auditwheel==5.2.0
     # Avoid messing local .venv from volume
     poetry config virtualenvs.create false
+    poetry config virtualenvs.in-project false
     # If bazel gets stuck running locally, run:
-    # rm -rf build_package/ dist/ temporian.egg-info/
+    # rm -rf build_package/ build/ temporian.egg-info/
 }
 
 function temporian::build_wheel() {

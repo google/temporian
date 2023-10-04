@@ -5049,4 +5049,4 @@ tensorflow = ["tensorflow"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8,<3.12"
-content-hash = "768b7ea80e7dfa0ade4671fc170a0a74fed9aa472eecae0c157da259913d84fc"
+content-hash = "ff00e0e2b0ef623cf6b056ba369af5fbba51fea4442bdcee3cb87943191cfb62"
