@@ -242,43 +242,6 @@ def invert(
 def isnan(
     input: EventSetOrNode,
 ) -> EventSetOrNode:
-    """Returns boolean features, `True` in the NaN elements of an
-    [`EventSet`][temporian.EventSet].
-
-    Note that for `int` and `bool` this will always be `False` since those types
-    don't support NaNs. It only makes actual sense to use on `float` (or
-    `tp.float32`) features.
-
-    See also [`tp.notnan()`][temporian.notnan].
-
-    Example:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[1, 2, 3],
-        ...     features={"M":[np.nan, 5., np.nan], "N":  [-1, 0, 5]},
-        ... )
-        >>> b = tp.isnan(a)
-        >>> b
-        indexes: ...
-                'M': [ True False True]
-                'N': [False False False]
-        ...
-
-        >>> # Count nans
-        >>> b["M"].cast(int).cumsum()
-        indexes: ...
-                timestamps: [1. 2. 3.]
-                'M': [1 1 2]
-        ...
-
-        ```
-
-    Args:
-        input: EventSet to check for NaNs.
-
-    Returns:
-        EventSet with boolean features.
-    """
     assert isinstance(input, EventSetNode)
 
     return IsNanOperator(
@@ -290,51 +253,6 @@ def isnan(
 def notnan(
     input: EventSetOrNode,
 ) -> EventSetOrNode:
-    """Returns boolean features, `False` in the NaN elements of an
-    [`EventSet`][temporian.EventSet].
-
-    Equivalent to `tp.invert(tp.isnan(...))`.
-
-    Note that for `int` and `bool` this will always be `True` since those types
-    don't support NaNs. It only makes actual sense to use on `float` (or
-    `tp.float32`) features.
-
-    See also [`tp.isnan()`][temporian.isnan].
-
-    Example:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[1, 2, 3],
-        ...     features={"M":[np.nan, 5., np.nan], "N":  [-1, 0, 5]},
-        ... )
-        >>> b = tp.isnan(a)
-        >>> b
-        indexes: ...
-                'M': [ True False True]
-                'N': [False False False]
-        ...
-
-        >>> # Filter only not nan rows
-        >>> not_nans = ~b["M"]
-        >>> not_nans
-        indexes: ...
-                'M': [False True False]
-        ...
-
-        >>> a.filter(not_nans)
-        indexes: ...
-                'M': [5.]
-                'N': [0]
-        ...
-
-        ```
-
-    Args:
-        input: EventSet to check for NaNs.
-
-    Returns:
-        EventSet with boolean features.
-    """
     assert isinstance(input, EventSetNode)
 
     return NotNanOperator(

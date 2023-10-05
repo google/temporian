@@ -1254,6 +1254,47 @@ class EventSetOperations:
 
         return filter(self, condition=condition)
 
+    def isnan(
+        self: EventSetOrNode,
+    ) -> EventSetOrNode:
+        """Returns boolean features, `True` in the NaN elements of the
+        [`EventSet`][temporian.EventSet].
+
+        Note that for `int` and `bool` this will always be `False` since those types
+        don't support NaNs. It only makes actual sense to use on `float` (or
+        `tp.float32`) features.
+
+        See also `evset.notnan()`.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"M":[np.nan, 5., np.nan], "N":  [-1, 0, 5]},
+            ... )
+            >>> b = a.isnan()
+            >>> b
+            indexes: ...
+                    'M': [ True False True]
+                    'N': [False False False]
+            ...
+
+            >>> # Count nans
+            >>> b["M"].cast(int).cumsum()
+            indexes: ...
+                    timestamps: [1. 2. 3.]
+                    'M': [1 1 2]
+            ...
+
+            ```
+
+        Returns:
+            EventSet with boolean features.
+        """
+        from temporian.core.operators.unary import isnan
+
+        return isnan(self)
+
     def join(
         self: EventSetOrNode,
         other: EventSetOrNode,
@@ -1748,6 +1789,49 @@ class EventSetOperations:
         from temporian.core.operators.window.moving_sum import moving_sum
 
         return moving_sum(self, window_length=window_length, sampling=sampling)
+
+    def notnan(
+        self: EventSetOrNode,
+    ) -> EventSetOrNode:
+        """Returns boolean features, `False` in the NaN elements of an
+        [`EventSet`][temporian.EventSet].
+
+        Equivalent to `~evset.isnan(...)`.
+
+        Note that for `int` and `bool` this will always be `True` since those types
+        don't support NaNs. It only makes actual sense to use on `float` (or
+        `tp.float32`) features.
+
+        See also `evset.isnan()`.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"M":[np.nan, 5., np.nan], "N":  [-1, 0, 5]},
+            ... )
+            >>> b = a.notnan()
+            >>> b
+            indexes: ...
+                    'M': [False True False]
+                    'N': [ True True True]
+            ...
+
+            >>> # Filter only rows where "M" is not nan
+            >>> a.filter(b["M"])
+            indexes: ...
+                    'M': [5.]
+                    'N': [0]
+            ...
+
+            ```
+
+        Returns:
+            EventSet with boolean features.
+        """
+        from temporian.core.operators.unary import notnan
+
+        return notnan(self)
 
     def prefix(
         self: EventSetOrNode,
