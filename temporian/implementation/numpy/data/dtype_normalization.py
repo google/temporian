@@ -15,17 +15,13 @@
 """Shared data type normalization functions."""
 
 from __future__ import annotations
-import datetime
 import logging
-from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, List, Optional, Tuple
 
 import numpy as np
 
 from temporian.core.data.dtype import DType
-from temporian.core.data.duration_utils import (
-    MIN_TIMESTAMP_S,
-    datetime64_array_to_float64,
-)
+from temporian.core.data.duration_utils import datetime64_array_to_float64
 
 if TYPE_CHECKING:
     from temporian.core.typing import (
@@ -179,16 +175,16 @@ def normalize_timestamps(
     if not isinstance(values, np.ndarray):
         values = np.array(values)
 
-    # values is represented as a number. Cast to float64.
+    # values is represented as a number. Copy and cast to float64.
     if np.issubdtype(values.dtype, np.integer) or np.issubdtype(
         values.dtype, np.floating
     ):
-        values = values.astype(np.float64, copy=False)
+        values = values.astype(np.float64, copy=True)
 
     if values.dtype.type == np.float64:
         # Check NaN
         if np.isnan(values).any():
-            raise ValueError("Timestamps contains NaN values.")
+            raise ValueError("Timestamps contain NaN values.")
 
         return values, False
 
@@ -199,8 +195,6 @@ def normalize_timestamps(
     if values.dtype.type == np.datetime64:
         # values is a date. Cast to unix epoch in float64 seconds.
         values = datetime64_array_to_float64(values)
-        if np.any(values < MIN_TIMESTAMP_S):
-            raise ValueError("Timestamps contains null or invalid values.")
         return values, True
 
     raise ValueError(
