@@ -381,6 +381,33 @@ class EventSetOperations:
     # OPERATORS #
     #############
 
+    def abs(
+        self: EventSetOrNode,
+    ) -> EventSetOrNode:
+        """Gets the absolute value of an [`EventSet`][temporian.EventSet]'s
+        features.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"M":[np.nan, -1., 2.], "N":  [-1, -3, 5]},
+            ... )
+            >>> a.abs()
+            indexes: ...
+                    'M': [nan 1. 2.]
+                    'N': [1 3 5]
+            ...
+
+            ```
+
+        Returns:
+            EventSetOr with positive valued features.
+        """
+        from temporian.core.operators.unary import abs
+
+        return abs(self)
+
     def add_index(
         self: EventSetOrNode, indexes: Union[str, List[str]]
     ) -> EventSetOrNode:
@@ -1456,6 +1483,33 @@ class EventSetOperations:
         from temporian.core.operators.leak import leak
 
         return leak(self, duration=duration)
+
+    def log(self: EventSetOrNode) -> EventSetOrNode:
+        """Calculates the natural logarithm of an [`EventSet`][temporian.EventSet]'s
+        features.
+
+        Can only be used on floating point features.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3, 4, 5],
+            ...     features={"M": [np.e, 1., 2., 10., -1.]},
+            ... )
+            >>> a.log()
+            indexes: ...
+                    timestamps: [1. 2. 3. 4. 5.]
+                    'M': [1. 0. 0.6931 2.3026 nan]
+            ...
+
+            ```
+
+        Returns:
+            EventSetOr with logarithm of input features.
+        """
+        from temporian.core.operators.unary import log
+
+        return log(self)
 
     def moving_count(
         self: EventSetOrNode,

@@ -264,30 +264,6 @@ def notnan(
 def abs(
     input: EventSetOrNode,
 ) -> EventSetOrNode:
-    """Gets the absolute value of an [`EventSet`][temporian.EventSet]'s
-    features.
-
-    Example:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[1, 2, 3],
-        ...     features={"M":[np.nan, -1., 2.], "N":  [-1, -3, 5]},
-        ... )
-        >>> b = tp.abs(a)
-        >>> b
-        indexes: ...
-                'M': [nan 1. 2.]
-                'N': [1 3 5]
-        ...
-
-        ```
-
-    Args:
-        input: EventSetOr calculate absolute value.
-
-    Returns:
-        EventSetOr with positive valued features.
-    """
     assert isinstance(input, EventSetNode)
 
     return AbsOperator(
@@ -299,32 +275,6 @@ def abs(
 def log(
     input: EventSetOrNode,
 ) -> EventSetOrNode:
-    """Calculates the natural logarithm of an [`EventSet`][temporian.EventSet]'s
-    features.
-
-    Can only be used on floating point features.
-
-    Example:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[1, 2, 3, 4, 5],
-        ...     features={"M": [np.e, 1., 2., 10., -1.]},
-        ... )
-        >>> b = tp.log(a)
-        >>> b
-        indexes: ...
-                timestamps: [1. 2. 3. 4. 5.]
-                'M': [1. 0. 0.6931 2.3026 nan]
-        ...
-
-        ```
-
-    Args:
-        input: EventSetOr to calculate natural logarithm.
-
-    Returns:
-        EventSetOr with logarithm of input features.
-    """
     assert isinstance(input, EventSetNode)
 
     return LogOperator(
