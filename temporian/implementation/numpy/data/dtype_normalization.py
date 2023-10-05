@@ -17,12 +17,14 @@
 from __future__ import annotations
 import datetime
 import logging
-from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 
 from temporian.core.data.dtype import DType
 from temporian.core.data.duration_utils import datetime64_array_to_float64
+from temporian.core.data.node import EventSetNode
+from temporian.core.typing import TargetDtypes
 
 if TYPE_CHECKING:
     from temporian.core.typing import (
@@ -257,3 +259,102 @@ def normalize_index_key_list(
     normalized_indexes = [normalize_index_key(x) for x in normalized_indexes]
 
     return normalized_indexes
+
+
+def normalize_dtype(x: Any) -> DType:
+    if isinstance(x, DType):
+        return x
+    if x == int:
+        return DType.INT64
+    if x == float:
+        return DType.FLOAT64
+    if x == str:
+        return DType.STRING
+    if x == bool:
+        return DType.BOOLEAN
+    raise ValueError(f"Cannot normalize {x!r} as a DType.")
+
+
+def normalize_target_dtypes(
+    target: TargetDtypes,
+) -> Tuple[
+    Optional[DType],
+    Optional[Dict[str, DType]],
+    Optional[Dict[DType, DType]],
+]:
+    # Convert 'target' to one of these:
+    dtype: Optional[DType] = None
+    feature_name_to_dtype: Optional[Dict[str, DType]] = None
+    dtype_to_dtype: Optional[Dict[DType, DType]] = None
+
+    # Further type verifications are done in the operator
+    if isinstance(target, dict):
+        keys_are_strs = all(isinstance(v, str) for v in target.keys())
+        keys_are_dtypes = all(
+            isinstance(v, (DType, type)) for v in target.keys()
+        )
+        values_are_dtypes = all(
+            isinstance(v, (DType, type)) for v in target.values()
+        )
+
+        if keys_are_strs and values_are_dtypes:
+            feature_name_to_dtype = {
+                key: normalize_dtype(value) for key, value in target.items()
+            }
+
+            input_feature_names = input.schema.feature_names()
+            for feature_name in feature_name_to_dtype.keys():
+                if feature_name not in input_feature_names:
+                    raise ValueError(f"Unknown feature {feature_name!r}")
+
+        elif keys_are_dtypes and values_are_dtypes:
+            dtype_to_dtype = {
+                normalize_dtype(key): normalize_dtype(value)
+                for key, value in target.items()
+            }
+    elif isinstance(target, DType) or target in [float, int, str, bool]:
+        dtype = normalize_dtype(target)
+
+    if (
+        dtype is None
+        and feature_name_to_dtype is None
+        and dtype_to_dtype is None
+    ):
+        raise ValueError(
+            "`target` should be one of the following: (1) a Temporian dtype"
+            " e.g. tp.float64, (2) a dictionary of feature name (str) to"
+            " temporian dtype, or (3) a dictionary of temporian dtype to"
+            " temporian dtype. Alternatively, Temporian dtypes can be replaced"
+            " with python type. For example cast(..., target=float) is"
+            " equivalent to cast(..., target=tp.float64).\nInstead got,"
+            f" `target` = {target!r}."
+        )
+
+    return dtype, feature_name_to_dtype, dtype_to_dtype
+
+
+def build_dtypes_list_from_target_dtypes(
+    input: EventSetNode,
+    dtype: Optional[DType] = None,
+    dtype_to_dtype: Optional[Dict[DType, DType]] = None,
+    feature_name_to_dtype: Optional[Dict[str, DType]] = None,
+) -> List[DType]:
+    """Builds a list of output dtypes for the input based on the output of
+    normalize_target_dtypes."""
+
+    if dtype is not None:
+        return [dtype] * len(input.schema.features)
+
+    if feature_name_to_dtype is not None:
+        return [
+            feature_name_to_dtype.get(f.name, f.dtype)
+            for f in input.schema.features
+        ]
+
+    if dtype_to_dtype is not None:
+        return [
+            dtype_to_dtype.get(f.dtype, f.dtype) for f in input.schema.features
+        ]
+
+    # If none were set, return the input dtypes
+    return [f.dtype for f in input.schema.features]

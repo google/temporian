@@ -128,6 +128,17 @@ information about the value's position in the EventSet, and return the new
 value.
 """
 
+TargetDtypes = Union[
+    TypeOrDType,
+    Dict[str, TypeOrDType],
+    Dict[TypeOrDType, TypeOrDType],
+]
+"""Specification of target dtypes, used in operators that expected output dtypes
+to be specified.
+
+This can be a single dtype, a dictionary mapping feature names to dtypes, or a
+dictionary mapping current dtypes to target dtypes.
+"""
 
 # Internal
 

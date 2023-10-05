@@ -25,8 +25,8 @@ if TYPE_CHECKING:
         EventSetOrNode,
         IndexKeyList,
         MapFunction,
-        TypeOrDType,
         WindowLength,
+        TargetDtypes,
     )
 
 T_SCALAR = (int, float)
@@ -815,11 +815,7 @@ class EventSetOperations:
 
     def cast(
         self: EventSetOrNode,
-        target: Union[
-            TypeOrDType,
-            Dict[str, TypeOrDType],
-            Dict[TypeOrDType, TypeOrDType],
-        ],
+        target: TargetDtypes,
         check_overflow: bool = True,
     ) -> EventSetOrNode:
         """Casts the data types of an [`EventSet`][temporian.EventSet]'s features.
@@ -1420,19 +1416,32 @@ class EventSetOperations:
     def map(
         self: EventSetOrNode,
         func: MapFunction,
+        output_dtypes: Optional[TargetDtypes] = None,
     ) -> EventSetOrNode:
         """Applies a function on each of an [`EventSet`][temporian.EventSet]'s
         values.
 
+        If the output of the functon has a different dtype than the input, the
+        `output_dtypes` argument must be specified. Note that the function must
+        return values of these dtypes, else `map` will fail, not cast them.
+
         Args:
             func: The function to apply on each value.
+            output_dtype: Expected dtypes of the output feature(s) after
+                applying the function to them. If not provided, the output
+                dtypes will be expected to be the same as the input ones. If a
+                single dtype, all features will be expected to have that dtype.
+                If a mapping, the keys can be either feature names or the
+                input dtypes (and not both types mixed), and the values are the
+                target dtypes for them. All dtypes must be Temporian types (see
+                `dtype.py`).
 
         Returns:
             EventSet with the function applied on each value.
         """
         from temporian.core.operators.map import map
 
-        return map(self, func=func)
+        return map(self, func=func, output_dtypes=output_dtypes)
 
     def moving_count(
         self: EventSetOrNode,
