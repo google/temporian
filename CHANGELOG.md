@@ -16,6 +16,8 @@
 
 ### Fixes
 
+- Fixed issues when loading timestamps from `np.longlong` and other dtypes.
+
 ## 0.1.4
 
 ### Features
