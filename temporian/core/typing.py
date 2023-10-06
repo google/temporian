@@ -12,13 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, Callable, Dict, List, Set, Tuple, Type, TypeVar, Union
+from typing import Dict, List, Set, Tuple, Type, TypeVar, Union
 from temporian.core.data.dtype import DType
 from temporian.core.data.duration import Duration
 
 from temporian.core.data.node import EventSetNode
 from temporian.core.event_set_ops import EventSetOperations
-from temporian.core.types import MapExtras
 from temporian.implementation.numpy.data.event_set import EventSet
 
 
@@ -117,16 +116,6 @@ negative values, or missing values, the operator will treat the window as empty.
 
 Scalar = Union[int, float, str, bytes, bool]
 """A scalar value."""
-
-MapFunction = Union[Callable[[int], Any], Callable[[int, MapExtras], Any]]
-"""A function that maps an [`EventSet`][temporian.EventSet]'s value to another
-value.
-
-The function must receive the original value and optionally a
-[`MapExtras`][temporian.types.MapExtras] object, which includes additional
-information about the value's position in the EventSet, and return the new
-value.
-"""
 
 TargetDtypes = Union[
     TypeOrDType,

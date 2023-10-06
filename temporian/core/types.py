@@ -12,10 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Class definitions.
-
-WARNING: everything in this file is part of the public API.
-"""
+"""Data classes and type definitions."""
 
 from dataclasses import dataclass
 

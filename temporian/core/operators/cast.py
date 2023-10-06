@@ -176,7 +176,7 @@ def cast(
     assert isinstance(input, EventSetNode)
 
     dtype, feature_name_to_dtype, dtype_to_dtype = normalize_target_dtypes(
-        target
+        input, target
     )
 
     return CastOperator(

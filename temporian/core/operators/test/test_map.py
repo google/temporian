@@ -14,6 +14,7 @@
 
 from absl.testing import absltest
 from absl.testing.parameterized import TestCase
+import numpy as np
 
 from temporian.core.compilation import compile
 from temporian.core.serialization import save
@@ -25,18 +26,20 @@ class MapTest(TestCase):
     def test_basic(self):
         evset = event_set(timestamps=[1, 2, 3], features={"x": [10, 20, 30]})
 
+        result = evset.map(lambda x: x * 2)
+
         expected = event_set(
             timestamps=[1, 2, 3],
             features={"x": [20, 40, 60]},
             same_sampling_as=evset,
         )
 
-        result = evset.map(lambda x: x * 2)
-
         assertOperatorResult(self, result, expected)
 
     def test_with_extras(self):
         evset = event_set(timestamps=[1, 2, 3], features={"x": [10, 20, 30]})
+
+        result = evset.map(lambda v, e: v + e.timestamp)
 
         expected = event_set(
             timestamps=[1, 2, 3],
@@ -44,9 +47,76 @@ class MapTest(TestCase):
             same_sampling_as=evset,
         )
 
-        result = evset.map(lambda v, e: v + e.timestamp)
+        assertOperatorResult(self, result, expected)
+
+    def test_output_dtype(self):
+        evset = event_set(timestamps=[1, 2, 3], features={"x": [10, 20, 30]})
+
+        result = evset.map(
+            lambda v: "v" + str(v),
+            output_dtypes=str,
+        )
+
+        expected = event_set(
+            timestamps=[1, 2, 3],
+            features={"x": ["v10", "v20", "v30"]},
+            same_sampling_as=evset,
+        )
 
         assertOperatorResult(self, result, expected)
+
+    def test_output_dtype_mapping(self):
+        evset = event_set(
+            timestamps=[1, 2], features={"x": [10, 20], "y": ["100", "200"]}
+        )
+
+        def f(v):
+            if v.dtype == np.int64:
+                return v + 1.0
+            return int(v) + 2
+
+        result = evset.map(f, output_dtypes={str: int, int: float})
+
+        expected = event_set(
+            timestamps=[1, 2],
+            features={"x": [11.0, 21.0], "y": [102, 202]},
+            same_sampling_as=evset,
+        )
+
+        assertOperatorResult(self, result, expected)
+
+    def test_output_dtype_feature_mapping(self):
+        evset = event_set(
+            timestamps=[1, 2], features={"x": [10, 20], "y": ["100", "200"]}
+        )
+
+        def f(v):
+            if v.dtype == np.int64:
+                return v + 1.0
+            return int(v) + 2
+
+        result = evset.map(f, output_dtypes={"x": float, "y": int})
+
+        expected = event_set(
+            timestamps=[1, 2],
+            features={"x": [11.0, 21.0], "y": [102, 202]},
+            same_sampling_as=evset,
+        )
+
+        assertOperatorResult(self, result, expected)
+
+    def test_wrong_output_dtype(self):
+        evset = event_set(timestamps=[1, 2], features={"x": [10, 20]})
+
+        with self.assertRaisesRegex(
+            ValueError,
+            (
+                "Failed to build array of type int64 with the results of"
+                " `func`. Make sure you are specifying the correct"
+                " `output_dypes` and returning those types in `func`."
+            ),
+        ):
+            evset.map(lambda x: "v" + str(x))
 
     def test_too_many_args(self):
         evset = event_set(timestamps=[1], features={"a": [2]})

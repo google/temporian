@@ -32,6 +32,7 @@ PUBLIC_API_SYMBOLS = {
     "plot",
     "compile",
     "config",
+    "types",
     # IO
     "to_csv",
     "from_csv",

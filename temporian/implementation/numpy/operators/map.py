@@ -21,6 +21,9 @@ from typing import Dict
 
 import numpy as np
 from temporian.core.types import MapExtras
+from temporian.implementation.numpy.data.dtype_normalization import (
+    tp_dtype_to_np_dtype,
+)
 
 from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.core.operators.map import Map
@@ -48,10 +51,12 @@ class MapNumpyImplementation(OperatorImplementation):
         for index_key, index_data in input.data.items():
             # Iterate over features and apply func
             features = []
-            for feature_schema, orig_feature in zip(
-                input.schema.features, index_data.features
+            for feature_schema, orig_feature, output_dtype in zip(
+                input.schema.features,
+                index_data.features,
+                output_schema.feature_dtypes(),
             ):
-                feature = np.empty_like(orig_feature)
+                output_values = []
                 for i, value in enumerate(orig_feature):
                     args = [value]
                     if receives_extras:
@@ -62,8 +67,20 @@ class MapNumpyImplementation(OperatorImplementation):
                                 feature_name=feature_schema.name,
                             )
                         )
-                    feature[i] = func(*args)
-                features.append(feature)
+                    res = func(*args)
+                    output_values.append(res)
+                try:
+                    output_arr = np.array(
+                        output_values, dtype=tp_dtype_to_np_dtype(output_dtype)
+                    )
+                except ValueError as exc:
+                    raise ValueError(
+                        f"Failed to build array of type {output_dtype} with the"
+                        " results of `func`. Make sure you are specifying the"
+                        " correct `output_dypes` and returning those types in"
+                        " `func`."
+                    ) from exc
+                features.append(output_arr)
 
             output_evset.set_index_value(
                 index_key,

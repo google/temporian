@@ -15,7 +15,7 @@
 """Map operator class and public API function definitions."""
 
 from inspect import signature
-from typing import Dict, List, Optional
+from typing import Any, Callable, Dict, Optional, Union
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
@@ -23,18 +23,27 @@ from temporian.core.data.node import (
     EventSetNode,
     create_node_new_features_existing_sampling,
 )
+from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.base import Operator
-from temporian.core.typing import (
-    EventSetOrNode,
-    MapFunction,
-    TargetDtypes,
-)
+from temporian.core.types import MapExtras
+from temporian.core.typing import EventSetOrNode, TargetDtypes, Scalar
 from temporian.implementation.numpy.data.dtype_normalization import (
     build_dtypes_list_from_target_dtypes,
     normalize_target_dtypes,
 )
 from temporian.proto import core_pb2 as pb
 from temporian.utils.typecheck import typecheck
+
+
+MapFunction = Union[Callable[[Any], Scalar], Callable[[Any, MapExtras], Scalar]]
+"""A function that maps an [`EventSet`][temporian.EventSet]'s value to another
+value.
+
+The function must receive the original value and optionally a
+[`MapExtras`][temporian.types.MapExtras] object, which includes additional
+information about the value's position in the EventSet, and return the new
+value.
+"""
 
 
 class Map(Operator):
@@ -59,21 +68,21 @@ class Map(Operator):
         """
         super().__init__()
 
-        # Exactly one argument is set.
+        # at most one argument is set.
         assert (
             sum(
                 x is not None
                 for x in [dtype, dtype_to_dtype, feature_name_to_dtype]
             )
-            == 1
+            <= 1
         )
 
-        # "self._output_dtypes" is an array of output dtype for all the input
-        # features, in the same order
-        self._output_dtypes = build_dtypes_list_from_target_dtypes(
+        # output_dtypes is an array of output dtype for all the input features,
+        # in the same order
+        output_dtypes = build_dtypes_list_from_target_dtypes(
             input, dtype, dtype_to_dtype, feature_name_to_dtype
         )
-        assert len(self._output_dtypes) == len(input.schema.features)
+        assert len(output_dtypes) == len(input.schema.features)
 
         if len(signature(func).parameters) > 2:
             raise ValueError("`func` must receive at most 2 arguments.")
@@ -86,7 +95,10 @@ class Map(Operator):
         self.add_output(
             "output",
             create_node_new_features_existing_sampling(
-                features=input.schema.features,
+                features=[
+                    FeatureSchema(f.name, dtype)
+                    for f, dtype in zip(input.schema.features, output_dtypes)
+                ],
                 sampling_node=input,
                 creator=self,
             ),
@@ -97,10 +109,6 @@ class Map(Operator):
     @property
     def func(self) -> MapFunction:
         return self._func
-
-    @property
-    def output_dtypes(self) -> List[DType]:
-        return self._output_dtypes
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
@@ -133,7 +141,7 @@ def map(
     dtype = feature_name_to_dtype = dtype_to_dtype = None
     if output_dtypes is not None:
         dtype, feature_name_to_dtype, dtype_to_dtype = normalize_target_dtypes(
-            output_dtypes
+            input, output_dtypes
         )
 
     return Map(

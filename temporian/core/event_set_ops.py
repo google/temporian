@@ -24,10 +24,10 @@ if TYPE_CHECKING:
     from temporian.core.typing import (
         EventSetOrNode,
         IndexKeyList,
-        MapFunction,
         WindowLength,
         TargetDtypes,
     )
+    from temporian.core.operators.map import MapFunction
 
 T_SCALAR = (int, float)
 
