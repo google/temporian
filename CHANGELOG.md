@@ -5,13 +5,15 @@
 ### Features
 
 - Added `EventSet.where()` operator.
-- Add `filter_moving_count` operator.
+- Added `EventSet.filter_moving_count()` operator.
+- Added `EventSet.map()` operator.
 
 ### Improvements
 
 - Print `EventSet` timestamps as datetimes instead of float.
 - Support `sampling` argument in `EventSet.cumsum()` operator.
 - Using utf-8 codec to support non-ascii in string values.
+- New `tp.types` module to facilitate access to types used throughout the API.
 
 ### Fixes
 
