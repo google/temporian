@@ -96,10 +96,11 @@ operator_lib.register_operator(UntilNext)
 @compile
 def until_next(
     input: EventSetOrNode,
-    sampling: EventSetNode,
+    sampling: EventSetOrNode,
     timeout: Duration,
 ) -> EventSetOrNode:
     assert isinstance(input, EventSetNode)
+    assert isinstance(sampling, EventSetNode)
 
     return UntilNext(
         input=input,

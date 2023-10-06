@@ -522,7 +522,7 @@ class EventSetOperations:
 
         Returns:
             EventSet with a single feature with the day of the month each timestamp
-            in `sampling` belongs to.
+                in `sampling` belongs to.
         """
         from temporian.core.operators.calendar.day_of_month import (
             calendar_day_of_month,
@@ -558,7 +558,7 @@ class EventSetOperations:
 
         Returns:
             EventSet with a single feature with the day of the week each timestamp
-            in `sampling` belongs to.
+                in `sampling` belongs to.
         """
         from temporian.core.operators.calendar.day_of_week import (
             calendar_day_of_week,
@@ -595,7 +595,7 @@ class EventSetOperations:
 
         Returns:
             EventSet with a single feature with the hour each timestamp in `sampling`
-            belongs to.
+                belongs to.
         """
         from temporian.core.operators.calendar.hour import calendar_hour
 
@@ -630,7 +630,7 @@ class EventSetOperations:
 
         Returns:
             EventSet with a single feature with the ISO week each timestamp in
-            `sampling` belongs to.
+                `sampling` belongs to.
         """
         from temporian.core.operators.calendar.iso_week import calendar_iso_week
 
@@ -664,7 +664,7 @@ class EventSetOperations:
 
         Returns:
             EventSet with a single feature with the day of the year each timestamp
-            in `sampling` belongs to.
+                in `sampling` belongs to.
         """
         from temporian.core.operators.calendar.day_of_year import (
             calendar_day_of_year,
@@ -703,7 +703,7 @@ class EventSetOperations:
 
         Returns:
             EventSet with a single feature with the minute each timestamp in
-            `sampling` belongs to.
+                `sampling` belongs to.
         """
         from temporian.core.operators.calendar.minute import calendar_minute
 
@@ -738,7 +738,7 @@ class EventSetOperations:
 
         Returns:
             EventSet with a single feature with the month each timestamp in
-            `sampling` belongs to.
+                `sampling` belongs to.
         """
         from temporian.core.operators.calendar.month import calendar_month
 
@@ -774,7 +774,7 @@ class EventSetOperations:
 
         Returns:
             EventSet with a single feature with the second each timestamp in
-            `sampling` belongs to.
+                `sampling` belongs to.
         """
         from temporian.core.operators.calendar.second import calendar_second
 
@@ -807,7 +807,7 @@ class EventSetOperations:
 
         Returns:
             EventSet with a single feature with the year each timestamp in
-            `sampling` belongs to.
+                `sampling` belongs to.
         """
         from temporian.core.operators.calendar.year import calendar_year
 
@@ -1123,7 +1123,7 @@ class EventSetOperations:
 
         Returns:
             EventSet with a single feature with each event's ordinal position in
-            its index group.
+                its index group.
         """
         from temporian.core.operators.enumerate import enumerate
 
@@ -1185,7 +1185,7 @@ class EventSetOperations:
 
         Returns:
             EventSet containing the amplitude of each frequency band of the
-            Fourier Transform.
+                Fourier Transform.
         """
         from temporian.core.operators.fast_fourier_transform import (
             fast_fourier_transform,
@@ -1338,7 +1338,8 @@ class EventSetOperations:
                 Currently, only `"left"` join is supported.
             on: Optional extra int64 feature name to join on.
 
-        Returns
+        Returns:
+            The joined EventSets.
         """
         from temporian.core.operators.join import join
 
@@ -1709,7 +1710,7 @@ class EventSetOperations:
 
         Returns:
             EventSet containing the moving standard deviation of each feature in
-            the input.
+                the input.
         """
         from temporian.core.operators.window.moving_standard_deviation import (
             moving_standard_deviation,
@@ -2503,7 +2504,7 @@ class EventSetOperations:
 
         Returns:
             EventSet with a single feature named `timestamps` with each event's
-            timestamp.
+                timestamp.
         """
         from temporian.core.operators.timestamps import timestamps
 

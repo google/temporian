@@ -24,8 +24,8 @@ from temporian.core.data.node import (
     create_node_new_features_existing_sampling,
 )
 from temporian.core.data.schema import FeatureSchema
+from temporian.core.dataclasses import MapExtras
 from temporian.core.operators.base import Operator
-from temporian.core.types import MapExtras
 from temporian.core.typing import EventSetOrNode, TargetDtypes, Scalar
 from temporian.implementation.numpy.data.dtype_normalization import (
     build_dtypes_list_from_target_dtypes,
