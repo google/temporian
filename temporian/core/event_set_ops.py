@@ -1422,9 +1422,73 @@ class EventSetOperations:
         """Applies a function on each of an [`EventSet`][temporian.EventSet]'s
         values.
 
+        The function receives the scalar value, and optionally as second
+        argument a [`MapExtras`][temporian.types.MapExtras] object containing
+        information about the value's position in the EventSet.
+
         If the output of the functon has a different dtype than the input, the
-        `output_dtypes` argument must be specified. Note that the function must
-        return values of these dtypes, else `map` will fail, not cast them.
+        `output_dtypes` argument must be specified.
+
+        Usage example with lambda function:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2],
+            ...     features={"value": [10, 20, 30]},
+            ... )
+
+            >>> b = a.map(lambda v: v + 1)
+            >>> b
+            indexes: ...
+                (3 events):
+                    timestamps: [0. 1. 2.]
+                    'value': [11 21 31]
+            ...
+
+            ```
+
+        Usage example with `output_dtypes`:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2],
+            ...     features={"a": [10, 20, 30], "b": ["100", "200", "300"]},
+            ... )
+
+            >>> def f(value):
+            ...     if value.dtype == np.int64:
+            ...         return float(value) + 1
+            ...     else:
+            ...         return int(value) + 2
+
+            >>> b = a.map(f, output_dtypes={"a": float, "b": int})
+            >>> b
+            indexes: ...
+                (3 events):
+                    timestamps: [0. 1. 2.]
+                    'a': [11. 21. 31.]
+                    'b': [102 202 302]
+            ...
+
+            ```
+
+        Usage example with `MapExtras`:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2],
+            ...     features={"value": [10, 20, 30]},
+            ... )
+
+            >>> def f(value, extras):
+            ...     return f"{extras.feature_name}-{extras.timestamp}-{value}"
+
+            >>> b = a.map(f, output_dtypes=str)
+            >>> b
+            indexes: ...
+                (3 events):
+                    timestamps: [0. 1. 2.]
+                    'value': [b'value-0.0-10' b'value-1.0-20' b'value-2.0-30']
+            ...
+
+            ```
 
         Args:
             func: The function to apply on each value.
