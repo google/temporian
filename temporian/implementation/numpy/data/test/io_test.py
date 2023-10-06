@@ -67,9 +67,6 @@ class IOTest(absltest.TestCase):
             },
             schema=expected_schema,
         )
-
-        print("evset:\n", evset)
-        print("expected_evset:\n", expected_evset)
         self.assertEqual(evset, expected_evset)
 
     def test_timestamps_non_unix_time(self):
@@ -80,6 +77,12 @@ class IOTest(absltest.TestCase):
             np.array([2], dtype=np.int64),
             np.array([2], dtype=np.float32),
             np.array([2], dtype=np.float64),
+            np.array([2], dtype=np.byte),
+            np.array([2], dtype=np.short),
+            np.array([2], dtype=np.longlong),
+            np.array([2], dtype=np.ubyte),
+            np.array([2], dtype=np.ushort),
+            np.array([2], dtype=np.ulonglong),
             pd.Series([2]),
         ]:
             logging.info("Testing: %s (%s)", timestamps, type(timestamps))
@@ -103,6 +106,7 @@ class IOTest(absltest.TestCase):
             np.array(["1970-01-02"], dtype=np.object_),
             # Pandas
             pd.Series([pd.Timestamp("1970-01-02")]),
+            np.array([pd.Timestamp("1970-01-02")]),  # dtype object
             pd.Series(["1970-01-02"]),
         ]:
             logging.info("Testing: %s (%s)", timestamps, type(timestamps))
@@ -112,6 +116,41 @@ class IOTest(absltest.TestCase):
                 np.array([86400], dtype=np.float64),
             )
             self.assertTrue(evset.schema.is_unix_timestamp)
+
+    def test_unix_timestamps_null(self):
+        for timestamps in [
+            ["2020-01-01", ""],
+            ["2020-01-01", None],
+            ["2020-01-01", np.datetime64("NaT")],
+            pd.to_datetime(pd.Series(["2020-01-01", pd.NaT])),
+            np.array(["2020-01-01", None]),  # dtype object
+            np.array(["2020-01-01", ""]),  # dtype str
+            np.array(["2020-01-01", None]).astype("datetime64[ns]"),
+        ]:
+            logging.info(f"Testing: {timestamps}")
+            with self.assertRaisesRegex(
+                ValueError, "Timestamps contain null/NaT values"
+            ):
+                _ = event_set(timestamps)
+
+    def test_timestamps_nan(self):
+        for timestamps in [np.array([1, None], dtype=float), [1.0, np.nan]]:
+            logging.info(f"Testing: {timestamps}")
+            with self.assertRaisesRegex(
+                ValueError, "Timestamps contain NaN values"
+            ):
+                _ = event_set(timestamps)
+
+    def test_timestamps_invalid_str(self):
+        for timestamps in [
+            ["2020-01-01", "nan"],
+            ["2020-01-01", "-"],
+        ]:
+            logging.info(f"Testing: {timestamps}")
+            with self.assertRaisesRegex(
+                ValueError, "Error parsing datetime string"
+            ):
+                _ = event_set(timestamps)
 
     def test_arrays_not_same_length(self):
         with self.assertRaisesRegex(

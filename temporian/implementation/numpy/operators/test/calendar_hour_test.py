@@ -26,15 +26,15 @@ from temporian.io.pandas import from_pandas
 from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy.operators.test.utils import (
     assertEqualEventSet,
+    SetTimezone,
 )
 
 
 class CalendarHourNumpyImplementationTest(absltest.TestCase):
     """Test numpy implementation of calendar_hour operator."""
 
-    def test_basic(self) -> None:
-        "Basic test with flat node."
-        input_evset = from_pandas(
+    def setUp(self):
+        self.input_evset = from_pandas(
             pd.DataFrame(
                 data=[
                     [pd.to_datetime("1970-01-01 00:00:00", utc=True)],
@@ -47,22 +47,35 @@ class CalendarHourNumpyImplementationTest(absltest.TestCase):
             ),
         )
 
-        output_evset = event_set(
-            timestamps=input_evset.get_arbitrary_index_data().timestamps,
+        self.output_evset = event_set(
+            timestamps=self.input_evset.get_arbitrary_index_data().timestamps,
             features={
                 "calendar_hour": np.array([0, 1, 1, 12, 23]).astype(np.int32),
             },
             is_unix_timestamp=True,
         )
 
-        operator = CalendarHourOperator(input_evset.node())
-        impl = CalendarHourNumpyImplementation(operator)
-        output = impl.call(sampling=input_evset)["output"]
+        self.operator = CalendarHourOperator(self.input_evset.node())
+        self.impl = CalendarHourNumpyImplementation(self.operator)
 
-        assertEqualEventSet(self, output, output_evset)
+    def test_basic(self) -> None:
+        "Basic test with flat node."
+        output = self.impl.call(sampling=self.input_evset)["output"]
+
+        assertEqualEventSet(self, output, self.output_evset)
         self.assertTrue(
             output.get_arbitrary_index_data().features[0].dtype == np.int32
         )
+
+    def test_timezone_defined(self) -> None:
+        "Define TZ env var and check that it works identically"
+        with SetTimezone():
+            output = self.impl.call(sampling=self.input_evset)["output"]
+
+            assertEqualEventSet(self, output, self.output_evset)
+            self.assertTrue(
+                output.get_arbitrary_index_data().features[0].dtype == np.int32
+            )
 
 
 if __name__ == "__main__":

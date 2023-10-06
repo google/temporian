@@ -3,15 +3,27 @@
   // hide bazel-* directories from file viewer and search
   "files.exclude": {
     "**/.venv/": true,
-    "**/bazel-*/**": true
+    "**/bazel-*/**": true,
+    "**/build/**": true,
+    "**/build_package/**": true,
+    "**/.cache/**": true,
+    "**/temporian.egg-info/**": true,
   },
   "search.exclude": {
     "**/.venv/": true,
     "**/bazel-*/**": true,
+    "**/build/**": true,
+    "**/build_package/**": true,
+    "**/.cache/**": true,
+    "**/temporian.egg-info/**": true,
   },
   "files.watcherExclude": {
     "**/.venv/**": true,
-    "**/bazel-*/**": true
+    "**/bazel-*/**": true,
+    "**/build/**": true,
+    "**/build_package/**": true,
+    "**/.cache/**": true,
+    "**/temporian.egg-info/**": true,
   },
   "python.formatting.provider": "black",
   "editor.tabSize": 4,

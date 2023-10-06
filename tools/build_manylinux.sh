@@ -24,16 +24,19 @@ function temporian::setup_environment() {
     else
         echo "Must set PYTHON_VERSION env to 38|39|310|311"; exit 1;
     fi
-    export PIP_BIN="${PYTHON_DIR}"/bin/pip
-    export PYTHON_BIN_PATH="${PYTHON_DIR}"/bin/python
-    echo "PYTHON_BIN_PATH=${PYTHON_BIN_PATH}"
-    export WHEEL_BIN="${PYTHON_DIR}"/bin/wheel
-    ${PIP_BIN} install --upgrade pip
-    ${PIP_BIN} install poetry auditwheel==5.2.0
+    # Includes python, pip, wheel
+    export PATH="${PYTHON_DIR}/bin:$PATH"
+    pip install --upgrade pip
+    pip install poetry auditwheel==5.2.0
+    # Avoid messing local .venv from volume
+    poetry config virtualenvs.create false
+    poetry config virtualenvs.in-project false
+    # If bazel gets stuck running locally, run:
+    # rm -rf build_package/ build/ temporian.egg-info/
 }
 
 function temporian::build_wheel() {
-    "${PYTHON_BIN_PATH}" -m poetry build
+    python -m poetry build
 }
 
 function temporian::stamp_wheels() {
@@ -45,8 +48,7 @@ function temporian::stamp_wheels() {
     done
 }
 
+# TODO: Add automated tests
 temporian::setup_environment
 temporian::build_wheel
 temporian::stamp_wheels
-
-# TODO: Add automated tests.

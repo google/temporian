@@ -46,6 +46,13 @@ pybind_library(
 )
 
 pybind_library(
+    name = "tick_calendar",
+    srcs = ["tick_calendar.cc"],
+    hdrs = ["tick_calendar.h"],
+    deps = [":common"],
+)
+
+pybind_library(
     name = "until_next",
     srcs = ["until_next.cc"],
     hdrs = ["until_next.h"],
@@ -68,6 +75,7 @@ pybind_extension(
         ":join",
         ":resample",
         ":since_last",
+        ":tick_calendar",
         ":until_next",
         ":window",
     ],

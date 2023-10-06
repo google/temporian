@@ -30,3 +30,5 @@ temporian/proto/core_pb2.py
 
 # Coverage
 .coverage
+coverage.xml
+coverage.json

@@ -34,6 +34,7 @@ py_library(
         ":select_index_values",
         ":since_last",
         ":tick",
+        ":tick_calendar",
         ":timestamps",
         ":unary",
         ":unique_timestamps",
@@ -422,9 +423,25 @@ py_library(
         # already_there/numpy
         ":base",
         "//temporian/core/data:duration_utils",
-        "//temporian/core/operators:where",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy_cc/operators:operators_cc",
+        "//temporian/core/operators:where",
+    ],
+)
+
+py_library(
+    name = "tick_calendar",
+    srcs = ["tick_calendar.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/numpy
+        ":base",
+        "//temporian/core/data:duration_utils",
+        "//temporian/core/operators:tick_calendar",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy_cc/operators:operators_cc",
     ],
 )
 

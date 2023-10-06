@@ -74,6 +74,10 @@ def normalize_timestamp(x: Timestamp) -> NormalizedTimestamp:
 def datetime64_array_to_float64(array_datetimes: np.ndarray) -> np.ndarray:
     # Avoid copying, already done in last division by 1e9
     features_ns = array_datetimes.astype("datetime64[ns]", copy=False)
+    if np.isnan(features_ns).any():
+        raise ValueError(
+            "Timestamps contain null/NaT values, which are not supported."
+        )
     return features_ns.astype(np.float64, copy=False) / 1e9
 
 

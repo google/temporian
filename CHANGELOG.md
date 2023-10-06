@@ -4,6 +4,7 @@
 
 ### Features
 
+- Added `EventSet.tick_calendar()` operator.
 - Added `EventSet.where()` operator.
 - Added `EventSet.filter_moving_count()` operator.
 - Added `EventSet.map()` operator.
@@ -16,6 +17,8 @@
 - New `tp.types` module to facilitate access to types used throughout the API.
 
 ### Fixes
+
+- Fixed issues when loading timestamps from `np.longlong` and other dtypes.
 
 ## 0.1.4
 
