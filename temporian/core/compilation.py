@@ -33,8 +33,8 @@ def compile(fn: Optional[F] = None, *, verbose: int = 0) -> F:
     """Compiles a Temporian function.
 
     A Temporian function is a function that takes
-    [`EventSetOrNodes`][temporian.EventSetOrNode] as arguments and returns
-    [`EventSetOrNodes`][temporian.EventSetOrNode] as outputs.
+    [`EventSetOrNodes`][temporian.types.EventSetOrNode] as arguments and returns
+    [`EventSetOrNodes`][temporian.types.EventSetOrNode] as outputs.
 
     Compiling a function allows Temporian to optimize the underlying graph
     defined by the operators used inside the function, making it run on

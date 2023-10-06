@@ -12,15 +12,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Data classes and type definitions."""
+"""Types used throughout the API."""
 
-from dataclasses import dataclass
+# NOTE: this module should only contain type imports to be public under tp.types
+# Don't define classes or types here nor import stuff from here, will probably
+# result in circular imports.
 
-from temporian.core.typing import IndexKey
+from temporian.core.typing import (
+    EventSetCollection,
+    EventSetNodeCollection,
+    EventSetOrNode,
+    IndexKey,
+    IndexKeyItem,
+    IndexKeyList,
+    NodeToEventSetMapping,
+    WindowLength,
+)
+from temporian.core.dataclasses import MapExtras
+from temporian.core.operators.map import MapFunction
 
-
-@dataclass
-class MapExtras:
-    index_key: IndexKey
-    timestamp: float
-    feature_name: str
+# Add all the types that are part of the public API and should be shown in docs.
+__all__ = [
+    "EventSetCollection",
+    "EventSetNodeCollection",
+    "EventSetOrNode",
+    "IndexKey",
+    "IndexKeyItem",
+    "IndexKeyList",
+    "MapExtras",
+    "NodeToEventSetMapping",
+    "WindowLength",
+    "MapFunction",
+]

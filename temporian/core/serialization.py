@@ -73,7 +73,7 @@ def save(
     """Saves a compiled Temporian function to a file.
 
     The saved function must only take
-    [`EventSetOrNodes`][temporian.EventSetOrNode] as arguments, return a
+    [`EventSetOrNodes`][temporian.types.EventSetOrNode] as arguments, return a
     dictionary of names to EventSetOrNodes, and be decorated with
     [`@tp.compile`][temporian.compile].
 

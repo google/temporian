@@ -22,7 +22,6 @@ PUBLIC_API_SYMBOLS = {
     "EventSet",
     "IndexData",
     "EventSetNode",
-    "EventSetOrNode",
     "Schema",
     "duration",
     "run",

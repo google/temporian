@@ -1427,7 +1427,7 @@ class EventSetOperations:
 
         Args:
             func: The function to apply on each value.
-            output_dtype: Expected dtypes of the output feature(s) after
+            output_dtypes: Expected dtypes of the output feature(s) after
                 applying the function to them. If not provided, the output
                 dtypes will be expected to be the same as the input ones. If a
                 single dtype, all features will be expected to have that dtype.
