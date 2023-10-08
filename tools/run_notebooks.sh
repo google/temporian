@@ -22,5 +22,5 @@ rsync -r --safe-links --exclude='*/*.runfiles/' --include='*/' --include='*.py' 
 # Run the notebooks and overwrites them with the outputs
 for path in "$@"
 do
-    time PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python PYTHONPATH="${PKDIR}/:$PYTHONPATH" jupyter nbconvert --ExecutePreprocessor.timeout=600 --execute $path --to notebook --inplace
+    time PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python PYTHONPATH="${PKDIR}/:$PYTHONPATH" jupyter nbconvert --debug --ExecutePreprocessor.timeout=600 --execute $path --to notebook --inplace
 done
