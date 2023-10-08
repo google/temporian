@@ -93,9 +93,11 @@ class Plotter(PlotterBackend):
         self,
         xs: np.ndarray,
         color_idx: int,
+        name: str,
     ):
         self.ensure_cur_is_available(None)
 
+        # TODO: Use "name"
         color = colors[color_idx % len(colors)]
         data = {"x": xs, "y": np.zeros(len(xs)), "color": color}
         self.cur_fig.scatter(**data)
@@ -111,16 +113,10 @@ class Plotter(PlotterBackend):
             for js_var, fig in zip(js_vars, self.figs):
                 js_inputs[js_var] = fig.x_range
 
-                sub_core_code = "\n".join(
-                    [
-                        f"""
+                sub_core_code = "\n".join([f"""
                 {other_js_var}.start = start;
                 {other_js_var}.end = end;
-                """
-                        for other_js_var in js_vars
-                        if other_js_var != js_var
-                    ]
-                )
+                """ for other_js_var in js_vars if other_js_var != js_var])
 
                 core_code += f"""
                 if (cb_obj == {js_var}) {{

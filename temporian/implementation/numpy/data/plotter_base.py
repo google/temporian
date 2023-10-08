@@ -99,6 +99,7 @@ class PlotterBackend(ABC):
         self,
         xs: np.ndarray,
         color_idx: int,
+        name: str,
     ):
         """Plots samplings in the last added sub plot."""
 
