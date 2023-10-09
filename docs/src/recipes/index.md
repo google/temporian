@@ -7,6 +7,7 @@ in typical use cases.
 
 | Recipe                                                                                                |
 | ----------------------------------------------------------------------------------------------------- |
+| [Aggregate events by calendar features (month/year)](aggregate_calendar.ipynb) |
 | [Aggregate events by fixed-length intervals (turn events into time-series)](aggregate_interval.ipynb) |
 | [Aggregate events from different indexes](aggregate_index.ipynb)                                      |
 | [Unify events with identical timestamps](aggregate_duplicated.ipynb)                                  |
