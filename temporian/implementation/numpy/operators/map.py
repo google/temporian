@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 """Implementation for the Map operator."""
-
 
 from inspect import signature
 from typing import Dict
@@ -42,7 +40,7 @@ class MapNumpyImplementation(OperatorImplementation):
         output_schema = self.output_schema("output")
 
         func = self.operator.func
-        receives_extras = len(signature(func).parameters) > 1
+        receives_extras = self.operator.receives_extras
 
         # Create output EventSet
         output_evset = EventSet(data={}, schema=output_schema)
@@ -57,18 +55,23 @@ class MapNumpyImplementation(OperatorImplementation):
                 output_schema.feature_dtypes(),
             ):
                 output_values = []
-                for i, value in enumerate(orig_feature):
-                    args = [value]
+                for value, timestamp in zip(
+                    orig_feature, index_data.timestamps
+                ):
                     if receives_extras:
-                        args.append(
-                            MapExtras(
-                                index_key=index_key,
-                                timestamp=index_data.timestamps[i],
-                                feature_name=feature_schema.name,
+                        output_values.append(
+                            func(
+                                value,
+                                MapExtras(
+                                    index_key=index_key,
+                                    timestamp=timestamp,
+                                    feature_name=feature_schema.name,
+                                ),
                             )
                         )
-                    res = func(*args)
-                    output_values.append(res)
+                    else:
+                        assert len(signature(func).parameters) == 1
+                        output_values.append(func(value))
                 try:
                     output_arr = np.array(
                         output_values, dtype=tp_dtype_to_np_dtype(output_dtype)

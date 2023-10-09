@@ -1419,8 +1419,8 @@ class EventSetOperations:
         func: MapFunction,
         output_dtypes: Optional[TargetDtypes] = None,
     ) -> EventSetOrNode:
-        """Applies a function on each of an [`EventSet`][temporian.EventSet]'s
-        values.
+        """Applies a function on each value of an
+        [`EventSet`][temporian.EventSet]'s features.
 
         The function receives the scalar value, and optionally as second
         argument a [`MapExtras`][temporian.types.MapExtras] object containing
@@ -1504,9 +1504,9 @@ class EventSetOperations:
         Returns:
             EventSet with the function applied on each value.
         """
-        from temporian.core.operators.map import map
+        from temporian.core.operators.map import map as tp_map
 
-        return map(self, func=func, output_dtypes=output_dtypes)
+        return tp_map(self, func=func, output_dtypes=output_dtypes)
 
     def moving_count(
         self: EventSetOrNode,

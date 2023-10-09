@@ -84,8 +84,11 @@ class Map(Operator):
         )
         assert len(output_dtypes) == len(input.schema.features)
 
-        if len(signature(func).parameters) > 2:
-            raise ValueError("`func` must receive at most 2 arguments.")
+        num_params = len(signature(func).parameters)
+        if num_params > 2 or num_params < 1:
+            raise ValueError("`func` must receive 1 or 2 arguments.")
+
+        self._receives_extras = num_params == 2
 
         self.add_attribute("func", func)
         self._func = func
@@ -109,6 +112,10 @@ class Map(Operator):
     @property
     def func(self) -> MapFunction:
         return self._func
+
+    @property
+    def receives_extras(self) -> bool:
+        return self._receives_extras
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:

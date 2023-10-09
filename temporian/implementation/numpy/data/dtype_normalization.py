@@ -20,7 +20,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
-from temporian.core.data.dtype import DType
+from temporian.core.data.dtype import PY_TYPE_TO_DTYPE, DType
 from temporian.core.data.duration_utils import datetime64_array_to_float64
 from temporian.core.data.node import EventSetNode
 
@@ -241,16 +241,11 @@ def normalize_index_key_list(
 
 
 def normalize_dtype(x: Any) -> DType:
+    """Normalizes a tp DType or python type to a tp DType."""
     if isinstance(x, DType):
         return x
-    if x == int:
-        return DType.INT64
-    if x == float:
-        return DType.FLOAT64
-    if x == str:
-        return DType.STRING
-    if x == bool:
-        return DType.BOOLEAN
+    elif x in PY_TYPE_TO_DTYPE:
+        return PY_TYPE_TO_DTYPE[x]
     raise ValueError(f"Cannot normalize {x!r} as a DType.")
 
 
@@ -262,12 +257,15 @@ def normalize_target_dtypes(
     Optional[Dict[str, DType]],
     Optional[Dict[DType, DType]],
 ]:
+    """Normalizes a TargetDtypes object to either a single DType, a dictionary
+    of feature names to DTypes, or a dictionary of DTypes to DTypes.
+
+    Only one of the three items in the output tuple will not be None."""
     # Convert 'target' to one of these:
     dtype: Optional[DType] = None
     feature_name_to_dtype: Optional[Dict[str, DType]] = None
     dtype_to_dtype: Optional[Dict[DType, DType]] = None
 
-    # Further type verifications are done in the operator
     if isinstance(target, dict):
         keys_are_strs = all(isinstance(v, str) for v in target.keys())
         keys_are_dtypes = all(

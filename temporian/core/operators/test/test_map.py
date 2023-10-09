@@ -122,9 +122,20 @@ class MapTest(TestCase):
         evset = event_set(timestamps=[1], features={"a": [2]})
 
         with self.assertRaisesRegex(
-            ValueError, "`func` must receive at most 2 arguments."
+            ValueError, "`func` must receive 1 or 2 arguments."
         ):
             evset.map(lambda v, e, z: v + e.timestamp)
+
+    def test_too_little_args(self):
+        evset = event_set(timestamps=[1], features={"a": [2]})
+
+        def f():
+            return 0
+
+        with self.assertRaisesRegex(
+            ValueError, "`func` must receive 1 or 2 arguments."
+        ):
+            evset.map(f)
 
     def test_serialize_fails(self):
         @compile
