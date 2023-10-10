@@ -450,11 +450,8 @@ def _all_identifiers(collection: Any) -> Set[str]:
 
 
 def _serialize_operator(src: base.Operator) -> pb.Operator:
-    if any(callable(item) for item in src.attributes.values()):
-        raise ValueError(
-            f"Cannot serialize {src.definition.key} operator since it takes a"
-            " Python function as attribute."
-        )
+    if not src.definition.is_serializable:
+        raise ValueError(f"{src.definition.key} operator is not serializable.")
 
     return pb.Operator(
         id=_identifier(src),

@@ -126,6 +126,7 @@ class Map(Operator):
             ],
             inputs=[pb.OperatorDef.Input(key="input")],
             outputs=[pb.OperatorDef.Output(key="output")],
+            is_serializable=False,
         )
 
 

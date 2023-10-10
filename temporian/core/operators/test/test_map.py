@@ -127,10 +127,7 @@ class MapTest(TestCase):
 
         with self.assertRaisesRegex(
             ValueError,
-            (
-                "Cannot serialize MAP operator since it takes a Python function"
-                " as attribute."
-            ),
+            "MAP operator is not serializable.",
         ):
             save(f, "path", evset)
 
