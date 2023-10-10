@@ -186,6 +186,9 @@ message OperatorDef {
   // Arguments of the operator.
   repeated Attribute attributes = 4;
 
+  // Whether this operator cannot be serialized.
+  optional bool is_serializable = 5 [default = true];
+
   message Input {
     // String identifier of the input. Should be unique.
     optional string key = 1;
@@ -222,6 +225,7 @@ message OperatorDef {
       LIST_DTYPE = 9;
       BYTES = 10;
       LIST_INDEX_KEYS = 11;
+      CALLABLE = 12; // Non serializable
     }
   }
 }

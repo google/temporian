@@ -73,7 +73,7 @@ def save(
     """Saves a compiled Temporian function to a file.
 
     The saved function must only take
-    [`EventSetOrNodes`][temporian.EventSetOrNode] as arguments, return a
+    [`EventSetOrNodes`][temporian.types.EventSetOrNode] as arguments, return a
     dictionary of names to EventSetOrNodes, and be decorated with
     [`@tp.compile`][temporian.compile].
 
@@ -450,9 +450,12 @@ def _all_identifiers(collection: Any) -> Set[str]:
 
 
 def _serialize_operator(src: base.Operator) -> pb.Operator:
+    if not src.definition.is_serializable:
+        raise ValueError(f"{src.definition.key} operator is not serializable.")
+
     return pb.Operator(
         id=_identifier(src),
-        operator_def_key=src.definition().key,
+        operator_def_key=src.definition.key,
         inputs=[
             pb.Operator.EventSetNodeArgument(key=k, node_id=_identifier(v))
             for k, v in src.inputs.items()

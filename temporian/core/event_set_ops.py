@@ -23,10 +23,11 @@ from temporian.core.data.duration import Duration
 if TYPE_CHECKING:
     from temporian.core.typing import (
         EventSetOrNode,
-        TypeOrDType,
         IndexKeyList,
         WindowLength,
+        TargetDtypes,
     )
+    from temporian.core.operators.map import MapFunction
 
 T_SCALAR = (int, float)
 
@@ -548,7 +549,7 @@ class EventSetOperations:
 
         Returns:
             EventSet with a single feature with the day of the month each timestamp
-            in `sampling` belongs to.
+                in `sampling` belongs to.
         """
         from temporian.core.operators.calendar.day_of_month import (
             calendar_day_of_month,
@@ -584,7 +585,7 @@ class EventSetOperations:
 
         Returns:
             EventSet with a single feature with the day of the week each timestamp
-            in `sampling` belongs to.
+                in `sampling` belongs to.
         """
         from temporian.core.operators.calendar.day_of_week import (
             calendar_day_of_week,
@@ -621,7 +622,7 @@ class EventSetOperations:
 
         Returns:
             EventSet with a single feature with the hour each timestamp in `sampling`
-            belongs to.
+                belongs to.
         """
         from temporian.core.operators.calendar.hour import calendar_hour
 
@@ -656,7 +657,7 @@ class EventSetOperations:
 
         Returns:
             EventSet with a single feature with the ISO week each timestamp in
-            `sampling` belongs to.
+                `sampling` belongs to.
         """
         from temporian.core.operators.calendar.iso_week import calendar_iso_week
 
@@ -690,7 +691,7 @@ class EventSetOperations:
 
         Returns:
             EventSet with a single feature with the day of the year each timestamp
-            in `sampling` belongs to.
+                in `sampling` belongs to.
         """
         from temporian.core.operators.calendar.day_of_year import (
             calendar_day_of_year,
@@ -729,7 +730,7 @@ class EventSetOperations:
 
         Returns:
             EventSet with a single feature with the minute each timestamp in
-            `sampling` belongs to.
+                `sampling` belongs to.
         """
         from temporian.core.operators.calendar.minute import calendar_minute
 
@@ -764,7 +765,7 @@ class EventSetOperations:
 
         Returns:
             EventSet with a single feature with the month each timestamp in
-            `sampling` belongs to.
+                `sampling` belongs to.
         """
         from temporian.core.operators.calendar.month import calendar_month
 
@@ -800,7 +801,7 @@ class EventSetOperations:
 
         Returns:
             EventSet with a single feature with the second each timestamp in
-            `sampling` belongs to.
+                `sampling` belongs to.
         """
         from temporian.core.operators.calendar.second import calendar_second
 
@@ -833,7 +834,7 @@ class EventSetOperations:
 
         Returns:
             EventSet with a single feature with the year each timestamp in
-            `sampling` belongs to.
+                `sampling` belongs to.
         """
         from temporian.core.operators.calendar.year import calendar_year
 
@@ -841,11 +842,7 @@ class EventSetOperations:
 
     def cast(
         self: EventSetOrNode,
-        target: Union[
-            TypeOrDType,
-            Dict[str, TypeOrDType],
-            Dict[TypeOrDType, TypeOrDType],
-        ],
+        target: TargetDtypes,
         check_overflow: bool = True,
     ) -> EventSetOrNode:
         """Casts the data types of an [`EventSet`][temporian.EventSet]'s features.
@@ -1153,7 +1150,7 @@ class EventSetOperations:
 
         Returns:
             EventSet with a single feature with each event's ordinal position in
-            its index group.
+                its index group.
         """
         from temporian.core.operators.enumerate import enumerate
 
@@ -1215,7 +1212,7 @@ class EventSetOperations:
 
         Returns:
             EventSet containing the amplitude of each frequency band of the
-            Fourier Transform.
+                Fourier Transform.
         """
         from temporian.core.operators.fast_fourier_transform import (
             fast_fourier_transform,
@@ -1409,7 +1406,8 @@ class EventSetOperations:
                 Currently, only `"left"` join is supported.
             on: Optional extra int64 feature name to join on.
 
-        Returns
+        Returns:
+            The joined EventSets.
         """
         from temporian.core.operators.join import join
 
@@ -1483,6 +1481,115 @@ class EventSetOperations:
         from temporian.core.operators.leak import leak
 
         return leak(self, duration=duration)
+
+    def map(
+        self: EventSetOrNode,
+        func: MapFunction,
+        output_dtypes: Optional[TargetDtypes] = None,
+        receive_extras: bool = False,
+    ) -> EventSetOrNode:
+        """Applies a function on each value of an
+        [`EventSet`][temporian.EventSet]'s features.
+
+        The function receives the scalar value, and if `receive_extras` is True,
+        also a [`MapExtras`][temporian.types.MapExtras] object containing
+        information about the value's position in the EventSet. The MapExtras
+        object should not be modified by the function, since it is shared across
+        all calls.
+
+        If the output of the functon has a different dtype than the input, the
+        `output_dtypes` argument must be specified.
+
+        This operator is slow. When possible, existing operators should be used.
+
+        A Temporian graph with a `map` operator is not serializable.
+
+        Usage example with lambda function:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2],
+            ...     features={"value": [10, 20, 30]},
+            ... )
+
+            >>> b = a.map(lambda v: v + 1)
+            >>> b
+            indexes: ...
+                (3 events):
+                    timestamps: [0. 1. 2.]
+                    'value': [11 21 31]
+            ...
+
+            ```
+
+        Usage example with `output_dtypes`:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2],
+            ...     features={"a": [10, 20, 30], "b": ["100", "200", "300"]},
+            ... )
+
+            >>> def f(value):
+            ...     if value.dtype == np.int64:
+            ...         return float(value) + 1
+            ...     else:
+            ...         return int(value) + 2
+
+            >>> b = a.map(f, output_dtypes={"a": float, "b": int})
+            >>> b
+            indexes: ...
+                (3 events):
+                    timestamps: [0. 1. 2.]
+                    'a': [11. 21. 31.]
+                    'b': [102 202 302]
+            ...
+
+            ```
+
+        Usage example with `MapExtras`:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2],
+            ...     features={"value": [10, 20, 30]},
+            ... )
+
+            >>> def f(value, extras):
+            ...     return f"{extras.feature_name}-{extras.timestamp}-{value}"
+
+            >>> b = a.map(f, output_dtypes=str, receive_extras=True)
+            >>> b
+            indexes: ...
+                (3 events):
+                    timestamps: [0. 1. 2.]
+                    'value': [b'value-0.0-10' b'value-1.0-20' b'value-2.0-30']
+            ...
+
+            ```
+
+        Args:
+            func: The function to apply on each value.
+            output_dtypes: Expected dtypes of the output feature(s) after
+                applying the function to them. If not provided, the output
+                dtypes will be expected to be the same as the input ones. If a
+                single dtype, all features will be expected to have that dtype.
+                If a mapping, the keys can be either feature names or the
+                input dtypes (and not both types mixed), and the values are the
+                target dtypes for them. All dtypes must be Temporian types (see
+                `dtype.py`).
+            receive_extras: Whether the function should receive a
+                [`MapExtras`][temporian.types.MapExtras] object as second
+                argument.
+
+        Returns:
+            EventSet with the function applied on each value.
+        """
+        from temporian.core.operators.map import map as tp_map
+
+        return tp_map(
+            self,
+            func=func,
+            output_dtypes=output_dtypes,
+            receive_extras=receive_extras,
+        )
 
     def log(self: EventSetOrNode) -> EventSetOrNode:
         """Calculates the natural logarithm of an [`EventSet`][temporian.EventSet]'s
@@ -1777,7 +1884,7 @@ class EventSetOperations:
 
         Returns:
             EventSet containing the moving standard deviation of each feature in
-            the input.
+                the input.
         """
         from temporian.core.operators.window.moving_standard_deviation import (
             moving_standard_deviation,
@@ -2754,7 +2861,7 @@ class EventSetOperations:
 
         Returns:
             EventSet with a single feature named `timestamps` with each event's
-            timestamp.
+                timestamp.
         """
         from temporian.core.operators.timestamps import timestamps
 

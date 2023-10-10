@@ -22,7 +22,6 @@ PUBLIC_API_SYMBOLS = {
     "EventSet",
     "IndexData",
     "EventSetNode",
-    "EventSetOrNode",
     "Schema",
     "duration",
     "run",
@@ -32,6 +31,7 @@ PUBLIC_API_SYMBOLS = {
     "plot",
     "compile",
     "config",
+    "types",
     # IO
     "to_csv",
     "from_csv",

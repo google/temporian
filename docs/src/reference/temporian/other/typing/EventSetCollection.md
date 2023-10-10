@@ -1,1 +1,0 @@
-::: temporian.core.typing.EventSetCollection

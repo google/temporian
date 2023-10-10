@@ -5,6 +5,7 @@ from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.io import event_set
 
 
+# TODO: remove this class once all tests have been migrated to use the public API functions
 class EventSetOpsTest(absltest.TestCase):
     """Tests that all expected operators are available and work on EventSet and
     EventSetNode and that they return the correct type."""
@@ -145,6 +146,10 @@ class EventSetOpsTest(absltest.TestCase):
     def test_leak(self):
         self.assertTrue(isinstance(self.evset.leak(3), EventSet))
         self.assertTrue(isinstance(self.node.leak(3), EventSetNode))
+
+    def test_map(self):
+        self.assertTrue(isinstance(self.evset.map(lambda x: x), EventSet))
+        self.assertTrue(isinstance(self.node.map(lambda x: x), EventSetNode))
 
     def test_moving_count(self):
         self.assertTrue(isinstance(self.evset.moving_count(1), EventSet))

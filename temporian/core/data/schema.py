@@ -15,10 +15,9 @@
 """Schema and related classes."""
 
 from __future__ import annotations
-
+from dataclasses import dataclass
 from typing import List, Tuple, Dict, Union
 
-from dataclasses import dataclass
 from temporian.core.data.dtype import DType, IndexDType
 
 

@@ -14,7 +14,7 @@
 
 """Cast operator class and public API function definition."""
 
-from typing import Union, Dict, Optional, List, Any
+from typing import Dict, Optional, List
 from temporian.core.data.schema import Schema, FeatureSchema
 
 
@@ -27,22 +27,12 @@ from temporian.core.data.node import (
     create_node_with_new_reference,
 )
 from temporian.core.operators.base import Operator
-from temporian.core.typing import EventSetOrNode, TypeOrDType
+from temporian.core.typing import EventSetOrNode, TargetDtypes
+from temporian.implementation.numpy.data.dtype_normalization import (
+    build_dtypes_list_from_target_dtypes,
+    normalize_target_dtypes,
+)
 from temporian.proto import core_pb2 as pb
-
-
-def _normalize_dtype(x: Any) -> DType:
-    if isinstance(x, DType):
-        return x
-    if x == int:
-        return DType.INT64
-    if x == float:
-        return DType.FLOAT64
-    if x == str:
-        return DType.STRING
-    if x == bool:
-        return DType.BOOLEAN
-    raise ValueError(f"Cannot normalize {x!r} as a DType.")
 
 
 class CastOperator(Operator):
@@ -64,9 +54,8 @@ class CastOperator(Operator):
             input: Input node.
             check_overflow: Check for casting overflow.
             dtype: All the input features are casted to dtype.
-            dtype_to_dtype: Mapping between feature name and new dtype.
-                feature_name_to_dtype: Mapping between current dtype and new
-                dtype.
+            dtype_to_dtype: Mapping between current dtype and new dtype.
+            feature_name_to_dtype: Mapping between feature name and new dtype.
             dtypes: Dtype for each of the input feature (indexed by feature
                 idx).
         """
@@ -82,10 +71,10 @@ class CastOperator(Operator):
             == 1
         )
 
-        # "_new_dtypes" is an array of target dtype for all the input features
+        # "self._dtypes" is an array of target dtype for all the input features
         # (in the same order as the input features).
         if dtypes is None:
-            dtypes = self._build_dtypes(
+            dtypes = build_dtypes_list_from_target_dtypes(
                 input, dtype, dtype_to_dtype, feature_name_to_dtype
             )
 
@@ -154,30 +143,6 @@ class CastOperator(Operator):
     def is_noop(self) -> bool:
         return self._is_noop
 
-    def _build_dtypes(
-        self,
-        input: EventSetNode,
-        dtype: Optional[DType] = None,
-        dtype_to_dtype: Optional[Dict[DType, DType]] = None,
-        feature_name_to_dtype: Optional[Dict[str, DType]] = None,
-    ) -> List[DType]:
-        if dtype is not None:
-            return [dtype] * len(input.schema.features)
-
-        if feature_name_to_dtype is not None:
-            return [
-                feature_name_to_dtype.get(f.name, f.dtype)
-                for f in input.schema.features
-            ]
-
-        if dtype_to_dtype is not None:
-            return [
-                dtype_to_dtype.get(f.dtype, f.dtype)
-                for f in input.schema.features
-            ]
-
-        assert False
-
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
@@ -203,64 +168,16 @@ operator_lib.register_operator(CastOperator)
 @compile
 def cast(
     input: EventSetOrNode,
-    target: Union[
-        TypeOrDType,
-        Dict[str, TypeOrDType],
-        Dict[TypeOrDType, TypeOrDType],
-    ],
+    target: TargetDtypes,
     check_overflow: bool = True,
 ) -> EventSetOrNode:
     assert isinstance(input, EventSetNode)
 
-    # Convert 'target' to one of these:
-    dtype: Optional[DType] = None
-    feature_name_to_dtype: Optional[Dict[str, DType]] = None
-    dtype_to_dtype: Optional[Dict[DType, DType]] = None
-
-    # Further type verifications are done in the operator
-    if isinstance(target, dict):
-        keys_are_strs = all(isinstance(v, str) for v in target.keys())
-        keys_are_dtypes = all(
-            isinstance(v, (DType, type)) for v in target.keys()
-        )
-        values_are_dtypes = all(
-            isinstance(v, (DType, type)) for v in target.values()
-        )
-
-        if keys_are_strs and values_are_dtypes:
-            feature_name_to_dtype = {
-                key: _normalize_dtype(value) for key, value in target.items()
-            }
-
-            input_feature_names = input.schema.feature_names()
-            for feature_name in feature_name_to_dtype.keys():
-                if feature_name not in input_feature_names:
-                    raise ValueError(f"Unknown feature {feature_name!r}")
-
-        elif keys_are_dtypes and values_are_dtypes:
-            dtype_to_dtype = {
-                _normalize_dtype(key): _normalize_dtype(value)
-                for key, value in target.items()
-            }
-    elif isinstance(target, DType) or target in [float, int, str, bool]:
-        dtype = _normalize_dtype(target)
-
-    if (
-        dtype is None
-        and feature_name_to_dtype is None
-        and dtype_to_dtype is None
-    ):
-        raise ValueError(
-            "`target` should be one of the following: (1) a Temporian dtype"
-            " e.g. tp.float64, (2) a dictionary of feature name (str) to"
-            " temporian dtype, or (3) a dictionary of temporian dtype to"
-            " temporian dtype. Alternatively, Temporian dtypes can be replaced"
-            " with python type. For example cast(..., target=float) is"
-            " equivalent to cast(..., target=tp.float64).\nInstead got,"
-            f" `target` = {target!r}."
-        )
-
     assert isinstance(input, EventSetNode)
+
+    dtype, feature_name_to_dtype, dtype_to_dtype = normalize_target_dtypes(
+        input, target
+    )
 
     return CastOperator(
         input,

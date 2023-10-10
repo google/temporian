@@ -80,12 +80,12 @@ def assertOperatorResult(
         raise ValueError("EventSet has no creator.")
     op = result.creator
 
-    serialized_op = serialization._serialize_operator(op)
+    if op.definition.is_serializable:
+        serialized_op = serialization._serialize_operator(op)
+        nodes = {}
+        for node in op.inputs.values():
+            nodes[serialization._identifier(node)] = node
+        for node in op.outputs.values():
+            nodes[serialization._identifier(node)] = node
 
-    nodes = {}
-    for node in op.inputs.values():
-        nodes[serialization._identifier(node)] = node
-    for node in op.outputs.values():
-        nodes[serialization._identifier(node)] = node
-
-    _ = serialization._unserialize_operator(serialized_op, nodes)
+        _ = serialization._unserialize_operator(serialized_op, nodes)

@@ -114,6 +114,20 @@ If an `EventSet`, it should contain strictly positive values. If receiving 0,
 negative values, or missing values, the operator will treat the window as empty.
 """
 
+Scalar = Union[int, float, str, bytes, bool]
+"""A scalar value."""
+
+TargetDtypes = Union[
+    TypeOrDType,
+    Dict[str, TypeOrDType],
+    Dict[TypeOrDType, TypeOrDType],
+]
+"""Specification of target dtypes, used in operators that expected output dtypes
+to be specified.
+
+This can be a single dtype, a dictionary mapping feature names to dtypes, or a
+dictionary mapping current dtypes to target dtypes.
+"""
 
 # Internal
 

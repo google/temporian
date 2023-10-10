@@ -14,11 +14,9 @@
 
 """Data types declaration."""
 
-from typing import Any
-
 import math
 from enum import Enum
-from typing import Union
+from typing import Any, Union
 
 
 class DType(Enum):
@@ -80,7 +78,7 @@ class DType(Enum):
         """
 
         try:
-            return _PY_TYPE_TO_DTYPE[type(value)]
+            return PY_TYPE_TO_DTYPE[type(value)]
         except KeyError as e:
             raise ValueError(
                 f"Couldn't find a dtype to store a value of type {type(value)}."
@@ -88,7 +86,7 @@ class DType(Enum):
             ) from e
 
 
-_PY_TYPE_TO_DTYPE = {
+PY_TYPE_TO_DTYPE = {
     float: DType.FLOAT64,
     int: DType.INT64,
     str: DType.STRING,
@@ -96,7 +94,7 @@ _PY_TYPE_TO_DTYPE = {
     bool: DType.BOOLEAN,
 }
 
-_DTYPE_TO_PY_TYPES = {
+DTYPE_TO_PY_TYPES = {
     DType.FLOAT64: float,
     DType.FLOAT32: float,
     DType.INT64: int,
@@ -107,7 +105,7 @@ _DTYPE_TO_PY_TYPES = {
 
 
 def tp_dtype_to_py_type(dtype: DType) -> Any:
-    return _DTYPE_TO_PY_TYPES[dtype]
+    return DTYPE_TO_PY_TYPES[dtype]
 
 
 # The dtype of indexes.

@@ -69,6 +69,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "LESS_EQUAL_SCALAR",
             "LESS_SCALAR",
             "LOG",
+            "MAP",
             "MODULO",
             "MODULO_SCALAR",
             "MOVING_COUNT",
