@@ -4,10 +4,19 @@
 
 ### Features
 
-- Added `EventSet.tick_calendar()` operator.
-- Added `EventSet.where()` operator.
+### Improvements
+
+### Fixes
+
+## 0.1.5
+
+### Features
+
 - Added `EventSet.filter_moving_count()` operator.
 - Added `EventSet.map()` operator.
+- Added `EventSet.tick_calendar()` operator.
+- Added `EventSet.where()` operator.
+- Added all moving window operators to Beam execution backend.
 
 ### Improvements
 
@@ -15,6 +24,7 @@
 - Support `sampling` argument in `EventSet.cumsum()` operator.
 - Using utf-8 codec to support non-ascii in string values.
 - New `tp.types` module to facilitate access to types used throughout the API.
+- Relaxed version requirements for protobuf and pandas.
 
 ### Fixes
 
