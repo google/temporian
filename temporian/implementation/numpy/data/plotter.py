@@ -195,17 +195,17 @@ def plot(
     """Plots one or several [`EventSets`][temporian.EventSet].
 
 
-    If multiple eventsets are provided, they should all have the same index.
+    If multiple EventSets are provided, they should all have the same index.
     The time axis (i.e., horizontal axis) is shared among all the plots.
     Different features can be plotted independently or on the same plots.
-    Plotting an eventset without features plots timestamps instead.
+    Plotting an EventSet without features plots timestamps instead.
 
-    When plotting a single eventset, this function is equivalent to
+    When plotting a single EventSet, this function is equivalent to
     [`EventSet.plot()`][temporian.EventSet.plot].
 
-    Feature name are used as a legend. When plotting an eventset without
+    Feature names are used as a legend. When plotting an EventSet without
     features, the legend is set to be "[sampling]", or to the `name` of the
-    evenset, if set.
+    EventSet, if set.
 
     Examples:
         ```python
