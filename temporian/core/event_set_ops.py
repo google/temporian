@@ -1418,12 +1418,13 @@ class EventSetOperations:
         self: EventSetOrNode,
         func: MapFunction,
         output_dtypes: Optional[TargetDtypes] = None,
+        receive_extras: bool = False,
     ) -> EventSetOrNode:
         """Applies a function on each value of an
         [`EventSet`][temporian.EventSet]'s features.
 
-        The function receives the scalar value, and optionally as second
-        argument a [`MapExtras`][temporian.types.MapExtras] object containing
+        The function receives the scalar value, and if `receive_extras` is True,
+        also a [`MapExtras`][temporian.types.MapExtras] object containing
         information about the value's position in the EventSet. The MapExtras
         object should not be modified by the function, since it is shared across
         all calls.
@@ -1486,7 +1487,7 @@ class EventSetOperations:
             >>> def f(value, extras):
             ...     return f"{extras.feature_name}-{extras.timestamp}-{value}"
 
-            >>> b = a.map(f, output_dtypes=str)
+            >>> b = a.map(f, output_dtypes=str, receive_extras=True)
             >>> b
             indexes: ...
                 (3 events):
@@ -1506,13 +1507,21 @@ class EventSetOperations:
                 input dtypes (and not both types mixed), and the values are the
                 target dtypes for them. All dtypes must be Temporian types (see
                 `dtype.py`).
+            receive_extras: Whether the function should receive a
+                [`MapExtras`][temporian.types.MapExtras] object as second
+                argument.
 
         Returns:
             EventSet with the function applied on each value.
         """
         from temporian.core.operators.map import map as tp_map
 
-        return tp_map(self, func=func, output_dtypes=output_dtypes)
+        return tp_map(
+            self,
+            func=func,
+            output_dtypes=output_dtypes,
+            receive_extras=receive_extras,
+        )
 
     def moving_count(
         self: EventSetOrNode,

@@ -14,7 +14,6 @@
 
 """Map operator class and public API function definitions."""
 
-from inspect import signature
 from typing import Any, Callable, Dict, Optional, Union
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
@@ -51,6 +50,7 @@ class Map(Operator):
         self,
         input: EventSetNode,
         func: MapFunction,
+        receive_extras: bool,
         dtype: Optional[DType] = None,
         dtype_to_dtype: Optional[Dict[DType, DType]] = None,
         feature_name_to_dtype: Optional[Dict[str, DType]] = None,
@@ -84,11 +84,7 @@ class Map(Operator):
         )
         assert len(output_dtypes) == len(input.schema.features)
 
-        num_params = len(signature(func).parameters)
-        if num_params > 2 or num_params < 1:
-            raise ValueError("`func` must receive 1 or 2 arguments.")
-
-        self._receives_extras = num_params == 2
+        self._receive_extras = receive_extras
 
         self.add_attribute("func", func)
         self._func = func
@@ -114,8 +110,8 @@ class Map(Operator):
         return self._func
 
     @property
-    def receives_extras(self) -> bool:
-        return self._receives_extras
+    def receive_extras(self) -> bool:
+        return self._receive_extras
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
@@ -142,6 +138,7 @@ def map(
     input: EventSetOrNode,
     func: MapFunction,
     output_dtypes: Optional[TargetDtypes],
+    receive_extras: bool,
 ) -> EventSetOrNode:
     assert isinstance(input, EventSetNode)
 
@@ -154,6 +151,7 @@ def map(
     return Map(
         input=input,
         func=func,
+        receive_extras=receive_extras,
         dtype=dtype,
         feature_name_to_dtype=feature_name_to_dtype,
         dtype_to_dtype=dtype_to_dtype,

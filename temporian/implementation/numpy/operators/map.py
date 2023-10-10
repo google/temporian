@@ -40,7 +40,7 @@ class MapNumpyImplementation(OperatorImplementation):
         output_schema = self.output_schema("output")
 
         func = self.operator.func
-        receives_extras = self.operator.receives_extras
+        receive_extras = self.operator.receive_extras
 
         # Create output EventSet
         output_evset = EventSet(data={}, schema=output_schema)
@@ -59,15 +59,21 @@ class MapNumpyImplementation(OperatorImplementation):
                     timestamp=0,
                     feature_name=feature_schema.name,
                 )
+
+                # TODO: preallocate numpy array directly when output dtype isn't
+                # string (in which case we need to know the max length of func's
+                # results before doing so)
                 output_values = [None] * len(orig_feature)
+
                 for i, (value, timestamp) in enumerate(
                     zip(orig_feature, index_data.timestamps)
                 ):
                     extras.timestamp = timestamp
-                    if receives_extras:
+                    if receive_extras:
                         output_values[i] = func(value, extras)  # type: ignore
                     else:
                         output_values[i] = func(value)  # type: ignore
+
                 try:
                     output_arr = np.array(
                         output_values, dtype=tp_dtype_to_np_dtype(output_dtype)
@@ -79,6 +85,7 @@ class MapNumpyImplementation(OperatorImplementation):
                         " correct `output_dypes` and returning those types in"
                         " `func`."
                     ) from exc
+
                 features.append(output_arr)
 
             output_evset.set_index_value(

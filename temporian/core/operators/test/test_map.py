@@ -39,7 +39,7 @@ class MapTest(TestCase):
     def test_with_extras(self):
         evset = event_set(timestamps=[1, 2, 3], features={"x": [10, 20, 30]})
 
-        result = evset.map(lambda v, e: v + e.timestamp)
+        result = evset.map(lambda v, e: v + e.timestamp, receive_extras=True)
 
         expected = event_set(
             timestamps=[1, 2, 3],
@@ -117,25 +117,6 @@ class MapTest(TestCase):
             ),
         ):
             evset.map(lambda x: "v" + str(x))
-
-    def test_too_many_args(self):
-        evset = event_set(timestamps=[1], features={"a": [2]})
-
-        with self.assertRaisesRegex(
-            ValueError, "`func` must receive 1 or 2 arguments."
-        ):
-            evset.map(lambda v, e, z: v + e.timestamp)
-
-    def test_too_little_args(self):
-        evset = event_set(timestamps=[1], features={"a": [2]})
-
-        def f():
-            return 0
-
-        with self.assertRaisesRegex(
-            ValueError, "`func` must receive 1 or 2 arguments."
-        ):
-            evset.map(f)
 
     def test_serialize_fails(self):
         @compile
