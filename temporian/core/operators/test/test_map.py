@@ -131,6 +131,22 @@ class MapTest(TestCase):
         ):
             evset.map(lambda x: "v" + str(x))
 
+    def test_too_many_args(self):
+        evset = event_set(timestamps=[1, 2], features={"x": [10, 20]})
+
+        with self.assertRaisesRegex(
+            TypeError, "missing 1 required positional argument"
+        ):
+            evset.map(lambda x, e: "v" + str(x))
+
+    def test_too_little_args(self):
+        evset = event_set(timestamps=[1, 2], features={"x": [10, 20]})
+
+        with self.assertRaisesRegex(
+            TypeError, "takes 1 positional argument but 2 were given"
+        ):
+            evset.map(lambda x: "v" + str(x), receive_extras=True)
+
     def test_serialize_fails(self):
         @compile
         def f(e):
