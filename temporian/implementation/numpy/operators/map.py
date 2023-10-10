@@ -54,24 +54,20 @@ class MapNumpyImplementation(OperatorImplementation):
                 index_data.features,
                 output_schema.feature_dtypes(),
             ):
-                output_values = []
-                for value, timestamp in zip(
-                    orig_feature, index_data.timestamps
+                extras = MapExtras(
+                    index_key=index_key,
+                    timestamp=0,
+                    feature_name=feature_schema.name,
+                )
+                output_values = [None] * len(orig_feature)
+                for i, (value, timestamp) in enumerate(
+                    zip(orig_feature, index_data.timestamps)
                 ):
+                    extras.timestamp = timestamp
                     if receives_extras:
-                        output_values.append(
-                            func(
-                                value,
-                                MapExtras(
-                                    index_key=index_key,
-                                    timestamp=timestamp,
-                                    feature_name=feature_schema.name,
-                                ),
-                            )
-                        )
+                        output_values[i] = func(value, extras)  # type: ignore
                     else:
-                        assert len(signature(func).parameters) == 1
-                        output_values.append(func(value))
+                        output_values[i] = func(value)  # type: ignore
                 try:
                     output_arr = np.array(
                         output_values, dtype=tp_dtype_to_np_dtype(output_dtype)

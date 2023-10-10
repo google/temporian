@@ -1424,10 +1424,16 @@ class EventSetOperations:
 
         The function receives the scalar value, and optionally as second
         argument a [`MapExtras`][temporian.types.MapExtras] object containing
-        information about the value's position in the EventSet.
+        information about the value's position in the EventSet. The MapExtras
+        object should not be modified by the function, since it is shared across
+        all calls.
 
         If the output of the functon has a different dtype than the input, the
         `output_dtypes` argument must be specified.
+
+        This operator is slow. When possible, existing operators should be used.
+
+        A Temporian graph with a `map` operator is not serializable.
 
         Usage example with lambda function:
             ```python
