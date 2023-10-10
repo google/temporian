@@ -36,6 +36,19 @@ class MapTest(TestCase):
 
         assertOperatorResult(self, result, expected)
 
+    def test_builtin_func(self):
+        evset = event_set(timestamps=[1, 2, 3], features={"x": [1.1, 2.3, 2.8]})
+
+        result = evset.map(round)
+
+        expected = event_set(
+            timestamps=[1, 2, 3],
+            features={"x": [1.0, 2.0, 3.0]},
+            same_sampling_as=evset,
+        )
+
+        assertOperatorResult(self, result, expected)
+
     def test_with_extras(self):
         evset = event_set(timestamps=[1, 2, 3], features={"x": [10, 20, 30]})
 
