@@ -84,8 +84,8 @@ class Plotter(PlotterBackend):
         self,
         xs: np.ndarray,
         color_idx: int,
+        name: str,
     ):
-        name = "[sampling]"
         _matplotlib_sub_plot(
             ax=self.ax(),
             xs=xs,

@@ -93,9 +93,11 @@ class Plotter(PlotterBackend):
         self,
         xs: np.ndarray,
         color_idx: int,
+        name: str,
     ):
         self.ensure_cur_is_available(None)
 
+        # TODO: Use "name"
         color = colors[color_idx % len(colors)]
         data = {"x": xs, "y": np.zeros(len(xs)), "color": color}
         self.cur_fig.scatter(**data)

@@ -62,6 +62,9 @@ class GroupItem:
     # Index of the feature in "evset". If -1, plots the timestamp.
     feature_idx: int
 
+    # Optional plotting name. Only used when plotting timestamps.
+    name: Optional[str] = None
+
 
 @dataclass
 class Group:
@@ -116,7 +119,7 @@ def build_groups(
             groups.append(Group([GroupItem(evsets, feature_idx)]))
         if len(groups) == 0:
             # Plot the timestamps
-            groups.append(Group([GroupItem(evsets, -1)]))
+            groups.append(Group([GroupItem(evsets, -1, name=evsets.name)]))
         return groups
 
     if isinstance(evsets, tuple):
@@ -134,7 +137,7 @@ def build_groups(
                 group_items.append(GroupItem(evset, feature_idx))
                 plot_for_current_evset = True
             if not plot_for_current_evset:
-                group_items.append(GroupItem(evset, -1))
+                group_items.append(GroupItem(evset, -1, name=evset.name))
 
         return [Group(group_items)]
 
@@ -192,13 +195,17 @@ def plot(
     """Plots one or several [`EventSets`][temporian.EventSet].
 
 
-    If multiple eventsets are provided, they should all have the same index.
+    If multiple EventSets are provided, they should all have the same index.
     The time axis (i.e., horizontal axis) is shared among all the plots.
     Different features can be plotted independently or on the same plots.
-    Plotting an eventset without features plots timestamps instead.
+    Plotting an EventSet without features plots timestamps instead.
 
-    When plotting a single eventset, this function is equivalent to
+    When plotting a single EventSet, this function is equivalent to
     [`EventSet.plot()`][temporian.EventSet.plot].
+
+    Feature names are used as a legend. When plotting an EventSet without
+    features, the legend is set to be "[sampling]", or to the `name` of the
+    EventSet, if set.
 
     Examples:
         ```python
@@ -396,7 +403,11 @@ def plot_with_plotter(
 
                 if group_item.feature_idx == -1:
                     # Plot the timestamps.
-                    plotter.plot_sampling(xs=xs, color_idx=color_idx)
+                    plotter.plot_sampling(
+                        xs=xs,
+                        color_idx=color_idx,
+                        name=group_item.name or "[sampling]",
+                    )
                 else:
                     feature_name = group_item.evset.schema.features[
                         group_item.feature_idx
