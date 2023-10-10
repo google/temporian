@@ -43,6 +43,10 @@ class DType(Enum):
     def is_integer(self) -> bool:
         return self in (DType.INT64, DType.INT32)
 
+    @property
+    def is_numerical(self) -> bool:
+        return self.is_float or self.is_integer
+
     def missing_value(self) -> Union[float, int, bytes]:
         """
         Returns missing value for specific dtype.

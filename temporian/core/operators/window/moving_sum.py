@@ -33,6 +33,12 @@ class MovingSumOperator(BaseWindowOperator):
         return "MOVING_SUM"
 
     def get_feature_dtype(self, feature: FeatureSchema) -> DType:
+        if not feature.dtype.is_numerical:
+            raise ValueError(
+                "moving_sum requires numerical point inputs."
+                " Instead, get feature {feature.name!r} with type"
+                f" {feature.dtype}."
+            )
         return feature.dtype
 
 

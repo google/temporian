@@ -31,6 +31,12 @@ class MovingMaxOperator(BaseWindowOperator):
         return "MOVING_MAX"
 
     def get_feature_dtype(self, feature: FeatureSchema) -> DType:
+        if not feature.dtype.is_numerical:
+            raise ValueError(
+                "moving_max requires numerical point inputs."
+                " Instead, get feature {feature.name!r} with type"
+                f" {feature.dtype}."
+            )
         return feature.dtype
 
 
