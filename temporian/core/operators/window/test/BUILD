@@ -52,3 +52,39 @@ py_test(
         "//temporian/test:utils",
     ],
 )
+
+py_test(
+    name = "test_moving_min",
+    srcs = ["test_moving_min.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_moving_max",
+    srcs = ["test_moving_max.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_moving_standard_deviation",
+    srcs = ["test_moving_standard_deviation.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
