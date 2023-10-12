@@ -30,6 +30,13 @@ class MovingStandardDeviationOperator(BaseWindowOperator):
         return "MOVING_STANDARD_DEVIATION"
 
     def get_feature_dtype(self, feature: FeatureSchema) -> DType:
+        if not feature.dtype.is_float:
+            raise ValueError(
+                "moving_standard_deviation requires the input EventSet to"
+                " contain floating point features only, but received feature"
+                f" {feature.name!r} with type {feature.dtype}. Note: You can"
+                " cast features e.g. `.cast(tp.float32)`"
+            )
         return (
             DType.FLOAT32 if feature.dtype == DType.FLOAT32 else DType.FLOAT64
         )

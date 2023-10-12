@@ -269,6 +269,22 @@ class SimpleMovingAverageTest(TestCase):
         result = evset.simple_moving_average(window_length=5.0)
         assertOperatorResult(self, result, expected)
 
+    def test_error_input_int(self):
+        evset = event_set([1, 2], {"f": [1, 2]})
+        with self.assertRaisesRegex(
+            ValueError,
+            "simple_moving_average requires the input EventSet to contain",
+        ):
+            _ = evset.simple_moving_average(1)
+
+    def test_error_input_bytes(self):
+        evset = event_set([1, 2], {"f": ["A", "B"]})
+        with self.assertRaisesRegex(
+            ValueError,
+            "simple_moving_average requires the input EventSet to contain",
+        ):
+            _ = evset.simple_moving_average(1)
+
 
 if __name__ == "__main__":
     absltest.main()

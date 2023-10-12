@@ -31,6 +31,12 @@ class MovingMinOperator(BaseWindowOperator):
         return "MOVING_MIN"
 
     def get_feature_dtype(self, feature: FeatureSchema) -> DType:
+        if not feature.dtype.is_numerical:
+            raise ValueError(
+                "moving_min requires the input EventSet to contain numerical"
+                f" features only, but received feature {feature.name!r} with"
+                f" type {feature.dtype}"
+            )
         return feature.dtype
 
 

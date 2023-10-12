@@ -197,6 +197,14 @@ class MovingSumTest(TestCase):
             window_length=window_length.data[()].features[0],
         )
 
+    def test_error_input_bytes(self):
+        evset = event_set([1, 2], {"f": ["A", "B"]})
+        with self.assertRaisesRegex(
+            ValueError,
+            "moving_sum requires the input EventSet to contain numerical",
+        ):
+            _ = evset.moving_sum(1)
+
 
 if __name__ == "__main__":
     absltest.main()

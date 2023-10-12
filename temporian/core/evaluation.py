@@ -294,7 +294,7 @@ def has_leak(
 
     Single input output example:
         ```python
-        >>> a = tp.input_node([("f", float)])
+        >>> a = tp.input_node([("f", tp.float32)])
         >>> b = a.moving_sum(5)
         >>> c = b.leak(6)
         >>> d = c.prefix("my_prefix_")
