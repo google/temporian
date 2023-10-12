@@ -201,7 +201,7 @@ class MovingSumTest(TestCase):
         evset = event_set([1, 2], {"f": ["A", "B"]})
         with self.assertRaisesRegex(
             ValueError,
-            "moving_sum requires numerical point inputs",
+            "moving_sum requires the input EventSet to contain numerical",
         ):
             _ = evset.moving_sum(1)
 

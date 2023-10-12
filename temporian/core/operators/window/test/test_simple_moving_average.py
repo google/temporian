@@ -273,7 +273,7 @@ class SimpleMovingAverageTest(TestCase):
         evset = event_set([1, 2], {"f": [1, 2]})
         with self.assertRaisesRegex(
             ValueError,
-            "simple_moving_average requires floating point inputs",
+            "simple_moving_average requires the input EventSet to contain",
         ):
             _ = evset.simple_moving_average(1)
 
@@ -281,7 +281,7 @@ class SimpleMovingAverageTest(TestCase):
         evset = event_set([1, 2], {"f": ["A", "B"]})
         with self.assertRaisesRegex(
             ValueError,
-            "simple_moving_average requires floating point inputs",
+            "simple_moving_average requires the input EventSet to contain",
         ):
             _ = evset.simple_moving_average(1)
 
