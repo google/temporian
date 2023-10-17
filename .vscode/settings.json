@@ -25,7 +25,15 @@
     "**/.cache/**": true,
     "**/temporian.egg-info/**": true,
   },
-  "python.formatting.provider": "black",
+  "black-formatter.interpreter": [
+    "${workspaceFolder}/.venv/bin/python"
+  ],
+  "black-formatter.path": [
+    "${workspaceFolder}/.venv/bin/black"
+  ],
+  "black-formatter.args": [
+    "--config=${workspaceFolder}/pyproject.toml"
+  ],
   "editor.tabSize": 4,
   "editor.formatOnSave": true,
   "python.linting.flake8Enabled": false,

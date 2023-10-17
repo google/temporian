@@ -31,10 +31,12 @@ def assertEqualEventSet(
     test.assertEqual(
         real,
         expected,
-        "\n==========\nREAL:\n==========\n"
-        f"{real}"
-        "\n==========\nEXPECTED:\n==========\n"
-        f"{expected}",
+        (
+            "\n==========\nREAL:\n==========\n"
+            f"{real}"
+            "\n==========\nEXPECTED:\n==========\n"
+            f"{expected}"
+        ),
     )
 
 
@@ -46,10 +48,12 @@ def assertEqualDFRandomRowOrder(
     test.assertEqual(
         row_real,
         row_expected,
-        "\n==========\nREAL:\n==========\n"
-        f"{real}"
-        "\n==========\nEXPECTED:\n==========\n"
-        f"{expected}",
+        (
+            "\n==========\nREAL:\n==========\n"
+            f"{real}"
+            "\n==========\nEXPECTED:\n==========\n"
+            f"{expected}"
+        ),
     )
 
 

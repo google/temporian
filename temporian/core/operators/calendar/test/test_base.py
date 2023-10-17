@@ -28,8 +28,10 @@ class BaseCalendarTest(TestCase):
 
         with self.assertRaisesRegex(
             ValueError,
-            "Calendar operators can only be applied on nodes with unix"
-            " timestamps as sampling",
+            (
+                "Calendar operators can only be applied on nodes with unix"
+                " timestamps as sampling"
+            ),
         ):
             event_set(
                 timestamps=["1970-01-01 00:00:00"],
