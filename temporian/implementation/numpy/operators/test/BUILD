@@ -609,6 +609,7 @@ py_test(
     deps = [
         # already_there/absl/testing:absltest
         ":utils",
+        "//temporian/test:utils",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
