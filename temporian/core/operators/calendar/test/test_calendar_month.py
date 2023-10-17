@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pandas as pd
 from absl.testing import absltest
 from absl.testing.parameterized import TestCase
 
@@ -20,24 +19,27 @@ from temporian.implementation.numpy.data.io import event_set
 from temporian.test.utils import assertOperatorResult, i32
 
 
-class CalendarDayOfWeekTest(TestCase):
+class CalendarMonthTest(TestCase):
     def test_basic(self):
         timestamps = [
-            pd.to_datetime("Monday Mar 13 12:00:00 2023", utc=True),
-            pd.to_datetime("Tuesday Mar 14 12:00:00 2023", utc=True),
-            pd.to_datetime("Friday Mar 17 00:00:01 2023", utc=True),
-            pd.to_datetime("Friday Mar 17 23:59:59 2023", utc=True),
-            pd.to_datetime("Sunday Mar 19 23:59:59 2023", utc=True),
+            "1970-01-01 00:00:00",
+            "2021-01-01 00:00:00",
+            "2021-07-15 12:30:00",
+            "2021-12-31 23:59:59",
+            "2045-12-31 23:59:59",
+            "2045-12-01 00:00:00",
         ]
         evset = event_set(timestamps=timestamps)
 
         expected = event_set(
             timestamps=timestamps,
-            features={"calendar_day_of_week": i32([0, 1, 4, 4, 6])},
+            features={
+                "calendar_month": i32([1, 1, 7, 12, 12, 12]),
+            },
             same_sampling_as=evset,
         )
 
-        result = evset.calendar_day_of_week()
+        result = evset.calendar_month()
         assertOperatorResult(self, result, expected)
 
 

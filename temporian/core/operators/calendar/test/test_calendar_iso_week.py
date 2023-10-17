@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pandas as pd
 from absl.testing import absltest
 from absl.testing.parameterized import TestCase
 
@@ -20,24 +19,29 @@ from temporian.implementation.numpy.data.io import event_set
 from temporian.test.utils import assertOperatorResult, i32
 
 
-class CalendarDayOfWeekTest(TestCase):
+class CalendarIsoWeekTest(TestCase):
     def test_basic(self):
         timestamps = [
-            pd.to_datetime("Monday Mar 13 12:00:00 2023", utc=True),
-            pd.to_datetime("Tuesday Mar 14 12:00:00 2023", utc=True),
-            pd.to_datetime("Friday Mar 17 00:00:01 2023", utc=True),
-            pd.to_datetime("Friday Mar 17 23:59:59 2023", utc=True),
-            pd.to_datetime("Sunday Mar 19 23:59:59 2023", utc=True),
+            "1970-01-01",  # Thursday, so ISO week 1 goes until Sunday 4th
+            "1970-01-04",  # Sunday, still ISO week 1
+            "1970-01-05",  # Monday, ISO week 2
+            "2023-01-01",  # Sunday, ISO week 52 (week 1 is the first to contain a Thursday)
+            "2023-01-08",  # Sunday, ISO week 1
+            "2023-01-09",  # Monday, ISO week "2023-03-24", ISO week 1"2023-12-31", ISO week 52
+            "2023-03-24",  # ISO week 12
+            "2023-12-31",  # ISO week 52
         ]
         evset = event_set(timestamps=timestamps)
 
         expected = event_set(
             timestamps=timestamps,
-            features={"calendar_day_of_week": i32([0, 1, 4, 4, 6])},
+            features={
+                "calendar_iso_week": i32([1, 1, 2, 52, 1, 2, 12, 52]),
+            },
             same_sampling_as=evset,
         )
 
-        result = evset.calendar_day_of_week()
+        result = evset.calendar_iso_week()
         assertOperatorResult(self, result, expected)
 
 

@@ -14,6 +14,7 @@
 
 import os
 import sys
+import time
 
 import numpy as np
 from absl import flags
@@ -93,3 +94,18 @@ def assertOperatorResult(
             nodes[serialization._identifier(node)] = node
 
         _ = serialization._unserialize_operator(serialized_op, nodes)
+
+
+class SetTimezone:
+    def __init__(self, timezone: str = "America/Montevideo"):
+        self._tz = timezone
+        self._restore_tz = ""
+
+    def __enter__(self):
+        self._restore_tz = os.environ.get("TZ", "")
+        os.environ["TZ"] = self._tz
+        time.tzset()
+
+    def __exit__(self, *args):
+        os.environ["TZ"] = self._restore_tz
+        time.tzset()
