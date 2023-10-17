@@ -25,7 +25,7 @@ from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy.operators.window import (
     base as base_window_impl,
 )
-from temporian.test.utils import _f32
+from temporian.test.utils import f32
 
 
 class SimpleMovingAverageTest(absltest.TestCase):
@@ -50,7 +50,7 @@ class SimpleMovingAverageTest(absltest.TestCase):
         evset = event_set(timestamps=[0], features={"a": [1]})
         window_length = event_set(
             timestamps=[1],
-            features={"a": _f32([1])},
+            features={"a": f32([1])},
         )
         with self.assertRaisesRegex(
             ValueError, "`window_length` must have exactly one float64 feature"
