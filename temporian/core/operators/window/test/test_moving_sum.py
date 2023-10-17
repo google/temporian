@@ -21,19 +21,19 @@ from absl.testing.parameterized import TestCase, parameters
 
 from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy_cc.operators import operators_cc
-from temporian.test.utils import _f32, _f64, assertOperatorResult
+from temporian.test.utils import f32, f64, assertOperatorResult
 
 
 class MovingSumTest(TestCase):
     def test_without_sampling(self):
-        timestamps = _f64([1, 2, 3, 5, 20])
+        timestamps = f64([1, 2, 3, 5, 20])
         evset = event_set(
-            timestamps=timestamps, features={"a": _f32([10, nan, 12, 13, 14])}
+            timestamps=timestamps, features={"a": f32([10, nan, 12, 13, 14])}
         )
 
         expected = event_set(
             timestamps=timestamps,
-            features={"a": _f32([10.0, 10.0, 22.0, 35.0, 14.0])},
+            features={"a": f32([10.0, 10.0, 22.0, 35.0, 14.0])},
             same_sampling_as=evset,
         )
 
@@ -90,14 +90,14 @@ class MovingSumTest(TestCase):
 
     @parameters(
         {  # normal
-            "timestamps": _f64([1, 2, 3, 5, 6]),
+            "timestamps": f64([1, 2, 3, 5, 6]),
             "feature": [10.0, 11.0, 12.0, 13.0, 14.0],
             "window_length": 3.1,
             "sampling_timestamps": [-1.0, 1.0, 1.1, 3.0, 3.5, 6.0, 10.0],
             "output_feature": [0.0, 10.0, 10.0, 33.0, 33.0, 39.0, 0.0],
         },
         {  # w nan
-            "timestamps": _f64([1, 2, 3, 5, 6]),
+            "timestamps": f64([1, 2, 3, 5, 6]),
             "feature": [nan, 11.0, nan, 13.0, 14.0],
             "window_length": 1.1,
             "sampling_timestamps": [1, 2, 2.5, 3, 3.5, 4, 5, 6],
@@ -130,21 +130,21 @@ class MovingSumTest(TestCase):
         assertOperatorResult(self, result, expected)
 
     def test_with_variable_winlen_same_sampling(self):
-        timestamps = _f64([0, 1, 2, 3, 5, 20])
+        timestamps = f64([0, 1, 2, 3, 5, 20])
         evset = event_set(
             timestamps=timestamps,
-            features={"a": _f32([nan, 10, 11, 12, 13, 14])},
+            features={"a": f32([nan, 10, 11, 12, 13, 14])},
         )
 
         window = event_set(
             timestamps=timestamps,
-            features={"a": _f64([1, 1, 1.5, 0.5, 3.5, 20])},
+            features={"a": f64([1, 1, 1.5, 0.5, 3.5, 20])},
             same_sampling_as=evset,
         )
 
         expected = event_set(
             timestamps=timestamps,
-            features={"a": _f32([0, 10, 21, 12, 36, 60])},
+            features={"a": f32([0, 10, 21, 12, 36, 60])},
             same_sampling_as=evset,
         )
 
@@ -152,12 +152,12 @@ class MovingSumTest(TestCase):
         assertOperatorResult(self, result, expected)
 
     def test_with_variable_winlen_diff_sampling(self):
-        window_timestamps = _f64([-1, 1, 4, 19, 20, 20])
-        window_length = _f64([10, 0.5, 2.5, 19, 16, np.inf])
+        window_timestamps = f64([-1, 1, 4, 19, 20, 20])
+        window_length = f64([10, 0.5, 2.5, 19, 16, np.inf])
 
         evset = event_set(
-            timestamps=_f64([0, 1, 2, 3, 5, 20]),
-            features={"a": _f32([nan, 10, 11, 12, 13, 14])},
+            timestamps=f64([0, 1, 2, 3, 5, 20]),
+            features={"a": f32([nan, 10, 11, 12, 13, 14])},
         )
 
         window = event_set(
@@ -167,7 +167,7 @@ class MovingSumTest(TestCase):
 
         expected = event_set(
             timestamps=window_timestamps,
-            features={"a": _f32([0, 10, 23, 46, 27, 60])},
+            features={"a": f32([0, 10, 23, 46, 27, 60])},
             same_sampling_as=window,
         )
 
@@ -186,7 +186,7 @@ class MovingSumTest(TestCase):
             timestamps=[1], features={"a": [1.0]}, same_sampling_as=evset
         )
 
-        cpp_moving_sum_mock.return_value = _f64([10.0])
+        cpp_moving_sum_mock.return_value = f64([10.0])
 
         evset.moving_sum(window_length=window_length)
 

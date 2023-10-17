@@ -48,12 +48,16 @@ def get_test_data_path(path: str) -> str:
     return os.path.join(flags.FLAGS.test_srcdir, "temporian", path)
 
 
-def _f64(l):
+def f64(l):
     return np.array(l, np.float64)
 
 
-def _f32(l):
+def f32(l):
     return np.array(l, np.float32)
+
+
+def i32(l):
+    return np.array(l, np.int32)
 
 
 def assertOperatorResult(
