@@ -26,6 +26,7 @@ from temporian.core.data.schema import Schema
 from temporian.core.operators.base import Operator
 from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
+from temporian.utils.typecheck import typecheck
 
 
 class RenameOperator(Operator):
@@ -165,6 +166,7 @@ def _normalize_rename_indexes(
     return indexes
 
 
+@typecheck
 @compile
 def rename(
     input: EventSetOrNode,
