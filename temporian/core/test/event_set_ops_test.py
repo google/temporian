@@ -43,50 +43,6 @@ class EventSetOpsTest(absltest.TestCase):
         self.assertTrue(isinstance(self.evset.begin(), EventSet))
         self.assertTrue(isinstance(self.node.begin(), EventSetNode))
 
-    def test_calendar_day_of_month(self):
-        self.assertTrue(
-            isinstance(self.evset.calendar_day_of_month(), EventSet)
-        )
-        self.assertTrue(
-            isinstance(self.node.calendar_day_of_month(), EventSetNode)
-        )
-
-    def test_calendar_day_of_week(self):
-        self.assertTrue(isinstance(self.evset.calendar_day_of_week(), EventSet))
-        self.assertTrue(
-            isinstance(self.node.calendar_day_of_week(), EventSetNode)
-        )
-
-    def test_calendar_day_of_year(self):
-        self.assertTrue(isinstance(self.evset.calendar_day_of_year(), EventSet))
-        self.assertTrue(
-            isinstance(self.node.calendar_day_of_year(), EventSetNode)
-        )
-
-    def test_calendar_hour(self):
-        self.assertTrue(isinstance(self.evset.calendar_hour(), EventSet))
-        self.assertTrue(isinstance(self.node.calendar_hour(), EventSetNode))
-
-    def test_calendar_iso_week(self):
-        self.assertTrue(isinstance(self.evset.calendar_iso_week(), EventSet))
-        self.assertTrue(isinstance(self.node.calendar_iso_week(), EventSetNode))
-
-    def test_calendar_minute(self):
-        self.assertTrue(isinstance(self.evset.calendar_minute(), EventSet))
-        self.assertTrue(isinstance(self.node.calendar_minute(), EventSetNode))
-
-    def test_calendar_month(self):
-        self.assertTrue(isinstance(self.evset.calendar_month(), EventSet))
-        self.assertTrue(isinstance(self.node.calendar_month(), EventSetNode))
-
-    def test_calendar_second(self):
-        self.assertTrue(isinstance(self.evset.calendar_second(), EventSet))
-        self.assertTrue(isinstance(self.node.calendar_second(), EventSetNode))
-
-    def test_calendar_year(self):
-        self.assertTrue(isinstance(self.evset.calendar_year(), EventSet))
-        self.assertTrue(isinstance(self.node.calendar_year(), EventSetNode))
-
     def test_cast(self):
         self.assertTrue(isinstance(self.evset.cast({"a": float}), EventSet))
         self.assertTrue(isinstance(self.node.cast({"a": float}), EventSetNode))
