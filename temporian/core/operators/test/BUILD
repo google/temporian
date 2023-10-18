@@ -76,3 +76,14 @@ py_test(
         "//temporian/core/operators:tick_calendar",
     ],
 )
+
+py_test(
+    name = "test_arithmetic_multi_index",
+    srcs = ["test_arithmetic_multi_index.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
+        # "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
