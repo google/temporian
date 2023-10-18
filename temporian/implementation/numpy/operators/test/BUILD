@@ -272,25 +272,6 @@ py_test(
 )
 
 py_test(
-    name = "moving_standard_deviation_test",
-    srcs = ["moving_standard_deviation_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/pandas
-        # already_there/numpy
-        "//temporian/io:pandas",
-        ":utils",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/core/operators/window:moving_standard_deviation",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators/window:moving_standard_deviation",
-    ],
-)
-
-py_test(
     name = "moving_count_test",
     srcs = ["moving_count_test.py"],
     srcs_version = "PY3",
@@ -306,25 +287,6 @@ py_test(
         "//temporian/core/operators/window:moving_count",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators/window:moving_count",
-    ],
-)
-
-py_test(
-    name = "moving_min_test",
-    srcs = ["moving_min_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/pandas
-        # already_there/numpy
-        "//temporian/io:pandas",
-        ":utils",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/core/operators/window:moving_min",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators/window:moving_min",
     ],
 )
 
