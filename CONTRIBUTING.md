@@ -36,14 +36,20 @@ Temporian requires Python `3.9.0` or greater. We recommend using [PyEnv](https:/
 pyenv install 3.9.6
 ```
 
-After both Poetry and an adequate Python version have been installed, you can proceed to install the virtual environment and the required dependencies. Navigate to the project's root and run:
+After both Poetry and an adequate Python version have been installed, you can proceed to install the virtual environment and the required dependencies.
+
+Configure poetry to create the virtual environment in the project's root directory (some vscode settings depend on this) by executing:
+
+```shell
+poetry config virtualenvs.in-project true
+```
+
+Navigate to the project's root and run:
 
 ```shell
 pyenv which python | xargs poetry env use
 poetry install
 ```
-
-You can also install the environment in the project's root directory by executing `poetry config virtualenvs.in-project true` before it.
 
 Finally, activate the virtual environment by executing:
 
