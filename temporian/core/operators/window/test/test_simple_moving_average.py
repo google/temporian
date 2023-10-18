@@ -20,7 +20,7 @@ from absl.testing.parameterized import parameters
 from absl.testing.parameterized import TestCase
 
 from temporian.implementation.numpy.data.io import event_set
-from temporian.test.utils import _f32, _f64, assertOperatorResult
+from temporian.test.utils import f32, f64, assertOperatorResult
 from temporian.core.data.duration import shortest
 
 
@@ -28,27 +28,27 @@ class SimpleMovingAverageTest(TestCase):
     @parameters(
         {  # empty f32
             "timestamps": [],
-            "feature": _f32([]),
+            "feature": f32([]),
             "window": 5.0,
-            "output_feature": _f32([]),
+            "output_feature": f32([]),
         },
         {  # empty f64
             "timestamps": [],
-            "feature": _f64([]),
+            "feature": f64([]),
             "window": 5.0,
-            "output_feature": _f64([]),
+            "output_feature": f64([]),
         },
         {  # normal
             "timestamps": [1, 2, 3, 5, 20],
-            "feature": _f32([10, 11, 12, 13, 14]),
+            "feature": f32([10, 11, 12, 13, 14]),
             "window": 5.0,
-            "output_feature": _f32([10.0, 10.5, 11.0, 11.5, 14.0]),
+            "output_feature": f32([10.0, 10.5, 11.0, 11.5, 14.0]),
         },
         {  # w nan
             "timestamps": [1, 1.5, 2, 5, 20],
-            "feature": _f32([10, nan, nan, 13, 14]),
+            "feature": f32([10, nan, nan, 13, 14]),
             "window": 1.0,
-            "output_feature": _f32([10.0, 10.0, nan, 13.0, 14.0]),
+            "output_feature": f32([10.0, 10.0, nan, 13.0, 14.0]),
         },
     )
     def test_without_sampling(
@@ -72,31 +72,31 @@ class SimpleMovingAverageTest(TestCase):
     @parameters(
         {  # empty f32
             "timestamps": [],
-            "feature": _f32([]),
+            "feature": f32([]),
             "window": 5.0,
             "sampling_timestamps": [],
-            "output_feature": _f32([]),
+            "output_feature": f32([]),
         },
         {  # empty f64
             "timestamps": [],
-            "feature": _f64([]),
+            "feature": f64([]),
             "window": 5.0,
             "sampling_timestamps": [],
-            "output_feature": _f64([]),
+            "output_feature": f64([]),
         },
         {  # normal
             "timestamps": [1, 2, 3, 5, 6],
-            "feature": _f32([10, 11, 12, 13, 14]),
+            "feature": f32([10, 11, 12, 13, 14]),
             "window": 3.0,
             "sampling_timestamps": [-1.0, 1.0, 1.1, 3.0, 3.5, 6.0, 10.0],
-            "output_feature": _f32([nan, 10.0, 10.0, 11.0, 11.0, 13.5, nan]),
+            "output_feature": f32([nan, 10.0, 10.0, 11.0, 11.0, 13.5, nan]),
         },
         {  # w nan
             "timestamps": [1, 2, 3, 5, 6],
-            "feature": _f32([nan, 11, nan, 13, 14]),
+            "feature": f32([nan, 11, nan, 13, 14]),
             "window": 1.0,
             "sampling_timestamps": [1.0, 2.0, 2.5, 3.0, 3.5, 4.0, 5.0, 6.0],
-            "output_feature": _f32([nan, 11.0, 11.0, nan, nan, nan, 13.0, 14]),
+            "output_feature": f32([nan, 11.0, 11.0, nan, nan, nan, 13.0, 14]),
         },
     )
     def test_with_sampling(
@@ -125,9 +125,9 @@ class SimpleMovingAverageTest(TestCase):
     @parameters(
         {  # normal
             "timestamps": [0, 1, 2, 3, 5, 20],
-            "feature": _f32([nan, 10, 11, 12, 13, 14]),
-            "variable_window": _f64([1, 1, 1.5, 0.5, 3.5, 20]),
-            "output_feature": _f32([nan, 10, 10.5, 12, 12, 12]),
+            "feature": f32([nan, 10, 11, 12, 13, 14]),
+            "variable_window": f64([1, 1, 1.5, 0.5, 3.5, 20]),
+            "output_feature": f32([nan, 10, 10.5, 12, 12, 12]),
         },
         {  # invalid values
             "timestamps": [0, 1, 2, 3, 5, 6, 20],
@@ -143,15 +143,15 @@ class SimpleMovingAverageTest(TestCase):
         },
         {  # repeated ts same winlen
             "timestamps": [2, 2, 2, 2],
-            "feature": _f64([10, 11, 12, 13]),
-            "variable_window": _f64([0, 1, 1, 2]),
+            "feature": f64([10, 11, 12, 13]),
+            "variable_window": f64([0, 1, 1, 2]),
             "output_feature": [nan, 11.5, 11.5, 11.5],
         },
         {  # empty
-            "timestamps": _f64([]),
-            "feature": _f64([]),
-            "variable_window": _f64([]),
-            "output_feature": _f64([]),
+            "timestamps": f64([]),
+            "feature": f64([]),
+            "variable_window": f64([]),
+            "output_feature": f64([]),
         },
     )
     def test_with_variable_winlen_same_sampling(
@@ -209,17 +209,17 @@ class SimpleMovingAverageTest(TestCase):
         },
         {  # repeated ts same winlen
             "timestamps": [0, 1, 2, 3],
-            "feature": _f64([10, 11, 12, 13]),
+            "feature": f64([10, 11, 12, 13]),
             "window_timestamps": [2, 2, 2, 2],
-            "variable_window": _f64([0, 1, 1, 2]),
-            "output_feature": _f64([nan, 12, 12, 11.5]),
+            "variable_window": f64([0, 1, 1, 2]),
+            "output_feature": f64([nan, 12, 12, 11.5]),
         },
         {  # empty arrays
-            "timestamps": _f64([1]),
-            "feature": _f64([10]),
-            "variable_window": _f64([]),
-            "window_timestamps": _f64([]),
-            "output_feature": _f64([]),
+            "timestamps": f64([1]),
+            "feature": f64([10]),
+            "variable_window": f64([]),
+            "window_timestamps": f64([]),
+            "output_feature": f64([]),
         },
     )
     def test_with_variable_winlen_diff_sampling(

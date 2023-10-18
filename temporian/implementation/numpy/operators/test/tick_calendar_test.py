@@ -23,8 +23,8 @@ from temporian.implementation.numpy.operators.tick_calendar import (
 from temporian.implementation.numpy.operators.test.utils import (
     assertEqualEventSet,
     testOperatorAndImp,
-    SetTimezone,
 )
+from temporian.test.utils import SetTimezone
 
 
 class TickCalendarOperatorTest(absltest.TestCase):
