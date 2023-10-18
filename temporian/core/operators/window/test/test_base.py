@@ -25,7 +25,8 @@ from temporian.implementation.numpy.data.io import event_set
 from temporian.implementation.numpy.operators.window import (
     base as base_window_impl,
 )
-from temporian.test.utils import f32
+from temporian.implementation.numpy_cc.operators import operators_cc
+from temporian.test.utils import f32, f64
 
 
 class SimpleMovingAverageTest(absltest.TestCase):
@@ -88,6 +89,29 @@ class SimpleMovingAverageTest(absltest.TestCase):
             ),
         ):
             evset.moving_sum(window_length=window_length, sampling=sampling)
+
+    @patch.object(operators_cc, "moving_sum")
+    def test_with_variable_winlen_same_sampling_uses_correct_cpp_impl(
+        self, cpp_moving_sum_mock
+    ):
+        """Checks that the no-sampling version of cpp code is called when
+        passing a variable window_length with same sampling as the input."""
+        evset = event_set(timestamps=[1], features={"a": [10.0]})
+
+        window_length = event_set(
+            timestamps=[1], features={"a": [1.0]}, same_sampling_as=evset
+        )
+
+        cpp_moving_sum_mock.return_value = f64([10.0])
+
+        evset.moving_sum(window_length=window_length)
+
+        # sampling_timestamps not passed
+        cpp_moving_sum_mock.assert_called_once_with(
+            evset_timestamps=evset.data[()].timestamps,
+            evset_values=evset.data[()].features[0],
+            window_length=window_length.data[()].features[0],
+        )
 
 
 if __name__ == "__main__":
