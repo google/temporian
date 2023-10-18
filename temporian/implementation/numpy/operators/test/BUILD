@@ -272,44 +272,6 @@ py_test(
 )
 
 py_test(
-    name = "moving_count_test",
-    srcs = ["moving_count_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/pandas
-        # already_there/numpy
-        "//temporian/io:pandas",
-        ":utils",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/core/operators/window:moving_count",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators/window:moving_count",
-    ],
-)
-
-py_test(
-    name = "moving_max_test",
-    srcs = ["moving_max_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/pandas
-        # already_there/numpy
-        "//temporian/io:pandas",
-        ":utils",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/core/operators/window:moving_max",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators/window:moving_max",
-    ],
-)
-
-py_test(
     name = "propagate_test",
     srcs = ["propagate_test.py"],
     srcs_version = "PY3",
