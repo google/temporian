@@ -187,6 +187,22 @@ class RenameTest(TestCase):
         )
         assertOperatorResult(self, result, expected, check_sampling=False)
 
+    def test_single_string_when_multiple_features(self):
+        evset = event_set(
+            timestamps=[1, 2],
+            features={"a": [10, 11], "b": [1, 2]},
+        )
+
+        with self.assertRaisesRegex(
+            ValueError,
+            (
+                "Cannot apply rename operator with a single rename string when "
+                "the EventSet contains multiple features. Pass a dictionary "
+                "of rename strings instead."
+            ),
+        ):
+            evset.rename("c")
+
 
 if __name__ == "__main__":
     absltest.main()
