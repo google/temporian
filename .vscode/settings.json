@@ -34,6 +34,10 @@
   "black-formatter.args": [
     "--config=${workspaceFolder}/pyproject.toml"
   ],
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true
+  },
   "editor.tabSize": 4,
   "editor.formatOnSave": true,
   "python.linting.flake8Enabled": false,
