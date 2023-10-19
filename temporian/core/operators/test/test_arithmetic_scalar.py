@@ -157,7 +157,7 @@ class ArithmeticScalarTest(absltest.TestCase):
     def test_correct_sum_multi_index(self) -> None:
         """Test correct sum operator with multiple indexes."""
 
-        evset = event_set(
+        evset_index = event_set(
             timestamps=[1, 2, 3, 4, 5],
             features={
                 "store_id": [0, 0, 1, 1, 2],
@@ -176,13 +176,13 @@ class ArithmeticScalarTest(absltest.TestCase):
                 "sales": [20, 10, 22, np.nan, 40],
             },
             indexes=["store_id", "product_id"],
-            same_sampling_as=evset,
+            same_sampling_as=evset_index,
         )
 
         # evset first
-        assertOperatorResult(self, self.evset + value, expected)
+        assertOperatorResult(self, evset_index + value, expected)
         # value first
-        assertOperatorResult(self, value + self.evset, expected)
+        assertOperatorResult(self, value + evset_index, expected)
 
     def test_addition_upcast(self) -> None:
         """Test correct addition operator with a value that would require
@@ -196,7 +196,7 @@ class ArithmeticScalarTest(absltest.TestCase):
             features={"sales": [10, 0, 12, -10, 30]},  # int64 feature
             same_sampling_as=self.evset,
         )
-        with self.assertRaisesRegex(ValueError, "cast"):
+        with self.assertRaisesRegex(ValueError, "Use cast()"):
             _ = evset + value
 
     def test_addition_with_string_value(self) -> None:
