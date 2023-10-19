@@ -66,22 +66,6 @@ py_test(
 )
 
 py_test(
-    name = "arithmetic_scalar_test",
-    srcs = ["arithmetic_scalar_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/numpy
-        # already_there/pandas
-        "//temporian/io:pandas",
-        "//temporian/core/operators/scalar",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators/scalar",
-        ":utils",
-    ],
-)
-
-py_test(
     name = "relational_scalar_test",
     srcs = ["relational_scalar_test.py"],
     srcs_version = "PY3",

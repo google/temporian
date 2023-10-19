@@ -87,3 +87,14 @@ py_test(
         "//temporian/test:utils",
     ],
 )
+
+py_test(
+    name = "test_arithmetic_scalar",
+    srcs = ["test_arithmetic_scalar.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
+        # "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
