@@ -225,22 +225,6 @@ py_test(
 )
 
 py_test(
-    name = "select_test",
-    srcs = ["select_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/numpy
-        # already_there/pandas
-        "//temporian/io:pandas",
-        "//temporian/core:evaluation",
-        "//temporian/core/operators:select",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators:select",
-    ],
-)
-
-py_test(
     name = "add_index_test",
     srcs = ["add_index_test.py"],
     srcs_version = "PY3",
