@@ -179,18 +179,6 @@ class EventSetOpsTest(absltest.TestCase):
         self.assertTrue(isinstance(self.evset.prefix("a"), EventSet))
         self.assertTrue(isinstance(self.node.prefix("a"), EventSetNode))
 
-    def test_propagate(self):
-        self.assertTrue(
-            isinstance(
-                self.evset.drop_index("x").propagate(self.evset), EventSet
-            )
-        )
-        self.assertTrue(
-            isinstance(
-                self.node.drop_index("x").propagate(self.node), EventSetNode
-            )
-        )
-
     def test_resample(self):
         self.assertTrue(
             isinstance(self.evset.resample(self.other_evset), EventSet)
