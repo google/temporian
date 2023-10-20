@@ -62,7 +62,10 @@ def i32(l):
 
 
 def assertOperatorResult(
-    test: absltest.TestCase, result: EventSet, expected: EventSet
+    test: absltest.TestCase,
+    result: EventSet,
+    expected: EventSet,
+    check_sampling=True,
 ):
     """Tests that the output of an operator is the expected one, and performs
     tests that are common to all operators.
@@ -77,7 +80,9 @@ def assertOperatorResult(
     # Result is the expected one
 
     test.assertEqual(result, expected)
-    result.check_same_sampling(expected)
+
+    if check_sampling:
+        result.check_same_sampling(expected)
 
     # Graph can be serialized and deserialized
 
