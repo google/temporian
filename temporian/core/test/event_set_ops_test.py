@@ -5,7 +5,9 @@ from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.io import event_set
 
 
-# TODO: remove this class once all tests have been migrated to use the public API functions
+# TODO: remove all the operator tests from this class when done migrating them
+# Leave a single test, checking that the output of an op is an EventSet when
+# passed an EventSet and an EventSetNode when passed an EventSetNode
 class EventSetOpsTest(absltest.TestCase):
     """Tests that all expected operators are available and work on EventSet and
     EventSetNode and that they return the correct type."""
@@ -107,30 +109,6 @@ class EventSetOpsTest(absltest.TestCase):
         self.assertTrue(isinstance(self.evset.map(lambda x: x), EventSet))
         self.assertTrue(isinstance(self.node.map(lambda x: x), EventSetNode))
 
-    def test_moving_count(self):
-        self.assertTrue(isinstance(self.evset.moving_count(1), EventSet))
-        self.assertTrue(isinstance(self.node.moving_count(1), EventSetNode))
-
-    def test_moving_max(self):
-        self.assertTrue(isinstance(self.evset.moving_max(1), EventSet))
-        self.assertTrue(isinstance(self.node.moving_max(1), EventSetNode))
-
-    def test_moving_min(self):
-        self.assertTrue(isinstance(self.evset.moving_min(1), EventSet))
-        self.assertTrue(isinstance(self.node.moving_min(1), EventSetNode))
-
-    def test_moving_standard_deviation(self):
-        self.assertTrue(
-            isinstance(self.evset.moving_standard_deviation(1), EventSet)
-        )
-        self.assertTrue(
-            isinstance(self.node.moving_standard_deviation(1), EventSetNode)
-        )
-
-    def test_moving_sum(self):
-        self.assertTrue(isinstance(self.evset.moving_sum(1), EventSet))
-        self.assertTrue(isinstance(self.node.moving_sum(1), EventSetNode))
-
     def test_prefix(self):
         self.assertTrue(isinstance(self.evset.prefix("a"), EventSet))
         self.assertTrue(isinstance(self.node.prefix("a"), EventSetNode))
@@ -176,14 +154,6 @@ class EventSetOpsTest(absltest.TestCase):
     def test_set_index(self):
         self.assertTrue(isinstance(self.evset.set_index("a"), EventSet))
         self.assertTrue(isinstance(self.node.set_index("a"), EventSetNode))
-
-    def test_simple_moving_average(self):
-        self.assertTrue(
-            isinstance(self.evset.simple_moving_average(1.0), EventSet)
-        )
-        self.assertTrue(
-            isinstance(self.node.simple_moving_average(1.0), EventSetNode)
-        )
 
     def test_since_last(self):
         self.assertTrue(isinstance(self.evset.since_last(), EventSet))
