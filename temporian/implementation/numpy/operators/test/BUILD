@@ -241,6 +241,26 @@ py_test(
 )
 
 py_test(
+    name = "propagate_test",
+    srcs = ["propagate_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        # already_there/pandas
+        # already_there/numpy
+        ":utils",
+        "//temporian/io:pandas",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:node",
+        "//temporian/core/data:schema",
+        "//temporian/core/operators:propagate",
+        "//temporian/implementation/numpy:evaluation",
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/implementation/numpy/operators:propagate",
+    ],
+)
+
+py_test(
     name = "moving_standard_deviation_test",
     srcs = ["moving_standard_deviation_test.py"],
     srcs_version = "PY3",
