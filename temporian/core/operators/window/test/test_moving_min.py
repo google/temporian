@@ -22,7 +22,7 @@ from temporian.implementation.numpy.data.io import event_set
 from temporian.test.utils import assertOperatorResult, f32
 
 
-class MovingMaxTest(TestCase):
+class MovingMinTest(TestCase):
     def test_basic(self):
         timestamps = [0, 1, 2, 3, 5, 20]
         evset = event_set(

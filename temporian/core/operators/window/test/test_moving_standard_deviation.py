@@ -23,7 +23,7 @@ from temporian.implementation.numpy.data.io import event_set
 from temporian.test.utils import assertOperatorResult, f32, f64
 
 
-class MovingStandardDeviationAverageTest(TestCase):
+class MovingStandardDeviationTest(TestCase):
     def test_basic(self):
         timestamps = [1, 2, 3, 5, 20]
         evset = event_set(
