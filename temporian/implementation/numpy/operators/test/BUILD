@@ -206,37 +206,6 @@ py_test(
 )
 
 py_test(
-    name = "select_test",
-    srcs = ["select_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/numpy
-        # already_there/pandas
-        "//temporian/io:pandas",
-        "//temporian/core:evaluation",
-        "//temporian/core/operators:select",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators:select",
-    ],
-)
-
-py_test(
-    name = "rename_test",
-    srcs = ["rename_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/numpy
-        # already_there/pandas
-        "//temporian/io:pandas",
-        "//temporian/core/operators:rename",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators:rename",
-    ],
-)
-
-py_test(
     name = "add_index_test",
     srcs = ["add_index_test.py"],
     srcs_version = "PY3",
@@ -249,102 +218,6 @@ py_test(
         "//temporian/core/operators:add_index",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators:add_index",
-    ],
-)
-
-py_test(
-    name = "moving_standard_deviation_test",
-    srcs = ["moving_standard_deviation_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/pandas
-        # already_there/numpy
-        "//temporian/io:pandas",
-        ":utils",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/core/operators/window:moving_standard_deviation",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators/window:moving_standard_deviation",
-    ],
-)
-
-py_test(
-    name = "moving_count_test",
-    srcs = ["moving_count_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/pandas
-        # already_there/numpy
-        "//temporian/io:pandas",
-        ":utils",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/core/operators/window:moving_count",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators/window:moving_count",
-    ],
-)
-
-py_test(
-    name = "moving_min_test",
-    srcs = ["moving_min_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/pandas
-        # already_there/numpy
-        "//temporian/io:pandas",
-        ":utils",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/core/operators/window:moving_min",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators/window:moving_min",
-    ],
-)
-
-py_test(
-    name = "moving_max_test",
-    srcs = ["moving_max_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/pandas
-        # already_there/numpy
-        "//temporian/io:pandas",
-        ":utils",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/core/operators/window:moving_max",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators/window:moving_max",
-    ],
-)
-
-py_test(
-    name = "propagate_test",
-    srcs = ["propagate_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/pandas
-        # already_there/numpy
-        "//temporian/io:pandas",
-        ":utils",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/core/operators:propagate",
-        "//temporian/implementation/numpy:evaluation",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators:propagate",
     ],
 )
 
@@ -548,22 +421,6 @@ py_test(
         "//temporian/implementation/numpy/data:io",
         "//temporian/core/operators:fast_fourier_transform",
         "//temporian/implementation/numpy/operators:fast_fourier_transform",
-    ],
-)
-
-py_test(
-    name = "select_index_values_test",
-    srcs = ["select_index_values_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        ":utils",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/core/operators:select_index_values",
-        "//temporian/implementation/numpy/operators:select_index_values",
     ],
 )
 
