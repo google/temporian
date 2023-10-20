@@ -77,10 +77,16 @@ def assertOperatorResult(
       - The result has the same sampling as the expected output.
       - Serialization / unserialization of the graph.
     """
-    # Result is the expected one
-
-    test.assertEqual(result, expected)
-
+    test.assertEqual(
+        result,
+        expected,
+        (
+            "\n==========\nRESULT:\n==========\n"
+            f"{result}"
+            "\n==========\nEXPECTED:\n==========\n"
+            f"{expected}"
+        ),
+    )
     if check_sampling:
         result.check_same_sampling(expected)
 

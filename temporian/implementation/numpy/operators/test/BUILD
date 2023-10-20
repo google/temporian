@@ -98,25 +98,6 @@ py_test(
 )
 
 py_test(
-    name = "arithmetic_multi_index_test",
-    srcs = ["arithmetic_multi_index_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/numpy
-        # already_there/pandas
-        # absl/testing:absltest dep,
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/io:pandas",
-        "//temporian/core/operators/binary",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators/binary",
-        ":utils",
-    ],
-)
-
-py_test(
     name = "cast_test",
     srcs = ["cast_test.py"],
     srcs_version = "PY3",
