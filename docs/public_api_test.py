@@ -89,12 +89,6 @@ PUBLIC_API_SYMBOLS = {
     "greater_scalar",
     "less_equal_scalar",
     "less_scalar",
-    # UNARY OPERATORS
-    "abs",
-    "log",
-    "invert",
-    "isnan",
-    "notnan",
 }
 
 
