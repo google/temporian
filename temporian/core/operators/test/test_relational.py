@@ -19,8 +19,7 @@ from temporian.test.utils import assertOperatorResult
 
 
 class RelationalTest(absltest.TestCase):
-    """Test numpy implementation of relational operators:
-    equal, not equal, greater, greater or equal, etc."""
+    """Test relational operators: equal, greater, greater or equal, etc."""
 
     def setUp(self):
         self.evset_1 = event_set(

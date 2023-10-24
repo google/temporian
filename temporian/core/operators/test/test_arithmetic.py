@@ -21,8 +21,8 @@ from temporian.test.utils import f32, f64, assertOperatorResult
 
 
 class ArithmeticTest(absltest.TestCase):
-    """Test numpy implementation of all arithmetic operators,
-    but using a two-level index and disordered rows."""
+    """Test arithmetic operators between two event-sets
+    using a two-level index and disordered rows."""
 
     def setUp(self):
         # 2 index columns, 2 feature columns (float64 and float32)

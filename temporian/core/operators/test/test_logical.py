@@ -19,8 +19,7 @@ from temporian.test.utils import assertOperatorResult
 
 
 class LogicalTest(absltest.TestCase):
-    """Test numpy implementation of all arithmetic operators:
-    addition, subtraction, division and multiplication"""
+    """Test logical ops: | (OR) & (AND) ^ (XOR)"""
 
     def setUp(self):
         self.evset_1 = event_set(
