@@ -18,21 +18,6 @@ py_library(
 
 # Tests
 # =====
-py_test(
-    name = "arithmetic_test",
-    srcs = ["arithmetic_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/numpy
-        # already_there/pandas
-        "//temporian/core/operators/binary",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/io:pandas",
-        "//temporian/implementation/numpy/operators/binary",
-        ":utils",
-    ],
-)
 
 py_test(
     name = "relational_test",
