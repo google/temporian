@@ -18,7 +18,7 @@ from temporian.implementation.numpy.data.io import event_set
 from temporian.test.utils import assertOperatorResult
 
 
-class ArithmeticScalarTest(absltest.TestCase):
+class RelationalScalarTest(absltest.TestCase):
     """Test implementation of arithmetic operators with a scalar value:
     addition, subtraction, division and multiplication"""
 

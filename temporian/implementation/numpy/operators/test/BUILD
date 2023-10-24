@@ -68,22 +68,6 @@ py_test(
     ],
 )
 
-py_test(
-    name = "unary_test",
-    srcs = ["unary_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":utils",
-        # already_there/absl/testing:absltest
-        # already_there/numpy
-        # already_there/pandas
-        "//temporian/io:pandas",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators:unary",
-    ],
-)
 
 py_test(
     name = "lag_test",
