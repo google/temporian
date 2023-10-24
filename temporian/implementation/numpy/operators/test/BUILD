@@ -36,21 +36,6 @@ py_test(
 )
 
 py_test(
-    name = "logical_test",
-    srcs = ["logical_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/pandas
-        "//temporian/io:pandas",
-        "//temporian/core/operators/binary",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators/binary",
-        ":utils",
-    ],
-)
-
-py_test(
     name = "relational_scalar_test",
     srcs = ["relational_scalar_test.py"],
     srcs_version = "PY3",
