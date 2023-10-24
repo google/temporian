@@ -20,7 +20,7 @@ from temporian.implementation.numpy.data.io import event_set
 from temporian.test.utils import f32, f64, assertOperatorResult
 
 
-class ArithmeticMultiIndexTest(absltest.TestCase):
+class ArithmeticTest(absltest.TestCase):
     """Test numpy implementation of all arithmetic operators,
     but using a two-level index and disordered rows."""
 
@@ -122,6 +122,32 @@ class ArithmeticMultiIndexTest(absltest.TestCase):
             same_sampling_as=self.evset_1,
         )
         assertOperatorResult(self, self.evset_1 // self.evset_2, expected_evset)
+
+    def test_noindex_unsorted(self) -> None:
+        evset_1 = event_set(
+            timestamps=[2, 1, 0, 3],
+            features={
+                "f1": [2, 1, 0, 3],
+                "f2": [20, 10, 0, 30],
+            },
+        )
+        evset_2 = event_set(
+            timestamps=[3, 2, 1, 0],
+            features={
+                "f2": [30, 20, 10, 0],
+                "f1": [-3, -2, -1, 0],
+            },
+            same_sampling_as=evset_1,
+        )
+        expected = event_set(
+            timestamps=[0, 1, 2, 3],
+            features={
+                "add_f1_f2": [0, 11, 22, 33],
+                "add_f2_f1": [0, 9, 18, 27],
+            },
+            same_sampling_as=evset_1,
+        )
+        assertOperatorResult(self, evset_1 + evset_2, expected)
 
 
 if __name__ == "__main__":

@@ -78,8 +78,8 @@ py_test(
 )
 
 py_test(
-    name = "test_arithmetic_multi_index",
-    srcs = ["test_arithmetic_multi_index.py"],
+    name = "test_arithmetic",
+    srcs = ["test_arithmetic.py"],
     srcs_version = "PY3",
     deps = [
         "//temporian/implementation/numpy/data:io",
