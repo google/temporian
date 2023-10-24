@@ -85,10 +85,24 @@ class EventSetOperations:
         """
 
         raise ValueError(
-            f"Cannot {op_name} {self._clsname} and {type(other)} objects. Only"
-            f" {self._clsname} or values of type ({allowed_types}) are"
-            " supported."
+            f"Cannot use operator '{op_name}' on {self._clsname} and"
+            f" {type(other)} objects. Only {self._clsname} or values of type"
+            f" ({allowed_types}) are supported."
         )
+
+    def equal(self, other: Any):
+        if isinstance(other, self.__class__):
+            from temporian.core.operators.binary import equal
+
+            return equal(input_1=self, input_2=other)
+
+        if isinstance(other, T_SCALAR + (bool, str)):
+            from temporian.core.operators.scalar import equal_scalar
+
+            return equal_scalar(input=self, value=other)
+
+        self._raise_error("equal", other, "int,float,bool,str")
+        assert False
 
     def __ne__(self, other: Any):
         if isinstance(other, self.__class__):

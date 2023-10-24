@@ -38,37 +38,42 @@ Check the index on the left for a more detailed description of any symbol.
 
 ## Operators
 
-| Symbols                                                                                                    | Description                                                                                                  |
-| ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| [`tp.combine()`][temporian.combine]                                                                        | Combines events from [`EventSets`][temporian.EventSet] with different samplings.                             |
-| [`tp.glue()`][temporian.glue]                                                                              | Concatenates features from [`EventSets`][temporian.EventSet] with the same sampling.                         |
-| [`EventSet.add_index()`][temporian.EventSet.add_index]                                                     | Adds indexes to an [`EventSet`][temporian.EventSet].                                                         |
-| [`EventSet.begin()`][temporian.EventSet.begin]                                                             | Generates a single timestamp at the beginning of the input.                                                  |
-| [`EventSet.cast()`][temporian.EventSet.cast]                                                               | Casts the dtype of features.                                                                                 |
-| [`EventSet.drop_index()`][temporian.EventSet.drop_index]                                                   | Removes indexes from an [`EventSet`][temporian.EventSet].                                                    |
-| [`EventSet.end()`][temporian.EventSet.end]                                                                 | Generates a single timestamp at the end of the input.                                                        |
-| [`EventSet.enumerate()`][temporian.EventSet.enumerate]                                                     | Creates an ordinal feature enumerating the events according to their timestamp.                              |
-| [`EventSet.experimental_fast_fourier_transform()`][temporian.EventSet.experimental_fast_fourier_transform] | Apply a Fast Fourier Transform.                                                                              |
-| [`EventSet.filter()`][temporian.EventSet.filter]                                                           | Filters out events in an [`EventSet`][temporian.EventSet] for which a condition is false.                    |
-| [`EventSet.filter_moving_count()`][temporian.EventSet.filter_moving_count]                                 | Skips events such that no more than one event is within a time window of `window_length`.                    |
-| [`EventSet.join()`][temporian.EventSet.join]                                                               | Join [`EventSets`][temporian.EventSet] with different samplings but the same index together.                 |
-| [`EventSet.lag()`][temporian.EventSet.lag]                                                                 | Adds a delay to an [`EventSet`][temporian.EventSet]'s timestamps.                                            |
-| [`EventSet.leak()`][temporian.EventSet.leak]                                                               | Subtracts a duration from an [`EventSet`][temporian.EventSet]'s timestamps.                                  |
-| [`EventSet.map()`][temporian.EventSet.map]                                                                 | Applies a function on each of an [`EventSet`][temporian.EventSet]'s values.                                  |
-| [`EventSet.prefix()`][temporian.EventSet.prefix]                                                           | Adds a prefix to the names of the features in an [`EventSet`][temporian.EventSet].                           |
-| [`EventSet.propagate()`][temporian.EventSet.propagate]                                                     | Propagates feature values over a sub index.                                                                  |
-| [`EventSet.rename()`][temporian.EventSet.rename]                                                           | Renames an [`EventSet`][temporian.EventSet]'s features and index.                                            |
-| [`EventSet.resample()`][temporian.EventSet.resample]                                                       | Resamples an [`EventSet`][temporian.EventSet] at each timestamp of another [`EventSet`][temporian.EventSet]. |
-| [`EventSet.select()`][temporian.EventSet.select]                                                           | Selects a subset of features from an [`EventSet`][temporian.EventSet].                                       |
-| [`EventSet.select_index_values()`][temporian.EventSet.select_index_values]                                 | Selects a subset of index values from an [`EventSet`][temporian.EventSet].                                   |
-| [`EventSet.set_index()`][temporian.EventSet.set_index]                                                     | Replaces the indexes in an [`EventSet`][temporian.EventSet].                                                 |
-| [`EventSet.since_last()`][temporian.EventSet.since_last]                                                   | Computes the amount of time since the last distinct timestamp.                                               |
-| [`EventSet.tick()`][temporian.EventSet.tick]                                                               | Generates timestamps at regular intervals in the range of a guide.                                           |
-| [`EventSet.tick_calendar()`][temporian.EventSet.tick]                                                      | Generates timestamps at the specified calendar date-time events.                                             |
-| [`EventSet.timestamps()`][temporian.EventSet.timestamps]                                                   | Creates a feature from the events timestamps (`float64`).                                                    |
-| [`EventSet.unique_timestamps()`][temporian.EventSet.unique_timestamps]                                     | Removes events with duplicated timestamps from an [`EventSet`][temporian.EventSet].                          |
-| [`EventSet.until_next()`][temporian.EventSet.until_next]                                                   | Duration until the next sampling event.                                                                      |
-| [`EventSet.where()`][temporian.EventSet.where]                                                             | Choose events from two possible sources, based on boolean conditions.                                        |
+| Symbols                                                                                                    | Description                                                                                                              |
+| ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| [`tp.combine()`][temporian.combine]                                                                        | Combines events from [`EventSets`][temporian.EventSet] with different samplings.                                         |
+| [`tp.glue()`][temporian.glue]                                                                              | Concatenates features from [`EventSets`][temporian.EventSet] with the same sampling.                                     |
+| [`EventSet.abs()`][temporian.EventSet.abs]                                                                 | Computes the absolute value of the features.                                                                             |
+| [`EventSet.add_index()`][temporian.EventSet.add_index]                                                     | Adds indexes to an [`EventSet`][temporian.EventSet].                                                                     |
+| [`EventSet.begin()`][temporian.EventSet.begin]                                                             | Generates a single timestamp at the beginning of the input.                                                              |
+| [`EventSet.cast()`][temporian.EventSet.cast]                                                               | Casts the dtype of features.                                                                                             |
+| [`EventSet.drop_index()`][temporian.EventSet.drop_index]                                                   | Removes indexes from an [`EventSet`][temporian.EventSet].                                                                |
+| [`EventSet.end()`][temporian.EventSet.end]                                                                 | Generates a single timestamp at the end of the input.                                                                    |
+| [`EventSet.enumerate()`][temporian.EventSet.enumerate]                                                     | Creates an ordinal feature enumerating the events according to their timestamp.                                          |
+| [`EventSet.equal()`][temporian.EventSet.equal]                                                             | Creates boolean features with event-wise equality to another `EventSet` or to a scalar value.                            |
+| [`EventSet.experimental_fast_fourier_transform()`][temporian.EventSet.experimental_fast_fourier_transform] | Applies a Fast Fourier Transform.                                                                                        |
+| [`EventSet.filter()`][temporian.EventSet.filter]                                                           | Filters out events in an [`EventSet`][temporian.EventSet] for which a condition is false.                                |
+| [`EventSet.filter_moving_count()`][temporian.EventSet.filter_moving_count]                                 | Skips events such that no more than one event is within a time window of `window_length`.                                |
+| [`EventSet.isnan()`][temporian.EventSet.isnan]                                                             | Event-wise boolean that is `True` in the `NaN` positions of the input events. Equivalent to `~evset.notnan()`.           |
+| [`EventSet.join()`][temporian.EventSet.join]                                                               | Joins [`EventSets`][temporian.EventSet] with different samplings but the same index together.                            |
+| [`EventSet.lag()`][temporian.EventSet.lag]                                                                 | Adds a delay to an [`EventSet`][temporian.EventSet]'s timestamps.                                                        |
+| [`EventSet.leak()`][temporian.EventSet.leak]                                                               | Subtracts a duration from an [`EventSet`][temporian.EventSet]'s timestamps.                                              |
+| [`EventSet.log()`][temporian.EventSet.log]                                                                 | Computes natural logarithm of the features                                                                               |
+| [`EventSet.map()`][temporian.EventSet.map]                                                                 | Applies a function on each of an [`EventSet`][temporian.EventSet]'s values.                                              |
+| [`EventSet.notnan()`][temporian.EventSet.notnan]                                                           | Event-wise boolean that is `True` if the input values are not `NaN`. Equivalent to `~evset.isnan()`.                     |
+| [`EventSet.prefix()`][temporian.EventSet.prefix]                                                           | Adds a prefix to the names of the features in an [`EventSet`][temporian.EventSet].                                       |
+| [`EventSet.propagate()`][temporian.EventSet.propagate]                                                     | Propagates feature values over a sub index.                                                                              |
+| [`EventSet.rename()`][temporian.EventSet.rename]                                                           | Renames an [`EventSet`][temporian.EventSet]'s features and index.                                                        |
+| [`EventSet.resample()`][temporian.EventSet.resample]                                                       | Resamples an [`EventSet`][temporian.EventSet] at each timestamp of another [`EventSet`][temporian.EventSet].             |
+| [`EventSet.select()`][temporian.EventSet.select]                                                           | Selects a subset of features from an [`EventSet`][temporian.EventSet].                                                   |
+| [`EventSet.select_index_values()`][temporian.EventSet.select_index_values]                                 | Selects a subset of index values from an [`EventSet`][temporian.EventSet].                                               |
+| [`EventSet.set_index()`][temporian.EventSet.set_index]                                                     | Replaces the indexes in an [`EventSet`][temporian.EventSet].                                                             |
+| [`EventSet.since_last()`][temporian.EventSet.since_last]                                                   | Computes the amount of time since the last distinct timestamp.                                                           |
+| [`EventSet.tick()`][temporian.EventSet.tick]                                                               | Generates timestamps at regular intervals in the range of a guide.                                                       |
+| [`EventSet.tick_calendar()`][temporian.EventSet.tick]                                                      | Generates timestamps at the specified calendar date-time events.                                                         |
+| [`EventSet.timestamps()`][temporian.EventSet.timestamps]                                                   | Creates a feature from the events timestamps (`float64`).                                                                |
+| [`EventSet.unique_timestamps()`][temporian.EventSet.unique_timestamps]                                     | Removes events with duplicated timestamps from an [`EventSet`][temporian.EventSet].                                      |
+| [`EventSet.until_next()`][temporian.EventSet.until_next]                                                   | Duration until the next sampling event.                                                                                  |
+| [`EventSet.where()`][temporian.EventSet.where]                                                             | Choose events from two possible sources, based on boolean conditions.                                                    |
 
 ### Binary operators
 
@@ -78,11 +83,6 @@ Check the index on the left for a more detailed description of any symbol.
 | [`tp.equal()`][temporian.equal] [`tp.not_equal()`][temporian.not_equal] [`tp.greater()`][temporian.greater] [`tp.greater_equal()`][temporian.greater_equal] [`tp.less()`][temporian.less] [`tp.less_equal()`][temporian.less_equal]               | Compute a relational binary operator between two [`EventSets`][temporian.EventSet].                                         |
 | [`tp.logical_and()`][temporian.logical_and] [`tp.logical_or()`][temporian.logical_or] [`tp.logical_xor()`][temporian.logical_xor]                                                                                                                 | Compute a logical binary operation between two [`EventSets`][temporian.EventSet].                                           |
 
-### Unary operators
-
-| Symbols                                                                                                                                                     | Description                                                      |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| [`tp.abs()`][temporian.abs] [`tp.log()`][temporian.log] [`tp.invert()`][temporian.invert] [`tp.isnan()`][temporian.isnan] [`tp.notnan()`][temporian.notnan] | Compute unary operations on an [`EventSet`][temporian.EventSet]. |
 
 ### Calendar operators
 

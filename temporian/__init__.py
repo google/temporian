@@ -134,13 +134,6 @@ from temporian.core.operators.scalar.relational_scalar import greater_scalar
 from temporian.core.operators.scalar.relational_scalar import less_equal_scalar
 from temporian.core.operators.scalar.relational_scalar import less_scalar
 
-# Unary operators
-from temporian.core.operators.unary import invert
-from temporian.core.operators.unary import isnan
-from temporian.core.operators.unary import notnan
-from temporian.core.operators.unary import abs
-from temporian.core.operators.unary import log
-
 # Remove automatic file tree symbols from public API
 # pylint: disable=undefined-variable
 del proto
