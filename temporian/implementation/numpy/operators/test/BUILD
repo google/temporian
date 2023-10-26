@@ -191,21 +191,6 @@ py_test(
 )
 
 py_test(
-    name = "drop_index_test",
-    srcs = ["drop_index_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":utils",
-        # already_there/absl/testing:absltest
-        # already_there/pandas
-        "//temporian/io:pandas",
-        "//temporian/core/operators:drop_index",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators:drop_index",
-    ],
-)
-
-py_test(
     name = "resample_test",
     srcs = ["resample_test.py"],
     srcs_version = "PY3",

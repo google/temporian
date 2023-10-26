@@ -42,6 +42,28 @@ py_test(
 )
 
 py_test(
+    name = "test_arithmetic_multi_index",
+    srcs = ["test_arithmetic_multi_index.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
+        # "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_drop_index",
+    srcs = ["test_drop_index.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
     name = "test_map",
     srcs = ["test_map.py"],
     srcs_version = "PY3",
@@ -117,16 +139,5 @@ py_test(
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/operators:tick_calendar",
-    ],
-)
-
-py_test(
-    name = "test_arithmetic_multi_index",
-    srcs = ["test_arithmetic_multi_index.py"],
-    srcs_version = "PY3",
-    deps = [
-        "//temporian/implementation/numpy/data:io",
-        # "//temporian/core/data:duration",
-        "//temporian/test:utils",
     ],
 )

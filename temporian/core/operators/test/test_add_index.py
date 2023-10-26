@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy as np
 from absl.testing import absltest
 from absl.testing.parameterized import TestCase
 
 from temporian.implementation.numpy.data.io import event_set
-from temporian.test.utils import assertOperatorResult, f32, i32
+from temporian.test.utils import assertOperatorResult, i32
 
 
 class AddIndexTest(TestCase):
