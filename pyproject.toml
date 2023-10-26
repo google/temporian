@@ -50,9 +50,9 @@ toml = "^0.10.2"
 pylint = "^2.14.0"
 memory-profiler = "^0.61.0"
 # scalene = "^1.5.20" # FIXME: scalene doesn't support Python 3.11
-mkdocs = "^1.4.2"
-mkdocstrings = { extras = ["python"], version = "^0.20.0" }
-mkdocstrings-python = "^1.2.1"
+mkdocs = "^1.5.3"
+mkdocstrings = {extras = ["python"], version = "^0.23.0"}
+mkdocstrings-python = "^1.7.3"
 mkdocs-material = "^9.1.5"
 mkdocs-gen-files = "^0.4.0"
 mkdocs-literate-nav = "^0.6.0"
