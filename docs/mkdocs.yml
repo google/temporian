@@ -53,7 +53,7 @@ extra_css:
 # Navigation bar
 nav:
   - Home: index.md
-  - 3 minutes to Temporian: 3_minutes.md
+  - Getting Started: getting_started.ipynb
   - User Guide: user_guide.ipynb
   - Recipes: recipes/
   - Tutorials: tutorials/

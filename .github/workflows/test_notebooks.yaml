@@ -11,11 +11,11 @@ jobs:
         # * can be used and all .ipynb files in that dir will be tested sequentially
         path:
           - user_guide
+          - getting_started
           - recipes/*
           - tutorials/anomaly_detection_supervised
           - tutorials/anomaly_detection_unsupervised
           - tutorials/bank_fraud_detection_with_tfdf
-          - tutorials/getting_started
           - tutorials/heart_rate_analysis
           - tutorials/loan_outcomes_prediction
           - tutorials/m5_competition
