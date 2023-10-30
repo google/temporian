@@ -118,19 +118,6 @@ py_test(
 )
 
 py_test(
-    name = "filter_test",
-    srcs = ["filter_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":utils",
-        # already_there/absl/testing:absltest
-        "//temporian/core/operators:filter",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators:filter",
-    ],
-)
-
-py_test(
     name = "glue_test",
     srcs = ["glue_test.py"],
     srcs_version = "PY3",
