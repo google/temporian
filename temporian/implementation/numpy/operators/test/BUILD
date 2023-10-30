@@ -360,19 +360,3 @@ py_test(
         "//temporian/implementation/numpy/operators:tick_calendar",
     ],
 )
-
-py_test(
-    name = "until_next_test",
-    srcs = ["until_next_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        ":utils",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/core/operators:until_next",
-        "//temporian/implementation/numpy/operators:until_next",
-    ],
-)

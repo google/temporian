@@ -152,14 +152,13 @@ py_test(
 )
 
 py_test(
-    name = "until_next_test",
-    srcs = ["until_next_test.py"],
+    name = "test_until_next",
+    srcs = ["test_until_next.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/operators:until_next",
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
     ],
 )
 
