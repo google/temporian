@@ -12,21 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 from absl.testing import absltest
+from absl.testing.parameterized import TestCase
 
-from temporian.core.operators.where import Where
 from temporian.implementation.numpy.data.io import event_set
-from temporian.implementation.numpy.operators.where import (
-    WhereNumpyImplementation,
-)
-from temporian.implementation.numpy.operators.test.utils import (
-    assertEqualEventSet,
-    testOperatorAndImp,
-)
+from temporian.test.utils import assertOperatorResult
 
 
-class WhereOperatorTest(absltest.TestCase):
+class WhereTest(TestCase):
     def setUp(self):
         self.evset = event_set(
             timestamps=[1, 2, 3, 4, 5, 6],
@@ -36,13 +29,14 @@ class WhereOperatorTest(absltest.TestCase):
             },
             indexes=["idx"],
         )
-        self.node = self.evset.node()
 
     def test_both_single_values(self):
         on_true = "hi"
         on_false = "goodbye"
 
-        expected_output = event_set(
+        result = self.evset.where(on_true=on_true, on_false=on_false)
+
+        expected = event_set(
             timestamps=[1, 2, 3, 4, 5, 6],
             features={
                 "cond": [
@@ -56,15 +50,10 @@ class WhereOperatorTest(absltest.TestCase):
                 "idx": ["A", "A", "A", "B", "B", "B"],
             },
             indexes=["idx"],
+            same_sampling_as=self.evset,
         )
 
-        # Run op
-        op = Where(input=self.node, on_true=on_true, on_false=on_false)
-        instance = WhereNumpyImplementation(op)
-        testOperatorAndImp(self, op, instance)
-        output = instance.call(input=self.evset)["output"]
-
-        assertEqualEventSet(self, output, expected_output)
+        assertOperatorResult(self, result, expected)
 
     def test_both_evsets(self):
         sources = event_set(
@@ -80,8 +69,9 @@ class WhereOperatorTest(absltest.TestCase):
         on_true = sources["on_true"]
         on_false = sources["on_false"]
 
-        # SetUp() condition:
-        # [False, True, False, True, False, False]
+        result = self.evset.where(on_true=on_true, on_false=on_false)
+
+        # SetUp() condition: [False, True, False, True, False, False]
         expected_output = event_set(
             timestamps=[1, 2, 3, 4, 5, 6],
             features={
@@ -89,21 +79,9 @@ class WhereOperatorTest(absltest.TestCase):
                 "idx": ["A", "A", "A", "B", "B", "B"],
             },
             indexes=["idx"],
+            same_sampling_as=self.evset,
         )
-
-        # Run op
-        op = Where(
-            input=self.node,
-            on_true=on_true.node(),
-            on_false=on_false.node(),
-        )
-        instance = WhereNumpyImplementation(op)
-        testOperatorAndImp(self, op, instance)
-        output = instance.call(
-            input=self.evset, on_true=on_true, on_false=on_false
-        )["output"]
-
-        assertEqualEventSet(self, output, expected_output)
+        assertOperatorResult(self, result, expected_output)
 
     def test_true_evset_false_single_value(self):
         on_false = -10
@@ -117,28 +95,20 @@ class WhereOperatorTest(absltest.TestCase):
             same_sampling_as=self.evset,
         )
 
-        # SetUp() condition:
-        # [False, True, False, True, False, False]
-        expected_output = event_set(
+        result = self.evset.where(on_true=on_true, on_false=on_false)
+
+        # SetUp() condition: [False, True, False, True, False, False]
+        expected = event_set(
             timestamps=[1, 2, 3, 4, 5, 6],
             features={
                 "cond": [-10, 6, -10, 8, -10, -10],
                 "idx": ["A", "A", "A", "B", "B", "B"],
             },
             indexes=["idx"],
+            same_sampling_as=self.evset,
         )
 
-        # Run op
-        op = Where(
-            input=self.node,
-            on_true=on_true.node(),
-            on_false=on_false,  # single value
-        )
-        instance = WhereNumpyImplementation(op)
-        testOperatorAndImp(self, op, instance)
-        output = instance.call(input=self.evset, on_true=on_true)["output"]
-
-        assertEqualEventSet(self, output, expected_output)
+        assertOperatorResult(self, result, expected)
 
     def test_true_single_val_false_evset(self):
         on_true = 10
@@ -152,8 +122,9 @@ class WhereOperatorTest(absltest.TestCase):
             same_sampling_as=self.evset,
         )
 
-        # SetUp() condition:
-        # [False, True, False, True, False, False]
+        result = self.evset.where(on_true=on_true, on_false=on_false)
+
+        # SetUp() condition: [False, True, False, True, False, False]
         expected_output = event_set(
             timestamps=[1, 2, 3, 4, 5, 6],
             features={
@@ -161,27 +132,14 @@ class WhereOperatorTest(absltest.TestCase):
                 "idx": ["A", "A", "A", "B", "B", "B"],
             },
             indexes=["idx"],
+            same_sampling_as=self.evset,
         )
 
-        # Run op
-        op = Where(
-            input=self.node,
-            on_true=on_true,  # single value (10)
-            on_false=on_false.node(),
-        )
-        instance = WhereNumpyImplementation(op)
-        testOperatorAndImp(self, op, instance)
-        output = instance.call(input=self.evset, on_false=on_false)["output"]
-
-        assertEqualEventSet(self, output, expected_output)
+        assertOperatorResult(self, result, expected_output)
 
     def test_dtype_mismatch_single_values(self):
         with self.assertRaisesRegex(ValueError, "should have the same dtype"):
-            _ = Where(
-                input=self.node,
-                on_true="A string",
-                on_false=5,  # An integer
-            )
+            self.evset.where(on_true="A string", on_false=5)
 
     def test_dtype_mismatch_evsets(self):
         sources = event_set(
@@ -198,11 +156,7 @@ class WhereOperatorTest(absltest.TestCase):
         on_false = sources["on_false"]  # string
 
         with self.assertRaisesRegex(ValueError, "should have the same dtype"):
-            _ = Where(
-                input=self.node,
-                on_true=on_true.node(),
-                on_false=on_false.node(),
-            )
+            self.evset.where(on_true=on_true, on_false=on_false)
 
     def test_dtype_mismatch_evset_to_single_value(self):
         source_evset = event_set(
@@ -217,18 +171,11 @@ class WhereOperatorTest(absltest.TestCase):
         source_str = "A string"
 
         with self.assertRaisesRegex(ValueError, "should have the same dtype"):
-            _ = Where(
-                input=self.node,
-                on_true=source_evset.node(),
-                on_false=source_str,
-            )
+            self.evset.where(on_true=source_evset, on_false=source_str)
+
         # Reverse on_true/on_false order
         with self.assertRaisesRegex(ValueError, "should have the same dtype"):
-            _ = Where(
-                input=self.node,
-                on_true=source_str,
-                on_false=source_evset.node(),
-            )
+            self.evset.where(on_true=source_str, on_false=source_evset)
 
     def test_non_boolean_input(self):
         # Non-boolean condition
@@ -241,7 +188,7 @@ class WhereOperatorTest(absltest.TestCase):
         with self.assertRaisesRegex(
             ValueError, "Input should have only 1 boolean feature"
         ):
-            _ = Where(input=non_boolean.node(), on_true=1, on_false=0)
+            non_boolean.where(on_true=1, on_false=0)
 
     def test_multiple_feats(self):
         multi_feats = event_set(
@@ -252,31 +199,20 @@ class WhereOperatorTest(absltest.TestCase):
                 "f2": [1] * 6,
             },
         )
+
         # Check input
         with self.assertRaisesRegex(
             ValueError, "Input should have only 1 boolean feature"
         ):
-            _ = Where(
-                input=multi_feats.node(),
-                on_true=1,
-                on_false=0,
-            )
+            multi_feats.where(on_true=1, on_false=0)
 
         # Check on_true
         with self.assertRaisesRegex(ValueError, "should have only 1 feature"):
-            _ = Where(
-                input=multi_feats["cond"].node(),  # Correct: Single feature
-                on_true=multi_feats.node(),  # Incorrect: multiple features
-                on_false=0,
-            )
+            multi_feats["cond"].where(on_true=multi_feats, on_false=0)
 
         # Check on_false
         with self.assertRaisesRegex(ValueError, "should have only 1 feature"):
-            _ = Where(
-                input=multi_feats["cond"].node(),  # Correct: Single feature
-                on_true=1,
-                on_false=multi_feats.node(),  # Incorrect
-            )
+            multi_feats["cond"].where(on_true=1, on_false=multi_feats)
 
 
 if __name__ == "__main__":
