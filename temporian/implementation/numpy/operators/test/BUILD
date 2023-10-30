@@ -163,19 +163,6 @@ py_test(
 )
 
 py_test(
-    name = "lag_test",
-    srcs = ["lag_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":utils",
-        # already_there/absl/testing:absltest
-        "//temporian/core/operators:lag",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators:lag",
-    ],
-)
-
-py_test(
     name = "drop_index_test",
     srcs = ["drop_index_test.py"],
     srcs_version = "PY3",
