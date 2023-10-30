@@ -64,6 +64,17 @@ py_test(
 )
 
 py_test(
+    name = "test_resample",
+    srcs = ["test_resample.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
     name = "test_select",
     srcs = ["test_select.py"],
     srcs_version = "PY3",
