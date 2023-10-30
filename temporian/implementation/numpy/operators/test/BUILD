@@ -181,26 +181,6 @@ py_test(
 )
 
 py_test(
-    name = "prefix_test",
-    srcs = ["prefix_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/pandas
-        # already_there/numpy
-        "//temporian/io:pandas",
-        ":utils",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/core/operators:prefix",
-        "//temporian/implementation/numpy:evaluation",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators:prefix",
-    ],
-)
-
-py_test(
     name = "unique_timestamps_test",
     srcs = ["unique_timestamps_test.py"],
     srcs_version = "PY3",
