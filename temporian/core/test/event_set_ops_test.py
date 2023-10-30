@@ -83,42 +83,10 @@ class EventSetOpsTest(absltest.TestCase):
             )
         )
 
-    def test_filter(self):
-        self.assertTrue(
-            isinstance(self.evset.filter(self.evset["a"] > 3), EventSet)
-        )
-        self.assertTrue(
-            isinstance(self.node.filter(self.node["a"] > 3), EventSetNode)
-        )
-
     def test_join(self):
         self.assertTrue(isinstance(self.evset.join(self.other_evset), EventSet))
         self.assertTrue(
             isinstance(self.node.join(self.other_node), EventSetNode)
-        )
-
-    def test_lag(self):
-        self.assertTrue(isinstance(self.evset.lag(3), EventSet))
-        self.assertTrue(isinstance(self.node.lag(3), EventSetNode))
-
-    def test_leak(self):
-        self.assertTrue(isinstance(self.evset.leak(3), EventSet))
-        self.assertTrue(isinstance(self.node.leak(3), EventSetNode))
-
-    def test_map(self):
-        self.assertTrue(isinstance(self.evset.map(lambda x: x), EventSet))
-        self.assertTrue(isinstance(self.node.map(lambda x: x), EventSetNode))
-
-    def test_prefix(self):
-        self.assertTrue(isinstance(self.evset.prefix("a"), EventSet))
-        self.assertTrue(isinstance(self.node.prefix("a"), EventSetNode))
-
-    def test_resample(self):
-        self.assertTrue(
-            isinstance(self.evset.resample(self.other_evset), EventSet)
-        )
-        self.assertTrue(
-            isinstance(self.node.resample(self.other_node), EventSetNode)
         )
 
     def test_select(self):
@@ -149,14 +117,6 @@ class EventSetOpsTest(absltest.TestCase):
         self.assertTrue(isinstance(self.evset.filter_moving_count(5), EventSet))
         self.assertTrue(
             isinstance(self.node.filter_moving_count(5), EventSetNode)
-        )
-
-    def test_until_next(self):
-        self.assertTrue(
-            isinstance(self.evset.until_next(self.other_evset, 5), EventSet)
-        )
-        self.assertTrue(
-            isinstance(self.node.until_next(self.other_node, 5), EventSetNode)
         )
 
 
