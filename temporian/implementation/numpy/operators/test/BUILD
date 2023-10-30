@@ -118,21 +118,6 @@ py_test(
 )
 
 py_test(
-    name = "glue_test",
-    srcs = ["glue_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":utils",
-        # already_there/absl/testing:absltest
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/operators:glue",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators:glue",
-    ],
-)
-
-py_test(
     name = "unary_test",
     srcs = ["unary_test.py"],
     srcs_version = "PY3",
