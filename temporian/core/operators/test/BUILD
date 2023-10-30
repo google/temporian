@@ -31,6 +31,17 @@ py_test(
 )
 
 py_test(
+    name = "test_leak",
+    srcs = ["test_leak.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
     name = "test_map",
     srcs = ["test_map.py"],
     srcs_version = "PY3",

@@ -176,21 +176,6 @@ py_test(
 )
 
 py_test(
-    name = "leak_test",
-    srcs = ["leak_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        ":utils",
-        "//temporian/core:evaluation",
-        "//temporian/core/operators:leak",
-        "//temporian/implementation/numpy:evaluation",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators:leak",
-    ],
-)
-
-py_test(
     name = "drop_index_test",
     srcs = ["drop_index_test.py"],
     srcs_version = "PY3",

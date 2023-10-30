@@ -21,7 +21,7 @@ from temporian.implementation.numpy.data.io import event_set
 from temporian.test.utils import assertOperatorResult
 
 
-class Resampleest(TestCase):
+class ResampleTest(TestCase):
     def test_basic(self):
         evset = event_set(
             timestamps=[1, 5, 8, 9, 1, 1],
