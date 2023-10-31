@@ -167,22 +167,6 @@ py_test(
 )
 
 py_test(
-    name = "join_test",
-    srcs = ["join_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        ":utils",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/core/operators:join",
-        "//temporian/implementation/numpy/operators:join",
-    ],
-)
-
-py_test(
     name = "timestamps_test",
     srcs = ["timestamps_test.py"],
     srcs_version = "PY3",

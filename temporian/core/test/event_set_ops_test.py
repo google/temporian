@@ -83,12 +83,6 @@ class EventSetOpsTest(absltest.TestCase):
             )
         )
 
-    def test_join(self):
-        self.assertTrue(isinstance(self.evset.join(self.other_evset), EventSet))
-        self.assertTrue(
-            isinstance(self.node.join(self.other_node), EventSetNode)
-        )
-
     def test_select(self):
         self.assertTrue(isinstance(self.evset.select("a"), EventSet))
         self.assertTrue(isinstance(self.node.select("a"), EventSetNode))
@@ -96,10 +90,6 @@ class EventSetOpsTest(absltest.TestCase):
     def test_set_index(self):
         self.assertTrue(isinstance(self.evset.set_index("a"), EventSet))
         self.assertTrue(isinstance(self.node.set_index("a"), EventSetNode))
-
-    def test_tick(self):
-        self.assertTrue(isinstance(self.evset.tick(1), EventSet))
-        self.assertTrue(isinstance(self.node.tick(1), EventSetNode))
 
     def test_timestamps(self):
         self.assertTrue(isinstance(self.evset.timestamps(), EventSet))

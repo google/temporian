@@ -7,18 +7,6 @@ package(
 # =====
 
 py_test(
-    name = "join_test",
-    srcs = ["join_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/operators:join",
-    ],
-)
-
-py_test(
     name = "fft_test",
     srcs = ["fft_test.py"],
     srcs_version = "PY3",
@@ -55,6 +43,17 @@ py_test(
 py_test(
     name = "test_glue",
     srcs = ["test_glue.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_join",
+    srcs = ["test_join.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
