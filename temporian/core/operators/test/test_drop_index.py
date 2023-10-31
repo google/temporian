@@ -23,15 +23,15 @@ class DropIndexTest(TestCase):
     def setUp(self) -> None:
         self.timestamps = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
         self.features = {
-            "state_id": ["A", "A", "A", "B", "B", "B", "B", "B"],
-            "store_id": [0, 0, 0, 0, 0, 1, 1, 1],
-            "item_id": [1, 1, 1, 2, 2, 2, 2, 3],
-            "sales": [10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0],
+            "a": ["A", "A", "A", "B", "B", "B", "B", "B"],
+            "b": [0, 0, 0, 0, 0, 1, 1, 1],
+            "c": [1, 1, 1, 2, 2, 2, 2, 3],
+            "d": [10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0],
         }
         self.evset = event_set(
             timestamps=self.timestamps,
             features=self.features,
-            indexes=["store_id", "item_id"],
+            indexes=["b", "c"],
         )
 
     def test_drop_all(self) -> None:
@@ -39,10 +39,10 @@ class DropIndexTest(TestCase):
             timestamps=self.timestamps,
             # Old indexes are now the last features
             features={
-                "state_id": self.features["state_id"],
-                "sales": self.features["sales"],
-                "store_id": self.features["store_id"],
-                "item_id": self.features["item_id"],
+                "a": self.features["a"],
+                "d": self.features["d"],
+                "b": self.features["b"],
+                "c": self.features["c"],
             },
         )
 
@@ -55,15 +55,15 @@ class DropIndexTest(TestCase):
             timestamps=self.timestamps,
             # Old indexes are now the last features
             features={
-                "item_id": self.features["item_id"],
-                "state_id": self.features["state_id"],
-                "sales": self.features["sales"],
-                "store_id": self.features["store_id"],
+                "c": self.features["c"],
+                "a": self.features["a"],
+                "d": self.features["d"],
+                "b": self.features["b"],
             },
-            indexes=["item_id"],
+            indexes=["c"],
         )
 
-        result = self.evset.drop_index("store_id")
+        result = self.evset.drop_index("b")
 
         assertOperatorResult(self, result, expected, check_sampling=False)
 
@@ -72,15 +72,15 @@ class DropIndexTest(TestCase):
             timestamps=self.timestamps,
             # Old indexes are now the last features
             features={
-                "store_id": self.features["store_id"],
-                "state_id": self.features["state_id"],
-                "sales": self.features["sales"],
-                "item_id": self.features["item_id"],
+                "b": self.features["b"],
+                "a": self.features["a"],
+                "d": self.features["d"],
+                "c": self.features["c"],
             },
-            indexes=["store_id"],
+            indexes=["b"],
         )
 
-        result = self.evset.drop_index("item_id")
+        result = self.evset.drop_index("c")
 
         assertOperatorResult(self, result, expected, check_sampling=False)
 
@@ -89,14 +89,14 @@ class DropIndexTest(TestCase):
             timestamps=self.timestamps,
             # Old indexes are now the last features
             features={
-                "store_id": self.features["store_id"],
-                "state_id": self.features["state_id"],
-                "sales": self.features["sales"],
+                "b": self.features["b"],
+                "a": self.features["a"],
+                "d": self.features["d"],
             },
-            indexes=["store_id"],
+            indexes=["b"],
         )
 
-        result = self.evset.drop_index("item_id", keep=False)
+        result = self.evset.drop_index("c", keep=False)
 
         assertOperatorResult(self, result, expected, check_sampling=False)
 
@@ -121,6 +121,16 @@ class DropIndexTest(TestCase):
         result = evset.drop_index("b")
 
         assertOperatorResult(self, result, expected, check_sampling=False)
+
+    def test_wrong_index(self):
+        with self.assertRaisesRegex(ValueError, "x is not an index in"):
+            self.evset.drop_index("x")
+
+    def test_empty_list(self):
+        with self.assertRaisesRegex(
+            ValueError, "Cannot specify empty list as `indexes` argument"
+        ):
+            self.evset.drop_index([])
 
 
 if __name__ == "__main__":
