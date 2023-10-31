@@ -38,7 +38,7 @@ class BeginTest(TestCase):
     def test_empty(self):
         evset = event_set(timestamps=[], features={"a": []})
 
-        result = evset.end()
+        result = evset.begin()
 
         expected = event_set(timestamps=[])
 

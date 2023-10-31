@@ -97,6 +97,14 @@ class SinceLastTest(TestCase):
 
         assertOperatorResult(self, result, expected)
 
+    def test_negative_steps(self):
+        evset = event_set([])
+
+        with self.assertRaisesRegex(
+            ValueError, "Number of steps must be greater than 0. Got"
+        ):
+            evset.since_last(steps=-1)
+
 
 if __name__ == "__main__":
     absltest.main()
