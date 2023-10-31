@@ -51,10 +51,6 @@ class EventSetOpsTest(absltest.TestCase):
         self.node = self.evset.node()
         self.other_node = self.other_evset.node()
 
-    def test_begin(self):
-        self.assertTrue(isinstance(self.evset.begin(), EventSet))
-        self.assertTrue(isinstance(self.node.begin(), EventSetNode))
-
     def test_cast(self):
         self.assertTrue(isinstance(self.evset.cast({"a": float}), EventSet))
         self.assertTrue(isinstance(self.node.cast({"a": float}), EventSetNode))
@@ -62,10 +58,6 @@ class EventSetOpsTest(absltest.TestCase):
     def test_cumsum(self):
         self.assertTrue(isinstance(self.evset.cumsum(), EventSet))
         self.assertTrue(isinstance(self.node.cumsum(), EventSetNode))
-
-    def test_end(self):
-        self.assertTrue(isinstance(self.evset.end(), EventSet))
-        self.assertTrue(isinstance(self.node.end(), EventSetNode))
 
     def test_enumerate(self):
         self.assertTrue(isinstance(self.evset.enumerate(), EventSet))
