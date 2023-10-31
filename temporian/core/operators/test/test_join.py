@@ -115,6 +115,15 @@ class JoinTest(TestCase):
         with self.assertRaisesRegex(ValueError, "Got float64 instead for left"):
             evset_1.join(evset_2, on="c")
 
+    def test_same_sampling(self):
+        evset_1 = event_set([0], features={"a": [0]})
+        evset_2 = event_set([0], features={"b": [0]}, same_sampling_as=evset_1)
+        with self.assertRaisesRegex(
+            ValueError,
+            "Both inputs have the same sampling. Use ",
+        ):
+            evset_1.join(evset_2)
+
 
 if __name__ == "__main__":
     absltest.main()
