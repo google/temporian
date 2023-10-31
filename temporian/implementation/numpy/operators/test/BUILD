@@ -135,21 +135,6 @@ py_test(
 )
 
 py_test(
-    name = "unique_timestamps_test",
-    srcs = ["unique_timestamps_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/pandas
-        # already_there/numpy
-        "//temporian/io:pandas",
-        "//temporian/core/operators:unique_timestamps",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators:unique_timestamps",
-    ],
-)
-
-py_test(
     name = "begin_test",
     srcs = ["begin_test.py"],
     srcs_version = "PY3",

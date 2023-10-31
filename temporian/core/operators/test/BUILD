@@ -174,6 +174,17 @@ py_test(
 )
 
 py_test(
+    name = "test_unique_timestamps",
+    srcs = ["test_unique_timestamps.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
     name = "test_until_next",
     srcs = ["test_until_next.py"],
     srcs_version = "PY3",

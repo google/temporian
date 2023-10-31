@@ -97,10 +97,6 @@ class EventSetOpsTest(absltest.TestCase):
         self.assertTrue(isinstance(self.evset.set_index("a"), EventSet))
         self.assertTrue(isinstance(self.node.set_index("a"), EventSetNode))
 
-    def test_since_last(self):
-        self.assertTrue(isinstance(self.evset.since_last(), EventSet))
-        self.assertTrue(isinstance(self.node.since_last(), EventSetNode))
-
     def test_tick(self):
         self.assertTrue(isinstance(self.evset.tick(1), EventSet))
         self.assertTrue(isinstance(self.node.tick(1), EventSetNode))
@@ -108,10 +104,6 @@ class EventSetOpsTest(absltest.TestCase):
     def test_timestamps(self):
         self.assertTrue(isinstance(self.evset.timestamps(), EventSet))
         self.assertTrue(isinstance(self.node.timestamps(), EventSetNode))
-
-    def test_unique_timestamps(self):
-        self.assertTrue(isinstance(self.evset.unique_timestamps(), EventSet))
-        self.assertTrue(isinstance(self.node.unique_timestamps(), EventSetNode))
 
     def test_filter_moving_count(self):
         self.assertTrue(isinstance(self.evset.filter_moving_count(5), EventSet))
