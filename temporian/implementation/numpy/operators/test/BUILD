@@ -18,84 +18,6 @@ py_library(
 
 # Tests
 # =====
-py_test(
-    name = "arithmetic_test",
-    srcs = ["arithmetic_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/numpy
-        # already_there/pandas
-        "//temporian/core/operators/binary",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/io:pandas",
-        "//temporian/implementation/numpy/operators/binary",
-        ":utils",
-    ],
-)
-
-py_test(
-    name = "relational_test",
-    srcs = ["relational_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/numpy
-        # already_there/pandas
-        "//temporian/io:pandas",
-        "//temporian/core/operators/binary",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators/binary",
-        ":utils",
-    ],
-)
-
-py_test(
-    name = "logical_test",
-    srcs = ["logical_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/pandas
-        "//temporian/io:pandas",
-        "//temporian/core/operators/binary",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators/binary",
-        ":utils",
-    ],
-)
-
-py_test(
-    name = "arithmetic_scalar_test",
-    srcs = ["arithmetic_scalar_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/numpy
-        # already_there/pandas
-        "//temporian/io:pandas",
-        "//temporian/core/operators/scalar",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators/scalar",
-        ":utils",
-    ],
-)
-
-py_test(
-    name = "relational_scalar_test",
-    srcs = ["relational_scalar_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/numpy
-        # already_there/pandas
-        "//temporian/io:pandas",
-        "//temporian/core/operators/scalar",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators/scalar",
-        ":utils",
-    ],
-)
 
 py_test(
     name = "cast_test",
@@ -114,23 +36,6 @@ py_test(
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators:cast",
-    ],
-)
-
-py_test(
-    name = "unary_test",
-    srcs = ["unary_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":utils",
-        # already_there/absl/testing:absltest
-        # already_there/numpy
-        # already_there/pandas
-        "//temporian/io:pandas",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators:unary",
     ],
 )
 

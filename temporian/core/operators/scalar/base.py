@@ -85,9 +85,11 @@ class BaseScalarOperator(Operator):
             for feature in input.schema.features:
                 if feature.dtype not in self.map_vtype_dtype[type(value)]:
                     raise ValueError(
-                        f"Scalar has {type(value)=}, which can only operate"
-                        f" with dtypes: {self.map_vtype_dtype[type(value)]}. "
-                        f"But {feature.name} has dtype {feature.dtype}."
+                        f"Cannot add feature '{feature.name}'"
+                        f" (dtype {feature.dtype}) with value '{value}'"
+                        f" of type {type(value)}. Use cast() to convert the"
+                        f" feature to {self.map_vtype_dtype[type(value)]}"
+                        " first, or change the value type."
                     )
 
         # outputs
