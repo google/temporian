@@ -88,3 +88,15 @@ py_test(
         "//temporian/test:utils",
     ],
 )
+
+py_test(
+    name = "test_moving_count",
+    srcs = ["test_moving_count.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)

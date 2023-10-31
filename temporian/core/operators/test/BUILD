@@ -7,18 +7,6 @@ package(
 # =====
 
 py_test(
-    name = "propagate_test",
-    srcs = ["propagate_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/operators:propagate",
-    ],
-)
-
-py_test(
     name = "join_test",
     srcs = ["join_test.py"],
     srcs_version = "PY3",
@@ -43,6 +31,61 @@ py_test(
 )
 
 py_test(
+    name = "test_add_index",
+    srcs = ["test_add_index.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_filter",
+    srcs = ["test_filter.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_glue",
+    srcs = ["test_glue.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_lag",
+    srcs = ["test_lag.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_leak",
+    srcs = ["test_leak.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
     name = "test_map",
     srcs = ["test_map.py"],
     srcs_version = "PY3",
@@ -54,14 +97,79 @@ py_test(
 )
 
 py_test(
-    name = "until_next_test",
-    srcs = ["until_next_test.py"],
+    name = "test_prefix",
+    srcs = ["test_prefix.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/operators:until_next",
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_propagate",
+    srcs = ["test_propagate.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_rename",
+    srcs = ["test_rename.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_resample",
+    srcs = ["test_resample.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_select",
+    srcs = ["test_select.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_select_index_values",
+    srcs = ["test_select_index_values.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_until_next",
+    srcs = ["test_until_next.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
     ],
 )
 
@@ -80,6 +188,17 @@ py_test(
 py_test(
     name = "test_arithmetic",
     srcs = ["test_arithmetic.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
+        # "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_where",
+    srcs = ["test_where.py"],
     srcs_version = "PY3",
     deps = [
         "//temporian/implementation/numpy/data:io",
