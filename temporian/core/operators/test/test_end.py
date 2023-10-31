@@ -12,43 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 from absl.testing import absltest
+from absl.testing.parameterized import TestCase
 
-from temporian.core.operators.end import EndOperator
 from temporian.implementation.numpy.data.io import event_set
-from temporian.implementation.numpy.operators.end import (
-    EndNumpyImplementation,
-)
+from temporian.test.utils import assertOperatorResult
 
 
-class EndOperatorTest(absltest.TestCase):
-    def setUp(self):
-        pass
-
-    def test_base(self):
+class EndTest(TestCase):
+    def test_basic(self):
         evset = event_set(
             timestamps=[1, 2, 3, 4],
-            features={
-                "a": [5, 6, 7, 8],
-                "b": ["A", "A", "B", "B"],
-            },
-            indexes=["b"],
-        )
-        node = evset.node()
-
-        expected_output = event_set(
-            timestamps=[2, 4],
-            features={"b": ["A", "B"]},
+            features={"a": [5, 6, 7, 8], "b": ["A", "A", "B", "B"]},
             indexes=["b"],
         )
 
-        # Run op
-        op = EndOperator(input=node)
-        instance = EndNumpyImplementation(op)
-        output = instance.call(input=evset)["output"]
+        result = evset.end()
 
-        self.assertEqual(output, expected_output)
+        expected = event_set(
+            timestamps=[2, 4], features={"b": ["A", "B"]}, indexes=["b"]
+        )
+
+        assertOperatorResult(self, result, expected, check_sampling=False)
 
 
 if __name__ == "__main__":

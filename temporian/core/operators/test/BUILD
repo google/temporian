@@ -40,6 +40,17 @@ py_test(
 )
 
 py_test(
+    name = "test_end",
+    srcs = ["test_end.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
     name = "test_fast_fourier_transform",
     srcs = ["test_fast_fourier_transform.py"],
     srcs_version = "PY3",

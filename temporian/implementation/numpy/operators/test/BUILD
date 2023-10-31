@@ -135,22 +135,6 @@ py_test(
 )
 
 py_test(
-    name = "end_test",
-    srcs = ["end_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        ":utils",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/core/operators:end",
-        "//temporian/implementation/numpy/operators:end",
-    ],
-)
-
-py_test(
     name = "timestamps_test",
     srcs = ["timestamps_test.py"],
     srcs_version = "PY3",
