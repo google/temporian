@@ -150,25 +150,6 @@ py_test(
 )
 
 py_test(
-    name = "since_last_test",
-    srcs = ["since_last_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/pandas
-        # already_there/numpy
-        "//temporian/io:pandas",
-        ":utils",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/core/operators:since_last",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators:since_last",
-    ],
-)
-
-py_test(
     name = "begin_test",
     srcs = ["begin_test.py"],
     srcs_version = "PY3",
