@@ -27,9 +27,9 @@ build:
       - pip install -r docs/src/tutorials/requirements.txt
 
     pre_build:
+      - tools/run_notebooks.sh docs/src/getting_started.ipynb
       - tools/run_notebooks.sh docs/src/user_guide.ipynb
       - tools/run_notebooks.sh $(ls docs/src/recipes/*.ipynb)
-      - tools/run_notebooks.sh docs/src/tutorials/getting_started.ipynb
       # These are too slow
       # - tools/run_notebooks.sh docs/src/tutorials/*.ipynb
 

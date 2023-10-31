@@ -91,17 +91,17 @@ Check the [Getting Started tutorial](https://temporian.readthedocs.io/en/stable/
 
 ## Next steps
 
-New users should refer to the [3 minutes to Temporian](https://temporian.readthedocs.io/en/stable/3_minutes/) page, which provides a
+New users should refer to the [Getting Started](https://temporian.readthedocs.io/en/stable/getting_started/) guide, which provides a
 quick overview of the key concepts and operations of Temporian.
 
-After reading the 3 minute guide, visit the [User Guide](https://temporian.readthedocs.io/en/stable/user_guide/) for a deep dive into
+After that, visit the [User Guide](https://temporian.readthedocs.io/en/stable/user_guide/) for a deep dive into
 the major concepts, operators, conventions, and practices of Temporian. For a
 hands-on learning experience, work through the [Tutorials](https://temporian.readthedocs.io/en/stable/tutorials/) or refer to the [API
 reference](https://temporian.readthedocs.io/en/stable/reference/).
 
 ## Documentation
 
-The documentation 📚 is available at [temporian.readthedocs.io](https://temporian.readthedocs.io/en/stable/). The [3 minutes to Temporian ⏰️](https://temporian.readthedocs.io/en/stable/3_minutes/) is the best way to start.
+The documentation 📚 is available at [temporian.readthedocs.io](https://temporian.readthedocs.io/en/stable/). The [Getting Started guide](https://temporian.readthedocs.io/en/stable/getting_started/) is the best way to start.
 
 ## Contributing
 
