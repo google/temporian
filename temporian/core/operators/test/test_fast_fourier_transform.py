@@ -106,6 +106,15 @@ class FastFourierTransformTest(TestCase):
                 num_events=20, num_spectral_lines=15
             )
 
+    def test_wrong_num_spectral_lines_negative(self):
+        evset = event_set([], {"a": f32([])})
+        with self.assertRaisesRegex(
+            ValueError, "num_spectral_lines should be positive. Got"
+        ):
+            evset.experimental_fast_fourier_transform(
+                num_events=20, num_spectral_lines=-1
+            )
+
 
 if __name__ == "__main__":
     absltest.main()
