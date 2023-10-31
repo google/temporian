@@ -14,7 +14,7 @@
 
 """Implementation for the Glue operator."""
 
-from typing import Dict, List
+from typing import Dict
 
 from temporian.core.operators.glue import GlueOperator
 from temporian.implementation.numpy import implementation_lib
@@ -38,10 +38,6 @@ class GlueNumpyImplementation(OperatorImplementation):
 
         # Dictionary order is guaranteed
         evsets = list(inputs.values())
-        if len(evsets) < 2:
-            raise ValueError(
-                f"Glue operator cannot be called on a {len(evsets)} EventSets."
-            )
 
         dst_evset = EventSet(data={}, schema=output_schema)
         for index_key, index_data in evsets[0].data.items():

@@ -14,7 +14,7 @@
 
 from absl.testing import absltest
 from absl.testing.parameterized import TestCase
-from temporian.core.operators.glue import glue
+from temporian.core.operators.glue import MAX_NUM_ARGUMENTS, glue
 
 from temporian.implementation.numpy.data.io import event_set
 from temporian.test.utils import assertOperatorResult, f32
@@ -88,6 +88,18 @@ class GlueTest(TestCase):
                 [], features={"a": []}, same_sampling_as=evset_1
             )
             glue(evset_1, evset_2)
+
+    def test_no_evsets(self):
+        with self.assertRaisesRegex(
+            ValueError,
+            "At least two arguments should be provided.",
+        ):
+            glue()
+
+    def test_too_many_evsets(self):
+        evsets = [event_set([], features={"a": []})] * (MAX_NUM_ARGUMENTS + 1)
+        with self.assertRaisesRegex(ValueError, "Too many"):
+            glue(*evsets)
 
     def test_order_unchanged(self):
         """Tests that input evsets' order is kept.
