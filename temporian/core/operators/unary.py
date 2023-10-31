@@ -193,44 +193,6 @@ operator_lib.register_operator(LogOperator)
 def invert(
     input: EventSetOrNode,
 ) -> EventSetOrNode:
-    """Inverts a boolean [`EventSet`][temporian.EventSet] (~EventSet).
-
-    Swaps False <-> True element-wise.
-
-    Does not work on integers, they should be cast to
-    [`tp.bool_`][temporian.bool_] beforehand, using
-    [`EventSet.cast()`][temporian.EventSet.cast].
-
-    Example:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[1, 2],
-        ...     features={"M": [1, 5], "N": [1.0, 5.5]},
-        ... )
-        >>> # Boolean node
-        >>> b = a < 2
-        >>> b
-        indexes: ...
-                'M': [ True False]
-                'N': [ True False]
-        ...
-
-        >>> # Inverted node
-        >>> c = ~b
-        >>> c
-        indexes: ...
-                'M': [False True]
-                'N': [False True]
-        ...
-
-        ```
-
-    Args:
-        input: EventSet to invert.
-
-    Returns:
-        Inverted EventSet.
-    """
     assert isinstance(input, EventSetNode)
 
     return InvertOperator(

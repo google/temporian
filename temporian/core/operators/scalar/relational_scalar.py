@@ -79,44 +79,6 @@ def equal_scalar(
     input: EventSetOrNode,
     value: Union[float, int, str, bool, bytes],
 ) -> EventSetOrNode:
-    """Checks for equality between an [`EventSet`][temporian.EventSet] and a
-    scalar element-wise.
-
-    Each item in each feature in `input` is compared to `value`.
-    Note that if both elements are NaNs, returns False.
-
-    Usage example:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
-        ... )
-
-        >>> # WARN: Don't use this for element-wise comparison
-        >>> a == 100
-        False
-
-        >>> # Element-wise comparison
-        >>> b = tp.equal_scalar(a, 100)
-        >>> b
-        indexes: []
-        features: [('f1', bool_), ('f2', bool_)]
-        events:
-            (3 events):
-                timestamps: [1. 2. 3.]
-                'f1': [False True False]
-                'f2': [False True False]
-        ...
-
-        ```
-
-    Args:
-        input: EventSet to compare the value to.
-        value: Scalar value to compare to the input.
-
-    Returns:
-        EventSet containing the result of the comparison.
-    """
     assert isinstance(input, EventSetNode)
 
     return EqualScalarOperator(
@@ -130,41 +92,6 @@ def not_equal_scalar(
     input: EventSetOrNode,
     value: Union[float, int, str, bytes, bool],
 ) -> EventSetOrNode:
-    """Checks for differences between an [`EventSet`][temporian.EventSet] and a
-    scalar element-wise.
-
-    Each item in each feature in `input` is compared to `value`.
-    Note that if both elements are NaNs, returns True.
-
-    Usage example:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
-        ... )
-
-        >>> # Equivalent
-        >>> b = tp.not_equal_scalar(a, 100)
-        >>> b = a != 100
-        >>> b
-        indexes: []
-        features: [('f1', bool_), ('f2', bool_)]
-        events:
-            (3 events):
-                timestamps: [1. 2. 3.]
-                'f1': [ True False True]
-                'f2': [ True False True]
-        ...
-
-        ```
-
-    Args:
-        input: EventSet to compare the value to.
-        value: Scalar value to compare to the input.
-
-    Returns:
-        EventSet containing the result of the comparison.
-    """
     assert isinstance(input, EventSetNode)
 
     return NotEqualScalarOperator(
@@ -178,41 +105,6 @@ def greater_equal_scalar(
     input: EventSetOrNode,
     value: Union[float, int, str, bytes, bool],
 ) -> EventSetOrNode:
-    """Check if the input [`EventSet`][temporian.EventSet] is greater or equal
-    than a scalar element-wise.
-
-    Each item in each feature in `input` is compared to `value`.
-    Note that it will always return False on NaN elements.
-
-    Usage example:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
-        ... )
-
-        >>> # Equivalent
-        >>> b = tp.greater_equal_scalar(a, 100)
-        >>> b = a >= 100
-        >>> b
-        indexes: []
-        features: [('f1', bool_), ('f2', bool_)]
-        events:
-            (3 events):
-                timestamps: [1. 2. 3.]
-                'f1': [False True True]
-                'f2': [False True False]
-        ...
-
-        ```
-
-    Args:
-        input: EventSet to compare the value to.
-        value: Scalar value to compare to the input.
-
-    Returns:
-        EventSet containing the result of the comparison.
-    """
     assert isinstance(input, EventSetNode)
 
     return GreaterEqualScalarOperator(
@@ -226,41 +118,6 @@ def less_equal_scalar(
     input: EventSetOrNode,
     value: Union[float, int, str, bytes, bool],
 ) -> EventSetOrNode:
-    """Check if the input [`EventSet`][temporian.EventSet] is less or equal than
-    a scalar element-wise.
-
-    Each item in each feature in `input` is compared to `value`.
-    Note that it will always return False on NaN elements.
-
-    Usage example:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
-        ... )
-
-        >>> # Equivalent
-        >>> b = tp.less_equal_scalar(a, 100)
-        >>> b = a <= 100
-        >>> b
-        indexes: []
-        features: [('f1', bool_), ('f2', bool_)]
-        events:
-            (3 events):
-                timestamps: [1. 2. 3.]
-                'f1': [ True True False]
-                'f2': [ True True True]
-        ...
-
-        ```
-
-    Args:
-        input: EventSet to compare the value to.
-        value: Scalar value to compare to the input.
-
-    Returns:
-        EventSet containing the result of the comparison.
-    """
     assert isinstance(input, EventSetNode)
 
     return LessEqualScalarOperator(
@@ -274,41 +131,6 @@ def greater_scalar(
     input: EventSetOrNode,
     value: Union[float, int, str, bytes, bool],
 ) -> EventSetOrNode:
-    """Check if the input [`EventSet`][temporian.EventSet] is greater than a
-    scalar element-wise.
-
-    Each item in each feature in `input` is compared to `value`.
-    Note that it will always return False on NaN elements.
-
-    Usage example:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
-        ... )
-
-        >>> # Equivalent
-        >>> b = tp.greater_scalar(a, 100)
-        >>> b = a > 100
-        >>> b
-        indexes: []
-        features: [('f1', bool_), ('f2', bool_)]
-        events:
-            (3 events):
-                timestamps: [1. 2. 3.]
-                'f1': [False False True]
-                'f2': [False False False]
-        ...
-
-        ```
-
-    Args:
-        input: EventSet to compare the value to.
-        value: Scalar value to compare to the input.
-
-    Returns:
-        EventSet containing the result of the comparison.
-    """
     assert isinstance(input, EventSetNode)
 
     return GreaterScalarOperator(
@@ -322,41 +144,6 @@ def less_scalar(
     input: EventSetOrNode,
     value: Union[float, int, str, bytes, bool],
 ) -> EventSetOrNode:
-    """Check if the input [`EventSet`][temporian.EventSet] is less than a scalar
-    element-wise.
-
-    Each item in each feature in `input` is compared to `value`.
-    Note that it will always return False on NaN elements.
-
-    Usage example:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
-        ... )
-
-        >>> # Equivalent
-        >>> b = tp.less_scalar(a, 100)
-        >>> b = a < 100
-        >>> b
-        indexes: []
-        features: [('f1', bool_), ('f2', bool_)]
-        events:
-            (3 events):
-                timestamps: [1. 2. 3.]
-                'f1': [ True False False]
-                'f2': [ True False True]
-        ...
-
-        ```
-
-    Args:
-        input: EventSet to compare the value to.
-        value: Scalar value to compare to the input.
-
-    Returns:
-        EventSet containing the result of the comparison.
-    """
     assert isinstance(input, EventSetNode)
 
     return LessScalarOperator(
