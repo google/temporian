@@ -85,9 +85,9 @@ class EventSetOperations:
         """
 
         raise ValueError(
-            f"Cannot {op_name} {self._clsname} and {type(other)} objects. Only"
-            f" {self._clsname} or values of type ({allowed_types}) are"
-            " supported."
+            f"Cannot use operator '{op_name}' on {self._clsname} and"
+            f" {type(other)} objects. Only {self._clsname} or values of type"
+            f" ({allowed_types}) are supported."
         )
 
     def __ne__(self, other: Any):
@@ -1155,6 +1155,75 @@ class EventSetOperations:
         from temporian.core.operators.enumerate import enumerate
 
         return enumerate(self)
+
+    def equal(self: EventSetOrNode, other: Any) -> EventSetOrNode:
+        """Checks element-wise equality of an [`EventSet`][temporian.EventSet]
+        to another one or to a single value.
+
+        Each feature is compared element-wise to the feature in
+        `other` in the same position.
+        Note that it will always return False on NaN elements.
+
+        Inputs must have the same sampling and the same number of features.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [0, 100, 200]}
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f2": [-10, 100, 5]},
+            ...     same_sampling_as=a
+            ... )
+
+            >>> # WARN: Don't use this for element-wise comparison
+            >>> a == b
+            False
+
+            >>> # Element-wise comparison to a scalar value
+            >>> c = a.equal(100)
+            >>> c
+            indexes: []
+            features: [('f1', bool_)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'f1': [False True False]
+            ...
+
+            >>> # Element-wise comparison between two EventSets
+            >>> c = a.equal(b)
+            >>> c
+            indexes: []
+            features: [('eq_f1_f2', bool_)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'eq_f1_f2': [False True False]
+            ...
+
+            ```
+
+        Args:
+            other: Second EventSet or single value to compare.
+
+        Returns:
+            EventSet with boolean features.
+        """
+        if isinstance(other, self.__class__):
+            from temporian.core.operators.binary import equal
+
+            return equal(input_1=self, input_2=other)
+
+        if isinstance(other, T_SCALAR + (bool, str)):
+            from temporian.core.operators.scalar import equal_scalar
+
+            return equal_scalar(input=self, value=other)
+
+        self._raise_error("equal", other, "int,float,bool,str")
+        assert False
 
     def experimental_fast_fourier_transform(
         self: EventSetOrNode,

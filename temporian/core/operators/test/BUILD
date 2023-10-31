@@ -186,8 +186,8 @@ py_test(
 )
 
 py_test(
-    name = "test_arithmetic_multi_index",
-    srcs = ["test_arithmetic_multi_index.py"],
+    name = "test_arithmetic",
+    srcs = ["test_arithmetic.py"],
     srcs_version = "PY3",
     deps = [
         "//temporian/implementation/numpy/data:io",
@@ -199,6 +199,61 @@ py_test(
 py_test(
     name = "test_where",
     srcs = ["test_where.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
+        # "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_arithmetic_scalar",
+    srcs = ["test_arithmetic_scalar.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
+        # "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_logical",
+    srcs = ["test_logical.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
+        # "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_relational",
+    srcs = ["test_relational.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
+        # "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_relational_scalar",
+    srcs = ["test_relational_scalar.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
+        # "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_unary",
+    srcs = ["test_unary.py"],
     srcs_version = "PY3",
     deps = [
         "//temporian/implementation/numpy/data:io",

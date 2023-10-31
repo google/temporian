@@ -124,9 +124,7 @@ def equal(
         Result of the comparison.
     """
     assert isinstance(input_1, EventSetNode)
-
-    if not isinstance(input_2, EventSetNode):
-        return equal_scalar(input=input_1, value=input_2)  # type: ignore
+    assert isinstance(input_2, EventSetNode)
 
     return EqualOperator(
         input_1=input_1,
