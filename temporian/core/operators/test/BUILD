@@ -7,20 +7,30 @@ package(
 # =====
 
 py_test(
-    name = "fft_test",
-    srcs = ["fft_test.py"],
+    name = "test_add_index",
+    srcs = ["test_add_index.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/operators:fast_fourier_transform",
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
     ],
 )
 
 py_test(
-    name = "test_add_index",
-    srcs = ["test_add_index.py"],
+    name = "test_drop_index",
+    srcs = ["test_drop_index.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_fast_fourier_transform",
+    srcs = ["test_fast_fourier_transform.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest

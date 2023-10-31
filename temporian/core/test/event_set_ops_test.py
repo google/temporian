@@ -1,3 +1,17 @@
+# Copyright 2021 Google LLC.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from absl.testing import absltest
 from temporian.core.data.node import EventSetNode
 from temporian.implementation.numpy.data.event_set import EventSet
@@ -37,10 +51,6 @@ class EventSetOpsTest(absltest.TestCase):
         self.node = self.evset.node()
         self.other_node = self.other_evset.node()
 
-    def test_add_index(self):
-        self.assertTrue(isinstance(self.evset.add_index("a"), EventSet))
-        self.assertTrue(isinstance(self.node.add_index("a"), EventSetNode))
-
     def test_begin(self):
         self.assertTrue(isinstance(self.evset.begin(), EventSet))
         self.assertTrue(isinstance(self.node.begin(), EventSetNode))
@@ -53,10 +63,6 @@ class EventSetOpsTest(absltest.TestCase):
         self.assertTrue(isinstance(self.evset.cumsum(), EventSet))
         self.assertTrue(isinstance(self.node.cumsum(), EventSetNode))
 
-    def test_drop_index(self):
-        self.assertTrue(isinstance(self.evset.drop_index("x"), EventSet))
-        self.assertTrue(isinstance(self.node.drop_index("x"), EventSetNode))
-
     def test_end(self):
         self.assertTrue(isinstance(self.evset.end(), EventSet))
         self.assertTrue(isinstance(self.node.end(), EventSetNode))
@@ -65,31 +71,9 @@ class EventSetOpsTest(absltest.TestCase):
         self.assertTrue(isinstance(self.evset.enumerate(), EventSet))
         self.assertTrue(isinstance(self.node.enumerate(), EventSetNode))
 
-    def test_fast_fourier_transform(self):
-        self.assertTrue(
-            isinstance(
-                self.evset["a"].experimental_fast_fourier_transform(
-                    num_events=2
-                ),
-                EventSet,
-            )
-        )
-        self.assertTrue(
-            isinstance(
-                self.node["a"].experimental_fast_fourier_transform(
-                    num_events=2
-                ),
-                EventSetNode,
-            )
-        )
-
     def test_select(self):
         self.assertTrue(isinstance(self.evset.select("a"), EventSet))
         self.assertTrue(isinstance(self.node.select("a"), EventSetNode))
-
-    def test_set_index(self):
-        self.assertTrue(isinstance(self.evset.set_index("a"), EventSet))
-        self.assertTrue(isinstance(self.node.set_index("a"), EventSetNode))
 
     def test_timestamps(self):
         self.assertTrue(isinstance(self.evset.timestamps(), EventSet))
