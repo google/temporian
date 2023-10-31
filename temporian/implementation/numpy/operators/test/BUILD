@@ -167,22 +167,6 @@ py_test(
 )
 
 py_test(
-    name = "tick_test",
-    srcs = ["tick_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        ":utils",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/core/operators:tick",
-        "//temporian/implementation/numpy/operators:tick",
-    ],
-)
-
-py_test(
     name = "join_test",
     srcs = ["join_test.py"],
     srcs_version = "PY3",
