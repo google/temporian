@@ -42,19 +42,41 @@ py_test(
 )
 
 py_test(
-    name = "test_arithmetic_multi_index",
-    srcs = ["test_arithmetic_multi_index.py"],
+    name = "test_filter",
+    srcs = ["test_filter.py"],
     srcs_version = "PY3",
     deps = [
+        # already_there/absl/testing:absltest
         "//temporian/implementation/numpy/data:io",
-        # "//temporian/core/data:duration",
         "//temporian/test:utils",
     ],
 )
 
 py_test(
-    name = "test_drop_index",
-    srcs = ["test_drop_index.py"],
+    name = "test_glue",
+    srcs = ["test_glue.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_lag",
+    srcs = ["test_lag.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_leak",
+    srcs = ["test_leak.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
@@ -66,6 +88,17 @@ py_test(
 py_test(
     name = "test_map",
     srcs = ["test_map.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_prefix",
+    srcs = ["test_prefix.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
@@ -97,6 +130,17 @@ py_test(
 )
 
 py_test(
+    name = "test_resample",
+    srcs = ["test_resample.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
     name = "test_select",
     srcs = ["test_select.py"],
     srcs_version = "PY3",
@@ -119,14 +163,13 @@ py_test(
 )
 
 py_test(
-    name = "until_next_test",
-    srcs = ["until_next_test.py"],
+    name = "test_until_next",
+    srcs = ["test_until_next.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/operators:until_next",
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
     ],
 )
 
@@ -139,5 +182,27 @@ py_test(
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/core/operators:tick_calendar",
+    ],
+)
+
+py_test(
+    name = "test_arithmetic_multi_index",
+    srcs = ["test_arithmetic_multi_index.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
+        # "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_where",
+    srcs = ["test_where.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
+        # "//temporian/core/data:duration",
+        "//temporian/test:utils",
     ],
 )

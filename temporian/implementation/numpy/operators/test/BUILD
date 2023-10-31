@@ -118,34 +118,6 @@ py_test(
 )
 
 py_test(
-    name = "filter_test",
-    srcs = ["filter_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":utils",
-        # already_there/absl/testing:absltest
-        "//temporian/core/operators:filter",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators:filter",
-    ],
-)
-
-py_test(
-    name = "glue_test",
-    srcs = ["glue_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":utils",
-        # already_there/absl/testing:absltest
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/operators:glue",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators:glue",
-    ],
-)
-
-py_test(
     name = "unary_test",
     srcs = ["unary_test.py"],
     srcs_version = "PY3",
@@ -159,74 +131,6 @@ py_test(
         "//temporian/core/data:node",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/operators:unary",
-    ],
-)
-
-py_test(
-    name = "lag_test",
-    srcs = ["lag_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":utils",
-        # already_there/absl/testing:absltest
-        "//temporian/core/operators:lag",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators:lag",
-    ],
-)
-
-py_test(
-    name = "leak_test",
-    srcs = ["leak_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        ":utils",
-        "//temporian/core:evaluation",
-        "//temporian/core/operators:leak",
-        "//temporian/implementation/numpy:evaluation",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators:leak",
-    ],
-)
-
-py_test(
-    name = "resample_test",
-    srcs = ["resample_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/pandas
-        # already_there/numpy
-        "//temporian/io:pandas",
-        ":utils",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/core/operators:resample",
-        "//temporian/implementation/numpy:evaluation",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators:resample",
-    ],
-)
-
-py_test(
-    name = "prefix_test",
-    srcs = ["prefix_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        # already_there/pandas
-        # already_there/numpy
-        "//temporian/io:pandas",
-        ":utils",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/core/operators:prefix",
-        "//temporian/implementation/numpy:evaluation",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators:prefix",
     ],
 )
 
@@ -423,37 +327,5 @@ py_test(
         "//temporian/implementation/numpy/data:io",
         "//temporian/core/operators:tick_calendar",
         "//temporian/implementation/numpy/operators:tick_calendar",
-    ],
-)
-
-py_test(
-    name = "until_next_test",
-    srcs = ["until_next_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        ":utils",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/core/operators:until_next",
-        "//temporian/implementation/numpy/operators:until_next",
-    ],
-)
-
-py_test(
-    name = "where_test",
-    srcs = ["where_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        ":utils",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/core/operators:where",
-        "//temporian/implementation/numpy/operators:where",
     ],
 )
