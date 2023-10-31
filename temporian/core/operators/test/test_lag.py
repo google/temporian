@@ -13,33 +13,29 @@
 # limitations under the License.
 
 from absl.testing import absltest
+from absl.testing.parameterized import TestCase
 
-from temporian.core.operators.lag import LagOperator
-from temporian.implementation.numpy.operators.lag import LagNumpyImplementation
 from temporian.implementation.numpy.data.io import event_set
-from temporian.implementation.numpy.operators.test.utils import (
-    assertEqualEventSet,
-    testOperatorAndImp,
-)
+from temporian.test.utils import assertOperatorResult
 
 
-class LagNumpyImplementationTest(absltest.TestCase):
-    def test_base(self) -> None:
-        input_data = event_set(
+class LagTest(TestCase):
+    def test_basic(self):
+        evset = event_set(
             timestamps=[1, 2, 3, 4],
             features={"x": [4, 5, 6, 7], "y": [1, 1, 2, 2]},
             indexes=["y"],
         )
-        expected_result = event_set(
+
+        result = evset.lag(2)
+
+        expected = event_set(
             timestamps=[1 + 2, 2 + 2, 3 + 2, 4 + 2],
             features={"x": [4, 5, 6, 7], "y": [1, 1, 2, 2]},
             indexes=["y"],
         )
-        op = LagOperator(input=input_data.node(), duration=2)
-        imp = LagNumpyImplementation(op)
-        testOperatorAndImp(self, op, imp)
-        filtered_evset = imp.call(input=input_data)["output"]
-        assertEqualEventSet(self, filtered_evset, expected_result)
+
+        assertOperatorResult(self, result, expected, check_sampling=False)
 
 
 if __name__ == "__main__":

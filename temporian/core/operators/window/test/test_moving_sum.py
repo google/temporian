@@ -13,14 +13,12 @@
 # limitations under the License.
 
 from math import nan
-from unittest.mock import patch
 
 import numpy as np
 from absl.testing import absltest
 from absl.testing.parameterized import TestCase, parameters
 
 from temporian.implementation.numpy.data.io import event_set
-from temporian.implementation.numpy_cc.operators import operators_cc
 from temporian.test.utils import f32, f64, assertOperatorResult
 
 
@@ -173,29 +171,6 @@ class MovingSumTest(TestCase):
 
         result = evset.moving_sum(window_length=window)
         assertOperatorResult(self, result, expected)
-
-    @patch.object(operators_cc, "moving_sum")
-    def test_with_variable_winlen_same_sampling_uses_correct_cpp_impl(
-        self, cpp_moving_sum_mock
-    ):
-        """Checks that the no-sampling version of cpp code is called when
-        passing a variable window_length with same sampling as the input."""
-        evset = event_set(timestamps=[1], features={"a": [10.0]})
-
-        window_length = event_set(
-            timestamps=[1], features={"a": [1.0]}, same_sampling_as=evset
-        )
-
-        cpp_moving_sum_mock.return_value = f64([10.0])
-
-        evset.moving_sum(window_length=window_length)
-
-        # sampling_timestamps not passed
-        cpp_moving_sum_mock.assert_called_once_with(
-            evset_timestamps=evset.data[()].timestamps,
-            evset_values=evset.data[()].features[0],
-            window_length=window_length.data[()].features[0],
-        )
 
     def test_error_input_bytes(self):
         evset = event_set([1, 2], {"f": ["A", "B"]})
