@@ -17,8 +17,7 @@ namespace {
 namespace py = pybind11;
 
 // TODO: Check if absl map would be more efficient.
-template <typename K, typename V>
-using Map = std::unordered_map<K, V>;
+template <typename K, typename V> using Map = std::unordered_map<K, V>;
 
 // Aggregates group data to be returned.
 struct GroupAccumulator {
@@ -247,7 +246,7 @@ add_index_compute_index(const py::list &features) {
                          index_acc.GroupBeginIdxToArray());
 }
 
-}  // namespace
+} // namespace
 
 void init_add_index(py::module &m) {
   m.def("add_index_compute_index", &add_index_compute_index, "",

@@ -40,9 +40,6 @@
   },
   "editor.tabSize": 4,
   "editor.formatOnSave": true,
-  "python.linting.flake8Enabled": false,
-  "python.linting.pylintEnabled": true,
-  "python.linting.enabled": true,
   "editor.rulers": [
     80
   ],
