@@ -753,8 +753,6 @@ class EventSetOperations:
             ...     same_sampling_as=a
             ... )
 
-            >>> # Equivalent
-            >>> c = tp.floordiv(a, b)
             >>> c = a // b
             >>> c
             indexes: []
