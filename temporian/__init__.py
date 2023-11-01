@@ -98,42 +98,6 @@ from temporian.utils import config
 from temporian.core.operators.glue import glue
 from temporian.core.operators.combine import combine
 
-# Binary operators
-from temporian.core.operators.binary.arithmetic import add
-from temporian.core.operators.binary.arithmetic import subtract
-from temporian.core.operators.binary.arithmetic import multiply
-from temporian.core.operators.binary.arithmetic import divide
-from temporian.core.operators.binary.arithmetic import floordiv
-from temporian.core.operators.binary.arithmetic import modulo
-from temporian.core.operators.binary.arithmetic import power
-
-from temporian.core.operators.binary.relational import equal
-from temporian.core.operators.binary.relational import not_equal
-from temporian.core.operators.binary.relational import greater
-from temporian.core.operators.binary.relational import greater_equal
-from temporian.core.operators.binary.relational import less
-from temporian.core.operators.binary.relational import less_equal
-
-from temporian.core.operators.binary.logical import logical_and
-from temporian.core.operators.binary.logical import logical_or
-from temporian.core.operators.binary.logical import logical_xor
-
-# Scalar operators
-from temporian.core.operators.scalar.arithmetic_scalar import add_scalar
-from temporian.core.operators.scalar.arithmetic_scalar import subtract_scalar
-from temporian.core.operators.scalar.arithmetic_scalar import multiply_scalar
-from temporian.core.operators.scalar.arithmetic_scalar import divide_scalar
-from temporian.core.operators.scalar.arithmetic_scalar import floordiv_scalar
-from temporian.core.operators.scalar.arithmetic_scalar import modulo_scalar
-from temporian.core.operators.scalar.arithmetic_scalar import power_scalar
-
-from temporian.core.operators.scalar.relational_scalar import equal_scalar
-from temporian.core.operators.scalar.relational_scalar import not_equal_scalar
-from temporian.core.operators.scalar.relational_scalar import greater_equal_scalar
-from temporian.core.operators.scalar.relational_scalar import greater_scalar
-from temporian.core.operators.scalar.relational_scalar import less_equal_scalar
-from temporian.core.operators.scalar.relational_scalar import less_scalar
-
 # Remove automatic file tree symbols from public API
 # pylint: disable=undefined-variable
 del proto

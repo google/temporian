@@ -101,7 +101,6 @@ plugins:
       include: ["*.ipynb"] # Use ["*.py", "*.ipynb"] to render jupytext too.
       ignore: ["**/.ipynb_checkpoints/*"]
       allow_errors: false # Cancel build if cell execution fails.
-      theme: dark
   # Configuration to generate the reference pages from the docstrings.
   - mkdocstrings:
       default_handler: python
