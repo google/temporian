@@ -28,10 +28,7 @@ from temporian.implementation.numpy.operators.test.utils import (
 )
 
 
-class TimestampsOperatorTest(absltest.TestCase):
-    def setUp(self):
-        pass
-
+class TimestampsTest(absltest.TestCase):
     def test_base(self):
         evset = event_set(
             timestamps=[-1, 1, 2, 3, 4, 10],

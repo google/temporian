@@ -19,27 +19,6 @@ py_library(
 # Tests
 # =====
 
-
-py_test(
-    name = "cast_test",
-    srcs = ["cast_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        ":utils",
-        # already_there/absl/testing:absltest
-        # already_there/numpy
-        # already_there/pandas
-        "//temporian/io:pandas",
-        "//temporian/core:evaluation",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/operators:cast",
-        "//temporian/implementation/numpy/data:event_set",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/implementation/numpy/operators:cast",
-    ],
-)
-
 py_test(
     name = "unique_timestamps_test",
     srcs = ["unique_timestamps_test.py"],
@@ -135,38 +114,6 @@ py_test(
         "//temporian/implementation/numpy/data:io",
         "//temporian/core/operators:join",
         "//temporian/implementation/numpy/operators:join",
-    ],
-)
-
-py_test(
-    name = "timestamps_test",
-    srcs = ["timestamps_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        ":utils",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/core/operators:timestamps",
-        "//temporian/implementation/numpy/operators:timestamps",
-    ],
-)
-
-py_test(
-    name = "combine_test",
-    srcs = ["combine_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        ":utils",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/core/operators:combine",
-        "//temporian/implementation/numpy/operators:combine",
     ],
 )
 

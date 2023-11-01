@@ -27,7 +27,7 @@ from temporian.implementation.numpy.operators.test.utils import (
 )
 
 
-class CombineOperatorTest(absltest.TestCase):
+class CombineTest(absltest.TestCase):
     def setUp(self):
         # Indexes: a, b, c
         self.evset_1 = event_set(

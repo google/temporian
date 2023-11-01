@@ -294,3 +294,36 @@ py_test(
         "//temporian/test:utils",
     ],
 )
+
+py_test(
+    name = "test_cast",
+    srcs = ["test_cast.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
+        # "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_combine",
+    srcs = ["combine_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
+        # "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_timestamps",
+    srcs = ["test_timestamps.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
+        # "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)

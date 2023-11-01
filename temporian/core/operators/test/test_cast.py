@@ -32,7 +32,7 @@ from temporian.implementation.numpy.operators.test.utils import (
 from temporian.core.evaluation import run
 
 
-class CastNumpyImplementationTest(absltest.TestCase):
+class CastTest(absltest.TestCase):
     """Test numpy implementation of all arithmetic operators,
     but using a two-level index and disordered rows."""
 
