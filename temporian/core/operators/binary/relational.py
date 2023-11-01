@@ -77,51 +77,6 @@ def equal(
     input_1: EventSetOrNode,
     input_2: EventSetOrNode,
 ) -> EventSetOrNode:
-    """Checks (element-wise) for equality between two [`EventSets`][temporian.EventSet].
-
-    Each feature in `input_1` is compared element-wise to the feature in
-    `input_2` in the same position.
-    Note that it will always return False on NaN elements.
-
-    `input_1` and `input_2` must have the same sampling and the same number of
-    features.
-
-    Example:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 100, 200]}
-        ... )
-        >>> b = tp.event_set(
-        ...     timestamps=[1, 2, 3],
-        ...     features={"f2": [-10, 100, 5]},
-        ...     same_sampling_as=a
-        ... )
-
-        >>> # WARN: Don't use this for element-wise comparison
-        >>> a == b
-        False
-
-        >>> # Element-wise comparison
-        >>> c = tp.equal(a, b)
-        >>> c
-        indexes: []
-        features: [('eq_f1_f2', bool_)]
-        events:
-            (3 events):
-                timestamps: [1. 2. 3.]
-                'eq_f1_f2': [False True False]
-        ...
-
-        ```
-
-    Args:
-        input_1: First EventSet.
-        input_2: Second EventSet.
-
-    Returns:
-        Result of the comparison.
-    """
     assert isinstance(input_1, EventSetNode)
     assert isinstance(input_2, EventSetNode)
 
@@ -136,48 +91,6 @@ def not_equal(
     input_1: EventSetOrNode,
     input_2: EventSetOrNode,
 ) -> EventSetOrNode:
-    """Checks (element-wise) for differences between two [`EventSets`][temporian.EventSet].
-
-    If two EventSets, each feature in `input_1` is compared element-wise to the
-    feature in `input_2` in the same position.
-    Note that it will always return True on NaNs (even if both are).
-
-    `input_1` and `input_2` must have the same sampling and the same number of
-    features.
-
-    Example:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 100, 200]}
-        ... )
-        >>> b = tp.event_set(
-        ...     timestamps=[1, 2, 3],
-        ...     features={"f2": [-10, 100, 5]},
-        ...     same_sampling_as=a
-        ... )
-
-        >>> # Equivalent
-        >>> c = tp.not_equal(a, b)
-        >>> c = a != b
-        >>> c
-        indexes: []
-        features: [('ne_f1_f2', bool_)]
-        events:
-            (3 events):
-                timestamps: [1. 2. 3.]
-                'ne_f1_f2': [ True False True]
-        ...
-
-        ```
-
-    Args:
-        input_1: First EventSet.
-        input_2: Second EventSet.
-
-    Returns:
-        Result of the comparison.
-    """
     assert isinstance(input_1, EventSetNode)
     assert isinstance(input_2, EventSetNode)
 
@@ -192,48 +105,6 @@ def greater(
     input_left: EventSetOrNode,
     input_right: EventSetOrNode,
 ) -> EventSetOrNode:
-    """Checks (element-wise) if input_left > input_right.
-
-    Each feature in `input_left` is compared element-wise to the feature in
-    `input_right` in the same position.
-    Note that it will always return False on NaN elements.
-
-    `input_left` and `input_right` must have the same sampling and the same
-    number of features.
-
-    Example:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 100, 200]}
-        ... )
-        >>> b = tp.event_set(
-        ...     timestamps=[1, 2, 3],
-        ...     features={"f2": [-10, 100, 5]},
-        ...     same_sampling_as=a
-        ... )
-
-        >>> # Equivalent
-        >>> c = tp.greater(a, b)
-        >>> c = a > b
-        >>> c
-        indexes: []
-        features: [('gt_f1_f2', bool_)]
-        events:
-            (3 events):
-                timestamps: [1. 2. 3.]
-                'gt_f1_f2': [ True False True]
-        ...
-
-        ```
-
-    Args:
-        input_left: EventSet to the left of the operator.
-        input_right: EventSet to the right of the operator.
-
-    Returns:
-        Result of the comparison.
-    """
     assert isinstance(input_left, EventSetNode)
     assert isinstance(input_right, EventSetNode)
 
@@ -248,50 +119,6 @@ def greater_equal(
     input_left: EventSetOrNode,
     input_right: EventSetOrNode,
 ) -> EventSetOrNode:
-    """Checks (element-wise) if input_left >= input_right.
-
-    If an EventSet, each feature in `self` is compared element-wise to the
-    feature in `other` in the same position. `self` and `other` must have the
-    same sampling and the same number of features.
-
-    If a scalar value, each item in each feature in `input` is compared to
-    `value`.
-
-    Note that it will always return False on NaN elements.
-
-    Example:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 100, 200]}
-        ... )
-        >>> b = tp.event_set(
-        ...     timestamps=[1, 2, 3],
-        ...     features={"f2": [-10, 100, 5]},
-        ...     same_sampling_as=a
-        ... )
-
-        >>> # Equivalent
-        >>> c = tp.greater_equal(a, b)
-        >>> c = a >= b
-        >>> c
-        indexes: []
-        features: [('ge_f1_f2', bool_)]
-        events:
-            (3 events):
-                timestamps: [1. 2. 3.]
-                'ge_f1_f2': [ True True True]
-        ...
-
-        ```
-
-    Args:
-        input_left: EventSet to the left of the operator.
-        input_right: EventSet to the right of the operator.
-
-    Returns:
-        Result of the comparison.
-    """
     assert isinstance(input_left, EventSetNode)
     assert isinstance(input_right, EventSetNode)
 
@@ -306,48 +133,6 @@ def less(
     input_left: EventSetOrNode,
     input_right: EventSetOrNode,
 ) -> EventSetOrNode:
-    """Checks (element-wise) if input_left < input_right.
-
-    Each feature in `input_left` is compared element-wise to the feature in
-    `input_right` in the same position.
-    Note that it will always return False on NaN elements.
-
-    `input_left` and `input_right` must have the same sampling and the same
-    number of features.
-
-    Example:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 100, 200]}
-        ... )
-        >>> b = tp.event_set(
-        ...     timestamps=[1, 2, 3],
-        ...     features={"f2": [-10, 100, 5]},
-        ...     same_sampling_as=a
-        ... )
-
-        >>> # Equivalent
-        >>> c = tp.less(a, b)
-        >>> c = a < b
-        >>> c
-        indexes: []
-        features: [('lt_f1_f2', bool_)]
-        events:
-            (3 events):
-                timestamps: [1. 2. 3.]
-                'lt_f1_f2': [False False False]
-        ...
-
-        ```
-
-    Args:
-        input_left: EventSet to the left of the operator.
-        input_right: EventSet to the right of the operator.
-
-    Returns:
-        Result of the comparison.
-    """
     assert isinstance(input_left, EventSetNode)
     assert isinstance(input_right, EventSetNode)
 
@@ -362,48 +147,6 @@ def less_equal(
     input_left: EventSetOrNode,
     input_right: EventSetOrNode,
 ) -> EventSetOrNode:
-    """Checks (element-wise) if input_left <= input_right.
-
-    Each feature in `input_left` is compared element-wise to the feature in
-    `input_right` in the same position.
-    Note that it will always return False on NaN elements.
-
-    `input_left` and `input_right` must have the same sampling and the same
-    number of features.
-
-    Example:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 100, 200]}
-        ... )
-        >>> b = tp.event_set(
-        ...     timestamps=[1, 2, 3],
-        ...     features={"f2": [-10, 100, 5]},
-        ...     same_sampling_as=a
-        ... )
-
-        >>> # Equivalent
-        >>> c = tp.less_equal(a, b)
-        >>> c = a <= b
-        >>> c
-        indexes: []
-        features: [('le_f1_f2', bool_)]
-        events:
-            (3 events):
-                timestamps: [1. 2. 3.]
-                'le_f1_f2': [False True False]
-        ...
-
-        ```
-
-    Args:
-        input_left: EventSet to the left of the operator.
-        input_right: EventSet to the right of the operator.
-
-    Returns:
-        Result of the comparison.
-    """
     assert isinstance(input_left, EventSetNode)
     assert isinstance(input_right, EventSetNode)
 
