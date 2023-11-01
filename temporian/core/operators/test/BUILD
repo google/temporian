@@ -272,3 +272,14 @@ py_test(
         "//temporian/test:utils",
     ],
 )
+
+py_test(
+    name = "test_tick_calendar",
+    srcs = ["test_tick_calendar.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
+        # "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
