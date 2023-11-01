@@ -155,22 +155,6 @@ py_test(
 )
 
 py_test(
-    name = "enumerate_test",
-    srcs = ["enumerate_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        ":utils",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/core/operators:enumerate",
-        "//temporian/implementation/numpy/operators:enumerate",
-    ],
-)
-
-py_test(
     name = "combine_test",
     srcs = ["combine_test.py"],
     srcs_version = "PY3",

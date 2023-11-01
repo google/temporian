@@ -283,3 +283,14 @@ py_test(
         "//temporian/test:utils",
     ],
 )
+
+py_test(
+    name = "test_enumerate",
+    srcs = ["test_enumerate.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
+        # "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
