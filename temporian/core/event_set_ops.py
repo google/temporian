@@ -443,7 +443,7 @@ class EventSetOperations:
         self._raise_error("subtract", other, "int,float")
         assert False
 
-    def __mul__(self, other: Any):
+    def __mul__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
         """Multiplies an [`EventSet`][temporian.EventSet] or a scalar value with
         `self` element-wise.
 
@@ -530,7 +530,7 @@ class EventSetOperations:
     def __rmul__(self, other: Any):
         return self.__mul__(other)
 
-    def __neg__(self):
+    def __neg__(self: EventSetOrNode) -> EventSetOrNode:
         """Negates an [`EventSet`][temporian.EventSet] element-wise.
 
         Example:
@@ -554,7 +554,7 @@ class EventSetOperations:
 
         return multiply_scalar(input=self, value=-1)
 
-    def __invert__(self):
+    def __invert__(self: EventSetOrNode) -> EventSetOrNode:
         """Inverts a boolean [`EventSet`][temporian.EventSet] element-wise.
 
         Swaps False <-> True.
@@ -599,7 +599,7 @@ class EventSetOperations:
 
         return abs(input=self)
 
-    def __truediv__(self, other: Any):
+    def __truediv__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
         """Divides `self` by an [`EventSet`][temporian.EventSet] or a scalar
         value element-wise.
 
@@ -726,7 +726,7 @@ class EventSetOperations:
         self._raise_error("divide", other, "(int,float)")
         assert False
 
-    def __floordiv__(self, other: Any):
+    def __floordiv__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
         """Divides `self` by an [`EventSet`][temporian.EventSet] or a scalar
         value and takes the floor of the result, element-wise.
 
@@ -820,7 +820,7 @@ class EventSetOperations:
         self._raise_error("floor_divide", other, "(int,float)")
         assert False
 
-    def __pow__(self, other: Any):
+    def __pow__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
         """Computes power with another
         [`EventSet`][temporian.EventSet] or a scalar value element-wise.
 
@@ -913,7 +913,7 @@ class EventSetOperations:
         self._raise_error("exponentiate", other, "(int,float)")
         assert False
 
-    def __mod__(self, other: Any):
+    def __mod__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
         """Computes modulo or remainder of division with another
         [`EventSet`][temporian.EventSet] or a scalar value.
 
