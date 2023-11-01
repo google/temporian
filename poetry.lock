@@ -2447,13 +2447,13 @@ mkdocs = ">=1.0.3,<2.0.0"
 
 [[package]]
 name = "mkdocs-jupyter"
-version = "0.24.3"
+version = "0.24.6"
 description = "Use Jupyter in mkdocs websites"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.9"
 files = [
-    {file = "mkdocs_jupyter-0.24.3-py3-none-any.whl", hash = "sha256:904262a8678a5e5920b7c3c03b5010b36301a69d0a38f2fcbf430493adf6879e"},
-    {file = "mkdocs_jupyter-0.24.3.tar.gz", hash = "sha256:3d81da9aea27480e93bab22438910c4f0b9630613e74f85b576590d78e0e8b14"},
+    {file = "mkdocs_jupyter-0.24.6-py3-none-any.whl", hash = "sha256:56fb7ad796f2414a4143d54a966b805caf315c32413e97f85591623fa87dceca"},
+    {file = "mkdocs_jupyter-0.24.6.tar.gz", hash = "sha256:89fcbe8a9523864d5416de1a60711640b6bc2972279d2adf46ed2776c2d9ff7c"},
 ]
 
 [package.dependencies]
@@ -2463,9 +2463,6 @@ mkdocs = ">=1.4.0,<2"
 mkdocs-material = ">9.0.0"
 nbconvert = ">=7.2.9,<8"
 pygments = ">2.12.0"
-
-[package.extras]
-test = ["coverage[toml]", "pymdown-extensions", "pytest", "pytest-cov"]
 
 [[package]]
 name = "mkdocs-literate-nav"
@@ -4902,4 +4899,4 @@ tensorflow = ["tensorflow"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8,<3.12"
-content-hash = "6e8b91365b2e51b2014219c7eae8ab6e8153b74c07c1bc30b8096bd7dd417bd7"
+content-hash = "500280e9b547b2b5477416e432a3f3b0305e20c0809558eaf146fb86033a738c"
