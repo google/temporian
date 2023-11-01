@@ -33,6 +33,7 @@ durations are expressed in seconds (see
 so it is recommended to use seconds as timestamps where possible.
 """
 
+# TODO: Use "math.nextafter" after drop of python 3.8.
 shortest = np.nextafter(0, 1)
 """Shortest interval between events that can be represented using float64.
 

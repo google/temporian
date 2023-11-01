@@ -204,22 +204,6 @@ py_test(
 )
 
 py_test(
-    name = "filter_moving_count_test",
-    srcs = ["filter_moving_count_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        ":utils",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/implementation/numpy/data:io",
-        "//temporian/core/operators:filter_moving_count",
-        "//temporian/implementation/numpy/operators:filter_moving_count",
-    ],
-)
-
-py_test(
     name = "tick_calendar_test",
     srcs = ["tick_calendar_test.py"],
     srcs_version = "PY3",
