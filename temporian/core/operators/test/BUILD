@@ -308,7 +308,7 @@ py_test(
 
 py_test(
     name = "test_combine",
-    srcs = ["combine_test.py"],
+    srcs = ["test_combine.py"],
     srcs_version = "PY3",
     deps = [
         "//temporian/implementation/numpy/data:io",
