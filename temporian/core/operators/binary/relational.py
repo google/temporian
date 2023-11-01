@@ -20,7 +20,6 @@ from temporian.core.data.dtype import DType
 from temporian.core.data.node import EventSetNode
 from temporian.core.data.schema import FeatureSchema
 from temporian.core.operators.binary.base import BaseBinaryOperator
-from temporian.core.operators.scalar.relational_scalar import equal_scalar
 from temporian.core.typing import EventSetOrNode
 
 
@@ -139,8 +138,8 @@ def not_equal(
 ) -> EventSetOrNode:
     """Checks (element-wise) for differences between two [`EventSets`][temporian.EventSet].
 
-    Each feature in `input_1` is compared element-wise to the feature in
-    `input_2` in the same position.
+    If two EventSets, each feature in `input_1` is compared element-wise to the
+    feature in `input_2` in the same position.
     Note that it will always return True on NaNs (even if both are).
 
     `input_1` and `input_2` must have the same sampling and the same number of
@@ -251,12 +250,14 @@ def greater_equal(
 ) -> EventSetOrNode:
     """Checks (element-wise) if input_left >= input_right.
 
-    Each feature in `input_left` is compared element-wise to the feature in
-    `input_right` in the same position.
-    Note that it will always return False on NaN elements.
+    If an EventSet, each feature in `self` is compared element-wise to the
+    feature in `other` in the same position. `self` and `other` must have the
+    same sampling and the same number of features.
 
-    `input_left` and `input_right` must have the same sampling and the same
-    number of features.
+    If a scalar value, each item in each feature in `input` is compared to
+    `value`.
+
+    Note that it will always return False on NaN elements.
 
     Example:
         ```python

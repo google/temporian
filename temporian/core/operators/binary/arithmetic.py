@@ -251,8 +251,8 @@ def subtract(
     Each feature in `input_2` is subtracted from the feature in `input_1` in the
     same position.
 
-    `input_1` and `input_2` must have the same sampling, index,
-    number of features and dtype for the features in the same positions.
+    `input_1` and `input_2` must have the same sampling, index, number of
+    features and dtype for the features in the same positions.
 
     Example:
         ```python
@@ -266,8 +266,6 @@ def subtract(
         ...     same_sampling_as=a
         ... )
 
-        >>> # Equivalent
-        >>> c = tp.subtract(a, b)
         >>> c = a - b
         >>> c
         indexes: []
