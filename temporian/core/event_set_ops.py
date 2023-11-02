@@ -1623,6 +1623,9 @@ class EventSetOperations:
 
         Output feature contains numbers between 1 and 31.
 
+        By default, the timezone is UTC unless the `tz` argument is specified,
+        as an offset in hours or a timezone name (see `pytz.all_timezones`).
+
         Usage example:
             ```python
             >>> a = tp.event_set(
@@ -1639,6 +1642,9 @@ class EventSetOperations:
             ...
 
             ```
+
+        Args:
+            tz: timezone name or UTC offset in hours.
 
         Returns:
             EventSet with a single feature with the day of the month each timestamp
@@ -1661,6 +1667,9 @@ class EventSetOperations:
 
         Output feature contains numbers from 0 (Monday) to 6 (Sunday).
 
+        By default, the timezone is UTC unless the `tz` argument is specified,
+        as an offset in hours or a timezone name (see `pytz.all_timezones`).
+
         Usage example:
             ```python
             >>> a = tp.event_set(
@@ -1677,6 +1686,9 @@ class EventSetOperations:
             ...
 
             ```
+
+        Args:
+            tz: timezone name or UTC offset in hours.
 
         Returns:
             EventSet with a single feature with the day of the week each timestamp
@@ -1699,7 +1711,10 @@ class EventSetOperations:
 
         Output feature contains numbers between 0 and 23.
 
-        Usage example:
+        By default, the timezone is UTC unless the `tz` argument is specified,
+        as an offset in hours or a timezone name (see `pytz.all_timezones`).
+
+        Basic example with UTC datetimes:
             ```python
             >>> from datetime import datetime
             >>> a = tp.event_set(
@@ -1716,6 +1731,46 @@ class EventSetOperations:
             ...
 
             ```
+
+        Example with timezone:
+            ```python
+            >>> import pytz
+            >>> from datetime import datetime
+
+            >>> # Define a custom timezone (UTC-3)
+            >>> custom_tz = pytz.timezone('America/Montevideo')
+
+            >>> # Let's define one event in UTC and another in UTC-3
+            >>> a = tp.event_set(
+            ...       timestamps=[datetime(2020,1,1,9,00),  # UTC time: 9am
+            ...                   datetime(2020,1,1,15,00, tzinfo=custom_tz)
+            ...       ]
+            ...     )
+
+            >>> # Option 1: specify UTC-3 offset in hours
+            >>> a.calendar_hour(tz=-3)
+            indexes: ...
+                    'calendar_hour': [ 6 15]
+            ...
+
+            >>> # Option 2: specify timezone name
+            >>> a.calendar_hour(tz="America/Montevideo")
+            indexes: ...
+                    'calendar_hour': [ 6 15]
+            ...
+
+            >>> # No timezone specified, get UTC hour
+            >>> a.calendar_hour()
+            indexes: ...
+                    'calendar_hour': [ 9 18]
+            ...
+
+
+
+            ```
+
+        Args:
+            tz: timezone name or UTC offset in hours.
 
         Returns:
             EventSet with a single feature with the hour each timestamp in `sampling`
@@ -1736,6 +1791,9 @@ class EventSetOperations:
 
         Output feature contains numbers between 1 and 53.
 
+        By default, the timezone is UTC unless the `tz` argument is specified,
+        as an offset in hours or a timezone name (see `pytz.all_timezones`).
+
         Usage example:
             ```python
             >>> a = tp.event_set(
@@ -1753,6 +1811,9 @@ class EventSetOperations:
             ...
 
             ```
+
+        Args:
+            tz: timezone name or UTC offset in hours.
 
         Returns:
             EventSet with a single feature with the ISO week each timestamp in
@@ -1773,6 +1834,9 @@ class EventSetOperations:
 
         Output feature contains numbers between 1 and 366.
 
+        By default, the timezone is UTC unless the `tz` argument is specified,
+        as an offset in hours or a timezone name (see `pytz.all_timezones`).
+
         Usage example:
             ```python
             >>> a = tp.event_set(
@@ -1789,6 +1853,9 @@ class EventSetOperations:
             ...
 
             ```
+
+        Args:
+            tz: timezone name or UTC offset in hours.
 
         Returns:
             EventSet with a single feature with the day of the year each timestamp
@@ -1812,6 +1879,9 @@ class EventSetOperations:
         Output feature contains numbers between
         0 and 59.
 
+        By default, the timezone is UTC unless the `tz` argument is specified,
+        as an offset in hours or a timezone name (see `pytz.all_timezones`).
+
         Usage example:
             ```python
             >>> from datetime import datetime
@@ -1830,6 +1900,9 @@ class EventSetOperations:
             ...
 
             ```
+
+        Args:
+            tz: timezone name or UTC offset in hours.
 
         Returns:
             EventSet with a single feature with the minute each timestamp in
@@ -1850,6 +1923,9 @@ class EventSetOperations:
 
         Output feature contains numbers between 1 and 12.
 
+        By default, the timezone is UTC unless the `tz` argument is specified,
+        as an offset in hours or a timezone name (see `pytz.all_timezones`).
+
         Usage example:
             ```python
             >>> a = tp.event_set(
@@ -1867,6 +1943,9 @@ class EventSetOperations:
             ...
 
             ```
+
+        Args:
+            tz: timezone name or UTC offset in hours.
 
         Returns:
             EventSet with a single feature with the month each timestamp in
@@ -1887,6 +1966,9 @@ class EventSetOperations:
 
         Output feature contains numbers between 0 and 59.
 
+        By default, the timezone is UTC unless the `tz` argument is specified,
+        as an offset in hours or a timezone name (see `pytz.all_timezones`).
+
         Usage example:
             ```python
             >>> from datetime import datetime
@@ -1906,6 +1988,9 @@ class EventSetOperations:
 
             ```
 
+        Args:
+            tz: timezone name or UTC offset in hours.
+
         Returns:
             EventSet with a single feature with the second each timestamp in
                 `sampling` belongs to.
@@ -1922,6 +2007,9 @@ class EventSetOperations:
 
         Features in the input are ignored, only the timestamps are used and
         they must be unix timestamps (`is_unix_timestamp=True`).
+
+        By default, the timezone is UTC unless the `tz` argument is specified,
+        as an offset in hours or a timezone name (see `pytz.all_timezones`).
 
         Usage example:
             ```python
@@ -1940,6 +2028,9 @@ class EventSetOperations:
             ...
 
             ```
+
+        Args:
+            tz: timezone name or UTC offset in hours.
 
         Returns:
             EventSet with a single feature with the year each timestamp in
@@ -3353,7 +3444,6 @@ class EventSetOperations:
         `dtype.MissingValue(...)`.
 
         Example:
-
             ```python
             >>> a = tp.event_set(
             ...     timestamps=[1, 5, 8, 9],
@@ -3456,7 +3546,6 @@ class EventSetOperations:
         loading and running the graph on new data.
 
         Example with `keys` with a single index and a single key:
-
             ```python
             >>> a = tp.event_set(
             ...     timestamps=[0, 1, 2, 3],
@@ -3479,7 +3568,6 @@ class EventSetOperations:
             ```
 
         Example with `keys` with multiple indexes and keys:
-
             ```python
             >>> a = tp.event_set(
             ...     timestamps=[0, 1, 2, 3],
@@ -3506,7 +3594,6 @@ class EventSetOperations:
             ```
 
         Example with `number`:
-
             ```python
             >>> import random
             >>> random.seed(0)
@@ -3536,7 +3623,6 @@ class EventSetOperations:
             ```
 
         Example with `fraction`:
-
             ```python
             >>> import random
             >>> random.seed(0)
@@ -4054,7 +4140,6 @@ class EventSetOperations:
         applied independently for each index.
 
         Usage example:
-
             ```python
             >>> a = tp.event_set(timestamps=[5, 9, 9, 16], features={'f': [1,2,3,4]})
             >>> b = a.unique_timestamps()
@@ -4141,7 +4226,6 @@ class EventSetOperations:
         block following events.
 
         Usage example:
-
             ```python
             >>> a = tp.event_set(timestamps=[1, 2, 3])
             >>> b = a.filter_moving_count(window_length=1.5)
@@ -4183,7 +4267,6 @@ class EventSetOperations:
         same data type, or be explicitly casted to the same type beforehand.
 
         Example with single values:
-
             ```python
             >>> a = tp.event_set(timestamps=[5, 9, 9],
             ...                  features={'f': [True, True, False]})
@@ -4199,7 +4282,6 @@ class EventSetOperations:
             ```
 
         Example with EventSets:
-
             ```python
             >>> a = tp.event_set(timestamps=[5, 9, 10],
             ...                  features={'condition': [True, True, False],
@@ -4218,7 +4300,6 @@ class EventSetOperations:
             ```
 
         Example setting to NaN based on condition:
-
             ```python
             >>> a = tp.event_set(timestamps=[5, 6, 7, 8, 9],
             ...                  features={'f': [1, 2, -3, -4, 5]})
