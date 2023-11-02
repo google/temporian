@@ -69,63 +69,6 @@ def logical_and(
     input_1: EventSetOrNode,
     input_2: EventSetOrNode,
 ) -> EventSetOrNode:
-    """Gets the logical AND (`&`) between boolean features in two
-    [`EventSets`][temporian.EventSet], element-wise.
-
-    Each feature in `input_1` is compared element-wise to the feature in
-    `input_2` in the same position.
-
-    `input_1` and `input_2` must have the same sampling, the same number of
-    features, and all feature types must be `bool` (see cast example below).
-
-    Usage example:
-        ```python
-        >>> a = tp.event_set(timestamps=[1, 2, 3], features={"f1": [100, 150, 200]})
-
-        >>> # Sample boolean features
-        >>> b = a > 100
-        >>> c = a < 200
-
-        >>> # Equivalent
-        >>> d = tp.logical_and(b, c)
-        >>> d = b & c
-        >>> d
-        indexes: []
-        features: [('and_f1_f1', bool_)]
-        events:
-            (3 events):
-                timestamps: [1. 2. 3.]
-                'and_f1_f1': [False True False]
-        ...
-
-        ```
-
-    Cast integer to boolean:
-        ```python
-        >>> a = tp.event_set(
-        ...     timestamps=[1, 2, 3],
-        ...     features={"f1": [0, 1, 1], "f2": [1, 1, 0]}
-        ... )
-        >>> b = a.cast(bool)
-        >>> c = b["f1"] & b["f2"]
-        >>> c
-        indexes: []
-        features: [('and_f1_f2', bool_)]
-        events:
-            (3 events):
-                timestamps: [1. 2. 3.]
-                'and_f1_f2': [False True False]
-        ...
-
-        ```
-
-    Args:
-        input_1: First EventSet, with only boolean features.
-        input_2: Second EventSet, with only boolean features.
-
-    Returns:
-        EventSet with boolean features.
-    """
     assert isinstance(input_1, EventSetNode)
     assert isinstance(input_2, EventSetNode)
 
@@ -140,45 +83,6 @@ def logical_or(
     input_1: EventSetOrNode,
     input_2: EventSetOrNode,
 ) -> EventSetOrNode:
-    """Gets the logical OR (`|`) between boolean features in two
-    [`EventSets`][temporian.EventSet], element-wise.
-
-    Each feature in `input_1` is compared element-wise to the feature in
-    `input_2` in the same position.
-
-    `input_1` and `input_2` must have the same sampling, the same number of
-    features, and all feature types must be `bool`
-    (see cast example in [`tp.logical_and()`][temporian.logical_and]).
-
-    Usage example:
-        ```python
-        >>> a = tp.event_set(timestamps=[1, 2, 3], features={"f1": [100, 150, 200]})
-
-        >>> # Sample boolean features
-        >>> b = a <= 100
-        >>> c = a >= 200
-
-        >>> # Equivalent
-        >>> d = tp.logical_or(b, c)
-        >>> d = b | c
-        >>> d
-        indexes: []
-        features: [('or_f1_f1', bool_)]
-        events:
-            (3 events):
-                timestamps: [1. 2. 3.]
-                'or_f1_f1': [ True False True]
-        ...
-
-        ```
-
-    Args:
-        input_1: First EventSet, with only boolean features.
-        input_2: Second EventSet, with only boolean features.
-
-    Returns:
-        EventSet with boolean features.
-    """
     assert isinstance(input_1, EventSetNode)
     assert isinstance(input_2, EventSetNode)
 
@@ -193,45 +97,6 @@ def logical_xor(
     input_1: EventSetOrNode,
     input_2: EventSetOrNode,
 ) -> EventSetOrNode:
-    """Gets the logical XOR (`^`) between boolean features in two
-    [`EventSets`][temporian.EventSet], element-wise.
-
-    Each feature in `input_1` is compared element-wise to the feature in
-    `input_2` in the same position.
-
-    `input_1` and `input_2` must have the same sampling, the same number of
-    features, and all feature types must be `bool`
-    (see cast example in [`tp.logical_and()`][temporian.logical_and]).
-
-    Usage example:
-        ```python
-        >>> a = tp.event_set(timestamps=[1, 2, 3], features={"f1": [100, 150, 200]})
-
-        >>> # Sample boolean features
-        >>> b = a > 100
-        >>> c = a < 200
-
-        >>> # Equivalent
-        >>> d = tp.logical_xor(b, c)
-        >>> d = b ^ c
-        >>> d
-        indexes: []
-        features: [('xor_f1_f1', bool_)]
-        events:
-            (3 events):
-                timestamps: [1. 2. 3.]
-                'xor_f1_f1': [ True False True]
-        ...
-
-        ```
-
-    Args:
-        input_1: First EventSet, with only boolean features.
-        input_2: Second EventSet, with only boolean features.
-
-    Returns:
-        EventSet with boolean features.
-    """
     assert isinstance(input_1, EventSetNode)
     assert isinstance(input_2, EventSetNode)
 

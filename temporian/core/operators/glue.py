@@ -41,11 +41,11 @@ class GlueOperator(Operator):
         # serialization.
 
         if len(inputs) < 2:
-            raise ValueError("At least two arguments should be provided")
+            raise ValueError("At least two arguments should be provided.")
 
         if len(inputs) >= MAX_NUM_ARGUMENTS:
             raise ValueError(
-                f"Too many (>{MAX_NUM_ARGUMENTS}) arguments provided"
+                f"Too many (>{MAX_NUM_ARGUMENTS}) arguments provided."
             )
 
         # inputs

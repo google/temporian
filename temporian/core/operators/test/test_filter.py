@@ -39,6 +39,33 @@ class FilterTest(TestCase):
 
         assertOperatorResult(self, result, expected, check_sampling=False)
 
+    def test_no_condition(self):
+        evset = event_set([0, 1, 2], features={"cond": [True, False, True]})
+
+        result = evset.filter()
+
+        expected = event_set([0, 2], features={"cond": [True, True]})
+
+        assertOperatorResult(self, result, expected, check_sampling=False)
+
+    def test_condition_many_features(self):
+        evset = event_set([])
+        condition = event_set(
+            [], features={"a": [], "b": []}, same_sampling_as=evset
+        )
+        with self.assertRaisesRegex(
+            ValueError, "Condition must be a single feature. Got"
+        ):
+            evset.filter(condition)
+
+    def test_condition_not_boolean(self):
+        evset = event_set([])
+        condition = event_set([0], features={"a": [3]}, same_sampling_as=evset)
+        with self.assertRaisesRegex(
+            ValueError, "Condition must be a boolean feature. Got"
+        ):
+            evset.filter(condition)
+
 
 if __name__ == "__main__":
     absltest.main()

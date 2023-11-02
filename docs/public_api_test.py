@@ -58,37 +58,6 @@ PUBLIC_API_SYMBOLS = {
     # OPERATORS
     "glue",
     "combine",
-    # BINARY OPERATORS
-    "add",
-    "subtract",
-    "multiply",
-    "divide",
-    "floordiv",
-    "modulo",
-    "power",
-    "equal",
-    "not_equal",
-    "greater",
-    "greater_equal",
-    "less",
-    "less_equal",
-    "logical_and",
-    "logical_or",
-    "logical_xor",
-    # SCALAR OPERATORS
-    "add_scalar",
-    "subtract_scalar",
-    "multiply_scalar",
-    "divide_scalar",
-    "floordiv_scalar",
-    "modulo_scalar",
-    "power_scalar",
-    "equal_scalar",
-    "not_equal_scalar",
-    "greater_equal_scalar",
-    "greater_scalar",
-    "less_equal_scalar",
-    "less_scalar",
 }
 
 

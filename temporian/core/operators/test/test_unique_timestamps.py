@@ -12,43 +12,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 from absl.testing import absltest
+from absl.testing.parameterized import TestCase
 
-from temporian.core.operators.begin import BeginOperator
 from temporian.implementation.numpy.data.io import event_set
-from temporian.implementation.numpy.operators.begin import (
-    BeginNumpyImplementation,
-)
+from temporian.test.utils import assertOperatorResult
 
 
-class BeginOperatorTest(absltest.TestCase):
-    def setUp(self):
-        pass
-
-    def test_base(self):
+class UniqueTimestampsTest(TestCase):
+    def test_basic(self):
         evset = event_set(
-            timestamps=[1, 2, 3, 4],
+            timestamps=[1, 2, 2, 2, 3, 3, 3, 4],
             features={
-                "a": [5, 6, 7, 8],
-                "b": ["A", "A", "B", "B"],
+                "a": [1, 2, 3, 4, 5, 6, 7, 8],
+                "c": [1, 1, 1, 1, 1, 2, 2, 2],
             },
-            indexes=["b"],
-        )
-        node = evset.node()
-
-        expected_output = event_set(
-            timestamps=[1, 3],
-            features={"b": ["A", "B"]},
-            indexes=["b"],
+            indexes=["c"],
         )
 
-        # Run op
-        op = BeginOperator(input=node)
-        instance = BeginNumpyImplementation(op)
-        output = instance.call(input=evset)["output"]
+        result = evset.unique_timestamps()
 
-        self.assertEqual(output, expected_output)
+        expected = event_set(
+            timestamps=[1, 2, 3, 3, 4],
+            features={"c": [1, 1, 1, 2, 2]},
+            indexes=["c"],
+        )
+
+        assertOperatorResult(self, result, expected, check_sampling=False)
 
 
 if __name__ == "__main__":
