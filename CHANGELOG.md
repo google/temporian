@@ -4,6 +4,8 @@
 
 ### Features
 
+- Support for timezone argument in all calendar operators.
+
 ### Improvements
 
 ### Fixes
