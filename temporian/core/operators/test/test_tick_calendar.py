@@ -148,6 +148,60 @@ class TickCalendarOperatorTest(parameterized.TestCase):
         result = evset.tick_calendar(hour="*", wday=6)
         assertOperatorResult(self, result, expected_evset, check_sampling=False)
 
+    def test_invalid_ranges(self):
+        evset = event_set(timestamps=["2020-01-01", "2020-06-01"])
+        for kwargs in (
+            {"second": -1},
+            {"second": 60},
+            {"minute": -1},
+            {"minute": 60},
+            {"hour": -1},
+            {"hour": 24},
+            {"mday": 0},
+            {"mday": 32},
+            {"mday": -1},  # may be supported in the future
+            {"month": -1},
+            {"month": 13},
+            {"wday": -1},
+            {"wday": 7},
+        ):
+            with self.assertRaisesRegex(
+                ValueError, "Value should be '\*' or integer in range"
+            ):
+                evset.tick_calendar(**kwargs)
+
+    def test_invalid_types(self):
+        evset = event_set(timestamps=["2020-01-01", "2020-06-01"])
+        for kwargs in (
+            {"second": "1"},
+            {"minute": "00"},
+            {"hour": "00:00"},
+            {"month": "January"},
+            {"wday": "Sat"},
+        ):
+            with self.assertRaisesRegex(ValueError, "Non matching type"):
+                evset.tick_calendar(**kwargs)  # type: ignore
+
+    def test_undefined_args(self):
+        evset = event_set(timestamps=["2020-01-01", "2020-06-01"])
+        with self.assertRaisesRegex(
+            ValueError,
+            "Can't set argument to None because previous and following",
+        ):
+            evset.tick_calendar(second=1, hour=1)  # undefined min
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "Can't set argument to None because previous and following",
+        ):
+            evset.tick_calendar(second=1, month=1)
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "Can't set argument to None because previous and following",
+        ):
+            evset.tick_calendar(hour=0, month=1)
+
 
 if __name__ == "__main__":
     absltest.main()

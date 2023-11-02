@@ -238,18 +238,6 @@ py_test(
 )
 
 py_test(
-    name = "tick_calendar_test",
-    srcs = ["tick_calendar_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/operators:tick_calendar",
-    ],
-)
-
-py_test(
     name = "test_arithmetic",
     srcs = ["test_arithmetic.py"],
     srcs_version = "PY3",
