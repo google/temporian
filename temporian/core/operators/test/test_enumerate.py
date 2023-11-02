@@ -15,22 +15,11 @@
 
 from absl.testing import absltest
 
-import numpy as np
-from temporian.core.operators.enumerate import Enumerate
 from temporian.implementation.numpy.data.io import event_set
-from temporian.implementation.numpy.operators.enumerate import (
-    EnumerateNumpyImplementation,
-)
-from temporian.implementation.numpy.operators.test.utils import (
-    assertEqualEventSet,
-    testOperatorAndImp,
-)
+from temporian.test.utils import assertOperatorResult, i64
 
 
-class EnumerateOperatorTest(absltest.TestCase):
-    def setUp(self):
-        pass
-
+class EnumerateTest(absltest.TestCase):
     def test_base(self):
         evset = event_set(
             timestamps=[1, 2, 3, 4, 0, 1],
@@ -41,7 +30,6 @@ class EnumerateOperatorTest(absltest.TestCase):
             },
             indexes=["c"],
         )
-        node = evset.node()
 
         expected_output = event_set(
             timestamps=[1, 2, 3, 4, 0, 1],
@@ -50,15 +38,18 @@ class EnumerateOperatorTest(absltest.TestCase):
                 "c": ["A", "A", "A", "A", "B", "B"],
             },
             indexes=["c"],
+            same_sampling_as=evset,
         )
+        assertOperatorResult(self, evset.enumerate(), expected_output)
 
-        # Run op
-        op = Enumerate(input=node)
-        instance = EnumerateNumpyImplementation(op)
-        testOperatorAndImp(self, op, instance)
-        output = instance.call(input=evset)["output"]
-
-        assertEqualEventSet(self, output, expected_output)
+    def test_empty(self):
+        evset = event_set(timestamps=[])
+        expect_evset = event_set(
+            timestamps=[],
+            features={"enumerate": i64([])},
+            same_sampling_as=evset,
+        )
+        assertOperatorResult(self, evset.enumerate(), expect_evset)
 
 
 if __name__ == "__main__":

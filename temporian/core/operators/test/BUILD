@@ -325,3 +325,69 @@ py_test(
         "//temporian/test:utils",
     ],
 )
+
+py_test(
+    name = "test_filter_moving_count",
+    srcs = ["test_filter_moving_count.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_tick_calendar",
+    srcs = ["test_tick_calendar.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
+        # "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_enumerate",
+    srcs = ["test_enumerate.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
+        # "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_cast",
+    srcs = ["test_cast.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
+        # "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_combine",
+    srcs = ["test_combine.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
+        # "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_timestamps",
+    srcs = ["test_timestamps.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
+        # "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)

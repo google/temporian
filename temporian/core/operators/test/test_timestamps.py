@@ -11,27 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from datetime import datetime, timezone
-
 from absl.testing import absltest
 
 import numpy as np
-from temporian.core.operators.timestamps import Timestamps
 from temporian.implementation.numpy.data.io import event_set
-from temporian.implementation.numpy.operators.timestamps import (
-    TimestampsNumpyImplementation,
-)
 from temporian.core.data.duration_utils import convert_timestamps_to_datetimes
-from temporian.implementation.numpy.operators.test.utils import (
-    assertEqualEventSet,
-    testOperatorAndImp,
-)
+from temporian.test.utils import assertOperatorResult
 
 
-class TimestampsOperatorTest(absltest.TestCase):
-    def setUp(self):
-        pass
-
+class TimestampsTest(absltest.TestCase):
     def test_base(self):
         evset = event_set(
             timestamps=[-1, 1, 2, 3, 4, 10],
@@ -41,8 +29,6 @@ class TimestampsOperatorTest(absltest.TestCase):
             },
             indexes=["b"],
         )
-        node = evset.node()
-
         expected_output = event_set(
             timestamps=[-1, 1, 2, 3, 4, 10],
             features={
@@ -50,15 +36,9 @@ class TimestampsOperatorTest(absltest.TestCase):
                 "b": ["A", "A", "B", "B", "C", "C"],
             },
             indexes=["b"],
+            same_sampling_as=evset,
         )
-
-        # Run op
-        op = Timestamps(input=node)
-        instance = TimestampsNumpyImplementation(op)
-        testOperatorAndImp(self, op, instance)
-        output = instance.call(input=evset)["output"]
-
-        assertEqualEventSet(self, output, expected_output)
+        assertOperatorResult(self, evset.timestamps(), expected_output)
 
     def test_unix_timestamps(self):
         t0 = 1688156488.0
@@ -72,8 +52,6 @@ class TimestampsOperatorTest(absltest.TestCase):
             },
             indexes=["b"],
         )
-        node = evset.node()
-
         expected_output = event_set(
             timestamps=timestamps,
             features={
@@ -82,15 +60,9 @@ class TimestampsOperatorTest(absltest.TestCase):
             },
             indexes=["b"],
             is_unix_timestamp=True,
+            same_sampling_as=evset,
         )
-
-        # Run op
-        op = Timestamps(input=node)
-        instance = TimestampsNumpyImplementation(op)
-        testOperatorAndImp(self, op, instance)
-        output = instance.call(input=evset)["output"]
-
-        assertEqualEventSet(self, output, expected_output)
+        assertOperatorResult(self, evset.timestamps(), expected_output)
 
 
 if __name__ == "__main__":
