@@ -1612,7 +1612,9 @@ class EventSetOperations:
 
         return begin(self)
 
-    def calendar_day_of_month(self: EventSetOrNode) -> EventSetOrNode:
+    def calendar_day_of_month(
+        self: EventSetOrNode, tz: Union[str, float, int] = 0
+    ) -> EventSetOrNode:
         """Obtains the day of month the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
@@ -1646,9 +1648,11 @@ class EventSetOperations:
             calendar_day_of_month,
         )
 
-        return calendar_day_of_month(self)
+        return calendar_day_of_month(self, tz)
 
-    def calendar_day_of_week(self: EventSetOrNode) -> EventSetOrNode:
+    def calendar_day_of_week(
+        self: EventSetOrNode, tz: Union[str, float, int] = 0
+    ) -> EventSetOrNode:
         """Obtains the day of the week the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
@@ -1682,9 +1686,11 @@ class EventSetOperations:
             calendar_day_of_week,
         )
 
-        return calendar_day_of_week(self)
+        return calendar_day_of_week(self, tz)
 
-    def calendar_hour(self: EventSetOrNode) -> EventSetOrNode:
+    def calendar_hour(
+        self: EventSetOrNode, tz: Union[str, float, int] = 0
+    ) -> EventSetOrNode:
         """Obtains the hour the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
@@ -1717,9 +1723,11 @@ class EventSetOperations:
         """
         from temporian.core.operators.calendar.hour import calendar_hour
 
-        return calendar_hour(self)
+        return calendar_hour(self, tz)
 
-    def calendar_iso_week(self: EventSetOrNode) -> EventSetOrNode:
+    def calendar_iso_week(
+        self: EventSetOrNode, tz: Union[str, float, int] = 0
+    ) -> EventSetOrNode:
         """Obtains the ISO week the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
@@ -1752,9 +1760,11 @@ class EventSetOperations:
         """
         from temporian.core.operators.calendar.iso_week import calendar_iso_week
 
-        return calendar_iso_week(self)
+        return calendar_iso_week(self, tz)
 
-    def calendar_day_of_year(self: EventSetOrNode) -> EventSetOrNode:
+    def calendar_day_of_year(
+        self: EventSetOrNode, tz: Union[str, float, int] = 0
+    ) -> EventSetOrNode:
         """Obtains the day of year the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
@@ -1788,9 +1798,11 @@ class EventSetOperations:
             calendar_day_of_year,
         )
 
-        return calendar_day_of_year(self)
+        return calendar_day_of_year(self, tz)
 
-    def calendar_minute(self: EventSetOrNode) -> EventSetOrNode:
+    def calendar_minute(
+        self: EventSetOrNode, tz: Union[str, float, int] = 0
+    ) -> EventSetOrNode:
         """Obtain the minute the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
@@ -1825,9 +1837,11 @@ class EventSetOperations:
         """
         from temporian.core.operators.calendar.minute import calendar_minute
 
-        return calendar_minute(self)
+        return calendar_minute(self, tz)
 
-    def calendar_month(self: EventSetOrNode) -> EventSetOrNode:
+    def calendar_month(
+        self: EventSetOrNode, tz: Union[str, float, int] = 0
+    ) -> EventSetOrNode:
         """Obtains the month the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
@@ -1860,9 +1874,11 @@ class EventSetOperations:
         """
         from temporian.core.operators.calendar.month import calendar_month
 
-        return calendar_month(self)
+        return calendar_month(self, tz)
 
-    def calendar_second(self: EventSetOrNode) -> EventSetOrNode:
+    def calendar_second(
+        self: EventSetOrNode, tz: Union[str, float, int] = 0
+    ) -> EventSetOrNode:
         """Obtains the second the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
@@ -1896,9 +1912,11 @@ class EventSetOperations:
         """
         from temporian.core.operators.calendar.second import calendar_second
 
-        return calendar_second(self)
+        return calendar_second(self, tz)
 
-    def calendar_year(self: EventSetOrNode) -> EventSetOrNode:
+    def calendar_year(
+        self: EventSetOrNode, tz: Union[str, float, int] = 0
+    ) -> EventSetOrNode:
         """Obtains the year the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
@@ -1929,7 +1947,7 @@ class EventSetOperations:
         """
         from temporian.core.operators.calendar.year import calendar_year
 
-        return calendar_year(self)
+        return calendar_year(self, tz)
 
     def cast(
         self: EventSetOrNode,

@@ -13,15 +13,14 @@
 # limitations under the License.
 
 from abc import abstractmethod
-from datetime import datetime
-from typing import Dict, Any
+from datetime import datetime, timezone, timedelta
+from typing import Dict
 
 import numpy as np
 
 from temporian.core.operators.calendar.base import BaseCalendarOperator
 from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.implementation.numpy.operators.base import OperatorImplementation
-from temporian.core.data.duration_utils import convert_timestamp_to_datetime
 
 
 class BaseCalendarNumpyImplementation(OperatorImplementation):
@@ -35,6 +34,7 @@ class BaseCalendarNumpyImplementation(OperatorImplementation):
     def __call__(self, sampling: EventSet) -> Dict[str, EventSet]:
         assert isinstance(self.operator, BaseCalendarOperator)
         output_schema = self.output_schema("output")
+        tzinfo = timezone(timedelta(hours=self.operator.utc_offset))
 
         # create destination EventSet
         dst_evset = EventSet(data={}, schema=output_schema)
@@ -42,13 +42,12 @@ class BaseCalendarNumpyImplementation(OperatorImplementation):
             value = np.array(
                 [
                     self._get_value_from_datetime(
-                        convert_timestamp_to_datetime(ts)
+                        datetime.fromtimestamp(ts, tz=tzinfo)
                     )
                     for ts in index_data.timestamps
-                ]
-            ).astype(
-                np.int32
-            )  # TODO: parametrize output dtype
+                ],
+                dtype=np.int32,
+            )
 
             dst_evset.set_index_value(
                 index_key,
@@ -59,7 +58,7 @@ class BaseCalendarNumpyImplementation(OperatorImplementation):
         return {"output": dst_evset}
 
     @abstractmethod
-    def _get_value_from_datetime(self, dt: datetime) -> Any:
+    def _get_value_from_datetime(self, dt: datetime) -> int:
         """Gets the value of the datetime object that corresponds to each
         specific calendar operator.
 

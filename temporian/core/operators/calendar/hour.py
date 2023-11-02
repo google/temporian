@@ -14,6 +14,7 @@
 
 """Calendar hour operator class and public API function definitions."""
 
+from typing import Union
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.node import EventSetNode
@@ -35,7 +36,10 @@ operator_lib.register_operator(CalendarHourOperator)
 
 
 @compile
-def calendar_hour(sampling: EventSetOrNode) -> EventSetOrNode:
+def calendar_hour(
+    sampling: EventSetOrNode, tz: Union[str, float, int] = 0
+) -> EventSetOrNode:
     assert isinstance(sampling, EventSetNode)
+    utc_offset = BaseCalendarOperator.convert_to_utc_offset(tz)
 
-    return CalendarHourOperator(sampling).outputs["output"]
+    return CalendarHourOperator(sampling, utc_offset).outputs["output"]
