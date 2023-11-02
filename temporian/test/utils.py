@@ -117,6 +117,23 @@ def assertOperatorResult(
         _ = serialization._unserialize_operator(serialized_op, nodes)
 
 
+def assertEqualDFRandomRowOrder(
+    test: absltest.TestCase, real: "pd.DataFrame", expected: "pd.DataFrame"
+):
+    row_real = set([str(row.to_dict()) for _, row in real.iterrows()])
+    row_expected = set([str(row.to_dict()) for _, row in expected.iterrows()])
+    test.assertEqual(
+        row_real,
+        row_expected,
+        (
+            "\n==========\nREAL:\n==========\n"
+            f"{real}"
+            "\n==========\nEXPECTED:\n==========\n"
+            f"{expected}"
+        ),
+    )
+
+
 class SetTimezone:
     def __init__(self, timezone: str = "America/Montevideo"):
         self._tz = timezone
