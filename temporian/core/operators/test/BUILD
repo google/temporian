@@ -7,32 +7,52 @@ package(
 # =====
 
 py_test(
-    name = "join_test",
-    srcs = ["join_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/operators:join",
-    ],
-)
-
-py_test(
-    name = "fft_test",
-    srcs = ["fft_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/operators:fast_fourier_transform",
-    ],
-)
-
-py_test(
     name = "test_add_index",
     srcs = ["test_add_index.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_begin",
+    srcs = ["test_begin.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_drop_index",
+    srcs = ["test_drop_index.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_end",
+    srcs = ["test_end.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_fast_fourier_transform",
+    srcs = ["test_fast_fourier_transform.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
@@ -55,6 +75,17 @@ py_test(
 py_test(
     name = "test_glue",
     srcs = ["test_glue.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_join",
+    srcs = ["test_join.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
@@ -154,6 +185,39 @@ py_test(
 py_test(
     name = "test_select_index_values",
     srcs = ["test_select_index_values.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_since_last",
+    srcs = ["test_since_last.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_tick",
+    srcs = ["test_tick.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_unique_timestamps",
+    srcs = ["test_unique_timestamps.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
