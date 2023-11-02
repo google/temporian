@@ -61,6 +61,10 @@ def i32(l):
     return np.array(l, np.int32)
 
 
+def i64(l):
+    return np.array(l, np.int64)
+
+
 def assertOperatorResult(
     test: absltest.TestCase,
     result: EventSet,
