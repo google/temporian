@@ -145,7 +145,7 @@ class TickCalendarOperatorTest(parameterized.TestCase):
             timestamps=timestamps,
         )
 
-        result = evset.tick_calendar(hour="*", wday=6)
+        result = evset.tick_calendar(hour="*", wday=5)
         assertOperatorResult(self, result, expected_evset, check_sampling=False)
 
 
