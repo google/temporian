@@ -63,9 +63,9 @@ class UntilNextTest(absltest.TestCase):
         sampling = event_set([])
 
         with self.assertRaisesRegex(
-            ValueError, "A duration should be a strictly"
+            ValueError, "Timeout should be finite. Instead, got "
         ):
-            evset.until_next(sampling=sampling, timeout=math.nan)
+            evset.until_next(sampling=sampling, timeout=math.inf)
 
 
 if __name__ == "__main__":

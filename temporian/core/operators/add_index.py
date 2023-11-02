@@ -37,10 +37,10 @@ class AddIndexOperator(Operator):
     ) -> None:
         super().__init__()
 
-        self._output_feature_schemas = self._get_output_feature_schemas(
+        output_feature_schemas = self._get_output_feature_schemas(
             input, indexes
         )
-        self._output_indexes = self._get_output_indexes(input, indexes)
+        output_indexes = self._get_output_indexes(input, indexes)
         self._indexes = indexes
 
         self.add_input("input", input)
@@ -50,8 +50,8 @@ class AddIndexOperator(Operator):
         self.add_output(
             "output",
             create_node_new_features_new_sampling(
-                features=self._output_feature_schemas,
-                indexes=self._output_indexes,
+                features=output_feature_schemas,
+                indexes=output_indexes,
                 is_unix_timestamp=input.schema.is_unix_timestamp,
                 creator=self,
             ),
@@ -75,11 +75,11 @@ class AddIndexOperator(Operator):
 
         new_indexes: List[IndexSchema] = []
         for index in indexes:
-            if index not in feature_dict:
-                raise ValueError(f"{index} is not a feature in input.")
-
             if index in index_dict:
                 raise ValueError(f"{index} is already an index in input.")
+
+            if index not in feature_dict:
+                raise ValueError(f"{index} is not a feature in input.")
 
             new_indexes.append(
                 IndexSchema(name=index, dtype=feature_dict[index])
@@ -100,14 +100,6 @@ class AddIndexOperator(Operator):
             inputs=[pb.OperatorDef.Input(key="input")],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
-
-    @property
-    def output_feature_schemas(self) -> List[FeatureSchema]:
-        return self._output_feature_schemas
-
-    @property
-    def output_indexes(self) -> List[IndexSchema]:
-        return self._output_indexes
 
     @property
     def indexes(self) -> List[str]:

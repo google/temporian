@@ -35,6 +35,15 @@ class BeginTest(TestCase):
 
         assertOperatorResult(self, result, expected, check_sampling=False)
 
+    def test_empty(self):
+        evset = event_set(timestamps=[], features={"a": []})
+
+        result = evset.begin()
+
+        expected = event_set(timestamps=[])
+
+        assertOperatorResult(self, result, expected, check_sampling=False)
+
 
 if __name__ == "__main__":
     absltest.main()

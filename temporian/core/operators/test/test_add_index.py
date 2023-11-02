@@ -23,65 +23,65 @@ class AddIndexTest(TestCase):
     def setUp(self) -> None:
         self.timestamps = [0.4, 0.5, 0.6, 0.1, 0.2, 0.3, 0.4, 0.3]
         self.features = {
-            "state_id": ["A", "A", "A", "B", "B", "B", "B", "B"],
-            "store_id": [0, 0, 0, 0, 0, 1, 1, 1],
-            "item_id": [1, 1, 1, 2, 2, 2, 2, 3],
-            "sales": [10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0],
+            "a": ["A", "A", "A", "B", "B", "B", "B", "B"],
+            "b": [0, 0, 0, 0, 0, 1, 1, 1],
+            "c": [1, 1, 1, 2, 2, 2, 2, 3],
+            "d": [10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0],
         }
         self.evset = event_set(
             timestamps=self.timestamps,
             features=self.features,
-            indexes=["state_id"],
+            indexes=["a"],
         )
 
     def test_add_index_single(self):
-        result = self.evset.add_index("store_id")
+        result = self.evset.add_index("b")
 
         expected = event_set(
             timestamps=self.timestamps,
             features=self.features,
-            indexes=["state_id", "store_id"],
+            indexes=["a", "b"],
         )
 
         assertOperatorResult(self, result, expected, check_sampling=False)
 
     def test_add_index_multiple(self):
-        result = self.evset.add_index(["store_id", "item_id"])
+        result = self.evset.add_index(["b", "c"])
 
         expected = event_set(
             timestamps=self.timestamps,
             features=self.features,
-            indexes=["state_id", "store_id", "item_id"],
+            indexes=["a", "b", "c"],
         )
 
         assertOperatorResult(self, result, expected, check_sampling=False)
 
     def test_set_index_single(self):
-        result = self.evset.set_index("store_id")
+        result = self.evset.set_index("b")
 
         expected = event_set(
             timestamps=self.timestamps,
             # Old index is now the last feature
             features={
-                **{k: v for k, v in self.features.items() if k != "state_id"},
-                "state_id": self.features["state_id"],
+                **{k: v for k, v in self.features.items() if k != "a"},
+                "a": self.features["a"],
             },
-            indexes=["store_id"],
+            indexes=["b"],
         )
 
         assertOperatorResult(self, result, expected, check_sampling=False)
 
     def test_set_index_multiple(self):
-        result = self.evset.set_index(["store_id", "item_id"])
+        result = self.evset.set_index(["b", "c"])
 
         expected = event_set(
             timestamps=self.timestamps,
             # Old index is now the last feature
             features={
-                **{k: v for k, v in self.features.items() if k != "state_id"},
-                "state_id": self.features["state_id"],
+                **{k: v for k, v in self.features.items() if k != "a"},
+                "a": self.features["a"],
             },
-            indexes=["store_id", "item_id"],
+            indexes=["b", "c"],
         )
 
         assertOperatorResult(self, result, expected, check_sampling=False)
@@ -177,6 +177,26 @@ class AddIndexTest(TestCase):
         self.assertEqual(result.data[(1, b"Y")].timestamps.tolist(), [3])
         self.assertEqual(result.data[(2, b"X")].timestamps.tolist(), [4, 5])
         self.assertEqual(result.data[(3, b"Z")].timestamps.tolist(), [6])
+
+    def test_target_doesnt_exist(self):
+        with self.assertRaisesRegex(ValueError, "is not a feature in input"):
+            self.evset.add_index("e")
+
+    def test_target_is_index(self):
+        with self.assertRaisesRegex(ValueError, "is already an index in input"):
+            self.evset.add_index("a")
+
+    def test_empty_list(self):
+        with self.assertRaisesRegex(
+            ValueError, "Cannot specify empty list as `indexes` argument"
+        ):
+            self.evset.add_index([])
+
+    def test_empty_list_set(self):
+        with self.assertRaisesRegex(
+            ValueError, "Cannot specify empty list as `indexes` argument"
+        ):
+            self.evset.set_index([])
 
 
 if __name__ == "__main__":

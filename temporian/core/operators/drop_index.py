@@ -50,7 +50,7 @@ class DropIndexOperator(Operator):
             input, indexes, keep
         )
 
-        self._output_indexes = [
+        output_indexes = [
             index_level
             for index_level in input.schema.indexes
             if index_level.name not in indexes
@@ -60,7 +60,7 @@ class DropIndexOperator(Operator):
             "output",
             create_node_new_features_new_sampling(
                 features=self._output_feature_schemas,
-                indexes=self._output_indexes,
+                indexes=output_indexes,
                 is_unix_timestamp=input.schema.is_unix_timestamp,
                 creator=self,
             ),
@@ -74,19 +74,9 @@ class DropIndexOperator(Operator):
             return input.schema.features
 
         index_dict = input.schema.index_name_to_dtype()
-        feature_dict = input.schema.feature_name_to_dtype()
 
         new_features: List[FeatureSchema] = []
         for index in indexes:
-            if index not in index_dict:
-                raise ValueError(f"{index} is not an index in input.")
-
-            if index in feature_dict:
-                raise ValueError(
-                    f"{index} already exists in input's features. If you"
-                    " want to drop the index, specify `keep=False`."
-                )
-
             new_features.append(
                 FeatureSchema(name=index, dtype=index_dict[index])
             )
@@ -97,10 +87,6 @@ class DropIndexOperator(Operator):
     @property
     def output_feature_schemas(self) -> List[FeatureSchema]:
         return self._output_feature_schemas
-
-    @property
-    def output_indexes(self) -> List[IndexSchema]:
-        return self._output_indexes
 
     @property
     def indexes(self) -> List[str]:
@@ -150,7 +136,7 @@ def _normalize_indexes(
     index_dict = input.schema.index_name_to_dtype()
     for index in indexes:
         if index not in index_dict:
-            raise KeyError(
+            raise ValueError(
                 f"{index} is not an index in {input.schema.indexes}."
             )
 
