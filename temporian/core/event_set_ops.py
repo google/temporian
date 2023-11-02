@@ -15,19 +15,19 @@
 # pylint: disable=import-outside-toplevel
 
 from __future__ import annotations
-from typing import Any, Dict, List, Literal, Optional, Union, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Union
 
 from temporian.core.data.duration import Duration
 
-
 if TYPE_CHECKING:
+    from temporian.core.operators.map import MapFunction
     from temporian.core.typing import (
         EventSetOrNode,
         IndexKeyList,
-        WindowLength,
         TargetDtypes,
+        WindowLength,
     )
-    from temporian.core.operators.map import MapFunction
 
 T_SCALAR = (int, float)
 
@@ -90,7 +90,69 @@ class EventSetOperations:
             f" ({allowed_types}) are supported."
         )
 
-    def __ne__(self, other: Any):
+    def __ne__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
+        """Computes not equal (`self != other`) element-wise with another
+        [`EventSet`][temporian.EventSet] or a scalar value.
+
+        If an EventSet, each feature in `self` is compared element-wise to
+        the feature in `other` in the same position. `self` and `other`
+        must have the same sampling and the same number of features.
+
+        If a scalar value, each item in each feature in `self` is compared to
+        `other`.
+
+        Note that it will always return True on NaNs (even if both are).
+
+        Example with EventSet:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [0, 100, 200]}
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f2": [-10, 100, 5]},
+            ...     same_sampling_as=a
+            ... )
+
+            >>> c = a != b
+            >>> c
+            indexes: []
+            features: [('ne_f1_f2', bool_)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'ne_f1_f2': [ True False True]
+            ...
+
+            ```
+
+        Example with scalar value:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
+            ... )
+
+            >>> b = a != 100
+            >>> b
+            indexes: []
+            features: [('f1', bool_), ('f2', bool_)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'f1': [ True False True]
+                    'f2': [ True False True]
+            ...
+
+            ```
+
+        Args:
+            other: EventSet or scalar value.
+
+        Returns:
+            Result of the comparison.
+        """
         if isinstance(other, self.__class__):
             from temporian.core.operators.binary import not_equal
 
@@ -104,7 +166,171 @@ class EventSetOperations:
         self._raise_error("ne", other, "int,float,bool,str")
         assert False
 
-    def __add__(self, other: Any):
+    def __add__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
+        """Adds an [`EventSet`][temporian.EventSet] or a scalar value to
+        `self` element-wise.
+
+        If an EventSet, each feature in `self` is added to the feature in
+        `other` in the same position. `self` and `other` must have the same
+        sampling, index, number of features and dtype for the features in the
+        same positions.
+
+        If a scalar, `other` is added to each item in each feature in `self`.
+
+        Example with EventSet:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [0, 100, 200], "f2": [10, -10, 5]}
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f3": [-1, 1, 2], "f4": [1, -1, 5]},
+            ...     same_sampling_as=a
+            ... )
+
+            >>> c = a + b
+            >>> c
+            indexes: []
+            features: [('add_f1_f3', int64), ('add_f2_f4', int64)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'add_f1_f3': [ -1 101 202]
+                    'add_f2_f4': [ 11 -11 10]
+            ...
+
+            ```
+
+        Example with scalar value:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [0, 100, 200], "f2": [10, -10, 5]}
+            ... )
+
+            >>> b = a + 3
+            >>> b
+            indexes: ...
+                    timestamps: [1. 2. 3.]
+                    'f1': [ 3 103 203]
+                    'f2': [13 -7 8]
+            ...
+
+            >>> b = 3 + a
+            >>> b
+            indexes: ...
+                    timestamps: [1. 2. 3.]
+                    'f1': [ 3 103 203]
+                    'f2': [13 -7 8]
+            ...
+
+            ```
+
+        Cast dtypes example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [0, 100, 200], "f2": [10., -10., 5.]}
+            ... )
+
+            >>> # Cannot add: f1 is int64 but f2 is float64
+            >>> c = a["f1"] + a["f2"]
+            Traceback (most recent call last):
+                ...
+            ValueError: ... corresponding features should have the same dtype. ...
+
+            >>> # Cast f1 to float
+            >>> c = a["f1"].cast(tp.float64) + a["f2"]
+            >>> c
+            indexes: []
+            features: [('add_f1_f2', float64)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'add_f1_f2': [ 10. 90. 205.]
+            ...
+
+            ```
+
+        Resample example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"fa": [1, 2, 3]},
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[-1, 1.5, 3, 5],
+            ...     features={"fb": [-10, 15, 30, 50]},
+            ... )
+
+            >>> # Cannot add different samplings
+            >>> c = a + b
+            Traceback (most recent call last):
+                ...
+            ValueError: ... should have the same sampling. ...
+
+            >>> # Resample a to match b timestamps
+            >>> c = a.resample(b) + b
+            >>> c
+            indexes: []
+            features: [('add_fa_fb', int64)]
+            events:
+                (4 events):
+                    timestamps: [-1. 1.5 3. 5. ]
+                    'add_fa_fb': [-10 16 33 53]
+            ...
+
+            ```
+
+        Reindex example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3, 4],
+            ...     features={
+            ...         "cat": [1, 1, 2, 2],
+            ...         "M": [10, 20, 30, 40]
+            ...     },
+            ...     indexes=["cat"]
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[1, 2, 3, 4],
+            ...     features={
+            ...         "cat": [1, 1, 2, 2],
+            ...         "N": [10, 20, 30, 40]
+            ...     },
+            ... )
+
+            >>> # Cannot add with different index (only 'a' is indexed by 'cat')
+            >>> c = a + b
+            Traceback (most recent call last):
+                ...
+            ValueError: Arguments don't have the same index. ...
+
+            >>> # Add index 'cat' to b
+            >>> b = b.add_index("cat")
+            >>> # Make explicit same samplings and add
+            >>> c = a + b.resample(a)
+            >>> c
+            indexes: [('cat', int64)]
+            features: [('add_M_N', int64)]
+            events:
+                cat=1 (2 events):
+                    timestamps: [1. 2.]
+                    'add_M_N': [20 40]
+                cat=2 (2 events):
+                    timestamps: [3. 4.]
+                    'add_M_N': [60 80]
+            ...
+
+            ```
+
+        Args:
+            other: EventSet or scalar value.
+
+        Returns:
+            Result of the operation.
+        """
         # TODO: In this and other operants, factor code and add support for
         # swapping operators (e.g. a+1, a+b, 1+a).
 
@@ -124,16 +350,84 @@ class EventSetOperations:
     def __radd__(self, other: Any):
         return self.__add__(other)
 
-    def __sub__(self, other: Any):
+    def __sub__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
+        """Subtracts an [`EventSet`][temporian.EventSet] or a scalar value from
+        `self` element-wise.
+
+        If an EventSet, each feature in `self` is subtracted from the feature in
+        `other` in the same position. `self` and `other` must have the same
+        sampling, index, number of features and dtype for the features in the
+        same positions.
+
+        If a scalar, `other` is subtracted from each item in each feature in
+        `self`.
+
+        See examples in [`EventSet.__add__()`][temporian.EventSet.__add__] to
+        see how to match samplings, dtypes and index, in order to apply
+        arithmetic operators in different EventSets.
+
+        Example with EventSet:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [0, 100, 200]}
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f2": [10, 20, -5]},
+            ...     same_sampling_as=a
+            ... )
+
+            >>> c = a - b
+            >>> c
+            indexes: []
+            features: [('sub_f1_f2', int64)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'sub_f1_f2': [-10 80 205]
+            ...
+
+            ```
+
+        Example with scalar value:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [0, 100, 200], "f2": [10, -10, 5]}
+            ... )
+
+            >>> b = a - 3
+            >>> b
+            indexes: ...
+                    timestamps: [1. 2. 3.]
+                    'f1': [ -3  97 197]
+                    'f2': [ 7 -13   2]
+            ...
+
+            >>> c = 3 - a
+            >>> c
+            indexes: ...
+                    timestamps: [1. 2. 3.]
+                    'f1': [ 3  -97 -197]
+                    'f2': [-7 13  -2]
+            ...
+
+            ```
+
+        Args:
+            other: EventSet or scalar value.
+
+        Returns:
+            Result of the operation.
+        """
         if isinstance(other, self.__class__):
             from temporian.core.operators.binary import subtract
 
             return subtract(input_1=self, input_2=other)
 
         if isinstance(other, T_SCALAR):
-            from temporian.core.operators.scalar import (
-                subtract_scalar,
-            )
+            from temporian.core.operators.scalar import subtract_scalar
 
             return subtract_scalar(minuend=self, subtrahend=other)
 
@@ -142,25 +436,91 @@ class EventSetOperations:
 
     def __rsub__(self, other: Any):
         if isinstance(other, T_SCALAR):
-            from temporian.core.operators.scalar import (
-                subtract_scalar,
-            )
+            from temporian.core.operators.scalar import subtract_scalar
 
             return subtract_scalar(minuend=other, subtrahend=self)
 
         self._raise_error("subtract", other, "int,float")
         assert False
 
-    def __mul__(self, other: Any):
+    def __mul__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
+        """Multiplies an [`EventSet`][temporian.EventSet] or a scalar value with
+        `self` element-wise.
+
+        If an EventSet, each feature in `self` is multiplied with the feature in
+        `other` in the same position. `self` and `other` must have the same
+        sampling, index, number of features and dtype for the features in the
+        same positions.
+
+        If a scalar, each item in each feature in `self` is multiplied with
+        `other`.
+
+        See examples in [`EventSet.__add__()`][temporian.EventSet.__add__] to
+        see how to match samplings, dtypes and index, in order to apply
+        arithmetic operators in different EventSets.
+
+        Example with EventSet:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [0, 100, 200]}
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f2": [10, 3, 2]},
+            ...     same_sampling_as=a
+            ... )
+
+            >>> c = a * b
+            >>> c
+            indexes: []
+            features: [('mult_f1_f2', int64)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'mult_f1_f2': [ 0 300 400]
+            ...
+
+            ```
+
+        Example with scalar value:
+             ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [0, 100, 200], "f2": [10, -10, 5]}
+            ... )
+
+            >>> b = a * 2
+            >>> b
+            indexes: ...
+                    timestamps: [1. 2. 3.]
+                    'f1': [ 0 200 400]
+                    'f2': [ 20 -20 10]
+            ...
+
+            >>> b = 2 * a
+            >>> b
+            indexes: ...
+                    timestamps: [1. 2. 3.]
+                    'f1': [ 0 200 400]
+                    'f2': [ 20 -20 10]
+            ...
+
+            ```
+
+        Args:
+            other: EventSet or scalar value.
+
+        Returns:
+            Result of the operation.
+        """
         if isinstance(other, self.__class__):
             from temporian.core.operators.binary import multiply
 
             return multiply(input_1=self, input_2=other)
 
         if isinstance(other, T_SCALAR):
-            from temporian.core.operators.scalar import (
-                multiply_scalar,
-            )
+            from temporian.core.operators.scalar import multiply_scalar
 
             return multiply_scalar(input=self, value=other)
 
@@ -170,12 +530,66 @@ class EventSetOperations:
     def __rmul__(self, other: Any):
         return self.__mul__(other)
 
-    def __neg__(self):
+    def __neg__(self: EventSetOrNode) -> EventSetOrNode:
+        """Negates an [`EventSet`][temporian.EventSet] element-wise.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2],
+            ...     features={"M": [1, -5], "N": [-1.0, 5.5]},
+            ... )
+            >>> -a
+            indexes: ...
+                    'M': [-1  5]
+                    'N': [ 1.  -5.5]
+            ...
+
+            ```
+
+        Returns:
+            Negated EventSet.
+        """
         from temporian.core.operators.scalar import multiply_scalar
 
         return multiply_scalar(input=self, value=-1)
 
-    def __invert__(self):
+    def __invert__(self: EventSetOrNode) -> EventSetOrNode:
+        """Inverts a boolean [`EventSet`][temporian.EventSet] element-wise.
+
+        Swaps False <-> True.
+
+        Does not work on integers, they should be cast to
+        [`tp.bool_`][temporian.bool_] beforehand, using
+        [`EventSet.cast()`][temporian.EventSet.cast].
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2],
+            ...     features={"M": [1, 5], "N": [1.0, 5.5]},
+            ... )
+            >>> # Boolean EventSet
+            >>> b = a < 2
+            >>> b
+            indexes: ...
+                    'M': [ True False]
+                    'N': [ True False]
+            ...
+
+            >>> # Inverted EventSet
+            >>> c = ~b
+            >>> c
+            indexes: ...
+                    'M': [False True]
+                    'N': [False True]
+            ...
+
+            ```
+
+        Returns:
+            Inverted EventSet.
+        """
         from temporian.core.operators.unary import invert
 
         return invert(input=self)
@@ -185,7 +599,111 @@ class EventSetOperations:
 
         return abs(input=self)
 
-    def __truediv__(self, other: Any):
+    def __truediv__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
+        """Divides `self` by an [`EventSet`][temporian.EventSet] or a scalar
+        value element-wise.
+
+        If an EventSet, each feature in `self` is divided by the feature in
+        `other` in the same position. `self` and `other` must have the same
+        sampling, index, number of features and dtype for the features in the
+        same positions.
+
+        If a scalar, each item in each feature in `self` is divided by `other`.
+
+        This operator cannot be used in features with dtypes `int32` or `int64`.
+        Cast to float before (see example) or use
+        [`EventSet.__floordiv__()`][temporian.EventSet.__floordiv__] instead.
+
+        See examples in [`EventSet.__add__()`][temporian.EventSet.__add__] to
+        see how to match samplings, dtypes and index, in order to apply
+        arithmetic operators in different EventSets.
+
+        Example with EventSet:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [0.0, 100.0, 200.0]}
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f2": [10.0, 20.0, 50.0]},
+            ...     same_sampling_as=a
+            ... )
+
+            >>> c = a / b
+            >>> c
+            indexes: []
+            features: [('div_f1_f2', float64)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'div_f1_f2': [0. 5. 4.]
+            ...
+
+            ```
+
+        Example casting integer features:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [0, 100, 200]}
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f2": [10, 20, 50]},
+            ...     same_sampling_as=a
+            ... )
+
+            >>> # Cannot divide int64 features
+            >>> c = a / b
+            Traceback (most recent call last):
+                ...
+            ValueError: Cannot use the divide operator on feature f1 of type int64. ...
+
+            >>> # Cast to tp.float64 or tp.float32 before
+            >>> c = a.cast(tp.float64) / b.cast(tp.float64)
+            >>> c
+            indexes: []
+            features: [('div_f1_f2', float64)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'div_f1_f2': [0. 5. 4.]
+            ...
+
+            ```
+
+        Example with scalar value:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [0., 100., 200.], "f2": [10., -10., 5.]}
+            ... )
+
+            >>> b = a / 2
+            >>> b
+            indexes: ...
+                    timestamps: [1. 2. 3.]
+                    'f1': [ 0. 50. 100.]
+                    'f2': [ 5. -5. 2.5]
+            ...
+
+            >>> c = 1000 / a
+            >>> c
+            indexes: ...
+                    timestamps: [1. 2. 3.]
+                    'f1': [inf 10. 5.]
+                    'f2': [ 100. -100. 200.]
+            ...
+
+            ```
+
+        Args:
+            other: EventSet or scalar value.
+
+        Returns:
+            Result of the operation.
+        """
         if isinstance(other, self.__class__):
             from temporian.core.operators.binary import divide
 
@@ -208,16 +726,83 @@ class EventSetOperations:
         self._raise_error("divide", other, "(int,float)")
         assert False
 
-    def __floordiv__(self, other: Any):
+    def __floordiv__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
+        """Divides `self` by an [`EventSet`][temporian.EventSet] or a scalar
+        value and takes the floor of the result, element-wise.
+
+        If an EventSet, each feature in `self` is divided by the feature in
+        `other` in the same position. `self` and `other` must have the same
+        sampling, index, number of features and dtype for the features in the
+        same positions.
+
+        If a scalar, each item in each feature in `self` is divided by `other`.
+
+        See examples in [`EventSet.__add__()`][temporian.EventSet.__add__] to
+        see how to match samplings, dtypes and index, in order to apply
+        arithmetic operators in different EventSets.
+
+        Example with EventSet:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [0, 100, 200]}
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f2": [10, 3, 150]},
+            ...     same_sampling_as=a
+            ... )
+
+            >>> c = a // b
+            >>> c
+            indexes: []
+            features: [('floordiv_f1_f2', int64)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'floordiv_f1_f2': [ 0 33 1]
+            ...
+
+            ```
+
+        Example with scalar value:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [1, 100, 200], "f2": [10., -10., 5.]}
+            ... )
+
+            >>> b = a // 3
+            >>> b
+            indexes: ...
+                    timestamps: [1. 2. 3.]
+                    'f1': [ 0 33 66]
+                    'f2': [ 3. -4. 1.]
+            ...
+
+            >>> c = 300 // a
+            >>> c
+            indexes: ...
+                    timestamps: [1. 2. 3.]
+                    'f1': [300 3 1]
+                    'f2': [ 30. -30. 60.]
+            ...
+
+            ```
+
+        Args:
+            other: EventSet or scalar value.
+
+        Returns:
+            Result of the operation.
+        """
         if isinstance(other, self.__class__):
             from temporian.core.operators.binary import floordiv
 
             return floordiv(numerator=self, denominator=other)
 
         if isinstance(other, T_SCALAR):
-            from temporian.core.operators.scalar import (
-                floordiv_scalar,
-            )
+            from temporian.core.operators.scalar import floordiv_scalar
 
             return floordiv_scalar(numerator=self, denominator=other)
 
@@ -226,16 +811,84 @@ class EventSetOperations:
 
     def __rfloordiv__(self, other: Any):
         if isinstance(other, T_SCALAR):
-            from temporian.core.operators.scalar import (
-                floordiv_scalar,
-            )
+            from temporian.core.operators.scalar import floordiv_scalar
 
             return floordiv_scalar(numerator=other, denominator=self)
 
         self._raise_error("floor_divide", other, "(int,float)")
         assert False
 
-    def __pow__(self, other: Any):
+    def __pow__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
+        """Computes power with another
+        [`EventSet`][temporian.EventSet] or a scalar value element-wise.
+
+        If an EventSet, each feature in `self` is raised to the feature in
+        `other` in the same position. `self` and `other` must have the same
+        sampling, index, number of features and dtype for the features in the
+        same positions.
+
+        If a scalar, each item in each feature in `self` is raised to
+        `other`.
+
+        See examples in [`EventSet.__add__()`][temporian.EventSet.__add__] to
+        see how to match samplings, dtypes and index, in order to apply
+        arithmetic operators in different EventSets.
+
+        Example with EventSet:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [5, 2, 4]}
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f2": [0, 3, 2]},
+            ...     same_sampling_as=a
+            ... )
+
+            >>> c = a ** b
+            >>> c
+            indexes: []
+            features: [('pow_f1_f2', int64)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'pow_f1_f2': [ 1 8 16]
+            ...
+
+            ```
+
+        Example with scalar value:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [0, 2, 3], "f2": [1., 2., 3.]}
+            ... )
+
+            >>> b = a ** 3
+            >>> b
+            indexes: ...
+                    timestamps: [1. 2. 3.]
+                    'f1': [ 0 8 27]
+                    'f2': [ 1. 8. 27.]
+            ...
+
+            >>> c = 3 ** a
+            >>> c
+            indexes: ...
+                    timestamps: [1. 2. 3.]
+                    'f1': [ 1 9 27]
+                    'f2': [ 3. 9. 27.]
+            ...
+
+            ```
+
+        Args:
+            other: EventSet or scalar value.
+
+        Returns:
+            Result of the operation.
+        """
         if isinstance(other, self.__class__):
             from temporian.core.operators.binary import power
 
@@ -258,7 +911,77 @@ class EventSetOperations:
         self._raise_error("exponentiate", other, "(int,float)")
         assert False
 
-    def __mod__(self, other: Any):
+    def __mod__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
+        """Computes modulo or remainder of division with another
+        [`EventSet`][temporian.EventSet] or a scalar value.
+
+        If an EventSet, each feature in `self` is reduced modulo the feature in
+        `other` in the same position. `self` and `other` must have the same
+        sampling, index, number of features and dtype for the features in the
+        same positions.
+
+        If a scalar, each item in each feature in `self` is reduced modulo
+        `other`.
+
+        See examples in [`EventSet.__add__()`][temporian.EventSet.__add__] to
+        see how to match samplings, dtypes and index, in order to apply
+        arithmetic operators in different EventSets.
+
+        Example with EventSet:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [0, 7, 200]}
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f2": [10, 5, 150]},
+            ...     same_sampling_as=a
+            ... )
+
+            >>> c = a % b
+            >>> c
+            indexes: []
+            features: [('mod_f1_f2', int64)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'mod_f1_f2': [ 0 2 50]
+            ...
+
+            ```
+
+        Example with scalar value:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [1, 100, 200], "f2": [10., -10., 5.]}
+            ... )
+
+            >>> b = a % 3
+            >>> b
+            indexes: ...
+                    timestamps: [1. 2. 3.]
+                    'f1': [1 1 2]
+                    'f2': [1. 2. 2.]
+            ...
+
+            >>> c = 300 % a
+            >>> c
+            indexes: ...
+                    timestamps: [1. 2. 3.]
+                    'f1': [ 0 0 100]
+                    'f2': [ 0. -0. 0.]
+            ...
+
+            ```
+
+        Args:
+            other: EventSet or scalar value.
+
+        Returns:
+            Result of the operation.
+        """
         if isinstance(other, self.__class__):
             from temporian.core.operators.binary import modulo
 
@@ -281,64 +1004,304 @@ class EventSetOperations:
         self._raise_error("compute modulo (%)", other, "(int,float)")
         assert False
 
-    def __gt__(self, other: Any):
+    def __gt__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
+        """Computes greater (`self > other`) element-wise with another
+        [`EventSet`][temporian.EventSet] or a scalar value.
+
+        If an EventSet, each feature in `self` is compared element-wise to the
+        feature in `other` in the same position. `self` and `other` must have
+        the same sampling and the same number of features.
+
+        If a scalar value, each item in each feature in `self` is compared to
+        `other`.
+
+        Note that it will always return False on NaN elements.
+
+        Example with EventSet:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [0, 100, 200]}
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f2": [-10, 100, 5]},
+            ...     same_sampling_as=a
+            ... )
+
+            >>> c = a > b
+            >>> c
+            indexes: []
+            features: [('gt_f1_f2', bool_)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'gt_f1_f2': [ True False True]
+            ...
+
+            ```
+
+        Example with scalar:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
+            ... )
+
+            >>> b = a != 100
+            >>> b
+            indexes: []
+            features: [('f1', bool_), ('f2', bool_)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'f1': [ True False True]
+                    'f2': [ True False True]
+            ...
+
+            ```
+
+        Args:
+            other: EventSet or scalar value.
+
+        Returns:
+            Result of the comparison.
+        """
         if isinstance(other, self.__class__):
             from temporian.core.operators.binary import greater
 
             return greater(input_left=self, input_right=other)
 
         if isinstance(other, T_SCALAR):
-            from temporian.core.operators.scalar import (
-                greater_scalar,
-            )
+            from temporian.core.operators.scalar import greater_scalar
 
             return greater_scalar(input=self, value=other)
 
         self._raise_error("compare", other, "(int,float)")
         assert False
 
-    def __ge__(self, other: Any):
+    def __ge__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
+        """Computes greater equal (`self >= other`) element-wise with another
+        [`EventSet`][temporian.EventSet] or a scalar value.
+
+        If an EventSet, each feature in `self` is compared element-wise to the
+        feature in `other` in the same position. `self` and `other` must have
+        the same sampling and the same number of features.
+
+        If a scalar value, each item in each feature in `input` is compared to
+        `value`.
+
+        Note that it will always return False on NaN elements.
+
+        Example with EventSet:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [0, 100, 200]}
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f2": [-10, 100, 5]},
+            ...     same_sampling_as=a
+            ... )
+
+            >>> c = a >= b
+            >>> c
+            indexes: []
+            features: [('ge_f1_f2', bool_)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'ge_f1_f2': [ True True True]
+            ...
+
+            ```
+
+        Example with scalar:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
+            ... )
+
+            >>> b = a >= 100
+            >>> b
+            indexes: []
+            features: [('f1', bool_), ('f2', bool_)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'f1': [False True True]
+                    'f2': [False True False]
+            ...
+
+            ```
+
+        Args:
+            other: EventSet or scalar value.
+
+        Returns:
+            Result of the comparison.
+        """
         if isinstance(other, self.__class__):
             from temporian.core.operators.binary import greater_equal
 
             return greater_equal(input_left=self, input_right=other)
 
         if isinstance(other, T_SCALAR):
-            from temporian.core.operators.scalar import (
-                greater_equal_scalar,
-            )
+            from temporian.core.operators.scalar import greater_equal_scalar
 
             return greater_equal_scalar(input=self, value=other)
 
         self._raise_error("compare", other, "(int,float)")
         assert False
 
-    def __lt__(self, other: Any):
+    def __lt__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
+        """Computes less (`self < other`) element-wise with another
+        [`EventSet`][temporian.EventSet] or a scalar value.
+
+        If an EventSet, each feature in `self` is compared element-wise to the
+        feature in `other` in the same position. `self` and `other` must have
+        the same sampling and the same number of features.
+
+        If a scalar value, each item in each feature in `input` is compared to
+        `value`.
+
+        Note that it will always return False on NaN elements.
+
+        Example with EventSet:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [0, 100, 200]}
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f2": [-10, 100, 5]},
+            ...     same_sampling_as=a
+            ... )
+
+            >>> c = a < b
+            >>> c
+            indexes: []
+            features: [('lt_f1_f2', bool_)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'lt_f1_f2': [False False False]
+            ...
+
+            ```
+
+        Example with scalar:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
+            ... )
+
+            >>> b = a < 100
+            >>> b
+            indexes: []
+            features: [('f1', bool_), ('f2', bool_)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'f1': [ True False False]
+                    'f2': [ True False True]
+            ...
+
+            ```
+
+        Args:
+            other: EventSet or scalar value.
+
+        Returns:
+            Result of the comparison.
+        """
         if isinstance(other, self.__class__):
             from temporian.core.operators.binary import less
 
             return less(input_left=self, input_right=other)
 
         if isinstance(other, T_SCALAR):
-            from temporian.core.operators.scalar import (
-                less_scalar,
-            )
+            from temporian.core.operators.scalar import less_scalar
 
             return less_scalar(input=self, value=other)
 
         self._raise_error("compare", other, "(int,float)")
         assert False
 
-    def __le__(self, other: Any):
+    def __le__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
+        """Computes less equal (`self <= other`) element-wise with another
+        [`EventSet`][temporian.EventSet] or a scalar value.
+
+        If an EventSet, each feature in `self` is compared element-wise to the
+        feature in `other` in the same position. `self` and `other` must have
+        the same sampling and the same number of features.
+
+        If a scalar value, each item in each feature in `input` is compared to
+        `value`.
+
+        Note that it will always return False on NaN elements.
+
+        Example with EventSet:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [0, 100, 200]}
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f2": [-10, 100, 5]},
+            ...     same_sampling_as=a
+            ... )
+
+            >>> c = a <= b
+            >>> c
+            indexes: []
+            features: [('le_f1_f2', bool_)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'le_f1_f2': [False True False]
+            ...
+
+            ```
+
+        Example with scalar:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [0, 100, 200], "f2": [-10, 100, 5]}
+            ... )
+
+            >>> b = a <= 100
+            >>> b
+            indexes: []
+            features: [('f1', bool_), ('f2', bool_)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'f1': [ True True False]
+                    'f2': [ True True True]
+            ...
+
+            ```
+
+        Args:
+            other: EventSet or scalar value.
+
+        Returns:
+            Result of the comparison.
+        """
         if isinstance(other, self.__class__):
             from temporian.core.operators.binary import less_equal
 
             return less_equal(input_left=self, input_right=other)
 
         if isinstance(other, T_SCALAR):
-            from temporian.core.operators.scalar import (
-                less_equal_scalar,
-            )
+            from temporian.core.operators.scalar import less_equal_scalar
 
             return less_equal_scalar(input=self, value=other)
 
@@ -351,7 +1314,61 @@ class EventSetOperations:
             f"Only {self._clsname}s with boolean features are supported."
         )
 
-    def __and__(self, other: Any):
+    def __and__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
+        """Computes logical and (`self & other`) element-wise with another
+        [`EventSet`][temporian.EventSet].
+
+        Each feature in `self` is compared element-wise to the feature in
+        `other` in the same position.
+
+        `self` and `other` must have the same sampling, the same number of
+        features, and all feature types must be `bool` (see cast example below).
+
+        Example:
+            ```python
+            >>> a = tp.event_set(timestamps=[1, 2, 3], features={"f1": [100, 150, 200]})
+
+            >>> # Sample boolean features
+            >>> b = a > 100
+            >>> c = a < 200
+
+            >>> d = b & c
+            >>> d
+            indexes: []
+            features: [('and_f1_f1', bool_)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'and_f1_f1': [False True False]
+            ...
+
+            ```
+
+        Example casting integer to boolean:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [0, 1, 1], "f2": [1, 1, 0]}
+            ... )
+            >>> b = a.cast(bool)
+            >>> c = b["f1"] & b["f2"]
+            >>> c
+            indexes: []
+            features: [('and_f1_f2', bool_)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'and_f1_f2': [False True False]
+            ...
+
+            ```
+
+        Args:
+            other: EventSet with only boolean features.
+
+        Returns:
+            EventSet with result of the comparison.
+        """
         if isinstance(other, self.__class__):
             from temporian.core.operators.binary import logical_and
 
@@ -360,7 +1377,44 @@ class EventSetOperations:
         self._raise_bool_error("&", other)
         assert False
 
-    def __or__(self, other: Any):
+    def __or__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
+        """Computes logical or (`self | other`) element-wise with another
+        [`EventSet`][temporian.EventSet].
+
+        Each feature in `self` is compared element-wise to the feature in
+        `other` in the same position.
+
+        `self` and `other` must have the same sampling, the same number of
+        features, and all feature types must be `bool`.
+
+        See cast example in [`EventSet.__and__()`][temporian.EventSet.__and__].
+
+        Example:
+            ```python
+            >>> a = tp.event_set(timestamps=[1, 2, 3], features={"f1": [100, 150, 200]})
+
+            >>> # Sample boolean features
+            >>> b = a <= 100
+            >>> c = a >= 200
+
+            >>> d = b | c
+            >>> d
+            indexes: []
+            features: [('or_f1_f1', bool_)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'or_f1_f1': [ True False True]
+            ...
+
+            ```
+
+        Args:
+            other: EventSet with only boolean features.
+
+        Returns:
+            EventSet with result of the comparison.
+        """
         if isinstance(other, self.__class__):
             from temporian.core.operators.binary import logical_or
 
@@ -369,7 +1423,44 @@ class EventSetOperations:
         self._raise_bool_error("|", other)
         assert False
 
-    def __xor__(self, other: Any):
+    def __xor__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
+        """Computes logical xor (`self ^ other`) element-wise with another
+        [`EventSet`][temporian.EventSet].
+
+        Each feature in `self` is compared element-wise to the feature in
+        `other` in the same position.
+
+        `self` and `other` must have the same sampling, the same number of
+        features, and all feature types must be `bool`.
+
+        See cast example in [`EventSet.__and__()`][temporian.EventSet.__and__].
+
+        Example:
+            ```python
+            >>> a = tp.event_set(timestamps=[1, 2, 3], features={"f1": [100, 150, 200]})
+
+            >>> # Sample boolean features
+            >>> b = a > 100
+            >>> c = a < 200
+
+            >>> d = b ^ c
+            >>> d
+            indexes: []
+            features: [('xor_f1_f1', bool_)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'xor_f1_f1': [ True False True]
+            ...
+
+            ```
+
+        Args:
+            other: EventSet with only boolean features.
+
+        Returns:
+            EventSet with result of the comparison.
+        """
         if isinstance(other, self.__class__):
             from temporian.core.operators.binary import logical_xor
 
@@ -403,7 +1494,7 @@ class EventSetOperations:
             ```
 
         Returns:
-            EventSetOr with positive valued features.
+            EventSet with positive valued features.
         """
         from temporian.core.operators.unary import abs
 
@@ -2981,7 +4072,7 @@ class EventSetOperations:
         while `until_next` returns one value for each input value (here again,
         sampling events are after input events).
 
-        The output [EventSet][temporian.EventSet] has one event for each event
+        The output [`EventSet`][temporian.EventSet] has one event for each event
         in input, but with its timestamp moved forward to the nearest future
         event in `sampling`. If no timestamp in sampling is closer than timeout,
         it is moved by `timeout` into the future instead.
