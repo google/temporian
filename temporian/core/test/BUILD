@@ -113,13 +113,3 @@ py_test(
         "//temporian",
     ],
 )
-
-py_test(
-    name = "event_set_ops_test",
-    srcs = ["event_set_ops_test.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/absl/testing:absltest
-        "//temporian",
-    ],
-)
