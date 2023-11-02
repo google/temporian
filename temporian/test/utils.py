@@ -65,6 +65,21 @@ def i64(l):
     return np.array(l, np.int64)
 
 
+def assertEqualEventSet(
+    test: absltest.TestCase, result: EventSet, expected: EventSet
+):
+    test.assertEqual(
+        result,
+        expected,
+        (
+            "\n==========\nRESULT:\n==========\n"
+            f"{result}"
+            "\n==========\nEXPECTED:\n==========\n"
+            f"{expected}"
+        ),
+    )
+
+
 def assertOperatorResult(
     test: absltest.TestCase,
     result: EventSet,
@@ -81,16 +96,7 @@ def assertOperatorResult(
       - The result has the same sampling as the expected output.
       - Serialization / unserialization of the graph.
     """
-    test.assertEqual(
-        result,
-        expected,
-        (
-            "\n==========\nRESULT:\n==========\n"
-            f"{result}"
-            "\n==========\nEXPECTED:\n==========\n"
-            f"{expected}"
-        ),
-    )
+    assertEqualEventSet(test, result, expected)
     if check_sampling:
         result.check_same_sampling(expected)
 
