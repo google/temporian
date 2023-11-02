@@ -31,6 +31,14 @@ class TickCalendarNumpyImplementation(OperatorImplementation):
         assert isinstance(operator, TickCalendar)
         super().__init__(operator)
 
+    def _wday_py_to_cpp(self, py_wday: int) -> int:
+        """Converts wday number from Python (wday=0 for Monday) to C++
+        convention (wday=0 for Sunday).
+        This is required to keep coherency between calendar_day_of_week()
+        operator (which uses datetime.weekday()) and tick_calendar() (which
+        uses tm_wday in tick_calendar.cc)."""
+        return (py_wday + 1) % 7
+
     def _get_arg_range(
         self,
         arg_value: Union[int, Literal["*"]],
@@ -88,8 +96,8 @@ class TickCalendarNumpyImplementation(OperatorImplementation):
                     max_mday=mday_range[1],
                     min_month=month_range[0],
                     max_month=month_range[1],
-                    min_wday=wday_range[0],
-                    max_wday=wday_range[1],
+                    min_wday=self._wday_py_to_cpp(wday_range[0]),
+                    max_wday=self._wday_py_to_cpp(wday_range[1]),
                 )
             output_evset.set_index_value(
                 index_key,
