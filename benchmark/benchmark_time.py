@@ -30,6 +30,7 @@ bazel run -c opt //benchmark:benchmark_time -- --f add_index from_pandas
 import argparse
 import time
 from typing import List, NamedTuple, Union
+import logging
 
 import numpy as np
 import pandas as pd
@@ -229,13 +230,31 @@ def benchmark_from_pandas(runner):
                     )
 
 
+def benchmark_from_pandas_with_objects(runner):
+    runner.add_separator()
+    for num_timestamps in [10_000_000]:
+        dt = {
+            "timestamp": np.random.rand(num_timestamps),
+            "feature_int64": np.random.randint(
+                0, 1000, num_timestamps, np.int64
+            ),
+            "feature_obj_str": [
+                f"hello_the_world_{v}" for v in np.random.rand(num_timestamps)
+            ],
+        }
+        df = pd.DataFrame(dt)
+        print("df:\n", df.dtypes, "\n", type(df["feature_obj_str"][0]))
+        benchmark_name = f"from_pandas_with_objects:s:{num_timestamps:_}"
+        runner.benchmark(benchmark_name, lambda: tp.from_pandas(df))
+
+
 def benchmark_add_index(runner):
     runner.add_separator()
 
     np.random.seed(0)
     for number_timestamps in [10_000, 100_000, 1_000_000]:
-        feature_values = list(range(int(10)))
-        index_values = list(range(int(5)))
+        feature_values = list(range(10))
+        index_values = list(range(5))
         timestamps = np.sort(
             np.random.randn(number_timestamps) * number_timestamps
         )
@@ -274,14 +293,59 @@ def benchmark_add_index(runner):
             ["feature_1", "feature_2"],
             ["feature_1", "feature_2", "feature_3"],
             ["feature_1", "feature_2", "feature_3", "feature_4"],
-            ["feature_1", "feature_2", "feature_3", "feature_4", "feature_5"],
+            [
+                "feature_1",
+                "feature_2",
+                "feature_3",
+                "feature_4",
+                "feature_5",
+            ],
         ]
 
         for index in possible_indexes:
             output = node.add_index(index)
             runner.benchmark(
-                f"add_index:s:{number_timestamps:_}:num_idx:{len(index)}",
+                f"add_index:s:{number_timestamps:_}_num_idx:{len(index)}",
                 lambda: tp.run(output, input={node: evset}),
+            )
+
+
+def benchmark_add_index_v2(runner):
+    runner.add_separator()
+
+    np.random.seed(0)
+    for num_timestamps in [1_000_000]:
+        for str_index in [True, False]:
+            str_values = [f"{v}" for v in range(10_000)]
+            num_values = list(range(10_000))
+            timestamps = np.sort(
+                np.random.randn(num_timestamps) * num_timestamps
+            )
+
+            index_values = list(range(10_000))
+            if str_index:
+                index_values = [f"{v}" for v in index_values]
+            index = np.random.choice(index_values, num_timestamps)
+
+            evset = tp.event_set(
+                timestamps,
+                {
+                    "timestamp": timestamps,
+                    "index": index,
+                    "feature_1": np.random.choice(str_values, num_timestamps),
+                    "feature_2": np.random.choice(str_values, num_timestamps),
+                    "feature_3": np.random.choice(num_values, num_timestamps),
+                    "feature_4": np.random.choice(num_values, num_timestamps),
+                },
+            )
+
+            node = evset.node()
+            output = node.add_index("index")
+            runner.benchmark(
+                f"add_index_v2:s:{num_timestamps:_}_str_index:{str_index}",
+                lambda: tp.run(output, input={node: evset}),
+                warmup_repetitions=1,
+                repetitions=1,
             )
 
 
@@ -369,6 +433,8 @@ def main():
         "cast",
         "unique_timestamps",
         "add_index",
+        "add_index_v2",
+        "from_pandas_with_objects",
     ]
     if args.functions is not None:
         benchmarks_to_run = args.functions

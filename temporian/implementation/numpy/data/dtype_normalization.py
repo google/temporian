@@ -116,16 +116,20 @@ def normalize_features(
     `normalize_features` should match `_DTYPE_MAPPING`.
     """
 
+    logging.debug("normalize features %s", name)
+
     def _str_to_bytes(feat_array: np.ndarray) -> np.ndarray:
         """Encode string/object/bytes to np.bytes, using UTF-8 encoding"""
         return np.char.encode(feat_array, "UTF-8")
 
     # Convert pandas, list, tuples -> np.ndarray
     if str(type(feature_values)) == "<class 'pandas.core.series.Series'>":
+        logging.debug("from pandas series")
         if feature_values.dtype == "object":
             feature_values = feature_values.fillna("")
         feature_values = feature_values.to_numpy(copy=True)
     elif isinstance(feature_values, (tuple, list)):
+        logging.debug("from python list")
         # Convert list/tuple to array
         feature_values = np.array(feature_values)
     elif not isinstance(feature_values, np.ndarray):
@@ -141,13 +145,16 @@ def normalize_features(
 
     # Convert np.datetime -> np.float64
     if array_dtype == np.datetime64:
+        logging.debug("from np datetime64")
         # nanosecond resolution as in timestamps
         feature_values = datetime64_array_to_float64(feature_values)
 
     # Convert np.object_, np.str_ -> np.bytes_
     elif array_dtype == np.str_:
+        logging.debug("from np str_")
         feature_values = _str_to_bytes(feature_values)
     elif array_dtype == np.object_:
+        logging.debug("from object")
         logging.warning(
             (
                 'Feature "%s" is an array of numpy.object_ and will be'
