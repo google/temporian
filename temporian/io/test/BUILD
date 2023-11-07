@@ -13,9 +13,9 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/pandas
+        "//temporian/test:utils",
         "//temporian/implementation/numpy/data:io",
         "//temporian/io:pandas",
-        "//temporian/implementation/numpy/operators/test:utils",
     ],
 )
 
@@ -27,8 +27,8 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/numpy
         # already_there/tensorflow
+        "//temporian/test:utils",
         "//temporian/implementation/numpy/data:io",
         "//temporian/io:tensorflow",
-        "//temporian/implementation/numpy/operators/test:utils",
     ],
 )

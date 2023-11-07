@@ -20,9 +20,7 @@ import numpy as np
 import pandas as pd
 from temporian.io.pandas import from_pandas, to_pandas
 from temporian.implementation.numpy.data.io import event_set
-from temporian.implementation.numpy.operators.test.utils import (
-    assertEqualDFRandomRowOrder,
-)
+from temporian.test.utils import assertEqualDFRandomRowOrder
 
 
 class DataFrameToEventTest(absltest.TestCase):

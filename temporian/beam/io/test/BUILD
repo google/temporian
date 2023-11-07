@@ -36,7 +36,7 @@ py_test(
         "//temporian/io:csv",
         "//temporian/beam/io:csv",
         "//temporian/io:tensorflow",
-        "//temporian/implementation/numpy/operators/test:utils",
+        "//temporian/test:utils",
     ],
 )
 

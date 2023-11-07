@@ -65,6 +65,21 @@ def i64(l):
     return np.array(l, np.int64)
 
 
+def assertEqualEventSet(
+    test: absltest.TestCase, result: EventSet, expected: EventSet
+):
+    test.assertEqual(
+        result,
+        expected,
+        (
+            "\n==========\nRESULT:\n==========\n"
+            f"{result}"
+            "\n==========\nEXPECTED:\n==========\n"
+            f"{expected}"
+        ),
+    )
+
+
 def assertOperatorResult(
     test: absltest.TestCase,
     result: EventSet,
@@ -81,16 +96,7 @@ def assertOperatorResult(
       - The result has the same sampling as the expected output.
       - Serialization / unserialization of the graph.
     """
-    test.assertEqual(
-        result,
-        expected,
-        (
-            "\n==========\nRESULT:\n==========\n"
-            f"{result}"
-            "\n==========\nEXPECTED:\n==========\n"
-            f"{expected}"
-        ),
-    )
+    assertEqualEventSet(test, result, expected)
     if check_sampling:
         result.check_same_sampling(expected)
 
@@ -109,6 +115,23 @@ def assertOperatorResult(
             nodes[serialization._identifier(node)] = node
 
         _ = serialization._unserialize_operator(serialized_op, nodes)
+
+
+def assertEqualDFRandomRowOrder(
+    test: absltest.TestCase, real: "pd.DataFrame", expected: "pd.DataFrame"
+):
+    row_real = set([str(row.to_dict()) for _, row in real.iterrows()])
+    row_expected = set([str(row.to_dict()) for _, row in expected.iterrows()])
+    test.assertEqual(
+        row_real,
+        row_expected,
+        (
+            "\n==========\nREAL:\n==========\n"
+            f"{real}"
+            "\n==========\nEXPECTED:\n==========\n"
+            f"{expected}"
+        ),
+    )
 
 
 class SetTimezone:

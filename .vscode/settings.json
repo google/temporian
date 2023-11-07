@@ -6,6 +6,7 @@
     "**/bazel-*/**": true,
     "**/build/**": true,
     "**/build_package/**": true,
+    "**/__pycache__/**": true,
     "**/.cache/**": true,
     "**/temporian.egg-info/**": true,
   },
@@ -14,6 +15,7 @@
     "**/bazel-*/**": true,
     "**/build/**": true,
     "**/build_package/**": true,
+    "**/__pycache__/**": true,
     "**/.cache/**": true,
     "**/temporian.egg-info/**": true,
   },
@@ -22,15 +24,10 @@
     "**/bazel-*/**": true,
     "**/build/**": true,
     "**/build_package/**": true,
+    "**/__pycache__/**": true,
     "**/.cache/**": true,
     "**/temporian.egg-info/**": true,
   },
-  "black-formatter.interpreter": [
-    "${workspaceFolder}/.venv/bin/python"
-  ],
-  "black-formatter.path": [
-    "${workspaceFolder}/.venv/bin/black"
-  ],
   "black-formatter.args": [
     "--config=${workspaceFolder}/pyproject.toml"
   ],
@@ -120,5 +117,6 @@
   },
   "python.analysis.typeCheckingMode": "basic",
   "jupyter.notebookFileRoot": "${fileDirname}",
-  "C_Cpp.clang_format_fallbackStyle": "Google"
+  "C_Cpp.clang_format_fallbackStyle": "Google",
+  "editor.defaultFormatter": "ms-python.black-formatter"
 }

@@ -274,64 +274,48 @@ py_library(
     # Operator implementation test
     with open(
         os.path.join(
-            "temporian",
-            "implementation",
-            "numpy",
-            "operators",
-            "test",
-            lower_op + "_test.py",
+            "temporian", "core", "operators", "test", f"test_{lower_op}.py"
         ),
         "w",
         encoding="utf-8",
     ) as file:
         file.write(
-            f"""\
-{license_content()}
+            f"""{license_content()}
 
-from absl.testing import absltest
+from absl.testing import absltest, parameterized
 
-import numpy as np
-from temporian.core.operators.{lower_op} import {capitalized_op}
 from temporian.implementation.numpy.data.io import event_set
-from temporian.implementation.numpy.operators.{lower_op} import (
-    {capitalized_op}NumpyImplementation,
-)
-from temporian.implementation.numpy.operators.test.utils import (
-    assertEqualEventSet,
-    testOperatorAndImp,
-)
+from temporian.test.utils import assertOperatorResult, f64, i32
 
-class {capitalized_op}OperatorTest(absltest.TestCase):
-    def setUp(self):
-        pass
 
-    def test_base(self):
+class {capitalized_op}Test(parameterized.TestCase):
+    def test_empty(self):
+        evset = event_set(timestamps=[], features={{"a": i32([])}})
+        result = evset.{lower_op}()
+        expected = event_set(timestamps=[], same_sampling_as=evset)
+
+        assertOperatorResult(self, result, expected, check_sampling=True)
+
+    @parameterized.parameters(
+        {{"in_timestamps": [0.0, 1.0], "out_timestamps": [0.0, 1.0]}},
+        {{"in_timestmaps": [1.0, 2.0], "out_timestamps": [1.0, 2.0]}},
+    )
+    def test_base(self, in_timestamps, out_timestamps):
         evset = event_set(
-            timestamps=[1,2,3,4],
+            timestamps=in_timestamps,
             features={{
-                    "a": [1.0, 2.0, 3.0, 4.0],
-                    "b": [5, 6, 7, 8],
-                    "c": ["A", "A", "B", "B"],
+                "a": f64([0, 0]),
             }},
-            indexes=["c"],
         )
-        node = evset.node()
-
-        expected_output = event_set(
-            timestamps=[1, 1],
+        result = evset.{lower_op}()
+        expected = event_set(
+            timestamps=out_timestamps,
             features={{
-                    "c": ["A", "B"],
+                "a": f64([0, 0]),
             }},
-            indexes=["c"],
         )
 
-        # Run op
-        op = {capitalized_op}(input=node, param=1.0)
-        instance = {capitalized_op}NumpyImplementation(op)
-        testOperatorAndImp(self, op, instance)
-        output = instance.call(input=evset)["output"]
-
-        assertEqualEventSet(self, output, expected_output)
+        assertOperatorResult(self, result, expected, check_sampling=False)
 
 
 if __name__ == "__main__":
@@ -342,27 +326,20 @@ if __name__ == "__main__":
 
     # Operator implementation test  build
     with open(
-        os.path.join(
-            "temporian", "implementation", "numpy", "operators", "test", "BUILD"
-        ),
+        os.path.join("temporian", "core", "operators", "test", "BUILD"),
         "a",
         encoding="utf-8",
     ) as file:
         file.write(
             f"""
 py_test(
-    name = "{lower_op}_test",
-    srcs = ["{lower_op}_test.py"],
+    name = "test_{lower_op}",
+    srcs = ["test_{lower_op}.py"],
     srcs_version = "PY3",
     deps = [
-        # already_there/absl/testing:absltest
-        ":utils",
-        "//temporian/core/data:dtype",
-        "//temporian/core/data:node",
-        "//temporian/core/data:schema",
         "//temporian/implementation/numpy/data:io",
-        "//temporian/core/operators:{lower_op}",
-        "//temporian/implementation/numpy/operators:{lower_op}",
+        # "//temporian/core/data:duration",
+        "//temporian/test:utils",
     ],
 )
     """
@@ -381,7 +358,6 @@ Don't forget to update the following code:
 - The PUBLIC_API_SYMBOLS set in temporian/test/public_api_test.py (if global)
 - The .md file in docs/src/reference/temporian/operators
 - The docs API ref's home page docs/src/reference/index.md
-- The tests in temporian/core/test/event_set_ops_test.py
 - Write unit tests in temporian/core/operators/test
 - Once your op is implemented, run `python tools/build_cleaner.py` and fix Bazel dependencies
 """

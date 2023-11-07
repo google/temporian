@@ -18,9 +18,7 @@ import tempfile
 from absl.testing import absltest
 from numpy.testing import assert_array_equal
 import tensorflow as tf
-from temporian.implementation.numpy.operators.test.utils import (
-    assertEqualEventSet,
-)
+from temporian.test.utils import assertEqualEventSet
 
 from temporian.io.tensorflow import (
     to_tensorflow_dataset,

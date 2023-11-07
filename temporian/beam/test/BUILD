@@ -29,11 +29,11 @@ py_library(
     deps = [
         # already_there/absl/testing:absltest
         # already_there/apache_beam
+        "//temporian/test:utils",
         "//temporian/beam/io:csv",
         "//temporian/beam:evaluation",
         "//temporian/io:csv",
         "//temporian/core/data:node",
         "//temporian/implementation/numpy/data:event_set",
-        "//temporian/implementation/numpy/operators/test:utils",
     ],
 )
