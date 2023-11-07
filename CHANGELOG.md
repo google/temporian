@@ -8,6 +8,8 @@
 
 ### Fixes
 
+- Use `wday=0` for Mondays in `tick_calendar` (like `calendar_day_of_week`).
+
 ## 0.1.5
 
 ### Features
