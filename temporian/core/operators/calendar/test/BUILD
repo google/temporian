@@ -117,8 +117,8 @@ py_test(
 )
 
 py_test(
-    name = "test_timezone_argument",
-    srcs = ["test_timezone_argument.py"],
+    name = "test_base_timezone",
+    srcs = ["test_base_timezone.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest

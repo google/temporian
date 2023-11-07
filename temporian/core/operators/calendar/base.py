@@ -27,6 +27,25 @@ from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
+def timezone_to_utc_offset(timezone: Union[str, float, int]) -> float:
+    """Normalizes timezone (tz name or number) to a float (UTC offset)."""
+    if isinstance(timezone, (bytes, str)):
+        tz_time = datetime.datetime.now(tz=pytz.timezone(timezone))
+        offset_timedelta = datetime.datetime.utcoffset(tz_time)
+        return (
+            0.0
+            if offset_timedelta is None
+            else offset_timedelta.total_seconds() / 3600
+        )
+    if not isinstance(timezone, (int, float)):
+        raise TypeError(
+            "Timezone argument (tz) must be a number of hours (int or"
+            " float) between (-24, 24) or a timezone name (string, see"
+            f" pytz.all_timezones). Got '{timezone}' ({type(timezone)})."
+        )
+    return float(timezone)
+
+
 class BaseCalendarOperator(Operator, ABC):
     """Interface definition and common logic for calendar operators."""
 
@@ -74,18 +93,6 @@ class BaseCalendarOperator(Operator, ABC):
             ],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
-
-    @staticmethod
-    def convert_to_utc_offset(timezone: Union[str, float, int]) -> float:
-        if isinstance(timezone, str):
-            tz_time = datetime.datetime.now(tz=pytz.timezone(timezone))
-            offset_timedelta = datetime.datetime.utcoffset(tz_time)
-            return (
-                0.0
-                if offset_timedelta is None
-                else offset_timedelta.total_seconds() / 3600
-            )
-        return float(timezone)
 
     @property
     def utc_offset(self) -> float:

@@ -15,6 +15,7 @@
 from datetime import datetime, timedelta, timezone
 from absl.testing import absltest
 from absl.testing.parameterized import TestCase
+from pytz.exceptions import UnknownTimeZoneError
 
 from temporian.implementation.numpy.data.io import event_set
 from temporian.test.utils import assertOperatorResult, i32
@@ -120,6 +121,16 @@ class CalendarTimezoneTest(TestCase):
         assertOperatorResult(
             self, self.evset.calendar_second(tz_offset), expected
         )
+
+    def test_invalid_timezone(self):
+        with self.assertRaises(UnknownTimeZoneError):
+            self.evset.calendar_hour(tz="I'm a fake timezone")
+
+    def test_invalid_type(self):
+        with self.assertRaisesRegex(
+            TypeError, "Timezone argument \(tz\) must be a number of hours"
+        ):
+            self.evset.calendar_hour(tz=None)
 
 
 if __name__ == "__main__":

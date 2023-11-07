@@ -1624,7 +1624,9 @@ class EventSetOperations:
         Output feature contains numbers between 1 and 31.
 
         By default, the timezone is UTC unless the `tz` argument is specified,
-        as an offset in hours or a timezone name (see `pytz.all_timezones`).
+        as an offset in hours or a timezone name. See
+        [`EventSet.calendar_hour()`][temporian.EventSet.calendar_hour] for an
+        example using timezones.
 
         Usage example:
             ```python
@@ -1644,7 +1646,7 @@ class EventSetOperations:
             ```
 
         Args:
-            tz: timezone name or UTC offset in hours.
+            tz: timezone name (see `pytz.all_timezones`) or UTC offset in hours.
 
         Returns:
             EventSet with a single feature with the day of the month each timestamp
@@ -1668,7 +1670,9 @@ class EventSetOperations:
         Output feature contains numbers from 0 (Monday) to 6 (Sunday).
 
         By default, the timezone is UTC unless the `tz` argument is specified,
-        as an offset in hours or a timezone name (see `pytz.all_timezones`).
+        as an offset in hours or a timezone name. See
+        [`EventSet.calendar_hour()`][temporian.EventSet.calendar_hour] for an
+        example using timezones.
 
         Usage example:
             ```python
@@ -1688,7 +1692,7 @@ class EventSetOperations:
             ```
 
         Args:
-            tz: timezone name or UTC offset in hours.
+            tz: timezone name (see `pytz.all_timezones`) or UTC offset in hours.
 
         Returns:
             EventSet with a single feature with the day of the week each timestamp
@@ -1712,7 +1716,9 @@ class EventSetOperations:
         Output feature contains numbers between 0 and 23.
 
         By default, the timezone is UTC unless the `tz` argument is specified,
-        as an offset in hours or a timezone name (see `pytz.all_timezones`).
+        as an offset in hours or a timezone name. See
+        [`EventSet.calendar_hour()`][temporian.EventSet.calendar_hour] for an
+        example using timezones.
 
         Basic example with UTC datetimes:
             ```python
@@ -1734,43 +1740,32 @@ class EventSetOperations:
 
         Example with timezone:
             ```python
-            >>> import pytz
-            >>> from datetime import datetime
-
-            >>> # Define a custom timezone (UTC-3)
-            >>> custom_tz = pytz.timezone('America/Montevideo')
-
-            >>> # Let's define one event in UTC and another in UTC-3
-            >>> a = tp.event_set(
-            ...       timestamps=[datetime(2020,1,1,9,00),  # UTC time: 9am
-            ...                   datetime(2020,1,1,15,00, tzinfo=custom_tz)
-            ...       ]
-            ...     )
+            >>> # UTC datetimes (unless datetime(tzinfo=...) is used)
+            >>> a = tp.event_set(timestamps=["2020-01-01 09:00",
+            ...                              "2020-01-01 15:00"])
 
             >>> # Option 1: specify UTC-3 offset in hours
             >>> a.calendar_hour(tz=-3)
             indexes: ...
-                    'calendar_hour': [ 6 15]
+                    'calendar_hour': [ 6 12]
             ...
 
-            >>> # Option 2: specify timezone name
+            >>> # Option 2: specify timezone name (see pytz.all_timezones)
             >>> a.calendar_hour(tz="America/Montevideo")
             indexes: ...
-                    'calendar_hour': [ 6 15]
+                    'calendar_hour': [ 6 12]
             ...
 
             >>> # No timezone specified, get UTC hour
             >>> a.calendar_hour()
             indexes: ...
-                    'calendar_hour': [ 9 18]
+                    'calendar_hour': [ 9 15]
             ...
-
-
 
             ```
 
         Args:
-            tz: timezone name or UTC offset in hours.
+            tz: timezone name (see `pytz.all_timezones`) or UTC offset in hours.
 
         Returns:
             EventSet with a single feature with the hour each timestamp in `sampling`
@@ -1792,7 +1787,9 @@ class EventSetOperations:
         Output feature contains numbers between 1 and 53.
 
         By default, the timezone is UTC unless the `tz` argument is specified,
-        as an offset in hours or a timezone name (see `pytz.all_timezones`).
+        as an offset in hours or a timezone name. See
+        [`EventSet.calendar_hour()`][temporian.EventSet.calendar_hour] for an
+        example using timezones.
 
         Usage example:
             ```python
@@ -1813,7 +1810,7 @@ class EventSetOperations:
             ```
 
         Args:
-            tz: timezone name or UTC offset in hours.
+            tz: timezone name (see `pytz.all_timezones`) or UTC offset in hours.
 
         Returns:
             EventSet with a single feature with the ISO week each timestamp in
@@ -1835,7 +1832,9 @@ class EventSetOperations:
         Output feature contains numbers between 1 and 366.
 
         By default, the timezone is UTC unless the `tz` argument is specified,
-        as an offset in hours or a timezone name (see `pytz.all_timezones`).
+        as an offset in hours or a timezone name. See
+        [`EventSet.calendar_hour()`][temporian.EventSet.calendar_hour] for an
+        example using timezones.
 
         Usage example:
             ```python
@@ -1855,7 +1854,7 @@ class EventSetOperations:
             ```
 
         Args:
-            tz: timezone name or UTC offset in hours.
+            tz: timezone name (see `pytz.all_timezones`) or UTC offset in hours.
 
         Returns:
             EventSet with a single feature with the day of the year each timestamp
@@ -1880,7 +1879,9 @@ class EventSetOperations:
         0 and 59.
 
         By default, the timezone is UTC unless the `tz` argument is specified,
-        as an offset in hours or a timezone name (see `pytz.all_timezones`).
+        as an offset in hours or a timezone name. See
+        [`EventSet.calendar_hour()`][temporian.EventSet.calendar_hour] for an
+        example using timezones.
 
         Usage example:
             ```python
@@ -1902,7 +1903,7 @@ class EventSetOperations:
             ```
 
         Args:
-            tz: timezone name or UTC offset in hours.
+            tz: timezone name (see `pytz.all_timezones`) or UTC offset in hours.
 
         Returns:
             EventSet with a single feature with the minute each timestamp in
@@ -1924,7 +1925,9 @@ class EventSetOperations:
         Output feature contains numbers between 1 and 12.
 
         By default, the timezone is UTC unless the `tz` argument is specified,
-        as an offset in hours or a timezone name (see `pytz.all_timezones`).
+        as an offset in hours or a timezone name. See
+        [`EventSet.calendar_hour()`][temporian.EventSet.calendar_hour] for an
+        example using timezones.
 
         Usage example:
             ```python
@@ -1945,7 +1948,7 @@ class EventSetOperations:
             ```
 
         Args:
-            tz: timezone name or UTC offset in hours.
+            tz: timezone name (see `pytz.all_timezones`) or UTC offset in hours.
 
         Returns:
             EventSet with a single feature with the month each timestamp in
@@ -1967,7 +1970,9 @@ class EventSetOperations:
         Output feature contains numbers between 0 and 59.
 
         By default, the timezone is UTC unless the `tz` argument is specified,
-        as an offset in hours or a timezone name (see `pytz.all_timezones`).
+        as an offset in hours or a timezone name. See
+        [`EventSet.calendar_hour()`][temporian.EventSet.calendar_hour] for an
+        example using timezones.
 
         Usage example:
             ```python
@@ -1989,7 +1994,7 @@ class EventSetOperations:
             ```
 
         Args:
-            tz: timezone name or UTC offset in hours.
+            tz: timezone name (see `pytz.all_timezones`) or UTC offset in hours.
 
         Returns:
             EventSet with a single feature with the second each timestamp in
@@ -2009,7 +2014,9 @@ class EventSetOperations:
         they must be unix timestamps (`is_unix_timestamp=True`).
 
         By default, the timezone is UTC unless the `tz` argument is specified,
-        as an offset in hours or a timezone name (see `pytz.all_timezones`).
+        as an offset in hours or a timezone name. See
+        [`EventSet.calendar_hour()`][temporian.EventSet.calendar_hour] for an
+        example using timezones.
 
         Usage example:
             ```python
@@ -2030,7 +2037,7 @@ class EventSetOperations:
             ```
 
         Args:
-            tz: timezone name or UTC offset in hours.
+            tz: timezone name (see `pytz.all_timezones`) or UTC offset in hours.
 
         Returns:
             EventSet with a single feature with the year each timestamp in

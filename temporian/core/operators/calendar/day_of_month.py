@@ -17,7 +17,10 @@ from typing import Union
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.node import EventSetNode
-from temporian.core.operators.calendar.base import BaseCalendarOperator
+from temporian.core.operators.calendar.base import (
+    BaseCalendarOperator,
+    timezone_to_utc_offset,
+)
 from temporian.core.typing import EventSetOrNode
 
 
@@ -39,6 +42,6 @@ def calendar_day_of_month(
     sampling: EventSetOrNode, tz: Union[str, float, int] = 0
 ) -> EventSetOrNode:
     assert isinstance(sampling, EventSetNode)
-    utc_offset = BaseCalendarOperator.convert_to_utc_offset(tz)
+    utc_offset = timezone_to_utc_offset(tz)
 
     return CalendarDayOfMonthOperator(sampling, utc_offset).outputs["output"]
