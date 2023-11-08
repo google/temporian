@@ -6,86 +6,110 @@
 ![formatting](https://github.com/google/temporian/actions/workflows/formatting.yaml/badge.svg)
 ![publish](https://github.com/google/temporian/actions/workflows/publish.yaml/badge.svg)
 
-Temporian is an open-source Python library for preprocessing ⚡ and feature engineering 🛠 temporal data 📈 for machine learning applications 🤖. It is a library tailor-made to address the unique characteristics and complexities of time-related data, such as time-series and transactional data.
+**Temporian** is an library for **safe**, **simple** and **effcient** preprocessing and feature engineering of temporal data in machine learning pipelines in Python. Temporian supports multivariate time-series, multivariate time-sequences, event logs, and cross-source event streams.
 
-> Temporal data is any form of data that represents a state in time. In
-> Temporian, temporal datasets contain [events](https://temporian.readthedocs.io/en/stable/user_guide/#events-and-eventsets), which consists of
-> values for one or more attributes at a given timestamp. Common
-> examples of temporal data are transaction logs, sensor signals, and
-> weather patterns. For more, see
-> [What is Temporal data](https://temporian.readthedocs.io/en/stable/user_guide/#what-is-temporal-data).
+Temporian is to [temporal data](https://temporian.readthedocs.io/en/stable/user_guide/#what-is-temporal-data) what Pandas is to tabular data.
 
 ## Key features
 
-- **Unified data processing** 📈: Temporian operates natively on many forms
-  of temporal data, including multivariate time-series, multi-index
-  time-series, and non-uniformly sampled data.
+- **Support most type of temporal data** 📈: Handles both uniformly sampled and
+non-uniformly sampled data, both single-variate and multivariate data, both flat
+ and multi-index data, and both mono-source and multi-source non-synchronized
+ events.
 
+- **Protect from unwanted future leakage** 😰: Unless explicitly specified with
+`tp.leak`, features computation cannot depend on future data, thereby preventing
+ unwanted, hard-to-debug, and potentially costly future leakage.
+
+ - **Optimized for Temporal data** 🔥: Temporian's core computation is
+ implemented in C++ and optimized for temporal data. Temporian can be more than
+ 1,000x faster than non-temporal-specific libraries when operating on temporal
+ data.
+
+ - **ML library agnostic:** Temporian does not perform any machine learning
+ tasks. However, it can be used with any machine learning library, such as
+ PyTorch, Scikit-Learn, Jax, or TensorFlow.
+
+<!--
 - **Iterative and interactive development** 📊: Users can easily analyze
   temporal data and visualize results in real-time with iterative tools like
   notebooks. When prototyping, users can iteratively preprocess, analyze, and
   visualize temporal data in real-time with notebooks. In production, users
   can easily reuse, apply, and scale these implementations to larger datasets.
 
-- **Avoids future leakage** 😰: Future leakage occurs during model training
-  when a model is exposed to data from future events, which leaks information
-  that would otherwise not be available to the model and can result in
-  overfitting. Temporian operators do not create leakage by default. Users
-  can also use Temporian to programmatically detect whether specific signals
-  were exposed to future leakages.
-
 - **Flexible runtime** ☁️: Temporian programs can run seamlessly in-process in
   Python, on large datasets using [Apache Beam](https://beam.apache.org/).
-
-- **Highly optimized** 🔥: Temporian's core is implemented and optimized in
-  C++, so large amounts of data can be handled in-process. In some cases,
-  Temporian is 1000x faster than other libraries.
-
-> **Note**
-> Temporian's development is in alpha.
+-->
 
 ## QuickStart
 
 ### Installation
 
-Temporian is available on [PyPI](https://pypi.org/project/temporian/). Install it with pip:
+Install Temporian from [PyPI](https://pypi.org/project/temporian/) with `pip`:
 
 ```shell
-pip install temporian
+pip install temporian -U
 ```
 
 ### Minimal example
 
-The following example uses a dataset, `sales.csv`, which contains transactional data. Here is a preview of the data:
+Consider a record of individual sale logs that contain the `timestamp`, `store`, and `revenue` of individual sales.
 
 ```shell
-$ head sales.csv
-timestamp,store,price,count
-2022-01-01,CA,27.42,61.9
-2022-01-01,TX,98.55,18.02
-2022-01-02,CA,32.74,14.93
-2022-01-15,TX,48.69,83.99
+$ !cat sales.csv
+timestamp,store,revenue
+2023-12-04 21:21:05,STORE_31,5071
+2023-11-08 17:14:38,STORE_4,1571
+2023-11-29 21:44:46,STORE_49,6101
+2023-12-20 18:17:14,STORE_18,4499
+2023-12-15 10:55:09,STORE_2,6666
 ...
 ```
 
-The following code calculates the weekly sales for each store, visualizes the output with a plot, and exports the data to a CSV file.
+Our goal is to compute the sum of revenue for each store at 23:00 every weekday (excluding weekends).
+
+First, we load the data and list the workdays.
 
 ```python
 import temporian as tp
 
-input_data = tp.from_csv("sales.csv")
+# Load sale transactions
+sales = tp.from_csv("sales.csv")
 
-per_store = input_data.set_index("store")
-weekly_sum = per_store["price"].moving_sum(window_length=tp.duration.days(7))
+# Index sales per store
+sales_per_store = sales.add_index("store")
 
-# Plot the result
-weekly_sum.plot()
+# List work days
+every_days = sales_per_store.tick_calendar(hour=22)
+work_days = (every_days.calendar_day_of_week() <= 5).filter()
 
-# Save the results
-tp.to_csv(weekly_sum, "store_sales_moving_sum.csv")
+work_days.plot(max_num_plots=1)
 ```
 
-![](https://github.com/google/temporian/raw/main/docs/src/assets/frontpage_plot.png)
+![](https://github.com/google/temporian/raw/main/docs/src/assets/frontpage_workdays.png)
+![](docs/src/assets/frontpage_workdays.png)
+
+Then, we sum the daily revenue for each workday and each store.
+
+```python
+# Aggregate revenue per store and per work day
+aggregated_revenue = sales_per_store["revenue"].moving_sum(tp.duration.days(1), sampling=work_days).rename("aggregated_revenue")
+
+# Plot the results
+aggregated_revenue.plot(max_num_plots=3)
+```
+
+![](https://github.com/google/temporian/raw/main/docs/src/assets/frontpage_aggregated_revenue.png)
+![](docs/src/assets/frontpage_aggregated_revenue.png)
+
+Finaly, we can export the result as a Pandas dataframe for further processing or for consumption by other libraries.
+
+```python
+tp.to_pandas(aggregated_revenue)
+```
+
+![](https://github.com/google/temporian/raw/main/docs/src/assets/frontpage_pandas.png)
+![](docs/src/assets/frontpage_pandas.png)
 
 Check the [Getting Started tutorial](https://temporian.readthedocs.io/en/stable/tutorials/getting_started/) to try it out!
 
