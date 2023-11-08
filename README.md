@@ -87,7 +87,6 @@ work_days.plot(max_num_plots=1)
 ```
 
 ![](https://github.com/google/temporian/raw/main/docs/src/assets/frontpage_workdays.png)
-![](docs/src/assets/frontpage_workdays.png)
 
 Then, we sum the daily revenue for each workday and each store.
 
@@ -100,7 +99,6 @@ aggregated_revenue.plot(max_num_plots=3)
 ```
 
 ![](https://github.com/google/temporian/raw/main/docs/src/assets/frontpage_aggregated_revenue.png)
-![](docs/src/assets/frontpage_aggregated_revenue.png)
 
 Finaly, we can export the result as a Pandas dataframe for further processing or for consumption by other libraries.
 
@@ -109,7 +107,6 @@ tp.to_pandas(aggregated_revenue)
 ```
 
 ![](https://github.com/google/temporian/raw/main/docs/src/assets/frontpage_pandas.png)
-![](docs/src/assets/frontpage_pandas.png)
 
 Check the [Getting Started tutorial](https://temporian.readthedocs.io/en/stable/tutorials/getting_started/) to try it out!
 
