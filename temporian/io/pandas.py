@@ -80,8 +80,8 @@ def from_pandas(
     feature_dict = df.drop(columns=timestamps).to_dict("series")
 
     return event_set(
-        timestamps=df[timestamps].to_numpy(copy=True),
-        features={k: v.to_numpy(copy=True) for k, v in feature_dict.items()},
+        timestamps=df[timestamps].to_numpy(),
+        features={k: v.to_numpy() for k, v in feature_dict.items()},
         indexes=indexes,
         name=name,
         same_sampling_as=same_sampling_as,

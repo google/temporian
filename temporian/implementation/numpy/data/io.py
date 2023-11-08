@@ -1,5 +1,6 @@
 from typing import Any, List, Optional, Union, Dict
 
+import logging
 import numpy as np
 from temporian.implementation.numpy.data.dtype_normalization import (
     normalize_features,
@@ -110,6 +111,7 @@ def event_set(
     if features is None:
         features = {}
 
+    logging.debug("Normalizing features")
     features = {
         name: normalize_features(value, name)
         for name, value in features.items()
@@ -122,9 +124,11 @@ def event_set(
         )
 
     # Convert timestamps to expected type.
+    logging.debug("Normalizing timestamps")
     timestamps, auto_is_unix_timestamp = normalize_timestamps(timestamps)
 
     if not np.all(timestamps[:-1] <= timestamps[1:]):
+        logging.debug("Sorting timestamps")
         order = np.argsort(timestamps, kind="mergesort")
         timestamps = timestamps[order]
         features = {name: value[order] for name, value in features.items()}
@@ -134,6 +138,7 @@ def event_set(
     assert isinstance(is_unix_timestamp, bool)
 
     # Infer the schema
+    logging.debug("Assembling schema")
     schema = Schema(
         features=[
             (feature_key, numpy_array_to_tp_dtype(feature_key, feature_data))
@@ -144,6 +149,7 @@ def event_set(
     )
 
     # Shallow copy the data to temporian format
+    logging.debug("Assembling data")
     index_data = IndexData(
         features=[
             features[feature_name] for feature_name in schema.feature_names()
@@ -158,6 +164,7 @@ def event_set(
 
     if indexes:
         # Index the data
+        logging.debug("Indexing events")
         input_node = evset.node()
         output_node = add_index(input_node, indexes=indexes)
         evset = run(output_node, {input_node: evset})
@@ -166,6 +173,7 @@ def event_set(
     evset.name = name
 
     if same_sampling_as is not None:
+        logging.debug("Setting same sampling")
         evset.schema.check_compatible_index(same_sampling_as.schema)
 
         if evset.data.keys() != same_sampling_as.data.keys():
