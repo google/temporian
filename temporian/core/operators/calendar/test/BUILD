@@ -115,3 +115,14 @@ py_test(
         "//temporian/test:utils",
     ],
 )
+
+py_test(
+    name = "test_base_timezone",
+    srcs = ["test_base_timezone.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
