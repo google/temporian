@@ -11,6 +11,7 @@
 ### Fixes
 
 - Use `wday=0` for Mondays in `tick_calendar` (like `calendar_day_of_week`).
+- Support bool in `DType.missing_value()`.
 
 ## 0.1.5
 
