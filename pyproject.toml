@@ -52,14 +52,14 @@ memory-profiler = "^0.61.0"
 # scalene = "^1.5.20" # FIXME: scalene doesn't support Python 3.11
 mkdocs = "^1.5.3"
 mkdocstrings = { extras = ["python"], version = "^0.23.0" }
-mkdocstrings-python = "^1.7.3"
+mkdocstrings-python = "^1.7.4"
 mkdocs-material = "^9.1.5"
 mkdocs-gen-files = "^0.4.0"
 mkdocs-literate-nav = "^0.6.0"
 mkdocs-section-index = "^0.3.5"
 mkdocs-jupyter = { version = "^0.24.6", python = "^3.9" }
 mkdocs-exclude-search = "^0.6.5"
-griffe = "^0.36.8"
+griffe = "^0.37.0"
 bokeh = "^3.1.0"
 ipykernel = "^6.22.0"
 jupyterlab = "^4.0.0"
