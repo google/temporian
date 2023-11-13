@@ -47,7 +47,7 @@ class DType(Enum):
     def is_numerical(self) -> bool:
         return self.is_float or self.is_integer
 
-    def missing_value(self) -> Union[float, int, bytes]:
+    def missing_value(self) -> Union[float, int, bytes, bool]:
         """
         Returns missing value for specific dtype.
 
@@ -63,6 +63,9 @@ class DType(Enum):
 
         if self == DType.STRING:
             return b""
+
+        if self == DType.BOOLEAN:
+            return False
 
         raise ValueError(f"Non-implemented type {self}")
 

@@ -6,13 +6,22 @@ package(
 # Tests
 # =====
 py_test(
-    name = "node_test",
-    srcs = ["node_test.py"],
+    name = "test_node",
+    srcs = ["test_node.py"],
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
-        "//temporian",
         "//temporian/core/test:utils",
         "//temporian/implementation/numpy/data:event_set",
+    ],
+)
+
+py_test(
+    name = "test_dtype",
+    srcs = ["test_dtype.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/core/data:dtype",
     ],
 )
