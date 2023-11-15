@@ -13,11 +13,14 @@
 # limitations under the License.
 
 """Calendar day of month operator class and public API function definitions."""
-
+from typing import Union
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.node import EventSetNode
-from temporian.core.operators.calendar.base import BaseCalendarOperator
+from temporian.core.operators.calendar.base import (
+    BaseCalendarOperator,
+    timezone_to_utc_offset,
+)
 from temporian.core.typing import EventSetOrNode
 
 
@@ -35,7 +38,10 @@ operator_lib.register_operator(CalendarDayOfMonthOperator)
 
 
 @compile
-def calendar_day_of_month(sampling: EventSetOrNode) -> EventSetOrNode:
+def calendar_day_of_month(
+    sampling: EventSetOrNode, tz: Union[str, float, int] = 0
+) -> EventSetOrNode:
     assert isinstance(sampling, EventSetNode)
+    utc_offset = timezone_to_utc_offset(tz)
 
-    return CalendarDayOfMonthOperator(sampling).outputs["output"]
+    return CalendarDayOfMonthOperator(sampling, utc_offset).outputs["output"]

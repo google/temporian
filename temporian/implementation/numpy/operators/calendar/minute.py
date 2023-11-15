@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any
 from datetime import datetime
 
 from temporian.core.operators.calendar.minute import (
@@ -30,7 +29,7 @@ class CalendarMinuteNumpyImplementation(BaseCalendarNumpyImplementation):
     def __init__(self, operator: CalendarMinuteOperator) -> None:
         super().__init__(operator)
 
-    def _get_value_from_datetime(self, dt: datetime) -> Any:
+    def _get_value_from_datetime(self, dt: datetime) -> int:
         return dt.minute
 
 

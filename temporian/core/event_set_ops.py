@@ -1612,7 +1612,9 @@ class EventSetOperations:
 
         return begin(self)
 
-    def calendar_day_of_month(self: EventSetOrNode) -> EventSetOrNode:
+    def calendar_day_of_month(
+        self: EventSetOrNode, tz: Union[str, float, int] = 0
+    ) -> EventSetOrNode:
         """Obtains the day of month the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
@@ -1620,6 +1622,11 @@ class EventSetOperations:
         they must be unix timestamps (`is_unix_timestamp=True`).
 
         Output feature contains numbers between 1 and 31.
+
+        By default, the timezone is UTC unless the `tz` argument is specified,
+        as an offset in hours or a timezone name. See
+        [`EventSet.calendar_hour()`][temporian.EventSet.calendar_hour] for an
+        example using timezones.
 
         Usage example:
             ```python
@@ -1638,6 +1645,9 @@ class EventSetOperations:
 
             ```
 
+        Args:
+            tz: timezone name (see `pytz.all_timezones`) or UTC offset in hours.
+
         Returns:
             EventSet with a single feature with the day of the month each timestamp
                 in `sampling` belongs to.
@@ -1646,9 +1656,11 @@ class EventSetOperations:
             calendar_day_of_month,
         )
 
-        return calendar_day_of_month(self)
+        return calendar_day_of_month(self, tz)
 
-    def calendar_day_of_week(self: EventSetOrNode) -> EventSetOrNode:
+    def calendar_day_of_week(
+        self: EventSetOrNode, tz: Union[str, float, int] = 0
+    ) -> EventSetOrNode:
         """Obtains the day of the week the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
@@ -1656,6 +1668,11 @@ class EventSetOperations:
         they must be unix timestamps (`is_unix_timestamp=True`).
 
         Output feature contains numbers from 0 (Monday) to 6 (Sunday).
+
+        By default, the timezone is UTC unless the `tz` argument is specified,
+        as an offset in hours or a timezone name. See
+        [`EventSet.calendar_hour()`][temporian.EventSet.calendar_hour] for an
+        example using timezones.
 
         Usage example:
             ```python
@@ -1674,6 +1691,9 @@ class EventSetOperations:
 
             ```
 
+        Args:
+            tz: timezone name (see `pytz.all_timezones`) or UTC offset in hours.
+
         Returns:
             EventSet with a single feature with the day of the week each timestamp
                 in `sampling` belongs to.
@@ -1682,9 +1702,11 @@ class EventSetOperations:
             calendar_day_of_week,
         )
 
-        return calendar_day_of_week(self)
+        return calendar_day_of_week(self, tz)
 
-    def calendar_hour(self: EventSetOrNode) -> EventSetOrNode:
+    def calendar_hour(
+        self: EventSetOrNode, tz: Union[str, float, int] = 0
+    ) -> EventSetOrNode:
         """Obtains the hour the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
@@ -1693,7 +1715,12 @@ class EventSetOperations:
 
         Output feature contains numbers between 0 and 23.
 
-        Usage example:
+        By default, the timezone is UTC unless the `tz` argument is specified,
+        as an offset in hours or a timezone name. See
+        [`EventSet.calendar_hour()`][temporian.EventSet.calendar_hour] for an
+        example using timezones.
+
+        Basic example with UTC datetimes:
             ```python
             >>> from datetime import datetime
             >>> a = tp.event_set(
@@ -1711,15 +1738,46 @@ class EventSetOperations:
 
             ```
 
+        Example with timezone:
+            ```python
+            >>> # UTC datetimes (unless datetime(tzinfo=...) is used)
+            >>> a = tp.event_set(timestamps=["2020-01-01 09:00",
+            ...                              "2020-01-01 15:00"])
+
+            >>> # Option 1: specify UTC-3 offset in hours
+            >>> a.calendar_hour(tz=-3)
+            indexes: ...
+                    'calendar_hour': [ 6 12]
+            ...
+
+            >>> # Option 2: specify timezone name (see pytz.all_timezones)
+            >>> a.calendar_hour(tz="America/Montevideo")
+            indexes: ...
+                    'calendar_hour': [ 6 12]
+            ...
+
+            >>> # No timezone specified, get UTC hour
+            >>> a.calendar_hour()
+            indexes: ...
+                    'calendar_hour': [ 9 15]
+            ...
+
+            ```
+
+        Args:
+            tz: timezone name (see `pytz.all_timezones`) or UTC offset in hours.
+
         Returns:
             EventSet with a single feature with the hour each timestamp in `sampling`
                 belongs to.
         """
         from temporian.core.operators.calendar.hour import calendar_hour
 
-        return calendar_hour(self)
+        return calendar_hour(self, tz)
 
-    def calendar_iso_week(self: EventSetOrNode) -> EventSetOrNode:
+    def calendar_iso_week(
+        self: EventSetOrNode, tz: Union[str, float, int] = 0
+    ) -> EventSetOrNode:
         """Obtains the ISO week the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
@@ -1727,6 +1785,11 @@ class EventSetOperations:
         they must be unix timestamps (`is_unix_timestamp=True`).
 
         Output feature contains numbers between 1 and 53.
+
+        By default, the timezone is UTC unless the `tz` argument is specified,
+        as an offset in hours or a timezone name. See
+        [`EventSet.calendar_hour()`][temporian.EventSet.calendar_hour] for an
+        example using timezones.
 
         Usage example:
             ```python
@@ -1746,15 +1809,20 @@ class EventSetOperations:
 
             ```
 
+        Args:
+            tz: timezone name (see `pytz.all_timezones`) or UTC offset in hours.
+
         Returns:
             EventSet with a single feature with the ISO week each timestamp in
                 `sampling` belongs to.
         """
         from temporian.core.operators.calendar.iso_week import calendar_iso_week
 
-        return calendar_iso_week(self)
+        return calendar_iso_week(self, tz)
 
-    def calendar_day_of_year(self: EventSetOrNode) -> EventSetOrNode:
+    def calendar_day_of_year(
+        self: EventSetOrNode, tz: Union[str, float, int] = 0
+    ) -> EventSetOrNode:
         """Obtains the day of year the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
@@ -1762,6 +1830,11 @@ class EventSetOperations:
         they must be unix timestamps (`is_unix_timestamp=True`).
 
         Output feature contains numbers between 1 and 366.
+
+        By default, the timezone is UTC unless the `tz` argument is specified,
+        as an offset in hours or a timezone name. See
+        [`EventSet.calendar_hour()`][temporian.EventSet.calendar_hour] for an
+        example using timezones.
 
         Usage example:
             ```python
@@ -1780,6 +1853,9 @@ class EventSetOperations:
 
             ```
 
+        Args:
+            tz: timezone name (see `pytz.all_timezones`) or UTC offset in hours.
+
         Returns:
             EventSet with a single feature with the day of the year each timestamp
                 in `sampling` belongs to.
@@ -1788,9 +1864,11 @@ class EventSetOperations:
             calendar_day_of_year,
         )
 
-        return calendar_day_of_year(self)
+        return calendar_day_of_year(self, tz)
 
-    def calendar_minute(self: EventSetOrNode) -> EventSetOrNode:
+    def calendar_minute(
+        self: EventSetOrNode, tz: Union[str, float, int] = 0
+    ) -> EventSetOrNode:
         """Obtain the minute the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
@@ -1799,6 +1877,11 @@ class EventSetOperations:
 
         Output feature contains numbers between
         0 and 59.
+
+        By default, the timezone is UTC unless the `tz` argument is specified,
+        as an offset in hours or a timezone name. See
+        [`EventSet.calendar_hour()`][temporian.EventSet.calendar_hour] for an
+        example using timezones.
 
         Usage example:
             ```python
@@ -1819,15 +1902,20 @@ class EventSetOperations:
 
             ```
 
+        Args:
+            tz: timezone name (see `pytz.all_timezones`) or UTC offset in hours.
+
         Returns:
             EventSet with a single feature with the minute each timestamp in
                 `sampling` belongs to.
         """
         from temporian.core.operators.calendar.minute import calendar_minute
 
-        return calendar_minute(self)
+        return calendar_minute(self, tz)
 
-    def calendar_month(self: EventSetOrNode) -> EventSetOrNode:
+    def calendar_month(
+        self: EventSetOrNode, tz: Union[str, float, int] = 0
+    ) -> EventSetOrNode:
         """Obtains the month the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
@@ -1835,6 +1923,11 @@ class EventSetOperations:
         they must be unix timestamps (`is_unix_timestamp=True`).
 
         Output feature contains numbers between 1 and 12.
+
+        By default, the timezone is UTC unless the `tz` argument is specified,
+        as an offset in hours or a timezone name. See
+        [`EventSet.calendar_hour()`][temporian.EventSet.calendar_hour] for an
+        example using timezones.
 
         Usage example:
             ```python
@@ -1854,15 +1947,20 @@ class EventSetOperations:
 
             ```
 
+        Args:
+            tz: timezone name (see `pytz.all_timezones`) or UTC offset in hours.
+
         Returns:
             EventSet with a single feature with the month each timestamp in
                 `sampling` belongs to.
         """
         from temporian.core.operators.calendar.month import calendar_month
 
-        return calendar_month(self)
+        return calendar_month(self, tz)
 
-    def calendar_second(self: EventSetOrNode) -> EventSetOrNode:
+    def calendar_second(
+        self: EventSetOrNode, tz: Union[str, float, int] = 0
+    ) -> EventSetOrNode:
         """Obtains the second the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
@@ -1870,6 +1968,11 @@ class EventSetOperations:
         they must be unix timestamps (`is_unix_timestamp=True`).
 
         Output feature contains numbers between 0 and 59.
+
+        By default, the timezone is UTC unless the `tz` argument is specified,
+        as an offset in hours or a timezone name. See
+        [`EventSet.calendar_hour()`][temporian.EventSet.calendar_hour] for an
+        example using timezones.
 
         Usage example:
             ```python
@@ -1890,20 +1993,30 @@ class EventSetOperations:
 
             ```
 
+        Args:
+            tz: timezone name (see `pytz.all_timezones`) or UTC offset in hours.
+
         Returns:
             EventSet with a single feature with the second each timestamp in
                 `sampling` belongs to.
         """
         from temporian.core.operators.calendar.second import calendar_second
 
-        return calendar_second(self)
+        return calendar_second(self, tz)
 
-    def calendar_year(self: EventSetOrNode) -> EventSetOrNode:
+    def calendar_year(
+        self: EventSetOrNode, tz: Union[str, float, int] = 0
+    ) -> EventSetOrNode:
         """Obtains the year the timestamps in an
         [`EventSet`][temporian.EventSet]'s sampling are in.
 
         Features in the input are ignored, only the timestamps are used and
         they must be unix timestamps (`is_unix_timestamp=True`).
+
+        By default, the timezone is UTC unless the `tz` argument is specified,
+        as an offset in hours or a timezone name. See
+        [`EventSet.calendar_hour()`][temporian.EventSet.calendar_hour] for an
+        example using timezones.
 
         Usage example:
             ```python
@@ -1923,13 +2036,16 @@ class EventSetOperations:
 
             ```
 
+        Args:
+            tz: timezone name (see `pytz.all_timezones`) or UTC offset in hours.
+
         Returns:
             EventSet with a single feature with the year each timestamp in
                 `sampling` belongs to.
         """
         from temporian.core.operators.calendar.year import calendar_year
 
-        return calendar_year(self)
+        return calendar_year(self, tz)
 
     def cast(
         self: EventSetOrNode,
@@ -3335,7 +3451,6 @@ class EventSetOperations:
         `dtype.MissingValue(...)`.
 
         Example:
-
             ```python
             >>> a = tp.event_set(
             ...     timestamps=[1, 5, 8, 9],
@@ -3438,7 +3553,6 @@ class EventSetOperations:
         loading and running the graph on new data.
 
         Example with `keys` with a single index and a single key:
-
             ```python
             >>> a = tp.event_set(
             ...     timestamps=[0, 1, 2, 3],
@@ -3461,7 +3575,6 @@ class EventSetOperations:
             ```
 
         Example with `keys` with multiple indexes and keys:
-
             ```python
             >>> a = tp.event_set(
             ...     timestamps=[0, 1, 2, 3],
@@ -3488,7 +3601,6 @@ class EventSetOperations:
             ```
 
         Example with `number`:
-
             ```python
             >>> import random
             >>> random.seed(0)
@@ -3518,7 +3630,6 @@ class EventSetOperations:
             ```
 
         Example with `fraction`:
-
             ```python
             >>> import random
             >>> random.seed(0)
@@ -4036,7 +4147,6 @@ class EventSetOperations:
         applied independently for each index.
 
         Usage example:
-
             ```python
             >>> a = tp.event_set(timestamps=[5, 9, 9, 16], features={'f': [1,2,3,4]})
             >>> b = a.unique_timestamps()
@@ -4123,7 +4233,6 @@ class EventSetOperations:
         block following events.
 
         Usage example:
-
             ```python
             >>> a = tp.event_set(timestamps=[1, 2, 3])
             >>> b = a.filter_moving_count(window_length=1.5)
@@ -4165,7 +4274,6 @@ class EventSetOperations:
         same data type, or be explicitly casted to the same type beforehand.
 
         Example with single values:
-
             ```python
             >>> a = tp.event_set(timestamps=[5, 9, 9],
             ...                  features={'f': [True, True, False]})
@@ -4181,7 +4289,6 @@ class EventSetOperations:
             ```
 
         Example with EventSets:
-
             ```python
             >>> a = tp.event_set(timestamps=[5, 9, 10],
             ...                  features={'condition': [True, True, False],
@@ -4200,7 +4307,6 @@ class EventSetOperations:
             ```
 
         Example setting to NaN based on condition:
-
             ```python
             >>> a = tp.event_set(timestamps=[5, 6, 7, 8, 9],
             ...                  features={'f': [1, 2, -3, -4, 5]})
