@@ -379,3 +379,13 @@ py_test(
         "//temporian/test:utils",
     ],
 )
+
+py_test(
+    name = "test_drop",
+    srcs = ["test_drop.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
