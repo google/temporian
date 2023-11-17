@@ -14,7 +14,6 @@
 
 from absl.testing import absltest
 
-import temporian as tp
 from temporian.core.test import utils
 from temporian.implementation.numpy.data.event_set import EventSet
 
