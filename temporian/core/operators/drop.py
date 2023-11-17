@@ -16,15 +16,11 @@
 """Drop operator class and public API function definitions."""
 
 from typing import List, Union
-from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.node import (
     EventSetNode,
-    create_node_new_features_new_sampling,
 )
-from temporian.core.operators.base import Operator
 from temporian.core.typing import EventSetOrNode
-from temporian.proto import core_pb2 as pb
 from temporian.utils.typecheck import typecheck
 from temporian.core.operators.select import select
 
