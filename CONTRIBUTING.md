@@ -44,6 +44,12 @@ Configure poetry to create the virtual environment in the project's root directo
 poetry config virtualenvs.in-project true
 ```
 
+Before installing the package you need to install [bazel](https://bazel.build/install) (in Mac we recommend installing bazelisk with brew):
+
+```shell
+brew install bazelisk
+```
+
 Navigate to the project's root and run:
 
 ```shell
@@ -58,12 +64,6 @@ poetry shell
 ```
 
 ### Testing
-
-Install bazel and buildifier (in Mac we recommend installing bazelisk with brew):
-
-```shell
-brew install bazelisk
-```
 
 Run all tests with bazel:
 
