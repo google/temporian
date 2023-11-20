@@ -4382,3 +4382,57 @@ class EventSetOperations:
         from temporian.core.operators.select import drop
 
         return drop(self, feature_names=feature_names)
+
+    def assign(
+        self: EventSetOrNode, **others: EventSetOrNode
+    ) -> EventSetOrNode:
+        """Assign new features to an [EventSet][temporian.EventSet].
+
+        If the name provided already exists on the EventSet, the feature is
+        overriden.
+
+        Usage example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2],
+            ...     features={'A': [1, 2]},
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[1, 2],
+            ...     features={'B': [3, 4]},
+            ...     same_sampling_as=a,
+            ... )
+            >>> ab = a.assign(new_name=b)
+            >>> ab
+            indexes: []
+            features: [('A', int64), ('new_name', int64)]
+            events:
+                (2 events):
+                    timestamps: [1. 2.]
+                    'A': [1 2]
+                    'new_name': [3 4]
+            ...
+            >>> ab = a.assign(B=b, B2=b['B'] * 2)
+            >>> ab
+            indexes: []
+            features: [('A', int64), ('B', int64), ('B2', int64)]
+            events:
+                (2 events):
+                    timestamps: [1. 2.]
+                    'A': [1 2]
+                    'B': [3 4]
+                    'B2': [6 8]
+            ...
+
+            ```
+
+        Args:
+            **others: The argument name is going to be used as the new feature
+                name. The EventSets need to have a single feature
+
+        Returns:
+            EventSet with the added feature.
+        """
+        from temporian.core.operators.glue import assign
+
+        return assign(self, **others)
