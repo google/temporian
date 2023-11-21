@@ -4333,3 +4333,52 @@ class EventSetOperations:
         from temporian.core.operators.where import where
 
         return where(self, on_true, on_false)
+
+    def drop(
+        self: EventSetOrNode,
+        feature_names: Union[str, List[str]],
+    ) -> EventSetOrNode:
+        """Removes a subset of features from an [`EventSet`][temporian.EventSet].
+
+        Usage example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2],
+            ...     features={"A": [1, 2], "B": ['s', 'm'], "C": [5.0, 5.5]},
+            ... )
+
+            >>> # Drop single feature
+            >>> bc = a.drop('A')
+            >>> bc
+            indexes: []
+            features: [('B', str_), ('C', float64)]
+            events:
+                (2 events):
+                    timestamps: [1. 2.]
+                    'B': [b's' b'm']
+                    'C': [5.  5.5]
+            ...
+
+            >>> # Drop multiple features
+            >>> c = a.drop(['A', 'B'])
+            >>> c
+            indexes: []
+            features: [('C', float64)]
+            events:
+                (2 events):
+                    timestamps: [1. 2.]
+                    'C': [5.  5.5]
+            ...
+
+            ```
+
+        Args:
+            feature_names: Name or list of names of the features to drop from the
+                input.
+
+        Returns:
+            EventSet containing all features execpt the ones dropped.
+        """
+        from temporian.core.operators.select import drop
+
+        return drop(self, feature_names=feature_names)

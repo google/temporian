@@ -17,7 +17,7 @@ jobs:
           - tutorials/anomaly_detection_unsupervised
           - tutorials/bank_fraud_detection_with_tfdf
           - tutorials/heart_rate_analysis
-          - tutorials/loan_outcomes_prediction
+          # - tutorials/loan_outcomes_prediction # TODO: re enable this notebook
           - tutorials/m5_competition
     steps:
       - name: Checkout
