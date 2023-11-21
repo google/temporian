@@ -4379,6 +4379,6 @@ class EventSetOperations:
         Returns:
             EventSet containing all features execpt the ones dropped.
         """
-        from temporian.core.operators.drop import drop
+        from temporian.core.operators.select import drop
 
         return drop(self, feature_names=feature_names)

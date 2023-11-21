@@ -109,3 +109,27 @@ def select(
         )
 
     return SelectOperator(input, feature_names).outputs["output"]
+
+
+@compile
+def drop(
+    input: EventSetOrNode, feature_names: Union[str, List[str]]
+) -> EventSetOrNode:
+    assert isinstance(input, EventSetNode)
+
+    if isinstance(feature_names, str):
+        feature_names = [feature_names]
+
+    input_features = input.schema.feature_names()
+
+    if not all([fn in input_features for fn in feature_names]):
+        raise TypeError(
+            "Features"
+            f" {[fn for fn in feature_names if fn not in input_features]} are"
+            " not present in the input"
+        )
+
+    return select(
+        input=input,
+        feature_names=[fn for fn in input_features if fn not in feature_names],
+    )
