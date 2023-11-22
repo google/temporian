@@ -14,10 +14,13 @@
 
 """Filter operator class and public API function definition."""
 
-from typing import Optional
+from datetime import datetime
+from typing import Optional, Union
 
 from temporian.core import operator_lib
-from temporian.core.compilation import compile
+from temporian.core.compilation import (
+    compile,
+)  # pylint: disable=redefined-builtin
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import (
     EventSetNode,
@@ -80,7 +83,6 @@ class FilterOperator(Operator):
 operator_lib.register_operator(FilterOperator)
 
 
-# pylint: disable=redefined-builtin
 @compile
 def filter(
     input: EventSetOrNode,
@@ -93,3 +95,51 @@ def filter(
     assert isinstance(condition, EventSetNode)
 
     return FilterOperator(input, condition).outputs["output"]
+
+
+@compile
+def before(
+    input: EventSetOrNode, timestamp: Union[float, datetime]
+) -> EventSetOrNode:
+    assert isinstance(input, EventSetNode)
+
+    if isinstance(timestamp, datetime):
+        if not input.schema.is_unix_timestamp:
+            raise ValueError(
+                "Cannot use a datetime timestamp to filter timestamps that are"
+                " not unix timestamp. Set `is_unix_timestamp=True` on the"
+                " EventSet or use a float when calling `before`"
+            )
+        timestamp = timestamp.timestamp()
+    else:
+        if input.schema.is_unix_timestamp:
+            raise ValueError(
+                "Cannot use a float timestamp to filter unix timestamp. Set"
+                " `is_unix_timestamp=False` on the EventSet or use a float"
+                " when calling `before`"
+            )
+    return filter(input, input.timestamps() < timestamp)
+
+
+@compile
+def after(
+    input: EventSetOrNode, timestamp: Union[float, datetime]
+) -> EventSetOrNode:
+    assert isinstance(input, EventSetNode)
+
+    if isinstance(timestamp, datetime):
+        if not input.schema.is_unix_timestamp:
+            raise ValueError(
+                "Cannot use a datetime timestamp to filter timestamps that are"
+                " not unix timestamp. Set `is_unix_timestamp=True` on the"
+                " EventSet or use a float when calling `after`"
+            )
+        timestamp = timestamp.timestamp()
+    else:
+        if input.schema.is_unix_timestamp:
+            raise ValueError(
+                "Cannot use a float timestamp to filter unix timestamp. Set"
+                " `is_unix_timestamp=False` on the EventSet or use a float when"
+                " calling `after`"
+            )
+    return filter(input, input.timestamps() > timestamp)
