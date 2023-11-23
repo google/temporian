@@ -1,4 +1,5 @@
 """Utilities for unit testing."""
+
 from typing import Dict, List, Optional
 
 from temporian.core.data.dtype import DType
@@ -28,6 +29,10 @@ def create_input_node(name: Optional[str] = None):
         indexes=[("x", DType.INT64), ("y", DType.STRING)],
         name=name,
     )
+
+
+def create_simple_input_node(name: Optional[str] = None):
+    return input_node(features=[("f1", DType.FLOAT64)])
 
 
 def create_input_event_set(name: Optional[str] = None) -> EventSet:
@@ -122,6 +127,30 @@ class OpI2O1(base.Operator):
                     ("f6", DType.STRING),
                 ],
                 sampling_node=input_1,
+                creator=self,
+            ),
+        )
+        self.check()
+
+
+class OpMultiIO1(base.Operator):
+    @classmethod
+    def build_op_definition(cls) -> pb.OperatorDef:
+        return pb.OperatorDef(
+            key="OpMultiIO1",
+            inputs=[pb.OperatorDef.Input(key_prefix="input_")],
+            outputs=[pb.OperatorDef.Output(key="output")],
+        )
+
+    def __init__(self, **inputs: EventSetNode):
+        super().__init__()
+        for k, v in inputs.items():
+            self.add_input(k, v)
+        self.add_output(
+            "output",
+            create_node_new_features_existing_sampling(
+                features=[("o", DType.BOOLEAN)],
+                sampling_node=next(iter(inputs.values())),
                 creator=self,
             ),
         )
@@ -245,6 +274,7 @@ TEST_OPERATORS = [
     OpI2O1,
     OpI1O2,
     OpWithAttributes,
+    OpMultiIO1,
 ]
 
 # Utilities to register and unregister test operators.

@@ -104,6 +104,62 @@ class SerializationTest(absltest.TestCase):
             & serialization._all_identifiers(restored.named_outputs.values())
         )
 
+    def test_serialize_with_key_prefix(self):
+        i1 = utils.create_simple_input_node()
+        i2 = utils.create_simple_input_node()
+        i3 = utils.create_simple_input_node()
+        o2 = utils.OpMultiIO1(input_1=i1, input_2=i2, input_3=i3)
+
+        original = graph.infer_graph_named_nodes(
+            {"io_input_1": i1, "io_input_2": i2, "io_input_3": i3},
+            {"io_output": o2.outputs["output"]},
+        )
+        logging.info("original:\n%s", original)
+
+        proto = serialization._serialize(original)
+        logging.info("proto:\n%s", proto)
+
+        restored = serialization._unserialize(proto)
+        logging.info("restored:\n%s", restored)
+
+        self.assertEqual(len(original.samplings), len(restored.samplings))
+        self.assertEqual(len(original.features), len(restored.features))
+        self.assertEqual(len(original.operators), len(restored.operators))
+        self.assertEqual(len(original.nodes), len(restored.nodes))
+        self.assertEqual(
+            original.named_inputs.keys(), restored.named_inputs.keys()
+        )
+        self.assertEqual(
+            original.named_outputs.keys(), restored.named_outputs.keys()
+        )
+        # TODO: Deep equality tests.
+
+        # Ensures that "original" and "restored" don't link to the same objects.
+        self.assertFalse(
+            serialization._all_identifiers(original.samplings)
+            & serialization._all_identifiers(restored.samplings)
+        )
+        self.assertFalse(
+            serialization._all_identifiers(original.features)
+            & serialization._all_identifiers(restored.features)
+        )
+        self.assertFalse(
+            serialization._all_identifiers(original.operators)
+            & serialization._all_identifiers(restored.operators)
+        )
+        self.assertFalse(
+            serialization._all_identifiers(original.nodes)
+            & serialization._all_identifiers(restored.nodes)
+        )
+        self.assertFalse(
+            serialization._all_identifiers(original.named_inputs.values())
+            & serialization._all_identifiers(restored.named_inputs.values())
+        )
+        self.assertFalse(
+            serialization._all_identifiers(original.named_outputs.values())
+            & serialization._all_identifiers(restored.named_outputs.values())
+        )
+
     def test_serialize_autonode(self):
         input_data = event_set(
             timestamps=[1, 2, 3, 4],

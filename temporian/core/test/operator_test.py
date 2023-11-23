@@ -68,6 +68,65 @@ class OperatorTest(absltest.TestCase):
         ):
             t.check()
 
+    def test_check_operator_with_key_prefix(self):
+        class ToyOperator(base.Operator):
+            @classmethod
+            def build_op_definition(cls) -> pb.OperatorDef:
+                return pb.OperatorDef(
+                    key="TOY",
+                    inputs=[pb.OperatorDef.Input(key_prefix="input_")],
+                )
+
+            def _get_pandas_implementation(self):
+                raise NotImplementedError()
+
+        def build_fake_node():
+            return input_node(features=[])
+
+        t = ToyOperator()
+        t.check()
+
+        t.add_input("input", build_fake_node())
+        with self.assertRaisesRegex(ValueError, 'Unexpected input "input"'):
+            t.check()
+
+        t = ToyOperator()
+        t.add_input("input_1", build_fake_node())
+        t.add_input("input_2", build_fake_node())
+        t.add_input("input_3", build_fake_node())
+
+        with self.assertRaisesRegex(
+            ValueError, 'Already existing input "input_3"'
+        ):
+            t.add_input("input_3", build_fake_node())
+
+        t.check()
+
+    def test_check_operator_with_key_prefix_and_invalid_def(self):
+        class ToyOperator(base.Operator):
+            @classmethod
+            def build_op_definition(cls) -> pb.OperatorDef:
+                return pb.OperatorDef(
+                    key="TOY",
+                    inputs=[
+                        pb.OperatorDef.Input(key_prefix="input_"),
+                        pb.OperatorDef.Input(key_prefix="input"),
+                    ],
+                )
+
+            def _get_pandas_implementation(self):
+                raise NotImplementedError()
+
+        def build_fake_node():
+            return input_node(features=[])
+
+        t = ToyOperator()
+        t.add_input("input_1", build_fake_node())
+        with self.assertRaisesRegex(
+            ValueError, 'Input "input_1" matches multiple prefix inputs'
+        ):
+            t.check()
+
 
 if __name__ == "__main__":
     absltest.main()
