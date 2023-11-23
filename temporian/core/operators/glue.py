@@ -208,3 +208,21 @@ def glue(
     inputs_dict = {f"input_{idx}": input for idx, input in enumerate(inputs)}
 
     return GlueOperator(**inputs_dict).outputs["output"]  # type: ignore
+
+
+@typecheck
+@compile
+def assign(input: EventSetOrNode, **others: EventSetOrNode) -> EventSetOrNode:
+    assert isinstance(input, EventSetNode)
+    others_renamed = []
+    for name, other in others.items():
+        if len(other.schema.features) != 1:
+            raise ValueError(
+                "The assigned EventSets must have a single feature"
+            )
+        others_renamed.append(other.rename(name))
+
+        if name in input.schema.feature_names():
+            input = input.drop(name)
+
+    return glue(input, *others_renamed)
