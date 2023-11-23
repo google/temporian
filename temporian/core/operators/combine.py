@@ -28,7 +28,7 @@ from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
 from temporian.utils.typecheck import typecheck
 
-MAX_NUM_ARGUMENTS = 30
+_INPUT_KEY_PREFIX = "input_"
 
 
 class How(str, Enum):
@@ -58,11 +58,6 @@ class Combine(Operator):
 
         if len(inputs) < 2:
             raise ValueError("At least two arguments should be provided")
-
-        if len(inputs) >= MAX_NUM_ARGUMENTS:
-            raise ValueError(
-                f"Too many (>{MAX_NUM_ARGUMENTS}) arguments provided"
-            )
 
         # Attributes
         self._how = how
@@ -110,10 +105,7 @@ class Combine(Operator):
                     type=pb.OperatorDef.Attribute.Type.STRING,
                 ),
             ],
-            inputs=[
-                pb.OperatorDef.Input(key=f"input_{idx}", is_optional=idx >= 2)
-                for idx in range(MAX_NUM_ARGUMENTS)
-            ],
+            inputs=[pb.OperatorDef.Input(key_prefix=_INPUT_KEY_PREFIX)],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
 
@@ -249,5 +241,7 @@ def combine(
         return inputs[0]
 
     # NOTE: input name must match op. definition name
-    inputs_dict = {f"input_{idx}": input for idx, input in enumerate(inputs)}
+    inputs_dict = {
+        f"{_INPUT_KEY_PREFIX}{idx}": input for idx, input in enumerate(inputs)
+    }
     return Combine(how=how, **inputs_dict).outputs["output"]  # type: ignore
