@@ -102,7 +102,7 @@ class OperatorTest(absltest.TestCase):
 
         t.check()
 
-    def test_check_operator_with_key_prefix_and_invalid_def(self):
+    def test_check_operator_error_overlapping_prefixes(self):
         class ToyOperator(base.Operator):
             @classmethod
             def build_op_definition(cls) -> pb.OperatorDef:
@@ -124,6 +124,33 @@ class OperatorTest(absltest.TestCase):
         t.add_input("input_1", build_fake_node())
         with self.assertRaisesRegex(
             ValueError, 'Input "input_1" matches multiple prefix inputs'
+        ):
+            t.check()
+
+    def test_check_operator_error_overlapping_prefix_and_non_prefix(
+        self,
+    ):
+        class ToyOperator(base.Operator):
+            @classmethod
+            def build_op_definition(cls) -> pb.OperatorDef:
+                return pb.OperatorDef(
+                    key="TOY",
+                    inputs=[
+                        pb.OperatorDef.Input(key_prefix="input_"),
+                        pb.OperatorDef.Input(key="input_1"),
+                    ],
+                )
+
+            def _get_pandas_implementation(self):
+                raise NotImplementedError()
+
+        def build_fake_node():
+            return input_node(features=[])
+
+        t = ToyOperator()
+        t.add_input("input_1", build_fake_node())
+        with self.assertRaisesRegex(
+            ValueError, "matches both a prefix and non-prefix input"
         ):
             t.check()
 

@@ -186,7 +186,9 @@ class Operator(ABC):
                         " inputs."
                     )
 
-                if available_input in [v.key for v in definition.inputs]:
+                if available_input in [
+                    v.key for v in definition.inputs if v.HasField("key")
+                ]:
                     if num_multi_input_matches != 0:
                         raise ValueError(
                             f'Input "{available_input}" matches both a prefix'
