@@ -75,4 +75,4 @@ FeatureItemWithIdx = Tuple[BeamIndexKey, FeatureItemWithIdxValue]
 
 # From the point of view of the user, a BeamEventSet play the same role as
 # an EventSet in Temporian in-process.
-BeamEventSet = Tuple[beam.PCollection[FeatureItem]]
+BeamEventSet = Tuple[beam.PCollection[FeatureItem], ...]

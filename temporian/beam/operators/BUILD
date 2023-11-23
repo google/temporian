@@ -24,6 +24,8 @@ py_library(
     deps = [
         ":add_index",
         ":select",
+        ":rename",
+        ":prefix",
         "//temporian/beam/operators/window:moving_count",
         "//temporian/beam/operators/window:moving_max",
         "//temporian/beam/operators/window:moving_min",
@@ -56,5 +58,30 @@ py_library(
         "//temporian/beam:implementation_lib",
         "//temporian/beam/operators:base",
         "//temporian/core/operators:add_index",
+    ],
+)
+
+py_library(
+    name = "rename",
+    srcs = ["rename.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/beam:implementation_lib",
+        "//temporian/beam:typing",
+        "//temporian/beam/operators:base",
+        "//temporian/core/operators:select",
+    ],
+)
+
+
+py_library(
+    name = "prefix",
+    srcs = ["prefix.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/beam:implementation_lib",
+        "//temporian/beam:typing",
+        "//temporian/beam/operators:base",
+        "//temporian/core/operators:select",
     ],
 )

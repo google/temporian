@@ -26,3 +26,28 @@ py_test(
         "//temporian/core/operators:add_index",
     ],
 )
+
+py_test(
+    name = "rename_test",
+    srcs = ["rename_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/beam/test:utils",
+        "//temporian/core/operators:rename",
+    ],
+)
+
+
+py_test(
+    name = "prefix_test",
+    srcs = ["prefix_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/beam/test:utils",
+        "//temporian/core/operators:prefix",
+    ],
+)
