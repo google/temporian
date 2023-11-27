@@ -190,8 +190,14 @@ message OperatorDef {
   optional bool is_serializable = 5 [default = true];
 
   message Input {
-    // String identifier of the input. Should be unique.
-    optional string key = 1;
+    oneof type {
+      // String identifier of the input. Should be unique.
+      string key = 1;
+
+      // String prefix to identify multiple inputs. An input should only match
+      // one "key_prefix". If set, "is_optional" is ignored.
+      string key_prefix = 2;
+    }
 
     // If true, the input is optional.
     optional bool is_optional = 3;

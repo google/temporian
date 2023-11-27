@@ -26,8 +26,7 @@ from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
 from temporian.utils.typecheck import typecheck
 
-# Maximum number of arguments taken by the glue operator
-MAX_NUM_ARGUMENTS = 100
+_INPUT_KEY_PREFIX = "input_"
 
 
 class GlueOperator(Operator):
@@ -42,11 +41,6 @@ class GlueOperator(Operator):
 
         if len(inputs) < 2:
             raise ValueError("At least two arguments should be provided.")
-
-        if len(inputs) >= MAX_NUM_ARGUMENTS:
-            raise ValueError(
-                f"Too many (>{MAX_NUM_ARGUMENTS}) arguments provided."
-            )
 
         # inputs
         output_features = []
@@ -95,11 +89,7 @@ class GlueOperator(Operator):
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
             key="GLUE",
-            # TODO: Add support to array of nodes arguments.
-            inputs=[
-                pb.OperatorDef.Input(key=f"input_{idx}", is_optional=idx >= 2)
-                for idx in range(MAX_NUM_ARGUMENTS)
-            ],
+            inputs=[pb.OperatorDef.Input(key_prefix=_INPUT_KEY_PREFIX)],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
 
@@ -203,10 +193,9 @@ def glue(
     """
     if len(inputs) == 1 and isinstance(inputs[0], EventSetNode):
         return inputs[0]
-
-    # Note: The node should be called "input_{idx}" with idx in [0, MAX_NUM_ARGUMENTS).
-    inputs_dict = {f"input_{idx}": input for idx, input in enumerate(inputs)}
-
+    inputs_dict = {
+        f"{_INPUT_KEY_PREFIX}{idx}": input for idx, input in enumerate(inputs)
+    }
     return GlueOperator(**inputs_dict).outputs["output"]  # type: ignore
 
 

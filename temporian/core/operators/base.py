@@ -159,16 +159,46 @@ class Operator(ABC):
         with OperatorExceptionDecorator(self):
             # Check that expected inputs are present
             for expected_input in definition.inputs:
-                if (
-                    not expected_input.is_optional
-                    and expected_input.key not in self._inputs
-                ):
-                    raise ValueError(f'Missing input "{expected_input.key}".')
+                if expected_input.HasField("key"):
+                    if (
+                        not expected_input.is_optional
+                        and expected_input.key not in self._inputs
+                    ):
+                        raise ValueError(
+                            f'Missing input "{expected_input.key}".'
+                        )
+                elif expected_input.HasField("key_prefix"):
+                    # Nothing to check
+                    pass
+                else:
+                    raise ValueError("Invalid operator definition")
 
             # Check that no unexpected inputs are present
             for available_input in self._inputs:
-                if available_input not in [v.key for v in definition.inputs]:
-                    raise ValueError(f'Unexpected input "{available_input}".')
+                num_multi_input_matches = sum(
+                    available_input.startswith(v.key_prefix)
+                    for v in definition.inputs
+                    if v.HasField("key_prefix")
+                )
+                if num_multi_input_matches > 1:
+                    raise ValueError(
+                        f'Input "{available_input}" matches multiple prefix'
+                        " inputs."
+                    )
+
+                if available_input in [
+                    v.key for v in definition.inputs if v.HasField("key")
+                ]:
+                    if num_multi_input_matches != 0:
+                        raise ValueError(
+                            f'Input "{available_input}" matches both a prefix'
+                            " and non-prefix input."
+                        )
+                else:
+                    if num_multi_input_matches != 1:
+                        raise ValueError(
+                            f'Unexpected input "{available_input}".'
+                        )
 
             # Check that expected outputs are present
             for expected_output in definition.outputs:

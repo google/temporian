@@ -8,6 +8,7 @@ build_package
 tmp_*
 .cache/
 .env
+my_venv
 
 # benchmark outputs
 profile.*

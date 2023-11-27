@@ -14,10 +14,13 @@
 
 from absl.testing import absltest
 from absl.testing.parameterized import TestCase
-from temporian.core.operators.glue import MAX_NUM_ARGUMENTS, glue
-
+from temporian.core.operators.glue import glue
+import tempfile
+import os
 from temporian.implementation.numpy.data.io import event_set
 from temporian.test.utils import assertOperatorResult, f32
+from temporian.core import serialization
+from temporian.core import evaluation
 
 
 class GlueTest(TestCase):
@@ -96,11 +99,6 @@ class GlueTest(TestCase):
         ):
             glue()
 
-    def test_too_many_evsets(self):
-        evsets = [event_set([], features={"a": []})] * (MAX_NUM_ARGUMENTS + 1)
-        with self.assertRaisesRegex(ValueError, "Too many"):
-            glue(*evsets)
-
     def test_order_unchanged(self):
         """Tests that input evsets' order is kept.
 
@@ -163,6 +161,42 @@ class GlueTest(TestCase):
         )
 
         assertOperatorResult(self, result, expected)
+
+    def test_serialization(self):
+        # Generate some input event sets.
+        num_inputs = 1000
+        input_0 = event_set([0], {"f0": [0]})
+        inputs = [
+            event_set([0], {f"f{i}": [i]}, same_sampling_as=input_0)
+            for i in range(1, num_inputs)
+        ]
+        inputs = [input_0, *inputs]
+
+        # Glue the inputs together.
+        input_nodes = [e.node() for e in inputs]
+        output_node = glue(*input_nodes)
+
+        # Save and restore the graph.
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "my_fn.tem")
+            serialization.save_graph(
+                inputs={f"i_{i}": v for i, v in enumerate(input_nodes)},
+                outputs={"output": output_node},
+                path=path,
+            )
+            loaded_inputs, loaded_output = serialization.load_graph(
+                path=path, squeeze=True
+            )
+
+        # Execute the loaded graph.
+        output = evaluation.run(
+            loaded_output,
+            {loaded_inputs[f"i_{i}"]: v for i, v in enumerate(inputs)},
+        )
+        expeted_output = event_set(
+            [0], {f"f{i}": [i] for i in range(0, num_inputs)}
+        )
+        self.assertEqual(output, expeted_output)
 
 
 if __name__ == "__main__":
