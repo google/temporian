@@ -89,7 +89,9 @@ def from_pandas(
 
 
 def to_pandas(
-    evset: EventSet, tp_string_to_pd_string: bool = True
+    evset: EventSet,
+    tp_string_to_pd_string: bool = True,
+    timestamp_to_datetime: bool = True,
 ) -> "pandas.DataFrame":
     """Converts an [`EventSet`][temporian.EventSet] to a pandas DataFrame.
 
@@ -128,6 +130,8 @@ def to_pandas(
         evset: Input event set.
         tp_string_to_pd_string: If true, cast Temporian strings (equivalent to
             np.string_ or np.bytes) to Pandas strings (equivalent to np.str_).
+        timestamp_to_datetime: IF true, cast Temporian timestamps to datetime64
+            when is_unix_timestamp is set to True.
 
     Returns:
         DataFrame created from EventSet.
@@ -146,7 +150,7 @@ def to_pandas(
         assert isinstance(index, tuple)
 
         # Timestamps
-        if evset.schema.is_unix_timestamp:
+        if evset.schema.is_unix_timestamp and timestamp_to_datetime:
             dst[timestamp_key].append(data.timestamps.astype("datetime64[s]"))
         else:
             dst[timestamp_key].append(data.timestamps)
