@@ -4,14 +4,31 @@
 
 ### Features
 
-- Support for timezone argument in all calendar operators.
+### Improvements
+
+### Fixes
+
+## 0.1.6
+
+### Features
+
+- Support for `timezone` argument in all calendar operators.
+- Add `drop()` operator to drop features.
+- Add `assign()` operator to assign features.
+- Add `before()` and `after()` operators.
 
 ### Improvements
+
+- Improve error messages for type mismatch in window operators.
+- Improve structure of docs site.
+- Support exporting timestamps as datetimes in `tp.to_pandas()`.
+- Remove inputs limit in `glue()` and `combine()`.
 
 ### Fixes
 
 - Use `wday=0` for Mondays in `tick_calendar` (like `calendar_day_of_week`).
 - Support bool in `DType.missing_value()`.
+- Show `EventSet`'s magic methods in docs.
 
 ## 0.1.5
 
