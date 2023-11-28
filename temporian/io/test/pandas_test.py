@@ -510,6 +510,24 @@ class DataFrameToEventTest(absltest.TestCase):
 
         assertEqualDFRandomRowOrder(self, df, expected_df)
 
+    def test_evset_to_df_unix_timestamp(self):
+        evset = event_set(
+            timestamps=[
+                datetime.datetime(2023, 11, 1),
+                datetime.datetime(2023, 11, 2),
+                datetime.datetime(2023, 11, 3),
+            ],
+            features={
+                "f": [1, 2, 3],
+            },
+        )
+
+        df = to_pandas(evset)
+        assert pd.api.types.is_datetime64_any_dtype(df["timestamp"])
+
+        evset2 = from_pandas(df)
+        assert evset2.schema.is_unix_timestamp
+
 
 if __name__ == "__main__":
     absltest.main()

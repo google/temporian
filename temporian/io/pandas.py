@@ -89,7 +89,9 @@ def from_pandas(
 
 
 def to_pandas(
-    evset: EventSet, tp_string_to_pd_string: bool = True
+    evset: EventSet,
+    tp_string_to_pd_string: bool = True,
+    timestamp_to_datetime: bool = True,
 ) -> "pandas.DataFrame":
     """Converts an [`EventSet`][temporian.EventSet] to a pandas DataFrame.
 
@@ -106,15 +108,16 @@ def to_pandas(
         ...     indexes=["my_index"],
         ... )
 
-        # Indices are not set as dataframe's indices and dates are unix timestamps
+        # Indices are not set as dataframe's indices. Timestamps are exported as
+        # datetime64[s] if they were created as datetimes, otherwhise they are
+        # floats
         >>> df = tp.to_pandas(evset)
         >>> df
         my_index   feature_1     timestamp
-        0       red        0.5  1.420070e+09
-        1       red        0.6  1.420157e+09
+        0       red        0.5  2015-01-01
+        1       red        0.6  2015-01-02
 
         # Set index/date manually in pandas
-        >>> df["timestamp"] = pd.to_datetime(df["timestamp"], unit='s')
         >>> df.set_index("my_index")
                     feature_1  timestamp
         my_index
@@ -127,6 +130,8 @@ def to_pandas(
         evset: Input event set.
         tp_string_to_pd_string: If true, cast Temporian strings (equivalent to
             np.string_ or np.bytes) to Pandas strings (equivalent to np.str_).
+        timestamp_to_datetime: IF true, cast Temporian timestamps to datetime64
+            when is_unix_timestamp is set to True.
 
     Returns:
         DataFrame created from EventSet.
@@ -145,7 +150,10 @@ def to_pandas(
         assert isinstance(index, tuple)
 
         # Timestamps
-        dst[timestamp_key].append(data.timestamps)
+        if evset.schema.is_unix_timestamp and timestamp_to_datetime:
+            dst[timestamp_key].append(data.timestamps.astype("datetime64[s]"))
+        else:
+            dst[timestamp_key].append(data.timestamps)
 
         # Features
         for feature_name, feature in zip(feature_names, data.features):
