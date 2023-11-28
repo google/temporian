@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Union
 
 from temporian.core.data.duration import Duration
@@ -4436,3 +4437,121 @@ class EventSetOperations:
         from temporian.core.operators.glue import assign
 
         return assign(self, **others)
+
+    def before(
+        self: EventSetOrNode,
+        timestamp: Union[int, float, datetime],
+    ) -> EventSetOrNode:
+        """Filters events [`EventSet`][temporian.EventSet] that happened before
+        a particular timestamp.
+
+        The timestamp can be a datetime if the EventSet's timestamps are unix
+        timestamps.
+
+        The comparison is strict, meaning that the obtained timestamps would be
+        less than (`<`) the provided timestamp.
+
+        This operation is equivalent to:
+        `input.filter(input.timestamps() < timestamp)`
+
+        Usage example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 5, 6],
+            ...     features={"f1": [0, 10, 50, 60]},
+            ... )
+
+            >>> a.before(5)
+            indexes: []
+            features: [('f1', int64)]
+            events:
+                 (2 events):
+                    timestamps: [0. 1.]
+                    'f1': [ 0 10]
+            ...
+
+            >>> from datetime import datetime
+            >>> a = tp.event_set(
+            ...     timestamps=[datetime(2022, 1, 1), datetime(2022, 1, 2)],
+            ...     features={"f1": [1, 2]},
+            ... )
+
+            >>> a.before(datetime(2022, 1, 1, 12))
+            indexes: []
+            features: [('f1', int64)]
+            events:
+                 (1 events):
+                    timestamps: ['2022-01-01T00:00:00']
+                    'f1': [1]
+            ...
+
+            ```
+
+        Args:
+            timestamp: EventSet with a single boolean feature.
+
+        Returns:
+            Filtered EventSet.
+        """
+        from temporian.core.operators.filter import before
+
+        return before(self, timestamp=timestamp)
+
+    def after(
+        self: EventSetOrNode,
+        timestamp: Union[int, float, datetime],
+    ) -> EventSetOrNode:
+        """Filters events [`EventSet`][temporian.EventSet] that happened after a
+        particular timestamp.
+
+        The timestamp can be a datetime if the EventSet's timestamps are unix
+        timestamps.
+
+        The comparison is strict, meaning that the obtained timestamps would be
+        greater than (`>`) the provided timestamp.
+
+        This operation is equivalent to:
+        `input.filter(input.timestamps() < timestamp)`
+
+        Usage example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 5, 6],
+            ...     features={"f1": [0, 10, 50, 60]},
+            ... )
+
+            >>> a.after(4)
+            indexes: []
+            features: [('f1', int64)]
+            events:
+                 (2 events):
+                    timestamps: [5. 6.]
+                    'f1': [50 60]
+            ...
+
+            >>> from datetime import datetime
+            >>> a = tp.event_set(
+            ...     timestamps=[datetime(2022, 1, 1), datetime(2022, 1, 2)],
+            ...     features={"f1": [1, 2]},
+            ... )
+
+            >>> a.after(datetime(2022, 1, 1, 12))
+            indexes: []
+            features: [('f1', int64)]
+            events:
+                 (1 events):
+                    timestamps: ['2022-01-02T00:00:00']
+                    'f1': [2]
+            ...
+
+            ```
+
+        Args:
+            timestamp: EventSet with a single boolean feature.
+
+        Returns:
+            Filtered EventSet.
+        """
+        from temporian.core.operators.filter import after
+
+        return after(self, timestamp=timestamp)

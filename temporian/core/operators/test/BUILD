@@ -395,7 +395,26 @@ py_test(
     srcs_version = "PY3",
     deps = [
         "//temporian/implementation/numpy/data:io",
-        # "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_before",
+    srcs = ["test_before.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
+    name = "test_after",
+    srcs = ["test_after.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
         "//temporian/test:utils",
     ],
 )
