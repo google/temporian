@@ -25,3 +25,5 @@ from temporian.beam.operators.window import moving_sum
 from temporian.beam.operators.window import simple_moving_average
 from temporian.beam.operators import select
 from temporian.beam.operators import add_index
+from temporian.beam.operators import rename
+from temporian.beam.operators import prefix
