@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """Rename operator."""
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Union, List
 
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
@@ -110,7 +110,7 @@ operator_lib.register_operator(RenameOperator)
 
 def _normalize_rename_features(
     schema: Schema,
-    features: Optional[Union[str, Dict[str, str]]],
+    features: Optional[Union[str, Dict[str, str], List[str]]],
 ) -> Dict[str, str]:
     if features is None:
         return {}
@@ -123,6 +123,22 @@ def _normalize_rename_features(
                 "of rename strings instead."
             )
         features = {schema.features[0].name: features}
+    elif isinstance(features, list):
+        if len(features) != len(schema.features):
+            raise ValueError(
+                f"The provided {len(features)} new names ({features!r}) don't"
+                f" match the number of features ({len(schema.features)}) in the"
+                " event-set."
+            )
+        features = {
+            old_feature.name: new_name
+            for old_feature, new_name in zip(schema.features, features)
+        }
+    elif not isinstance(features, dict):
+        raise ValueError(
+            "The rename argument should be string, a map of string to string,"
+            f" or a list of string. Got {features} instead."
+        )
 
     feature_dict = schema.feature_name_to_dtype()
 
@@ -139,7 +155,7 @@ def _normalize_rename_features(
 
 def _normalize_rename_indexes(
     schema: Schema,
-    indexes: Optional[Union[str, Dict[str, str]]],
+    indexes: Optional[Union[str, Dict[str, str], List[str]]],
 ) -> Dict[str, str]:
     if indexes is None:
         return {}
@@ -152,6 +168,22 @@ def _normalize_rename_indexes(
                 "of rename strings instead."
             )
         indexes = {schema.indexes[0].name: indexes}
+    elif isinstance(indexes, list):
+        if len(indexes) != len(schema.indexes):
+            raise ValueError(
+                f"The provided {len(indexes)} new names ({indexes!r}) don't"
+                f" match the number of indexes ({len(schema.indexes)}) in the"
+                " event-set."
+            )
+        indexes = {
+            old_index.name: new_name
+            for old_index, new_name in zip(schema.indexes, indexes)
+        }
+    elif not isinstance(indexes, dict):
+        raise ValueError(
+            "The rename argument should be string, a map of string to string,"
+            f" or a list of string. Got {indexes} instead."
+        )
 
     indexes_dict = schema.index_name_to_dtype()
 
@@ -170,8 +202,8 @@ def _normalize_rename_indexes(
 @compile
 def rename(
     input: EventSetOrNode,
-    features: Optional[Union[str, Dict[str, str]]] = None,
-    indexes: Optional[Union[str, Dict[str, str]]] = None,
+    features: Optional[Union[str, Dict[str, str], List[str]]] = None,
+    indexes: Optional[Union[str, Dict[str, str], List[str]]] = None,
 ) -> EventSetOrNode:
     assert isinstance(input, EventSetNode)
 
