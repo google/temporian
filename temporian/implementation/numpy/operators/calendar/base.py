@@ -34,7 +34,6 @@ class BaseCalendarNumpyImplementation(OperatorImplementation):
     def __call__(self, sampling: EventSet) -> Dict[str, EventSet]:
         assert isinstance(self.operator, BaseCalendarOperator)
         output_schema = self.output_schema("output")
-        tzinfo = timezone(timedelta(hours=self.operator.utc_offset))
 
         # create destination EventSet
         dst_evset = EventSet(data={}, schema=output_schema)
@@ -42,7 +41,7 @@ class BaseCalendarNumpyImplementation(OperatorImplementation):
             value = np.array(
                 [
                     self._get_value_from_datetime(
-                        datetime.fromtimestamp(ts, tz=tzinfo)
+                        datetime.fromtimestamp(ts, tz=self.operator.tz)
                     )
                     for ts in index_data.timestamps
                 ],
