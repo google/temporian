@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from absl.testing import absltest
+from absl.testing import absltest, parameterized
 from absl.testing.parameterized import TestCase
+import numpy as np
 
 from temporian.implementation.numpy.data.io import event_set
 from temporian.test.utils import assertOperatorResult
@@ -138,7 +139,7 @@ class WhereTest(TestCase):
         assertOperatorResult(self, result, expected_output)
 
     def test_dtype_mismatch_single_values(self):
-        with self.assertRaisesRegex(ValueError, "should have the same dtype"):
+        with self.assertRaisesRegex(ValueError, "go two scalars"):
             self.evset.where(on_true="A string", on_false=5)
 
     def test_dtype_mismatch_evsets(self):
@@ -213,6 +214,42 @@ class WhereTest(TestCase):
         # Check on_false
         with self.assertRaisesRegex(ValueError, "should have only 1 feature"):
             multi_feats["cond"].where(on_true=1, on_false=multi_feats)
+
+    @parameterized.named_parameters(
+        ("float_to_float32", np.float32, 3.0, np.float32),
+        ("float_to_float64", np.float64, 3.0, np.float64),
+        ("int_to_float32", np.float32, 3, np.float32),
+        ("int_to_float64", np.float64, 3, np.float64),
+        ("int_to_int32", np.int32, 3, np.int32),
+        ("int_to_int64", np.int64, 3, np.int64),
+    )
+    def test_implicit_cast(self, src_dtype, attr_value, dst_dtype):
+        evtset = event_set(
+            timestamps=[0, 1],
+            features={"cond": [True, False], "a": np.array([1, 2], src_dtype)},
+        )
+        result = evtset["cond"].where(on_true=evtset["a"], on_false=attr_value)
+        expected = event_set(
+            timestamps=[0, 1],
+            features={"cond": np.array([1, 3], dst_dtype)},
+            same_sampling_as=result,
+        )
+        assertOperatorResult(self, result, expected)
+
+    @parameterized.named_parameters(
+        ("float_to_int32", np.int32, 3.0),
+        ("float_to_int64", np.int64, 3.0),
+        ("bool_to_float32", np.float32, True),
+    )
+    def test_not_allowed_implicit_cast(self, src_dtype, attr_value):
+        evtset = event_set(
+            timestamps=[0, 1],
+            features={"cond": [True, False], "a": np.array([1, 2], src_dtype)},
+        )
+        with self.assertRaisesRegex(
+            ValueError, "should have the same dtype or compatible dtypes"
+        ):
+            _ = evtset["cond"].where(on_true=evtset["a"], on_false=attr_value)
 
 
 if __name__ == "__main__":

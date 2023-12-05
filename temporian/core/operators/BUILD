@@ -7,6 +7,14 @@ package(
 # =========
 
 py_library(
+    name = "operators_without_implementation",
+    srcs_version = "PY3",
+    deps = [
+        ":fillna",
+    ],
+)
+
+py_library(
     name = "base",
     srcs = ["base.py"],
     srcs_version = "PY3",
@@ -440,6 +448,20 @@ py_library(
 py_library(
     name = "where",
     srcs = ["where.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:node",
+        "//temporian/core/data:schema",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+
+
+py_library(
+    name = "fillna",
+    srcs = ["fillna.py"],
     srcs_version = "PY3",
     deps = [
         ":base",

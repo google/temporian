@@ -29,6 +29,7 @@ py_library(
         "//temporian/core/operators/binary:relational",
         "//temporian/core/operators/scalar:arithmetic_scalar",
         "//temporian/core/operators/scalar:relational_scalar",
+        "//temporian/core/operators:operators_without_implementation",
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
         "//temporian/implementation/numpy/data:plotter",
