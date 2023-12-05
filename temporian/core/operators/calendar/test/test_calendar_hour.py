@@ -41,6 +41,24 @@ class CalendarHourTest(TestCase):
         result = evset.calendar_hour()
         assertOperatorResult(self, result, expected)
 
+    def test_dst(self):
+        timestamps = [
+            "2023-03-12 00:00:00",  # before DST -8
+            "2023-03-13 00:00:00",  # after DST -7
+        ]
+        evset = event_set(timestamps=timestamps)
+
+        expected = event_set(
+            timestamps=timestamps,
+            features={
+                "calendar_hour": i32([16, 17]),
+            },
+            same_sampling_as=evset,
+        )
+
+        result = evset.calendar_hour(tz="US/Pacific")
+        assertOperatorResult(self, result, expected)
+
 
 if __name__ == "__main__":
     absltest.main()
