@@ -13,11 +13,9 @@
 # limitations under the License.
 
 """Base calendar operator class definition."""
-import pytz
 import datetime
-from typing import Union
 from abc import ABC, abstractmethod
-from dateutil.tz.tz import tzoffset
+from typing import Union
 
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import (
@@ -26,25 +24,6 @@ from temporian.core.data.node import (
 )
 from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
-
-
-def parse_tz(tz: Union[str, float, int]) -> datetime.tzinfo:
-    """Normalizes timezone (tz name or number) to a tzinfo."""
-    if isinstance(tz, (bytes, str)):
-        return pytz.timezone(tz)
-    if isinstance(tz, (int, float)):
-        if abs(tz) >= 24:
-            raise ValueError(
-                "Timezone offset must be a number of hours strictly between"
-                f" (-24, 24). Got: {tz=}"
-            )
-        return tzoffset(name=None, offset=datetime.timedelta(hours=tz))
-    else:
-        raise TypeError(
-            "Timezone argument (tz) must be a number of hours (int or"
-            " float) between (-24, 24) or a timezone name (string, see"
-            f" pytz.all_timezones). Got '{tz}' ({type(tz)})."
-        )
 
 
 class BaseCalendarOperator(Operator, ABC):
@@ -60,7 +39,7 @@ class BaseCalendarOperator(Operator, ABC):
                 " `is_unix_timestamp=True` when manually creating a sampling."
             )
 
-        self._tz = parse_tz(tz)
+        self._tz = tz
         self.add_attribute("tz", tz)
 
         # input and output
@@ -90,7 +69,7 @@ class BaseCalendarOperator(Operator, ABC):
         )
 
     @property
-    def tz(self) -> datetime.tzinfo:
+    def tz(self) -> Union[int, float, str]:
         """Gets timezone offset from UTC, in hours."""
         return self._tz
 

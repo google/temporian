@@ -12,25 +12,45 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from datetime import datetime
+from typing import Dict, Optional
+
+import numpy as np
 
 from temporian.core.operators.calendar.day_of_year import (
     CalendarDayOfYearOperator,
 )
 from temporian.implementation.numpy import implementation_lib
-from temporian.implementation.numpy.operators.calendar.base import (
-    BaseCalendarNumpyImplementation,
-)
+from temporian.implementation.numpy.data.event_set import EventSet, IndexData
+from temporian.implementation.numpy.operators.base import OperatorImplementation
+from temporian.implementation.numpy_cc.operators import operators_cc
 
 
-class CalendarDayOfYearNumpyImplementation(BaseCalendarNumpyImplementation):
-    """Numpy implementation of the calendar_day_of_year operator."""
+class CalendarDayOfYearNumpyImplementation(OperatorImplementation):
+    """Interface definition and common logic for numpy implementation of
+    calendar operators."""
 
     def __init__(self, operator: CalendarDayOfYearOperator) -> None:
         super().__init__(operator)
+        assert isinstance(operator, CalendarDayOfYearOperator)
 
-    def _get_value_from_datetime(self, dt: datetime) -> int:
-        return dt.timetuple().tm_yday
+    def __call__(self, sampling: EventSet) -> Dict[str, EventSet]:
+        assert isinstance(self.operator, CalendarDayOfYearOperator)
+        output_schema = self.output_schema("output")
+
+        # create destination EventSet
+        dst_evset = EventSet(data={}, schema=output_schema)
+        for index_key, index_data in sampling.data.items():
+            value = operators_cc.calendar_day_of_year(
+                index_data.timestamps, self.operator.utc_offset
+            )
+
+            dst_evset.set_index_value(
+                index_key,
+                IndexData([value], index_data.timestamps, schema=output_schema),
+                normalize=False,
+            )
+
+        return {"output": dst_evset}
 
 
 implementation_lib.register_operator_implementation(

@@ -42,6 +42,17 @@ class CalendarYearTest(TestCase):
         result = evset.calendar_year()
         assertOperatorResult(self, result, expected)
 
+        expected = event_set(
+            timestamps=timestamps,
+            features={
+                "calendar_year": i32([1960, 1970, 2021, 2021, 2022, 2046]),
+            },
+            same_sampling_as=evset,
+        )
+
+        result = evset.calendar_year(tz=1)
+        assertOperatorResult(self, result, expected)
+
 
 if __name__ == "__main__":
     absltest.main()

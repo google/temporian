@@ -78,6 +78,7 @@ pybind_extension(
         ":tick_calendar",
         ":until_next",
         ":window",
+        "//temporian/implementation/numpy_cc/operators/calendar:year",
     ],
 )
 

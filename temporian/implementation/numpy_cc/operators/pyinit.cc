@@ -9,6 +9,7 @@
 #include "temporian/implementation/numpy_cc/operators/tick_calendar.h"
 #include "temporian/implementation/numpy_cc/operators/until_next.h"
 #include "temporian/implementation/numpy_cc/operators/window.h"
+#include "temporian/implementation/numpy_cc/operators/calendar/year.h"
 
 namespace {
 namespace py = pybind11;
@@ -23,4 +24,5 @@ PYBIND11_MODULE(operators_cc, m) {
   init_tick_calendar(m);
   init_filter_moving_count(m);
   init_until_next(m);
+  init_calendar_year(m);
 }
