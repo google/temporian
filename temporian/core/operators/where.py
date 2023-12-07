@@ -54,24 +54,70 @@ class Where(Operator):
         # on_false: can be input or attribute
         false_dtype, is_node_f = self._add_argument(on_false, "on_false", input)
         self._on_false_attribute = None if is_node_f else on_false
-
-        if true_dtype != false_dtype:
-            raise ValueError(
-                f"Arguments 'on_true' (dtype={true_dtype}) and 'on_false'"
-                f" (dtype={false_dtype}) should have the same dtype. Cast one"
-                " of the values, check the cast() method if it's an EventSet."
-            )
+        output_dtype = self._output_dtypes(
+            true_dtype, is_node_t, false_dtype, is_node_f
+        )
 
         self.add_output(
             "output",
             create_node_new_features_existing_sampling(
-                features=[(self.output_feature_name, true_dtype)],
+                features=[(self.output_feature_name, output_dtype)],
                 sampling_node=input,
                 creator=self,
             ),
         )
 
         self.check()
+
+    def _output_dtypes(
+        self,
+        true_dtype: DType,
+        is_node_t: bool,
+        false_dtype: DType,
+        is_node_f: bool,
+    ) -> DType:
+        """Checks if operand dtypes are compatible."""
+
+        if true_dtype == false_dtype:
+            return true_dtype
+
+        # The dtypes of the inputs do no match.
+        #
+        # This situation is only permitted when one of the operands is a
+        # scalar integer and the other operand (scalar or event) is a float.
+
+        if not is_node_t and not is_node_f:
+            # Two scalars
+            raise ValueError(
+                "At leasat one of the operants of 'where' should be an"
+                " EventSet. Instead, got two scalars."
+            )
+
+        if not is_node_t or not is_node_f:
+            # An eventset and a scalar
+            if is_node_t:
+                node_dtype = true_dtype
+                attribute_dtype = false_dtype
+            else:
+                node_dtype = false_dtype
+                attribute_dtype = true_dtype
+
+            if node_dtype.is_float and attribute_dtype.is_numerical:
+                # Casting of the attribute integer or float dtype to the node
+                # float dtype
+                return node_dtype
+
+            elif node_dtype.is_integer and attribute_dtype.is_integer:
+                # Casting of the attribute integer dtype to the node integer
+                # dtype
+                return node_dtype
+
+        raise ValueError(
+            f"Arguments 'on_true' (dtype={true_dtype}) and 'on_false'"
+            f" (dtype={false_dtype}) should have the same dtype or compatible"
+            " dtypes. Cast one of the values, check the cast() method if it's"
+            " an EventSet."
+        )
 
     def _add_argument(
         self,

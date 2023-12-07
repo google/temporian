@@ -4568,3 +4568,41 @@ class EventSetOperations:
         from temporian.core.operators.filter import after
 
         return after(self, timestamp=timestamp)
+
+    def fillna(self: EventSetOrNode, value: float = 0.0) -> EventSetOrNode:
+        """Replaces all the NaN values with `value`.
+
+        Features that cannot contain NaN values (e.g. integer or bytes features)
+        are not impacted.
+
+        Usage example:
+            ```python
+            >>> import math
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 3],
+            ...     features={
+            ...         "f1": [0., 10., math.nan],
+            ...         "f2": ["a","b",""]},
+            ... )
+
+            >>> a.fillna()
+            indexes: []
+            features: [('f1', float64), ('f2', str_)]
+            events:
+                 (3 events):
+                    timestamps: [0. 1. 3.]
+                    'f1': [ 0. 10.  0.]
+                    'f2': [b'a' b'b' b'']
+            ...
+
+            ```
+
+        Args:
+            value: Value to replace Nans with?
+
+        Returns:
+            EventSet without NaNs.
+        """
+        from temporian.core.operators.fillna import fillna
+
+        return fillna(self, value)
