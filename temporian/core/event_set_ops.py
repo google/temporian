@@ -4598,10 +4598,10 @@ class EventSetOperations:
             ```
 
         Args:
-            value: Value replacing NaN.
+            value: Value to replace Nans with?
 
         Returns:
-            Eventset without NaN.
+            EventSet without NaNs.
         """
         from temporian.core.operators.fillna import fillna
 

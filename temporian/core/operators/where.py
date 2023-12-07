@@ -89,8 +89,8 @@ class Where(Operator):
         if not is_node_t and not is_node_f:
             # Two scalars
             raise ValueError(
-                "One of the operants of where should be an eventset. Instead,"
-                " go two scalars"
+                "At leasat one of the operants of 'where' should be an"
+                " EventSet. Instead, got two scalars."
             )
 
         if not is_node_t or not is_node_f:
