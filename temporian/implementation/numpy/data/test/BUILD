@@ -14,6 +14,7 @@ py_test(
     deps = [
         # already_there/numpy
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/implementation/numpy/data:io",
         "//temporian/utils:golden",
         "//temporian/utils:config",
@@ -25,6 +26,7 @@ py_test(
     srcs = ["plotter_test.py"],
     srcs_version = "PY3",
     deps = [
+        # already_there/absl/testing:absltest
         # already_there/absl/testing:parameterized
         # already_there/matplotlib
         "//temporian/implementation/numpy/data:io",
@@ -38,6 +40,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         # already_there/numpy
         # already_there/pandas
         "//temporian/core/data:dtype",

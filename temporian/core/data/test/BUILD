@@ -11,6 +11,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/core/test:utils",
         "//temporian/implementation/numpy/data:event_set",
     ],
@@ -22,6 +23,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/core/data:dtype",
     ],
 )

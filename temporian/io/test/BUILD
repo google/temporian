@@ -12,6 +12,7 @@ py_test(
     deps = [
         # already_there/absl/testing:absltest
         # already_there/numpy
+        # already_there/absl/testing:parameterized
         # already_there/pandas
         "//temporian/test:utils",
         "//temporian/implementation/numpy/data:io",
@@ -25,6 +26,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         # already_there/numpy
         # already_there/tensorflow
         "//temporian/test:utils",

@@ -12,6 +12,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/operators",
     ],

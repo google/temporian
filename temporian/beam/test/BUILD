@@ -12,6 +12,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/implementation/numpy/data:io",
         "//temporian/beam/test:utils",
         "//temporian/core/operators:select",
@@ -29,6 +30,7 @@ py_library(
     deps = [
         "//temporian/core/data:dtype",
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         # already_there/apache_beam
         "//temporian/test:utils",
         "//temporian/beam/io:csv",

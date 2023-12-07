@@ -9,6 +9,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/implementation/numpy/data:io",
         "//temporian/beam/test:utils",
         "//temporian/core/operators:select",
@@ -21,6 +22,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/implementation/numpy/data:io",
         "//temporian/beam/test:utils",
         "//temporian/core/operators:add_index",
@@ -33,6 +35,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/implementation/numpy/data:io",
         "//temporian/beam/test:utils",
         "//temporian/core/operators:rename",
@@ -46,6 +49,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/implementation/numpy/data:io",
         "//temporian/beam/test:utils",
         "//temporian/core/operators:prefix",

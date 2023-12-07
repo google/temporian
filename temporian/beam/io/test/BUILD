@@ -13,6 +13,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/beam/io:dict",
         "//temporian/core/data:node",
         "//temporian/core/data:dtype",
@@ -28,6 +29,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/beam/io:tensorflow",
         "//temporian/beam/io:dict",
         "//temporian/core/data:node",
@@ -47,6 +49,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/beam/io:csv",
         "//temporian/beam/io:dict",
         "//temporian/core/data:node",

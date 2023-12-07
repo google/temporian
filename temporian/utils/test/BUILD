@@ -12,6 +12,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/utils:string",
     ],
 )
@@ -22,6 +23,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/utils:typecheck",
         "//temporian/core:compilation",
         "//temporian/implementation/numpy/data:io",
