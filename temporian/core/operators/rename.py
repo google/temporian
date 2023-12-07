@@ -128,7 +128,7 @@ def _normalize_rename_features(
             raise ValueError(
                 f"The provided {len(features)} new names ({features!r}) don't"
                 f" match the number of features ({len(schema.features)}) in the"
-                " event-set."
+                " EventSet."
             )
         features = {
             old_feature.name: new_name
@@ -173,7 +173,7 @@ def _normalize_rename_indexes(
             raise ValueError(
                 f"The provided {len(indexes)} new names ({indexes!r}) don't"
                 f" match the number of indexes ({len(schema.indexes)}) in the"
-                " event-set."
+                " EventSet."
             )
         indexes = {
             old_index.name: new_name
