@@ -12,7 +12,8 @@ py_library(
     srcs_version = "PY3",
     deps = [
         # already_there/numpy
-        # already_there/absl
+        # already_there/absl/logging
+        # already_there/absl/testing:absltest
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/core:serialization",
     ],
