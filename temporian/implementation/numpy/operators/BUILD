@@ -394,10 +394,10 @@ py_library(
     deps = [
         # already_there/numpy
         ":base",
-        "//temporian/core/data:duration_utils",
         "//temporian/core/operators:until_next",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy_cc/operators:operators_cc",
     ],
 )
 
@@ -408,7 +408,7 @@ py_library(
     deps = [
         # already_there/numpy
         ":base",
-        "//temporian/core/data:duration_utils",
+        "//temporian/implementation/numpy_cc/operators:operators_cc",
         "//temporian/core/operators:filter_moving_count",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
@@ -422,10 +422,9 @@ py_library(
     deps = [
         # already_there/numpy
         ":base",
-        "//temporian/core/data:duration_utils",
+        "//temporian/implementation/numpy/data:dtype_normalization",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
-        "//temporian/implementation/numpy_cc/operators:operators_cc",
         "//temporian/core/operators:where",
     ],
 )
@@ -437,7 +436,6 @@ py_library(
     deps = [
         # already_there/numpy
         ":base",
-        "//temporian/core/data:duration_utils",
         "//temporian/core/operators:tick_calendar",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
@@ -452,7 +450,7 @@ py_library(
     deps = [
         # already_there/numpy
         ":base",
-        "//temporian/core/data:duration_utils",
+        "//temporian/implementation/numpy/data:dtype_normalization",
         "//temporian/core/operators:map",
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",

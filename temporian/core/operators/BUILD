@@ -19,6 +19,7 @@ py_library(
     srcs = ["base.py"],
     srcs_version = "PY3",
     deps = [
+
         "//temporian/core:typing",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
@@ -39,6 +40,7 @@ py_library(
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
+        "//temporian/implementation/numpy/data:dtype_normalization",
     ],
 )
 
@@ -115,6 +117,7 @@ py_library(
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
+        "//temporian/utils:typecheck",
     ],
 )
 
@@ -233,6 +236,7 @@ py_library(
         "//temporian/core:typing",
         "//temporian/core/data:node",
         "//temporian/proto:core_py_proto",
+        "//temporian/utils:typecheck",
     ],
 )
 
@@ -381,6 +385,11 @@ py_library(
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
+        "//temporian/core/data:dtype",
+        "//temporian/core:typing",
+        "//temporian/implementation/numpy/data:dtype_normalization",
+        "//temporian/utils:typecheck",
+        "//temporian/core:compilation",
     ],
 )
 
@@ -389,11 +398,11 @@ py_library(
     srcs = ["tick_calendar.py"],
     srcs_version = "PY3",
     deps = [
+        # already_there/numpy
         ":base",
         "//temporian/core:compilation",
         "//temporian/core:operator_lib",
         "//temporian/core:typing",
-        "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/proto:core_py_proto",
         "//temporian/utils:typecheck",
@@ -426,9 +435,10 @@ py_library(
         "//temporian/core:operator_lib",
         "//temporian/core/data:duration_utils",
         "//temporian/core/data:node",
-        "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
         "//temporian/utils:typecheck",
+        "//temporian/core:typing",
+        "//temporian/core/data:dtype",
     ],
 )
 
@@ -440,8 +450,11 @@ py_library(
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
-        "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
+        "//temporian/core:typing",
+        "//temporian/core/data:duration_utils",
+        "//temporian/utils:typecheck",
+        "//temporian/core:compilation",
     ],
 )
 
@@ -453,8 +466,11 @@ py_library(
         ":base",
         "//temporian/core:operator_lib",
         "//temporian/core/data:node",
-        "//temporian/core/data:schema",
         "//temporian/proto:core_py_proto",
+        "//temporian/core:typing",
+        "//temporian/utils:typecheck",
+        "//temporian/core:compilation",
+        "//temporian/core/data:dtype",
     ],
 )
 
@@ -464,10 +480,11 @@ py_library(
     srcs = ["fillna.py"],
     srcs_version = "PY3",
     deps = [
-        ":base",
-        "//temporian/core:operator_lib",
         "//temporian/core/data:node",
-        "//temporian/core/data:schema",
-        "//temporian/proto:core_py_proto",
+        "//temporian/core:typing",
+        "//temporian/core/data:dtype",
+        "//temporian/core/operators:glue",
+        "//temporian/utils:typecheck",
+        "//temporian/core:compilation",
     ],
 )

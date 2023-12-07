@@ -11,12 +11,11 @@ py_library(
     srcs = ["base.py"],
     srcs_version = "PY3",
     deps = [
-        # already_there/apache_beam
+
         "//temporian/beam:typing",
-        "//temporian/beam:implementation_lib",
         "//temporian/beam/operators:base",
-        "//temporian/beam/io:dict",
-        "//temporian/implementation/numpy/operators:base",
+        "//temporian/core/operators/window:base",
+        "//temporian/implementation/numpy/operators/window:base",
     ],
 )
 
@@ -28,6 +27,12 @@ py_library(
         ":base",
         "//temporian/core/operators/window:moving_count",
         "//temporian/implementation/numpy/operators/window:moving_count",
+        "//temporian/beam:implementation_lib",
+        "//temporian/beam/operators:base",
+        "//temporian/core/operators/window:base",
+        "//temporian/beam:typing",
+        # already_there/apache_beam
+        "//temporian/implementation/numpy/operators/window:base",
     ],
 )
 
@@ -39,6 +44,8 @@ py_library(
         ":base",
         "//temporian/core/operators/window:moving_max",
         "//temporian/implementation/numpy/operators/window:moving_max",
+        "//temporian/beam:implementation_lib",
+        "//temporian/implementation/numpy/operators/window:base",
     ],
 )
 
@@ -50,6 +57,8 @@ py_library(
         ":base",
         "//temporian/core/operators/window:moving_min",
         "//temporian/implementation/numpy/operators/window:moving_min",
+        "//temporian/beam:implementation_lib",
+        "//temporian/implementation/numpy/operators/window:base",
     ],
 )
 
@@ -61,6 +70,8 @@ py_library(
         ":base",
         "//temporian/core/operators/window:moving_standard_deviation",
         "//temporian/implementation/numpy/operators/window:moving_standard_deviation",
+        "//temporian/beam:implementation_lib",
+        "//temporian/implementation/numpy/operators/window:base",
     ],
 )
 
@@ -72,6 +83,8 @@ py_library(
         ":base",
         "//temporian/core/operators/window:moving_sum",
         "//temporian/implementation/numpy/operators/window:moving_sum",
+        "//temporian/beam:implementation_lib",
+        "//temporian/implementation/numpy/operators/window:base",
     ],
 )
 
@@ -83,5 +96,7 @@ py_library(
         ":base",
         "//temporian/core/operators/window:simple_moving_average",
         "//temporian/implementation/numpy/operators/window:simple_moving_average",
+        "//temporian/beam:implementation_lib",
+        "//temporian/implementation/numpy/operators/window:base",
     ],
 )

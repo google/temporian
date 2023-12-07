@@ -27,6 +27,7 @@ py_library(
     srcs = ["utils.py"],
     srcs_version = "PY3",
     deps = [
+        "//temporian/core/data:dtype",
         # already_there/absl/testing:absltest
         # already_there/apache_beam
         "//temporian/test:utils",

@@ -21,7 +21,6 @@ py_library(
         "//temporian/core/operators/calendar:base",
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/operators:base",
-        "//temporian/core/data:duration_utils",
     ],
 )
 

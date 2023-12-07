@@ -104,5 +104,7 @@ py_library(
     deps = [
         # already_there/numpy
         "//temporian/core/data:dtype",
+        "//temporian/core/data:duration_utils",
+        "//temporian/core/data:node",
     ],
 )

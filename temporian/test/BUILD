@@ -11,7 +11,9 @@ py_library(
     srcs = ["utils.py"],
     srcs_version = "PY3",
     deps = [
-        # already_there/numpy,
+        # already_there/numpy
+        # already_there/absl
+        "//temporian/implementation/numpy/data:event_set",
         "//temporian/core:serialization",
     ],
 )
