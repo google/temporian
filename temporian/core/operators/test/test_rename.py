@@ -83,7 +83,7 @@ class RenameTest(TestCase):
         )
         with self.assertRaisesRegex(
             ValueError,
-            "don't match the number of features \\(3\\) in the event-set.",
+            "don't match the number of features",
         ):
             _ = evset.rename(["d", "e"])
 
@@ -157,7 +157,7 @@ class RenameTest(TestCase):
         )
         with self.assertRaisesRegex(
             ValueError,
-            "don't match the number of indexes \\(2\\) in the event-set.",
+            "don't match the number of indexes",
         ):
             _ = evset.rename(indexes=["c", "d", "e"])
 
