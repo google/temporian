@@ -139,7 +139,7 @@ class WhereTest(TestCase):
         assertOperatorResult(self, result, expected_output)
 
     def test_dtype_mismatch_single_values(self):
-        with self.assertRaisesRegex(ValueError, "go two scalars"):
+        with self.assertRaisesRegex(ValueError, "got two scalars"):
             self.evset.where(on_true="A string", on_false=5)
 
     def test_dtype_mismatch_evsets(self):
