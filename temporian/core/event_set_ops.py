@@ -3394,7 +3394,7 @@ class EventSetOperations:
         names of the same size as `evtset.schema.feature_names()`.
 
         The indexes renaming follows the same criteria, accepting a single
-        string or a mapping for multiple indexes.
+        string, a mapping, or a list.
 
         Usage example:
             ```python
