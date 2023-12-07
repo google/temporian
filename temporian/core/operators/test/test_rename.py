@@ -63,6 +63,30 @@ class RenameTest(TestCase):
 
         assertOperatorResult(self, result, expected)
 
+    def test_rename_multiple_features_with_list(self):
+        evset = event_set(
+            timestamps=[1, 2],
+            features={"a": [10, 11], "b": [1, 2], "c": [100, 101]},
+        )
+        result = evset.rename(["d", "e", "f"])
+        expected = event_set(
+            timestamps=[1, 2],
+            features={"d": [10, 11], "e": [1, 2], "f": [100, 101]},
+            same_sampling_as=evset,
+        )
+        assertOperatorResult(self, result, expected)
+
+    def test_rename_multiple_features_with_list_wrong_length(self):
+        evset = event_set(
+            timestamps=[1, 2],
+            features={"a": [10, 11], "b": [1, 2], "c": [100, 101]},
+        )
+        with self.assertRaisesRegex(
+            ValueError,
+            "don't match the number of features",
+        ):
+            _ = evset.rename(["d", "e"])
+
     def test_rename_single_index_with_str(self):
         evset = event_set(
             timestamps=[1, 2],
@@ -110,6 +134,32 @@ class RenameTest(TestCase):
         )
 
         assertOperatorResult(self, result, expected, check_sampling=False)
+
+    def test_rename_multiple_indexes_with_list(self):
+        evset = event_set(
+            timestamps=[1, 2],
+            features={"a": [10, 11], "b": [1, 2]},
+            indexes=["a", "b"],
+        )
+        result = evset.rename(indexes=["c", "d"])
+        expected = event_set(
+            timestamps=[1, 2],
+            features={"c": [10, 11], "d": [1, 2]},
+            indexes=["c", "d"],
+        )
+        assertOperatorResult(self, result, expected, check_sampling=False)
+
+    def test_rename_multiple_indexes_with_list_wrong_length(self):
+        evset = event_set(
+            timestamps=[1, 2],
+            features={"a": [10, 11], "b": [1, 2]},
+            indexes=["a", "b"],
+        )
+        with self.assertRaisesRegex(
+            ValueError,
+            "don't match the number of indexes",
+        ):
+            _ = evset.rename(indexes=["c", "d", "e"])
 
     def test_rename_feature_with_empty_str(self):
         with self.assertRaisesRegex(

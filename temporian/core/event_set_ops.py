@@ -3381,19 +3381,20 @@ class EventSetOperations:
 
     def rename(
         self: EventSetOrNode,
-        features: Optional[Union[str, Dict[str, str]]] = None,
-        indexes: Optional[Union[str, Dict[str, str]]] = None,
+        features: Optional[Union[str, Dict[str, str], List[str]]] = None,
+        indexes: Optional[Union[str, Dict[str, str], List[str]]] = None,
     ) -> EventSetOrNode:
         """Renames an [`EventSet`][temporian.EventSet]'s features and index.
 
         If the input has a single feature, then the `features` can be a
         single string with the new name.
 
-        If the input has multiple features, then `features` must be a mapping
-        with the old names as keys and the new names as values.
+        If the input has multiple features, then `features` can either be (1) a
+        dictionary mapping old names to the new names, or (2) a list of new
+        names of the same size as `evtset.schema.feature_names()`.
 
-        The indexes renaming follows the same criteria, accepting a single string or
-        a mapping for multiple indexes.
+        The indexes renaming follows the same criteria, accepting a single
+        string, a mapping, or a list.
 
         Usage example:
             ```python
@@ -3414,8 +3415,20 @@ class EventSetOperations:
                     'f1_result': [ 0 10]
             ...
 
-            >>> # Rename multiple features
+            >>> # Rename multiple features with a dictionary
             >>> b_rename = b.rename({"f1": "5xf1", "f2": "5xf2"})
+            >>> b_rename
+            indexes: []
+            features: [('5xf1', int64), ('5xf2', int64)]
+            events:
+                (2 events):
+                    timestamps: [0. 1.]
+                    '5xf1': [ 0 10]
+                    '5xf2': [25 30]
+            ...
+
+            >>> # Rename multiple features with a list
+            >>> b_rename = b.rename(["5xf1", "5xf2"])
             >>> b_rename
             indexes: []
             features: [('5xf1', int64), ('5xf2', int64)]

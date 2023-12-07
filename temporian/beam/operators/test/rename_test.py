@@ -49,6 +49,16 @@ class RenameTest(absltest.TestCase):
             self, input_data=evset, output_node=output_node
         )
 
+    def test_rename_multiple_features_with_list(self):
+        evset = event_set(
+            timestamps=[1, 2],
+            features={"a": [10, 11], "b": [1, 2], "c": [100, 101]},
+        )
+        output_node = rename(evset.node(), ["d", "e", "f"])
+        check_beam_implementation(
+            self, input_data=evset, output_node=output_node
+        )
+
     def test_rename_single_index_with_str(self):
         evset = event_set(
             timestamps=[1, 2],
