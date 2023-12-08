@@ -37,6 +37,7 @@ PYBIND11_MODULE(operators_cc, m) {
   init_calendar_day_of_month(m);
   init_calendar_hour(m);
   init_calendar_minute(m);
+  init_calendar_second(m);
   init_calendar_day_of_year(m);
   init_calendar_day_of_week(m);
   init_calendar_isoweek(m);
