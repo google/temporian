@@ -41,7 +41,7 @@ class CalendarDayOfYearNumpyImplementation(OperatorImplementation):
         dst_evset = EventSet(data={}, schema=output_schema)
         for index_key, index_data in sampling.data.items():
             value = operators_cc.calendar_day_of_year(
-                index_data.timestamps, self.operator.utc_offset
+                index_data.timestamps, self.operator.tz
             )
 
             dst_evset.set_index_value(
