@@ -12,14 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from absl.testing import absltest
-from absl.testing.parameterized import TestCase
+from absl.testing import absltest, parameterized
 
 from temporian.implementation.numpy.data.io import event_set
 from temporian.test.utils import assertOperatorResult, i32
 
 
-class CalendarHourTest(TestCase):
+class CalendarHourTest(parameterized.TestCase):
     def test_basic(self):
         timestamps = [
             "1970-01-01 00:00:00",
@@ -57,6 +56,26 @@ class CalendarHourTest(TestCase):
         )
 
         result = evset.calendar_hour(tz="US/Pacific")
+        assertOperatorResult(self, result, expected)
+
+    @parameterized.parameters({"tz": 1}, {"tz": 1.0}, {"tz": "Europe/Brussels"})
+    def test_tz(self, tz):
+        timestamps = [
+            "2021-01-01 00:00:01",
+            "2021-12-31 23:59:59",
+            "2045-12-31 23:59:59",
+        ]
+        evset = event_set(timestamps=timestamps)
+
+        expected = event_set(
+            timestamps=timestamps,
+            features={
+                "calendar_hour": i32([1, 0, 0]),
+            },
+            same_sampling_as=evset,
+        )
+
+        result = evset.calendar_hour(tz=tz)
         assertOperatorResult(self, result, expected)
 
 

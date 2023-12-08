@@ -12,14 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from absl.testing import absltest
-from absl.testing.parameterized import TestCase
+from absl.testing import absltest, parameterized
 
 from temporian.implementation.numpy.data.io import event_set
 from temporian.test.utils import assertOperatorResult, i32
 
 
-class CalendarMinuteTest(TestCase):
+class CalendarMinuteTest(parameterized.TestCase):
     def test_basic(self):
         timestamps = [
             "1970-01-01 00:00:00",

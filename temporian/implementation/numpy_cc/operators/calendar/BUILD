@@ -45,3 +45,36 @@ pybind_library(
         ":common"
     ],
 )
+
+pybind_library(
+    name = "hour",
+    srcs = ["hour.cc"],
+    hdrs = ["hour.h"],
+    deps = [
+        "@com_google_absl//absl/time",
+        "//temporian/implementation/numpy_cc/operators:common",
+        ":common"
+    ],
+)
+
+pybind_library(
+    name = "minute",
+    srcs = ["minute.cc"],
+    hdrs = ["minute.h"],
+    deps = [
+        "@com_google_absl//absl/time",
+        "//temporian/implementation/numpy_cc/operators:common",
+        ":common"
+    ],
+)
+
+pybind_library(
+    name = "second",
+    srcs = ["second.cc"],
+    hdrs = ["second.h"],
+    deps = [
+        "@com_google_absl//absl/time",
+        "//temporian/implementation/numpy_cc/operators:common",
+        ":common"
+    ],
+)
