@@ -100,3 +100,14 @@ pybind_library(
         ":common"
     ],
 )
+
+pybind_library(
+    name = "isoweek",
+    srcs = ["isoweek.cc"],
+    hdrs = ["isoweek.h"],
+    deps = [
+        "@com_google_absl//absl/time",
+        "//temporian/implementation/numpy_cc/operators:common",
+        ":common"
+    ],
+)

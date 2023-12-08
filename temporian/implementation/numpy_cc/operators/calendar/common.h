@@ -28,3 +28,23 @@ static absl::TimeZone handle_tz(const pybind11::object tz) {
     throw std::invalid_argument("Unsupported argument type");
   }
 }
+
+static int map_week_day(const absl::Weekday &wd) {
+  switch (wd) {
+    case absl::Weekday::monday:
+      return 0;
+    case absl::Weekday::tuesday:
+      return 1;
+    case absl::Weekday::wednesday:
+      return 2;
+    case absl::Weekday::thursday:
+      return 3;
+    case absl::Weekday::friday:
+      return 4;
+    case absl::Weekday::saturday:
+      return 5;
+    case absl::Weekday::sunday:
+      return 6;
+  }
+  std::invalid_argument("Invalid weekday");
+}

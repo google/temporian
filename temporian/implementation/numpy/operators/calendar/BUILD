@@ -29,7 +29,6 @@ py_library(
     srcs = ["day_of_month.py"],
     srcs_version = "PY3",
     deps = [
-        ":base",
         "//temporian/core/operators/calendar:day_of_month",
         "//temporian/implementation/numpy:implementation_lib",
     ],
@@ -40,7 +39,6 @@ py_library(
     srcs = ["day_of_week.py"],
     srcs_version = "PY3",
     deps = [
-        ":base",
         "//temporian/core/operators/calendar:day_of_week",
         "//temporian/implementation/numpy:implementation_lib",
     ],
@@ -51,7 +49,6 @@ py_library(
     srcs = ["day_of_year.py"],
     srcs_version = "PY3",
     deps = [
-        ":base",
         "//temporian/core/operators/calendar:day_of_year",
         "//temporian/implementation/numpy:implementation_lib",
     ],
@@ -62,7 +59,6 @@ py_library(
     srcs = ["hour.py"],
     srcs_version = "PY3",
     deps = [
-        ":base",
         "//temporian/core/operators/calendar:hour",
         "//temporian/implementation/numpy:implementation_lib",
     ],
@@ -73,7 +69,6 @@ py_library(
     srcs = ["iso_week.py"],
     srcs_version = "PY3",
     deps = [
-        ":base",
         "//temporian/core/operators/calendar:iso_week",
         "//temporian/implementation/numpy:implementation_lib",
     ],
@@ -84,7 +79,6 @@ py_library(
     srcs = ["minute.py"],
     srcs_version = "PY3",
     deps = [
-        ":base",
         "//temporian/core/operators/calendar:minute",
         "//temporian/implementation/numpy:implementation_lib",
     ],
@@ -95,7 +89,6 @@ py_library(
     srcs = ["month.py"],
     srcs_version = "PY3",
     deps = [
-        ":base",
         "//temporian/core/operators/calendar:month",
         "//temporian/implementation/numpy:implementation_lib",
     ],
@@ -106,7 +99,6 @@ py_library(
     srcs = ["second.py"],
     srcs_version = "PY3",
     deps = [
-        ":base",
         "//temporian/core/operators/calendar:second",
         "//temporian/implementation/numpy:implementation_lib",
     ],
@@ -117,7 +109,6 @@ py_library(
     srcs = ["year.py"],
     srcs_version = "PY3",
     deps = [
-        ":base",
         "//temporian/core/operators/calendar:year",
         "//temporian/implementation/numpy:implementation_lib",
     ],

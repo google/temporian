@@ -15,26 +15,6 @@
 namespace {
 namespace py = pybind11;
 
-int map_week_day(const absl::Weekday &wd) {
-  switch (wd) {
-    case absl::Weekday::monday:
-      return 0;
-    case absl::Weekday::tuesday:
-      return 1;
-    case absl::Weekday::wednesday:
-      return 2;
-    case absl::Weekday::thursday:
-      return 3;
-    case absl::Weekday::friday:
-      return 4;
-    case absl::Weekday::saturday:
-      return 5;
-    case absl::Weekday::sunday:
-      return 6;
-  }
-  std::invalid_argument("Invalid weekday");
-}
-
 py::array_t<int> calendar_day_of_week(const py::array_t<double> &timestamps,
                                       const py::object tz) {
   auto parsed_tz = handle_tz(tz);
