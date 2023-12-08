@@ -85,6 +85,7 @@ pybind_extension(
         "//temporian/implementation/numpy_cc/operators/calendar:minute",
         "//temporian/implementation/numpy_cc/operators/calendar:second",
         "//temporian/implementation/numpy_cc/operators/calendar:day_of_year",
+        "//temporian/implementation/numpy_cc/operators/calendar:day_of_week",
     ],
 )
 

@@ -3,6 +3,7 @@
 
 #include "temporian/implementation/numpy_cc/operators/add_index.h"
 #include "temporian/implementation/numpy_cc/operators/calendar/day_of_month.h"
+#include "temporian/implementation/numpy_cc/operators/calendar/day_of_week.h"
 #include "temporian/implementation/numpy_cc/operators/calendar/day_of_year.h"
 #include "temporian/implementation/numpy_cc/operators/calendar/hour.h"
 #include "temporian/implementation/numpy_cc/operators/calendar/minute.h"
@@ -36,4 +37,5 @@ PYBIND11_MODULE(operators_cc, m) {
   init_calendar_hour(m);
   init_calendar_minute(m);
   init_calendar_day_of_year(m);
+  init_calendar_day_of_week(m);
 }

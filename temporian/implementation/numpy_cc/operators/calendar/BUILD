@@ -89,3 +89,14 @@ pybind_library(
         ":common"
     ],
 )
+
+pybind_library(
+    name = "day_of_week",
+    srcs = ["day_of_week.cc"],
+    hdrs = ["day_of_week.h"],
+    deps = [
+        "@com_google_absl//absl/time",
+        "//temporian/implementation/numpy_cc/operators:common",
+        ":common"
+    ],
+)
