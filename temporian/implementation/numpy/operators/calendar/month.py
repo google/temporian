@@ -12,27 +12,43 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from datetime import datetime
+from typing import Dict
 
-from temporian.core.operators.calendar.month import (
-    CalendarMonthOperator,
-)
+from temporian.core.operators.calendar.month import CalendarMonthOperator
 from temporian.implementation.numpy import implementation_lib
-from temporian.implementation.numpy.operators.calendar.base import (
-    BaseCalendarNumpyImplementation,
-)
+from temporian.implementation.numpy.data.event_set import EventSet, IndexData
+from temporian.implementation.numpy.operators.base import OperatorImplementation
+from temporian.implementation.numpy_cc.operators import operators_cc
 
 
-class CalendarMonthNumpyImplementation(BaseCalendarNumpyImplementation):
-    """Numpy implementation of the calendar_month operator."""
+class CalendarYearNumpyImplementation(OperatorImplementation):
+    """Interface definition and common logic for numpy implementation of
+    calendar operators."""
 
     def __init__(self, operator: CalendarMonthOperator) -> None:
         super().__init__(operator)
+        assert isinstance(operator, CalendarMonthOperator)
 
-    def _get_value_from_datetime(self, dt: datetime) -> int:
-        return dt.month
+    def __call__(self, sampling: EventSet) -> Dict[str, EventSet]:
+        assert isinstance(self.operator, CalendarMonthOperator)
+        output_schema = self.output_schema("output")
+
+        # create destination EventSet
+        dst_evset = EventSet(data={}, schema=output_schema)
+        for index_key, index_data in sampling.data.items():
+            value = operators_cc.calendar_month(
+                index_data.timestamps, self.operator.tz
+            )
+
+            dst_evset.set_index_value(
+                index_key,
+                IndexData([value], index_data.timestamps, schema=output_schema),
+                normalize=False,
+            )
+
+        return {"output": dst_evset}
 
 
 implementation_lib.register_operator_implementation(
-    CalendarMonthOperator, CalendarMonthNumpyImplementation
+    CalendarMonthOperator, CalendarYearNumpyImplementation
 )
