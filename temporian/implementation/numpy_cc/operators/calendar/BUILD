@@ -34,3 +34,14 @@ pybind_library(
         ":common"
     ],
 )
+
+pybind_library(
+    name = "day_of_month",
+    srcs = ["day_of_month.cc"],
+    hdrs = ["day_of_month.h"],
+    deps = [
+        "@com_google_absl//absl/time",
+        "//temporian/implementation/numpy_cc/operators:common",
+        ":common"
+    ],
+)

@@ -80,6 +80,7 @@ pybind_extension(
         ":window",
         "//temporian/implementation/numpy_cc/operators/calendar:year",
         "//temporian/implementation/numpy_cc/operators/calendar:month",
+        "//temporian/implementation/numpy_cc/operators/calendar:day_of_month",
     ],
 )
 
