@@ -9,9 +9,10 @@ static absl::TimeZone handle_tz(const pybind11::object tz) {
 
   } else if (pybind11::isinstance<pybind11::float_>(tz)) {
     // handle tz as an float
-    float float_tz = tz.cast<float>();
+    float float_tz = tz.cast<float>() * 60 * 60;
+    int int_tz = static_cast<int>(std::round(float_tz));
     // tz is expresed in hours, needs to be converted to seconds
-    return absl::FixedTimeZone(float_tz * 60 * 60);
+    return absl::FixedTimeZone(int_tz);
 
   } else if (pybind11::isinstance<pybind11::str>(tz)) {
     // handle tz as an string
