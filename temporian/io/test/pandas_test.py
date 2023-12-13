@@ -13,13 +13,14 @@
 # limitations under the License.
 
 import datetime
-
 import math
-from absl.testing import absltest
+
 import numpy as np
 import pandas as pd
-from temporian.io.pandas import from_pandas, to_pandas
+from absl.testing import absltest
+
 from temporian.implementation.numpy.data.io import event_set
+from temporian.io.pandas import from_pandas, to_pandas
 from temporian.test.utils import assertEqualDFRandomRowOrder
 
 
@@ -527,6 +528,28 @@ class DataFrameToEventTest(absltest.TestCase):
 
         evset2 = from_pandas(df)
         assert evset2.schema.is_unix_timestamp
+
+    def test_timestamps_params(self):
+        evset = event_set(
+            timestamps=[
+                datetime.datetime(2023, 11, 1),
+                datetime.datetime(2023, 11, 2),
+                datetime.datetime(2023, 11, 3),
+            ],
+            features={
+                "f": [1, 2, 3],
+            },
+        )
+        df = to_pandas(evset)
+        assert "timestamp" in df.columns
+        assert np.issubdtype(df["timestamp"].dtype, np.datetime64)
+
+        df = to_pandas(evset, timestamp_to_datetime=False)
+        assert "timestamp" in df.columns
+        assert np.issubdtype(df["timestamp"].dtype, np.float64)
+
+        df = to_pandas(evset, timestamps=False)
+        assert "timestamp" not in df.columns
 
 
 if __name__ == "__main__":
