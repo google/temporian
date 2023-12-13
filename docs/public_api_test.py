@@ -37,6 +37,8 @@ PUBLIC_API_SYMBOLS = {
     "from_csv",
     "to_pandas",
     "from_pandas",
+    "to_parquet",
+    "from_parquet",
     "to_tensorflow_dataset",
     "from_tensorflow_record",
     "to_tensorflow_record",

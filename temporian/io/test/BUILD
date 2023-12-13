@@ -32,3 +32,17 @@ py_test(
         "//temporian/io:tensorflow",
     ],
 )
+
+py_test(
+    name = "parquet_test",
+    srcs = ["parquet_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        # already_there/numpy
+        # already_there/pandas
+        "//temporian/test:utils",
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/io:parquet",
+    ],
+)
