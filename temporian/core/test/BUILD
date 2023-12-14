@@ -46,6 +46,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/core/data:node",
         "//temporian/core/operators:base",
         "//temporian/proto:core_py_proto",
@@ -59,6 +60,7 @@ py_test(
     deps = [
         ":utils",
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/core:graph",
     ],
 )
@@ -71,6 +73,7 @@ py_test(
         ":utils",
         # already_there/absl/logging
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian",
         "//temporian/core:graph",
         "//temporian/core:serialization",
@@ -86,6 +89,7 @@ py_test(
     deps = [
         ":utils",
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/core:evaluation",
         "//temporian/implementation/numpy/data:event_set",
         "//temporian",
@@ -98,6 +102,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/core:operator_lib",
         "//temporian",
     ],
@@ -109,6 +114,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/core:operator_lib",
         "//temporian",
     ],

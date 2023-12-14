@@ -13,10 +13,10 @@ py_library(
     ],
     srcs_version = "PY3",
     deps = [
+        "//temporian/core:types",
         "//temporian/core:compilation",
         "//temporian/core:evaluation",
         "//temporian/core:serialization",
-        "//temporian/core:typing",
         "//temporian/core/data:dtype",
         "//temporian/core/data:duration",
         "//temporian/core/data:node",

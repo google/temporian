@@ -105,6 +105,9 @@ py_library(
     name = "dataclasses",
     srcs = ["dataclasses.py"],
     srcs_version = "PY3",
+    deps = [
+        "//temporian/core:typing",
+    ]
 )
 
 py_library(
@@ -114,5 +117,6 @@ py_library(
     deps = [
         ":dataclasses",
         ":typing",
+        "//temporian/core/operators:map",
     ],
 )

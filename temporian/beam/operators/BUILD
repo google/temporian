@@ -69,7 +69,7 @@ py_library(
         "//temporian/beam:implementation_lib",
         "//temporian/beam:typing",
         "//temporian/beam/operators:base",
-        "//temporian/core/operators:select",
+        "//temporian/core/operators:rename",
     ],
 )
 
@@ -82,6 +82,6 @@ py_library(
         "//temporian/beam:implementation_lib",
         "//temporian/beam:typing",
         "//temporian/beam/operators:base",
-        "//temporian/core/operators:select",
+        "//temporian/core/operators:prefix",
     ],
 )

@@ -11,7 +11,11 @@ py_library(
     srcs = ["utils.py"],
     srcs_version = "PY3",
     deps = [
-        # already_there/numpy,
+        # already_there/numpy
+        # already_there/absl/logging
+        # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
+        "//temporian/implementation/numpy/data:event_set",
         "//temporian/core:serialization",
     ],
 )
@@ -23,6 +27,7 @@ py_test(
     deps = [
         # already_there/absl/logging
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         # already_there/bokeh
         # already_there/matplotlib
         "//temporian",
@@ -37,6 +42,7 @@ py_test(
     deps = [
         # already_there/absl/logging
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         # already_there/bokeh
         # already_there/matplotlib
         "//temporian",
@@ -52,6 +58,7 @@ py_test(
     deps = [
         "//temporian",
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
     ],
 )
 
@@ -62,6 +69,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         # already_there/pandas
         "//temporian",
         ":utils",

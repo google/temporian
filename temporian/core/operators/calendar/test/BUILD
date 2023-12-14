@@ -12,6 +12,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/implementation/numpy/data:io",
         "//temporian/test:utils",
     ],
@@ -23,6 +24,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/implementation/numpy/data:io",
         "//temporian/test:utils",
     ],
@@ -33,7 +35,9 @@ py_test(
     srcs = ["test_calendar_day_of_week.py"],
     srcs_version = "PY3",
     deps = [
+        # already_there/pandas
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/implementation/numpy/data:io",
         "//temporian/test:utils",
     ],
@@ -45,6 +49,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/implementation/numpy/data:io",
         "//temporian/test:utils",
     ],
@@ -56,6 +61,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/implementation/numpy/data:io",
         "//temporian/test:utils",
     ],
@@ -67,6 +73,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/implementation/numpy/data:io",
         "//temporian/test:utils",
     ],
@@ -78,6 +85,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/implementation/numpy/data:io",
         "//temporian/test:utils",
     ],
@@ -89,6 +97,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/implementation/numpy/data:io",
         "//temporian/test:utils",
     ],
@@ -100,6 +109,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/implementation/numpy/data:io",
         "//temporian/test:utils",
     ],
@@ -111,6 +121,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/implementation/numpy/data:io",
         "//temporian/test:utils",
     ],
@@ -122,6 +133,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
         "//temporian/implementation/numpy/data:io",
         "//temporian/test:utils",
     ],
