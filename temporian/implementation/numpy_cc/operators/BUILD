@@ -66,6 +66,17 @@ pybind_library(
     deps = [":common"],
 )
 
+
+pybind_library(
+    name = "calendar",
+    srcs = ["calendar.cc"],
+    hdrs = ["calendar.h"],
+    deps = [
+        "@com_google_absl//absl/time",
+        "//temporian/implementation/numpy_cc/operators:common",
+    ],
+)
+
 pybind_extension(
     name = "operators_cc",
     srcs = ["pyinit.cc"],
@@ -78,15 +89,7 @@ pybind_extension(
         ":tick_calendar",
         ":until_next",
         ":window",
-        "//temporian/implementation/numpy_cc/operators/calendar:year",
-        "//temporian/implementation/numpy_cc/operators/calendar:month",
-        "//temporian/implementation/numpy_cc/operators/calendar:day_of_month",
-        "//temporian/implementation/numpy_cc/operators/calendar:hour",
-        "//temporian/implementation/numpy_cc/operators/calendar:minute",
-        "//temporian/implementation/numpy_cc/operators/calendar:second",
-        "//temporian/implementation/numpy_cc/operators/calendar:day_of_year",
-        "//temporian/implementation/numpy_cc/operators/calendar:day_of_week",
-        "//temporian/implementation/numpy_cc/operators/calendar:isoweek",
+        "//temporian/implementation/numpy_cc/operators:calendar",
     ],
 )
 

@@ -12,17 +12,6 @@ py_library(
     srcs_version = "PY3",
 )
 
-py_library(
-    name = "base",
-    srcs = ["base.py"],
-    srcs_version = "PY3",
-    deps = [
-        # already_there/numpy
-        "//temporian/core/operators/calendar:base",
-        "//temporian/implementation/numpy/data:event_set",
-        "//temporian/implementation/numpy/operators:base",
-    ],
-)
 
 py_library(
     name = "day_of_month",
