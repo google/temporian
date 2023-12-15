@@ -29,6 +29,19 @@ py_library(
 )
 
 py_library(
+    name = "parquet",
+    srcs = ["parquet.py"],
+    srcs_version = "PY3",
+    deps = [
+        # force/pandas
+        ":pandas",
+        "//temporian/implementation/numpy/data:event_set",
+        "//temporian/utils:typecheck",
+    ],
+)
+
+
+py_library(
     name = "pandas",
     srcs = ["pandas.py"],
     srcs_version = "PY3",
