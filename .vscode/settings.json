@@ -41,7 +41,7 @@
     80
   ],
   "editor.codeActionsOnSave": {
-    "source.organizeImports": false
+    "source.organizeImports": "never"
   },
   "files.trimFinalNewlines": true,
   "files.trimTrailingWhitespace": true,
