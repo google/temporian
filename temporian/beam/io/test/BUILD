@@ -14,6 +14,7 @@ py_test(
     deps = [
         # already_there/absl/testing:absltest
         # already_there/absl/testing:parameterized
+        # already_there/google/protobuf:use_fast_cpp_protos
         "//temporian/beam/io:dict",
         "//temporian/core/data:node",
         "//temporian/core/data:dtype",
@@ -30,6 +31,7 @@ py_test(
     deps = [
         # already_there/absl/testing:absltest
         # already_there/absl/testing:parameterized
+        # already_there/google/protobuf:use_fast_cpp_protos
         "//temporian/beam/io:tensorflow",
         "//temporian/beam/io:dict",
         "//temporian/core/data:node",
@@ -50,6 +52,7 @@ py_test(
     deps = [
         # already_there/absl/testing:absltest
         # already_there/absl/testing:parameterized
+        # already_there/google/protobuf:use_fast_cpp_protos
         "//temporian/beam/io:csv",
         "//temporian/beam/io:dict",
         "//temporian/core/data:node",
