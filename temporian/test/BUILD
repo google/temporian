@@ -15,6 +15,7 @@ py_library(
         # already_there/absl/logging
         # already_there/absl/testing:absltest
         # already_there/absl/testing:parameterized
+        # already_there/google/protobuf:use_fast_cpp_protos
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/core:serialization",
     ],
@@ -29,6 +30,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/absl/testing:parameterized
         # already_there/bokeh
+        # already_there/google/protobuf:use_fast_cpp_protos
         # already_there/matplotlib
         "//temporian",
     ],
@@ -44,6 +46,7 @@ py_test(
         # already_there/absl/testing:absltest
         # already_there/absl/testing:parameterized
         # already_there/bokeh
+        # already_there/google/protobuf:use_fast_cpp_protos
         # already_there/matplotlib
         "//temporian",
         "//temporian/beam",
@@ -59,6 +62,7 @@ py_test(
         "//temporian",
         # already_there/absl/testing:absltest
         # already_there/absl/testing:parameterized
+        # already_there/google/protobuf:use_fast_cpp_protos
     ],
 )
 
@@ -70,6 +74,7 @@ py_test(
     deps = [
         # already_there/absl/testing:absltest
         # already_there/absl/testing:parameterized
+        # already_there/google/protobuf:use_fast_cpp_protos
         # already_there/pandas
         "//temporian",
         ":utils",
