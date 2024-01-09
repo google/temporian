@@ -1,0 +1,6 @@
+include LICENSE
+include README.md
+recursive-include * *.so
+recursive-include * *.dylib
+recursive-include * *.dll
+recursive-include * *.pyd
