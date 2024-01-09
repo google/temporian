@@ -49,6 +49,8 @@ Install Temporian from [PyPI](https://pypi.org/project/temporian/) with `pip`:
 pip install temporian -U
 ```
 
+Temporian is currently available for Linux and MacOS (ARM and Intel). Windows support is under development.
+
 ### Minimal example
 
 Consider sale records that contain contain the `timestamp`, `store`, and `revenue` of individual sales.
