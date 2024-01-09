@@ -500,7 +500,7 @@ class MagicMethodsTest(absltest.TestCase):
         float_2: EventSetNodeOrEvset,
         **kwargs,
     ):
-        out = float_1**float_2
+        out = float_1 ** float_2
         self.assertTrue(isinstance(out.creator, PowerOperator))
         self.assertTrue(out.schema.features[0].name == "pow_f1_f3")
         self.assertTrue(out.schema.features[1].name == "pow_f2_f4")
@@ -614,9 +614,9 @@ class MagicMethodsTest(absltest.TestCase):
         self._check_node_same_dtype(float_1, out)
 
     def test_power_scalar(self, float_1: EventSetNodeOrEvset, **kwargs):
-        out = 3**float_1
+        out = 3 ** float_1
         self.assertTrue(isinstance(out.creator, PowerScalarOperator))
-        out = float_1**3
+        out = float_1 ** 3
         self.assertTrue(isinstance(out.creator, PowerScalarOperator))
         self.assertTrue(out.schema.features[0].name == "f1")
         self.assertTrue(out.schema.features[1].name == "f2")

@@ -142,17 +142,17 @@ class ArithmeticScalarTest(absltest.TestCase):
             features={"sales": f64([100, 0, 144, np.nan, 900])},
             same_sampling_as=self.evset,
         )
-        assertOperatorResult(self, self.evset**value, expected)
+        assertOperatorResult(self, self.evset ** value, expected)
 
     def test_correct_power_value_first(self) -> None:
         """Test correct power operator with value as base."""
         value = 2.0
         expected = event_set(
             timestamps=[1, 2, 3, 4, 5],
-            features={"sales": f64([1024, 1, 4096, np.nan, 2**30])},
+            features={"sales": f64([1024, 1, 4096, np.nan, 2 ** 30])},
             same_sampling_as=self.evset,
         )
-        assertOperatorResult(self, value**self.evset, expected)
+        assertOperatorResult(self, value ** self.evset, expected)
 
     def test_correct_sum_multi_index(self) -> None:
         """Test correct sum operator with multiple indexes."""

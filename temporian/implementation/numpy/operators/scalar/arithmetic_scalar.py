@@ -124,8 +124,8 @@ class PowerScalarNumpyImplementation(BaseScalarNumpyImplementation):
         dtype: DType,
     ) -> np.ndarray:
         if self._operator.is_value_first:
-            return value**feature
-        return feature**value
+            return value ** feature
+        return feature ** value
 
 
 implementation_lib.register_operator_implementation(
