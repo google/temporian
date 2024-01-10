@@ -9,7 +9,7 @@
 set -vex
 
 # Build temporian
-bazel build -c opt //temporian
+bazel build -c opt --config=linux //temporian
 
 # Assemble files
 PKDIR="$(pwd)/build_package"
