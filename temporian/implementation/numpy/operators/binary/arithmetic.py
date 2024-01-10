@@ -145,7 +145,7 @@ class PowerNumpyImplementation(BaseBinaryNumpyImplementation):
         evset_2_feature: np.ndarray,
         dtype: DType,
     ) -> np.ndarray:
-        return evset_1_feature ** evset_2_feature
+        return evset_1_feature**evset_2_feature
 
 
 implementation_lib.register_operator_implementation(
