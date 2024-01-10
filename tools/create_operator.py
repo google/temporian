@@ -73,7 +73,8 @@ def main(argv):
         "w",
         encoding="utf-8",
     ) as file:
-        file.write(f'''{license_content()}
+        file.write(
+            f'''{license_content()}
 
 """{capitalized_op} operator class and public API function definitions."""
 
@@ -156,7 +157,8 @@ def {lower_op}(input: EventSetOrNode, param: float) -> EventSetOrNode:
 
     return {capitalized_op}(input=input, param=param).outputs["output"]
 
-''')
+'''
+        )
 
     # Operator build
     with open(
@@ -164,7 +166,8 @@ def {lower_op}(input: EventSetOrNode, param: float) -> EventSetOrNode:
         "a",
         encoding="utf-8",
     ) as file:
-        file.write(f"""
+        file.write(
+            f"""
 py_library(
     name = "{lower_op}",
     srcs = ["{lower_op}.py"],
@@ -177,7 +180,8 @@ py_library(
         "//temporian/proto:core_py_proto",
     ],
 )
-    """)
+    """
+        )
 
     # Operator implementation
     with open(
@@ -191,7 +195,8 @@ py_library(
         "w",
         encoding="utf-8",
     ) as file:
-        file.write(f'''{license_content()}
+        file.write(
+            f'''{license_content()}
 
 """Implementation for the {capitalized_op} operator."""
 
@@ -236,7 +241,8 @@ class {capitalized_op}NumpyImplementation(OperatorImplementation):
 implementation_lib.register_operator_implementation(
     {capitalized_op}, {capitalized_op}NumpyImplementation
 )
-''')
+'''
+        )
 
     # Operator implementation build
     with open(
@@ -246,7 +252,8 @@ implementation_lib.register_operator_implementation(
         "a",
         encoding="utf-8",
     ) as file:
-        file.write(f"""
+        file.write(
+            f"""
 py_library(
     name = "{lower_op}",
     srcs = ["{lower_op}.py"],
@@ -261,7 +268,8 @@ py_library(
     ],
 )
 
-    """)
+    """
+        )
 
     # Operator implementation test
     with open(
@@ -271,7 +279,8 @@ py_library(
         "w",
         encoding="utf-8",
     ) as file:
-        file.write(f"""{license_content()}
+        file.write(
+            f"""{license_content()}
 
 from absl.testing import absltest, parameterized
 
@@ -312,7 +321,8 @@ class {capitalized_op}Test(parameterized.TestCase):
 if __name__ == "__main__":
     absltest.main()
 
-""")
+"""
+        )
 
     # Operator implementation test  build
     with open(
@@ -320,7 +330,8 @@ if __name__ == "__main__":
         "a",
         encoding="utf-8",
     ) as file:
-        file.write(f"""
+        file.write(
+            f"""
 py_test(
     name = "test_{lower_op}",
     srcs = ["test_{lower_op}.py"],
@@ -331,9 +342,11 @@ py_test(
         "//temporian/test:utils",
     ],
 )
-    """)
+    """
+        )
 
-    print("""\
+    print(
+        """\
 Don't forget to update the following code:
 - The imports in the top-level init file temporian/__init__.py (if global)
 - The EventSetOperations class in temporian/core/event_set_ops.py (if not global)
@@ -347,7 +360,8 @@ Don't forget to update the following code:
 - The docs API ref's home page docs/src/reference/index.md
 - Write unit tests in temporian/core/operators/test
 - Once your op is implemented, run `python tools/build_cleaner.py` and fix Bazel dependencies
-""")
+"""
+    )
 
 
 if __name__ == "__main__":
