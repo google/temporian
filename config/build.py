@@ -59,11 +59,18 @@ class _BazelBuildCommand(setuptools.Command):
                 "https://docs.bazel.build/versions/master/install.html for "
                 "installation instruction."
             )
-        self._additional_build_options = []
         if platform.system() == "Darwin":
-            self._additional_build_options = ["--macos_minimum_os=10.9"]
+            self._additional_build_options = [
+                "--macos_minimum_os=10.9",
+                "--config=macos",
+            ]
         elif platform.system() == "Windows":
-            self._additional_build_options = ["--copt=-DWIN32_LEAN_AND_MEAN"]
+            self._additional_build_options = [
+                "--copt=-DWIN32_LEAN_AND_MEAN",
+                "--config=windows",
+            ]
+        else:
+            self._additional_build_options = ["--config=linux"]
 
     def run(self):
         subprocess.check_call(
