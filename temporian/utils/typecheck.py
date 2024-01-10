@@ -100,15 +100,11 @@ def _check_annotation(trace: _Trace, is_compiled: bool, value, annotation):
         except ValueError:
             logging.warning("Cannot unfold annotation %s", annotation)
 
-    if (
-        annotation
-        in (
-            EventSet,
-            EventSetNode,
-            EventSetOperations,
-        )
-        and isinstance(value, (EventSet, EventSetNode, EventSetOperations))
-    ):
+    if annotation in (
+        EventSet,
+        EventSetNode,
+        EventSetOperations,
+    ) and isinstance(value, (EventSet, EventSetNode, EventSetOperations)):
         return
 
     if annotation in [inspect._empty, Any, Optional]:

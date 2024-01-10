@@ -19,16 +19,14 @@ import logging
 try:
     import apache_beam as _
 except ImportError as e:
-    logging.fatal(
-        """Cannot import Apache Beam library.
+    logging.fatal("""Cannot import Apache Beam library.
 
 Solutions:
 
 1. Install Apache Beam. You can install Beam with the following command: pip install apache-beam
 
 2. Remove the temporian.beam import. If you remove the temporian.beam import, you can still run Temporian graphs in process with `import temporian as tp` and `tp.evaluate`.
-"""
-    )
+""")
 
 from temporian.beam.io.dict import to_event_set, to_dict
 from temporian.beam.io.csv import from_csv_raw, from_csv, to_csv
