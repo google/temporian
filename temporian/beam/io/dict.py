@@ -1,11 +1,10 @@
 """Utilities to import/export Beam-Event-Set from/to dataset containers."""
 
-from typing import Iterable, Dict, Any, Tuple, Iterator
+from typing import Dict, Any, Tuple, Iterator, Sequence, List
 
 import numpy as np
 import apache_beam as beam
 
-from temporian.core.data.node import Schema
 from temporian.core.data.dtype import DType, tp_dtype_to_py_type
 from temporian.io.format import DictEventSetFormat, DictEventSetFormatChoices
 from temporian.implementation.numpy.data.dtype_normalization import (
@@ -25,19 +24,23 @@ from temporian.beam.typing import (
     FeatureItemWithIdxValue,
     FeatureItemWithIdx,
 )
+from temporian.core.data.schema import Schema, FeatureSchema
+from temporian.beam.io import np_array_coder  # pylint: disable=unused-import
 
 
 def _cast_feature_value(value: Any, dtype: DType) -> SingleFeatureValue:
     """Convert a user feature value to the internal representation."""
 
-    py_type = tp_dtype_to_np_dtype(dtype)
+    py_type = tp_dtype_to_py_type(dtype)
+    if py_type is bytes and isinstance(value, str):
+        return bytes(value, encoding="utf-8")
     return py_type(value)
 
 
 def _cast_index_value(value: Any, dtype: DType) -> BeamIndexKeyItem:
     """Convert a user index value to the internal representation."""
 
-    return _cast_feature_value(value, dtype).item()
+    return _cast_feature_value(value, dtype)
 
 
 def _parse_and_index(
@@ -60,16 +63,16 @@ def _parse_and_index(
     the user into BeamEventSet, the working format used by Temporian.
     """
 
-    index_values = [
+    index_values = tuple(
         _cast_index_value(row[index.name], index.dtype)
         for index in schema.indexes
-    ]
-    feature_values = [
+    )
+    feature_values = tuple(
         _cast_feature_value(row[feature.name], feature.dtype)
         for feature in schema.features
-    ]
-    timestamp = np.float64(row[timestamp_key])
-    return tuple(index_values), (timestamp, tuple(feature_values))
+    )
+    timestamp = float(row[timestamp_key])
+    return index_values, (timestamp, feature_values)
 
 
 class _MergeTimestamps(beam.DoFn):
@@ -79,7 +82,7 @@ class _MergeTimestamps(beam.DoFn):
     feature+index, and splits aggragated values by features.
 
     Example:
-        item
+        Input
             (20, ), (100, (11, 12))
             (20, ), (101, (13, 14))
             (21, ), (102, (15, 16))
@@ -94,27 +97,43 @@ class _MergeTimestamps(beam.DoFn):
     the user into BeamEventSet, the working format used by Temporian.
     """
 
-    def __init__(self, num_features: int):
-        self._num_features = num_features
+    def __init__(self, features: List[FeatureSchema]):
+        self._feature_np_dtypes = [
+            tp_dtype_to_np_dtype(feature.dtype) for feature in features
+        ]
 
     def process(
         self,
-        item: Tuple[BeamIndexKey, Iterable[StructuredRowValue]],
+        item: Tuple[BeamIndexKey, Sequence[StructuredRowValue]],
     ) -> Iterator[FeatureItemWithIdx]:
         index, feat_and_ts = item
-        timestamps = np.array([v[0] for v in feat_and_ts], dtype=np.float64)
-        for feature_idx in range(self._num_features):
-            values = np.array([v[1][feature_idx] for v in feat_and_ts])
+        timestamps = np.fromiter(
+            (v[0] for v in feat_and_ts),
+            dtype=np.float64,
+            count=len(feat_and_ts),
+        )
+        for feature_idx, feature_np_type in enumerate(self._feature_np_dtypes):
+            if feature_np_type is np.bytes_:
+                # Let numpy figure the length of the longest string.
+                values = np.array([v[1][feature_idx] for v in feat_and_ts])
+            else:
+                values = np.fromiter(
+                    (v[1][feature_idx] for v in feat_and_ts),
+                    dtype=feature_np_type,
+                    count=len(feat_and_ts),
+                )
             yield index, (timestamps, values, feature_idx)
 
 
 def _merge_timestamps_no_features(
-    item: Tuple[BeamIndexKey, Iterable[StructuredRowValue]],
+    item: Tuple[BeamIndexKey, Sequence[StructuredRowValue]],
 ) -> FeatureItem:
     """Same as _MergeTimestamps, but when there are no features."""
 
     index, feat_and_ts = item
-    timestamps = np.array([v[0] for v in feat_and_ts], dtype=np.float64)
+    timestamps = np.fromiter(
+        (v[0] for v in feat_and_ts), dtype=np.float64, count=len(feat_and_ts)
+    )
     return index, (timestamps, None)
 
 
@@ -304,7 +323,7 @@ def to_event_set(
                 indexed
                 # Build feature and timestamps arrays.
                 | "Merge by timestamps"
-                >> beam.ParDo(_MergeTimestamps(num_features)),
+                >> beam.ParDo(_MergeTimestamps(schema.features)),
                 num_features=num_features,
                 reshuffle=True,
             )
@@ -324,7 +343,7 @@ def to_event_set(
 def _convert_to_dict_event_key_value(
     item: Tuple[
         BeamIndexKey,
-        Iterable[FeatureItemWithIdxValue],
+        Sequence[FeatureItemWithIdxValue],
     ],
     schema: Schema,
     timestamp_key: str,
@@ -343,11 +362,11 @@ def _convert_to_dict_event_key_value(
     timestamps = feature_blocks[0][POS_TIMESTAMP_VALUES]
     for event_idx, timestamp in enumerate(timestamps):
         item_dict = common_item_dict.copy()
-        item_dict[timestamp_key] = timestamp
+        item_dict[timestamp_key] = timestamp.item()
         for feature_schema, feature in zip(schema.features, feature_blocks):
             values = feature[POS_FEATURE_VALUES]
             assert values is not None
-            item_dict[feature_schema.name] = values[event_idx]
+            item_dict[feature_schema.name] = values[event_idx].item()
 
         yield item_dict
 
@@ -355,7 +374,7 @@ def _convert_to_dict_event_key_value(
 def _convert_to_dict_event_set_key_value(
     item: Tuple[
         BeamIndexKey,
-        Iterable[FeatureItemWithIdxValue],
+        Sequence[FeatureItemWithIdxValue],
     ],
     schema: Schema,
     timestamp_key: str,
