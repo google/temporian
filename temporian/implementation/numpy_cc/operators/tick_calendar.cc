@@ -28,8 +28,8 @@ py::array_t<double> tick_calendar(
   std::vector<double> ticks;
 
   // Date range
-  const long start_t = (long)std::floor(start_timestamp);
-  const long end_t = (long)std::floor(end_timestamp);
+  const auto start_t = static_cast<std::time_t>(std::floor(start_timestamp));
+  const auto end_t = static_cast<std::time_t>(std::floor(end_timestamp));
 
   std::tm start_utc = *std::gmtime(&start_t);
 
@@ -51,15 +51,18 @@ py::array_t<double> tick_calendar(
         while (hour <= max_hour && in_range) {
           while (minute <= max_minute && in_range) {
             while (second <= max_second && in_range) {
-              std::tm tm_date = {};
-              tm_date.tm_year = year;      // Since 1900
-              tm_date.tm_mon = month - 1;  // zero-based
-              tm_date.tm_mday = mday;
-              tm_date.tm_hour = hour;
-              tm_date.tm_min = minute;
-              tm_date.tm_sec = second;
-              tm_date.tm_isdst = 0;
-              tm_date.tm_gmtoff = start_local.tm_gmtoff;
+              std::tm tm_date = {
+                .tm_sec = second,
+                .tm_min = minute,
+                .tm_hour = hour,
+                .tm_mday = mday,
+                .tm_mon = month - 1,  // zero-based
+                .tm_year = year,      // Since 1900
+                .tm_isdst = 0,
+                // TODO: Solve following:
+                // https://github.com/google/temporian/pull/325
+                // .tm_gmtoff = start_local.tm_gmtoff,
+              };
 
               // This assumes that the date is in local timezone
               const std::time_t time_local = std::mktime(&tm_date);

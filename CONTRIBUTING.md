@@ -68,7 +68,7 @@ poetry shell
 Run all tests with bazel:
 
 ```shell
-bazel test //...:all
+bazel test --config=linux //...:all
 ```
 
 You can use the Bazel test flag `--test_output=streamed` to see the test logs in realtime.
@@ -85,12 +85,12 @@ Benchmarking and profiling of pre-configured scripts is available as follow:
 #### Time and memory profiling
 
 ```shell
-bazel run -c opt //benchmark:profile_time -- [name]
-bazel run -c opt //benchmark:profile_memory -- [name] [-p]
+bazel run -c opt --config=linux //benchmark:profile_time -- [name]
+bazel run -c opt --config=linux //benchmark:profile_memory -- [name] [-p]
 ```
 
 where `[name]` is the name of one of the python scripts in
-[benchmark/scripts](benchmark/scripts), e.g. `bazel run -c opt benchmark:profile_time -- basic`.
+[benchmark/scripts](benchmark/scripts), e.g. `bazel run -c opt --config=linux benchmark:profile_time -- basic`.
 
 `-p` flag displays memory over time plot instead of line-by-line memory
 consumption.
@@ -98,7 +98,7 @@ consumption.
 #### Time benchmarking
 
 ```shell
-bazel run -c opt //benchmark:benchmark_time
+bazel run -c opt --config=linux //benchmark:benchmark_time
 ```
 
 ### Running docs server
@@ -161,7 +161,7 @@ To check if your examples are correct, you may run:
 
 ```shell
 # Test anything in temporian/*.py and docs/*.md
-bazel test //temporian/test:doc_test --test_output=streamed
+bazel test --config=linux //temporian/test:doc_test --test_output=streamed
 ```
 
 In case of unexpected outputs, the result is printed and compared to the expected values, so that they can be fixed.

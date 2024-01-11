@@ -58,4 +58,5 @@ Note that separate builds for ARM64 and Intel Macs are necessary.
 
 ## Windows builds
 
-TODO
+Install the requirements listed in `tools\build.bat`, and then run it. The pip
+packages are exported to `dist/`.

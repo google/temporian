@@ -18,7 +18,7 @@ jobs:
           - tutorials/bank_fraud_detection_with_tfdf
           - tutorials/heart_rate_analysis
           # - tutorials/loan_outcomes_prediction # TODO: re enable this notebook
-          - tutorials/m5_competition
+          # - tutorials/m5_competition # Note: Github cannot download dataset anymore.
     steps:
       - name: Checkout
         uses: actions/checkout@v3

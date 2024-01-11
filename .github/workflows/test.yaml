@@ -39,7 +39,7 @@ jobs:
         run: poetry install --no-interaction
 
       - name: Run tests
-        run: poetry run bazel test //temporian/...:all //docs/...:all //tools/...:all --test_output=errors --compilation_mode=dbg
+        run: poetry run bazel test //temporian/...:all //docs/...:all //tools/...:all --test_output=errors --compilation_mode=dbg --config=linux
         # Note: Since mid-August 23, using "//...:all" incorrectly try to
         # compile the directory "build" created during the installation of one
         # of the dependency during "poetry install".

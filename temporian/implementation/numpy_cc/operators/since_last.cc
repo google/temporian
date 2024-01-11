@@ -1,6 +1,7 @@
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
+#include <limits>
 #include <cstdint>
 #include <iostream>
 #include <map>

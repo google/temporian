@@ -5,5 +5,45 @@ build --noincompatible_strict_action_env
 build:linux --copt=-fdiagnostics-color=always
 build --color=yes
 
-build --cxxopt=-std=c++17
-build --host_cxxopt=-std=c++17
+build:linux --cxxopt=-std=c++17
+build:linux --host_cxxopt=-std=c++17
+
+build:macos --cxxopt=-std=c++17
+build:macos --host_cxxopt=-std=c++17
+
+build:windows --cxxopt=/std:c++20
+build:windows --host_cxxopt=/std:c++20
+
+
+# Misc build options we need for windows.
+build:windows --copt=/Zc:__cplusplus
+build:windows --host_copt=/Zc:__cplusplus
+build:windows --copt=/D_USE_MATH_DEFINES
+build:windows --host_copt=/D_USE_MATH_DEFINES
+build:windows --copt=-DWIN32_LEAN_AND_MEAN
+build:windows --host_copt=-DWIN32_LEAN_AND_MEAN
+build:windows --copt=-DNOGDI
+build:windows --host_copt=-DNOGDI
+build:windows --linkopt=/NDEBUG
+build:windows --host_linkopt=/NDEBUG
+# Eliminates functions never referenced
+build:windows --linkopt=/OPT:REF
+build:windows --host_linkopt=/OPT:REF
+# Redundant COMDATs
+build:windows --linkopt=/OPT:ICF
+build:windows --host_linkopt=/OPT:ICF
+# Enable preprocessor conformance mode
+build:windows --copt=/Zc:preprocessor
+build:windows --host_copt=/Zc:preprocessor
+ # Generate Intrinsic Functions
+build:windows --copt=/Oi
+build:windows --host_copt=/Oi
+ # Whole program optimization (not for tooling)
+build:windows --copt=/GL
+# Enable Function-Level Linking
+build:windows --copt=/Gy
+build:windows --host_copt=/Gy
+build:windows --materialize_param_files
+build:windows --features=compiler_param_file
+build:windows --verbose_failures
+build:windows --experimental_strict_action_env=true
