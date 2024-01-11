@@ -13,6 +13,7 @@ py_library(
     deps = [
         # already_there/apache_beam
         # already_there/numpy
+        ":np_array_coder",
         "//temporian/implementation/numpy/data:dtype_normalization",
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
@@ -47,5 +48,15 @@ py_library(
         "//temporian/core/data:node",
         "//temporian/beam:typing",
         "//temporian/io:format",
+    ],
+)
+
+py_library(
+    name = "np_array_coder",
+    srcs = ["np_array_coder.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/apache_beam
+        # already_there/numpy
     ],
 )
