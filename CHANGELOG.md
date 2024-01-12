@@ -8,6 +8,21 @@
 
 ### Fixes
 
+## 0.7.0
+
+### Features
+
+- Add `tp.from_parquet()` and `tp.to_parquet()`.
+- Add `EventSet.fillna()` operator.
+
+### Improvements
+
+- Add support for pip build on Windows.
+- Documentation improvements.
+- Add `timestamps` parameter to `tp.from_pandas()`.
+- Add implicit casting in `EventSet.where()` operator.
+- Add support for list argument in `EventSet.rename()` operator.
+
 ## 0.1.6
 
 ### Features
