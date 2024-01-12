@@ -235,7 +235,9 @@ def save_graph(
         f.write(text_format.MessageToBytes(proto))
 
 
-def load_graph(path: str, squeeze: bool = False) -> Tuple[
+def load_graph(
+    path: str, squeeze: bool = False
+) -> Tuple[
     Union[EventSetNode, Dict[str, EventSetNode]],
     Union[EventSetNode, Dict[str, EventSetNode]],
 ]:
