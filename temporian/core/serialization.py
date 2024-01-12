@@ -311,7 +311,7 @@ def _check_fn_outputs(output: Any):
 
 def _kwargs_from_args_and_kwargs(
     param_names: List[str],
-    args: Tuple[Any],
+    args: Tuple[Any, ...],
     kwargs: Dict[str, Any],
 ) -> Dict[str, Any]:
     """Merges args and kwargs into a single name->value param dict."""

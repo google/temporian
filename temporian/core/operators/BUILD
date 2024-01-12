@@ -102,6 +102,7 @@ py_library(
         "//temporian/core/data:dtype",
         "//temporian/core/data:node",
         "//temporian/proto:core_py_proto",
+        "//temporian/core/data:duration_utils",
     ],
 )
 

@@ -115,7 +115,7 @@ class AfterTest(TestCase):
         )
 
         with self.assertRaisesRegex(ValueError, "unix"):
-            result = evset.after(datetime(2023, 11, 16, 10, 16, 00))
+            _ = evset.after(datetime(2023, 11, 16, 10, 16, 00))
 
 
 if __name__ == "__main__":

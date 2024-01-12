@@ -42,7 +42,7 @@ py_test(
     deps = [
         # already_there/absl/testing:absltest
         # already_there/numpy
-        # already_there/pandas
+        # already_there/pyarrow
         "//temporian/test:utils",
         "//temporian/implementation/numpy/data:io",
         "//temporian/io:parquet",

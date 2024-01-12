@@ -4119,14 +4119,14 @@ class EventSetOperations:
 
         Unix timestamps and filter example:
             ```python
-            >>> from datetime import datetime
+            >>> from datetime import datetime, timezone
             >>> a = tp.event_set(
             ...    timestamps=[datetime(1970,1,1,0,0,30), datetime(2023,1,1,1,0,0)],
             ... )
             >>> b = a.timestamps()
 
             >>> # Filter using the timestamps
-            >>> max_date = datetime(2020, 1, 1).timestamp()
+            >>> max_date = datetime(2020, 1, 1, tzinfo=timezone.utc).timestamp()
             >>> c = b.filter(b < max_date)
 
             >>> # Operate like any other feature

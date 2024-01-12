@@ -29,6 +29,7 @@ from temporian.core.data.node import (
 from temporian.core.operators.base import Operator
 from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
+from temporian.core.data import duration_utils
 
 
 class FilterOperator(Operator):
@@ -110,7 +111,7 @@ def before(
                 " not unix timestamp. Set `is_unix_timestamp=True` on the"
                 " EventSet or use a float when calling `before`"
             )
-        timestamp = timestamp.timestamp()
+        timestamp = duration_utils.normalize_timestamp(timestamp)
     else:
         if input.schema.is_unix_timestamp:
             raise ValueError(
@@ -134,7 +135,7 @@ def after(
                 " not unix timestamp. Set `is_unix_timestamp=True` on the"
                 " EventSet or use a float when calling `after`"
             )
-        timestamp = timestamp.timestamp()
+        timestamp = duration_utils.normalize_timestamp(timestamp)
     else:
         if input.schema.is_unix_timestamp:
             raise ValueError(
