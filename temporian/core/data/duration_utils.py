@@ -60,7 +60,7 @@ def normalize_timestamp(x: Timestamp) -> NormalizedTimestamp:
         return x.astype("datetime64[ns]").astype(np.float64) / 1e9
 
     if isinstance(x, datetime.datetime):
-        return float(x.timestamp())
+        return float(x.replace(tzinfo=datetime.timezone.utc).timestamp())
 
     if isinstance(x, int):
         return float(x)

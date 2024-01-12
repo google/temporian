@@ -235,9 +235,7 @@ def save_graph(
         f.write(text_format.MessageToBytes(proto))
 
 
-def load_graph(
-    path: str, squeeze: bool = False
-) -> Tuple[
+def load_graph(path: str, squeeze: bool = False) -> Tuple[
     Union[EventSetNode, Dict[str, EventSetNode]],
     Union[EventSetNode, Dict[str, EventSetNode]],
 ]:
@@ -311,7 +309,7 @@ def _check_fn_outputs(output: Any):
 
 def _kwargs_from_args_and_kwargs(
     param_names: List[str],
-    args: Tuple[Any],
+    args: Tuple[Any, ...],
     kwargs: Dict[str, Any],
 ) -> Dict[str, Any]:
     """Merges args and kwargs into a single name->value param dict."""
