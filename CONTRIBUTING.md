@@ -168,7 +168,7 @@ In case of unexpected outputs, the result is printed and compared to the expecte
 
 ### Developing a new operator
 
-We provide a utility script that generates new files, modifies existing ones, and prints needed modifications to develop and make available a new operator. From the project's root, run:
+We provide a utility script that generates placeholder files, modifies existing ones, and prints needed modifications to develop and make available a new operator. From the project's root, run:
 
 ```shell
 tools/create_operator.py --operator <name>
@@ -180,11 +180,17 @@ Here are some key files you'll need to modify (and write the operator's logic in
 - [temporian/core/event_set_ops.py](temporian/core/event_set_ops.py) or [temporian/__init__.py](temporian/__init__.py), depending on if the operator is available in the `EventSet` class (like `EventSet.since_last()`) or in the global `tp` module (like `tp.glue()`).
 - Write the operator's core logic in `temporian/core/operators/<name>.py`.
     - The core logic is that related to the operator's definition in the graph, checks, and normalization during initialization. It doesn't interact with the actual data contained within the `EventSet`.
-    - See for example [temporian/core/operators/since_last.py](temporian/core/operators/since_last.py).
+    - Example: [temporian/core/operators/since_last.py](temporian/core/operators/since_last.py).
 - Write the operator's implementation in `temporian/implementation/numpy/operators/<name>.py`.
     - The implementation is what actually executes the operator's logic on an `EventSet`'s data.
-    - See for example [temporian/implementation/numpy/operators/since_last.py](temporian/implementation/numpy/operators/since_last.py).
+    - Example of a Python-only operator: [temporian/implementation/numpy/operators/since_last.py](temporian/implementation/numpy/operators/since_last.py).
+    - Example of a C++ operator: [temporian/implementation/numpy/operators/resample.py](temporian/implementation/numpy/operators/resample.py) and [temporian/implementation/numpy_cc/operators/resample.cc](temporian/implementation/numpy_cc/operators/resample.cc).
 - Write unit tests for the operator in `temporian/core/operators/test/test_<name>.py`.
-    - See for example [temporian/core/operators/test/test_since_last.py](temporian/core/operators/test/test_since_last.py).
+    - Example: [temporian/core/operators/test/test_since_last.py](temporian/core/operators/test/test_since_last.py).
+- Add the operator to the docs in `docs/src/reference/temporian/operators/<name>.md`.
+    - The docs are generated automatically by [mkdocstrings](https://mkdocstrings.github.io/python/) from the operator's docstring.
+    - Example: [docs/src/reference/temporian/operators/since_last.md](docs/src/reference/temporian/operators/since_last.md).
+
+Groups of operator with a similar implementation as grouped together. For instance, `temporian/core/operators/window` contains moving window operators (e.g., `EventSet.simple_moving_average()`) and `temporian/core/operators/binary` contains operators taking two features as input (e.g. `EventSet.subtract()`).
 
 Read the script's output to see in detail all other files that need to be modified to finish setting up the operator!
