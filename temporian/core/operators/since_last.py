@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Resample operator class and public API function definition."""
+"""Since last operator class and public API function definition."""
 
 from typing import Optional
 

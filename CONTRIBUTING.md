@@ -175,3 +175,16 @@ tools/create_operator.py --operator <name>
 ```
 
 so for example, to create the `EventSet.map()` operator, you'd run `tools/create_operator.py --operator map`.
+
+Here are some key files you'll need to modify (and write the operator's logic in):
+- [temporian/core/event_set_ops.py](temporian/core/event_set_ops.py) or [temporian/__init__.py](temporian/__init__.py), depending on if the operator is available in the `EventSet` class (like `EventSet.since_last()`) or in the global `tp` module (like `tp.glue()`).
+- Write the operator's core logic in `temporian/core/operators/<name>.py`.
+    - The core logic is that related to the operator's definition in the graph, checks, and normalization during initialization. It doesn't interact with the actual data contained within the `EventSet`.
+    - See for example [temporian/core/operators/since_last.py](temporian/core/operators/since_last.py).
+- Write the operator's implementation in `temporian/implementation/numpy/operators/<name>.py`.
+    - The implementation is what actually executes the operator's logic on an `EventSet`'s data.
+    - See for example [temporian/implementation/numpy/operators/since_last.py](temporian/implementation/numpy/operators/since_last.py).
+- Write unit tests for the operator in `temporian/core/operators/test/test_<name>.py`.
+    - See for example [temporian/core/operators/test/test_since_last.py](temporian/core/operators/test/test_since_last.py).
+
+Read the script's output to see in detail all other files that need to be modified to finish setting up the operator!
