@@ -165,3 +165,13 @@ bazel test --config=linux //temporian/test:doc_test --test_output=streamed
 ```
 
 In case of unexpected outputs, the result is printed and compared to the expected values, so that they can be fixed.
+
+### Developing a new operator
+
+We provide a utility script that generates new files, modifies existing ones, and prints needed modifications to develop and make available a new operator. From the project's root, run:
+
+```shell
+tools/create_operator.py --operator <name>
+```
+
+so for example, to create the `EventSet.map()` operator, you'd run `tools/create_operator.py --operator map`.
