@@ -31,8 +31,8 @@ jobs:
           name: dist-ubuntu-${{ matrix.python-version }}
           path: dist
 
-  build-macos:
-    runs-on: macos-latest-xl
+  build-macos-intel:
+    runs-on: macos-12-large
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
@@ -54,11 +54,37 @@ jobs:
       - name: Save package for following jobs
         uses: actions/upload-artifact@v3
         with:
-          name: dist-macos-${{ matrix.python-version }}
+          name: dist-macos-intel-${{ matrix.python-version }}
+          path: dist
+
+  build-macos-arm:
+    runs-on: macos-latest-xlarge
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install poetry
+        run: pip install poetry
+
+      - name: Build package
+        run: poetry build
+
+      - name: Save package for following jobs
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-macos-arm-${{ matrix.python-version }}
           path: dist
 
   test-install:
-    needs: [build-linux, build-macos]
+    needs: [build-linux, build-macos-intel, build-macos-arm]
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
