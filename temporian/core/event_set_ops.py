@@ -1501,6 +1501,38 @@ class EventSetOperations:
 
         return abs(self)
 
+    def __round__(self):
+        from temporian.core.operators.unary import round
+
+        return round(input=self)
+    
+    def round(
+        self: EventSetOrNode,
+    ) -> EventSetOrNode:
+        """Rounds the values of an [`EventSet`][temporian.EventSet]'s features to the nearest integer.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"M": [1.4, 2.6, 3.1], "N":  [-1.9, -3.5, 5.8]},
+            ... )
+            >>> a.round()
+            indexes: ...
+                    'M': [1, 3, 3]
+                    'N': [-2, -4, 6]
+            ...
+
+            ```
+
+        Returns:
+            EventSet with rounded feature values.
+        """
+        from temporian.core.operators.unary import round
+
+        return round(self)
+
+
     def add_index(
         self: EventSetOrNode, indexes: Union[str, List[str]]
     ) -> EventSetOrNode:
@@ -2894,6 +2926,7 @@ class EventSetOperations:
         from temporian.core.operators.unary import log
 
         return log(self)
+
 
     def moving_count(
         self: EventSetOrNode,

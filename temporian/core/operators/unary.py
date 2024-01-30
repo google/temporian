@@ -182,11 +182,30 @@ class LogOperator(BaseUnaryOperator):
         return feature_dtype
 
 
+class RoundOperator(BaseUnaryOperator):
+    @classmethod
+    def op_key_definition(cls) -> str:
+        return "ROUND"
+
+    @classmethod
+    def allowed_dtypes(cls) -> List[DType]:
+        return [
+            DType.INT32,
+            DType.INT64,
+        ]
+
+    @classmethod
+    def get_output_dtype(cls, feature_dtype: DType) -> DType:
+        return feature_dtype
+
+
 operator_lib.register_operator(InvertOperator)
 operator_lib.register_operator(IsNanOperator)
 operator_lib.register_operator(NotNanOperator)
 operator_lib.register_operator(AbsOperator)
 operator_lib.register_operator(LogOperator)
+operator_lib.register_operator(RoundOperator)
+
 
 
 @compile
@@ -240,5 +259,16 @@ def log(
     assert isinstance(input, EventSetNode)
 
     return LogOperator(
+        input=input,
+    ).outputs["output"]
+
+
+@compile
+def round(
+    input: EventSetOrNode,
+) -> EventSetOrNode:
+    assert isinstance(input, EventSetNode)
+
+    return RoundOperator(
         input=input,
     ).outputs["output"]

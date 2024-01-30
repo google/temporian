@@ -10,6 +10,7 @@ from temporian.core.operators.unary import (
     NotNanOperator,
     IsNanOperator,
     LogOperator,
+    RoundOperator,
 )
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.data.event_set import IndexData
@@ -77,6 +78,11 @@ class LogNumpyImplementation(BaseUnaryNumpyImplementation):
         return np.log(feature)
 
 
+class RoundNumpyImplementation(BaseUnaryNumpyImplementation):
+    def _do_operation(self, feature: np.ndarray) -> np.ndarray:
+        return np.round(feature)
+
+
 implementation_lib.register_operator_implementation(
     AbsOperator, AbsNumpyImplementation
 )
@@ -91,4 +97,7 @@ implementation_lib.register_operator_implementation(
 )
 implementation_lib.register_operator_implementation(
     LogOperator, LogNumpyImplementation
+)
+implementation_lib.register_operator_implementation(
+    RoundOperator, RoundNumpyImplementation
 )
