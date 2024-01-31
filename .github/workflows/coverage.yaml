@@ -1,64 +1,64 @@
-name: coverage
+# name: coverage
 
-on: [pull_request]
+# on: [pull_request]
 
-jobs:
-  coverage:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        branch: [pr, main]
-    outputs:
-      cov-pr: ${{ steps.coverage.outputs.cov-pr }}
-      cov-main: ${{ steps.coverage.outputs.cov-main }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ matrix.branch == 'main' && 'main' || '' }}
+# jobs:
+#   coverage:
+#     runs-on: ubuntu-latest
+#     strategy:
+#       matrix:
+#         branch: [pr, main]
+#     outputs:
+#       cov-pr: ${{ steps.coverage.outputs.cov-pr }}
+#       cov-main: ${{ steps.coverage.outputs.cov-main }}
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v3
+#         with:
+#           ref: ${{ matrix.branch == 'main' && 'main' || '' }}
 
-      - name: Bazel cache
-        id: bazel-cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/bazel
-          key: ${{ runner.os }}-3.10-bazel-cache-${{ hashFiles('**/BUILD', '.bazelrc', '.bazelversion', 'WORKSPACE') }}
-          restore-keys: ${{ runner.os }}-3.10-bazel-cache-
+#       - name: Bazel cache
+#         id: bazel-cache
+#         uses: actions/cache@v3
+#         with:
+#           path: ~/.cache/bazel
+#           key: ${{ runner.os }}-3.10-bazel-cache-${{ hashFiles('**/BUILD', '.bazelrc', '.bazelversion', 'WORKSPACE') }}
+#           restore-keys: ${{ runner.os }}-3.10-bazel-cache-
 
-      - name: Install poetry
-        run: pipx install poetry
+#       - name: Install poetry
+#         run: pipx install poetry
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-          cache: poetry
+#       - name: Setup Python
+#         uses: actions/setup-python@v4
+#         with:
+#           python-version: "3.10"
+#           cache: poetry
 
-      - name: Install dependencies
-        run: poetry install --no-interaction
+#       - name: Install dependencies
+#         run: poetry install --no-interaction
 
-      - name: Run coverage
-        id: coverage
-        run: |
-          poetry run ./tools/coverage.sh
-          poetry run coverage json
-          content=$(cat ./coverage.json)
-          echo "cov-${{ matrix.branch }}=$content" >> $GITHUB_OUTPUT
+#       - name: Run coverage
+#         id: coverage
+#         run: |
+#           poetry run ./tools/coverage.sh
+#           poetry run coverage json
+#           content=$(cat ./coverage.json)
+#           echo "cov-${{ matrix.branch }}=$content" >> $GITHUB_OUTPUT
 
-  comment:
-    runs-on: ubuntu-latest
-    needs: [coverage]
-    steps:
-      - uses: actions/github-script@v6
-        with:
-          script: |
-            const pr = ${{fromJson(needs.coverage.outputs.cov-pr).totals.percent_covered}};
-            const main = ${{fromJson(needs.coverage.outputs.cov-main).totals.percent_covered}};
-            const diff = pr - main;
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `### Coverage report
-              **Main**: ${main.toFixed(2)}% | **PR**: ${pr.toFixed(2)}% | **Diff: ${diff.toFixed(2)} ${diff >= 0 ? '✅' : '⚠️'}**`
-            })
+#   comment:
+#     runs-on: ubuntu-latest
+#     needs: [coverage]
+#     steps:
+#       - uses: actions/github-script@v6
+#         with:
+#           script: |
+#             const pr = ${{fromJson(needs.coverage.outputs.cov-pr).totals.percent_covered}};
+#             const main = ${{fromJson(needs.coverage.outputs.cov-main).totals.percent_covered}};
+#             const diff = pr - main;
+#             github.rest.issues.createComment({
+#               issue_number: context.issue.number,
+#               owner: context.repo.owner,
+#               repo: context.repo.repo,
+#               body: `### Coverage report
+#               **Main**: ${main.toFixed(2)}% | **PR**: ${pr.toFixed(2)}% | **Diff: ${diff.toFixed(2)} ${diff >= 0 ? '✅' : '⚠️'}**`
+#             })
