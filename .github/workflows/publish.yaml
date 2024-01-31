@@ -1,6 +1,8 @@
 name: publish
 
 on:
+  push:
+    # REMOVE
   release:
     types: [published] # Runs both for releases and prereleases
 
