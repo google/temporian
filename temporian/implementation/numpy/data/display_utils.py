@@ -77,9 +77,9 @@ def display_html(evset: EventSet) -> str:
         index_data = evset.data[index_key]
         num_timestamps = len(index_data.timestamps)
         max_timestamps = config.display_max_events or num_timestamps
-        #Slices timestamps and features if there are more than 6 events
-        display_timestamps = np.concatenate((index_data.timestamps[:3], index_data.timestamps[-3:])) if num_timestamps > 6 else index_data.timestamps[:num_timestamps]
-        display_features = [np.concatenate((values[:3], values[-3:])) if num_timestamps > 6 else values for values in index_data.features]
+        #Slices timestamps and features if there are more than 7 events
+        display_timestamps = np.concatenate((index_data.timestamps[:3], index_data.timestamps[-3:])) if num_timestamps > 7 else index_data.timestamps[:num_timestamps]
+        display_features = [np.concatenate((values[:3], values[-3:])) if num_timestamps > 7 else values for values in index_data.features]
 
         # Display index values
         html_index_value = html_div(dom)
@@ -150,7 +150,7 @@ def display_html(evset: EventSet) -> str:
                 
             # Create ellipse row if more than 6 entries
             table.appendChild(html_table_row(dom, row))
-            if timestamp_idx == 2 and num_timestamps > 6:
+            if timestamp_idx == 2 and num_timestamps > 7:
                 ellipsis_row = [ELLIPSIS] * (1 + len(visible_feats) + int(has_hidden_feats))
                 table.appendChild(html_table_row(dom, ellipsis_row))
 
