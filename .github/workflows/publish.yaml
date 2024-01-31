@@ -5,60 +5,62 @@ on:
     types: [published] # Runs both for releases and prereleases
 
 jobs:
-  test:
-    uses: google/temporian/.github/workflows/test.yaml@main
-    secrets: inherit
+  # test:
+  #   uses: google/temporian/.github/workflows/test.yaml@main
+  #   secrets: inherit
 
-  build-linux:
-    runs-on: ubuntu-latest
-    container: gcr.io/tfx-oss-public/manylinux2014-bazel:bazel-5.3.0
-    strategy:
-      matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+  # build-linux:
+  #   runs-on: ubuntu-latest
+  #   container: gcr.io/tfx-oss-public/manylinux2014-bazel:bazel-5.3.0
+  #   strategy:
+  #     matrix:
+  #       python-version: ["3.8", "3.9", "3.10", "3.11"]
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
 
-      - name: Build package
-        run: |
-          version="${{ matrix.python-version }}"
-          versionstr=${version//./}
-          PYTHON_VERSION=$versionstr ./tools/build_manylinux.sh
+  #     - name: Build package
+  #       run: |
+  #         version="${{ matrix.python-version }}"
+  #         versionstr=${version//./}
+  #         PYTHON_VERSION=$versionstr ./tools/build_manylinux.sh
 
-      - name: Save package for following jobs
-        uses: actions/upload-artifact@v3
-        with:
-          name: dist-ubuntu-${{ matrix.python-version }}
-          path: dist
+  #     - name: Save package for following jobs
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: dist-ubuntu-${{ matrix.python-version }}
+  #         path: dist
 
-  build-macos-intel:
-    runs-on: macos-12-large
-    strategy:
-      matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+  # # macos-XXX-large are Intel runners, macos-XXX-xlarge are arm64 runners
+  # # https://docs.github.com/en/actions/using-github-hosted-runners/about-larger-runners/about-larger-runners
+  # build-macos-intel:
+  #   runs-on: macos-13-large
+  #   strategy:
+  #     matrix:
+  #       python-version: ["3.8", "3.9", "3.10", "3.11"]
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
+  #     - name: Set up Python ${{ matrix.python-version }}
+  #       uses: actions/setup-python@v4
+  #       with:
+  #         python-version: ${{ matrix.python-version }}
 
-      - name: Install poetry
-        run: pip install poetry
+  #     - name: Install poetry
+  #       run: pip install poetry
 
-      - name: Build package
-        run: poetry build
+  #     - name: Build package
+  #       run: poetry build
 
-      - name: Save package for following jobs
-        uses: actions/upload-artifact@v3
-        with:
-          name: dist-macos-intel-${{ matrix.python-version }}
-          path: dist
+  #     - name: Save package for following jobs
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: dist-macos-intel-${{ matrix.python-version }}
+  #         path: dist
 
   build-macos-arm:
-    runs-on: macos-latest-xlarge
+    runs-on: macos-13-xlarge
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
@@ -84,12 +86,17 @@ jobs:
           path: dist
 
   test-install:
-    needs: [build-linux, build-macos-intel, build-macos-arm]
+    # needs: [build-linux, build-macos-intel, build-macos-arm]
+    needs: [build-macos-arm]
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
-        platform: ["ubuntu", "macos"]
-    runs-on: ${{ matrix.platform }}-latest
+        platform: [
+            # { runner: ubuntu-latest, artifact: ubuntu },
+            # { runner: macos-13-large, artifact: macos-intel },
+            { runner: macos-13-xlarge, artifact: macos-arm },
+          ]
+    runs-on: ${{ matrix.platform.runner }}
     env:
       # Workaround for macos pip compatibility issue
       # See https://github.com/actions/setup-python/issues/469
@@ -106,7 +113,7 @@ jobs:
       - name: Download build
         uses: actions/download-artifact@v3
         with:
-          name: dist-${{ matrix.platform }}-${{ matrix.python-version }}
+          name: dist-${{ matrix.platform.artifact }}-${{ matrix.python-version }}
           path: dist
 
       - name: Install from wheel
@@ -115,31 +122,31 @@ jobs:
       - name: Test installation
         run: python tools/check_install.py
 
-  publish:
-    needs: [test, test-install]
-    runs-on: ubuntu-latest
-    environment: pypi
-    env:
-      POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+  # publish:
+  #   needs: [test, test-install]
+  #   runs-on: ubuntu-latest
+  #   environment: pypi
+  #   env:
+  #     POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
 
-      - name: Install poetry
-        run: pip install poetry
+  #     - name: Install poetry
+  #       run: pip install poetry
 
-      - name: Download builds for all Python versions and platforms
-        uses: actions/download-artifact@v3
-        with:
-          # Skipping `name` key to download all artifacts from this workflow
-          # Artifacts are are downloaded to dist/<artifact-name>
-          path: dist
+  #     - name: Download builds for all Python versions and platforms
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         # Skipping `name` key to download all artifacts from this workflow
+  #         # Artifacts are are downloaded to dist/<artifact-name>
+  #         path: dist
 
-      - name: Move wheels and sources to dist/
-        run: |
-          mv dist/*/*.whl dist/
-          mv -n dist/*/*.tar.gz dist/
+  #     - name: Move wheels and sources to dist/
+  #       run: |
+  #         mv dist/*/*.whl dist/
+  #         mv -n dist/*/*.tar.gz dist/
 
-      - name: Publish to PyPI
-        # TODO: change to prod PyPI repo
-        run: poetry publish --no-interaction --skip-existing
+  #     - name: Publish to PyPI
+  #       # TODO: change to prod PyPI repo
+  #       run: poetry publish --no-interaction --skip-existing
