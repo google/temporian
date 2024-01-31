@@ -96,8 +96,7 @@ jobs:
           path: dist
 
   test-install:
-    # needs: [build-linux, build-macos-intel, build-macos-arm]
-    needs: [build-macos-arm]
+    needs: [build-linux, build-macos-intel]
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
