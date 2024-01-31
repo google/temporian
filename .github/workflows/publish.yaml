@@ -70,10 +70,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      # - name: Set up Python ${{ matrix.python-version }}
-      #   uses: actions/setup-python@v4
-      #   with:
-      #     python-version: ${{ matrix.python-version }}
+      # actions/setup-python doesn't support py < 3.10 on macos arm
+      # https://github.com/actions/setup-python/issues/696#issuecomment-1637587760
 
       - name: Install Python
         run: |
@@ -97,35 +95,71 @@ jobs:
           name: dist-macos-arm-${{ matrix.python-version }}
           path: dist
 
-  test-install:
-    # needs: [build-linux, build-macos-intel, build-macos-arm]
+  # test-install:
+  #   # needs: [build-linux, build-macos-intel, build-macos-arm]
+  #   needs: [build-macos-arm]
+  #   strategy:
+  #     matrix:
+  #       python-version: ["3.8", "3.9", "3.10", "3.11"]
+  #       platform: [
+  #           # { runner: ubuntu-latest, artifact: ubuntu },
+  #           # { runner: macos-13-large, artifact: macos-intel },
+  #           { runner: macos-13-xlarge, artifact: macos-arm },
+  #         ]
+  #   runs-on: ${{ matrix.platform.runner }}
+  #   env:
+  #     # Workaround for macos pip compatibility issue
+  #     # See https://github.com/actions/setup-python/issues/469
+  #     SYSTEM_VERSION_COMPAT: 0
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+
+  #     - name: Set up Python ${{ matrix.python-version }}
+  #       uses: actions/setup-python@v4
+  #       with:
+  #         python-version: ${{ matrix.python-version }}
+
+  #     - name: Download build
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: dist-${{ matrix.platform.artifact }}-${{ matrix.python-version }}
+  #         path: dist
+
+  #     - name: Install from wheel
+  #       run: pip install dist/*.whl
+
+  #     - name: Test installation
+  #       run: python tools/check_install.py
+
+  test-macos-arm-install:
     needs: [build-macos-arm]
+    runs-on: macos-13-xlarge
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
-        platform: [
-            # { runner: ubuntu-latest, artifact: ubuntu },
-            # { runner: macos-13-large, artifact: macos-intel },
-            { runner: macos-13-xlarge, artifact: macos-arm },
-          ]
-    runs-on: ${{ matrix.platform.runner }}
-    env:
-      # Workaround for macos pip compatibility issue
-      # See https://github.com/actions/setup-python/issues/469
-      SYSTEM_VERSION_COMPAT: 0
+    # env:
+    #   # Workaround for macos pip compatibility issue
+    #   # See https://github.com/actions/setup-python/issues/469
+    #   SYSTEM_VERSION_COMPAT: 0
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
+      - name: Install Python
+        run: |
+          brew update
+          brew install python@${{ matrix.python-version }}
+
+      - name: Install pip
+        run: |
+          curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+          python${{ matrix.python-version }} get-pip.py
 
       - name: Download build
         uses: actions/download-artifact@v3
         with:
-          name: dist-${{ matrix.platform.artifact }}-${{ matrix.python-version }}
+          name: dist-macos-arm-${{ matrix.python-version }}
           path: dist
 
       - name: Install from wheel
