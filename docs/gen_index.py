@@ -3,6 +3,7 @@ Generates a docs/index.md on the fly from the README.md and fixes some of the li
 
 Source: https://github.com/tryolabs/norfair/blob/master/docs/gen_index.py
 """
+
 import re
 
 import mkdocs_gen_files

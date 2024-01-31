@@ -1,14 +1,13 @@
-[data-md-color-scheme="temporian"] {
-    --md-primary-fg-color--light: #24201D;
-    --md-primary-fg-color--dark: #24201D;
-    background-color: red;
-    --md-default-bg-color: red;
+[data-md-color-scheme="default"] {
 }
 
 /* Change background color when dark mode */
 [data-md-color-scheme="slate"] {
     --md-default-bg-color: #121212;
     --md-code-bg-color: #212121;
+    /* make font a bit brighter than mkdocs-material's default */
+    --md-typeset-color: #f0f0f0;
+    --md-code-fg-color: #f0f0f0;
 }
 
 /* Hide Temporian text in header. Uncomment if we swap the logo in the header for the full-text one.

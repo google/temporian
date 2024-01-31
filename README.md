@@ -39,7 +39,7 @@ Temporian is to [temporal data](https://temporian.readthedocs.io/en/stable/user_
   Python, on large datasets using [Apache Beam](https://beam.apache.org/).
 -->
 
-## QuickStart
+## Quickstart
 
 ### Installation
 
@@ -120,13 +120,15 @@ the major concepts, operators, conventions, and practices of Temporian. For a
 hands-on learning experience, work through the [Tutorials](https://temporian.readthedocs.io/en/stable/tutorials/) or refer to the [API
 reference](https://temporian.readthedocs.io/en/stable/reference/).
 
+If you need help, have a question, want to contribute, or just want to be a part of the Temporian community, we encourage you to join our [Discord](https://discord.gg/x8rm9YYy) server! 🤝🏼
+
 ## Documentation
 
 The documentation 📚 is available at [temporian.readthedocs.io](https://temporian.readthedocs.io/en/stable/). The [Getting Started guide](https://temporian.readthedocs.io/en/stable/getting_started/) is the best way to start.
 
 ## Contributing
 
-Contributions to Temporian are welcome! Check out the [contributing guide](CONTRIBUTING.md) to get started.
+Contributions to Temporian are welcome! Check out the [Contributing guide](https://temporian.readthedocs.io/en/stable/contributing/) to get started.
 
 ## Credits
 
