@@ -1,15 +1,13 @@
 name: publish
 
 on:
-  push:
-    # REMOVE
   release:
     types: [published] # Runs both for releases and prereleases
 
 jobs:
-  # test:
-  #   uses: google/temporian/.github/workflows/test.yaml@main
-  #   secrets: inherit
+  test:
+    uses: google/temporian/.github/workflows/test.yaml@main
+    secrets: inherit
 
   build-linux:
     runs-on: ubuntu-latest
@@ -164,8 +162,7 @@ jobs:
         run: python${{ matrix.python-version }} tools/check_install.py
 
   publish:
-    # needs: [test, test-install, test-macos-arm-install]
-    needs: [test-install, test-macos-arm-install]
+    needs: [test, test-install, test-macos-arm-install]
     runs-on: ubuntu-latest
     environment: pypi
     env:
