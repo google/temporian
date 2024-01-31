@@ -6,7 +6,7 @@ To create a new release, follow these steps:
 
 1. Open a new branch with the version's name, e.g. `v1.3.2`.
 
-2. Update the version number in `pyproject.toml` and `temporian/__init__.py` to the new version number (`1.3.2` in this case).
+2. Update the version number in `pyproject.toml`, `config/setup.py`, `tools/build.bat`, and `temporian/__init__.py` to the new version number (`1.3.2` in this case).
 
 3. Edit the [changelog](../CHANGELOG.md) by moving the latest changes to the new version's section and clearing the latest changes one.
 
