@@ -78,8 +78,9 @@ def display_html(evset: EventSet) -> str:
         num_timestamps = len(index_data.timestamps)
         max_timestamps = config.display_max_events or num_timestamps
         #Slices timestamps and features if there are more than 7 events
-        display_timestamps = np.concatenate((index_data.timestamps[:3], index_data.timestamps[-3:])) if num_timestamps > 7 else index_data.timestamps[:num_timestamps]
-        display_features = [np.concatenate((values[:3], values[-3:])) if num_timestamps > 7 else values for values in index_data.features]
+        half_max_timestamps = (max_timestamps // 2)
+        display_timestamps = np.concatenate((index_data.timestamps[:half_max_timestamps], index_data.timestamps[-half_max_timestamps:])) if num_timestamps > max_timestamps else index_data.timestamps[:num_timestamps]
+        display_features = [np.concatenate((values[:half_max_timestamps], values[-half_max_timestamps:])) if num_timestamps > max_timestamps else values for values in index_data.features]
 
         # Display index values
         html_index_value = html_div(dom)
@@ -148,9 +149,9 @@ def display_html(evset: EventSet) -> str:
             if has_hidden_feats:
                 row.append(ELLIPSIS)
                 
-            # Create ellipse row if more than 6 entries
+            # Create ellipsis row between first 3 and last 3 if more than 6 entries
             table.appendChild(html_table_row(dom, row))
-            if timestamp_idx == 2 and num_timestamps > 7:
+            if timestamp_idx == (half_max_timestamps -1) and num_timestamps > max_timestamps:
                 ellipsis_row = [ELLIPSIS] * (1 + len(visible_feats) + int(has_hidden_feats))
                 table.appendChild(html_table_row(dom, ellipsis_row))
 
