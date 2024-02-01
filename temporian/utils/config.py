@@ -55,7 +55,7 @@ notebook."""
 display_max_features = int(os.environ.get("TEMPORIAN_MAX_DISPLAY_FEATURES", 16))
 """Maximum number of features to show when displaying an EventSet in a
 notebook."""
-display_max_events = int(os.environ.get("TEMPORIAN_MAX_DISPLAY_EVENTS", 5))
+display_max_events = int(os.environ.get("TEMPORIAN_MAX_DISPLAY_EVENTS", 7))
 """Maximum number of events to show per index value when displaying an EventSet
 in a notebook."""
 display_max_chars = int(os.environ.get("TEMPORIAN_MAX_DISPLAY_CHARS", 32))
