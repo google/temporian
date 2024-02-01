@@ -76,8 +76,8 @@ def display_html(evset: EventSet) -> str:
     for index_key in all_index_keys[:max_indexes]:
         index_data = evset.data[index_key]
         num_timestamps = len(index_data.timestamps)
-        max_timestamps = config.display_max_events or num_timestamps
-        #Slices timestamps and features if there are more than 7 events
+        max_timestamps = min(config.display_max_events, num_timestamps)
+        # Slices timestamps and features if there are more than 7 events
         half_max_timestamps = (max_timestamps // 2)
         display_timestamps = np.concatenate((index_data.timestamps[:half_max_timestamps], index_data.timestamps[-half_max_timestamps:])) if num_timestamps > max_timestamps else index_data.timestamps[:num_timestamps]
         display_features = [np.concatenate((values[:half_max_timestamps], values[-half_max_timestamps:])) if num_timestamps > max_timestamps else values for values in index_data.features]
