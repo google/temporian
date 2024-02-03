@@ -1505,7 +1505,7 @@ class EventSetOperations:
         from temporian.core.operators.unary import round
 
         return round(input=self)
-    
+
     def round(
         self: EventSetOrNode,
     ) -> EventSetOrNode:
@@ -2926,7 +2926,6 @@ class EventSetOperations:
         from temporian.core.operators.unary import log
 
         return log(self)
-
 
     def moving_count(
         self: EventSetOrNode,

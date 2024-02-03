@@ -99,6 +99,53 @@ class UnaryTest(absltest.TestCase):
         )
         assertOperatorResult(self, evset.notnan(), expected)
 
+    def test_round_single_feature(self):
+        evset = event_set(
+            timestamps=[1, 2, 3],
+            features={"f": [1.1, -2.5, -3.9]},
+        )
+        expected = event_set(
+            timestamps=[1, 2, 3],
+            features={"f": [1.0, -3.0, -4.0]},
+            same_sampling_as=evset,
+        )
+        assertOperatorResult(self, evset.round(), expected)
+        assertOperatorResult(self, round(evset), expected)  # __round__ magic
+
+    def test_round_multiple_features(self):
+        evset = event_set(
+            timestamps=[1, 2],
+            features={"a": [10.5, 11.7], "b": [1.2, 2.9]},
+        )
+        expected = event_set(
+            timestamps=[1, 2],
+            features={"a": [11, 12], "b": [1, 3]},
+            same_sampling_as=evset,
+        )
+        assertOperatorResult(self, evset.round(), expected)
+        assertOperatorResult(self, round(evset), expected)  # __round__ magic
+
+    def test_round_non_accepted_types(self):
+        evset = event_set(
+            timestamps=[1, 2],
+            features={"a": ["10.5", 11.7], "b": [1, 2]},
+        )
+        with self.assertRaises(TypeError):
+            _ = evset
+
+    def test_round_float32_and_float64_features(self):
+        evset = event_set(
+            timestamps=[1, 2],
+            features={"a": [10.5, 11.7], "b": [1.2, 2.9]},
+        )
+        expected = event_set(
+            timestamps=[1, 2],
+            features={"a": [11.0, 12.0], "b": [1.0, 3.0]},
+            same_sampling_as=evset,
+        )
+        assertOperatorResult(self, evset.round(), expected)
+        assertOperatorResult(self, round(evset), expected)  # __round__ magic
+
 
 if __name__ == "__main__":
     absltest.main()

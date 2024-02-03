@@ -190,6 +190,8 @@ class RoundOperator(BaseUnaryOperator):
     @classmethod
     def allowed_dtypes(cls) -> List[DType]:
         return [
+            DType.FLOAT32,
+            DType.FLOAT64,
             DType.INT32,
             DType.INT64,
         ]
@@ -205,7 +207,6 @@ operator_lib.register_operator(NotNanOperator)
 operator_lib.register_operator(AbsOperator)
 operator_lib.register_operator(LogOperator)
 operator_lib.register_operator(RoundOperator)
-
 
 
 @compile
