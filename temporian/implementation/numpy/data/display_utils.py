@@ -78,9 +78,30 @@ def display_html(evset: EventSet) -> str:
         num_timestamps = len(index_data.timestamps)
         max_timestamps = min(config.display_max_events, num_timestamps)
         # Slices timestamps and features if there are more than 'max_timestamps' events
-        half_max_timestamps = (max_timestamps // 2)
-        display_timestamps = np.concatenate((index_data.timestamps[:half_max_timestamps], index_data.timestamps[-half_max_timestamps:])) if num_timestamps > max_timestamps else index_data.timestamps
-        display_features = [np.concatenate((values[:half_max_timestamps], values[-half_max_timestamps:])) for values in index_data.features] if num_timestamps > max_timestamps else index_data.features
+        half_max_timestamps = max_timestamps // 2
+        display_timestamps = (
+            np.concatenate(
+                (
+                    index_data.timestamps[:half_max_timestamps],
+                    index_data.timestamps[-half_max_timestamps:],
+                )
+            )
+            if num_timestamps > max_timestamps
+            else index_data.timestamps
+        )
+        display_features = (
+            [
+                np.concatenate(
+                    (
+                        values[:half_max_timestamps],
+                        values[-half_max_timestamps:],
+                    )
+                )
+                for values in index_data.features
+            ]
+            if num_timestamps > max_timestamps
+            else index_data.features
+        )
 
         # Display index values
         html_index_value = html_div(dom)
@@ -128,9 +149,7 @@ def display_html(evset: EventSet) -> str:
         table.appendChild(html_table_row(dom, col_names, header=True))
 
         # Rows with events
-        for timestamp_idx, timestamp in enumerate(
-            display_timestamps
-        ):
+        for timestamp_idx, timestamp in enumerate(display_timestamps):
             row = []
             # Timestamp column
             timestamp_repr = (
@@ -142,17 +161,26 @@ def display_html(evset: EventSet) -> str:
 
             # Feature values
             for feature_idx, feature_schema in enumerate(visible_feats):
-                row.append(repr_value_html(display_features[feature_idx][timestamp_idx], feature_schema.dtype))
-
+                row.append(
+                    repr_value_html(
+                        display_features[feature_idx][timestamp_idx],
+                        feature_schema.dtype,
+                    )
+                )
 
             # Add ... column on the right
             if has_hidden_feats:
                 row.append(ELLIPSIS)
-                
+
             # Create ellipsis row between first half and last half if more than man_timestamps entries
             table.appendChild(html_table_row(dom, row))
-            if timestamp_idx == (half_max_timestamps -1) and num_timestamps > max_timestamps:
-                ellipsis_row = [ELLIPSIS] * (1 + len(visible_feats) + int(has_hidden_feats))
+            if (
+                timestamp_idx == (half_max_timestamps - 1)
+                and num_timestamps > max_timestamps
+            ):
+                ellipsis_row = [ELLIPSIS] * (
+                    1 + len(visible_feats) + int(has_hidden_feats)
+                )
                 table.appendChild(html_table_row(dom, ellipsis_row))
 
         top.appendChild(table)
