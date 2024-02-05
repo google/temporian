@@ -5,8 +5,7 @@ on:
     branches: # Specifying branches makes it not run on pushed tags
       - "*"
   workflow_call: # Allow being ran from other actions
-  # Enable when we start receiving PRs from forks
-  # pull_request: # Run on PRs from forks (push doesn't cover those)
+  pull_request: # Run on PRs from forks (push doesn't cover those)
 
 jobs:
   test:
