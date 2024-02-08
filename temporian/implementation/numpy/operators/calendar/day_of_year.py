@@ -12,45 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, Optional
-
-import numpy as np
+from typing import Callable
 
 from temporian.core.operators.calendar.day_of_year import (
     CalendarDayOfYearOperator,
 )
 from temporian.implementation.numpy import implementation_lib
-from temporian.implementation.numpy.data.event_set import EventSet, IndexData
-from temporian.implementation.numpy.operators.base import OperatorImplementation
+from temporian.implementation.numpy.operators.calendar.base import (
+    BaseCalendarNumpyImplementation,
+)
 from temporian.implementation.numpy_cc.operators import operators_cc
 
 
-class CalendarDayOfYearNumpyImplementation(OperatorImplementation):
-    """Interface definition and common logic for numpy implementation of
-    calendar operators."""
-
-    def __init__(self, operator: CalendarDayOfYearOperator) -> None:
-        super().__init__(operator)
-        assert isinstance(operator, CalendarDayOfYearOperator)
-
-    def __call__(self, sampling: EventSet) -> Dict[str, EventSet]:
-        assert isinstance(self.operator, CalendarDayOfYearOperator)
-        output_schema = self.output_schema("output")
-
-        # create destination EventSet
-        dst_evset = EventSet(data={}, schema=output_schema)
-        for index_key, index_data in sampling.data.items():
-            value = operators_cc.calendar_day_of_year(
-                index_data.timestamps, self.operator.tz
-            )
-
-            dst_evset.set_index_value(
-                index_key,
-                IndexData([value], index_data.timestamps, schema=output_schema),
-                normalize=False,
-            )
-
-        return {"output": dst_evset}
+class CalendarDayOfYearNumpyImplementation(BaseCalendarNumpyImplementation):
+    def _implementation(self) -> Callable:
+        return operators_cc.calendar_day_of_year
 
 
 implementation_lib.register_operator_implementation(
