@@ -7,7 +7,7 @@ This guide describes how to contribute, and will help you set up your environmen
 Check out the open [GitHub issues](https://github.com/google/temporian/issues) to see what we're working on, and what we need help with.
 Look especially for the `good first issue` label, which indicates issues that are suitable for new contributors.
 
-If you'd like help or additional guidance to contribute, please join our [Discord](https://discord.gg/x8rm9YYy).
+If you'd like help or additional guidance to contribute, please join our [Discord](https://discord.gg/nT54yATCTy).
 
 ## Code reviews
 
