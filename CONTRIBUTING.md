@@ -19,11 +19,17 @@ All new contributions must pass all the tests and checks performed by GitHub act
 
 ### Environment Setup
 
-After cloning the repository, please manually install the git hooks:
+You can't push directly to our repository so you'll have to create a Fork, visit this [guide](https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project) for more information.
+
+After forking the repo you should clone your repository:
 
 ```shell
-git clone git@github.com:google/temporian.git
+git clone https://github.com/YOUR-USERNAME/temporian
+```
 
+And manually install the git hooks:
+
+```shell
 cp .git-hooks/* .git/hooks
 ```
 
