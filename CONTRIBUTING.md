@@ -95,7 +95,7 @@ Benchmarking and profiling of pre-configured scripts is available as follow:
 
 ```shell
 bazel run -c opt --config=linux //benchmark:profile_time -- [name]
-bazel run -c opt --config=linux //benchmark:profile_memory -- [name] [-p]
+bazel run -c opt --config=linux //benchmark:profile_memory -- [name]
 ```
 
 where `[name]` is the name of one of the python scripts in
