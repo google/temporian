@@ -36,7 +36,6 @@ STORE, PRODUCT, TIMESTAMP, SALES, COSTS = (
 )
 
 
-@profile
 def main():
     print(f"Running lag benchmark with N={N}...")
 
