@@ -257,6 +257,10 @@ def from_tensorflow_record(
         timestamp_values = np.array(get_value(example, timestamps), np.float64)
         num_timestamps = len(timestamp_values)
 
+        if not np.all(np.diff(timestamp_values) >= 0):
+            print("timestamp_values:", timestamp_values)
+            raise ValueError("The timestamps are not sorted")
+
         # Indexes
         indexes = []
         for index_schema in schema.indexes:

@@ -26,6 +26,7 @@ from temporian.io.tensorflow import (
     from_tensorflow_record,
 )
 from temporian.implementation.numpy.data.io import event_set
+from temporian.core.data import schema
 
 
 class TensorFlowTest(absltest.TestCase):
@@ -148,6 +149,25 @@ class TensorFlowTest(absltest.TestCase):
             path=tmp_file, schema=evset.schema
         )
         assertEqualEventSet(self, evset, loaded_evtset)
+
+    def test_from_tensorflow_record_non_sorted(self) -> None:
+        tmp_dir_handle = tempfile.TemporaryDirectory()
+        tmp_file = os.path.join(tmp_dir_handle.name, "data")
+
+        with tf.io.TFRecordWriter(tmp_file, options="GZIP") as file_writer:
+            ex = tf.train.Example()
+            ex.features.feature["timestamp"].float_list.value[:] = [1, 3, 2]
+            file_writer.write(ex.SerializeToString())
+
+        with self.assertRaisesRegex(
+            ValueError, "The timestamps are not sorted"
+        ):
+            _ = from_tensorflow_record(
+                path=tmp_file,
+                schema=schema.Schema(
+                    features=[], indexes=[], is_unix_timestamp=False
+                ),
+            )
 
 
 def _extract_tfrecord(path: str):
