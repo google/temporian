@@ -3319,6 +3319,10 @@ class EventSetOperations:
         `sampling` are `["x","y"]`), duplicates the features of the input over the
         indexes of `sampling`.
 
+        Index values in `self` but not in `sampling` are removed. An index value
+        without timestamps is created for each index values in `sampling` but
+        not in `self`.
+
         Example use case:
             ```python
             >>> products = tp.event_set(
