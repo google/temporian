@@ -14,6 +14,7 @@
 
 """Utilities for converting EventSets to TensorFlow dataset."""
 
+from typing import List, Union
 from copy import deepcopy
 import logging
 
@@ -197,7 +198,7 @@ def to_tensorflow_record(
 
 
 def from_tensorflow_record(
-    path: str,
+    path: Union[str, List[str]],
     schema: Schema,
     timestamps: str = "timestamp",
     format: TFRecordEventSetFormatChoices = TFRecordEventSetFormat.GROUPED_BY_INDEX,
@@ -211,7 +212,7 @@ def from_tensorflow_record(
     The GZIP compression is used.
 
     Args:
-        path: Path to input TF.Record.
+        path: Path to TF.Record file or list of path to TF.Record files.
         timestamps: Name of the output column containing timestamps.
         format: Format of the events inside the received record. At the moment
             only TFRecordEventSetFormat.GROUPED_BY_INDEX is supported. See
