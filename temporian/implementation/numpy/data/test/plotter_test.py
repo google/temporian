@@ -51,6 +51,14 @@ class PlotterTest(parameterized.TestCase):
             return_fig=True,
         )
 
+        _ = plotter.plot(
+            evset,
+            indexes=[1, 2],
+            interactive=interactive,
+            return_fig=True,
+            font_scale=2,
+        )
+
     def test_index_str(self):
         try:
             import IPython.display

@@ -191,6 +191,7 @@ def plot(
     interactive: bool = False,
     backend: Optional[str] = None,
     merge: bool = False,
+    font_scale: float = 1,
 ):
     """Plots one or several [`EventSets`][temporian.EventSet].
 
@@ -267,6 +268,7 @@ def plot(
         merge: If true, plots all features in the same plots. If false, plots
             features in separate plots. merge=True on event-sets [e1, e2] is
             equivalent to plotting (e1, e2).
+        font_scale: Scalling factor for all the fonts.
     """
 
     if merge:
@@ -315,6 +317,7 @@ def plot(
         ),
         max_num_plots=max_num_plots,
         style=style,
+        font_scale=font_scale,
     )
 
     if backend is None:
