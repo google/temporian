@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from absl.testing import absltest, parameterized
 
 from temporian.implementation.numpy.data.io import event_set
@@ -135,7 +135,7 @@ class TickCalendarOperatorTest(parameterized.TestCase):
 
         # Expected timestamps: all hours on Saturdays
         timestamps = []
-        day = datetime(2023, 1, 7)  # First saturday
+        day = datetime(2023, 1, 7, tzinfo=timezone.utc)  # First saturday
         one_week = timedelta(days=7)
         while day.year < 2024:
             for hour in range(24):
