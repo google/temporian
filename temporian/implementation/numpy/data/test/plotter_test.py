@@ -222,7 +222,6 @@ class PlotterTest(parameterized.TestCase):
         try:
             tmp_handle = tempfile.TemporaryDirectory()
             tmp_path = os.path.join(tmp_handle.name, "fig.png")
-            tmp_path = "/tmp/non_matching_index.png"  # DO NOT SUBMIT
 
             if interactive:
                 bokeh_export_png(plot, filename=tmp_path)
