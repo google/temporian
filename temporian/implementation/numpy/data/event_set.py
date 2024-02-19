@@ -340,6 +340,11 @@ class EventSet(EventSetOperations):
             count += len(data.timestamps)
         return count
 
+    def num_indexes(self) -> int:
+        """Total number of index values."""
+
+        return len(self.data)
+
     def check_same_sampling(self, other: EventSet):
         """Checks if two EventSets have the same sampling."""
         self.node().check_same_sampling(other.node())

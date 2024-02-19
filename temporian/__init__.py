@@ -50,7 +50,7 @@ from temporian.core.data.dtype import str_
 from temporian.core.data.dtype import bytes_
 
 # Schema
-from temporian.core.data.schema import Schema
+from temporian.core.data.schema import Schema, FeatureSchema, IndexSchema
 
 # Durations
 from temporian.core.data import duration
