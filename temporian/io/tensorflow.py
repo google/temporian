@@ -151,20 +151,20 @@ def to_tensorflow_record(
                     DType.INT32,
                     DType.INT64,
                 ]:
-                    f(ex, feature_schema.name).int64_list.value[:] = (
-                        index_value.features[feature_idx]
-                    )
+                    f(ex, feature_schema.name).int64_list.value[
+                        :
+                    ] = index_value.features[feature_idx]
                 elif feature_schema.dtype in [
                     DType.FLOAT32,
                     DType.FLOAT64,
                 ]:
-                    f(ex, feature_schema.name).float_list.value[:] = (
-                        index_value.features[feature_idx]
-                    )
+                    f(ex, feature_schema.name).float_list.value[
+                        :
+                    ] = index_value.features[feature_idx]
                 elif feature_schema.dtype == DType.STRING:
-                    f(ex, feature_schema.name).bytes_list.value[:] = (
-                        index_value.features[feature_idx]
-                    )
+                    f(ex, feature_schema.name).bytes_list.value[
+                        :
+                    ] = index_value.features[feature_idx]
                 else:
                     raise ValueError("Non supported feature dtype")
 
