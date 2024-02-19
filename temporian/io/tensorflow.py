@@ -202,6 +202,8 @@ def from_tensorflow_record(
     schema: Schema,
     timestamps: str = "timestamp",
     format: TFRecordEventSetFormatChoices = TFRecordEventSetFormat.GROUPED_BY_INDEX,
+    num_parallel_reads=None,
+    buffer_size=None,
 ) -> EventSet:
     """Imports an EventSet from a TF.Records of TF.Examples.
 
@@ -218,6 +220,10 @@ def from_tensorflow_record(
             only TFRecordEventSetFormat.GROUPED_BY_INDEX is supported. See
             [TFRecordEventSetFormat][temporian.io.format.TFRecordEventSetFormat]
             for more.
+        num_parallel_reads: Number of files to read in parallel. Only used if
+            `path` is a list of files. If not set, files are read sequentially.
+        buffer_size: Number of bytes in the buffer. If not set, use a sensible
+            default value.
 
     Returns:
         Imported EventSet.
@@ -249,7 +255,12 @@ def from_tensorflow_record(
         else:
             raise ValueError("Non supported type")
 
-    tf_dataset = tf.data.TFRecordDataset(path, compression_type="GZIP")
+    tf_dataset = tf.data.TFRecordDataset(
+        path,
+        compression_type="GZIP",
+        num_parallel_reads=num_parallel_reads,
+        buffer_size=buffer_size,
+    )
     for serialized_example in tf_dataset:
         example = tf.train.Example()
         example.ParseFromString(serialized_example.numpy())
