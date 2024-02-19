@@ -341,7 +341,7 @@ class EventSet(EventSetOperations):
         return count
 
     def num_indexes(self) -> int:
-        """Total number of indexes."""
+        """Total number of index values."""
 
         return len(self.data)
 
