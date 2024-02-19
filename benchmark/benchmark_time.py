@@ -18,13 +18,14 @@ Benchmark Python API.
 Usage example:
 
 # Run the full benchmark.
-bazel run -c opt //benchmark:benchmark_time
+bazel run -c opt --config=linux //benchmark:benchmark_time
 
 # Only run the "add_index" runs.
-bazel run -c opt //benchmark:benchmark_time -- -f=add_index
+bazel run -c opt --config=linux //benchmark:benchmark_time -- -f=add_index
 
 # Run add_index and from_pandas
-bazel run -c opt //benchmark:benchmark_time -- --f add_index from_pandas
+bazel run -c opt --config=linux //benchmark:benchmark_time -- \
+    --f add_index from_pandas
 
 """
 import argparse
@@ -93,11 +94,11 @@ def benchmark_simple_moving_average(runner):
 
 def benchmark_moving_minimum(runner):
     runner.add_separator()
-    for n in [100, 10_000, 1_000_000]:
+    for n in [10_000, 1_000_000, 10_000_000]:
         ds = _build_toy_dataset(n)
 
         node = ds.node()
-        output = node.moving_min(window_length=10.0)
+        output = node.moving_min(window_length=1000.0)
 
         runner.benchmark(
             f"moving_minimum:{n:_}",
