@@ -91,6 +91,20 @@ def benchmark_simple_moving_average(runner):
         )
 
 
+def benchmark_moving_minimum(runner):
+    runner.add_separator()
+    for n in [100, 10_000, 1_000_000]:
+        ds = _build_toy_dataset(n)
+
+        node = ds.node()
+        output = node.moving_min(window_length=10.0)
+
+        runner.benchmark(
+            f"moving_minimum:{n:_}",
+            lambda: tp.run(output, input={node: ds}),
+        )
+
+
 def benchmark_select_and_glue(runner):
     runner.add_separator()
     for n in [100, 10_000, 1_000_000]:
@@ -435,6 +449,7 @@ def main():
         "add_index",
         "add_index_v2",
         "from_pandas_with_objects",
+        "moving_minimum",
     ]
     if args.functions is not None:
         benchmarks_to_run = args.functions
