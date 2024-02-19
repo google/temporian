@@ -4136,6 +4136,8 @@ class EventSetOperations:
         mday: Optional[Union[int, Literal["*"]]] = None,
         month: Optional[Union[int, Literal["*"]]] = None,
         wday: Optional[Union[int, Literal["*"]]] = None,
+        include_right: bool = True,
+        include_left: bool = False,
     ) -> EventSetOrNode:
         """Generates events periodically at fixed times or dates e.g. each month.
 
@@ -4252,6 +4254,8 @@ class EventSetOperations:
             wday: '*' (any day), None (auto) or number in range `[0-6]`
                     (Sun-Sat) to tick at particular day of week. Can only be
                     specified if `day_of_month` is `None`.
+            include_right: If True, a tick after the last timestamp is included.
+            include_left: If True, a tick before the first timestamp is included.
 
         Returns:
             A feature-less EventSet with timestamps at specified interval.
@@ -4266,6 +4270,8 @@ class EventSetOperations:
             mday=mday,
             month=month,
             wday=wday,
+            include_right=include_right,
+            include_left=include_left,
         )
 
     def timestamps(self: EventSetOrNode) -> EventSetOrNode:

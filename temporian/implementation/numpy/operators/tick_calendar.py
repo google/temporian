@@ -81,6 +81,9 @@ class TickCalendarNumpyImplementation(OperatorImplementation):
             wday = self._wday_py_to_cpp(wday)
         wday_range = self._get_arg_range(wday, self.operator.wday_max_range())
 
+        include_right = self.operator.include_right
+        include_left = self.operator.include_left
+
         # Fill output EventSet's data
         for index_key, index_data in input.data.items():
             if len(index_data.timestamps) == 0:
@@ -101,6 +104,8 @@ class TickCalendarNumpyImplementation(OperatorImplementation):
                     max_month=month_range[1],
                     min_wday=wday_range[0],
                     max_wday=wday_range[1],
+                    include_right=include_right,
+                    include_left=include_left,
                 )
             output_evset.set_index_value(
                 index_key,

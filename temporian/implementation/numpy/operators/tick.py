@@ -57,6 +57,11 @@ class TickNumpyImplementation(OperatorImplementation):
                     if save_begin != begin:
                         begin += self.operator.interval
 
+                if self.operator.include_left:
+                    begin -= self.operator.interval
+                if self.operator.include_right:
+                    end += self.operator.interval
+
                 dst_timestamps = np.arange(
                     begin,
                     np.nextafter(end, math.inf),

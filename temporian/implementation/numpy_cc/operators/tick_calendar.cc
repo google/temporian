@@ -15,10 +15,14 @@
 namespace {
 namespace py = pybind11;
 
-py::array_t<double> tick_calendar(
-    const double start_timestamp,                // min date
-    const double end_timestamp,                  // max date
-    const int min_second, const int max_second,  // second range
+bool in_range(const int value, const int min, const int max) {
+  return value >= min && value <= max;
+}
+
+std::vector<double> find_ticks(
+    double start_timestamp, const double end_timestamp, const bool forward,
+    const int max_ticks, const int min_second,
+    const int max_second,                        // second range
     const int min_minute, const int max_minute,  // minute range
     const int min_hour, const int max_hour,      // hours range
     const int min_mday, const int max_mday,      // month days
@@ -28,26 +32,46 @@ py::array_t<double> tick_calendar(
   // Ticks list
   std::vector<double> ticks;
 
-  // Date range
-  const auto start_t = static_cast<std::time_t>(std::floor(start_timestamp));
-  const auto end_t = static_cast<std::time_t>(std::floor(end_timestamp));
+  // Direction in wich to search
+  int step = forward ? 1 : -1;
 
-  std::tm start_utc = *std::gmtime(&start_t);
+  // End time
+  const bool end_time_set = end_timestamp >= 0;
+  const auto end_t = end_time_set
+                         ? static_cast<std::time_t>(std::floor(end_timestamp))
+                         : static_cast<std::time_t>(0);
+
+  // Start time
+  std::time_t start_t;
+  std::tm start_utc;
+
+  // The main loop needs the start_utc to be the first datetime >= to the
+  // start_t that is contained in the ranges defined by all the min-max
+  do {
+    start_t = static_cast<std::time_t>(std::floor(start_timestamp));
+    start_utc = *std::gmtime(&start_t);
+    start_timestamp += step;
+  } while (!(in_range(start_utc.tm_mon + 1, min_month, max_month) &&
+             in_range(start_utc.tm_mday, min_mday, max_mday) &&
+             in_range(start_utc.tm_hour, min_hour, max_hour) &&
+             in_range(start_utc.tm_min, min_minute, max_minute) &&
+             in_range(start_utc.tm_sec, min_second, max_second) &&
+             in_range(start_utc.tm_wday, min_wday, max_wday)));
 
   int year = start_utc.tm_year + 1900;
-  int month = std::max(start_utc.tm_mon + 1, min_month);  // 1-12
-  int mday = std::max(start_utc.tm_mday, min_mday);       // 1-31
-  int hour = std::max(start_utc.tm_hour, min_hour);
-  int minute = std::max(start_utc.tm_min, min_minute);
-  int second = std::max(start_utc.tm_sec, min_second);
+  int month = start_utc.tm_mon + 1;  // zero-based tm_mon
+  int mday = start_utc.tm_mday;
+  int hour = start_utc.tm_hour;
+  int minute = start_utc.tm_min;
+  int second = start_utc.tm_sec;
 
-  bool in_range = true;
-  while (in_range) {
-    while (month <= max_month && in_range) {
-      while (mday <= max_mday && in_range) {
-        while (hour <= max_hour && in_range) {
-          while (minute <= max_minute && in_range) {
-            while (second <= max_second && in_range) {
+  bool keep_looking = true;
+  while (keep_looking) {
+    while (in_range(month, min_month, max_month) && keep_looking) {
+      while (in_range(mday, min_mday, max_mday) && keep_looking) {
+        while (in_range(hour, min_hour, max_hour) && keep_looking) {
+          while (in_range(minute, min_minute, max_minute) && keep_looking) {
+            while (in_range(second, min_second, max_second) && keep_looking) {
               const auto cur_time_or =
                   UTCMkTime(year, month, mday, hour, minute, second);
 
@@ -59,9 +83,14 @@ py::array_t<double> tick_calendar(
                 // This alternative way to access the value works correctly.
                 const auto cur_time = *cur_time_or;
 
-                // Finish condition
-                if (cur_time.seconds_since_epoch > end_t) {
-                  in_range = false;
+                // Finish conditions
+                if (end_time_set && cur_time.seconds_since_epoch > end_t) {
+                  keep_looking = false;
+                  break;
+                }
+
+                if (max_ticks > 0 && ticks.size() >= max_ticks) {
+                  keep_looking = false;
                   break;
                 }
 
@@ -75,33 +104,69 @@ py::array_t<double> tick_calendar(
                 minute = max_minute;
                 hour = max_hour;
               }
-              second++;
+              second += step;
             }
             second = min_second;
-            minute++;
+            minute += step;
           }
           second = min_second;
           minute = min_minute;
-          hour++;
+          hour += step;
         }
         second = min_second;
         minute = min_minute;
         hour = min_hour;
-        mday++;
+        mday += step;
       }
       second = min_second;
       minute = min_minute;
       hour = min_hour;
       mday = min_mday;
-      month++;
+      month += step;
     }
     second = min_second;
     minute = min_minute;
     hour = min_hour;
     mday = min_mday;
     month = min_month;
-    year++;
+    year += step;
   }
+  return ticks;
+}
+
+py::array_t<double> tick_calendar(
+    const double start_timestamp,                // min date
+    const double end_timestamp,                  // max date
+    const int min_second, const int max_second,  // second range
+    const int min_minute, const int max_minute,  // minute range
+    const int min_hour, const int max_hour,      // hours range
+    const int min_mday, const int max_mday,      // month days
+    const int min_month, const int max_month,    // month range
+    const int min_wday, const int max_wday,      // weekdays
+    const bool include_right, const bool include_left) {
+  auto ticks =
+      find_ticks(start_timestamp, end_timestamp, true, -1, min_second,
+                 max_second, min_minute, max_minute, min_hour, max_hour,
+                 min_mday, max_mday, min_month, max_month, min_wday, max_wday);
+
+  if (include_right && (ticks.back() < end_timestamp)) {
+    // starting from the end, find 1 tick to the right
+    auto right_ticks =
+        find_ticks(end_timestamp, -1, true, 1, min_second, max_second,
+                   min_minute, max_minute, min_hour, max_hour, min_mday,
+                   max_mday, min_month, max_month, min_wday, max_wday);
+    ticks.insert(ticks.end(), right_ticks.begin(), right_ticks.end());
+  }
+
+  if (include_left && (ticks.front() > start_timestamp)) {
+    // starting from the start, find 1 tick to the left
+    auto left_ticks =
+        find_ticks(start_timestamp, -1, false, 1, min_second, max_second,
+                   min_minute, max_minute, min_hour, max_hour, min_mday,
+                   max_mday, min_month, max_month, min_wday, max_wday);
+    ticks.insert(ticks.begin(), left_ticks.begin(), left_ticks.end());
+  }
+
   // TODO: optimize mday += 7 on specific wdays
 
   // Allocate output array
@@ -119,5 +184,5 @@ void init_tick_calendar(py::module& m) {
         py::arg("min_minute"), py::arg("max_minute"), py::arg("min_hour"),
         py::arg("max_hour"), py::arg("min_mday"), py::arg("max_mday"),
         py::arg("min_month"), py::arg("max_month"), py::arg("min_wday"),
-        py::arg("max_wday"));
+        py::arg("max_wday"), py::arg("include_right"), py::arg("include_left"));
 }
