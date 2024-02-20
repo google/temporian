@@ -49,6 +49,49 @@ class PropagateTest(TestCase):
 
         assertOperatorResult(self, result, expected, check_sampling=False)
 
+    def test_remove_index(self):
+        evset = event_set(
+            timestamps=[1, 2],
+            features={"a": [1, 2], "x": [1, 2]},
+            indexes=["x"],
+        )
+        sampling = event_set(
+            timestamps=[3, 4],
+            features={"x": [1, 1], "y": [1, 2]},
+            indexes=["x", "y"],
+        )
+
+        result = evset.propagate(sampling)
+
+        expected = event_set(
+            timestamps=[1, 1],
+            features={"a": [1, 1], "x": [1, 1], "y": [1, 2]},
+            indexes=["x", "y"],
+        )
+        assertOperatorResult(self, result, expected, check_sampling=False)
+
+    def test_add_empty_index(self):
+        evset = event_set(
+            timestamps=[1, 2],
+            features={"a": [1, 2], "x": [1, 2]},
+            indexes=["x"],
+        )
+        sampling = event_set(
+            timestamps=[3, 4, 5, 6],
+            features={"x": [1, 1, 3, 3], "y": [1, 2, 4, 5]},
+            indexes=["x", "y"],
+        )
+
+        result = evset.propagate(sampling)
+
+        expected = event_set(
+            timestamps=[1, 1, 1, 1],
+            features={"a": [1, 1, 2, 2], "x": [1, 1, 3, 3], "y": [1, 2, 4, 5]},
+            indexes=["x", "y"],
+        )
+        expected = expected.filter(expected["a"] != 2)
+        assertOperatorResult(self, result, expected, check_sampling=False)
+
     def test_wrong_index(self):
         evset = event_set([], features={"x": []}, indexes=["x"])
         sampling = event_set([], features={"y": []}, indexes=["y"])

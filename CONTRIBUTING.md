@@ -7,7 +7,7 @@ This guide describes how to contribute, and will help you set up your environmen
 Check out the open [GitHub issues](https://github.com/google/temporian/issues) to see what we're working on, and what we need help with.
 Look especially for the `good first issue` label, which indicates issues that are suitable for new contributors.
 
-If you'd like help or additional guidance to contribute, please join our [Discord](https://discord.gg/x8rm9YYy).
+If you'd like help or additional guidance to contribute, please join our [Discord](https://discord.gg/nT54yATCTy).
 
 ## Code reviews
 
@@ -19,11 +19,17 @@ All new contributions must pass all the tests and checks performed by GitHub act
 
 ### Environment Setup
 
-After cloning the repository, please manually install the git hooks:
+You can't push directly to our repository so you'll have to create a Fork, visit this [guide](https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project) for more information.
+
+After forking the repo you should clone your repository:
 
 ```shell
-git clone git@github.com:google/temporian.git
+git clone https://github.com/YOUR-USERNAME/temporian
+```
 
+And manually install the git hooks:
+
+```shell
 cp .git-hooks/* .git/hooks
 ```
 

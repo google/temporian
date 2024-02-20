@@ -23,6 +23,8 @@ PUBLIC_API_SYMBOLS = {
     "IndexData",
     "EventSetNode",
     "Schema",
+    "FeatureSchema",
+    "IndexSchema",
     "duration",
     "run",
     "has_leak",

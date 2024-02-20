@@ -14,10 +14,14 @@
 
 from typing import Dict
 
+import numpy as np
+
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.core.operators.propagate import Propagate
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.base import OperatorImplementation
+from temporian.implementation.numpy.data import event_set
+from temporian.implementation.numpy.data import dtype_normalization
 
 
 class PropagateNumpyImplementation(OperatorImplementation):
@@ -43,10 +47,22 @@ class PropagateNumpyImplementation(OperatorImplementation):
 
             # Find the source data
             if src_index not in input.data:
-                # TODO: Add option to skip non matched indexes.
-                raise ValueError(f'Cannot find index "{src_index}" in "evset".')
-
-            dst_data[sampling_index] = input.data[src_index]
+                # An empty index value.
+                dst_data[sampling_index] = event_set.IndexData(
+                    features=[
+                        np.zeros(
+                            shape=0,
+                            dtype=dtype_normalization.tp_dtype_to_np_dtype(
+                                feature.dtype
+                            ),
+                        )
+                        for feature in output_schema.features
+                    ],
+                    timestamps=np.array([], dtype=np.float64),
+                    schema=output_schema,
+                )
+            else:
+                dst_data[sampling_index] = input.data[src_index]
 
         output_evset = EventSet(data=dst_data, schema=output_schema)
         return {"output": output_evset}

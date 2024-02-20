@@ -41,8 +41,8 @@ class Plotter(PlotterBackend):
     def finalize_subplot(
         self,
     ):
-        assert self.cur_fig is not None
-        self.figs.append(self.cur_fig)
+        if self.cur_fig is not None:
+            self.figs.append(self.cur_fig)
 
     def ensure_cur_is_available(self, categorical_values: Optional[List[str]]):
         if self.cur_fig is None:

@@ -17,6 +17,12 @@ from temporian.implementation.numpy.data.plotter_base import (
     PlotterBackend,
 )
 
+_BASE_FONT_SIZE = 10
+
+
+def _font_size(options: Options):
+    return int(_BASE_FONT_SIZE * options.font_scale)
+
 
 class Plotter(PlotterBackend):
     def __init__(self, num_plots: int, options: Options):
@@ -51,13 +57,13 @@ class Plotter(PlotterBackend):
         self.cur_is_unix_timestamp = is_unix_timestamp
 
         if title is not None:
-            self.ax().set_title(title, fontsize=8)
+            self.ax().set_title(title, fontsize=_font_size(self.options))
 
     def finalize_subplot(
         self,
     ):
         if self.cur_num_items > 1:
-            self.ax().legend(fontsize=8)
+            self.ax().legend(fontsize=_font_size(self.options))
         self.fig_idx += 1
 
     def plot_feature(
@@ -155,5 +161,12 @@ def _matplotlib_sub_plot(
     ax.yaxis.set_tick_params(labelsize=8)
     ax.yaxis.set_major_locator(ticker.MaxNLocator(5))
     ax.yaxis.set_minor_locator(ticker.NullLocator())
+
+    for item in (
+        [ax.xaxis.label, ax.yaxis.label]
+        + ax.get_xticklabels()
+        + ax.get_yticklabels()
+    ):
+        item.set_fontsize(_font_size(options))
 
     ax.grid(lw=0.4, ls="--", axis="x")

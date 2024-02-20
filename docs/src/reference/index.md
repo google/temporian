@@ -6,11 +6,13 @@ Check the index on the left for a more detailed description of any symbol.
 
 ## Classes
 
-| Symbol                                      | Description                                                                                                     |
-| ------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| [`tp.EventSetNode`][temporian.EventSetNode] | Reference to the input or output of an operator in the compute graph.                                           |
-| [`tp.EventSet`][temporian.EventSet]         | Container for actual temporal data.                                                                             |
-| [`tp.Schema`][temporian.Schema]             | Description of the data inside an [`EventSetNode`][temporian.EventSetNode] or [`EventSet`][temporian.EventSet]. |
+| Symbol                                        | Description                                                                                                     |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| [`tp.EventSetNode`][temporian.EventSetNode]   | Reference to the input or output of an operator in the compute graph.                                           |
+| [`tp.EventSet`][temporian.EventSet]           | Container for actual temporal data.                                                                             |
+| [`tp.Schema`][temporian.Schema]               | Description of the data inside an [`EventSetNode`][temporian.EventSetNode] or [`EventSet`][temporian.EventSet]. |
+| [`tp.FeatureSchema`][temporian.FeatureSchema] | Description of a feature inside a [`Schema`][temporian.Schema].                                                 |
+| [`tp.IndexSchema`][temporian.IndexSchema]     | Description of an index inside a [`Schema`][temporian.Schema].                                                  |
 
 ## Functions
 
