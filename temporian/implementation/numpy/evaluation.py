@@ -51,7 +51,7 @@ def run_schedule(
     """
     data = {**inputs}
 
-    gc_being_time = time.time()
+    gc_begin_time = time.time()
 
     num_steps = len(schedule.steps)
     for step_idx, step in enumerate(schedule.steps):
@@ -128,17 +128,17 @@ def run_schedule(
 
         if (
             force_garbage_collector_interval is not None
-            and (time.time() - gc_being_time)
+            and (time.time() - gc_begin_time)
             >= force_garbage_collector_interval
         ):
             begin_gc = time.time()
             if verbose >= 2:
                 print("Garbage collection", file=sys.stderr, flush=True, end="")
             gc.collect()
-            gc_being_time = time.time()
+            gc_begin_time = time.time()
             if verbose >= 2:
                 print(
-                    f" [{gc_being_time - begin_gc:.5f} s]",
+                    f" [{gc_begin_time - begin_gc:.5f} s]",
                     file=sys.stderr,
                     flush=True,
                 )
