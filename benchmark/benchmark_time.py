@@ -17,6 +17,9 @@ Benchmark Python API.
 
 Usage example:
 
+sudo apt install linux-cpupower
+sudo cpupower frequency-set --governor performance
+
 # Run the full benchmark.
 bazel run -c opt --config=linux //benchmark:benchmark_time
 
