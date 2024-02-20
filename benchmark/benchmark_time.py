@@ -39,7 +39,10 @@ import temporian as tp
 
 
 def _build_toy_dataset(
-    n: int, data_prefix="", data2_is_categorical_integer=False
+    n: int,
+    data_prefix="",
+    data2_is_categorical_integer=False,
+    num_indexes: int = 10,
 ) -> tp.EventSet:
     """Builds a toy dataset with two features.
 
@@ -54,7 +57,7 @@ def _build_toy_dataset(
     """
 
     np.random.seed(0)
-    index_values = list(range(int(10)))
+    index_values = list(range(int(num_indexes)))
     timestamps = np.sort(np.random.randn(n) * n)
     index_1 = np.random.choice(index_values, n)
     index_2 = np.random.choice(index_values, n)
@@ -94,11 +97,11 @@ def benchmark_simple_moving_average(runner):
 
 def benchmark_moving_minimum(runner):
     runner.add_separator()
-    for n in [10_000, 1_000_000, 10_000_000]:
-        ds = _build_toy_dataset(n)
+    for n in [1_000_000, 10_000_000, 100_000_000]:
+        ds = _build_toy_dataset(n, num_indexes=1)
 
         node = ds.node()
-        output = node.moving_min(window_length=1000.0)
+        output = node.moving_min(window_length=10_000)
 
         runner.benchmark(
             f"moving_minimum:{n:_}",
