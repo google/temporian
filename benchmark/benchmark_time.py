@@ -17,6 +17,9 @@ Benchmark Python API.
 
 Usage example:
 
+sudo apt install linux-cpupower
+sudo cpupower frequency-set --governor performance
+
 # Run the full benchmark.
 bazel run -c opt --config=linux //benchmark:benchmark_time
 
@@ -97,7 +100,7 @@ def benchmark_simple_moving_average(runner):
 
 def benchmark_moving_minimum(runner):
     runner.add_separator()
-    for n in [1_000_000, 10_000_000, 100_000_000]:
+    for n in [1_000_000, 10_000_000]:
         ds = _build_toy_dataset(n, num_indexes=1)
 
         node = ds.node()
