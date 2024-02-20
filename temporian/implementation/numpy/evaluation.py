@@ -132,11 +132,11 @@ def run_schedule(
             >= force_garbage_collector_interval
         ):
             begin_gc = time.time()
-            if verbose >= 1:
+            if verbose >= 2:
                 print("Garbage collection", file=sys.stderr, flush=True, end="")
             gc.collect()
             gc_being_time = time.time()
-            if verbose >= 1:
+            if verbose >= 2:
                 print(
                     f" [{gc_being_time - begin_gc:.5f} s]",
                     file=sys.stderr,
