@@ -29,7 +29,12 @@ from temporian.implementation.numpy.data.event_set import EventSet
 F = TypeVar("F", bound=Callable)
 
 
-def compile(fn: Optional[F] = None, *, verbose: int = 0) -> F:
+def compile(
+    fn: Optional[F] = None,
+    *,
+    verbose: int = 0,
+    force_garbage_collector_interval: Optional[float] = 10,
+) -> F:
     """Compiles a Temporian function.
 
     A Temporian function is a function that takes
@@ -79,6 +84,8 @@ def compile(fn: Optional[F] = None, *, verbose: int = 0) -> F:
         verbose: If >0, prints details about the execution on the standard error
             output when the wrapped function is applied eagerly on EventSets.
             The larger the number, the more information is displayed.
+        force_garbage_collector_interval: If set, triggers the garbage
+            collection every "force_garbage_collector_interval" seconds.
 
     Returns:
         The compiled function.
@@ -120,7 +127,13 @@ def compile(fn: Optional[F] = None, *, verbose: int = 0) -> F:
             elif is_eager:
                 from temporian.core.evaluation import run
 
-                return run(query=outputs, input=inputs_map, verbose=verbose)
+                return run(
+                    query=outputs,
+                    input=inputs_map,
+                    verbose=verbose,
+                    check_execution=True,
+                    force_garbage_collector_interval=force_garbage_collector_interval,
+                )
 
             return outputs
 

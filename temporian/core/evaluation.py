@@ -38,7 +38,7 @@ def run(
     input: NodeToEventSetMapping,
     verbose: int = 0,
     check_execution: bool = True,
-    force_garbage_collector_interval: Optional[float] = None,
+    force_garbage_collector_interval: Optional[float] = 10,
 ) -> EventSetCollection:
     """Evaluates [`EventSetNodes`][temporian.EventSetNode] on [`EventSets`][temporian.EventSet].
 

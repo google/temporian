@@ -162,7 +162,7 @@ class CompileTest(absltest.TestCase):
 
         f(self.evset)
 
-        run_mock.assert_called_once_with(ANY, ANY, 1)
+        run_mock.assert_called_once_with(ANY, ANY, 1, ANY, ANY)
 
     @patch.object(evaluation, "run", autospec=True)
     def test_verbose_0(self, run_mock):
@@ -172,7 +172,7 @@ class CompileTest(absltest.TestCase):
 
         f(self.evset)
 
-        run_mock.assert_called_once_with(ANY, ANY, 0)
+        run_mock.assert_called_once_with(ANY, ANY, 0, ANY, ANY)
 
     def test_call_no_args(self):
         @compile()

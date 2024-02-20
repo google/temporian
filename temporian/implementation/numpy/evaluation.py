@@ -33,7 +33,7 @@ def run_schedule(
     schedule: Schedule,
     verbose: int,
     check_execution: bool,
-    force_garbage_collector_interval: Optional[float] = None,
+    force_garbage_collector_interval: Optional[float] = 10,
 ) -> Dict[EventSetNode, EventSet]:
     """Evaluates a schedule on a dictionary of input
     [`EventSets`][temporian.EventSet].
@@ -132,7 +132,7 @@ def run_schedule(
             >= force_garbage_collector_interval
         ):
             if verbose >= 2:
-                print("Garbage collection\n", file=sys.stderr)
+                print("Garbage collection\n", file=sys.stderr, flush=True)
             gc.collect()
             gc_being_time = time.time()
 
