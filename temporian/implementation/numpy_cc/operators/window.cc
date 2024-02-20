@@ -438,7 +438,7 @@ struct MovingExtremumAccumulator : Accumulator<INPUT, OUTPUT> {
   void Add(Idx idx) override {
     const INPUT value = Accumulator<INPUT, OUTPUT>::values[idx];
     if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
-      if (std::isnan(value)) {
+      if (!(value == value)) {
         return;
       }
     }
@@ -455,7 +455,7 @@ struct MovingExtremumAccumulator : Accumulator<INPUT, OUTPUT> {
     const INPUT value = Accumulator<INPUT, OUTPUT>::values[idx];
 
     if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
-      if (std::isnan(value)) {
+      if (!(value == value)) {
         return;
       }
     }
@@ -473,7 +473,7 @@ struct MovingExtremumAccumulator : Accumulator<INPUT, OUTPUT> {
   void Remove(Idx idx) override {
     const INPUT value = Accumulator<INPUT, OUTPUT>::values[idx];
     if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
-      if (std::isnan(value)) {
+      if (!(value == value)) {
         return;
       }
     }
@@ -486,9 +486,11 @@ struct MovingExtremumAccumulator : Accumulator<INPUT, OUTPUT> {
   }
 
   OUTPUT Result() override {
-    return best_indices.empty()
-               ? std::numeric_limits<OUTPUT>::quiet_NaN()
-               : Accumulator<INPUT, OUTPUT>::values[best_indices.front()];
+    if (best_indices.empty()) {
+      return std::numeric_limits<OUTPUT>::quiet_NaN();
+    } else {
+      return Accumulator<INPUT, OUTPUT>::values[best_indices.front()];
+    }
   }
 
   // Subset of indexes of the observations in the window, sorted by index value,
