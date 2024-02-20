@@ -76,7 +76,11 @@ def display_html(evset: EventSet) -> str:
     for index_key in all_index_keys[:max_indexes]:
         index_data = evset.data[index_key]
         num_timestamps = len(index_data.timestamps)
-        max_timestamps = min(config.display_max_events, num_timestamps)
+        max_timestamps = (
+            min(config.display_max_events, num_timestamps)
+            if config.display_max_events != None
+            else num_timestamps
+        )
         if max_timestamps == 1:
             display_timestamps = index_data.timestamps[
                 :1
@@ -180,7 +184,7 @@ def display_html(evset: EventSet) -> str:
             if has_hidden_feats:
                 row.append(ELLIPSIS)
 
-            # Create ellipsis row between first half and last half if more than man_timestamps entries
+            # Create ellipsis row between first half and last half if more than max_timestamps entries
             table.appendChild(html_table_row(dom, row))
             if (
                 timestamp_idx == ((max_timestamps // 2) - 1)
