@@ -138,7 +138,7 @@ def run_schedule(
             gc_being_time = time.time()
             if verbose >= 1:
                 print(
-                    f" [{end_time - begin_gc:.5f} s]",
+                    f" [{gc_being_time - begin_gc:.5f} s]",
                     file=sys.stderr,
                     flush=True,
                 )
