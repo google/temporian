@@ -283,7 +283,7 @@ def plot(
         merge: If true, plots all features in the same plots. If false, plots
             features in separate plots. merge=True on event-sets [e1, e2] is
             equivalent to plotting (e1, e2).
-        font_scale: Scalling factor for all the fonts.
+        font_scale: Scaling factor for all the fonts.
     """
 
     if merge:
@@ -393,7 +393,7 @@ def plot_with_plotter(
             for group_item in group.items:
                 if index not in group_item.evset.data:
                     if group_item.feature_idx == -1:
-                        tag = "sampling"
+                        tag = "timestamps"
                     else:
                         tag = group_item.evset.schema.features[
                             group_item.feature_idx
@@ -432,7 +432,7 @@ def plot_with_plotter(
                     plotter.plot_sampling(
                         xs=xs,
                         color_idx=color_idx,
-                        name=group_item.name or "[sampling]",
+                        name=group_item.name or "[timestamps]",
                     )
                 else:
                     feature_name = group_item.evset.schema.features[

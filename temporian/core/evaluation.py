@@ -127,7 +127,7 @@ def run(
     normalized_query = _normalize_query(query)
 
     if verbose >= 1:
-        print("Build schedule", file=sys.stderr)
+        print("Build schedule", file=sys.stderr, flush=True)
 
     # Schedule execution
     assert isinstance(normalized_query, set)

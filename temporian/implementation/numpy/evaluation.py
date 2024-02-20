@@ -70,12 +70,14 @@ def run_schedule(
                 f"    {step_idx+1} / {num_steps}: {step.op.operator_key()}",
                 file=sys.stderr,
                 end="",
+                flush=True,
             )
         elif verbose >= 2:
             print("=============================", file=sys.stderr)
             print(
                 f"{step_idx+1} / {num_steps}: Run {step.op}",
                 file=sys.stderr,
+                flush=True,
             )
 
         # Construct operator inputs
@@ -85,7 +87,11 @@ def run_schedule(
         }
 
         if verbose >= 2:
-            print(f"Inputs:\n{operator_inputs}\n", file=sys.stderr)
+            print(
+                f"Inputs:\n{operator_inputs}\n",
+                file=sys.stderr,
+                flush=True,
+            )
 
         # Compute output
         begin_time = time.perf_counter()
@@ -96,10 +102,18 @@ def run_schedule(
         end_time = time.perf_counter()
 
         if verbose == 1:
-            print(f" [{end_time - begin_time:.5f} s]", file=sys.stderr)
+            print(
+                f" [{end_time - begin_time:.5f} s]",
+                file=sys.stderr,
+                flush=True,
+            )
         elif verbose >= 2:
             print(f"Outputs:\n{operator_outputs}\n", file=sys.stderr)
-            print(f"Duration: {end_time - begin_time} s", file=sys.stderr)
+            print(
+                f"Duration: {end_time - begin_time} s",
+                file=sys.stderr,
+                flush=True,
+            )
 
         # materialize data in output nodes
         for output_key, output_node in step.op.outputs.items():
