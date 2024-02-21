@@ -16,6 +16,11 @@ namespace py = pybind11;
 typedef py::array_t<double> ArrayD;
 typedef py::array_t<float> ArrayF;
 
+template <typename T>
+using ArrayRef = py::detail::unchecked_reference<T, 1>;
+
+typedef size_t Idx;
+
 // NOTE: accumulate() is overloaded for the 4 possible combinations of:
 // - with or without external sampling
 // - with constant or variable window length
@@ -37,7 +42,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
   auto v_timestamps = evset_timestamps.unchecked<1>();
   auto v_values = evset_values.template unchecked<1>();
 
-  TAccumulator accumulator;
+  TAccumulator accumulator(v_values);
 
   // Index of the first value in the window.
   size_t begin_idx = 0;
@@ -50,12 +55,12 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
     // values in v_timestamps.
 
     // Add all values with same timestamp as the current one.
-    accumulator.Add(v_values[end_idx]);
+    accumulator.Add(end_idx);
     const auto current_ts = v_timestamps[end_idx];
     size_t first_diff_ts_idx = end_idx + 1;
     while (first_diff_ts_idx < n_event &&
            v_timestamps[first_diff_ts_idx] == current_ts) {
-      accumulator.Add(v_values[first_diff_ts_idx]);
+      accumulator.Add(first_diff_ts_idx);
       first_diff_ts_idx++;
     }
 
@@ -63,7 +68,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
     while (begin_idx < n_event &&
            // Compare both sides around ~0 to get maximum float resolution
            v_timestamps[end_idx] - v_timestamps[begin_idx] >= window_length) {
-      accumulator.Remove(v_values[begin_idx]);
+      accumulator.Remove(begin_idx);
       begin_idx++;
     }
 
@@ -98,7 +103,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
   auto v_values = evset_values.template unchecked<1>();
   auto v_sampling = sampling_timestamps.unchecked<1>();
 
-  TAccumulator accumulator;
+  TAccumulator accumulator(v_values);
 
   size_t begin_idx = 0;
   size_t end_idx = 0;
@@ -107,7 +112,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
     const auto right_limit = v_sampling[sampling_idx];
 
     while (end_idx < n_event && v_timestamps[end_idx] <= right_limit) {
-      accumulator.Add(v_values[end_idx]);
+      accumulator.Add(end_idx);
       end_idx++;
     }
 
@@ -115,7 +120,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
            // Compare both sides around ~0 to get maximum float resolution
            v_sampling[sampling_idx] - v_timestamps[begin_idx] >=
                window_length) {
-      accumulator.Remove(v_values[begin_idx]);
+      accumulator.Remove(begin_idx);
       begin_idx++;
     }
 
@@ -150,7 +155,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
   assert(v_timestamps.shape(0) == v_window_length.shape(0));
   assert(v_timestamps.shape(0) == v_values.shape(0));
 
-  TAccumulator accumulator;
+  TAccumulator accumulator(v_values);
 
   // Index of the first value in the window.
   size_t begin_idx = 0;
@@ -173,7 +178,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
     }
 
     while (end_idx < n_event && v_timestamps[end_idx] <= curr_ts) {
-      accumulator.Add(v_values[end_idx]);
+      accumulator.Add(end_idx);
       end_idx++;
     }
 
@@ -185,7 +190,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
       while (begin_idx < n_event &&
              v_timestamps[idx] - v_timestamps[begin_idx] >=
                  curr_window_length) {
-        accumulator.Remove(v_values[begin_idx]);
+        accumulator.Remove(begin_idx);
         begin_idx++;
       }
     } else {
@@ -194,7 +199,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
       while (begin_idx > 0 && v_timestamps[idx] - v_timestamps[begin_idx - 1] <
                                   curr_window_length) {
         begin_idx--;
-        accumulator.AddLeft(v_values[begin_idx]);
+        accumulator.AddLeft(begin_idx);
       }
     }
 
@@ -226,7 +231,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
   assert(v_timestamps.shape(0) == v_values.shape(0));
   assert(v_sampling.shape(0) == v_window_length.shape(0));
 
-  TAccumulator accumulator;
+  TAccumulator accumulator(v_values);
 
   size_t begin_idx = 0;
   size_t end_idx = 0;
@@ -240,7 +245,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
     }
 
     while (end_idx < n_event && v_timestamps[end_idx] <= right_limit) {
-      accumulator.Add(v_values[end_idx]);
+      accumulator.Add(end_idx);
       end_idx++;
     }
 
@@ -252,7 +257,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
       // Window's beginning moved forwards.
       while (begin_idx < n_event &&
              right_limit - v_timestamps[begin_idx] >= curr_window_length) {
-        accumulator.Remove(v_values[begin_idx]);
+        accumulator.Remove(begin_idx);
         begin_idx++;
       }
     } else {
@@ -261,7 +266,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
       while (begin_idx > 0 &&
              right_limit - v_timestamps[begin_idx - 1] < curr_window_length) {
         begin_idx--;
-        accumulator.AddLeft(v_values[begin_idx]);
+        accumulator.AddLeft(begin_idx);
       }
     }
 
@@ -272,19 +277,28 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
 }
 
 // Note: We only use inheritance to compile check the code.
-template <typename INPUT, typename OUTPUT> struct Accumulator {
+template <typename INPUT, typename OUTPUT>
+struct Accumulator {
+  Accumulator(const ArrayRef<INPUT> &values) : values(values) {}
+
   virtual ~Accumulator() = default;
-  virtual void Add(INPUT value) = 0;
-  virtual void Remove(INPUT value) = 0;
+  virtual void Add(Idx idx) = 0;
+  virtual void Remove(Idx idx) = 0;
   virtual OUTPUT Result() = 0;
 
   // // Add a value to left of the window. Relevant in deque-based accumulators.
-  virtual void AddLeft(INPUT value) { return Add(value); }
+  virtual void AddLeft(Idx idx) { return Add(idx); }
+
+  ArrayRef<INPUT> values;
 };
 
 template <typename INPUT, typename OUTPUT>
-struct SimpleMovingAverageAccumulator : Accumulator<INPUT, OUTPUT> {
-  void Add(INPUT value) override {
+struct SimpleMovingAverageAccumulator : public Accumulator<INPUT, OUTPUT> {
+  SimpleMovingAverageAccumulator(const ArrayRef<INPUT> &values)
+      : Accumulator<INPUT, OUTPUT>(values) {}
+
+  void Add(Idx idx) override {
+    const INPUT value = Accumulator<INPUT, OUTPUT>::values[idx];
     if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
       if (std::isnan(value)) {
         return;
@@ -294,7 +308,8 @@ struct SimpleMovingAverageAccumulator : Accumulator<INPUT, OUTPUT> {
     num_values++;
   }
 
-  void Remove(INPUT value) override {
+  void Remove(Idx idx) override {
+    const INPUT value = Accumulator<INPUT, OUTPUT>::values[idx];
     if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
       if (std::isnan(value)) {
         return;
@@ -319,7 +334,11 @@ struct SimpleMovingAverageAccumulator : Accumulator<INPUT, OUTPUT> {
 
 template <typename INPUT, typename OUTPUT>
 struct MovingStandardDeviationAccumulator : Accumulator<INPUT, OUTPUT> {
-  void Add(INPUT value) override {
+  MovingStandardDeviationAccumulator(const ArrayRef<INPUT> &values)
+      : Accumulator<INPUT, OUTPUT>(values) {}
+
+  void Add(Idx idx) override {
+    const INPUT value = Accumulator<INPUT, OUTPUT>::values[idx];
     if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
       if (std::isnan(value)) {
         return;
@@ -330,7 +349,8 @@ struct MovingStandardDeviationAccumulator : Accumulator<INPUT, OUTPUT> {
     num_values++;
   }
 
-  void Remove(INPUT value) override {
+  void Remove(Idx idx) override {
+    const INPUT value = Accumulator<INPUT, OUTPUT>::values[idx];
     if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
       if (std::isnan(value)) {
         return;
@@ -358,13 +378,16 @@ struct MovingStandardDeviationAccumulator : Accumulator<INPUT, OUTPUT> {
 
 template <typename OUTPUT>
 struct MovingCountAccumulator : Accumulator<double, OUTPUT> {
-  void Add(double value) override {
+  MovingCountAccumulator(const ArrayRef<double> &values)
+      : Accumulator<double, OUTPUT>(values) {}
+
+  void Add(Idx idx) override {
     static_assert(std::is_same<OUTPUT, int32_t>::value,
                   "OUTPUT must be int32_t");
     num_values++;
   }
 
-  void Remove(double value) override { num_values--; }
+  void Remove(Idx idx) override { num_values--; }
 
   OUTPUT Result() override { return num_values; }
 
@@ -374,7 +397,11 @@ struct MovingCountAccumulator : Accumulator<double, OUTPUT> {
 
 template <typename INPUT, typename OUTPUT>
 struct MovingSumAccumulator : Accumulator<INPUT, OUTPUT> {
-  void Add(INPUT value) override {
+  MovingSumAccumulator(const ArrayRef<INPUT> &values)
+      : Accumulator<INPUT, OUTPUT>(values) {}
+
+  void Add(Idx idx) override {
+    const INPUT value = Accumulator<INPUT, OUTPUT>::values[idx];
     if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
       if (std::isnan(value)) {
         return;
@@ -383,7 +410,8 @@ struct MovingSumAccumulator : Accumulator<INPUT, OUTPUT> {
     sum_values += value;
   }
 
-  void Remove(INPUT value) override {
+  void Remove(Idx idx) override {
+    const INPUT value = Accumulator<INPUT, OUTPUT>::values[idx];
     if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
       if (std::isnan(value)) {
         return;
@@ -400,76 +428,91 @@ struct MovingSumAccumulator : Accumulator<INPUT, OUTPUT> {
 
 template <typename INPUT, typename OUTPUT>
 struct MovingExtremumAccumulator : Accumulator<INPUT, OUTPUT> {
+  MovingExtremumAccumulator(const ArrayRef<INPUT> &values)
+      : Accumulator<INPUT, OUTPUT>(values) {}
+
   virtual ~MovingExtremumAccumulator() = default;
+
   virtual bool Compare(INPUT a, INPUT b) = 0;
 
-  void Add(INPUT value) override {
+  void Add(Idx idx) override {
+    const INPUT value = Accumulator<INPUT, OUTPUT>::values[idx];
     if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
-      if (std::isnan(value)) {
+      if (!(value == value)) {
         return;
       }
     }
-    if (values.empty() || Compare(value, current_extremum)) {
-      current_extremum = value;
+
+    while (!best_indices.empty() &&
+           !Compare(Accumulator<INPUT, OUTPUT>::values[best_indices.back()],
+                    value)) {
+      best_indices.pop_back();
     }
-    values.push_back(value);
+    best_indices.push_back(idx);
   }
 
-  void AddLeft(INPUT value) override {
-    if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
-      if (std::isnan(value)) {
-        return;
-      }
-    }
-    if (values.empty() || Compare(value, current_extremum)) {
-      current_extremum = value;
-    }
-    values.push_front(value);
-  }
+  void AddLeft(Idx idx) override {
+    const INPUT value = Accumulator<INPUT, OUTPUT>::values[idx];
 
-  void Remove(INPUT value) override {
     if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
-      if (std::isnan(value)) {
+      if (!(value == value)) {
         return;
       }
     }
 
-    assert(!values.empty());
-    assert(values.front() == value);
-
-    if (values.size() == 1) {
-      values.clear();
+    if (best_indices.empty()) {
+      best_indices.push_back(idx);
     } else {
-      values.pop_front();
-      if (value == current_extremum) {
-        // Compute the extremum on the remaining items.
-        current_extremum = values.front();
-        for (const auto value : values) {
-          if (Compare(value, current_extremum)) {
-            current_extremum = value;
-          }
-        }
+      if (Compare(value,
+                  Accumulator<INPUT, OUTPUT>::values[best_indices.front()])) {
+        best_indices.push_front(idx);
       }
+    }
+  }
+
+  void Remove(Idx idx) override {
+    const INPUT value = Accumulator<INPUT, OUTPUT>::values[idx];
+    if constexpr (std::numeric_limits<INPUT>::has_quiet_NaN) {
+      if (!(value == value)) {
+        return;
+      }
+    }
+
+    assert(!best_indices.empty());
+    assert(best_indices.front() >= idx);
+    if (best_indices.front() == idx) {
+      best_indices.pop_front();
     }
   }
 
   OUTPUT Result() override {
-    return values.empty() ? std::numeric_limits<OUTPUT>::quiet_NaN()
-                          : current_extremum;
+    if (best_indices.empty()) {
+      return std::numeric_limits<OUTPUT>::quiet_NaN();
+    } else {
+      return Accumulator<INPUT, OUTPUT>::values[best_indices.front()];
+    }
   }
 
-  // TODO(gbm): Implement without memory copy.
-  std::deque<INPUT> values;
-  INPUT current_extremum;
+  // Subset of indexes of the observations in the window, sorted by index value,
+  // and such that index "j" is not part of "best_indices" if there is another
+  // index "i" in "best_indices" such that "i>j" (i is after j) and the value of
+  // i is greater than the value if j.
+  std::deque<size_t> best_indices;
 };
 
 template <typename INPUT, typename OUTPUT>
 struct MovingMinAccumulator : MovingExtremumAccumulator<INPUT, OUTPUT> {
+  MovingMinAccumulator(const ArrayRef<INPUT> &values)
+      : MovingExtremumAccumulator<INPUT, OUTPUT>(values) {}
+
   bool Compare(INPUT a, INPUT b) { return a < b; }
 };
 
 template <typename INPUT, typename OUTPUT>
 struct MovingMaxAccumulator : MovingExtremumAccumulator<INPUT, OUTPUT> {
+  MovingMaxAccumulator(const ArrayRef<INPUT> &values)
+      : MovingExtremumAccumulator<INPUT, OUTPUT>(values) {}
+
   bool Compare(INPUT a, INPUT b) { return a > b; }
 };
 
@@ -481,65 +524,65 @@ struct MovingMaxAccumulator : MovingExtremumAccumulator<INPUT, OUTPUT> {
 //   INPUT: Input value type.
 //   OUTPUT: Output value type.
 //   ACCUMULATOR: Accumulator class.
-#define REGISTER_CC_FUNC(NAME, INPUT, OUTPUT, ACCUMULATOR)                     \
-                                                                               \
-  py::array_t<OUTPUT> NAME(const ArrayD &evset_timestamps,                     \
-                           const py::array_t<INPUT> &evset_values,             \
-                           const double window_length) {                       \
-    return accumulate<INPUT, OUTPUT, ACCUMULATOR<INPUT, OUTPUT>>(              \
-        evset_timestamps, evset_values, window_length);                        \
-  }                                                                            \
-                                                                               \
-  py::array_t<OUTPUT> NAME(                                                    \
-      const ArrayD &evset_timestamps, const py::array_t<INPUT> &evset_values,  \
-      const ArrayD &sampling_timestamps, const double window_length) {         \
-    return accumulate<INPUT, OUTPUT, ACCUMULATOR<INPUT, OUTPUT>>(              \
-        evset_timestamps, evset_values, sampling_timestamps, window_length);   \
-  }                                                                            \
-                                                                               \
-  py::array_t<OUTPUT> NAME(const ArrayD &evset_timestamps,                     \
-                           const py::array_t<INPUT> &evset_values,             \
-                           const ArrayD &window_length) {                      \
-    return accumulate<INPUT, OUTPUT, ACCUMULATOR<INPUT, OUTPUT>>(              \
-        evset_timestamps, evset_values, window_length);                        \
-  }                                                                            \
-                                                                               \
-  py::array_t<OUTPUT> NAME(                                                    \
-      const ArrayD &evset_timestamps, const py::array_t<INPUT> &evset_values,  \
-      const ArrayD &sampling_timestamps, const ArrayD &window_length) {        \
-    return accumulate<INPUT, OUTPUT, ACCUMULATOR<INPUT, OUTPUT>>(              \
-        evset_timestamps, evset_values, sampling_timestamps, window_length);   \
+#define REGISTER_CC_FUNC(NAME, INPUT, OUTPUT, ACCUMULATOR)                    \
+                                                                              \
+  py::array_t<OUTPUT> NAME(const ArrayD &evset_timestamps,                    \
+                           const py::array_t<INPUT> &evset_values,            \
+                           const double window_length) {                      \
+    return accumulate<INPUT, OUTPUT, ACCUMULATOR<INPUT, OUTPUT>>(             \
+        evset_timestamps, evset_values, window_length);                       \
+  }                                                                           \
+                                                                              \
+  py::array_t<OUTPUT> NAME(                                                   \
+      const ArrayD &evset_timestamps, const py::array_t<INPUT> &evset_values, \
+      const ArrayD &sampling_timestamps, const double window_length) {        \
+    return accumulate<INPUT, OUTPUT, ACCUMULATOR<INPUT, OUTPUT>>(             \
+        evset_timestamps, evset_values, sampling_timestamps, window_length);  \
+  }                                                                           \
+                                                                              \
+  py::array_t<OUTPUT> NAME(const ArrayD &evset_timestamps,                    \
+                           const py::array_t<INPUT> &evset_values,            \
+                           const ArrayD &window_length) {                     \
+    return accumulate<INPUT, OUTPUT, ACCUMULATOR<INPUT, OUTPUT>>(             \
+        evset_timestamps, evset_values, window_length);                       \
+  }                                                                           \
+                                                                              \
+  py::array_t<OUTPUT> NAME(                                                   \
+      const ArrayD &evset_timestamps, const py::array_t<INPUT> &evset_values, \
+      const ArrayD &sampling_timestamps, const ArrayD &window_length) {       \
+    return accumulate<INPUT, OUTPUT, ACCUMULATOR<INPUT, OUTPUT>>(             \
+        evset_timestamps, evset_values, sampling_timestamps, window_length);  \
   }
 
 // Similar to REGISTER_CC_FUNC, but without inputs
-#define REGISTER_CC_FUNC_NO_INPUT(NAME, OUTPUT, ACCUMULATOR)                   \
-                                                                               \
-  py::array_t<OUTPUT> NAME(const ArrayD &evset_timestamps,                     \
-                           const double window_length) {                       \
-    return accumulate<double, OUTPUT, ACCUMULATOR<OUTPUT>>(                    \
-        evset_timestamps, evset_timestamps, window_length);                    \
-  }                                                                            \
-                                                                               \
-  py::array_t<OUTPUT> NAME(const ArrayD &evset_timestamps,                     \
-                           const ArrayD &sampling_timestamps,                  \
-                           const double window_length) {                       \
-    return accumulate<double, OUTPUT, ACCUMULATOR<OUTPUT>>(                    \
-        evset_timestamps, evset_timestamps, sampling_timestamps,               \
-        window_length);                                                        \
-  }                                                                            \
-                                                                               \
-  py::array_t<OUTPUT> NAME(const ArrayD &evset_timestamps,                     \
-                           const ArrayD &window_length) {                      \
-    return accumulate<double, OUTPUT, ACCUMULATOR<OUTPUT>>(                    \
-        evset_timestamps, evset_timestamps, window_length);                    \
-  }                                                                            \
-                                                                               \
-  py::array_t<OUTPUT> NAME(const ArrayD &evset_timestamps,                     \
-                           const ArrayD &sampling_timestamps,                  \
-                           const ArrayD &window_length) {                      \
-    return accumulate<double, OUTPUT, ACCUMULATOR<OUTPUT>>(                    \
-        evset_timestamps, evset_timestamps, sampling_timestamps,               \
-        window_length);                                                        \
+#define REGISTER_CC_FUNC_NO_INPUT(NAME, OUTPUT, ACCUMULATOR)     \
+                                                                 \
+  py::array_t<OUTPUT> NAME(const ArrayD &evset_timestamps,       \
+                           const double window_length) {         \
+    return accumulate<double, OUTPUT, ACCUMULATOR<OUTPUT>>(      \
+        evset_timestamps, evset_timestamps, window_length);      \
+  }                                                              \
+                                                                 \
+  py::array_t<OUTPUT> NAME(const ArrayD &evset_timestamps,       \
+                           const ArrayD &sampling_timestamps,    \
+                           const double window_length) {         \
+    return accumulate<double, OUTPUT, ACCUMULATOR<OUTPUT>>(      \
+        evset_timestamps, evset_timestamps, sampling_timestamps, \
+        window_length);                                          \
+  }                                                              \
+                                                                 \
+  py::array_t<OUTPUT> NAME(const ArrayD &evset_timestamps,       \
+                           const ArrayD &window_length) {        \
+    return accumulate<double, OUTPUT, ACCUMULATOR<OUTPUT>>(      \
+        evset_timestamps, evset_timestamps, window_length);      \
+  }                                                              \
+                                                                 \
+  py::array_t<OUTPUT> NAME(const ArrayD &evset_timestamps,       \
+                           const ArrayD &sampling_timestamps,    \
+                           const ArrayD &window_length) {        \
+    return accumulate<double, OUTPUT, ACCUMULATOR<OUTPUT>>(      \
+        evset_timestamps, evset_timestamps, sampling_timestamps, \
+        window_length);                                          \
   }
 
 // Note: ";" are not needed for the code, but are required for our code
@@ -571,7 +614,7 @@ REGISTER_CC_FUNC(moving_max, int32_t, int32_t, MovingMaxAccumulator);
 REGISTER_CC_FUNC(moving_max, int64_t, int64_t, MovingMaxAccumulator);
 
 REGISTER_CC_FUNC_NO_INPUT(moving_count, int32_t, MovingCountAccumulator);
-} // namespace
+}  // namespace
 
 // Register c++ functions to pybind with and without sampling,
 // and with and without variable window length.
