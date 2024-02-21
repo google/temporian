@@ -4610,3 +4610,159 @@ class EventSetOperations:
         from temporian.core.operators.fillna import fillna
 
         return fillna(self, value)
+
+    def sin(self: EventSetOrNode) -> EventSetOrNode:
+        """Calculates the sine of an [`EventSet`][temporian.EventSet]'s features.
+
+        Can only be used on floating point features.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3, 4, 5],
+            ...     features={"M": [0, np.pi/2, np.pi, 3*np.pi/2, 2*np.pi]},
+            ... )
+            >>> a.sin()
+            indexes: ...
+                    timestamps: [1. 2. 3. 4. 5.]
+                    'M': [ 0.0000e+00  1.0000e+00  1.2246e-16 -1.0000e+00 -2.4493e-16]
+            ...
+
+            ```
+
+        Returns:
+            EventSetOrNode with sine of input features.
+        """
+        from temporian.core.operators.unary import sin
+
+        return sin(self)
+
+    def cos(self: EventSetOrNode) -> EventSetOrNode:
+        """Calculates the cosine of an [`EventSet`][temporian.EventSet]'s features.
+
+        Can only be used on floating point features.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3, 4, 5],
+            ...     features={"M": [0, np.pi/3, np.pi/2, np.pi, 2*np.pi]},
+            ... )
+            >>> a.cos()
+            indexes: ...
+                    timestamps: [1. 2. 3. 4. 5.]
+                    'M': [ 1.0000e+00  5.0000e-01  6.1232e-17 -1.0000e+00  1.0000e+00]
+            ...
+
+            ```
+
+        Returns:
+            EventSetOrNode with cosine of input features.
+        """
+        from temporian.core.operators.unary import cos
+
+        return cos(self)
+
+    def tan(self: EventSetOrNode) -> EventSetOrNode:
+        """Calculates the tangent of an [`EventSet`][temporian.EventSet]'s features.
+
+        Can only be used on floating point features.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3, 4],
+            ...     features={"M": [0, np.pi/4, np.pi/3, np.pi/6]},
+            ... )
+            >>> a.tan()
+            indexes: ...
+                    timestamps: [1. 2. 3. 4.]
+                    'M': [0.     1.     1.7321 0.5774]
+            ...
+
+            ```
+
+        Returns:
+            EventSetOrNode with tangent of input features.
+        """
+        from temporian.core.operators.unary import tan
+
+        return tan(self)
+
+    def arcsin(self: EventSetOrNode) -> EventSetOrNode:
+        """Calculates the inverse sine of an [`EventSet`][temporian.EventSet]'s features.
+
+        Can only be used on floating point features.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"M": [0, 0.5, -0.5]},
+            ... )
+            >>> a.arcsin()
+            indexes: ...
+                    timestamps: [1. 2. 3.]
+                    'M': [ 0.      0.5236 -0.5236]
+            ...
+
+            ```
+
+        Returns:
+            EventSetOrNode with inverse sine of input features.
+        """
+        from temporian.core.operators.unary import arcsin
+
+        return arcsin(self)
+
+    def arccos(self: EventSetOrNode) -> EventSetOrNode:
+        """Calculates the inverse cosine of an [`EventSet`][temporian.EventSet]'s features.
+
+        Can only be used on floating point features.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"M": [1.0, 0, -1.0]},
+            ... )
+            >>> a.arccos()
+            indexes: ...
+                    timestamps: [1. 2. 3.]
+                    'M': [0.     1.5708 3.1416]
+            ...
+
+            ```
+
+        Returns:
+            EventSetOrNode with inverse cosine of input features.
+        """
+        from temporian.core.operators.unary import arccos
+
+        return arccos(self)
+
+    def arctan(self: EventSetOrNode) -> EventSetOrNode:
+        """Calculates the inverse tangent of an [`EventSet`][temporian.EventSet]'s features.
+
+        Can only be used on floating point features.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3, 4],
+            ...     features={"M": [0, 1.0, -1.0, 5.0]},
+            ... )
+            >>> a.arctan()
+            indexes: ...
+                    timestamps: [1. 2. 3. 4.]
+                    'M': [ 0.      0.7854 -0.7854  1.3734]
+            ...
+
+            ```
+
+        Returns:
+            EventSetOrNode with inverse tangent of input features.
+        """
+        from temporian.core.operators.unary import arctan
+
+        return arctan(self)
