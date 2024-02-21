@@ -26,6 +26,8 @@ from temporian.io.tensorflow import (
     from_tensorflow_record,
 )
 from temporian.implementation.numpy.data.io import event_set
+from temporian.core.data import schema
+from temporian.core.operators.combine import combine
 
 
 class TensorFlowTest(absltest.TestCase):
@@ -148,6 +150,53 @@ class TensorFlowTest(absltest.TestCase):
             path=tmp_file, schema=evset.schema
         )
         assertEqualEventSet(self, evset, loaded_evtset)
+
+    def test_from_sharded_tensorflow_record(self) -> None:
+        evset_1 = event_set(
+            timestamps=[1, 2],
+            features={"f1": [10, 11], "i1": [1, 1]},
+            indexes=["i1"],
+        )
+        evset_2 = event_set(
+            timestamps=[3, 4],
+            features={"f1": [12, 13], "i1": [2, 2]},
+            indexes=["i1"],
+        )
+        evset_all = combine(evset_1, evset_2)
+
+        tmp_dir_handle = tempfile.TemporaryDirectory()
+        tmp_file_1 = os.path.join(tmp_dir_handle.name, "data_00000_of_00001")
+        tmp_file_2 = os.path.join(tmp_dir_handle.name, "data_00001_of_00001")
+
+        to_tensorflow_record(
+            evset_1, path=tmp_file_1, format="grouped_by_index"
+        )
+        to_tensorflow_record(
+            evset_2, path=tmp_file_2, format="grouped_by_index"
+        )
+        loaded_evtset = from_tensorflow_record(
+            path=[tmp_file_1, tmp_file_2], schema=evset_all.schema
+        )
+        assertEqualEventSet(self, evset_all, loaded_evtset)
+
+    def test_from_tensorflow_record_non_sorted(self) -> None:
+        tmp_dir_handle = tempfile.TemporaryDirectory()
+        tmp_file = os.path.join(tmp_dir_handle.name, "data")
+
+        with tf.io.TFRecordWriter(tmp_file, options="GZIP") as file_writer:
+            ex = tf.train.Example()
+            ex.features.feature["timestamp"].float_list.value[:] = [1, 3, 2]
+            file_writer.write(ex.SerializeToString())
+
+        with self.assertRaisesRegex(
+            ValueError, "The timestamps are not sorted"
+        ):
+            _ = from_tensorflow_record(
+                path=tmp_file,
+                schema=schema.Schema(
+                    features=[], indexes=[], is_unix_timestamp=False
+                ),
+            )
 
 
 def _extract_tfrecord(path: str):

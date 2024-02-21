@@ -51,6 +51,14 @@ class PlotterTest(parameterized.TestCase):
             return_fig=True,
         )
 
+        _ = plotter.plot(
+            evset,
+            indexes=[1, 2],
+            interactive=interactive,
+            return_fig=True,
+            font_scale=2,
+        )
+
     def test_index_str(self):
         try:
             import IPython.display
@@ -186,6 +194,42 @@ class PlotterTest(parameterized.TestCase):
                 )
             ],
         )
+
+    @parameterized.parameters((True,), (False,))
+    def test_plot_non_matching_index(self, interactive):
+        evset_1 = event_set(
+            timestamps=[1, 2],
+            features={"a": [1, 2], "x": [1, 1]},
+            indexes=["x"],
+        )
+
+        evset_2 = event_set(
+            timestamps=[3, 4, 5, 6],
+            features={"b": [3, 4, 5, 6], "x": [1, 1, 2, 2]},
+            indexes=["x"],
+        )
+
+        evset_3 = event_set(
+            timestamps=[], features={"c": [], "x": []}, indexes=["x"]
+        )
+
+        plot = plotter.plot(
+            [evset_1, evset_2, evset_3],
+            return_fig=True,
+            interactive=interactive,
+        )
+
+        try:
+            tmp_handle = tempfile.TemporaryDirectory()
+            tmp_path = os.path.join(tmp_handle.name, "fig.png")
+
+            if interactive:
+                bokeh_export_png(plot, filename=tmp_path)
+            else:
+                plot.savefig(tmp_path)
+        except RuntimeError:
+            # Fails if chromedriver is not available.
+            pass
 
 
 if __name__ == "__main__":

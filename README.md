@@ -120,7 +120,7 @@ the major concepts, operators, conventions, and practices of Temporian. For a
 hands-on learning experience, work through the [Tutorials](https://temporian.readthedocs.io/en/stable/tutorials/) or refer to the [API
 reference](https://temporian.readthedocs.io/en/stable/reference/).
 
-If you need help, have a question, want to contribute, or just want to be a part of the Temporian community, we encourage you to join our [Discord](https://discord.gg/x8rm9YYy) server! 🤝🏼
+If you need help, have a question, want to contribute, or just want to be a part of the Temporian community, we encourage you to join our [Discord](https://discord.gg/nT54yATCTy) server! 🤝🏼
 
 ## Documentation
 

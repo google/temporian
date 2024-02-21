@@ -14,6 +14,7 @@
 
 """Utilities for converting EventSets to TensorFlow dataset."""
 
+from typing import List, Union
 from copy import deepcopy
 import logging
 
@@ -197,10 +198,12 @@ def to_tensorflow_record(
 
 
 def from_tensorflow_record(
-    path: str,
+    path: Union[str, List[str]],
     schema: Schema,
     timestamps: str = "timestamp",
     format: TFRecordEventSetFormatChoices = TFRecordEventSetFormat.GROUPED_BY_INDEX,
+    num_parallel_reads=None,
+    buffer_size=None,
 ) -> EventSet:
     """Imports an EventSet from a TF.Records of TF.Examples.
 
@@ -211,12 +214,16 @@ def from_tensorflow_record(
     The GZIP compression is used.
 
     Args:
-        path: Path to input TF.Record.
+        path: Path to TF.Record file or list of path to TF.Record files.
         timestamps: Name of the output column containing timestamps.
         format: Format of the events inside the received record. At the moment
             only TFRecordEventSetFormat.GROUPED_BY_INDEX is supported. See
             [TFRecordEventSetFormat][temporian.io.format.TFRecordEventSetFormat]
             for more.
+        num_parallel_reads: Number of files to read in parallel. Only used if
+            `path` is a list of files. If not set, files are read sequentially.
+        buffer_size: Number of bytes in the buffer. If not set, use a sensible
+            default value.
 
     Returns:
         Imported EventSet.
@@ -248,7 +255,12 @@ def from_tensorflow_record(
         else:
             raise ValueError("Non supported type")
 
-    tf_dataset = tf.data.TFRecordDataset(path, compression_type="GZIP")
+    tf_dataset = tf.data.TFRecordDataset(
+        path,
+        compression_type="GZIP",
+        num_parallel_reads=num_parallel_reads,
+        buffer_size=buffer_size,
+    )
     for serialized_example in tf_dataset:
         example = tf.train.Example()
         example.ParseFromString(serialized_example.numpy())
@@ -256,6 +268,10 @@ def from_tensorflow_record(
         # Timestamps
         timestamp_values = np.array(get_value(example, timestamps), np.float64)
         num_timestamps = len(timestamp_values)
+
+        if not np.all(np.diff(timestamp_values) >= 0):
+            print("timestamp_values:", timestamp_values)
+            raise ValueError("The timestamps are not sorted")
 
         # Indexes
         indexes = []

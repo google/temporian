@@ -30,6 +30,7 @@ class Options(NamedTuple):
     max_num_plots: int
     style: Style
     interactive: bool
+    font_scale: float
 
 
 class PlotterBackend(ABC):

@@ -36,7 +36,6 @@ STORE, PRODUCT, TIMESTAMP, SALES, COSTS = (
 )
 
 
-@profile
 def main():
     print(f"Running basic benchmark with N={N}...")
 
@@ -89,7 +88,7 @@ def main():
     )
 
     # Print output's first row, useful to check reproducibility
-    print(res.first_index_data())
+    print(res)
 
 
 if __name__ == "__main__":
