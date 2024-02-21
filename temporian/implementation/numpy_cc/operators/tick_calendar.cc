@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "temporian/implementation/numpy_cc/operators/common.h"
+#include "temporian/implementation/numpy_cc/operators/tick_calendar_utils.h"
 
 namespace {
 namespace py = pybind11;
@@ -33,16 +34,12 @@ py::array_t<double> tick_calendar(
 
   std::tm start_utc = *std::gmtime(&start_t);
 
-  int year = start_utc.tm_year;                           // from 1900
-  int month = std::max(start_utc.tm_mon + 1, min_month);  // zero-based tm_mon
+  int year = start_utc.tm_year + 1900;
+  int month = std::max(start_utc.tm_mon + 1, min_month);  // 1-12
   int mday = std::max(start_utc.tm_mday, min_mday);       // 1-31
   int hour = std::max(start_utc.tm_hour, min_hour);
   int minute = std::max(start_utc.tm_min, min_minute);
   int second = std::max(start_utc.tm_sec, min_second);
-
-  // Workaround to get timestamp from UTC datetimes (mktime depends on timezone)
-  std::tm start_local = *std::localtime(&start_t);
-  const int offset_tzone = std::mktime(&start_utc) - std::mktime(&start_local);
 
   bool in_range = true;
   while (in_range) {
@@ -51,37 +48,22 @@ py::array_t<double> tick_calendar(
         while (hour <= max_hour && in_range) {
           while (minute <= max_minute && in_range) {
             while (second <= max_second && in_range) {
-              std::tm tm_date = {
-                .tm_sec = second,
-                .tm_min = minute,
-                .tm_hour = hour,
-                .tm_mday = mday,
-                .tm_mon = month - 1,  // zero-based
-                .tm_year = year,      // Since 1900
-                .tm_isdst = 0,
-                // TODO: Solve following:
-                // https://github.com/google/temporian/pull/325
-                // .tm_gmtoff = start_local.tm_gmtoff,
-              };
-
-              // This assumes that the date is in local timezone
-              const std::time_t time_local = std::mktime(&tm_date);
+              const auto cur_time_or =
+                  UTCMkTime(year, month, mday, hour, minute, second);
 
               // Valid date
-              if (time_local != -1 && tm_date.tm_mday == mday) {
-                // Remove timezone offset from timestamp
-                const std::time_t time_utc = time_local - offset_tzone;
+              if (cur_time_or.has_value()) {
+                const auto cur_time = cur_time_or.value();
 
                 // Finish condition
-                if (time_utc > end_t) {
+                if (cur_time.seconds_since_epoch > end_t) {
                   in_range = false;
                   break;
                 }
 
-                // Check weekday match (mktime sets it properly)
-                if (tm_date.tm_wday >= min_wday &&
-                    tm_date.tm_wday <= max_wday) {
-                  ticks.push_back(time_utc);
+                // Check weekday match
+                if (cur_time.wday >= min_wday && cur_time.wday <= max_wday) {
+                  ticks.push_back(cur_time.seconds_since_epoch);
                 }
               } else {
                 // Invalid date (e.g: 31/4)
@@ -127,7 +109,7 @@ py::array_t<double> tick_calendar(
 
 }  // namespace
 
-void init_tick_calendar(py::module &m) {
+void init_tick_calendar(py::module& m) {
   m.def("tick_calendar", &tick_calendar, "", py::arg("start_timestamp"),
         py::arg("end_timestamp"), py::arg("min_second"), py::arg("max_second"),
         py::arg("min_minute"), py::arg("max_minute"), py::arg("min_hour"),
