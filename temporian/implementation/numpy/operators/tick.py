@@ -41,14 +41,15 @@ class TickNumpyImplementation(OperatorImplementation):
 
         # fill output EventSet data
         for index_key, index_data in input.data.items():
-            if len(index_data.timestamps) == 0:
+            if len(index_data.timestamps) <= 1:
                 dst_timestamps = np.array([], dtype=np.float64)
             else:
                 begin = index_data.timestamps[0]
                 end = index_data.timestamps[-1]
 
+                save_begin = begin
+                save_end = end
                 if self.operator.align:
-                    save_begin = begin
                     begin = (
                         float(begin // self.operator.interval)
                         * self.operator.interval
@@ -57,9 +58,17 @@ class TickNumpyImplementation(OperatorImplementation):
                     if save_begin != begin:
                         begin += self.operator.interval
 
-                if self.operator.include_left:
+                # adjust begin if include_left and the first tick is not going
+                # to be equal to the begin
+                if self.operator.include_left and (
+                    (save_begin - begin) % self.operator.interval != 0
+                ):
                     begin -= self.operator.interval
-                if self.operator.include_right:
+                # adjust end if include_right and the final tick is not going
+                # to be equal to the end
+                if self.operator.include_right and (
+                    (save_end - begin) % self.operator.interval != 0
+                ):
                     end += self.operator.interval
 
                 dst_timestamps = np.arange(

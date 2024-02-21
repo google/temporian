@@ -4087,7 +4087,11 @@ class EventSetOperations:
         return since_last(self, steps=steps, sampling=sampling)
 
     def tick(
-        self: EventSetOrNode, interval: Duration, align: bool = True
+        self: EventSetOrNode,
+        interval: Duration,
+        align: bool = True,
+        include_right: bool = True,
+        include_left: bool = False,
     ) -> EventSetOrNode:
         """Generates timestamps at regular intervals in the range of a guide
         [`EventSet`][temporian.EventSet].
@@ -4120,13 +4124,21 @@ class EventSetOperations:
                 (similar to [`EventSet.begin()`][temporian.EventSet.begin]).
                 If true (default), ticks are generated on timestamps that are
                 multiple of `interval`.
+            include_right: If True, a tick after the last timestamp is included.
+            include_left: If True, a tick before the first timestamp is included.
 
         Returns:
             A feature-less EventSet with regular timestamps.
         """
         from temporian.core.operators.tick import tick
 
-        return tick(self, interval=interval, align=align)
+        return tick(
+            self,
+            interval=interval,
+            align=align,
+            include_right=include_right,
+            include_left=include_left,
+        )
 
     def tick_calendar(
         self: EventSetOrNode,
