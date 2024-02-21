@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import time
 import sys
 import time
+import gc
 
-from typing import Dict
+from typing import Dict, Optional
 
 from temporian.core.data.node import EventSetNode
 from temporian.implementation.numpy import implementation_lib
@@ -31,6 +33,7 @@ def run_schedule(
     schedule: Schedule,
     verbose: int,
     check_execution: bool,
+    force_garbage_collector_interval: Optional[float] = 10,
 ) -> Dict[EventSetNode, EventSet]:
     """Evaluates a schedule on a dictionary of input
     [`EventSets`][temporian.EventSet].
@@ -43,8 +46,12 @@ def run_schedule(
         check_execution: If `True`, data of the intermediate results of the
             operators is checked against its expected structure and raises if
             it differs.
+        force_garbage_collector_interval: If set, triggers the garbage
+            collection every "force_garbage_collector_interval" seconds.
     """
     data = {**inputs}
+
+    gc_begin_time = time.time()
 
     num_steps = len(schedule.steps)
     for step_idx, step in enumerate(schedule.steps):
@@ -118,5 +125,22 @@ def run_schedule(
         for node in step.released_nodes:
             assert node in data
             del data[node]
+
+        if (
+            force_garbage_collector_interval is not None
+            and (time.time() - gc_begin_time)
+            >= force_garbage_collector_interval
+        ):
+            begin_gc = time.time()
+            if verbose >= 2:
+                print("Garbage collection", file=sys.stderr, flush=True, end="")
+            gc.collect()
+            gc_begin_time = time.time()
+            if verbose >= 2:
+                print(
+                    f" [{gc_begin_time - begin_gc:.5f} s]",
+                    file=sys.stderr,
+                    flush=True,
+                )
 
     return data
