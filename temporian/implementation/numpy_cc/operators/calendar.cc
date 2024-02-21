@@ -10,7 +10,7 @@
 namespace {
 namespace py = pybind11;
 
-std::string parse_tz(const py::object tz, absl::TimeZone &parsed_tz) {
+std::string parse_tz(const py::object &tz, absl::TimeZone &parsed_tz) {
   if (py::isinstance<py::int_>(tz)) {
     // handle tz as an int
     const int int_tz = tz.cast<int>();
