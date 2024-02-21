@@ -14,7 +14,7 @@
 
 """Utilities for converting EventSets to TensorFlow dataset."""
 
-from typing import List, Union
+from typing import List, Union, Optional
 from copy import deepcopy
 import logging
 
@@ -202,8 +202,8 @@ def from_tensorflow_record(
     schema: Schema,
     timestamps: str = "timestamp",
     format: TFRecordEventSetFormatChoices = TFRecordEventSetFormat.GROUPED_BY_INDEX,
-    num_parallel_reads=None,
-    buffer_size=None,
+    num_parallel_reads: Optional[int] = None,
+    buffer_size: Optional[int] = None,
 ) -> EventSet:
     """Imports an EventSet from a TF.Records of TF.Examples.
 
