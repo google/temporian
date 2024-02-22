@@ -9,6 +9,8 @@ tmp_*
 .cache/
 .env
 my_venv
+venv
+.idea
 
 # benchmark outputs
 profile.*
