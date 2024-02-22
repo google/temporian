@@ -9,7 +9,7 @@ tmp_*
 .cache/
 .env
 my_venv
-venv
+venv*
 .idea
 
 # benchmark outputs
