@@ -125,12 +125,12 @@ class UnaryTest(absltest.TestCase):
 
     def test_correct_tan(self) -> None:
         evset = event_set(
-            timestamps=[1],
-            features={"f": [np.pi/3]}
+            timestamps=[1, 2, 3, 4],
+            features={"f": [0, np.pi/4, np.pi/3, np.pi/6]}
         )
         expected = event_set(
-            timestamps=[1],
-            features={"f": [1.7321]},
+            timestamps=[1, 2, 3, 4],
+            features={"f": [0., 1., 1.73205081, 0.57735027]},
             same_sampling_as=evset,
         )
         assertOperatorResult(self, evset.tan(), expected)
