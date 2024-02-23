@@ -34,24 +34,23 @@ def to_numpy(
         >>> from datetime import datetime
 
         >>> evset = tp.event_set(
-        ...     timestamps=[datetime(2024, 2, 22), datetime(2015, 2, 23)],
+        ...     timestamps=['2023-11-08T17:14:38', '2023-11-29T21:44:46'],
         ...     features={
-        ...         "feature_1": [0.5, 0.6],
-        ...         "my_index": ["red", "red"],
+        ...         "store": ['STORE_1', 'STORE_2'],
+        ...         "revenue": [1571, 6101]
         ...     },
-        ...     indexes=["my_index"],
+        ...     indexes=["store"],
         ... )
 
         # datetime64[s] if they were created as datetimes, otherwhise they are
         # floats
         >>> res = tp.to_numpy(evset)
         >>> res
-        {
-            "timestamps": ['2023-11-08', '2023-11-29'],
-            "feature_1": [0.5, 0.6],
-            "my_index": ["red", "red"],
-        }
+        {'store': array([b'STORE_2', b'STORE_1'], dtype='|S7'), 'revenue': array([6101, 1571]),
+        'timestamp': array(['2023-11-29T21:44:46', '2023-11-08T17:14:38'], dtype='datetime64[s]')}
+
         ```
+
     Args:
         evset: input event set.
         timestamp_to_datetime: If true, cast Temporian timestamps to datetime64
@@ -85,6 +84,11 @@ def to_numpy(
         # Features
         for feature_name, feature in zip(feature_names, data.features):
             dst[feature_name].append(feature)
+
+        # Indexes
+        num_timestamps = len(data.timestamps)
+        for index_name, index_item in zip(index_names, index):
+            dst[index_name].append(np.repeat(index_item, num_timestamps))
 
     dst = {k: np.concatenate(v) for k, v in dst.items()}
     return dst

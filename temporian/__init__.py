@@ -73,6 +73,7 @@ from temporian.core.evaluation import has_leak
 from temporian.io.csv import to_csv
 from temporian.io.csv import from_csv
 from temporian.io.pandas import to_pandas
+from temporian.io.numpy import to_numpy
 from temporian.io.pandas import from_pandas
 from temporian.io.parquet import from_parquet
 from temporian.io.parquet import to_parquet
