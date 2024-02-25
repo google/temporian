@@ -19,17 +19,17 @@ class NumpyTest(absltest.TestCase):
 
         result = to_numpy(evset)
 
-        expected_timestamps = np.array(['2023-11-08T17:14:38', '2023-11-29T21:44:46'],
-                                       dtype='datetime64[s]')
-        expected_feature_1 = np.array([0.5, 0.6])
-        expected_my_index = np.array(["red", "blue"])
+        expected = {
+            "timestamp": np.array(['2023-11-08T17:14:38', '2023-11-29T21:44:46'],
+                                   dtype='datetime64[s]'),
+            "feature_1": np.array([0.5, 0.6]),
+            "my_index": np.array(["red", "blue"]),
+        }
 
-        # Convert byte strings in x to Unicode strings for a fair comparison
+        # Convert byte strings in result to Unicode strings for a fair comparison
         result['my_index'] = np.array([item.decode('utf-8') for item in result['my_index']])
-
-        np.testing.assert_array_equal(np.sort(result["feature_1"]), np.sort(expected_feature_1))
-        np.testing.assert_array_equal(np.sort(result["timestamp"]), np.sort(expected_timestamps))
-        np.testing.assert_array_equal(np.sort(result["my_index"]), np.sort(expected_my_index))
+        for k in expected:
+            np.testing.assert_array_equal(np.sort(result[k]), np.sort(expected[k]))
 
     def test_no_index(self):
         evset = event_set(
@@ -42,17 +42,17 @@ class NumpyTest(absltest.TestCase):
 
         result = to_numpy(evset)
 
-        expected_timestamps = np.array(['2023-11-08T17:14:38', '2023-11-29T21:44:46'],
-                                       dtype='datetime64[s]')
-        expected_feature_1 = np.array([0.5, 0.6])
-        expected_my_index = np.array(["red", "blue"])
+        expected = {
+            "timestamp": np.array(['2023-11-08T17:14:38', '2023-11-29T21:44:46'],
+                                  dtype='datetime64[s]'),
+            "feature_1": np.array([0.5, 0.6]),
+            "my_index": np.array(["red", "blue"]),
+        }
 
-        # Convert byte strings in x to Unicode strings for a fair comparison
+        # Convert byte strings in result to Unicode strings for a fair comparison
         result['my_index'] = np.array([item.decode('utf-8') for item in result['my_index']])
-
-        np.testing.assert_array_equal(np.sort(result["feature_1"]), np.sort(expected_feature_1))
-        np.testing.assert_array_equal(np.sort(result["timestamp"]), np.sort(expected_timestamps))
-        np.testing.assert_array_equal(np.sort(result["my_index"]), np.sort(expected_my_index))
+        for k in expected:
+            np.testing.assert_array_equal(np.sort(result[k]), np.sort(expected[k]))
 
     def test_no_timestamps(self):
         evset = event_set(
@@ -65,16 +65,33 @@ class NumpyTest(absltest.TestCase):
         )
 
         result = to_numpy(evset, timestamps=False)
+        assert "timestamp" not in result
 
-        expected_timestamps = np.array(['2023-11-08T17:14:38', '2023-11-29T21:44:46'], dtype='datetime64[s]')
-        expected_feature_1 = np.array([0.5, 0.6])
-        expected_my_index = np.array(["red", "blue"])
+    def test_timestamp_to_datetime_param(self):
+        evset = event_set(
+            timestamps=[np.datetime64("2022-01-01"), np.datetime64("2022-01-02")],
+            features={
+                "feature_1": [0.5, 0.6],
+                "my_index": ["red", "blue"],
+            },
+            indexes=["my_index"]
+        )
 
-        # Convert byte strings in x to Unicode strings for a fair comparison
-        result['my_index'] = np.array([item.decode('utf-8') for item in result['my_index']])
+        result = to_numpy(evset, timestamp_to_datetime=False)
 
-        np.testing.assert_array_equal(np.sort(result["feature_1"]), np.sort(expected_feature_1))
-        np.testing.assert_array_equal(np.sort(result["my_index"]), np.sort(expected_my_index))
+        assert "timestamp" in result
+        assert np.issubdtype(result["timestamp"].dtype, np.float64)
+
+    def test_empty_event_set(self):
+        evset = event_set(timestamps=['2023-11-08T17:14:38', '2023-11-29T21:44:46'])
+        result = to_numpy(evset)
+
+        expected = {
+            "timestamp": np.array(['2023-11-08T17:14:38', '2023-11-29T21:44:46'],
+                                  dtype='datetime64[s]')
+        }
+
+        np.testing.assert_array_equal(np.sort(result['timestamp']), np.sort(expected['timestamp']))
 
 
 if __name__ == "__main__":
