@@ -1510,7 +1510,7 @@ class EventSetOperations:
         self: EventSetOrNode,
     ) -> EventSetOrNode:
         """Rounds the values of an [`EventSet`][temporian.EventSet]'s features to the nearest integer.
-
+only float types are allowed and the output. Output type wil be same as the input type
         Example:
             ```python
             >>> a = tp.event_set(

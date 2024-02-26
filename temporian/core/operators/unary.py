@@ -192,8 +192,6 @@ class RoundOperator(BaseUnaryOperator):
         return [
             DType.FLOAT32,
             DType.FLOAT64,
-            DType.INT32,
-            DType.INT64,
         ]
 
     @classmethod
