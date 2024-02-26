@@ -121,6 +121,17 @@ memory usage: 1.2 kB
             "temporian/implementation/numpy/data/test/test_data/test_html_repr_no_limits_golden.html",
         )
 
+    def test_html_repr_no_limits(self):
+        config.display_max_indexes = None
+        config.display_max_features = None
+        config.display_max_events = None
+
+        golden.check_string(
+            self,
+            self.evset._repr_html_(),
+            "temporian/implementation/numpy/data/test/test_data/test_html_repr_no_limits_golden.html",
+        )
+
     def test_html_repr_limits(self):
         config.display_max_indexes = 1
         config.display_max_features = 1
