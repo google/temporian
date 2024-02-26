@@ -92,6 +92,17 @@ class CalendarYearTest(parameterized.TestCase):
         result = evset.calendar_year(tz=tz)
         assertOperatorResult(self, result, expected)
 
+    def test_bad_tz(self):
+        timestamps = [
+            "2021-01-01 00:00:01",
+            "2021-12-31 23:59:59",
+            "2045-12-31 23:59:59",
+        ]
+        evset = event_set(timestamps=timestamps)
+
+        with self.assertRaisesRegex(ValueError, "Invalid timezone"):
+            evset.calendar_year(tz="I'm an invalid timezone")
+
 
 if __name__ == "__main__":
     absltest.main()

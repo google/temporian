@@ -28,7 +28,7 @@ class BaseCalendarNumpyImplementation(OperatorImplementation):
             error = implementation(
                 index_data.timestamps, self.operator.tz, output
             )
-            if len(error) > 0:
+            if error is not None:
                 raise ValueError(error)
             dst_evset.set_index_value(
                 index_key,

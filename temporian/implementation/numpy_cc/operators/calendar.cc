@@ -1,6 +1,7 @@
 #include <pybind11/iostream.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 #include <iostream>
 
@@ -10,7 +11,7 @@
 namespace {
 namespace py = pybind11;
 
-std::string parse_tz(const py::object &tz, absl::TimeZone &parsed_tz) {
+std::optional<std::string> parse_tz(const py::object &tz, absl::TimeZone &parsed_tz) {
   if (py::isinstance<py::int_>(tz)) {
     // handle tz as an int
     const int int_tz = tz.cast<int>();
@@ -39,7 +40,7 @@ std::string parse_tz(const py::object &tz, absl::TimeZone &parsed_tz) {
            "or str";
   }
 
-  return "";
+  return {};
 }
 
 int is_leapyear(int64_t year) {
@@ -69,13 +70,13 @@ int map_week_day(const absl::Weekday &wd) {
 
 // Function for iterating a timestamps array, converting to civil time
 // and apply a calendar_op to each one
-std::string apply_calendar_op(const py::array_t<double> &timestamps,
+std::optional<std::string> apply_calendar_op(const py::array_t<double> &timestamps,
                               const py::object tz,
                               std::function<int(absl::CivilSecond)> calendar_op,
                               py::array_t<int32_t> &output) {
   absl::TimeZone parsed_tz;
   const auto error = parse_tz(tz, parsed_tz);
-  if (!error.empty()) {
+  if (error.has_value()) {
     return error;
   }
 
@@ -99,13 +100,13 @@ std::string apply_calendar_op(const py::array_t<double> &timestamps,
     v_output[i] = calendar_op(local_time);
   }
 
-  return "";
+  return {};
 }
 
 // year calendar op
 int year(absl::CivilSecond value) { return value.year(); }
 
-std::string calendar_year(const py::array_t<double> &timestamps,
+std::optional<std::string> calendar_year(const py::array_t<double> &timestamps,
                           const py::object tz, py::array_t<int> &output) {
   return apply_calendar_op(timestamps, tz, year, output);
 }
@@ -113,14 +114,14 @@ std::string calendar_year(const py::array_t<double> &timestamps,
 // month calendar op
 int month(absl::CivilSecond value) { return value.month(); }
 
-std::string calendar_month(const py::array_t<double> &timestamps,
+std::optional<std::string> calendar_month(const py::array_t<double> &timestamps,
                            const py::object tz, py::array_t<int> &output) {
   return apply_calendar_op(timestamps, tz, month, output);
 }
 
 // hour calendar op
 int hour(absl::CivilSecond value) { return value.hour(); }
-std::string calendar_hour(const py::array_t<double> &timestamps,
+std::optional<std::string> calendar_hour(const py::array_t<double> &timestamps,
                           const py::object tz, py::array_t<int> &output) {
   return apply_calendar_op(timestamps, tz, hour, output);
 }
@@ -128,7 +129,7 @@ std::string calendar_hour(const py::array_t<double> &timestamps,
 // day of month calendar op
 int day_of_month(absl::CivilSecond value) { return value.day(); }
 
-std::string calendar_day_of_month(const py::array_t<double> &timestamps,
+std::optional<std::string> calendar_day_of_month(const py::array_t<double> &timestamps,
                                   const py::object tz,
                                   py::array_t<int> &output) {
   return apply_calendar_op(timestamps, tz, day_of_month, output);
@@ -137,7 +138,7 @@ std::string calendar_day_of_month(const py::array_t<double> &timestamps,
 // minute calendar op
 int minute(absl::CivilSecond value) { return value.minute(); }
 
-std::string calendar_minute(const py::array_t<double> &timestamps,
+std::optional<std::string> calendar_minute(const py::array_t<double> &timestamps,
                             const py::object tz, py::array_t<int> &output) {
   return apply_calendar_op(timestamps, tz, minute, output);
 }
@@ -145,7 +146,7 @@ std::string calendar_minute(const py::array_t<double> &timestamps,
 // second calendar op
 int second(absl::CivilSecond value) { return value.second(); }
 
-std::string calendar_second(const py::array_t<double> &timestamps,
+std::optional<std::string> calendar_second(const py::array_t<double> &timestamps,
                             const py::object tz, py::array_t<int> &output) {
   return apply_calendar_op(timestamps, tz, second, output);
 }
@@ -153,7 +154,7 @@ std::string calendar_second(const py::array_t<double> &timestamps,
 // day of year calendar op
 int day_of_year(absl::CivilSecond value) { return absl::GetYearDay(value); }
 
-std::string calendar_day_of_year(const py::array_t<double> &timestamps,
+std::optional<std::string> calendar_day_of_year(const py::array_t<double> &timestamps,
                                  const py::object tz,
                                  py::array_t<int> &output) {
   return apply_calendar_op(timestamps, tz, day_of_year, output);
@@ -164,7 +165,7 @@ int day_of_week(absl::CivilSecond value) {
   return map_week_day(absl::GetWeekday(value));
 }
 
-std::string calendar_day_of_week(const py::array_t<double> &timestamps,
+std::optional<std::string> calendar_day_of_week(const py::array_t<double> &timestamps,
                                  const py::object tz,
                                  py::array_t<int> &output) {
   return apply_calendar_op(timestamps, tz, day_of_week, output);
@@ -199,7 +200,7 @@ int iso_week(absl::CivilSecond value) {
   return iso_week;
 }
 
-std::string calendar_isoweek(const py::array_t<double> &timestamps,
+std::optional<std::string> calendar_isoweek(const py::array_t<double> &timestamps,
                              const py::object tz, py::array_t<int> &output) {
   return apply_calendar_op(timestamps, tz, iso_week, output);
 }
