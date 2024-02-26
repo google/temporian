@@ -99,6 +99,73 @@ class UnaryTest(absltest.TestCase):
         )
         assertOperatorResult(self, evset.notnan(), expected)
 
+    def test_correct_sin(self) -> None:
+        evset = event_set(
+            timestamps=[1, 2, 3, 4],
+            features={"f": [0, np.pi / 2, np.pi, 3 * np.pi / 2]},
+        )
+        expected = event_set(
+            timestamps=[1, 2, 3, 4],
+            features={
+                "f": [0.0000000e00, 1.0000000e00, 1.2246468e-16, -1.0000000e00]
+            },
+            same_sampling_as=evset,
+        )
+        assertOperatorResult(self, evset.sin(), expected)
+
+    def test_correct_cos(self) -> None:
+        evset = event_set(
+            timestamps=[1, 2, 3, 4],
+            features={"f": [0, np.pi / 3, np.pi / 2, np.pi]},
+        )
+        expected = event_set(
+            timestamps=[1, 2, 3, 4],
+            features={"f": [1.0000e00, 5.0000e-01, 6.1232e-17, -1.0000e00]},
+            same_sampling_as=evset,
+        )
+        assertOperatorResult(self, evset.cos(), expected)
+
+    def test_correct_tan(self) -> None:
+        evset = event_set(
+            timestamps=[1, 2, 3, 4],
+            features={"f": [0, np.pi / 4, np.pi / 3, np.pi / 6]},
+        )
+        expected = event_set(
+            timestamps=[1, 2, 3, 4],
+            features={"f": [0.0, 1.0, 1.73205081, 0.57735027]},
+            same_sampling_as=evset,
+        )
+        assertOperatorResult(self, evset.tan(), expected)
+
+    def test_correct_arcsin(self) -> None:
+        evset = event_set(timestamps=[1, 2, 3], features={"f": [0, 0.5, -0.5]})
+        expected = event_set(
+            timestamps=[1, 2, 3],
+            features={"f": [0.0, 0.5236, -0.5236]},
+            same_sampling_as=evset,
+        )
+        assertOperatorResult(self, evset.arcsin(), expected)
+
+    def test_correct_arccos(self) -> None:
+        evset = event_set(timestamps=[1, 2, 3], features={"f": [1.0, 0, -1.0]})
+        expected = event_set(
+            timestamps=[1, 2, 3],
+            features={"f": [0.0, 1.5708, 3.1416]},
+            same_sampling_as=evset,
+        )
+        assertOperatorResult(self, evset.arccos(), expected)
+
+    def test_correct_arctan(self) -> None:
+        evset = event_set(
+            timestamps=[1, 2, 3, 4], features={"f": [0, 1.0, -1.0, 5.0]}
+        )
+        expected = event_set(
+            timestamps=[1, 2, 3, 4],
+            features={"f": [0.0, 0.7854, -0.7854, 1.3734]},
+            same_sampling_as=evset,
+        )
+        assertOperatorResult(self, evset.arctan(), expected)
+
 
 if __name__ == "__main__":
     absltest.main()
