@@ -3171,6 +3171,63 @@ class EventSetOperations:
             self, window_length=window_length, sampling=sampling
         )
 
+    def moving_product(
+        self: EventSetOrNode,
+        window_length: WindowLength,
+        sampling: Optional[EventSetOrNode] = None,
+    ) -> EventSetOrNode:
+        """Computes the product of values in a sliding window over an
+        [`EventSet`][temporian.EventSet].
+
+        For each t in sampling, and for each feature independently, returns at
+        time t the product of non-zero and non-NaN values for the feature in the window
+        (t - window_length, t].
+
+        `sampling` can't be specified if a variable `window_length` is
+        specified (i.e., if `window_length` is an EventSet).
+
+        If `sampling` is specified or `window_length` is an EventSet, the moving
+        window is sampled at each timestamp in them, else it is sampled on the
+        input's.
+
+        Zeros or missing values (such as NaNs) result in the accumulator's result being 0 for the window.
+        If the window does not contain any non-missing values (e.g., all values are
+        missing or zero, or the window does not contain any sampling), outputs missing
+        values.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 5, 6, 7],
+            ...     features={"value": [np.nan, 1, 5, 10, 15, 20]},
+            ... )
+
+            >>> b = a.moving_product(tp.duration.seconds(4))
+            >>> b
+            indexes: ...
+                (6 events):
+                    timestamps: [0. 1. 2. 5. 6. 7.]
+                    'value': [1. 1. 5. 50. 150. 3000.]
+            ...
+
+            ```
+
+        See [`EventSet.moving_count()`][temporian.EventSet.moving_count] for
+        examples of moving window operations with external sampling and indices.
+
+        Args:
+            window_length: Sliding window's length.
+            sampling: Timestamps to sample the sliding window's value at. If not
+                provided, timestamps in the input are used.
+
+        Returns:
+            EventSet containing the moving product of each feature in the input,
+            considering non-zero and non-NaN values only.
+        """
+        from temporian.core.operators.window.moving_product import moving_product
+
+        return moving_product(self, window_length=window_length, sampling=sampling)
+
     def moving_sum(
         self: EventSetOrNode,
         window_length: WindowLength,

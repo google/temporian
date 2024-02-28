@@ -25,3 +25,4 @@ from temporian.core.operators.window.moving_sum import moving_sum
 from temporian.core.operators.window.moving_count import moving_count
 from temporian.core.operators.window.moving_min import moving_min
 from temporian.core.operators.window.moving_max import moving_max
+from temporian.core.operators.window.moving_product import moving_product

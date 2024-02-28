@@ -51,6 +51,18 @@ py_library(
 )
 
 py_library(
+    name = "moving_product",
+    srcs = ["moving_product.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators/window:moving_product",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy_cc/operators:operators_cc",
+    ],
+)
+
+py_library(
     name = "moving_sum",
     srcs = ["moving_sum.py"],
     srcs_version = "PY3",

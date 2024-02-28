@@ -516,6 +516,50 @@ struct MovingMaxAccumulator : MovingExtremumAccumulator<INPUT, OUTPUT> {
   bool Compare(INPUT a, INPUT b) { return a > b; }
 };
 
+template <typename INPUT, typename OUTPUT>
+struct MovingProductAccumulator : public Accumulator<INPUT, OUTPUT> {
+    MovingProductAccumulator(const ArrayRef<INPUT>& values)
+        : Accumulator<INPUT, OUTPUT>(values), product_values(1.0), zero_count(0), left_index(0), right_index(-1) {}
+
+    void Add(Idx idx) override {
+        const INPUT value = Accumulator<INPUT, OUTPUT>::values[idx];
+        if (value == 0) {
+            zero_count++;
+        } else if (!std::isnan(value)) {
+            product_values *= value;
+        }
+        // Keep track of the latest index added.
+        right_index = idx;
+    }
+
+    // Removes a value from the window, preparing for possible recomputation of the product.
+    void Remove(Idx idx) override {
+        // Adjust the left index to exclude the removed value, signaling a window shift.
+        left_index = idx + 1;
+        // Note: Actual removal logic is deferred to when the product is recalculated.
+    }
+    // If we encouter zero even once then the whole product becomes zero; program terminated!
+    OUTPUT Result() override {
+        if (zero_count > 0) {
+            return 0;
+        }
+        return product_values;
+    }
+
+    void Reset() override {
+        product_values = 1.0;
+        zero_count = 0;
+        left_index = 0;
+        right_index = -1;
+    }
+
+    double product_values;
+    int zero_count;
+    Idx left_index; // start of the current window.
+    Idx right_index; // end of the current window.
+};
+
+
 // Instantiate the "accumulate" function with and without sampling,
 // and with and without variable window length.
 //
@@ -614,6 +658,9 @@ REGISTER_CC_FUNC(moving_max, int32_t, int32_t, MovingMaxAccumulator);
 REGISTER_CC_FUNC(moving_max, int64_t, int64_t, MovingMaxAccumulator);
 
 REGISTER_CC_FUNC_NO_INPUT(moving_count, int32_t, MovingCountAccumulator);
+
+REGISTER_CC_FUNC(moving_product, float, float, MovingProductAccumulator);
+REGISTER_CC_FUNC(moving_product, double, double, MovingProductAccumulator);
 }  // namespace
 
 // Register c++ functions to pybind with and without sampling,
@@ -693,4 +740,8 @@ void init_window(py::module &m) {
   ADD_PY_DEF(moving_max, int64_t, int64_t)
 
   ADD_PY_DEF_NO_INPUT(moving_count, int32_t)
+
+  ADD_PY_DEF(moving_product, float, float)
+  ADD_PY_DEF(moving_product, double, double)
+
 }

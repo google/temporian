@@ -57,6 +57,7 @@ py_library(
         "//temporian/implementation/numpy/operators/window:moving_count",
         "//temporian/implementation/numpy/operators/window:moving_max",
         "//temporian/implementation/numpy/operators/window:moving_min",
+        "//temporian/implementation/numpy/operators/window:moving_product",
         "//temporian/implementation/numpy/operators/window:moving_standard_deviation",
         "//temporian/implementation/numpy/operators/window:moving_sum",
         "//temporian/implementation/numpy/operators/window:simple_moving_average",
