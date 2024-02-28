@@ -20,8 +20,8 @@ bool in_range(const int value, const int min, const int max) {
 }
 
 std::vector<double> find_ticks(
-    double start_timestamp, const double end_timestamp, const bool forward,
-    const int max_ticks, const int min_second,
+    double start_timestamp, const std::optional<double> end_timestamp,
+    const bool forward, const int max_ticks, const int min_second,
     const int max_second,                        // second range
     const int min_minute, const int max_minute,  // minute range
     const int min_hour, const int max_hour,      // hours range
@@ -36,10 +36,11 @@ std::vector<double> find_ticks(
   int step = forward ? 1 : -1;
 
   // End time
-  const bool end_time_set = end_timestamp >= 0;
-  const auto end_t = end_time_set
-                         ? static_cast<std::time_t>(std::floor(end_timestamp))
-                         : static_cast<std::time_t>(0);
+  const std::optional<std::time_t> end_t =
+      end_timestamp.has_value()
+          ? std::optional<std::time_t>{static_cast<std::time_t>(
+                std::floor(end_timestamp.value()))}
+          : std::nullopt;
 
   // Start time
   std::time_t start_t;
@@ -84,7 +85,8 @@ std::vector<double> find_ticks(
                 const auto cur_time = *cur_time_or;
 
                 // Finish conditions
-                if (end_time_set && cur_time.seconds_since_epoch > end_t) {
+                if (end_t.has_value() &&
+                    cur_time.seconds_since_epoch > end_t.value()) {
                   keep_looking = false;
                   break;
                 }
@@ -152,7 +154,7 @@ py::array_t<double> tick_calendar(
   if (include_right && (ticks.back() < end_timestamp)) {
     // starting from the end, find 1 tick to the right
     auto right_ticks =
-        find_ticks(end_timestamp, -1, true, 1, min_second, max_second,
+        find_ticks(end_timestamp, std::nullopt, true, 1, min_second, max_second,
                    min_minute, max_minute, min_hour, max_hour, min_mday,
                    max_mday, min_month, max_month, min_wday, max_wday);
     ticks.insert(ticks.end(), right_ticks.begin(), right_ticks.end());
@@ -160,10 +162,10 @@ py::array_t<double> tick_calendar(
 
   if (include_left && (ticks.front() > start_timestamp)) {
     // starting from the start, find 1 tick to the left
-    auto left_ticks =
-        find_ticks(start_timestamp, -1, false, 1, min_second, max_second,
-                   min_minute, max_minute, min_hour, max_hour, min_mday,
-                   max_mday, min_month, max_month, min_wday, max_wday);
+    auto left_ticks = find_ticks(start_timestamp, std::nullopt, false, 1,
+                                 min_second, max_second, min_minute, max_minute,
+                                 min_hour, max_hour, min_mday, max_mday,
+                                 min_month, max_month, min_wday, max_wday);
     ticks.insert(ticks.begin(), left_ticks.begin(), left_ticks.end());
   }
 
