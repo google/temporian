@@ -546,7 +546,7 @@ struct MovingProductAccumulator : public Accumulator<INPUT, OUTPUT> {
         return product_values;
     }
 
-    void Reset() override {
+    void Reset() {
         product_values = 1.0;
         zero_count = 0;
         left_index = 0;
