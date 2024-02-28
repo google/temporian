@@ -516,48 +516,51 @@ struct MovingMaxAccumulator : MovingExtremumAccumulator<INPUT, OUTPUT> {
   bool Compare(INPUT a, INPUT b) { return a > b; }
 };
 
+// TODO: Revisit the MovingProductAccumulator for potential optimization to improve calculation efficiency while maintaining accuracy.
+// Especially consider optimizing the Result method which recalculates the product on-demand.
 template <typename INPUT, typename OUTPUT>
 struct MovingProductAccumulator : public Accumulator<INPUT, OUTPUT> {
+    int start_idx = 0;
+    int end_idx = -1; // Initialize to -1 to indicate an empty window initially
+
     MovingProductAccumulator(const ArrayRef<INPUT>& values)
-        : Accumulator<INPUT, OUTPUT>(values), product_values(1.0), zero_count(0), left_index(0), right_index(-1) {}
+        : Accumulator<INPUT, OUTPUT>(values) {}
 
     void Add(Idx idx) override {
-        const INPUT value = Accumulator<INPUT, OUTPUT>::values[idx];
-        if (value == 0) {
-            zero_count++;
-        } else if (!std::isnan(value)) {
-            product_values *= value;
-        }
-        // Keep track of the latest index added.
-        right_index = idx;
+        // Simply move the end to the given index
+        end_idx = idx;
     }
 
-    // Removes a value from the window, preparing for possible recomputation of the product.
     void Remove(Idx idx) override {
-        // Adjust the left index to exclude the removed value, signaling a window shift.
-        left_index = idx + 1;
-        // Note: Actual removal logic is deferred to when the product is recalculated.
+        // Adjust the start index to exclude the removed value, signaling a window shift.
+        start_idx = idx + 1;
     }
-    // If we encouter zero even once then the whole product becomes zero; program terminated!
+
     OUTPUT Result() override {
-        if (zero_count > 0) {
-            return 0;
+        double product = 1.0;
+        bool has_zero = false;
+
+        // Calculate the product of all values inside the window
+        for (int idx = start_idx; idx <= end_idx; ++idx) {
+            const INPUT value = Accumulator<INPUT, OUTPUT>::values[idx];
+            if (value == 0) {
+                has_zero = true;
+                break; // Exit early if a zero is found
+            } else if (!std::isnan(value)) {
+                product *= value;
+            }
+            // NaN values are skipped
         }
-        return product_values;
+
+        return has_zero ? 0 : product;
     }
 
-    void Reset() {
-        product_values = 1.0;
-        zero_count = 0;
-        left_index = 0;
-        right_index = -1;
+    void Reset()  {
+        start_idx = 0;
+        end_idx = -1;
     }
-
-    double product_values;
-    int zero_count;
-    Idx left_index; // start of the current window.
-    Idx right_index; // end of the current window.
 };
+
 
 
 // Instantiate the "accumulate" function with and without sampling,
