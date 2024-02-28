@@ -47,13 +47,14 @@ class CalendarMonthTest(parameterized.TestCase):
             "2021-01-01 00:00:01",
             "2021-12-31 23:59:59",
             "2045-12-31 23:59:59",
+            "2021-01-31 23:59:59",
         ]
         evset = event_set(timestamps=timestamps)
 
         expected = event_set(
             timestamps=timestamps,
             features={
-                "calendar_month": i32([1, 1, 1]),
+                "calendar_month": i32([1, 1, 1, 2]),
             },
             same_sampling_as=evset,
         )

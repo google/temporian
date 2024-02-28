@@ -78,6 +78,28 @@ class CalendarHourTest(parameterized.TestCase):
         result = evset.calendar_hour(tz=tz)
         assertOperatorResult(self, result, expected)
 
+    @parameterized.parameters(
+        {"tz": 0}, {"tz": 0.0}, {"tz": "UTC"}, {"tz": "GMT"}
+    )
+    def test_utc(self, tz):
+        timestamps = [
+            "2021-01-01 00:00:01",
+            "2021-12-31 23:59:59",
+            "2045-12-31 23:59:59",
+        ]
+        evset = event_set(timestamps=timestamps)
+
+        expected = event_set(
+            timestamps=timestamps,
+            features={
+                "calendar_hour": i32([0, 23, 23]),
+            },
+            same_sampling_as=evset,
+        )
+
+        result = evset.calendar_hour(tz=tz)
+        assertOperatorResult(self, result, expected)
+
 
 if __name__ == "__main__":
     absltest.main()
