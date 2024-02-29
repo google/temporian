@@ -2,13 +2,12 @@ workspace(name = "temporian")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-
 http_archive(
   name = "com_google_absl",
-  urls = ["https://github.com/abseil/abseil-cpp/archive/98eb410c93ad059f9bba1bf43f5bb916fc92a5ea.zip"],
-  strip_prefix = "abseil-cpp-98eb410c93ad059f9bba1bf43f5bb916fc92a5ea",
+  sha256 = "edc6a93163af5b2a186d468717f6fe23653a5cb31a1e6932f0aba05af7d762e9",
+  urls = ["https://github.com/abseil/abseil-cpp/archive/refs/tags/20240116.1.zip"],
+  strip_prefix = "abseil-cpp-20240116.1",
 )
-
 
 http_archive(
     name = "rules_python",

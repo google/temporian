@@ -1,5 +1,9 @@
+#include <pybind11/pybind11.h>
+
 #include <cstdint>
 #include <optional>
+
+#include "absl/time/time.h"
 
 struct MyTime {
   int64_t seconds_since_epoch;
@@ -15,3 +19,9 @@ bool IsLeapYear(int year);
 std::optional<MyTime> UTCMkTime(const int year, const int month, const int day,
                                 const int hour, const int minute,
                                 const int second);
+
+typedef std::optional<std::string> ErrorString;
+namespace py = pybind11;
+
+ErrorString parse_tz(const py::object &tz, absl::TimeZone &parsed_tz);
+int map_week_day(const absl::Weekday &wd);
