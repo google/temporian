@@ -66,9 +66,13 @@ jobs:
             const report = `### Coverage report
             **Main**: ${main.toFixed(2)}% | **PR**: ${pr.toFixed(2)}% | **Diff: ${diff.toFixed(2)} ${diff >= 0 ? '✅' : '⚠️'}**`;
             await core.summary.addRaw(report).write()
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: report
-            })
+            try {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: report
+              })
+            } catch (e) {
+              console.log("Could not post comment to pull request", e)
+            }
