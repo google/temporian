@@ -178,7 +178,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           # Skipping `name` key to download all artifacts from this workflow
-          # Artifacts are are downloaded to dist/<artifact-name>
+          # Artifacts are downloaded to dist/<artifact-name>
           path: dist
 
       - name: Move wheels and sources to dist/

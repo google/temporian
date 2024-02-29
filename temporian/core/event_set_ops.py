@@ -2124,7 +2124,7 @@ class EventSetOperations:
             ValueError: If `check_overflow=True` and some value is out of the range
                 of the `target` dtype.
             ValueError: If trying to cast a non-numeric string to numeric dtype.
-            ValueError: If `target` is not a dtype nor a mapping.
+            ValueError: If `target` is neither a dtype nor a mapping.
             ValueError: If `target` is a mapping, but some of the keys are not a
                 dtype nor a feature in `input.feature_names`, or if those types are
                 mixed.
@@ -2450,7 +2450,7 @@ class EventSetOperations:
 
         The window length is defined in number of events, instead of
         timestamp duration like most other operators. The 'num_events' argument
-        needs to be specified by warg i.e. fast_fourier_transform(num_events=5)
+        needs to be specified by kwarg i.e. fast_fourier_transform(num_events=5)
         instead of fast_fourier_transform(5).
 
         The operator returns the amplitude of each spectral line as
@@ -4246,7 +4246,7 @@ class EventSetOperations:
         is filtered out if there is a non-filtered out event in
         (t-window_length, t].
 
-        This operator is different from `(evtset.moving_count(window_length)
+        This operator is different from `(evset.moving_count(window_length)
         == 0).filter()`. In `filter_moving_count` a filtered event does not
         block following events.
 

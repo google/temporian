@@ -101,7 +101,7 @@ class JoinTest(TestCase):
         evset_1 = event_set([0], features={"a": [0]})
         evset_2 = event_set([0], features={"b": [0]})
         with self.assertRaisesRegex(ValueError, "Non supported join type"):
-            evset_1.join(evset_2, how="non existing join")
+            evset_1.join(evset_2, how="nonexistent join")
 
     def test_missing_on(self):
         evset_1 = event_set([0], features={"a": [0]})
