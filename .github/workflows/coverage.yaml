@@ -55,10 +55,12 @@ jobs:
             const pr = ${{fromJson(needs.coverage.outputs.cov-pr).totals.percent_covered}};
             const main = ${{fromJson(needs.coverage.outputs.cov-main).totals.percent_covered}};
             const diff = pr - main;
+            const report = `### Coverage report
+            **Main**: ${main.toFixed(2)}% | **PR**: ${pr.toFixed(2)}% | **Diff: ${diff.toFixed(2)} ${diff >= 0 ? '✅' : '⚠️'}**`;
+            await core.summary.addRaw(report).write()
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `### Coverage report
-              **Main**: ${main.toFixed(2)}% | **PR**: ${pr.toFixed(2)}% | **Diff: ${diff.toFixed(2)} ${diff >= 0 ? '✅' : '⚠️'}**`
+              body: report
             })
