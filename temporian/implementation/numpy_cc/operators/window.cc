@@ -538,21 +538,19 @@ struct MovingProductAccumulator : public Accumulator<INPUT, OUTPUT> {
 
     OUTPUT Result() override {
         double product = 1.0;
-        bool has_zero = false;
 
         // Calculate the product of all values inside the window
         for (int idx = start_idx; idx <= end_idx; ++idx) {
             const INPUT value = Accumulator<INPUT, OUTPUT>::values[idx];
             if (value == 0) {
-                has_zero = true;
-                break; // Exit early if a zero is found
+                return 0; // Directly return 0 if a zero is found
             } else if (!std::isnan(value)) {
                 product *= value;
             }
             // NaN values are skipped
         }
 
-        return has_zero ? 0 : product;
+        return product;
     }
 
     void Reset()  {
