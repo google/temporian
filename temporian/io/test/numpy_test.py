@@ -6,7 +6,6 @@ from temporian.io.numpy import to_numpy
 
 
 class NumpyTest(absltest.TestCase):
-
     def test_correct(self):
         evset = event_set(
             timestamps=["2023-11-08T17:14:38", "2023-11-29T21:44:46"],
