@@ -3179,6 +3179,8 @@ class EventSetOperations:
         """Computes the product of values in a sliding window over an
         [`EventSet`][temporian.EventSet].
 
+        This operation only supports floating-point features.
+
         For each t in sampling, and for each feature independently, returns at
         time t the product of non-zero and non-NaN values for the feature in the window
         (t - window_length, t].
@@ -3190,10 +3192,10 @@ class EventSetOperations:
         window is sampled at each timestamp in them, else it is sampled on the
         input's.
 
-        Zeros or missing values (such as NaNs) result in the accumulator's result being 0 for the window.
-        If the window does not contain any non-missing values (e.g., all values are
-        missing or zero, or the window does not contain any sampling), outputs missing
-        values.
+        Zeros result in the accumulator's result being 0 for the window. NaN values are ignored in the
+        calculation of the product. If the window does not contain any non-missing, non-zero values (e.g.,
+        all values are missing or the window does not contain any sampling), the output for that window is
+        missing (NaN).
 
         Example:
             ```python
@@ -3224,9 +3226,13 @@ class EventSetOperations:
             EventSet containing the moving product of each feature in the input,
             considering non-zero and non-NaN values only.
         """
-        from temporian.core.operators.window.moving_product import moving_product
+        from temporian.core.operators.window.moving_product import (
+            moving_product,
+        )
 
-        return moving_product(self, window_length=window_length, sampling=sampling)
+        return moving_product(
+            self, window_length=window_length, sampling=sampling
+        )
 
     def moving_sum(
         self: EventSetOrNode,
