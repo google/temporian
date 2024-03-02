@@ -38,6 +38,7 @@ PUBLIC_API_SYMBOLS = {
     "to_csv",
     "from_csv",
     "to_pandas",
+    "to_numpy",
     "from_pandas",
     "to_parquet",
     "from_parquet",
