@@ -1,4 +1,4 @@
-load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
+load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library", "pybind_library_test")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -49,7 +49,7 @@ pybind_library(
     name = "tick_calendar",
     srcs = ["tick_calendar.cc"],
     hdrs = ["tick_calendar.h"],
-    deps = [":common"],
+    deps = [":common", ":tick_calendar_utils"],
 )
 
 pybind_library(
@@ -84,4 +84,20 @@ pybind_extension(
 py_library(
     name = "operators_cc",
     data = [":operators_cc.so"],
+)
+
+cc_library(
+    name = "tick_calendar_utils",
+    srcs = ["tick_calendar_utils.cc"    ],
+    hdrs = ["tick_calendar_utils.h"    ],
+    deps = [],
+)
+
+cc_test(
+    name = "tick_calendar_utils_test",
+    srcs = ["tick_calendar_utils_test.cc"],
+    deps = [
+        ":tick_calendar_utils",
+        "@com_google_googletest//:gtest_main"
+        ],
 )

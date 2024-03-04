@@ -163,17 +163,32 @@ def normalize_features(features: InputFeatures) -> Optional[Set[str]]:
     raise ValueError(f"Non supported feature type {features}")
 
 
-def validate_indexes(indexes: List[NormalizedIndexKey], groups: Groups):
-    """Ensures that indexes are valid i.e. available in all event-sets."""
+def _unroll_evsets(evsets: InputEventSet) -> List[EventSet]:
+    """Returns the list of all the event sets."""
 
-    for g in groups:
-        for item in g.items:
-            for index in indexes:
-                if index not in item.evset.data:
-                    raise ValueError(
-                        f"Index {index!r} does not exist in event set:"
-                        f" {item.evset}"
-                    )
+    if isinstance(evsets, EventSet):
+        return [evsets]
+
+    if isinstance(evsets, (list, tuple)):
+        return sum((_unroll_evsets(x) for x in evsets), [])
+
+    raise ValueError("Non supported evsets input")
+
+
+def _list_index_values(
+    indexes: Optional[IndexKeyList], evsets: InputEventSet, max_values: int
+) -> List[NormalizedIndexKey]:
+    """Lists all the index values to plot."""
+
+    flat_indexes = set(normalize_index_key_list(indexes, None))
+    index_values = []
+    for evtset in _unroll_evsets(evsets):
+        for index_value in evtset.data:
+            if indexes is None or index_value in flat_indexes:
+                index_values.append(index_value)
+                if len(index_values) >= max_values:
+                    return index_values
+    return index_values
 
 
 def plot(
@@ -191,6 +206,7 @@ def plot(
     interactive: bool = False,
     backend: Optional[str] = None,
     merge: bool = False,
+    font_scale: float = 1,
 ):
     """Plots one or several [`EventSets`][temporian.EventSet].
 
@@ -223,7 +239,7 @@ def plot(
         >>> tp.plot([evset, evset_2], merge=True)
         >>> tp.plot((evset, evset_2))
 
-        # Make the plot interractive
+        # Make the plot interactive
         >>> tp.plot(evset, interactive=True)
 
         # Save figure to file
@@ -267,6 +283,7 @@ def plot(
         merge: If true, plots all features in the same plots. If false, plots
             features in separate plots. merge=True on event-sets [e1, e2] is
             equivalent to plotting (e1, e2).
+        font_scale: Scaling factor for all the fonts.
     """
 
     if merge:
@@ -282,13 +299,7 @@ def plot(
 
     normalized_features = normalize_features(features)
     groups = build_groups(evsets, normalized_features)
-    normalized_indexes = normalize_index_key_list(
-        indexes,
-        available_indexes=list(
-            groups[0].items[0].evset.get_index_keys(sort=True)
-        ),
-    )
-    validate_indexes(normalized_indexes, groups)
+    normalized_indexes = _list_index_values(indexes, evsets, max_num_plots)
 
     if len(groups) == 0:
         raise ValueError("Not input eventsets")
@@ -315,6 +326,7 @@ def plot(
         ),
         max_num_plots=max_num_plots,
         style=style,
+        font_scale=font_scale,
     )
 
     if backend is None:
@@ -379,6 +391,20 @@ def plot_with_plotter(
             title = None
 
             for group_item in group.items:
+                if index not in group_item.evset.data:
+                    if group_item.feature_idx == -1:
+                        tag = "timestamps"
+                    else:
+                        tag = group_item.evset.schema.features[
+                            group_item.feature_idx
+                        ].name
+                    plotter.plot_sampling(
+                        xs=np.array([]),
+                        color_idx=color_idx,
+                        name=f"{tag}:missing",
+                    )
+                    continue
+
                 xs = group_item.evset.data[index].timestamps
                 uniform = is_uniform(xs)
 
@@ -406,7 +432,7 @@ def plot_with_plotter(
                     plotter.plot_sampling(
                         xs=xs,
                         color_idx=color_idx,
-                        name=group_item.name or "[sampling]",
+                        name=group_item.name or "[timestamps]",
                     )
                 else:
                     feature_name = group_item.evset.schema.features[

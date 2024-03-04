@@ -79,7 +79,7 @@ class _MergeTimestamps(beam.DoFn):
     """Aggregates + split StructuredRows into IndexValue.
 
     This function aggregates together all the timestamps+values having the same
-    feature+index, and splits aggragated values by features.
+    feature+index, and splits aggregated values by features.
 
     Example:
         Input

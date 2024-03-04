@@ -31,8 +31,10 @@ jobs:
           name: dist-ubuntu-${{ matrix.python-version }}
           path: dist
 
-  build-macos:
-    runs-on: macos-latest-xl
+  # macos-XXX-large are Intel runners, macos-XXX-xlarge are arm64 runners
+  # https://docs.github.com/en/actions/using-github-hosted-runners/about-larger-runners/about-larger-runners
+  build-macos-intel:
+    runs-on: macos-13-large
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
@@ -54,16 +56,54 @@ jobs:
       - name: Save package for following jobs
         uses: actions/upload-artifact@v3
         with:
-          name: dist-macos-${{ matrix.python-version }}
+          name: dist-macos-intel-${{ matrix.python-version }}
           path: dist
 
-  test-install:
-    needs: [build-linux, build-macos]
+  build-macos-arm:
+    runs-on: macos-13-xlarge
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
-        platform: ["ubuntu", "macos"]
-    runs-on: ${{ matrix.platform }}-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # actions/setup-python doesn't support py < 3.10 on macos arm
+      # https://github.com/actions/setup-python/issues/696#issuecomment-1637587760
+
+      - name: Install Python
+        run: |
+          brew update
+          brew install python@${{ matrix.python-version }}
+
+      - name: Install pip
+        run: |
+          curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+          python${{ matrix.python-version }} get-pip.py
+
+      - name: Install poetry
+        run: pip install poetry
+
+      - name: Build package
+        run: poetry build
+
+      - name: Save package for following jobs
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-macos-arm-${{ matrix.python-version }}
+          path: dist
+
+  test-install:
+    needs: [build-linux, build-macos-intel]
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        platform:
+          [
+            { runner: ubuntu-latest, artifact: ubuntu },
+            { runner: macos-13-large, artifact: macos-intel },
+          ]
+    runs-on: ${{ matrix.platform.runner }}
     env:
       # Workaround for macos pip compatibility issue
       # See https://github.com/actions/setup-python/issues/469
@@ -80,7 +120,7 @@ jobs:
       - name: Download build
         uses: actions/download-artifact@v3
         with:
-          name: dist-${{ matrix.platform }}-${{ matrix.python-version }}
+          name: dist-${{ matrix.platform.artifact }}-${{ matrix.python-version }}
           path: dist
 
       - name: Install from wheel
@@ -89,8 +129,40 @@ jobs:
       - name: Test installation
         run: python tools/check_install.py
 
+  test-macos-arm-install:
+    needs: [build-macos-arm]
+    runs-on: macos-13-xlarge
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Python
+        run: |
+          brew update
+          brew install python@${{ matrix.python-version }}
+
+      - name: Install pip
+        run: |
+          curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+          python${{ matrix.python-version }} get-pip.py
+
+      - name: Download build
+        uses: actions/download-artifact@v3
+        with:
+          name: dist-macos-arm-${{ matrix.python-version }}
+          path: dist
+
+      - name: Install from wheel
+        run: pip install dist/*.whl
+
+      - name: Test installation
+        run: python${{ matrix.python-version }} tools/check_install.py
+
   publish:
-    needs: [test, test-install]
+    needs: [test, test-install, test-macos-arm-install]
     runs-on: ubuntu-latest
     environment: pypi
     env:
@@ -106,7 +178,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           # Skipping `name` key to download all artifacts from this workflow
-          # Artifacts are are downloaded to dist/<artifact-name>
+          # Artifacts are downloaded to dist/<artifact-name>
           path: dist
 
       - name: Move wheels and sources to dist/
@@ -115,5 +187,4 @@ jobs:
           mv -n dist/*/*.tar.gz dist/
 
       - name: Publish to PyPI
-        # TODO: change to prod PyPI repo
         run: poetry publish --no-interaction --skip-existing

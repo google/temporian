@@ -38,6 +38,7 @@ def run(
     input: NodeToEventSetMapping,
     verbose: int = 0,
     check_execution: bool = True,
+    force_garbage_collector_interval: Optional[float] = 10,
 ) -> EventSetCollection:
     """Evaluates [`EventSetNodes`][temporian.EventSetNode] on [`EventSets`][temporian.EventSet].
 
@@ -108,6 +109,8 @@ def run(
         check_execution: If true, the input and output of the op implementation
             are validated to check any bug in the library internal code. If
             false, checks are skipped.
+        force_garbage_collector_interval: If set, triggers the garbage
+            collection every "force_garbage_collector_interval" seconds.
 
     Returns:
         An object with the same structure as `query` containing the results.
@@ -124,7 +127,7 @@ def run(
     normalized_query = _normalize_query(query)
 
     if verbose >= 1:
-        print("Build schedule", file=sys.stderr)
+        print("Build schedule", file=sys.stderr, flush=True)
 
     # Schedule execution
     assert isinstance(normalized_query, set)
@@ -151,6 +154,7 @@ def run(
         schedule,
         verbose=verbose,
         check_execution=check_execution,
+        force_garbage_collector_interval=force_garbage_collector_interval,
     )
 
     end_time = time.perf_counter()

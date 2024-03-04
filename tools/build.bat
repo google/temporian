@@ -12,12 +12,17 @@
 cls
 setlocal
 
-set TEMPORIAN_VERSION=0.1.6
+set TEMPORIAN_VERSION=0.7.0
+
 set BAZEL=bazel.exe
+:: You can pass BAZEL flags here e.g. set BAZEL=bazel.exe --output_user_root=C:\src\tmp_bazel
+
 set BAZEL_VC=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC
 set BAZEL_SH=C:\msys64\usr\bin\bash.exe
 set BAZEL_FLAGS=--config=windows
 set PY_DEPS=six python-dateutil absl-py protobuf pandas matplotlib apache-beam tensorflow
+
+%BAZEL% version
 
 CALL :End2End 39 || goto :error
 CALL :End2End 310 || goto :error

@@ -1,7 +1,7 @@
 import setuptools
 from setuptools.dist import Distribution
 
-_VERSION = "0.1.6"
+_VERSION = "0.7.0"
 
 
 class _BinaryDistribution(Distribution):
@@ -37,6 +37,7 @@ setup_kwargs = {
         " and not-so-common temporal data preprocessing functions."
     ),
     "long_description": long_description,
+    "long_description_content_type":"text/markdown",
     "author": (
         "Mathieu Guillame-Bert, Braulio Ríos, Guillermo Etchebarne, Ian"
         " Spektor, Richard Stotz"
@@ -45,10 +46,18 @@ setup_kwargs = {
     "maintainer": "Mathieu Guillame-Bert",
     "maintainer_email": "gbm@google.com",
     "url": "https://github.com/google/temporian",
+     "project_urls":{
+        "Documentation": "https://https://temporian.readthedocs.io",
+        "Source": "https://github.com/google/temporian.git",
+        "Tracker": (
+            "https://github.com/google/temporian/issues"
+        ),
+    },
     "packages": setuptools.find_packages(),
     "install_requires": install_requires,
     "extras_require": extras_require,
-    "python_requires": ">=3.8,<3.12",
+    "python_requires": ">=3.9,<3.12",
+    "license": "Apache 2.0",
     "include_package_data": True,
     "distclass": _BinaryDistribution,
 }

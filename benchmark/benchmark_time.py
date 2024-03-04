@@ -17,14 +17,18 @@ Benchmark Python API.
 
 Usage example:
 
+sudo apt install linux-cpupower
+sudo cpupower frequency-set --governor performance
+
 # Run the full benchmark.
-bazel run -c opt //benchmark:benchmark_time
+bazel run -c opt --config=linux //benchmark:benchmark_time
 
 # Only run the "add_index" runs.
-bazel run -c opt //benchmark:benchmark_time -- -f=add_index
+bazel run -c opt --config=linux //benchmark:benchmark_time -- -f=add_index
 
 # Run add_index and from_pandas
-bazel run -c opt //benchmark:benchmark_time -- --f add_index from_pandas
+bazel run -c opt --config=linux //benchmark:benchmark_time -- \
+    --f add_index from_pandas
 
 """
 import argparse
@@ -38,7 +42,10 @@ import temporian as tp
 
 
 def _build_toy_dataset(
-    n: int, data_prefix="", data2_is_categorical_integer=False
+    n: int,
+    data_prefix="",
+    data2_is_categorical_integer=False,
+    num_indexes: int = 10,
 ) -> tp.EventSet:
     """Builds a toy dataset with two features.
 
@@ -53,7 +60,7 @@ def _build_toy_dataset(
     """
 
     np.random.seed(0)
-    index_values = list(range(int(10)))
+    index_values = list(range(int(num_indexes)))
     timestamps = np.sort(np.random.randn(n) * n)
     index_1 = np.random.choice(index_values, n)
     index_2 = np.random.choice(index_values, n)
@@ -87,6 +94,20 @@ def benchmark_simple_moving_average(runner):
 
         runner.benchmark(
             f"simple_moving_average:{n:_}",
+            lambda: tp.run(output, input={node: ds}),
+        )
+
+
+def benchmark_moving_minimum(runner):
+    runner.add_separator()
+    for n in [1_000_000, 10_000_000]:
+        ds = _build_toy_dataset(n, num_indexes=1)
+
+        node = ds.node()
+        output = node.moving_min(window_length=10_000)
+
+        runner.benchmark(
+            f"moving_minimum:{n:_}",
             lambda: tp.run(output, input={node: ds}),
         )
 
@@ -435,6 +456,7 @@ def main():
         "add_index",
         "add_index_v2",
         "from_pandas_with_objects",
+        "moving_minimum",
     ]
     if args.functions is not None:
         benchmarks_to_run = args.functions

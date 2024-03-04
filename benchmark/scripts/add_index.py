@@ -22,7 +22,6 @@ import temporian as tp
 from temporian.implementation.numpy.data.event_set import EventSet
 
 
-@profile
 def run(input_node, input_data, output_node):
     tp.run(output_node, input={input_node: input_data}, check_execution=False)
 

@@ -29,7 +29,7 @@ Docstrings should be:
 Docstrings should do nothing but describe.
 
 Docstrings should not attempt to show how to perform tasks, but may include a
-succint example of the correct way to use what its documenting.
+succinct example of the correct way to use what its documenting.
 
 ## Style
 

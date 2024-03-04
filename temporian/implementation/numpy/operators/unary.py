@@ -11,6 +11,12 @@ from temporian.core.operators.unary import (
     IsNanOperator,
     LogOperator,
     RoundOperator,
+    SinOperator,
+    CosOperator,
+    TanOperator,
+    ArcSinOperator,
+    ArcCosOperator,
+    ArcTanOperator,
 )
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.data.event_set import IndexData
@@ -78,9 +84,39 @@ class LogNumpyImplementation(BaseUnaryNumpyImplementation):
         return np.log(feature)
 
 
+
 class RoundNumpyImplementation(BaseUnaryNumpyImplementation):
     def _do_operation(self, feature: np.ndarray) -> np.ndarray:
         return np.round(feature)
+
+class SinNumpyImplementation(BaseUnaryNumpyImplementation):
+    def _do_operation(self, feature: np.ndarray) -> np.ndarray:
+        return np.sin(feature)
+
+
+class CosNumpyImplementation(BaseUnaryNumpyImplementation):
+    def _do_operation(self, feature: np.ndarray) -> np.ndarray:
+        return np.cos(feature)
+
+
+class TanNumpyImplementation(BaseUnaryNumpyImplementation):
+    def _do_operation(self, feature: np.ndarray) -> np.ndarray:
+        return np.tan(feature)
+
+
+class ArcSinNumpyImplementation(BaseUnaryNumpyImplementation):
+    def _do_operation(self, feature: np.ndarray) -> np.ndarray:
+        return np.arcsin(feature)
+
+
+class ArcCosNumpyImplementation(BaseUnaryNumpyImplementation):
+    def _do_operation(self, feature: np.ndarray) -> np.ndarray:
+        return np.arccos(feature)
+
+
+class ArcTanNumpyImplementation(BaseUnaryNumpyImplementation):
+    def _do_operation(self, feature: np.ndarray) -> np.ndarray:
+        return np.arctan(feature)
 
 
 implementation_lib.register_operator_implementation(
@@ -99,5 +135,23 @@ implementation_lib.register_operator_implementation(
     LogOperator, LogNumpyImplementation
 )
 implementation_lib.register_operator_implementation(
+
     RoundOperator, RoundNumpyImplementation
+
+    SinOperator, SinNumpyImplementation
+)
+implementation_lib.register_operator_implementation(
+    CosOperator, CosNumpyImplementation
+)
+implementation_lib.register_operator_implementation(
+    TanOperator, TanNumpyImplementation
+)
+implementation_lib.register_operator_implementation(
+    ArcSinOperator, ArcSinNumpyImplementation
+)
+implementation_lib.register_operator_implementation(
+    ArcCosOperator, ArcCosNumpyImplementation
+)
+implementation_lib.register_operator_implementation(
+    ArcTanOperator, ArcTanNumpyImplementation
 )

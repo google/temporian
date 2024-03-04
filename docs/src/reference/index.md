@@ -6,11 +6,13 @@ Check the index on the left for a more detailed description of any symbol.
 
 ## Classes
 
-| Symbol                                      | Description                                                                                                     |
-| ------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| [`tp.EventSetNode`][temporian.EventSetNode] | Reference to the input or output of an operator in the compute graph.                                           |
-| [`tp.EventSet`][temporian.EventSet]         | Container for actual temporal data.                                                                             |
-| [`tp.Schema`][temporian.Schema]             | Description of the data inside an [`EventSetNode`][temporian.EventSetNode] or [`EventSet`][temporian.EventSet]. |
+| Symbol                                        | Description                                                                                                     |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| [`tp.EventSetNode`][temporian.EventSetNode]   | Reference to the input or output of an operator in the compute graph.                                           |
+| [`tp.EventSet`][temporian.EventSet]           | Container for actual temporal data.                                                                             |
+| [`tp.Schema`][temporian.Schema]               | Description of the data inside an [`EventSetNode`][temporian.EventSetNode] or [`EventSet`][temporian.EventSet]. |
+| [`tp.FeatureSchema`][temporian.FeatureSchema] | Description of a feature inside a [`Schema`][temporian.Schema].                                                 |
+| [`tp.IndexSchema`][temporian.IndexSchema]     | Description of an index inside a [`Schema`][temporian.Schema].                                                  |
 
 ## Functions
 
@@ -44,8 +46,14 @@ Check the index on the left for a more detailed description of any symbol.
 | [`tp.glue()`][temporian.glue]                                                                              | Concatenates features from [`EventSets`][temporian.EventSet] with the same sampling.                           |
 | [`EventSet.abs()`][temporian.EventSet.abs]                                                                 | Computes the absolute value of the features.
 | [`EventSet.add_index()`][temporian.EventSet.add_index]                                                     | Adds indexes to an [`EventSet`][temporian.EventSet].                                                           |
+| [`EventSet.abs()`][temporian.EventSet.abs]                                                                 | Computes the absolute value of the features.                                                                   |
+| [`EventSet.add_index()`][temporian.EventSet.add_index]                                                     | Adds indexes to an [`EventSet`][temporian.EventSet].
+| [`EventSet.arccos()`][temporian.EventSet.arccos]                                                           | Computes the inverse cosine of the features.
+| [`EventSet.arcsin()`][temporian.EventSet.arcsin]                                                           | Computes the inverse sine of the features.
+| [`EventSet.arctan()`][temporian.EventSet.arctan]                                                           | Computes the inverse tangent of the features.                                                     |
 | [`EventSet.begin()`][temporian.EventSet.begin]                                                             | Generates a single timestamp at the beginning of the input.                                                    |
-| [`EventSet.cast()`][temporian.EventSet.cast]                                                               | Casts the dtype of features.                                                                                   |
+| [`EventSet.cast()`][temporian.EventSet.cast]                                                               | Casts the dtype of features.
+| [`EventSet.cos()`][temporian.EventSet.cos]                                                                 | Computes the cosine of the features.                                                                                    |
 | [`EventSet.drop_index()`][temporian.EventSet.drop_index]                                                   | Removes indexes from an [`EventSet`][temporian.EventSet].                                                      |
 | [`EventSet.end()`][temporian.EventSet.end]                                                                 | Generates a single timestamp at the end of the input.                                                          |
 | [`EventSet.enumerate()`][temporian.EventSet.enumerate]                                                     | Creates an ordinal feature enumerating the events according to their timestamp.                                |
@@ -67,8 +75,10 @@ Check the index on the left for a more detailed description of any symbol.
 | [`EventSet.round()`][temporian.EventSet.round]                                                             | Computes the round value of the features.                                                                         |
 | [`EventSet.select()`][temporian.EventSet.select]                                                           | Selects a subset of features from an [`EventSet`][temporian.EventSet].                                         |
 | [`EventSet.select_index_values()`][temporian.EventSet.select_index_values]                                 | Selects a subset of index values from an [`EventSet`][temporian.EventSet].                                     |
-| [`EventSet.set_index()`][temporian.EventSet.set_index]                                                     | Replaces the indexes in an [`EventSet`][temporian.EventSet].                                                   |
-| [`EventSet.since_last()`][temporian.EventSet.since_last]                                                   | Computes the amount of time since the last distinct timestamp.                                                 |
+| [`EventSet.set_index()`][temporian.EventSet.set_index]                                                     | Replaces the indexes in an [`EventSet`][temporian.EventSet].
+| [`EventSet.sin()`][temporian.EventSet.sin]                                                                 | Computes the sine of the features.                                                    |
+| [`EventSet.since_last()`][temporian.EventSet.since_last]                                                   | Computes the amount of time since the last distinct timestamp.
+| [`EventSet.tan()`][temporian.EventSet.tan]                                                                 | Computes the tangent of the features.                                                  |
 | [`EventSet.tick()`][temporian.EventSet.tick]                                                               | Generates timestamps at regular intervals in the range of a guide.                                             |
 | [`EventSet.tick_calendar()`][temporian.EventSet.tick]                                                      | Generates timestamps at the specified calendar date-time events.                                               |
 | [`EventSet.timestamps()`][temporian.EventSet.timestamps]                                                   | Creates a feature from the events timestamps (`float64`).                                                      |

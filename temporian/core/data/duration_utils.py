@@ -60,7 +60,7 @@ def normalize_timestamp(x: Timestamp) -> NormalizedTimestamp:
         return x.astype("datetime64[ns]").astype(np.float64) / 1e9
 
     if isinstance(x, datetime.datetime):
-        return float(x.astimezone(tz=datetime.timezone.utc).timestamp())
+        return float(x.replace(tzinfo=datetime.timezone.utc).timestamp())
 
     if isinstance(x, int):
         return float(x)
@@ -160,7 +160,7 @@ def convert_numpy_datetime64_to_duration(
 
 def convert_datetime_to_duration(date: datetime.datetime) -> NormalizedDuration:
     """Convert datetime to duration epoch UTC."""
-    return float(date.astimezone(tz=datetime.timezone.utc).timestamp())
+    return float(date.replace(tzinfo=datetime.timezone.utc).timestamp())
 
 
 def convert_datetime_date_to_duration(
@@ -205,7 +205,7 @@ def duration_abbreviation(
     Returns:
         Abbreviation for the duration.
     """
-    # check cuttoff is a TimeUnit or if its a string that is a valid TimeUnit
+    # check cutoff is a TimeUnit or if its a string that is a valid TimeUnit
     if not TimeUnit.is_valid(cutoff):
         raise ValueError(
             f"Invalid cutoff: {cutoff}. Possible options are: {list(TimeUnit)}"

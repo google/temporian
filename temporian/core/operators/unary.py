@@ -186,6 +186,97 @@ class RoundOperator(BaseUnaryOperator):
     @classmethod
     def op_key_definition(cls) -> str:
         return "ROUND"
+      
+class SinOperator(BaseUnaryOperator):
+    @classmethod
+    def op_key_definition(cls) -> str:
+        return "SIN"
+
+    @classmethod
+    def allowed_dtypes(cls) -> List[DType]:
+        return [
+            DType.FLOAT32,
+            DType.FLOAT64,
+        ]
+
+    @classmethod
+    def get_output_dtype(cls, feature_dtype: DType) -> DType:
+        return feature_dtype
+
+
+class CosOperator(BaseUnaryOperator):
+    @classmethod
+    def op_key_definition(cls) -> str:
+        return "COS"
+
+    @classmethod
+    def allowed_dtypes(cls) -> List[DType]:
+        return [
+            DType.FLOAT32,
+            DType.FLOAT64,
+        ]
+
+    @classmethod
+    def get_output_dtype(cls, feature_dtype: DType) -> DType:
+        return feature_dtype
+
+
+class TanOperator(BaseUnaryOperator):
+    @classmethod
+    def op_key_definition(cls) -> str:
+        return "TAN"
+
+    @classmethod
+    def allowed_dtypes(cls) -> List[DType]:
+        return [
+            DType.FLOAT32,
+            DType.FLOAT64,
+        ]
+
+    @classmethod
+    def get_output_dtype(cls, feature_dtype: DType) -> DType:
+        return feature_dtype
+
+
+class ArcSinOperator(BaseUnaryOperator):
+    @classmethod
+    def op_key_definition(cls) -> str:
+        return "ARCSIN"
+
+    @classmethod
+    def allowed_dtypes(cls) -> List[DType]:
+        return [
+            DType.FLOAT32,
+            DType.FLOAT64,
+        ]
+
+    @classmethod
+    def get_output_dtype(cls, feature_dtype: DType) -> DType:
+        return feature_dtype
+
+
+class ArcCosOperator(BaseUnaryOperator):
+    @classmethod
+    def op_key_definition(cls) -> str:
+        return "ARCCOS"
+
+    @classmethod
+    def allowed_dtypes(cls) -> List[DType]:
+        return [
+            DType.FLOAT32,
+            DType.FLOAT64,
+        ]
+
+    @classmethod
+    def get_output_dtype(cls, feature_dtype: DType) -> DType:
+        return feature_dtype
+
+
+class ArcTanOperator(BaseUnaryOperator):
+    @classmethod
+    def op_key_definition(cls) -> str:
+        return "ARCTAN"
+
 
     @classmethod
     def allowed_dtypes(cls) -> List[DType]:
@@ -205,6 +296,12 @@ operator_lib.register_operator(NotNanOperator)
 operator_lib.register_operator(AbsOperator)
 operator_lib.register_operator(LogOperator)
 operator_lib.register_operator(RoundOperator)
+operator_lib.register_operator(SinOperator)
+operator_lib.register_operator(CosOperator)
+operator_lib.register_operator(TanOperator)
+operator_lib.register_operator(ArcSinOperator)
+operator_lib.register_operator(ArcCosOperator)
+operator_lib.register_operator(ArcTanOperator)
 
 
 @compile
@@ -269,5 +366,71 @@ def round(
     assert isinstance(input, EventSetNode)
 
     return RoundOperator(
+        input=input,
+    ).outputs["output"]
+
+@compile  
+def sin(
+    input: EventSetOrNode,
+) -> EventSetOrNode:
+    assert isinstance(input, EventSetNode)
+
+    return SinOperator(
+        input=input,
+    ).outputs["output"]
+
+
+@compile
+def cos(
+    input: EventSetOrNode,
+) -> EventSetOrNode:
+    assert isinstance(input, EventSetNode)
+
+    return CosOperator(
+        input=input,
+    ).outputs["output"]
+
+
+@compile
+def tan(
+    input: EventSetOrNode,
+) -> EventSetOrNode:
+    assert isinstance(input, EventSetNode)
+
+    return TanOperator(
+        input=input,
+    ).outputs["output"]
+
+
+@compile
+def arcsin(
+    input: EventSetOrNode,
+) -> EventSetOrNode:
+    assert isinstance(input, EventSetNode)
+
+    return ArcSinOperator(
+        input=input,
+    ).outputs["output"]
+
+
+@compile
+def arccos(
+    input: EventSetOrNode,
+) -> EventSetOrNode:
+    assert isinstance(input, EventSetNode)
+
+    return ArcCosOperator(
+        input=input,
+    ).outputs["output"]
+
+
+@compile
+def arctan(
+    input: EventSetOrNode,
+) -> EventSetOrNode:
+    assert isinstance(input, EventSetNode)
+
+    return ArcTanOperator(
+
         input=input,
     ).outputs["output"]
