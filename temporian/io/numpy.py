@@ -42,9 +42,8 @@ def to_numpy(
         ...     indexes=["store"],
         ... )
 
-        # Indices are not set as dataframe's indices. Timestamps are exported as
-        # datetime64[s] if they were created as datetimes, otherwhise they are
-        # floats
+        # Timestamps are exported as datetime64[s] if they were created as datetimes,
+        # otherwhise they are floats
         >>> res = tp.to_numpy(evset)
         >>> res
         {'store': array([b'STORE_2', b'STORE_1'], dtype='|S7'), 'revenue': array([6101, 1571]),
