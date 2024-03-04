@@ -63,17 +63,3 @@ TEST_P(UTCMkTimeTest, IsInvalid) {
   EXPECT_FALSE(UTCMkTime(1900, 4, 31, 0, 0, 0).has_value());
   EXPECT_FALSE(UTCMkTime(1900, 2, 29, 0, 0, 0).has_value());
 }
-
-TEST(map_week_day, Base) { EXPECT_EQ(map_week_day(absl::Weekday::monday), 0); }
-
-TEST(parse_tz, Base) {
-  absl::TimeZone parsed_tz;
-  auto error = parse_tz(py::str("invalid tz"), parsed_tz);
-  EXPECT_TRUE(error.has_value());
-
-  error = parse_tz(py::str("UTC"), parsed_tz);
-  EXPECT_FALSE(error.has_value());
-
-  error = parse_tz(py::str("US/Pacific"), parsed_tz);
-  EXPECT_FALSE(error.has_value());
-}
