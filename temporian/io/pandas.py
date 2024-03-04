@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Utilities for converting EventSets to pandas DataFrames and viceversa."""
+"""Utilities for converting EventSets to pandas DataFrames and vice versa."""
 
 import numpy as np
 
@@ -63,7 +63,7 @@ def from_pandas(
             timestamp types.
         name: Optional name of the EventSet. Used for debugging, and
             graph serialization.
-        same_sampling_as: If set, the new EventSet is cheched and tagged as
+        same_sampling_as: If set, the new EventSet is checked and tagged as
             having the same sampling as `same_sampling_as`. Some operators,
             such as [`EventSet.filter()`][temporian.EventSet.filter], require
             their inputs to have the same sampling.

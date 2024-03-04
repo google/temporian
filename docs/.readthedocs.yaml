@@ -19,11 +19,10 @@ build:
   jobs:
     post_create_environment:
       - pip install poetry
-      - poetry config virtualenvs.create false
       - npm install -g @bazel/bazelisk
 
     post_install:
-      - poetry install
+      - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH poetry install
       - pip install -r docs/src/tutorials/requirements.txt
 
     pre_build:

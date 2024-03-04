@@ -239,7 +239,7 @@ def plot(
         >>> tp.plot([evset, evset_2], merge=True)
         >>> tp.plot((evset, evset_2))
 
-        # Make the plot interractive
+        # Make the plot interactive
         >>> tp.plot(evset, interactive=True)
 
         # Save figure to file

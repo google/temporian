@@ -23,7 +23,7 @@ from temporian.core.typing import (
 
 # When applicable, follow the same naming convention as temporian/core/typing.py
 #
-# The Beam computation relies eavily on tuples instead of dataclasses or named
+# The Beam computation relies heavily on tuples instead of dataclasses or named
 # tuples as it seems tuples are the most efficient solution.
 #
 # Individual features of a same event set are stored separately.

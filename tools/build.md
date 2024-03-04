@@ -13,7 +13,7 @@ Unfortunately, building non-pure packages through Poetry is still somewhat
 unstable. Notably, the build uses a custom build script located under
 `config/build.py`. The definition of these custom build scripts is being
 discussed in this
-[Github issue](https://github.com/python-poetry/poetry/issues/2740) on the
+[GitHub issue](https://github.com/python-poetry/poetry/issues/2740) on the
 Poetry repository.
 
 If needed, the `build.py` can also serve as the basis for a handcrafted
@@ -45,7 +45,7 @@ where `<version>` is one of `38`, `39`, `310`, `311`.
 This will place the manylinux package in the `dist/` directory under
 Temporian's root.
 
-## MacOS builds
+## macOS builds
 
 Simply activate the desired Python version (e.g. using Pyenv) install Poetry
 and run

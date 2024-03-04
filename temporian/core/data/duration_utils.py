@@ -205,7 +205,7 @@ def duration_abbreviation(
     Returns:
         Abbreviation for the duration.
     """
-    # check cuttoff is a TimeUnit or if its a string that is a valid TimeUnit
+    # check cutoff is a TimeUnit or if its a string that is a valid TimeUnit
     if not TimeUnit.is_valid(cutoff):
         raise ValueError(
             f"Invalid cutoff: {cutoff}. Possible options are: {list(TimeUnit)}"
