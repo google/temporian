@@ -6,6 +6,8 @@
 
 ### Improvements
 
+- Speed up of calendar operations (now implemented in c++)
+
 ### Fixes
 
 ## 0.7.0

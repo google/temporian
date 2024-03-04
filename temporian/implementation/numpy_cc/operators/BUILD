@@ -66,6 +66,18 @@ pybind_library(
     deps = [":common"],
 )
 
+
+pybind_library(
+    name = "calendar",
+    srcs = ["calendar.cc"],
+    hdrs = ["calendar.h"],
+    deps = [
+        "@com_google_absl//absl/time",
+        ":common",
+        ":tick_calendar_utils",
+    ],
+)
+
 pybind_extension(
     name = "operators_cc",
     srcs = ["pyinit.cc"],
@@ -78,6 +90,7 @@ pybind_extension(
         ":tick_calendar",
         ":until_next",
         ":window",
+        ":calendar",
     ],
 )
 
@@ -88,9 +101,9 @@ py_library(
 
 cc_library(
     name = "tick_calendar_utils",
-    srcs = ["tick_calendar_utils.cc"    ],
-    hdrs = ["tick_calendar_utils.h"    ],
-    deps = [],
+    srcs = ["tick_calendar_utils.cc"],
+    hdrs = ["tick_calendar_utils.h"],
+    deps = ["@com_google_absl//absl/time", ":common"],
 )
 
 cc_test(

@@ -12,25 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from datetime import datetime
+from typing import Callable
 
-from temporian.core.operators.calendar.minute import (
-    CalendarMinuteOperator,
-)
+from temporian.core.operators.calendar.minute import CalendarMinuteOperator
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.calendar.base import (
     BaseCalendarNumpyImplementation,
 )
+from temporian.implementation.numpy_cc.operators import operators_cc
 
 
 class CalendarMinuteNumpyImplementation(BaseCalendarNumpyImplementation):
-    """Numpy implementation of the calendar_minute operator."""
-
-    def __init__(self, operator: CalendarMinuteOperator) -> None:
-        super().__init__(operator)
-
-    def _get_value_from_datetime(self, dt: datetime) -> int:
-        return dt.minute
+    def _implementation(self) -> Callable:
+        return operators_cc.calendar_minute
 
 
 implementation_lib.register_operator_implementation(

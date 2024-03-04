@@ -15,13 +15,11 @@
 """Calendar ISO week operator class and public API function definitions."""
 
 from typing import Union
+
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.node import EventSetNode
-from temporian.core.operators.calendar.base import (
-    BaseCalendarOperator,
-    timezone_to_utc_offset,
-)
+from temporian.core.operators.calendar.base import BaseCalendarOperator
 from temporian.core.typing import EventSetOrNode
 
 
@@ -43,6 +41,5 @@ def calendar_iso_week(
     sampling: EventSetOrNode, tz: Union[str, float, int] = 0
 ) -> EventSetOrNode:
     assert isinstance(sampling, EventSetNode)
-    utc_offset = timezone_to_utc_offset(tz)
 
-    return CalendarISOWeekOperator(sampling, utc_offset).outputs["output"]
+    return CalendarISOWeekOperator(sampling, tz).outputs["output"]

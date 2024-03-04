@@ -12,14 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from absl.testing import absltest
-from absl.testing.parameterized import TestCase
+from absl.testing import absltest, parameterized
 
 from temporian.implementation.numpy.data.io import event_set
 from temporian.test.utils import assertOperatorResult, i32
 
 
-class CalendarYearTest(TestCase):
+class CalendarYearTest(parameterized.TestCase):
     def test_basic(self):
         timestamps = [
             "1960-01-01 00:00:00",
@@ -41,6 +40,68 @@ class CalendarYearTest(TestCase):
 
         result = evset.calendar_year()
         assertOperatorResult(self, result, expected)
+
+        expected = event_set(
+            timestamps=timestamps,
+            features={
+                "calendar_year": i32([1960, 1970, 2021, 2021, 2022, 2046]),
+            },
+            same_sampling_as=evset,
+        )
+
+        result = evset.calendar_year(tz=1)
+        assertOperatorResult(self, result, expected)
+
+    @parameterized.parameters({"tz": 1}, {"tz": 1.0}, {"tz": "Europe/Brussels"})
+    def test_tz(self, tz):
+        timestamps = [
+            "2021-01-01 00:00:01",
+            "2021-12-31 23:59:59",
+            "2045-12-31 23:59:59",
+        ]
+        evset = event_set(timestamps=timestamps)
+
+        expected = event_set(
+            timestamps=timestamps,
+            features={
+                "calendar_year": i32([2021, 2022, 2046]),
+            },
+            same_sampling_as=evset,
+        )
+
+        result = evset.calendar_year(tz=tz)
+        assertOperatorResult(self, result, expected)
+
+    @parameterized.parameters({"tz": 0}, {"tz": 0.0}, {"tz": "UTC"})
+    def test_utc(self, tz):
+        timestamps = [
+            "2021-01-01 00:00:01",
+            "2021-12-31 23:59:59",
+            "2045-12-31 23:59:59",
+        ]
+        evset = event_set(timestamps=timestamps)
+
+        expected = event_set(
+            timestamps=timestamps,
+            features={
+                "calendar_year": i32([2021, 2021, 2045]),
+            },
+            same_sampling_as=evset,
+        )
+
+        result = evset.calendar_year(tz=tz)
+        assertOperatorResult(self, result, expected)
+
+    def test_bad_tz(self):
+        timestamps = [
+            "2021-01-01 00:00:01",
+            "2021-12-31 23:59:59",
+            "2045-12-31 23:59:59",
+        ]
+        evset = event_set(timestamps=timestamps)
+
+        with self.assertRaisesRegex(ValueError, "Invalid timezone"):
+            evset.calendar_year(tz="I'm an invalid timezone")
 
 
 if __name__ == "__main__":
