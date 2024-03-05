@@ -13,10 +13,11 @@
 # limitations under the License.
 
 from datetime import datetime, timedelta, timezone
+
 from absl.testing import absltest, parameterized
 
 from temporian.implementation.numpy.data.io import event_set
-from temporian.test.utils import assertOperatorResult, SetTimezone
+from temporian.test.utils import SetTimezone, assertOperatorResult
 
 
 class TickCalendarOperatorTest(parameterized.TestCase):
@@ -95,6 +96,18 @@ class TickCalendarOperatorTest(parameterized.TestCase):
                 "2020-01-10 13:00",
                 "2020-02-10 13:00",
                 "2020-03-10 13:00",
+            ],
+            "right": None,
+        },
+        {
+            # Test: Negative timestamps
+            "span": ["1930-07-30 12:59:59.99", "1930-09-30 13:00"],
+            "calendar_args": dict(hour=13, mday=30),
+            "left": "1930-06-30 13:00",
+            "ticks": [
+                "1930-07-30 13:00",
+                "1930-08-30 13:00",
+                "1930-09-30 13:00",
             ],
             "right": None,
         },

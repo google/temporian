@@ -12,14 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from absl.testing import absltest
-from absl.testing.parameterized import TestCase
+from absl.testing import absltest, parameterized
 
 from temporian.implementation.numpy.data.io import event_set
 from temporian.test.utils import assertOperatorResult
 
 
-class TickTest(TestCase):
+class TickTest(parameterized.TestCase):
     def test_no_align(self):
         evset = event_set([1, 5.5])
         result = evset.tick(4.0, align=False)
@@ -72,90 +71,192 @@ class TickTest(TestCase):
             self, result, expected_output, check_sampling=False
         )
 
-    def test_not_inclusive_right(self):
-        evset = event_set([1, 5, 9])
-        # Not aligned, no include right, end matches last tick
-        result = evset.tick(4.0, align=False, include_right=False)
-        expected_output = event_set([1, 5, 9])
-        assertOperatorResult(
-            self, result, expected_output, check_sampling=False
-        )
-        # Not aligned, no include right, end doesn't match last tick
-        result = evset.tick(3.0, align=False, include_right=False)
-        expected_output = event_set([1, 4, 7])
-        assertOperatorResult(
-            self, result, expected_output, check_sampling=False
-        )
-
-        # Aligned, no include right, end doesn't match last tick
-        result = evset.tick(4.0, align=True, include_right=False)
-        expected_output = event_set([4, 8])
-        assertOperatorResult(
-            self, result, expected_output, check_sampling=False
-        )
-        # Not aligned, no include right, end matches last tick
-        result = evset.tick(3.0, align=True, include_right=False)
-        expected_output = event_set([3, 6, 9])
-        assertOperatorResult(
-            self, result, expected_output, check_sampling=False
-        )
-
-    def test_inclusive_right(self):
-        evset = event_set([1, 5, 9])
-        # Not aligned, include right, end matches last tick
-        result = evset.tick(4.0, align=False, include_right=True)
-        expected_output = event_set([1, 5, 9])
-        assertOperatorResult(
-            self, result, expected_output, check_sampling=False
-        )
-        # Not aligned, include right, end doesn't match last tick
-        result = evset.tick(3.0, align=False, include_right=True)
-        expected_output = event_set([1, 4, 7, 10])
+    @parameterized.parameters(
+        # Not aligned, end matches last tick
+        {
+            "input": [1, 5, 9],
+            "output": [1, 5, 9],
+            "align": False,
+            "interval": 4,
+        },
+        # Not aligned, end doesn't match last tick
+        {
+            "input": [1, 5, 9],
+            "output": [1, 4, 7],
+            "align": False,
+            "interval": 3,
+        },
+        # Aligned, end doesn't match last tick
+        {
+            "input": [1, 5, 9],
+            "output": [4, 8],
+            "align": True,
+            "interval": 4,
+        },
+        # Aligned, end matches last tick
+        {
+            "input": [1, 5, 9],
+            "output": [3, 6, 9],
+            "align": True,
+            "interval": 3,
+        },
+    )
+    def test_not_inclusive_right(self, input, output, align, interval):
+        evset = event_set(input)
+        result = evset.tick(interval, align=align, include_right=False)
+        expected_output = event_set(output)
         assertOperatorResult(
             self, result, expected_output, check_sampling=False
         )
 
-        # Aligned, include right, end doesn't match last tick
-        result = evset.tick(4.0, align=True, include_right=True)
-        expected_output = event_set([4, 8, 12])
-        assertOperatorResult(
-            self, result, expected_output, check_sampling=False
-        )
-        # Not aligned, include right, end matches last tick
-        result = evset.tick(3.0, align=True, include_right=True)
-        expected_output = event_set([3, 6, 9])
+    @parameterized.parameters(
+        # Not aligned, end matches last tick
+        {
+            "input": [1, 5, 9],
+            "output": [1, 5, 9],
+            "align": False,
+            "interval": 4,
+        },
+        # Not aligned, end doesn't match last tick
+        {
+            "input": [1, 5, 9],
+            "output": [1, 4, 7, 10],
+            "align": False,
+            "interval": 3,
+        },
+        # Aligned, end doesn't match last tick
+        {
+            "input": [1, 5, 9],
+            "output": [4, 8, 12],
+            "align": True,
+            "interval": 4,
+        },
+        # Aligned, end matches last tick
+        {
+            "input": [1, 5, 9],
+            "output": [3, 6, 9],
+            "align": True,
+            "interval": 3,
+        },
+    )
+    def test_inclusive_right(self, input, output, align, interval):
+        evset = event_set(input)
+        result = evset.tick(interval, align=align, include_right=True)
+        expected_output = event_set(output)
         assertOperatorResult(
             self, result, expected_output, check_sampling=False
         )
 
-    def test_not_inclusive_left(self):
-        evset = event_set([1, 5, 9])
-        # Not aligned, no include left, start matches first tick
-        result = evset.tick(4.0, align=False, include_left=False)
-        expected_output = event_set([1, 5, 9])
+    @parameterized.parameters(
+        # Not aligned, start matches first tick
+        {
+            "input": [1, 5, 9],
+            "output": [1, 5, 9],
+            "align": False,
+            "interval": 4,
+        },
+        # Aligned, start doesn't match first tick
+        {
+            "input": [1, 5, 9],
+            "output": [4, 8, 12],
+            "align": True,
+            "interval": 4,
+        },
+    )
+    def test_not_inclusive_left(self, input, output, align, interval):
+        evset = event_set(input)
+        result = evset.tick(interval, align=align, include_left=False)
+        expected_output = event_set(output)
         assertOperatorResult(
             self, result, expected_output, check_sampling=False
         )
 
-        # Aligned, no include left, start doesn't match first tick
-        result = evset.tick(4.0, align=True, include_left=False)
-        expected_output = event_set([4, 8, 12])
+    @parameterized.parameters(
+        # Not aligned, start matches first tick
+        {
+            "input": [1, 5, 9],
+            "output": [1, 5, 9],
+            "align": False,
+            "interval": 4,
+        },
+        # Aligned, start doesn't match first tick
+        {
+            "input": [1, 5, 9],
+            "output": [0, 4, 8, 12],
+            "align": True,
+            "interval": 4,
+        },
+    )
+    def test_inclusive_left(self, input, output, align, interval):
+        evset = event_set(input)
+        result = evset.tick(interval, align=align, include_left=True)
+        expected_output = event_set(output)
         assertOperatorResult(
             self, result, expected_output, check_sampling=False
         )
 
-    def test_inclusive_left(self):
-        evset = event_set([1, 5, 9])
-        # Not aligned, include left, start matches first tick
-        result = evset.tick(4.0, align=False, include_left=True)
-        expected_output = event_set([1, 5, 9])
-        assertOperatorResult(
-            self, result, expected_output, check_sampling=False
+    @parameterized.parameters(
+        # all negatives
+        {
+            "input": [-9, -5, -1],
+            "output": [-9, -5, -1],
+            "align": False,
+            "interval": 4,
+            "right": False,
+            "left": False,
+        },
+        # include right, end matches last tick
+        {
+            "input": [-9, -5, -1],
+            "output": [-9, -5, -1],
+            "align": False,
+            "interval": 4,
+            "right": True,
+            "left": False,
+        },
+        # include right, end doesn't match last tick
+        {
+            "input": [-9, -5, -1],
+            "output": [-9, -6, -3, 0],
+            "align": False,
+            "interval": 3,
+            "right": True,
+            "left": False,
+        },
+        # include left, include left
+        {
+            "input": [-9, -5, -1],
+            "output": [-9, -5, -1],
+            "align": False,
+            "interval": 4,
+            "right": False,
+            "left": True,
+        },
+        # include left, aligned so that left doesn't match first tick
+        {
+            "input": [-9, -5, -1],
+            "output": [-12, -8, -4],
+            "align": True,
+            "interval": 4,
+            "right": False,
+            "left": True,
+        },
+        # include left adn right, aligned so that left doesn't match first tick
+        {
+            "input": [-9, -5, -1],
+            "output": [-12, -8, -4, 0],
+            "align": True,
+            "interval": 4,
+            "right": True,
+            "left": True,
+        },
+    )
+    def test_negatives(self, input, output, align, interval, right, left):
+        evset = event_set(input)
+        result = evset.tick(
+            interval, align=align, include_right=right, include_left=left
         )
-
-        # Aligned, include left, start doesn't match first tick
-        result = evset.tick(4.0, align=True, include_left=True)
-        expected_output = event_set([0, 4, 8, 12])
+        expected_output = event_set(output)
         assertOperatorResult(
             self, result, expected_output, check_sampling=False
         )

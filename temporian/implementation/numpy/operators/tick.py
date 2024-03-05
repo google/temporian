@@ -71,10 +71,14 @@ class TickNumpyImplementation(OperatorImplementation):
                 ):
                     end += self.operator.interval
 
+                interval = np.float64(self.operator.interval)
+                # arange doesn't include the end so we move it to the next tick
+                end = begin + ((end - begin) // interval + 1) * interval
+
                 dst_timestamps = np.arange(
                     begin,
-                    np.nextafter(end, math.inf),
-                    self.operator.interval,
+                    end,
+                    interval,
                     dtype=np.float64,
                 )
 
