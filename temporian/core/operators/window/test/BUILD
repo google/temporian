@@ -19,6 +19,19 @@ py_test(
 )
 
 py_test(
+    name = "test_cumprod",
+    srcs = ["test_cumprod.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
+
+py_test(
     name = "test_cumsum",
     srcs = ["test_cumsum.py"],
     srcs_version = "PY3",

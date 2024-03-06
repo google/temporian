@@ -16,6 +16,8 @@
 
 from typing import Optional
 
+import numpy as np
+
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
 from temporian.core.data.dtype import DType
@@ -66,4 +68,20 @@ def moving_product(
         input=input,
         window_length=window_length,
         sampling=sampling,
+    ).outputs["output"]
+
+
+@compile
+def cumprod(
+    input: EventSetOrNode,
+    sampling: Optional[EventSetOrNode] = None,
+) -> EventSetOrNode:
+    assert isinstance(input, EventSetNode)
+    if sampling is not None:
+        assert isinstance(sampling, EventSetNode)
+
+    return MovingProductOperator(
+        input=input,
+        window_length=np.inf,
+        sampling=sampling
     ).outputs["output"]
