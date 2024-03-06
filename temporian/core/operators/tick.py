@@ -37,21 +37,21 @@ class Tick(Operator):
         input: EventSetNode,
         interval: NormalizedDuration,
         align: bool,
-        include_right: bool = True,
-        include_left: bool = False,
+        after_last: bool = True,
+        before_first: bool = False,
     ):
         super().__init__()
 
         self._interval = interval
         self._align = align
-        self._include_right = include_right
-        self._include_left = include_left
+        self._after_last = after_last
+        self._before_first = before_first
 
         self.add_input("input", input)
         self.add_attribute("interval", interval)
         self.add_attribute("align", align)
-        self.add_attribute("include_right", include_right)
-        self.add_attribute("include_left", include_left)
+        self.add_attribute("after_last", after_last)
+        self.add_attribute("before_first", before_first)
 
         self.add_output(
             "output",
@@ -74,12 +74,12 @@ class Tick(Operator):
         return self._align
 
     @property
-    def include_right(self) -> bool:
-        return self._include_right
+    def after_last(self) -> bool:
+        return self._after_last
 
     @property
-    def include_left(self) -> bool:
-        return self._include_left
+    def before_first(self) -> bool:
+        return self._before_first
 
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
@@ -95,11 +95,11 @@ class Tick(Operator):
                     type=pb.OperatorDef.Attribute.Type.BOOL,
                 ),
                 pb.OperatorDef.Attribute(
-                    key="include_right",
+                    key="after_last",
                     type=pb.OperatorDef.Attribute.Type.BOOL,
                 ),
                 pb.OperatorDef.Attribute(
-                    key="include_left",
+                    key="before_first",
                     type=pb.OperatorDef.Attribute.Type.BOOL,
                 ),
             ],
@@ -117,8 +117,8 @@ def tick(
     input: EventSetOrNode,
     interval: Duration,
     align: bool = True,
-    include_right: bool = True,
-    include_left: bool = False,
+    after_last: bool = True,
+    before_first: bool = False,
 ) -> EventSetOrNode:
     assert isinstance(input, EventSetNode)
 
@@ -126,6 +126,6 @@ def tick(
         input=input,
         interval=normalize_duration(interval),
         align=align,
-        include_right=include_right,
-        include_left=include_left,
+        after_last=after_last,
+        before_first=before_first,
     ).outputs["output"]

@@ -14,7 +14,7 @@
 
 
 """TickCalendar operator class and public API function definitions."""
-from typing import Literal, Tuple, Optional, Union
+from typing import Literal, Optional, Tuple, Union
 
 import numpy as np
 
@@ -42,8 +42,8 @@ class TickCalendar(Operator):
         mday: Union[int, TypeWildCard],
         month: Union[int, TypeWildCard],
         wday: Union[int, TypeWildCard],
-        include_right: bool = True,
-        include_left: bool = False,
+        after_last: bool = True,
+        before_first: bool = False,
     ):
         super().__init__()
         if not input.schema.is_unix_timestamp:
@@ -58,16 +58,16 @@ class TickCalendar(Operator):
         self._mday = self._check_arg(mday, self.mday_max_range())
         self._month = self._check_arg(month, self.month_max_range())
         self._wday = self._check_arg(wday, self.wday_max_range())
-        self.include_right = include_right
-        self.include_left = include_left
+        self.after_last = after_last
+        self.before_first = before_first
         self.add_attribute("second", second)
         self.add_attribute("minute", minute)
         self.add_attribute("hour", hour)
         self.add_attribute("mday", mday)
         self.add_attribute("month", month)
         self.add_attribute("wday", wday)
-        self.add_attribute("include_right", include_right)
-        self.add_attribute("include_left", include_left)
+        self.add_attribute("after_last", after_last)
+        self.add_attribute("before_first", before_first)
 
         self.add_input("input", input)
 
@@ -185,11 +185,11 @@ class TickCalendar(Operator):
                     type=pb.OperatorDef.Attribute.Type.ANY,
                 ),
                 pb.OperatorDef.Attribute(
-                    key="include_right",
+                    key="after_last",
                     type=pb.OperatorDef.Attribute.Type.BOOL,
                 ),
                 pb.OperatorDef.Attribute(
-                    key="include_left",
+                    key="before_first",
                     type=pb.OperatorDef.Attribute.Type.BOOL,
                 ),
             ],
@@ -211,8 +211,8 @@ def tick_calendar(
     mday: Optional[Union[int, TypeWildCard]] = None,
     month: Optional[Union[int, TypeWildCard]] = None,
     wday: Optional[Union[int, TypeWildCard]] = None,
-    include_right: bool = True,
-    include_left: bool = False,
+    after_last: bool = True,
+    before_first: bool = False,
 ) -> EventSetOrNode:
     # Don't allow empty args
     if all(arg is None for arg in (second, minute, hour, mday, month, wday)):
@@ -272,6 +272,6 @@ def tick_calendar(
         mday=mday,
         month=month,
         wday=wday,
-        include_right=include_right,
-        include_left=include_left,
+        after_last=after_last,
+        before_first=before_first,
     ).outputs["output"]

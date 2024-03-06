@@ -145,13 +145,13 @@ py::array_t<double> tick_calendar(
     const int min_mday, const int max_mday,      // month days
     const int min_month, const int max_month,    // month range
     const int min_wday, const int max_wday,      // weekdays
-    const bool include_right, const bool include_left) {
+    const bool after_last, const bool before_first) {
   auto ticks =
       find_ticks(start_timestamp, end_timestamp, true, -1, min_second,
                  max_second, min_minute, max_minute, min_hour, max_hour,
                  min_mday, max_mday, min_month, max_month, min_wday, max_wday);
 
-  if (include_right && (ticks.back() < end_timestamp)) {
+  if (after_last && (ticks.empty() || ticks.back() < end_timestamp)) {
     // starting from the end, find 1 tick to the right
     auto right_ticks =
         find_ticks(end_timestamp, std::nullopt, true, 1, min_second, max_second,
@@ -160,7 +160,7 @@ py::array_t<double> tick_calendar(
     ticks.insert(ticks.end(), right_ticks.begin(), right_ticks.end());
   }
 
-  if (include_left && (ticks.front() > start_timestamp)) {
+  if (before_first && (ticks.empty() || ticks.front() > start_timestamp)) {
     // starting from the start, find 1 tick to the left
     auto left_ticks = find_ticks(start_timestamp, std::nullopt, false, 1,
                                  min_second, max_second, min_minute, max_minute,
@@ -186,5 +186,6 @@ void init_tick_calendar(py::module& m) {
         py::arg("min_minute"), py::arg("max_minute"), py::arg("min_hour"),
         py::arg("max_hour"), py::arg("min_mday"), py::arg("max_mday"),
         py::arg("min_month"), py::arg("max_month"), py::arg("min_wday"),
-        py::arg("max_wday"), py::arg("include_right"), py::arg("include_left"));
+        py::arg("max_wday"), py::arg("after_last"),
+        py::arg("before_first"));
 }

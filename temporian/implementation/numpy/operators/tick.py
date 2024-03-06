@@ -16,13 +16,14 @@
 """Implementation for the Tick operator."""
 
 
+import math
 from typing import Dict
 
-import math
 import numpy as np
-from temporian.implementation.numpy.data.event_set import IndexData, EventSet
+
 from temporian.core.operators.tick import Tick
 from temporian.implementation.numpy import implementation_lib
+from temporian.implementation.numpy.data.event_set import EventSet, IndexData
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 
 
@@ -41,7 +42,7 @@ class TickNumpyImplementation(OperatorImplementation):
 
         # fill output EventSet data
         for index_key, index_data in input.data.items():
-            if len(index_data.timestamps) <= 1:
+            if len(index_data.timestamps) < 1:
                 dst_timestamps = np.array([], dtype=np.float64)
             else:
                 begin = index_data.timestamps[0]
@@ -58,15 +59,15 @@ class TickNumpyImplementation(OperatorImplementation):
                     if save_begin != begin:
                         begin += self.operator.interval
 
-                # adjust begin if include_left and the first tick is not going
+                # adjust begin if before_first and the first tick is not going
                 # to be equal to the begin
-                if self.operator.include_left and (
+                if self.operator.before_first and (
                     (save_begin - begin) % self.operator.interval != 0
                 ):
                     begin -= self.operator.interval
-                # adjust end if include_right and the final tick is not going
+                # adjust end if after_last and the final tick is not going
                 # to be equal to the end
-                if self.operator.include_right and (
+                if self.operator.after_last and (
                     (save_end - begin) % self.operator.interval != 0
                 ):
                     end += self.operator.interval

@@ -111,28 +111,38 @@ class TickCalendarOperatorTest(parameterized.TestCase):
             ],
             "right": None,
         },
+        {
+            # Test: empty
+            "span": [],
+            "calendar_args": dict(hour=13, mday=30),
+            "left": None,
+            "ticks": [],
+            "right": None,
+        },
     )
     def test_base(self, span, left, ticks, right, calendar_args):
-        for include_right in [None, True, False]:
-            for include_left in [None, True, False]:
+        for after_last in [None, True, False]:
+            for before_first in [None, True, False]:
                 expected = ticks
 
-                if include_right is None:
+                if after_last is None:
                     # inclusive on the right by default
                     if right is not None:
                         expected = expected + [right]
                 else:
-                    calendar_args["include_right"] = include_right
-                    if include_right and right is not None:
+                    calendar_args["after_last"] = after_last
+                    if after_last and right is not None:
                         expected = expected + [right]
 
-                if include_left is not None:
-                    calendar_args["include_left"] = include_left
-                    if include_left and left is not None:
+                if before_first is not None:
+                    calendar_args["before_first"] = before_first
+                    if before_first and left is not None:
                         expected = [left] + expected
 
-                evset = event_set(timestamps=span)
-                expected_evset = event_set(timestamps=expected)
+                evset = event_set(timestamps=span, is_unix_timestamp=True)
+                expected_evset = event_set(
+                    timestamps=expected, is_unix_timestamp=True
+                )
                 result = evset.tick_calendar(**calendar_args)
 
                 # NOTE: check_sampling=False still checks timestamps
@@ -279,6 +289,70 @@ class TickCalendarOperatorTest(parameterized.TestCase):
             "Can't set argument to None because previous and following",
         ):
             evset.tick_calendar(hour=0, month=1)
+
+    # test expected behavior for a single event for all combination of params
+    @parameterized.parameters(
+        {
+            "mday": 10,
+            "after_last": True,
+            "before_first": False,
+            "expected": ["2023-02-10"],
+        },
+        {
+            "mday": 10,
+            "after_last": False,
+            "before_first": False,
+            "expected": ["2023-02-10"],
+        },
+        {
+            "mday": 10,
+            "after_last": True,
+            "before_first": True,
+            "expected": ["2023-02-10"],
+        },
+        {
+            "mday": 10,
+            "after_last": False,
+            "before_first": True,
+            "expected": ["2023-02-10"],
+        },
+        {
+            "mday": 15,
+            "after_last": True,
+            "before_first": False,
+            "expected": ["2023-02-15"],
+        },
+        {
+            "mday": 15,
+            "after_last": False,
+            "before_first": False,
+            "expected": [],
+        },
+        {
+            "mday": 15,
+            "after_last": True,
+            "before_first": True,
+            "expected": ["2023-01-15", "2023-02-15"],
+        },
+        {
+            "mday": 15,
+            "after_last": False,
+            "before_first": True,
+            "expected": ["2023-01-15"],
+        },
+    )
+    def test_single_event(self, mday, after_last, before_first, expected):
+        evset = event_set(["2023-02-10"])
+        expected_output = event_set(expected, is_unix_timestamp=True)
+        result = evset.tick_calendar(
+            mday=mday,
+            after_last=after_last,
+            before_first=before_first,
+        )
+
+        assertOperatorResult(
+            self, result, expected_output, check_sampling=False
+        )
 
 
 if __name__ == "__main__":

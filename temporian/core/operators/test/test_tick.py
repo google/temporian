@@ -53,19 +53,66 @@ class TickTest(parameterized.TestCase):
             self, result, expected_output, check_sampling=False
         )
 
-    def test_no_align_single(self):
+    # test expected behavior for a single event for all combination of params
+    @parameterized.parameters(
+        {
+            "align": False,
+            "after_last": True,
+            "before_first": False,
+            "expected": [1],
+        },
+        {
+            "align": False,
+            "after_last": False,
+            "before_first": False,
+            "expected": [1],
+        },
+        {
+            "align": False,
+            "after_last": True,
+            "before_first": True,
+            "expected": [1],
+        },
+        {
+            "align": False,
+            "after_last": False,
+            "before_first": True,
+            "expected": [1],
+        },
+        {
+            "align": True,
+            "after_last": True,
+            "before_first": False,
+            "expected": [4],
+        },
+        {
+            "align": True,
+            "after_last": False,
+            "before_first": False,
+            "expected": [],
+        },
+        {
+            "align": True,
+            "after_last": True,
+            "before_first": True,
+            "expected": [0, 4],
+        },
+        {
+            "align": True,
+            "after_last": False,
+            "before_first": True,
+            "expected": [0],
+        },
+    )
+    def test_single_event(self, align, after_last, before_first, expected):
         evset = event_set([1])
-        expected_output = event_set([])
-        result = evset.tick(4.0, align=False)
-
-        assertOperatorResult(
-            self, result, expected_output, check_sampling=False
+        expected_output = event_set(expected)
+        result = evset.tick(
+            4.0,
+            align=align,
+            after_last=after_last,
+            before_first=before_first,
         )
-
-    def test_align_single(self):
-        evset = event_set([1])
-        expected_output = event_set([])
-        result = evset.tick(4.0, align=True)
 
         assertOperatorResult(
             self, result, expected_output, check_sampling=False
@@ -103,7 +150,7 @@ class TickTest(parameterized.TestCase):
     )
     def test_not_inclusive_right(self, input, output, align, interval):
         evset = event_set(input)
-        result = evset.tick(interval, align=align, include_right=False)
+        result = evset.tick(interval, align=align, after_last=False)
         expected_output = event_set(output)
         assertOperatorResult(
             self, result, expected_output, check_sampling=False
@@ -141,7 +188,7 @@ class TickTest(parameterized.TestCase):
     )
     def test_inclusive_right(self, input, output, align, interval):
         evset = event_set(input)
-        result = evset.tick(interval, align=align, include_right=True)
+        result = evset.tick(interval, align=align, after_last=True)
         expected_output = event_set(output)
         assertOperatorResult(
             self, result, expected_output, check_sampling=False
@@ -165,7 +212,7 @@ class TickTest(parameterized.TestCase):
     )
     def test_not_inclusive_left(self, input, output, align, interval):
         evset = event_set(input)
-        result = evset.tick(interval, align=align, include_left=False)
+        result = evset.tick(interval, align=align, before_first=False)
         expected_output = event_set(output)
         assertOperatorResult(
             self, result, expected_output, check_sampling=False
@@ -189,7 +236,7 @@ class TickTest(parameterized.TestCase):
     )
     def test_inclusive_left(self, input, output, align, interval):
         evset = event_set(input)
-        result = evset.tick(interval, align=align, include_left=True)
+        result = evset.tick(interval, align=align, before_first=True)
         expected_output = event_set(output)
         assertOperatorResult(
             self, result, expected_output, check_sampling=False
@@ -202,59 +249,59 @@ class TickTest(parameterized.TestCase):
             "output": [-9, -5, -1],
             "align": False,
             "interval": 4,
-            "right": False,
-            "left": False,
+            "future": False,
+            "past": False,
         },
-        # include right, end matches last tick
+        # include future, end matches last tick
         {
             "input": [-9, -5, -1],
             "output": [-9, -5, -1],
             "align": False,
             "interval": 4,
-            "right": True,
-            "left": False,
+            "future": True,
+            "past": False,
         },
-        # include right, end doesn't match last tick
+        # include future, end doesn't match last tick
         {
             "input": [-9, -5, -1],
             "output": [-9, -6, -3, 0],
             "align": False,
             "interval": 3,
-            "right": True,
-            "left": False,
+            "future": True,
+            "past": False,
         },
-        # include left, include left
+        # include past, include past
         {
             "input": [-9, -5, -1],
             "output": [-9, -5, -1],
             "align": False,
             "interval": 4,
-            "right": False,
-            "left": True,
+            "future": False,
+            "past": True,
         },
-        # include left, aligned so that left doesn't match first tick
+        # include past, aligned so that past doesn't match first tick
         {
             "input": [-9, -5, -1],
             "output": [-12, -8, -4],
             "align": True,
             "interval": 4,
-            "right": False,
-            "left": True,
+            "future": False,
+            "past": True,
         },
-        # include left adn right, aligned so that left doesn't match first tick
+        # include past and future, aligned so that past doesn't match first tick
         {
             "input": [-9, -5, -1],
             "output": [-12, -8, -4, 0],
             "align": True,
             "interval": 4,
-            "right": True,
-            "left": True,
+            "future": True,
+            "past": True,
         },
     )
-    def test_negatives(self, input, output, align, interval, right, left):
+    def test_negatives(self, input, output, align, interval, future, past):
         evset = event_set(input)
         result = evset.tick(
-            interval, align=align, include_right=right, include_left=left
+            interval, align=align, after_last=future, before_first=past
         )
         expected_output = event_set(output)
         assertOperatorResult(

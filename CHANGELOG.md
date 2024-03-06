@@ -6,6 +6,8 @@
 
 ### Improvements
 
+- Added `before_first` and `after_last` parameters to `EventSet.tick` and `EventSet.tick_calendar`
+
 ### Fixes
 
 ## 0.8.1
@@ -38,6 +40,8 @@ Adding missing wheels for macos, no changes to the library
 ### Fixes
 
 - Fixed a bug with `EventSet.tick_calendar` and daylight savings time.
+- Fixed a bug in `EventSet.tick_calendar` where it would miss the first tick under certain conditions
+- Fixed a bug in `EventSet.tick` where it would miss the last tick under certain conditions
 - Fixed a bug with calendar operations and daylight savings time.
 
 ### Thanks
