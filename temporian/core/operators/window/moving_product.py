@@ -81,7 +81,5 @@ def cumprod(
         assert isinstance(sampling, EventSetNode)
 
     return MovingProductOperator(
-        input=input,
-        window_length=np.inf,
-        sampling=sampling
+        input=input, window_length=np.inf, sampling=sampling
     ).outputs["output"]
