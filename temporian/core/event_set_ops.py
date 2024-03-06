@@ -3193,23 +3193,22 @@ class EventSetOperations:
         input's.
 
         Zeros result in the accumulator's result being 0 for the window. NaN values are ignored in the
-        calculation of the product. If the window does not contain any non-missing, non-zero values (e.g.,
-        all values are missing or the window does not contain any sampling), the output for that window is
-        missing (NaN).
+        calculation of the product. If the window does not contain any NaN, zero or any non-zero values (e.g.,
+        all values are missing), the output for that window is an empty array.
 
         Example:
             ```python
             >>> a = tp.event_set(
-            ...     timestamps=[0, 1, 2, 5, 6, 7],
-            ...     features={"value": [np.nan, 1, 5, 10, 15, 20]},
+            ...     timestamps=[0, 1, 2],
+            ...     features={"value": [np.nan, 1, 5]},
             ... )
 
-            >>> b = a.moving_product(tp.duration.seconds(4))
+            >>> b = a.moving_product(tp.duration.seconds(1))
             >>> b
             indexes: ...
-                (6 events):
-                    timestamps: [0. 1. 2. 5. 6. 7.]
-                    'value': [1. 1. 5. 50. 150. 3000.]
+                (3 events):
+                    timestamps: [0. 1. 2.]
+                    'value': [nan 1. 5.]
             ...
 
             ```

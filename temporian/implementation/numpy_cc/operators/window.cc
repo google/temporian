@@ -516,8 +516,8 @@ struct MovingMaxAccumulator : MovingExtremumAccumulator<INPUT, OUTPUT> {
   bool Compare(INPUT a, INPUT b) { return a > b; }
 };
 
-// TODO: Revisit the MovingProductAccumulator for potential optimization to improve calculation efficiency while maintaining accuracy.
-// Especially consider optimizing the Result method which recalculates the product on-demand.
+// TODO: Revisit the MovingProductAccumulator for potential optimization to
+// improve calculation efficiency while maintaining accuracy.
 template <typename INPUT, typename OUTPUT>
 struct MovingProductAccumulator : public Accumulator<INPUT, OUTPUT> {
     int start_idx = 0;
@@ -525,7 +525,6 @@ struct MovingProductAccumulator : public Accumulator<INPUT, OUTPUT> {
 
     MovingProductAccumulator(const ArrayRef<INPUT>& values)
         : Accumulator<INPUT, OUTPUT>(values) {}
-
     void Add(Idx idx) override {
         // Simply move the end to the given index
         end_idx = idx;
@@ -537,17 +536,26 @@ struct MovingProductAccumulator : public Accumulator<INPUT, OUTPUT> {
     }
 
     OUTPUT Result() override {
-        double product = 1.0;
+        if (start_idx > end_idx) {
+            // No valid indices to process, indicating an empty window or EventSet
+            return std::numeric_limits<OUTPUT>::quiet_NaN();
+        }
 
-        // Calculate the product of all values inside the window
+        double product = 1.0;
+        bool hasEncounteredValidValue = false; // This will be true if any non-NaN and non-zero value is encountered
+
         for (int idx = start_idx; idx <= end_idx; ++idx) {
             const INPUT value = Accumulator<INPUT, OUTPUT>::values[idx];
             if (value == 0) {
-                return 0; // Directly return 0 if a zero is found
+                return 0;  // If a zero is found, return 0 immediately.
             } else if (!std::isnan(value)) {
                 product *= value;
+                hasEncounteredValidValue = true;
             }
-            // NaN values are skipped
+        }
+
+        if (!hasEncounteredValidValue) {
+            return std::numeric_limits<OUTPUT>::quiet_NaN();
         }
 
         return product;
