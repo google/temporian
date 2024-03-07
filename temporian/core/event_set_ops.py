@@ -2153,7 +2153,7 @@ class EventSetOperations:
             ```python
             >>> a = tp.event_set(
             ...     timestamps=[0, 1, 2, 3],
-            ...     features={"value": [1, 2, 10, 12]},
+            ...     features={"value": [1.0, 2.0, 10.0, 12.0]},
             ... )
 
             >>> b = a.cumprod()
