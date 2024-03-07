@@ -130,22 +130,14 @@ class MovingProductTest(TestCase):
             "feature": [10.0, 11.0, 12.0, 13.0, 14.0],
             "window_length": 3.1,
             "sampling_timestamps": [-1.0, 1.0, 1.1, 3.0, 3.5, 6.0, 10.0],
-            "output_feature": [
-                1.000e00,
-                1.000e01,
-                1.000e01,
-                1.320e03,
-                1.320e03,
-                2.184e03,
-                1.000e00,
-            ],
+            "output_feature": [nan, 10.0, 10.0, 1320.0, 1320.0, 2184.0, nan],
         },
         {  # w nan
             "timestamps": f64([1, 2, 3, 5, 6]),
             "feature": [nan, 11.0, nan, 13.0, 14.0],
             "window_length": 1.1,
             "sampling_timestamps": [1, 2, 2.5, 3, 3.5, 4, 5, 6],
-            "output_feature": [1.0, 11.0, 11.0, 11.0, 1.0, 1.0, 13.0, 182.0],
+            "output_feature": [nan, 11.0, 11.0, 11.0, nan, nan, 13.0, 182.0],
         },
     )
     def test_with_sampling(
@@ -188,7 +180,7 @@ class MovingProductTest(TestCase):
 
         expected = event_set(
             timestamps=timestamps,
-            features={"a": f32([1, 10, 110, 12, 1, 1])},
+            features={"a": f32([nan, 10, 110, 12, nan, nan])},
             same_sampling_as=evset,
         )
 
@@ -211,7 +203,7 @@ class MovingProductTest(TestCase):
 
         expected = event_set(
             timestamps=window_timestamps,
-            features={"a": f32([1, 10, 132, 1, 182, 1])},
+            features={"a": f32([nan, 10.0, 132.0, nan, 182.0, nan])},
             same_sampling_as=window,
         )
 
