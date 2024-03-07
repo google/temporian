@@ -2133,6 +2133,78 @@ class EventSetOperations:
 
         return cast(self, target=target, check_overflow=check_overflow)
 
+    def cumprod(
+        self: EventSetOrNode,
+        sampling: Optional[EventSetOrNode] = None,
+    ) -> EventSetOrNode:
+        """Computes the cumulative product of values over each feature in an
+        [`EventSet`][temporian.EventSet].
+
+        This operation only supports floating-point features.
+
+        Missing (NaN) values are not accounted for. The output will be NaN until
+        the input contains at least one numeric value.
+
+        Warning: The `cumprod` function leverages an infinite window length for
+        its calculations, which may lead to considerable computational overhead
+        with increasing dataset sizes.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 3],
+            ...     features={"value": [1.0, 2.0, 10.0, 12.0]},
+            ... )
+
+            >>> b = a.cumprod()
+            >>> b
+            indexes: ...
+                (4 events):
+                    timestamps: [0. 1. 2. 3.]
+                    'value': [  1.   2.  20. 240.]
+            ...
+
+            ```
+
+        Examples with sampling:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 5, 6, 7],
+            ...     features={"value": [1, 2, 10, 12, np.nan, 2]},
+            ... )
+
+            >>> # Cumulative product at 5 and 10
+            >>> b = tp.event_set(timestamps=[5, 10])
+            >>> c = a.cumprod(sampling=b)
+            >>> c
+            indexes: ...
+                (2 events):
+                    timestamps: [ 5. 10.]
+                    'value': [240. 480.]
+            ...
+
+            >>> # Product all values in the EventSet
+            >>> c = a.cumprod(sampling=a.end())
+            >>> c
+            indexes: ...
+                (1 events):
+                    timestamps: [7.]
+                    'value': [480.]
+            ...
+
+            ```
+
+        Args:
+            sampling: Timestamps to sample the sliding window's value at. If not
+                provided, timestamps in the input are used.
+
+        Returns:
+            Cumulative product of each feature.
+        """
+        from temporian.core.operators.window.moving_product import cumprod
+
+        return cumprod(self, sampling=sampling)
+
     def cumsum(
         self: EventSetOrNode,
         sampling: Optional[EventSetOrNode] = None,
@@ -3168,6 +3240,68 @@ class EventSetOperations:
         )
 
         return moving_standard_deviation(
+            self, window_length=window_length, sampling=sampling
+        )
+
+    def moving_product(
+        self: EventSetOrNode,
+        window_length: WindowLength,
+        sampling: Optional[EventSetOrNode] = None,
+    ) -> EventSetOrNode:
+        """Computes the product of values in a sliding window over an
+        [`EventSet`][temporian.EventSet].
+
+        This operation only supports floating-point features.
+
+        For each t in sampling, and for each feature independently, returns at
+        time t the product of non-zero and non-NaN values for the feature in the window
+        (t - window_length, t].
+
+        `sampling` can't be specified if a variable `window_length` is
+        specified (i.e., if `window_length` is an EventSet).
+
+        If `sampling` is specified or `window_length` is an EventSet, the moving
+        window is sampled at each timestamp in them, else it is sampled on the
+        input's.
+
+        Zeros result in the accumulator's result being 0 for the window. NaN values are ignored in the
+        calculation of the product. If the window does not contain any NaN, zero or any non-zero values (e.g.,
+        all values are missing), the output for that window is an empty array.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2],
+            ...     features={"value": [np.nan, 1, 5]},
+            ... )
+
+            >>> b = a.moving_product(tp.duration.seconds(1))
+            >>> b
+            indexes: ...
+                (3 events):
+                    timestamps: [0. 1. 2.]
+                    'value': [nan 1. 5.]
+            ...
+
+            ```
+
+        See [`EventSet.moving_count()`][temporian.EventSet.moving_count] for
+        examples of moving window operations with external sampling and indices.
+
+        Args:
+            window_length: Sliding window's length.
+            sampling: Timestamps to sample the sliding window's value at. If not
+                provided, timestamps in the input are used.
+
+        Returns:
+            EventSet containing the moving product of each feature in the input,
+            considering non-zero and non-NaN values only.
+        """
+        from temporian.core.operators.window.moving_product import (
+            moving_product,
+        )
+
+        return moving_product(
             self, window_length=window_length, sampling=sampling
         )
 

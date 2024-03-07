@@ -79,6 +79,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "MOVING_COUNT",
             "MOVING_MAX",
             "MOVING_MIN",
+            "MOVING_PRODUCT",
             "MOVING_STANDARD_DEVIATION",
             "MOVING_SUM",
             "MULTIPLICATION",
