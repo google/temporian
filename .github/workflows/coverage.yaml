@@ -1,6 +1,8 @@
 name: coverage
 
-on: [push]
+on:
+  # this allows for `contents: write` and `pull-requests: write` from forks
+  pull_request_target:
 
 # limit default permissions to just read-only checkouts
 permissions:
@@ -19,7 +21,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: ${{ matrix.branch == 'main' && 'main' || '' }}
+          # for safety, `pull_request_target` changes the default checkout to be the target branch, so we have to request the merge (we're limited to `permissions: {contents: read}`, so this is ok)
+          ref: ${{ matrix.branch == 'main' && 'main' || (github.event.pull_request && format('refs/pull/{0}/merge', github.event.pull_request.number)) || '' }}
 
       - name: Bazel cache
         id: bazel-cache
