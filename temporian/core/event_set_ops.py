@@ -2142,15 +2142,8 @@ class EventSetOperations:
 
         This operation only supports floating-point features.
 
-        Foreach timestamp, calculate the product of the feature from the beginning.
-        Shorthand for `moving_product(event, window_length=np.inf)`.
-
         Missing (NaN) values are not accounted for. The output will be NaN until
         the input contains at least one numeric value.
-
-        If `sampling` is specified or `window_length` is an EventSet, the moving
-        window is sampled at each timestamp in them, else it is sampled on the
-        input's.
 
         Warning: The `cumprod` function leverages an infinite window length for
         its calculations, which may lead to considerable computational overhead
