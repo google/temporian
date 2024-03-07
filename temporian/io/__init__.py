@@ -19,3 +19,5 @@ from temporian.io.csv import from_csv
 
 from temporian.io.pandas import to_pandas
 from temporian.io.pandas import from_pandas
+
+from temporian.io.numpy import to_numpy

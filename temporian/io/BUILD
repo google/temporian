@@ -13,6 +13,7 @@ py_library(
     deps = [
         ":csv",
         ":pandas",
+        ":numpy"
     ],
 )
 
@@ -49,6 +50,16 @@ py_library(
         # already_there/numpy
         # force/pandas
         "//temporian/core/data:dtype",
+        "//temporian/implementation/numpy/data:event_set",
+        "//temporian/implementation/numpy/data:io",
+    ],
+)
+
+py_library(
+    name = "numpy",
+    srcs = ["numpy.py"],
+    srcs_version = "PY3",
+    deps = [
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/implementation/numpy/data:io",
     ],
