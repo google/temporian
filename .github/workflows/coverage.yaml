@@ -19,7 +19,7 @@ jobs:
       cov-main: ${{ steps.coverage.outputs.cov-main }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           # for safety, `pull_request_target` changes the default checkout to be the target branch, so we have to request the merge (we're limited to `permissions: {contents: read}`, so this is ok)
           ref: ${{ matrix.branch == 'main' && 'main' || (github.event.pull_request && format('refs/pull/{0}/merge', github.event.pull_request.number)) || '' }}
@@ -60,7 +60,7 @@ jobs:
       pull-requests: write
 
     steps:
-      - uses: actions/github-script@v6
+      - uses: actions/github-script@v7
         with:
           script: |
             const pr = ${{fromJson(needs.coverage.outputs.cov-pr).totals.percent_covered}};
