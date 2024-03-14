@@ -4,11 +4,18 @@
 
 ### Features
 
+- Add `EventSet.moving_product()` and `EventSet.cumprod()` operators.
+- Add `to.to_numpy()`.
+- Add trigonometric functions `EventSet.arccos()`, `EventSet.arcsin()`, `EventSet.arctan()`, `EventSet.cos()`, `EventSet.sin()`, and `EventSet.tan()`.
+
 ### Improvements
 
 - Speed up of calendar operations (now implemented in c++)
 
 ### Fixes
+
+- Fixed a bug with `EventSet.tick_calendar` and daylight savings time.
+- Fixed a bug with calendar operations and daylight savings time.
 
 ## 0.7.0
 
