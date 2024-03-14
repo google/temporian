@@ -14,7 +14,6 @@
 
 """Utilities for converting EventSets to pandas DataFrames and vice versa."""
 
-import numpy as np
 
 from typing import List, Optional
 from temporian.implementation.numpy.data.event_set import EventSet
@@ -25,13 +24,29 @@ from temporian.core.data.dtype import DType
 def from_polars(
     df: "polars.DataFrame",
     timestamps: str = "timestamp",
-    indexes: Optional[List[str]] = None,  # Clarification: Temporian indexes, not Polars
+    indexes: Optional[
+        List[str]
+    ] = None,  # Clarification: Temporian indexes, not Polars
     name: Optional[str] = None,
     same_sampling_as: Optional[EventSet] = None,
 ) -> EventSet:
-    """Converts a Polars DataFrame into an EventSet, with a preference for zero-copy conversion.
+    """Converts a Polars DataFrame into an EventSet.
 
-    The function attempts to avoid data copying but will do so if necessary for compatibility.
+    See [`tp.event_set()`][temporian.event_set] for the list of supported
+    timestamp and feature types.
+
+    Usage example:
+        ```python
+        >>> df = pl.DataFrame(
+                {
+                    "product_id": [666964, 666964, 574016, 574016],
+                    "timestamp": [1.0, 2.0, 3.0, None],
+                    "costs": [740.0, 508.0, 573.0, 573.0],
+                }
+            )
+        >>> evset = tp.from_polars(df, indexes=["product_id"])
+
+        ```
 
     Args:
         df: A Polars DataFrame.
@@ -47,7 +62,9 @@ def from_polars(
         The function attempts to minimize data copying but will copy if required for compatibility.
     """
     if timestamps not in df.columns:
-        raise ValueError(f"Timestamp column '{timestamps}' not found in the DataFrame.")
+        raise ValueError(
+            f"Timestamp column '{timestamps}' not found in the DataFrame."
+        )
 
     # Extract timestamps, allowing copy if necessary for compatibility
     timestamps_array = df.get_column(timestamps).to_numpy(allow_copy=True)
@@ -62,11 +79,10 @@ def from_polars(
     return event_set(
         timestamps=timestamps_array,
         features=feature_dict,
-        indexes=indexes,  # Temporian indexes, if any
+        indexes=indexes,
         name=name,
         same_sampling_as=same_sampling_as,
     )
-
 
 
 def to_polars(
@@ -77,15 +93,42 @@ def to_polars(
 ) -> "pl.DataFrame":
     """Converts an  [`EventSet`][temporian.EventSet] to a Polars DataFrame.
 
+    Usage example:
+        ```python
+        >>> from datetime import datetime
+
+        >>> evset = tp.event_set(
+        ...     timestamps=[datetime(2015, 1, 1), datetime(2015, 1, 2)],
+        ...     features={
+        ...         "feature_1": [0.5, 0.6],
+        ...         "my_index": ["red", "yellow"],
+        ...    },
+        ...    indexes=["my_index"],
+        ... )
+
+        >>> df = tp.to_polars(evset)
+        >>> df
+        shape: (2, 3)
+        ┌──────────┬───────────┬─────────────────────┐
+        │ my_index ┆ feature_1 ┆ timestamp           │
+        │ ---      ┆ ---       ┆ ---                 │
+        │ str      ┆ f64       ┆ datetime[μs]        │
+        ╞══════════╪═══════════╪═════════════════════╡
+        │ red      ┆ 0.5       ┆ 2015-01-01 00:00:00 │
+        │ red      ┆ 0.6       ┆ 2015-01-02 00:00:00 │
+        └──────────┴───────────┴─────────────────────┘
+        ```
+
     Args:
         evset: Input event set.
-        timestamp_to_date: If true, convert epoch timestamps to Polars Date objects.
+        timestamp_to_datetime: If true, convert epoch timestamps to Polars Date objects.
         timestamps: If true, include the timestamps as a column in the DataFrame.
         tp_string_to_pl_string: If true, cast Temporian strings to Polars Object.
 
     Returns:
         A Polars DataFrame created from EventSet.
     """
+
     import polars as pl
 
     timestamp_key = "timestamp"
@@ -103,19 +146,18 @@ def to_polars(
     for index, data in evset.data.items():
         assert isinstance(index, tuple)
 
-
         if timestamps:
             timestamps_data = data.timestamps
             if evset.schema.is_unix_timestamp and timestamp_to_datetime:
                 # Convert Unix timestamps to Polars datetime objects
                 # Assuming timestamps_data is a list of integers representing Unix timestamps in seconds
-                datetime_series = pl.from_epoch(pl.Series(timestamps_data), time_unit='s')
+                datetime_series = pl.from_epoch(
+                    pl.Series(timestamps_data), time_unit="s"
+                )
 
                 data_dict[timestamp_key].extend(datetime_series)
             else:
-
                 data_dict[timestamp_key].extend(timestamps_data)
-
 
         # Features
         for feature_name, feature in zip(feature_names, data.features):

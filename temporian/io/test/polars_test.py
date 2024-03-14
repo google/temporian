@@ -23,16 +23,16 @@ from temporian.implementation.numpy.data.io import event_set
 from temporian.io.polars import to_polars, from_polars
 from temporian.test.utils import assertEqualDFRandomRowOrderPolars
 
+
 class DataFrameToEventTest(absltest.TestCase):
     def test_correct(self) -> None:
         df = pl.DataFrame(
-
             {
                 "product_id": [666964, 666964, 574016],
                 "timestamp": [1.0, 2.0, 3.0],
                 "costs": [740.0, 508.0, 573.0],
             }
-)
+        )
         expected_evset = event_set(
             timestamps=[1.0, 2.0, 3.0],
             features={
@@ -44,14 +44,12 @@ class DataFrameToEventTest(absltest.TestCase):
         evset = from_polars(df, indexes=["product_id"], timestamps="timestamp")
         self.assertEqual(evset, expected_evset)
 
-
     def test_timestamp_order(self) -> None:
         df = pl.DataFrame(
             {
                 "timestamp": [1.0, 2.0, 3.0],
                 "costs": [100.0, 200.0, 300.0],
             }
-
         )
         expected_evset = event_set(
             timestamps=[1.0, 2.0, 3.0],
@@ -85,18 +83,46 @@ class DataFrameToEventTest(absltest.TestCase):
 
     def test_string_in_index(self):
         evset = from_polars(
-
-                pl.DataFrame(
-                    {
-                        "index_x": ["X1", "X1", "X1", "X2", "X2", "X2", "X2", "X2", "X2"],
-                        "index_y": ["Y1", "Y1", "Y1", "Y1", "Y1", "Y1", "Y2", "Y2", "Y2"],
-                        "timestamp": [1.0, 2.0, 3.0, 1.1, 2.1, 3.1, 1.2, 2.2, 3.2],
-                        "costs": [10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0],
-                    },
-
-                ),
-                indexes=["index_x", "index_y"],
-                )
+            pl.DataFrame(
+                {
+                    "index_x": [
+                        "X1",
+                        "X1",
+                        "X1",
+                        "X2",
+                        "X2",
+                        "X2",
+                        "X2",
+                        "X2",
+                        "X2",
+                    ],
+                    "index_y": [
+                        "Y1",
+                        "Y1",
+                        "Y1",
+                        "Y1",
+                        "Y1",
+                        "Y1",
+                        "Y2",
+                        "Y2",
+                        "Y2",
+                    ],
+                    "timestamp": [1.0, 2.0, 3.0, 1.1, 2.1, 3.1, 1.2, 2.2, 3.2],
+                    "costs": [
+                        10.0,
+                        11.0,
+                        12.0,
+                        13.0,
+                        14.0,
+                        15.0,
+                        16.0,
+                        17.0,
+                        18.0,
+                    ],
+                },
+            ),
+            indexes=["index_x", "index_y"],
+        )
         expected_evset = event_set(
             timestamps=[1.0, 2.0, 3.0, 1.1, 2.1, 3.1, 1.2, 2.2, 3.2],
             features={
@@ -153,7 +179,11 @@ class DataFrameToEventTest(absltest.TestCase):
         df = pl.DataFrame(
             {
                 "product_id": [666964, 666964, 574016],
-                "timestamp": [np.datetime64("2022-01-01"), np.datetime64("2022-01-02"), np.datetime64("2022-01-03")],
+                "timestamp": [
+                    np.datetime64("2022-01-01"),
+                    np.datetime64("2022-01-02"),
+                    np.datetime64("2022-01-03"),
+                ],
                 "timestamp": ["2022-01-01", "2022-01-02", "2022-01-03"],
                 "costs": [740.0, 508.0, 573.0],
             }
@@ -221,13 +251,14 @@ class DataFrameToEventTest(absltest.TestCase):
         df = pl.DataFrame(
             {
                 "product_id": [666964, 666964, 574016],
-                "timestamp": [datetime.datetime.strptime("2022-01-01", "%Y-%m-%d"),
-                 datetime.datetime.strptime("2022-01-02", "%Y-%m-%d"),
-                 datetime.datetime.strptime("2022-01-03", "%Y-%m-%d"),],
+                "timestamp": [
+                    datetime.datetime.strptime("2022-01-01", "%Y-%m-%d"),
+                    datetime.datetime.strptime("2022-01-02", "%Y-%m-%d"),
+                    datetime.datetime.strptime("2022-01-03", "%Y-%m-%d"),
+                ],
                 "costs": [740.0, 508.0, 573.0],
             }
         )
-
 
         expected_evset = event_set(
             timestamps=[1640995200, 1641081600, 1641168000],
@@ -312,7 +343,6 @@ class DataFrameToEventTest(absltest.TestCase):
             {
                 "product_id": [666964, 666964, 574016],
                 "costs": ["2022-01-01", "2022-01-02", "2022-01-03"],
-
                 "timestamp": [740.0, 508.0, 573.0],
             }
         )
@@ -398,12 +428,14 @@ class DataFrameToEventTest(absltest.TestCase):
             indexes=["x", "y"],
         )
 
-        expected_df = pl.DataFrame({
-            "x": ["X1", "X1", "X1", "X2", "X2", "X2", "X2", "X2", "X2"],
-            "y": ["Y1", "Y1", "Y1", "Y1", "Y1", "Y1", "Y2", "Y2", "Y2"],
-            "sma_a": [10.0, 10.5, 11.0, 13.0, 13.5, 14.0, 16.0, 16.5, 17.0],
-            "timestamp": [1.0, 2.0, 3.0, 1.1, 2.1, 3.1, 1.2, 2.2, 3.2]
-        })
+        expected_df = pl.DataFrame(
+            {
+                "x": ["X1", "X1", "X1", "X2", "X2", "X2", "X2", "X2", "X2"],
+                "y": ["Y1", "Y1", "Y1", "Y1", "Y1", "Y1", "Y2", "Y2", "Y2"],
+                "sma_a": [10.0, 10.5, 11.0, 13.0, 13.5, 14.0, 16.0, 16.5, 17.0],
+                "timestamp": [1.0, 2.0, 3.0, 1.1, 2.1, 3.1, 1.2, 2.2, 3.2],
+            }
+        )
 
         df = to_polars(evset)
         assertEqualDFRandomRowOrderPolars(self, df, expected_df)
@@ -458,6 +490,7 @@ class DataFrameToEventTest(absltest.TestCase):
         df = to_polars(evset)
         self.assertTrue("timestamp" in df.columns)
         self.assertTrue(df["timestamp"].dtype == pl.Datetime)
+
 
 if __name__ == "__main__":
     absltest.main()
