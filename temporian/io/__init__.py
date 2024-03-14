@@ -21,3 +21,6 @@ from temporian.io.pandas import to_pandas
 from temporian.io.pandas import from_pandas
 
 from temporian.io.numpy import to_numpy
+
+from temporian.io.polars import to_polars
+from temporian.io.polars import from_polars
