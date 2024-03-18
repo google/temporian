@@ -18,7 +18,7 @@ py_library(
         "//temporian/core:evaluation",
         "//temporian/core:serialization",
         "//temporian/core/data:dtype",
-        "//temporian/core/data:duration",
+        "//temporian/api:duration",
         "//temporian/core/data:node",
         "//temporian/core/data:schema",
         "//temporian/core/operators:combine",

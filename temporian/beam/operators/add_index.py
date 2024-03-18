@@ -104,7 +104,7 @@ def _add_index_to_feature(
     items: Tuple[
         BeamIndexKey,
         Tuple[Iterable[FeatureItemValue], ...],
-    ]
+    ],
 ) -> Iterator[FeatureItem]:
     """Adds the new index values to all remaining feature items."""
 

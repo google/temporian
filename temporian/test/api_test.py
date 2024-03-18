@@ -198,6 +198,12 @@ class TFPTest(absltest.TestCase):
         ):
             tp.event_set(timestamps=[1, 2], features=[])
 
+    def test_duration_to_string(self):
+        self.assertEqual(
+            tp.duration.to_string(tp.duration.days(2) + tp.duration.hours(3)),
+            "2d3h",
+        )
+
 
 if __name__ == "__main__":
     absltest.main()

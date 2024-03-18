@@ -53,7 +53,7 @@ from temporian.core.data.dtype import bytes_
 from temporian.core.data.schema import Schema, FeatureSchema, IndexSchema
 
 # Durations
-from temporian.core.data import duration
+from temporian.api import duration
 
 # EventSets
 from temporian.implementation.numpy.data.event_set import EventSet, IndexData

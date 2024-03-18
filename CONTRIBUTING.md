@@ -75,7 +75,7 @@ All tests must pass for your contribution to be accepted.
 Run all tests with bazel:
 
 ```shell
-bazel test --config=linux //...:all
+bazel test --config=linux //...:all --test_output=errors
 ```
 
 You can use the Bazel test flag `--test_output=streamed` to see the test logs in realtime.

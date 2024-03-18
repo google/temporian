@@ -105,20 +105,7 @@ def before(
     assert isinstance(input, EventSetNode)
 
     if isinstance(timestamp, datetime):
-        if not input.schema.is_unix_timestamp:
-            raise ValueError(
-                "Cannot use a datetime timestamp to filter timestamps that are"
-                " not unix timestamp. Set `is_unix_timestamp=True` on the"
-                " EventSet or use a float when calling `before`"
-            )
         timestamp = duration_utils.normalize_timestamp(timestamp)
-    else:
-        if input.schema.is_unix_timestamp:
-            raise ValueError(
-                "Cannot use a float timestamp to filter unix timestamp. Set"
-                " `is_unix_timestamp=False` on the EventSet or use a float"
-                " when calling `before`"
-            )
     return filter(input, input.timestamps() < timestamp)
 
 
@@ -129,18 +116,5 @@ def after(
     assert isinstance(input, EventSetNode)
 
     if isinstance(timestamp, datetime):
-        if not input.schema.is_unix_timestamp:
-            raise ValueError(
-                "Cannot use a datetime timestamp to filter timestamps that are"
-                " not unix timestamp. Set `is_unix_timestamp=True` on the"
-                " EventSet or use a float when calling `after`"
-            )
         timestamp = duration_utils.normalize_timestamp(timestamp)
-    else:
-        if input.schema.is_unix_timestamp:
-            raise ValueError(
-                "Cannot use a float timestamp to filter unix timestamp. Set"
-                " `is_unix_timestamp=False` on the EventSet or use a float when"
-                " calling `after`"
-            )
     return filter(input, input.timestamps() > timestamp)
