@@ -29,7 +29,7 @@ Check the index on the left for a more detailed description of any symbol.
 | ------------------------------------------- | --------------------------------------------------------------------- |
 | [`tp.from_pandas()`][temporian.from_pandas] | Converts a Pandas DataFrame into an [`EventSet`][temporian.EventSet]. |
 | [`tp.to_pandas()`][temporian.to_pandas]     | Converts an [`EventSet`][temporian.EventSet] to a pandas DataFrame.   |
-| [`tp.from_polars()`]temporian.from_polars   | Converts a Polars DataFrame into an [`EventSet`][temporian.EventSet]. |
+| [`tp.from_polars()`][temporian.from_polars] | Converts a Polars DataFrame into an [`EventSet`][temporian.EventSet]. |
 | [`tp.to_polars()`][temporian.to_polars]     | Converts an [`EventSet`][temporian.EventSet] to a polars DataFrame.   |
 | [`tp.from_csv()`][temporian.from_csv]       | Reads an [`EventSet`][temporian.EventSet] from a CSV file.            |
 | [`tp.to_csv()`][temporian.to_csv]           | Saves an [`EventSet`][temporian.EventSet] to a CSV file.              |

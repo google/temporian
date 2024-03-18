@@ -12,28 +12,46 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Utilities for converting EventSets to pandas DataFrames and vice versa."""
-
+"""Utilities for converting EventSets to polars DataFrames and vice versa."""
 
 from typing import List, Optional
+
+import logging
+
 from temporian.implementation.numpy.data.event_set import EventSet
 from temporian.implementation.numpy.data.io import event_set
 from temporian.core.data.dtype import DType
 
 
+def import_pl():
+    try:
+        import polars as pl
+
+        return pl
+    except ImportError:
+        logging.warning(
+            "`tp.to_polars()` requires for Polars to be"
+            " installed. Install Polars with pip using `pip install"
+            " temporian[polars]` or `pip install polars`."
+        )
+        raise
+
+
 def from_polars(
     df: "polars.DataFrame",
+    indexes: Optional[List[str]] = None,
     timestamps: str = "timestamp",
-    indexes: Optional[
-        List[str]
-    ] = None,  # Clarification: Temporian indexes, not Polars
     name: Optional[str] = None,
     same_sampling_as: Optional[EventSet] = None,
+    allow_copy: bool = True,
 ) -> EventSet:
     """Converts a Polars DataFrame into an EventSet.
 
     See [`tp.event_set()`][temporian.event_set] for the list of supported
     timestamp and feature types.
+
+    Note:
+        The function attempts to minimize data copying but will copy if required for compatibility.
 
     Usage example:
         ```python
@@ -46,20 +64,39 @@ def from_polars(
             )
         >>> evset = tp.from_polars(df, indexes=["product_id"])
 
+        >>> df1 = pl.DataFrame(
+                {
+                    "timestamp": [1, 2, 3, 4],
+                    "id": [1, 2, 3, None],
+                    "category": [10, 20, 30, 40]
+                }
+            )
+        >>> e = tp.from_polars(df, indexes=["category"], allow_copy=False)
+        # This may raise an error if the conversion requires data copying,
+        # for example, due to the presence of `None` in the 'id' column or
+        # the need to reorder data based on 'category' indexes.
+
         ```
 
     Args:
-        df: A Polars DataFrame.
-        timestamps: Column name for timestamps.
-        indexes: Names of the columns to use as Temporian indexes. If None, the data is not indexed.
-        name: Optional name for the EventSet.
-        same_sampling_as: Ensures the new EventSet has the same sampling as this EventSet.
-
+        df: A non indexed Polars dataframe.
+        indexes: Names of the columns to use as indexes. If empty
+            (default), the data is not indexed. Only integer and string columns
+            can be used as indexes.
+        timestamps: Name of the column containing the timestamps. See
+            [`tp.event_set()`][temporian.event_set] for the list of supported
+            timestamp types.
+        name: Optional name of the EventSet. Used for debugging, and
+            graph serialization.
+        same_sampling_as: If set, the new EventSet is checked and tagged as
+            having the same sampling as `same_sampling_as`. Some operators,
+            such as [`EventSet.filter()`][temporian.EventSet.filter], require
+            their inputs to have the same sampling.
+        allow_copy: Allow memory to be copied to perform the conversion. If set
+            to False, causes conversions that are not zero-copy to fail.
     Returns:
-        An instance of EventSet.
+        An instance of the EventSet.
 
-    Note:
-        The function attempts to minimize data copying but will copy if required for compatibility.
     """
     if timestamps not in df.columns:
         raise ValueError(
@@ -67,12 +104,12 @@ def from_polars(
         )
 
     # Extract timestamps, allowing copy if necessary for compatibility
-    timestamps_array = df.get_column(timestamps).to_numpy(allow_copy=True)
+    timestamps_array = df.get_column(timestamps).to_numpy(allow_copy=allow_copy)
 
     # Prepare features, allowing copy if necessary
     feature_columns = [col for col in df.columns if col != timestamps]
     feature_dict = {
-        col: df.get_column(col).to_numpy(allow_copy=True)
+        col: df.get_column(col).to_numpy(allow_copy=allow_copy)
         for col in feature_columns
     }
 
@@ -87,9 +124,9 @@ def from_polars(
 
 def to_polars(
     evset: EventSet,
+    tp_string_to_pl_string: bool = True,
     timestamp_to_datetime: bool = True,
     timestamps: bool = True,
-    tp_string_to_pl_string: bool = True,
 ) -> "pl.DataFrame":
     """Converts an  [`EventSet`][temporian.EventSet] to a Polars DataFrame.
 
@@ -120,13 +157,13 @@ def to_polars(
         ```
 
     Args:
-        evset: Input event set.
+        evset: Input EventSet.
         timestamp_to_datetime: If true, convert epoch timestamps to Polars Date objects.
         timestamps: If true, include the timestamps as a column in the DataFrame.
         tp_string_to_pl_string: If true, cast Temporian strings to Polars Object.
 
     Returns:
-        A Polars DataFrame created from EventSet.
+        A Polars DataFrame created from the EventSet.
     """
 
     import polars as pl

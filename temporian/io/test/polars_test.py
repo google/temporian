@@ -23,8 +23,7 @@ from temporian.implementation.numpy.data.io import event_set
 from temporian.io.polars import to_polars, from_polars
 from temporian.test.utils import assertEqualDFRandomRowOrderPolars
 
-
-class DataFrameToEventTest(absltest.TestCase):
+class FromPolarsTest(absltest.TestCase):
     def test_correct(self) -> None:
         df = pl.DataFrame(
             {
@@ -175,38 +174,11 @@ class DataFrameToEventTest(absltest.TestCase):
         evset = from_polars(df, indexes=["product_id"], timestamps="timestamp")
         self.assertEqual(evset, expected_evset)
 
-    def test_npdatetime64_index(self) -> None:
-        df = pl.DataFrame(
-            {
-                "product_id": [666964, 666964, 574016],
-                "timestamp": [
-                    np.datetime64("2022-01-01"),
-                    np.datetime64("2022-01-02"),
-                    np.datetime64("2022-01-03"),
-                ],
-                "timestamp": ["2022-01-01", "2022-01-02", "2022-01-03"],
-                "costs": [740.0, 508.0, 573.0],
-            }
-        )
-        expected_evset = event_set(
-            timestamps=[1640995200, 1641081600, 1641168000],
-            features={
-                "product_id": [666964, 666964, 574016],
-                "costs": [740.0, 508.0, 573.0],
-            },
-            indexes=["product_id"],
-            is_unix_timestamp=True,
-        )
-        evset = from_polars(df, indexes=["product_id"], timestamps="timestamp")
-
-        self.assertEqual(evset, expected_evset)
-        self.assertTrue(evset.schema.is_unix_timestamp)
-
     def test_plTimestamp_index(self) -> None:
         df = pl.DataFrame(
             {
                 "product_id": [666964, 666964, 574016],
-                "timestamp": ["2022-01-01", "2022-01-02", "2022-01-03"],
+                "timestamp": pl.date_range(datetime.date(2022, 1, 1), datetime.date(2022, 1, 3), "1d", eager=True),
                 "costs": [740.0, 508.0, 573.0],
             }
         )
@@ -342,7 +314,7 @@ class DataFrameToEventTest(absltest.TestCase):
         df = pl.DataFrame(
             {
                 "product_id": [666964, 666964, 574016],
-                "costs": ["2022-01-01", "2022-01-02", "2022-01-03"],
+                "costs":  pl.date_range(datetime.date(2022, 1, 1), datetime.date(2022, 1, 3), "1d", eager=True),
                 "timestamp": [740.0, 508.0, 573.0],
             }
         )
@@ -350,7 +322,13 @@ class DataFrameToEventTest(absltest.TestCase):
             timestamps=[740.0, 508.0, 573.0],
             features={
                 "product_id": [666964, 666964, 574016],
-                "costs": ["2022-01-01", "2022-01-02", "2022-01-03"],
+                "costs": (
+                    np.array(
+                        ["2022-01-01", "2022-01-02", "2022-01-03"],
+                        dtype="datetime64[ns]",
+                    ).astype(np.float64)
+                    / 1e9
+                ),
             },
         )
         evset = from_polars(df, indexes=[], timestamps="timestamp")
@@ -376,6 +354,8 @@ class DataFrameToEventTest(absltest.TestCase):
 
         self.assertEqual(evset, expected_evset)
 
+
+class ToPolarsTest(absltest.TestCase):
     def test_evset_to_df(self):
         evset = event_set(
             timestamps=[1.0, 2.0, 3.0],
@@ -491,6 +471,12 @@ class DataFrameToEventTest(absltest.TestCase):
         self.assertTrue("timestamp" in df.columns)
         self.assertTrue(df["timestamp"].dtype == pl.Datetime)
 
+        df = to_polars(evset, timestamp_to_datetime=False)
+        self.assertTrue("timestamp" in df.columns)
+        self.assertTrue(df["timestamp"].dtype == pl.Float64)
+
+        df = to_polars(evset, timestamps=False)
+        self.assertFalse("timestamp" in df.columns)
 
 if __name__ == "__main__":
     absltest.main()
