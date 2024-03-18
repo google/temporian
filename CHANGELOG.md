@@ -4,6 +4,14 @@
 
 ### Features
 
+### Improvements
+
+### Fixes
+
+## 0.8.0
+
+### Features
+
 - Add `EventSet.moving_product()` and `EventSet.cumprod()` operators.
 - Add `to.to_numpy()`.
 - Add trigonometric functions `EventSet.arccos()`, `EventSet.arcsin()`, `EventSet.arctan()`, `EventSet.cos()`, `EventSet.sin()`, and `EventSet.tan()`.
