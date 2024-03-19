@@ -42,6 +42,7 @@ py_library(
         ":where",
         "//temporian/implementation/numpy/operators/binary:arithmetic",
         "//temporian/implementation/numpy/operators/binary:logical",
+        "//temporian/implementation/numpy/operators/binary:bitwise",
         "//temporian/implementation/numpy/operators/binary:relational",
         "//temporian/implementation/numpy/operators/calendar:day_of_month",
         "//temporian/implementation/numpy/operators/calendar:day_of_week",

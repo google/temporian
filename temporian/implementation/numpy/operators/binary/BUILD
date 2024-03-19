@@ -14,6 +14,7 @@ py_library(
         ":arithmetic",
         ":logical",
         ":relational",
+        ":bitwise",
     ],
 )
 
@@ -59,6 +60,19 @@ py_library(
 py_library(
     name = "logical",
     srcs = ["logical.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        # already_there/numpy
+        "//temporian/core/data:dtype",
+        "//temporian/core/operators/binary",
+        "//temporian/implementation/numpy:implementation_lib",
+    ],
+)
+
+py_library(
+    name = "bitwise",
+    srcs = ["bitwise.py"],
     srcs_version = "PY3",
     deps = [
         ":base",

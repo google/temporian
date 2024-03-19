@@ -35,6 +35,7 @@ from temporian.implementation.numpy.operators import rename
 from temporian.implementation.numpy.operators.binary import arithmetic
 from temporian.implementation.numpy.operators.binary import relational
 from temporian.implementation.numpy.operators.binary import logical
+from temporian.implementation.numpy.operators.binary import bitwise
 
 from temporian.implementation.numpy.operators.scalar import arithmetic_scalar
 from temporian.implementation.numpy.operators.scalar import relational_scalar

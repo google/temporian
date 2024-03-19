@@ -56,3 +56,12 @@ from temporian.core.operators.binary.logical import (
     logical_or,
     logical_xor,
 )
+
+from temporian.core.operators.binary.bitwise import (
+    BitwiseAndOperator,
+    BitwiseOrOperator,
+    BitwiseXorOperator,
+    bitwise_and,
+    bitwise_or,
+    bitwise_xor,
+)
