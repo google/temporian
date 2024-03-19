@@ -1,12 +1,6 @@
 name: coverage
 
-on:
-  # this allows for `contents: write` and `pull-requests: write` from forks
-  pull_request_target:
-
-# limit default permissions to just read-only checkouts
-permissions:
-  contents: read
+on: [push, pull_request]
 
 jobs:
   coverage:
@@ -68,14 +62,4 @@ jobs:
             const diff = pr - main;
             const report = `### Coverage report
             **Main**: ${main.toFixed(2)}% | **PR**: ${pr.toFixed(2)}% | **Diff: ${diff.toFixed(2)} ${diff >= 0 ? '✅' : '⚠️'}**`;
-            await core.summary.addRaw(report).write()
-            try {
-              github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: report
-              })
-            } catch (e) {
-              console.log("Could not post comment to pull request", e)
-            }
+            await core.summary.addRaw(report, true).write();
