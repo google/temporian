@@ -53,6 +53,7 @@ class RegisteredOperatorsTest(absltest.TestCase):
             "EQUAL_SCALAR",
             "FFT",
             "FILTER",
+            "FILTER_EMPTY_INDEX",
             "FILTER_MAX_MOVING_COUNT",
             "FLOORDIV",
             "FLOORDIV_SCALAR",

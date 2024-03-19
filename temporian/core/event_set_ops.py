@@ -2627,6 +2627,43 @@ class EventSetOperations:
 
         return filter(self, condition=condition)
 
+    def filter_empty_index(
+        self: EventSetOrNode,
+    ) -> EventSetOrNode:
+        """Filters out indexes without events.
+
+        Usage example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3, 4],
+            ...     features={
+            ...         "i1": [1, 1, 2, 2],
+            ...         "f1": [10, 11, 12, 13],
+            ...     },
+            ...     indexes=["i1"]
+            ... )
+
+            >>> filtered = a.filter(a["f1"] <= 11).filter_empty_index()
+            >>> filtered
+            indexes: [('i1', int64)]
+            features: [('f1', int64)]
+            events:
+                i1=1 (2 events):
+                    timestamps: [1. 2.]
+                    'f1': [10 11]
+            ...
+
+            ```
+
+        Returns:
+            Filtered EventSet.
+        """
+        from temporian.core.operators.filter_empty_index import (
+            filter_empty_index,
+        )
+
+        return filter_empty_index(self)
+
     def isnan(
         self: EventSetOrNode,
     ) -> EventSetOrNode:
