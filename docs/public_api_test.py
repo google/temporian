@@ -70,7 +70,7 @@ class PublicAPITest(absltest.TestCase):
     def test_public_symbols(self):
         """Asserts that the symbols exposed under tp.<> are exactly the
         ones we expect."""
-        symbols = {s for s in dir(tp) if not s.startswith("__") and s != "api"}
+        symbols = {s for s in dir(tp) if not s.startswith("__")}
         self.assertEqual(PUBLIC_API_SYMBOLS, symbols)
 
     def test_public_symbols_in_docs(self):
