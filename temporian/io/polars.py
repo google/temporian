@@ -62,21 +62,21 @@ def from_polars(
     Usage example:
         ```python
         >>> df = pl.DataFrame(
-                {
-                    "product_id": [666964, 666964, 574016, 574016],
-                    "timestamp": [1.0, 2.0, 3.0, None],
-                    "costs": [740.0, 508.0, 573.0, 573.0],
-                }
-            )
+        ...       {
+        ...            "product_id": [666964, 666964, 574016, 574016],
+        ...            "timestamp": [1.0, 2.0, 3.0, None],
+        ...            "costs": [740.0, 508.0, 573.0, 573.0],
+        ...        }
+        ...    )
         >>> evset = tp.from_polars(df, indexes=["product_id"])
 
         >>> df1 = pl.DataFrame(
-                {
-                    "timestamp": [1, 2, 3, 4],
-                    "id": [1, 2, 3, None],
-                    "category": [10, 20, 30, 40]
-                }
-            )
+        ...        {
+        ...            "timestamp": [1, 2, 3, 4],
+        ...            "id": [1, 2, 3, None],
+        ...            "category": [10, 20, 30, 40]
+        ...        }
+        ...    )
         >>> e = tp.from_polars(df, indexes=["category"], allow_copy=False)
 
         ```
