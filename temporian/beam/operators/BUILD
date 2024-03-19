@@ -26,6 +26,7 @@ py_library(
         ":select",
         ":rename",
         ":prefix",
+        ":leak",
         "//temporian/beam/operators/window:moving_count",
         "//temporian/beam/operators/window:moving_max",
         "//temporian/beam/operators/window:moving_min",
@@ -83,5 +84,18 @@ py_library(
         "//temporian/beam:typing",
         "//temporian/beam/operators:base",
         "//temporian/core/operators:prefix",
+    ],
+)
+
+
+py_library(
+    name = "leak",
+    srcs = ["leak.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/beam:implementation_lib",
+        "//temporian/beam:typing",
+        "//temporian/beam/operators:base",
+        "//temporian/core/operators:leak",
     ],
 )

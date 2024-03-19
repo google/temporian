@@ -27,3 +27,4 @@ from temporian.beam.operators import select
 from temporian.beam.operators import add_index
 from temporian.beam.operators import rename
 from temporian.beam.operators import prefix
+from temporian.beam.operators import leak
