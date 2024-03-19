@@ -23,6 +23,7 @@ from temporian.implementation.numpy.data.io import event_set
 from temporian.io.polars import to_polars, from_polars
 from temporian.test.utils import assertEqualDFRandomRowOrderPolars
 
+
 class FromPolarsTest(absltest.TestCase):
     def test_correct(self) -> None:
         df = pl.DataFrame(
@@ -178,7 +179,12 @@ class FromPolarsTest(absltest.TestCase):
         df = pl.DataFrame(
             {
                 "product_id": [666964, 666964, 574016],
-                "timestamp": pl.date_range(datetime.date(2022, 1, 1), datetime.date(2022, 1, 3), "1d", eager=True),
+                "timestamp": pl.date_range(
+                    datetime.date(2022, 1, 1),
+                    datetime.date(2022, 1, 3),
+                    "1d",
+                    eager=True,
+                ),
                 "costs": [740.0, 508.0, 573.0],
             }
         )
@@ -314,7 +320,12 @@ class FromPolarsTest(absltest.TestCase):
         df = pl.DataFrame(
             {
                 "product_id": [666964, 666964, 574016],
-                "costs":  pl.date_range(datetime.date(2022, 1, 1), datetime.date(2022, 1, 3), "1d", eager=True),
+                "costs": pl.date_range(
+                    datetime.date(2022, 1, 1),
+                    datetime.date(2022, 1, 3),
+                    "1d",
+                    eager=True,
+                ),
                 "timestamp": [740.0, 508.0, 573.0],
             }
         )
@@ -477,6 +488,7 @@ class ToPolarsTest(absltest.TestCase):
 
         df = to_polars(evset, timestamps=False)
         self.assertFalse("timestamp" in df.columns)
+
 
 if __name__ == "__main__":
     absltest.main()

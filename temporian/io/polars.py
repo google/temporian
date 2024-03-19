@@ -50,8 +50,14 @@ def from_polars(
     See [`tp.event_set()`][temporian.event_set] for the list of supported
     timestamp and feature types.
 
+    The `allow_copy` parameter is passed directly to Polars' `to_numpy` method.
+    If set to `False`, the conversion process may fail if Polars is unable to
+    perform a zero-copy conversion.Users are encouraged to refer to Polars
+    documentation on `to_numpy` for detailed information on when a
+    non-zero-copy conversion might be required.
+
     Note:
-        The function attempts to minimize data copying but will copy if required for compatibility.
+       The function attempts to minimize data copying but will copy if required for compatibility.
 
     Usage example:
         ```python
@@ -72,9 +78,6 @@ def from_polars(
                 }
             )
         >>> e = tp.from_polars(df, indexes=["category"], allow_copy=False)
-        # This may raise an error if the conversion requires data copying,
-        # for example, due to the presence of `None` in the 'id' column or
-        # the need to reorder data based on 'category' indexes.
 
         ```
 
@@ -95,7 +98,7 @@ def from_polars(
         allow_copy: Allow memory to be copied to perform the conversion. If set
             to False, causes conversions that are not zero-copy to fail.
     Returns:
-        An instance of the EventSet.
+        An EventSet.
 
     """
     if timestamps not in df.columns:
