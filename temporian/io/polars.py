@@ -61,6 +61,7 @@ def from_polars(
 
     Usage example:
         ```python
+        >>> import polars as pl
         >>> df = pl.DataFrame(
         ...       {
         ...            "product_id": [666964, 666964, 574016, 574016],
