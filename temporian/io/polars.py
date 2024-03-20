@@ -170,7 +170,7 @@ def to_polars(
         A Polars DataFrame created from the EventSet.
     """
 
-    import polars as pl
+    pl = import_pl()
 
     timestamp_key = "timestamp"
 
