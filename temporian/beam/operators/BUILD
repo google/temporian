@@ -34,6 +34,8 @@ py_library(
         ":cast",
         ":unique_timestamps",
         ":resample",
+        ":drop_index",
+        ":propagate",
         "//temporian/beam/operators/window:moving_count",
         "//temporian/beam/operators/window:moving_max",
         "//temporian/beam/operators/window:moving_min",
@@ -194,5 +196,30 @@ py_library(
         "//temporian/beam:typing",
         "//temporian/beam/operators:base",
         "//temporian/core/operators:resample",
+    ],
+)
+
+py_library(
+    name = "drop_index",
+    srcs = ["drop_index.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/beam:implementation_lib",
+        "//temporian/beam:typing",
+        "//temporian/beam/operators:base",
+        "//temporian/core/operators:drop_index",
+    ],
+)
+
+
+py_library(
+    name = "propagate",
+    srcs = ["propagate.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/beam:implementation_lib",
+        "//temporian/beam:typing",
+        "//temporian/beam/operators:base",
+        "//temporian/core/operators:propagate",
     ],
 )

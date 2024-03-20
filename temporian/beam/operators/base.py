@@ -67,7 +67,7 @@ def beam_eventset_flatmap(
     return tuple([apply(idx, item) for idx, item in enumerate(src)])
 
 
-def _extract_from_iterable(
+def extract_from_iterable(
     src: Iterable[FeatureItemValue],
 ) -> Optional[FeatureItemValue]:
     for x in src:
@@ -96,8 +96,8 @@ def beam_eventset_map_with_sampling(
         idx: int,
     ) -> Iterator[FeatureItem]:
         index, (it_feature, it_sampling) = item
-        feature = _extract_from_iterable(it_feature)
-        sampling = _extract_from_iterable(it_sampling)
+        feature = extract_from_iterable(it_feature)
+        sampling = extract_from_iterable(it_sampling)
         if sampling is not None:
             yield fn(index, feature, sampling, idx)
 

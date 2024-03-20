@@ -45,7 +45,6 @@ py_test(
     ],
 )
 
-
 py_test(
     name = "prefix_test",
     srcs = ["prefix_test.py"],
@@ -88,7 +87,6 @@ py_test(
     ],
 )
 
-
 py_test(
     name = "filter_test",
     srcs = ["filter_test.py"],
@@ -102,7 +100,6 @@ py_test(
         "//temporian/core/operators:filter",
     ],
 )
-
 
 py_test(
     name = "timestamps_test",
@@ -118,7 +115,6 @@ py_test(
     ],
 )
 
-
 py_test(
     name = "filter_empty_index_test",
     srcs = ["filter_empty_index_test.py"],
@@ -132,7 +128,6 @@ py_test(
         "//temporian/core/operators:filter_empty_index",
     ],
 )
-
 
 py_test(
     name = "cast_test",
@@ -148,7 +143,6 @@ py_test(
     ],
 )
 
-
 py_test(
     name = "unique_timestamps_test",
     srcs = ["unique_timestamps_test.py"],
@@ -163,7 +157,6 @@ py_test(
     ],
 )
 
-
 py_test(
     name = "resample_test",
     srcs = ["resample_test.py"],
@@ -175,5 +168,33 @@ py_test(
         "//temporian/implementation/numpy/data:io",
         "//temporian/beam/test:utils",
         "//temporian/core/operators:resample",
+    ],
+)
+
+py_test(
+    name = "drop_index_test",
+    srcs = ["drop_index_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
+        # already_there/google/protobuf:use_fast_cpp_protos
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/beam/test:utils",
+        "//temporian/core/operators:drop_index",
+    ],
+)
+
+py_test(
+    name = "propagate_test",
+    srcs = ["propagate_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
+        # already_there/google/protobuf:use_fast_cpp_protos
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/beam/test:utils",
+        "//temporian/core/operators:propagate",
     ],
 )

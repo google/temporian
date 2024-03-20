@@ -93,27 +93,22 @@ class _DictToTFExample(beam.DoFn):
         # Features
         for feature_schema in self._schema.features:
             src_value = dict_example[feature_schema.name]
+
             if feature_schema.dtype in [
                 DType.BOOLEAN,
                 DType.INT32,
                 DType.INT64,
             ]:
-                f(ex, feature_schema.name).int64_list.value[
-                    :
-                ] = src_value = dict_example[feature_schema.name]
+                f(ex, feature_schema.name).int64_list.value[:] = src_value
 
             elif feature_schema.dtype in [
                 DType.FLOAT32,
                 DType.FLOAT64,
             ]:
-                f(ex, feature_schema.name).float_list.value[
-                    :
-                ] = src_value = dict_example[feature_schema.name]
+                f(ex, feature_schema.name).float_list.value[:] = src_value
 
             elif feature_schema.dtype == DType.STRING:
-                f(ex, feature_schema.name).bytes_list.value[
-                    :
-                ] = src_value = dict_example[feature_schema.name]
+                f(ex, feature_schema.name).bytes_list.value[:] = src_value
 
             else:
                 raise ValueError("Non supported feature dtype")
