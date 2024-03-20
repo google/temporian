@@ -56,6 +56,17 @@ def beam_eventset_map(
     return tuple([apply(idx, item) for idx, item in enumerate(src)])
 
 
+def beam_eventset_flatmap(
+    src: BeamEventSet, name: str, fn: Callable[[FeatureItem, int], FeatureItem]
+) -> BeamEventSet:
+    """Applies a function on each feature of a Beam eventset."""
+
+    def apply(idx, item):
+        return item | f"Map on feature #{idx} {name}" >> beam.FlatMap(fn, idx)
+
+    return tuple([apply(idx, item) for idx, item in enumerate(src)])
+
+
 def _extract_from_iterable(
     src: Iterable[FeatureItemValue],
 ) -> Optional[FeatureItemValue]:
