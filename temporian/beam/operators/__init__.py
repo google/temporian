@@ -37,3 +37,4 @@ from temporian.beam.operators import unique_timestamps
 from temporian.beam.operators import resample
 from temporian.beam.operators import drop_index
 from temporian.beam.operators import propagate
+from temporian.beam.operators.scalar import scalar

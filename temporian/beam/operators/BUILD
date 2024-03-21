@@ -36,6 +36,7 @@ py_library(
         ":resample",
         ":drop_index",
         ":propagate",
+        "//temporian/beam/operators/scalar",
         "//temporian/beam/operators/window:moving_count",
         "//temporian/beam/operators/window:moving_max",
         "//temporian/beam/operators/window:moving_min",
