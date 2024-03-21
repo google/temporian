@@ -61,6 +61,7 @@ from temporian.implementation.numpy.operators import end
 from temporian.implementation.numpy.operators import enumerate
 from temporian.implementation.numpy.operators import fast_fourier_transform
 from temporian.implementation.numpy.operators import filter_moving_count
+from temporian.implementation.numpy.operators import filter_empty_index
 from temporian.implementation.numpy.operators import map
 from temporian.implementation.numpy.operators import select_index_values
 from temporian.implementation.numpy.operators import since_last
