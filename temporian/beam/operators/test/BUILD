@@ -214,3 +214,18 @@ py_test(
         "//temporian/core/operators/scalar:relational_scalar",
     ],
 )
+
+py_test(
+    name = "binary_test",
+    srcs = ["binary_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
+        # already_there/google/protobuf:use_fast_cpp_protos
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/beam/test:utils",
+        "//temporian/core/operators/binary:arithmetic",
+        "//temporian/core/operators/binary:relational",
+    ],
+)

@@ -38,3 +38,4 @@ from temporian.beam.operators import resample
 from temporian.beam.operators import drop_index
 from temporian.beam.operators import propagate
 from temporian.beam.operators.scalar import scalar
+from temporian.beam.operators.binary import binary
