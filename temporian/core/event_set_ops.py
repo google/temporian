@@ -4312,11 +4312,11 @@ class EventSetOperations:
                     (Sun-Sat) to tick at particular day of week. Can only be
                     specified if `day_of_month` is `None`.
             after_last: If True, a tick after the last timestamp is included.
-                    Useful for windows operations were you want the timestamps
+                    Useful for window operations where you want the timestamps
                     to be included in the range of the ticks.
             before_first: If True, a tick before the first timestamp is
                     included.
-                    Useful for windows operations were you want the timestamps
+                    Useful for window operations where you want the timestamps
                     to be included in the range of the ticks.
 
         Returns:
