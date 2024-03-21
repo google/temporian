@@ -85,6 +85,10 @@ class Schema:
     def is_unix_timestamp(self) -> bool:
         return self._is_unix_timestamp
 
+    @is_unix_timestamp.setter
+    def is_unix_timestamp(self, value):
+        self._is_unix_timestamp = value
+
     def feature_names(self) -> List[str]:
         return [feature.name for feature in self._features]
 

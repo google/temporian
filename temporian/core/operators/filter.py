@@ -14,6 +14,7 @@
 
 """Filter operator class and public API function definition."""
 
+import logging
 from datetime import datetime
 from typing import Optional, Union
 
@@ -98,6 +99,15 @@ def filter(
     return FilterOperator(input, condition).outputs["output"]
 
 
+def compate_datetime_to_non_unix_warning() -> str:
+    return (
+        "Comparing a python datetime with an eventset having"
+        " is_unix_timestamp=True. The datetime is converted to a unix utc"
+        " timestamps. Set is_unix_timestamp=True on the eventset to remove this"
+        " warning."
+    )
+
+
 @compile
 def before(
     input: EventSetOrNode, timestamp: Union[float, datetime]
@@ -105,6 +115,8 @@ def before(
     assert isinstance(input, EventSetNode)
 
     if isinstance(timestamp, datetime):
+        if not input.schema.is_unix_timestamp:
+            logging.warning("%s", compate_datetime_to_non_unix_warning())
         timestamp = duration_utils.normalize_timestamp(timestamp)
     return filter(input, input.timestamps() < timestamp)
 
@@ -116,5 +128,7 @@ def after(
     assert isinstance(input, EventSetNode)
 
     if isinstance(timestamp, datetime):
+        if not input.schema.is_unix_timestamp:
+            logging.warning("%s", compate_datetime_to_non_unix_warning())
         timestamp = duration_utils.normalize_timestamp(timestamp)
     return filter(input, input.timestamps() > timestamp)
