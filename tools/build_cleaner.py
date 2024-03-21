@@ -223,7 +223,7 @@ def expand_dep(dep: str, rule_dir: str) -> Tuple[str, ...]:
 
 
 def list_possible_source_of_import(
-    imp_items: Tuple[str, ...]
+    imp_items: Tuple[str, ...],
 ) -> List[Tuple[str, ...]]:
     """List the possible source file of a given import."""
 
@@ -287,7 +287,7 @@ def find_all_build_files(dir: str) -> List[Tuple[str, str]]:
 
 
 def find_source_to_rules(
-    build_file_dirs: List[Tuple[str, str]]
+    build_file_dirs: List[Tuple[str, str]],
 ) -> SourceToRule:
     """Mapping from source file to build rules."""
 

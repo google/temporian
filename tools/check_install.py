@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-""" Minimal script to test that temporian is installed and running well.
+"""Minimal script to test that temporian is installed and running well.
 
 Usage example:
     pip install -U temporian

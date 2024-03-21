@@ -108,7 +108,7 @@ def _convert_to_csv(
     item: Tuple[
         BeamIndexKey,
         Iterable[FeatureItemWithIdxValue],
-    ]
+    ],
 ) -> str:
     index, feature_blocks = item
     index_data = _bytes_to_strs(list(index))
