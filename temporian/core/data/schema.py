@@ -134,6 +134,26 @@ class Schema:
                 f"{self.feature_names} and {other.feature_names}."
             )
 
+    def to_proto(self) -> "serialization.pb.Schema":
+        """Converts the schema into a protobuf.
+
+        Usage example:
+            schema = tp.Schema(features=[("f1",int), (f2, float)])
+            proto_schema = schema.to_proto()"
+            restored_schema = tp.Schema.from_proto(proto_schema)
+        """
+        from temporian.core import serialization
+
+        return serialization._serialize_schema(self)
+
+    @classmethod
+    def from_proto(self, proto: "serialization.pb.Schema") -> "Schema":
+        """Creates a schema from a protobuf."""
+
+        from temporian.core import serialization
+
+        return serialization._unserialize_schema(proto)
+
 
 def _normalize_feature(x):
     if isinstance(x, FeatureSchema):

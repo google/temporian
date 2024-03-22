@@ -16,6 +16,9 @@ from absl.testing import absltest
 
 from temporian.core.test import utils
 from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.core.data.node import (
+    input_node_from_schema,
+)
 
 
 class EventSetNodeTest(absltest.TestCase):
@@ -25,6 +28,11 @@ class EventSetNodeTest(absltest.TestCase):
         result = node.run({node: evset})
         self.assertIsInstance(result, EventSet)
         self.assertTrue(result is evset)
+
+    def test_input_node_from_schema(self):
+        node = utils.create_input_node()
+        other_node = input_node_from_schema(node.schema)
+        self.assertEqual(node.schema, other_node.schema)
 
     def test_run_single_operator(self):
         evset = utils.create_input_event_set()
