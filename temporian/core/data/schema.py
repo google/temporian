@@ -19,6 +19,7 @@ from dataclasses import dataclass
 from typing import List, Tuple, Dict, Union
 
 from temporian.core.data.dtype import DType, IndexDType
+from google.protobuf import text_format
 
 
 @dataclass(frozen=True)
@@ -138,21 +139,48 @@ class Schema:
         """Converts the schema into a protobuf.
 
         Usage example:
+            ```
             schema = tp.Schema(features=[("f1",int), (f2, float)])
-            proto_schema = schema.to_proto()"
+            proto_schema = schema.to_proto()
             restored_schema = tp.Schema.from_proto(proto_schema)
+            ```
         """
         from temporian.core import serialization
 
         return serialization._serialize_schema(self)
 
+    def to_proto_file(self, path: str) -> None:
+        """Save the schema to a file with text protobuf format.
+
+        Usage example:
+            ```
+            schema = tp.Schema(features=[("f1",int), (f2, float)])
+            path = "/tmp/my_schema.pbtxt"
+            schema.to_proto_file(path)
+            restored_schema = tp.Schema.from_proto_file(path)
+            ```
+        """
+        proto = self.to_proto()
+        with open(path, "wb") as f:
+            f.write(text_format.MessageToBytes(proto))
+
     @classmethod
-    def from_proto(self, proto: "serialization.pb.Schema") -> "Schema":
+    def from_proto(cls, proto: "serialization.pb.Schema") -> "Schema":
         """Creates a schema from a protobuf."""
 
         from temporian.core import serialization
 
         return serialization._unserialize_schema(proto)
+
+    @classmethod
+    def from_proto_file(cls, path: str) -> "Schema":
+        """Creates a schema from a file text protobuf."""
+
+        from temporian.core import serialization
+
+        with open(path, "rb") as f:
+            proto = text_format.Parse(f.read(), serialization.pb.Schema())
+        return Schema.from_proto(proto)
 
 
 def _normalize_feature(x):
