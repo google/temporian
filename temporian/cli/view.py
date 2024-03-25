@@ -561,7 +561,7 @@ class Viewer:
                     self.last_mouse_position.x, loc
                 )
                 diff_seconds = mouse_timestamp - last_mouse_timestamp
-                diff_str = str(datetime.timedelta(abs(diff_seconds)))
+                diff_str = str(datetime.timedelta(seconds=abs(diff_seconds)))
 
                 low_x = min(self.mouse_position.x, self.last_mouse_position.x)
                 high_x = max(self.mouse_position.x, self.last_mouse_position.x)
