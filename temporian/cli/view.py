@@ -144,7 +144,9 @@ class Viewer:
         (158, 218, 229),
     ]
 
-    def __init__(self, evtsets: List[tp.EventSet], args):
+    def __init__(
+        self, evtsets: List[tp.EventSet], args, create_ui: bool = True
+    ):
         # Print the available evensets.
         for evtsets_idx, evtset in enumerate(evtsets):
             print(f"Event-set #{evtsets_idx}:\n{evtset}")
@@ -152,9 +154,11 @@ class Viewer:
         self.font_size = args.font_size
         self.evtsets = evtsets
         self.compute_statistics()
-        self.create_ui()
+        if create_ui:
+            self.create_ui()
         self.select_display(0, ".*")  # Display the first index value
-        self.refresh_selection()
+        if create_ui:
+            self.refresh_selection()
 
     def refresh_selection(self):
         """Updates display after a change to the selected index or features.
@@ -249,6 +253,15 @@ class Viewer:
         if is_empty:
             min_time = 0
             max_time = 100
+        else:
+            # Add margin
+            if min_time == max_time:
+                min_time -= 1
+                max_time += 1
+            else:
+                margin = (max_time - min_time) * 0.02
+                min_time -= margin
+                max_time += margin
 
         self.total_time = TimeSegment(min_time, max_time)
         self.display_time = TimeSegment(min_time, max_time)
