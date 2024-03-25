@@ -560,9 +560,8 @@ class Viewer:
                 last_mouse_timestamp = self.x_screen_to_timestamp(
                     self.last_mouse_position.x, loc
                 )
-                diff = datetime.timedelta(
-                    seconds=mouse_timestamp - last_mouse_timestamp
-                )
+                diff_seconds = mouse_timestamp - last_mouse_timestamp
+                diff_str = str(datetime.timedelta(abs(diff_seconds)))
 
                 low_x = min(self.mouse_position.x, self.last_mouse_position.x)
                 high_x = max(self.mouse_position.x, self.last_mouse_position.x)
@@ -582,7 +581,7 @@ class Viewer:
                         / 2,
                         self.last_mouse_position.y + 3,
                     ),
-                    f"length: {diff}",
+                    f"length: {diff_str}",
                     anchor="mt",
                     fill="red",
                     font_size=self.font_size,
