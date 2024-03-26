@@ -176,8 +176,10 @@ class EventSetNode(EventSetOperations):
 
 
 def input_node(
-    features: List[Tuple[str, DType]],
-    indexes: Optional[List[Tuple[str, IndexDType]]] = None,
+    features: Union[List[FeatureSchema], List[Tuple[str, DType]]],
+    indexes: Optional[
+        Union[List[IndexSchema], List[Tuple[str, IndexDType]]]
+    ] = None,
     is_unix_timestamp: bool = False,
     same_sampling_as: Optional[EventSetNode] = None,
     name: Optional[str] = None,
@@ -243,6 +245,43 @@ def input_node(
             name=name,
             creator=None,
         )
+
+
+def input_node_from_schema(
+    schema: Schema,
+    same_sampling_as: Optional[EventSetNode] = None,
+    name: Optional[str] = None,
+) -> EventSetNode:
+    """Creates an input [`EventSetNode`][temporian.EventSetNode] from a schema.
+
+    Usage example:
+
+        ```python
+        >>> # Create two nodes with the same schema.
+        >>> a = tp.input_node(features=[("f1", tp.float64), ("f2", tp.str_)])
+        >>> b = tp.input_node_from_schema(a.schema)
+
+        ```
+
+    Args:
+        schema: Schema of the node.
+        same_sampling_as: If set, the created EventSetNode is guaranteed to have the
+            same sampling as same_sampling_as`. In this case, `indexes` and
+            `is_unix_timestamp` should not be provided. Some operators require
+            for input EventSetNodes to have the same sampling.
+        name: Name for the EventSetNode.
+
+    Returns:
+        EventSetNode with the given specifications.
+    """
+
+    return input_node(
+        features=schema.features,
+        indexes=schema.indexes,
+        is_unix_timestamp=schema.is_unix_timestamp,
+        same_sampling_as=same_sampling_as,
+        name=name,
+    )
 
 
 @dataclass

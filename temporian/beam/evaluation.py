@@ -137,6 +137,14 @@ def run_multi_io(
 
     data = {**inputs}
 
+    # Check that operators implementations are available
+    needed_operators = set()
+    for step in schedule.steps:
+        needed_operators.add(step.op.definition.key)
+    implementation_lib.check_operators_implementations_are_available(
+        needed_operators
+    )
+
     num_steps = len(schedule.steps)
     for step_idx, step in enumerate(schedule.steps):
         operator_def = step.op.definition

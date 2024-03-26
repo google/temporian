@@ -30,6 +30,7 @@ PUBLIC_API_SYMBOLS = {
     "has_leak",
     "event_set",
     "input_node",
+    "input_node_from_schema",
     "plot",
     "compile",
     "config",

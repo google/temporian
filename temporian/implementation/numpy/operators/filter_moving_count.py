@@ -45,7 +45,7 @@ class FilterMaxMovingCountNumpyImplementation(OperatorImplementation):
 
         # Fill output EventSet's data
         for index_key, index_data in input.data.items():
-            dst_timestamps = operators_cc.filter_moving_count(
+            sampling_idx = operators_cc.filter_moving_count(
                 index_data.timestamps,
                 window_length=window_length,
             )
@@ -53,8 +53,8 @@ class FilterMaxMovingCountNumpyImplementation(OperatorImplementation):
             output_evset.set_index_value(
                 index_key,
                 IndexData(
-                    features=[],
-                    timestamps=dst_timestamps,
+                    features=[f[sampling_idx] for f in index_data.features],
+                    timestamps=index_data.timestamps[sampling_idx],
                     schema=output_schema,
                 ),
             )

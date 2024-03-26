@@ -27,3 +27,16 @@ py_test(
         "//temporian/core/data:dtype",
     ],
 )
+
+
+py_test(
+    name = "schema_test",
+    srcs = ["schema_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
+        "//temporian/core/data:schema",
+        "//temporian/core:serialization",
+    ],
+)
