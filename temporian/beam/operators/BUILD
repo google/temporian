@@ -36,6 +36,8 @@ py_library(
         ":resample",
         ":drop_index",
         ":propagate",
+        ":lag",
+        ":filter_moving_count",
         "//temporian/beam/operators/scalar",
         "//temporian/beam/operators/binary",
         "//temporian/beam/operators/window:moving_count",
@@ -223,5 +225,29 @@ py_library(
         "//temporian/beam:typing",
         "//temporian/beam/operators:base",
         "//temporian/core/operators:propagate",
+    ],
+)
+
+py_library(
+    name = "lag",
+    srcs = ["lag.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/beam:implementation_lib",
+        "//temporian/beam:typing",
+        "//temporian/beam/operators:base",
+        "//temporian/core/operators:lag",
+    ],
+)
+
+py_library(
+    name = "filter_moving_count",
+    srcs = ["filter_moving_count.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/beam:implementation_lib",
+        "//temporian/beam:typing",
+        "//temporian/beam/operators:base",
+        "//temporian/core/operators:filter_moving_count",
     ],
 )

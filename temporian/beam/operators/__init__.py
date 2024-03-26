@@ -39,3 +39,5 @@ from temporian.beam.operators import drop_index
 from temporian.beam.operators import propagate
 from temporian.beam.operators.scalar import scalar
 from temporian.beam.operators.binary import binary
+from temporian.beam.operators import filter_moving_count
+from temporian.beam.operators import lag
