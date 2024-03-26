@@ -42,7 +42,7 @@ jobs:
           cache: poetry
 
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: poetry install --no-interaction --extras polars
 
       - name: Run coverage
         id: coverage
