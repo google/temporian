@@ -12,7 +12,7 @@
 namespace {
 namespace py = pybind11;
 
-py::array_t<double> filter_moving_count(
+py::array_t<Idx> filter_moving_count(
     const py::array_t<double> &event_timestamps, const double window_length) {
   // Input size
   const Idx n_event = event_timestamps.shape(0);
@@ -20,7 +20,7 @@ py::array_t<double> filter_moving_count(
   // Access raw input / output data
   auto v_event = event_timestamps.unchecked<1>();
 
-  std::vector<double> output;
+  std::vector<Idx> output;
 
   // Index of the last emitted event. If -1, no event was emitted so far.
   Idx last_emitted_idx = -1;
@@ -31,7 +31,7 @@ py::array_t<double> filter_moving_count(
         (t - v_event[last_emitted_idx]) >= window_length) {
       // Emitting event.
       last_emitted_idx = event_idx;
-      output.push_back(t);
+      output.push_back(event_idx);
     }
   }
 

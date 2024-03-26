@@ -61,6 +61,16 @@ class FilterMovingCountTest(parameterized.TestCase):
             self, result, expected_output, check_sampling=False
         )
 
+    def test_with_feature(
+        self,
+    ):
+        evset = event_set([1, 2, 4], {"f": [10, 11, 14]})
+        expected_output = event_set([1, 4], {"f": [10, 14]})
+        result = evset.filter_moving_count(window_length=1.5)
+        assertOperatorResult(
+            self, result, expected_output, check_sampling=False
+        )
+
 
 if __name__ == "__main__":
     absltest.main()
