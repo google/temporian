@@ -7,7 +7,7 @@ import pandas as pd
 from numpy.testing import assert_array_equal
 from datetime import datetime
 
-from temporian.implementation.numpy.data.io import event_set
+from temporian.implementation.numpy.data.io import event_set, from_indexed_dicts
 from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.core.data.schema import Schema
 from temporian.core.data.dtype import DType
@@ -198,6 +198,39 @@ class IOTest(absltest.TestCase):
                     "y": {1, 2},
                 },
             )
+
+    def test_from_indexed_dicts(self):
+        evset = from_indexed_dicts(
+            [
+                (
+                    {"i1": 1, "i2": "A"},
+                    {"timestamp": [1, 2], "f1": [10, 11], "f2": ["X", "Y"]},
+                ),
+                (
+                    {"i1": 1, "i2": "B"},
+                    {"timestamp": [3, 4], "f1": [12, 13], "f2": ["X", "X"]},
+                ),
+                (
+                    {"i1": 2, "i2": "A"},
+                    {"timestamp": [5, 6], "f1": [14, 15], "f2": ["Y", "Y"]},
+                ),
+                (
+                    {"i1": 2, "i2": "B"},
+                    {"timestamp": [7, 8], "f1": [16, 17], "f2": ["Y", "Z"]},
+                ),
+            ]
+        )
+        expected = event_set(
+            timestamps=[1, 2, 3, 4, 5, 6, 7, 8],
+            features={
+                "f1": [10, 11, 12, 13, 14, 15, 16, 17],
+                "f2": ["X", "Y", "X", "X", "Y", "Y", "Y", "Z"],
+                "i1": [1, 1, 1, 1, 2, 2, 2, 2],
+                "i2": ["A", "A", "B", "B", "A", "A", "B", "B"],
+            },
+            indexes=["i1", "i2"],
+        )
+        self.assertEqual(evset, expected)
 
 
 if __name__ == "__main__":
