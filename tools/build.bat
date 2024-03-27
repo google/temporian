@@ -13,7 +13,6 @@ cls
 setlocal
 
 set TEMPORIAN_VERSION=0.8.1
-
 set BAZEL=bazel.exe
 :: You can pass BAZEL flags here e.g. set BAZEL=bazel.exe --output_user_root=C:\src\tmp_bazel
 
@@ -37,7 +36,10 @@ exit /b %errorlevel%
 :: Runs the full build+test+pip for a specific version of python.
 :End2End
 set PYTHON_VERSION=%~1
-set PYTHON_DIR=C:/Python%PYTHON_VERSION%
+:: FIXME
+:: GA python path: C:\hostedtoolcache\windows\Python\3.9.13\x64\python.exe
+:: set PYTHON_DIR=C:/Python%PYTHON_VERSION%
+set PYTHON_DIR=C:/hostedtoolcache/windows/Python/3.9.13/x64
 set PYTHON=%PYTHON_DIR%/python.exe
 set PYTHON3_BIN_PATH=%PYTHON%
 set PYTHON3_LIB_PATH=%PYTHON_DIR%/Lib
