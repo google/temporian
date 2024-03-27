@@ -181,14 +181,14 @@ def _list_index_values(
     """Lists all the index values to plot."""
 
     flat_indexes = set(normalize_index_key_list(indexes, None))
-    index_values = []
+    index_values = set()
     for evtset in _unroll_evsets(evsets):
         for index_value in evtset.data:
             if indexes is None or index_value in flat_indexes:
-                index_values.append(index_value)
+                index_values.add(index_value)
                 if len(index_values) >= max_values:
-                    return index_values
-    return index_values
+                    return list(index_values)
+    return list(index_values)
 
 
 def plot(
