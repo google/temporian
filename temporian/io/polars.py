@@ -65,8 +65,8 @@ def from_polars(
         >>> df = pl.DataFrame(
         ...       {
         ...            "product_id": [666964, 666964, 574016, 574016],
-        ...            "timestamp": [1.0, 2.0, 3.0, None],
-        ...            "costs": [740.0, 508.0, 573.0, 573.0],
+        ...            "timestamp": [1.0, 2.0, 3.0, 4.0],
+        ...            "costs": [740.0, 508.0, 573.0, None],
         ...        }
         ...    )
         >>> evset = tp.from_polars(df, indexes=["product_id"])
@@ -78,7 +78,8 @@ def from_polars(
         ...            "category": [10, 20, 30, 40]
         ...        }
         ...    )
-        >>> e = tp.from_polars(df, indexes=["category"], allow_copy=False)
+        >>> evset1 = tp.from_polars(df1, indexes=["category"], allow_copy=True)
+        # allow_copy=False will result in zero_copy error for above event set.
 
         ```
 
