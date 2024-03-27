@@ -6,7 +6,12 @@
 
 ### Improvements
 
+- Added `before_first` and `after_last` parameters to `EventSet.tick` and `EventSet.tick_calendar`
+
 ### Fixes
+
+- Fixed a bug in `EventSet.tick_calendar` where it would miss the first tick under certain conditions
+- Fixed a bug in `EventSet.tick` where it would miss the last tick under certain conditions
 
 ## 0.8.1
 

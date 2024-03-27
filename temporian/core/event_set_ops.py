@@ -4087,7 +4087,11 @@ class EventSetOperations:
         return since_last(self, steps=steps, sampling=sampling)
 
     def tick(
-        self: EventSetOrNode, interval: Duration, align: bool = True
+        self: EventSetOrNode,
+        interval: Duration,
+        align: bool = True,
+        after_last: bool = True,
+        before_first: bool = False,
     ) -> EventSetOrNode:
         """Generates timestamps at regular intervals in the range of a guide
         [`EventSet`][temporian.EventSet].
@@ -4098,7 +4102,7 @@ class EventSetOperations:
             >>> b = a.tick(interval=tp.duration.seconds(3), align=True)
             >>> b
             indexes: ...
-                    timestamps: [ 6. 9. 12. 15.]
+                    timestamps: [ 6. 9. 12. 15. 18.]
             ...
 
             ```
@@ -4109,24 +4113,53 @@ class EventSetOperations:
             >>> b = a.tick(interval=tp.duration.seconds(3), align=False)
             >>> b
             indexes: ...
-                    timestamps: [ 5. 8. 11. 14.]
+                    timestamps: [ 5. 8. 11. 14. 17.]
             ...
 
             ```
 
+        Example with before_first:
+            ```python
+            >>> a = tp.event_set(timestamps=[5, 9, 16])
+            >>> b = a.tick(interval=tp.duration.seconds(3), align=True, before_first=True)
+            >>> b
+            indexes: ...
+                    timestamps: [ 3. 6. 9. 12. 15. 18.]
+            ...
+
+            ```
+
+        Example without after_last:
+            ```python
+            >>> a = tp.event_set(timestamps=[5, 9, 16])
+            >>> b = a.tick(interval=tp.duration.seconds(3), align=True, after_last=False)
+            >>> b
+            indexes: ...
+                    timestamps: [ 6. 9. 12. 15.]
+            ...
+
+            ```
         Args:
             interval: Tick interval.
             align: If false, the first tick is generated at the first timestamp
                 (similar to [`EventSet.begin()`][temporian.EventSet.begin]).
                 If true (default), ticks are generated on timestamps that are
                 multiple of `interval`.
+            after_last: If True, a tick after the last timestamp is included.
+            before_first: If True, a tick before the first timestamp is included.
 
         Returns:
             A feature-less EventSet with regular timestamps.
         """
         from temporian.core.operators.tick import tick
 
-        return tick(self, interval=interval, align=align)
+        return tick(
+            self,
+            interval=interval,
+            align=align,
+            after_last=after_last,
+            before_first=before_first,
+        )
 
     def tick_calendar(
         self: EventSetOrNode,
@@ -4136,6 +4169,8 @@ class EventSetOperations:
         mday: Optional[Union[int, Literal["*"]]] = None,
         month: Optional[Union[int, Literal["*"]]] = None,
         wday: Optional[Union[int, Literal["*"]]] = None,
+        after_last: bool = True,
+        before_first: bool = False,
     ) -> EventSetOrNode:
         """Generates events periodically at fixed times or dates e.g. each month.
 
@@ -4165,7 +4200,7 @@ class EventSetOperations:
             >>> b
             indexes: ...
             events:
-                (365 events):
+                (366 events):
                     timestamps: [...]
             ...
 
@@ -4175,7 +4210,7 @@ class EventSetOperations:
             >>> tp.glue(b.calendar_hour(), b.calendar_minute())
             indexes: ...
             events:
-                (365 events):
+                (366 events):
                     timestamps: [...]
                     'calendar_hour': [2 2 2 ... 2 2 2]
                     'calendar_minute': [30 30 30 ... 30 30 30]
@@ -4187,7 +4222,7 @@ class EventSetOperations:
             >>> b.calendar_day_of_month()
             indexes: ...
             events:
-                (12 events):
+                (13 events):
                     timestamps: [...]
                     'calendar_day_of_month': [5 5 5 ... 5 5 5]
             ...
@@ -4199,10 +4234,10 @@ class EventSetOperations:
             >>> tp.glue(b.calendar_day_of_month(), b.calendar_month())
             indexes: ...
             events:
-                (2 events):
+                (3 events):
                     timestamps: [...]
-                    'calendar_day_of_month': [1 1]
-                    'calendar_month': [2 2]
+                    'calendar_day_of_month': [1 1 1]
+                    'calendar_month': [2 2 2]
             ...
 
             >>> # Every second in the period  (2 hours -> 7200 seconds)
@@ -4223,7 +4258,7 @@ class EventSetOperations:
             >>> b
             indexes: ...
             events:
-                (120 events):
+                (121 events):
                     timestamps: [...]
             ...
 
@@ -4233,6 +4268,30 @@ class EventSetOperations:
                 ...
             ValueError: Can't set argument to None because previous and
             following arguments were specified. Set to '*' or an integer ...
+
+            >>> # not after_last
+            >>> a = tp.event_set(timestamps=["2020-02-01", "2020-04-01"])
+            >>> b = a.tick_calendar(mday=10, after_last=False)
+            >>> tp.glue(b.calendar_day_of_month(), b.calendar_month())
+            indexes: ...
+            events:
+                (2 events):
+                    timestamps: [...]
+                    'calendar_day_of_month': [10 10]
+                    'calendar_month': [2 3]
+            ...
+
+            >>> # before_first
+            >>> a = tp.event_set(timestamps=["2020-02-01", "2020-04-01"])
+            >>> b = a.tick_calendar(mday=10, before_first=True)
+            >>> tp.glue(b.calendar_day_of_month(), b.calendar_month())
+            indexes: ...
+            events:
+                (4 events):
+                    timestamps: [...]
+                    'calendar_day_of_month': [10 10 10 10]
+                    'calendar_month': [1 2 3 4]
+            ...
 
             ```
 
@@ -4252,6 +4311,13 @@ class EventSetOperations:
             wday: '*' (any day), None (auto) or number in range `[0-6]`
                     (Sun-Sat) to tick at particular day of week. Can only be
                     specified if `day_of_month` is `None`.
+            after_last: If True, a tick after the last timestamp is included.
+                    Useful for window operations where you want the timestamps
+                    to be included in the range of the ticks.
+            before_first: If True, a tick before the first timestamp is
+                    included.
+                    Useful for window operations where you want the timestamps
+                    to be included in the range of the ticks.
 
         Returns:
             A feature-less EventSet with timestamps at specified interval.
@@ -4266,6 +4332,8 @@ class EventSetOperations:
             mday=mday,
             month=month,
             wday=wday,
+            after_last=after_last,
+            before_first=before_first,
         )
 
     def timestamps(self: EventSetOrNode) -> EventSetOrNode:
