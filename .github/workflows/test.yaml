@@ -35,7 +35,7 @@ jobs:
           cache: poetry
 
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: poetry install --no-interaction --extras polars
 
       - name: Run tests
         run: poetry run bazel test //temporian/...:all //docs/...:all //tools/...:all --test_output=errors --compilation_mode=dbg --config=linux
