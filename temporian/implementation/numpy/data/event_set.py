@@ -136,7 +136,7 @@ class IndexData:
         if not isinstance(other, IndexData):
             return False
 
-        if not np.array_equal(self.timestamps, other.timestamps):
+        if not np.allclose(self.timestamps, other.timestamps):
             return False
 
         for f1, f2 in zip(self.features, other.features):
