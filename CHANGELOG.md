@@ -10,6 +10,9 @@
 
 ### Fixes
 
+- Fixed a bug in `EventSet.tick_calendar` where it would miss the first tick under certain conditions
+- Fixed a bug in `EventSet.tick` where it would miss the last tick under certain conditions
+
 ## 0.8.1
 
 Adding missing wheels for macos, no changes to the library
@@ -40,8 +43,6 @@ Adding missing wheels for macos, no changes to the library
 ### Fixes
 
 - Fixed a bug with `EventSet.tick_calendar` and daylight savings time.
-- Fixed a bug in `EventSet.tick_calendar` where it would miss the first tick under certain conditions
-- Fixed a bug in `EventSet.tick` where it would miss the last tick under certain conditions
 - Fixed a bug with calendar operations and daylight savings time.
 
 ### Thanks
