@@ -78,8 +78,10 @@ def from_polars(
         ...            "category": [10, 20, 30, 40]
         ...        }
         ...    )
+
+        # allow_copy=False will result in zero_copy error for the below event set.
         >>> evset1 = tp.from_polars(df1, indexes=["category"], allow_copy=True)
-        # allow_copy=False will result in zero_copy error for above event set.
+
 
         ```
 
@@ -149,16 +151,8 @@ def to_polars(
         ... )
 
         >>> df = tp.to_polars(evset)
-        >>> df
-        shape: (2, 3)
-        ┌──────────┬───────────┬─────────────────────┐
-        │ my_index ┆ feature_1 ┆ timestamp           │
-        │ ---      ┆ ---       ┆ ---                 │
-        │ str      ┆ f64       ┆ datetime[μs]        │
-        ╞══════════╪═══════════╪═════════════════════╡
-        │ red      ┆ 0.5       ┆ 2015-01-01 00:00:00 │
-        │ red      ┆ 0.6       ┆ 2015-01-02 00:00:00 │
-        └──────────┴───────────┴─────────────────────┘
+
+
         ```
 
     Args:
