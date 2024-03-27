@@ -41,8 +41,7 @@ matplotlib = "^3.7.1"
 
 # Extras (keep versions in sync with dev deps)
 apache-beam = { version = "^2.48.0", optional = true }
-tensorflow = { version = "^2.12.0", optional = true }
-tensorflow-io-gcs-filesystem = { version = "0.34.0", optional = true }
+tensorflow = {version = ">=2.12.0,<2.16", optional = true}
 polars = { version = "^0.20.15", optional = true }
 
 [tool.poetry.group.dev.dependencies]
@@ -69,8 +68,9 @@ apache-beam = "^2.48.0"
 pillow = ">=9.5,<11.0"
 cairosvg = "^2.7.0"
 colorama = "^0.4.6"
-tensorflow = "^2.12.0"
-tensorflow-io-gcs-filesystem = "0.34.0"
+tensorflow = ">=2.13.0,<2.16"
+# limit this package because versions after 0.35 fail on python 3.8
+tensorflow-io-gcs-filesystem = ">=0.33.0,<0.35"
 selenium = "^4.11.2"
 coverage = "^7.3.1"
 mdx-truly-sane-lists = "^1.3"
