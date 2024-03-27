@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "temporian"
-version = "0.8.0"
+version = "0.8.1"
 description = "Temporian is a Python package for feature engineering of temporal data, focusing on preventing common modeling errors and providing a simple and powerful API, a first-class iterative development experience, and efficient and well-tested implementations of common and not-so-common temporal data preprocessing functions."
 authors = [
     "Mathieu Guillame-Bert, Braulio Ríos, Guillermo Etchebarne, Ian Spektor, Richard Stotz <gbm@google.com>",
