@@ -217,6 +217,20 @@ class TFPTest(absltest.TestCase):
             "2d3h",
         )
 
+    def test_schema_to_from_proto(self):
+        a = tp.Schema(features=[("f1", tp.int32), ("f2", tp.float64)])
+        p = a.to_proto()
+        b = tp.Schema.from_proto(p)
+        self.assertEqual(a, b)
+
+    def test_schema_to_from_proto_file(self):
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "schema.pbtxt")
+            a = tp.Schema(features=[("f1", tp.int32), ("f2", tp.float64)])
+            a.to_proto_file(path)
+            b = tp.Schema.from_proto_file(path)
+            self.assertEqual(a, b)
+
 
 if __name__ == "__main__":
     absltest.main()

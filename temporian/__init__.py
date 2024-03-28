@@ -39,7 +39,7 @@ del _impls
 
 # EventSetNodes
 from temporian.core.data.node import EventSetNode
-from temporian.core.data.node import input_node
+from temporian.core.data.node import input_node, input_node_from_schema
 
 # Dtypes
 from temporian.core.data.dtype import float64

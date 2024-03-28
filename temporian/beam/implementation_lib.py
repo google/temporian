@@ -14,12 +14,24 @@
 
 """Registering mechanism for operator implementation classes."""
 
-from typing import Any, Dict
+from typing import Any, Dict, Set
 
 _OPERATOR_IMPLEMENTATIONS = {}
 
 # TODO: Create a "registration" module to handle in-process and beam operator
 # registration.
+
+
+def check_operators_implementations_are_available(needed: Set[str]):
+    """Checks if operator implementations are available."""
+    missing = set(needed) - set(_OPERATOR_IMPLEMENTATIONS.keys())
+    if missing:
+        raise ValueError(
+            f"Unknown operator implementations '{missing}' for Beam backend. It"
+            " seems this operator is only available for the in-process"
+            " Temporian backend. Available Beam operator implementations are:"
+            f" {list(_OPERATOR_IMPLEMENTATIONS.keys())}."
+        )
 
 
 def register_operator_implementation(
