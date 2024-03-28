@@ -128,7 +128,7 @@ def to_pandas(
         ```
 
     Args:
-        evset: Input event set.
+        evset: Input EventSet.
         tp_string_to_pd_string: If true, cast Temporian strings (equivalent to
             np.string_ or np.bytes) to Pandas strings (equivalent to np.str_).
         timestamp_to_datetime: If true, cast Temporian timestamps to datetime64
