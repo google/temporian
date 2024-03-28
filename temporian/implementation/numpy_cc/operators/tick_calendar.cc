@@ -53,7 +53,11 @@ py::array_t<double> tick_calendar(
 
               // Valid date
               if (cur_time_or.has_value()) {
-                const auto cur_time = cur_time_or.value();
+                // NOTE: std:optional.value() fails to build on github runner
+                // for arm64 macos although this function is on the
+                // c++17 standard.
+                // This alternative way to access the value works correctly.
+                const auto cur_time = *cur_time_or;
 
                 // Finish condition
                 if (cur_time.seconds_since_epoch > end_t) {

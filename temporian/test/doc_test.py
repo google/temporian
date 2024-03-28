@@ -19,6 +19,7 @@ from typing import List
 
 import numpy as np
 import pandas as pd
+import polars as pl
 from absl.testing import absltest
 
 import temporian as tp
@@ -62,6 +63,7 @@ class DocTest(absltest.TestCase):
                         globs={
                             "np": np,
                             "pd": pd,
+                            "pl": pl,
                             "tp": tp,
                             "tmp_dir": tmp_dir,
                         },

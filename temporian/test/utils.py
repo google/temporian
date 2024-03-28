@@ -134,6 +134,27 @@ def assertEqualDFRandomRowOrder(
     )
 
 
+def assertEqualDFRandomRowOrderPolars(
+    test: absltest.TestCase, real: "pl.DataFrame", expected: "pl.DataFrame"
+):
+    list_real = real.to_dicts()
+    list_expected = expected.to_dicts()
+
+    sorted_real = sorted(list_real, key=lambda x: str(x))
+    sorted_expected = sorted(list_expected, key=lambda x: str(x))
+
+    test.assertEqual(
+        sorted_real,
+        sorted_expected,
+        (
+            "\n==========\nREAL:\n==========\n"
+            f"{real}"
+            "\n==========\nEXPECTED:\n==========\n"
+            f"{expected}"
+        ),
+    )
+
+
 class SetTimezone:
     def __init__(self, timezone: str = "America/Montevideo"):
         self._tz = timezone

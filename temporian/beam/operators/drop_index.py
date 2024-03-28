@@ -64,14 +64,17 @@ class DropIndexBeamImplementation(BeamOperatorImplementation):
             for item in items:
                 _, (item_timestamps, item_values) = item
                 all_timestamps.append(item_timestamps)
-                all_values.append(item_values)
                 if item_values is None:
                     values_are_none = True
+                else:
+                    all_values.append(item_values)
 
             aggregated_timestamps = np.concatenate(all_timestamps)
             sorted_idxs = np.argsort(aggregated_timestamps, kind="mergesort")
             new_timestamps = aggregated_timestamps[sorted_idxs]
             if values_are_none:
+                # Note: All the values are expected to be None.
+                assert len(all_values) == 0
                 new_features = None
             else:
                 new_features = np.concatenate(all_values)[sorted_idxs]
@@ -137,6 +140,11 @@ class DropIndexBeamImplementation(BeamOperatorImplementation):
             )
 
         if self.operator.keep:
+            # This operation converts some of the index values into feature
+            # values. group_by_new_index contains the different channels for the
+            # different input features. This operation does not need/use input
+            # feature values, only the index values. So we take any feature
+            # channel (e.g. the first one) and extract the index from it.
             new_features_output = tuple(
                 group_by_new_index[0]
                 | f"Create index feature for src index #{src_index_idx} {self.operator}"

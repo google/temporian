@@ -25,7 +25,7 @@
 # from temporian.module import submodule as _submodule
 # del _submodule
 
-__version__ = "0.8.0"
+__version__ = "0.8.1"
 
 # Register all operator implementations
 from temporian.implementation.numpy import operators as _impls
@@ -78,6 +78,8 @@ from temporian.io.numpy import to_numpy
 from temporian.io.pandas import from_pandas
 from temporian.io.parquet import from_parquet
 from temporian.io.parquet import to_parquet
+from temporian.io.polars import to_polars
+from temporian.io.polars import from_polars
 from temporian.io.tensorflow import to_tensorflow_dataset
 from temporian.io.tensorflow import from_tensorflow_record
 from temporian.io.tensorflow import to_tensorflow_record
