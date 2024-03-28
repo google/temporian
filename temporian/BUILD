@@ -36,6 +36,7 @@ py_library(
         "//temporian/implementation/numpy/operators",
         "//temporian/io:csv",
         "//temporian/io:pandas",
+        "//temporian/io:polars",
         "//temporian/io:numpy",
         "//temporian/io:parquet",
         "//temporian/io:tensorflow",

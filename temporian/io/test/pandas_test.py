@@ -24,7 +24,7 @@ from temporian.io.pandas import from_pandas, to_pandas
 from temporian.test.utils import assertEqualDFRandomRowOrder
 
 
-class DataFrameToEventTest(absltest.TestCase):
+class FromPandasTest(absltest.TestCase):
     def test_correct(self) -> None:
         df = pd.DataFrame(
             [
@@ -419,6 +419,8 @@ class DataFrameToEventTest(absltest.TestCase):
 
         self.assertEqual(evset, expected_evset)
 
+
+class ToPandasTest(absltest.TestCase):
     def test_evset_to_df(self) -> None:
         evset = event_set(
             timestamps=[1.0, 2.0, 3.0],

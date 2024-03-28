@@ -8,6 +8,10 @@
 
 ### Fixes
 
+## 0.8.1
+
+Adding missing wheels for macos, no changes to the library
+
 ## 0.8.0
 
 ### Features
