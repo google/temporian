@@ -17,7 +17,7 @@ jobs:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3  # v4 doesn't work on the container
 
       - name: Build package
         run: |
@@ -34,10 +34,16 @@ jobs:
   # macos-XXX-large are Intel runners, macos-XXX-xlarge are arm64 runners
   # https://docs.github.com/en/actions/using-github-hosted-runners/about-larger-runners/about-larger-runners
   build-macos-intel:
-    runs-on: macos-13-large
+    runs-on: ${{ matrix.platform.runner }}
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
+        platform:
+          [
+            { runner: macos-12-large, artifact: macos12-intel },
+            { runner: macos-13-large, artifact: macos13-intel },
+            { runner: macos-14-large, artifact: macos14-intel },
+          ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -56,14 +62,20 @@ jobs:
       - name: Save package for following jobs
         uses: actions/upload-artifact@v3
         with:
-          name: dist-macos-intel-${{ matrix.python-version }}
+          name: dist-${{ matrix.platform.artifact }}-${{ matrix.python-version }}
           path: dist
 
   build-macos-arm:
-    runs-on: macos-13-xlarge
+    runs-on: ${{ matrix.platform.runner }}
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
+        platform:
+          [
+            # there is not runner for macos12 on arm
+            { runner: macos-13-xlarge, artifact: macos-13-arm },
+            { runner: macos-14-xlarge, artifact: macos-14-arm }
+          ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -90,7 +102,7 @@ jobs:
       - name: Save package for following jobs
         uses: actions/upload-artifact@v3
         with:
-          name: dist-macos-arm-${{ matrix.python-version }}
+          name: dist-${{ matrix.platform.artifact }}-${{ matrix.python-version }}
           path: dist
 
   test-install:
@@ -101,7 +113,9 @@ jobs:
         platform:
           [
             { runner: ubuntu-latest, artifact: ubuntu },
-            { runner: macos-13-large, artifact: macos-intel },
+            { runner: macos-12-large, artifact: macos12-intel },
+            { runner: macos-13-large, artifact: macos13-intel },
+            { runner: macos-14-large, artifact: macos14-intel },
           ]
     runs-on: ${{ matrix.platform.runner }}
     env:
@@ -110,7 +124,7 @@ jobs:
       SYSTEM_VERSION_COMPAT: 0
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
@@ -131,13 +145,18 @@ jobs:
 
   test-macos-arm-install:
     needs: [build-macos-arm]
-    runs-on: macos-13-xlarge
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
+        platform:
+          [
+            { runner: macos-13-xlarge, artifact: macos-13-arm },
+            { runner: macos-14-xlarge, artifact: macos-14-arm }
+          ]
+    runs-on: ${{ matrix.platform.runner }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Install Python
         run: |
@@ -152,7 +171,7 @@ jobs:
       - name: Download build
         uses: actions/download-artifact@v3
         with:
-          name: dist-macos-arm-${{ matrix.python-version }}
+          name: dist-${{ matrix.platform.artifact }}-${{ matrix.python-version }}
           path: dist
 
       - name: Install from wheel
@@ -169,7 +188,7 @@ jobs:
       POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Install poetry
         run: pip install poetry

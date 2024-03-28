@@ -21,6 +21,21 @@ py_test(
 )
 
 py_test(
+    name = "polars_test",
+    srcs = ["polars_test.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        # already_there/numpy
+        # already_there/absl/testing:parameterized
+        # already_there/polars
+        "//temporian/test:utils",
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/io:polars",
+    ],
+)
+
+py_test(
     name = "numpy_test",
     srcs = ["numpy_test.py"],
     srcs_version = "PY3",
