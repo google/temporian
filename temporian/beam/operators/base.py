@@ -46,7 +46,9 @@ class BeamOperatorImplementation(ABC):
 
 
 def beam_eventset_map(
-    src: BeamEventSet, name: str, fn: Callable[[FeatureItem, int], FeatureItem]
+    src: BeamEventSet,
+    name: str,
+    fn: Callable[[FeatureItem, int], Iterable[FeatureItem]],
 ) -> BeamEventSet:
     """Applies a function on each feature of a Beam eventset."""
 
@@ -56,7 +58,20 @@ def beam_eventset_map(
     return tuple([apply(idx, item) for idx, item in enumerate(src)])
 
 
-def _extract_from_iterable(
+def beam_eventset_flatmap(
+    src: BeamEventSet,
+    name: str,
+    fn: Callable[[FeatureItem, int], Iterable[FeatureItem]],
+) -> BeamEventSet:
+    """Applies a function on each feature of a Beam eventset."""
+
+    def apply(idx, item):
+        return item | f"Map on feature #{idx} {name}" >> beam.FlatMap(fn, idx)
+
+    return tuple([apply(idx, item) for idx, item in enumerate(src)])
+
+
+def extract_from_iterable(
     src: Iterable[FeatureItemValue],
 ) -> Optional[FeatureItemValue]:
     for x in src:
@@ -85,8 +100,8 @@ def beam_eventset_map_with_sampling(
         idx: int,
     ) -> Iterator[FeatureItem]:
         index, (it_feature, it_sampling) = item
-        feature = _extract_from_iterable(it_feature)
-        sampling = _extract_from_iterable(it_sampling)
+        feature = extract_from_iterable(it_feature)
+        sampling = extract_from_iterable(it_sampling)
         if sampling is not None:
             yield fn(index, feature, sampling, idx)
 
