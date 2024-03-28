@@ -46,7 +46,9 @@ class BeamOperatorImplementation(ABC):
 
 
 def beam_eventset_map(
-    src: BeamEventSet, name: str, fn: Callable[[FeatureItem, int], FeatureItem]
+    src: BeamEventSet,
+    name: str,
+    fn: Callable[[FeatureItem, int], Iterable[FeatureItem]],
 ) -> BeamEventSet:
     """Applies a function on each feature of a Beam eventset."""
 
@@ -57,7 +59,9 @@ def beam_eventset_map(
 
 
 def beam_eventset_flatmap(
-    src: BeamEventSet, name: str, fn: Callable[[FeatureItem, int], FeatureItem]
+    src: BeamEventSet,
+    name: str,
+    fn: Callable[[FeatureItem, int], Iterable[FeatureItem]],
 ) -> BeamEventSet:
     """Applies a function on each feature of a Beam eventset."""
 
