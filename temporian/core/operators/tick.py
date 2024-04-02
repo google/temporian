@@ -17,6 +17,11 @@
 
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
+from temporian.core.data.duration_utils import (
+    Duration,
+    NormalizedDuration,
+    normalize_duration,
+)
 from temporian.core.data.node import (
     EventSetNode,
     create_node_new_features_new_sampling,
@@ -24,25 +29,29 @@ from temporian.core.data.node import (
 from temporian.core.operators.base import Operator
 from temporian.core.typing import EventSetOrNode
 from temporian.proto import core_pb2 as pb
-from temporian.core.data.duration_utils import (
-    Duration,
-    NormalizedDuration,
-    normalize_duration,
-)
 
 
 class Tick(Operator):
     def __init__(
-        self, input: EventSetNode, interval: NormalizedDuration, align: bool
+        self,
+        input: EventSetNode,
+        interval: NormalizedDuration,
+        align: bool,
+        after_last: bool = True,
+        before_first: bool = False,
     ):
         super().__init__()
 
         self._interval = interval
         self._align = align
+        self._after_last = after_last
+        self._before_first = before_first
 
         self.add_input("input", input)
         self.add_attribute("interval", interval)
         self.add_attribute("align", align)
+        self.add_attribute("after_last", after_last)
+        self.add_attribute("before_first", before_first)
 
         self.add_output(
             "output",
@@ -64,6 +73,14 @@ class Tick(Operator):
     def align(self) -> bool:
         return self._align
 
+    @property
+    def after_last(self) -> bool:
+        return self._after_last
+
+    @property
+    def before_first(self) -> bool:
+        return self._before_first
+
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         return pb.OperatorDef(
@@ -75,6 +92,14 @@ class Tick(Operator):
                 ),
                 pb.OperatorDef.Attribute(
                     key="align",
+                    type=pb.OperatorDef.Attribute.Type.BOOL,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="after_last",
+                    type=pb.OperatorDef.Attribute.Type.BOOL,
+                ),
+                pb.OperatorDef.Attribute(
+                    key="before_first",
                     type=pb.OperatorDef.Attribute.Type.BOOL,
                 ),
             ],
@@ -89,10 +114,18 @@ operator_lib.register_operator(Tick)
 # TODO: Add support for begin/end arguments.
 @compile
 def tick(
-    input: EventSetOrNode, interval: Duration, align: bool = True
+    input: EventSetOrNode,
+    interval: Duration,
+    align: bool = True,
+    after_last: bool = True,
+    before_first: bool = False,
 ) -> EventSetOrNode:
     assert isinstance(input, EventSetNode)
 
     return Tick(
-        input=input, interval=normalize_duration(interval), align=align
+        input=input,
+        interval=normalize_duration(interval),
+        align=align,
+        after_last=after_last,
+        before_first=before_first,
     ).outputs["output"]

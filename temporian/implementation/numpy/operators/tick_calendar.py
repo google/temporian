@@ -15,13 +15,13 @@
 
 """Implementation for the TickCalendar operator."""
 
-from typing import Dict, Literal, Union, Tuple
+from typing import Dict, Literal, Tuple, Union
 
 import numpy as np
 
-from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.core.operators.tick_calendar import TickCalendar
 from temporian.implementation.numpy import implementation_lib
+from temporian.implementation.numpy.data.event_set import EventSet, IndexData
 from temporian.implementation.numpy.operators.base import OperatorImplementation
 from temporian.implementation.numpy_cc.operators import operators_cc
 
@@ -81,6 +81,9 @@ class TickCalendarNumpyImplementation(OperatorImplementation):
             wday = self._wday_py_to_cpp(wday)
         wday_range = self._get_arg_range(wday, self.operator.wday_max_range())
 
+        after_last = self.operator.after_last
+        before_first = self.operator.before_first
+
         # Fill output EventSet's data
         for index_key, index_data in input.data.items():
             if len(index_data.timestamps) == 0:
@@ -101,6 +104,8 @@ class TickCalendarNumpyImplementation(OperatorImplementation):
                     max_month=month_range[1],
                     min_wday=wday_range[0],
                     max_wday=wday_range[1],
+                    after_last=after_last,
+                    before_first=before_first,
                 )
             output_evset.set_index_value(
                 index_key,
