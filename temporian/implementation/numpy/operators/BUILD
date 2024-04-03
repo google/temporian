@@ -55,6 +55,7 @@ py_library(
         "//temporian/implementation/numpy/operators/calendar:year",
         "//temporian/implementation/numpy/operators/scalar:arithmetic_scalar",
         "//temporian/implementation/numpy/operators/scalar:relational_scalar",
+        "//temporian/implementation/numpy/operators/scalar:bitwise_scalar",
         "//temporian/implementation/numpy/operators/window:moving_count",
         "//temporian/implementation/numpy/operators/window:moving_max",
         "//temporian/implementation/numpy/operators/window:moving_min",

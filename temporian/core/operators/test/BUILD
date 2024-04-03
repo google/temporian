@@ -485,3 +485,15 @@ py_test(
         "//temporian/test:utils",
     ],
 )
+
+py_test(
+    name = "test_bitwise_scalar",
+    srcs = ["test_bitwise_scalar.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/test:utils",
+    ],
+)

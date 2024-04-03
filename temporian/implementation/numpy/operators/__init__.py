@@ -39,6 +39,7 @@ from temporian.implementation.numpy.operators.binary import bitwise
 
 from temporian.implementation.numpy.operators.scalar import arithmetic_scalar
 from temporian.implementation.numpy.operators.scalar import relational_scalar
+from temporian.implementation.numpy.operators.scalar import bitwise_scalar
 
 from temporian.implementation.numpy.operators.window import simple_moving_average
 from temporian.implementation.numpy.operators.window import moving_standard_deviation

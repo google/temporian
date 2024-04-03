@@ -1645,8 +1645,8 @@ class EventSetOperations:
             events:
                 (3 events):
                     timestamps: [1. 2. 3.]
-                    'bitwise_and_f1_f3': [ 2, 4, 0]
-                    'bitwise_and_f2_f4': [ 8, 8, 13]
+                    'bitwise_and_f1_f3': [2 4 0]
+                    'bitwise_and_f2_f4': [ 8  8 13]
             ...
 
             ```
@@ -1662,9 +1662,10 @@ class EventSetOperations:
             >>> b
             indexes: ...
                     timestamps: [1. 2. 3.]
-                    'f1': [ 2 1 3]
-                    'f2': [ 1 3 1]
+                    'f1': [2 1 3]
+                    'f2': [1 3 1]
             ...
+
             ```
 
         Args:
@@ -1674,10 +1675,13 @@ class EventSetOperations:
             Result of the operation.
         """
         if isinstance(other, self.__class__):
-            from temporian.core.operators import bitwise_and
+            from temporian.core.operators.binary import bitwise_and
             return bitwise_and(input_1=self, input_2=other)
 
-        #TODO SZ Add scalar bitwise
+        if isinstance(other, int):
+            from temporian.core.operators.scalar import bitwise_and_scalar
+            return bitwise_and_scalar(input=self, value=other)
+
         self._raise_error("bitwise_and", other, "int")
         assert False
 
@@ -1713,8 +1717,8 @@ class EventSetOperations:
             events:
                 (3 events):
                     timestamps: [1. 2. 3.]
-                    'bitwise_or_f1_f3': [ 3, 5, 15]
-                    'bitwise_or_f2_f4': [ 11, 15, 15]
+                    'bitwise_or_f1_f3': [ 3 5 15]
+                    'bitwise_or_f2_f4': [11 15 15]
             ...
 
             ```
@@ -1730,9 +1734,10 @@ class EventSetOperations:
             >>> b
             indexes: ...
                     timestamps: [1. 2. 3.]
-                    'f1': [ 3 7 7]
-                    'f2': [ 11 11 15]
+                    'f1': [3 7 7]
+                    'f2': [11 11 15]
             ...
+
             ```
 
         Args:
@@ -1742,15 +1747,18 @@ class EventSetOperations:
             Result of the operation.
         """
         if isinstance(other, self.__class__):
-            from temporian.core.operators import bitwise_or
+            from temporian.core.operators.binary import bitwise_or
             return bitwise_or(input_1=self, input_2=other)
 
-        #TODO SZ Add scalar bitwise
+        if isinstance(other, int):
+            from temporian.core.operators.scalar import bitwise_or_scalar
+            return bitwise_or_scalar(input=self, value=other)
+
         self._raise_error("bitwise_or", other, "int")
         assert False
 
     def bitwise_xor(self: EventSetOrNode, other: Any) -> EventSetOrNode:
-       """Computes the bitwise XOR between an [`EventSet`][temporian.EventSet]
+        """Computes the bitwise XOR between an [`EventSet`][temporian.EventSet]
         or a scalar value to `self` element-wise. The operation is only
         supported for Events with features that are integers.
 
@@ -1781,8 +1789,8 @@ class EventSetOperations:
             events:
                 (3 events):
                     timestamps: [1. 2. 3.]
-                    'bitwise_xor_f1_f3': [ 1, 1, 15]
-                    'bitwise_xor_f2_f4': [ 3, 7, 2]
+                    'bitwise_xor_f1_f3': [ 1 1 15]
+                    'bitwise_xor_f2_f4': [3 7 2]
             ...
 
             ```
@@ -1798,9 +1806,10 @@ class EventSetOperations:
             >>> b
             indexes: ...
                     timestamps: [1. 2. 3.]
-                    'f1': [ 1 6 4]
-                    'f2': [ 10 8 14]
+                    'f1': [1 6 4]
+                    'f2': [10 8 14]
             ...
+
             ```
 
         Args:
@@ -1810,10 +1819,13 @@ class EventSetOperations:
             Result of the operation.
         """
         if isinstance(other, self.__class__):
-            from temporian.core.operators import bitwise_xor
+            from temporian.core.operators.binary import bitwise_xor
             return bitwise_xor(input_1=self, input_2=other)
 
-        #TODO SZ Add scalar bitwise
+        if isinstance(other, int):
+            from temporian.core.operators.scalar import bitwise_xor_scalar
+            return bitwise_xor_scalar(input=self, value=other)
+
         self._raise_error("bitwise_xor", other, "int")
         assert False
 

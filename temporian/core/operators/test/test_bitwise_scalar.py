@@ -12,67 +12,69 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import numpy as np
 from absl.testing import absltest
-
 from temporian.implementation.numpy.data.io import event_set
 from temporian.test.utils import assertOperatorResult
-from temporian.core.operators.binary import (
-    bitwise_and,
-    bitwise_or,
-    bitwise_xor
+from temporian.core.operators.scalar import (
+    bitwise_and_scalar,
+    bitwise_or_scalar,
+    bitwise_xor_scalar
 )
 
 
-class BitwiseTest(absltest.TestCase):
-    """Test bitwise ops: | (OR) & (AND) ^ (XOR)"""
+class ArithmeticScalarTest(absltest.TestCase):
+    """Test numpy implementation of all arithmetic operators:
+    addition, subtraction, division and multiplication"""
 
     def setUp(self):
-        self.evset_1 = event_set(
+        self.evset = event_set(
             timestamps=[1, 2, 3, 4],
-            features={"x": [5, 9, 12, 3]},
-        )
-        self.evset_2 = event_set(
-            timestamps=[1, 2, 3, 4],
-            features={"x": [7, 10, 6, 15]},
-            same_sampling_as=self.evset_1,
+            features={"x": [2, 5, 7, 9]},
         )
 
     def test_correct_and(self) -> None:
-        """Test correct AND operator."""
+        """Test correct and operator."""
+        value = 3
         expected = event_set(
             timestamps=[1, 2, 3, 4],
-            features={"bitwise_and_x_x": [5, 8, 4, 3]},
-            same_sampling_as=self.evset_1,
+            features={"x": [2, 1, 3, 1]},
+            same_sampling_as=self.evset,
         )
+
         assertOperatorResult(
             self,
-            bitwise_and(self.evset_1, self.evset_2),
+            bitwise_and_scalar(self.evset, value),
             expected
         )
 
     def test_correct_or(self) -> None:
-        """Test correct OR operator."""
+        """Test correct or operator."""
+        value = 3
         expected = event_set(
             timestamps=[1, 2, 3, 4],
-            features={"bitwise_or_x_x": [7, 11, 14, 15]},
-            same_sampling_as=self.evset_1,
+            features={"x": [3, 7, 7, 11]},
+            same_sampling_as=self.evset,
         )
+
         assertOperatorResult(
             self,
-            bitwise_or(self.evset_1, self.evset_2),
+            bitwise_or_scalar(self.evset, value),
             expected
         )
 
     def test_correct_xor(self) -> None:
-        """Test correct XOR operator."""
+        """Test correct xor operator."""
+        value = 3
         expected = event_set(
             timestamps=[1, 2, 3, 4],
-            features={"bitwise_xor_x_x": [2, 3, 10, 12]},
-            same_sampling_as=self.evset_1,
+            features={"x": [1, 6, 4, 10]},
+            same_sampling_as=self.evset,
         )
+
         assertOperatorResult(
             self,
-            bitwise_xor(self.evset_1, self.evset_2),
+            bitwise_xor_scalar(self.evset, value),
             expected
         )
 
