@@ -25,14 +25,39 @@ from temporian.core.operators.scalar.base import (
 )
 from temporian.core.typing import EventSetOrNode
 
+class BaseBitwiseScalarOperator(BaseScalarOperator):
+    DEF_KEY = ""
+    def __init__(
+        self,
+        input: EventSetNode,
+        value: int,
+        is_value_first: bool = False,
+    ):
+        # Check that all features are Integer
+        for feature in input.schema.features:
+            if feature.dtype != DType.INT32 and feature.dtype != DType.INT64:
+                raise ValueError(
+                    "Bitwise operators only support INT32 or INT64 types, but "
+                    f"feature {feature.name} has dtype {feature.dtype}"
+                )
+        # Check that the value is an integer
+        if not isinstance(value, int):
+            raise ValueError(
+                "Bitwise operators only support int values, but value"
+                f" has type {type(value)}"
+            )
+        super().__init__(input, value, is_value_first)
 
-class BitwiseAndScalarOperator(BaseScalarOperator):
+
+class BitwiseAndScalarOperator(BaseBitwiseScalarOperator):
     DEF_KEY = "BITWISE_AND_SCALAR"
 
-class BitwiseOrScalarOperator(BaseScalarOperator):
+
+class BitwiseOrScalarOperator(BaseBitwiseScalarOperator):
     DEF_KEY = "BITWISE_OR_SCALAR"
 
-class BitwiseXorScalarOperator(BaseScalarOperator):
+
+class BitwiseXorScalarOperator(BaseBitwiseScalarOperator):
     DEF_KEY = "BITWISE_XOR_SCALAR"
 
 
