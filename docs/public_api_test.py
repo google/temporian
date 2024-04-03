@@ -48,6 +48,7 @@ PUBLIC_API_SYMBOLS = {
     "to_tensorflow_dataset",
     "from_tensorflow_record",
     "to_tensorflow_record",
+    "from_indexed_dicts",
     # DTYPES
     "float64",
     "float32",
