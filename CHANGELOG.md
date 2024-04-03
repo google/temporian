@@ -7,6 +7,7 @@
 ### Improvements
 
 - Added `before_first` and `after_last` parameters to `EventSet.tick` and `EventSet.tick_calendar`
+- Added `bokeh_webgl` as a possible `backend` for `tp.plot`.
 
 ### Fixes
 
