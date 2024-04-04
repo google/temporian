@@ -47,7 +47,7 @@ class RelationalTest(absltest.TestCase):
             features={
                 "store_id": [0, 0, 1, 1, 2, 2],
                 # NOTE: nan == nan is False
-                "eq_sales_cost": [True, False, False, False, True, False],
+                "sales": [True, False, False, False, True, False],
             },
             indexes=["store_id"],
             same_sampling_as=self.evset_1,
@@ -68,7 +68,7 @@ class RelationalTest(absltest.TestCase):
 
         expected = event_set(
             timestamps=timestamps,
-            features={"eq_a_b": [True, False, False, True]},
+            features={"a": [True, False, False, True]},
             same_sampling_as=evset_1,
         )
         # NOTE: evset_1 == evset_2 is not overloaded for event-wise comparison
@@ -88,7 +88,7 @@ class RelationalTest(absltest.TestCase):
 
         expected = event_set(
             timestamps=timestamps,
-            features={"ne_a_b": [False, True, True, False]},
+            features={"a": [False, True, True, False]},
             same_sampling_as=evset_1,
         )
 
@@ -101,7 +101,7 @@ class RelationalTest(absltest.TestCase):
             features={
                 "store_id": [0, 0, 1, 1, 2, 2],
                 # NOTE: nan != nan is True
-                "ne_sales_cost": [False, True, True, True, False, True],
+                "sales": [False, True, True, True, False, True],
             },
             indexes=["store_id"],
             same_sampling_as=self.evset_1,
@@ -115,7 +115,7 @@ class RelationalTest(absltest.TestCase):
             features={
                 "store_id": [0, 0, 1, 1, 2, 2],
                 # NOTE: any comparison to nan is always False
-                "gt_sales_cost": [False, True, False, False, False, False],
+                "sales": [False, True, False, False, False, False],
             },
             indexes=["store_id"],
             same_sampling_as=self.evset_1,
@@ -129,7 +129,7 @@ class RelationalTest(absltest.TestCase):
             features={
                 "store_id": [0, 0, 1, 1, 2, 2],
                 # NOTE: any comparison to nan is always False
-                "ge_sales_cost": [True, True, False, False, True, False],
+                "sales": [True, True, False, False, True, False],
             },
             indexes=["store_id"],
             same_sampling_as=self.evset_1,
@@ -143,7 +143,7 @@ class RelationalTest(absltest.TestCase):
             features={
                 "store_id": [0, 0, 1, 1, 2, 2],
                 # NOTE: any comparison to nan is always False
-                "lt_sales_cost": [False, False, True, False, False, False],
+                "sales": [False, False, True, False, False, False],
             },
             indexes=["store_id"],
             same_sampling_as=self.evset_1,
@@ -157,7 +157,7 @@ class RelationalTest(absltest.TestCase):
             features={
                 "store_id": [0, 0, 1, 1, 2, 2],
                 # NOTE: any comparison to nan is always False
-                "le_sales_cost": [True, False, True, False, True, False],
+                "sales": [True, False, True, False, True, False],
             },
             indexes=["store_id"],
             same_sampling_as=self.evset_1,

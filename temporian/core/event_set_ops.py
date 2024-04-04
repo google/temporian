@@ -119,11 +119,11 @@ class EventSetOperations:
             >>> c = a != b
             >>> c
             indexes: []
-            features: [('ne_f1_f2', bool_)]
+            features: [('f1', bool_)]
             events:
                 (3 events):
                     timestamps: [1. 2. 3.]
-                    'ne_f1_f2': [ True False True]
+                    'f1': [ True False True]
             ...
 
             ```
@@ -193,12 +193,12 @@ class EventSetOperations:
             >>> c = a + b
             >>> c
             indexes: []
-            features: [('add_f1_f3', int64), ('add_f2_f4', int64)]
+            features: [('f1', int64), ('f2', int64)]
             events:
                 (3 events):
                     timestamps: [1. 2. 3.]
-                    'add_f1_f3': [ -1 101 202]
-                    'add_f2_f4': [ 11 -11 10]
+                    'f1': [ -1 101 202]
+                    'f2': [ 11 -11 10]
             ...
 
             ```
@@ -245,11 +245,11 @@ class EventSetOperations:
             >>> c = a["f1"].cast(tp.float64) + a["f2"]
             >>> c
             indexes: []
-            features: [('add_f1_f2', float64)]
+            features: [('f1', float64)]
             events:
                 (3 events):
                     timestamps: [1. 2. 3.]
-                    'add_f1_f2': [ 10. 90. 205.]
+                    'f1': [ 10. 90. 205.]
             ...
 
             ```
@@ -275,11 +275,11 @@ class EventSetOperations:
             >>> c = a.resample(b) + b
             >>> c
             indexes: []
-            features: [('add_fa_fb', int64)]
+            features: [('fa', int64)]
             events:
                 (4 events):
                     timestamps: [-1. 1.5 3. 5. ]
-                    'add_fa_fb': [-10 16 33 53]
+                    'fa': [-10 16 33 53]
             ...
 
             ```
@@ -314,14 +314,14 @@ class EventSetOperations:
             >>> c = a + b.resample(a)
             >>> c
             indexes: [('cat', int64)]
-            features: [('add_M_N', int64)]
+            features: [('M', int64)]
             events:
                 cat=1 (2 events):
                     timestamps: [1. 2.]
-                    'add_M_N': [20 40]
+                    'M': [20 40]
                 cat=2 (2 events):
                     timestamps: [3. 4.]
-                    'add_M_N': [60 80]
+                    'M': [60 80]
             ...
 
             ```
@@ -382,11 +382,11 @@ class EventSetOperations:
             >>> c = a - b
             >>> c
             indexes: []
-            features: [('sub_f1_f2', int64)]
+            features: [('f1', int64)]
             events:
                 (3 events):
                     timestamps: [1. 2. 3.]
-                    'sub_f1_f2': [-10 80 205]
+                    'f1': [-10 80 205]
             ...
 
             ```
@@ -475,11 +475,11 @@ class EventSetOperations:
             >>> c = a * b
             >>> c
             indexes: []
-            features: [('mult_f1_f2', int64)]
+            features: [('f1', int64)]
             events:
                 (3 events):
                     timestamps: [1. 2. 3.]
-                    'mult_f1_f2': [ 0 300 400]
+                    'f1': [ 0 300 400]
             ...
 
             ```
@@ -634,11 +634,11 @@ class EventSetOperations:
             >>> c = a / b
             >>> c
             indexes: []
-            features: [('div_f1_f2', float64)]
+            features: [('f1', float64)]
             events:
                 (3 events):
                     timestamps: [1. 2. 3.]
-                    'div_f1_f2': [0. 5. 4.]
+                    'f1': [0. 5. 4.]
             ...
 
             ```
@@ -665,11 +665,11 @@ class EventSetOperations:
             >>> c = a.cast(tp.float64) / b.cast(tp.float64)
             >>> c
             indexes: []
-            features: [('div_f1_f2', float64)]
+            features: [('f1', float64)]
             events:
                 (3 events):
                     timestamps: [1. 2. 3.]
-                    'div_f1_f2': [0. 5. 4.]
+                    'f1': [0. 5. 4.]
             ...
 
             ```
@@ -757,11 +757,11 @@ class EventSetOperations:
             >>> c = a // b
             >>> c
             indexes: []
-            features: [('floordiv_f1_f2', int64)]
+            features: [('f1', int64)]
             events:
                 (3 events):
                     timestamps: [1. 2. 3.]
-                    'floordiv_f1_f2': [ 0 33 1]
+                    'f1': [ 0 33 1]
             ...
 
             ```
@@ -850,11 +850,11 @@ class EventSetOperations:
             >>> c = a ** b
             >>> c
             indexes: []
-            features: [('pow_f1_f2', int64)]
+            features: [('f1', int64)]
             events:
                 (3 events):
                     timestamps: [1. 2. 3.]
-                    'pow_f1_f2': [ 1 8 16]
+                    'f1': [ 1 8 16]
             ...
 
             ```
@@ -943,11 +943,11 @@ class EventSetOperations:
             >>> c = a % b
             >>> c
             indexes: []
-            features: [('mod_f1_f2', int64)]
+            features: [('f1', int64)]
             events:
                 (3 events):
                     timestamps: [1. 2. 3.]
-                    'mod_f1_f2': [ 0 2 50]
+                    'f1': [ 0 2 50]
             ...
 
             ```
@@ -1033,11 +1033,11 @@ class EventSetOperations:
             >>> c = a > b
             >>> c
             indexes: []
-            features: [('gt_f1_f2', bool_)]
+            features: [('f1', bool_)]
             events:
                 (3 events):
                     timestamps: [1. 2. 3.]
-                    'gt_f1_f2': [ True False True]
+                    'f1': [ True False True]
             ...
 
             ```
@@ -1109,11 +1109,11 @@ class EventSetOperations:
             >>> c = a >= b
             >>> c
             indexes: []
-            features: [('ge_f1_f2', bool_)]
+            features: [('f1', bool_)]
             events:
                 (3 events):
                     timestamps: [1. 2. 3.]
-                    'ge_f1_f2': [ True True True]
+                    'f1': [ True True True]
             ...
 
             ```
@@ -1185,11 +1185,11 @@ class EventSetOperations:
             >>> c = a < b
             >>> c
             indexes: []
-            features: [('lt_f1_f2', bool_)]
+            features: [('f1', bool_)]
             events:
                 (3 events):
                     timestamps: [1. 2. 3.]
-                    'lt_f1_f2': [False False False]
+                    'f1': [False False False]
             ...
 
             ```
@@ -1261,11 +1261,11 @@ class EventSetOperations:
             >>> c = a <= b
             >>> c
             indexes: []
-            features: [('le_f1_f2', bool_)]
+            features: [('f1', bool_)]
             events:
                 (3 events):
                     timestamps: [1. 2. 3.]
-                    'le_f1_f2': [False True False]
+                    'f1': [False True False]
             ...
 
             ```
@@ -1336,11 +1336,11 @@ class EventSetOperations:
             >>> d = b & c
             >>> d
             indexes: []
-            features: [('and_f1_f1', bool_)]
+            features: [('f1', bool_)]
             events:
                 (3 events):
                     timestamps: [1. 2. 3.]
-                    'and_f1_f1': [False True False]
+                    'f1': [False True False]
             ...
 
             ```
@@ -1355,11 +1355,11 @@ class EventSetOperations:
             >>> c = b["f1"] & b["f2"]
             >>> c
             indexes: []
-            features: [('and_f1_f2', bool_)]
+            features: [('f1', bool_)]
             events:
                 (3 events):
                     timestamps: [1. 2. 3.]
-                    'and_f1_f2': [False True False]
+                    'f1': [False True False]
             ...
 
             ```
@@ -1401,11 +1401,11 @@ class EventSetOperations:
             >>> d = b | c
             >>> d
             indexes: []
-            features: [('or_f1_f1', bool_)]
+            features: [('f1', bool_)]
             events:
                 (3 events):
                     timestamps: [1. 2. 3.]
-                    'or_f1_f1': [ True False True]
+                    'f1': [ True False True]
             ...
 
             ```
@@ -1447,11 +1447,11 @@ class EventSetOperations:
             >>> d = b ^ c
             >>> d
             indexes: []
-            features: [('xor_f1_f1', bool_)]
+            features: [('f1', bool_)]
             events:
                 (3 events):
                     timestamps: [1. 2. 3.]
-                    'xor_f1_f1': [ True False True]
+                    'f1': [ True False True]
             ...
 
             ```
@@ -2477,11 +2477,11 @@ class EventSetOperations:
             >>> c = a.equal(b)
             >>> c
             indexes: []
-            features: [('eq_f1_f2', bool_)]
+            features: [('f1', bool_)]
             events:
                 (3 events):
                     timestamps: [1. 2. 3.]
-                    'eq_f1_f2': [False True False]
+                    'f1': [False True False]
             ...
 
             ```
@@ -3529,14 +3529,14 @@ class EventSetOperations:
             >>> div = products / store_resample
             >>> div
             indexes: [('product', int64)]
-            features: [('div_sales_sales', float64)]
+            features: [('sales', float64)]
             events:
                 product=1 (3 events):
                     timestamps: [1. 2. 3.]
-                    'div_sales_sales': [0.01   0.01   0.0167]
+                    'sales': [0.01   0.01   0.0167]
                 product=2 (3 events):
                     timestamps: [1. 2. 3.]
-                    'div_sales_sales': [0.1    0.1    0.1667]
+                    'sales': [0.1    0.1    0.1667]
             ...
 
             ```

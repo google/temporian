@@ -67,7 +67,7 @@ class BaseBinaryOperator(Operator):
         # outputs
         output_features = [  # pylint: disable=g-complex-comprehension
             FeatureSchema(
-                name=self.output_feature_name(feature_1, feature_2),
+                name=feature_1.name,
                 dtype=self.output_feature_dtype(feature_1, feature_2),
             )
             for feature_1, feature_2 in zip(
@@ -106,11 +106,6 @@ class BaseBinaryOperator(Operator):
     @abstractmethod
     def prefix(self) -> str:
         """Gets the prefix to use for the output features."""
-
-    def output_feature_name(
-        self, feature_1: FeatureSchema, feature_2: FeatureSchema
-    ) -> str:
-        return f"{self.prefix}_{feature_1.name}_{feature_2.name}"
 
     def output_feature_dtype(
         self, feature_1: FeatureSchema, feature_2: FeatureSchema

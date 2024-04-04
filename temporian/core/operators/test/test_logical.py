@@ -35,7 +35,7 @@ class LogicalTest(absltest.TestCase):
         """Test correct AND operator."""
         expected = event_set(
             timestamps=[1, 2, 3, 4],
-            features={"and_x_x": [True, False, False, False]},
+            features={"x": [True, False, False, False]},
             same_sampling_as=self.evset_1,
         )
         assertOperatorResult(self, self.evset_1 & self.evset_2, expected)
@@ -44,7 +44,7 @@ class LogicalTest(absltest.TestCase):
         """Test correct OR operator."""
         expected = event_set(
             timestamps=[1, 2, 3, 4],
-            features={"or_x_x": [True, False, True, True]},
+            features={"x": [True, False, True, True]},
             same_sampling_as=self.evset_1,
         )
         assertOperatorResult(self, self.evset_1 | self.evset_2, expected)
@@ -53,7 +53,7 @@ class LogicalTest(absltest.TestCase):
         """Test correct XOR operator."""
         expected = event_set(
             timestamps=[1, 2, 3, 4],
-            features={"xor_x_x": [False, False, True, True]},
+            features={"x": [False, False, True, True]},
             same_sampling_as=self.evset_1,
         )
         assertOperatorResult(self, self.evset_1 ^ self.evset_2, expected)
