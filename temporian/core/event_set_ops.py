@@ -556,34 +556,24 @@ class EventSetOperations:
         return multiply_scalar(input=self, value=-1)
 
     def __invert__(self: EventSetOrNode) -> EventSetOrNode:
-        """Inverts a boolean [`EventSet`][temporian.EventSet] element-wise.
+        """Inverts a boolean or integer [`EventSet`][temporian.EventSet]
+        element-wise.
 
-        Swaps False <-> True.
-
-        Does not work on integers, they should be cast to
-        [`tp.bool_`][temporian.bool_] beforehand, using
-        [`EventSet.cast()`][temporian.EventSet.cast].
+        Swaps False <-> True. Applies bitwise NOT to each integer.
 
         Example:
             ```python
             >>> a = tp.event_set(
             ...     timestamps=[1, 2],
-            ...     features={"M": [1, 5], "N": [1.0, 5.5]},
+            ...     features={"M": [True, False], "N": [1, 5]},
             ... )
-            >>> # Boolean EventSet
-            >>> b = a < 2
-            >>> b
-            indexes: ...
-                    'M': [ True False]
-                    'N': [ True False]
-            ...
 
             >>> # Inverted EventSet
-            >>> c = ~b
-            >>> c
+            >>> b = ~a
+            >>> b
             indexes: ...
                     'M': [False True]
-                    'N': [False True]
+                    'N': [-2 -6]
             ...
 
             ```
