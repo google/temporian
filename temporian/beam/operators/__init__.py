@@ -27,3 +27,17 @@ from temporian.beam.operators import select
 from temporian.beam.operators import add_index
 from temporian.beam.operators import rename
 from temporian.beam.operators import prefix
+from temporian.beam.operators import leak
+from temporian.beam.operators import glue
+from temporian.beam.operators import filter
+from temporian.beam.operators import timestamps
+from temporian.beam.operators import filter_empty_index
+from temporian.beam.operators import cast
+from temporian.beam.operators import unique_timestamps
+from temporian.beam.operators import resample
+from temporian.beam.operators import drop_index
+from temporian.beam.operators import propagate
+from temporian.beam.operators.scalar import scalar
+from temporian.beam.operators.binary import binary
+from temporian.beam.operators import filter_moving_count
+from temporian.beam.operators import lag

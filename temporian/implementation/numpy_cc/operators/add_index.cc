@@ -47,7 +47,7 @@ struct GroupAccumulator {
   // Index of the next available spot in "row_idxs".
   Idx next_row_idx = 0;
 
-  // Initializes the the group accumulator.
+  // Initializes the group accumulator.
   //
   // Should be called once before any other method.
   void Initialize(const std::size_t num_rows) {

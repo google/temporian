@@ -42,6 +42,7 @@ from temporian.implementation.numpy.operators.scalar import relational_scalar
 from temporian.implementation.numpy.operators.scalar import bitwise_scalar
 
 from temporian.implementation.numpy.operators.window import simple_moving_average
+from temporian.implementation.numpy.operators.window import moving_product
 from temporian.implementation.numpy.operators.window import moving_standard_deviation
 from temporian.implementation.numpy.operators.window import moving_sum
 from temporian.implementation.numpy.operators.window import moving_count
@@ -62,6 +63,7 @@ from temporian.implementation.numpy.operators import end
 from temporian.implementation.numpy.operators import enumerate
 from temporian.implementation.numpy.operators import fast_fourier_transform
 from temporian.implementation.numpy.operators import filter_moving_count
+from temporian.implementation.numpy.operators import filter_empty_index
 from temporian.implementation.numpy.operators import map
 from temporian.implementation.numpy.operators import select_index_values
 from temporian.implementation.numpy.operators import since_last

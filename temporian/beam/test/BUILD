@@ -35,8 +35,10 @@ py_library(
         # already_there/apache_beam
         "//temporian/test:utils",
         "//temporian/beam/io:csv",
+        "//temporian/beam/io:tensorflow",
         "//temporian/beam:evaluation",
         "//temporian/io:csv",
+        "//temporian/io:tensorflow",
         "//temporian/core/data:node",
         "//temporian/implementation/numpy/data:event_set",
     ],

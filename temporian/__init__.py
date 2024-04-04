@@ -25,10 +25,11 @@
 # from temporian.module import submodule as _submodule
 # del _submodule
 
-__version__ = "0.7.0"
+__version__ = "0.8.1"
 
 # Register all operator implementations
 from temporian.implementation.numpy import operators as _impls
+
 del _impls
 
 
@@ -38,7 +39,7 @@ del _impls
 
 # EventSetNodes
 from temporian.core.data.node import EventSetNode
-from temporian.core.data.node import input_node
+from temporian.core.data.node import input_node, input_node_from_schema
 
 # Dtypes
 from temporian.core.data.dtype import float64
@@ -53,11 +54,11 @@ from temporian.core.data.dtype import bytes_
 from temporian.core.data.schema import Schema, FeatureSchema, IndexSchema
 
 # Durations
-from temporian.core.data import duration
+from temporian.api import duration
 
 # EventSets
 from temporian.implementation.numpy.data.event_set import EventSet, IndexData
-from temporian.implementation.numpy.data.io import event_set
+from temporian.implementation.numpy.data.io import event_set, from_indexed_dicts
 
 # Serialization
 from temporian.core.serialization import save
@@ -73,9 +74,12 @@ from temporian.core.evaluation import has_leak
 from temporian.io.csv import to_csv
 from temporian.io.csv import from_csv
 from temporian.io.pandas import to_pandas
+from temporian.io.numpy import to_numpy
 from temporian.io.pandas import from_pandas
 from temporian.io.parquet import from_parquet
 from temporian.io.parquet import to_parquet
+from temporian.io.polars import to_polars
+from temporian.io.polars import from_polars
 from temporian.io.tensorflow import to_tensorflow_dataset
 from temporian.io.tensorflow import from_tensorflow_record
 from temporian.io.tensorflow import to_tensorflow_record
@@ -107,3 +111,4 @@ del io
 del core
 del utils
 del implementation
+del api

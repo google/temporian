@@ -14,6 +14,7 @@
 
 """Filter operator class and public API function definition."""
 
+import logging
 from datetime import datetime
 from typing import Optional, Union
 
@@ -98,6 +99,15 @@ def filter(
     return FilterOperator(input, condition).outputs["output"]
 
 
+def compate_datetime_to_non_unix_warning() -> str:
+    return (
+        "Comparing a python datetime with an eventset having"
+        " is_unix_timestamp=True. The datetime is converted to a unix utc"
+        " timestamps. Set is_unix_timestamp=True on the eventset to remove this"
+        " warning."
+    )
+
+
 @compile
 def before(
     input: EventSetOrNode, timestamp: Union[float, datetime]
@@ -106,19 +116,8 @@ def before(
 
     if isinstance(timestamp, datetime):
         if not input.schema.is_unix_timestamp:
-            raise ValueError(
-                "Cannot use a datetime timestamp to filter timestamps that are"
-                " not unix timestamp. Set `is_unix_timestamp=True` on the"
-                " EventSet or use a float when calling `before`"
-            )
+            logging.warning("%s", compate_datetime_to_non_unix_warning())
         timestamp = duration_utils.normalize_timestamp(timestamp)
-    else:
-        if input.schema.is_unix_timestamp:
-            raise ValueError(
-                "Cannot use a float timestamp to filter unix timestamp. Set"
-                " `is_unix_timestamp=False` on the EventSet or use a float"
-                " when calling `before`"
-            )
     return filter(input, input.timestamps() < timestamp)
 
 
@@ -130,17 +129,6 @@ def after(
 
     if isinstance(timestamp, datetime):
         if not input.schema.is_unix_timestamp:
-            raise ValueError(
-                "Cannot use a datetime timestamp to filter timestamps that are"
-                " not unix timestamp. Set `is_unix_timestamp=True` on the"
-                " EventSet or use a float when calling `after`"
-            )
+            logging.warning("%s", compate_datetime_to_non_unix_warning())
         timestamp = duration_utils.normalize_timestamp(timestamp)
-    else:
-        if input.schema.is_unix_timestamp:
-            raise ValueError(
-                "Cannot use a float timestamp to filter unix timestamp. Set"
-                " `is_unix_timestamp=False` on the EventSet or use a float when"
-                " calling `after`"
-            )
     return filter(input, input.timestamps() > timestamp)

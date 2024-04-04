@@ -27,8 +27,15 @@ from temporian.beam.io.csv import from_csv as beam_from_csv
 from temporian.beam.io.csv import to_csv as beam_to_csv
 from temporian.beam.evaluation import run_multi_io
 from temporian.io.csv import to_csv, from_csv
+from temporian.io.tensorflow import to_tensorflow_record, from_tensorflow_record
 from temporian.core.data.node import EventSetNode
 from temporian.implementation.numpy.data.event_set import EventSet
+from temporian.beam.io.tensorflow import (
+    from_tensorflow_record as beam_from_tensorflow_record,
+)
+from temporian.beam.io.tensorflow import (
+    to_tensorflow_record as beam_to_tensorflow_record,
+)
 
 
 def check_beam_implementation(
@@ -58,17 +65,19 @@ def check_beam_implementation(
     input_paths = []
 
     # Export input data to csv
-    for input_idx, input_evtset in enumerate(input_data):
+    for input_idx, input_evset in enumerate(input_data):
         input_path = os.path.join(tmp_dir, f"input_{input_idx}.csv")
         input_paths.append(input_path)
-        to_csv(input_evtset, path=input_path)
+        to_tensorflow_record(input_evset, path=input_path)
 
     # Run the Temporian program using the Beam backend
     with TestPipeline() as p:
         input_pcollection = {}
-        for input_path, input_evtset in zip(input_paths, input_data):
-            input_pcollection[input_evtset.node()] = p | beam_from_csv(
-                input_path, input_evtset.node().schema
+        for input_path, input_evset in zip(input_paths, input_data):
+            input_pcollection[
+                input_evset.node()
+            ] = p | beam_from_tensorflow_record(
+                input_path, input_evset.node().schema
             )
 
         output_pcollection = run_multi_io(
@@ -77,7 +86,7 @@ def check_beam_implementation(
 
         assert len(output_pcollection) == 1
 
-        output = output_pcollection[output_node] | beam_to_csv(
+        output = output_pcollection[output_node] | beam_to_tensorflow_record(
             output_path, output_node.schema, shard_name_template=""
         )
 
@@ -86,9 +95,7 @@ def check_beam_implementation(
             equal_to([output_path]),
         )
 
-    beam_output = from_csv(
-        output_path, indexes=output_node.schema.index_names()
-    )
+    beam_output = from_tensorflow_record(output_path, output_node.schema)
 
     if cast:
         beam_output = beam_output.cast(cast)

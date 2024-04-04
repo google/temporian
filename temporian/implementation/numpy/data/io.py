@@ -1,4 +1,4 @@
-from typing import Any, List, Optional, Union, Dict
+from typing import Any, List, Optional, Union, Dict, Tuple
 
 import logging
 import numpy as np
@@ -12,7 +12,13 @@ from temporian.utils.typecheck import typecheck
 from temporian.implementation.numpy.data.event_set import EventSet, IndexData
 from temporian.core.evaluation import run
 from temporian.core.operators.add_index import add_index
-from temporian.core.data.schema import Schema
+from temporian.core.data.schema import Schema, IndexSchema, FeatureSchema
+from temporian.core.data.dtype import DType
+from temporian.implementation.numpy.data.dtype_normalization import (
+    numpy_dtype_to_tp_dtype,
+    normalize_index_item,
+    normalize_features,
+)
 
 # Array of values as feed by the user.
 DataArray = Union[List[Any], np.ndarray, "pandas.Series"]
@@ -100,7 +106,7 @@ def event_set(
             times are required for calendar operators. If `None` (default),
             timestamps are interpreted as unix times if the `timestamps`
             argument is an array of date or date-like object.
-        same_sampling_as: If set, the new EventSet is cheched and tagged as
+        same_sampling_as: If set, the new EventSet is checked and tagged as
             having the same sampling as `same_sampling_as`. Some operators,
             such as [`EventSet.filter()`][temporian.EventSet.filter], require
             their inputs to have the same sampling.
@@ -199,3 +205,113 @@ def event_set(
         evset.node()._sampling = same_sampling_as.node().sampling_node
 
     return evset
+
+
+@typecheck
+def from_indexed_dicts(
+    data: List[Tuple[Dict[str, Any], Dict[str, DataArray]]],
+    timestamps: str = "timestamp",
+    is_unix_timestamp: bool = False,
+) -> EventSet:
+    """Creates an [`EventSet`][temporian.EventSet] from indexed data.
+
+    Unlike `event_set`, `from_indexed_dicts` expects for the data to be already
+    split by index value. Supported values for timestamps, indexes, and
+    features as similar to `event_set`.
+
+    Usage examples:
+
+        ```python
+        >>> evset = tp.from_indexed_dicts(
+        ...    [
+        ...        (
+        ...            {"i1": 1, "i2": "A"},
+        ...            {"timestamp": [1, 2], "f1": [10, 11], "f2": ["X", "Y"]},
+        ...        ),
+        ...        (
+        ...            {"i1": 1, "i2": "B"},
+        ...            {"timestamp": [3, 4], "f1": [12, 13], "f2": ["X", "X"]},
+        ...        ),
+        ...    ])
+
+        ```
+
+    Args:
+        data: Indexed data.
+        timestamps: Name of the feature to be used as timestamps for the
+            EventSet.
+        is_unix_timestamp: Whether the timestamps correspond to unix time. Unix
+            times are required for calendar operators. If `None` (default),
+            timestamps are interpreted as unix times if the `timestamps`
+            argument is an array of date or date-like object.
+
+    Returns:
+        An EventSet.
+    """
+
+    if not isinstance(data, list):
+        raise ValueError("data is expected to be a list of two-items tuples")
+
+    if len(data) == 0:
+        raise ValueError("Cannot create eventset without any values")
+
+    if not isinstance(data[0], tuple):
+        raise ValueError("data is expected to be a list of two-items tuples")
+
+    first_index_value = data[0][0]
+    index_schema = []
+    for k, v in first_index_value.items():
+        index_schema.append(
+            IndexSchema(name=k, dtype=DType.from_python_value(v))
+        )
+
+    first_feature_values = data[0][1]
+
+    if timestamps not in first_feature_values:
+        raise ValueError(f"No value with name timestamps={timestamps!r}")
+
+    # Build schema
+    features_schema = []
+    for k, v in first_feature_values.items():
+        if k == timestamps:
+            continue
+        if isinstance(v, np.ndarray):
+            tp_dtype = numpy_dtype_to_tp_dtype(k, v.dtype.type)
+        else:
+            if not isinstance(v, list):
+                raise ValueError(
+                    "Feature values are expected to be numpy arrays or lists."
+                    f" Instead feature {k} has type {type(v)}"
+                )
+            if len(v) == 0:
+                raise ValueError("Feature {k} has zero observations.")
+            tp_dtype = DType.from_python_value(v[0])
+        features_schema.append(FeatureSchema(name=k, dtype=tp_dtype))
+
+    schema = Schema(
+        features=features_schema,
+        indexes=index_schema,
+        is_unix_timestamp=is_unix_timestamp,
+    )
+
+    # Build content
+    evtset_data = {}
+    for src_index_value, src_feature_value in data:
+        dst_timestamps, _ = normalize_timestamps(src_feature_value[timestamps])
+        dst_index_value = tuple(
+            normalize_index_item(src_index_value[k.name]) for k in index_schema
+        )
+        dst_feature_value = [
+            normalize_features(src_feature_value[k.name], k)
+            for k in features_schema
+        ]
+        evtset_data[dst_index_value] = IndexData(
+            features=dst_feature_value,
+            timestamps=dst_timestamps,
+            schema=schema,
+        )
+
+    return EventSet(
+        schema=schema,
+        data=evtset_data,
+    )

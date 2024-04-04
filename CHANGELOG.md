@@ -6,7 +6,48 @@
 
 ### Improvements
 
+- Added `before_first` and `after_last` parameters to `EventSet.tick` and `EventSet.tick_calendar`
+
 ### Fixes
+
+- Fixed a bug in `EventSet.tick_calendar` where it would miss the first tick under certain conditions
+- Fixed a bug in `EventSet.tick` where it would miss the last tick under certain conditions
+
+## 0.8.1
+
+Adding missing wheels for macos, no changes to the library
+
+## 0.8.0
+
+### Features
+
+- Add `EventSet.moving_product()` and `EventSet.cumprod()` operators. @akshatvishu
+- Add `to.to_numpy()`. @nagavenkateshgavini
+- Add trigonometric functions `EventSet.arccos()`, `EventSet.arcsin()`, `EventSet.arctan()`, `EventSet.cos()`, `EventSet.sin()`, and `EventSet.tan()`. @akshatvishu
+
+### Improvements
+
+- Speed up of calendar operations (now implemented in c++)
+- Add `force_garbage_collector_interval` to `tp.compile`.
+- Improved worst case time complexity from quadratic to linear for moving min/max operator.
+- Show first and last events instead of only first ones when displaying an EventSet. @jtaylor205
+- Exposed `tp.FeatureSchema` and `tp.IndexSchema`
+- `EventSet.propagate` now works even if both arguments don't have the same index values.
+- Add `font_scale` param to `tp.plot`
+- Speed-up `tp.plot` on evsets with a large number of index values.
+- `tp.plot` now works even when evsets have different index values.
+- Allow `tp.from_tensorflow_record` to consume a list of paths.
+- Add parameters `num_parallel_reads` and `buffer_size` to `tp.from_tensorflow_record`.
+- Check that timestamps are sorted on `tp.from_tensorflow_record`
+
+### Fixes
+
+- Fixed a bug with `EventSet.tick_calendar` and daylight savings time.
+- Fixed a bug with calendar operations and daylight savings time.
+
+### Thanks
+
+In adition to the contributors mentioned above, thanks to @umbr4g3, @jsoref, and @tanaysd for improvements to the Github Actions and profiling.
 
 ## 0.7.0
 

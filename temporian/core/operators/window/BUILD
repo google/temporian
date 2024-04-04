@@ -17,6 +17,7 @@ py_library(
         ":moving_standard_deviation",
         ":moving_sum",
         ":simple_moving_average",
+        ":moving_product",
     ],
 )
 
@@ -115,6 +116,21 @@ py_library(
 py_library(
     name = "moving_max",
     srcs = ["moving_max.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:compilation",
+        "//temporian/core:operator_lib",
+        "//temporian/core:typing",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:node",
+        "//temporian/core/data:schema",
+    ],
+)
+
+py_library(
+    name = "moving_product",
+    srcs = ["moving_product.py"],
     srcs_version = "PY3",
     deps = [
         ":base",

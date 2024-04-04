@@ -516,6 +516,59 @@ struct MovingMaxAccumulator : MovingExtremumAccumulator<INPUT, OUTPUT> {
   bool Compare(INPUT a, INPUT b) { return a > b; }
 };
 
+// TODO: Revisit the MovingProductAccumulator for potential optimization to
+// improve calculation efficiency while maintaining accuracy.
+template <typename INPUT, typename OUTPUT>
+struct MovingProductAccumulator : public Accumulator<INPUT, OUTPUT> {
+    int start_idx = 0;
+    int end_idx = -1; // Initialize to -1 to indicate an empty window initially
+
+    MovingProductAccumulator(const ArrayRef<INPUT>& values)
+        : Accumulator<INPUT, OUTPUT>(values) {}
+    void Add(Idx idx) override {
+        // Simply move the end to the given index
+        end_idx = idx;
+    }
+
+    void Remove(Idx idx) override {
+        // Adjust the start index to exclude the removed value, signaling a window shift.
+        start_idx = idx + 1;
+    }
+
+    OUTPUT Result() override {
+        if (start_idx > end_idx) {
+            // No valid indices to process, indicating an empty window or EventSet
+            return std::numeric_limits<OUTPUT>::quiet_NaN();
+        }
+
+        double product = 1.0;
+        bool hasEncounteredValidValue = false; // This will be true if any non-NaN and non-zero value is encountered
+
+        for (int idx = start_idx; idx <= end_idx; ++idx) {
+            const INPUT value = Accumulator<INPUT, OUTPUT>::values[idx];
+            if (value == 0) {
+                return 0;  // If a zero is found, return 0 immediately.
+            } else if (!std::isnan(value)) {
+                product *= value;
+                hasEncounteredValidValue = true;
+            }
+        }
+
+        if (!hasEncounteredValidValue) {
+            return std::numeric_limits<OUTPUT>::quiet_NaN();
+        }
+
+        return product;
+    }
+
+    void Reset()  {
+        start_idx = 0;
+        end_idx = -1;
+    }
+};
+
+
+
 // Instantiate the "accumulate" function with and without sampling,
 // and with and without variable window length.
 //
@@ -614,6 +667,9 @@ REGISTER_CC_FUNC(moving_max, int32_t, int32_t, MovingMaxAccumulator);
 REGISTER_CC_FUNC(moving_max, int64_t, int64_t, MovingMaxAccumulator);
 
 REGISTER_CC_FUNC_NO_INPUT(moving_count, int32_t, MovingCountAccumulator);
+
+REGISTER_CC_FUNC(moving_product, float, float, MovingProductAccumulator);
+REGISTER_CC_FUNC(moving_product, double, double, MovingProductAccumulator);
 }  // namespace
 
 // Register c++ functions to pybind with and without sampling,
@@ -693,4 +749,8 @@ void init_window(py::module &m) {
   ADD_PY_DEF(moving_max, int64_t, int64_t)
 
   ADD_PY_DEF_NO_INPUT(moving_count, int32_t)
+
+  ADD_PY_DEF(moving_product, float, float)
+  ADD_PY_DEF(moving_product, double, double)
+
 }

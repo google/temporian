@@ -2469,7 +2469,7 @@ class EventSetOperations:
             ValueError: If `check_overflow=True` and some value is out of the range
                 of the `target` dtype.
             ValueError: If trying to cast a non-numeric string to numeric dtype.
-            ValueError: If `target` is not a dtype nor a mapping.
+            ValueError: If `target` is neither a dtype nor a mapping.
             ValueError: If `target` is a mapping, but some of the keys are not a
                 dtype nor a feature in `input.feature_names`, or if those types are
                 mixed.
@@ -2477,6 +2477,78 @@ class EventSetOperations:
         from temporian.core.operators.cast import cast
 
         return cast(self, target=target, check_overflow=check_overflow)
+
+    def cumprod(
+        self: EventSetOrNode,
+        sampling: Optional[EventSetOrNode] = None,
+    ) -> EventSetOrNode:
+        """Computes the cumulative product of values over each feature in an
+        [`EventSet`][temporian.EventSet].
+
+        This operation only supports floating-point features.
+
+        Missing (NaN) values are not accounted for. The output will be NaN until
+        the input contains at least one numeric value.
+
+        Warning: The `cumprod` function leverages an infinite window length for
+        its calculations, which may lead to considerable computational overhead
+        with increasing dataset sizes.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 3],
+            ...     features={"value": [1.0, 2.0, 10.0, 12.0]},
+            ... )
+
+            >>> b = a.cumprod()
+            >>> b
+            indexes: ...
+                (4 events):
+                    timestamps: [0. 1. 2. 3.]
+                    'value': [  1.   2.  20. 240.]
+            ...
+
+            ```
+
+        Examples with sampling:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 5, 6, 7],
+            ...     features={"value": [1, 2, 10, 12, np.nan, 2]},
+            ... )
+
+            >>> # Cumulative product at 5 and 10
+            >>> b = tp.event_set(timestamps=[5, 10])
+            >>> c = a.cumprod(sampling=b)
+            >>> c
+            indexes: ...
+                (2 events):
+                    timestamps: [ 5. 10.]
+                    'value': [240. 480.]
+            ...
+
+            >>> # Product all values in the EventSet
+            >>> c = a.cumprod(sampling=a.end())
+            >>> c
+            indexes: ...
+                (1 events):
+                    timestamps: [7.]
+                    'value': [480.]
+            ...
+
+            ```
+
+        Args:
+            sampling: Timestamps to sample the sliding window's value at. If not
+                provided, timestamps in the input are used.
+
+        Returns:
+            Cumulative product of each feature.
+        """
+        from temporian.core.operators.window.moving_product import cumprod
+
+        return cumprod(self, sampling=sampling)
 
     def cumsum(
         self: EventSetOrNode,
@@ -2795,7 +2867,7 @@ class EventSetOperations:
 
         The window length is defined in number of events, instead of
         timestamp duration like most other operators. The 'num_events' argument
-        needs to be specified by warg i.e. fast_fourier_transform(num_events=5)
+        needs to be specified by kwarg i.e. fast_fourier_transform(num_events=5)
         instead of fast_fourier_transform(5).
 
         The operator returns the amplitude of each spectral line as
@@ -2899,6 +2971,43 @@ class EventSetOperations:
         from temporian.core.operators.filter import filter
 
         return filter(self, condition=condition)
+
+    def filter_empty_index(
+        self: EventSetOrNode,
+    ) -> EventSetOrNode:
+        """Filters out indexes without events.
+
+        Usage example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3, 4],
+            ...     features={
+            ...         "i1": [1, 1, 2, 2],
+            ...         "f1": [10, 11, 12, 13],
+            ...     },
+            ...     indexes=["i1"]
+            ... )
+
+            >>> filtered = a.filter(a["f1"] <= 11).filter_empty_index()
+            >>> filtered
+            indexes: [('i1', int64)]
+            features: [('f1', int64)]
+            events:
+                i1=1 (2 events):
+                    timestamps: [1. 2.]
+                    'f1': [10 11]
+            ...
+
+            ```
+
+        Returns:
+            Filtered EventSet.
+        """
+        from temporian.core.operators.filter_empty_index import (
+            filter_empty_index,
+        )
+
+        return filter_empty_index(self)
 
     def isnan(
         self: EventSetOrNode,
@@ -3513,6 +3622,68 @@ class EventSetOperations:
         )
 
         return moving_standard_deviation(
+            self, window_length=window_length, sampling=sampling
+        )
+
+    def moving_product(
+        self: EventSetOrNode,
+        window_length: WindowLength,
+        sampling: Optional[EventSetOrNode] = None,
+    ) -> EventSetOrNode:
+        """Computes the product of values in a sliding window over an
+        [`EventSet`][temporian.EventSet].
+
+        This operation only supports floating-point features.
+
+        For each t in sampling, and for each feature independently, returns at
+        time t the product of non-zero and non-NaN values for the feature in the window
+        (t - window_length, t].
+
+        `sampling` can't be specified if a variable `window_length` is
+        specified (i.e., if `window_length` is an EventSet).
+
+        If `sampling` is specified or `window_length` is an EventSet, the moving
+        window is sampled at each timestamp in them, else it is sampled on the
+        input's.
+
+        Zeros result in the accumulator's result being 0 for the window. NaN values are ignored in the
+        calculation of the product. If the window does not contain any NaN, zero or any non-zero values (e.g.,
+        all values are missing), the output for that window is an empty array.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2],
+            ...     features={"value": [np.nan, 1, 5]},
+            ... )
+
+            >>> b = a.moving_product(tp.duration.seconds(1))
+            >>> b
+            indexes: ...
+                (3 events):
+                    timestamps: [0. 1. 2.]
+                    'value': [nan 1. 5.]
+            ...
+
+            ```
+
+        See [`EventSet.moving_count()`][temporian.EventSet.moving_count] for
+        examples of moving window operations with external sampling and indices.
+
+        Args:
+            window_length: Sliding window's length.
+            sampling: Timestamps to sample the sliding window's value at. If not
+                provided, timestamps in the input are used.
+
+        Returns:
+            EventSet containing the moving product of each feature in the input,
+            considering non-zero and non-NaN values only.
+        """
+        from temporian.core.operators.window.moving_product import (
+            moving_product,
+        )
+
+        return moving_product(
             self, window_length=window_length, sampling=sampling
         )
 
@@ -4261,7 +4432,11 @@ class EventSetOperations:
         return since_last(self, steps=steps, sampling=sampling)
 
     def tick(
-        self: EventSetOrNode, interval: Duration, align: bool = True
+        self: EventSetOrNode,
+        interval: Duration,
+        align: bool = True,
+        after_last: bool = True,
+        before_first: bool = False,
     ) -> EventSetOrNode:
         """Generates timestamps at regular intervals in the range of a guide
         [`EventSet`][temporian.EventSet].
@@ -4272,7 +4447,7 @@ class EventSetOperations:
             >>> b = a.tick(interval=tp.duration.seconds(3), align=True)
             >>> b
             indexes: ...
-                    timestamps: [ 6. 9. 12. 15.]
+                    timestamps: [ 6. 9. 12. 15. 18.]
             ...
 
             ```
@@ -4283,24 +4458,53 @@ class EventSetOperations:
             >>> b = a.tick(interval=tp.duration.seconds(3), align=False)
             >>> b
             indexes: ...
-                    timestamps: [ 5. 8. 11. 14.]
+                    timestamps: [ 5. 8. 11. 14. 17.]
             ...
 
             ```
 
+        Example with before_first:
+            ```python
+            >>> a = tp.event_set(timestamps=[5, 9, 16])
+            >>> b = a.tick(interval=tp.duration.seconds(3), align=True, before_first=True)
+            >>> b
+            indexes: ...
+                    timestamps: [ 3. 6. 9. 12. 15. 18.]
+            ...
+
+            ```
+
+        Example without after_last:
+            ```python
+            >>> a = tp.event_set(timestamps=[5, 9, 16])
+            >>> b = a.tick(interval=tp.duration.seconds(3), align=True, after_last=False)
+            >>> b
+            indexes: ...
+                    timestamps: [ 6. 9. 12. 15.]
+            ...
+
+            ```
         Args:
             interval: Tick interval.
             align: If false, the first tick is generated at the first timestamp
                 (similar to [`EventSet.begin()`][temporian.EventSet.begin]).
                 If true (default), ticks are generated on timestamps that are
                 multiple of `interval`.
+            after_last: If True, a tick after the last timestamp is included.
+            before_first: If True, a tick before the first timestamp is included.
 
         Returns:
             A feature-less EventSet with regular timestamps.
         """
         from temporian.core.operators.tick import tick
 
-        return tick(self, interval=interval, align=align)
+        return tick(
+            self,
+            interval=interval,
+            align=align,
+            after_last=after_last,
+            before_first=before_first,
+        )
 
     def tick_calendar(
         self: EventSetOrNode,
@@ -4310,6 +4514,8 @@ class EventSetOperations:
         mday: Optional[Union[int, Literal["*"]]] = None,
         month: Optional[Union[int, Literal["*"]]] = None,
         wday: Optional[Union[int, Literal["*"]]] = None,
+        after_last: bool = True,
+        before_first: bool = False,
     ) -> EventSetOrNode:
         """Generates events periodically at fixed times or dates e.g. each month.
 
@@ -4339,7 +4545,7 @@ class EventSetOperations:
             >>> b
             indexes: ...
             events:
-                (365 events):
+                (366 events):
                     timestamps: [...]
             ...
 
@@ -4349,7 +4555,7 @@ class EventSetOperations:
             >>> tp.glue(b.calendar_hour(), b.calendar_minute())
             indexes: ...
             events:
-                (365 events):
+                (366 events):
                     timestamps: [...]
                     'calendar_hour': [2 2 2 ... 2 2 2]
                     'calendar_minute': [30 30 30 ... 30 30 30]
@@ -4361,7 +4567,7 @@ class EventSetOperations:
             >>> b.calendar_day_of_month()
             indexes: ...
             events:
-                (12 events):
+                (13 events):
                     timestamps: [...]
                     'calendar_day_of_month': [5 5 5 ... 5 5 5]
             ...
@@ -4373,10 +4579,10 @@ class EventSetOperations:
             >>> tp.glue(b.calendar_day_of_month(), b.calendar_month())
             indexes: ...
             events:
-                (2 events):
+                (3 events):
                     timestamps: [...]
-                    'calendar_day_of_month': [1 1]
-                    'calendar_month': [2 2]
+                    'calendar_day_of_month': [1 1 1]
+                    'calendar_month': [2 2 2]
             ...
 
             >>> # Every second in the period  (2 hours -> 7200 seconds)
@@ -4397,7 +4603,7 @@ class EventSetOperations:
             >>> b
             indexes: ...
             events:
-                (120 events):
+                (121 events):
                     timestamps: [...]
             ...
 
@@ -4407,6 +4613,30 @@ class EventSetOperations:
                 ...
             ValueError: Can't set argument to None because previous and
             following arguments were specified. Set to '*' or an integer ...
+
+            >>> # not after_last
+            >>> a = tp.event_set(timestamps=["2020-02-01", "2020-04-01"])
+            >>> b = a.tick_calendar(mday=10, after_last=False)
+            >>> tp.glue(b.calendar_day_of_month(), b.calendar_month())
+            indexes: ...
+            events:
+                (2 events):
+                    timestamps: [...]
+                    'calendar_day_of_month': [10 10]
+                    'calendar_month': [2 3]
+            ...
+
+            >>> # before_first
+            >>> a = tp.event_set(timestamps=["2020-02-01", "2020-04-01"])
+            >>> b = a.tick_calendar(mday=10, before_first=True)
+            >>> tp.glue(b.calendar_day_of_month(), b.calendar_month())
+            indexes: ...
+            events:
+                (4 events):
+                    timestamps: [...]
+                    'calendar_day_of_month': [10 10 10 10]
+                    'calendar_month': [1 2 3 4]
+            ...
 
             ```
 
@@ -4426,6 +4656,13 @@ class EventSetOperations:
             wday: '*' (any day), None (auto) or number in range `[0-6]`
                     (Sun-Sat) to tick at particular day of week. Can only be
                     specified if `day_of_month` is `None`.
+            after_last: If True, a tick after the last timestamp is included.
+                    Useful for window operations where you want the timestamps
+                    to be included in the range of the ticks.
+            before_first: If True, a tick before the first timestamp is
+                    included.
+                    Useful for window operations where you want the timestamps
+                    to be included in the range of the ticks.
 
         Returns:
             A feature-less EventSet with timestamps at specified interval.
@@ -4440,6 +4677,8 @@ class EventSetOperations:
             mday=mday,
             month=month,
             wday=wday,
+            after_last=after_last,
+            before_first=before_first,
         )
 
     def timestamps(self: EventSetOrNode) -> EventSetOrNode:
@@ -4591,7 +4830,7 @@ class EventSetOperations:
         is filtered out if there is a non-filtered out event in
         (t-window_length, t].
 
-        This operator is different from `(evtset.moving_count(window_length)
+        This operator is different from `(evset.moving_count(window_length)
         == 0).filter()`. In `filter_moving_count` a filtered event does not
         block following events.
 

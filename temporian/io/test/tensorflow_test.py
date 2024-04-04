@@ -146,10 +146,10 @@ class TensorFlowTest(absltest.TestCase):
         tmp_file = os.path.join(tmp_dir_handle.name, "data")
 
         to_tensorflow_record(evset, path=tmp_file, format="grouped_by_index")
-        loaded_evtset = from_tensorflow_record(
+        loaded_evset = from_tensorflow_record(
             path=tmp_file, schema=evset.schema
         )
-        assertEqualEventSet(self, evset, loaded_evtset)
+        assertEqualEventSet(self, evset, loaded_evset)
 
     def test_from_sharded_tensorflow_record(self) -> None:
         evset_1 = event_set(

@@ -13,10 +13,9 @@
 # limitations under the License.
 
 """Base calendar operator class definition."""
-import pytz
 import datetime
-from typing import Union
 from abc import ABC, abstractmethod
+from typing import Union
 
 from temporian.core.data.dtype import DType
 from temporian.core.data.node import (
@@ -27,29 +26,10 @@ from temporian.core.operators.base import Operator
 from temporian.proto import core_pb2 as pb
 
 
-def timezone_to_utc_offset(timezone: Union[str, float, int]) -> float:
-    """Normalizes timezone (tz name or number) to a float (UTC offset)."""
-    if isinstance(timezone, (bytes, str)):
-        tz_time = datetime.datetime.now(tz=pytz.timezone(timezone))
-        offset_timedelta = datetime.datetime.utcoffset(tz_time)
-        return (
-            0.0
-            if offset_timedelta is None
-            else offset_timedelta.total_seconds() / 3600
-        )
-    if not isinstance(timezone, (int, float)):
-        raise TypeError(
-            "Timezone argument (tz) must be a number of hours (int or"
-            " float) between (-24, 24) or a timezone name (string, see"
-            f" pytz.all_timezones). Got '{timezone}' ({type(timezone)})."
-        )
-    return float(timezone)
-
-
 class BaseCalendarOperator(Operator, ABC):
     """Interface definition and common logic for calendar operators."""
 
-    def __init__(self, sampling: EventSetNode, utc_offset: float):
+    def __init__(self, sampling: EventSetNode, tz: Union[int, float, str]):
         super().__init__()
 
         if not sampling.schema.is_unix_timestamp:
@@ -59,14 +39,8 @@ class BaseCalendarOperator(Operator, ABC):
                 " `is_unix_timestamp=True` when manually creating a sampling."
             )
 
-        # attribute: timezone
-        if abs(utc_offset) >= 24:
-            raise ValueError(
-                "Timezone offset must be a number of hours strictly between"
-                f" (-24, 24). Got: {utc_offset=}"
-            )
-        self._utc_offset = utc_offset
-        self.add_attribute("utc_offset", utc_offset)
+        self._tz = tz
+        self.add_attribute("tz", tz)
 
         # input and output
         self.add_input("sampling", sampling)
@@ -87,17 +61,17 @@ class BaseCalendarOperator(Operator, ABC):
             inputs=[pb.OperatorDef.Input(key="sampling")],
             attributes=[
                 pb.OperatorDef.Attribute(
-                    key="utc_offset",
-                    type=pb.OperatorDef.Attribute.Type.FLOAT_64,
+                    key="tz",
+                    type=pb.OperatorDef.Attribute.Type.ANY,
                 ),
             ],
             outputs=[pb.OperatorDef.Output(key="output")],
         )
 
     @property
-    def utc_offset(self) -> float:
+    def tz(self) -> Union[int, float, str]:
         """Gets timezone offset from UTC, in hours."""
-        return self._utc_offset
+        return self._tz
 
     @classmethod
     @abstractmethod

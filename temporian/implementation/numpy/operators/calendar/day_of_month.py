@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from datetime import datetime
+from typing import Callable
 
 from temporian.core.operators.calendar.day_of_month import (
     CalendarDayOfMonthOperator,
@@ -21,16 +21,12 @@ from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.operators.calendar.base import (
     BaseCalendarNumpyImplementation,
 )
+from temporian.implementation.numpy_cc.operators import operators_cc
 
 
 class CalendarDayOfMonthNumpyImplementation(BaseCalendarNumpyImplementation):
-    """Numpy implementation of the calendar_day_of_month operator."""
-
-    def __init__(self, operator: CalendarDayOfMonthOperator) -> None:
-        super().__init__(operator)
-
-    def _get_value_from_datetime(self, dt: datetime) -> int:
-        return dt.day
+    def _implementation(self) -> Callable:
+        return operators_cc.calendar_day_of_month
 
 
 implementation_lib.register_operator_implementation(

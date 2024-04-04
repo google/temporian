@@ -12,7 +12,7 @@
 cls
 setlocal
 
-set TEMPORIAN_VERSION=0.7.0
+set TEMPORIAN_VERSION=0.8.1
 
 set BAZEL=bazel.exe
 :: You can pass BAZEL flags here e.g. set BAZEL=bazel.exe --output_user_root=C:\src\tmp_bazel

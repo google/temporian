@@ -123,13 +123,11 @@ class CalendarTimezoneTest(TestCase):
         )
 
     def test_invalid_timezone(self):
-        with self.assertRaises(UnknownTimeZoneError):
+        with self.assertRaises(ValueError):
             self.evset.calendar_hour(tz="I'm a fake timezone")
 
     def test_invalid_type(self):
-        with self.assertRaisesRegex(
-            TypeError, "Timezone argument \(tz\) must be a number of hours"
-        ):
+        with self.assertRaises(ValueError):
             self.evset.calendar_hour(tz=None)
 
 

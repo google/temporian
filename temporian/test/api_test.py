@@ -109,6 +109,19 @@ class TFPTest(absltest.TestCase):
         reconstructed_evset = tp.from_pandas(df)
         self.assertEqual(evset, reconstructed_evset)
 
+    def test_polars(self):
+        evset = tp.event_set(
+            timestamps=[0.0, 2.0, 4.0, 6.0],
+            features={
+                "f1": [1.0, 2.0, 3.0, 4.0],
+                "f2": [5.0, 6.0, 7.0, 8.0],
+            },
+        )
+
+        df = tp.to_polars(evset)
+        reconstructed_evset = tp.from_polars(df)
+        self.assertEqual(evset, reconstructed_evset)
+
     def test_serialization(self):
         a = tp.input_node([("f1", tp.float32), ("f2", tp.float32)])
         b = a.simple_moving_average(window_length=7)
@@ -197,6 +210,26 @@ class TFPTest(absltest.TestCase):
             re.escape("Non matching type for \"<class 'list'>\" in the union"),
         ):
             tp.event_set(timestamps=[1, 2], features=[])
+
+    def test_duration_to_string(self):
+        self.assertEqual(
+            tp.duration.to_string(tp.duration.days(2) + tp.duration.hours(3)),
+            "2d3h",
+        )
+
+    def test_schema_to_from_proto(self):
+        a = tp.Schema(features=[("f1", tp.int32), ("f2", tp.float64)])
+        p = a.to_proto()
+        b = tp.Schema.from_proto(p)
+        self.assertEqual(a, b)
+
+    def test_schema_to_from_proto_file(self):
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "schema.pbtxt")
+            a = tp.Schema(features=[("f1", tp.int32), ("f2", tp.float64)])
+            a.to_proto_file(path)
+            b = tp.Schema.from_proto_file(path)
+            self.assertEqual(a, b)
 
 
 if __name__ == "__main__":

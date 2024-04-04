@@ -114,9 +114,6 @@ class AfterTest(TestCase):
             features={"x": [4, 5, 6]},
         )
 
-        with self.assertRaisesRegex(ValueError, "unix"):
-            _ = evset.after(datetime(2023, 11, 16, 10, 16, 00))
-
 
 if __name__ == "__main__":
     absltest.main()

@@ -489,3 +489,17 @@ py_library(
         "//temporian/core:compilation",
     ],
 )
+
+py_library(
+    name = "filter_empty_index",
+    srcs = ["filter_empty_index.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:operator_lib",
+        "//temporian/core/data:node",
+        "//temporian/core/data:schema",
+        "//temporian/proto:core_py_proto",
+    ],
+)
+    

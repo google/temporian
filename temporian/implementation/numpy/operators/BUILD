@@ -21,6 +21,7 @@ py_library(
         ":fast_fourier_transform",
         ":filter",
         ":filter_moving_count",
+        ":filter_empty_index",
         ":glue",
         ":join",
         ":lag",
@@ -59,6 +60,7 @@ py_library(
         "//temporian/implementation/numpy/operators/window:moving_count",
         "//temporian/implementation/numpy/operators/window:moving_max",
         "//temporian/implementation/numpy/operators/window:moving_min",
+        "//temporian/implementation/numpy/operators/window:moving_product",
         "//temporian/implementation/numpy/operators/window:moving_standard_deviation",
         "//temporian/implementation/numpy/operators/window:moving_sum",
         "//temporian/implementation/numpy/operators/window:simple_moving_average",
@@ -457,5 +459,19 @@ py_library(
         "//temporian/implementation/numpy:implementation_lib",
         "//temporian/implementation/numpy/data:event_set",
         "//temporian/core:types",
+    ],
+)
+
+py_library(
+    name = "filter_empty_index",
+    srcs = ["filter_empty_index.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/numpy
+        ":base",
+        "//temporian/core/data:duration_utils",
+        "//temporian/core/operators:filter_empty_index",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event_set",
     ],
 )

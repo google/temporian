@@ -21,7 +21,7 @@ jobs:
           # - tutorials/m5_competition # Note: Github cannot download dataset anymore.
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Bazel cache
         id: bazel-cache
