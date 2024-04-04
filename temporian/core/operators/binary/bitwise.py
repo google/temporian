@@ -34,8 +34,8 @@ class BaseBitwiseOperator(BaseBinaryOperator):
         for feature in input_1.schema.features:
             if feature.dtype != DType.INT32 and feature.dtype != DType.INT64:
                 raise ValueError(
-                    "Bitwise operators only support INT32 or INT64 types, but feature"
-                    f" {feature.name} has dtype {feature.dtype}"
+                    "Bitwise operators only support INT32 or INT64 types, but "
+                    f"feature {feature.name} has dtype {feature.dtype}"
                 )
 
     def output_feature_dtype(
@@ -65,6 +65,14 @@ class BitwiseOrOperator(BaseBitwiseOperator):
 
 class BitwiseXorOperator(BaseBitwiseOperator):
     OP_NAME = "bitwise_xor"
+
+
+class LeftShiftOperator(BaseBitwiseOperator):
+    OP_NAME = "left_shift"
+
+
+class RightShiftOperator(BaseBitwiseOperator):
+    OP_NAME = "right_shift"
 
 
 @compile
@@ -109,6 +117,36 @@ def bitwise_xor(
     ).outputs["output"]
 
 
+@compile
+def left_shift(
+    input_1: EventSetOrNode,
+    input_2: EventSetOrNode,
+) -> EventSetOrNode:
+    assert isinstance(input_1, EventSetNode)
+    assert isinstance(input_2, EventSetNode)
+
+    return LeftShiftOperator(
+        input_1=input_1,
+        input_2=input_2,
+    ).outputs["output"]
+
+
+@compile
+def right_shift(
+    input_1: EventSetOrNode,
+    input_2: EventSetOrNode,
+) -> EventSetOrNode:
+    assert isinstance(input_1, EventSetNode)
+    assert isinstance(input_2, EventSetNode)
+
+    return RightShiftOperator(
+        input_1=input_1,
+        input_2=input_2,
+    ).outputs["output"]
+
+
 operator_lib.register_operator(BitwiseAndOperator)
 operator_lib.register_operator(BitwiseOrOperator)
 operator_lib.register_operator(BitwiseXorOperator)
+operator_lib.register_operator(LeftShiftOperator)
+operator_lib.register_operator(RightShiftOperator)

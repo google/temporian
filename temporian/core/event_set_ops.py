@@ -1460,6 +1460,145 @@ class EventSetOperations:
         self._raise_bool_error("^", other)
         assert False
 
+    def __lshift__(self:EventSetOrNode, other: Any) -> EventSetOrNode:
+        """Performs a left bitwise shift (`self << other`) element-wise with
+        another [`EventSet`][temporian.EventSet] or a scalar value.
+
+        If `other` is an `EventSet`, each feature in `self` is shifted left by
+        the corresponding value in `other` at the same position.
+        If `other` is a scalar, each feature in `self` is shifted left by
+        the scalar value.
+
+        When `other` is an `EventSet`, `self` and `other` must have the same
+        sampling and the same number of features. The feature types in `self`
+        must be non-negative integer types.
+        When `other` is a scalar, it must be a non-negative integer.
+
+        Example with EventSet:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [2, 4, 8]}
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f2": [1, 2, 3]},
+            ...     same_sampling_as=a
+            ... )
+            >>> c = a << b
+            >>> c
+            indexes: []
+            features: [('left_shift_f1_f2', int64)]
+            events: (3 events):
+            timestamps: [1. 2. 3.]
+            'left_shift_f1_f2': [  4  16 64]
+            ...
+
+            ```
+
+        Example with scalar value:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [2, 4, 8]}
+            ... )
+            >>> b = a << 2
+            >>> b
+            indexes: []
+            features: [('f1', int64)]
+            events: (3 events):
+            timestamps: [1. 2. 3.]
+            'f1': [  8  16  32]
+            ...
+
+            ```
+
+        Args:
+            other: EventSet with only boolean features.
+
+        Returns:
+            EventSet with result of the comparison.
+        """
+
+        if isinstance(other, self.__class__):
+            from temporian.core.operators.binary import left_shift
+            return left_shift(input_1=self, input_2=other)
+
+        if isinstance(other, int):
+            from temporian.core.operators.scalar import left_shift_scalar
+            return left_shift_scalar(input=self, value=other)
+
+        self._raise_error("<<", other, "int")
+        assert False
+
+    def __rshift__(self:EventSetOrNode, other: Any) -> EventSetOrNode:
+        """Performs a right bitwise shift (`self >> other`) element-wise with
+        another [`EventSet`][temporian.EventSet] or a scalar value.
+        If `other` is an `EventSet`, each feature in `self` is shifted right
+        by the corresponding value in `other` at the same position.
+        If `other` is a scalar, each feature in `self` is shifted right by the
+        scalar value.
+
+        When `other` is an `EventSet`, `self` and `other` must have the same
+        sampling and the same number of features. The feature types
+        in `self` must be non-negative integer types.
+        When `other` is a scalar, it must be a non-negative integer.
+
+        Example with EventSet:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [8, 16, 32]}
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f2": [1, 2, 3]},
+            ...     same_sampling_as=a
+            ... )
+            >>> c = a >> b
+            >>> c
+            indexes: []
+            features: [('right_shift_f1_f2', int64)]
+            events: (3 events):
+            timestamps: [1. 2. 3.]
+            'right_shift_f1_f2': [4 4 4]
+            ...
+
+            ```
+
+        Example with scalar value:
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [8, 16, 32]}
+            ... )
+            >>> b = a >> 2
+            >>> b
+            indexes: []
+            features: [('f1', int64)]
+            events: (3 events):
+            timestamps: [1. 2. 3.]
+            'f1': [2 4 8]
+            ...
+
+            ```
+
+        Args:
+            other: EventSet with only boolean features.
+
+        Returns:
+            EventSet with result of the comparison.
+        """
+
+        if isinstance(other, self.__class__):
+            from temporian.core.operators.binary import right_shift
+            return right_shift(input_1=self, input_2=other)
+
+        if isinstance(other, int):
+            from temporian.core.operators.scalar import right_shift_scalar
+            return right_shift_scalar(input=self, value=other)
+
+        self._raise_error(">>", other, "int")
+        assert False
     #############
     # OPERATORS #
     #############

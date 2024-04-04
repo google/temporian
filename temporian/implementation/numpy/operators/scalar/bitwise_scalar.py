@@ -22,6 +22,8 @@ from temporian.core.operators.scalar import (
     BitwiseAndScalarOperator,
     BitwiseOrScalarOperator,
     BitwiseXorScalarOperator,
+    LeftShiftScalarOperator,
+    RightShiftScalarOperator,
 )
 from temporian.implementation.numpy import implementation_lib
 
@@ -62,6 +64,30 @@ class BitwiseXorScalarNumpyImplementation(BaseScalarNumpyImplementation):
         return np.bitwise_xor(feature.data, value)
 
 
+class LeftScalarNumpyImplementation(BaseScalarNumpyImplementation):
+    """Numpy implementation of the left shift scalar operator."""
+
+    def _do_operation(
+        self,
+        feature: np.ndarray,
+        value: int,
+        dtype: DType,
+    ) -> np.ndarray:
+        return np.left_shift(feature.data, value)
+
+
+class RightScalarNumpyImplementation(BaseScalarNumpyImplementation):
+    """Numpy implementation of the right shift scalar operator."""
+
+    def _do_operation(
+        self,
+        feature: np.ndarray,
+        value: int,
+        dtype: DType,
+    ) -> np.ndarray:
+        return np.right_shift(feature.data, value)
+
+
 implementation_lib.register_operator_implementation(
     BitwiseAndScalarOperator, BitwiseAndScalarNumpyImplementation
 )
@@ -70,4 +96,10 @@ implementation_lib.register_operator_implementation(
 )
 implementation_lib.register_operator_implementation(
     BitwiseXorScalarOperator, BitwiseXorScalarNumpyImplementation
+)
+implementation_lib.register_operator_implementation(
+    LeftShiftScalarOperator, LeftScalarNumpyImplementation
+)
+implementation_lib.register_operator_implementation(
+    RightShiftScalarOperator, RightScalarNumpyImplementation
 )

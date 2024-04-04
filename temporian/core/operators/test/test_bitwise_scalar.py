@@ -19,7 +19,9 @@ from temporian.test.utils import assertOperatorResult
 from temporian.core.operators.scalar import (
     bitwise_and_scalar,
     bitwise_or_scalar,
-    bitwise_xor_scalar
+    bitwise_xor_scalar,
+    left_shift_scalar,
+    right_shift_scalar,
 )
 
 
@@ -76,6 +78,30 @@ class ArithmeticScalarTest(absltest.TestCase):
             self,
             bitwise_xor_scalar(self.evset, value),
             expected
+        )
+
+    def test_correct_left_shift(self) -> None:
+        """Test correct left shift operator."""
+        value = 2
+        expected = event_set(
+            timestamps=[1, 2, 3, 4],
+            features={"x": [8, 20, 28, 36]},
+            same_sampling_as=self.evset,
+        )
+        assertOperatorResult(
+            self, left_shift_scalar(self.evset, value), expected
+        )
+
+    def test_correct_right_shift(self) -> None:
+        """Test correct right shift operator."""
+        value = 1
+        expected = event_set(
+            timestamps=[1, 2, 3, 4],
+            features={"x": [1, 2, 3, 4]},
+            same_sampling_as=self.evset,
+        )
+        assertOperatorResult(
+            self, right_shift_scalar(self.evset, value), expected
         )
 
 

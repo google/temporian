@@ -22,4 +22,6 @@ from temporian.implementation.numpy.operators.scalar.bitwise_scalar import (
     BitwiseAndScalarOperator,
     BitwiseOrScalarOperator,
     BitwiseXorScalarOperator,
+    LeftShiftScalarOperator,
+    RightShiftScalarOperator,
 )

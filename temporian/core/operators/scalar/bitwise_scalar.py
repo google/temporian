@@ -41,10 +41,10 @@ class BaseBitwiseScalarOperator(BaseScalarOperator):
                     f"feature {feature.name} has dtype {feature.dtype}"
                 )
         # Check that the value is an integer
-        if not isinstance(value, int):
+        if DType.from_python_value(value) not in [DType.INT32, DType.INT64]:
             raise ValueError(
                 "Bitwise operators only support int values, but value"
-                f" has type {type(value)}"
+                f" has type {DType.from_python_value(value)}"
             )
         super().__init__(input, value, is_value_first)
 
@@ -59,6 +59,14 @@ class BitwiseOrScalarOperator(BaseBitwiseScalarOperator):
 
 class BitwiseXorScalarOperator(BaseBitwiseScalarOperator):
     DEF_KEY = "BITWISE_XOR_SCALAR"
+
+
+class LeftShiftScalarOperator(BaseBitwiseScalarOperator):
+    DEF_KEY = "LEFT_SHIFT_SCALAR"
+
+
+class RightShiftScalarOperator(BaseBitwiseScalarOperator):
+    DEF_KEY = "RIGHT_SHIFT_SCALAR"
 
 
 @compile
@@ -100,6 +108,34 @@ def bitwise_xor_scalar(
     ).outputs["output"]
 
 
+@compile
+def left_shift_scalar(
+    input: EventSetOrNode,
+    value: int,
+) -> EventSetOrNode:
+    assert isinstance(input, EventSetNode)
+
+    return LeftShiftScalarOperator(
+        input=input,
+        value=value,
+    ).outputs["output"]
+
+
+@compile
+def right_shift_scalar(
+    input: EventSetOrNode,
+    value: int,
+) -> EventSetOrNode:
+    assert isinstance(input, EventSetNode)
+
+    return RightShiftScalarOperator(
+        input=input,
+        value=value,
+    ).outputs["output"]
+
+
 operator_lib.register_operator(BitwiseAndScalarOperator)
 operator_lib.register_operator(BitwiseOrScalarOperator)
 operator_lib.register_operator(BitwiseXorScalarOperator)
+operator_lib.register_operator(LeftShiftScalarOperator)
+operator_lib.register_operator(RightShiftScalarOperator)

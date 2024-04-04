@@ -21,6 +21,8 @@ from temporian.core.operators.binary import (
     BitwiseAndOperator,
     BitwiseOrOperator,
     BitwiseXorOperator,
+    LeftShiftOperator,
+    RightShiftOperator,
 )
 from temporian.implementation.numpy import implementation_lib
 
@@ -70,6 +72,36 @@ class BitwiseXorNumpyImplementation(BaseBinaryNumpyImplementation):
         return np.bitwise_xor(evset_1_feature.data, evset_2_feature.data)
 
 
+class LeftShiftNumpyImplementation(BaseBinaryNumpyImplementation):
+    """Numpy implementation of the Left Shift operator."""
+
+    def __init__(self, operator: LeftShiftOperator) -> None:
+        super().__init__(operator)
+
+    def _do_operation(
+        self,
+        evset_1_feature: np.ndarray,
+        evset_2_feature: np.ndarray,
+        dtype: DType,
+    ) -> np.ndarray:
+        return np.left_shift(evset_1_feature.data, evset_2_feature.data)
+
+
+class RightShiftNumpyImplementation(BaseBinaryNumpyImplementation):
+    """Numpy implementation of the Right Shift operator."""
+
+    def __init__(self, operator: RightShiftOperator) -> None:
+        super().__init__(operator)
+
+    def _do_operation(
+        self,
+        evset_1_feature: np.ndarray,
+        evset_2_feature: np.ndarray,
+        dtype: DType,
+    ) -> np.ndarray:
+        return np.right_shift(evset_1_feature.data, evset_2_feature.data)
+
+
 implementation_lib.register_operator_implementation(
     BitwiseAndOperator, BitwiseAndNumpyImplementation
 )
@@ -78,4 +110,10 @@ implementation_lib.register_operator_implementation(
 )
 implementation_lib.register_operator_implementation(
     BitwiseXorOperator, BitwiseXorNumpyImplementation
+)
+implementation_lib.register_operator_implementation(
+    LeftShiftOperator, LeftShiftNumpyImplementation
+)
+implementation_lib.register_operator_implementation(
+    RightShiftOperator, RightShiftNumpyImplementation
 )

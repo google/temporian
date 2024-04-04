@@ -25,4 +25,6 @@ from temporian.implementation.numpy.operators.binary.bitwise import (
     BitwiseAndNumpyImplementation,
     BitwiseOrNumpyImplementation,
     BitwiseXorNumpyImplementation,
+    LeftShiftNumpyImplementation,
+    RightShiftNumpyImplementation,
 )
