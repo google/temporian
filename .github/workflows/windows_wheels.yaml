@@ -1,0 +1,67 @@
+name: windows_build
+
+on:
+  [push]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: [3.9] #["3.8", "3.9", "3.10", "3.11"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Build package
+        run: tools/build.bat
+
+      - name: Save package for following jobs
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-windows-${{ matrix.python-version }}
+          path: dist
+
+
+  # test-install:
+  #   needs: [build-windows]
+  #   strategy:
+  #     matrix:
+  #       python-version: [3.9] #["3.8", "3.9", "3.10", "3.11"]
+  #       platform:
+  #         [
+  #           { runner: ubuntu-latest, artifact: ubuntu },
+  #           { runner: macos-12-large, artifact: macos12-intel },
+  #           { runner: macos-13-large, artifact: macos13-intel },
+  #           { runner: macos-14-large, artifact: macos14-intel },
+  #         ]
+  #   runs-on: ${{ matrix.platform.runner }}
+  #   env:
+  #     # Workaround for macos pip compatibility issue
+  #     # See https://github.com/actions/setup-python/issues/469
+  #     SYSTEM_VERSION_COMPAT: 0
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+
+  #     - name: Set up Python ${{ matrix.python-version }}
+  #       uses: actions/setup-python@v4
+  #       with:
+  #         python-version: ${{ matrix.python-version }}
+
+  #     - name: Download build
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: dist-${{ matrix.platform.artifact }}-${{ matrix.python-version }}
+  #         path: dist
+
+  #     - name: Install from wheel
+  #       run: pip install dist/*.whl
+
+  #     - name: Test installation
+  #       run: python tools/check_install.py
