@@ -1,7 +1,7 @@
 import setuptools
 from setuptools.dist import Distribution
 
-_VERSION = "0.7.0"
+_VERSION = "0.9.0"
 
 
 class _BinaryDistribution(Distribution):
