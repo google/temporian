@@ -279,8 +279,8 @@ class MagicMethodsTest(absltest.TestCase):
     ):
         out = float_1 != float_2
         self.assertTrue(isinstance(out.creator, NotEqualOperator))
-        self.assertTrue(out.schema.features[0].name == "ne_f1_f3")
-        self.assertTrue(out.schema.features[1].name == "ne_f2_f4")
+        self.assertTrue(out.schema.features[0].name == "f1")
+        self.assertTrue(out.schema.features[1].name == "f2")
         self._check_boolean(out, float_1)
 
     def test_greater(
@@ -291,8 +291,8 @@ class MagicMethodsTest(absltest.TestCase):
     ):
         out = float_1 > float_2
         self.assertTrue(isinstance(out.creator, GreaterOperator))
-        self.assertTrue(out.schema.features[0].name == "gt_f1_f3")
-        self.assertTrue(out.schema.features[1].name == "gt_f2_f4")
+        self.assertTrue(out.schema.features[0].name == "f1")
+        self.assertTrue(out.schema.features[1].name == "f2")
         self._check_boolean(out, float_1)
 
     def test_less(
@@ -303,8 +303,8 @@ class MagicMethodsTest(absltest.TestCase):
     ):
         out = float_1 < float_2
         self.assertTrue(isinstance(out.creator, LessOperator))
-        self.assertTrue(out.schema.features[0].name == "lt_f1_f3")
-        self.assertTrue(out.schema.features[1].name == "lt_f2_f4")
+        self.assertTrue(out.schema.features[0].name == "f1")
+        self.assertTrue(out.schema.features[1].name == "f2")
         self._check_boolean(out, float_1)
 
     def test_greater_equal(
@@ -315,8 +315,8 @@ class MagicMethodsTest(absltest.TestCase):
     ):
         out = float_1 >= float_2
         self.assertTrue(isinstance(out.creator, GreaterEqualOperator))
-        self.assertTrue(out.schema.features[0].name == "ge_f1_f3")
-        self.assertTrue(out.schema.features[1].name == "ge_f2_f4")
+        self.assertTrue(out.schema.features[0].name == "f1")
+        self.assertTrue(out.schema.features[1].name == "f2")
         self._check_boolean(out, float_1)
 
     def test_less_equal(
@@ -327,8 +327,8 @@ class MagicMethodsTest(absltest.TestCase):
     ):
         out = float_1 <= float_2
         self.assertTrue(isinstance(out.creator, LessEqualOperator))
-        self.assertTrue(out.schema.features[0].name == "le_f1_f3")
-        self.assertTrue(out.schema.features[1].name == "le_f2_f4")
+        self.assertTrue(out.schema.features[0].name == "f1")
+        self.assertTrue(out.schema.features[1].name == "f2")
         self._check_boolean(out, float_1)
 
     # ###################################
@@ -428,8 +428,8 @@ class MagicMethodsTest(absltest.TestCase):
     ):
         out = float_1 + float_2
         self.assertTrue(isinstance(out.creator, AddOperator))
-        self.assertTrue(out.schema.features[0].name == "add_f1_f3")
-        self.assertTrue(out.schema.features[1].name == "add_f2_f4")
+        self.assertTrue(out.schema.features[0].name == "f1")
+        self.assertTrue(out.schema.features[1].name == "f2")
         self._check_node_same_dtype(float_1, out)
 
     def test_subtraction(
@@ -440,8 +440,8 @@ class MagicMethodsTest(absltest.TestCase):
     ):
         out = float_1 - float_2
         self.assertTrue(isinstance(out.creator, SubtractOperator))
-        self.assertTrue(out.schema.features[0].name == "sub_f1_f3")
-        self.assertTrue(out.schema.features[1].name == "sub_f2_f4")
+        self.assertTrue(out.schema.features[0].name == "f1")
+        self.assertTrue(out.schema.features[1].name == "f2")
         self._check_node_same_dtype(float_1, out)
 
     def test_multiplication(
@@ -452,8 +452,8 @@ class MagicMethodsTest(absltest.TestCase):
     ):
         out = float_1 * float_2
         self.assertTrue(isinstance(out.creator, MultiplyOperator))
-        self.assertTrue(out.schema.features[0].name == "mult_f1_f3")
-        self.assertTrue(out.schema.features[1].name == "mult_f2_f4")
+        self.assertTrue(out.schema.features[0].name == "f1")
+        self.assertTrue(out.schema.features[1].name == "f2")
         self._check_node_same_dtype(float_1, out)
 
     def test_division(
@@ -464,8 +464,8 @@ class MagicMethodsTest(absltest.TestCase):
     ):
         out = float_1 / float_2
         self.assertTrue(isinstance(out.creator, DivideOperator))
-        self.assertTrue(out.schema.features[0].name == "div_f1_f3")
-        self.assertTrue(out.schema.features[1].name == "div_f2_f4")
+        self.assertTrue(out.schema.features[0].name == "f1")
+        self.assertTrue(out.schema.features[1].name == "f2")
         self._check_node_same_dtype(float_1, out)
 
     def test_floordiv(
@@ -478,8 +478,8 @@ class MagicMethodsTest(absltest.TestCase):
         # Check floordiv operator instead
         out = int_1 // int_2
         self.assertTrue(isinstance(out.creator, FloorDivOperator))
-        self.assertTrue(out.schema.features[0].name == "floordiv_f5_f7")
-        self.assertTrue(out.schema.features[1].name == "floordiv_f6_f8")
+        self.assertTrue(out.schema.features[0].name == "f5")
+        self.assertTrue(out.schema.features[1].name == "f6")
         self._check_node_same_dtype(int_1, out)
 
     def test_modulo(
@@ -490,8 +490,8 @@ class MagicMethodsTest(absltest.TestCase):
     ):
         out = float_1 % float_2
         self.assertTrue(isinstance(out.creator, ModuloOperator))
-        self.assertTrue(out.schema.features[0].name == "mod_f1_f3")
-        self.assertTrue(out.schema.features[1].name == "mod_f2_f4")
+        self.assertTrue(out.schema.features[0].name == "f1")
+        self.assertTrue(out.schema.features[1].name == "f2")
         self._check_node_same_dtype(float_1, out)
 
     def test_power(
@@ -502,8 +502,8 @@ class MagicMethodsTest(absltest.TestCase):
     ):
         out = float_1**float_2
         self.assertTrue(isinstance(out.creator, PowerOperator))
-        self.assertTrue(out.schema.features[0].name == "pow_f1_f3")
-        self.assertTrue(out.schema.features[1].name == "pow_f2_f4")
+        self.assertTrue(out.schema.features[0].name == "f1")
+        self.assertTrue(out.schema.features[1].name == "f2")
         self._check_node_same_dtype(float_1, out)
 
     # ###################################

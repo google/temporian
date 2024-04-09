@@ -121,17 +121,17 @@ def glue(
         >>> c = a["M"] - a["N"]
 
         # Glue all features from a,b,c
-        >>> d = tp.glue(a, b, c)
+        >>> d = tp.glue(a, b.rename("plus_N"), c.rename("minus_N"))
         >>> d
         indexes: []
-        features: [('M', int64), ('N', int64), ('add_M_N', int64), ('sub_M_N', int64)]
+        features: [('M', int64), ('N', int64), ('plus_N', int64), ('minus_N', int64)]
         events:
             (3 events):
                 timestamps: [0. 1. 5.]
                 'M': [ 0 10 50]
                 'N': [ 50 100 500]
-                'add_M_N': [ 50 110 550]
-                'sub_M_N': [ -50  -90 -450]
+                'plus_N': [ 50 110 550]
+                'minus_N': [ -50  -90 -450]
         ...
 
         ```
