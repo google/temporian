@@ -208,21 +208,21 @@ def event_set(
 
 
 @typecheck
-def from_indexed_dicts(
+def from_struct(
     data: List[Tuple[Dict[str, Any], Dict[str, DataArray]]],
     timestamps: str = "timestamp",
     is_unix_timestamp: bool = False,
 ) -> EventSet:
     """Creates an [`EventSet`][temporian.EventSet] from indexed data.
 
-    Unlike `event_set`, `from_indexed_dicts` expects for the data to be already
+    Unlike `event_set`, `from_struct` expects for the data to be already
     split by index value. Supported values for timestamps, indexes, and
     features as similar to `event_set`.
 
     Usage examples:
 
         ```python
-        >>> evset = tp.from_indexed_dicts(
+        >>> evset = tp.from_struct(
         ...    [
         ...        (
         ...            {"i1": 1, "i2": "A"},

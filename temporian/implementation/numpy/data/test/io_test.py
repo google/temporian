@@ -7,7 +7,7 @@ import pandas as pd
 from numpy.testing import assert_array_equal
 from datetime import datetime
 
-from temporian.implementation.numpy.data.io import event_set, from_indexed_dicts
+from temporian.implementation.numpy.data.io import event_set, from_struct
 from temporian.implementation.numpy.data.event_set import IndexData, EventSet
 from temporian.core.data.schema import Schema
 from temporian.core.data.dtype import DType
@@ -199,8 +199,8 @@ class IOTest(absltest.TestCase):
                 },
             )
 
-    def test_from_indexed_dicts(self):
-        evset = from_indexed_dicts(
+    def test_from_struct(self):
+        evset = from_struct(
             [
                 (
                     {"i1": 1, "i2": "A"},
