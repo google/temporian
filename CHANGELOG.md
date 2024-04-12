@@ -6,13 +6,29 @@
 
 ### Improvements
 
-- Added `before_first` and `after_last` parameters to `EventSet.tick` and `EventSet.tick_calendar`
+### Fixes
+
+## v0.9.0
+
+### Features
+
+- Add `tp.from_polars` and `tp.to_polars`. @akshatvishu
+- Add `EventSet.filter_moving_count`.
+- Add `tp.input_node_from_schema`.
+- Add `tp.from_struct`.
+
+### Improvements
+
+- Add `before_first` and `after_last` parameters to `EventSet.tick` and `EventSet.tick_calendar`
 - Added `bokeh_webgl` as a possible `backend` for `tp.plot`.
+- Binary operations maintain the name of the feature on the left.
+- Implement more operators in beam (still in beta).
 
 ### Fixes
 
 - Fixed a bug in `EventSet.tick_calendar` where it would miss the first tick under certain conditions
 - Fixed a bug in `EventSet.tick` where it would miss the last tick under certain conditions
+- Upgrade to tensorflow 2.13 for compatibility with macOS on arm
 
 ## 0.8.1
 
