@@ -88,9 +88,16 @@ def bokeh_backend():
     return plotter_bokeh.Plotter
 
 
+def bokeh_webgl_backend():
+    from temporian.implementation.numpy.data import plotter_bokeh
+
+    return plotter_bokeh.PlotterWebGL
+
+
 BACKENDS: Dict[str, Callable] = {
     "matplotlib": matplotlib_backend,
     "bokeh": bokeh_backend,
+    "bokeh_webgl": bokeh_webgl_backend,
 }
 
 
@@ -279,7 +286,7 @@ def plot(
             effectively selects a backend that support interactive plotting.
             Ignored if "backend" is set.
         backend: Plotting library to use. Possible values are: matplotlib,
-            bokeh. If set, overrides the "interactive" argument.
+            bokeh, and bokeh_webgl. If set, overrides the "interactive" argument.
         merge: If true, plots all features in the same plots. If false, plots
             features in separate plots. merge=True on event-sets [e1, e2] is
             equivalent to plotting (e1, e2).

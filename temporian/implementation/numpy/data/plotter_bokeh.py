@@ -21,6 +21,8 @@ from temporian.implementation.numpy.data.plotter_base import (
 
 
 class Plotter(PlotterBackend):
+    output_backend = "canvas"
+
     def __init__(self, num_plots: int, options: Options):
         super().__init__(num_plots, options)
 
@@ -46,7 +48,7 @@ class Plotter(PlotterBackend):
 
     def ensure_cur_is_available(self, categorical_values: Optional[List[str]]):
         if self.cur_fig is None:
-            self.cur_fig = create_fig(
+            self.cur_fig = self.create_fig(
                 self.cur_title,
                 self.cur_is_unix_timestamp,
                 self.options,
@@ -152,57 +154,62 @@ class Plotter(PlotterBackend):
         show(figure_set)
         return figure_set
 
+    def create_fig(
+        self,
+        title: Optional[str],
+        is_unix_timestamp: bool,
+        options: Options,
+        categorical_values: Optional[List[str]],
+    ):
+        tools = [
+            "xpan",
+            "pan",
+            "xwheel_zoom",
+            "ywheel_zoom",
+            "box_zoom",
+            "reset",
+            "undo",
+            "save",
+            "hover",
+        ]
 
-def create_fig(
-    title: Optional[str],
-    is_unix_timestamp: bool,
-    options: Options,
-    categorical_values: Optional[List[str]],
-):
-    tools = [
-        "xpan",
-        "pan",
-        "xwheel_zoom",
-        "ywheel_zoom",
-        "box_zoom",
-        "reset",
-        "undo",
-        "save",
-        "hover",
-    ]
+        fig_args = {}
+        if is_unix_timestamp:
+            fig_args["x_axis_type"] = "datetime"
+        if title:
+            fig_args["title"] = title
 
-    fig_args = {}
-    if is_unix_timestamp:
-        fig_args["x_axis_type"] = "datetime"
-    if title:
-        fig_args["title"] = title
+        if options.min_time is not None or options.max_time is not None:
+            args = {}
+            if options.min_time is not None:
+                args["start"] = (
+                    convert_timestamp_to_datetime(options.min_time)
+                    if is_unix_timestamp
+                    else options.min_time
+                )
+            if options.max_time is not None:
+                args["end"] = (
+                    convert_timestamp_to_datetime(options.max_time)
+                    if is_unix_timestamp
+                    else options.max_time
+                )
+            fig_args["x_range"] = Range1d(**args)
 
-    if options.min_time is not None or options.max_time is not None:
-        args = {}
-        if options.min_time is not None:
-            args["start"] = (
-                convert_timestamp_to_datetime(options.min_time)
-                if is_unix_timestamp
-                else options.min_time
-            )
-        if options.max_time is not None:
-            args["end"] = (
-                convert_timestamp_to_datetime(options.max_time)
-                if is_unix_timestamp
-                else options.max_time
-            )
-        fig_args["x_range"] = Range1d(**args)
+        if categorical_values is not None:
+            fig_args["y_range"] = categorical_values
 
-    if categorical_values is not None:
-        fig_args["y_range"] = categorical_values
+        # Note: Ranges cannot be set after the figure is created see:
+        # https://discourse.bokeh.org/t/updating-y-range-to-categorical/2397/3
+        fig = figure(
+            width=options.width_px,
+            height=options.height_per_plot_px,
+            tools=tools,
+            output_backend=self.output_backend,
+            **fig_args,
+        )
 
-    # Note: Ranges cannot be set after the figure is created see:
-    # https://discourse.bokeh.org/t/updating-y-range-to-categorical/2397/3
-    fig = figure(
-        width=options.width_px,
-        height=options.height_per_plot_px,
-        tools=tools,
-        **fig_args,
-    )
+        return fig
 
-    return fig
+
+class PlotterWebGL(Plotter):
+    output_backend = "webgl"
