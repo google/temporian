@@ -39,7 +39,7 @@ std::vector<double> find_ticks(
   const std::optional<std::time_t> end_t =
       end_timestamp.has_value()
           ? std::optional<std::time_t>{static_cast<std::time_t>(
-                std::floor(end_timestamp.value()))}
+                std::floor(*end_timestamp))}
           : std::nullopt;
 
   // Start time
@@ -86,7 +86,7 @@ std::vector<double> find_ticks(
 
                 // Finish conditions
                 if (end_t.has_value() &&
-                    cur_time.seconds_since_epoch > end_t.value()) {
+                    cur_time.seconds_since_epoch > *end_t) {
                   keep_looking = false;
                   break;
                 }
