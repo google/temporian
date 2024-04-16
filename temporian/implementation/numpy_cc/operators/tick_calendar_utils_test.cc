@@ -30,9 +30,9 @@ TEST_P(UTCMkTimeTest, MatchExpected) {
       UTCMkTime(test_case.year, test_case.month, test_case.day, test_case.hour,
                 test_case.minute, test_case.second);
   EXPECT_TRUE(result.has_value());
-  EXPECT_EQ(result.value().seconds_since_epoch,
+  EXPECT_EQ((*result).seconds_since_epoch,
             test_case.expected_seconds_since_epoch);
-  EXPECT_EQ(result.value().wday, test_case.expected_wday);
+  EXPECT_EQ((*result).wday, test_case.expected_wday);
 }
 
 INSTANTIATE_TEST_SUITE_P(UTCMkTimeTestBase, UTCMkTimeTest,
