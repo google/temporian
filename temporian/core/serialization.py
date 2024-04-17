@@ -87,6 +87,32 @@ def save(
     only EventSetNodes, and save that instead. Note that the partial function
     needs to be compiled too, with `tp.compile(partial(...))`.
 
+    Example:
+        ```python
+        >>> a = tp.event_set([0, 1, 2], {"a": [10.0, 20.0, 10.0]})
+
+        >>> # define function and compile it
+        >>> @tp.compile()
+        ... def func(evset):
+        ...     return {"avg_evset": evset.simple_moving_average(3)}
+
+        >>> # save function
+        >>> file_path = tmp_dir / "my_prep.tem"
+        >>> tp.save(func, file_path, evset=a)
+
+        >>> # load function
+        >>> loaded_func = tp.load(file_path)
+        >>> loaded_func(a)
+        {'avg_evset': indexes: []
+        features: [('a', float64)]
+        events:
+            (3 events):
+                timestamps: [0. 1. 2.]
+                'a': [10.     15.     13.3333]
+        ...
+
+        ```
+
     Args:
         fn: The function to save.
         path: The path to save the function to.
@@ -127,6 +153,32 @@ def load(
 
     The loaded function receives the same positional and keyword arguments and
     applies the same operator graph to its inputs as when it was saved.
+
+    Example:
+        ```python
+        >>> a = tp.event_set([0, 1, 2], {"a": [10.0, 20.0, 10.0]})
+
+        >>> # define function and compile it
+        >>> @tp.compile()
+        ... def func(evset):
+        ...     return {"avg_evset": evset.simple_moving_average(3)}
+
+        >>> # save function
+        >>> file_path = tmp_dir / "my_prep.tem"
+        >>> tp.save(func, file_path, evset=a)
+
+        >>> # load function
+        >>> loaded_func = tp.load(file_path)
+        >>> loaded_func(a)
+        {'avg_evset': indexes: []
+        features: [('a', float64)]
+        events:
+            (3 events):
+                timestamps: [0. 1. 2.]
+                'a': [10.     15.     13.3333]
+        ...
+
+        ```
 
     Args:
         path: The path to load the function from.
