@@ -54,7 +54,7 @@ scalene = { version = "^1.5.34", python = ">=3.8,<3.11.0 || >3.11.0,<3.12" }
 mkdocs = "^1.5.3"
 mkdocstrings = { extras = ["python"], version = "^0.23.0" }
 mkdocstrings-python = "^1.7.4"
-mkdocs-material = "^9.1.5"
+mkdocs-material = "^9.5.17"
 mkdocs-gen-files = "^0.4.0"
 mkdocs-literate-nav = "^0.6.0"
 mkdocs-section-index = "^0.3.5"
