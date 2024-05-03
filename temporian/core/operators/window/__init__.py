@@ -27,3 +27,4 @@ from temporian.core.operators.window.moving_min import moving_min
 from temporian.core.operators.window.moving_max import moving_max
 from temporian.core.operators.window.moving_product import cumprod
 from temporian.core.operators.window.moving_product import moving_product
+from temporian.core.operators.window.moving_quantile import moving_quantile

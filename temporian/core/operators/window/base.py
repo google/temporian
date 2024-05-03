@@ -15,7 +15,7 @@
 """Base calendar operator class definition."""
 
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Any, List, Optional, Mapping
 from temporian.core.data.duration_utils import normalize_duration
 
 
@@ -33,6 +33,8 @@ from temporian.proto import core_pb2 as pb
 
 class BaseWindowOperator(Operator, ABC):
     """Interface definition and common logic for window operators."""
+
+    extra_attribute_def: List[Mapping[str, Any]] = []
 
     def __init__(
         self,
@@ -93,6 +95,7 @@ class BaseWindowOperator(Operator, ABC):
                 creator=self,
             ),
         )
+        self.add_extra_attributes()
 
         self.check()
 
@@ -119,8 +122,14 @@ class BaseWindowOperator(Operator, ABC):
     def has_variable_winlen(self) -> bool:
         return self._has_variable_winlen
 
+    def add_extra_attributes(self):
+        pass
+
     @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
+        extra_attr_def = [
+            pb.OperatorDef.Attribute(**attr) for attr in cls.extra_attribute_def
+        ]
         return pb.OperatorDef(
             key=cls.operator_def_key(),
             attributes=[
@@ -129,6 +138,7 @@ class BaseWindowOperator(Operator, ABC):
                     type=pb.OperatorDef.Attribute.Type.FLOAT_64,
                     is_optional=True,
                 ),
+                *extra_attr_def,
             ],
             inputs=[
                 pb.OperatorDef.Input(key="input"),

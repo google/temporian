@@ -111,3 +111,15 @@ py_library(
         "//temporian/implementation/numpy_cc/operators:operators_cc",
     ],
 )
+
+py_library(
+    name = "moving_quantile",
+    srcs = ["moving_quantile.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core/operators/window:moving_quantile",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy_cc/operators:operators_cc",
+    ],
+)

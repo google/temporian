@@ -62,6 +62,7 @@ py_library(
         "//temporian/implementation/numpy/operators/window:moving_standard_deviation",
         "//temporian/implementation/numpy/operators/window:moving_sum",
         "//temporian/implementation/numpy/operators/window:simple_moving_average",
+        "//temporian/implementation/numpy/operators/window:moving_quantile",
     ],
 )
 

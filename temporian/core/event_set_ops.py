@@ -3218,6 +3218,24 @@ class EventSetOperations:
 
         return moving_min(self, window_length=window_length, sampling=sampling)
 
+    def moving_quantile(
+        self: EventSetOrNode,
+        window_length: WindowLength,
+        quantile: float,
+        sampling: Optional[EventSetOrNode] = None,
+    ) -> EventSetOrNode:
+        """ """
+        from temporian.core.operators.window.moving_quantile import (
+            moving_quantile,
+        )
+
+        return moving_quantile(
+            self,
+            window_length=window_length,
+            quantile=quantile,
+            sampling=sampling,
+        )
+
     def moving_standard_deviation(
         self: EventSetOrNode,
         window_length: WindowLength,
