@@ -192,7 +192,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
     const auto curr_ts = v_timestamps[idx];
     auto curr_window_length = v_window_length[idx];
 
-    if (std::isnan(curr_window_length)) {
+    if (std::isnan(curr_window_length) || curr_window_length < 0) {
       curr_window_length = 0;
     }
 
@@ -257,7 +257,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
     const auto right_limit = v_sampling[sampling_idx];
     auto curr_window_length = v_window_length[sampling_idx];
 
-    if (std::isnan(curr_window_length)) {
+    if (std::isnan(curr_window_length) || curr_window_length < 0) {
       curr_window_length = 0;
     }
 
