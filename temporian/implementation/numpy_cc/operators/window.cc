@@ -174,7 +174,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
   auto v_window_length = window_length.unchecked<1>();
 
   assert(v_timestamps.shape(0) == v_window_length.shape(0));
-  assert(v_timestamps.shape(0) == v_values.shape(0));
+  assert(v_timestamps.shape(0) == evset_values.shape(0));
 
   // Index of the first value in the window.
   size_t begin_idx = 0;
@@ -247,7 +247,7 @@ py::array_t<OUTPUT> accumulate(const ArrayD &evset_timestamps,
   auto v_sampling = sampling_timestamps.unchecked<1>();
   auto v_window_length = window_length.unchecked<1>();
 
-  assert(v_timestamps.shape(0) == v_values.shape(0));
+  assert(v_timestamps.shape(0) == evset_values.shape(0));
   assert(v_sampling.shape(0) == v_window_length.shape(0));
 
   size_t begin_idx = 0;

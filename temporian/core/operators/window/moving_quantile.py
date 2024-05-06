@@ -44,10 +44,8 @@ class MovingQuantileOperator(BaseWindowOperator):
     ):
         if quantile < 0 or quantile > 1:
             raise ValueError(
-                (
-                    "`quantile` must be a float between 0 and 1. "
-                    f"Received {quantile}"
-                )
+                "`quantile` must be a float between 0 and 1. "
+                f"Received {quantile}"
             )
         self.quantile = quantile
         super().__init__(input, window_length, sampling)
@@ -62,9 +60,9 @@ class MovingQuantileOperator(BaseWindowOperator):
     def get_feature_dtype(self, feature: FeatureSchema) -> DType:
         if not feature.dtype.is_numerical:
             raise ValueError(
-                "moving_quantile requires the input EventSet to contain numerical"
-                f" features only, but received feature {feature.name!r} with"
-                f" type {feature.dtype}"
+                "moving_quantile requires the input EventSet to contain"
+                " numerical features only, but received feature"
+                f" {feature.name!r} with type {feature.dtype}"
             )
         if feature.dtype.is_integer:
             return DType.FLOAT32
