@@ -34,8 +34,6 @@ from temporian.proto import core_pb2 as pb
 class BaseWindowOperator(Operator, ABC):
     """Interface definition and common logic for window operators."""
 
-    extra_attribute_def: List[Mapping[str, Any]] = []
-
     def __init__(
         self,
         input: EventSetNode,
@@ -126,9 +124,14 @@ class BaseWindowOperator(Operator, ABC):
         pass
 
     @classmethod
+    def extra_attribute_def(cls) -> List[Mapping[str, Any]]:
+        return []
+
+    @classmethod
     def build_op_definition(cls) -> pb.OperatorDef:
         extra_attr_def = [
-            pb.OperatorDef.Attribute(**attr) for attr in cls.extra_attribute_def
+            pb.OperatorDef.Attribute(**attr)
+            for attr in cls.extra_attribute_def()
         ]
         return pb.OperatorDef(
             key=cls.operator_def_key(),

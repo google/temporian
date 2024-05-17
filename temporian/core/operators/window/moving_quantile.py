@@ -14,7 +14,7 @@
 
 """Moving count operator class and public API function definition."""
 
-from typing import Optional
+from typing import List, Mapping, Optional, Any
 
 from temporian.core import operator_lib
 from temporian.core.compilation import compile
@@ -27,14 +27,6 @@ from temporian.proto import core_pb2 as pb
 
 
 class MovingQuantileOperator(BaseWindowOperator):
-    extra_attribute_def = [
-        {
-            "key": "quantile",
-            "is_optional": True,
-            "type": pb.OperatorDef.Attribute.Type.FLOAT_64,
-        }
-    ]
-
     def __init__(
         self,
         input: EventSetNode,
@@ -47,8 +39,12 @@ class MovingQuantileOperator(BaseWindowOperator):
                 "`quantile` must be a float between 0 and 1. "
                 f"Received {quantile}"
             )
-        self.quantile = quantile
+        self._quantile = quantile
         super().__init__(input, window_length, sampling)
+
+    @property
+    def quantile(self) -> float:
+        return self._quantile
 
     def add_extra_attributes(self):
         self.add_attribute("quantile", self.quantile)
@@ -67,6 +63,16 @@ class MovingQuantileOperator(BaseWindowOperator):
         if feature.dtype.is_integer:
             return DType.FLOAT32
         return feature.dtype
+
+    @classmethod
+    def extra_attribute_def(cls) -> List[Mapping[str, Any]]:
+        return [
+            {
+                "key": "quantile",
+                "is_optional": True,
+                "type": pb.OperatorDef.Attribute.Type.FLOAT_64,
+            }
+        ]
 
 
 operator_lib.register_operator(MovingQuantileOperator)

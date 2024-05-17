@@ -13,14 +13,16 @@ class CustomHeap {
   void push(T value) {
     heap.push_back(value);
     auto it = std::prev(heap.end());
+    // Notice that this breaks if a value repeats, not a problem in our case
+    // since we are using the Heap to store the indices
     val_to_node[value] = it;
-    // TODO: better sorting?
+    // TODO: there is no better way to insert in order with a list
+    // but exploring with trees could make this better
     while (it != heap.begin()) {
       auto parent = std::prev(it);
       if (!compare(*parent, *it)) {
         break;
       }
-      // TODO: check that this swap is doing what I want
       std::swap(*parent, *it);
       val_to_node[*it] = it;
       val_to_node[*parent] = parent;
@@ -35,6 +37,8 @@ class CustomHeap {
       auto value = heap.back();
       heap.pop_back();
       auto it = val_to_node.find(value);
+      // all other pointers in val_to_node are still valid because
+      // heap is a double linked list
       val_to_node.erase(it);
       return value;
     }
@@ -52,25 +56,11 @@ class CustomHeap {
     auto it = val_to_node.find(value);
     if (it != val_to_node.end()) {
       heap.erase(it->second);
+      // all other pointers in val_to_node are still valid because
+      // heap is a double linked list
       val_to_node.erase(it);
-    } else {
-      // TODO: exception meant for debugging, remove it
-      throw std::invalid_argument("removing a value that doesn't exists");
     }
   }
   int size() { return heap.size(); }
   int empty() { return heap.empty(); }
-
-  void print() {
-    std::cout << "my_heap{" << std::endl << " [";
-    std::for_each(heap.begin(), heap.end(),
-                  [](const int n) { std::cout << n << ' '; });
-    std::cout << "]" << std::endl;
-
-    // std::cout << " {" << std::endl;
-    // for (const auto& pair : val_to_node) {
-    //   std::cout << "  " << pair.first << ": " << *(pair.second) << std::endl;
-    // }
-    // std::cout << " }" << std::endl;
-  }
 };

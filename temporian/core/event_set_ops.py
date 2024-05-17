@@ -3254,7 +3254,7 @@ class EventSetOperations:
             ...     features={"value": [np.nan, 1, 5, 10, 15, 20]},
             ... )
 
-            >>> a.moving_quantile(tp.duration.seconds(4), quantile=0.5)
+            >>> a.moving_quantile(4, quantile=0.5)
             indexes: ...
                 (6 events):
                     timestamps: [0. 1. 2. 5. 6. 7.]
