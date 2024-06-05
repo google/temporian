@@ -40,6 +40,8 @@ class MovingQuantileOperator(BaseWindowOperator):
                 f"Received {quantile}"
             )
         self._quantile = quantile
+        # This line should be at the top but `BaseWindowOperator.__init__` calls
+        # `self.check` which fails if `this._quantile` is not set
         super().__init__(input, window_length, sampling)
 
     @property
