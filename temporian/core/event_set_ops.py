@@ -3247,6 +3247,10 @@ class EventSetOperations:
         The quantile calculated in each window is equivalent to numpy's
         `"averaged_inverted_cdf"` method.
 
+        This operation only accepts numeric dtypes in the input.
+        For `float64` the output will be `float64` but for
+        `float32`, `int64`, and `int32` output will be `float32`.
+
         Example:
             ```python
             >>> a = tp.event_set(
