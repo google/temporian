@@ -32,7 +32,7 @@ class MovingQuantileOperator(BaseWindowOperator):
         input: EventSetNode,
         window_length: WindowLength,
         quantile: float,
-        sampling: Optional[EventSetNode] = None,
+        sampling: Optional[EventSetNode],
     ):
         if quantile < 0 or quantile > 1:
             raise ValueError(
