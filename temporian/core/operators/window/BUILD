@@ -142,3 +142,18 @@ py_library(
         "//temporian/core/data:schema",
     ],
 )
+
+py_library(
+    name = "moving_quantile",
+    srcs = ["moving_quantile.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        "//temporian/core:compilation",
+        "//temporian/core:operator_lib",
+        "//temporian/core:typing",
+        "//temporian/core/data:dtype",
+        "//temporian/core/data:node",
+        "//temporian/core/data:schema",
+    ],
+)

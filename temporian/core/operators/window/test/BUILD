@@ -134,3 +134,16 @@ py_test(
         "//temporian/test:utils",
     ],
 )
+
+py_test(
+    name = "test_moving_quantile",
+    srcs = ["test_moving_quantile.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
+        "//temporian/implementation/numpy/data:io",
+        "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)

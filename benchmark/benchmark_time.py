@@ -98,6 +98,20 @@ def benchmark_simple_moving_average(runner):
         )
 
 
+def benchmark_moving_quantile(runner):
+    runner.add_separator()
+    for n in [100, 10_000, 1_000_000]:
+        ds = _build_toy_dataset(n)
+
+        node = ds.node()
+        output = node.moving_quantile(window_length=10.0, quantile=0.5)
+
+        runner.benchmark(
+            f"moving_quantile (0.5):{n:_}",
+            lambda: tp.run(output, input={node: ds}),
+        )
+
+
 def benchmark_moving_minimum(runner):
     runner.add_separator()
     for n in [1_000_000, 10_000_000]:
@@ -457,6 +471,7 @@ def main():
         "add_index_v2",
         "from_pandas_with_objects",
         "moving_minimum",
+        "moving_quantile",
     ]
     if args.functions is not None:
         benchmarks_to_run = args.functions

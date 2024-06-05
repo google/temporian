@@ -17,11 +17,18 @@ pybind_library(
     deps = [":common"],
 )
 
+cc_library(
+    name = "custom_heap",
+    srcs = [],
+    hdrs = ["custom_heap.h"],
+    deps = [":common"],
+)
+
 pybind_library(
     name = "window",
     srcs = ["window.cc"],
     hdrs = ["window.h"],
-    deps = [":common"],
+    deps = [":common", "custom_heap"],
 )
 
 pybind_library(

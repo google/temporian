@@ -3218,6 +3218,79 @@ class EventSetOperations:
 
         return moving_min(self, window_length=window_length, sampling=sampling)
 
+    def moving_quantile(
+        self: EventSetOrNode,
+        window_length: WindowLength,
+        quantile: float,
+        sampling: Optional[EventSetOrNode] = None,
+    ) -> EventSetOrNode:
+        """Computes the quantile in a sliding window over an
+        [`EventSet`][temporian.EventSet].
+
+        For each t in sampling, and for each feature independently, returns at
+        time t the appropiated quantile for the feature in the window
+        (t - window_length, t].
+
+        `sampling` can't be  specified if a variable `window_length` is
+        specified (i.e. if `window_length` is an EventSet).
+
+        If `sampling` is specified or `window_length` is an EventSet, the moving
+        window is sampled at each timestamp in them, else it is sampled on the
+        input's.
+
+        Missing values (such as NaNs) are ignored.
+
+        If the window does not contain any values (e.g., all the values are
+        missing, or the window does not contain any sampling), outputs missing
+        values.
+
+        The quantile calculated in each window is equivalent to numpy's
+        `"averaged_inverted_cdf"` method.
+
+        This operation only accepts numeric dtypes in the input.
+        For `float64` the output will be `float64` but for
+        `float32`, `int64`, and `int32` output will be `float32`.
+
+        Example:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[0, 1, 2, 5, 6, 7],
+            ...     features={"value": [np.nan, 1, 5, 10, 15, 20]},
+            ... )
+
+            >>> a.moving_quantile(4, quantile=0.5)
+            indexes: ...
+                (6 events):
+                    timestamps: [0. 1. 2. 5. 6. 7.]
+                    'value': [ nan  1.   3.   7.5 12.5 15. ]
+            ...
+
+            ```
+
+        See [`EventSet.moving_count()`][temporian.EventSet.moving_count] for
+        examples of moving window operations with external sampling and indices.
+
+        Args:
+            window_length: Sliding window's length.
+            quantile: the desired quantile defined in the range (0, 1).
+            sampling: Timestamps to sample the sliding window's value at. If not
+                provided, timestamps in the input are used.
+
+        Returns:
+            EventSet containing the moving standard deviation of each feature in
+                the input.
+        """
+        from temporian.core.operators.window.moving_quantile import (
+            moving_quantile,
+        )
+
+        return moving_quantile(
+            self,
+            window_length=window_length,
+            quantile=quantile,
+            sampling=sampling,
+        )
+
     def moving_standard_deviation(
         self: EventSetOrNode,
         window_length: WindowLength,

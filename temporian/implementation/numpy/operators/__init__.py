@@ -46,6 +46,7 @@ from temporian.implementation.numpy.operators.window import moving_sum
 from temporian.implementation.numpy.operators.window import moving_count
 from temporian.implementation.numpy.operators.window import moving_min
 from temporian.implementation.numpy.operators.window import moving_max
+from temporian.implementation.numpy.operators.window import moving_quantile
 from temporian.implementation.numpy.operators.calendar import day_of_month
 from temporian.implementation.numpy.operators.calendar import day_of_week
 from temporian.implementation.numpy.operators.calendar import day_of_year
