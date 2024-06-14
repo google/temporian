@@ -47,3 +47,16 @@ from temporian.core.operators.scalar.relational_scalar import (
     LessEqualScalarOperator,
     LessScalarOperator,
 )
+
+from temporian.core.operators.scalar.bitwise_scalar import (
+    bitwise_and_scalar,
+    bitwise_or_scalar,
+    bitwise_xor_scalar,
+    left_shift_scalar,
+    right_shift_scalar,
+    BitwiseAndScalarOperator,
+    BitwiseOrScalarOperator,
+    BitwiseXorScalarOperator,
+    LeftShiftScalarOperator,
+    RightShiftScalarOperator,
+)

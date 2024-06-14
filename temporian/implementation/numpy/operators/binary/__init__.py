@@ -21,3 +21,10 @@ from temporian.implementation.numpy.operators.binary.logical import (
     LogicalOrNumpyImplementation,
     LogicalXorNumpyImplementation,
 )
+from temporian.implementation.numpy.operators.binary.bitwise import (
+    BitwiseAndNumpyImplementation,
+    BitwiseOrNumpyImplementation,
+    BitwiseXorNumpyImplementation,
+    LeftShiftNumpyImplementation,
+    RightShiftNumpyImplementation,
+)
