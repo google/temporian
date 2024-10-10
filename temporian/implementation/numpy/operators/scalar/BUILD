@@ -13,6 +13,7 @@ py_library(
     deps = [
         ":arithmetic_scalar",
         ":relational_scalar",
+        ":bitwise_scalar",
     ],
 )
 
@@ -50,6 +51,19 @@ py_library(
         ":base",
         "//temporian/core/data:dtype",
         # already_there/numpy
+        "//temporian/core/operators/scalar",
+        "//temporian/implementation/numpy:implementation_lib",
+    ],
+)
+
+py_library(
+    name = "bitwise_scalar",
+    srcs = ["bitwise_scalar.py"],
+    srcs_version = "PY3",
+    deps = [
+        ":base",
+        # already_there/numpy
+        "//temporian/core/data:dtype",
         "//temporian/core/operators/scalar",
         "//temporian/implementation/numpy:implementation_lib",
     ],

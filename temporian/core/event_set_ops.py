@@ -556,34 +556,24 @@ class EventSetOperations:
         return multiply_scalar(input=self, value=-1)
 
     def __invert__(self: EventSetOrNode) -> EventSetOrNode:
-        """Inverts a boolean [`EventSet`][temporian.EventSet] element-wise.
+        """Inverts a boolean or integer [`EventSet`][temporian.EventSet]
+        element-wise.
 
-        Swaps False <-> True.
-
-        Does not work on integers, they should be cast to
-        [`tp.bool_`][temporian.bool_] beforehand, using
-        [`EventSet.cast()`][temporian.EventSet.cast].
+        Swaps False <-> True. Applies bitwise NOT to each integer.
 
         Example:
             ```python
             >>> a = tp.event_set(
             ...     timestamps=[1, 2],
-            ...     features={"M": [1, 5], "N": [1.0, 5.5]},
+            ...     features={"M": [True, False], "N": [1, 5]},
             ... )
-            >>> # Boolean EventSet
-            >>> b = a < 2
-            >>> b
-            indexes: ...
-                    'M': [ True False]
-                    'N': [ True False]
-            ...
 
             >>> # Inverted EventSet
-            >>> c = ~b
-            >>> c
+            >>> b = ~a
+            >>> b
             indexes: ...
                     'M': [False True]
-                    'N': [False True]
+                    'N': [-2 -6]
             ...
 
             ```
@@ -1470,6 +1460,145 @@ class EventSetOperations:
         self._raise_bool_error("^", other)
         assert False
 
+    def __lshift__(self:EventSetOrNode, other: Any) -> EventSetOrNode:
+        """Performs a left bitwise shift (`self << other`) element-wise with
+        another [`EventSet`][temporian.EventSet] or a scalar value.
+
+        If `other` is an `EventSet`, each feature in `self` is shifted left by
+        the corresponding value in `other` at the same position.
+        If `other` is a scalar, each feature in `self` is shifted left by
+        the scalar value.
+
+        When `other` is an `EventSet`, `self` and `other` must have the same
+        sampling and the same number of features. The feature types in `self`
+        must be non-negative integer types.
+        When `other` is a scalar, it must be a non-negative integer.
+
+        Example with EventSet:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [2, 4, 8]}
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f2": [1, 2, 3]},
+            ...     same_sampling_as=a
+            ... )
+            >>> c = a << b
+            >>> c
+            indexes: []
+            features: [('left_shift_f1_f2', int64)]
+            events: (3 events):
+            timestamps: [1. 2. 3.]
+            'left_shift_f1_f2': [  4  16 64]
+            ...
+
+            ```
+
+        Example with scalar value:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [2, 4, 8]}
+            ... )
+            >>> b = a << 2
+            >>> b
+            indexes: []
+            features: [('f1', int64)]
+            events: (3 events):
+            timestamps: [1. 2. 3.]
+            'f1': [  8  16  32]
+            ...
+
+            ```
+
+        Args:
+            other: EventSet with only boolean features.
+
+        Returns:
+            EventSet with result of the comparison.
+        """
+
+        if isinstance(other, self.__class__):
+            from temporian.core.operators.binary import left_shift
+            return left_shift(input_1=self, input_2=other)
+
+        if isinstance(other, int):
+            from temporian.core.operators.scalar import left_shift_scalar
+            return left_shift_scalar(input=self, value=other)
+
+        self._raise_error("<<", other, "int")
+        assert False
+
+    def __rshift__(self:EventSetOrNode, other: Any) -> EventSetOrNode:
+        """Performs a right bitwise shift (`self >> other`) element-wise with
+        another [`EventSet`][temporian.EventSet] or a scalar value.
+        If `other` is an `EventSet`, each feature in `self` is shifted right
+        by the corresponding value in `other` at the same position.
+        If `other` is a scalar, each feature in `self` is shifted right by the
+        scalar value.
+
+        When `other` is an `EventSet`, `self` and `other` must have the same
+        sampling and the same number of features. The feature types
+        in `self` must be non-negative integer types.
+        When `other` is a scalar, it must be a non-negative integer.
+
+        Example with EventSet:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [8, 16, 32]}
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f2": [1, 2, 3]},
+            ...     same_sampling_as=a
+            ... )
+            >>> c = a >> b
+            >>> c
+            indexes: []
+            features: [('right_shift_f1_f2', int64)]
+            events: (3 events):
+            timestamps: [1. 2. 3.]
+            'right_shift_f1_f2': [4 4 4]
+            ...
+
+            ```
+
+        Example with scalar value:
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [8, 16, 32]}
+            ... )
+            >>> b = a >> 2
+            >>> b
+            indexes: []
+            features: [('f1', int64)]
+            events: (3 events):
+            timestamps: [1. 2. 3.]
+            'f1': [2 4 8]
+            ...
+
+            ```
+
+        Args:
+            other: EventSet with only boolean features.
+
+        Returns:
+            EventSet with result of the comparison.
+        """
+
+        if isinstance(other, self.__class__):
+            from temporian.core.operators.binary import right_shift
+            return right_shift(input_1=self, input_2=other)
+
+        if isinstance(other, int):
+            from temporian.core.operators.scalar import right_shift_scalar
+            return right_shift_scalar(input=self, value=other)
+
+        self._raise_error(">>", other, "int")
+        assert False
     #############
     # OPERATORS #
     #############
@@ -1612,6 +1741,222 @@ class EventSetOperations:
         from temporian.core.operators.begin import begin
 
         return begin(self)
+
+    def bitwise_and(self: EventSetOrNode, other: Any) -> EventSetOrNode:
+        """Computes the bitwise AND between an [`EventSet`][temporian.EventSet]
+        or a scalar value to `self` element-wise. The operation is only
+        supported for Events with features that are integers.
+
+        If an EventSet, each feature in `self` is bitwise ANDed to the feature
+        in `other` in the same position. `self` and `other` must have the same
+        sampling, index, number of features and dtype for the features in the
+        same positions.
+
+        If a scalar, `other` is bitwise ANDed with each item in each feature
+        in `self`.
+
+        Example with EventSet:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [2, 5, 7], "f2": [9, 11, 13]}
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f3": [3, 4, 8], "f4": [10, 12, 15]},
+            ...     same_sampling_as=a
+            ... )
+
+            >>> c = a.bitwise_and(b)
+            >>> c
+            indexes: []
+            features: [('bitwise_and_f1_f3', int64), ('bitwise_and_f2_f4', int64)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'bitwise_and_f1_f3': [2 4 0]
+                    'bitwise_and_f2_f4': [ 8  8 13]
+            ...
+
+            ```
+
+        Example with scalar value:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [2, 5, 7], "f2": [9, 11, 13]}
+            ... )
+
+            >>> b = a.bitwise_and(3)
+            >>> b
+            indexes: ...
+                    timestamps: [1. 2. 3.]
+                    'f1': [2 1 3]
+                    'f2': [1 3 1]
+            ...
+
+            ```
+
+        Args:
+            other: EventSet or scalar value.
+
+        Returns:
+            Result of the operation.
+        """
+        if isinstance(other, self.__class__):
+            from temporian.core.operators.binary import bitwise_and
+            return bitwise_and(input_1=self, input_2=other)
+
+        if isinstance(other, int):
+            from temporian.core.operators.scalar import bitwise_and_scalar
+            return bitwise_and_scalar(input=self, value=other)
+
+        self._raise_error("bitwise_and", other, "int")
+        assert False
+
+    def bitwise_or(self: EventSetOrNode, other: Any) -> EventSetOrNode:
+        """Computes the bitwise OR between an [`EventSet`][temporian.EventSet]
+        or a scalar value to `self` element-wise. The operation is only
+        supported for Events with features that are integers.
+
+        If an EventSet, each feature in `self` is bitwise ORed to the feature
+        in `other` in the same position. `self` and `other` must have the same
+        sampling, index, number of features and dtype for the features in the
+        same positions.
+
+        If a scalar, `other` is bitwise ORed with each item in each feature
+        in `self`.
+
+        Example with EventSet:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [2, 5, 7], "f2": [9, 11, 13]}
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f3": [3, 4, 8], "f4": [10, 12, 15]},
+            ...     same_sampling_as=a
+            ... )
+
+            >>> c = a.bitwise_or(b)
+            >>> c
+            indexes: []
+            features: [('bitwise_or_f1_f3', int64), ('bitwise_or_f2_f4', int64)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'bitwise_or_f1_f3': [ 3 5 15]
+                    'bitwise_or_f2_f4': [11 15 15]
+            ...
+
+            ```
+
+        Example with scalar value:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [2, 5, 7], "f2": [9, 11, 13]}
+            ... )
+
+            >>> b = a.bitwise_or(3)
+            >>> b
+            indexes: ...
+                    timestamps: [1. 2. 3.]
+                    'f1': [3 7 7]
+                    'f2': [11 11 15]
+            ...
+
+            ```
+
+        Args:
+            other: EventSet or scalar value.
+
+        Returns:
+            Result of the operation.
+        """
+        if isinstance(other, self.__class__):
+            from temporian.core.operators.binary import bitwise_or
+            return bitwise_or(input_1=self, input_2=other)
+
+        if isinstance(other, int):
+            from temporian.core.operators.scalar import bitwise_or_scalar
+            return bitwise_or_scalar(input=self, value=other)
+
+        self._raise_error("bitwise_or", other, "int")
+        assert False
+
+    def bitwise_xor(self: EventSetOrNode, other: Any) -> EventSetOrNode:
+        """Computes the bitwise XOR between an [`EventSet`][temporian.EventSet]
+        or a scalar value to `self` element-wise. The operation is only
+        supported for Events with features that are integers.
+
+        If an EventSet, each feature in `self` is bitwise XORed to the feature
+        in `other` in the same position. `self` and `other` must have the same
+        sampling, index, number of features and dtype for the features in the
+        same positions.
+
+        If a scalar, `other` is bitwise XORed with each item in each feature
+        in `self`.
+
+        Example with EventSet:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [2, 5, 7], "f2": [9, 11, 13]}
+            ... )
+            >>> b = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f3": [3, 4, 8], "f4": [10, 12, 15]},
+            ...     same_sampling_as=a
+            ... )
+
+            >>> c = a.bitwise_xor(b)
+            >>> c
+            indexes: []
+            features: [('bitwise_xor_f1_f3', int64), ('bitwise_xor_f2_f4', int64)]
+            events:
+                (3 events):
+                    timestamps: [1. 2. 3.]
+                    'bitwise_xor_f1_f3': [ 1 1 15]
+                    'bitwise_xor_f2_f4': [3 7 2]
+            ...
+
+            ```
+
+        Example with scalar value:
+            ```python
+            >>> a = tp.event_set(
+            ...     timestamps=[1, 2, 3],
+            ...     features={"f1": [2, 5, 7], "f2": [9, 11, 13]}
+            ... )
+
+            >>> b = a.bitwise_xor(3)
+            >>> b
+            indexes: ...
+                    timestamps: [1. 2. 3.]
+                    'f1': [1 6 4]
+                    'f2': [10 8 14]
+            ...
+
+            ```
+
+        Args:
+            other: EventSet or scalar value.
+
+        Returns:
+            Result of the operation.
+        """
+        if isinstance(other, self.__class__):
+            from temporian.core.operators.binary import bitwise_xor
+            return bitwise_xor(input_1=self, input_2=other)
+
+        if isinstance(other, int):
+            from temporian.core.operators.scalar import bitwise_xor_scalar
+            return bitwise_xor_scalar(input=self, value=other)
+
+        self._raise_error("bitwise_xor", other, "int")
+        assert False
 
     def calendar_day_of_month(
         self: EventSetOrNode, tz: Union[str, float, int] = 0

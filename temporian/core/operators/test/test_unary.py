@@ -47,11 +47,36 @@ class UnaryTest(absltest.TestCase):
         )
         assertOperatorResult(self, ~evset, expected)
 
-    def test_error_nonboolean(self) -> None:
-        """Check that trying to invert a non-boolean raises ValueError"""
-        evset = event_set(timestamps=[1, 2, 3], features={"f": [1, 2, 3]})
+    def test_invert_integer(self) -> None:
+        """Test inversion of boolean features"""
+        evset = event_set(
+            timestamps=[0, 1, 2, 1],
+            features={
+                "store_id": [1, 1, 1, 2],
+                "product_id": [1, 2, 2, 1],
+                "int": [2, 5, 7, 9],
+                "bool": [True, False, True, False],
+            },
+            indexes=["store_id", "product_id"],
+        )
+        expected = event_set(
+            timestamps=[0, 1, 2, 1],
+            features={
+                "store_id": [1, 1, 1, 2],
+                "product_id": [1, 2, 2, 1],
+                "int": [-3, -6, -8, -10],
+                "bool": [False, True, False, True],
+            },
+            indexes=["store_id", "product_id"],
+            same_sampling_as=evset,
+        )
+        assertOperatorResult(self, ~evset, expected)
 
-        with self.assertRaisesRegex(ValueError, "bool"):
+    def test_error_invert_float(self) -> None:
+        """Check that trying to invert a float raises ValueError"""
+        evset = event_set(timestamps=[1, 2, 3], features={"f": [1.1, 2.1, 3.4]})
+
+        with self.assertRaisesRegex(ValueError, "float"):
             _ = ~evset
 
     def test_correct_abs(self) -> None:

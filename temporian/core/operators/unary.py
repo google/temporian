@@ -99,11 +99,11 @@ class InvertOperator(BaseUnaryOperator):
 
     @classmethod
     def allowed_dtypes(cls) -> List[DType]:
-        return [DType.BOOLEAN]
+        return [DType.BOOLEAN, DType.INT32, DType.INT64]
 
     @classmethod
     def get_output_dtype(cls, feature_dtype: DType) -> DType:
-        return DType.BOOLEAN
+        return feature_dtype
 
 
 class IsNanOperator(BaseUnaryOperator):

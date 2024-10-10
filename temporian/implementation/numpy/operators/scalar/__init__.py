@@ -17,3 +17,11 @@ from temporian.implementation.numpy.operators.scalar.relational_scalar import (
     LessEqualScalarNumpyImplementation,
     LessScalarNumpyImplementation,
 )
+
+from temporian.implementation.numpy.operators.scalar.bitwise_scalar import (
+    BitwiseAndScalarOperator,
+    BitwiseOrScalarOperator,
+    BitwiseXorScalarOperator,
+    LeftShiftScalarOperator,
+    RightShiftScalarOperator,
+)
