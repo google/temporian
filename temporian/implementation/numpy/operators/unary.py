@@ -10,6 +10,7 @@ from temporian.core.operators.unary import (
     NotNanOperator,
     IsNanOperator,
     LogOperator,
+    RoundOperator,
     SinOperator,
     CosOperator,
     TanOperator,
@@ -83,6 +84,11 @@ class LogNumpyImplementation(BaseUnaryNumpyImplementation):
         return np.log(feature)
 
 
+
+class RoundNumpyImplementation(BaseUnaryNumpyImplementation):
+    def _do_operation(self, feature: np.ndarray) -> np.ndarray:
+        return np.round(feature)
+
 class SinNumpyImplementation(BaseUnaryNumpyImplementation):
     def _do_operation(self, feature: np.ndarray) -> np.ndarray:
         return np.sin(feature)
@@ -129,6 +135,9 @@ implementation_lib.register_operator_implementation(
     LogOperator, LogNumpyImplementation
 )
 implementation_lib.register_operator_implementation(
+
+    RoundOperator, RoundNumpyImplementation
+
     SinOperator, SinNumpyImplementation
 )
 implementation_lib.register_operator_implementation(

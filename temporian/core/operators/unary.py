@@ -182,6 +182,11 @@ class LogOperator(BaseUnaryOperator):
         return feature_dtype
 
 
+class RoundOperator(BaseUnaryOperator):
+    @classmethod
+    def op_key_definition(cls) -> str:
+        return "ROUND"
+      
 class SinOperator(BaseUnaryOperator):
     @classmethod
     def op_key_definition(cls) -> str:
@@ -272,6 +277,7 @@ class ArcTanOperator(BaseUnaryOperator):
     def op_key_definition(cls) -> str:
         return "ARCTAN"
 
+
     @classmethod
     def allowed_dtypes(cls) -> List[DType]:
         return [
@@ -289,6 +295,7 @@ operator_lib.register_operator(IsNanOperator)
 operator_lib.register_operator(NotNanOperator)
 operator_lib.register_operator(AbsOperator)
 operator_lib.register_operator(LogOperator)
+operator_lib.register_operator(RoundOperator)
 operator_lib.register_operator(SinOperator)
 operator_lib.register_operator(CosOperator)
 operator_lib.register_operator(TanOperator)
@@ -353,6 +360,16 @@ def log(
 
 
 @compile
+def round(
+    input: EventSetOrNode,
+) -> EventSetOrNode:
+    assert isinstance(input, EventSetNode)
+
+    return RoundOperator(
+        input=input,
+    ).outputs["output"]
+
+@compile  
 def sin(
     input: EventSetOrNode,
 ) -> EventSetOrNode:
@@ -414,5 +431,6 @@ def arctan(
     assert isinstance(input, EventSetNode)
 
     return ArcTanOperator(
+
         input=input,
     ).outputs["output"]
