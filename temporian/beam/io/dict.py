@@ -1,5 +1,6 @@
 """Utilities to import/export Beam-Event-Set from/to dataset containers."""
 
+from collections.abc import Iterable
 from typing import Dict, Any, Tuple, Iterator, Sequence, List
 
 import numpy as np
@@ -104,7 +105,7 @@ class _MergeTimestamps(beam.DoFn):
 
     def process(
         self,
-        item: Tuple[BeamIndexKey, Sequence[StructuredRowValue]],
+        item: Tuple[BeamIndexKey, Iterable[StructuredRowValue]],
     ) -> Iterator[FeatureItemWithIdx]:
         index, feat_and_ts = item
         timestamps = np.fromiter(
@@ -126,7 +127,7 @@ class _MergeTimestamps(beam.DoFn):
 
 
 def _merge_timestamps_no_features(
-    item: Tuple[BeamIndexKey, Sequence[StructuredRowValue]],
+    item: Tuple[BeamIndexKey, Iterable[StructuredRowValue]],
 ) -> FeatureItem:
     """Same as _MergeTimestamps, but when there are no features."""
 
@@ -343,7 +344,7 @@ def to_event_set(
 def _convert_to_dict_event_key_value(
     item: Tuple[
         BeamIndexKey,
-        Sequence[FeatureItemWithIdxValue],
+        Iterable[FeatureItemWithIdxValue],
     ],
     schema: Schema,
     timestamp_key: str,
@@ -352,7 +353,7 @@ def _convert_to_dict_event_key_value(
 
     # Sort the feature by feature index.
     feature_blocks = sorted(feature_blocks, key=lambda x: x[POS_FEATURE_IDX])
-    assert len(feature_blocks) > 0
+    assert feature_blocks
 
     # All the feature blocks have the same timestamps. We use the first one.
     common_item_dict = {}
@@ -374,7 +375,7 @@ def _convert_to_dict_event_key_value(
 def _convert_to_dict_event_set_key_value(
     item: Tuple[
         BeamIndexKey,
-        Sequence[FeatureItemWithIdxValue],
+        Iterable[FeatureItemWithIdxValue],
     ],
     schema: Schema,
     timestamp_key: str,
@@ -383,7 +384,7 @@ def _convert_to_dict_event_set_key_value(
 
     # Sort the feature by feature index.
     feature_blocks = sorted(feature_blocks, key=lambda x: x[POS_FEATURE_IDX])
-    assert len(feature_blocks) > 0
+    assert feature_blocks
 
     item_dict = {}
     for index_schema, index_value in zip(schema.indexes, index):

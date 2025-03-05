@@ -13,7 +13,8 @@
 # limitations under the License.
 
 import numpy as np
-from typing import Dict, Tuple, Sequence
+from collections.abc import Iterable
+from typing import Dict, Tuple
 import apache_beam as beam
 
 from temporian.core.operators.drop_index import (
@@ -54,7 +55,7 @@ class DropIndexBeamImplementation(BeamOperatorImplementation):
             return tuple((src_indexes[i] for i in final_index_idxs))
 
         def merge_events(
-            group: Tuple[BeamIndexKey, Sequence[FeatureItem]],
+            group: Tuple[BeamIndexKey, Iterable[FeatureItem]],
         ) -> FeatureItem:
             """Merges together events in the same output index."""
             new_indexes, items = group
@@ -81,7 +82,7 @@ class DropIndexBeamImplementation(BeamOperatorImplementation):
             return new_indexes, (new_timestamps, new_features)
 
         def src_index_to_feature(
-            any_group: Tuple[BeamIndexKey, Sequence[FeatureItem]],
+            any_group: Tuple[BeamIndexKey, Iterable[FeatureItem]],
             final_nonindex_idx: int,
         ) -> FeatureItem:
             """Create a feature with the dropped index."""
@@ -103,7 +104,7 @@ class DropIndexBeamImplementation(BeamOperatorImplementation):
             return new_indexes, (new_timestamps, new_features)
 
         def feature_less_event(
-            any_group: Tuple[BeamIndexKey, Sequence[FeatureItem]],
+            any_group: Tuple[BeamIndexKey, Iterable[FeatureItem]],
         ) -> FeatureItem:
             """Create an event without feature."""
             new_indexes, items = any_group
