@@ -45,7 +45,7 @@ tensorflow = {version = ">=2.12.0,<2.16", optional = true}
 polars = { version = "^0.20.15", optional = true }
 
 [tool.poetry.group.dev.dependencies]
-black = "^22.12.0"
+black = ">=22.12,<25.0"
 isort = "^5.12.0"
 toml = "^0.10.2"
 pylint = "^2.14.0"
