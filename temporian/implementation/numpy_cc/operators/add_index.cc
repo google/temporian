@@ -223,8 +223,9 @@ void recursive_build_index(const py::list &features,
     if (casted_feature.dtype().kind() == 'S') {
       process_feature_string(casted_feature, features, feature_idx,
                              selected_rows, index_acc, partial_group);
+      return;
     }
-    return;
+    // Unsupported array dtype - fall through to error handler
   }
 
   py::print("Feature:", feature.get_type());

@@ -198,6 +198,20 @@ class AddIndexTest(TestCase):
         ):
             self.evset.set_index([])
 
+    def test_float_index_raises_error(self):
+        """Test that add_index on float column raises error instead of silent data loss.
+
+        Regression test for https://github.com/google/temporian/issues/437
+        """
+        evset = event_set(
+            [1, 2, 3],
+            features={"a": [1.0, 2.0, 3.0], "b": [1, 2, 3]},
+        )
+
+        with self.assertRaises(Exception):
+            # Float columns cannot be used as indexes
+            evset.add_index("a")
+
 
 if __name__ == "__main__":
     absltest.main()
