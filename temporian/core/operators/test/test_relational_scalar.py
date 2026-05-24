@@ -79,6 +79,28 @@ class RelationalScalarTest(absltest.TestCase):
         )
         assertOperatorResult(self, evset != value, expected)
 
+    def test_ordering_str(self) -> None:
+        timestamps = [1, 2, 3, 4]
+        evset = event_set(
+            timestamps=timestamps,
+            features={"a": ["A", "A", "B", "C"]},
+        )
+
+        cases = [
+            (evset > "A", [False, False, True, True]),
+            (evset >= "B", [False, False, True, True]),
+            (evset < "C", [True, True, True, False]),
+            (evset <= "B", [True, True, True, False]),
+        ]
+
+        for actual, expected_values in cases:
+            expected = event_set(
+                timestamps=timestamps,
+                features={"a": expected_values},
+                same_sampling_as=evset,
+            )
+            assertOperatorResult(self, actual, expected)
+
     def test_equal_nan(self) -> None:
         """Test equal operator against a nan value."""
         # NOTE: any comparison to nan should be False, even nan==nan

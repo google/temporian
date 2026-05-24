@@ -31,6 +31,8 @@ if TYPE_CHECKING:
     )
 
 T_SCALAR = (int, float)
+T_COMPARABLE_SCALAR = T_SCALAR + (str,)
+T_EQUALITY_SCALAR = T_COMPARABLE_SCALAR + (bool,)
 
 
 class EventSetOperations:
@@ -159,7 +161,7 @@ class EventSetOperations:
 
             return not_equal(input_1=self, input_2=other)
 
-        if isinstance(other, T_SCALAR + (bool, str)):
+        if isinstance(other, T_EQUALITY_SCALAR):
             from temporian.core.operators.scalar import not_equal_scalar
 
             return not_equal_scalar(input=self, value=other)
@@ -1073,12 +1075,12 @@ class EventSetOperations:
 
             return greater(input_left=self, input_right=other)
 
-        if isinstance(other, T_SCALAR):
+        if isinstance(other, T_COMPARABLE_SCALAR):
             from temporian.core.operators.scalar import greater_scalar
 
             return greater_scalar(input=self, value=other)
 
-        self._raise_error("compare", other, "(int,float)")
+        self._raise_error("compare", other, "(int,float,str)")
         assert False
 
     def __ge__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
@@ -1149,12 +1151,12 @@ class EventSetOperations:
 
             return greater_equal(input_left=self, input_right=other)
 
-        if isinstance(other, T_SCALAR):
+        if isinstance(other, T_COMPARABLE_SCALAR):
             from temporian.core.operators.scalar import greater_equal_scalar
 
             return greater_equal_scalar(input=self, value=other)
 
-        self._raise_error("compare", other, "(int,float)")
+        self._raise_error("compare", other, "(int,float,str)")
         assert False
 
     def __lt__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
@@ -1225,12 +1227,12 @@ class EventSetOperations:
 
             return less(input_left=self, input_right=other)
 
-        if isinstance(other, T_SCALAR):
+        if isinstance(other, T_COMPARABLE_SCALAR):
             from temporian.core.operators.scalar import less_scalar
 
             return less_scalar(input=self, value=other)
 
-        self._raise_error("compare", other, "(int,float)")
+        self._raise_error("compare", other, "(int,float,str)")
         assert False
 
     def __le__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
@@ -1301,12 +1303,12 @@ class EventSetOperations:
 
             return less_equal(input_left=self, input_right=other)
 
-        if isinstance(other, T_SCALAR):
+        if isinstance(other, T_COMPARABLE_SCALAR):
             from temporian.core.operators.scalar import less_equal_scalar
 
             return less_equal_scalar(input=self, value=other)
 
-        self._raise_error("compare", other, "(int,float)")
+        self._raise_error("compare", other, "(int,float,str)")
         assert False
 
     def _raise_bool_error(self, boolean_op: str, other: Any) -> None:
@@ -2497,7 +2499,7 @@ class EventSetOperations:
 
             return equal(input_1=self, input_2=other)
 
-        if isinstance(other, T_SCALAR + (bool, str)):
+        if isinstance(other, T_EQUALITY_SCALAR):
             from temporian.core.operators.scalar import equal_scalar
 
             return equal_scalar(input=self, value=other)
