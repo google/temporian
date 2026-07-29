@@ -1073,12 +1073,12 @@ class EventSetOperations:
 
             return greater(input_left=self, input_right=other)
 
-        if isinstance(other, T_SCALAR):
+        if isinstance(other, T_SCALAR + (str, bytes)):
             from temporian.core.operators.scalar import greater_scalar
 
             return greater_scalar(input=self, value=other)
 
-        self._raise_error("compare", other, "(int,float)")
+        self._raise_error("compare", other, "(int,float,str,bytes)")
         assert False
 
     def __ge__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
@@ -1149,12 +1149,12 @@ class EventSetOperations:
 
             return greater_equal(input_left=self, input_right=other)
 
-        if isinstance(other, T_SCALAR):
+        if isinstance(other, T_SCALAR + (str, bytes)):
             from temporian.core.operators.scalar import greater_equal_scalar
 
             return greater_equal_scalar(input=self, value=other)
 
-        self._raise_error("compare", other, "(int,float)")
+        self._raise_error("compare", other, "(int,float,str,bytes)")
         assert False
 
     def __lt__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
@@ -1225,12 +1225,12 @@ class EventSetOperations:
 
             return less(input_left=self, input_right=other)
 
-        if isinstance(other, T_SCALAR):
+        if isinstance(other, T_SCALAR + (str, bytes)):
             from temporian.core.operators.scalar import less_scalar
 
             return less_scalar(input=self, value=other)
 
-        self._raise_error("compare", other, "(int,float)")
+        self._raise_error("compare", other, "(int,float,str,bytes)")
         assert False
 
     def __le__(self: EventSetOrNode, other: Any) -> EventSetOrNode:
@@ -1301,12 +1301,12 @@ class EventSetOperations:
 
             return less_equal(input_left=self, input_right=other)
 
-        if isinstance(other, T_SCALAR):
+        if isinstance(other, T_SCALAR + (str, bytes)):
             from temporian.core.operators.scalar import less_equal_scalar
 
             return less_equal_scalar(input=self, value=other)
 
-        self._raise_error("compare", other, "(int,float)")
+        self._raise_error("compare", other, "(int,float,str,bytes)")
         assert False
 
     def _raise_bool_error(self, boolean_op: str, other: Any) -> None:
