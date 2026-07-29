@@ -175,5 +175,50 @@ class RelationalScalarTest(absltest.TestCase):
         assertOperatorResult(self, self.evset != value, expected)
 
 
+    def test_less_scalar_str(self) -> None:
+        """Test < with a string scalar (regression for #369)."""
+        timestamps = [1, 2, 3, 4]
+        evset = event_set(timestamps=timestamps, features={"a": ["a", "b", "c", "d"]})
+        expected = event_set(
+            timestamps=timestamps,
+            features={"a": [True, True, False, False]},
+            same_sampling_as=evset,
+        )
+        assertOperatorResult(self, evset < "c", expected)
+
+    def test_greater_scalar_str(self) -> None:
+        """Test > with a string scalar (regression for #369)."""
+        timestamps = [1, 2, 3, 4]
+        evset = event_set(timestamps=timestamps, features={"a": ["a", "b", "c", "d"]})
+        expected = event_set(
+            timestamps=timestamps,
+            features={"a": [False, False, False, True]},
+            same_sampling_as=evset,
+        )
+        assertOperatorResult(self, evset > "c", expected)
+
+    def test_less_equal_scalar_str(self) -> None:
+        """Test <= with a string scalar (regression for #369)."""
+        timestamps = [1, 2, 3, 4]
+        evset = event_set(timestamps=timestamps, features={"a": ["a", "b", "c", "d"]})
+        expected = event_set(
+            timestamps=timestamps,
+            features={"a": [True, True, True, False]},
+            same_sampling_as=evset,
+        )
+        assertOperatorResult(self, evset <= "c", expected)
+
+    def test_greater_equal_scalar_str(self) -> None:
+        """Test >= with a string scalar (regression for #369)."""
+        timestamps = [1, 2, 3, 4]
+        evset = event_set(timestamps=timestamps, features={"a": ["a", "b", "c", "d"]})
+        expected = event_set(
+            timestamps=timestamps,
+            features={"a": [False, False, True, True]},
+            same_sampling_as=evset,
+        )
+        assertOperatorResult(self, evset >= "c", expected)
+
+
 if __name__ == "__main__":
     absltest.main()
