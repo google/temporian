@@ -38,6 +38,10 @@ absl-py = "^1.3.0"
 protobuf = ">=3.20.3"
 pandas = ">=1.5.2"
 matplotlib = "^3.7.1"
+# The numpy_cc extensions are built with pybind11 2.11, which predates numpy 2
+# support (pybind11 2.12). Under numpy >= 2 the bindings return wrong values
+# instead of failing, so the cap is a correctness constraint, not a preference.
+numpy = ">=1.21,<2"
 
 # Extras (keep versions in sync with dev deps)
 apache-beam = { version = "^2.48.0", optional = true }
