@@ -189,7 +189,7 @@ def display_html(evset: EventSet) -> str:
             if (
                 timestamp_idx == ((max_timestamps // 2) - 1)
                 and num_timestamps > max_timestamps
-            ) or (max_timestamps == 1):
+            ):
                 ellipsis_row = [ELLIPSIS] * (
                     1 + len(visible_feats) + int(has_hidden_feats)
                 )
