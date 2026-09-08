@@ -60,7 +60,10 @@ def normalize_timestamp(x: Timestamp) -> NormalizedTimestamp:
         return x.astype("datetime64[ns]").astype(np.float64) / 1e9
 
     if isinstance(x, datetime.datetime):
-        return float(x.replace(tzinfo=datetime.timezone.utc).timestamp())
+        epoch = datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc)
+        return float(
+            (x.replace(tzinfo=datetime.timezone.utc) - epoch).total_seconds()
+        )
 
     if isinstance(x, int):
         return float(x)
@@ -160,7 +163,10 @@ def convert_numpy_datetime64_to_duration(
 
 def convert_datetime_to_duration(date: datetime.datetime) -> NormalizedDuration:
     """Convert datetime to duration epoch UTC."""
-    return float(date.replace(tzinfo=datetime.timezone.utc).timestamp())
+    epoch = datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc)
+    return float(
+        (date.replace(tzinfo=datetime.timezone.utc) - epoch).total_seconds()
+    )
 
 
 def convert_datetime_date_to_duration(
