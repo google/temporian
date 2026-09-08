@@ -28,6 +28,17 @@ py_test(
     ],
 )
 
+py_test(
+    name = "test_duration_utils",
+    srcs = ["test_duration_utils.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/absl/testing:absltest
+        # already_there/absl/testing:parameterized
+        "//temporian/core/data:duration_utils",
+    ],
+)
+
 
 py_test(
     name = "schema_test",
