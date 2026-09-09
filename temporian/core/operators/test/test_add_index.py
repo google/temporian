@@ -178,6 +178,21 @@ class AddIndexTest(TestCase):
         self.assertEqual(result.data[(2, b"X")].timestamps.tolist(), [4, 5])
         self.assertEqual(result.data[(3, b"Z")].timestamps.tolist(), [6])
 
+    def test_add_index_preserves_event_count(self):
+        # Regression test for https://github.com/google/temporian/issues/437.
+        # add_index was returning 0 events per partition when run under numpy
+        # >= 2 due to a pybind11/numpy-2 incompatibility in the C++ kernel.
+        evset = event_set(
+            [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+            features={"customer": ["A", "A", "B", "B", "B", "C"]},
+        )
+        result = evset.add_index("customer")
+        total = sum(len(d.timestamps) for d in result.data.values())
+        self.assertEqual(total, 6)
+        self.assertEqual(len(result.data[(b"A",)].timestamps), 2)
+        self.assertEqual(len(result.data[(b"B",)].timestamps), 3)
+        self.assertEqual(len(result.data[(b"C",)].timestamps), 1)
+
     def test_target_doesnt_exist(self):
         with self.assertRaisesRegex(ValueError, "is not a feature in input"):
             self.evset.add_index("e")
