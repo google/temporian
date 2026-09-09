@@ -1,11 +1,51 @@
 from collections import defaultdict
-from typing import Dict
+from typing import Dict, List, Tuple
+
+import numpy as np
 
 from temporian.core.operators.add_index import AddIndexOperator
 from temporian.implementation.numpy import implementation_lib
 from temporian.implementation.numpy.data.event_set import EventSet, IndexData
 from temporian.implementation.numpy.operators.base import OperatorImplementation
-from temporian.implementation.numpy_cc.operators import operators_cc
+
+
+def _compute_groups(
+    index_features: List[np.ndarray],
+) -> Tuple[list, np.ndarray, np.ndarray]:
+    """Groups row indices by the combined values of index_features.
+
+    Returns:
+        group_keys: list of tuples, one per unique group.
+        row_idxs: flat int64 array of row indices ordered by group.
+        group_begin_idx: int64 array of length len(group_keys)+1 with the
+            start offset of each group in row_idxs.
+    """
+    if len(index_features) == 0 or index_features[0].shape[0] == 0:
+        return [], np.array([], dtype=np.int64), np.array([0], dtype=np.int64)
+
+    num_rows = index_features[0].shape[0]
+
+    # Build a dict mapping group_key -> list of row indices.
+    groups: dict = defaultdict(list)
+    for row_idx in range(num_rows):
+        key = tuple(
+            int(f[row_idx]) if f.dtype.kind in ("i", "u")
+            else bytes(f[row_idx])
+            for f in index_features
+        )
+        groups[key].append(row_idx)
+
+    group_keys = []
+    all_row_idxs = []
+    begin_offsets = [0]
+    for key, rows in groups.items():
+        group_keys.append(key)
+        all_row_idxs.extend(rows)
+        begin_offsets.append(len(all_row_idxs))
+
+    row_idxs = np.array(all_row_idxs, dtype=np.int64)
+    group_begin_idx = np.array(begin_offsets, dtype=np.int64)
+    return group_keys, row_idxs, group_begin_idx
 
 
 class AddIndexNumpyImplementation(OperatorImplementation):
@@ -34,11 +74,9 @@ class AddIndexNumpyImplementation(OperatorImplementation):
         dst_data = {}
         for src_index, src_data in input.data.items():
             index_features = [src_data.features[i] for i in new_index_idxs]
-            (
-                group_keys,
-                row_idxs,
-                group_begin_idx,
-            ) = operators_cc.add_index_compute_index(index_features)
+            group_keys, row_idxs, group_begin_idx = _compute_groups(
+                index_features
+            )
 
             for group_idx, group_key in enumerate(group_keys):
                 dst_index = src_index + group_key
