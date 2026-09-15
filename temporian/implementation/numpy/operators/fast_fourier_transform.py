@@ -72,7 +72,15 @@ class FastFourierTransformNumpyImplementation(OperatorImplementation):
                 fft_res = np.fft.fft(selected_src_values)[:num_spectral_lines]
                 ft_ampl = np.abs(fft_res).astype(src_values.dtype)
                 dst_values.append(ft_ampl)
-            dst_values = np.stack(dst_values, axis=1)
+            if dst_values:
+                dst_values = np.stack(dst_values, axis=1)
+            else:
+                # An index holding fewer than num_events events yields no
+                # windows. dst_timestamps is already empty here, so stack an
+                # empty feature per spectral line to keep the two aligned.
+                dst_values = np.zeros(
+                    (num_spectral_lines, 0), dtype=src_values.dtype
+                )
 
             output_evset.set_index_value(
                 index_key,

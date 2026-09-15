@@ -75,6 +75,31 @@ class FastFourierTransformTest(TestCase):
             num_events=4, window="hamming", num_spectral_lines=2
         )
 
+    def test_fewer_events_than_window(self):
+        # No window fits, so the result is empty rather than an error.
+        evset = event_set([0, 1, 2], features={"a": f32([0, 1, 2])})
+        result = evset.experimental_fast_fourier_transform(num_events=4)
+        expected_output = event_set(
+            timestamps=[], features={"a0": f32([]), "a1": f32([])}
+        )
+        assertOperatorResult(
+            self, result, expected_output, check_sampling=False
+        )
+
+    def test_index_shorter_than_window(self):
+        # One short index must not fail the indexes that do have enough events.
+        evset = event_set(
+            timestamps=[0, 1, 2, 3, 0, 1, 2],
+            features={
+                "a": f32([0, 1, 5, -1, 0, 1, 5]),
+                "g": ["a"] * 4 + ["b"] * 3,
+            },
+            indexes=["g"],
+        )
+        result = evset.experimental_fast_fourier_transform(num_events=4)
+        self.assertEqual(len(result.get_index_value(("b",)).timestamps), 0)
+        self.assertEqual(len(result.get_index_value(("a",)).timestamps), 1)
+
     def test_wrong_dtype(self):
         evset = event_set([], {"a": i32([])})
         with self.assertRaisesRegex(ValueError, "should be tp.float32"):
