@@ -473,3 +473,19 @@ py_library(
         "//temporian/implementation/numpy/data:event_set",
     ],
 )
+
+py_library(
+    name = "unique",
+    srcs = ["unique.py"],
+    srcs_version = "PY3",
+    deps = [
+        # already_there/numpy
+        ":base",
+        "//temporian/core/data:duration_utils",
+        "//temporian/core/operators:unique",
+        "//temporian/implementation/numpy:implementation_lib",
+        "//temporian/implementation/numpy/data:event_set",
+    ],
+)
+
+    
