@@ -485,3 +485,14 @@ py_test(
     ],
 )
     
+py_test(
+    name = "test_unique",
+    srcs = ["test_unique.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//temporian/implementation/numpy/data:io",
+        # "//temporian/core/data:duration",
+        "//temporian/test:utils",
+    ],
+)
+    
